@@ -1,0 +1,21 @@
+dag:
+  name: enrich_employee
+  schedule_start_date: 2024, 9, 11
+  owner: Data People
+  documentation:
+    dag_purpose: Enrich HR System data - This dag was created to solve the problem of inner dependencies between enrich_hr_system and enrich_hr_system_custom. Therefore, it serves as a complement to these dags.
+cluster:
+  type: databricks_13_3_min_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: full
+  has_hive_sync: false
+  custom_schema: hr_system
+  bucket_config_name: people_bucket
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"

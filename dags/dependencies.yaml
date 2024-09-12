@@ -1780,6 +1780,9 @@ bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.hubspot:load-clean-company
 bietlejuice.enrich_emlio:
   - bietlejuice.emlio:load-clean-emlio-logs
+bietlejuice.enrich_employee:
+  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
+  - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy
 bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.batch_inference:load-clean-batch-inference
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues

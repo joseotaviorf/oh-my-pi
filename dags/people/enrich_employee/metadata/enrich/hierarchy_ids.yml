@@ -1,0 +1,53 @@
+---
+database_name: datalake_hr_system
+table_name: hierarchy_ids
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "Contains the hierarchy key of employees by sk_assignment."
+columns:
+  sk_assignment:
+    description: "Unique identifier for the period of service related to the assignment."
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_period_of_service
+  sk_hierarchy:
+    description: "Employee hierarchy identification key. It is formed in this table from the IDs of leadership levels 0 to 9."
+  sk_assignment_leadership_order_0:
+    description: "ID assignment of the highest manager in the hierarchy. Usually equal to the CEO id."
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_manager_assignment
+  sk_assignment_leadership_order_1:
+    description: "ID assignment of the second highest manager in the hierarchy."
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_manager_assignment
+  sk_assignment_leadership_order_2:
+    description: "ID assignment of the third highest manager in the hierarchy."
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_manager_assignment
+  sk_assignment_leadership_order_3:
+    description: "ID assignment of the fourth highest manager in the hierarchy."
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_manager_assignment
+  sk_assignment_leadership_order_4:
+    description: "ID assignment of the fifth highest manager in the hierarchy."
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_manager_assignment
+  sk_assignment_leadership_order_5:
+    description: "ID assignment of the sixth highest manager in the hierarchy."
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_manager_assignment
+  sk_assignment_leadership_order_6:
+    description: "ID assignment of the seventh highest manager in the hierarchy."
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_manager_assignment
+  sk_assignment_leadership_order_7:
+    description: "ID assignment of the eighth highest manager in the hierarchy."
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_manager_assignment
+  sk_assignment_leadership_order_8:
+    description: "ID assignment of the ninth highest manager in the hierarchy."
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_manager_assignment
+  sk_assignment_leadership_order_9:
+    description: "ID assignment of the tenth highest manager in the hierarchy."
+    lineage:
+      - datalake_hr_system.management_hierarchy.id_manager_assignment
