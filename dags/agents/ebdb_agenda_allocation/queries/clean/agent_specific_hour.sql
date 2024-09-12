@@ -1,0 +1,22 @@
+select
+    id,
+    agente_id as id_agent,
+    data as dt_agent_specific_hour,
+    disponivel08as09 as is_available_between_08_and_09,
+    disponivel09as10 as is_available_between_09_and_10,
+    disponivel10as11 as is_available_between_10_and_11,
+    disponivel11as12 as is_available_between_11_and_12,
+    disponivel12as13 as is_available_between_12_and_13,
+    disponivel13as14 as is_available_between_13_and_14,
+    disponivel14as15 as is_available_between_14_and_15,
+    disponivel15as16 as is_available_between_15_and_16,
+    disponivel16as17 as is_available_between_16_and_17,
+    disponivel17as18 as is_available_between_17_and_18,
+    disponivel18as19 as is_available_between_18_and_19,
+    disponivel19as20 as is_available_between_19_and_20,
+    isFolga as is_supposed_to_be_off_work,
+    folga as is_off_work,
+    atualizadoEm as ts_updated,
+    criadoEm as ts_created
+from
+    datalake_ebdb_test_raw.horarioespecificoagente

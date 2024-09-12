@@ -1,0 +1,24 @@
+dag:
+  name: ebdb_agenda_allocation
+  schedule_interval: 20 21 * * *
+  owner: Data Agents
+  documentation:
+    dag_purpose: Extraction of EBDB tables related to agent agenda allocation into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_schema: ebdb
+  source_database: ebdb
+  custom_schema: ebdb_test
+  tables_customization:
+    HorarioEspecificoAgente:
+      clean_table_name: agent_specific_hour
+    HorarioEspecificoAgente_AUD:
+      clean_table_name: agent_specific_hour_aud
+    HorarioSemanalAgente_AUD:
+      clean_table_name: agent_weekly_hours_aud
+    HorarioSemanalMascara:
+      clean_table_name: mask_weekly_hour
+cluster:
+  type: databricks_12_2_min_general_cluster

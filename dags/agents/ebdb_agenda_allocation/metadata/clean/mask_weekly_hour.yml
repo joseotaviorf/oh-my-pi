@@ -1,0 +1,54 @@
+database_name: datalake_ebdb_test_clean
+table_name: mask_weekly_hour
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.id
+  id_work_contract:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.workcontract_id
+  day_of_week:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.diadasemana
+  has_hours_between_08_and_09_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel08as09
+  has_hours_between_09_and_10_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel09as10
+  has_hours_between_10_and_11_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel10as11
+  has_hours_between_11_and_12_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel11as12
+  has_hours_between_12_and_13_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel12as13
+  has_hours_between_13_and_14_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel13as14
+  has_hours_between_14_and_15_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel14as15
+  has_hours_between_15_and_16_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel15as16
+  has_hours_between_16_and_17_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel16as17
+  has_hours_between_17_and_18_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel17as18
+  has_hours_between_18_and_19_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel18as19
+  has_hours_between_19_and_20_available:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.horarios_disponivel19as20
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_raw.horariosemanalmascara.atualizadoem
