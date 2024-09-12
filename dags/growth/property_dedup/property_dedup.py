@@ -21,7 +21,7 @@ SOURCE = "property_dedup"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2023, 7, 10, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 10 * * *"
-CLUSTER_DESCRIPTION = "databricks_12_2_med_io-general_cluster"
+CLUSTER_DESCRIPTION = "databricks_13_3_med_memory_2_workers_cluster"
 
 config_service = ConfigurationService(SOURCE)
 

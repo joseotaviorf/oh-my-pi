@@ -21,7 +21,7 @@ SOURCE = "rene_descartes"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2020, 7, 27, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
-CLUSTER_DESCRIPTION = "databricks_12_2_max_io-general_cluster"
+CLUSTER_DESCRIPTION = "databricks_13_3_med_memory_cluster"
 
 config_service = ConfigurationService(SOURCE)
 

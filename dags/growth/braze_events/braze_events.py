@@ -21,7 +21,7 @@ SOURCE = "braze_events"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2020, 11, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "30 0 * * *"
-CLUSTER_DESCRIPTION = "databricks_12_2_med_io-general_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_med_mem_driver_high_mem_nodes"
 
 config_service = ConfigurationService(SOURCE)
 athena_query_results_bucket = config_service.get_config("athena_query_results_bucket")
