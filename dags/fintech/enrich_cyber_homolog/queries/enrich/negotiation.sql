@@ -1,27 +1,27 @@
 WITH discounts AS (
   SELECT
     id_agreement,
-    SUM(IF(field_name = "Valor dos Juros para Acordo (Visão Contrato)", amount_without_discount, 0)) AS total_fees_amount,
-    SUM(IF(field_name = "Valor da Multa para Acordo (Visão Contrato)", amount_without_discount, 0)) AS total_fine_amount,
-    SUM(IF(field_name = "Valor principal das parcelas vencidas selecionadas", amount_without_discount, 0)) AS total_original_amount,
-    SUM(IF(field_name = "Valor principal das parcelas vencidas selecionadas", discount, 0)) AS discount_to_original_amount,
-    SUM(IF(field_name = "Valor da Multa para Acordo (Visão Contrato)", discount, 0)) AS discount_to_fine_amount,
-    SUM(IF(field_name = "Valor dos Juros para Acordo (Visão Contrato)", discount, 0)) AS discount_to_fees_amount,
-    SUM(amount_without_discount) AS total_debt_amount,
-    SUM(amount_with_discount) AS total_negotiated_amount,
-    SUM(discount) AS total_discount_amount
+    SUM(IF(field_name IN ("Juros Residuais", "Juros Parcelas"), amount_without_discount, 0)) AS fees_amount,
+    SUM(IF(field_name IN ("Multa Residual", "Multa Acordo"), amount_without_discount, 0)) AS fine_amount,
+    SUM(IF(field_name IN ("Parcelas Vencidas", "Parcelas a Vencer") , amount_without_discount, 0)) AS original_amount,
+    SUM(IF(field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), discount, 0)) AS discount_to_original_amount,
+    SUM(IF(field_name IN ("Juros Residuais", "Juros Parcelas"), discount, 0)) AS discount_to_fees_amount,
+    SUM(IF(field_name IN ("Multa Residual", "Multa Acordo"), discount, 0)) AS discount_to_fine_amount,
+    SUM(amount_without_discount) AS debt_amount,
+    SUM(amount_with_discount) AS negotiated_amount,
+    SUM(discount) AS discount_amount
   FROM datalake_cyber_clean.agreement_discounts
   GROUP BY 1
 ),
 installments AS (
   SELECT
     ai.id_agreement,
-    SUM(amount_to_pay) AS total_negotiated_amount,
-    SUM(tax_amount) AS total_credit_card_fee_amount,
+    SUM(amount_to_pay) AS negotiated_amount,
+    SUM(tax_amount) AS credit_card_fee_amount,
     MIN(IF(ai.installment_number = 0, DATE(ai.ts_due_installment), NULL)) AS dt_due_promisse,
     SUM(IF(ai.installment_number = 0, p.payment_amount, 0)) AS down_payment_amount,
     MAX(IF(ai.installment_number = 0, DATE(p.ts_payment), NULL)) AS dt_down_payment,
-    MAX(ai.installment_number) + 1 AS total_paid_installments,
+    MAX(ai.installment_number) + 1 AS paid_installments,
     MAX(IF(ai.installment_number = 0, p.payment_method, NULL)) AS promisse_payment_method
   FROM datalake_cyber_clean.agreement_installments AS ai
   INNER JOIN datalake_cyber_clean.payments AS p
@@ -36,7 +36,7 @@ SELECT
     a.id_user AS id_operator,
     ag.agency_name AS advisory,
     cp.offer_number AS id_campaign,
-    a.contract_group AS creditor,
+    ca.contract_group AS creditor,
     a.agreement_type AS agreement_type,
     at.agreement_type_description,
     i.promisse_payment_method,
@@ -52,21 +52,23 @@ SELECT
     CASE
         WHEN a.status = "Autorizado" THEN "offset"
         WHEN a.status = "Finalizado" THEN "finished"
-        WHEN a.status = "Cancelado" THEN "canceled"
+        WHEN a.status = "Cancelado" AND i.dt_down_payment IS NOT NULL THEN "broken"
+        WHEN a.status = "Cancelado" AND i.dt_down_payment IS NULL THEN "canceled"
         WHEN a.status = "Pendente" THEN "started"
         ELSE a.status
     END AS negotiation_status,
+    IF(i.dt_down_payment IS NOT NULL, TRUE, FALSE) AS is_down_payment_paid,
     a.number_of_installments + 1 AS number_of_installments,
-    i.total_paid_installments AS paid_installments,
+    i.paid_installments AS paid_installments,
     a.broken_payments AS breached_installments,
-    d.total_original_amount,
-    i.total_credit_card_fee_amount,
-    d.total_fine_amount,
-    d.total_fees_amount,
-    d.total_debt_amount AS total_debt_amount_without_credit_card_fee,
-    d.total_debt_amount + i.total_credit_card_fee_amount AS total_debt_amount_with_credit_card_fee,
-    i.total_negotiated_amount,
-    d.total_discount_amount,
+    d.original_amount,
+    i.credit_card_fee_amount,
+    d.fine_amount,
+    d.fees_amount,
+    d.debt_amount AS debt_amount_without_credit_card_fee,
+    d.debt_amount + i.credit_card_fee_amount AS debt_amount_with_credit_card_fee,
+    i.negotiated_amount,
+    d.discount_amount,
     d.discount_to_original_amount,
     d.discount_to_fine_amount,
     d.discount_to_fees_amount,

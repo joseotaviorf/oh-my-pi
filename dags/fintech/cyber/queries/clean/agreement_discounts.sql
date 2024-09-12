@@ -2,18 +2,18 @@ SELECT
     ADID AS id_agreement,
     ACFIELD AS field,
     CASE
-        WHEN UPPER(ADFIELD) = "U1VLRPRCAG" THEN "Valor principal das parcelas vencidas selecionadas"
-        WHEN UPPER(ADFIELD) = "U1VLRPRCAVAG" THEN "Valor principal das parcelas a vencer selecionadas"
-        WHEN UPPER(ADFIELD) = "U1VLRPRMUAGR" THEN "Valor de multa das parcelas selecionadas"
-        WHEN UPPER(ADFIELD) = "U1VLRPRJUAG" THEN "Valor de juros das parcelas selecionadas"
-        WHEN UPPER(ADFIELD) = "U1VLRMUREAG" THEN "Valor de multa residual das parcelas selecionadas"
-        WHEN UPPER(ADFIELD) = "U1VLRMUAG" THEN "Valor da Multa para Acordo (Visão Contrato)"
-        WHEN UPPER(ADFIELD) = "U1VLRJUREAG" THEN "Valor de juros residuais das parcelas selecionadas"
-        WHEN UPPER(ADFIELD) = "U1VLRJUAG" THEN "Valor dos Juros para Acordo (Visão Contrato)"
-        WHEN UPPER(ADFIELD) = "U1VLCUSREAG" THEN "Valor das Custas Residuais das parcelas selecionadas"
-        WHEN UPPER(ADFIELD) = "U1VLCUSTASAG" THEN "Valor das Custas (Visão Contrato)"
-        WHEN UPPER(ADFIELD) = "U1VLRHOREAG" THEN "Valor dos Honorários Residuais das parcelas selecionadas"
-        WHEN UPPER(ADFIELD) = "U1VLRDESPJUD" THEN "Valor das despesas judiciais"
+        WHEN UPPER(ADFIELD) = "U1VLRPRCAG" THEN "Parcelas Vencidas"
+        WHEN UPPER(ADFIELD) = "U1VLRPRCAVAG" THEN "Parcelas a Vencer"
+        WHEN UPPER(ADFIELD) = "U1VLRPRMUAGR" THEN "Multa Parcelas"
+        WHEN UPPER(ADFIELD) = "U1VLRMUREAG" THEN "Multa Residuais"
+        WHEN UPPER(ADFIELD) = "U1VLRMUAG" THEN "Multa Acordo"
+        WHEN UPPER(ADFIELD) = "U1VLRPRJUAG" THEN "Juros Parcelas"
+        WHEN UPPER(ADFIELD) = "U1VLRJUREAG" THEN "Juros Residuais"
+        WHEN UPPER(ADFIELD) = "U1VLRJUAG" THEN "Juros Acordo"
+        WHEN UPPER(ADFIELD) = "U1VLCUSREAG" THEN "Custas Residuais"
+        WHEN UPPER(ADFIELD) = "U1VLCUSTASAG" THEN "Custas Acordo"
+        WHEN UPPER(ADFIELD) = "U1VLRHOREAG" THEN "Honorários Residuais"
+        WHEN UPPER(ADFIELD) = "U1VLRDESPJUD" THEN "Despesas judiciais"
         ELSE ADFIELD
     END AS field_name,
     ADOP AS arithmetic_operator,

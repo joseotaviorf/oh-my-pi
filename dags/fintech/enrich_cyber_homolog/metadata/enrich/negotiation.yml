@@ -9,14 +9,18 @@ columns:
     description: ''
     lineage:
     - datalake_cyber_clean.agreements.a.id_agreement
+  id_contract:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.id_contract
+  id_contract_external:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.id_contract_external
   id_customer:
     description: ''
     lineage:
     - datalake_cyber_clean.agreements.c.id_client
-  id_contract:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.agreements.c.id_contract_external
   id_operator:
     description: ''
     lineage:
@@ -32,75 +36,121 @@ columns:
   creditor:
     description: ''
     lineage:
-    - datalake_cyber_clean.agreements.a.contract_group
+    - datalake_cyber_clean.agreements.ca.contract_group
   agreement_type:
     description: ''
     lineage:
     - datalake_cyber_clean.agreements.a.agreement_type
+  agreement_type_description:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.agreement_type_description
+  promisse_payment_method:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.promisse_payment_method
+  min_down_payment_percentage:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.min_down_payment_percentage
   origin_agreement:
     description: ''
     lineage:
-    - datalake_cyber_clean.agreements.CASE WHEN u.user_type = "Externo" THEN "Assessoria"
-      WHEN NOT id_campaign IS NULL THEN "Carta Campanha" END
-  is_recurrent_debtor:
+    - "datalake_cyber_clean.agreements.CASE WHEN ag.agency_type IN (\"Assessoria Convencional\"\
+      , \"Assessoria Digital\") THEN \"Assessoria\" WHEN ag.agency_type = \"Portal\"\
+      \ THEN \"Portal Auto Negocia\xE7\xE3o\" WHEN NOT cp.id_campaign IS NULL THEN\
+      \ \"Carta Campanha\" WHEN ag.agency_type = \"Cyber Credit\" THEN \"Operador\
+      \ Interno\" ELSE ag.agency_type END"
+  original_negotiation_status:
     description: ''
     lineage:
-    - datalake_cyber_clean.agreements.NULL
+    - datalake_cyber_clean.agreements.a.status
   negotiation_status:
     description: ''
     lineage:
     - datalake_cyber_clean.agreements.CASE WHEN a.status = "Autorizado" THEN "offset"
-      WHEN a.status = "Finalizado" THEN "finished" WHEN a.status = "Cancelado" THEN
-      "canceled" ELSE a.status END
+      WHEN a.status = "Finalizado" THEN "finished" WHEN a.status = "Cancelado" AND
+      NOT i.dt_down_payment IS NULL THEN "broken" WHEN a.status = "Cancelado" AND
+      i.dt_down_payment IS NULL THEN "canceled" WHEN a.status = "Pendente" THEN "started"
+      ELSE a.status END
+  is_down_payment_paid:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.CASE WHEN NOT i.dt_down_payment IS NULL THEN
+      TRUE ELSE FALSE END
   number_of_installments:
     description: ''
     lineage:
-    - datalake_cyber_clean.agreements.number_of_installments
+    - datalake_cyber_clean.agreements.a.number_of_installments + 1
   paid_installments:
     description: ''
     lineage:
-    - datalake_cyber_clean.agreements.NULL
+    - datalake_cyber_clean.agreements.i.paid_installments
   breached_installments:
     description: ''
     lineage:
     - datalake_cyber_clean.agreements.a.broken_payments
-  original_debt_amount:
+  original_amount:
     description: ''
     lineage:
-    - datalake_cyber_clean.agreements.a.total_negotiated_amount_without_fees
-  fine_fee_amount:
+    - datalake_cyber_clean.agreements.original_amount
+  credit_card_fee_amount:
     description: ''
     lineage:
-    - datalake_cyber_clean.agreements.a.fees_amount
+    - datalake_cyber_clean.agreements.credit_card_fee_amount
+  fine_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.fine_amount
+  fees_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.fees_amount
+  debt_amount_without_credit_card_fee:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.d.debt_amount
+  debt_amount_with_credit_card_fee:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.d.debt_amount + i.credit_card_fee_amount
+  negotiated_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.negotiated_amount
+  discount_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.discount_amount
+  discount_to_original_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.discount_to_original_amount
+  discount_to_fine_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.discount_to_fine_amount
+  discount_to_fees_amount:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.discount_to_fees_amount
   percentage_paid_agreement:
     description: ''
     lineage:
     - datalake_cyber_clean.agreements.percentage_paid_agreement
-  additional_interest_rate:
+  down_payment_amount:
     description: ''
     lineage:
-    - datalake_cyber_clean.agreements.additional_interest_rate
-  interest_fee_amount:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.agreements.a.interest_rate * a.total_negotiated_amount_without_fees
-  credit_card_fee_amount:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.agreements.a.additional_interest_rate * a.total_negotiated_amount_without_fees
-  total_debt_amount:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.agreements.a.total_negotiated_amount_with_fees
-  total_discount_amount:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.agreements.ad.amount_without_discount - ad.amount_with_discount
-  negotiated_amount:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.agreements.ad.amount_with_discount
+    - datalake_cyber_clean.agreements.down_payment_amount
   dt_promisse:
     description: ''
     lineage:
     - datalake_cyber_clean.agreements.a.ts_agreement_creation
+  dt_due_promisse:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.dt_due_promisse
+  dt_down_payment:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.agreements.dt_down_payment

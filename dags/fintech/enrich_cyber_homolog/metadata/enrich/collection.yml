@@ -8,7 +8,11 @@ columns:
   id_contract:
     description: ''
     lineage:
-    - datalake_cyber_clean.logs.c.id_contract_external
+    - datalake_cyber_clean.logs.id_contract
+  id_contract_external:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.id_contract_external
   id_customer:
     description: ''
     lineage:
@@ -21,10 +25,18 @@ columns:
     description: ''
     lineage:
     - datalake_cyber_clean.logs.l.contract_group
-  company:
+  operator_email:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.u.user_email
+  operator_type:
     description: ''
     lineage:
     - datalake_cyber_clean.logs.u.user_type
+  operator_agency:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.ag.agency_name
   action:
     description: ''
     lineage:
@@ -32,7 +44,7 @@ columns:
   action_description:
     description: ''
     lineage:
-    - datalake_cyber_clean.logs.a.code_description
+    - datalake_cyber_clean.logs.cda.code_description
   result:
     description: ''
     lineage:
@@ -40,7 +52,7 @@ columns:
   result_description:
     description: ''
     lineage:
-    - datalake_cyber_clean.logs.aa.code_description
+    - datalake_cyber_clean.logs.cdr.code_description
   complement:
     description: ''
     lineage:
@@ -48,36 +60,16 @@ columns:
   complement_description:
     description: ''
     lineage:
-    - datalake_cyber_clean.logs.aa.code_description
+    - datalake_cyber_clean.logs.cdc.code_description
   occurrence_description:
     description: ''
     lineage:
     - datalake_cyber_clean.logs.l.comment
-  esforco:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.logs.NULL
-  alo:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.logs.NULL
-  cpc:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.logs.NULL
-  promisse:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.logs.NULL
-  agreement:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.logs.NULL
-  failure:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.logs.NULL
   ts_occurrence:
     description: ''
     lineage:
     - datalake_cyber_clean.logs.l.ts_activity
+  ts_load:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.logs.NOW()

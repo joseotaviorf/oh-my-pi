@@ -12,7 +12,11 @@ columns:
   id_contract:
     description: ''
     lineage:
-    - datalake_cyber_clean.historical_agreements.c.id_contract_external
+    - datalake_cyber_clean.historical_agreements.id_contract
+  id_contract_external:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.id_contract_external
   id_invoice:
     description: ''
     lineage:
@@ -49,3 +53,7 @@ columns:
     description: ''
     lineage:
     - datalake_cyber_clean.historical_agreements.b.ts_due
+  ts_load:
+    description: ''
+    lineage:
+    - datalake_cyber_clean.historical_agreements.NOW()

@@ -19,7 +19,7 @@ SELECT
     APAMTPAY AS payment_amount,
     APINTAMT AS interest_amount,
     APHONO AS fees_amount,
-    APINTTAXAMT AS tax_amount,
+    APINTTAXAMT AS credit_card_fee_amount,
     APAMZAMT AS amortization_amount,
     APBLNC AS final_balance,
     APINDATE AS ts_start_payment_term,

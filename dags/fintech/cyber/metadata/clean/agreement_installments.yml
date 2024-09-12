@@ -58,7 +58,7 @@ columns:
     description: "Final balance"
     lineage:
       - datalake_cyber_raw.agpmtdet.APBLNC
-  tax_amount:
+  credit_card_fee_amount:
     description: "Tax amount"
     lineage:
       - datalake_cyber_raw.agpmtdet.APINTTAXAMT
