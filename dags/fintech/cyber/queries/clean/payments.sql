@@ -1,7 +1,7 @@
 SELECT
     PMID AS id_payment,
     PMACCT AS id_contract,
-    INT(PMTDDESC) AS id_agreement,
+    INT(PMTDDESC) AS id_agreement_installment,
     PMSSNUM AS id_client,
     CASE
         WHEN PMACCTG = "1" THEN "QuintoAndar"

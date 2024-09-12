@@ -3,7 +3,13 @@ SELECT
     AGFIRM AS agency_name,
     AGNICKNAME AS agency_commercial_name,
     AGIRSNUM AS cnpj,
-    AGAGCYCD AS agency_type,
+    CASE
+        WHEN AGAGCYCD = "CC" THEN "Cyber Credit"
+        WHEN AGAGCYCD = "AC" THEN "Assessoria Convencional"
+        WHEN AGAGCYCD = "AD" THEN "Assessoria Digital"
+        WHEN AGAGCYCD = "PO" THEN "Portal"
+        ELSE AGAGCYCD
+    END AS agency_type,
     AGSUPER AS super_agency,
     IF(AGSTATUS = "A", TRUE, FALSE) AS is_active_agency,
     CASE

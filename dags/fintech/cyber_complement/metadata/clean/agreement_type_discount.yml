@@ -1,0 +1,51 @@
+---
+database_name: datalake_cyber_complement_clean
+table_name: agreement_type_discount
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Table with information on the fields used to compose the value that will be negotiated with the customer and the % discount that can be applied in each field.
+columns:
+  agreement_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agtpdsc.ACTYPE
+  original_field_name:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agtpdsc.ACFIELD
+  label:
+    description: "Description of the CyberFinancial Field parameterized in the type of agreement."
+    lineage:
+      - datalake_cyber_raw.agtpdsc.ACLABEL
+  arithmetic_operator:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agtpdsc.ACOP
+  accounting_order:
+    description: "Accounting Order"
+    lineage:
+      - datalake_cyber_raw.agtpdsc.ACLOADPOS
+  max_discount_level_1:
+    description: "Maximum discount - level 1"
+    lineage:
+      - datalake_cyber_raw.agtpdsc.ACMAXDISC1
+  max_discount_level_2:
+    description: "Maximum discount - level 2 - Not used by the consultancy."
+    lineage:
+      - datalake_cyber_raw.agtpdsc.ACMAXDISC2
+  max_discount_level_3:
+    description: "Maximum discount - level 3 - Not used by the consultancy."
+    lineage:
+      - datalake_cyber_raw.agtpdsc.ACMAXDISC3
+  max_discount_level_4:
+    description: "Maximum discount - level 4 - Not used by the consultancy."
+    lineage:
+      - datalake_cyber_raw.agtpdsc.ACMAXDISC4
+  max_discount_level_5:
+    description: "Maximum discount - level 5 - Not used by the consultancy."
+    lineage:
+      - datalake_cyber_raw.agtpdsc.ACMAXDISC5
+  max_discount_level_6:
+    description: "Maximum discount - level 6 - Not used by the consultancy."
+    lineage:
+      - datalake_cyber_raw.agtpdsc.ACMAXDISC6

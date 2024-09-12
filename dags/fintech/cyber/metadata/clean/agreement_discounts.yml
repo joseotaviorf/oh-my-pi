@@ -30,7 +30,12 @@ columns:
     lineage:
       - datalake_cyber_raw.agdscdet.ADDISCVL
   discount:
-    description: "Discount Applied"
+    description: "Discount Amount"
+    lineage:
+      - datalake_cyber_raw.agdscdet.ADORVL
+      - datalake_cyber_raw.agdscdet.ADDISCVL
+  discount_percentage_rounded:
+    description: "Discount Percentage Rounded (integer)"
     lineage:
       - datalake_cyber_raw.agdscdet.ADDISC
   discount_percentage:

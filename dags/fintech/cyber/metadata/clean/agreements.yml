@@ -9,8 +9,8 @@ columns:
     description: "Agreement identifier. Table PK (Primary Key)"
     lineage:
       - datalake_cyber_raw.agrhdr.AHID
-  id_contract:
-    description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
+  id_client:
+    description: "ID Client (CPF). To get the ID Contract, please use table `contracts_agreements`"
     lineage:
       - datalake_cyber_raw.agrhdr.AHACCT
   id_user:

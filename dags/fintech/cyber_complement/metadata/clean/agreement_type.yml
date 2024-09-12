@@ -1,0 +1,131 @@
+---
+database_name: datalake_cyber_complement_clean
+table_name: agreement_type
+owner: null
+domain: fintech
+description: null
+columns:
+  id_agreement_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGTYPE
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGACCTG
+  agreement_type_description:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGNAME
+  payments_to_be_forgiven:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGCNDPAYN
+  fullfilled_payments_to_forgive:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGCNDPAYM
+  min_delay_days:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGDMDAYSMIN
+  max_delay_days:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGDMDAYSMAX
+  order_classification:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGSORTORD
+  missed_payments_to_break_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGBREAK
+  consecutive_payments_received:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGCSINITNT
+  notify_central_system_periodically:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGCSPERNT
+  payment_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGPYTYPE
+  days_from_date_inicial_payment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGINITPYDAYS
+  min_down_payment_percentage:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGINITPYMINP
+  max_percentage_initial_payment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGINITPYMAXP
+  days_until_last_payment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGLSTPYDAYS
+  agreement_interest_rate:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGRATE
+  fine_rate:
+    description: "Fine Rate in case of delay in payment of the Agreement installment"
+    lineage:
+      - datalake_cyber_raw.agrtype.AGRATE2
+  free_days:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGGRDAYS
+  max_installments:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGMAXPMTS
+  valid_frequencies:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGFREQ
+  ts_start_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGINITDT
+  ts_end_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGENDDT
+  min_payment_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGMININITPY
+  fees:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGTAXRATE
+  valid_period:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGVALPER
+  flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGSELFCURE
+  AGSTATUS:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGSTATUS
+  AGMINPAR:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGMINPAR
+  agreement_channel:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGCANALNEG
+  agreement_type:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agrtype.AGFORMAPAG

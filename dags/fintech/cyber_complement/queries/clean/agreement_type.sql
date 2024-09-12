@@ -17,11 +17,11 @@ SELECT
   AGCSPERNT AS notify_central_system_periodically,
   AGPYTYPE AS payment_type,
   AGINITPYDAYS AS days_from_date_inicial_payment,
-  AGINITPYMINP AS min_initial_payment,
+  AGINITPYMINP AS min_down_payment_percentage,
   AGINITPYMAXP AS max_percentage_initial_payment,
   AGLSTPYDAYS AS days_until_last_payment,
   AGRATE AS agreement_interest_rate,
-  AGRATE2 AS additional_interest_rate,
+  AGRATE2 AS fine_rate,
   AGGRDAYS As free_days,
   AGMAXPMTS AS max_installments, --Número máximo de parcelas permitidas.
   AGFREQ AS valid_frequencies,

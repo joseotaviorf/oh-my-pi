@@ -1,6 +1,6 @@
 SELECT
     AHID AS id_agreement,
-    AHACCT AS id_contract,
+    AHACCT AS id_client,
     AHCOLLID AS id_user,
     AHTYPE AS agreement_type,
     CASE

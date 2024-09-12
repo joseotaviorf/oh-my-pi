@@ -1,0 +1,7 @@
+---
+database_name: datalake_cyber_raw
+table_name: collid
+columns:
+  CLPASSWD:
+    tags:
+      - Confidential
