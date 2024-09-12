@@ -16,7 +16,7 @@ WITH base AS (
     dt.theme_detail,
     CASE
       WHEN frc.status = 'TRANSFERRED'
-        AND dd.team <> 'Inside Sales'
+        AND dd2.team <> 'Inside Sales'
         AND frc.is_first_department_interaction = True
       THEN 1
       ELSE 0
@@ -28,7 +28,9 @@ WITH base AS (
   LEFT JOIN
     dw_customer_support.dim_department dd
       ON dd.sk_department = frc.sk_department
-      OR dd.department = frc.transferred_to
+  LEFT JOIN 
+    dw_customer_support.dim_department dd2 
+      ON dd2.department = frc.transferred_to
   LEFT JOIN
     dw_customer_support.dim_agent da
       ON frc.agent_email = da.email
