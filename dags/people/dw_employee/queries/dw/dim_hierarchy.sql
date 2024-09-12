@@ -2,14 +2,14 @@ WITH
 hr_system_workers AS (
     SELECT
       w.id_person,
-      a.id_period_of_service,
+      ei.id_period_of_service,
       w.names,
       w.emails
     FROM
       datalake_hr_system_clean.workers AS w
     LEFT JOIN
-      assignments AS a
-        ON a.id_person = w.id_person
+      datalake_hr_system.employee_ids AS ei
+        ON ei.id_person = w.id_person
     QUALIFY
       dt_effective = MAX(dt_effective)
         OVER (PARTITION BY w.id_person)
