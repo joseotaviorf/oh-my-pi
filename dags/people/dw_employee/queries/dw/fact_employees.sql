@@ -277,90 +277,6 @@ WITH
             not is_direct_manager
         GROUP BY
             id_manager_assignment
-    ),
-    assignments AS (
-        SELECT DISTINCT
-            id_assignment,
-            id_period_of_service
-        FROM
-            datalake_hr_system.assignments
-    ),
-    ranked_managers AS (
-        SELECT
-            mh.id_assignment,
-            mh.id_period_of_service,
-            mh.id_manager_assignment,
-            a.id_period_of_service AS id_period_of_service_manager,
-            mh.separation_degree,
-            ROW_NUMBER() OVER (
-                PARTITION BY
-                    mh.id_assignment
-                ORDER BY
-                    mh.separation_degree DESC
-            ) as rn
-        FROM
-            datalake_hr_system.management_hierarchy AS mh
-        LEFT JOIN
-            assignments AS a
-                ON a.id_assignment = mh.id_manager_assignment
-    ),
-    managers_long AS (
-        SELECT
-            id_period_of_service,
-            MAX(
-                CASE
-                    WHEN rn = 1 THEN id_period_of_service_manager
-                END
-            ) AS sk_assignment_leadership_order_0,
-            MAX(
-                CASE
-                    WHEN rn = 2 THEN id_period_of_service_manager
-                END
-            ) AS sk_assignment_leadership_order_1,
-            MAX(
-                CASE
-                    WHEN rn = 3 THEN id_period_of_service_manager
-                END
-            ) AS sk_assignment_leadership_order_2,
-            MAX(
-                CASE
-                    WHEN rn = 4 THEN id_period_of_service_manager
-                END
-            ) AS sk_assignment_leadership_order_3,
-            MAX(
-                CASE
-                    WHEN rn = 5 THEN id_period_of_service_manager
-                END
-            ) AS sk_assignment_leadership_order_4,
-            MAX(
-                CASE
-                    WHEN rn = 6 THEN id_period_of_service_manager
-                END
-            ) AS sk_assignment_leadership_order_5,
-            MAX(
-                CASE
-                    WHEN rn = 7 THEN id_period_of_service_manager
-                END
-            ) AS sk_assignment_leadership_order_6,
-            MAX(
-                CASE
-                    WHEN rn = 8 THEN id_period_of_service_manager
-                END
-            ) AS sk_assignment_leadership_order_7,
-            MAX(
-                CASE
-                    WHEN rn = 9 THEN id_period_of_service_manager
-                END
-            ) AS sk_assignment_leadership_order_8,
-            MAX(
-                CASE
-                    WHEN rn = 10 THEN id_period_of_service_manager
-                END
-            ) AS sk_assignment_leadership_order_9
-        FROM
-            ranked_managers
-        GROUP BY
-            id_period_of_service
     )
 
 SELECT
@@ -377,20 +293,7 @@ SELECT
     REPLACE (am.dt_termination_work_relationship, '-', '') AS sk_dt_termination_work_relationship,
     am.sk_last_increase_date,
     REPLACE (se.dt_first_promotion, '-', '') AS sk_dt_first_promotion,
-    MD5(
-        CONCAT(
-            COALESCE(sk_assignment_leadership_order_0, -1),
-            COALESCE(sk_assignment_leadership_order_1, -1),
-            COALESCE(sk_assignment_leadership_order_2, -1),
-            COALESCE(sk_assignment_leadership_order_3, -1),
-            COALESCE(sk_assignment_leadership_order_4, -1),
-            COALESCE(sk_assignment_leadership_order_5, -1),
-            COALESCE(sk_assignment_leadership_order_6, -1),
-            COALESCE(sk_assignment_leadership_order_7, -1),
-            COALESCE(sk_assignment_leadership_order_8, -1),
-            COALESCE(sk_assignment_leadership_order_9, -1)
-        )
-    ) AS sk_hierarchy,
+    h.sk_hierarchy,
     am.assignment_number,
     am.salary_currency,
     am.is_last_work_relationship,
@@ -429,7 +332,7 @@ LEFT JOIN
     datalake_hr_system.disability AS d
         ON am.sk_employee = d.id_person
 LEFT JOIN
-    managers_long AS ml
-        ON ml.id_period_of_service = am.sk_assignment
+    datalake_hr_system.hierarchy_ids AS h
+        ON h.sk_assignment = am.sk_assignment
 WHERE
     am.is_last_work_relationship
