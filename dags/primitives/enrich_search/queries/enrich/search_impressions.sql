@@ -16,8 +16,8 @@ WITH experiments AS (
         FROM (
             SELECT
                 *,
-                explode(map_keys(str_to_map(regexp_replace(config.variants, '\\{|\\}', '' )))) AS _variant_name,
-                str_to_map(regexp_replace(config.variants, '\\{|\\}', '' )) AS variants
+                explode(map_keys(str_to_map(regexp_replace(config.variants, '\\{{|\\}}', '' )))) AS _variant_name,
+                str_to_map(regexp_replace(config.variants, '\\{{|\\}}', '' )) AS variants
             FROM
                 datalake_search.experiment_config
             WHERE
@@ -162,9 +162,7 @@ WHERE row_n = 1
 experiment_searches AS (
     SELECT
     id_search,
-    -- this build a json {experiment_name: variant} example:
-    -- {exemple_experiment_name_1: baseline, exemple_experiment_name_2: treatment_1, ....}
-    concat('\\{', array_join(array_agg(variants), ','), '\\}') AS variants
+    concat('{{', array_join(array_agg(variants), ','), '}}') AS variants
 FROM experiment_searches_not_json
 GROUP BY id_search
 ),
@@ -449,7 +447,7 @@ SELECT
 
     --experimentation
 
-    COALESCE(variants, '\\{\\}') AS variants,
+    COALESCE(variants, '{{}}') AS variants,
 
     --metrics
 
