@@ -127,17 +127,17 @@ class Tables:
     source_viva_real_houses = "vespucio_sources_delta.source_viva_real_house"
     source_zap_imoveis_houses = "vespucio_sources_delta.source_zap_imoveis_house"
 
-    step1_staged_condos = "vespucio_pipeline_delta.step1_staged_condos"
-    step1_staged_houses = "vespucio_pipeline_delta.step1_staged_houses"
-    step2_geocode_cache = "vespucio_pipeline_delta.step2_geocode_cache"
-    step2_geocoded_condos = "vespucio_pipeline_delta.step2_geocoded_condos"
-    step2_geocoded_houses = "vespucio_pipeline_delta.step2_geocoded_houses"
-    step3_clustered_condos = "vespucio_pipeline_delta.step3_clustered_condos"
-    step3_clustered_houses = "vespucio_pipeline_delta.step3_clustered_houses"
-    step4_merged_condos = "vespucio_pipeline_delta.step4_merged_condos"
-    step4_merged_houses = "vespucio_pipeline_delta.step4_merged_houses"
-    step5_images_houses = "vespucio_pipeline_delta.step5_images_houses"
-    step6_linked_condos = "vespucio_pipeline_delta.step6_linked_condos"
+    stage_step_condos = "vespucio_pipeline_delta.stage_step_condos"
+    stage_step_houses = "vespucio_pipeline_delta.stage_step_houses"
+    geocode_step_cache = "vespucio_pipeline_delta.geocode_step_cache"
+    geocode_step_condos = "vespucio_pipeline_delta.geocode_step_condos"
+    geocode_step_houses = "vespucio_pipeline_delta.geocode_step_houses"
+    cluster_step_condos = "vespucio_pipeline_delta.cluster_step_condos"
+    cluster_step_houses = "vespucio_pipeline_delta.cluster_step_houses"
+    merge_step_condos = "vespucio_pipeline_delta.merge_step_condos"
+    merge_step_houses = "vespucio_pipeline_delta.merge_step_houses"
+    images_step_houses = "vespucio_pipeline_delta.images_step_houses"
+    link_step_condos = "vespucio_pipeline_delta.link_step_condos"
 
     condo_compounds = "vespucio_prod_delta.condo_compounds"
     house_compounds = "vespucio_prod_delta.house_compounds"
@@ -281,7 +281,7 @@ kodak_api_key = ""
 
 core_tasks = [
     create_task(
-        entry_point="core_step1stage",
+        entry_point="core_stage_step",
         parameters=[
             f"--input_source_ebdb_condos={Tables.source_ebdb_condo}",
             f"--input_source_navent_condos={Tables.source_navent_condo}",
@@ -291,85 +291,85 @@ core_tasks = [
             f"--input_source_navent_houses={Tables.source_navent_houses}",
             f"--input_source_union_houses={Tables.source_union_houses}",
             f"--overwrite_schema",
-            f"--output_staged_condos={Tables.step1_staged_condos}",
-            f"--output_staged_houses={Tables.step1_staged_houses}",
+            f"--output_staged_condos={Tables.stage_step_condos}",
+            f"--output_staged_houses={Tables.stage_step_houses}",
         ],
     ),
     create_task(
-        entry_point="core_step2geocode",
+        entry_point="core_geocode_step",
         parameters=[
             f"--enable_online_geocoder",
             f"--geocode_username=vespucio_prod_pipeline",
             f"--google_geocode_api_keys_from_secret={APIEnum.GOOGLE_GEOCODING}",
-            f"--geocode_cache_table={Tables.step2_geocode_cache}",
+            f"--geocode_cache_table={Tables.geocode_step_cache}",
             f"--update_cache",
-            f"--input_staged_condos={Tables.step1_staged_condos}",
-            f"--input_staged_houses={Tables.step1_staged_houses}",
+            f"--input_staged_condos={Tables.stage_step_condos}",
+            f"--input_staged_houses={Tables.stage_step_houses}",
             f"--overwrite_schema",
-            f"--output_geocoded_condos={Tables.step2_geocoded_condos}",
-            f"--output_geocoded_houses={Tables.step2_geocoded_houses}",
+            f"--output_geocoded_condos={Tables.geocode_step_condos}",
+            f"--output_geocoded_houses={Tables.geocode_step_houses}",
         ],
     ),
     create_task(
-        entry_point="core_step3cluster",
+        entry_point="core_cluster_step",
         parameters=[
-            f"--input_geocoded_condos={Tables.step2_geocoded_condos}",
-            f"--input_geocoded_houses={Tables.step2_geocoded_houses}",
+            f"--input_geocoded_condos={Tables.geocode_step_condos}",
+            f"--input_geocoded_houses={Tables.geocode_step_houses}",
             f"--overwrite_schema",
-            f"--output_clustered_condos={Tables.step3_clustered_condos}",
-            f"--output_clustered_houses={Tables.step3_clustered_houses}",
+            f"--output_clustered_condos={Tables.cluster_step_condos}",
+            f"--output_clustered_houses={Tables.cluster_step_houses}",
         ],
     ),
     create_task(
-        entry_point="core_step4merge",
+        entry_point="core_merge_step",
         parameters=[
-            f"--input_staged_condos={Tables.step1_staged_condos}",
-            f"--input_staged_houses={Tables.step1_staged_houses}",
-            f"--input_clustered_condos={Tables.step3_clustered_condos}",
-            f"--input_clustered_houses={Tables.step3_clustered_houses}",
+            f"--input_staged_condos={Tables.stage_step_condos}",
+            f"--input_staged_houses={Tables.stage_step_houses}",
+            f"--input_clustered_condos={Tables.cluster_step_condos}",
+            f"--input_clustered_houses={Tables.cluster_step_houses}",
             f"--overwrite_schema",
-            f"--output_merged_condos={Tables.step4_merged_condos}",
-            f"--output_merged_houses={Tables.step4_merged_houses}",
+            f"--output_merged_condos={Tables.merge_step_condos}",
+            f"--output_merged_houses={Tables.merge_step_houses}",
         ],
     ),
     create_task(
-        entry_point="core_step5images",
+        entry_point="core_images_step",
         parameters=[
-            f"--input_merged_houses={Tables.step4_merged_houses}",
-            f"--input_images_houses={Tables.step5_images_houses}",
+            f"--input_merged_houses={Tables.merge_step_houses}",
+            f"--input_images_houses={Tables.images_step_houses}",
             "--overwrite_schema",
-            f"--output_images_houses={Tables.step5_images_houses}",
+            f"--output_images_houses={Tables.images_step_houses}",
             f"--kodak_auth_token={kodak_api_key}",
             "--kodak_api_url=https://kodak.quintoandar.com.br/s2s/v1",
             "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
         ],
     ),
     create_task(
-        entry_point="core_step6link",
+        entry_point="core_link_step",
         parameters=[
-            f"--input_merged_condos={Tables.step4_merged_condos}",
-            f"--input_images_houses={Tables.step5_images_houses}",
+            f"--input_merged_condos={Tables.merge_step_condos}",
+            f"--input_images_houses={Tables.images_step_houses}",
             f"--overwrite_schema",
-            f"--output_linked_condos={Tables.step6_linked_condos}",
+            f"--output_linked_condos={Tables.link_step_condos}",
             f"--output_house_compounds={Tables.house_compounds}",
         ],
     ),
 ]
 
-step7_tasks = [
+after_link_tasks = [
     create_task(
-        entry_point="core_step7listing",
+        entry_point="core_listing_step",
         parameters=[
             f"--input_house_compounds={Tables.house_compounds}",
-            f"--input_linked_condos={Tables.step6_linked_condos}",
+            f"--input_linked_condos={Tables.link_step_condos}",
             f"--overwrite_schema",
             f"--output_listings_houses={Tables.listings}",
         ],
     ),
     create_task(
-        entry_point="core_step7condo_plans",
+        entry_point="core_condo_plans_step",
         parameters=[
-            f"--input_linked_condos={Tables.step6_linked_condos}",
+            f"--input_linked_condos={Tables.link_step_condos}",
             f"--input_house_compounds={Tables.house_compounds}",
             "--overwrite_schema",
             f"--output_condo_compounds={Tables.condo_compounds}",
@@ -390,7 +390,7 @@ plugin_tasks = [
             f"--delete_old_indices",
             f"--input_condo_compounds={Tables.condo_compounds}",
             f"--input_house_compounds={Tables.house_compounds}",
-            f"--input_geocode_cache={Tables.step2_geocode_cache}",
+            f"--input_geocode_cache={Tables.geocode_step_cache}",
             f"--output_index_prefix=vespucio_prod",
         ],
     ),
@@ -484,6 +484,6 @@ join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 execute_job_cluster_task >> source_tasks
 source_tasks >> core_tasks[0]
 chain(*core_tasks)
-core_tasks[-1] >> step7_tasks
-step7_tasks >> join_plugins
+core_tasks[-1] >> after_link_tasks
+after_link_tasks >> join_plugins
 join_plugins >> plugin_tasks
