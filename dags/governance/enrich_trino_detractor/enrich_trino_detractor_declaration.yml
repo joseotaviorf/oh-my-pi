@@ -18,6 +18,6 @@ workflow:
   short_circuit_customization:
     function: CHECK_IS_SPECIFIC_WEEKDAY
     function_params:
-      day: 0
+      weekday: 0
 cluster:
   type: databricks_12_2_med_general_photon_cluster
