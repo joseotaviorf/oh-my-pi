@@ -12,7 +12,7 @@ WITH users AS (
 query_metrics AS (
     SELECT
         queryId AS id_query,
-        CAST(get_json_object(session, '$.user') AS STRING) AS user,
+        CAST(get_json_object(session, '$.user') AS STRING) AS executor_user,
         CAST(get_json_object(session, '$.source') AS STRING) AS source,
         CAST(
             get_json_object(
@@ -48,12 +48,14 @@ query_metrics AS (
         AND CAST(get_json_object(session, '$.source') AS STRING) = 'Apache Superset'
         AND query LIKE '%-- {{%'
         AND errorcode IS NULL
+        AND execution_end_time IS NOT NULL
 ),
 enrich_base AS (
     SELECT
         qm.id_superset_dashboard,
         qm.id_superset_slice,
         -- mb_queries.context,
+        qm.executor_user,
         sl.slice_name,
         sl.last_owner,
         sl.company_line AS line,
@@ -101,6 +103,7 @@ enrich_base AS (
 SELECT
     base.id_superset_dashboard,
     base.id_superset_slice,
+    executor_user,
     base.slice_name,
     base.last_owner,
     base.line,
@@ -111,10 +114,11 @@ SELECT
     base.input_data_gb,
     base.peak_total_memory_gb,
     base.number_stages,
-    CASE WHEN (cpu_time_sec >= "{cpu_threshold}") THEN TRUE ELSE FALSE END AS cpu_time_sec_threshold_active,
-    CASE WHEN (input_data_gb >= "{input_data_threshold}") THEN TRUE ELSE FALSE END AS input_data_gb_threshold_active,
-    CASE WHEN (number_stages >= "{stages_threshold}") THEN TRUE ELSE FALSE END AS stages_threshold_active,
-    CASE WHEN (execution_time_sec >= "{execution_time_threshold}") THEN TRUE ELSE FALSE END AS execution_time_sec_threshold_active,
+    base.cpu_time_sec,
+    CASE WHEN (CAST(cpu_time_sec AS INTEGER) >= "{cpu_threshold}") THEN TRUE ELSE FALSE END AS cpu_time_sec_threshold_active,
+    CASE WHEN (CAST(input_data_gb AS INTEGER) >= "{input_data_threshold}") THEN TRUE ELSE FALSE END AS input_data_gb_threshold_active,
+    CASE WHEN (CAST(number_stages AS INTEGER) >= "{stages_threshold}") THEN TRUE ELSE FALSE END AS stages_threshold_active,
+    CASE WHEN (CAST(execution_time_sec AS INTEGER) >= "{execution_time_threshold}") THEN TRUE ELSE FALSE END AS execution_time_sec_threshold_active,
     ts_execution_start,
     ts_execution_end,
     base.year,
@@ -128,8 +132,8 @@ LEFT JOIN
 WHERE
     id_superset_slice IS NOT NULL
     AND (
-        COALESCE(cpu_time_sec, 0) >= "{cpu_threshold}"
-        OR COALESCE(input_data_gb, 0) >= "{input_data_threshold}"
-        OR COALESCE(number_stages, 0) >= "{stages_threshold}"
-        OR COALESCE(execution_time_sec, 0) >= "{execution_time_threshold}"
+        COALESCE(CAST(cpu_time_sec AS INTEGER), 0) >= "{cpu_threshold}"
+        OR COALESCE(CAST(input_data_gb AS INTEGER), 0) >= "{input_data_threshold}"
+        OR COALESCE(CAST(number_stages AS INTEGER), 0) >= "{stages_threshold}"
+        OR COALESCE(CAST(execution_time_sec AS INTEGER), 0) >= "{execution_time_threshold}"
     )
