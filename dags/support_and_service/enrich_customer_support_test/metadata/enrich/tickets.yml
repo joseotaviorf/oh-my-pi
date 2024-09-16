@@ -40,6 +40,14 @@ columns:
     lineage:
       - datalake_gsheets_clean.department_control.team
     description: Team of the queue of the ticket
+  direction:
+    lineage:
+      - datalake_customer_support_test.calls.direction
+      - datalake_zendesk.tickets_current.tags
+    description: Describes if the ticket is related to a contact started by the customer of by 5A
+    categories:
+      INBOUND: Customer contacted 5A
+      OUTBOUND: 5A contacted the customer
   client_type:
     description: Type of client, from custom_fields like 'Tipo de Cliente'
     lineage:

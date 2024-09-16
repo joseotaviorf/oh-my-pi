@@ -118,20 +118,28 @@ unique_tickets AS (
 ),
 tickets_per_task AS (
   SELECT
-    dt.id_ticket,
+    ut.id_ticket,
     t.id_problem_ticket,
     t.id_user_main,
     t.id_contract,
     t.id_call,
     t.id_session,
-    COALESCE(ch.queue_name, ca1.queue_name, ca2.queue_name, t.ticket_queue) AS queue,
+    CASE
+      WHEN ut.channel = 'chat' THEN ch.queue_name
+      WHEN ut.channel = 'call' THEN COALESCE(ca1.queue_name, ca2.queue_name)
+      ELSE t.ticket_queue
+    END AS queue,
     t.contact_ticket,
     t.task_sid_twilio,
     t.twilio_task,
     t.tags,
     t.description,
     t.status,
-    COALESCE(ch.queue_name, ca1.queue_name, ca2.queue_name, t.ticket_queue) AS queue,
+    CASE
+      WHEN ut.channel = 'chat' THEN ch.worker_email
+      WHEN ut.channel = 'call' THEN COALESCE(ca1.worker_email, ca2.worker_email)
+      ELSE t.analyst_email
+    END AS analyst_email,
     ch.source,
     CASE
       WHEN COALESCE(ca1.direction, ca2.direction) IN ('outbound-api', 'outbound')
@@ -140,7 +148,7 @@ tickets_per_task AS (
       WHEN t.tags LIKE '%"ticket_ativo"%' THEN 'OUTBOUND'
       ELSE 'INBOUND'
     END AS direction,
-    dt.channel,
+    ut.channel,
     t.request_type,
     t.client_type,
     t.step_tag,
@@ -165,8 +173,8 @@ tickets_per_task AS (
   FROM
     incoming_tickets AS t
   INNER JOIN
-    unique_tickets AS dt
-      ON dt.id_ticket = t.id_ticket
+    unique_tickets AS ut
+      ON ut.id_ticket = t.id_ticket
   LEFT JOIN
     datalake_customer_support_test.chats AS ch
       ON ch.id_task = t.twilio_task
@@ -233,6 +241,7 @@ tickets AS (
         ) THEN TRUE
       ELSE FALSE
     END AS is_back_ticket,
+    t.direction,
     tq.front_or_back,
     tq.journey_step,
     tq.team,
@@ -458,6 +467,7 @@ SELECT DISTINCT
   t.area,
   t.status,
   t.channel,
+  t.direction,
   t.tags,
   t.description,
   t.request_type,
