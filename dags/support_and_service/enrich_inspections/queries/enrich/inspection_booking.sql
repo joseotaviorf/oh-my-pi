@@ -111,6 +111,7 @@ repairs AS (
         rev1.reviewer_type AS requester_type,
         rev2.reviewer_type AS granted_type,
         rr.responsibility,
+        rr.comment,
         rr.is_finished,
         rr.is_exempted,
         rev2.reviewer_type = 'OWNER' AS is_exempted_by_owner,
@@ -138,10 +139,7 @@ repairs AS (
           ON rev1.id_reviewer = rr.id_reviewer 
     LEFT JOIN 
         datalake_inspections_clean.reviewer AS rev2 
-          ON rev2.id_reviewer = rr.id_granted_by 
-    WHERE 
-        rr.comment IS NOT NULL 
-        AND rr.responsibility IN ('TENANT','OWNER','ABSORBED_BY_COMPANY', 'EXEMPTED')  
+          ON rev2.id_reviewer = rr.id_granted_by
 ),
 repair_metrics AS (
     SELECT 
@@ -190,9 +188,11 @@ repair_metrics AS (
                     WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1 
                   END) AS total_tentant_repair_ac
     FROM 
-        repairs 
+        repairs
     WHERE 
-        rn = 1
+        comment IS NOT NULL 
+        AND responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')  
+        AND rn = 1
     GROUP BY 
           1,2
 )
