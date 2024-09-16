@@ -1,0 +1,29 @@
+---
+database_name: datalake_workable
+table_name: cost_center
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table that conciliates cost center data from Workable and HR System.
+columns:
+  id_cost_center:
+    description: 'Id of the cost center from HR System.'
+    lineage:
+    - datalake_hr_system_clean.organizations.id_organization
+  cost_center_name_pin:
+    description: 'Name of the cost center from HR System.'
+    lineage:
+    - datalake_hr_system_clean.organizations.name
+  cost_center_workable:
+    description: 'Name of the cost center from Workable.'
+    lineage:
+    - datalake_workable.custom_fields.cost_center
+  cost_center_code_workable:
+    description: 'Code of the cost center from Workable.'
+    lineage:
+    - datalake_workable.custom_fields.cost_center
+  cost_center_code:
+    description: 'Code of the cost center from HR System.'
+    lineage:
+    - datalake_hr_system_clean.organizations.codigo_dff
+  ts_load:
+    description: 'Timestamp of when the data was loaded.'

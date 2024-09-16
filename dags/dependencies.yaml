@@ -3103,6 +3103,19 @@ bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-round
 bietlejuice.enrich_wordpress_baroes:
   - bietlejuice.wordpress_baroes:load-clean-conteudos-data
+bietlejuice.enrich_workable:
+  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
+  - bietlejuice.hr_system:load-clean-organizations
+  - bietlejuice.workable_redshift:load-clean-activities
+  - bietlejuice.workable_redshift:load-clean-answers
+  - bietlejuice.workable_redshift:load-clean-candidates
+  - bietlejuice.workable_redshift:load-clean-field-choices
+  - bietlejuice.workable_redshift:load-clean-field-value-choices
+  - bietlejuice.workable_redshift:load-clean-field-values
+  - bietlejuice.workable_redshift:load-clean-fields
+  - bietlejuice.workable_redshift:load-clean-jobs
+  - bietlejuice.workable_redshift:load-clean-members
+  - bietlejuice.workable_redshift:load-clean-requisitions
 bietlejuice.enrich_zendesk:
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users

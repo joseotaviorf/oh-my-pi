@@ -1,0 +1,115 @@
+---
+database_name: datalake_workable
+table_name: custom_fields
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table that stores custom fields data from Workable.
+columns:
+  id_resource:
+    description: 'Id of the resource from Workable, could be requisition, candidate, offer, etc.'
+    lineage:
+    - datalake_workable_redshift_clean.field_values.id_resource
+  company:
+    description: 'Company that the requisition belongs to.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  opening_reason:
+    description: 'Opening reason of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  position_name:
+    description: 'Position name of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  salary_band:
+    description: 'Salary band of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  career_track:
+    description: 'Career track of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  cost_center:
+    description: 'Cost center of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  business_partner:
+    description: 'Business partner of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  affirmative_position:
+    description: 'If the requisition is an affirmative action position.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  how_closed:
+    description: 'How the requisition was closed.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  capacity_overhead:
+    description: 'If the requisition is capacity or overhead.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  hiring_manager_email:
+    description: 'Hiring manager email of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  candidate_source:
+    description: 'Candidate source of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  is_confidential:
+    description: 'Requisition is confidential.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  is_hunted:
+    description: 'If the candidate was hunted.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  dt_new_opened:
+    description: 'Date of when the requisition was opened.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  dt_closure_expected:
+    description: 'Date of when the requisition is expected to be closed.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  dt_closure_renegotiated:
+    description: 'Date of when the requisition was renegotiated to be closed.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  ts_load:
+    description: 'Timestamp of when the data was loaded.'

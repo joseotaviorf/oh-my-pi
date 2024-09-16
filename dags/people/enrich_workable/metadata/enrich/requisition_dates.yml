@@ -1,0 +1,72 @@
+---
+database_name: datalake_workable
+table_name: requisition_dates
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table that stores unify date rules for requisitions.
+columns:
+  id:
+    description: 'Id of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.id
+  days_on_hold:
+    description: 'Days the requisition was on hold. This status is calculated from 
+      the moment the requisition was put on hold until the moment it was open again 
+      or cancelled.'
+    lineage:
+    - datalake_workable_redshift_clean.activities.ts_activity_created
+    - datalake_workable_redshift_clean.activities.id_trackable
+  days_open:
+    description: 'Days the requisition was open. This status is calculated from 
+      the moment the requisition was opened until the moment it was filled or cancelled'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.dt_opened
+    - datalake_workable_redshift.custom_fields.dt_new_opened
+    - datalake_workable_redshift_clean.requisitions.dt_filled
+    - datalake_workable_redshift_clean.activities.ts_activity_created
+    - datalake_workable_redshift_clean.activities.id_trackable
+  days_queue:
+    description: 'Days the requisition was in queue. This status is calculated 
+      from the moment the requisition was created until the moment it was opened.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.dt_opened
+    - datalake_workable_redshift.custom_fields.dt_new_opened
+    - datalake_workable_redshift_clean.activities.ts_activity_created
+    - datalake_workable_redshift_clean.activities.id_trackable
+    - datalake_workable_redshift_clean.requisitions.ts_created
+  has_used_dt_new_open:
+    description: 'This field is used to check if the open date of the requisition 
+      was updated.'
+    lineage:
+    - datalake_workable.custom_fields.dt_new_opened
+  dt_created:
+    description: 'Date the requisition was created.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.ts_created
+    - datalake_workable_redshift.custom_fields.dt_new_opened
+  dt_opened:
+    description: 'Date the requisition was opened.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.dt_opened
+    - datalake_workable_redshift.custom_fields.dt_new_opened
+  dt_filled:
+    description: 'Date the requisition was filled.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.dt_opened
+    - datalake_workable_redshift.custom_fields.dt_new_opened
+    - datalake_workable_redshift_clean.requisitions.dt_filled
+  dt_cancelled:
+    description: 'Date the requisition was cancelled.'
+    lineage:
+    - datalake_workable_redshift_clean.activities.ts_activity_created
+  dt_last_on_hold:
+    description: 'Date the of the last time the requisition was put on hold.'
+    lineage:
+    - datalake_workable_redshift_clean.activities.ts_activity_created
+  dt_closing_old_sla:
+    description: 'Closing date of the requisition based on the old SLA.'
+    lineage:
+    - datalake_workable.custom_fields.dt_closure_renegotiated
+    - datalake_workable.custom_fields.dt_closure_expected
+  ts_load:
+    description: 'Timestamp of when the data was loaded.'

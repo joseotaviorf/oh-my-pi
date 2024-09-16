@@ -1,0 +1,162 @@
+---
+database_name: datalake_workable
+table_name: requisition_details
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table that prepare data for dim_requisition and fact_requistions
+columns:
+  id_requisition:
+    description: 'Id of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.id
+  sk_requisition:
+    description: 'Surrogate key of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.id
+  id_candidate:
+    description: 'Id of the candidate.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.id_candidate
+  id_job:
+    description: 'Id of the job.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.id_jobs
+  sk_owner:
+    description: 'Surrogate key of the owner of the requisition, links to dw_employee.dim_employee.'
+    lineage:
+    - datalake_hr_system.employee_ids.id_person
+  sk_hiring_manager:
+    description: 'Surrogate key of the hiring manager of the requisition, links to dw_employee.dim_employee.'
+    lineage:
+    - datalake_hr_system.employee_ids.id_person
+  sk_business_partner:
+    description: 'Surrogate key of the business partner of the requisition, links to dw_employee.dim_employee.'
+    lineage:
+    - datalake_hr_system.employee_ids.id_person
+  requisition_code:
+    description: 'Requisition code.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.code
+  requisition_state:
+    description: 'Requisition state.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.state
+  requisition_status:
+    description: 'Requisition status.'
+    lineage:
+    - datalake_workable_redshift_clean.requisitions.state
+  job_title:
+    description: 'Job title of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.jobs.title
+  position_name:
+    description: 'Position name of the requisition.'
+    lineage:
+    - datalake_workable.custom_fields.position_name
+  opening_reason:
+    description: 'Reason for the opening of the requisition.'
+    lineage:
+    - datalake_workable.custom_fields.opening_reason
+  salary_band:
+    description: 'Salary band of the requisition.'
+    lineage:
+    - datalake_workable.custom_fields.salary_band
+  capacity_overhead:
+    description: 'This field is used to check if the requisition is capacity or overhead.
+      Capacity requisitions are requisitions that are used to increase the capacity of the team and 
+      overhead requisitions are requisitions that are strategic for the company, usual leaders.'
+    lineage:
+    - datalake_workable.custom_fields.capacity_overhead
+  affirmative_position:
+    description: 'This field is used to check if the requisition is affirmative action.'
+    lineage:
+    - datalake_workable.custom_fields.affirmative_position
+  career_track:
+    description: "Indicates the career_track that the job belongs to. Possible values are: 
+      'Líder', 'Contribuidor Individual'"
+    lineage:
+    - datalake_workable.custom_fields.career_track
+  how_closed:
+    description: 'This field is used to check how the requisition was closed.'
+    lineage:
+    - datalake_workable.custom_fields.how_closed
+  cost_center:
+    description: 'Cost center of the requisition.'
+    lineage:
+    - datalake_workable.custom_fields.cost_center
+  company_country:
+    description: 'Country of the company of the requisition.'
+    lineage:
+    - datalake_workable.custom_fields.company
+  sla_type:
+    description: 'SLA type of the requisition. Old or New'
+    lineage:
+    - datalake_workable.requisition_dates.dt_opened
+  sla:
+    description: 'This field is used to check if the requisition is within the SLA.
+      Possible values are: On time, Delayed'
+    lineage:
+    - datalake_workable.requisition_dates.dt_opened
+    - datalake_workable.requisition_dates.dt_filled
+    - datalake_workable.requisition_dates.dt_closing_old_sla
+    - datalake_workable.requisition_dates.days_open
+    - datalake_workable_redshift_clean.requisitions.state
+    - datalake_workable_redshift_clean.jobs.title
+    - datalake_workable.custom_fields.salary_band
+    - datalake_workable.custom_fields.career_track
+    - datalake_workable.custom_fields.capacity_overhead
+    - datalake_workable.custom_fields.company
+    - datalake_workable_redshift_clean.requisitions.state
+  days_sla:
+    description: 'For new SLA, this field is used to check the days the requisition was within the SLA.'
+    lineage:
+    - datalake_workable_redshift_clean.jobs.title
+    - datalake_workable.custom_fields.salary_band
+    - datalake_workable.custom_fields.career_track
+    - datalake_workable.custom_fields.capacity_overhead
+    - datalake_workable.custom_fields.company
+  days_on_hold:
+    description: 'How many days the requisition was on hold.'
+    lineage:
+    - datalake_workable.requisition_dates.days_on_hold
+  days_open:
+    description: 'How many days the requisition was open.'
+    lineage:
+    - datalake_workable.requisition_dates.days_open
+  days_queue:
+    description: 'How many days the requisition was in queue.'
+    lineage:
+    - datalake_workable.requisition_dates.days_queue
+  days_delay:
+    description: 'How many days the requisition was delayed.'
+    lineage:
+    - datalake_workable.requisition_dates.days_open
+    - datalake_workable.requisition_dates.dt_filled
+    - datalake_workable.requisition_dates.dt_closing_old_sla
+  is_confidential:
+    description: 'Flag that indicates if the requisition is confidential.'
+    lineage:
+    - datalake_workable_redshift.custom_fields.is_confidential
+  dt_created:
+    description: 'Date the requisition was created.'
+    lineage:
+    - datalake_workable.requisition_dates.dt_created
+  dt_opened:
+    description: 'Date the requisition was opened.'
+    lineage:
+    - datalake_workable.requisition_dates.dt_opened
+  dt_filled:
+    description: 'Date the requisition was filled.'
+    lineage:
+    - datalake_workable.requisition_dates.dt_filled
+  dt_cancelled:
+    description: 'Date the requisition was cancelled.'
+    lineage:
+    - datalake_workable.requisition_dates.dt_cancelled
+  dt_last_on_hold:
+    description: 'Date the of the last time the requisition was put on hold.'
+    lineage:
+    - datalake_workable.requisition_dates.dt_last_on_hold
+  ts_load:
+    description: 'Timestamp of when the data was loaded.'
+
