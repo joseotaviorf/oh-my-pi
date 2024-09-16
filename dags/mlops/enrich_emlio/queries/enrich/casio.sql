@@ -1,8 +1,8 @@
-SELECT 
-    service_version, 
-    id_service, 
-    year, 
-    month, 
+SELECT
+    service_version,
+    id_service,
+    year,
+    month,
     day,
     s_inputs.latitude,
     s_inputs.longitude,
@@ -743,9 +743,25 @@ SELECT
     s_inputs.idhm_state_level__avg,
     s_inputs.idhm_renda_state_level__avg,
     s_inputs.idhm_educacao_state_level__avg,
-    s_inputs.idhm_longevidade_state_level__avg
+    s_inputs.idhm_longevidade_state_level__avg,
+    s_keys.house_id,
+    s_keys.prediction_id,
+    s_keys.x_original_requester,
+    s_keys.x_request_via,
+    s_keys.x_model_request_metadata,
+    s_keys.request_method,
+    s_outputs.result.quantile_10,
+    s_outputs.result.quantile_20,
+    s_outputs.result.quantile_30,
+    s_outputs.result.quantile_40,
+    s_outputs.result.quantile_50,
+    s_outputs.result.quantile_60,
+    s_outputs.result.quantile_70,
+    s_outputs.result.quantile_80,
+    s_outputs.result.quantile_90,
+    s_outputs.result.certainty
 FROM (
-        SELECT 
+        SELECT
             from_json(inputs, "Struct<latitude: DOUBLE,
                                     longitude: DOUBLE,
                                     bedroom_count: INTEGER,
@@ -1485,17 +1501,33 @@ FROM (
                                     idhm_state_level__avg: DOUBLE,
                                     idhm_renda_state_level__avg: DOUBLE,
                                     idhm_educacao_state_level__avg: DOUBLE,
-                                    idhm_longevidade_state_level__avg: DOUBLE>") as s_inputs, 
-        service_version, 
-        id_service, 
-        year, 
-        month, 
+                                    idhm_longevidade_state_level__avg: DOUBLE>") as s_inputs,
+        FROM_JSON(service_keys, "Struct<house_id: STRING,
+                                        prediction_id: STRING,
+                                        x_original_requester: STRING,
+                                        x_request_via: STRING,
+                                        x_model_request_metadata: STRING,
+                                        request_method: STRING>") as s_keys,
+        FROM_JSON(outputs, "Struct<result: Struct<quantile_10: DOUBLE,
+                                                  quantile_20: DOUBLE,
+                                                  quantile_30: DOUBLE,
+                                                  quantile_40: DOUBLE,
+                                                  quantile_50: DOUBLE,
+                                                  quantile_60: DOUBLE,
+                                                  quantile_70: DOUBLE,
+                                                  quantile_80: DOUBLE,
+                                                  quantile_90: DOUBLE,
+                                                  certainty: STRING>>") as s_outputs,
+        service_version,
+        id_service,
+        year,
+        month,
         day
-    FROM 
-        datalake_emlio_clean.emlio_logs 
-    WHERE 
-        year = {year} 
-        AND month = {month} 
+    FROM
+        datalake_emlio_clean.emlio_logs
+    WHERE
+        year = {year}
+        AND month = {month}
         AND day = {day}
         AND id_service = 'casio'
 );
