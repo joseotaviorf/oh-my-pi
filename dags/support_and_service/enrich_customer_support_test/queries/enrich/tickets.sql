@@ -124,7 +124,7 @@ tickets_per_task AS (
     t.id_contract,
     t.id_call,
     t.id_session,
-    COALESCE(ch.queue_name, ca.queue_name, t.ticket_queue) AS queue,
+    COALESCE(ch.queue_name, ca1.queue_name, ca2.queue_name, t.ticket_queue) AS queue,
     t.contact_ticket,
     t.task_sid_twilio,
     t.twilio_task,
