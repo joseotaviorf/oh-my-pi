@@ -1,0 +1,65 @@
+---
+database_name: dw_hiring
+table_name: dim_requisition
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Dimension table that stores requisition data.
+columns:
+  sk_requisition:
+    description: 'Surrogate key for requisition'
+    lineage:
+    - datalake_workable.requisition_details.sk_requisition
+  requisition_code:
+    description: 'Requisition code'
+    lineage:
+    - datalake_workable.requisition_details.requisition_code
+  requisition_state:
+    description: 'Requisition state'
+    lineage:
+    - datalake_workable.requisition_details.requisition_state
+  requisition_status:
+    description: 'Requisition status'
+    lineage:
+    - datalake_workable.requisition_details.requisition_status
+  job_title:
+    description: 'Requisition job title'
+    lineage:
+    - datalake_workable.requisition_details.job_title
+  position_name:
+    description: 'Requisition position name'
+    lineage:
+    - datalake_workable.requisition_details..position_name
+  opening_reason:
+    description: 'Requisition opening reason'
+    lineage:
+    - datalake_workable.requisition_details.opening_reason
+  salary_band:
+    description: 'Salary band for the requisition'
+    lineage:
+    - datalake_workable.requisition_details.salary_band
+  capacity_overhead:
+    description: 'Column that inform if the requisition is capacity or overhead type'
+    lineage:
+    - datalake_workable.requisition_details.capacity_overhead
+  affirmative_position:
+    description: 'Column that inform if the requisition is affirmative position'
+    lineage:
+    - datalake_workable.requisition_details.affirmative_position
+  career_track:
+    description: "Indicates the career_track that the job belongs to. Possible values are: 'Líder', 'Contribuidor Individual'"
+    lineage:
+    - datalake_workable.requisition_details.career_track
+  how_closed:
+    description: 'Column that inform how the requisition was closed'
+    lineage:
+    - datalake_workable.requisition_details.how_closed
+  sla:
+    description: 'Column that inform if the sla was met'
+    lineage:
+    - datalake_workable.requisition_details.sla
+  sla_type:
+    description: 'Type of SLA'
+    lineage:
+    - datalake_workable.requisition_details.sla_type
+  ts_load:
+    description: 'Timestamp of the load'

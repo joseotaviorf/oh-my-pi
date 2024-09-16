@@ -516,6 +516,12 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-recurring-payment-renewal
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-occurrence
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment
+bietlejuice.dw_hiring:
+  - bietlejuice.enrich_workable:load-enrich-cost-center
+  - bietlejuice.enrich_workable:load-enrich-custom-fields
+  - bietlejuice.enrich_workable:load-enrich-requisition-details
+  - bietlejuice.workable_redshift:load-clean-answers
+  - bietlejuice.workable_redshift:load-clean-candidates
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-status

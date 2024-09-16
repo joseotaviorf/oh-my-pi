@@ -1,0 +1,33 @@
+---
+database_name: dw_hiring
+table_name: dim_candidate
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Dimension table that stores candidate data.
+columns:
+  sk_candidate:
+    description: 'Surrogate key for candidate'
+    lineage:
+    - datalake_workable_redshift_clean.candidates.id
+  headline:
+    description: 'Headline of the candidate'
+    lineage:
+    - datalake_workable_redshift_clean.candidates.headline
+  email:
+    description: 'Email of the candidate'
+    lineage:
+    - datalake_workable_redshift_clean.candidates.email
+  source_candidate:
+    description: 'Source of the candidate'
+    lineage:
+    - datalake_workable.custom_fields.candidate_source
+    - datalake_workable.custom_fields.candidates.is_hunted
+    - datalake_workable_redshift_clean.candidates.source
+    - datalake_workable_redshift_clean.candidates.application_method
+    - datalake_workable_redshift_clean.candidates.source_category
+  opportunity_info_source:
+    description: 'How the candidate got to know about the opportunity'
+    lineage:
+    - datalake_workable_redshift_clean.answers.answer
+  ts_load:
+    description: 'Timestamp of the load'
