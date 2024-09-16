@@ -1,0 +1,38 @@
+dag:
+  name: ebdb_agent
+  owner: Data Agents
+  schedule_interval: 20 21 * * *
+  documentation:
+    dag_purpose: |
+      Extraction of EBDB tables related to agents into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: ebdb_test
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  dbutils_secret_key: EBDB_DB
+  tables_customization:
+    DadosAgente:
+      clean_table_name: agent_data
+    DadosAgente_AUD:
+      clean_table_name: agent_data_aud
+    DadosAgente_businessContextsServed:
+      clean_table_name: agent_data_business_contexts_served
+    DadosAgente_businessContextsServed_AUD:
+      clean_table_name: agent_data_business_contexts_served_aud
+    DadosAgente_tipos:
+      clean_table_name: agent_data_types
+    AgentLeadReferral:
+      clean_table_name: agent_lead_referral
+    AgentLeadReferral_AUD:
+      clean_table_name: agent_lead_referral_aud
+    DadosAgente_Regiao_AUD:
+      clean_table_name: agent_region_data_aud
+    HouseAgentKeyTracking:
+      clean_table_name: house_agent_key_tracking
+    HouseAgentKeyTracking_AUD:
+      clean_table_name: house_agent_key_tracking_aud
+cluster:
+  type: databricks_12_2_med_general_cluster
