@@ -77,7 +77,7 @@ direct_offer AS (
     dw_rent.fact_rent_flows f
   LEFT JOIN
     dw_rent.dim_rent_flow_type d
-        ON f.sk_rent_flow_type = f.sk_rent_flow_type
+        ON f.sk_rent_flow_type = d.sk_rent_flow_type
   WHERE
     d.first_touchpoint = 'DIRECT'
   GROUP BY 1,2,3
