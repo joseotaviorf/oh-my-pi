@@ -1,0 +1,28 @@
+dag:
+  name: ebdb_partner
+  schedule_interval: 10 21 * * *
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Extraction of EBDB tables related to Parters into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: ebdb_test
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  dbutils_secret_key: EBDB_DB
+  tables_customization:
+    Partner:
+      clean_table_name: partner
+    PartnerAgent:
+      clean_table_name: partner_agent
+    PartnerAgent_AUD:
+      clean_table_name: partner_agent_aud
+    DadosAfiliado:
+      clean_table_name: affiliate_data
+    DadosAfiliado_AUD:
+      clean_table_name: affiliate_data_aud
+cluster:
+  type: databricks_12_2_min_general_cluster

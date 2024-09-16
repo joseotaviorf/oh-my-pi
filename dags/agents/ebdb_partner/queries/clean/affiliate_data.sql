@@ -1,0 +1,26 @@
+SELECT
+    id,
+    usuario_id AS id_user,
+    gerenteContas_id AS id_account_manager,
+    indicadoPor_id AS id_indicated_by,
+    idPlanilhaGdocs AS id_gdocs_sheet,
+    doormanAffiliateData_id AS id_doorman_affiliate_data,
+    ativo AS is_active,
+    verificado AS is_verified,
+    roofTopper AS is_roof_topper,
+    affiliateType AS affiliate_type,
+    tipoAfiliado AS affiliate_type_old,
+    indicacaoShortUrl AS indication_short_url,
+    cidadeAtuacao AS operation_city,
+    principaisBairrosAtuacao AS main_operation_neighborhoods,
+    preferenciaPagamento AS payment_preference,
+    numeroCreci AS creci_number,
+    origin,
+    semanaUltimaComunicacaoBalanco AS last_week_balance_communication,
+    ultimoCalculoComissaoIndicado AS ts_last_commission_calculation_indicated,
+    dataComunicacaoEnvioCartao AS ts_card_sent_communication,
+    inicioAtuacao AS ts_operation_start,
+    criadoEm AS ts_created,
+    atualizadoEm AS ts_updated
+FROM
+    datalake_ebdb_test_raw.DadosAfiliado

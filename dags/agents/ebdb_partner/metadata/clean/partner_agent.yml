@@ -1,0 +1,24 @@
+database_name: datalake_ebdb_test_clean
+table_name: partner_agent
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_test_raw.partneragent.id
+  id_partner:
+    lineage:
+      - datalake_ebdb_test_raw.partneragent.partner_id
+  id_user:
+    lineage:
+      - datalake_ebdb_test_raw.partneragent.user_id
+  type:
+    lineage:
+      - datalake_ebdb_test_raw.partneragent.type
+  status:
+    lineage:
+      - datalake_ebdb_test_raw.partneragent.status
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_raw.partneragent.atualizadoem
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_raw.partneragent.criadoem
