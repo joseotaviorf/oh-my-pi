@@ -20,10 +20,12 @@ workflow:
       clean_table_name: agent_data_aud
     DadosAgente_businessContextsServed:
       clean_table_name: agent_data_business_contexts_served
+      raw_primary_keys: ["DadosAgente_id", "businessContextsServed"]
     DadosAgente_businessContextsServed_AUD:
       clean_table_name: agent_data_business_contexts_served_aud
     DadosAgente_tipos:
       clean_table_name: agent_data_types
+      raw_primary_keys: ["DadosAgente_id", "tipos"]
     AgentLeadReferral:
       clean_table_name: agent_lead_referral
     AgentLeadReferral_AUD:
