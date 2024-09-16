@@ -20,7 +20,18 @@ buyer_review AS (
         type = 'tenant_visit'
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_reviewed, id_reviewer ORDER BY dt_creation ASC) = 1
-)
+), 
+status_log AS (
+  SELECT 
+    id_schedule,
+    id_author_user 
+  FROM 
+    datalake_ebdb_clean.visit_status_log 
+  WHERE 
+    event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
+    AND ts_created >= '2024-08-01'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_schedule ORDER BY ts_created) = 1)
 SELECT
     b.id AS id_booking,
     b.id_sale_flow,
@@ -35,7 +46,7 @@ SELECT
     b.id_sale_fixed_agent AS id_fixed_agent,
     b.id_visitor AS id_buyer,
     h.id_user AS id_seller,
-    b.id_user_creation AS id_user_creation,
+    COALESCE(vsl.id_author_user,b.id_attendant, b.id_user_creation) AS id_user_creation,
     b.id_user_cancelation AS id_user_cancelation,
     b.id_user_sale_attendence_5a,
     b.id_user_secretariat_on_visit_date,
@@ -105,5 +116,8 @@ LEFT JOIN
           AND b.id_company_supply IS NULL
           AND b.partner_3p_supply = cs_supply.extracted_3p_tag
         )
+LEFT JOIN 
+  status_log AS vsl
+    ON b.id = vsl.id_schedule
 WHERE
     b.visit_intent = 'SALE'
