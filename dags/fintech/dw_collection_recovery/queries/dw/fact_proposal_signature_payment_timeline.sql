@@ -13,13 +13,13 @@ WITH gateway_cleanup AS (
         WHEN 'OMIE' THEN 'P20'
         ELSE gateway_clean
     END AS gateway_plataform_clean
-  FROM 
+  FROM
     dw_collection_recovery.fact_quintocred_contract_payment_signature_timeline
 ),
 step_1_cpts AS (
-  SELECT 
+  SELECT
     *,
-    CASE 
+    CASE
       WHEN (gateway_plataform_clean != 'P30_COLL' OR gateway_plataform_clean IS NULL) THEN gateway_plataform_clean
       WHEN (flag_annual_payment NOT IN ('ANNUAL', 'ANNUAL+ACTIVATION') OR flag_annual_payment is null) AND birth_origin = 'is_born_2.0' THEN 'P20'
       ELSE 'P30'
@@ -28,15 +28,15 @@ step_1_cpts AS (
     gateway_cleanup
 ),
 step_2_cpts AS (
-  SELECT 
+  SELECT
     *,
     COALESCE(LAST_VALUE(current_plataform) IGNORE NULLS OVER (PARTITION BY sk_propose ORDER BY ref_month ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 'UNDEFINED') AS current_plataform_ffil
   FROM
     step_1_cpts
 ),
 step_3_cpts AS (
-  SELECT 
-  *, 
+  SELECT
+  *,
   CASE
       WHEN birth_origin = 'is_born_3.0' THEN 'P30'
       WHEN birth_origin = 'is_born_2.0' AND current_plataform_ffil = 'P30' THEN 'P20_MIGRATED_P30'
@@ -59,21 +59,21 @@ step_3_cpts AS (
       WHEN memory_annual_valid_limit IS NOT NULL OR (memory_annual_limit IS NOT NULL AND gateway_memory_transaction = 'DELINQUENCY' AND memory_flag_annual_payment IN ('ANNUAL+ACTIVATION', 'ANNUAL')) THEN CONCAT(gateway_memory_transaction, '_ANNUAL')
       ELSE 'UNFOUND'
     END AS gateway_estimation
-  FROM 
+  FROM
     step_2_cpts
 ),
 checkpoint_step_3_cpts AS (
-  SELECT 
+  SELECT
     *,
-    CASE 
-      WHEN gateway_estimation IN ('DELINQUENCY_ANNUAL', 'DELINQUENCY_RENEWAL') AND migration_status = 'P20' THEN 'P20_MIGRATED_P30'
-      ELSE migration_status 
+    CASE
+      WHEN gateway_estimation IN ('DELINQUENCY_ANNUAL', 'DELINQUENCY_RENEWAL', 'DELINQUENCY_MONTHLY_RENEWAL') AND migration_status = 'P20' THEN 'P20_MIGRATED_P30'
+      ELSE migration_status
     END AS migration_status_v2
-  FROM 
+  FROM
     step_3_cpts
 ),
 checkpoint_stepA AS (
-  SELECT 
+  SELECT
     *,
     CAST(mob AS INTEGER) % 12 AS months_since_last_renewal,
     EXTRACT(MONTH FROM dt_contract_started) AS month_of_birth,
@@ -84,40 +84,40 @@ checkpoint_stepA AS (
     checkpoint_step_3_cpts
 ),
 step_A2 AS (
-  SELECT 
+  SELECT
     *,
-    CASE 
+    CASE
       WHEN n_of_expected_previous_renewals = 0 THEN 'FIRST YEAR'
       WHEN months_since_last_renewal = 0 THEN 'RENEWAL AT MONTH'
       WHEN months_since_last_renewal < EXTRACT(MONTH FROM ref_month) THEN 'RENEWED IN THIS YEAR'
       WHEN months_to_be_renewed <= (12 - EXTRACT(MONTH FROM ref_month)) THEN 'TO BE RENEWED THIS YEAR'
       ELSE 'UNDEFINED'
     END AS renewal_status
-  FROM 
+  FROM
     checkpoint_stepA
 ),
 step_A3 AS (
-  SELECT 
+  SELECT
     *,
-    CASE 
+    CASE
       WHEN renewal_status = 'FIRST YEAR' then MAKE_DATE(year(dt_contract_started)+1, month(dt_contract_started), 1)
       WHEN renewal_status = 'RENEWAL AT MONTH' then ref_month
       WHEN renewal_status = 'TO BE RENEWED THIS YEAR' then MAKE_DATE(year(ref_month), month(dt_contract_started), 1)
       ELSE MAKE_DATE(year(ref_month)+1, month(dt_contract_started), 1)
     END as expected_month_renewal
-  FROM 
+  FROM
     step_A2
 ),
 step_A4 AS (
-  SELECT 
+  SELECT
     *,
-    CASE 
+    CASE
       WHEN month_of_birth IN (1,3,5,7,8,10,12) THEN MAKE_DATE(year(expected_month_renewal), month_of_birth, day_of_birth)
       WHEN month_of_birth IN (4, 6, 9, 11) THEN MAKE_DATE(year(expected_month_renewal), month_of_birth, day_of_birth)
       WHEN month_of_birth IN (2) THEN MAKE_DATE(year(expected_month_renewal), month_of_birth, 28)
       ELSE Null
     END AS expected_day_renewal
-  FROM 
+  FROM
     step_A3
 )
 SELECT
@@ -134,9 +134,9 @@ SELECT
   current_plataform_ffil,
   migration_status,
   migration_status_v2,
-  CASE 
+  CASE
     WHEN expected_day_renewal >= DATE('2024-9-15') AND expected_day_renewal <= DATE('2024-12-31') THEN 'Renewal Journey'
-    ELSE 'Partial Link' 
+    ELSE 'Partial Link'
   END AS clean_migration_mechanism_flag,
   flag_missing_payment_adjs,
   flag_missing_payment_adjs_v2,
