@@ -20,7 +20,8 @@ WITH last_dash AS (
 ), logs AS (
   SELECT
     id_dashboard,
-    COUNT(0) last_90d_views
+    COUNT(0) last_90d_views,
+    COUNT(distinct CONCAT_WS("-", year, month, day, id_user)) daily_users_last_90d -- in case of target, created a new cte with period to be evaluated
   FROM datalake_superset_clean.logs
   WHERE id_dashboard IS NOT NULL
     AND action = 'DashboardRestApi.get'
@@ -67,7 +68,9 @@ SELECT
   d.ts_changed,
   COALESCE(l.last_90d_views,0) AS last_90d_views,
   tags.tags AS new_tags,
-  d.published
+  d.published,
+  l.daily_users_last_90d,
+  row_number() over (partition by d.company_line order by l.daily_users_last_90d desc, l.last_90d_views desc) as popularity_by_line_rank
 FROM last_dash d
 JOIN slices_list sl ON sl.id_dashboard = d.id
 JOIN dash_owners dw ON dw.id_dashboard = d.id
