@@ -16,43 +16,6 @@ extract_total_credit_card_fee AS (
         ,2) credit_card_fee_amount
     FROM extract_array_credit_card_fee
 ),
-paid_installments AS (
-    SELECT
-        n.`id` AS id_negotiation,
-        FIRST_VALUE(i.total_amount) OVER(PARTITION BY n.`id` ORDER BY i.ts_updated) AS down_payment_amount,
-        IF(i.status = 'paid', n.`id`, NULL) AS paid_negotiation,
-        IF(i.status = 'paid', i.total_amount, 0) AS paid_amount,
-        IF(i.status = 'paid', i.ts_updated, NULL) AS ts_updated
-    FROM
-       datalake_trato_feito_clean.negotiation AS n
-    LEFT JOIN
-        datalake_trato_feito_clean.installment AS i
-            ON n.id = i.id_negotiation
-),
-cte_paid AS (
-    SELECT
-        id_negotiation,
-        down_payment_amount,
-        SUM(paid_amount) AS paid_amount,
-        COUNT(paid_negotiation) AS qt_paid,
-        MIN(ts_updated) AS ts_first_payment,
-        MAX(ts_updated) AS ts_last_payment
-    FROM paid_installments
-    GROUP BY 1,2
-),
-cte_installments AS (
-    SELECT
-        n.`id` AS id_negotiation,
-        COUNT(i.`id`) AS qt_installments,
-        SUM(i.total_amount) AS total_expected_amount,
-        MAX(i.dt_due) AS dt_expected_end
-    FROM
-        datalake_trato_feito_clean.negotiation AS n
-    LEFT JOIN
-        datalake_trato_feito_clean.installment AS i
-            ON n.`id` = i.id_negotiation
-    GROUP BY 1
-),
 cte_recurrent AS (
     SELECT
         `id` AS id_negotiation,
@@ -72,39 +35,22 @@ cte_renegotiated AS (
             ON ac.id_external = d.id_external
     GROUP BY 1
 ),
-cte_ts_breach AS (
+installments AS (
     SELECT
-        n.`id` AS id_negotiation,
-        MIN(i.ts_expired) AS ts_breach
-    FROM
-        datalake_trato_feito_clean.negotiation AS n
-    LEFT JOIN
-        datalake_trato_feito_clean.installment AS i
-            ON n.id = i.id_negotiation
-    WHERE
-        i.status <> 'paid'
+        id_negotiation,
+        SUM(IF(installment_number = 1 AND status = 'paid', total_amount, 0)) AS down_payment_amount,
+        SUM(IF(status = 'paid', total_amount, 0)) AS paid_amount,
+        COUNT(DISTINCT IF(status = 'paid', id, NULL)) AS qt_installments_paid,
+        MAX(installment_number) AS qt_installments,
+        SUM(total_amount) AS total_expected_amount,
+        MIN(IF(ts_paid IS NULL AND status NOT IN ('paid', 'pending', 'registered'), installment_number, NULL)) AS breached_installment,
+        COUNT(DISTINCT IF(ts_paid IS NULL AND status NOT IN ('paid', 'pending', 'registered'), id, NULL)) AS total_breached_installments,
+        MIN(IF(status = 'paid', ts_paid, NULL)) AS ts_first_payment,
+        MAX(IF(status = 'paid', ts_paid, NULL)) AS ts_last_payment,
+        MAX(dt_due) AS dt_expected_end,
+        MIN(ts_expired) AS ts_breach
+    FROM datalake_debt_recovery.installment
     GROUP BY 1
-),
-cte_installment_order AS (
-    SELECT
-        i.id_negotiation,
-        ROW_NUMBER() OVER(PARTITION BY i.id_negotiation ORDER BY i.dt_due ASC) AS installment_number,
-        i.ts_expired
-    FROM
-        datalake_trato_feito_clean.installment AS i
-),
-cte_breach AS (
-    SELECT
-        cb.id_negotiation,
-        cb.ts_breach,
-        MIN(co.installment_number) AS breached_installment
-    FROM
-        cte_ts_breach AS cb
-    LEFT JOIN
-        cte_installment_order AS co
-            ON cb.id_negotiation = co.id_negotiation
-            AND cb.ts_breach = co.ts_expired
-    GROUP BY 1, 2
 ),
 cte_debts AS (
     SELECT
@@ -126,39 +72,34 @@ SELECT
     CONCAT(d.origin, "_", d.type) AS debtor,
     c.name AS collector,
     n.status,
-    ci.qt_installments,
-    cp.qt_paid AS qt_installments_paid,
-    ci.total_expected_amount,
-    IFNULL(cp.down_payment_amount, 0) AS down_payment_amount,
-    cp.paid_amount,
+    i.qt_installments,
+    i.qt_installments_paid,
+    i.total_expected_amount,
+    i.down_payment_amount,
+    i.paid_amount,
     d.negotiation_original_amount,
     d.negotiation_discount_amount,
     d.interest_fee_amount,
     d.fine_fee_amount,
     d.negotiation_fees_amount,
     cc.credit_card_fee_amount,
-    cb.breached_installment,
+    i.breached_installment,
+    i.total_breached_installments,
     cr.recurrent AS is_contract_recurrent_debtor,
     COALESCE(crn.renegotiated, False) AS has_renegotiated,
-    ci.dt_expected_end,
-    cp.ts_first_payment,
+    i.dt_expected_end,
+    i.ts_first_payment,
     CASE
-        WHEN ci.qt_installments = cp.qt_paid THEN cp.ts_last_payment
+        WHEN i.qt_installments = i.qt_installments_paid THEN i.ts_last_payment
         ELSE NULL
     END AS ts_paid_all,
-    cb.ts_breach,
+    i.ts_breach,
     n.ts_created AS ts_created_at
 FROM
     datalake_trato_feito_clean.negotiation AS n
 LEFT JOIN
     datalake_trato_feito_clean.debtor AS d
         ON n.id_debtor = d.id
-LEFT JOIN
-    cte_installments AS ci
-        ON n.`id` = ci.id_negotiation
-LEFT JOIN
-    cte_paid AS cp
-        ON ci.id_negotiation = cp.id_negotiation
 LEFT JOIN
     cte_debts AS d
         ON n.`id` = d.id_negotiation
@@ -168,9 +109,8 @@ LEFT JOIN
 LEFT JOIN
     cte_renegotiated AS crn
         ON n.`id` = crn.id_negotiation
-LEFT JOIN
-    cte_breach AS cb
-        ON n.`id` = cb.id_negotiation
+LEFT JOIN installments AS i
+    ON n.`id` = i.id_negotiation
 LEFT JOIN extract_total_credit_card_fee AS cc
     ON cc.`id` = n.`id`
 LEFT JOIN datalake_trato_feito_clean.collector AS c

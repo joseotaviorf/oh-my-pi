@@ -73,6 +73,8 @@ columns:
       - datalake_trato_feito_clean.negotiation.payload
   breached_installment:
     description: "Breached installment number"
+  total_breached_installments:
+    description: "Total of breached installments"
   is_contract_recurrent_debtor:
     description: "Indicates if it is a recurrent contract debtor"
     lineage:

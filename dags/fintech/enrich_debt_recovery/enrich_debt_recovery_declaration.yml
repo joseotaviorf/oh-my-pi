@@ -10,5 +10,8 @@ dag:
 workflow:
   type: query
   layer: enrich
+  inner_dependencies:
+    negotiation:
+      - installment
 cluster:
   type: databricks_13_3_med_general_cluster

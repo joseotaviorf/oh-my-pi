@@ -17,6 +17,10 @@ columns:
     description: "Negotiation unique ID"
     lineage:
       - datalake_trato_feito_clean.installment.id_negotiation
+  installment_number:
+    description: "Installment Number (1,2...), order by due date"
+  our_number:
+    description: "Our number"
   status:
     description: "Status of the installment"
     lineage:
