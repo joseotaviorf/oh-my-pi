@@ -114,7 +114,7 @@ step_A4 AS (
     CASE
       WHEN month_of_birth IN (1,3,5,7,8,10,12) THEN MAKE_DATE(year(expected_month_renewal), month_of_birth, day_of_birth)
       WHEN month_of_birth IN (4, 6, 9, 11) THEN MAKE_DATE(year(expected_month_renewal), month_of_birth, day_of_birth)
-      WHEN month_of_birth IN (2) THEN MAKE_DATE(year(expected_month_renewal), month_of_birth, 28)
+      WHEN month_of_birth IN (2) THEN MAKE_DATE(year(expected_month_renewal), month_of_birth, LEAST(28, day_of_birth))
       ELSE Null
     END AS expected_day_renewal
   FROM
