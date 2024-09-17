@@ -65,7 +65,7 @@ vans_checkout_union AS (
         b.status in (':boleto.status/paid', ':boleto.status/write-down-paid-requested')
         AND (b.id_bank_boleto = 1 OR b.id_bank_boleto IS NULL)
         AND (NULLIF(b.company_use, '') IS NOT NULL OR NULLIF(b.document_number, '') IS NOT NULL)
-        AND LOWER(b.document_number) NOT LIKE 'fs%'
+        AND LOWER(b.document_number) NOT LIKE 'f%'
 ),
 
 pre_vans_checkout AS (
