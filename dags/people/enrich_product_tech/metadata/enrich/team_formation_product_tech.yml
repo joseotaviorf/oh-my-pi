@@ -9,36 +9,37 @@ columns:
     description: 'Unique identifier of the employee teams in a particular date'
     lineage:
     - datalake_gsheets_clean.team_formation_product_tech.id
-    - datalake_gsheets_clean.team_formation_product_tech.email
-    - datalake_gsheets_clean.team_formation_product_tech.subdirectorate
-    - datalake_gsheets_clean.team_formation_product_tech.team_1
-    - datalake_gsheets_clean.team_formation_product_tech.team_2
-    - datalake_gsheets_clean.team_formation_product_tech.team_3
-    - datalake_gsheets_clean.team_formation_product_tech.team_4
-    - datalake_gsheets_clean.team_formation_product_tech.team_5
     - datalake_gsheets_clean.team_formation_product_tech.ts_load
   id_teams:
     description: 'Unique identifier of the employee teams combination'
     lineage:
     - datalake_gsheets_clean.team_formation_product_tech.id
+  assignment_number:
+    description: 'Assignment number of the employee, from the HR system'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.assignment_number
   email:
-    description: 'Employee email'
+    description: 'Email of the employee'
     lineage:
     - datalake_gsheets_clean.team_formation_product_tech.email
-  employees_name:
-    description: 'Employee name'
+  employee_name:
+    description: 'Name of the employee'
     lineage:
-    - datalake_gsheets_clean.team_formation_product_tech.employees_name
-  subdirectorate:
-    description: 'Employee subdirectorate'
+    - datalake_gsheets_clean.team_formation_product_tech.employee_name
+  line:
+    description: 'Line of the employee'
     lineage:
-    - datalake_gsheets_clean.team_formation_product_tech.subdirectorate
+    - datalake_gsheets_clean.team_formation_product_tech.line
+  chapter:
+    description: 'Chapter of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.chapter
   team_1:
-    description: 'Primary team of the employee'
+    description: 'First team of the employee'
     lineage:
     - datalake_gsheets_clean.team_formation_product_tech.team_1
   team_2:
-    description: 'Secondary team of the employee'
+    description: 'Second team of the employee'
     lineage:
     - datalake_gsheets_clean.team_formation_product_tech.team_2
   team_3:
@@ -53,9 +54,45 @@ columns:
     description: 'Fifth team of the employee'
     lineage:
     - datalake_gsheets_clean.team_formation_product_tech.team_5
-  ts_change:
-    description: 'Timestamp of the team formation change'
+  team_6:
+    description: 'Sixth team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_6
+  team_7:
+    description: 'Seventh team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_7
+  team_8:
+    description: 'Eighth team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_8
+  team_9:
+    description: 'Ninth team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_9
+  team_10:
+    description: 'Tenth team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_10
+  line_leader:
+    description: 'What line the employee is a leader'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.line_leader
+  team_leader:
+    description: 'What team the employee is a leader'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_leader
+  is_line_leader:
+    description: 'Flag that indicates if the employee is a line leader'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.is_line_leader
+  is_team_leader:
+    description: 'Flag that indicates if the employee is a team leader'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.is_team_leader
+  ts_updated:
+    description: 'Timestamp of the change in gsheets of the Product and Tech team'
     lineage:
     - datalake_gsheets_clean.team_formation_product_tech.ts_load
   ts_load:
-    description: 'Timestamp of the data load'
+    description: 'Timestamp of the load in the table'

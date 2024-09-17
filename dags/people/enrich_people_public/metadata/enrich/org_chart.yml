@@ -65,23 +65,61 @@ columns:
     description: "Subdirectorate to which the employee belongs"
     lineage:
       - datalake_hr_system_clean.organizations.subdirectorate
+  line:
+    description: 'Line of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.line
+  chapter:
+    description: 'Chapter of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.chapter
+  line_leader:
+    description: 'What line the employee is a leader'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.line_leader
+  team_leader:
+    description: 'What team the employee is a leader'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_leader
   product_and_tech_team_1:
-    description: "Primary team of the worker. Only filled for some workers of product and tech"
+    description: 'First team of the employee'
     lineage:
-      - datalake_gsheets_clean.team_formation_product_tech.team_1
+    - datalake_gsheets_clean.team_formation_product_tech.team_1
   product_and_tech_team_2:
-    description: "One of the teams of the worker"
+    description: 'Second team of the employee'
     lineage:
-      - datalake_gsheets_clean.team_formation_product_tech.team_2
+    - datalake_gsheets_clean.team_formation_product_tech.team_2
   product_and_tech_team_3:
-    description: "One of the teams of the worker"
+    description: 'Third team of the employee'
     lineage:
-      - datalake_gsheets_clean.team_formation_product_tech.team_3
+    - datalake_gsheets_clean.team_formation_product_tech.team_3
   product_and_tech_team_4:
-    description: "One of the teams of the worker"
+    description: 'Fourth team of the employee'
     lineage:
-      - datalake_gsheets_clean.team_formation_product_tech.team_4
+    - datalake_gsheets_clean.team_formation_product_tech.team_4
   product_and_tech_team_5:
-    description: "One of the teams of the worker"
+    description: 'Fifth team of the employee'
     lineage:
-      - datalake_gsheets_clean.team_formation_product_tech.team_5
+    - datalake_gsheets_clean.team_formation_product_tech.team_5
+  product_and_tech_team_6:
+    description: 'Sixth team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_6
+  product_and_tech_team_7:
+    description: 'Seventh team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_7
+  product_and_tech_team_8:
+    description: 'Eighth team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_8
+  product_and_tech_team_9:
+    description: 'Ninth team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_9
+  product_and_tech_team_10:
+    description: 'Tenth team of the employee'
+    lineage:
+    - datalake_gsheets_clean.team_formation_product_tech.team_10
+  ts_load:
+    description: 'Timestamp of the load in the table'

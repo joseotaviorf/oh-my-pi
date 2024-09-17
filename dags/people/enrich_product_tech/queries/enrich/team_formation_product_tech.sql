@@ -14,26 +14,31 @@ WITH enrich_pt AS (
 SELECT
   MD5(
     CONCAT(
-      gsheets_pt.email,
-      gsheets_pt.subdirectorate,
-      COALESCE(gsheets_pt.team_1, '-1'),
-      COALESCE(gsheets_pt.team_2, '-1'),
-      COALESCE(gsheets_pt.team_3, '-1'),
-      COALESCE(gsheets_pt.team_4, '-1'),
-      COALESCE(gsheets_pt.team_5, '-1'),
+      gsheets_pt.id,
       DATE_FORMAT(gsheets_pt.ts_load, 'yyyyMMdd')
     )
   ) AS id,
   gsheets_pt.id AS id_teams,
+  gsheets_pt.assignment_number,
   gsheets_pt.email,
-  gsheets_pt.employees_name,
-  gsheets_pt.subdirectorate,
+  gsheets_pt.employee_name,
+  gsheets_pt.line,
+  gsheets_pt.chapter,
   gsheets_pt.team_1,
   gsheets_pt.team_2,
   gsheets_pt.team_3,
   gsheets_pt.team_4,
   gsheets_pt.team_5,
-  ts_load AS ts_change,
+  gsheets_pt.team_6,
+  gsheets_pt.team_7,
+  gsheets_pt.team_8,
+  gsheets_pt.team_9,
+  gsheets_pt.team_10,
+  gsheets_pt.line_leader,
+  gsheets_pt.team_leader,
+  is_line_leader,
+  is_team_leader,
+  ts_load AS ts_updated,
   NOW() AS ts_load
 FROM
   datalake_gsheets_clean.team_formation_product_tech AS gsheets_pt

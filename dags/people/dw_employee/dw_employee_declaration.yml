@@ -18,9 +18,6 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
-  inner_dependencies:
-    dim_product_tech:
-      - dim_employee_contact
   tables_customization:
     dim_demographic_information:
       extraction_type: incremental

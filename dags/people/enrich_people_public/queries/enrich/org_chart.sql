@@ -127,26 +127,21 @@ SELECT
   assignment_cte.vice_presidency,
   assignment_cte.directorate,
   assignment_cte.subdirectorate,
-  CASE
-    WHEN sheets.team_1 = '' THEN NULL
-      ELSE sheets.team_1
-    END AS product_and_tech_team_1,
-  CASE
-    WHEN sheets.team_2 = '' THEN NULL
-      ELSE sheets.team_2
-    END AS product_and_tech_team_2,
-  CASE
-    WHEN sheets.team_3 = ''
-    THEN NULL ELSE sheets.team_3
-  END AS product_and_tech_team_3,
-  CASE
-    WHEN sheets.team_4 = ''
-    THEN NULL ELSE sheets.team_4
-  END AS product_and_tech_team_4,
-  CASE
-    WHEN sheets.team_5 = ''
-    THEN NULL ELSE sheets.team_5
-  END AS product_and_tech_team_5
+  sheets.line,
+  sheets.chapter,
+  sheets.line_leader,
+  sheets.team_leader,
+  sheets.team_1 AS product_and_tech_team_1,
+  sheets.team_2 AS product_and_tech_team_2,
+  sheets.team_3 AS product_and_tech_team_3,
+  sheets.team_4 AS product_and_tech_team_4,
+  sheets.team_5 AS product_and_tech_team_5,
+  sheets.team_6 AS product_and_tech_team_6,
+  sheets.team_7 AS product_and_tech_team_7,
+  sheets.team_8 AS product_and_tech_team_8,
+  sheets.team_9 AS product_and_tech_team_9,
+  sheets.team_10 AS product_and_tech_team_10,
+  NOW() AS ts_load
 FROM
   employee_cte AS employee
 LEFT JOIN

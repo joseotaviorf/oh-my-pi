@@ -497,6 +497,7 @@ bietlejuice.dw_employee:
   - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy
+  - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
   - bietlejuice.hr_system:load-clean-actions-lov
   - bietlejuice.hr_system:load-clean-areas-of-responsibility
   - bietlejuice.hr_system:load-clean-jobs
@@ -2244,6 +2245,7 @@ bietlejuice.enrich_owner_fees:
 bietlejuice.enrich_people_public:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-managers
+  - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
   - bietlejuice.hr_system:load-clean-organizations
   - bietlejuice.hr_system:load-clean-workers
 bietlejuice.enrich_pixar:

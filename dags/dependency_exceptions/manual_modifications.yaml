@@ -949,10 +949,6 @@ quintoml.recs.house_user_embeddings_quintoml.inference:
     - wonka.user_listing_page_viewed_cross_devices:load-user_listing_page_viewed_cross_devices
     - wonka.user_sale_listing_page_viewed_cross_devices:load-user_sale_listing_page_viewed_cross_devices
 
-bietlejuice.enrich_product_tech:
-  add:
-    - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
-
 wonka.house_demand_balancer_predictions:
   add:
     - bietlejuice.demand_balancer_service:load-clean-demand-balancer
