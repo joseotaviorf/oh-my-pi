@@ -36,5 +36,5 @@ workflow:
       z_order_by: ["id_assignment"]
     demographic_attributes:
       extraction_type: incremental
-      merge_on: ["id_person"]
+      merge_on: ["id_person", "legislation_code"]
       z_order_by: ["id_person"]
