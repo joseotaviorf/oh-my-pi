@@ -24,8 +24,8 @@ SELECT
   m.chat_type,
   m.message,
   m.index,
-  m.ts_created,
-  LAG(m.ts_created) OVER(PARTITION BY m.id_channel ORDER BY m.ts_created) AS ts_last_message,
+  CAST(m.ts_created AS TIMESTAMP) AS ts_created,
+  LAG(CAST(m.ts_created AS TIMESTAMP)) OVER(PARTITION BY m.id_channel ORDER BY m.ts_created) AS ts_last_message,
   m.year,
   m.month,
   m.day
