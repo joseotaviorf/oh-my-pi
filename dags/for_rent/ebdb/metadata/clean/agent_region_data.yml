@@ -1,9 +1,0 @@
-database_name: datalake_ebdb_clean
-table_name: agent_region_data
-columns:
-  id_agent_data:
-    lineage:
-      - datalake_ebdb_raw.dadosagente_regiao.dadosagente_id
-  id_regions:
-    lineage:
-      - datalake_ebdb_raw.dadosagente_regiao.regioes_id

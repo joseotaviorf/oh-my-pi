@@ -423,6 +423,12 @@ table_block_list:
   - RestrictionType_AUD
   - SpecialCondition
   - SpecialCondition_AUD
+  - DadosCorretor
+  - DadosAgente_Regiao
+  - HorarioSemanalAgente
+  - AgentsProspect
+  - AgentsProspect_AUD
+  - LeadImobiliaria
 
 view_allow_list:
   - MapRegiao
