@@ -149,6 +149,11 @@ columns:
     lineage:
       - datalake_recupera_clean.installment.installment_number
       - datalake_recupera_clean.installment.amount_to_pay
+  down_payment_amount_without_fees:
+    description: Indicated the down payment amount without fees.
+    lineage:
+      - datalake_recupera_clean.installment.installment_number
+      - datalake_recupera_clean.installment.main_amount
   total_amount_paid:
     description: Total paid amount. Original field name = TOTAL_PAGO
     lineage:

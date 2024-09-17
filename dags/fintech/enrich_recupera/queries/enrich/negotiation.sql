@@ -123,6 +123,7 @@ agreements AS (
     ROUND(SUM(i.discount_amount),2) AS negotiation_discount_amount,
     ROUND(SUM(i.amount_to_pay),2) AS total_negotiated_amount,
     ROUND(MIN(CASE WHEN i.installment_number = "000" THEN i.amount_to_pay END),2) AS down_payment_amount,
+    ROUND(MIN(CASE WHEN i.installment_number = "000" THEN i.main_amount END),2) AS down_payment_amount_without_fees,
     ROUND(SUM(CASE WHEN r.id_receipt IS NOT NULL THEN i.amount_to_pay END), 2) AS total_amount_paid
   FROM active_installments AS i
   INNER JOIN first_installment AS f
@@ -226,6 +227,7 @@ SELECT DISTINCT
   COALESCE(a.total_negotiated_to_be_due_amount, 0) AS negotiated_to_be_due_amount,
   COALESCE(a.total_negotiated_overdue_amount, 0) AS negotiated_overdue_amount,
   COALESCE(a.down_payment_amount, 0) AS down_payment_amount,
+  COALESCE(a.down_payment_amount_without_fees, 0) AS down_payment_amount_without_fees,
   COALESCE(a.total_amount_paid, 0) AS total_amount_paid,
   a.total_next_due,
   DATE(NULLIF(TRIM(ic.ts_canceled_installment),"")) AS dt_cancellation,
