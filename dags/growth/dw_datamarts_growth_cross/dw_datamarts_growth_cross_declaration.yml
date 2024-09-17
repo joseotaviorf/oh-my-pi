@@ -36,15 +36,6 @@ workflow:
       - performance_marketing_metrics_demand 
       - sale_performance_marketing_metrics_demand 
       - tenant_prospect_status
-    casa_mineira_top_of_funnel_volumes_daily:
-      - performance_marketing_metrics_imobiliaria_casa_mineira 
-      - performance_marketing_metrics_portal_casa_mineira
-    casa_mineira_top_of_funnel_volumes_monthly:
-      - performance_marketing_metrics_imobiliaria_casa_mineira 
-      - performance_marketing_metrics_portal_casa_mineira
-    casa_mineira_top_of_funnel_volumes_weekly:
-      - performance_marketing_metrics_imobiliaria_casa_mineira 
-      - performance_marketing_metrics_portal_casa_mineira
 cluster:
   type: custom_cluster
   custom_configurations:

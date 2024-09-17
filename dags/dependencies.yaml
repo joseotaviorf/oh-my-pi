@@ -402,9 +402,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-cost
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-nbp
   - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-ncp
-  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-tof-daily
-  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-tof-monthly
-  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-tof-weekly
   - bietlejuice.gsheets_growth:done-clean-targets-portal-casa-mineira-cost-cf
   - bietlejuice.gsheets_growth:done-clean-taxonomy-crm-casa-mineira
   - bietlejuice.gsheets_growth:done-clean-taxonomy-portal-casa-mineira
@@ -2937,13 +2934,6 @@ bietlejuice.enrich_top_of_funnel_affiliates:
 bietlejuice.enrich_top_of_funnel_demand:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events
-bietlejuice.enrich_top_of_funnel_portal_cm:
-  - bietlejuice.casa_mineira_amplitude:load-clean-329001-portal
-  - bietlejuice.casa_mineira_portal:load-clean-city
-  - bietlejuice.casa_mineira_portal:load-clean-house
-  - bietlejuice.casa_mineira_portal:load-clean-neighborhood
-  - bietlejuice.casa_mineira_portal:load-clean-uf
-  - bietlejuice.gsheets_growth:done-clean-taxonomy-portal-casa-mineira
 bietlejuice.enrich_top_of_funnel_supply:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
