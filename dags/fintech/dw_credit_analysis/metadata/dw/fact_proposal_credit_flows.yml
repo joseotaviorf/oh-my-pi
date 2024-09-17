@@ -38,7 +38,7 @@ columns:
   sk_early_credit_analysis:
     lineage:
       - dw_credit.fact_early_credit.early_credit_analysis
-    description: "Key of the early credit analysis."
+    description: "Key of the last early credit analysis created 1 month before the offer submitted date."
   sk_analysis_request:
     lineage:
       - datalake_credit_analysis.credit_engine_analysis_request.id_analysis_request
@@ -213,13 +213,13 @@ columns:
   is_bypass:
     description: "True if the analysis was bypassed."
   is_early_credit:
-    description: "Indicates if the offer had an early credit analysis."
+    description: "Indicates if the offer had an early credit analysis 1 month before the offer submitted date."
   is_user_version:
     description: "True to the user version of the funnel, this flag contain the filters: rental_administrator = QUINTOANDAR, country code = BR and is_last_credit_evaluation = TRUE"
   dt_early_credit_created:
     lineage:
       - dw_credit.fact_early_credit.dt_early_credit_created
-    description: "Date when early credit analysis was created."
+    description: "Date when the last early credit analysis was created 1 month before de offer submitted date."
   dt_early_credit_expired:
     lineage:
       - dw_credit.fact_early_credit.dt_early_credit_expired
