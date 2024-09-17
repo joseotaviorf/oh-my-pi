@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the enriched table amplitude_partner_taxonomy, which we will use to add a taxonomy to our Dim partner table. This table contains events data from the event type "register_form_completed".
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: incremental
   default_partitions: ["year", "month", "day"]

@@ -7,7 +7,7 @@ dag:
       This DAG brings data from the brokerage flow to offers
 
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 
 cluster:
