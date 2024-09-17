@@ -89,7 +89,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agrhdr.AHTOTPMTSH
   fees_amount:
-    description: "Fees (honorários) amount"
+    description: "Fees (honorários) amount."
     lineage:
       - datalake_cyber_raw.agrhdr.AGRHONO
   interest_rate:

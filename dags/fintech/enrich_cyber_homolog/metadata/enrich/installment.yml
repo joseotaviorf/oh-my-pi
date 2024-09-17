@@ -1,105 +1,105 @@
 ---
 database_name: datalake_cyber_homolog
 table_name: installment
-owner: null
+owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: null
+description: Table granularity - installments of agreements/negotiations
 columns:
   id_agreement_installment:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.id_agreement_installment
+      - datalake_cyber_clean.agreement_installments.id_agreement_installment
   id_negotiation:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.a.id_agreement
+      - datalake_cyber_clean.agreement_installments.id_agreement
   id_contract:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.id_contract
+      - datalake_cyber_clean.agreement_installments.id_contract
   id_contract_external:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.id_contract_external
+      - datalake_cyber_clean.agreement_installments.id_contract_external
   id_debtor:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.c.id_client
+      - datalake_cyber_clean.agreement_installments.id_client
   id_receipt:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.p.id_payment
+      - datalake_cyber_clean.agreement_installments.id_payment
   our_number:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.our_number
+      - datalake_cyber_clean.agreement_installments.our_number
   installment_number:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.ai.installment_number + 1
+      - datalake_cyber_clean.agreement_installments.installment_number
   creditor:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.ca.contract_group
+      - datalake_cyber_clean.agreement_installments.contract_group
   status:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.status
+      - datalake_cyber_clean.agreement_installments.status
   installment_status:
-    description: ''
+    description: ""
     lineage:
-    - "datalake_cyber_clean.agreement_installments.CASE WHEN ai.status = 'Quebrado'\
-      \ THEN 'canceled' WHEN ai.status = 'Conclu\xEDdo' THEN 'paid' WHEN ai.status\
-      \ IN ('Pendente de Pagamento', 'Programado') THEN 'pending' ELSE ai.status END"
+      - datalake_cyber_clean.agreement_installments.status
   payment_type:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.payment_type
+      - datalake_cyber_clean.agreement_installments.payment_type
   payment_method:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.payment_method
-  amount_to_pay:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.agreement_installments.amount_to_pay
-  interest_amount:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.agreement_installments.interest_amount
-  fees_amount:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.agreement_installments.fees_amount
-  tax_amount:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.agreement_installments.tax_amount
+      - datalake_cyber_clean.agreement_installments.payment_method
   amortization_amount:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.amortization_amount
-  final_balance:
-    description: ''
+      - datalake_cyber_clean.agreement_installments.amortization_amount
+  interest_amount:
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.final_balance
+      - datalake_cyber_clean.agreement_installments.interest_amount
+  fees_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement_installments.fees_amount
+  credit_card_fee_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement_installments.credit_card_fee_amount
+  fine_rate:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement_installments.fine_rate
+  amount_to_pay:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement_installments.amount_to_pay
+  agreement_balance_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement_installments.agreement_balance_amount
   paid_amount:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.p.payment_amount
+      - datalake_cyber_clean.agreement_installments.payment_amount
   dt_creation:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.DATE(a.ts_agreement_creation)
+      - datalake_cyber_clean.agreement_installments.ts_agreement_creation
   dt_due:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.DATE(ai.ts_due_installment)
+      - datalake_cyber_clean.agreement_installments.ts_due_installment
   dt_paid:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.agreement_installments.DATE(p.ts_payment)
+      - datalake_cyber_clean.agreement_installments.ts_payment
   ts_load:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.agreement_installments.NOW()
+    description: ""

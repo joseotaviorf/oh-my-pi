@@ -1,75 +1,73 @@
 ---
 database_name: datalake_cyber_homolog
 table_name: collection
-owner: null
+owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: null
+description: Collection of debts. Table granularity - occurrence/call/action
 columns:
   id_contract:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.id_contract
+      - datalake_cyber_clean.logs.id_contract
   id_contract_external:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.id_contract_external
+      - datalake_cyber_clean.logs.id_contract_external
   id_customer:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.c.id_client
+      - datalake_cyber_clean.logs.id_client
   id_operator:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.UPPER(l.id_user)
+      - datalake_cyber_clean.logs.id_user
   creditor:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.l.contract_group
+      - datalake_cyber_clean.logs.contract_group
   operator_email:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.u.user_email
+      - datalake_cyber_clean.logs.user_email
   operator_type:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.u.user_type
+      - datalake_cyber_clean.logs.user_type
   operator_agency:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.ag.agency_name
+      - datalake_cyber_clean.logs.agency_name
   action:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.action
+      - datalake_cyber_clean.logs.action
   action_description:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.cda.code_description
+      - datalake_cyber_clean.logs.code_description
   result:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.result
+      - datalake_cyber_clean.logs.result
   result_description:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.cdr.code_description
+      - datalake_cyber_clean.logs.code_description
   complement:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.l.complement
+      - datalake_cyber_clean.logs.complement
   complement_description:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.cdc.code_description
+      - datalake_cyber_clean.logs.code_description
   occurrence_description:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.l.comment
+      - datalake_cyber_clean.logs.comment
   ts_occurrence:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.logs.l.ts_activity
+      - datalake_cyber_clean.logs.ts_activity
   ts_load:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.logs.NOW()
+    description: ""

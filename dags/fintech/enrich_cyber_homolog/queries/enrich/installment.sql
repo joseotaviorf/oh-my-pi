@@ -17,12 +17,13 @@ SELECT
     END AS installment_status,
     p.payment_type,
     p.payment_method,
-    ai.amount_to_pay,
-    ai.interest_amount,
-    ai.fees_amount,
-    ai.tax_amount,
     ai.amortization_amount,
-    ai.final_balance,
+    ai.interest_amount,
+    ai.installments_fees_amount,
+    ai.credit_card_fee_amount,
+    at.fine_rate,
+    ai.amount_to_pay,
+    ai.agreement_balance_amount,
     p.payment_amount AS paid_amount,
     DATE(a.ts_agreement_creation) AS dt_creation,
     DATE(ai.ts_due_installment) AS dt_due,
@@ -40,3 +41,5 @@ LEFT JOIN datalake_cyber_clean.payments AS p
 LEFT JOIN datalake_cyber_clean.agreement_invoices AS ain
   ON ai.id_agreement = ain.id_agreement
     AND ai.installment_number = ain.installment_number
+LEFT JOIN datalake_cyber_clean.agreement_type AS at
+  ON a.agreement_type = at.id_agreement_type

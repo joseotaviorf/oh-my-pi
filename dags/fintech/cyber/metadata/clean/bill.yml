@@ -163,17 +163,25 @@ columns:
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLRORI
   main_amount:
-    description: ""
+    description: "Main amount (valor principal)"
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLPRINC
   interest_amount:
-    description: ""
+    description: "Interest Amount (Valor de Jusos Residuais)"
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLJUR
+  eviction_cost_amount:
+    description: "Evictions rcosts. (pt: Valor Custas Residuais). It is the cost amount of the lawsuit against the debtor for contracts in eviction. The `residual` name is because the costs were generated on previous broken agreements"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PACUSTAS
   fine_amount:
-    description: ""
+    description: "Fine amount"
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLMUL
+  evictions_lawyers:
+    description: "Honorários (evictions lawyers)"
+    lineage:
+      - datalake_cyber_raw.tb_parcela.PAHONORARIOS
   entry_title:
     description: ""
     lineage:
@@ -210,14 +218,6 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.tb_parcela.PAVLRTOBOL
-  cost_withdrawal_quintocred:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_parcela.PACUSTAS
-  fee_quintocred_eviction:
-    description: ""
-    lineage:
-      - datalake_cyber_raw.tb_parcela.PAHONORARIOS
   ts_creation:
     description: ""
     lineage:

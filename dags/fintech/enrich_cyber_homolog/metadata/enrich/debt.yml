@@ -1,59 +1,61 @@
 ---
 database_name: datalake_cyber_homolog
 table_name: debt
-owner: null
+owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: null
+description: Debts/invoices that were negotiated. Table granularity - invoices
 columns:
   id_debtor:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.historical_agreements.c.id_client
+      - datalake_cyber_clean.historical_agreements.id_client
   id_contract:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.historical_agreements.id_contract
+      - datalake_cyber_clean.historical_agreements.id_contract_external
   id_contract_external:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.historical_agreements.id_contract_external
+      - datalake_cyber_clean.historical_agreements.id_contract_external
   id_invoice:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.historical_agreements.id_invoice
+      - datalake_cyber_clean.historical_agreements.id_invoice
   creditor:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.historical_agreements.a.contract_group
+      - datalake_cyber_clean.historical_agreements.contract_group
+  our_number:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.historical_agreements.our_number
+  purpose:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.historical_agreements.purpose
   payment_status:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.historical_agreements.b.retsuko_status
-  invoice_due_amount:
-    description: ''
+      - datalake_cyber_clean.historical_agreements.retsuko_status
+  due_amount:
+    description: ""
     lineage:
-    - datalake_cyber_clean.historical_agreements.b.due_amount
-  paid_amount:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.historical_agreements.b.main_amount
+      - datalake_cyber_clean.historical_agreements.due_amount
   interest_fee_amount:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.historical_agreements.b.interest_amount
+      - datalake_cyber_clean.historical_agreements.interest_amount
   fine_fee_amount:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.historical_agreements.b.fine_amount
+      - datalake_cyber_clean.historical_agreements.fine_amount
   debt_amount:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.historical_agreements.b.main_amount
+      - datalake_cyber_clean.historical_agreements.main_amount
   dt_invoice_due:
-    description: ''
+    description: ""
     lineage:
-    - datalake_cyber_clean.historical_agreements.b.ts_due
+      - datalake_cyber_clean.historical_agreements.ts_due
   ts_load:
-    description: ''
-    lineage:
-    - datalake_cyber_clean.historical_agreements.NOW()
+    description: ""

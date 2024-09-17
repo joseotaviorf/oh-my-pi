@@ -39,7 +39,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agpmtdet.APDETID
   amount_to_pay:
-    description: "Amount Payable for the Installment"
+    description: "Installment amount."
     lineage:
       - datalake_cyber_raw.agpmtdet.APAMT
   payment_amount:
@@ -51,19 +51,19 @@ columns:
     lineage:
       - datalake_cyber_raw.agpmtdet.APINTAMT
   amortization_amount:
-    description: "Amortization amount"
+    description: "Amount that will be amortized"
     lineage:
       - datalake_cyber_raw.agpmtdet.APAMZAMT
-  final_balance:
-    description: "Final balance"
+  balance_amount:
+    description: "Final balance = total agreement amount - amortization amount"
     lineage:
       - datalake_cyber_raw.agpmtdet.APBLNC
   credit_card_fee_amount:
-    description: "Tax amount"
+    description: "Credit Card Fee “prorated” per installment of the agreement"
     lineage:
       - datalake_cyber_raw.agpmtdet.APINTTAXAMT
-  fees_amount:
-    description: "Fees (honorários) amount"
+  installments_fees_amount:
+    description: "Installments fees amount (Juros de Financiamento)."
     lineage:
       - datalake_cyber_raw.agpmtdet.APHONO
   ts_start_payment_term:

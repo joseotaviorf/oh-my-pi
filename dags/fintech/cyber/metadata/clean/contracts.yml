@@ -449,12 +449,12 @@ columns:
     description: "week day"
     lineage:
       - datalake_cyber_raw.uda1.U1DIASEMANA
-  U1QTDFAVENC:
-    description: ""
+  open_invoices:
+    description: "invoices due/open invoices (pt: quantidade de faturas em aberto)"
     lineage:
       - datalake_cyber_raw.uda1.U1QTDFAVENC
-  U1TPCOB:
-    description: ""
+  collection_flow:
+    description: "(pt: Fluxo de cobrança)"
     lineage:
       - datalake_cyber_raw.uda1.U1TPCOB
   days:
@@ -465,7 +465,7 @@ columns:
     description: "Classification"
     lineage:
       - datalake_cyber_raw.uda1.U1CLASSCTR
-  U1OCOREVIC:
-    description: ""
+  restrictive_occurrence:
+    description: "Restrictive occurrence (pt: ocorrência restritiva)"
     lineage:
       - datalake_cyber_raw.uda1.U1OCOREVIC

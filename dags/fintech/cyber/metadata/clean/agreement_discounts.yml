@@ -15,6 +15,10 @@ columns:
       - datalake_cyber_raw.agdscdet.ACFIELD
   field_name:
     description: "Field"
+    categories:
+      "Parcelas Vencidas": "VALOR DO PRINCIPAL DO SOMATÓRIO DAS PARCELAS"
+      "Juros Acordo": "VALOR DE JUROS DO CONTRATO"
+      "Multa Acordo": "VALOR DE MULTA DO CONTRATO"
     lineage:
       - datalake_cyber_raw.agdscdet.ADFIELD
   arithmetic_operator:
