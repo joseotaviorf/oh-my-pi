@@ -54,8 +54,8 @@ cluster:
   type: custom_cluster
   custom_configurations:
     driver_node_type_id: r5d.2xlarge
-    node_type_id: r5d.large
-    num_workers: 4
+    node_type_id: r5d.2xlarge
+    num_workers: 3
     spark_version: 13.3.x-scala2.12
   custom_libraries:
     - pypi:
