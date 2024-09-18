@@ -3,7 +3,7 @@ dag:
   schedule_start_date: 2020,8,6
   owner: Data Agents
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: agent
   default_extraction_type: full
@@ -21,7 +21,7 @@ workflow:
         month: "{month}"
         day: "{day}"
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_xmin_memory_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
