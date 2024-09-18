@@ -16,7 +16,7 @@ workflow:
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
-    - "{dag_name}"
+    - "{schema}"
     - "{table_name}"
   tables_customization:
     actvertb:

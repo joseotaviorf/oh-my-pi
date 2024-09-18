@@ -1,7 +1,7 @@
 ---
 database_name: datalake_cyber_complement_clean
 table_name: agreement_type
-owner: null
+owner: bianca.martins@quintoandar.com.br
 domain: fintech
 description: null
 columns:

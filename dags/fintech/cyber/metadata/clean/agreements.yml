@@ -85,10 +85,10 @@ columns:
     lineage:
       - datalake_cyber_raw.agrhdr.AHTOTPMT
   total_negotiated_amount_without_fees:
-    description: "Total negotiated amount of the agreement without fees"
+    description: "Amount Payable without fees/honorarium"
     lineage:
       - datalake_cyber_raw.agrhdr.AHTOTPMTSH
-  fees_amount:
+  honorarium_amount:
     description: "Fees (honorários) amount."
     lineage:
       - datalake_cyber_raw.agrhdr.AGRHONO
@@ -97,7 +97,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agrhdr.AHRATE
   additional_interest_rate:
-    description: ""
+    description: "Additional contract interest rate. It is only used when payment was made during the grace period."
     lineage:
       - datalake_cyber_raw.agrhdr.AHRATE2
   payment_type_after_free_term:

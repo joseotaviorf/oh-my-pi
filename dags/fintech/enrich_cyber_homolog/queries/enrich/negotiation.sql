@@ -31,6 +31,7 @@ amount_details AS (
 installments AS (
   SELECT
     ai.id_agreement,
+    COUNT(DISTINCT id_agreement_installment) AS number_of_installments,
     SUM(amount_to_pay) AS negotiated_amount,
     SUM(credit_card_fee_amount) AS credit_card_fee_amount,
     SUM(interest_amount) AS installment_interest_fees_amount,
@@ -73,9 +74,9 @@ SELECT
         ELSE a.status
     END AS negotiation_status,
     IF(i.dt_down_payment IS NOT NULL, TRUE, FALSE) AS is_down_payment_paid,
-    a.number_of_installments,
+    i.number_of_installments,
     i.paid_installments,
-    IF(a.status = "Cancelado", a.number_of_installments - i.paid_installments, 0) AS breached_installments,
+    IF(a.status = "Cancelado", i.number_of_installments - i.paid_installments, 0) AS breached_installments,
     d.original_amount,
     a.type_interest_quota,
     a.interest_rate,
@@ -86,6 +87,7 @@ SELECT
     d.contract_interest_fees_amount + i.installment_interest_fees_amount AS total_interest_fees_amount,
     d.eviction_costs_amount,
     d.eviction_honorarium_amount,
+    a.honorarium_amount,
     i.credit_card_fee_amount,
     d.debt_amount + d.eviction_honorarium_amount AS debt_amount,
     d.negotiated_amount + i.credit_card_fee_amount AS negotiated_amount,

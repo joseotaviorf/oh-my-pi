@@ -1500,6 +1500,8 @@ bietlejuice.enrich_cyber_homolog:
   - bietlejuice.cyber:load-clean-payments
   - bietlejuice.cyber:load-clean-users
   - bietlejuice.cyber_complement:load-clean-logs-code-description
+  - bietlejuice.cyber:load-clean-history-contract-distribution
+  - bietlejuice.cyber_complement:load-clean-agency-group
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows

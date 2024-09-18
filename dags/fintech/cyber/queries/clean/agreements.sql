@@ -40,7 +40,7 @@ SELECT
     AHBREAK AS broken_payments,
     AHTOTPMT AS total_negotiated_amount_with_fees,
     AHTOTPMTSH AS total_negotiated_amount_without_fees,
-    AGRHONO AS fees_amount,
+    AGRHONO AS honorarium_amount,
     AHRATE AS interest_rate,
     AHRATE2 AS additional_interest_rate,
     AHGRPERTY AS payment_type_after_free_term,

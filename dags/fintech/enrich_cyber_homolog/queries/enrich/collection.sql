@@ -15,6 +15,10 @@ SELECT
   cdc.code_description AS complement_description,
   l.comment AS occurrence_description,
   l.ts_activity AS ts_occurrence,
+  cca.esforco,
+  cca.alo,
+  cca.cpc,
+  cca.acordo,
   NOW() AS ts_load
 FROM datalake_cyber_clean.logs AS l
 INNER JOIN datalake_cyber_clean.contracts AS c
@@ -24,9 +28,13 @@ LEFT JOIN datalake_cyber_clean.users AS u
 LEFT JOIN datalake_cyber_clean.agency AS ag
   ON u.id_agency = ag.id_agency
 LEFT JOIN datalake_cyber_clean.logs_code_description AS cda
-  ON l.action = a.code AND a.code_type == "Ação"
+  ON l.action = cda.code AND cda.code_type == "Ação"
 LEFT JOIN datalake_cyber_clean.logs_code_description AS cdr
-  ON l.result = aa.code AND aa.code_type == "Resultado"
+  ON l.result = cdr.code AND cdr.code_type == "Resultado"
 LEFT JOIN datalake_cyber_clean.logs_code_description AS cdc
-  ON l.complement = aaa.code AND aaa.code_type == "Carta"
+  ON l.complement = cdc.code AND cdc.code_type == "Carta"
+LEFT JOIN datalake_gsheets_clean.cyber_collection_actions AS cca
+  ON cca.action_code = l.action
+    AND cca.result_code = l.result
+    AND cca.complement_code = l.complement
 WHERE UPPER(l.id_user) NOT IN ("SISTEMA", "HOST", "RCVRY")

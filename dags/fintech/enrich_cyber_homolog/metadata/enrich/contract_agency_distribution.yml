@@ -1,0 +1,32 @@
+---
+database_name: datalake_cyber_homolog
+table_name: contract_agency_distribution
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Get the changes in contract distribution between agencies/advisories
+columns:
+  id_contract_external:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.id_contract_external
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.history_contract_distribution.contract_group
+  agency_group:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.history_contract_distribution.agency
+  agency_name:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agency.agency_name
+  dt_start_interval:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.history_contract_distribution.ts_distribution
+      - datalake_cyber_clean.history_contract_distribution.ts_redistribution
+  dt_end_interval:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.history_contract_distribution.ts_redistribution

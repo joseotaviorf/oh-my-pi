@@ -77,6 +77,12 @@ sheets_info:
     clean_table_name: crm_tasks_to_remove
     sheet_context: static
 
+  cyber_collection_actions:
+    sheet_id: 1z02XrjdeLo8DQQhB-GdZhNujONPDDnDzvanAxSPblPg/edit?gid=839076722#gid=839076722
+    sheet_name: Acao_Resultado_Complemento
+    clean_table_name: cyber_collection_actions
+    sheet_context: static
+
   dados_docato:
     sheet_id: 1wValHoubCG72NQZkOAGMJyBQM26Dkd4QwzKW1IXhSTw
     sheet_name: dados_docato
