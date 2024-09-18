@@ -2,7 +2,7 @@ WITH house_listing_contracts AS (
   WITH latest_contract AS (
     SELECT
       id_house_listing,
-      LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY ts_listing_version_started) AS id_next_house_listing_rented,
+      id_house,
       MAX(id_contract) AS id_contract,
       DENSE_RANK() OVER (PARTITION BY id_house ORDER BY id_house_listing) AS order_renting
     FROM
@@ -10,14 +10,26 @@ WITH house_listing_contracts AS (
     WHERE
       contract_status IN ('Ativo', 'Finalizado')
     GROUP BY
-      id_house_listing, id_house, ts_listing_version_started
+      id_house_listing,
+      id_house
+  ),
+  previous_next_contract AS (
+    SELECT
+      id_house_listing,
+      LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY id_house_listing) AS id_next_house_listing_rented,
+      id_contract,
+      LAG(id_contract) OVER (PARTITION BY id_house ORDER BY id_house_listing) AS id_previous_contract,
+      LEAD(id_contract) OVER (PARTITION BY id_house ORDER BY id_house_listing) AS id_next_contract
+    FROM
+      latest_contract
   )
   SELECT
     hl.id_house_listing,
-    lc.id_next_house_listing_rented,
+    pnc.id_next_house_listing_rented,
     hl.id_house,
     c.id AS id_contract,
-    LAG(lc.id_contract) OVER (PARTITION BY hl.id_house ORDER BY hl.id_house_listing) AS id_previous_contract,
+    pnc.id_previous_contract,
+    pnc.id_next_contract,
     hl.version AS house_version,
     lc.order_renting,
     COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
@@ -30,48 +42,62 @@ WITH house_listing_contracts AS (
     latest_contract AS lc
       ON hl.id_house_listing = lc.id_house_listing
   LEFT JOIN
+    previous_next_contract AS pnc
+      ON hl.id_house_listing = pnc.id_house_listing
+  LEFT JOIN
     datalake_ebdb_contract.contract AS c
       ON c.id = lc.id_contract
 ),
+house_listing_not_extended AS (
+  SELECT
+    id_house_listing,
+    LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY ts_listing_version_start) AS id_next_house_listing_not_extended
+  FROM
+    datalake_ebdb_listing.house_listing
+  WHERE
+    is_extended_rental = FALSE
+),
 lbc AS (
-    SELECT
-        id_house,
-	      CAST(MAX(CAST((business_context = 'SALE') AS INTEGER)) AS BOOLEAN) AS is_for_sale,
-        CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent
-    FROM
-       datalake_ebdb_listing.listing_business_context
-    GROUP BY 1
+  SELECT
+    id_house,
+    CAST(MAX(CAST((business_context = 'SALE') AS INTEGER)) AS BOOLEAN) AS is_for_sale,
+    CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent
+  FROM
+    datalake_ebdb_listing.listing_business_context
+  GROUP BY 1
 ),
 autonomous_agent_info AS (
-    SELECT DISTINCT
-      h.id AS id_house,
-      pa.id_user AS sk_autonomous_agent
-    FROM
-      datalake_ebdb_clean.partner_agent AS pa
-    JOIN
-      datalake_ebdb_clean.partner AS dp
-        ON pa.id_partner = dp.id
-    JOIN
-      datalake_ebdb_clean.house AS h
-        ON pa.id_user = h.id_user_registrant
-    LEFT JOIN
-      datalake_ebdb_listing.listing_business_context AS lbc
-        ON lbc.id_house = h.id
-    WHERE
-      lbc.business_context <> 'SALE'
-      AND dp.type = 'AUTONOMOUS_AGENT'
-      AND dp.id <> '257' -- Test User
-      AND h.dt_creation >= pa.ts_created --This rule might change when we start to considering migration
-      AND h.id_external IS NOT NULL --This rule might change when we start to considering migration
+  SELECT DISTINCT
+    h.id AS id_house,
+    pa.id_user AS sk_autonomous_agent
+  FROM
+    datalake_ebdb_clean.partner_agent AS pa
+  JOIN
+    datalake_ebdb_clean.partner AS dp
+      ON pa.id_partner = dp.id
+  JOIN
+    datalake_ebdb_clean.house AS h
+      ON pa.id_user = h.id_user_registrant
+  LEFT JOIN
+    datalake_ebdb_listing.listing_business_context AS lbc
+      ON lbc.id_house = h.id
+  WHERE
+    lbc.business_context <> 'SALE'
+    AND dp.type = 'AUTONOMOUS_AGENT'
+    AND dp.id <> '257' -- Test User
+    AND h.dt_creation >= pa.ts_created --This rule might change when we start to considering migration
+    AND h.id_external IS NOT NULL --This rule might change when we start to considering migration
 )
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   hl.id_house_listing AS sk_house_listing,
   COALESCE(hlc.id_next_house_listing_rented, -1) AS sk_next_house_listing_rented,
+  COALESCE(hlne.id_next_house_listing_not_extended, -1) AS sk_next_house_listing_not_extended,
   COALESCE(h.id_user, -1) AS sk_owner,
   COALESCE(h.id_region, -1) AS sk_region,
   COALESCE(h.id_user_registrant, -1) AS sk_user_registration,
   COALESCE(hlc.id_contract, -1) AS sk_contract,
   COALESCE(hlc.id_previous_contract, -1) AS sk_previous_contract,
+  COALESCE(hlc.id_next_contract, -1) AS sk_next_contract,
   COALESCE(cd.id, -1) AS sk_condo,
   COALESCE(pa_b2b_online.id_user, pa_b2b_prime.id_user, -1) AS sk_user_partner_agent,
   COALESCE(pa_b2b_online.id_partner, pa_b2b_prime.id_partner, -1) AS sk_partner,
@@ -101,6 +127,9 @@ JOIN
 LEFT JOIN
   house_listing_contracts AS hlc
     ON hl.id_house_listing = hlc.id_house_listing
+LEFT JOIN
+  house_listing_not_extended AS hlne
+    ON hl.id_house_listing = hlne.id_house_listing
 LEFT JOIN
   datalake_ebdb_clean.condo AS cd
     ON h.id_condo_parent = cd.id
