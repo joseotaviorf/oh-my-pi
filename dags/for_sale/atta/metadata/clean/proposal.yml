@@ -59,6 +59,9 @@ columns:
   financing_value:
     lineage:
       - datalake_atta_raw.proposta.valor
+  status_translation:
+    lineage:
+      - datalake_atta_raw.proposta.StatusTranslation
   ts_registration:
     lineage:
       - datalake_atta_raw.proposta.dtentrada

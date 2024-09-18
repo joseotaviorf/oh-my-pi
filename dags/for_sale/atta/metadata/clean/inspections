@@ -1,0 +1,25 @@
+---
+database_name: datalake_atta_clean
+table_name: inspections
+columns:
+  id:
+    lineage:
+      - datalake_atta_raw.inspections.id
+  id_proposal:
+    lineage:
+      - datalake_atta_raw.inspections.PropostaId
+  status:
+    lineage:
+      - datalake_atta_raw.inspections.status
+  ts_started:
+    lineage:
+      - datalake_atta_raw.inspections.StartedAt
+  ts_finished:
+    lineage:
+      - datalake_atta_raw.inspections.FinishedAt
+  ts_created:
+    lineage:
+      - datalake_atta_raw.inspections.CreatedAt
+  ts_updated:
+    lineage:
+      - datalake_atta_raw.inspections.UpdatedAt

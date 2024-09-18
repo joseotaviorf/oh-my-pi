@@ -17,6 +17,7 @@ SELECT
     `STATUS`                    AS id_proposal_status,
     CPF                         AS client_cpf,
     Nome                        AS client_name,
+    StatusTranslation           AS status_translation,
     Valor                       AS financing_value,
     TIMESTAMP(DtEntrada)        AS ts_registration,
     TIMESTAMP(DtFinalizacao)    AS ts_financing_ended,

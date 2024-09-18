@@ -115,6 +115,10 @@ tables:
     extraction_type: full
     clean_table_name: bank_tracking
     db: atta
+  - table_name: inspections
+    extraction_type: full
+    clean_table_name: inspections
+    db: atta
 
 custom_cluster:
   driver_node_type_id: r5a.2xlarge
