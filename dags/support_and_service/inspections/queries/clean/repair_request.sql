@@ -13,6 +13,7 @@ SELECT
     title,
     cost,
     exempted AS is_exempted,
+    exempted_from_budget AS is_exempted_from_budget,
     from_analysis AS is_from_analysis,
     finished AS is_finished,
     automatically_identified AS has_automatically_identified,

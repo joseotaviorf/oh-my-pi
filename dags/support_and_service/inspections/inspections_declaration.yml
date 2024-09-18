@@ -23,6 +23,16 @@ workflow:
       date_filter_column: updated_at
     assessment:
       date_filter_column: updated_at
+    budget:
+      merge_on: ["id_budget"]
+      date_filter_column: updated_at
+    budget_aud:
+      date_filter_column: updated_at
+    budget_approval_payment_preference:
+      merge_on: ["id_budget_approval_payment_preference"]
+      date_filter_column: updated_at
+    budget_approval_payment_preference_aud:
+      date_filter_column: updated_at
     contestation_media:
       date_filter_column: updated_at
     contestation:
@@ -52,6 +62,7 @@ workflow:
     repair_request_media:
       date_filter_column: updated_at
     repair_request:
+      merge_on: ["id_repair_request"]
       date_filter_column: updated_at
     repair_suggestion:
       date_filter_column: updated_at

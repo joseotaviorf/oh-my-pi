@@ -36,6 +36,24 @@ columns:
       SAME: ""
       REPAIR_NEGOTIATED: ""
       OTHER: ""
+  origin:
+    lineage:
+      - datalake_inspections_raw.contestation.origin
+    description: Descriptive information that indicates when the contestation occurred.
+    categories:
+      REVIEW: If the contestation occurred at the time of review.
+      BUDGET_APPROVAL: If the contestation occurred at the time of budget approval process.
+  type:
+    lineage:
+      - datalake_inspections_raw.contestation.type
+    description: Descriptive information indicating the type of contestation made.
+    categories:
+      RESPONSIBILITY: If it was a contestation of responsibility for the repair.
+      COST: If it was a contestation of cost for the repair.
+  cost:
+    lineage:
+      - datalake_inspections_raw.contestation.cost
+    description: Float type information indicating the disputed value.
   ts_created:
     lineage:
       - datalake_inspections_raw.contestation.created_at
