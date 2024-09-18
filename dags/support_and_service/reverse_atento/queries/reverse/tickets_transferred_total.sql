@@ -52,13 +52,15 @@ WITH base AS (
       ,'CX Visitas [FRONT] [PRE]'
       ,'Consultores imobiliários 5A'
       ,'CX Parceiros Compra e Venda [FRONT]')
-    AND DATE_TRUNC('month', frc.ts_created) >= CURRENT_DATE - INTERVAL '13' MONTH
+    AND DATE_TRUNC('month', frc.ts_created) >= CURRENT_DATE - INTERVAL '6' MONTH
+    AND (da.agent_organization = "atento" OR da.agent_organization = "atn")
 ),
 transferred_segments AS (
   SELECT
     sk_conversation,
     sk_ticket,
     theme_detail,
+    department,
     SUM(task_transferred) AS transferencias,
     COUNT(DISTINCT sk_conversation) AS tickets,
     MAX(CASE WHEN segment_number = 1 THEN department END) AS department_1,
@@ -94,6 +96,7 @@ transferred_segments AS (
     theme_detail,
     transferencias,
     tickets,
+    department,
     department_1,
     op_1,
     transferred_to_1,
@@ -211,6 +214,7 @@ SELECT
   theme_detail,
   transferencias,
   tickets,
+  department,
   department_1,
   op_1,
   transferred_to_1,
@@ -327,6 +331,4 @@ SELECT
   DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM steps_definition
-WHERE
-  DATE_TRUNC('month',dt_started) >= DATE_TRUNC('month',CURRENT_DATE) - INTERVAL '2' MONTH
 GROUP BY ALL
