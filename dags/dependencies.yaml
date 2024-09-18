@@ -1009,10 +1009,8 @@ bietlejuice.dw_velo_zendesk:
   - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-metrics
   - bietlejuice.velo_zendesk:load-clean-users
 bietlejuice.dw_visit:
-  - bietlejuice.ebdb:load-clean-booking
   - bietlejuice.ebdb:load-clean-entrance
   - bietlejuice.ebdb:load-clean-feedback-tag
-  - bietlejuice.ebdb:load-clean-follow-up-details
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.ebdb:load-clean-visit-cancellation-details
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -3048,9 +3046,6 @@ bietlejuice.enrich_vespucio_pipeline:
   - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
   - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
 bietlejuice.enrich_visit:
-  - bietlejuice.ebdb:load-clean-booking
-  - bietlejuice.ebdb:load-clean-entrance
-  - bietlejuice.ebdb:load-clean-follow-up-details
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.ebdb:load-clean-visit-cancellation-details
   - bietlejuice.ebdb:load-clean-visit-fitting

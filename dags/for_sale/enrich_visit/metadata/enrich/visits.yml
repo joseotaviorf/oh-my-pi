@@ -23,20 +23,16 @@ columns:
     description: User ID of the property owner
   id_house:
     lineage:
-      - datalake_ebdb_clean.booking.id_house
+      - datalake_ebdb_clean.visit.id_house
     description: Id of the house of interest
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
     description: House listing ID
   id_rent_flow:
-    lineage:
-      - datalake_ebdb_clean.booking.id_rent_flow
     description: Id for Rent Flow connection
   id_sale_flow:
     lineage:
-      - datalake_ebdb_clean.booking.id_house
-      - datalake_ebdb_clean.booking.id_visitor
     description: Id for Sale Flow connection, junction of visitor with house
   id_company_supply:
     lineage:
@@ -55,8 +51,6 @@ columns:
       - datalake_ebdb_clean.visit_cancellation_details.id
     description: Visit cancellation details ID
   id_follow_up:
-    lineage:
-      - datalake_ebdb_clean.booking.id_fup_details
     description: ID for visit's follow up
   id_entrance_type:
     lineage:
@@ -103,8 +97,6 @@ columns:
       - datalake_ebdb_clean.visit.slot
     description: Slot is used to take the day of visit.
   business_context:
-    lineage:
-      - datalake_ebdb_clean.booking.business_context
     description: Which is the context of this visit.
   default_timezone:
     lineage:
