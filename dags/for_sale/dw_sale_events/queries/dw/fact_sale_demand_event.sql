@@ -256,7 +256,7 @@ events AS (
 ),
 final_results AS (
 SELECT
-    CONCAT(sk_event_date,COALESCE(NULLIF(sk_booking,-1),sk_buyer),sk_event_type) AS sk_sale_demand_event,
+    MD5(sk_event_date || '-' || sk_event_type || '-' || COALESCE(NULLIF(sk_offer, -1), sk_booking)) AS sk_sale_demand_event,
     e.sk_event_date,
     e.sk_event_type,
     e.sk_booking,
