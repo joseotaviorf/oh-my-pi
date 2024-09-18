@@ -1,0 +1,6 @@
+---
+table_name: datalake_google_ads_clean.geo_target_constant
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_geo_target:
+    is_unique:

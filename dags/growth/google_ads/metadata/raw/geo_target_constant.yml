@@ -1,0 +1,9 @@
+---
+database_name: datalake_google_ads_raw
+table_name: geo_target_constant
+owner: arthur.gonzaga@quintoandar.com.br
+domain: Growth
+description: Table load geographic information from Google Ads API extraction. Documentation can be found at https://developers.google.com/google-ads/api/reference/rpc/v15/GeoTargetConstant
+columns:
+  geoTargetConstant:
+    description: Geographic information from Google Ads API extraction

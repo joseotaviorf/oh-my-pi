@@ -1,0 +1,6 @@
+---
+database_name: datalake_google_ads_raw
+table_name: ad_group_geo_performance
+owner: arthur.gonzaga@quintoandar.com.br
+domain: Growth
+description: Table load data with geographic performance of our ad_group. Documentation can be found at https://developers.google.com/google-ads/api/reference/rpc/v15/GeoPerformance

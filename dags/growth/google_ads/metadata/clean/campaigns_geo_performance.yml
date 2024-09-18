@@ -1,0 +1,94 @@
+---
+database_name: datalake_google_ads_clean
+table_name: campaigns_geo_performance
+owner: arthur.gonzaga@quintoandar.com.br
+domain: Growth
+description: |
+  Table load Ads Performance Report from Google Ads API extraction for geographic view (city and region). 
+  Documentation can be found at https://developers.google.com/google-ads/api/reference/rpc/v13/overview
+columns:
+  id_external_customer:
+    description: Customer identificator
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.customer
+  id_campaign:
+    description: Campaign identificator
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.campaign
+  campaign_name:
+    description: Campagin name from google ads platform where metrics should be attributed
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.campaign
+  clicks:
+    description: Number of clicks from google ads platform
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.metrics
+  cost:
+    description: Cost from google ads platform
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.metrics
+  month:
+    description: Month as represented by the date of the first day of a month. Formatted as yyyy-MM-dd
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.segments
+  week:
+    description: Week as defined as Monday through Sunday, and represented by the date of Monday. Formatted as yyyy-MM-dd
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.segments
+  year:
+    description: Year, formatted as yyyy
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.segments
+  device:
+    description: Device to which metrics apply
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.segments
+  ad_network_type:
+    description: Ad network type
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.segments
+  impressions:
+    description: Number of impressions from google ads platform
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.metrics
+  account_descriptive_name:
+    description: Optional, non-unique descriptive name of the customer.
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.customer
+  labels:
+    description: Output only. The resource names of labels attached to this campaign
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.campaign
+  report_type:
+    description: Type of report extracted from Google API
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.report_type
+    categories:
+      AD_PERFORMANCE_REPORT: Ads report type
+      VIDEO_PERFORMANCE_REPORT: Video report type
+      CAMPAIGN_PERFORMANCE_REPORT: Campaign report type
+      KEYWORDS_PERFORMANCE_REPORT: Keywords report type
+  account_snake_case:
+    description: Account name pos string transformation
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.account_snake_case
+  country_code:
+    description: Country code the account belongs to.
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.account_snake_case
+  geo_target_city:
+    description: City of the campaign target
+    lineage:    
+      - datalake_google_ads_raw.campaigns_geo_performance.segments.geoTargetCity
+  geo_target_region:
+    description: Region of the campaign target
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.segments.geoTargetRegion
+  dt_loaded:
+    description: Date of loaded data
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.segments
+  dt_created:
+    description: Date of creation of each raw
+    lineage:
+      - datalake_google_ads_raw.campaigns_geo_performance.dt_created

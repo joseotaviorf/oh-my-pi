@@ -8,6 +8,9 @@ report_type_mapping:
   keywords_performance: KEYWORDS_PERFORMANCE_REPORT
   videos_performance: VIDEO_PERFORMANCE_REPORT
   search_term_performance: SEARCH_TERM_PERFORMANCE_REPORT
+  geo_target_constant: GEO_TARGET_CONSTANT
+  campaigns_geo_performance: CAMPAIGN_GEOGRAPHIC_REPORT
+  ad_group_geo_performance: AD_GROUP_GEOGRAPHIC_REPORT
 GAQL:
   ads_performance: |
     SELECT
@@ -118,6 +121,64 @@ GAQL:
     FROM search_term_view
     WHERE
         segments.date BETWEEN '{load_start_date}' AND '{load_end_date}'
+  geo_target_constant: |
+    SELECT
+      geo_target_constant.id, 
+      geo_target_constant.name,
+      geo_target_constant.country_code, 
+      geo_target_constant.canonical_name, 
+      geo_target_constant.parent_geo_target, 
+      geo_target_constant.resource_name, 
+      geo_target_constant.status, 
+      geo_target_constant.target_type 
+    FROM 
+      geo_target_constant
+  campaigns_geo_performance: |
+    SELECT
+      customer.id,
+      customer.descriptive_name,
+      campaign.id,
+      campaign.name,
+      campaign.labels,
+      metrics.clicks,
+      metrics.cost_micros,
+      metrics.impressions,
+      segments.device,
+      segments.ad_network_type,
+      segments.geo_target_city,
+      segments.geo_target_region,
+      segments.date,
+      segments.month,
+      segments.week,
+      segments.year
+    FROM 
+      geographic_view
+    WHERE
+      segments.date BETWEEN '{load_start_date}' AND '{load_end_date}'
+  ad_group_geo_performance: |
+    SELECT
+      customer.id,
+      customer.descriptive_name,
+      campaign.id,
+      campaign.name,
+      campaign.labels,
+      ad_group.id,
+      ad_group.name,
+      metrics.clicks,
+      metrics.cost_micros,
+      metrics.impressions,
+      segments.device,
+      segments.ad_network_type,
+      segments.geo_target_city,
+      segments.geo_target_region,
+      segments.date,
+      segments.month,
+      segments.week,
+      segments.year
+    FROM 
+      geographic_view
+    WHERE
+      segments.date BETWEEN '{load_start_date}' AND '{load_end_date}'
 schema:
   ads_performance: |
     customer STRUCT<

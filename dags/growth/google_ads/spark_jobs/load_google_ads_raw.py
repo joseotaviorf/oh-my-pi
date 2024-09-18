@@ -128,6 +128,8 @@ if __name__ == "__main__":
         googleads_client, login_customer_id, customer_filter
     )
 
+    logger.info(f'm=__main__, msg="Starting to run requests"')
+
     args = product(
         [googleads_client],
         customer_ids,
@@ -137,6 +139,9 @@ if __name__ == "__main__":
             )
         ],
     )
+
+    logger.info(f'm=__main__, msg="Collecting requests"')
+
     results = BaseSparkContext.sc.parallelize(args).map(_issue_search_request).collect()
 
     successes = []
@@ -173,17 +178,26 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     df = spark_client.conn.read.json(BaseSparkContext.sc.parallelize(successes))
 
+    logger.info(f'm=__main__, msg="Dataframe created with successfull results"')
+
     if not df.rdd.isEmpty():
-        df = (
-            df.withColumn(
-                "account_snake_case",
-                udf(StringFormatter.set_alphanumeric_snake_case)(
-                    df.customer.descriptiveName
-                ),
+        if report_type == 'geo_target_constant':
+            df = (
+                df.withColumn("report_type", lit(report_type_mapped))
             )
-            .withColumn("report_type", lit(report_type_mapped))
-            .withColumn("dt_created", df["segments.date"])
-        )
+            raw_partition_cols = None
+        else:
+            df = (
+                df.withColumn(
+                    "account_snake_case",
+                    udf(StringFormatter.set_alphanumeric_snake_case)(
+                        df.customer.descriptiveName
+                    ),
+                )
+                .withColumn("report_type", lit(report_type_mapped))
+                .withColumn("dt_created", df["segments.date"])
+            )            
+        
         s3_loader = S3Loader()
         spark_metastore_service = SparkMetastoreService(spark_client)
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
@@ -212,9 +226,10 @@ if __name__ == "__main__":
              force_recreate=False,
          )
 
-        spark_metastore_service.create_new_partitions_from_df(
-            df=df,
-            database_name=database_name,
-            table_name=report_type,
-            partition_cols=raw_partition_cols,
-        )
+        if raw_partition_cols is not None:
+            spark_metastore_service.create_new_partitions_from_df(
+                df=df,
+                database_name=database_name,
+                table_name=report_type,
+                partition_cols=raw_partition_cols,
+            )

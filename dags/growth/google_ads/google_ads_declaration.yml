@@ -36,6 +36,17 @@ workflow:
     videos_performance: 
       extra_spark_job_arguments: 
         - videos_performance # report type
+    geo_target_constant:
+      extra_spark_job_arguments:
+        - geo_target_constant # report type
+      extraction_type: full
+      partitions: []
+    campaigns_geo_performance:
+      extra_spark_job_arguments:
+        - campaigns_geo_performance # report type
+    ad_group_geo_performance:
+      extra_spark_job_arguments:
+        - ad_group_geo_performance # report type
     # search_term_performance: # Not used, but can be added if needed
     #   extra_spark_job_arguments:
     #     - search_term_performance # report type
@@ -45,7 +56,7 @@ cluster:
     driver_node_type_id: r5d.2xlarge
     node_type_id: r5d.large
     num_workers: 4
-    spark_version: 12.2.x-scala2.12
+    spark_version: 13.3.x-scala2.12
   custom_libraries:
     - pypi:
         package: google-ads==22.1.0

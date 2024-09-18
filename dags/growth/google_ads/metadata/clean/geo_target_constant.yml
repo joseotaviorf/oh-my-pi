@@ -1,0 +1,39 @@
+---
+database_name: datalake_google_ads_clean
+table_name: geo_target_constant
+owner: arthur.gonzaga@quintoandar.com.br
+domain: Growth
+description: Table load geographic information from Google Ads API extraction. Documentation can be found at https://developers.google.com/google-ads/api/reference/rpc/v15/GeoTargetConstan
+columns:
+  id_geo_target:
+    description: Unique identifier for the geographic target
+    lineage:
+      - datalake_google_ads_raw.geo_target_constant.geoTargetConstant
+  name:
+    description: Name of the geographic target
+    lineage:
+      - datalake_google_ads_raw.geo_target_constant.geoTargetConstant
+  canonical_name:
+    description: Canonical name of the geographic target
+    lineage:
+      - datalake_google_ads_raw.geo_target_constant.geoTargetConstant
+  country_code:
+    description: Country code of the geographic target
+    lineage:
+      - datalake_google_ads_raw.geo_target_constant.geoTargetConstant
+  parent_geo_target:
+    description: Parent geographic target
+    lineage:
+      - datalake_google_ads_raw.geo_target_constant.geoTargetConstant
+  resource_name:
+    description: Resource name of the geographic target
+    lineage:
+      - datalake_google_ads_raw.geo_target_constant.geoTargetConstant
+  status:
+    description: Status of the geographic target
+    lineage:
+      - datalake_google_ads_raw.geo_target_constant.geoTargetConstant
+  target_type:
+    description: Type of the geographic target
+    lineage:
+      - datalake_google_ads_raw.geo_target_constant.geoTargetConstant
