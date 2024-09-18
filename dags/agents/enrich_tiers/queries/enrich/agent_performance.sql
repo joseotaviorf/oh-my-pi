@@ -1,27 +1,13 @@
-WITH bimester AS (
-    WITH filter_bimester AS (
-        SELECT DISTINCT
-            ad.bimester,
-            ad.year
-        FROM 
-            datalake_quintoandar.aux_date AS ad
-        WHERE
-            ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    )
+WITH filter_bimester AS (
     SELECT
         ad.bimester_name,
-        ad.bimester_months,
-        ad.bimester_start,
-        ad.bimester_end,
         ad.date,
         ad.bimester,
         ad.year
     FROM 
         datalake_quintoandar.aux_date AS ad
-    JOIN
-        filter_bimester AS fb
-            ON fb.bimester = ad.bimester 
-            AND fb.year = ad.year
+    WHERE
+        ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 offer_signed AS (
     SELECT
@@ -29,31 +15,33 @@ offer_signed AS (
         COUNT(DISTINCT oa.id_offer) AS total_offer_signed,
         COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.has_tqc IS TRUE) AS total_offer_signed_with_tqc,
         COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.has_ciq IS TRUE) AS total_offer_signed_with_ciq,
-        b.bimester,
-        b.year
+        fb.year,
+        fb.bimester
     FROM
         datalake_tiers.agent_offers_signed AS oa
     JOIN
-        bimester AS b
-            ON DATE(oa.ts_sale_agreement_signed) BETWEEN b.bimester_start AND b.bimester_end
+        filter_bimester AS fb
+            ON fb.bimester = oa.bimester
+            AND fb.year = oa.year
     GROUP BY 1, 5, 6
 ),
 ciq_first_listing AS (
     SELECT
         cfl.id_user,
         COUNT(DISTINCT cfl.id_house) AS total_first_listing,
-        b.bimester,
-        b.year
+        fb.year,
+        fb.bimester
     FROM
         datalake_tiers.ciq_first_listing AS cfl
     JOIN
-        bimester AS b
-            ON DATE(cfl.ts_first_listing) BETWEEN b.bimester_start AND b.bimester_end
+        filter_bimester AS fb
+            ON fb.bimester = cfl.bimester
+            AND fb.year = cfl.year
     GROUP BY 1, 3, 4
 ),
 member_profile AS (
     SELECT
-        b.bimester_name,
+        fb.bimester_name,
         u.id_main_user,
         u.id_agent,
         mp.id_business_unit,
@@ -70,8 +58,8 @@ member_profile AS (
         mp.is_active,
         mp.ts_relationship_started,
         COALESCE(mp.ts_relationship_ended, mp.ts_load) AS ts_relationship_ended,
-        b.year,
-        b.bimester
+        fb.bimester,
+        fb.year
     FROM
         datalake_hub_services.member_profile AS mp
     JOIN
@@ -81,8 +69,8 @@ member_profile AS (
         datalake_hub_services_clean.business_unit AS bu
             ON bu.id = mp.id_business_unit
     JOIN
-        bimester AS b
-            ON b.date BETWEEN DATE(mp.ts_relationship_started) 
+        filter_bimester AS fb
+            ON fb.date BETWEEN DATE(mp.ts_relationship_started) 
             AND DATE(COALESCE(mp.ts_relationship_ended, mp.ts_load))
     WHERE
         mp.profile IN ('AGENT', 'NEGOTIATION_EXECUTIVE')

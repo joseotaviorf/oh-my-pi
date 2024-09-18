@@ -19,7 +19,7 @@ WITH share_rule AS (
         sr.ts_created,
         sr.ts_updated
     FROM
-        datalake_big_agent_clean.share_rule_aud AS sr
+        datalake_big_agent_clean.share_rule AS sr
     WHERE
         sr.external_condition_type = "HUB"
         AND sr.status = "VALID"

@@ -1,6 +1,16 @@
-
 -- Do not reprocess the table, as the source tables are still fully loaded
-WITH offer_agents AS (
+WITH filter_bimester AS (
+    SELECT DISTINCT
+        ad.bimester_start,
+        ad.bimester_end,
+        ad.bimester,
+        ad.year
+    FROM 
+        datalake_quintoandar.aux_date AS ad
+    WHERE
+        ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
+offer_agents AS (
     SELECT DISTINCT
         so.id_offer,
         so.id_user_consultant AS id_user_negotiation_executive,
@@ -38,10 +48,7 @@ union_offer_agents AS (
         oa.has_broker_tqc AS has_tqc,
         IF(oa.id_user_ciq = oa.id_user_broker, TRUE, FALSE) AS has_ciq,
         oa.ts_sale_agreement_signed,
-        oa.ts_updated,
-        DAY(oa.ts_updated) AS day,
-        MONTH(oa.ts_updated) AS month,
-        YEAR(oa.ts_updated) AS year
+        oa.ts_updated
     FROM
         offer_agents AS oa
     WHERE 
@@ -55,10 +62,7 @@ union_offer_agents AS (
         oa.has_negotiation_executive_tqc AS has_tqc,
         IF(oa.id_user_ciq = oa.id_user_negotiation_executive, TRUE, FALSE) AS has_ciq,
         oa.ts_sale_agreement_signed,
-        oa.ts_updated,
-        DAY(oa.ts_updated) AS day,
-        MONTH(oa.ts_updated) AS month,
-        YEAR(oa.ts_updated) AS year
+        oa.ts_updated
     FROM
         offer_agents AS oa
     WHERE 
@@ -73,11 +77,12 @@ SELECT
     uoa.has_ciq,
     uoa.ts_sale_agreement_signed,
     uoa.ts_updated,
-    uoa.day,
-    uoa.month,
-    uoa.year
+    fb.year,
+    fb.bimester
 FROM
     union_offer_agents AS uoa
+JOIN
+    filter_bimester AS fb
+        ON DATE(uoa.ts_updated) BETWEEN fb.bimester_start AND fb.bimester_end
 WHERE 
     uoa.ts_sale_agreement_signed IS NOT NULL
-    AND uoa.ts_updated BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}') 

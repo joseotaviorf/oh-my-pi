@@ -18,7 +18,7 @@ WITH points_rule AS (
         pr.ts_created,
         pr.ts_updated
     FROM
-        datalake_big_agent_clean.points_rule_aud AS pr
+        datalake_big_agent_clean.points_rule AS pr
     WHERE
         pr.external_condition_type = "HUB"
         AND pr.status = "VALID"

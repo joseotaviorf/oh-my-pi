@@ -1,5 +1,16 @@
 -- Do not reprocess the table, as the source tables are still fully loaded
-WITH ciq_first_listing AS (
+WITH filter_bimester AS (
+    SELECT DISTINCT
+        ad.bimester_start,
+        ad.bimester_end,
+        ad.bimester,
+        ad.year
+    FROM 
+        datalake_quintoandar.aux_date AS ad
+    WHERE
+        ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
+ciq_first_listing AS (
     SELECT DISTINCT
         hslc.id_house,
         hslc.id_user,
@@ -22,10 +33,10 @@ SELECT
     cfl.consultant_type,
     cfl.ts_first_listing,
     cfl.ts_updated,
-    YEAR(cfl.ts_updated) AS year,
-    MONTH(cfl.ts_updated) AS month,
-    DAY(cfl.ts_updated) AS day
+    fb.year,
+    fb.bimester
 FROM
     ciq_first_listing AS cfl
-WHERE
-    cfl.ts_updated BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+JOIN
+    filter_bimester AS fb
+        ON DATE(cfl.ts_updated) BETWEEN fb.bimester_start AND fb.bimester_end
