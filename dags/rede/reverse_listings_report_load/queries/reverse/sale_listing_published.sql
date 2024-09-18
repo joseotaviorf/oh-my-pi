@@ -1,9 +1,11 @@
 SELECT
-    (
-        100000 * ROUND(fls.sk_sale_listing / 1000) +
-        1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 
-         3
-     ) AS id,
+    CONCAT(
+        SUBSTRING(MD5(CAST((100000 * ROUND(fls.sk_sale_listing / 1000) + 1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 3) AS STRING)), 1, 8), '-',
+        SUBSTRING(MD5(CAST((100000 * ROUND(fls.sk_sale_listing / 1000) + 1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 3) AS STRING)), 9, 4), '-',
+        SUBSTRING(MD5(CAST((100000 * ROUND(fls.sk_sale_listing / 1000) + 1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 3) AS STRING)), 13, 4), '-',
+        SUBSTRING(MD5(CAST((100000 * ROUND(fls.sk_sale_listing / 1000) + 1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 3) AS STRING)), 17, 4), '-',
+        SUBSTRING(MD5(CAST((100000 * ROUND(fls.sk_sale_listing / 1000) + 1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 3) AS STRING)), 21, 12)
+    ) AS id,
     fls.sk_region AS location_id,
     ROUND(fls.sk_sale_listing / 1000) AS property_id,
     dc.uuid_company AS company_uuid,

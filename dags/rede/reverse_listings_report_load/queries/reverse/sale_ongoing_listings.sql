@@ -1,5 +1,11 @@
 SELECT
-    CAST(MIN(fdol.sk_snapshot) * 100 + 9 AS BIGINT) AS id,
+    CONCAT(
+        SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 1, 8), '-',
+        SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 9, 4), '-',
+        SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 13, 4), '-',
+        SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 17, 4), '-',
+        SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 21, 12)
+    ) AS id,
     sk_region AS location_id,
     dc.uuid_company AS company_uuid,
     'SALE' AS business_context,

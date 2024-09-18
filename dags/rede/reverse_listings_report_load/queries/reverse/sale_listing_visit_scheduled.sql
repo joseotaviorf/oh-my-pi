@@ -1,5 +1,11 @@
 SELECT
-    CAST(fv.sk_booking * 1000 + 4 AS BIGINT) AS id,
+    CONCAT(
+        SUBSTRING(MD5(CAST(fv.sk_booking AS STRING)), 1, 8), '-',
+        SUBSTRING(MD5(CAST(fv.sk_booking AS STRING)), 9, 4), '-',
+        SUBSTRING(MD5(CAST(fv.sk_booking AS STRING)), 13, 4), '-',
+        SUBSTRING(MD5(CAST(fv.sk_booking AS STRING)), 17, 4), '-',
+        SUBSTRING(MD5(CAST(fv.sk_booking AS STRING)), 21, 12)
+    ) AS id,
     fv.sk_region AS location_id,
     fv.sk_house AS property_id,
     dc.uuid_company AS company_uuid,

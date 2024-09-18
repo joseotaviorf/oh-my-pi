@@ -1,5 +1,11 @@
 SELECT
-    CAST(MIN(fsse.sk_event) * 1000 + 1 AS BIGINT) AS id,
+    CONCAT(
+        SUBSTRING(MD5(CAST(MIN(fsse.sk_event) AS STRING)), 1, 8), '-',
+        SUBSTRING(MD5(CAST(MIN(fsse.sk_event) AS STRING)), 9, 4), '-',
+        SUBSTRING(MD5(CAST(MIN(fsse.sk_event) AS STRING)), 13, 4), '-',
+        SUBSTRING(MD5(CAST(MIN(fsse.sk_event) AS STRING)), 17, 4), '-',
+        SUBSTRING(MD5(CAST(MIN(fsse.sk_event) AS STRING)), 21, 12)
+    ) AS id,
     fsse.sk_house_region AS location_id,
     fsse.sk_house AS property_id,
     dc.uuid_company AS company_uuid,
