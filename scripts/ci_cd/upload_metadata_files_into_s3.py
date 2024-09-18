@@ -16,7 +16,7 @@ from scripts.services.metadata_file_service import (
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    group = parser.add_mutually_exclusive_group(required=True)
+    group = parser.add_mutually_exclusive_group()
     group.add_argument(
         "--all",
         help="If all metadata files should be uploaded",
@@ -33,6 +33,16 @@ def parse_args():
         help="If only a specific metadata yml file should be uploaded",
         required=False,
     )
+
+    commit = group.add_argument_group()
+    commit.add_argument(
+        "--from-commit", help="if uses commit as checkpoint. Get the start commit"
+    )
+
+    commit.add_argument(
+        "--to-commit", help="if uses commit as checkpoint. Get the ends commit"
+    )
+
     parser.add_argument("--bucket", help="S3 Bucket where data should be stored")
     parser.add_argument("--host", help="Metadata Propagator hostname to be used")
     args = parser.parse_args()
@@ -40,11 +50,21 @@ def parse_args():
     bucket = args.bucket
     host = args.host
     branch = args.branch
+    from_commit = args.from_commit
+    to_commit = args.to_commit
     file = args.file
-    return bucket, host, all_files, branch, file
+    return bucket, host, all_files, branch, from_commit, to_commit, file
 
 
-def get_metadata_files(all_files, branch, file):
+def filter_new_and_changed_files(files_and_status, upsert_status_codes):
+    return [
+        (file, status)
+        for file, status in files_and_status.items()
+        if status in upsert_status_codes
+    ]
+
+
+def get_metadata_files(all_files, branch, from_commit, to_commit, file):
     metadata_file_service = MetadataFileService()
     if all_files:
         return list(metadata_file_service.list_metadata_files())
@@ -56,8 +76,10 @@ def get_metadata_files(all_files, branch, file):
             from_branch = "HEAD~1"
         else:
             from_branch = "origin/master"
-            git_service.fetch("master") # We need to do this because Woodpecker will only fetch from the current branch.
-        
+            git_service.fetch(
+                "master"
+            )  # We need to do this because Woodpecker will only fetch from the current branch.
+
         changed_files = [
             (file, status)
             for file, status in git_service.get_modified_files_from_diff(
@@ -65,6 +87,16 @@ def get_metadata_files(all_files, branch, file):
             ).items()
             if status in git_service.UPSERT_STATUS_CODES
         ]
+        metadata_files = metadata_file_service.filter_metadata_files(changed_files)
+        return metadata_files
+
+    elif from_commit and to_commit:
+        git_service = GitService()
+        changed_files = filter_new_and_changed_files(
+            git_service.get_modified_files_from_diff(from_commit, to_commit),
+            git_service.UPSERT_STATUS_CODES,
+        )
+
         metadata_files = metadata_file_service.filter_metadata_files(changed_files)
         return metadata_files
 
@@ -104,11 +136,17 @@ def upload_files(files: List[MetadataFileInfo], bucket):
 
 def metric_qualculation_method(metric_path: str) -> str:
     base_path = "/woodpecker/src/github.com/quintoandar/bi-etl-ejuice"
-    sql_file_path = metric_path.replace("metadata", "queries").replace(".ymal", ".sql").replace(".yml", ".sql")
+    sql_file_path = (
+        metric_path.replace("metadata", "queries")
+        .replace(".yaml", ".sql")
+        .replace(".yml", ".sql")
+    )
     safe_path = os.path.realpath(sql_file_path)
-    common_base = os.path.commonpath([base_path, safe_path]) 
+    common_base = os.path.commonpath([base_path, safe_path])
     if common_base != base_path:
-        print(f"common_base = {common_base}, base_path = {base_path}, safe_path = {safe_path}")
+        print(
+            f"common_base = {common_base}, base_path = {base_path}, safe_path = {safe_path}"
+        )
         raise ValueError("Invalid commom path")
     with open(sql_file_path, "r") as sql_file:
         return json.dumps(sql_file.read())
@@ -144,7 +182,11 @@ def generate_metric_payload(file_info: MetadataFileInfo) -> List[Dict]:
                     "created_by": metric_data["owner"],
                     "maturity_level": "Official",
                     "calculation": metric_qualculation_method(file_info.local_path),
-                    **{key: value for key, value in metric.items() if key in optional_args}
+                    **{
+                        key: value
+                        for key, value in metric.items()
+                        if key in optional_args
+                    },
                 }
             )
 
@@ -160,14 +202,13 @@ def generate_documentation_payload(file_info: MetadataFileInfo) -> Dict:
 
 
 def generate_payloads(files_info: List[MetadataFileInfo]):
-    doc_payloads = {
-        "documentation": [],
-        "metricEntity": []
-    }
+    doc_payloads = {"documentation": [], "metricEntity": []}
 
     for file_info in files_info:
         if file_info.has_documentation:
-            doc_payloads["documentation"].append(generate_documentation_payload(file_info))
+            doc_payloads["documentation"].append(
+                generate_documentation_payload(file_info)
+            )
         if file_info.has_metric:
             doc_payloads["metricEntity"] += generate_metric_payload(file_info)
 
@@ -186,14 +227,19 @@ def send_metadata_to_mp(files_info, host):
 
 
 def main():
-    bucket, host, all_files, branch, file = parse_args()
-    files = get_metadata_files(all_files, branch, file)
+    bucket, host, all_files, branch, from_commit, to_commit, file = parse_args()
+    files = get_metadata_files(all_files, branch, from_commit, to_commit, file)
 
     if not files:
         print("m=main, msg=No files found to upload.")
         exit(0)
 
-    files_info = [MetadataFileService.get_info(file) for file, status in files]
+    files_info = []
+    for file, _ in files:
+        try:
+            files_info.append(MetadataFileService.get_info(file))
+        except FileNotFoundError:
+            print(f"The file {file} not exists. Maybe the file was deleted.")
 
     print("m=main, msg=Files to be uploaded:")
     for file_info in files_info:
