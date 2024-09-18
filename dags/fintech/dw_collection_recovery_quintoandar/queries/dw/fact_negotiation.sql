@@ -108,6 +108,7 @@ recupera_negotiation AS (
     GREATEST(ROUND((expense_amount - adm_fee_amount) - negotiated_amount, 2), 0) AS discount_amount_without_adm_fee, -- Negotiated amount (negotiated_amount) - debt amount without credit card fee (debt_amount_without_adm_fee = original + fine + fee = expense_amount - adm_fee_amount)
     negotiated_amount,
     down_payment_amount,
+    down_payment_amount_without_fees,
     total_amount_paid,
     total_next_due,
     dt_cancellation,
@@ -207,6 +208,7 @@ union_sources AS (
     rn.negotiated_to_be_due_amount,
     rn.negotiated_overdue_amount,
     COALESCE(tfn.down_payment_amount, rn.down_payment_amount) AS down_payment_amount,
+    rn.down_payment_amount_without_fees,
     COALESCE(tfn.paid_amount, rn.total_amount_paid, 0) AS paid_amount,
     rn.total_next_due,
     oi.dt_due_invoice_anchor,
@@ -288,6 +290,7 @@ SELECT
   negotiated_to_be_due_amount,
   negotiated_overdue_amount,
   down_payment_amount,
+  down_payment_amount_without_fees,
   paid_amount,
   total_next_due,
   DATEDIFF(dt_down_payment, dt_due_invoice_anchor) AS sla_debt_anchor_to_promisse_payment,

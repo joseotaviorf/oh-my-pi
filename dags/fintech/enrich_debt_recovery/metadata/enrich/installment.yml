@@ -17,6 +17,10 @@ columns:
     description: "Negotiation unique ID"
     lineage:
       - datalake_trato_feito_clean.installment.id_negotiation
+  id_invoice_extra:
+    description: "Invoice ID (purpose = extra) created in the agreement."
+    lineage:
+      - datalake_trato_feito_clean.accounting_installment
   installment_number:
     description: "Installment Number (1,2...), order by due date"
   our_number:

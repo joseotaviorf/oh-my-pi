@@ -13,6 +13,16 @@ charges AS (
         GET_JSON_OBJECT(metadata, "$.our-number") AS our_number
     FROM datalake_trato_feito_clean.installment_charges
 ),
+invoice_extra AS (
+    SELECT
+        ai.id_external AS id_invoice_extra,
+        ai.id_installment
+    FROM datalake_trato_feito_clean.accounting_installment AS ai
+    LEFT JOIN datalake_trato_feito_clean.bill AS b
+        ON ai.id_external = b.id_external
+    WHERE b.external_status != 'canceled'
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY ai.id_installment ORDER BY IFNULL(b.dt_paid, DATE("2900-12-31"))) = 1
+),
 cte_pay AS (
     SELECT
         i.*,
@@ -30,6 +40,7 @@ SELECT
     cp.id_external,
     cp.id_negotiation,
     COALESCE(external_index, DENSE_RANK() OVER(PARTITION BY cp.id_negotiation ORDER BY cp.ts_created, cp.id_external)) AS installment_number,
+    ie.id_invoice_extra,
     c.our_number,
     cp.status,
     cp.adm_fee_amount,
@@ -48,3 +59,5 @@ FROM
     cte_pay AS cp
 LEFT JOIN charges AS c
     ON c.id_installment = cp.id
+LEFT JOIN invoice_extra AS ie
+    ON cp.id = ie.id_installment

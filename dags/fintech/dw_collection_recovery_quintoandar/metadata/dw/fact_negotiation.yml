@@ -254,6 +254,10 @@ columns:
     lineage:
       - datalake_recupera.negotiation.down_payment_amount
     description: "Down Payment (Entry) amount"
+  down_payment_amount_without_fees:
+    lineage:
+      - datalake_recupera.negotiation.down_payment_amount_without_fees
+    description: "Down Payment (Entry) amount without fees"
   paid_amount:
     lineage:
       - datalake_debt_recovery.negotiation.paid_amount

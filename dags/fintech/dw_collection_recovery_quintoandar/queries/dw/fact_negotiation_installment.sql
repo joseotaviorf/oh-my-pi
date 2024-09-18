@@ -14,17 +14,6 @@ deduplicate_trato_feito_negotiation AS (
     debtor != "velo_delinquency_tenant"
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_recupera ORDER BY ts_created_at DESC) = 1
 ),
-deduplicate_invoice_extra AS (
-  SELECT
-    a.id_external AS id_invoice,
-    a.id_installment
-  FROM
-      datalake_trato_feito_clean.accounting_installment AS a
-  LEFT JOIN datalake_retsuko.invoice AS i
-    ON i.id_external = a.id_external
-  WHERE i.status != "canceled"
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY a.id_installment ORDER BY COALESCE(i.ts_payment_confirmation, i.ts_paid) DESC, i.ts_created ASC) = 1
-),
 trato_feito_installment AS (
   SELECT
     n.id_contract,
@@ -32,7 +21,7 @@ trato_feito_installment AS (
     n.id_negotiation_recupera,
     n.creditor,
     i.id AS id_installment,
-    ai.id_invoice AS id_invoice_extra,
+    i.id_invoice_extra,
     i.installment_number,
     i.status AS installment_status,
     i.id_external AS id_receipt,
