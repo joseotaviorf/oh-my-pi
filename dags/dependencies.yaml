@@ -114,15 +114,6 @@ bietlejuice.dw_call:
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
   - bietlejuice.enrich_bigfone_twilio:load-enrich-inbound-call-locations
-bietlejuice.dw_casa_mineira_portal:
-  - bietlejuice.casa_mineira_portal:load-clean-attribute
-  - bietlejuice.casa_mineira_portal:load-clean-attribute-type
-  - bietlejuice.casa_mineira_portal:load-clean-city
-  - bietlejuice.casa_mineira_portal:load-clean-house
-  - bietlejuice.casa_mineira_portal:load-clean-house-attribute
-  - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-budget
-  - bietlejuice.casa_mineira_portal:load-clean-uf
-  - bietlejuice.enrich_casa_mineira_portal:load-enrich-real-estate-status
 bietlejuice.dw_chattermill:
   - bietlejuice.enrich_chattermill:load-enrich-responses
 bietlejuice.dw_collection_recovery:
@@ -2482,15 +2473,6 @@ bietlejuice.enrich_repairs:
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.repairs:load-clean-repair-request-chat
   - bietlejuice.repairs:load-clean-service-request
-bietlejuice.enrich_reports_validation:
-  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
-  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-sent
-  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-published
-  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-signed-contract
-  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-traffic
-  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-confirmed
-  - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-scheduled
-  - bietlejuice.reverse_listings_report_load:load-reverse-sale-ongoing-listings
 bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-boleto
@@ -3363,15 +3345,6 @@ bietlejuice.metric_ss__tickets:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
-bietlejuice.reports:
-  - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-accepted-into-sns
-  - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-sent-into-sns
-  - bietlejuice.reverse_listings_report_access:load-sale-listing-published-into-sns
-  - bietlejuice.reverse_listings_report_access:load-sale-listing-signed-contract-into-sns
-  - bietlejuice.reverse_listings_report_access:load-sale-listing-traffic-into-sns
-  - bietlejuice.reverse_listings_report_access:load-sale-listing-visit-confirmed-into-sns
-  - bietlejuice.reverse_listings_report_access:load-sale-listing-visit-scheduled-into-sns
-  - bietlejuice.reverse_listings_report_access:load-sale-ongoing-listings-into-sns
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent

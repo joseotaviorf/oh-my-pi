@@ -1,9 +1,0 @@
----
-table_name: datalake_reports_validation.sale_listing_signed_contract_divergence
-alert_channel: "#alerts-de-airflow-dags"
-is_incremental:
-  incremental_date_column: dt_entry
-  incremental_date_mask: yyyy-MM-dd
-table_level_validations:
-  has_size:
-    equal_to: 0

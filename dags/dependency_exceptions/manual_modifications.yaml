@@ -511,19 +511,6 @@ bietlejuice.enrich_repairs:
     - bietlejuice.repairs:load-clean-repair-expense-group
     - bietlejuice.repairs:load-clean-repair-request
     - bietlejuice.repairs:load-clean-repair-request-item
-bietlejuice.enrich_reports_validation:
-  add:
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-sent
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-published
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-signed-contract
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-traffic
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-confirmed
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-scheduled
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-ongoing-listings
-  remove:
-    - bietlejuice.reports:load-clean-daily-listings-summary
-    - bietlejuice.reports:load-clean-processed-event
 bietlejuice.enrich_atento_reports:
   add:
     - bietlejuice.reverse_atento:load-reverse-backlog-metric
@@ -779,17 +766,6 @@ bietlejuice.metric_growth__demand:
   remove:
     - bietlejuice.enrich_growth_manual_daily_costs:load-enrich-daily-costs
     - bietlejuice.enrich_growth_automatic_daily_costs:load-enrich-daily-costs
-bietlejuice.reports:
-  # This database is ingested as a quality check for the reverse ETL process, which is why it needs to run after it.
-  add:
-    - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-accepted-into-sns
-    - bietlejuice.reverse_listings_report_access:load-sale-listing-offer-sent-into-sns
-    - bietlejuice.reverse_listings_report_access:load-sale-listing-published-into-sns
-    - bietlejuice.reverse_listings_report_access:load-sale-listing-signed-contract-into-sns
-    - bietlejuice.reverse_listings_report_access:load-sale-listing-traffic-into-sns
-    - bietlejuice.reverse_listings_report_access:load-sale-listing-visit-confirmed-into-sns
-    - bietlejuice.reverse_listings_report_access:load-sale-listing-visit-scheduled-into-sns
-    - bietlejuice.reverse_listings_report_access:load-sale-ongoing-listings-into-sns
 bietlejuice.reverse_atento_access:
   add:
     - bietlejuice.reverse_atento:load-reverse-backlog-metric
