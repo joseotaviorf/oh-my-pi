@@ -16,7 +16,7 @@ SELECT
   vse.id_house_listing AS sk_house_listing,
   vse.id_rent_flow AS sk_rent_flow,
   vse.id_sale_flow AS sk_sale_flow,
-  NULL AS sk_entrance_type,
+  -1 AS sk_entrance_type,
   dct.sk_cancellation_type AS sk_cancellation_type,
   REPLACE(CAST(DATE(vse.ts_event_created) AS STRING), '-', '') AS sk_event_date,
   vse.country_code,
