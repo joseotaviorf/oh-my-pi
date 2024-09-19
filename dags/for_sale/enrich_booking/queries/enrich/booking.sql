@@ -126,7 +126,19 @@ reschedules AS (
     GROUP BY
         id_rescheduled_booking -- guaranteeing there are no future duplication on Product
 ),
-first_booking_author AS (
+status_log AS (
+  SELECT
+    id_schedule,
+    id_author_user
+  FROM
+    datalake_ebdb_clean.visit_status_log
+  WHERE
+    event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
+    AND ts_created >= '2024-08-01'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_schedule ORDER BY ts_created) = 1
+),
+first_booking_author_sc AS (
     SELECT DISTINCT
         bsc.id_booking,
         FIRST_VALUE(id_user) OVER (
@@ -135,6 +147,19 @@ first_booking_author AS (
         ) AS id_user_creation
     FROM
         datalake_ebdb_clean.booking_status_change AS bsc
+),
+first_booking_author AS (
+    SELECT DISTINCT
+        b.id AS id_booking,
+        COALESCE(sl.id_author_user, b.id_attendant, fbasc.id_user_creation) AS id_user_creation
+    FROM
+        datalake_ebdb_clean.booking AS b
+    LEFT JOIN
+        status_log AS sl
+            ON b.id = sl.id_schedule
+    LEFT JOIN
+        first_booking_author_sc AS fbasc
+            ON b.id = fbasc.id_booking
 ),
 visitor_fixed_agent AS (
     WITH fixed_agent_disabled AS (

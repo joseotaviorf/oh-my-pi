@@ -28,6 +28,8 @@ columns:
     description: Key of visit.
   id_user_creation:
     lineage:
+    - datalake_ebdb_clean.visit_status_log.id_author_user
+    - datalake_ebdb_clean.booking.id_attendant
     - datalake_ebdb_clean.booking_status_change.id_user
     description: An identifier for who had created the booking.
   id_user_cancelation:
