@@ -13,6 +13,7 @@ select
   jobfotografo_id as id_photo_job,
   atendente_id as id_attendant,
   origemultimaatualizacao_id as id_last_update_origin,
+  external_id as id_schedule,
   structured AS structured,
   codigo as code,
   durationinslots as slots_duration,

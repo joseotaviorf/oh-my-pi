@@ -43,6 +43,10 @@ columns:
   id_last_update_origin:
     lineage:
       - datalake_ebdb_raw.agendamento.origemultimaatualizacao_id
+  id_schedule:
+    lineage:
+      - datalake_ebdb_raw.agendamento.external_id
+    description: Identification key of appointment in schedule source.
   structured:
     lineage:
       - datalake_ebdb_raw.agendamento.structured
