@@ -1305,9 +1305,6 @@ bietlejuice.enrich_buyer_prospect:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
-bietlejuice.enrich_casa_mineira_portal:
-  - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
-  - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency-history
 bietlejuice.enrich_chattermill:
   - bietlejuice.chattermill:load-clean-responses
 bietlejuice.enrich_ciq:
