@@ -16,10 +16,6 @@ workflow:
     fact_daily_accredited_agent:
       extraction_type: incremental
       partitions: [year, month, day]
-      extra_query_template_params:
-        year: "{year}"
-        month: "{month}"
-        day: "{day}"
 cluster:
   type: databricks_12_2_xmin_memory_cluster
   access_control_list:
