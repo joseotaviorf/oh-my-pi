@@ -56,14 +56,28 @@ translate_field AS (
       WHEN UPPER(field_1) = 'U1IDFMAN' THEN 'Fatura mais antiga'
       WHEN UPPER(field_1) = 'U1SITEVIC' THEN 'Status Eviction'
       WHEN UPPER(field_1) = 'U1TPCOB' THEN 'Fluxo de cobrança'
-      WHEN UPPER(field_1) = 'DMDAYS' THEN 'Dias de atras'
+      WHEN UPPER(field_1) = 'U1STATCONT' THEN 'Status Contrato'
+      WHEN UPPER(field_1) = 'U1CLASSCTR' THEN 'Classificação Contrato'
+      WHEN UPPER(field_1) = 'DMDAYS' THEN 'Dias de atraso'
       WHEN UPPER(field_1) = 'DMACCT' THEN 'Contrato'
       WHEN UPPER(field_1) = 'DMCURBAL' THEN 'Saldo devedor'
-      WHEN UPPER(field_1) = 'DMQUE' THEN 'Fila 1 (Segmentação)'
       WHEN UPPER(field_1) = 'DMSTATE' THEN 'Estado'
+      WHEN UPPER(field_1) = 'DMQUE' THEN 'Fila Segmentação'
+      WHEN UPPER(field_1) = 'DMQUE3' THEN 'Fila Acordos'
+      WHEN UPPER(field_1) = 'DMQUE4' THEN 'Fila Canais Digitais'
+      WHEN UPPER(field_1) = 'DMQUE5' THEN 'Fila Evictions'
+      WHEN UPPER(field_1) = 'DMQUE6' THEN 'Fila Negativação'
+      WHEN UPPER(field_1) = 'DMLABEL3' THEN 'Label Campanhas'
+      WHEN UPPER(field_1) = 'DMLABEL5' THEN 'Label Evictions'
       ELSE UPPER(field_1)
     END AS field,
-    CONCAT("'", UPPER(field_2), "'") AS value,
+    CONCAT("'",
+        CASE
+            WHEN UPPER(field_1) = 'U1TIPOBOL' AND UPPER(field_2) = 'E' THEN 'Sim'
+            WHEN UPPER(field_1) = 'U1FLGPAUSA' AND UPPER(field_2) = 'S' THEN 'Sim'
+            ELSE UPPER(field_2)
+        END
+    , "'") AS value,
     CONCAT("'", UPPER(field_3), "'") AS value_2
   FROM union_sources
 ),
