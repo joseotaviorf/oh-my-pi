@@ -40,15 +40,15 @@ SELECT
     AVCOST AS cost,
     AVDESC AS code_description,
     CASE
-        WHEN AVACCTG = "*" THEN "Geral"
-        WHEN AVACCTG = "N" THEN "Grupo específico"
-        WHEN AVACCTG = "J" THEN "Para legal"
+        WHEN UPPER(AVACCTG) = "*" THEN "Geral"
+        WHEN UPPER(AVACCTG) = "N" THEN "Grupo específico"
+        WHEN UPPER(AVACCTG) = "J" THEN "Para legal"
         ELSE AVACCTG
     END AS group,
     AVTELRANK AS phone_number_rank,
     CASE
-        WHEN AVMODULE = "l" THEN "CyberLegal"
-        WHEN AVMODULE = "n" THEN "Todos os demais"
+        WHEN UPPER(AVMODULE) = "L" THEN "CyberLegal"
+        WHEN UPPER(AVMODULE) = "N" THEN "Todos os demais"
         ELSE AVMODULE
     END AS module,
     AVINACCT,

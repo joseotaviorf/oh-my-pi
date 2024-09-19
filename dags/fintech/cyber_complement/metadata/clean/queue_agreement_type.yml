@@ -1,0 +1,15 @@
+---
+database_name: datalake_cyber_complement_clean
+table_name: queue_agreement_type
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Contains information on valid queues by type of agreement.
+columns:
+  id_agreement_type:
+    description: "Agreement type"
+    lineage:
+      - datalake_cyber_raw.agrvalq.AQTYPE
+  id_queue:
+    description: "Queue ID. * indicates all queues."
+    lineage:
+      - datalake_cyber_raw.agrvalq.AQQUE

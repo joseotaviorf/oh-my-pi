@@ -18,6 +18,7 @@ SELECT
     END AS reason_written_down,
     U1CPFCNPJ AS cpf_cnpj,
     U1RG AS rg,
+    IF(U1TIPOBOL = 'E', TRUE, FALSE) AS has_boletagem,
     U1CLASSCTR AS classification,
     U1FASECOB AS collection_phase,
     IF(U1FLGPAUSA = "S",TRUE,FALSE) AS has_paused_collection,

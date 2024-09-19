@@ -23,4 +23,4 @@ SELECT
     next_level,
     nxt_return,
     queue
-  FROM datalake_cyber_raw.que_dectbl
+  FROM datalake_cyber_raw.lbl_dectbl3

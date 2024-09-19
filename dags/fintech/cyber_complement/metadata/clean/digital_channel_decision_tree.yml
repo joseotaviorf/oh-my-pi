@@ -3,7 +3,7 @@ database_name: datalake_cyber_complement_clean
 table_name: boletagem_decision_tree
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: null
+description: Contains information about digital channel/ salesforce/ massive billing sending
 columns:
   group:
     description: ""
