@@ -16,7 +16,7 @@ SELECT
   vse.id_house_listing AS sk_house_listing,
   vse.id_rent_flow AS sk_rent_flow,
   vse.id_sale_flow AS sk_sale_flow,
-  '' AS sk_entrance_type,
+  ent.sk_entrance_type AS sk_entrance_type,
   dct.sk_cancellation_type AS sk_cancellation_type,
   REPLACE(CAST(DATE(vse.ts_event_created) AS STRING), '-', '') AS sk_event_date,
   vse.country_code,
@@ -45,6 +45,15 @@ INNER JOIN
 INNER JOIN
   datalake_ebdb_listing.house AS lh
     ON vse.id_house = lh.id
+INNER JOIN
+  datalake_ebdb_clean.booking AS b
+  ON vse.id_schedule = b.id
+LEFT JOIN
+  datalake_ebdb_clean.follow_up_details AS fup
+  ON b.id_fup_details = fup.id
+LEFT JOIN
+  dw_visit.dim_entrance_type AS ent
+  ON fup.id_entrance = ent.sk_entrance_type
 LEFT JOIN
   datalake_ebdb_clean.visit_cancellation_details AS vcd
   ON vse.id_cancellation_detail = vcd.id

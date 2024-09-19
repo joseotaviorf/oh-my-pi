@@ -23,7 +23,7 @@ columns:
     description: Field that can be used as booking ID
   id_visitor:
     lineage:
-      - datalake_ebdb_clean.visit.id_visitor
+      - datalake_ebdb_clean.booking.id_visitor
     description: User id of the user is visiting the house
   id_owner:
     lineage:
@@ -31,7 +31,7 @@ columns:
     description: User ID of the property owner
   id_agent:
     lineage:
-      - datalake_ebdb_clean.visit.id_agent
+      - datalake_ebdb_clean.booking.id_agent
     description: Agent user who is following the visit
   id_author_user:
     lineage:
@@ -39,17 +39,24 @@ columns:
     description: User who made the last update.
   id_house:
     lineage:
-      - datalake_ebdb_clean.visit.id_house
+      - datalake_ebdb_clean.booking.id_house
     description: Id of the house of interest
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
     description: House listing ID
   id_rent_flow:
+    lineage:
+      - datalake_ebdb_clean.booking.id_rent_flow
     description: Id for Rent Flow connection
   id_sale_flow:
+    lineage:
+      - datalake_ebdb_clean.booking.id_house
+      - datalake_ebdb_clean.booking.id_visitor
     description: Id for Sale Flow connection, junction of visitor with house
   id_fup_details:
+    lineage:
+      - datalake_ebdb_clean.booking.id_fup_details
     description: Id for visit's follow up
   id_cancellation_detail:
     lineage:
@@ -76,6 +83,8 @@ columns:
       - datalake_ebdb_work_contract.work_contract.id_company_hubspot
     description: Demand partner name
   business_context:
+    lineage:
+      - datalake_ebdb_clean.booking.business_context
     description: The context of the visit, which can be RENT or SALE
   ranking:
     lineage:

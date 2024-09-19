@@ -23,6 +23,9 @@ column_level_validations:
   id_house_listing:
     is_complete:
       severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
   ts_created:
     is_complete:
       severity_level: Error
