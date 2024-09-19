@@ -4,4 +4,4 @@ SELECT
     revtype AS rev_type,
     businessContextsServed AS business_context
 FROM
-    datalake_ebdb_test_raw.DadosAgente_businessContextsServed_aud
+    datalake_ebdb_raw.DadosAgente_businessContextsServed_aud

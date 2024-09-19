@@ -23,4 +23,4 @@ SELECT
     criadoEm AS ts_created,
     atualizadoEm AS ts_updated
 FROM
-    datalake_ebdb_test_raw.DadosAfiliado
+    datalake_ebdb_raw.DadosAfiliado

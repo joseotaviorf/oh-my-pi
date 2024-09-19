@@ -18,4 +18,4 @@ SELECT
     horarios_disponivel18as19 as has_hours_between_18_and_19_available,
     horarios_disponivel19as20 as has_hours_between_19_and_20_available,
     atualizadoPor_id as id_updated_by
-FROM datalake_ebdb_test_raw.`horariosemanalagente_aud` 
+FROM datalake_ebdb_raw.`horariosemanalagente_aud` 

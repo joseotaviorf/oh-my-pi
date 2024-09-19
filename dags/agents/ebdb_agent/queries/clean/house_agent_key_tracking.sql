@@ -8,4 +8,4 @@ SELECT
     CAST(created_at AS TIMESTAMP) AS ts_created,
     CAST(updated_at AS TIMESTAMP) AS ts_updated
 FROM
-    datalake_ebdb_test_raw.HouseAgentKeyTracking
+    datalake_ebdb_raw.HouseAgentKeyTracking

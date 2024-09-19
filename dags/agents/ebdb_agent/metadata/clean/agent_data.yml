@@ -1,52 +1,52 @@
 ---
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: agent_data
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.id
+      - datalake_ebdb_raw.dadosagente.id
   id_coordinate:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.coordinateid
+      - datalake_ebdb_raw.dadosagente.coordinateid
   id_salesforce:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.salesforceid
+      - datalake_ebdb_raw.dadosagente.salesforceid
   id_city:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.cidade_id
+      - datalake_ebdb_raw.dadosagente.cidade_id
   id_work_contract:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.workcontract_id
+      - datalake_ebdb_raw.dadosagente.workcontract_id
   id_preferred_region:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.preferredregion_id
+      - datalake_ebdb_raw.dadosagente.preferredregion_id
   profile:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.perfil
+      - datalake_ebdb_raw.dadosagente.perfil
   agent_type:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.tipoagente
+      - datalake_ebdb_raw.dadosagente.tipoagente
   position_in_real_estate_agency:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.cargoimobiliaria
+      - datalake_ebdb_raw.dadosagente.cargoimobiliaria
   real_estate_agency:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.identificacaoimobiliaria
+      - datalake_ebdb_raw.dadosagente.identificacaoimobiliaria
   creci_number:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.numerocreci
+      - datalake_ebdb_raw.dadosagente.numerocreci
   is_active:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.ativo
+      - datalake_ebdb_raw.dadosagente.ativo
   blocked_schedule_edition:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.edicaoagendabloqueada
+      - datalake_ebdb_raw.dadosagente.edicaoagendabloqueada
   has_opted_for_online_support:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.opted_for_online_support
+      - datalake_ebdb_raw.dadosagente.opted_for_online_support
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.criadoem
+      - datalake_ebdb_raw.dadosagente.criadoem
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente.atualizadoem
+      - datalake_ebdb_raw.dadosagente.atualizadoem

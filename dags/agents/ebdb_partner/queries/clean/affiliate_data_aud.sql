@@ -25,4 +25,4 @@ SELECT
     affiliateType AS affiliate_type,
     doormanAffiliateData_id AS id_doorman_affiliate_data
 FROM
-    datalake_ebdb_test_raw.DadosAfiliado_AUD
+    datalake_ebdb_raw.DadosAfiliado_AUD

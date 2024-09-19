@@ -1,9 +1,9 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: agent_data_types
 columns:
   id_agent_data:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_tipos.dadosagente_id
+      - datalake_ebdb_raw.dadosagente_tipos.dadosagente_id
   types:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_tipos.tipos
+      - datalake_ebdb_raw.dadosagente_tipos.tipos

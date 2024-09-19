@@ -1,60 +1,60 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: agent_weekly_hours_aud
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.id
+      - datalake_ebdb_raw.horariosemanalagente_aud.id
   rev:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.rev
+      - datalake_ebdb_raw.horariosemanalagente_aud.rev
   rev_type:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.revtype
+      - datalake_ebdb_raw.horariosemanalagente_aud.revtype
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.atualizadoem
+      - datalake_ebdb_raw.horariosemanalagente_aud.atualizadoem
   id_agent:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.agente_id
+      - datalake_ebdb_raw.horariosemanalagente_aud.agente_id
   day_of_week:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.diadasemana
+      - datalake_ebdb_raw.horariosemanalagente_aud.diadasemana
   has_hours_between_08_and_09_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel08as09
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel08as09
   has_hours_between_09_and_10_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel09as10
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel09as10
   has_hours_between_10_and_11_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel10as11
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel10as11
   has_hours_between_11_and_12_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel11as12
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel11as12
   has_hours_between_12_and_13_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel12as13
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel12as13
   has_hours_between_13_and_14_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel13as14
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel13as14
   has_hours_between_14_and_15_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel14as15
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel14as15
   has_hours_between_15_and_16_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel15as16
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel15as16
   has_hours_between_16_and_17_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel16as17
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel16as17
   has_hours_between_17_and_18_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel17as18
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel17as18
   has_hours_between_18_and_19_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel18as19
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel18as19
   has_hours_between_19_and_20_available:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.horarios_disponivel19as20
+      - datalake_ebdb_raw.horariosemanalagente_aud.horarios_disponivel19as20
   id_updated_by:
     lineage:
-      - datalake_ebdb_test_raw.horariosemanalagente_aud.atualizadopor_id
+      - datalake_ebdb_raw.horariosemanalagente_aud.atualizadopor_id

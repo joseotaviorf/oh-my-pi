@@ -1,5 +1,5 @@
 ---
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: agent_lead_referral
 owner: herivelto.junior@quintoandar.com.br
 domain: For Sale
@@ -8,40 +8,40 @@ columns:
   id:
     description: Unique identifier for this referral.
     lineage:
-    - datalake_ebdb_test_raw.agentleadreferral.id
+    - datalake_ebdb_raw.agentleadreferral.id
   id_agent:
     description: Agent ID that invited this lead.
     lineage:
-    - datalake_ebdb_test_raw.agentleadreferral.agent_id
+    - datalake_ebdb_raw.agentleadreferral.agent_id
   id_lead:
     description: Lead User ID. Can JOIN with dim_user sk_user.
     lineage:
-    - datalake_ebdb_test_raw.agentleadreferral.lead_id
+    - datalake_ebdb_raw.agentleadreferral.lead_id
   name:
     description: Invited customer name.
     lineage:
-    - datalake_ebdb_test_raw.agentleadreferral.name
+    - datalake_ebdb_raw.agentleadreferral.name
   status:
     description: Invite status.
     lineage:
-    - datalake_ebdb_test_raw.agentleadreferral.status
+    - datalake_ebdb_raw.agentleadreferral.status
   phone:
     description: Lead phone
     lineage:
-    - datalake_ebdb_test_raw.agentleadreferral.phone
+    - datalake_ebdb_raw.agentleadreferral.phone
   code:
     description: Code sent to the invited user.
     lineage:
-    - datalake_ebdb_test_raw.agentleadreferral.code
+    - datalake_ebdb_raw.agentleadreferral.code
   origin:
     description: Channel through which a lead is captured.
     lineage:
-    - datalake_ebdb_test_raw.agentleadreferral.origin
+    - datalake_ebdb_raw.agentleadreferral.origin
   ts_created:
     description: Register creation timestamp
     lineage:
-    - datalake_ebdb_test_raw.agentleadreferral.createdAt
+    - datalake_ebdb_raw.agentleadreferral.createdAt
   ts_updated:
     description: Register update timestamp
     lineage:
-    - datalake_ebdb_test_raw.agentleadreferral.updatedAt
+    - datalake_ebdb_raw.agentleadreferral.updatedAt

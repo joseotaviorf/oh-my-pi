@@ -18,4 +18,4 @@ SELECT
     numeroCRECI_MOD AS mod_creci_number,
     opted_for_online_support_MOD AS has_opted_for_online_support_MOD
 FROM
-    datalake_ebdb_test_raw.dadosagente_aud 
+    datalake_ebdb_raw.dadosagente_aud 

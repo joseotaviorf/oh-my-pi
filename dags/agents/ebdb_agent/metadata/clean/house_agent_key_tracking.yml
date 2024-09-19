@@ -1,27 +1,27 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: house_agent_key_tracking
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking.id
+      - datalake_ebdb_raw.houseagentkeytracking.id
   id_agent:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking.agent_id
+      - datalake_ebdb_raw.houseagentkeytracking.agent_id
   id_house:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking.house_id
+      - datalake_ebdb_raw.houseagentkeytracking.house_id
   comments:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking.comments
+      - datalake_ebdb_raw.houseagentkeytracking.comments
   status:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking.status
+      - datalake_ebdb_raw.houseagentkeytracking.status
   dt_delivered:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking.delivered_on
+      - datalake_ebdb_raw.houseagentkeytracking.delivered_on
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking.created_at
+      - datalake_ebdb_raw.houseagentkeytracking.created_at
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking.updated_at
+      - datalake_ebdb_raw.houseagentkeytracking.updated_at

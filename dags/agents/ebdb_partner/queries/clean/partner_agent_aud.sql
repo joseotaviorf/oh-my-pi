@@ -10,4 +10,4 @@ SELECT
     status_MOD AS mod_status,
     type_MOD AS mod_type
 FROM
-    datalake_ebdb_test_raw.partneragent_aud
+    datalake_ebdb_raw.partneragent_aud

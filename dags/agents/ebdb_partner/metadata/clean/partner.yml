@@ -1,66 +1,66 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: partner
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.partner.id
+      - datalake_ebdb_raw.partner.id
   id_amplitude_device:
     lineage:
-      - datalake_ebdb_test_raw.partner.amplitudedeviceid
+      - datalake_ebdb_raw.partner.amplitudedeviceid
   id_state:
     lineage:
-      - datalake_ebdb_test_raw.partner.state_id
+      - datalake_ebdb_raw.partner.state_id
   uuid_company:
     lineage:
-      - datalake_ebdb_test_raw.partner.companyuuid
+      - datalake_ebdb_raw.partner.companyuuid
   name:
     lineage:
-      - datalake_ebdb_test_raw.partner.name
+      - datalake_ebdb_raw.partner.name
   phone:
     lineage:
-      - datalake_ebdb_test_raw.partner.phone
+      - datalake_ebdb_raw.partner.phone
   cnpj:
     lineage:
-      - datalake_ebdb_test_raw.partner.cnpj
+      - datalake_ebdb_raw.partner.cnpj
   creci:
     lineage:
-      - datalake_ebdb_test_raw.partner.creci
+      - datalake_ebdb_raw.partner.creci
   email:
     lineage:
-      - datalake_ebdb_test_raw.partner.email
+      - datalake_ebdb_raw.partner.email
   address:
     lineage:
-      - datalake_ebdb_test_raw.partner.address
+      - datalake_ebdb_raw.partner.address
   number:
     lineage:
-      - datalake_ebdb_test_raw.partner.number
+      - datalake_ebdb_raw.partner.number
   complement:
     lineage:
-      - datalake_ebdb_test_raw.partner.complement
+      - datalake_ebdb_raw.partner.complement
   city:
     lineage:
-      - datalake_ebdb_test_raw.partner.city
+      - datalake_ebdb_raw.partner.city
   neighborhood:
     lineage:
-      - datalake_ebdb_test_raw.partner.neighborhood
+      - datalake_ebdb_raw.partner.neighborhood
   zip_code:
     lineage:
-      - datalake_ebdb_test_raw.partner.zipcode
+      - datalake_ebdb_raw.partner.zipcode
   type:
     lineage:
-      - datalake_ebdb_test_raw.partner.type
+      - datalake_ebdb_raw.partner.type
   landing_url:
     lineage:
-      - datalake_ebdb_test_raw.partner.landingurl
+      - datalake_ebdb_raw.partner.landingurl
   trade_name:
     lineage:
-      - datalake_ebdb_test_raw.partner.tradename
+      - datalake_ebdb_raw.partner.tradename
   ts_partnership_started:
     lineage:
-      - datalake_ebdb_test_raw.partner.partnershipstartsat
+      - datalake_ebdb_raw.partner.partnershipstartsat
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.partner.criadoem
+      - datalake_ebdb_raw.partner.criadoem
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.partner.atualizadoem
+      - datalake_ebdb_raw.partner.atualizadoem

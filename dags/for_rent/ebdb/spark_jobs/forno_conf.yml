@@ -429,6 +429,25 @@ table_block_list:
   - AgentsProspect
   - AgentsProspect_AUD
   - LeadImobiliaria
+  - DadosAgente
+  - DadosAgente_AUD
+  - DadosAgente_businessContextsServed
+  - DadosAgente_businessContextsServed_AUD
+  - DadosAgente_tipos
+  - AgentLeadReferral
+  - AgentLeadReferral_AUD
+  - DadosAgente_Regiao_AUD
+  - HouseAgentKeyTracking
+  - HouseAgentKeyTracking_AUD
+  - HorarioEspecificoAgente
+  - HorarioEspecificoAgente_AUD
+  - HorarioSemanalAgente_AUD
+  - HorarioSemanalMascara
+  - Partner
+  - PartnerAgent
+  - PartnerAgent_AUD
+  - DadosAfiliado
+  - DadosAfiliado_AUD
 
 view_allow_list:
   - vteste_utf8mb3

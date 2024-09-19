@@ -12,4 +12,4 @@ SELECT
     delivered_on_mod AS mod_dt_delivered,
     CAST(delivered_on AS DATE) AS dt_delivered
 FROM
-    datalake_ebdb_test_raw.HouseAgentKeyTracking_aud
+    datalake_ebdb_raw.HouseAgentKeyTracking_aud

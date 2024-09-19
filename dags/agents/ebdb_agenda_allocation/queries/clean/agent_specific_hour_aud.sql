@@ -20,4 +20,4 @@ SELECT
     disponivel19as20 as is_available_between_19_and_20,
     atualizadoPor_id as id_updated_by,
     folga_MOD as mod_is_off_work
-FROM datalake_ebdb_test_raw.`horarioespecificoagente_aud` 
+FROM datalake_ebdb_raw.`horarioespecificoagente_aud` 

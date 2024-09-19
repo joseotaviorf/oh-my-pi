@@ -10,4 +10,4 @@ SELECT
     createdAt AS ts_created,
     updatedAt AS ts_updated
 FROM
-    datalake_ebdb_test_raw.agentleadreferral
+    datalake_ebdb_raw.agentleadreferral

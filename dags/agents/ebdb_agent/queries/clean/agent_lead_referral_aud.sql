@@ -18,4 +18,4 @@ SELECT
     lead_id_mod AS mod_id_lead,
     createdAt AS ts_created
 FROM
-    datalake_ebdb_test_raw.agentleadreferral_aud
+    datalake_ebdb_raw.agentleadreferral_aud

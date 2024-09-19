@@ -19,4 +19,4 @@ select
     atualizadoEm as ts_updated,
     criadoEm as ts_created
 from
-    datalake_ebdb_test_raw.horarioespecificoagente
+    datalake_ebdb_raw.horarioespecificoagente

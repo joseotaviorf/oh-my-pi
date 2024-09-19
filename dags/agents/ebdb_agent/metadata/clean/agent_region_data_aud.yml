@@ -1,15 +1,15 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: agent_region_data_aud
 columns:
   id_region:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_regiao_aud.regioes_id
+      - datalake_ebdb_raw.dadosagente_regiao_aud.regioes_id
   id_agent_data:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_regiao_aud.dadosagente_id
+      - datalake_ebdb_raw.dadosagente_regiao_aud.dadosagente_id
   rev_type:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_regiao_aud.revtype
+      - datalake_ebdb_raw.dadosagente_regiao_aud.revtype
   rev:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_regiao_aud.rev
+      - datalake_ebdb_raw.dadosagente_regiao_aud.rev

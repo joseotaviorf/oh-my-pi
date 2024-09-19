@@ -1,58 +1,58 @@
 ---
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: agent_data_aud
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.id
+      - datalake_ebdb_raw.dadosagente_aud.id
   id_work_contract:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.workcontract_id
+      - datalake_ebdb_raw.dadosagente_aud.workcontract_id
   id_preferred_region:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.preferredregion_id
+      - datalake_ebdb_raw.dadosagente_aud.preferredregion_id
   profile:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.perfil
+      - datalake_ebdb_raw.dadosagente_aud.perfil
   agent_type:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.tipoagente
+      - datalake_ebdb_raw.dadosagente_aud.tipoagente
   position_in_real_estate_agency:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.cargoimobiliaria
+      - datalake_ebdb_raw.dadosagente_aud.cargoimobiliaria
   real_estate_agency:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.identificacaoimobiliaria
+      - datalake_ebdb_raw.dadosagente_aud.identificacaoimobiliaria
   creci_number:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.numerocreci
+      - datalake_ebdb_raw.dadosagente_aud.numerocreci
   rev:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.rev
+      - datalake_ebdb_raw.dadosagente_aud.rev
   rev_type:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.revtype
+      - datalake_ebdb_raw.dadosagente_aud.revtype
   is_active:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.ativo
+      - datalake_ebdb_raw.dadosagente_aud.ativo
   is_schedule_blocked:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.edicaoagendabloqueada
+      - datalake_ebdb_raw.dadosagente_aud.edicaoagendabloqueada
   has_opted_for_online_support:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.opted_for_online_support
+      - datalake_ebdb_raw.dadosagente_aud.opted_for_online_support
   mod_agent_type:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.tipoagente_mod
+      - datalake_ebdb_raw.dadosagente_aud.tipoagente_mod
   mod_position_in_real_estate_agency:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.cargoimobiliaria_mod
+      - datalake_ebdb_raw.dadosagente_aud.cargoimobiliaria_mod
   mod_real_estate_agency:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.identificacaoimobiliaria_mod
+      - datalake_ebdb_raw.dadosagente_aud.identificacaoimobiliaria_mod
   mod_creci_number:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.numerocreci_mod
+      - datalake_ebdb_raw.dadosagente_aud.numerocreci_mod
   has_opted_for_online_support_mod:
     lineage:
-      - datalake_ebdb_test_raw.dadosagente_aud.opted_for_online_support_mod
+      - datalake_ebdb_raw.dadosagente_aud.opted_for_online_support_mod

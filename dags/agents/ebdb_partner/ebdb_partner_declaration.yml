@@ -8,11 +8,10 @@ dag:
 workflow:
   type: cdc
   layer: raw
-  custom_schema: ebdb_test
+  custom_schema: ebdb
   database_type: mysql
   source_database: ebdb
   source_schema: ebdb
-  dbutils_secret_key: EBDB_DB
   tables_customization:
     Partner:
       clean_table_name: partner

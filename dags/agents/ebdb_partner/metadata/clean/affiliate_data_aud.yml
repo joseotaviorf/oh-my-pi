@@ -1,78 +1,78 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: affiliate_data_aud
 columns:
   id_affiliate_data:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.id
+      - datalake_ebdb_raw.dadosafiliado_aud.id
   rev:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.rev
+      - datalake_ebdb_raw.dadosafiliado_aud.rev
   rev_type:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.revtype
+      - datalake_ebdb_raw.dadosafiliado_aud.revtype
   is_active:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.ativo
+      - datalake_ebdb_raw.dadosafiliado_aud.ativo
   operation_city:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.cidadeatuacao
+      - datalake_ebdb_raw.dadosafiliado_aud.cidadeatuacao
   count_leads_sheet:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.contadorplanilhadeleads
+      - datalake_ebdb_raw.dadosafiliado_aud.contadorplanilhadeleads
   closed_contracts:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.contratosfechados
+      - datalake_ebdb_raw.dadosafiliado_aud.contratosfechados
   id_gdocs_sheet:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.idplanilhagdocs
+      - datalake_ebdb_raw.dadosafiliado_aud.idplanilhagdocs
   ts_operation_start:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.inicioatuacao
+      - datalake_ebdb_raw.dadosafiliado_aud.inicioatuacao
   payment_preference:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.preferenciapagamento
+      - datalake_ebdb_raw.dadosafiliado_aud.preferenciapagamento
   main_operation_neighborhoods:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.principaisbairrosatuacao
+      - datalake_ebdb_raw.dadosafiliado_aud.principaisbairrosatuacao
   affiliate_type_old:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.tipoafiliado
+      - datalake_ebdb_raw.dadosafiliado_aud.tipoafiliado
   ts_last_commission_calculation_indicated:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.ultimocalculocomissaoindicado
+      - datalake_ebdb_raw.dadosafiliado_aud.ultimocalculocomissaoindicado
   id_user:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.usuario_id
+      - datalake_ebdb_raw.dadosafiliado_aud.usuario_id
   is_verified:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.verificado
+      - datalake_ebdb_raw.dadosafiliado_aud.verificado
   id_indicated_by:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.indicadopor_id
+      - datalake_ebdb_raw.dadosafiliado_aud.indicadopor_id
   mod_is_active:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.ativo_mod
+      - datalake_ebdb_raw.dadosafiliado_aud.ativo_mod
   creci_number:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.numerocreci
+      - datalake_ebdb_raw.dadosafiliado_aud.numerocreci
   ts_card_sent_communication:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.datacomunicacaoenviocartao
+      - datalake_ebdb_raw.dadosafiliado_aud.datacomunicacaoenviocartao
   last_week_balance_communication:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.semanaultimacomunicacaobalanco
+      - datalake_ebdb_raw.dadosafiliado_aud.semanaultimacomunicacaobalanco
   is_roof_topper:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.rooftopper
+      - datalake_ebdb_raw.dadosafiliado_aud.rooftopper
   mod_is_roof_topper:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.rooftopper_mod
+      - datalake_ebdb_raw.dadosafiliado_aud.rooftopper_mod
   origin:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.origin
+      - datalake_ebdb_raw.dadosafiliado_aud.origin
   affiliate_type:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.affiliatetype
+      - datalake_ebdb_raw.dadosafiliado_aud.affiliatetype
   id_doorman_affiliate_data:
     lineage:
-      - datalake_ebdb_test_raw.dadosafiliado_aud.doormanaffiliatedata_id
+      - datalake_ebdb_raw.dadosafiliado_aud.doormanaffiliatedata_id

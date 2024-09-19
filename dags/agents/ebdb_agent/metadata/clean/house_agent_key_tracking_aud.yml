@@ -1,39 +1,39 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: house_agent_key_tracking_aud
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.id
+      - datalake_ebdb_raw.houseagentkeytracking_aud.id
   id_agent:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.agent_id
+      - datalake_ebdb_raw.houseagentkeytracking_aud.agent_id
   id_house:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.house_id
+      - datalake_ebdb_raw.houseagentkeytracking_aud.house_id
   rev:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.rev
+      - datalake_ebdb_raw.houseagentkeytracking_aud.rev
   rev_type:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.revtype
+      - datalake_ebdb_raw.houseagentkeytracking_aud.revtype
   comments:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.comments
+      - datalake_ebdb_raw.houseagentkeytracking_aud.comments
   status:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.status
+      - datalake_ebdb_raw.houseagentkeytracking_aud.status
   mod_id_agent:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.agent_id_mod
+      - datalake_ebdb_raw.houseagentkeytracking_aud.agent_id_mod
   mod_comments:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.comments_mod
+      - datalake_ebdb_raw.houseagentkeytracking_aud.comments_mod
   mod_status:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.status_mod
+      - datalake_ebdb_raw.houseagentkeytracking_aud.status_mod
   mod_dt_delivered:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.delivered_on_mod
+      - datalake_ebdb_raw.houseagentkeytracking_aud.delivered_on_mod
   dt_delivered:
     lineage:
-      - datalake_ebdb_test_raw.houseagentkeytracking_aud.delivered_on
+      - datalake_ebdb_raw.houseagentkeytracking_aud.delivered_on
