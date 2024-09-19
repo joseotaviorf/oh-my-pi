@@ -31,15 +31,18 @@ amount_details AS (
 installments AS (
   SELECT
     ai.id_agreement,
+    MAX(IF(ai.installment_number = 0, p.payment_method, NULL)) AS promisse_payment_method,
     COUNT(DISTINCT ai.id_agreement_installment) AS number_of_installments,
+    MAX(IF(p.id_agreement_installment IS NOT NULL, ai.installment_number + 1, 0)) AS paid_installments,
     SUM(ai.amount_to_pay) AS negotiated_amount,
     SUM(ai.credit_card_fee_amount) AS credit_card_fee_amount,
     SUM(ai.installment_interest_amount) AS installment_interest_fees_amount,
-    MIN(IF(ai.installment_number = 0, DATE(ai.ts_due_installment), NULL)) AS dt_due_promisse,
     SUM(IF(p.id_agreement_installment IS NOT NULL AND ai.installment_number = 0, p.payment_amount, 0)) AS down_payment_amount,
-    MAX(IF(p.id_agreement_installment IS NOT NULL AND ai.installment_number = 0, DATE(p.ts_payment), NULL)) AS dt_down_payment,
-    MAX(IF(p.id_agreement_installment IS NOT NULL, ai.installment_number + 1, 0)) AS paid_installments,
-    MAX(IF(ai.installment_number = 0, p.payment_method, NULL)) AS promisse_payment_method
+    CASE
+      WHEN COUNT(DISTINCT p.id_payment) = COUNT(DISTINCT ai.id_agreement_installment) THEN MAX(DATE(p.ts_payment))
+    END AS dt_paid_all,
+    MIN(IF(ai.installment_number = 0, DATE(ai.ts_due_installment), NULL)) AS dt_due_promisse,
+    MAX(IF(p.id_agreement_installment IS NOT NULL AND ai.installment_number = 0, DATE(p.ts_payment), NULL)) AS dt_down_payment
   FROM datalake_cyber_clean.agreement_installments AS ai
   LEFT JOIN datalake_cyber_clean.payments AS p
     ON ai.id_agreement_installment = p.id_agreement_installment
@@ -48,20 +51,19 @@ installments AS (
 discount_type AS (
   SELECT
     id_agreement_type,
-    max_discount_level_1,
     MAX(max_discount_level_1) FILTER (WHERE label = 'Juros Acordo') AS max_interest_discount_percentage,
     MAX(max_discount_level_1) FILTER (WHERE label = 'Multa Acordo') AS max_fine_discount_percentage,
     MAX(max_discount_level_1) FILTER (WHERE label = 'Parcelas Vencidas') AS max_main_amount_discount_percantage
   FROM datalake_cyber_clean.agreement_type_discount
   WHERE LOWER(field_name) IN ('u1vlrprcag','u1vlrmuag','u1vlrjuag')
-  GROUP BY 1,2
+  GROUP BY 1
 )
 SELECT
     a.id_agreement AS id_negotiation,
     ca.id_contract,
     c.id_contract_external,
     c.id_client AS id_customer,
-    a.id_user AS id_operator,
+    UPPER(a.id_user) AS id_operator,
     ag.agency_name AS advisory,
     ca.contract_group AS creditor,
     a.agreement_type AS agreement_type,
@@ -79,11 +81,12 @@ SELECT
     END AS origin_agreement,
     a.status AS original_negotiation_status,
     CASE
-        WHEN a.status = "Autorizado" THEN "offset"
-        WHEN a.status = "Finalizado" THEN "finished"
         WHEN a.status = "Cancelado" AND i.dt_down_payment IS NOT NULL THEN "broken"
         WHEN a.status = "Cancelado" AND i.dt_down_payment IS NULL THEN "canceled"
-        WHEN a.status = "Pendente" THEN "started"
+        WHEN a.status = "Finalizado" THEN "finished"
+        WHEN a.status = "Autorizado" AND i.dt_down_payment IS NOT NULL THEN "offset"
+        WHEN a.status = "Autorizado" AND i.dt_down_payment IS NULL THEN "started"
+        WHEN a.status = "Pendente" THEN "pending"
         ELSE a.status
     END AS negotiation_status,
     a.frequency,
@@ -118,6 +121,7 @@ SELECT
     a.ts_agreement_creation AS dt_promisse,
     i.dt_due_promisse,
     i.dt_down_payment,
+    i.dt_paid_all,
     NOW() AS ts_load
 FROM datalake_cyber_clean.agreements AS a
 INNER JOIN datalake_cyber_clean.contracts_agreements AS ca
@@ -125,7 +129,7 @@ INNER JOIN datalake_cyber_clean.contracts_agreements AS ca
 LEFT JOIN datalake_cyber_clean.contracts AS c
   ON ca.id_contract = c.id_contract
 LEFT JOIN datalake_cyber_clean.users AS u
-  ON a.id_user = u.id_user
+  ON UPPER(a.id_user) = UPPER(u.id_user)
 LEFT JOIN datalake_cyber_clean.agency AS ag
   ON u.id_agency = ag.id_agency
 LEFT JOIN datalake_cyber_clean.agreement_type AS at

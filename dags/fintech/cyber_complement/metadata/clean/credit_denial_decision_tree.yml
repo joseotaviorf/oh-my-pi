@@ -1,0 +1,73 @@
+---
+database_name: datalake_cyber_complement_clean
+table_name: credit_denial_decision_tree
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.acct_grp
+  level:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.level1
+  test:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.test
+  sequence:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.sequence
+  comment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.comment1
+  field_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.LOWER(field_1)
+  operator:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.CASE WHEN op = '.eq.' THEN '=' WHEN op = '.ge.'
+        THEN '>=' WHEN op = '.gt.' THEN '>' WHEN op = '.le.' THEN '<=' WHEN op = '.lt.'
+        THEN '<' WHEN op = '.ne.' THEN '!=' ELSE op END
+  field_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.LOWER(field_2)
+  field_2_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.LOWER(field_2_flag)
+  field_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.LOWER(field_3)
+  field_3_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.LOWER(field_3_flag)
+  or_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.or_flag
+  num_return:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.num_return
+  next_level:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.next_level
+  nxt_return:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.nxt_return
+  queue:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.que_dectbl6.queue

@@ -24,7 +24,7 @@ FROM datalake_cyber_clean.logs AS l
 INNER JOIN datalake_cyber_clean.contracts AS c
   ON l.id_contract = c.id_contract
 LEFT JOIN datalake_cyber_clean.users AS u
-  ON LOWER(l.id_user) = LOWER(u.id_user)
+  ON UPPER(l.id_user) = UPPER(u.id_user)
 LEFT JOIN datalake_cyber_clean.agency AS ag
   ON u.id_agency = ag.id_agency
 LEFT JOIN datalake_cyber_clean.logs_code_description AS cda

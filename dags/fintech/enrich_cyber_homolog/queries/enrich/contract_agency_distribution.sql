@@ -48,4 +48,4 @@ SELECT
 FROM order_changes
 WHERE first_row = 1 OR last_row = 1
 GROUP BY
-  1,2,3,4
+  1,2,3

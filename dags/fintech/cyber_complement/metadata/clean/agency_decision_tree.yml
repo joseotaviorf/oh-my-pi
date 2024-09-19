@@ -1,0 +1,73 @@
+---
+database_name: datalake_cyber_complement_clean
+table_name: agency_decision_tree
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.acct_grp
+  level:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.level1
+  test:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.test
+  sequence:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.sequence
+  comment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.comment1
+  field_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.LOWER(field_1)
+  operator:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.CASE WHEN op = '.eq.' THEN '=' WHEN op = '.ge.'
+        THEN '>=' WHEN op = '.gt.' THEN '>' WHEN op = '.le.' THEN '<=' WHEN op = '.lt.'
+        THEN '<' WHEN op = '.ne.' THEN '!=' ELSE op END
+  field_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.LOWER(field_2)
+  field_2_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.LOWER(field_2_flag)
+  field_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.LOWER(field_3)
+  field_3_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.LOWER(field_3_flag)
+  or_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.or_flag
+  num_return:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.num_return
+  next_level:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.next_level
+  nxt_return:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.nxt_return
+  queue:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.agn_dectbl.queue

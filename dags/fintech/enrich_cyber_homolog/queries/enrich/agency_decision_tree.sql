@@ -5,7 +5,6 @@ calculate AS (
         group,
         level,
         test,
-        queue_type,
         MAX(CASE WHEN test = 0 AND sequence = -1 THEN comment ELSE NULL END) OVER (PARTITION BY level) AS level_name,
         MAX(CASE WHEN sequence = 1001 THEN queue ELSE NULL END) OVER (PARTITION BY level, test) AS queue,
         MAX(CASE WHEN sequence = 0 THEN comment ELSE NULL END) OVER (PARTITION BY level, test)  AS queue_name,
@@ -22,7 +21,6 @@ calculate AS (
 SELECT
   level,
   test,
-  queue_type,
   level_name,
   queue,
   queue_name,
@@ -30,4 +28,4 @@ SELECT
   NOW() AS ts_load
 FROM calculate
 WHERE params IS NOT NULL
-GROUP BY 1,2,3,4,5,6
+GROUP BY 1,2,3,4,5
