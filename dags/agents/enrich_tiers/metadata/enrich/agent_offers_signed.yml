@@ -19,14 +19,17 @@ columns:
       - datalake_sale_offer_flows.offer_specialists.id_agent
       - datalake_ebdb_user.user.id_agent
     description: Unique identifier of the agent.
+  id_user_ciq:
+    lineage:
+      - datalake_tiers.ciq_first_listing.id_user
+    description: Unique identifier of the CIQ user who captured/recommended the house through the CIQ program.
   agent_profile:
     description: Type of Agents (Negotiation Executive or Broker)
   has_tqc:
     description: Indicates that the offer had a buyer referral through the ‘Tem Quem Compra’ (TQC) program.
-  has_ciq:
+  is_ciq_first_listing:
     description: 
-      Indicates that the property on offer was recommended by the broker responsible for the visit, for 
-      listing through the CIQ program.
+      Indicates that this house was recommended through the CIQ program, i.e. its first listing is linked to a CIQ user.
   ts_sale_agreement_signed:
     lineage:
       - datalake_offer.sale_offer.ts_sale_agreement_signed

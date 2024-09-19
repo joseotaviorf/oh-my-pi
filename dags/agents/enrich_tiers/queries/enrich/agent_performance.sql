@@ -14,7 +14,6 @@ offer_signed AS (
         oa.id_user,
         COUNT(DISTINCT oa.id_offer) AS total_offer_signed,
         COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.has_tqc IS TRUE) AS total_offer_signed_with_tqc,
-        COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.has_ciq IS TRUE) AS total_offer_signed_with_ciq,
         fb.year,
         fb.bimester
     FROM
@@ -23,7 +22,21 @@ offer_signed AS (
         filter_bimester AS fb
             ON fb.bimester = oa.bimester
             AND fb.year = oa.year
-    GROUP BY 1, 5, 6
+    GROUP BY ALL
+),
+ciq_offer_signed AS (
+    SELECT
+        oa.id_user_ciq AS id_user,
+        COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.is_ciq_first_listing IS TRUE) AS total_offer_signed_with_ciq,
+        fb.year,
+        fb.bimester
+    FROM
+        datalake_tiers.agent_offers_signed AS oa
+    JOIN
+        filter_bimester AS fb
+            ON fb.bimester = oa.bimester
+            AND fb.year = oa.year
+    GROUP BY ALL
 ),
 ciq_first_listing AS (
     SELECT
@@ -37,7 +50,7 @@ ciq_first_listing AS (
         filter_bimester AS fb
             ON fb.bimester = cfl.bimester
             AND fb.year = cfl.year
-    GROUP BY 1, 3, 4
+    GROUP BY ALL
 ),
 member_profile AS (
     SELECT
@@ -98,10 +111,10 @@ SELECT
     mp.phone_number,
     mp.profile,
     mp.hub_name,
-    COALESCE(aos.total_offer_signed, 0) AS total_offer_signed,
-    COALESCE(aos.total_offer_signed_with_tqc, 0) AS total_offer_signed_with_tqc,
-    COALESCE(aos.total_offer_signed - aos.total_offer_signed_with_tqc, 0) AS total_offer_signed_without_tqc,
-    COALESCE(aos.total_offer_signed_with_ciq, 0) AS total_offer_signed_with_ciq,
+    COALESCE(os.total_offer_signed, 0) AS total_offer_signed,
+    COALESCE(os.total_offer_signed_with_tqc, 0) AS total_offer_signed_with_tqc,
+    COALESCE(os.total_offer_signed - os.total_offer_signed_with_tqc, 0) AS total_offer_signed_without_tqc,
+    COALESCE(cos.total_offer_signed_with_ciq, 0) AS total_offer_signed_with_ciq,
     COALESCE(cql.total_first_listing, 0) AS total_first_listing,
     mp.year,
     mp.bimester
@@ -111,10 +124,15 @@ LEFT JOIN
     user_with_multiple_roles AS uwmr
         ON uwmr.id_main_user = mp.id_main_user
 LEFT JOIN
-    offer_signed AS aos
-        ON aos.id_user = mp.id_main_user
-        AND aos.bimester = mp.bimester
-        AND aos.year = mp.year
+    offer_signed AS os
+        ON os.id_user = mp.id_main_user
+        AND os.bimester = mp.bimester
+        AND os.year = mp.year
+LEFT JOIN
+    ciq_offer_signed AS cos
+        ON cos.id_user = mp.id_main_user
+        AND cos.bimester = mp.bimester
+        AND cos.year = mp.year
 LEFT JOIN
     ciq_first_listing AS cql
         ON cql.id_user = mp.id_main_user 

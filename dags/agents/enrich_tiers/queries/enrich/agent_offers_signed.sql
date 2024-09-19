@@ -44,9 +44,10 @@ union_offer_agents AS (
         oa.id_offer,
         oa.id_user_broker AS id_user,
         oa.id_agent_broker AS id_agent,
+        oa.id_user_ciq,
         "Broker" AS agent_profile,
         oa.has_broker_tqc AS has_tqc,
-        IF(oa.id_user_ciq = oa.id_user_broker, TRUE, FALSE) AS has_ciq,
+        oa.id_user_ciq IS NOT NULL AS is_ciq_first_listing,
         oa.ts_sale_agreement_signed,
         oa.ts_updated
     FROM
@@ -58,9 +59,10 @@ union_offer_agents AS (
         oa.id_offer,
         oa.id_user_negotiation_executive AS id_user,
         oa.id_agent_negotiation_executive AS id_agent,
+        oa.id_user_ciq,
         "Negotiation Executive" AS agent_profile,
         oa.has_negotiation_executive_tqc AS has_tqc,
-        IF(oa.id_user_ciq = oa.id_user_negotiation_executive, TRUE, FALSE) AS has_ciq,
+        oa.id_user_ciq IS NOT NULL AS is_ciq_first_listing,
         oa.ts_sale_agreement_signed,
         oa.ts_updated
     FROM
@@ -72,9 +74,10 @@ SELECT
     uoa.id_offer,
     uoa.id_user,
     uoa.id_agent,
+    uoa.id_user_ciq,
     uoa.agent_profile,
     uoa.has_tqc,
-    uoa.has_ciq,
+    uoa.is_ciq_first_listing,
     uoa.ts_sale_agreement_signed,
     uoa.ts_updated,
     fb.year,
