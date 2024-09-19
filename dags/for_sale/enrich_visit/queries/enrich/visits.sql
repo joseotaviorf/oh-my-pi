@@ -83,7 +83,7 @@ SELECT
         ELSE visit_log.last_event
     END AS last_event,
     visit.slot,
-    NULL AS business_context,
+    '' AS business_context,
     COALESCE(ct.default_timezone, 'UTC') AS default_timezone,
     visit_cancellation.reason AS cancellation_reason,
     visit_cancellation.on_behalf_of AS cancellation_on_behalf_of,
