@@ -34,13 +34,7 @@ column_level_validations:
   id_house_listing:
     is_complete:
       severity_level: Error
-  business_context:
-    is_complete:
-      severity_level: Error
   ranking:
-    is_complete:
-      severity_level: Error
-  is_visit_last_event:
     is_complete:
       severity_level: Error
   ts_event_created:

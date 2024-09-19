@@ -90,8 +90,6 @@ columns:
     description:
       Identifies the sale flow key if applicable.
   sk_entrance_type:
-    lineage:
-      - dw_visit.dim_entrance_type.sk_entrance_type
     description:
       Key which identifies the entrance type of the visit. Joins with dim_entrance_type.
   sk_cancellation_type:
