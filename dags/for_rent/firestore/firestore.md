@@ -5,6 +5,8 @@ Firestore DAG retrieves Firestore audit data from Google Cloud Platform Pub/Sub 
 
 Pub/Sub, which stands for Publisher/Subscriber, is used for streaming analytics and data integration pipelines to ingest and distribute data, allowing services to communicate asynchronously.
 
+The Firestore's messages containing new offers with the submission date are originally posted on the [offer-topic](https://console.cloud.google.com/cloudpubsub/topic/detail/offer-topic?project=quintoandar-com-br-pwa) and than loaded to [offers-audit-topic](https://console.cloud.google.com/cloudpubsub/topic/detail/offers-audit-topic?project=quintoandar-com-br-pwa) by the [firestore-audit](https://github.com/quintoandar/firestore-audit) project through [audit-offersOnWrite](https://console.cloud.google.com/functions/details/us-central1/audit-offersOnWrite?env=gen1&project=quintoandar-com-br-pwa) Cloud Run Function. This proccess will stop working on 2025-01-30 due to the Node.js 16 deprecation by Google.
+
 ### Important notes when testing Pub/Sub
 ---
 
