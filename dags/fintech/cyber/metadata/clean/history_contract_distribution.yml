@@ -104,7 +104,7 @@ columns:
     description: "Queue 5. In Recupera this would be the distributor. A contract can be in more than one queue. Same as 'delinquent_master.current_queue_5'"
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_QUE5
-  negativity_queue:
+  credit_denial_queue:
     description: "Queue 6. In Recupera this would be the distributor. A contract can be in more than one queue. Same as 'delinquent_master.current_queue_6'"
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_QUE6

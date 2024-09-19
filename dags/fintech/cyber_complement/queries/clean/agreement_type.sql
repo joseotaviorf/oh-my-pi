@@ -34,5 +34,5 @@ SELECT
   AGSTATUS,
   AGMINPAR,
   AGCANALNEG AS agreement_channel, --Verificar definições existentes na estória de Multicanalidade.
-  AGFORMAPAG AS agreement_type -- BOL = boleto, CAR =Cartão de crédito, DCO = débito em conta.
+  AGFORMAPAG AS payment_method -- BOL = boleto, CAR =Cartão de crédito, DCO = débito em conta.
 FROM datalake_cyber_raw.agrtype

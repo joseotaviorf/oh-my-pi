@@ -27,7 +27,7 @@ SELECT
     HD_QUE3 AS agreement_queue,
     HD_QUE4 AS dialer_queue,
     HD_QUE5 AS eviction_queue,
-    HD_QUE6 AS negativity_queue,
+    HD_QUE6 AS credit_denial_queue,
     HD_LABEL1 AS label_1,
     HD_LABEL2 AS label_2,
     HD_LABEL3 AS label_3,

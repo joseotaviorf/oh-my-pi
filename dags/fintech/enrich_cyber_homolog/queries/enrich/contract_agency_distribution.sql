@@ -43,7 +43,8 @@ SELECT
   contract_group,
   agency_name,
   MAX(IF(first_row = 1, DATE(ts_distribution), NULL)) AS dt_start_interval,
-  IFNULL(MAX(IF(last_row = 1, DATE_SUB(ts_redistribution,1), NULL)),CURRENT_DATE) AS dt_end_interval
+  IFNULL(MAX(IF(last_row = 1, DATE_SUB(ts_redistribution,1), NULL)),CURRENT_DATE) AS dt_end_interval,
+  NOW() AS ts_load
 FROM order_changes
 WHERE first_row = 1 OR last_row = 1
 GROUP BY

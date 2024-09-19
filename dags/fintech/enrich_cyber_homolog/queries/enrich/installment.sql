@@ -99,7 +99,7 @@ split_fees_between_installments AS (
       DATE(a.ts_agreement_creation) AS dt_creation,
       DATE(ai.ts_due_installment) AS dt_due,
       DATE(p.ts_payment) AS dt_paid
-    FROM agreement_installments AS ai
+    FROM datalake_cyber_clean.agreement_installments AS ai
     LEFT JOIN datalake_cyber_clean.agreements AS a
         ON ai.id_agreement = a.id_agreement
     INNER JOIN datalake_cyber_clean.contracts_agreements AS ca

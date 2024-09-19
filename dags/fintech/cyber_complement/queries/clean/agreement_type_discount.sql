@@ -1,5 +1,5 @@
 SELECT
-    ACTYPE AS agreement_type,
+    ACTYPE AS id_agreement_type,
     ACFIELD AS field_name,
     ACLABEL AS label,
     ACOP AS arithmetic_operator,

@@ -395,8 +395,8 @@ columns:
       REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE5
-  negativity_queue:
-    description: "Negativity (negativação) queue"
+  credit_denial_queue:
+    description: "credit_denial (negativação) queue"
     categories:
       REAG: "Queue automatically created by Cyber"
     lineage:
@@ -431,7 +431,7 @@ columns:
       REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ5
-  previous_negativity_queue:
+  previous_credit_denial_queue:
     description: ""
     categories:
       REAG: "Queue automatically created by Cyber"
