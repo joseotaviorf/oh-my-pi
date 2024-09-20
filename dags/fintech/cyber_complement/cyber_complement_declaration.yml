@@ -44,9 +44,9 @@ workflow:
     valcodes:
       clean_table_name: logs_valid_result_code
     lbl_dectbl3:
-      clean_table_name: campaign_label
+      clean_table_name: campaign_label_decision_tree
     lbl_dectbl5:
-      clean_table_name: eviction_label
+      clean_table_name: eviction_label_decision_tree
 cluster:
   type: custom_cluster
   custom_configurations:
