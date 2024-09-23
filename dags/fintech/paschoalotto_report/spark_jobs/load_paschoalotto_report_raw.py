@@ -35,7 +35,7 @@ def __build_warning_messages(environment, s3_path_prefix, table_name, dates):
     for date in dates:
         messages.append(
             f"⚠️\n"
-            f"DAG: paschoalotto_report"
+            f"DAG: paschoalotto_report\n"
             f"Environment: *{environment}*\n"
             f"Table: `{s3_path_prefix}/{table_name}`\n"
             f"Status: *FAILED*\n"
@@ -59,11 +59,11 @@ if __name__ == "__main__":
     parser.add_argument("source", help="name of the source")
     parser.add_argument("source_root_path", help="name of the source")
     parser.add_argument("format", help="S3 object format")
+    parser.add_argument("table_name", help="translated table name (based on original_table_name)")
     parser.add_argument("load_start_date", help="Start of date range: '%Y-%m-%d'")
     parser.add_argument("load_end_date", help="End of date range: '%Y-%m-%d'")
-    parser.add_argument("table_name", help="translated table name (based on original_table_name)")
     parser.add_argument("extraction_type", help="indicates wheter the load is incremental or not (full)")
-    parser.add_argument("partition_cols", help="table partition")
+    parser.add_argument("partitions", help="table partition")
 
     args = parser.parse_args()
 
@@ -71,17 +71,17 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     source_root_path = args.source_root_path
+    format = args.format
+    table_name = args.table_name
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
-    table_name = args.table_name
     extraction_type = args.extraction_type
-    partition_cols = json.loads(args.partition_cols)
-    format = args.format
+    partitions = json.loads(args.partitions)
 
     logger.info(
         f"""m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
-        source_root_path={source_root_path}, partition_cols= {partition_cols}, date_to_ingest={date_to_ingest},
-        table_name={table_name}, extraction_type = {extraction_type}.
+        source_root_path={source_root_path}, partitions= {partitions}, load_start_date={load_start_date},
+        load_end_date = {load_end_date}, table_name={table_name}, extraction_type = {extraction_type}.
         msg=Starting spark job...
         """)
 
@@ -150,7 +150,7 @@ if __name__ == "__main__":
                     database_location=database_location,
                     layer=LayerEnum.RAW,
                     query=None,
-                    partitions=partition_cols,
+                    partitions=partitions,
                 ).load_and_register(df, format_options)
             else:
                 FullTableLoaderPipeline(

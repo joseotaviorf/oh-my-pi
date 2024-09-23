@@ -24,9 +24,11 @@ workflow:
     - "{schema}"
     - 5a-paschoalotto
     - parquet
+    - "{table_name}"
     - "{load_start_date}"
     - "{load_end_date}"
-    - "{table_name}"
+    - "{extraction_type}"
+    - "{partitions}"
   tables_customization:
     tb_arquivo_ret:
       clean_table_name: collection_actions
