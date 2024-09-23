@@ -6,4 +6,4 @@ tables_list:
     "cozy_vs_bp_coverage",
     "styled_usage",
   ]
-cluster_description: databricks_12_2_min_general_cluster
+cluster_description: databricks_13_3_med_general_2_workers_cluster

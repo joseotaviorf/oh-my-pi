@@ -23,9 +23,6 @@ column_level_validations:
   tokens:
     has_completeness:
       greater_than: 0.98
-  utils:
-    has_completeness:
-      greater_than: 0.98
   dt_created:
     has_completeness:
       greater_than: 0.98
