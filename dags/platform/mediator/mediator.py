@@ -33,18 +33,26 @@ def extract_dependencies():
     return dependencies_dict
 
 
-def extract_skip_list():
+def extract_skip_list(dependencies_dict):
     mediator_skip_list = Variable.get(
         "MEDIATOR_SKIP_LIST", deserialize_json=True, default_var={}
     )
-    force_skip_list = []
-    if "dags" in mediator_skip_list and mediator_skip_list["dags"]:
-        for dag_id, skip_date in mediator_skip_list["dags"].items():
+    force_skip_list = set()
+    if "dags_not_to_trigger" in mediator_skip_list and mediator_skip_list["dags_not_to_trigger"]:
+        for dag_id, skip_date in mediator_skip_list["dags_not_to_trigger"].items():
             skip_date = datetime.strptime(skip_date, "%Y-%m-%d").date()
             if date.today() == skip_date:
-                force_skip_list.append(dag_id)
+                force_skip_list.add(dag_id)
+    
+    if "skip_all_dependents_from_dags" in mediator_skip_list and mediator_skip_list["skip_all_dependents_from_dags"]:
+        for dag_id, skip_date in mediator_skip_list["skip_all_dependents_from_dags"].items():
+            skip_date = datetime.strptime(skip_date, "%Y-%m-%d").date()
+            if date.today() == skip_date:
+                for dependency_dag_id, dependencies_list in dependencies_dict.items():
+                    if dag_id in set(dependency.split(":")[0] for dependency in dependencies_list):
+                        force_skip_list.add(dependency_dag_id)
 
-    return force_skip_list
+    return list(force_skip_list)
 
 
 # Define tasks
@@ -66,11 +74,12 @@ mediator_dag = DAG(
 )
 
 dependencies_dict = extract_dependencies()
+skip_list = extract_skip_list(dependencies_dict)
 sensor_task = QuintoAndarShortCircuitExternalSensor(
     dag=mediator_dag,
     task_id="check-dependencies",
     dependencies=dependencies_dict,
-    skip_list=extract_skip_list(),
+    skip_list=skip_list,
     allow_rerun=False,
     retries=0,
     read_dags_from_db=True,

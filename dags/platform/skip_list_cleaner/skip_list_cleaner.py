@@ -28,14 +28,25 @@ def clean_skip_list():
     )
     clean_skip_list = json.loads(previous_skip_list)
     clean_skip_list["_last_updater"] = "DAG bietlejuice.skip_list_cleaner"
-    if clean_skip_list["dags"]:
-        for dag_id, skip_date in list(clean_skip_list["dags"].items()):
+    if clean_skip_list["dags_not_to_trigger"]:
+        for dag_id, skip_date in list(clean_skip_list["dags_not_to_trigger"].items()):
             skip_date = datetime.strptime(skip_date, "%Y-%m-%d").date()
             if skip_date < today_date:
                 print(
-                    f"m=clean_skip_list, msg=Removing DAG {dag_id} because the skip date is too old, skip_date={skip_date}, today_date={today_date}"
+                    f"m=clean_skip_list, msg=Removing DAG {dag_id} from 'dags_not_to_trigger' because the skip date is too old, skip_date={skip_date}, today_date={today_date}"
                 )
-                del clean_skip_list["dags"][dag_id]
+                del clean_skip_list["dags_not_to_trigger"][dag_id]
+
+    if clean_skip_list["skip_all_dependents_from_dags"]:
+        for dag_id, skip_date in list(
+            clean_skip_list["skip_all_dependents_from_dags"].items()
+        ):
+            skip_date = datetime.strptime(skip_date, "%Y-%m-%d").date()
+            if skip_date < today_date:
+                print(
+                    f"m=clean_skip_list, msg=Removing DAG {dag_id} from 'skip_all_dependents_from_dags' because the skip date is too old, skip_date={skip_date}, today_date={today_date}"
+                )
+                del clean_skip_list["skip_all_dependents_from_dags"][dag_id]
 
     Variable.set(key, json.dumps(clean_skip_list, indent=4))
 
