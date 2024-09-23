@@ -1,14 +1,16 @@
 SELECT
-    CONCAT(
-        SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 1, 8), '-',
-        SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 9, 4), '-',
-        SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 13, 4), '-',
-        SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 17, 4), '-',
-        SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 21, 12)
+    CAST(
+        CONCAT(
+            SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 1, 8), '-',
+            SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 9, 4), '-',
+            SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 13, 4), '-',
+            SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 17, 4), '-',
+            SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 21, 12)
+        ) AS STRING
     ) AS id,
     fsde.sk_region AS location_id,
     fsde.sk_house AS property_id,
-    dc.uuid_company AS company_uuid,
+    COALESCE(dc.uuid_company, '1P') AS company_uuid,
     'SALE' AS business_context,
     dsa.sale_price_agreed::FLOAT AS contract_value,
     fsde.ts_event,
@@ -27,8 +29,7 @@ JOIN
     dw_sale.dim_sale_agreement AS dsa
         ON dsa.sk_offer = fsde.sk_offer
 WHERE
-    dset.event_name = 'SALE_AGREEMENT_SIGNED'
-    AND dc.uuid_company IS NOT NULL
-    AND fsde.year = {year}
+    fsde.year = {year}
     AND fsde.month = {month}
     AND fsde.day = {day}
+    AND dset.event_name = 'SALE_AGREEMENT_SIGNED'

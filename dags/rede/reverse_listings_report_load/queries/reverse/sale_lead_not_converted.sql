@@ -1,10 +1,12 @@
 SELECT
-    CONCAT(
-        SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 1, 8), '-',
-        SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 9, 4), '-',
-        SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 13, 4), '-',
-        SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 17, 4), '-',
-        SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 21, 12)
+    CAST(
+        CONCAT(
+            SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 1, 8), '-',
+            SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 9, 4), '-',
+            SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 13, 4), '-',
+            SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 17, 4), '-',
+            SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 21, 12)
+        ) AS STRING
     ) AS id,
     flsr.sk_region AS location_id,
     dl.id_house AS property_id,

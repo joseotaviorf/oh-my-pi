@@ -1,13 +1,15 @@
 SELECT
-    CONCAT(
-        SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 1, 8), '-',
-        SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 9, 4), '-',
-        SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 13, 4), '-',
-        SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 17, 4), '-',
-        SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 21, 12)
+    CAST(
+        CONCAT(
+            SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 1, 8), '-',
+            SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 9, 4), '-',
+            SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 13, 4), '-',
+            SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 17, 4), '-',
+            SUBSTRING(MD5(CAST(MIN(fdol.sk_snapshot) AS STRING)), 21, 12)
+        ) AS STRING
     ) AS id,
     sk_region AS location_id,
-    dc.uuid_company AS company_uuid,
+    COALESCE(dc.uuid_company, '1P') AS company_uuid,
     'SALE' AS business_context,
     COUNT(*) AS ongoing_listings_count,
     MAKE_DATE(fdol.year, fdol.month, fdol.day)::TIMESTAMP AS ts_event,
@@ -20,8 +22,7 @@ JOIN
     dw_rede.dim_company AS dc
         ON dc.sk_company = fdol.sk_company
 WHERE
-    dc.uuid_company IS NOT NULL
-    AND fdol.year = {year}
+    fdol.year = {year}
     AND fdol.month = {month}
     AND fdol.day = {day}
 GROUP BY
