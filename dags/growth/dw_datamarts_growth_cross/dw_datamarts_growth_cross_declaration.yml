@@ -9,10 +9,6 @@ workflow:
   layer: dw
   custom_schema: datamarts
   inner_dependencies:
-    efficiency_monitor_rental:
-      - marketing_demand_supply_branding_costs
-    efficiency_monitor_sale:
-      - marketing_demand_supply_branding_costs
     marketing_demand_supply_branding_costs:
       - performance_marketing_cluster_promotional_bonus_costs
     performance_marketing_cluster_promotional_bonus_costs:
@@ -21,8 +17,6 @@ workflow:
       - tenant_prospect_status 
       - rent_flow_interactions
     tenant_prospect_status: 
-      - rent_flow_interactions
-    tenant_prospects_activations:
       - rent_flow_interactions
     top_of_funnel_volumes_daily:
       - performance_marketing_metrics_demand 
