@@ -2,7 +2,7 @@ dag:
   name: ebdb_location
   schedule_start_date: 2021, 2, 20
   schedule_interval: 50 21 * * *
-  owner: Data Engineering
+  owner: Data Agents
   documentation:
     dag_purpose: Extraction of EBDB tables related to Location into data lake. EBDB is the main database for QuintoAndar.
 workflow:
