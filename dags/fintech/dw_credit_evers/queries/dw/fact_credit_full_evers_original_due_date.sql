@@ -30,7 +30,7 @@ WITH debtors_all_time AS (
     ts_signature,
     ts_due
   FROM
-    datalake_invoice.credit_invoice_original_due_date
+    datalake_invoice.credit_invoice_original_due_date_homolog
   WHERE
     ts_signature >= DATE('2018-01-01')
     AND (paid_amount IS NULL
@@ -245,13 +245,15 @@ SELECT
     erdf.ts_signature,
     erdf.dt_reference,
     erdf.dt_contract_updated
-FROM calculate_final_ever_debt_forgiveness AS erdf
-LEFT JOIN calculate_final_ever AS er
-   ON er.id_contract_retsuko = erdf.id_contract_retsuko
-   AND er.contract_mob_number = erdf.contract_mob_number
-   AND er.contract_ever_number = erdf.contract_ever_number
+FROM 
+  calculate_final_ever_debt_forgiveness AS erdf
+LEFT JOIN 
+  calculate_final_ever AS er
+  ON er.id_contract_retsuko = erdf.id_contract_retsuko
+  AND er.contract_mob_number = erdf.contract_mob_number
+  AND er.contract_ever_number = erdf.contract_ever_number
 LEFT JOIN calculate_final_ever_fraud AS f
-   ON f.id_contract_retsuko = erdf.id_contract_retsuko
-   AND f.contract_mob_number = erdf.contract_mob_number
-   AND f.contract_ever_number = erdf.contract_ever_number
+  ON f.id_contract_retsuko = erdf.id_contract_retsuko
+  AND f.contract_mob_number = erdf.contract_mob_number
+  AND f.contract_ever_number = erdf.contract_ever_number
 

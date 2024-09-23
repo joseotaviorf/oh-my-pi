@@ -1,5 +1,5 @@
 database_name: dw_credit_evers
-table_name: ever_full_fraud
+table_name: fact_credit_full_evers_original_due_date
 owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: Credit Evers (delinquency) contracts with original due date. It reports Ever 'sujo', i.e, contains all kinds of invoices (extra, pos-rental, monthly and onboarding). The granularity of table is contract, mob and ever.
