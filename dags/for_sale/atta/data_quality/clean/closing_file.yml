@@ -1,0 +1,23 @@
+---
+table_name: datalake_atta_clean.closing_file
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_file:
+    is_complete:
+      severity_level: Error
+  id_closing:
+    is_complete:
+      severity_level: Error
+  id_user:
+    is_complete:
+      severity_level: Error
+  id_document:
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error

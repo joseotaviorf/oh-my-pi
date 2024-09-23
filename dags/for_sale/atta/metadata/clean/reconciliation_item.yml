@@ -1,0 +1,75 @@
+---
+database_name: datalake_atta_clean
+table_name: reconciliation_item
+description: This table contains information about reconciliation.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  id_reconciliation:
+    description: Id of the reconciliation.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.id
+  id_proposal:
+    description: Id of the proposal.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.proposta_id
+  id_closing:
+    description: Id of the closing.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.closing_id
+  id_closing_file:
+    description: Id of the closing file.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.closing_file_id
+  id_bank_proposal:
+    description: Id of the proposal in the bank system.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.proposal_bank_id
+  buyer_document:
+    description: Document of the buyer.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.buyer_document
+  buyer_name:
+    description: Name of the buyer.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.buyer_name
+  financial_value:
+    description: Financial value of the reconciliation.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.financial_value
+  bank_code:
+    description: Code of the bank that the financing was issued.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.bank
+  status:
+    description: Status of the reconciliation.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.status
+  modality:
+    description: Modality of the reconciliation.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.modality
+  operation_type:
+    description: Type of real estate credit operation.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.proposal_product
+  operation_term:
+    description: The term of the operation.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.term
+  modified_fields:
+    description: The fields that were automatically changed in the reconciliation process.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.modified_fields
+  validations:
+    description: Fields that differ from the bank file and their original values.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.validations
+  observation:
+    description: Observations made.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.observation
+  dt_signed:
+    description: Date of when the reconciliation was signed.
+    lineage:
+      - datalake_atta_raw.reconciliation_item.sign_date
