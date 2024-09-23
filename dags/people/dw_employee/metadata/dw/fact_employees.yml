@@ -36,6 +36,10 @@ columns:
     description: "Unique identifier for the manager’s assignment."
     lineage:
       - datalake_hr_system.assignments_metrics.sk_manager_assignment
+  sk_disability:
+    description: "Unique identifier for the disability related to the assignment."
+    lineage:
+      - datalake_hr_system.assignments_metrics.sk_disability
   sk_start_work_relationship_date:
     description: "Start date of the work relationship related to the assignment, formatted as SK."
     lineage:
@@ -71,7 +75,7 @@ columns:
   has_self_declared_disability:
     description: "Indicates if the worker has self-declared disability (TRUE or FALSE), self declared."
     lineage:
-      - datalake_hr_system.disability.has_self_declared_disability
+      - datalake_hr_system.assignments_metrics.has_self_declared_disability
   assignment_age_months:
     description: "Age of the assignment in months."
     lineage:

@@ -63,6 +63,7 @@ SELECT
   COALESCE(disability_self_declaration_description, '-1') AS disability_self_declaration_description,
   COALESCE(has_disability, FALSE) AS has_self_declared_disability,
   GREATEST (DATE(ds1.disabilities['EffectiveStartDate']), sd.dt_effective_start) AS dt_effective_start,
+  TIMESTAMP(ds1.disabilities['LastUpdateDate']) AS ts_last_updated,
   NOW() AS ts_load
 FROM workers AS w 
   LEFT JOIN 

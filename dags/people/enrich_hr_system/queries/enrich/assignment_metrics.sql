@@ -382,6 +382,16 @@ cte_enrich_demographic_attributes AS (
   ) AS sk_demographic_information
   FROM datalake_hr_system.demographic_attributes
   QUALIFY ts_last_update = MAX(ts_last_update) OVER (PARTITION BY id_person)
+),
+cte_enrich_disability AS (
+  SELECT
+    sk_disability,
+    id_person,
+    has_self_declared_disability
+  FROM disability
+  QUALIFY 
+    ts_last_updated = MAX(ts_last_updated) over (PARTITION BY id_person) 
+    OR ts_last_updated is null
 )
 SELECT
   -- ids
@@ -412,6 +422,7 @@ SELECT
       '-1'
     )
   END AS sk_manager_assignment,
+  COALESCE(d.sk_disability, '-1') AS sk_disability,
   COALESCE(REPLACE(s.dt_last_increase, '-', ''), '-1') AS sk_last_increase_date,
   COALESCE(REPLACE(s.dt_first_promotion, '-', ''), '-1') AS sk_first_promotion_date,
   -- non metrics
@@ -440,6 +451,7 @@ SELECT
       THEN TRUE
     ELSE FALSE
   END AS is_manager,
+  COALESCE(d.has_self_declared_disability, FALSE) AS has_self_declared_disability,
   CASE
     WHEN wr.worker_type = 'P'
       THEN 0
@@ -510,6 +522,9 @@ FROM
   LEFT JOIN
     cte_enrich_demographic_attributes AS da
       ON wr.id_person = da.id_person
+  LEFT JOIN 
+    cte_enrich_disability AS d
+      ON wr.id_person = d.id_person
 WHERE
   (
     wr.dt_start <= DATE('{load_start_date}')

@@ -19,7 +19,7 @@ columns:
   sk_disability:
     description: "Unique identifier for the disability related to the assignment."
     lineage:
-      - datalake_hr_system.disability.sk_disability
+      - datalake_hr_system.assignments_metrics.sk_disability
   sk_cost_center:
     description: "Unique identifier for the cost center related to the assignment."
     lineage:
@@ -75,7 +75,7 @@ columns:
   has_self_declared_disability:
     description: "Indicates if the worker has self-declared disability (TRUE or FALSE), self declared."
     lineage:
-      - datalake_hr_system.disability.has_self_declared_disability
+      - datalake_hr_system.assignments_metrics.has_self_declared_disability
   assignment_age_months:
     description: "Age of the assignment in months."
     lineage:

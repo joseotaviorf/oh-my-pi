@@ -288,7 +288,7 @@ SELECT
     am.sk_job,
     am.sk_manager,
     am.sk_manager_assignment,
-    COALESCE(d.sk_disability, '-1') AS sk_disability,
+    am.sk_disability,
     REPLACE (am.dt_start_work_relationship, '-', '') AS sk_work_relationship_started_date,
     REPLACE (am.dt_termination_work_relationship, '-', '') AS sk_dt_termination_work_relationship,
     am.sk_last_increase_date,
@@ -300,7 +300,7 @@ SELECT
     am.is_active,
     am.is_pending_worker,
     am.is_manager,
-    COALESCE(d.has_self_declared_disability, FALSE) AS has_self_declared_disability,
+    am.has_self_declared_disability,
     am.assignment_age_months,
     am.qnt_directly_led,
     COALESCE(s.qnt_undirectly_led, 0) AS qnt_undirectly_led,
@@ -328,9 +328,6 @@ LEFT JOIN
 LEFT JOIN
     subordinates AS s
         ON s.id_assignment = am.sk_assignment
-LEFT JOIN
-    datalake_hr_system.disability AS d
-        ON am.sk_employee = d.id_person
 LEFT JOIN
     datalake_hr_system.hierarchy_ids AS h
         ON h.sk_assignment = am.sk_assignment

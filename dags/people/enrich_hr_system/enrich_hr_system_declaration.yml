@@ -15,6 +15,7 @@ workflow:
   inner_dependencies:
     assignment_metrics:
       - assignments
+      - disability
     assignment_salaries:
       - assignments
     employee_ids:

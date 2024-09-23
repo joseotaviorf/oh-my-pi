@@ -15,7 +15,7 @@ SELECT
   am.sk_assignment,
   am.sk_employee,
   am.sk_demographic_information,
-  COALESCE(d.sk_disability, -1) AS sk_disability,
+  am.sk_disability,
   am.sk_cost_center,
   am.sk_business_unit,
   am.sk_job,
@@ -32,7 +32,7 @@ SELECT
   am.is_active,
   am.is_pending_worker,
   am.is_manager,
-  COALESCE(d.has_self_declared_disability, FALSE) AS has_self_declared_disability,
+  am.has_self_declared_disability,
   am.assignment_age_months,
   am.qnt_directly_led,
   COALESCE(s.qnt_undirectly_led, 0) AS qnt_undirectly_led,
@@ -59,6 +59,3 @@ FROM
   LEFT JOIN
     datalake_hr_system.hierarchy_ids AS h
       ON h.sk_assignment = am.sk_assignment
-  LEFT JOIN
-    datalake_hr_system.disability AS d
-      ON d.id_person = am.sk_employee
