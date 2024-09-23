@@ -26,6 +26,11 @@ workflow:
         - year
         - month
         - day
+    houses_published:
+      partitions:
+        - year
+        - month
+        - day
     item_interaction:
       partitions:
       - year

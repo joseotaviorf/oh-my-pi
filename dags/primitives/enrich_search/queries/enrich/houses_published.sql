@@ -83,52 +83,91 @@ house_cities AS (
         wonka.house_main
     GROUP BY
         id
+),
+
+df_houses_published AS (
+    SELECT
+        CAST(NULL AS STRING) AS id_search,
+        houses_published.id_house,
+
+        --ids
+
+        '{{}}' AS ids,
+
+        -- dimensions
+
+        to_json(
+            named_struct(
+                'business_context', houses_published.business_context,
+                'city', house_cities.city
+            )
+        ) AS dimensions,
+
+        --experimentation
+
+        variants,
+
+        --metrics
+
+        to_json(
+            named_struct(
+                'house_published', 1
+            )
+        ) AS metrics,
+
+        -- timestamps
+
+        to_json(
+            named_struct(
+                'ts_house_published', houses_published.ts_house_published
+            )
+        ) AS timestamps,
+
+        houses_published.ts_house_published AS ts_event,
+        DATE(houses_published.ts_house_published) AS date,
+        YEAR(houses_published.ts_house_published) AS year,
+        MONTH(houses_published.ts_house_published) AS month,
+        DAY(houses_published.ts_house_published) AS day,
+        WEEKOFYEAR(houses_published.ts_house_published) AS week
+    FROM
+      houses_published
+    LEFT JOIN house_cities
+        ON houses_published.id_house = house_cities.id_house
+    WHERE houses_published.ts_house_published BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_21}) AND DATE('{end_date}')
+),
+
+unique_houses_ids AS (
+    SELECT DISTINCT
+        id_house, ts_event, date, year, month, day, week
+    FROM
+        df_houses_published
+),
+
+join_dfs AS (
+    SELECT
+        search_impressions.id_search,
+        search_impressions.id_house,
+        search_impressions.ids,
+        search_impressions.dimensions,
+        search_impressions.variants,
+        regexp_replace(search_impressions.metrics, '\\}}', ',"house_published":1}}') AS metrics,
+        search_impressions.timestamps,
+        unique_houses_ids.ts_event,
+        unique_houses_ids.date,
+        unique_houses_ids.year,
+        unique_houses_ids.month,
+        unique_houses_ids.day,
+        unique_houses_ids.week
+    FROM
+        datalake_search.search_impressions AS search_impressions
+    INNER JOIN
+        unique_houses_ids
+    ON
+        search_impressions.id_house = unique_houses_ids.id_house
+        AND get_json_object(search_impressions.timestamps, '$.ts_house_published') = unique_houses_ids.ts_event
+    WHERE search_impressions.ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_21}) AND DATE('{end_date}')
 )
 
-SELECT
-    CAST(NULL AS STRING) AS id_search,
-    houses_published.id_house,
-
-    --ids
-
-    '{{}}' AS ids,
-
-    -- dimensions
-
-    to_json(
-        named_struct(
-            'business_context', houses_published.business_context,
-            'city', house_cities.city
-        )
-    ) AS dimensions,
-
-    --experimentation
-
-    variants,
-
-    --metrics
-
-    to_json(
-        named_struct(
-            'house_published', 1
-        )
-    ) AS metrics,
-
-    -- timestamps
-
-    to_json(
-        named_struct(
-            'ts_house_published', houses_published.ts_house_published
-        )
-    ) AS timestamps,
-
-    houses_published.ts_house_published AS ts_event,
-    DATE(houses_published.ts_house_published) AS date,
-    YEAR(houses_published.ts_house_published) AS year,
-    MONTH(houses_published.ts_house_published) AS month,
-    DAY(houses_published.ts_house_published) AS day
-FROM
-  houses_published
-LEFT JOIN house_cities
-    ON houses_published.id_house = house_cities.id_house
-WHERE houses_published.ts_house_published BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_21}) AND DATE('{end_date}')
+SELECT * FROM df_houses_published
+UNION ALL
+SELECT * FROM join_dfs

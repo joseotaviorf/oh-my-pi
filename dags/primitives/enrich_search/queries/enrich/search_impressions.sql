@@ -476,7 +476,8 @@ SELECT
     DATE(searches.ts_event) AS date,
     YEAR(searches.ts_event) AS year,
     MONTH(searches.ts_event) AS month,
-    DAY(searches.ts_event) AS day
+    DAY(searches.ts_event) AS day,
+    WEEKOFYEAR(searches.ts_event) AS week
 
 FROM searches
 LEFT JOIN experiment_searches
