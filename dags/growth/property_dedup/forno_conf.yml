@@ -1,9 +1,0 @@
----
-lineage_product_database_name: propertydedup
-partition_cols: [year, month, day]
-tables:
-  - duplicity_output
-  - duplicity_output_aud
-  - revinfo
-  - similar_property
-  - similar_property_aud

@@ -1,5 +1,0 @@
-database_name: datalake_property_dedup_raw
-table_name: duplicity_output_aud
-owner: henrique.miamoto@quintoandar.com.br
-domain: Data Growth
-description: It's an audit table that tracks historical changes to duplicity output information.

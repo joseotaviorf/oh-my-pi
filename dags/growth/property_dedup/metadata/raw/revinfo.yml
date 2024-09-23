@@ -1,5 +1,0 @@
-database_name: datalake_property_dedup_raw
-table_name: revinfo
-owner: henrique.miamoto@quintoandar.com.br
-domain: Data Growth
-description: The table is used to track changes or revisions made to entities in a database over time.
