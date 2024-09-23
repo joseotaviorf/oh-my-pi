@@ -34,6 +34,8 @@ tables:
     extraction_type: incremental
   ccv_edition_reason_aud:
     extraction_type: incremental
+  ccv_termination:
+    extraction_type: incremental
   clause_message:
     extraction_type: incremental
   closing_type:
