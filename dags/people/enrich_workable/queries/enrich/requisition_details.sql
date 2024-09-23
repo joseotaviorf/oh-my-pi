@@ -13,6 +13,7 @@ WITH
       ei.id_person,
       ei.id_assignment,
       ei.id_period_of_service,
+      hi.sk_hierarchy,
       ei.assignment_number,
       m.id AS id_member_workable,
       c.id AS id_candidate_workable,
@@ -27,12 +28,16 @@ WITH
     LEFT JOIN 
       datalake_workable_redshift_clean.candidates AS c 
         ON ei.personal_email = c.email
+    LEFT JOIN 
+      datalake_hr_system.hierarchy_ids AS hi
+        ON ei.id_period_of_service = hi.sk_assignment
   ),
   requisitions_details_step1 AS (
     SELECT DISTINCT
       r.id,
       r.id_candidate,
       r.id_job,
+      eec_hiring_manager.sk_hierarchy,
       eec_owner.id_person AS sk_owner,
       COALESCE(eec_hiring_manager_cf.id_person, eec_hiring_manager.id_person) AS sk_hiring_manager,
       eec_business_partner.id_person AS sk_business_partner,
@@ -179,6 +184,7 @@ SELECT
   id AS id_requisition,
   id_candidate,
   id_job,
+  sk_hierarchy,
   code AS requisition_code,
   state AS requisition_state,
   status AS requisition_status,

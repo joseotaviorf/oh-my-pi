@@ -7,6 +7,7 @@ SELECT
   COALESCE(erd.sk_owner, '-1') AS sk_owner,
   COALESCE(erd.sk_hiring_manager, '-1') AS sk_hiring_manager,
   COALESCE(erd.sk_business_partner, '-1') AS sk_business_partner,
+  COALESCE(erd.sk_hierarchy, '-1') AS sk_hierarchy,
   COALESCE(cc.id_cost_center, '-1') AS sk_cost_center,
   erd.is_confidential,
   erd.days_on_hold,

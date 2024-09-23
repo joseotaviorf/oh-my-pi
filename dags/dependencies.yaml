@@ -3081,6 +3081,7 @@ bietlejuice.enrich_wololo:
 bietlejuice.enrich_wordpress_baroes:
   - bietlejuice.wordpress_baroes:load-clean-conteudos-data
 bietlejuice.enrich_workable:
+  - bietlejuice.enrich_employee:load-enrich-hierarchy-ids
   - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.hr_system:load-clean-organizations
   - bietlejuice.workable_redshift:load-clean-activities

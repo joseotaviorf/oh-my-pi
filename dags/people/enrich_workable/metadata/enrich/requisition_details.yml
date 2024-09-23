@@ -21,6 +21,10 @@ columns:
     description: 'Id of the job.'
     lineage:
     - datalake_workable_redshift_clean.requisitions.id_jobs
+  sk_hierarchy:
+    description: 'Surrogate key of the hierarchy of the requisition, links to dw_employee.dim_hierarchy.'
+    lineage:
+    - datalake_hr_system.employee_ids.id_hierarchy
   sk_owner:
     description: 'Surrogate key of the owner of the requisition, links to dw_employee.dim_employee.'
     lineage:
