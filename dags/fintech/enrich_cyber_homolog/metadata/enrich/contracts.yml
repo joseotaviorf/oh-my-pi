@@ -1,0 +1,291 @@
+---
+database_name: datalake_cyber_homolog
+table_name: contracts
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.id_contract
+  id_contract_external:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.id_contract_external
+  id_client:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.id_client
+  id_contract_property:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.id_contract_property
+  id_oldest_negative_invoice:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.id_oldest_negative_invoice
+  id_last_negative_installment:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.id_last_negative_installment
+  status_agency_declined:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.status_agency_declined
+  delay_contamined_days:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.delay_contamined_days
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.contract_group
+  has_boletagem:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.has_boletagem
+  classification:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.classification
+  has_paused_collection:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.has_paused_collection
+  reason_pause:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.reason_pause
+  contract_version:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.contract_version
+  contract_guarantee:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.contract_guarantee
+  contract_status:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.contract_status
+  eviction_step:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.eviction_step
+  reason_eviction:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.reason_eviction
+  eviction_law_firm:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.eviction_law_firm
+  open_invoices:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.open_invoices
+  collection_flow:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.collection_flow
+  agreement_type:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.agreement_type
+  agreement_status:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.agreement_status
+  last_payment_promisse_status:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.last_payment_promisse_status
+  flag_promise_payment:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.flag_promise_payment
+  flag_account_in_agency_or_court:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.flag_account_in_agency_or_court
+  last_action:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.last_action
+  segmentation_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.segmentation_queue
+  previous_segmentation_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.previous_segmentation_queue
+  agreement_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.agreement_queue
+  previous_agreement_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.previous_agreement_queue
+  eviction_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.eviction_queue
+  previous_eviction_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.previous_eviction_queue
+  credit_denial_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.credit_denial_queue
+  previous_credit_denial_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.previous_credit_denial_queue
+  label_3:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.label_3
+  pre_legal_label:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.pre_legal_label
+  agency:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.dm.id_agency
+  agency_automatically_assigned:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.agency_automatically_assigned
+  times_account_assigned_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.times_account_assigned_agency
+  previous_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.previous_agency
+  current_agency_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.current_agency_amount
+  amount_prior_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.amount_prior_agency
+  overdue_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.overdue_amount
+  debt_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.debt_amount
+  total_package_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.total_package_amount
+  oldest_negative_invoice_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.oldest_negative_invoice_amount
+  contract_rental_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.contract_rental_amount
+  contract_condominium_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.contract_condominium_amount
+  contract_iptu_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.contract_iptu_amount
+  ts_start_guarantee:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_start_guarantee
+  ts_contract_start:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_contract_start
+  ts_contract_end:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_contract_end
+  ts_account_registered:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_account_registered
+  ts_last_update:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_last_update
+  ts_due_oldest_negative_invoice:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_due_oldest_negative_invoice
+  ts_due_oldest_invoice:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_due_oldest_invoice
+  ts_first_payment_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_first_payment_agreement
+  ts_last_payment_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_last_payment_agreement
+  ts_last_payment:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_last_payment
+  ts_next_contact:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_next_contact
+  ts_reference_current_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_reference_current_agency
+  ts_last_account_inactive:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_last_account_inactive
+  ts_last_account_reactivation:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_last_account_reactivation
+  ts_last_activity:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_last_activity
+  ts_assignment_previous_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_assignment_previous_agency
+  ts_last_update_segmentation_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_last_update_segmentation_queue
+  ts_last_update_agreement_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_last_update_agreement_queue
+  ts_last_update_eviction_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_last_update_eviction_queue
+  ts_last_update_credit_denial_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.ts_last_update_credit_denial_queue
+  ts_load:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.contracts.NOW()

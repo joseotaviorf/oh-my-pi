@@ -8,6 +8,7 @@ SELECT
     esforco,
     alo,
     cpc,
-    acordo
+    acordo,
+    NOW() AS ts_load
 FROM
     datalake_gsheets_raw.cyber_collection_actions

@@ -8,7 +8,7 @@ SELECT
     receipt_code,
     CASE
         WHEN is_installment_active = "S" THEN True
-        ELSE False
+        ELSE FALSE
     END AS is_installment_active,
     CASE
         WHEN installment_situation = "A" THEN "Parcela em aberta"

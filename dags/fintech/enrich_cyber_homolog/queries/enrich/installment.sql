@@ -1,13 +1,4 @@
 WITH
-eviction_costs AS (
-  SELECT
-    ha.id_agreement,
-    SUM(b.eviction_honorarium_amount) AS eviction_honorarium_amount
-  FROM datalake_cyber_clean.historical_agreements AS ha
-  LEFT JOIN datalake_cyber_clean.bill AS b
-    ON b.id_invoice = ha.id_invoice
-  GROUP BY 1
-),
 amount_details AS (
   SELECT
     ad.id_agreement,
@@ -15,11 +6,8 @@ amount_details AS (
     SUM(IF(ad.field_name IN ("Multa Residual", "Multa Acordo"), ad.amount_without_discount, 0)) AS fine_amount,
     SUM(IF(ad.field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), ad.amount_without_discount, 0)) AS original_amount,
     SUM(IF(ad.field_name IN ("Custas Residuais", "Custas Acordo"), ad.amount_without_discount, 0)) AS eviction_costs_amount,
-    SUM(ec.eviction_honorarium_amount) AS eviction_honorarium_amount,
     SUM(ad.discount) AS discount_amount
   FROM datalake_cyber_clean.agreement_discounts AS ad
-  LEFT JOIN eviction_costs AS ec
-    ON ad.id_agreement = ec.id_agreement
   GROUP BY 1
 ),
 total_installments AS (
@@ -34,14 +22,12 @@ split_fees_between_installments AS (
       a.id_agreement,
       i.total_installments,
       a.contract_interest_fees_amount,
-      floor(a.contract_interest_fees_amount/i.total_installments,2) AS installment_interest,
-      a.contract_interest_fees_amount - floor(a.contract_interest_fees_amount/i.total_installments,2) * (i.total_installments - 1) AS last_installment_interest,
+      floor(a.contract_interest_fees_amount/i.total_installments,2) AS contract_interest,
+      a.contract_interest_fees_amount - floor(a.contract_interest_fees_amount/i.total_installments,2) * (i.total_installments - 1) AS last_contract_interest,
       floor(a.fine_amount/i.total_installments,2) AS installment_fee,
       a.fine_amount - floor(a.fine_amount/i.total_installments,2) * (i.total_installments - 1) AS last_installment_fee,
       floor(a.eviction_costs_amount/i.total_installments,2) AS installment_costs,
       a.eviction_costs_amount - floor(a.eviction_costs_amount/i.total_installments,2) * (i.total_installments - 1) AS last_installment_costs,
-      floor(a.eviction_honorarium_amount/i.total_installments,2) AS installment_lawyers_fee,
-      a.eviction_honorarium_amount - floor(a.eviction_honorarium_amount/i.total_installments,2) * (i.total_installments - 1) AS last_installment_lawyers_fee,
       floor(a.discount_amount/i.total_installments,2) AS installment_discount,
       a.discount_amount - floor(a.discount_amount/i.total_installments,2) * (i.total_installments - 1) AS last_installment_discount
     FROM amount_details AS a
@@ -51,7 +37,7 @@ split_fees_between_installments AS (
   calculate_fields AS (
     SELECT
       ai.id_agreement_installment,
-      a.id_agreement AS id_negotiation,
+      ai.id_agreement AS id_negotiation,
       ca.id_contract,
       c.id_contract_external,
       c.id_client AS id_debtor,
@@ -68,13 +54,14 @@ split_fees_between_installments AS (
       END AS installment_status,
       p.payment_type,
       p.payment_method,
+      ain.has_sent_boleto,
       at.fine_rate,
       ai.amortization_amount,
       ai.installment_interest_amount,
       ai.credit_card_fee_amount,
       CASE
-        WHEN ai.installment_number + 1 = f.total_installments THEN f.last_installment_interest
-        ELSE f.installment_interest
+        WHEN ai.installment_number + 1 = f.total_installments THEN f.last_contract_interest
+        ELSE f.contract_interest
       END AS contract_interest_amount,
       CASE
         WHEN ai.installment_number + 1 = f.total_installments THEN f.last_installment_fee
@@ -86,10 +73,6 @@ split_fees_between_installments AS (
       END AS eviction_costs_amount,
       ai.honorarium_amount,
       CASE
-        WHEN ai.installment_number + 1 = f.total_installments THEN f.last_installment_lawyers_fee
-        ELSE f.installment_lawyers_fee
-      END AS eviction_lawyers_fee_amount,
-      CASE
         WHEN ai.installment_number + 1 = f.total_installments THEN f.last_installment_discount
         ELSE f.installment_discount
       END AS discount_amount,
@@ -98,7 +81,10 @@ split_fees_between_installments AS (
       p.payment_amount AS paid_amount,
       DATE(a.ts_agreement_creation) AS dt_creation,
       DATE(ai.ts_due_installment) AS dt_due,
-      DATE(p.ts_payment) AS dt_paid
+      DATE(p.ts_payment) AS dt_paid,
+      DATE(ain.ts_document) AS dt_emission_boleto,
+      DATE(ain.ts_due) AS dt_due_boleto,
+      DATE(ain.ts_processing) AS dt_processing_boleto
     FROM datalake_cyber_clean.agreement_installments AS ai
     LEFT JOIN datalake_cyber_clean.agreements AS a
         ON ai.id_agreement = a.id_agreement
@@ -130,14 +116,14 @@ split_fees_between_installments AS (
     installment_status,
     payment_type,
     payment_method,
-    amortization_amount - contract_interest_amount - credit_card_fee_amount - fine_amount  AS original_amount,
-    amortization_amount,
-    installment_interest_amount,
-    contract_interest_amount,
-    installment_interest_amount + contract_interest_amount AS total_interest_amount,
-    credit_card_fee_amount,
+    amount_to_pay - credit_card_fee_amount - installment_interest_amount - contract_interest_amount - fine_amount - eviction_costs_amount - honorarium_amount  + discount_amount AS original_amount,
+    amortization_amount, -- = amount_to_pay - credit_card_fee_amount
     fine_rate,
     fine_amount,
+    contract_interest_amount,
+    installment_interest_amount,
+    installment_interest_amount + contract_interest_amount AS total_interest_amount,
+    credit_card_fee_amount,
     eviction_costs_amount,
     honorarium_amount,
     eviction_lawyers_fee_amount,

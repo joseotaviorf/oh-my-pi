@@ -1,13 +1,4 @@
 WITH
-eviction_costs AS (
-  SELECT
-    ha.id_agreement,
-    SUM(b.eviction_honorarium_amount) AS eviction_honorarium_amount
-  FROM datalake_cyber_clean.historical_agreements AS ha
-  LEFT JOIN datalake_cyber_clean.bill AS b
-    ON b.id_invoice = ha.id_invoice
-  GROUP BY 1
-),
 amount_details AS (
   SELECT
     ad.id_agreement,
@@ -15,7 +6,6 @@ amount_details AS (
     SUM(IF(ad.field_name IN ("Multa Residual", "Multa Acordo"), ad.amount_without_discount, 0)) AS fine_amount,
     SUM(IF(ad.field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), ad.amount_without_discount, 0)) AS original_amount,
     SUM(IF(ad.field_name IN ("Custas Residuais", "Custas Acordo"), ad.amount_without_discount, 0)) AS eviction_costs_amount,
-    SUM(ec.eviction_honorarium_amount) AS eviction_honorarium_amount,
     SUM(IF(ad.field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), ad.discount, 0)) AS discount_to_original_amount,
     SUM(IF(ad.field_name IN ("Juros Residuais", "Juros Acordo"), ad.discount, 0)) AS discount_to_fees_amount,
     SUM(IF(ad.field_name IN ("Multa Residual", "Multa Acordo"), ad.discount, 0)) AS discount_to_fine_amount,
@@ -24,13 +14,12 @@ amount_details AS (
     SUM(ad.amount_with_discount) AS negotiated_amount,
     SUM(ad.discount) AS discount_amount
   FROM datalake_cyber_clean.agreement_discounts AS ad
-  LEFT JOIN eviction_costs AS ec
-    ON ad.id_agreement = ec.id_agreement
   GROUP BY 1
 ),
 installments AS (
   SELECT
     ai.id_agreement,
+    MIN(IF(ai.status = 'Quebrado', DATE(ai.ts_due_installment), NULL)) AS ts_cancelation,
     MAX(IF(ai.installment_number = 0, p.payment_method, NULL)) AS promisse_payment_method,
     COUNT(DISTINCT ai.id_agreement_installment) AS number_of_installments,
     MAX(IF(p.id_agreement_installment IS NOT NULL, ai.installment_number + 1, 0)) AS paid_installments,
@@ -57,7 +46,27 @@ discount_type AS (
   FROM datalake_cyber_clean.agreement_type_discount
   WHERE LOWER(field_name) IN ('u1vlrprcag','u1vlrmuag','u1vlrjuag')
   GROUP BY 1
+),
+total_invoices_negotiated AS (
+  SELECT
+    id_negotiation,
+    COUNT(DISTINCT id_invoice) AS total_invoices_negotiated
+  FROM datalake_cyber_homolog.debt_negotiation_mapping
+  GROUP BY 1
+),
+contract_invoice_negotiation AS (
+  SELECT
+    id_agreement,
+    SUM(invoice_due_amount) AS invoices_due_amount,
+    MAX(agreement_credit_card_fee) AS credit_card_fee,
+    MAX(agreement_eviction_costs_amount) AS eviction_costs_amount,
+    MAX(agreement_fine_amount) AS fine_amount,
+    MAX(agreement_contract_interest_fees_amount) AS contract_interest_fees_amount,
+    MAX(main_amount_overdue) AS total_debt_amount,
+    MAX(contract_delay_days)
+  FROM datalake_cyber_clean.historical_agreements
 )
+
 SELECT
     a.id_agreement AS id_negotiation,
     ca.id_contract,
@@ -66,6 +75,7 @@ SELECT
     UPPER(a.id_user) AS id_operator,
     ag.agency_name AS advisory,
     ca.contract_group AS creditor,
+    a.frequency,
     a.agreement_type AS agreement_type,
     at.agreement_type_description,
     at.min_delay_days AS agreement_type_min_delay_days,
@@ -89,8 +99,9 @@ SELECT
         WHEN a.status = "Pendente" THEN "pending"
         ELSE a.status
     END AS negotiation_status,
-    a.frequency,
+    a.description_broken_agreement,
     IF(i.dt_down_payment IS NOT NULL, TRUE, FALSE) AS is_down_payment_paid,
+    tin.total_invoices_negotiated,
     i.number_of_installments,
     i.paid_installments,
     IF(a.status = "Cancelado", i.number_of_installments - i.paid_installments, 0) AS breached_installments,
@@ -103,25 +114,25 @@ SELECT
     i.installment_interest_fees_amount,
     d.contract_interest_fees_amount + i.installment_interest_fees_amount AS total_interest_fees_amount,
     d.eviction_costs_amount,
-    d.eviction_honorarium_amount,
     a.honorarium_amount,
     i.credit_card_fee_amount,
-    d.debt_amount + d.eviction_honorarium_amount AS debt_amount,
+    d.debt_amount,
+    d.discount_amount,
     d.negotiated_amount + i.credit_card_fee_amount AS negotiated_amount,
+    i.down_payment_amount,
+    ROUND(a.percentage_paid_agreement, 2) AS percentage_paid_agreement,
     atd.max_interest_discount_percentage,
     atd.max_fine_discount_percentage,
     atd.max_main_amount_discount_percantage,
-    d.discount_amount,
     d.discount_to_original_amount,
     d.discount_to_fine_amount,
     d.discount_to_fees_amount,
     d.discount_to_eviction_costs,
-    ROUND(a.percentage_paid_agreement, 2) AS percentage_paid_agreement,
-    i.down_payment_amount,
     a.ts_agreement_creation AS dt_promisse,
     i.dt_due_promisse,
     i.dt_down_payment,
     i.dt_paid_all,
+    COALESCE(DATE(a.ts_agreement_breach), i.ts_cancelation) AS dt_cancellation,
     NOW() AS ts_load
 FROM datalake_cyber_clean.agreements AS a
 INNER JOIN datalake_cyber_clean.contracts_agreements AS ca
@@ -140,3 +151,5 @@ LEFT JOIN amount_details AS d
   ON a.id_agreement = d.id_agreement
 LEFT JOIN installments AS i
   ON i.id_agreement = a.id_agreement
+LEFT JOIN total_invoices_negotiated AS tin
+  ON a.id_agreement = tin.id_negotiation

@@ -629,7 +629,7 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC3
-  pre_legal_label:
+  eviction_label:
     description: "Pre legal label"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL5
@@ -641,7 +641,7 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL2
-  label_3:
+  campaign_label:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL3

@@ -116,7 +116,7 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL2
-  label_3:
+  campaign_label:
     description: ""
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL3
@@ -124,7 +124,7 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL4
-  pre_legal_label:
+  eviction_label:
     description: ""
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL5

@@ -3,7 +3,7 @@ WITH
 union_sources AS (
     SELECT
         *,
-        1 AS queue_number,
+        'Fila 1' AS queue_number,
         'Segmentação' AS queue_type
     FROM datalake_cyber_clean.segmentation_decision_tree
 
@@ -11,7 +11,7 @@ union_sources AS (
 
     SELECT
         *,
-        3 AS queue_number,
+        'Fila 3' AS queue_number,
         'Acordo' AS queue_type
     FROM datalake_cyber_clean.agreement_decision_tree
 
@@ -19,7 +19,7 @@ union_sources AS (
 
     SELECT
         *,
-        4 AS queue_number,
+        'Fila 4' AS queue_number,
         'Canais Digitais' AS queue_type
     FROM datalake_cyber_clean.digital_channel_decision_tree
 
@@ -27,7 +27,7 @@ union_sources AS (
 
     SELECT
         *,
-        5 AS queue_number,
+        'Fila 5' AS queue_number,
         'Eviction' AS queue_type
     FROM datalake_cyber_clean.eviction_decision_tree
 
@@ -35,9 +35,25 @@ union_sources AS (
 
     SELECT
         *,
-        6 AS queue_number,
+        'Fila 6' AS queue_number,
         'Negativação' AS queue_type
     FROM datalake_cyber_clean.credit_denial_decision_tree
+
+    UNION ALL
+
+    SELECT
+        *,
+        'Label 3' AS label_number,
+        'Campaign' AS queue_type
+    FROM datalake_cyber_clean.campaign_label_decision_tree
+
+    UNION ALL
+
+    SELECT
+        *,
+        'Label 5' AS label_number,
+        'Eviction' AS queue_type
+    FROM datalake_cyber_clean.eviction_label_decision_tree
 ),
 translate_field AS (
   SELECT
@@ -88,9 +104,9 @@ calculate AS (
         test,
         queue_number,
         queue_type,
-        MAX(CASE WHEN test = 0 AND sequence = -1 THEN comment ELSE NULL END) OVER (PARTITION BY level) AS level_name,
-        MAX(CASE WHEN sequence = 1001 THEN queue ELSE NULL END) OVER (PARTITION BY level, test) AS queue,
-        MAX(CASE WHEN sequence = 0 THEN comment ELSE NULL END) OVER (PARTITION BY level, test)  AS queue_name,
+        MAX(CASE WHEN test = 0 AND sequence = -1 THEN comment ELSE NULL END) OVER (PARTITION BY queue_number, level) AS level_name,
+        MAX(CASE WHEN sequence = 1001 THEN queue ELSE NULL END) OVER (PARTITION BY queue_number, level, test) AS queue,
+        MAX(CASE WHEN sequence = 0 THEN comment ELSE NULL END) OVER (PARTITION BY queue_number, level, test)  AS queue_name,
         CASE
             WHEN field IS NOT NULL AND operator = '.eo.' THEN CONCAT(field, ' = ' , value, ' OR ', field, ' = ', value_2)
             WHEN field IS NOT NULL AND operator = '.no.' THEN CONCAT(field, ' <> ' , value, ' AND ', field, ' <> ', value_2)

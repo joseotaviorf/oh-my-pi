@@ -9,5 +9,8 @@ dag:
 workflow:
   type: query
   layer: enrich
+  inner_dependencies:
+    negotiation:
+      - debt_negotiation_mapping
 cluster:
   type: databricks_13_3_med_general_cluster

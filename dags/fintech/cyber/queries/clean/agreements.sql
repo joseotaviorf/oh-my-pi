@@ -35,6 +35,7 @@ SELECT
         ELSE AHEXCP
     END AS exception,
     AHCSINITNT AS payments_to_notify,
+    AHDSCQB AS description_broken_agreement,
     AHCNDPAYN AS number_payments_to_exempt,
     AHCNDPAYM AS required_number_payments_to_exempt,
     AHBREAK AS broken_payments,
@@ -51,5 +52,6 @@ SELECT
     AHDT AS ts_agreement_creation,
     AHAUTDT AS ts_authorized,
     AHSTADT AS ts_status_update,
+    AHDTQB AS ts_agreement_breach,
     NOW() AS ts_load
 FROM datalake_cyber_raw.agrhdr
