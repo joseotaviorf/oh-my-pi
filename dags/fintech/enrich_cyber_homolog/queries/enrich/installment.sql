@@ -126,7 +126,6 @@ split_fees_between_installments AS (
     credit_card_fee_amount,
     eviction_costs_amount,
     honorarium_amount,
-    eviction_lawyers_fee_amount,
     discount_amount,
     amount_to_pay,
     agreement_balance_amount,
