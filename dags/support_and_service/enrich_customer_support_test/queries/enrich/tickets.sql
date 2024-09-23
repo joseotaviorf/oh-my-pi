@@ -148,6 +148,12 @@ tickets_per_task AS (
       WHEN t.tags LIKE '%"ticket_ativo"%' THEN 'OUTBOUND'
       ELSE 'INBOUND'
     END AS direction,
+    CASE
+      WHEN COALESCE(ca1.origin, ca2.origin) IS NOT NULL THEN CONCAT('CALL ', COALESCE(ca1.origin, ca2.origin))
+      WHEN ch.source = 'IN APP' THEN 'CHAT INAPP'
+      WHEN ch.source = 'WHATSAPP' THEN ch.source
+      ELSE "N/A"
+    END AS ticket_origin,
     ut.channel,
     t.request_type,
     t.client_type,
@@ -204,7 +210,7 @@ ticket_queue_attributes AS (
     tq.last_queue,
     tq.first_analyst_email,
     tq.last_analyst_email,
-    dc.front_or_back,
+    UPPER(NULLIF(NULLIF(dc.front_or_back, '-'), '')) AS front_or_back,
     dc.journey_step,
     dc.team,
     dc.area
@@ -232,16 +238,14 @@ tickets AS (
     t.tags,
     t.description,
     CASE
-      WHEN LOWER(tq.front_or_back) = 'back'
+      WHEN front_or_back = 'BACK'
         AND t.tags NOT LIKE '%bot_end_conversation%'
         AND t.tags NOT LIKE '%closed_by_merge%'
-        AND (
-          t.tags LIKE '%tarefa_atendimento_escalado%'
-          OR LOWER(tq.front_or_back) = 'back'
-        ) THEN TRUE
+        AND t.tags LIKE '%tarefa_atendimento_escalado%' THEN TRUE
       ELSE FALSE
     END AS is_back_ticket,
     t.direction,
+    t.ticket_origin,
     tq.front_or_back,
     tq.journey_step,
     tq.team,
@@ -466,8 +470,9 @@ SELECT DISTINCT
   t.team,
   t.area,
   t.status,
-  t.channel,
+  UPPER(t.channel) AS channel,
   t.direction,
+  t.ticket_origin,
   t.tags,
   t.description,
   t.request_type,
@@ -506,22 +511,40 @@ SELECT DISTINCT
   t.is_back_ticket,
   t.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
   t.is_call_answered,
-  IF(
-    t.front_or_back = 'front'
-    AND DATE(t.ts_solved) >= DATE('2022-01-01')
-    AND t.contact_theme_detail_tag IS NOT NULL
-    AND t.team != 'Ong Back'
-    AND t.area = 'CX'
-    AND t.last_queue NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
-      'Offboarding Reparos [OFF] [POS] [BACK]',
-      'Offboarding pré saída [OFF] [POS] [BACK]',
-      'Proteção QuintoAndar [OFF] [POS] [BACK]',
-      'Rescisão - Despejo [OFF][POS][BACK]',
-      'Rescisão 1 [OFF] [POS] [BACK]'
-    ),
-    TRUE,
-    FALSE
-  ) AS is_ticket_rate,
+  CASE
+    WHEN t.channel IN ('call', 'chat')
+      AND t.front_or_back = 'FRONT'
+      AND DATE(t.ts_solved) >= DATE('2022-01-01')
+      AND t.contact_theme_detail_tag IS NOT NULL
+      AND t.team != 'Ong Back'
+      AND t.area = 'CX'
+      AND t.last_queue NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
+        'Offboarding Reparos [OFF] [POS] [BACK]',
+        'Offboarding pré saída [OFF] [POS] [BACK]',
+        'Proteção QuintoAndar [OFF] [POS] [BACK]',
+        'Rescisão - Despejo [OFF][POS][BACK]',
+        'Rescisão 1 [OFF] [POS] [BACK]'
+      )
+      AND t.ticket_origin != "CALL OUTBOUND" THEN TRUE
+    WHEN t.channel IN ('email', 'whatsapp')
+      AND t.front_or_back IN ('FRONT', 'BACK')
+      AND DATE(t.ts_solved) >= DATE('2022-01-01')
+      AND t.contact_theme_detail_tag IS NOT NULL
+      AND t.team != 'Ong Back'
+      AND t.area = 'CX'
+      AND t.last_queue NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
+        'Offboarding Reparos [OFF] [POS] [BACK]',
+        'Offboarding pré saída [OFF] [POS] [BACK]',
+        'Proteção QuintoAndar [OFF] [POS] [BACK]',
+        'Rescisão - Despejo [OFF][POS][BACK]',
+        'Rescisão 1 [OFF] [POS] [BACK]'
+      )
+      AND NOT (
+        t.last_queue = 'ReclameAqui [CE] [POS] [BACK]'
+        AND t.type = 'problem'
+      ) THEN TRUE
+    ELSE FALSE
+  END AS is_ticket_rate,
   t.ts_budget,
   t.ts_created,
   tdw.ts_sla_started,

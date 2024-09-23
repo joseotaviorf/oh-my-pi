@@ -48,6 +48,17 @@ columns:
     categories:
       INBOUND: Customer contacted 5A
       OUTBOUND: 5A contacted the customer
+  ticket_origin:
+    lineage:
+      - datalake_customer_support_test.calls.origin
+      - datalake_customer_support_test.chats.source
+    description: Where the ticket comes from, as in which channel
+    categories:
+      CHAT INAPP: Chat via app
+      CALL IN APP: Call via app
+      WHATSAPP: Whatsapp
+      CALL INBOUND: Direct call
+      CALL OUTBOUND: 5A called the customer
   client_type:
     description: Type of client, from custom_fields like 'Tipo de Cliente'
     lineage:
