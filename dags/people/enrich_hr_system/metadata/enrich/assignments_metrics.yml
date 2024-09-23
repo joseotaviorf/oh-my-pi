@@ -16,7 +16,7 @@ columns:
   sk_demographic_information:
     description: "Surrogate key for the demographic information. MD5 of the demographic attributes"
     lineage:
-      - datalake_hr_system.work_relationships.id_person
+      - datalake_hr_system.demographic_attributes.sk_demographic_information
   sk_cost_center:
     description: "Surrogate key for the cost center. Just the id_cost_center"
     lineage:

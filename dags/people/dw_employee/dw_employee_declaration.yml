@@ -19,9 +19,6 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   tables_customization:
-    dim_demographic_information:
-      extraction_type: incremental
-      merge_on: ["sk_demographic_information"]
     dim_employee_documentation:
       extraction_type: incremental
       merge_on: ["sk_employee"]

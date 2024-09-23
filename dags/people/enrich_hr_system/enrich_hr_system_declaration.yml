@@ -15,6 +15,7 @@ workflow:
   inner_dependencies:
     assignment_metrics:
       - assignments
+      - demographic_attributes
       - disability
     assignment_salaries:
       - assignments
@@ -35,7 +36,3 @@ workflow:
       extraction_type: incremental
       merge_on: ["id_assignment", "dt_effective_start"]
       z_order_by: ["id_assignment"]
-    demographic_attributes:
-      extraction_type: incremental
-      merge_on: ["id_person", "legislation_code"]
-      z_order_by: ["id_person"]

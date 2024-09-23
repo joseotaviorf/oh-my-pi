@@ -1,17 +1,6 @@
 SELECT
     DISTINCT
-    md5(
-    concat(
-      COALESCE(da.ethnicity, '-1'),
-      COALESCE(da.gender_identity, '-1'),
-      COALESCE(da.sexual_orientation, '-1'),
-      COALESCE(da.neurodiversity, '-1'),
-      COALESCE(da.religion,'-1'),
-      COALESCE(da.country_situation, '-1'),
-      COALESCE(da.housing_type, '-1'),
-      COALESCE(da.quinto_andar_joining_method, '-1')
-    )
-  ) AS sk_demographic_information, 
+    da.sk_demographic_information, 
     COALESCE(da.ethnicity, '-1') AS ethnicity_code,
     CASE
       WHEN da.ethnicity IN ('1', '60', '7', 'ORA_HRX_BRIN') THEN 'Indígena'
@@ -219,5 +208,3 @@ SELECT
     NOW() AS ts_load
   FROM
    datalake_hr_system.demographic_attributes AS da
-  WHERE 
-    GREATEST(DATE(ts_last_update), dt_effective_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

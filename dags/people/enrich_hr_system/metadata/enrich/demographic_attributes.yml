@@ -9,6 +9,17 @@ columns:
     description: 'Id of the employee from the HR system'
     lineage:
     - datalake_hr_system_clean.workers.legislative_info.id_person
+  sk_demographic_information:
+    description: 'Surrogate key for the dimension, created with the MD5 of the concatenation of the demographic attributes'
+    lineage:
+    - datalake_hr_system_clean.workers.ethnicities.id_ethnicity
+    - datalake_hr_system_clean.workers.legislative_info.gender_identity
+    - datalake_hr_system_clean.workers.legislative_info.sexual_orientation
+    - datalake_hr_system_clean.workers.legislative_info.neurodiversity
+    - datalake_hr_system_clean.workers.religion.religion
+    - datalake_hr_system_clean.workers.legislative_info.country_situation
+    - datalake_hr_system_clean.workers.legislative_info.housing_type
+    - datalake_hr_system_clean.workers.legislative_info.quinto_andar_joining_method
   id_person_legislative:
     description: 'Id of the column legislative_info'
     lineage:

@@ -186,6 +186,19 @@ SELECT
   -- ids
   li.id_person,
   -- non-ids
+  md5(
+    concat(
+      COALESCE(eth.ethnicity, '-1'),
+      COALESCE(lidff.gender_identity, '-1'),
+      COALESCE(lidff.sexual_orientation, '-1'),
+      COALESCE(lidff.neurodiversity, '-1'),
+      COALESCE(rel.religion,'-1'),
+      COALESCE(lidff.country_situation, '-1'),
+      COALESCE(lidff.housing_type, '-1'),
+      COALESCE(lidff.quinto_andar_joining_method, '-1'),
+      COALESCE(li.legislation_code, '-1')
+    )
+  ) AS sk_demographic_information, 
   li.id_person_legislative,
   eth.id_ethnicity,
   rel.id_religion,
@@ -247,8 +260,3 @@ FROM
   LEFT JOIN external_identifiers AS ei ON li.id_person = ei.id_person
 WHERE
   ei.id_person IS NULL
-  AND GREATEST(
-    li.dt_effective_start,
-    DATE(eth.ts_last_update),
-    DATE(rel.ts_last_update)
-  ) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
