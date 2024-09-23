@@ -6,7 +6,8 @@ SELECT
   COALESCE(
     NULLIF(GET_JSON_OBJECT(memory,'$.business_rules.menu_taxonomies.selected_taxonomy'),''),
     NULLIF(GET_JSON_OBJECT(memory,'$.business_rules.confused_class.selected_theme_detail'),''),
-    NULLIF(GET_JSON_OBJECT(memory,'$.business_rules.menu_theme_details.selected_theme_detail'),'')
+    NULLIF(GET_JSON_OBJECT(memory,'$.business_rules.menu_theme_details.selected_theme_detail'),''),
+    NULLIF(GET_JSON_OBJECT(memory, '$.business_rules.theme_details.predicted_theme_detail'),'')
   ) AS selected_taxonomy,
   GET_JSON_OBJECT(memory, '$.basic.session.context_message') AS context_message,
   GET_JSON_OBJECT(memory, '$.basic.flags') AS flags,
@@ -17,8 +18,8 @@ SELECT
       AND GET_JSON_OBJECT(memory, '$.predictions.tags_v4.theme') <> 'null'
       OR GET_JSON_OBJECT(memory, '$.predictions.tags_v4.theme_detail') IS NOT NULL
       AND GET_JSON_OBJECT(memory, '$.predictions.tags_v4.theme_detail') <> 'null'
-      OR GET_JSON_OBJECT(memory, '$.predictions.tags_v4.customer_type') IS NOT NULL
-      AND GET_JSON_OBJECT(memory, '$.predictions.tags_v4.customer_type') <> 'null'
+      OR GET_JSON_OBJECT(memory, '$.predictions.tags_v4.customer_types') IS NOT NULL
+      AND GET_JSON_OBJECT(memory, '$.predictions.tags_v4.customer_types') <> 'null'
       OR GET_JSON_OBJECT(memory, '$.predictions.jon_snow') IS NOT NULL
       AND GET_JSON_OBJECT(memory, '$.predictions.jon_snow') <> 'null'
       AND GET_JSON_OBJECT(memory, '$.predictions.tags_v3') IS NULL

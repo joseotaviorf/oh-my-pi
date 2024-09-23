@@ -176,7 +176,7 @@ sessions_with_recontact AS (
       ON gs.id_session = j.id_correlation
       AND j.journey_name is null
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY gs.id_session ORDER BY gs.ts_started DESC, j.ts_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY gs.id_session ORDER BY gs.ts_started DESC) = 1
 )
 SELECT DISTINCT
   gs.id_session,
