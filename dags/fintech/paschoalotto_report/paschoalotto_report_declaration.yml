@@ -21,7 +21,7 @@ workflow:
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
-    - "{dag_name}"
+    - "{schema}"
     - 5a-paschoalotto
     - parquet
     - "{load_start_date}"
