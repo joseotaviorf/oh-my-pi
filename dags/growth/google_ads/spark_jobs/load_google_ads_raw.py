@@ -122,7 +122,7 @@ if __name__ == "__main__":
     credentials_str = dbutils.secrets.get(scope="quintoandar", key=APIEnum.GOOGLE_ADS)
     credentials = json.loads(credentials_str)
 
-    googleads_client = GoogleAdsClient.load_from_dict(credentials, version="v15")
+    googleads_client = GoogleAdsClient.load_from_dict(credentials, version="v17")
     googleads_client.login_customer_id = login_customer_id
     customer_ids = _list_customer_ids(
         googleads_client, login_customer_id, customer_filter

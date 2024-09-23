@@ -59,6 +59,6 @@ cluster:
     spark_version: 13.3.x-scala2.12
   custom_libraries:
     - pypi:
-        package: google-ads==22.1.0
+        package: google-ads==25.0.0
     - pypi:
-        package: google-auth==2.23
+        package: google-auth==2.35
