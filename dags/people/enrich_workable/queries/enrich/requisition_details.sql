@@ -19,9 +19,14 @@ WITH
       c.id AS id_candidate_workable,
       ei.work_email,
       ei.personal_email,
+      wr.dt_start,
+      COALESCE(wr.dt_termination, CURRENT_DATE + 30) AS dt_termination,
       NOW() AS ts_load
     FROM
       datalake_hr_system.employee_ids AS ei
+    LEFT JOIN 
+      datalake_hr_system.work_relationships AS wr
+        ON ei.id_period_of_service = wr.id_period_of_service
     LEFT JOIN 
       datalake_workable_redshift_clean.members AS m 
         ON ei.work_email = m.email
@@ -31,6 +36,8 @@ WITH
     LEFT JOIN 
       datalake_hr_system.hierarchy_ids AS hi
         ON ei.id_period_of_service = hi.sk_assignment
+    WHERE
+      assignment_number not like 'P%'
   ),
   requisitions_details_step1 AS (
     SELECT DISTINCT
@@ -166,15 +173,19 @@ WITH
     LEFT JOIN 
       employee_consolidations AS eec_owner 
         ON r.id_owner = eec_owner.id_member_workable
+          AND rd.dt_created BETWEEN eec_owner.dt_start AND eec_owner.dt_termination
     LEFT JOIN 
       employee_consolidations AS eec_hiring_manager 
         ON r.id_hiring_manager = eec_hiring_manager.id_member_workable
+          AND rd.dt_created BETWEEN eec_hiring_manager.dt_start AND eec_hiring_manager.dt_termination
     LEFT JOIN 
       employee_consolidations AS eec_hiring_manager_cf 
         ON ecf_requisitions.hiring_manager_email = eec_hiring_manager_cf.work_email
+          AND rd.dt_created BETWEEN eec_hiring_manager_cf.dt_start AND eec_hiring_manager_cf.dt_termination
     LEFT JOIN 
       employee_consolidations AS eec_business_partner 
         ON ecf_requisitions.business_partner = eec_business_partner.work_email
+          AND rd.dt_created BETWEEN eec_business_partner.dt_start AND eec_business_partner.dt_termination
   )
 SELECT
   MD5(CAST(id AS BINARY)) AS sk_requisition,
