@@ -50,7 +50,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 ENV = os.environ.get("ENVIRONMENT")
-DAG_OWNER = DAGOwnerEnum.DEFAULT_OWNER
+DAG_OWNER = DAGOwnerEnum.DATA_SS
 
 dag = DAG(
     dag_id=DAG_ID,
