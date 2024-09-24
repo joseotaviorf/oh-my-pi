@@ -53,20 +53,7 @@ total_invoices_negotiated AS (
     COUNT(DISTINCT id_invoice) AS total_invoices_negotiated
   FROM datalake_cyber_homolog.debt_negotiation_mapping
   GROUP BY 1
-),
-contract_invoice_negotiation AS (
-  SELECT
-    id_agreement,
-    SUM(invoice_due_amount) AS invoices_due_amount,
-    MAX(agreement_credit_card_fee) AS credit_card_fee,
-    MAX(agreement_eviction_costs_amount) AS eviction_costs_amount,
-    MAX(agreement_fine_amount) AS fine_amount,
-    MAX(agreement_contract_interest_fees_amount) AS contract_interest_fees_amount,
-    MAX(main_amount_overdue) AS total_debt_amount,
-    MAX(contract_delay_days)
-  FROM datalake_cyber_clean.historical_agreements
 )
-
 SELECT
     a.id_agreement AS id_negotiation,
     ca.id_contract,
