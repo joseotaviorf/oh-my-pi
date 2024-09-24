@@ -5,3 +5,4 @@ SELECT
     titulo_ocor AS occurrence_name,
     NOW() AS ts_load
 FROM datalake_webhelp_raw.ocorrencias_clientes
+QUALIFY ROW_NUMBER() OVER(PARTITION BY cod_ocor ORDER BY subfolder DESC) = 1

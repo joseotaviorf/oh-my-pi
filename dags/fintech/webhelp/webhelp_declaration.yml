@@ -16,39 +16,70 @@ workflow:
   layer: raw
   type: custom_ingestion
   load_spark_job: load_webhelp_raw
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
     - "{dag_name}"
     - lake-quinto-andar-sftp
-    - '["ATENDIMENTO", "COBRANCA"]'
-    - "{{ ds }}"
-    - "{table_name}"
+    - "COBRANCA"
     - parquet
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{extraction_type}"
+    - "{partitions}"
   tables_customization:
     historicos_clientes:
       clean_table_name: historical_customers
-    historicos_clientes_titulos:
-      clean_table_name: historical_customers_titles
-    login:
-      clean_table_name: login
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
     ocorrencias_clientes:
       clean_table_name: customer_occurrences
-    estagios:
-      clean_table_name: stages
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
     titulos:
       clean_table_name: titles
-    tipo_contrato:
-      clean_table_name: contract_type
-    credores:
-      clean_table_name: creditors
+      extraction_type: full
+      partitions: ["year", "month", "day"]
     parcelas:
       clean_table_name: installments
+      extraction_type: full
+      partitions: ["year", "month", "day"]
+    login:
+      clean_table_name: login
+      extraction_type: full
+      partitions: []
+    estagios:
+      clean_table_name: stages
+      extraction_type: full
+      partitions: []
+    tipo_contrato:
+      clean_table_name: contract_type
+      extraction_type: full
+      partitions: []
+    credores:
+      clean_table_name: creditors
+      extraction_type: full
+      partitions: []
     devedores:
       clean_table_name: debtors
+      extraction_type: full
+      partitions: []
     grupo_ocorrencias:
       clean_table_name: group_occurrences
+      extraction_type: full
+      partitions: []
     importacao:
       clean_table_name: import
+      extraction_type: full
+      partitions: []
+    analise_operadores:
+      clean_table_name: operator_analysis
+      extraction_type: full
+      partitions: []
+
 cluster:
   type: databricks_13_3_med_general_cluster

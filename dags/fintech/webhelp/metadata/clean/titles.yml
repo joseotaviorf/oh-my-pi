@@ -5,7 +5,7 @@ owner: bianca.martins@quintoandar.com.br
 domain: Fintech
 description: Title data
 columns:
-  id_contract:
+  id_title:
     description: "Contract code. PK of table"
     lineage:
       - datalake_webhelp_raw.titulos.cod_tit

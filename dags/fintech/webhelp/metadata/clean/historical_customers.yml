@@ -9,6 +9,10 @@ columns:
     description: "Tabulation/service code in CRM. PK of table"
     lineage:
       - datalake_webhelp_raw.historicos_clientes.cod_hist_cli
+  id_contract:
+    description: "Contract code"
+    lineage:
+      - datalake_webhelp_raw.historicos_clientes.cod_tit
   id_debtor:
     description: "CRM debtor/customer code. FK of table debtors"
     lineage:
@@ -17,7 +21,7 @@ columns:
     description: "Occurrence ID. FK of table customer_occurrences"
     lineage:
       - datalake_webhelp_raw.historicos_clientes.cod_ocor
-  id_operator:
+  id_login:
     description: "Code of the user/agent who registered the occurrence"
     lineage:
       - datalake_webhelp_raw.historicos_clientes.usuario_cad

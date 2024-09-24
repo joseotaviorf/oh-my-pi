@@ -1,0 +1,67 @@
+---
+database_name: datalake_webhelp_clean
+table_name: operator_analysis
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Login/logout webhelp operators
+columns:
+  data:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.data
+  celular:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.celular
+  tipo_pa:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.tipo_pa
+  nome_operador:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.nome_operador
+  max_login:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.max_login
+  max_logout:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.max_logout
+  tempo_logado:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.tempo_logado
+  tempo_idle:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.tempo_idle
+  tempo_conversacao:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.tempo_conversacao
+  tempo_pausa:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.tempo_pausa
+  tabulacoes:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.tabulacoes
+  tma:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.tma
+  acordos:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.acordos
+  transferencias:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.transferencias
+  clientes_distintos_acionados:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.clientes_distintos_acionados

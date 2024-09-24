@@ -9,7 +9,7 @@ columns:
     description: "Import ID"
     lineage:
       - datalake_webhelp_raw.importacao.cod_imp
-  import_file:
+  file_name:
     description: "Import file name"
     lineage:
       - datalake_webhelp_raw.importacao.nome_arq

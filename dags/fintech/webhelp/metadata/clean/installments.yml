@@ -9,7 +9,7 @@ columns:
     description: "ID installment. PK of table"
     lineage:
       - datalake_webhelp_raw.parcelas.cod_parc
-  id_contract:
+  id_title:
     description: "Contract ID. FK of table titles"
     lineage:
       - datalake_webhelp_raw.parcelas.cod_tit
@@ -33,7 +33,7 @@ columns:
     description: "True: Paid (Parcela quitada), False: Open (parcela em aberto)."
     lineage:
       - datalake_webhelp_raw.parcelas.quitado_parc
-  amount:
+  due_amount:
     description: "Installment amount"
     lineage:
       - datalake_webhelp_raw.parcelas.vr_parc

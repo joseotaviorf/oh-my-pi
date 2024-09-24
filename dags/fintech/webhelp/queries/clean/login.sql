@@ -1,5 +1,5 @@
 SELECT
-    cod_login AS id_user,
+    cod_login AS id_login,
     cod_pes AS id_person,
     cod_superv AS id_supervisor,
     niv_cod AS user_level,
@@ -8,3 +8,4 @@ SELECT
     subfolder AS context,
     NOW() AS ts_load
 FROM datalake_webhelp_raw.login
+QUALIFY ROW_NUMBER() OVER(PARTITION BY cod_login ORDER BY subfolder DESC) = 1

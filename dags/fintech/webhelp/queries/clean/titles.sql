@@ -1,5 +1,5 @@
 SELECT
-    cod_tit AS id_contract,
+    cod_tit AS id_title,
     cod_tipc AS id_contract_type,
     cod_cred AS id_creditor,
     contrato_tit AS contract_number,
@@ -9,3 +9,4 @@ SELECT
     dt_expir_tit AS ts_expiration,
     NOW() AS ts_load
 FROM datalake_webhelp_raw.titulos
+QUALIFY ROW_NUMBER() OVER(PARTITION BY cod_tit ORDER BY subfolder DESC) = 1
