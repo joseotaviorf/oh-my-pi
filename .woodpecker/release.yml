@@ -37,7 +37,7 @@ steps:
     depends_on: [make-package-python]
 
   export-releases-to-s3-prod:
-    image: plugins/s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: dist/*.whl
@@ -51,7 +51,7 @@ steps:
     depends_on: [prepare-release-prod]
 
   export-releases-to-s3-forno:
-    image: plugins/s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: dist/*.whl
@@ -65,7 +65,7 @@ steps:
     depends_on: [prepare-release-forno]
 
   export-init-script-to-s3-forno:
-    image: plugins/s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: scripts/init_script.sh
@@ -78,7 +78,7 @@ steps:
       branch: forno
 
   export-init-script-to-s3-prod:
-    image: plugins/s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: scripts/init_script.sh
