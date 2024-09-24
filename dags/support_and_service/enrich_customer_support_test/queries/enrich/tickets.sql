@@ -30,6 +30,7 @@ incoming_tickets AS (
       NULLIF(REGEXP_EXTRACT(description, '(WT[a-z0-9]{{20,40}})'), '')
     ) AS twilio_task,
     tags,
+    type,
     description,
     status,
     analyst_email,
@@ -133,6 +134,7 @@ tickets_per_task AS (
     t.task_sid_twilio,
     t.twilio_task,
     t.tags,
+    t.type,
     t.description,
     t.status,
     CASE
@@ -236,6 +238,7 @@ tickets AS (
     t.task_sid_twilio,
     t.twilio_task,
     t.tags,
+    t.type,
     t.description,
     CASE
       WHEN front_or_back = 'BACK'
@@ -474,6 +477,7 @@ SELECT DISTINCT
   t.direction,
   t.ticket_origin,
   t.tags,
+  t.type,
   t.description,
   t.request_type,
   t.client_type,

@@ -59,6 +59,13 @@ columns:
       WHATSAPP: Whatsapp
       CALL INBOUND: Direct call
       CALL OUTBOUND: 5A called the customer
+  type:
+    lineage:
+      - datalake_zendesk.tickets_current.type
+    description: Type of the ticket
+    categories:
+      incident: default ticket type
+      problem: a problem ticket references one or many incident tickets
   client_type:
     description: Type of client, from custom_fields like 'Tipo de Cliente'
     lineage:
