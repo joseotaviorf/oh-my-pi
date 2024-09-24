@@ -134,6 +134,7 @@ class Tables:
     geocode_step_houses = "vespucio_pipeline_delta.geocode_step_houses"
     cluster_step_condos = "vespucio_pipeline_delta.cluster_step_condos"
     cluster_step_houses = "vespucio_pipeline_delta.cluster_step_houses"
+    source_predict_step_houses = "vespucio_pipeline_delta.source_predict_step_houses"
     merge_step_condos = "vespucio_pipeline_delta.merge_step_condos"
     merge_step_houses = "vespucio_pipeline_delta.merge_step_houses"
     images_step_houses = "vespucio_pipeline_delta.images_step_houses"
@@ -321,12 +322,22 @@ core_tasks = [
         ],
     ),
     create_task(
+        entry_point="core_source_predict_step",
+        parameters=[
+            f"--input_staged_houses={Tables.stage_step_houses}",
+            f"--input_clustered_houses={Tables.cluster_step_houses}",
+            f"--overwrite_schema",
+            f"--output_source_predicted_houses={Tables.source_predict_step_houses}",
+        ]
+    ),
+    create_task(
         entry_point="core_merge_step",
         parameters=[
             f"--input_staged_condos={Tables.stage_step_condos}",
             f"--input_staged_houses={Tables.stage_step_houses}",
             f"--input_clustered_condos={Tables.cluster_step_condos}",
             f"--input_clustered_houses={Tables.cluster_step_houses}",
+            f"--input_source_predicted_houses={Tables.source_predict_step_houses}",
             f"--overwrite_schema",
             f"--output_merged_condos={Tables.merge_step_condos}",
             f"--output_merged_houses={Tables.merge_step_houses}",
