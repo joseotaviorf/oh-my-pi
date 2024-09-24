@@ -37,7 +37,7 @@ sauron_sessions AS (
   FROM
     datalake_sauron_clean.session
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+    year >= 2023 -- we need to check all sessions as they do not have a fixed lifetime
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_updated DESC) = 1
 ),
