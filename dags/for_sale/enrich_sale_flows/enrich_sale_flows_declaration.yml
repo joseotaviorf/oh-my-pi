@@ -17,4 +17,4 @@ workflow:
       extraction_type: incremental
     sale_flow: {}
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_min_2xlarge_memory_cluster
