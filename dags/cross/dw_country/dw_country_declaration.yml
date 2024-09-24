@@ -1,6 +1,6 @@
 dag:
   name: dw_country
-  owner: Data Engineering
+  owner: Data ForRent
 workflow:
   type: query
   layer: dw
