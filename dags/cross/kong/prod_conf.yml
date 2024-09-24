@@ -1,5 +1,7 @@
 ---
-dag_documentation:
-  dag_purpose: "Retrieves kong logs data from all 5A applications."
+dag:
+  documentation:
+    dag_purpose: "Retrieves kong logs data from all 5A applications."
+  owner: Data SS
 partition_cols: ["year", "month", "day", "hour"]
 table_name: "kong_logs"
