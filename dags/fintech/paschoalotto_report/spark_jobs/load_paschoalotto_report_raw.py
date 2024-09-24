@@ -110,6 +110,7 @@ if __name__ == "__main__":
 
     dates_to_ingest = _generate_date_range(load_start_date, load_end_date)
     for date_to_ingest in dates_to_ingest:
+        date_to_ingest_formatted = date_to_ingest.strftime("%Y-%m-%d")
         filtered_files = []
         for file in files_list:
             if 'quintocred' in file:
@@ -118,20 +119,18 @@ if __name__ == "__main__":
                 file_name = f"{table_name}_quintoandar"
             else:
                 file_name = table_name
+            dt_pattern = f"{file_name}_{date_to_ingest_formatted}.{format}"
 
-            dt_pattern = f"{file_name}_{date_to_ingest}.{format}"
             if file == dt_pattern:
                 filtered_files.append(file)
-
         dfs = []
         if len(filtered_files) > 0:
-
             for path in filtered_files:
                 df = s3_consumer.get_data_from_file(path=f"s3://{source_root_path}/{path}", format=format)
                 df = df.withColumn("s3_file_name", lit(path))
                 df = df.withColumn("context", when(expr("s3_file_name NOT LIKE '%quintocred%'"), lit('quintoandar')).otherwise(lit('quintocred')))
                 df = df.withColumn("ts_load", current_timestamp())
-                datetime_file = datetime.strptime(date_to_ingest, "%Y-%m-%d")
+                datetime_file = datetime.strptime(date_to_ingest_formatted, "%Y-%m-%d")
 
                 df = (
                     SparkDataFrameService()
@@ -143,28 +142,34 @@ if __name__ == "__main__":
 
             df = reduce(DataFrame.unionAll, dfs)
 
-            if extraction_type == "incremental":
-                IncrementalTableLoaderPipeline(
-                    database_name=database_name,
-                    table_name=table_name,
-                    database_location=database_location,
-                    layer=LayerEnum.RAW,
-                    query=None,
-                    partitions=partitions,
-                ).load_and_register(df, format_options)
+            if not df.isEmpty():
+                if extraction_type == "incremental":
+                    IncrementalTableLoaderPipeline(
+                        database_name=database_name,
+                        table_name=table_name,
+                        database_location=database_location,
+                        layer=LayerEnum.RAW,
+                        query=None,
+                        partitions=partitions,
+                    ).load_and_register(df, format_options)
+                else:
+                    FullTableLoaderPipeline(
+                        database_name=database_name,
+                        table_name=table_name,
+                        database_location=database_location,
+                        layer=LayerEnum.RAW,
+                        query=None
+                    ).load_and_register(df, format_options)
             else:
-                FullTableLoaderPipeline(
-                    database_name=database_name,
-                    table_name=table_name,
-                    database_location=database_location,
-                    layer=LayerEnum.RAW,
-                    query=None
-                ).load_and_register(df, format_options)
+                logger.warning(
+                f"m=__main__, msg= File {dt_pattern} is empty. Ending process without loading anything."
+                )
+                days_to_send_warning.append(date_to_ingest_formatted)
         else:
             logger.warning(
                 "m=__main__, msg= No files were found on S3 bucket. Ending process without loading anything."
             )
-            days_to_send_warning.append(date_to_ingest)
+            days_to_send_warning.append(date_to_ingest_formatted)
 
     if days_to_send_warning:
         base_dbutils = BaseDBUtils()
