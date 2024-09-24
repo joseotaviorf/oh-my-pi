@@ -9,3 +9,5 @@ FROM
     datalake_workable_redshift_raw.field_value_choices
 WHERE  
     MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY 
+    updated_at = MAX(updated_at) OVER (PARTITION BY id)
