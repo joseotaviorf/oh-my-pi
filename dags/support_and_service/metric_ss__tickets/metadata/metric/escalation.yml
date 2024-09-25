@@ -20,6 +20,11 @@ columns:
     dimension: True
     lineage:
       - dw_customer_support.dim_department.journey_step
+  board:
+    description: Department board.
+    dimension: True
+    lineage:
+      - dw_customer_support.dim_department.board
   department:
     description: Department name.
     dimension: True

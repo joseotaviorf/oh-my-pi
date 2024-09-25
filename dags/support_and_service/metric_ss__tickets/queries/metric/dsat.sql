@@ -6,6 +6,7 @@ SELECT
   END AS channel,
   dt.journey,
   dd_last.journey_step,
+  dd_last.board,
   dd_last.department,
   dd_last.team,
   dd_last.area,
