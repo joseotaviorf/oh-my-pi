@@ -20,6 +20,12 @@ columns:
     description: Session ID from Sauron
     lineage:
       - datalake_zendesk.tickets_current.id_session
+  id_twilio:
+    description: Twilio ID, either an id_task or id_call
+    lineage:
+      - datalake_customer_support_test.calls.id_task
+      - datalake_customer_support_test.calls.id_call
+      - datalake_customer_support_test.chats.id_task
   first_analyst_email:
     lineage:
       - datalake_zendesk.tickets_current.analyst_email

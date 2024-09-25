@@ -11,6 +11,18 @@ workflow:
   custom_schema: customer_support_test
   default_extraction_type: incremental
   tables_customization:
+    fact_tickets:
+      z_order_by:
+        [
+          sk_ticket,
+          sk_taxonomy,
+          sk_user,
+          sk_session,
+          sk_contract,
+          sk_department,
+          sk_analyst,
+        ]
+      merge_on: [sk_ticket]
     fact_ivr_interactions:
       z_order_by: [sk_task]
       merge_on: [sk_interaction]

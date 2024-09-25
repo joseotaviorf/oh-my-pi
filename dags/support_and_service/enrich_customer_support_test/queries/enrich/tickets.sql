@@ -125,6 +125,7 @@ tickets_per_task AS (
     t.id_contract,
     t.id_call,
     t.id_session,
+    COALESCE(ch.id_task, ca1.id_task, ca2.id_call) AS id_twilio,
     CASE
       WHEN ut.channel = 'chat' THEN ch.queue_name
       WHEN ut.channel = 'call' THEN COALESCE(ca1.queue_name, ca2.queue_name)
@@ -230,6 +231,7 @@ tickets AS (
     t.id_contract,
     t.id_call,
     t.id_session,
+    t.id_twilio,
     tq.first_queue,
     tq.last_queue,
     tq.first_analyst_email,
@@ -456,113 +458,203 @@ ticket_days_worked AS (
     ts_sla_started
   FROM
     ticket_days_off
+),
+ticket_metrics AS (
+  SELECT DISTINCT
+    t.id_ticket,
+    t.id_problem_ticket,
+    t.id_user_main,
+    t.id_contract,
+    t.id_call,
+    t.id_session,
+    t.id_twilio,
+    t.first_queue,
+    t.last_queue,
+    t.first_analyst_email,
+    t.last_analyst_email,
+    t.front_or_back,
+    t.journey_step,
+    tr.sub_journey,
+    t.team,
+    t.area,
+    t.status,
+    UPPER(t.channel) AS channel,
+    t.direction,
+    t.ticket_origin,
+    t.tags,
+    t.type,
+    t.description,
+    t.request_type,
+    t.client_type,
+    t.step_tag,
+    t.customer_type_tag,
+    t.contact_theme_tag,
+    t.contact_motivation_tag,
+    t.contact_theme_detail_tag,
+    t.custom_fields,
+    t.reopens,
+    t.replies,
+    btt.back_ticket_list,
+    btt.total_backoffice_minutes_time,
+    tdw.sla_target,
+    IF(tdw.days_worked < 0, 0, tdw.days_worked) AS days_worked,
+    IF(tdw.days_off < 0, 0, tdw.days_off) AS days_off,
+    CASE
+      WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) <= sla_target THEN IF(tdw.days_worked < 0, 0, tdw.days_worked)
+      ELSE 0
+    END AS time_spent_solved_in_time,
+    CASE
+      WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) > sla_target THEN IF(tdw.days_worked < 0, 0, tdw.days_worked)
+      ELSE 0
+    END AS time_spent_not_solved_in_time,
+    CASE
+      WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) <= sla_target THEN TRUE
+      ELSE FALSE
+    END AS is_ticket_solved_in_time,
+    CASE
+      WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) <= sla_target
+        OR ISNULL(tdw.days_worked) THEN FALSE
+      ELSE TRUE
+    END AS is_ticket_not_solved_in_time,
+    btt.has_open_back_ticket,
+    t.is_back_ticket,
+    t.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
+    t.is_call_answered,
+    CASE
+      WHEN t.channel IN ('call', 'chat')
+        AND t.front_or_back = 'FRONT'
+        AND DATE(t.ts_solved) >= DATE('2022-01-01')
+        AND t.contact_theme_detail_tag IS NOT NULL
+        AND t.team != 'Ong Back'
+        AND t.area = 'CX'
+        AND t.last_queue NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
+          'Offboarding Reparos [OFF] [POS] [BACK]',
+          'Offboarding pré saída [OFF] [POS] [BACK]',
+          'Proteção QuintoAndar [OFF] [POS] [BACK]',
+          'Rescisão - Despejo [OFF][POS][BACK]',
+          'Rescisão 1 [OFF] [POS] [BACK]'
+        )
+        AND t.ticket_origin != "CALL OUTBOUND" THEN TRUE
+      WHEN t.channel IN ('email', 'whatsapp')
+        AND t.front_or_back IN ('FRONT', 'BACK')
+        AND DATE(t.ts_solved) >= DATE('2022-01-01')
+        AND t.contact_theme_detail_tag IS NOT NULL
+        AND t.team != 'Ong Back'
+        AND t.area = 'CX'
+        AND t.last_queue NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
+          'Offboarding Reparos [OFF] [POS] [BACK]',
+          'Offboarding pré saída [OFF] [POS] [BACK]',
+          'Proteção QuintoAndar [OFF] [POS] [BACK]',
+          'Rescisão - Despejo [OFF][POS][BACK]',
+          'Rescisão 1 [OFF] [POS] [BACK]'
+        )
+        AND NOT (
+          t.last_queue = 'ReclameAqui [CE] [POS] [BACK]'
+          AND t.type = 'problem'
+        ) THEN TRUE
+      ELSE FALSE
+    END AS is_ticket_rate,
+    t.ts_budget,
+    t.ts_created,
+    tdw.ts_sla_started,
+    t.ts_solved,
+    t.ts_closed,
+    t.ts_updated,
+    t.year,
+    t.month,
+    t.day
+  FROM
+    tickets AS t
+  LEFT JOIN
+    back_ticket_timestamps AS btt
+      ON btt.id_front_ticket = t.id_ticket
+  LEFT JOIN
+    ticket_days_worked AS tdw
+      ON tdw.id_ticket = t.id_ticket
+  LEFT JOIN
+    datalake_gsheets_clean.ticket_rate_classification AS tr
+      ON t.contact_theme_detail_tag = tr.micro_taxonomy
+        AND t.contact_theme_tag = tr.macro_taxonomy
 )
-SELECT DISTINCT
-  t.id_ticket,
-  t.id_problem_ticket,
-  t.id_user_main,
-  t.id_contract,
-  t.id_call,
-  t.id_session,
-  t.first_queue,
-  t.last_queue,
-  t.first_analyst_email,
-  t.last_analyst_email,
-  t.front_or_back,
-  t.journey_step,
-  t.team,
-  t.area,
-  t.status,
-  UPPER(t.channel) AS channel,
-  t.direction,
-  t.ticket_origin,
-  t.tags,
-  t.type,
-  t.description,
-  t.request_type,
-  t.client_type,
-  t.step_tag,
-  t.customer_type_tag,
-  t.contact_theme_tag,
-  t.contact_motivation_tag,
-  t.contact_theme_detail_tag,
-  t.custom_fields,
-  t.reopens,
-  t.replies,
-  btt.back_ticket_list,
-  btt.total_backoffice_minutes_time,
-  tdw.sla_target,
-  IF(tdw.days_worked < 0, 0, tdw.days_worked) AS days_worked,
-  IF(tdw.days_off < 0, 0, tdw.days_off) AS days_off,
+SELECT
+  id_ticket,
+  id_problem_ticket,
+  id_user_main,
+  id_contract,
+  id_call,
+  id_session,
+  id_twilio,
+  first_queue,
+  last_queue,
+  first_analyst_email,
+  last_analyst_email,
+  front_or_back,
+  journey_step,
+  team,
+  area,
+  status,
+  channel,
+  direction,
+  ticket_origin,
+  tags,
+  type,
+  description,
+  request_type,
+  client_type,
+  step_tag,
+  customer_type_tag,
+  contact_theme_tag,
+  contact_motivation_tag,
+  contact_theme_detail_tag,
+  custom_fields,
+  reopens,
+  replies,
+  back_ticket_list,
+  total_backoffice_minutes_time,
+  sla_target,
+  days_worked,
+  days_off,
+  time_spent_solved_in_time,
+  time_spent_not_solved_in_time,
+  is_ticket_solved_in_time,
+  is_ticket_not_solved_in_time,
   CASE
-    WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) <= sla_target THEN IF(tdw.days_worked < 0, 0, tdw.days_worked)
-    ELSE 0
-  END AS time_spent_solved_in_time,
+    WHEN sub_journey IN ('Contract to Entrance', 'Listing & Search', 'Offboarding', 'Onboarding', 'Visits to Offer')
+      THEN 'FOR RENT'
+    WHEN sub_journey = 'For Sale' THEN 'FOR SALE'
+    WHEN sub_journey = 'Partners' THEN 'PARTNERS'
+    ELSE NULL
+  END AS context,
   CASE
-    WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) > sla_target THEN IF(tdw.days_worked < 0, 0, tdw.days_worked)
-    ELSE 0
-  END AS time_spent_not_solved_in_time,
-  CASE
-    WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) <= sla_target THEN TRUE
-    ELSE FALSE
-  END AS is_ticket_solved_in_time,
-  CASE
-    WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) <= sla_target
-      OR ISNULL(tdw.days_worked) THEN FALSE
-    ELSE TRUE
-  END AS is_ticket_not_solved_in_time,
-  btt.has_open_back_ticket,
-  t.is_back_ticket,
-  t.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
-  t.is_call_answered,
-  CASE
-    WHEN t.channel IN ('call', 'chat')
-      AND t.front_or_back = 'FRONT'
-      AND DATE(t.ts_solved) >= DATE('2022-01-01')
-      AND t.contact_theme_detail_tag IS NOT NULL
-      AND t.team != 'Ong Back'
-      AND t.area = 'CX'
-      AND t.last_queue NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
-        'Offboarding Reparos [OFF] [POS] [BACK]',
-        'Offboarding pré saída [OFF] [POS] [BACK]',
-        'Proteção QuintoAndar [OFF] [POS] [BACK]',
-        'Rescisão - Despejo [OFF][POS][BACK]',
-        'Rescisão 1 [OFF] [POS] [BACK]'
-      )
-      AND t.ticket_origin != "CALL OUTBOUND" THEN TRUE
-    WHEN t.channel IN ('email', 'whatsapp')
-      AND t.front_or_back IN ('FRONT', 'BACK')
-      AND DATE(t.ts_solved) >= DATE('2022-01-01')
-      AND t.contact_theme_detail_tag IS NOT NULL
-      AND t.team != 'Ong Back'
-      AND t.area = 'CX'
-      AND t.last_queue NOT IN ('Rescisão por Inadimplência [OFF][POS][BACK]',
-        'Offboarding Reparos [OFF] [POS] [BACK]',
-        'Offboarding pré saída [OFF] [POS] [BACK]',
-        'Proteção QuintoAndar [OFF] [POS] [BACK]',
-        'Rescisão - Despejo [OFF][POS][BACK]',
-        'Rescisão 1 [OFF] [POS] [BACK]'
-      )
-      AND NOT (
-        t.last_queue = 'ReclameAqui [CE] [POS] [BACK]'
-        AND t.type = 'problem'
-      ) THEN TRUE
-    ELSE FALSE
-  END AS is_ticket_rate,
-  t.ts_budget,
-  t.ts_created,
-  tdw.ts_sla_started,
-  t.ts_solved,
-  t.ts_closed,
-  t.ts_updated,
-  t.year,
-  t.month,
-  t.day
+    WHEN is_ticket_rate AND sub_journey = 'Ongoing' THEN
+      CASE
+        WHEN front_or_back = 'FRONT' THEN 15
+        WHEN front_or_back = 'BACK' THEN 30
+      END
+    WHEN is_ticket_rate AND sub_journey IN (
+      'Contract to Entrance', 'For Sale',
+      'Listing & Search', 'Offboarding',
+      'Onboarding', 'Partners', 'Visits to Offer'
+    ) THEN
+      CASE
+        WHEN front_or_back = 'FRONT' THEN 1
+        WHEN front_or_back = 'BACK' THEN 2
+      END
+    ELSE NULL
+  END AS ticket_rate_weight,
+  has_open_back_ticket,
+  is_back_ticket,
+  is_closed_by_merge,
+  is_call_answered,
+  is_ticket_rate,
+  ts_budget,
+  ts_created,
+  ts_sla_started,
+  ts_solved,
+  ts_closed,
+  ts_updated,
+  year,
+  month,
+  day
 FROM
-  tickets AS t
-LEFT JOIN
-  back_ticket_timestamps AS btt
-    ON btt.id_front_ticket = t.id_ticket
-LEFT JOIN
-  ticket_days_worked AS tdw
-    ON tdw.id_ticket = t.id_ticket
+  ticket_metrics
