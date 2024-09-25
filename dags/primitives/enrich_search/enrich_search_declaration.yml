@@ -16,6 +16,7 @@ workflow:
       - experiment_config
     houses_published:
       - experiment_config
+      - search_impressions
     item_interaction:
       - amplitude_user_device
     item_interaction_sale:
