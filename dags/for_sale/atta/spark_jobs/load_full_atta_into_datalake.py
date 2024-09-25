@@ -69,7 +69,8 @@ if __name__ == "__main__":
     if df:
         # Verificando e transformando colunas decimais
         for column in df.columns:
-            if isinstance(df.schema[column].dataType, DecimalType) and df.schema[column].precision > 38:
+            data_type = df.schema[column].dataType
+            if isinstance(data_type, DecimalType) and data_type.precision > 38:
                 df = df.withColumn(column, F.col(column).cast("decimal(38,30)"))
 
         s3_loader.load_df(
