@@ -15,7 +15,7 @@ WITH
         del.original_value,
         d.amount_paid,
         d.value - d.amount_paid AS open_amount,
-        IF( d.amount_paid > 0 AND (LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY COALESCE(r.ts_created, d.dt_paid)) <> d.amount_paid) , d.amount_paid - LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY COALESCE(r.ts_created, d.dt_paid)) , 0) AS amount_paid_added,
+        IF(d.amount_paid > 0 AND (LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY COALESCE(r.ts_created, d.dt_paid)) <> d.amount_paid) , d.amount_paid - LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY COALESCE(r.ts_created, d.dt_paid)), 0) AS amount_paid_added,
         d.value <= d.amount_paid AS is_finished,
         del.is_legacy_agreement,
         del.id_propose < 5000000 AS is_legacy_propose,
@@ -135,7 +135,7 @@ cte_timeline_daily AS (
         datalake_quintoandar.aux_date AS d
     LEFT JOIN
         timeline_base AS t
-            ON IF(t.is_finished, d.`date` >= t.dt_updated_paid AND d.`date` <= LAST_DAY(t.dt_updated_paid), IF(t.is_currently_active = true, d.`date` >= t.dt_updated_paid AND (d.`date` <= t.dt_delinquency_last_register OR t.dt_delinquency_last_register IS NULL), d.`date` >= t.dt_created AND d.`date` <= t.dt_delinquency_last_register))
+            ON IF(t.is_finished, d.`date` >= t.dt_updated_paid AND d.`date` <= LAST_DAY(t.dt_updated_paid), IF(t.is_currently_active = true, d.`date` >= LEAST(t.dt_updated_paid, t.dt_created, t.dt_due) AND (d.`date` <= t.dt_delinquency_last_register OR t.dt_delinquency_last_register IS NULL), d.`date` >= IF(t.dt_created > t.dt_due, t.dt_due, t.dt_created) AND d.`date` < t.dt_delinquency_last_register))
     WHERE
         d.`date` > DATE('2020-01-01')
         AND d.`date` <= CURRENT_DATE()
@@ -156,6 +156,7 @@ timeline AS (
 ),
 cte_timeline_status AS (
     WITH base_cte_status AS (
+        WITH base_fix AS (
         SELECT
             a.id,
             a.id_propose,
@@ -163,9 +164,11 @@ cte_timeline_status AS (
             r.ts_created,
             a.dt_payment_scheduled,
             DATEADD(HOUR, -3, r.ts_created) AS ts_created_local,
+            a.dt_due,
+            a.rev,
+            a.rev_end,
             re.ts_created AS ts_ended,
             IF(re.ts_created IS NULL AND a.id_status = 3, LAST_DAY(r.ts_created), re.ts_created) AS ts_ended_3
-
         FROM
             datalake_rental_guarantee_platform_clean.delinquency_aud a
         LEFT JOIN
@@ -174,10 +177,16 @@ cte_timeline_status AS (
         LEFT JOIN
             datalake_rental_guarantee_platform_clean.rev_info re
             ON a.rev_end = re.rev
-        GROUP BY 1,2,4,5,6,7,8
+            AND NOT a.mod_id_propose <=> TRUE
+        GROUP BY 1,2,4,5,6,7,8,9,10,11
         QUALIFY
             ROW_NUMBER() OVER(PARTITION BY a.id, DATE(r.ts_created) ORDER BY r.ts_created DESC) = 1
         )
+        SELECT
+            *,
+            IF(rev_end IS NOT NULL AND ts_ended IS NULL, LAG(ts_created_local) OVER (PARTITION BY id ORDER BY ts_created_local DESC),ts_ended) AS ts_ended_fixed
+        FROM base_fix
+    )
     SELECT
         s.id,
         s.id_status AS id_status,
@@ -186,7 +195,7 @@ cte_timeline_status AS (
         datalake_quintoandar.aux_date AS d
     LEFT JOIN
         base_cte_status s
-        ON IF( s.ts_ended IS NOT NULL AND s.ts_ended_3 IS NOT NULL, d.`date` >= IF(DATE(s.dt_payment_scheduled) < DATE(s.ts_created_local), DATE(s.dt_payment_scheduled), DATE(s.ts_created_local)) AND IF(s.ts_ended IS NOT NULL, d.`date` < DATE(s.ts_ended), d.`date` <= DATE(s.ts_ended_3)), d.`date` >= IF(DATE(s.dt_payment_scheduled) < DATE(s.ts_created_local), DATE(s.dt_payment_scheduled), DATE(s.ts_created_local)))
+        ON IF( s.ts_ended_fixed IS NOT NULL OR s.ts_ended_3 IS NOT NULL, d.`date` >= LEAST(DATE(s.dt_payment_scheduled), DATE(s.ts_created_local), DATE(s.dt_due)) AND IF(s.ts_ended_fixed IS NOT NULL, d.`date` < DATE(s.ts_ended_fixed), d.`date` <= DATE(s.ts_ended_3)), d.`date` >= IF(DATE(s.dt_payment_scheduled) < DATE(s.ts_created_local), DATE(s.dt_payment_scheduled), DATE(s.ts_created_local)))
     WHERE
         d.`date` > DATE('2020-01-01')
         AND d.`date` <= CURRENT_DATE()
@@ -217,7 +226,7 @@ LEFT JOIN
     cte_timeline_status s
     ON t.id_delinquency = s.id
     AND DATE(t.`date`) = DATE(s.dt_status_updated)
-WHERE 
+WHERE
     s.id_status IS NOT NULL
     AND t.date >= ADD_MONTHS(CURRENT_DATE, -6)
 GROUP BY 1,2,3,17
