@@ -34,5 +34,9 @@ workflow:
       clean_table_name: collection_actions
       extraction_type: incremental
       partitions: ["year", "month", "day"]
+    tb_arquivo_tempos:
+      clean_table_name: operator_logged_duration
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
 cluster:
   type: databricks_13_3_med_general_cluster

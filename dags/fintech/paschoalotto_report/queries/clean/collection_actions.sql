@@ -1,5 +1,4 @@
 SELECT
-    idunico AS id,
     cod_fup AS id_action,
     contrato AS id_contract,
     login_operador AS id_operator,
@@ -16,7 +15,7 @@ SELECT
     saldo_recuperado AS recovered_amount,
     tempo_falado AS call_duration,
     hora_registro AS action_hour,
-    data_registro AS dt_action,
+    DATE_FORMAT(TO_DATE(data_registro, 'dd/MM/yyyy HH:mm:ss'), 'yyyy-MM-dd') AS dt_action,
     data_admissao AS dt_operator_admission,
     ts_load,
     year,

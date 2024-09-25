@@ -5,10 +5,6 @@ owner: bianca.martins@quintoandar.com.br
 domain: fintech
 description: It represents the paschoalotto report 'RETORNO' that contains data about collection
 columns:
-  id:
-    description: "Table ID"
-    lineage:
-      - datalake_paschoalotto_raw.tb_arquivo_ret.idunico
   id_action:
     description: "Action ID (pt: Código da finalização)"
     lineage:

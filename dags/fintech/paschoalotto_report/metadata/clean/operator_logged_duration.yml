@@ -1,0 +1,91 @@
+---
+database_name: datalake_paschoalotto_report_clean
+table_name: operator_logged_duration
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: This table contains information about login, logout and operating time of operators
+columns:
+  id:
+    description: "ID"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.id_unico
+  actuation_cell:
+    description: "Actuation cell (pt: célula de atuação)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.celula
+  pa_hiring_type:
+    description: "PA Hiring Type (pt: Tipo de contratação da PA)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.tipo_pa
+  operator_name:
+    description: "Agent name (pt: nome do agente)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.nomeoperador
+  max_login:
+    description: "First login to the tool (pt:Primeiro logon na ferramenta)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.maxlogin
+  max_logout:
+    description: "Last logon to the tool (pt: último logon na ferramenta)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.maxlogout
+  total_logged_in_time:
+    description: "Total time logged into the tool (pt: Tempo total logado na ferramenta)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.tempologado
+  total_idle_time:
+    description: "Total time in IDLE state (pt: Total time in IDLE state)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.tempoidle
+  total_talk_time:
+    description: "Total talk time (pt: Tempo total em conversacao)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.tempoconversacao
+  total_pause_time:
+    description: "Total time paused (pt: Tempo total em pausa)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.tempopausa
+  total_tabulations:
+    description: "Number of tabulations performed by the agent (pt: Quantidade de tabulações realizadas pelo agente)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.tabulacoes
+  tma:
+    description: "Average agent service time (pt: Tempo médio atendimento do agente)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.tma
+  total_agreements:
+    description: "Number of agent agreements (pt: Quantidade de acordos do agente)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.acordos
+  total_transfers:
+    description: "Number of transfers made by the agent (pt: Quantidade de tranferências realizadas pelo agente)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.transferencias
+  distinct_contracts_contacted:
+    description: "Number of different contracts contacted by the agent (pt: Quantidade de contratos distintos acionados pelo agente)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.clientes_distintos_acionados
+  dt_admission:
+    description: "Agent admission date (pt: Data admissão agente)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.admissao
+  dt_operation:
+    description: "Date of agent activity (pt: Data da atuação do agente)"
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.data
+  ts_load:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.ts_load
+  year:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.year
+  month:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.month
+  day:
+    description: ""
+    lineage:
+      - datalake_paschoalotto_raw.tb_arquivo_tempos.day

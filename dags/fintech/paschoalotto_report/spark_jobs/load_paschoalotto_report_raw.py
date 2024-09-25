@@ -115,7 +115,7 @@ if __name__ == "__main__":
         for file in files_list:
             if 'quintocred' in file:
                 file_name = f"{table_name}_quintocred"
-            elif 'tb_arquivo_ret' in file:
+            elif 'tb_arquivo' in file:
                 file_name = f"{table_name}_quintoandar"
             else:
                 file_name = table_name
