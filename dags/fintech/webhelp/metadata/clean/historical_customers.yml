@@ -25,10 +25,6 @@ columns:
     description: "Code of the user/agent who registered the occurrence"
     lineage:
       - datalake_webhelp_raw.historicos_clientes.usuario_cad
-  id_service_digital_agent:
-    description: "Tabulation/service code performed by Digital Agents"
-    lineage:
-      - datalake_webhelp_raw.historicos_clientes.cod_hist_cli_mat
   extra_information_occurrence:
     description: "Additional information about the occurrence"
     lineage:

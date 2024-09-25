@@ -17,9 +17,5 @@ columns:
     description: "Occurrence name"
     lineage:
       - datalake_webhelp_raw.ocorrencias_clientes.titulo_ocor
-  id_occurrence_stage:
-    description: "Occurrence stage code (relates to 'id_stage' in the 'stages' table)"
-    lineage:
-      - datalake_webhelp_raw.ocorrencias_clientes.estagio_ocor
   ts_load:
     description: "Timestamp when data was loaded"
