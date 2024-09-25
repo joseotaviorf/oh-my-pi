@@ -5,7 +5,7 @@ WITH missing_theme_tickets AS (
     COUNT(DISTINCT id_ticket) AS missing_theme_tickets,
     DATE(ts_solved) AS dt_started
   FROM
-    temp_ss.tickets
+    datalake_customer_support_test.tickets
   WHERE
     -- It's necessary to apply all Ticket Rate rules but considering tickets that have no theme (taxonomy)
     contact_theme_detail_tag IS NULL
@@ -67,7 +67,7 @@ ticket_rate_proportion AS (
       ) AS DOUBLE
     ) AS total_tickets_proportional
   FROM
-    temp_ss.tickets AS ut
+    datalake_customer_support_test.tickets AS ut
   LEFT JOIN
     missing_theme_tickets AS mt
       ON mt.dt_started = DATE(ut.ts_solved)

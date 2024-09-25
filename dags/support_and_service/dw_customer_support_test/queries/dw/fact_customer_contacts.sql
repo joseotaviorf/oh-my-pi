@@ -29,21 +29,20 @@ average_reply_time AS (
 demand AS (
   SELECT DISTINCT
     id_session,
+    id_call,
     id_task,
     id_reservation,
     id_user,
     queue_name,
     CASE
-      WHEN channel_type = 'call-in-app' THEN 'CALL IN APP'
-      WHEN direction = 'outbound' THEN 'CALL OUTBOUND'
-      WHEN direction = 'inbound' THEN 'CALL INBOUND'
-      ELSE NULL
+      WHEN channel_type = 'call-in-app' THEN 'inbound'
+      ELSE LOWER(direction)
     END AS direction,
-    'CALL' AS channel,
+    'call' AS channel,
     CASE
-      WHEN id_reservation IS NULL THEN 'ABANDONED'
-      WHEN ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_task_created DESC) = 1 THEN 'COMPLETED'
-      ELSE 'TRANSFERRED'
+      WHEN id_reservation IS NULL THEN 'abandoned'
+      WHEN ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_task_created DESC) = 1 THEN 'completed'
+      ELSE 'transferred'
     END AS status,
     worker_email,
     CASE
@@ -52,10 +51,14 @@ demand AS (
     END AS customer_phone_number,
     NULL AS customer_email,
     NULL AS is_per_team_task,
-    is_reservation_answered AS is_answered,
+    is_call_answered AS is_contact_answered,
+    is_reservation_answered AS is_interaction_answered,
     ts_task_created,
     ts_reservation_created,
-    ts_reservation_ended
+    ts_reservation_ended,
+    year,
+    month,
+    day
   FROM
     datalake_customer_support_test.calls
   WHERE
@@ -63,32 +66,37 @@ demand AS (
   UNION ALL
   SELECT DISTINCT
     id_session,
+    NULL AS id_call,
     id_task,
     NULL AS id_reservation,
     id_user,
     queue_name,
-    'CHAT' AS channel,
-    'CHAT' AS direction,
+    'inbound' AS direction,
+    'chat' AS channel,
     CASE
-      WHEN task_completion_reason = 'task idled' THEN 'IDLED'
-      WHEN task_completion_reason = 'session expired' THEN 'EXPIRED'
-      WHEN task_completion_reason = 'task completed' THEN 'COMPLETED'
-      WHEN task_completion_reason = 'task transferred' THEN 'TRANSFERRED'
-      WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_created DESC) = 1 THEN 'COMPLETED'
-      ELSE 'TRANSFERRED'
+      WHEN task_completion_reason = 'task idled' THEN 'idled'
+      WHEN task_completion_reason = 'session expired' THEN 'expired'
+      WHEN task_completion_reason = 'task completed' THEN 'completed'
+      WHEN task_completion_reason = 'task transferred' THEN 'transferred'
+      WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_created DESC) = 1 THEN 'completed'
+      ELSE 'transferred'
     END AS status,
     worker_email,
     customer_phone_number,
     customer_email,
     is_per_team_task,
+    TRUE AS is_contact_answered,
     CASE
       WHEN task_status = 'canceled' THEN FALSE
       WHEN task_completion_reason = 'Task TTL Exceeded or Max assignment count exceeded' THEN FALSE
       ELSE TRUE
-    END AS is_answered,
+    END AS is_interaction_answered,
     ts_created AS ts_task_created,
     NULL AS ts_reservation_created,
-    NULL AS ts_reservation_ended
+    NULL AS ts_reservation_ended,
+    year,
+    month,
+    day
   FROM
     datalake_customer_support_test.chats
   WHERE
@@ -112,10 +120,10 @@ contacts AS (
       )
     ) AS sk_interaction,
     MD5(d.queue_name) AS sk_department,
-    d.id_session,
-    d.id_task,
-    d.id_reservation,
-    d.id_user,
+    d.id_session AS sk_session,
+    d.id_task AS sk_task,
+    CAST(COALESCE(t1.id_ticket, t2.id_ticket, t3.id_ticket) AS BIGINT) AS sk_ticket,
+    CAST(d.id_user AS BIGINT) AS sk_user,
     d.queue_name,
     d.channel,
     d.direction,
@@ -131,10 +139,12 @@ contacts AS (
     tm.first_reply_time,
     tm.total_handling_time,
     d.is_per_team_task,
-    d.is_answered,
+    d.is_contact_answered,
+    d.is_interaction_answered,
     d.ts_task_created,
     d.ts_reservation_created,
-    d.ts_reservation_ended
+    d.ts_reservation_ended,
+    NOW() AS ts_load
   FROM
     demand AS d
   LEFT JOIN
@@ -145,22 +155,38 @@ contacts AS (
     average_reply_time AS art
       ON art.id_task = d.id_task
       AND art.agent_email = d.worker_email
-      AND d.channel = 'CHAT'
+      AND d.channel = 'chat'
+  LEFT JOIN
+    datalake_customer_support_test.tickets AS t1
+      ON t3.id_twilio = d.id_call
+      AND STARTSWITH(t3.id_twilio, "CA")
+  LEFT JOIN
+    datalake_customer_support_test.tickets AS t2
+      ON t2.id_twilio = d.id_task
+      AND STARTSWITH(t2.id_twilio, "WT")
+  LEFT JOIN
+    datalake_customer_support_test.tickets AS t3
+      ON t1.id_session = d.id_session
 )
 SELECT
   sk_contact,
   sk_interaction,
-  COALESCE(id_user, -1) AS sk_user,
+  sk_session,
+  sk_task,
+  COALESCE(sk_ticket, -1) AS sk_ticket,
+  COALESCE(sk_user, -1) AS sk_user,
+  LAG(sk_department) OVER(PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_prev_department,
   sk_department,
-  LAG(sk_department) OVER(PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_from_department,
-  LEAD(sk_department) OVER(PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_to_department,
+  LEAD(sk_department) OVER(PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_next_department,
+  FIRST(sk_department) OVER (PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_first_department,
+  FIRST(sk_department) OVER (PARTITION BY sk_contact ORDER BY ts_task_created DESC) AS sk_last_department,
   direction,
   channel,
   status,
   worker_email,
   customer_phone_number,
   customer_email,
-  average_reply_time
+  average_reply_time,
   total_talk_time,
   total_queue_time,
   total_wrap_up_time,
@@ -180,7 +206,8 @@ SELECT
     ELSE FALSE
   END AS is_first_department_interaction,
   is_per_team_task,
-  is_answered,
+  is_contact_answered,
+  is_interaction_answered,
   ts_task_created,
   ts_reservation_created,
   ts_reservation_ended

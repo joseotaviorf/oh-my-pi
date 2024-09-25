@@ -13,7 +13,7 @@ WITH call_sessions AS (
 call_events AS (
   SELECT
     id_task,
-    id_call,
+    MAX(id_call) OVER(PARTITION BY id_task) AS id_call,
     id_reservation,
     id_queue,
     id_worker,
