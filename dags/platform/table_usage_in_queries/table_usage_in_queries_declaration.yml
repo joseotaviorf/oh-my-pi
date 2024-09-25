@@ -1,0 +1,25 @@
+dag:
+  name: table_usage_in_queries
+  owner: Data Ingestion
+  schedule_interval: 0 0 * * *
+  documentation: 
+    dag_purpose: |
+      Generate metrics about table usage in bietlejuice queries
+workflow:
+  type: custom_ingestion
+  layer: raw
+  default_extraction_type: incremental
+  custom_schema: databricks
+  load_spark_job: load_table_usage_in_queries
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{table_name}"
+    - "{{ ds }}"
+    - "{partitions}"
+  tables_customization:
+    table_usage_in_queries: {}
+cluster:
+  type: databricks_13_3_med_general_cluster
+
