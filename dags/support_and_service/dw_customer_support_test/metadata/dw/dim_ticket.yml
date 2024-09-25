@@ -1,0 +1,91 @@
+database_name: dw_customer_support_test
+table_name: dim_ticket
+description: Dimension table that contains data on tickets created in Zendesk Support
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+    description: Key of ticket that corresponds to the Zendesk ticket number
+  sk_problem_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.id_problem_ticket
+    description: Problem ticket identification key.
+  subject:
+    lineage:
+      - datalake_zendesk.tickets_current.subject
+    description: The value of the subject field for the ticket
+  description:
+    lineage:
+      - datalake_zendesk.tickets_current.description
+    description:
+      The first comment on the ticket. This is the text of the support
+      request or when an end-user submits a support request via email, the body of
+      the email request is used as the description.
+  ticket_via:
+    lineage:
+      - datalake_zendesk.tickets_current.ticket_via
+    description: The Zendesk's default source where the ticket was created
+  channel:
+    lineage:
+      - datalake_zendesk.tickets_current.channel
+    description: The source where the ticket was created from the company perspective
+  group_name:
+    lineage:
+      - datalake_zendesk.tickets_current.group_name
+    description: The group the ticket is assigned to
+  priority:
+    lineage:
+      - datalake_zendesk.tickets_current.priority
+    description: The urgency with which the ticket should be addressed
+  recipient:
+    lineage:
+      - datalake_zendesk.tickets_current.recipient
+    description: The original recipient e-mail address of the ticket
+  tags:
+    lineage:
+      - datalake_zendesk.tickets_current.tags
+    description: The list of all tags applied to the ticket
+  status:
+    lineage:
+      - datalake_zendesk.tickets_current.status
+    description:
+      The latest state of the ticket that can be set and updated either
+      manually by an agent or automatically via business rules.
+  type:
+    lineage:
+      - datalake_zendesk.tickets_current.ticket_type
+    description: Descriptive data about the type of ticket.
+  custom_fields:
+    lineage:
+      - datalake_zendesk.tickets_current.custom_fields
+    description:
+      The custom fields of the ticket that correspond to the Zendesk Forms
+      fields. It has JSON format with the form's field name and its value selected
+      or inputted by agent. The value equal to false is related to the field that
+      was not filled for the request
+  has_public_comments:
+    lineage:
+      - datalake_zendesk.tickets_current.has_public_comments
+    description:
+      Flag that indicates true if any ticket comments are public or false
+      otherwise
+  ts_created:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created
+    description: Timestamp of ticket's creation event (UTC timezone)
+  ts_created_brt:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created
+    description: ts_created in UTC-3 timezone
+  ts_updated:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_updated
+    description: Timestamp of latest ticket's update event (UTC timezone)
+  ts_updated_brt:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_updated
+    description: ts_updated in UTC-3 timezone
+  ts_load:
+    description: Timestamp of data load from database source (UTC timezone)

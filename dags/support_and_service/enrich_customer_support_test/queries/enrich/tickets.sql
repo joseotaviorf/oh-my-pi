@@ -213,7 +213,7 @@ ticket_queue_attributes AS (
     tq.last_queue,
     tq.first_analyst_email,
     tq.last_analyst_email,
-    UPPER(NULLIF(NULLIF(dc.front_or_back, '-'), '')) AS front_or_back,
+    LOWER(NULLIF(NULLIF(dc.front_or_back, '-'), '')) AS front_or_back,
     dc.journey_step,
     dc.team,
     dc.area
@@ -243,7 +243,7 @@ tickets AS (
     t.type,
     t.description,
     CASE
-      WHEN front_or_back = 'BACK'
+      WHEN front_or_back = 'back'
         AND t.tags NOT LIKE '%bot_end_conversation%'
         AND t.tags NOT LIKE '%closed_by_merge%'
         AND t.tags LIKE '%tarefa_atendimento_escalado%' THEN TRUE
@@ -522,7 +522,7 @@ ticket_metrics AS (
     t.is_call_answered,
     CASE
       WHEN t.channel IN ('call', 'chat')
-        AND t.front_or_back = 'FRONT'
+        AND t.front_or_back = 'front'
         AND DATE(t.ts_solved) >= DATE('2022-01-01')
         AND t.contact_theme_detail_tag IS NOT NULL
         AND t.team != 'Ong Back'
@@ -536,7 +536,7 @@ ticket_metrics AS (
         )
         AND t.ticket_origin != "CALL OUTBOUND" THEN TRUE
       WHEN t.channel IN ('email', 'whatsapp')
-        AND t.front_or_back IN ('FRONT', 'BACK')
+        AND t.front_or_back IN ('front', 'back')
         AND DATE(t.ts_solved) >= DATE('2022-01-01')
         AND t.contact_theme_detail_tag IS NOT NULL
         AND t.team != 'Ong Back'
@@ -628,8 +628,8 @@ SELECT
   CASE
     WHEN is_ticket_rate AND sub_journey = 'Ongoing' THEN
       CASE
-        WHEN front_or_back = 'FRONT' THEN 15
-        WHEN front_or_back = 'BACK' THEN 30
+        WHEN front_or_back = 'front' THEN 15
+        WHEN front_or_back = 'back' THEN 30
       END
     WHEN is_ticket_rate AND sub_journey IN (
       'Contract to Entrance', 'For Sale',
@@ -637,8 +637,8 @@ SELECT
       'Onboarding', 'Partners', 'Visits to Offer'
     ) THEN
       CASE
-        WHEN front_or_back = 'FRONT' THEN 1
-        WHEN front_or_back = 'BACK' THEN 2
+        WHEN front_or_back = 'front' THEN 1
+        WHEN front_or_back = 'back' THEN 2
       END
     ELSE NULL
   END AS ticket_rate_weight,

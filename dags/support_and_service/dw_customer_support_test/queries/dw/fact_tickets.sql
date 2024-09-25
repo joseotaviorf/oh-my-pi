@@ -10,8 +10,8 @@ WITH missing_theme_tickets AS (
     -- It's necessary to apply all Ticket Rate rules but considering tickets that have no theme (taxonomy)
     contact_theme_detail_tag IS NULL
     AND (
-      channel IN ('CALL', 'CHAT') AND front_or_back = 'FRONT'
-      OR channel = 'EMAIL' AND front_or_back IN ('BACK', 'FRONT')
+      channel IN ('call', 'chat') AND front_or_back = 'front'
+      OR channel = 'email' AND front_or_back IN ('back', 'front')
     )
     AND ts_solved >= '2022-01-01'
     AND team <> 'Ong Back'
@@ -25,9 +25,9 @@ WITH missing_theme_tickets AS (
       'Rescisão 1 [OFF] [POS] [BACK]'
     )
     AND (
-      channel != 'CALL'
+      channel != 'call'
       OR (
-        channel = 'CALL'
+        channel = 'call'
         AND ticket_origin IN ('CALL INAPP', 'CALL INBOUND')
       )
     )
