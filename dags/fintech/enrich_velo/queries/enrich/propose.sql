@@ -834,8 +834,16 @@ credit_analysis AS (
     FROM
         datalake_velo_neurotech_clean.logs_credit_granting
     WHERE 1=1
+),
+rescission AS (
+    SELECT DISTINCT 
+        id_propose
+    FROM 
+        datalake_rental_guarantee_platform_clean.delinquency
+    WHERE 
+        id_type = 2
+        AND is_active
 )
-
 SELECT DISTINCT
     p.id AS id_propose,
     pv.id_propose_values AS id_propose_values,
@@ -896,6 +904,11 @@ SELECT DISTINCT
     COALESCE(pcd.dt_ended_contract, fsc.dt_ended_contract) AS dt_ended,
     c.dt_next_renewal,
     COALESCE(pcd.dt_ended_propose, fsc.dt_ended_propose) AS dt_analyst_annulment_input,
+    IF(
+        r.id_propose IS NULL,
+        COALESCE(pcd.dt_ended_contract, fsc.dt_ended_contract),
+        COALESCE(pcd.dt_ended_propose, fsc.dt_ended_propose) 
+    ) AS dt_ended_official,
     COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
     IF(p.id < 5000000, old.ts_waiting_new_docs, wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
     CASE
@@ -1013,3 +1026,6 @@ LEFT JOIN
     credit_analysis AS ca
         ON ca.id_propose = p.id
         AND ca.rn = 1
+LEFT JOIN 
+  rescission as r
+    ON p.id = r.id_propose

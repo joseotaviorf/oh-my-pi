@@ -195,6 +195,13 @@ columns:
       - datalake_velo.propose.dt_analyst_annulment_input
       - datalake_velo.propose_legacy.dt_analyst_annulment_input
     description: Date of when status of the propose/contract ended was included on system
+  dt_ended_official:
+    lineage:
+      - datalake_velo.propose.dt_analyst_annulment_input
+      - datalake_velo.propose_legacy.dt_analyst_annulment_input
+      - datalake_velo.propose.dt_ended
+      - datalake_velo.propose_legacy.dt_ended
+    description: If the contract has a rescission delinquency then dt_analyst_annulment_input else dt_ended.
   ts_propose_started:
     lineage:
       - datalake_velo.propose.ts_propose_started

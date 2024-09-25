@@ -115,6 +115,11 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.fiancavelo_fianca_legacy.dt_ended
       - datalake_rental_guarantee_platform_clean.fiancavelo_fianca_legacy.ts_updated
+  dt_ended_official:
+    description: If the contract has a rescission delinquency then dt_analyst_annulment_input else dt_ended.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.fiancavelo_fianca_legacy.dt_ended
+      - datalake_rental_guarantee_platform_clean.fiancavelo_fianca_legacy.ts_updated
   ts_propose_started:
     description: Timestamp of when the propose has started
     lineage:
