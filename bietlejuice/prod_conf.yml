@@ -351,6 +351,16 @@ databricks_13_3_med_general_2_workers_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_13_3_med_general_driver_2_min_workers_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.large
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 databricks_13_3_med_general_photon_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5d.2xlarge
