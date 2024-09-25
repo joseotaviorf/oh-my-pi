@@ -42,6 +42,7 @@ SELECT
     dt_ended,
     dt_next_renewal,
     dt_analyst_annulment_input,
+    dt_ended_official,
     ts_propose_started,
     ts_waiting_new_docs,
     ts_evaluation_started,
