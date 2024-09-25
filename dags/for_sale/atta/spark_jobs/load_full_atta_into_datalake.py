@@ -67,12 +67,6 @@ if __name__ == "__main__":
     df = mysql_consumer.get_data_from_table(table_name)
 
     if df:
-        # Verificando e transformando colunas decimais
-        for column in df.columns:
-            data_type = df.schema[column].dataType
-            if isinstance(data_type, DecimalType) and data_type.precision > 38:
-                df = df.withColumn(column, F.col(column).cast("decimal(38,30)"))
-
         s3_loader.load_df(
             df=df,
             s3_path=f"{database_location}{table_name}",
