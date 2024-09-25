@@ -122,7 +122,7 @@ SELECT
   t.ts_closed,
   t.ts_updated
 FROM
-  temp_ss.tickets AS t
+  datalake_customer_support_test.tickets AS t
 LEFT JOIN
   ticket_rate_proportion AS tr
     ON tr.id_ticket = t.id_ticket
