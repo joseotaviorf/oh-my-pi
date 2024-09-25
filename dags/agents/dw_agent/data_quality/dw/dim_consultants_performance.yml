@@ -1,0 +1,11 @@
+---
+table_name: dw_public.dim_consultants_performance
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 100
+    severity_level: Error
+column_level_validations:
+  sk_consultant:
+    is_complete:
+      severity_level: Error

@@ -1,0 +1,13 @@
+---
+table_name: dw_public.dim_agent_region
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 12000000
+    severity_level: Error
+column_level_validations:
+  sk_agent_region:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
