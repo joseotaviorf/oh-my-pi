@@ -1,0 +1,11 @@
+---
+table_name: dw_agents_availability_staging.fact_inspector_daily_allocations
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 64000000
+    severity_level: Error
+column_level_validations:
+  sk_agent_slot_date:
+    is_complete:
+      severity_level: Error
