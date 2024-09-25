@@ -1,0 +1,40 @@
+dag:
+  name: facebook_insights
+  owner: Data Growth
+  schedule_start_date: 2019, 6, 1
+  schedule_interval: "0 3 * * *"
+  documentation: 
+    dag_purpose: |    
+      Facebook Insights brings our marketing campaigns data from facebook platform. We implemented an [API client](https://github.com/quintoandar/facebook-api-client-python) for usage in raw. We have a yaml file (facebook_insights_config) to define some columns and configs about the ingestion instead of using airflow variables.
+      Since social account has a special breakdown/field treatment, we decided to separate this account from others.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_facebook_insights_raw
+  default_partitions: [year, month, day]
+  default_extraction_type: incremental
+  has_hive_sync: false
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"  
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+    - "{load_start_date}" # load_start_date
+    - "{load_end_date}" # load_end_date
+    - "" # manual_accounts
+  tables_customization:
+    facebook_insights:
+      extra_spark_job_arguments: 
+        - facebook_insights # table_name
+    facebook_social_insights:
+      extra_spark_job_arguments: 
+        - facebook_social_insights # table_name
+    facebook_ads_insights_by_region:
+      extra_spark_job_arguments: 
+        - facebook_ads_insights_by_region # table_name
+cluster:
+  type: databricks_13_3_min_io-general_cluster
+  custom_libraries:
+    - whl: "{artifacts_bucket}/facebook-api-client-python/quintoandar_facebook_api_client-0.1.2-py2.py3-none-any.whl"

@@ -31,10 +31,10 @@ if __name__ == "__main__":
     parser.add_argument("env", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
-    parser.add_argument("table_name", help="granularity columns")
     parser.add_argument("load_start_date", help="time_range start date in str format")
     parser.add_argument("load_end_date", help="time_range end date in str format")
     parser.add_argument("manual_accounts", help="list of accounts")
+    parser.add_argument("table_name", help="granularity columns")
 
     args = parser.parse_args()
     env = args.env

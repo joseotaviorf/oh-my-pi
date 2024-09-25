@@ -1,0 +1,91 @@
+database_name: datalake_facebook_insights_clean
+table_name: facebook_ads_insights_by_region
+owner: arthur.gonzaga@quintoandar.com.br
+domain: Growth
+description: Table load Facebook Insights Performance Report from Facebook Ads API extraction with Region breakdown/field. 
+  Documentation can be found at https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/insights/
+columns:
+  id_ad:
+    description: The unique ID of the ad you're viewing in reporting
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.ad_id
+  id_account:
+    description: The ID number of your ad account, which groups your advertising activity. Your ad account includes your campaigns, ads and billing
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.account_id
+  id_adset:
+    description: The unique ID of the ad set you're viewing in reporting. An ad set is a group of ads that share the same budget, schedule, delivery optimization and targeting
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.adset_id
+  id_campaign:
+    description: The unique ID number of the ad campaign you're viewing in reporting. Your campaign contains ad sets and ads
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.campaign_id
+  account_name:
+    description: The name of the account name you're viewing in reporting
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.account_name
+  account_name_snake_case:
+    description: Account name pos string transformation
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.account_name_snake_case
+  country_code:
+    description: Country code the account belongs to.
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.account_name_snake_case
+  ad_name:
+    description: The name of the ad you're viewing in reporting
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.ad_name
+  adset_name:
+    description: The name of the ad set you're viewing in reporting. An ad set is a group of ads that share the same budget, schedule, delivery optimization and targeting
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.adset_name
+  campaign_name:
+    description: The name of the ad campaign you're viewing in reporting. Your campaign contains ad sets and ads
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.campaign_name
+  region:
+    description: The region that we are have results from the ads
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.region
+  clicks:
+    description: The number of clicks on your ads
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.clicks
+  impressions:
+    description: The number of times your ads were on screen
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.impressions
+  inline_link_clicks:
+    description: The number of clicks on links to select destinations or experiences, on or off Facebook-owned properties. Inline link clicks use a fixed 1-day-click attribution window
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.inline_link_clicks
+  reach:
+    description: The number of people who saw your ads at least once. Reach is different from impressions, which may include multiple views of your ads by the same people. This metric is estimated
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.reach
+  spend:
+    description: The estimated total amount of money you've spent on your campaign, ad set or ad during its schedule. This metric is estimated
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.spend
+  dt_start:
+    description: The start date for your data. This is controlled by the date range you've selected for your reporting view
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.date_start
+  dt_stop:
+    description: The end date for your data. This is controlled by the date range you've selected for your reporting view
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.date_stop
+  year:
+    description: Year of dt_start
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.date_start
+  month:
+    description: Month of dt_start
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.date_start
+  day:
+    description: Day of dt_start
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.date_start

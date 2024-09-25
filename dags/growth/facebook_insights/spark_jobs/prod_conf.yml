@@ -2,7 +2,7 @@
 raw_partition_cols:
   facebook_insights: [account_name_snake_case, year, month, day]
   facebook_social_insights: [year, month, day]
-
+  facebook_ads_insights_by_region: [account_name_snake_case, year, month, day]
 fields:
   facebook_insights:
     - account_id
@@ -33,16 +33,51 @@ fields:
     - campaign_name
     - adset_name
     - ad_name
-
+  facebook_ads_insights_by_region:
+    - account_id
+    - account_name
+    - ad_id
+    - ad_name
+    - adset_id
+    - adset_name
+    - campaign_id
+    - campaign_name
+    - reach
+    - impressions
+    - clicks
+    - date_start
+    - date_stop
+    - inline_link_clicks
+    - spend
 breakdowns:
   facebook_insights:
     - impression_device
   facebook_social_insights:
     - publisher_platform
     - platform_position
-
+  facebook_ads_insights_by_region:
+    - region
 accounts:
   facebook_insights:
+    - "2847775308769718"
+    - "832880310585080"
+    - "201111641091443"
+    - "146777296312699"
+    - "517800565488302"
+    - "455006745173996"
+    - "1023497688122195"
+    - "159065008868035"
+    - "902296353833179"
+    - "1239225476506330"
+    - "1791779007555373"
+    - "1626589680740974"
+    - "1260820603984552"
+    - "994734287259853"
+    - "994644903935458"
+    - "1130906744424280"
+    - "1436287040510143"
+    - "1213943219242309"
+  facebook_ads_insights_by_region:
     - "2847775308769718"
     - "832880310585080"
     - "201111641091443"
