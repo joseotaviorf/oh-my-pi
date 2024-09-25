@@ -1,6 +1,8 @@
 import json
 import logging
 from argparse import ArgumentParser
+from pyspark.sql import functions as F
+from pyspark.sql.types import DecimalType
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -65,6 +67,11 @@ if __name__ == "__main__":
     df = mysql_consumer.get_data_from_table(table_name)
 
     if df:
+        # Verificando e transformando colunas decimais
+        for column in df.columns:
+            if isinstance(df.schema[column].dataType, DecimalType) and df.schema[column].precision > 38:
+                df = df.withColumn(column, F.col(column).cast("decimal(38,30)"))
+
         s3_loader.load_df(
             df=df,
             s3_path=f"{database_location}{table_name}",
