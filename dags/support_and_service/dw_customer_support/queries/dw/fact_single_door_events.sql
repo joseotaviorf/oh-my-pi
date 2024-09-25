@@ -1,5 +1,11 @@
 SELECT
-  MD5(CAST(id_amplitude AS STRING)) AS sk_event,
+  MD5(
+    CONCAT(
+      id_user,
+      event_type,
+      CAST(ts_event AS STRING)
+    )
+  ) AS sk_event,
   id_user AS sk_user,
   CASE
     WHEN event_type = 'ongoing_requests_timeline_page_viewed' THEN 'ONGOING REQUESTS'
