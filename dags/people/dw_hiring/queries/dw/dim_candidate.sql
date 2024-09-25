@@ -47,7 +47,7 @@ LEFT JOIN
   opportunity_info_source AS ois 
     ON c.id = ois.id_candidate
 LEFT JOIN 
-  datalake_workable_clean.requisitions AS r 
+  datalake_workable_redshift_clean.requisitions AS r 
     ON c.id = r.id_candidate
 LEFT JOIN 
   datalake_workable.custom_fields AS ecf_requisitions 

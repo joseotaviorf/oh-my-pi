@@ -474,6 +474,7 @@ bietlejuice.dw_hiring:
   - bietlejuice.enrich_workable:load-enrich-requisition-details
   - bietlejuice.workable_redshift:load-clean-answers
   - bietlejuice.workable_redshift:load-clean-candidates
+  - bietlejuice.workable_redshift:load-clean-requisitions
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
