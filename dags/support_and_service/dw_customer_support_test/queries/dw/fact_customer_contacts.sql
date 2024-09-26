@@ -158,15 +158,15 @@ contacts AS (
       AND d.channel = 'chat'
   LEFT JOIN
     datalake_customer_support_test.tickets AS t1
-      ON t3.id_twilio = d.id_call
-      AND STARTSWITH(t3.id_twilio, "CA")
+      ON t1.id_twilio = d.id_call
+      AND STARTSWITH(t1.id_twilio, "WT")
   LEFT JOIN
     datalake_customer_support_test.tickets AS t2
       ON t2.id_twilio = d.id_task
-      AND STARTSWITH(t2.id_twilio, "WT")
+      AND STARTSWITH(t2.id_twilio, "CA")
   LEFT JOIN
     datalake_customer_support_test.tickets AS t3
-      ON t1.id_session = d.id_session
+      ON t3.id_session = d.id_session
 )
 SELECT
   sk_contact,
