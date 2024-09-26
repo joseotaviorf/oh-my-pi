@@ -16,6 +16,10 @@ tables:
     extraction_type: full
     clean_table_name: closing_file
     db: atta
+  - table_name: commission_revenue_share_params
+    extraction_type: full
+    clean_table_name: commission_revenue_share_params
+    db: atta
   - table_name: commission_revenue_share_periods
     extraction_type: full
     clean_table_name: commission_revenue_share_periods
