@@ -51,11 +51,11 @@ WITH house_listing_contracts AS (
 house_listing_not_extended AS (
   SELECT
     id_house_listing,
-    LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY ts_listing_version_start) AS id_next_house_listing_not_extended
+    LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY ts_listing_version_start) AS id_next_house_listing
   FROM
     datalake_ebdb_listing.house_listing
   WHERE
-    is_extended_rental = FALSE
+    has_termination_canceled = FALSE 
 ),
 lbc AS (
   SELECT
@@ -91,7 +91,7 @@ autonomous_agent_info AS (
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   hl.id_house_listing AS sk_house_listing,
   COALESCE(hlc.id_next_house_listing_rented, -1) AS sk_next_house_listing_rented,
-  COALESCE(hlne.id_next_house_listing_not_extended, -1) AS sk_next_house_listing_not_extended,
+  COALESCE(hlne.id_next_house_listing, -1) AS sk_next_house_listing,
   COALESCE(h.id_user, -1) AS sk_owner,
   COALESCE(h.id_region, -1) AS sk_region,
   COALESCE(h.id_user_registrant, -1) AS sk_user_registration,

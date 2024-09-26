@@ -14,7 +14,7 @@ columns:
     - datalake_listing_contracts.listing_contracts.id_house_listing
     description: Key of the next house listing with a valid contract, that is, a contract with status 'Ativo' or 'Finalizado'.
       This column was created to help to identify the next sk house listing because the sk_house_listing + 1 won't work with all the cases.
-  sk_next_house_listing_not_extended:
+  sk_next_house_listing:
     lineage:
     - datalake_listing_contracts.listing_contracts.id_house_listing
     description: Key of the next published house listing and the rental wasn't extended.
