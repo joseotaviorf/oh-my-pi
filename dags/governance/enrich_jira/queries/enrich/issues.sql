@@ -97,9 +97,11 @@ WITH record_selection AS (
         ROW_NUMBER() OVER (PARTITION BY key ORDER BY GET_JSON_OBJECT(fields,'$.updated') DESC) AS row_num
     FROM
         datalake_jira_clean.issues
+    QUALIFY
+        row_num = 1
 )
 SELECT
-    id_issue,
+    rs.id_issue,
     id_parent_issue,
     id_project,
     summary,
@@ -131,11 +133,14 @@ SELECT
     story_points,
     story_points_estimate,
     is_flagged,
+    di.dt_deleted IS NOT NULL AS is_deleted,
+    di.dt_deleted,
     dt_started,
     ts_created,
     ts_updated,
     ts_resolved
 FROM
-    record_selection
-WHERE
-    row_num = 1
+    record_selection AS rs
+LEFT JOIN
+    datalake_jira.deleted_issues AS di
+        ON rs.id_issue = di.id_issue

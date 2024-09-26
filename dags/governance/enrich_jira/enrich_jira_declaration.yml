@@ -8,5 +8,19 @@ dag:
 workflow:
     type: query_delta
     layer: enrich
+    tables_customization:
+        deleted_issues:
+            load_spark_job: load_deleted_issues
+            spark_job_arguments:
+                - "{environment}"
+                - "{bucket}"
+                - "{schema}"
+                - "{table_name}"
+                - '["DIN", "DG", "DAC"]' # Projects to look for deleted issues. We don't include every project because this is not a very optimal process
+    inner_dependencies:
+        issues:
+            - deleted_issues
 cluster:
     type: databricks_12_2_med_io-memory_photon_cluster
+    custom_libraries:
+        - whl: "{artifacts_bucket}/jira-api-client-python/quintoandar_jira_api_client-0.2.1-py2.py3-none-any.whl"

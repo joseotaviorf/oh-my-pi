@@ -133,6 +133,10 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: ""
+  is_deleted:
+    description: "Flag to identify if the issue was deleted"
+  dt_deleted:
+    description: "Date when the issue was deleted"
   dt_started:
     lineage:
       - datalake_jira_clean.issues.fields

@@ -1,0 +1,17 @@
+---
+database_name: datalake_jira
+table_name: deleted_issues
+description: |
+  "Every row in this table corresponds to a Jira issues that was hard deleted. This only includes Jira projects that were manually configured
+  to find deleted issues. This can be configured in enrich_jira_declaration.yml.
+  "
+domain: Data Ops & Governance 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_issue:
+    description: The id of the deleted issue.
+  dt_deleted:
+    description: "The date the issue was deleted. Warning: this column will correspond to the date of the first day in which this DAG ran
+      and identified that the issue was missing from Jira. It is not necessarily exactly equal to the deletion date. This is because
+      the DAG runs once a day and the issue could have been deleted in the same day the DAG ran.
+      Also, this table was created in September 25th 2024, so we can't know the deletion date before this."
