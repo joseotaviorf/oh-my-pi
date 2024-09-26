@@ -1,4 +1,5 @@
 sheets_info:
+
   affiliates_active_segmentation:
     sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
     sheet_name: ativos
@@ -148,6 +149,18 @@ sheets_info:
     sheet_name: base
     clean_table_name: ecglobal_active_users
     sheet_context: growth
+
+  encm_coefficient:
+    sheet_id: 1qAmeLFiO_W2vufA2oNK0326W5V_wbSjIYY7z32ahXns
+    sheet_name: coefficients
+    clean_table_name: encm_coefficients
+    sheet_context: growth  
+
+  encm_conversion_probability:
+    sheet_id: 1XZK73ooCchsUEDnpn5YhcVfdTU7Owz0GPniGKykX4gY
+    sheet_name: conversion_probability
+    clean_table_name: encm_conversion_probability
+    sheet_context: growth  
 
   full_taxonomy:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4

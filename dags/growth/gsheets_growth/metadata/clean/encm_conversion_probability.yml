@@ -1,0 +1,24 @@
+database_name: datalake_gsheets_clean
+table_name: encm_conversion_probability
+columns:
+  date_start:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability.date_start
+  date_end:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability.date_end
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability.city_group
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability.business_context
+  event_name:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability.event_name
+  coefficient:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability.coefficient
+  constant:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability.constant
