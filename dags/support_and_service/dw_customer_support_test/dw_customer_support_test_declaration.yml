@@ -28,15 +28,7 @@ workflow:
       merge_on: [sk_interaction]
     fact_customer_contacts:
       z_order_by: [sk_contact, sk_interaction]
-      merge_on:
-        [
-          sk_contact,
-          sk_interaction,
-          sk_user,
-          sk_department,
-          sk_from_department,
-          sk_to_department,
-        ]
+      merge_on: [sk_contact, sk_interaction, sk_user, sk_department]
 
 cluster:
   type: custom_cluster
