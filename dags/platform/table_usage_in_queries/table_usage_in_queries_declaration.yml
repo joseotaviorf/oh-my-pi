@@ -9,6 +9,7 @@ workflow:
   type: custom_ingestion
   layer: raw
   default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
   custom_schema: databricks
   load_spark_job: load_table_usage_in_queries
   spark_job_arguments:
