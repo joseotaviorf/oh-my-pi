@@ -3446,9 +3446,6 @@ bietlejuice.reverse_nazare:
   - bietlejuice.gsheets_for_sale:done-clean-sale-payments-tiers
 bietlejuice.reverse_nexxera:
   - bietlejuice.enrich_nexxera:load-enrich-dtw-filter
-bietlejuice.reverse_regions_polygon:
-  - bietlejuice.ebdb:load-clean-polygon-region
-  - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance
 bietlejuice.reverse_sale_unavailable_listings_access:

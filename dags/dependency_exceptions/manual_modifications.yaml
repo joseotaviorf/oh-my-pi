@@ -823,6 +823,8 @@ bietlejuice.reverse_atlas_pricing_report_access:
     - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-engagement
     - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-listing-price-history
     - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-region
+bietlejuice.reverse_regions_polygon:
+  override: []
 bietlejuice.reverse_robbyson_access:
   add:
     - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance
