@@ -24,6 +24,9 @@ workflow:
     report_approval:
       - reviewer
   tables_customization:
+    appointment_inspection:
+      partitions: [year, month, day]
+      extraction_type: incremental
     inspection_booking: {}
     inspection_status_change: {}
     item_group:

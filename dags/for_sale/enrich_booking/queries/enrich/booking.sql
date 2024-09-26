@@ -363,6 +363,7 @@ base_booking AS (
         hl.id_company_hubspot AS id_company_supply,
         hl.uuid_company AS uuid_company_supply,
         b3pa.id_company_demand,
+        b.id_schedule,
         COALESCE(hl.country_code, 'Undefined') AS country_code,
         COALESCE(ct.default_timezone, 'UTC') AS default_timezone,
         b.dt_booking,

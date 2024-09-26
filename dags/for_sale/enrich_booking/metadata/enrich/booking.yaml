@@ -97,6 +97,10 @@ columns:
     lineage:
     - datalake_ebdb_work_contract.work_contract.id_company_hubspot
     description: Id of the demand partner
+  id_schedule:
+    lineage:
+      - datalake_ebdb_clean.booking.id_schedule
+    description: Scheduling identification key in the schedules database.
   country_code:
     lineage:
     - datalake_ebdb_listing.house.country_code

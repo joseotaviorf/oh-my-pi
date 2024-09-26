@@ -1862,10 +1862,14 @@ bietlejuice.enrich_hubspot_management:
   - bietlejuice.hubspot:load-clean-task
   - bietlejuice.hubspot:load-clean-team
 bietlejuice.enrich_inspections:
+  - bietlejuice.ebdb:load-clean-booking
+  - bietlejuice.ebdb:load-clean-booking-aud
+  - bietlejuice.ebdb:load-clean-booking-status-change
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_inspections:load-clean-inspection
   - bietlejuice.ebdb_inspections:load-clean-inspection-aud
   - bietlejuice.ebdb_location:load-clean-country
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_region:load-enrich-region
@@ -1890,6 +1894,8 @@ bietlejuice.enrich_inspections:
   - bietlejuice.inspections:load-clean-reviewer-aud
   - bietlejuice.inspections:load-clean-room
   - bietlejuice.inspections:load-clean-room-type
+  - bietlejuice.schedules:load-clean-appointment
+  - bietlejuice.schedules:load-clean-appointment-history
   - bietlejuice.terminator:load-clean-termination
 bietlejuice.enrich_inspections_metrics:
   - bietlejuice.enrich_date:load-enrich-cities-calendar
