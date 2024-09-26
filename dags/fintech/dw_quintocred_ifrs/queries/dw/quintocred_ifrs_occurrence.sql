@@ -89,7 +89,7 @@ WITH base_inadimplecia_garantia AS (
         IF( entry.bill_item = 'REALTY_DAMAGE', true, false) AS is_danos_imovel,
         IF( p.is_contract AND p.dt_ended is null, true, false) AS is_contract_active,
         p.dt_contract_started,
-        p.dt_ended AS dt_contract_ended,
+        p.dt_ended_official AS dt_contract_ended,
         vp.total_package_amount AS valor_pacote
     FROM
         datalake_rental_guarantee_platform_clean.delinquency d

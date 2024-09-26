@@ -200,7 +200,7 @@ base_omie AS (
         IF(DATE_DIFF(COALESCE(te.dt_paid,current_date ), te.dt_due)<0,0,DATE_DIFF(COALESCE(te.dt_paid,current_date ), te.dt_due)) AS dias_atraso,
         IF (p.is_contract AND p.dt_ended IS NULL, true, false) AS is_contract_active,
         p.dt_contract_started,
-        p.dt_ended AS dt_contract_ended,
+        p.dt_ended_official AS dt_contract_ended,
         vp.total_package_amount AS valor_pacote
     FROM
         dw_velo.fact_velo_transaction_entries AS te
@@ -235,6 +235,7 @@ base_omie_ifrs AS (
         sk_propose,
         sk_propose_20,
         sk_transaction,
+        sk_transaction AS sk_key,
         client_cpf_cnpj,
         dt_register,
         dt_due,
@@ -282,6 +283,7 @@ omie_asaas_match AS (
         omie.sk_propose,
         omie.sk_propose_20,
         omie.sk_transaction,
+        omie.sk_transaction AS sk_key,
         omie.client_cpf_cnpj,
         omie.dt_register,
         omie.dt_due,
@@ -394,6 +396,7 @@ omie_pgto_acordos AS (
         aux.sk_propose,
         CAST(NULL AS INT) AS sk_propose_20,
         sk_transaction,
+        sk_transaction AS sk_key,
         client_cpf_cnpj,
         dt_register,
         dt_due,
@@ -409,7 +412,7 @@ omie_pgto_acordos AS (
         is_danos_imovel,
         IF(p.is_contract AND p.dt_ended IS NULL, true, false) AS is_contract_active,
         p.dt_contract_started,
-        p.dt_ended dt_contract_ended,
+        p.dt_ended_official dt_contract_ended,
         vp.total_package_amount valor_pacote,
         CAST('false' AS BOOLEAN) AS is_delinquency_renovacao,
         CAST('false' AS BOOLEAN) AS is_perdao_divida
@@ -472,7 +475,7 @@ base_sap_ifrs AS (
                 ELSE false
             END AS is_contract_active,
             p.dt_contract_started,
-            p.dt_ended AS dt_contract_ended,
+            p.dt_ended_official AS dt_contract_ended,
             vp.total_package_amount AS valor_pacote,
             CASE
                 WHEN (accounting_rule LIKE 'velo:a.01%'
@@ -520,6 +523,7 @@ base_sap_ifrs AS (
         sap.sk_propose,
         CAST(NULL AS INT) AS sk_propose_20,
         sap.sk_transaction,
+        sap.sk_transaction AS sk_key,
         omie.client_cpf_cnpj,
         NULL AS dt_register,
         sap.dt_due,
@@ -568,7 +572,7 @@ base_payment_asaas_sap AS (
             false AS is_danos_imovel,
             CASE WHEN pr.is_contract AND pr.dt_ended IS NULL THEN true ELSE false END AS is_contract_active,
             pr.dt_contract_started,
-            pr.dt_ended AS dt_contract_ended,
+            pr.dt_ended_official AS dt_contract_ended,
             vp.total_package_amount AS valor_pacote
         FROM
             datalake_rental_guarantee_platform_clean.payment p
@@ -609,6 +613,7 @@ base_payment_asaas_sap AS (
         sk_propose,
         CAST(NULL AS INT) AS sk_propose_20,
         sk_transaction,
+        sk_transaction AS sk_key,
         client_cpf_cnpj,
         dt_register,
         dt_due,
@@ -696,7 +701,7 @@ base_assinatura_3_0 AS (
             false AS is_danos_imovel,
             IF(pr.is_contract AND pr.dt_ended IS NULL,true,false) AS is_contract_active,
             pr.dt_contract_started,
-            pr.dt_ended AS dt_contract_ended,
+            pr.dt_ended_official AS dt_contract_ended,
             vp.total_package_amount AS valor_pacote,
             gateway.desc_lvl_1 AS gateway,
             status.desc_lvl_1 AS status_payment
@@ -751,6 +756,7 @@ base_assinatura_3_0 AS (
         sk_propose,
         CAST(NULL AS INT) AS sk_propose_20,
         sk_transaction,
+        sk_transaction AS sk_key,
         client_cpf_cnpj,
         dt_register,
         dt_due,
@@ -829,19 +835,19 @@ base_inadimplecia_assinatura AS (
         IF(d.id_status IN (3,7) OR d.original_value - d.amount_paid < 0, 0, d.original_value - d.amount_paid) AS net_amount_delinquency,
         IF(d.id_status IN (3,7) AND amount_paid < original_value, original_value - amount_paid, NULL) AS discount_value_delinquency,
 
-        IF(d.id_type IN (0,4), d.original_value, entry.entry_value) AS due_amount_entry,
-        IF(d.id_type IN (0,4), d.amount_paid, entry.paid_amount_entry) AS paid_amount_entry,
+        IF(d.id_type IN (0,4,5,6), d.original_value, entry.entry_value) AS due_amount_entry,
+        IF(d.id_type IN (0,4,5,6), d.amount_paid, entry.paid_amount_entry) AS paid_amount_entry,
         CASE
             WHEN d.id_status IN (3,7) OR d.original_value - d.amount_paid < 0 THEN 0
-            WHEN d.id_type IN (0,4) THEN d.original_value - d.amount_paid
+            WHEN d.id_type IN (0,4,5,6) THEN d.original_value - d.amount_paid
             ELSE (entry.entry_value - COALESCE(entry.paid_amount_entry,0 ))
         END AS net_amount_entry,
         CASE
-            WHEN d.id_status IN (3,7) AND d.id_type IN (0,4) AND amount_paid < original_value THEN abs(original_value - amount_paid)
+            WHEN d.id_status IN (3,7) AND d.id_type IN (0,4,5,6) AND amount_paid < original_value THEN abs(original_value - amount_paid)
             WHEN d.id_status IN (3,7) AND COALESCE(entry.paid_amount_entry,0) < entry.entry_value THEN abs(entry.entry_value - COALESCE(entry.paid_amount_entry,0))
         END AS discount_value_entry,
         CASE
-            WHEN id_type IN (0,4) THEN 'Assinatura'
+            WHEN id_type IN (0,4,5,6) THEN 'Assinatura'
             WHEN id_type = 1 THEN 'Garantia'
             WHEN id_type = 2 THEN 'Rescisão'
         END AS provisional_group,
@@ -851,7 +857,7 @@ base_inadimplecia_assinatura AS (
         IF(entry.bill_item = 'REALTY_DAMAGE', true, false) AS is_danos_imovel,
         IF(p.is_contract AND p.dt_ended IS NULL, true, false) AS is_contract_active,
         p.dt_contract_started,
-        p.dt_ended AS dt_contract_ended,
+        p.dt_ended_official AS dt_contract_ended,
         vp.total_package_amount AS valor_pacote
     FROM
         datalake_rental_guarantee_platform_clean.delinquency d
@@ -886,6 +892,7 @@ base_inadimplecia_ifrs_assinatura AS (
         sk_propose,
         CAST(NULL AS INT) AS sk_propose_20,
         COALESCE(sk_delinquency_entry, sk_delinquency)sk_transaction,
+        sk_delinquency AS sk_key,
         client_cpf_cnpj,
         dt_register,
         dt_due,
@@ -957,6 +964,7 @@ base_assinatura_ifrs_sem_repasse AS (
         sk_propose,
         sk_propose_20,
         sk_transaction,
+        sk_key,
         client_cpf_cnpj,
         dt_register,
         dt_due,
@@ -1017,15 +1025,15 @@ repasse_direto AS (
             ADD_MONTHS(DATE(CONCAT(CAST(i.accrual_year AS VARCHAR(10)),'-',CAST((i.accrual_month) AS VARCHAR(10)),'-','01')),1 ) AS dt_ref_boleto,
             i.dt_due AS fatura_vencimento,
             i.total_amount AS fatura_valor,
-            sap.id_contract AS sk_propose,
-            sap.mensalidade_por_contrato,
+            COALESCE(sap.id_contract,e.propose) AS sk_propose,
+            COALESCE(sap.mensalidade_por_contrato,e.amount) AS mensalidade_por_contrato,
             IF(b.status IN ('PAID','PAID_AFTER_DUE_DATE'), mensalidade_por_contrato, 0) AS paid_amount,
             DATE(b.ts_paid) AS boleto_compensando_em,
             DATE(b.ts_created) AS dt_boleto_created,
             b.status AS boleto_status,
             doc.document AS client_cpf_cnpj,
             fp.dt_contract_started,
-            fp.dt_ended AS dt_contract_ended,
+            fp.dt_ended_official AS dt_contract_ended,
             IF(fp.is_contract AND fp.dt_ended IS NULL, true, false) AS is_contract_active,
             vp.total_package_amount AS valor_pacote,
             ROW_NUMBER() OVER (PARTITION BY sap.id_contract,ADD_MONTHS(DATE(CONCAT(CAST(i.accrual_year AS VARCHAR(10)),'-',CAST((i.accrual_month) AS VARCHAR(10)),'-','01')),1 ) ORDER BY DATE(b.ts_paid) DESC, DATE(b.ts_created) DESC) AS rn
@@ -1065,6 +1073,7 @@ repasse_direto AS (
         sk_propose,
         CAST(NULL AS INT) AS sk_propose_20,
         CONCAT(sk_propose,REPLACE(dt_ref_boleto,'-','')) AS sk_transaction,
+        CONCAT(sk_propose,fatura_id) AS sk_key,
         client_cpf_cnpj,
         dt_ref_boleto AS dt_register,
         dt_ref_boleto AS dt_due,
@@ -1110,6 +1119,7 @@ base_final_unificada AS (
         sk_propose,
         sk_propose_20,
         sk_transaction,
+        sk_key,
         client_cpf_cnpj,
         dt_register,
         dt_due,
@@ -1138,6 +1148,7 @@ SELECT
     sk_propose,
     sk_propose_20,
     sk_transaction,
+    sk_key,
     client_cpf_cnpj,
     dt_register,
     dt_due,
