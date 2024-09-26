@@ -3,6 +3,7 @@ SELECT
     sk_propose,
     sk_propose_20,
     sk_transaction,
+    sk_key,
     client_cpf_cnpj,
     dt_register,
     dt_due,
