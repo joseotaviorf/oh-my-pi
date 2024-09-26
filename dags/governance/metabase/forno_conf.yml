@@ -29,6 +29,14 @@ tables: [
       "date_filter_column": "updated_at"
    },
    {
+      "table_name": "permissions_group",
+      "extraction_type": "full",
+   },
+   {
+      "table_name": "permissions_group_membership",
+      "extraction_type": "full",
+   },
+   {
       "table_name": "pulse",
       "extraction_type": "incremental",
       "date_filter_column": "updated_at"
