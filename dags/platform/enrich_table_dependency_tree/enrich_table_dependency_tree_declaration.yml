@@ -1,0 +1,30 @@
+---
+dag:
+  name: enrich_table_dependency_tree
+  owner: Data Ingestion
+  documentation:
+    dag_purpose: 'Create a dependency tree, mapping each table in bietlejuice to its dependents'
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: databricks
+  tables_customization:
+    bietlejuice_table_dependencies_with_indirection:
+      load_spark_job: load_table_dependency_tree
+      spark_job_arguments:
+        - '{environment}'
+        - '{bucket}'
+        - '{schema}'
+        - '{table_name}'
+        - '{partitions}'
+        - '{{ ds }}' # execution date
+        - 'datalake_databricks.bietlejuice_table_dependencies'
+  default_partitions:
+    - year
+    - month
+    - day
+  inner_dependencies:
+    bietlejuice_table_dependencies_with_indirection:
+      - bietlejuice_table_dependencies
+cluster:
+  type: databricks_13_3_med_general_cluster

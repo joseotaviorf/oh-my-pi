@@ -2838,6 +2838,9 @@ bietlejuice.enrich_survicate:
   - bietlejuice.survicate:load-clean-survey-questions
   - bietlejuice.survicate:load-clean-survey-responses
   - bietlejuice.survicate:load-clean-surveys
+bietlejuice.enrich_table_dependency_tree:
+  - bietlejuice.dag_inventory:load-clean-table
+  - bietlejuice.table_usage_in_queries:load-clean-table-usage-in-queries
 bietlejuice.enrich_tenant_journey:
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud

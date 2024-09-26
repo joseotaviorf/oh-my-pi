@@ -1,0 +1,30 @@
+---
+database_name: datalake_databricks
+table_name: bietlejuice_table_dependencies_with_indirection
+description: |
+  "Associates each dependent table with a dependency table (either a direct or indirect dependent). This data is extracted from bietlejuice queries daily."
+domain: Data Ops & Governance 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  dependent_table_name:
+    description: Name of the dependent table (i.e., table that depends on the other table)
+    lineage:
+      - datalake_databricks.bietlejuice_table_dependencies_with_indirection.dependent_table_name
+  dependency_table_name:
+    description: Name of the dependency table (i.e., table that the dependent table depends on)
+    lineage:
+      - datalake_databricks.bietlejuice_table_dependencies_with_indirection.dependency_table_name
+  level:
+    description: Level of the dependency (1 for direct dependencies, 2 or more for indirect dependencies)
+  year:
+    description: Year of the execution date
+    lineage:
+      - datalake_databricks.bietlejuice_table_dependencies_with_indirection.year
+  month:
+    description: Month of the execution date
+    lineage:
+      - datalake_databricks.bietlejuice_table_dependencies_with_indirection.month
+  day:
+    description: Day of the execution date
+    lineage:
+      - datalake_databricks.bietlejuice_table_dependencies_with_indirection.day
