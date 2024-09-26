@@ -172,6 +172,7 @@ house_listing AS (
       TRUE AS is_last_version,
       FALSE AS is_exclusive,
       FALSE AS is_extended_rental,
+      FALSE AS has_termination_canceled,
       FALSE AS is_originals_active,
       FALSE AS is_iorent_active,
       FALSE AS is_for_rent,
@@ -205,6 +206,7 @@ house_listing AS (
         hl.version = MAX(hl.version) OVER (PARTITION BY hl.id_house) AS is_last_version,
         lsc_exclusivity.dt_first_opted_in IS NOT NULL AS is_exclusive,
         hl.is_extended_rental,
+        hl.has_termination_canceled,
         ((lsc_originals.dt_last_opted_in IS NOT NULL and lsc_originals.dt_last_opted_out IS NULL)
             OR (lsc_originals.dt_last_opted_in > lsc_originals.dt_last_opted_out)) AS is_originals_active,
         ((lsc_iorent.dt_last_opted_in IS NOT NULL and lsc_iorent.dt_last_opted_out IS NULL)
@@ -431,6 +433,7 @@ SELECT
     hl.is_last_version,
     hl.is_exclusive,
     hl.is_extended_rental,
+    hl.has_termination_canceled,
     hl.is_originals_active,
     hl.is_iorent_active,
     hl.is_for_rent,

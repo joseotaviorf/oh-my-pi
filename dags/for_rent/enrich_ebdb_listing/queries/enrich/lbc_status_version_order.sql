@@ -565,6 +565,29 @@ SELECT
       , TRUE
       , FALSE
     ) AS is_extended_rental,
+    IF(
+      v.listing_version > 1
+      AND
+      (
+        (
+          ed_opt_out.id_house IS NULL
+          AND
+          v.ts_listing_version_start >= TIMESTAMP('2024-05-16T15:42:20.000+00:00') --Timestamp of when the OPT-OUT policy started
+          AND
+          v.revision_reason LIKE '%TERMINATION_CANCELED%'
+        )
+        OR
+        (
+          v.ts_listing_version_start < TIMESTAMP('2024-05-16T15:42:20.000+00:00') --Timestamp of when the OPT-OUT policy started
+          AND
+          v.previous_status_reason LIKE 'RELISTING_%'
+          AND
+          v.revision_reason LIKE '%TERMINATION_CANCELED%'
+        )
+      )
+      , TRUE
+      , FALSE
+    ) AS has_termination_canceled,
     v.lbc_state_order,
     v.state_order,
     v.max_state_order,
