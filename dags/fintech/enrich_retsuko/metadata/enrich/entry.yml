@@ -73,6 +73,10 @@ columns:
       payment-adjustment: ""
       postponement: ""
       sporadic-routine: ""
+  status:
+    description: "Indicates if a entry is related to an invoice (success) or not - not-invoiceable - (pending)"
+    lineage:
+      - datalake_retsuko_clean.entry.status
   accrual_year_month:
     description: "Expense reference month"
     lineage:

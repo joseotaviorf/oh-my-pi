@@ -16,6 +16,7 @@ SELECT
     e.bill_item,
     e.description,
     e.producer,
+    e.status,
     e.accrual_year_month,
     e.due_year_month,
     e.ts_created,
