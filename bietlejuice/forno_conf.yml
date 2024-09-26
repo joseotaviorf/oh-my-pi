@@ -209,7 +209,7 @@ cluster_template:
               value: databricks
         init_scripts:
             - s3:
-                  destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
+                  destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script_no_metrics.sh"
                   region: ""
         spark_conf:
             spark.rpc.message.maxSize: "2000"
@@ -227,10 +227,9 @@ cluster_template:
             spark.metrics.conf.*.sink.graphite.unit: "seconds"
             spark.metrics.conf.*.source.jvm.class: "org.apache.spark.metrics.source.JvmSource"
             spark.metrics.namespace: "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}"
-            spark.plugins: "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,br.com.quintoandar.GangliaMetrics"
+            spark.plugins: "br.com.quintoandar.GangliaMetrics"
             spark.jars.packages: "ch.cern.sparkmeasure:spark-plugins_2.12:0.2,ch.cern.sparkmeasure:spark-measure_2.12:0.21"
             spark.cernSparkPlugin.cloudFsName: "s3a"
-            spark.extraListeners: "ch.cern.sparkmeasure.FlightRecorderStageMetrics"
             spark.sparkmeasure.outputFilename: "/tmp/stageMetrics_flightRecorder.json"
             spark.sparkmeasure.outputFormat: "json"
             spark.sparkmeasure.printToStdout: "false"
