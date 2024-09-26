@@ -1,10 +1,10 @@
 SELECT
     cod_hist_cli AS id_historical_customers,
-    cod_tit AS id_contract,
+    cod_tit AS id_title,
     cod_dev AS id_debtor,
     cod_ocor AS id_occurrence,
     titulo_ocor AS occurrence,
-    usuario_cad AS id_operator,
+    usuario_cad AS id_login,
     complemento_hist_cli AS extra_information_occurrence,
     data_cad AS ts_service,
     dt_agen_hist AS ts_scheduling,

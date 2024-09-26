@@ -74,18 +74,10 @@ columns:
     lineage:
       - datalake_paschoalotto_raw.tb_arquivo_tempos.data
   ts_load:
-    description: ""
-    lineage:
-      - datalake_paschoalotto_raw.tb_arquivo_tempos.ts_load
+    description: "Timestamp when table was updated"
   year:
     description: ""
-    lineage:
-      - datalake_paschoalotto_raw.tb_arquivo_tempos.year
   month:
     description: ""
-    lineage:
-      - datalake_paschoalotto_raw.tb_arquivo_tempos.month
   day:
     description: ""
-    lineage:
-      - datalake_paschoalotto_raw.tb_arquivo_tempos.day

@@ -31,55 +31,68 @@ workflow:
     - "{load_end_date}"
     - "{extraction_type}"
     - "{partitions}"
+    - "{partition_folder}"
   tables_customization:
     historicos_clientes:
       clean_table_name: historical_customers
       extraction_type: incremental
       partitions: ["year", "month", "day"]
+      partition_folder: True
     ocorrencias_clientes:
       clean_table_name: customer_occurrences
       extraction_type: incremental
       partitions: ["year", "month", "day"]
+      partition_folder: True
     titulos:
       clean_table_name: titles
       extraction_type: full
-      partitions: ["year", "month", "day"]
+      partitions: []
+      partition_folder: True
     parcelas:
       clean_table_name: installments
       extraction_type: full
-      partitions: ["year", "month", "day"]
+      partitions: []
+      partition_folder: True
     login:
       clean_table_name: login
       extraction_type: full
       partitions: []
+      partition_folder: False
     estagios:
       clean_table_name: stages
       extraction_type: full
       partitions: []
+      partition_folder: False
     tipo_contrato:
       clean_table_name: contract_type
       extraction_type: full
       partitions: []
+      partition_folder: False
     credores:
       clean_table_name: creditors
       extraction_type: full
       partitions: []
+      partition_folder: False
     devedores:
       clean_table_name: debtors
       extraction_type: full
       partitions: []
+      partition_folder: False
     grupo_ocorrencias:
       clean_table_name: group_occurrences
       extraction_type: full
       partitions: []
+      partition_folder: False
     importacao:
       clean_table_name: import
       extraction_type: full
       partitions: []
+      partition_folder: False
     analise_operadores:
       clean_table_name: operator_analysis
       extraction_type: full
       partitions: []
+      partition_folder: False
 
 cluster:
   type: databricks_13_3_med_general_cluster

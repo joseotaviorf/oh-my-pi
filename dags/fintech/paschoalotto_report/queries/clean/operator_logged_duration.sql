@@ -10,7 +10,7 @@ SELECT
     tempoconversacao AS total_talk_time,
     tempopausa AS total_pause_time,
     tabulacoes AS total_tabulations,
-    tma AS tma,
+    tma,
     acordos AS total_agreements,
     transferencias AS total_transfers,
     clientes_distintos_acionados AS distinct_contracts_contacted,

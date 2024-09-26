@@ -79,6 +79,8 @@ if __name__ == "__main__":
     parser.add_argument("load_end_date", help="End of date range: '%Y-%m-%d'")
     parser.add_argument("extraction_type", help="extraction_type - full or incremental")
     parser.add_argument("partitions", help="partition columns")
+    parser.add_argument("partition_folder", help="Indicates if the file is inside a partition folder or not")
+
 
     args = parser.parse_args()
 
@@ -93,6 +95,7 @@ if __name__ == "__main__":
     load_end_date = args.load_end_date
     extraction_type = args.extraction_type
     partitions = json.loads(args.partitions)
+    partition_folder = args.partition_folder
 
 
     spark_client = SparkClient()
@@ -132,12 +135,12 @@ if __name__ == "__main__":
         f"""m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
         azure_container_name={azure_container_name}, azure_sub_folder = {azure_sub_folder}, format = {format},
         table_name={table_name}, date_to_ingest = {date_to_ingest_formatted},
-        extraction_type = {extraction_type}, partitions = {partitions}.
+        extraction_type = {extraction_type}, partitions = {partitions}, partition_folder = {partition_folder}.
         msg=Starting spark job...
         """)
 
 
-        if partitions:
+        if partition_folder:
             blob_storage_path = f"{base_blob_storage_path}/{azure_table_name}/{date_to_ingest.year}/{date_to_ingest.month}/{date_to_ingest.day}/"
         else:
             blob_storage_path = f"{base_blob_storage_path}/{azure_table_name}/"
@@ -170,19 +173,19 @@ if __name__ == "__main__":
 
         # Add ts_load columns
         df = df.withColumn("ts_load", current_timestamp())
-
-        if partitions:
-            df = (
-                SparkDataFrameService()
-                .input(df)
-                .create_year_month_day_columns_from_date(date_to_ingest)
-                .output()
-            )
         logger.info(f"Final dataframe - Displaying a sample of 5 rows out of a total of {df.count()} rows")
         df.show(5)
+
         logger.info(f"""Starting loading data into datalake database_name = {database_name}, table_name = {table_name}, extraction_type == {extraction_type}""")
         if not df.isEmpty():
             if extraction_type == "incremental":
+                df = (
+                    SparkDataFrameService()
+                    .input(df)
+                    .create_year_month_day_columns_from_date(date_to_ingest)
+                    .output()
+                )
+
                 IncrementalTableLoaderPipeline(
                     database_name=database_name,
                     table_name=table_name,
@@ -191,7 +194,9 @@ if __name__ == "__main__":
                     query=None,
                     partitions=partitions,
                 ).load_and_register(df, format_options)
+
             elif extraction_type == "full":
+
                 FullTableLoaderPipeline(
                     database_name=database_name,
                     table_name=table_name,
@@ -199,6 +204,7 @@ if __name__ == "__main__":
                     layer=LayerEnum.RAW,
                     query=None
                 ).load_and_register(df, format_options)
+
             else:
                 raise "Pass as param a valid extraction_type type"
         else:

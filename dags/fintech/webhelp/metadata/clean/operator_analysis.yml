@@ -5,63 +5,65 @@ owner: bianca.martins@quintoandar.com.br
 domain: fintech
 description: Login/logout webhelp operators
 columns:
-  data:
-    description: ""
+  actuation_cell:
+    description: "Actuation cell (pt: célula de atuação)"
     lineage:
-      - datalake_webhelp_raw.analise_operadores.data
-  celular:
-    description: ""
-    lineage:
-      - datalake_webhelp_raw.analise_operadores.celular
-  tipo_pa:
-    description: ""
+      - datalake_webhelp_raw.analise_operadores.celula
+  pa_hiring_type:
+    description: "PA Hiring Type (pt: Tipo de contratação da PA)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.tipo_pa
-  nome_operador:
-    description: ""
+  operator_name:
+    description: "Agent/operator name (pt: nome do agente)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.nome_operador
   max_login:
-    description: ""
+    description: "First login to the tool (pt:Primeiro logon na ferramenta)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.max_login
   max_logout:
-    description: ""
+    description: "Last logon to the tool (pt: último logon na ferramenta)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.max_logout
-  tempo_logado:
-    description: ""
+  total_logged_in_time:
+    description: "Total time logged into the tool (pt: Tempo total logado na ferramenta)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.tempo_logado
-  tempo_idle:
-    description: ""
+  total_idle_time:
+    description: "Total time in IDLE state (pt: Total time in IDLE state)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.tempo_idle
-  tempo_conversacao:
-    description: ""
+  total_talk_time:
+    description: "Total talk time (pt: Tempo total em conversacao)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.tempo_conversacao
-  tempo_pausa:
-    description: ""
+  total_pause_time:
+    description: "Total time paused (pt: Tempo total em pausa)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.tempo_pausa
-  tabulacoes:
-    description: ""
+  total_tabulations:
+    description: "Number of tabulations performed by the agent (pt: Quantidade de tabulações realizadas pelo agente)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.tabulacoes
   tma:
-    description: ""
+    description: "Average agent service time (pt: Tempo médio atendimento do agente)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.tma
-  acordos:
-    description: ""
+  total_agreements:
+    description: "Number of agent agreements (pt: Quantidade de acordos do agente)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.acordos
-  transferencias:
-    description: ""
+  total_transfers:
+    description: "Number of transfers made by the agent (pt: Quantidade de tranferências realizadas pelo agente)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.transferencias
-  clientes_distintos_acionados:
-    description: ""
+  distinct_contracts_contacted:
+    description: "Number of different contracts contacted by the agent (pt: Quantidade de contratos distintos acionados pelo agente)"
     lineage:
       - datalake_webhelp_raw.analise_operadores.clientes_distintos_acionados
+  dt_operation:
+    description: ""
+    lineage:
+      - datalake_webhelp_raw.analise_operadores.data
+  ts_load:
+    description: "Timestamp when table was updated"
