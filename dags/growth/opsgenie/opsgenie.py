@@ -97,7 +97,7 @@ raw_task_group = task_group.build_raw_task_group_for_all_tables(
     extraction_spark_job_file=raw_spark_job_file,
     raw_spark_job_extra_args=[
         SOURCE,
-        "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+        "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}",
         "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
     ]
 )
@@ -110,7 +110,7 @@ clean_task_groups = task_group.build_task_group_from_sql_files(
     has_create_external_table_task=False,
     partitions=partition_cols,
     extra_query_template_params={
-        "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
+        "load_start_date": "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}",
         "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
     },
 )
