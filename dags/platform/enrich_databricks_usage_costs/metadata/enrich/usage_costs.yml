@@ -34,6 +34,42 @@ columns:
     description: One of STANDARD or PHOTON. When PHOTON.
     lineage:
       - datalake_databricks.daily_clusters.spark_version
+  init_scripts:
+    description: The initialization scripts used by the cluster.
+    lineage:
+      - datalake_databricks.unique_clusters.spark_version
+  custom_tags:
+    description: The custom tags associated with the cluster.
+    lineage:
+      - datalake_databricks.unique_clusters.spark_version
+  driver_node_type:
+    description: The node type of the driver node.
+    lineage:
+      - datalake_databricks.unique_clusters.spark_version
+  node_type:
+    description: The node type of the worker nodes.
+    lineage:
+      - datalake_databricks.unique_clusters.spark_version
+  num_workers:
+    description: The number of workers in the cluster.
+    lineage:
+      - datalake_databricks.unique_clusters.spark_version
+  autoscale:
+    description: Autoscale configuration of the cluster.
+    lineage:
+      - datalake_databricks.unique_clusters.spark_version
+  auto_termination_minutes:
+    description: The number of minutes of inactivity before the cluster is automatically terminated.
+    lineage:
+      - datalake_databricks.unique_clusters.spark_version
+  is_elastic_disk_enabled:
+    description: Indicates whether elastic disk is enabled for the cluster.
+    lineage:
+      - datalake_databricks.unique_clusters.spark_version
+  is_automated:
+    description: Indicates whether the cluster is automated.
+    lineage:
+      - datalake_databricks.unique_clusters.spark_version
   dbus:
     description: Cluster cost measured by the official databricks unit.
     lineage:

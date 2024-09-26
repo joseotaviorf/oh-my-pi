@@ -59,13 +59,22 @@ SELECT
     END AS execution_context,
     dc.spark_version,
     dc.runtime_engine,
+    uc.init_scripts,
+    uc.custom_tags,
+    uc.driver_node_type,
+    uc.node_type,
+    uc.num_workers,
+    uc.autoscale,
+    uc.auto_termination_minutes,
+    uc.is_elastic_disk_enabled,
+    uc.is_automated,
     ROUND(gi.dbus, 2) AS dbus,
     ROUND(gi.dbus * dcd.dbu_price, 2) AS price,
     COUNT(gi.ts_execution) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), date(gi.ts_execution)) AS daily_executions,
     CAST(SPLIT_PART(dc.spark_version, '.', 1) AS INTEGER) AS spark_version_number,
     IF(id_dag IS NOT NULL AND id_job IS NOT NULL, TRUE, FALSE) AS is_dag_builder_migrated,
     DATE(gi.ts_execution) AS dt_execution,
-    MIN(DATE(gi.ts_execution)) OVER (PARTITION BY spark_version) AS dt_spark_updated,
+    MIN(DATE(gi.ts_execution)) OVER (PARTITION BY dc.spark_version) AS dt_spark_updated,
     IF(gi.id_dag IS NOT NULL, MIN(gi.ts_execution) OVER (PARTITION BY gi.id_dag ORDER BY gi.ts_execution DESC), NULL) AS ts_bietlejuice_first_execution,
     IF(gi.id_dag IS NOT NULL, MAX(gi.ts_execution) OVER (PARTITION BY gi.id_dag ORDER BY gi.ts_execution DESC), NULL) AS ts_bietlejuice_last_execution,
     IF(gi.id_job IS NOT NULL, MIN(gi.ts_execution) OVER (PARTITION BY gi.id_job ORDER BY gi.ts_execution DESC), NULL) AS ts_job_first_execution,
@@ -82,3 +91,6 @@ LEFT JOIN
 LEFT JOIN
   daily_cluster AS dc
     ON gi.id_cluster = dc.id_cluster
+LEFT JOIN
+  datalake_databricks.unique_clusters AS uc
+    ON gi.id_cluster = uc.id_cluster

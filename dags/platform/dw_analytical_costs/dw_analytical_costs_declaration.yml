@@ -10,6 +10,11 @@ workflow:
   layer: dw
   custom_schema: analytical_costs
   default_extraction_type: incremental
+  inner_dependencies:
+    fact_general_costs:
+      - fact_bietlejuice_costs
+      - fact_execution_costs
+      - fact_job_costs
   tables_customization:
     dim_cluster_configurations:
       extraction_type: full
@@ -17,7 +22,7 @@ workflow:
       merge_on: ['sk_snapshot']
     fact_execution_costs:
       merge_on: ['sk_snapshot']
-    fact_bietlejuice_costs:
+    fact_job_costs:
       merge_on: ['sk_snapshot']
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
