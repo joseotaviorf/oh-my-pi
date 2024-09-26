@@ -79,7 +79,7 @@ if __name__ == "__main__":
     parser.add_argument("load_end_date", help="End of date range: '%Y-%m-%d'")
     parser.add_argument("extraction_type", help="extraction_type - full or incremental")
     parser.add_argument("partitions", help="partition columns")
-    parser.add_argument("partition_folder", help="Indicates if the file is inside a partition folder or not")
+    parser.add_argument("partition_folder", help="Indicates if the file is inside a partition folder or not (general_folder)")
 
 
     args = parser.parse_args()
@@ -140,7 +140,7 @@ if __name__ == "__main__":
         """)
 
 
-        if partition_folder:
+        if partition_folder == "partition_folder":
             blob_storage_path = f"{base_blob_storage_path}/{azure_table_name}/{date_to_ingest.year}/{date_to_ingest.month}/{date_to_ingest.day}/"
         else:
             blob_storage_path = f"{base_blob_storage_path}/{azure_table_name}/"

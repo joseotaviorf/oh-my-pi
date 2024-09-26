@@ -31,68 +31,78 @@ workflow:
     - "{load_end_date}"
     - "{extraction_type}"
     - "{partitions}"
-    - "{partition_folder}"
   tables_customization:
     historicos_clientes:
       clean_table_name: historical_customers
       extraction_type: incremental
       partitions: ["year", "month", "day"]
-      partition_folder: True
+      extra_spark_job_arguments:
+        - partition_folder
     ocorrencias_clientes:
       clean_table_name: customer_occurrences
       extraction_type: incremental
       partitions: ["year", "month", "day"]
-      partition_folder: True
+      extra_spark_job_arguments:
+        - partition_folder
     titulos:
       clean_table_name: titles
       extraction_type: full
       partitions: []
-      partition_folder: True
+      extra_spark_job_arguments:
+        - partition_folder
     parcelas:
       clean_table_name: installments
       extraction_type: full
       partitions: []
-      partition_folder: True
+      extra_spark_job_arguments:
+        - partition_folder
     login:
       clean_table_name: login
       extraction_type: full
       partitions: []
-      partition_folder: False
+      extra_spark_job_arguments:
+        - general_folder
     estagios:
       clean_table_name: stages
       extraction_type: full
       partitions: []
-      partition_folder: False
+      extra_spark_job_arguments:
+        - general_folder
     tipo_contrato:
       clean_table_name: contract_type
       extraction_type: full
       partitions: []
-      partition_folder: False
+      extra_spark_job_arguments:
+        - general_folder
     credores:
       clean_table_name: creditors
       extraction_type: full
       partitions: []
-      partition_folder: False
+      extra_spark_job_arguments:
+        - general_folder
     devedores:
       clean_table_name: debtors
       extraction_type: full
       partitions: []
-      partition_folder: False
+      extra_spark_job_arguments:
+        - general_folder
     grupo_ocorrencias:
       clean_table_name: group_occurrences
       extraction_type: full
       partitions: []
-      partition_folder: False
+      extra_spark_job_arguments:
+        - general_folder
     importacao:
       clean_table_name: import
       extraction_type: full
       partitions: []
-      partition_folder: False
+      extra_spark_job_arguments:
+        - general_folder
     analise_operadores:
       clean_table_name: operator_analysis
       extraction_type: full
       partitions: []
-      partition_folder: False
-
+      extra_spark_job_arguments:
+        - general_folder
 cluster:
   type: databricks_13_3_med_general_cluster
