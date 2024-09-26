@@ -836,11 +836,11 @@ credit_analysis AS (
     WHERE 1=1
 ),
 rescission AS (
-    SELECT DISTINCT 
+    SELECT DISTINCT
         id_propose
-    FROM 
+    FROM
         datalake_rental_guarantee_platform_clean.delinquency
-    WHERE 
+    WHERE
         id_type = 2
         AND is_active
 )
@@ -907,27 +907,27 @@ SELECT DISTINCT
     IF(
         r.id_propose IS NULL,
         COALESCE(pcd.dt_ended_contract, fsc.dt_ended_contract),
-        COALESCE(pcd.dt_ended_propose, fsc.dt_ended_propose) 
+        COALESCE(pcd.dt_ended_propose, fsc.dt_ended_propose)
     ) AS dt_ended_official,
     COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
-    IF(p.id < 5000000, old.ts_waiting_new_docs, wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
+    IF(p.id < 5000000, COALESCE(old.ts_waiting_new_docs, wndd.ts_waiting_new_docs), wndd.ts_waiting_new_docs) AS ts_waiting_new_docs,
     CASE
         WHEN 3p.id_propose IS NULL AND p.id < 5000000 THEN old.ts_evaluation_started
         WHEN 3p.id_propose IS NULL AND p.id >= 5000000 THEN esd.ts_evaluation_started
         WHEN 3p.id_propose IS NOT NULL THEN COALESCE(DATE(c.ts_began), old.dt_contract_started)
     END AS ts_evaluation_started,
-    IF(p.id < 5000000, old.ts_rejected, rd.ts_rejected) AS ts_rejected,
+    IF(p.id < 5000000, COALESCE(old.ts_rejected, rd.ts_rejected), rd.ts_rejected) AS ts_rejected,
     CASE
         WHEN 3p.id_propose IS NULL AND p.id < 5000000 THEN old.ts_sign_started
         WHEN 3p.id_propose IS NULL AND p.id >= 5000000 THEN ssd.ts_sign_started
         WHEN 3p.id_propose IS NOT NULL THEN COALESCE(DATE(c.ts_began), old.dt_contract_started)
     END AS ts_sign_started,
-    IF(p.id < 5000000, old.ts_signed, psd.ts_signed) AS ts_signed,
-    IF(p.id < 5000000, old.ts_paid, pd.ts_paid) AS ts_paid,
-    IF(p.id < 5000000, old.ts_activation, ad.ts_activation) AS ts_activation,
-    IF(p.id < 5000000, old.ts_secured, sed.ts_secured) AS ts_secured,
-    IF(p.id < 5000000, old.ts_activation_analysis, aad.ts_activation_analysis) AS ts_activation_analysis,
-    IF(p.id < 5000000, old.ts_secure_pending, spd.ts_secure_pending) AS ts_secure_pending
+    IF(p.id < 5000000, COALESCE(old.ts_signed, psd.ts_signed), psd.ts_signed) AS ts_signed,
+    IF(p.id < 5000000, COALESCE(old.ts_paid, pd.ts_paid), pd.ts_paid) AS ts_paid,
+    IF(p.id < 5000000, COALESCE(old.ts_activation, ad.ts_activation), ad.ts_activation) AS ts_activation,
+    IF(p.id < 5000000, COALESCE(old.ts_secured, sed.ts_secured), sed.ts_secured) AS ts_secured,
+    IF(p.id < 5000000, COALESCE(old.ts_activation_analysis, aad.ts_activation_analysis), aad.ts_activation_analysis) AS ts_activation_analysis,
+    IF(p.id < 5000000, COALESCE(old.ts_secure_pending, spd.ts_secure_pending), spd.ts_secure_pending) AS ts_secure_pending
 FROM
     datalake_rental_guarantee_platform_clean.propose AS p
 LEFT JOIN
@@ -992,7 +992,7 @@ LEFT JOIN
         AND jk3.desc_master_type = 'Guarantee Status'
 LEFT JOIN
     datalake_rental_guarantee_platform_clean.bussines_type AS pbt
-    ON pbt.id = p.id_business_type
+        ON pbt.id = p.id_business_type
 LEFT JOIN
     datalake_velo.junk AS jk4
         ON jk4.desc_lvl_1 = pbt.name
@@ -1026,6 +1026,6 @@ LEFT JOIN
     credit_analysis AS ca
         ON ca.id_propose = p.id
         AND ca.rn = 1
-LEFT JOIN 
-  rescission as r
-    ON p.id = r.id_propose
+LEFT JOIN
+    rescission as r
+        ON p.id = r.id_propose
