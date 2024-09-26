@@ -12,5 +12,7 @@ workflow:
   inner_dependencies:
     negotiation:
       - debt_negotiation_mapping
+    contracts:
+      - queue_decision_tree
 cluster:
   type: databricks_13_3_med_general_cluster

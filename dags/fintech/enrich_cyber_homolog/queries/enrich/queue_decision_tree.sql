@@ -43,6 +43,14 @@ union_sources AS (
 
     SELECT
         *,
+        'Label 1' AS label_number,
+        'Discador Olos' AS queue_type
+    FROM datalake_cyber_clean.olos_dialer_label_decision_tree
+
+    UNION ALL
+
+    SELECT
+        *,
         'Label 3' AS label_number,
         'Campaign' AS queue_type
     FROM datalake_cyber_clean.campaign_label_decision_tree
@@ -52,8 +60,8 @@ union_sources AS (
     SELECT
         *,
         'Label 5' AS label_number,
-        'Eviction' AS queue_type
-    FROM datalake_cyber_clean.eviction_label_decision_tree
+        'Pré Jurídico' AS queue_type
+    FROM datalake_cyber_clean.pre_legal_label_decision_tree
 ),
 translate_field AS (
   SELECT

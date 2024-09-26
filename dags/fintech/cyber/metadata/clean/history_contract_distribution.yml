@@ -96,7 +96,7 @@ columns:
     description: "Queue 3. In Recupera this would be the distributor. A contract can be in more than one queue. Same as 'delinquent_master.current_queue_3'"
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_QUE3
-  dialer_queue:
+  digital_channel_queue:
     description: "Queue 4. In Recupera this would be the distributor. A contract can be in more than one queue. Same as 'delinquent_master.current_queue_4'"
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_QUE4
@@ -108,7 +108,7 @@ columns:
     description: "Queue 6. In Recupera this would be the distributor. A contract can be in more than one queue. Same as 'delinquent_master.current_queue_6'"
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_QUE6
-  label_1:
+  olos_dialer_label:
     description: ""
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL1
@@ -124,7 +124,7 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL4
-  eviction_label:
+  pre_legal_label:
     description: ""
     lineage:
       - datalake_cyber_raw.tb_historico_disponibilizacao.HD_LABEL5

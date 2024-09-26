@@ -383,7 +383,7 @@ columns:
       REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMQUE3
-  dialer_queue:
+  digital_channel_queue:
     description: "Dialer (olos) queue"
     categories:
       REAG: "Queue automatically created by Cyber"
@@ -419,7 +419,7 @@ columns:
       REAG: "Queue automatically created by Cyber"
     lineage:
       - datalake_cyber_raw.delqmst.DMPREVQ3
-  previous_dialer_queue:
+  previous_digital_channel_queue:
     description: ""
     categories:
       REAG: "Queue automatically created by Cyber"
@@ -629,11 +629,11 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMACSC3
-  eviction_label:
+  pre_legal_label:
     description: "Pre legal label"
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL5
-  label_1:
+  olos_dialer_label:
     description: ""
     lineage:
       - datalake_cyber_raw.delqmst.DMLABEL1
