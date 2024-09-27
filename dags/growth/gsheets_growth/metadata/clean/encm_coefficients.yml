@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: encm_conversion_probability
+columns:
+  date_start:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients.date_start
+  date_end:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients.date_end
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients.city_group
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients.business_context
+  event_name:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients.event_name
+  price_range:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients.price_range
+  prob_conv:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients.prob_conv
+  tm_conv:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients.tm_conv
+  min_range:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients.min_range
+  max_range:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients.max_range

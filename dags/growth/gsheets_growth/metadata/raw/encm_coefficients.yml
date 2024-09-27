@@ -1,2 +1,2 @@
 database_name: datalake_gsheets_raw
-table_name: encm_coefficient
+table_name: encm_coefficients

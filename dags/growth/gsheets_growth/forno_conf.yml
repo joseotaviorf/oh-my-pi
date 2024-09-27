@@ -150,7 +150,7 @@ sheets_info:
     clean_table_name: ecglobal_active_users
     sheet_context: growth
 
-  encm_coefficient:
+  encm_coefficients:
     sheet_id: 1qAmeLFiO_W2vufA2oNK0326W5V_wbSjIYY7z32ahXns
     sheet_name: coefficients
     clean_table_name: encm_coefficients
