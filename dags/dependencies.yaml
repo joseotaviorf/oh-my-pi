@@ -2426,14 +2426,6 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.enrich_ebdb_pricing:load-enrich-rent-percentile-price-changes
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_pro_owners:load-enrich-house-b2b-history
-bietlejuice.enrich_rental_listing_metrics:
-  - bietlejuice.dw_contract:load-dw-rent-dim-contract
-  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
-  - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
-  - bietlejuice.ebdb_house_properties:load-clean-occupant-type
-  - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
 bietlejuice.enrich_repairs:
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
