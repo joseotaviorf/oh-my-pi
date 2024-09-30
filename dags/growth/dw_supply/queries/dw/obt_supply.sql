@@ -58,6 +58,8 @@ base AS (
         fse.utm_source AS nm_source,
         fse.utm_medium AS nm_medium,
         fse.utm_campaign AS nm_campaign,
+        fse.utm_content AS nm_content,
+        fse.utm_term AS nm_term,
         dal.tp_lead,
         dfs.cd_funnel_step,
         dfs.tp_business_event,

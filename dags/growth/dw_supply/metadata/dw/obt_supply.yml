@@ -29,6 +29,12 @@ columns:
   nm_campaign:
     description: Name of the marketing campaign associated with the lead.
     lineage: dw_growth.fact_supply_events.utm_campaign
+  nm_content:
+    description: Name of the marketing content associated with the lead.
+    lineage: dw_growth.fact_supply_events.utm_content
+  nm_term:
+    description: Name of the marketing term associated with the lead.
+    lineage: dw_growth.fact_supply_events.utm_term
   sk_lead:
     description: Unique identifier for the lead.
     lineage: dw_growth.fact_supply_events.sk_lead
