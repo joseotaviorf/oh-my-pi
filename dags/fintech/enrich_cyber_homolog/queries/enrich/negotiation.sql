@@ -60,6 +60,7 @@ SELECT
     c.id_contract_external,
     c.id_client AS id_customer,
     UPPER(a.id_user) AS id_operator,
+    cp.offer_number AS id_campaign,
     ag.agency_name AS advisory,
     ca.contract_group AS creditor,
     a.frequency,
@@ -74,6 +75,7 @@ SELECT
       WHEN ag.agency_type IN ("Assessoria Convencional", "Assessoria Digital") THEN "Assessoria"
       WHEN ag.agency_type = "Portal" THEN "Portal Auto Negociação"
       WHEN ag.agency_type = "Cyber Credit" THEN "Operador Interno"
+      WHEN cp.id_campaign IS NOT NULL OR UPPER(a.agreement_type) LIKE '%CAM%' THEN "Carta Campanha"
       ELSE ag.agency_type
     END AS origin_agreement,
     a.status AS original_negotiation_status,
@@ -140,3 +142,5 @@ LEFT JOIN installments AS i
   ON i.id_agreement = a.id_agreement
 LEFT JOIN total_invoices_negotiated AS tin
   ON a.id_agreement = tin.id_negotiation
+LEFT JOIN datalake_cyber_clean.campaign AS cp
+  ON a.id_agreement = cp.id_negotiation

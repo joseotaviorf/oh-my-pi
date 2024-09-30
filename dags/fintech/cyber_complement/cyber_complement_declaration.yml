@@ -49,6 +49,8 @@ workflow:
       clean_table_name: campaign_label_decision_tree
     lbl_dectbl5:
       clean_table_name: pre_legal_label_decision_tree
+    tb_campanha:
+      clean_table_name: campaign
 cluster:
   type: custom_cluster
   custom_configurations:
