@@ -178,6 +178,9 @@ columns:
   has_received_after_signature:
     lineage:
       - datalake_ebdb_raw.contrato.recebidoaposassinatura
+  is_relisting_enabled:
+    lineage:
+      - datalake_ebdb_raw.contrato.relistingenabled
   has_contract_amendment:
     lineage:
       - datalake_ebdb_raw.contrato.termoaditivoadicionado

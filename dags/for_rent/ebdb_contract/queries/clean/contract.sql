@@ -59,6 +59,7 @@ SELECT
     emTransitoProprietario AS is_owner_in_transit,
     comSeguroResidencial AS has_home_insurance,
     recebidoAposAssinatura AS has_received_after_signature,
+    relistingEnabled AS is_relisting_enabled,
     termoAditivoAdicionado AS has_contract_amendment,
     todosAssinaramContratoEletronico AS has_everybody_signed_electronic_contract,
     tipoAssinatura AS signature_type,
