@@ -13,6 +13,18 @@ WITH weekends_and_holidays AS (
   WHERE
     sch.category = 'Nacional'
 ),
+departments AS (
+  SELECT
+    department,
+    journey_step,
+    area,
+    team,
+    front_or_back
+  FROM
+    datalake_gsheets_clean.department_control
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY department ORDER BY journey_step DESC) = 1
+),
 incoming_tickets AS (
   SELECT
     id_ticket,
@@ -220,7 +232,7 @@ ticket_queue_attributes AS (
   FROM
     queue_metrics AS tq
   LEFT JOIN
-    datalake_gsheets_clean.department_control dc
+    departments AS dc
       ON dc.department = tq.last_queue
 ),
 tickets AS (
