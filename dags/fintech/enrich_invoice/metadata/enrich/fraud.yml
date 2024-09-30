@@ -1,0 +1,79 @@
+---
+database_name: datalake_invoice
+table_name: fraud
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Fraud base
+columns:
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_retsuko.invoice.id_contract_external
+  id_invoice:
+    description: ""
+    lineage:
+      - datalake_retsuko.invoice.id_external
+  purpose:
+    description: ""
+    lineage:
+      - datalake_retsuko.invoice.purpose
+  country_code:
+    description: ""
+    lineage:
+      - datalake_retsuko.invoice.country_code
+  invoice_status:
+    description: ""
+    lineage:
+      - datalake_retsuko.invoice.invoice_status
+  user:
+    description: ""
+    lineage:
+      - datalake_retsuko.invoice_info.invoice_user
+  contract_status:
+    description: ""
+    lineage:
+      - datalake_ebdb_contract.contract.status
+  contract_guarantee:
+    description: ""
+    lineage:
+      - datalake_ebdb_contract.contract.guarantee_type
+  due_amount:
+    description: ""
+    lineage:
+      - datalake_retsuko.bill_items.value_sign_bill_item
+  accrual_year_month:
+    description: ""
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+  delay_days_invoice:
+    description: ""
+    lineage:
+      - datalake_retsuko.invoice.delay_days_invoice
+  dt_due_oldest_invoice:
+    description: ""
+    lineage:
+      - datalake_retsuko.invoice.dt_due_oldest_invoice
+  dt_invoice_due_adjusted:
+    description: ""
+    lineage:
+      - datalake_retsuko.invoice.dt_invoice_due_adjusted
+  dt_invoice_creation:
+    description: ""
+    lineage:
+      - datalake_retsuko.invoice.dt_invoice_creation
+  dt_month_write_off:
+    description: ""
+    lineage:
+      - datalake_retsuko.bill_items.dt_created
+  dt_invoice_write_off:
+    description: ""
+    lineage:
+      - datalake_retsuko.bill_items.dt_created
+  dt_contract_annulment:
+    description: ""
+    lineage:
+      - datalake_ebdb_contract.contract.dt_termination
+  ts_contract_signature:
+    description: ""
+    lineage:
+      - datalake_ebdb_contract.contract.ts_signed
