@@ -14,5 +14,10 @@ SELECT
     transferencias AS total_transfers,
     clientes_distintos_acionados AS distinct_contracts_contacted,
     data AS dt_operation,
+    year,
+    month,
+    day,
     NOW() AS ts_load
 FROM datalake_webhelp_raw.analise_operadores
+WHERE
+    MAKE_DATE(year,month,day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

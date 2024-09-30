@@ -44,6 +44,12 @@ workflow:
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
         - partition_folder
+    analise_operadores:
+      clean_table_name: operator_analysis
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
+      extra_spark_job_arguments:
+        - partition_folder
     titulos:
       clean_table_name: titles
       extraction_type: full
@@ -94,12 +100,6 @@ workflow:
         - general_folder
     importacao:
       clean_table_name: import
-      extraction_type: full
-      partitions: []
-      extra_spark_job_arguments:
-        - general_folder
-    analise_operadores:
-      clean_table_name: operator_analysis
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
