@@ -10,10 +10,12 @@ SELECT
     event_via,
     sequence_number,
     table_version,
+    is_public,
     dt_extracted,
     ts_batched,
     ts_received,
     ts_created,
+    ts_created_local,
     ts_load
 FROM
     datalake_velo_zendesk.ticket_audits

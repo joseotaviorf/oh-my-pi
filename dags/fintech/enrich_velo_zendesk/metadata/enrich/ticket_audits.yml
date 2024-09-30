@@ -48,6 +48,10 @@ columns:
     description: "Value after the event"
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.event
+  is_public:
+    description: "Flag indicating if the comment is public or internal"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_audits.event
   dt_extracted:
     description: "Date when the event was extracted"
     lineage:
@@ -62,6 +66,10 @@ columns:
       - datalake_velo_zendesk_clean.ticket_audits._sdc_received_at
   ts_created:
     description: "Timestamp of when the event was received"
+    lineage:
+      - datalake_velo_zendesk_clean.ticket_audits.created_at
+  ts_created_local:
+    description: "Timestamp of when the event was received in Brasilia Timezone"
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits.created_at
   ts_load:

@@ -48,6 +48,10 @@ columns:
     description: "Number of table version"
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits._sdc_table_version
+  is_public:
+    description: "Flag indicating if the comment is public or internal"
+    lineage:
+      - datalake_velo_zendesk.ticket_audits.is_public
   dt_extracted:
     description: "Date when the event was extracted"
     lineage:
@@ -64,6 +68,10 @@ columns:
     description: "Timestamp of when the event was received"
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits.created_at
+  ts_created_local:
+    description: "Timestamp of when the event was received in Brasilia Timezone"
+    lineage:
+      - datalake_velo_zendesk.ticket_audits.ts_created_local
   ts_load:
     description: "Timestamp when the register was loaded"
     lineage:
