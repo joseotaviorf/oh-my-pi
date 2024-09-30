@@ -47,13 +47,18 @@ workflow:
         ]
       extra_query_template_params:
         load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"
-        load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}" 
+        load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
       merge_on: [sk_session]
     dim_chatbot:
       partitions: [year, month, day]
       extraction_type: incremental
       z_order_by: [sk_session]
       merge_on: [sk_session]
+    dim_ra_ticket:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      z_order_by: [sk_ra_ticket]
+      merge_on: [sk_ra_ticket]
 
 cluster:
   type: custom_cluster

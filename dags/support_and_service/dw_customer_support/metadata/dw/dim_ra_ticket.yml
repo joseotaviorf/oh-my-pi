@@ -1,0 +1,98 @@
+database_name: dw_customer_support
+table_name: dim_ra_ticket
+description:
+  Dimension containing ReclameAqui attributes. Every row in this table represents a complaint
+  opened in ReclameAqui, with relevant attributes regarding customer information and complaint
+  response and interaction.
+
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_ra_ticket:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.id_hugme
+    description: The unique identifier of the complaint in the HugMe system.
+  ra_status:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.ra_status
+    description: The status in the RA system.
+  hugme_status:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.hugme_status
+    description: The status in the HugMe system.
+  source:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.source
+    description: The source from which the complaint originated.
+  title:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.complaint_title
+    description: The title of the complaint.
+  customer_cpf:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.customer_data
+    description: Customer CPF.
+  customer_city:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.customer_data
+    description: Customer city
+  customer_state:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.customer_data
+    description: Customer state
+  customer_email:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.customer_data
+    description: Customer email address.
+  customer_phone_numbers:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.customer_data
+    description: Customer phone numbers.
+  customer_tags:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.customer_data
+    description: Tags associated with the customer.
+  moderation_status:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.moderation
+    description: The status from the moderation data.
+  moderation_reason:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.moderation
+    description: The reason from the moderation data.
+  total_moderations:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.ticket_moderations_count
+    description: The total number of times the ticket was moderated.
+  rating:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.rating
+    description: The complaint's rating, with -1 values replaced by NULL.
+  total_ratings_without_response:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.rating_without_response
+    description: The total number of ratings without a response.
+  is_resolved:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.is_resolved
+    description: Indicates whether the complaint is resolved.
+  would_do_business_again:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.would_do_business_again
+    description: Indicates if the customer would do business again.
+  ts_created:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.ts_created
+    description: Timestamp when the complaint was created.
+  ts_last_replica:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.ts_last_replica
+    description: Timestamp of the last replication.
+  ts_rating:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.ts_rating
+    description: Timestamp when the rating was given.
+  ts_last_modification:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.ts_last_modification
+    description: Timestamp of the last modification.

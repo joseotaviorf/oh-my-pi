@@ -15,7 +15,19 @@ SELECT
   last_feeling,
   feed_type,
   moderation,
-  customer,
+  REPLACE(
+    REGEXP_REPLACE(
+      REGEXP_REPLACE(
+        REGEXP_REPLACE(REGEXP_REPLACE(customer, "\\[\\{{", "{"), "\\}}\\]", "}"),
+        "(\\[\\])",
+        "null"
+      ),
+      "\\[|\\]",
+      ""
+    ),
+    "=",
+    ":"
+  ) AS customer_data,
   user,
   account,
   rafone,
