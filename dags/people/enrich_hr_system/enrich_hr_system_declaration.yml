@@ -21,6 +21,7 @@ workflow:
       - assignments
     employee_ids:
       - assignments
+      - employee_info
   default_extraction_type: full
   has_hive_sync: false
   bucket_config_name: people_bucket

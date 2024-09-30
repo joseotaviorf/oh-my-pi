@@ -1,102 +1,32 @@
-WITH hr_system_workers AS (
+WITH cte_enrich_demographic_attributes AS (
   SELECT
     id_person,
-    person_number,
-    birth_town,
-    birth_region,
-    birth_country,
-    birth_country_name,
-    dt_birth,
-    names,
-    workers_dff,
-    external_identifiers
-  FROM
-    datalake_hr_system_clean.workers 
-  QUALIFY dt_effective = MAX(dt_effective) OVER (PARTITION BY id_person)
-),
-external_identifiers_step1 AS (
-  SELECT
-    id_person,
-    EXPLODE (external_identifiers) external_identifiers
-  FROM
-    hr_system_workers
-),
-external_identifiers AS (
-  SELECT
-    id_person
-  FROM
-    external_identifiers_step1
-  WHERE
-    external_identifiers ['ExternalIdentifierType'] = 'ID_ONDA1'
-),
-names_step1 AS (
-  SELECT
-    id_person,
-    EXPLODE (names) names
-  FROM
-    hr_system_workers
-),
-names AS (
-  SELECT
-    id_person,
-    names ["FirstName"] AS first_name,
-    names ["FullName"] AS full_name,
-    names ["LastName"] AS last_name,
-    names ["NameInformation15"] AS name_information_15,
-    names ["NameInformation16"] AS name_information_16
-  FROM
-    names_step1
-),
-workers_dff_step1 AS (
-  SELECT
-    id_person,
-    EXPLODE (workers_dff) workers_dff
-  FROM
-    hr_system_workers
-),
-workers_dff AS (
-  SELECT
-    id_person,
-    workers_dff ["nomeDaMae"] AS mother_name,
-    workers_dff ["nomeDoPai"] AS father_name
-  FROM
-    workers_dff_step1
-),
-cte_enrich_demographic_attributes AS (
-  SELECT
-    id_person,
-    ctps_number,
-    ctps_series,
-    issuing_state_ctps,
-    vote_registration_number,
-    electoral_zone,
-    polling_station,
     marital_status,
     highest_education_level,
-    gender,
-    has_disability
+    gender
   FROM
     datalake_hr_system.demographic_attributes 
-  QUALIFY ts_last_update = MAX(ts_last_update) OVER (PARTITION BY id_person)
+  QUALIFY 
+    ts_last_update = MAX(ts_last_update) OVER (PARTITION BY id_person)
 )
 SELECT
   --  ids
-  workers.id_person AS sk_employee,
+  emp_info.id_person AS sk_employee,
   -- -- non metric
-  workers.person_number,
+  emp_info.person_number,
   -- -- name information,
-  names.first_name,
-  names.last_name,
-  names.full_name,
-  names.name_information_15 AS first_social_name,
-  names.name_information_16 AS last_social_name,
+  emp_info.first_name,
+  emp_info.last_name,
+  emp_info.full_name,
+  emp_info.first_social_name,
+  emp_info.last_social_name,
   -- -- birth info,
-  workers.birth_town,
-  workers.birth_region AS birth_state,
-  workers.birth_country,
+  emp_info.birth_town,
+  emp_info.birth_state,
+  emp_info.birth_country,
   -- -- personal info,
-  wdff.mother_name,
-  wdff.father_name,
+  emp_info.mother_name,
+  emp_info.father_name,
   COALESCE(da.gender, '-1') AS gender_code,
   CASE
     WHEN da.gender = 'M' THEN 'Masculino'
@@ -143,39 +73,28 @@ SELECT
     ELSE '-1'
   END AS highest_education_level_description,
   CASE
-    WHEN DATEDIFF(current_date(), workers.dt_birth) < 21 * 365 THEN 'menos de 21 anos'
-    WHEN DATEDIFF(current_date(), workers.dt_birth) BETWEEN 21 * 365
+    WHEN DATEDIFF(current_date(), emp_info.dt_birth) < 21 * 365 THEN 'menos de 21 anos'
+    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 21 * 365
     AND 25 * 365 THEN 'de 21 até 25 anos'
-    WHEN DATEDIFF(current_date(), workers.dt_birth) BETWEEN 26 * 365
+    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 26 * 365
     AND 30 * 365 THEN 'de 26 até 30 anos'
-    WHEN DATEDIFF(current_date(), workers.dt_birth) BETWEEN 31 * 365
+    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 31 * 365
     AND 35 * 365 THEN 'de 31 até 35 anos'
-    WHEN DATEDIFF(current_date(), workers.dt_birth) BETWEEN 36 * 365
+    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 36 * 365
     AND 40 * 365 THEN 'de 36 até 40 anos'
-    WHEN DATEDIFF(current_date(), workers.dt_birth) BETWEEN 41 * 365
+    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 41 * 365
     AND 45 * 365 THEN 'de 41 até 45 anos'
-    WHEN DATEDIFF(current_date(), workers.dt_birth) BETWEEN 46 * 365
+    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 46 * 365
     AND 50 * 365 THEN 'de 46 até 50 anos'
-    WHEN DATEDIFF(current_date(), workers.dt_birth) BETWEEN 51 * 365
+    WHEN DATEDIFF(current_date(), emp_info.dt_birth) BETWEEN 51 * 365
     AND 55 * 365 THEN 'de 51 até 55 anos'
     ELSE 'mais de 55 anos'
   END AS age_range,
   -- -- dates
-  DATE(workers.dt_birth) AS dt_birth,
+  DATE(emp_info.dt_birth) AS dt_birth,
   NOW() AS ts_load
 FROM
-  hr_system_workers AS workers
-  LEFT JOIN 
-    cte_enrich_demographic_attributes AS da 
-        ON workers.id_person = da.id_person
-  LEFT JOIN 
-    names 
-        ON workers.id_person = names.id_person
-  LEFT JOIN 
-    workers_dff AS wdff 
-        ON workers.id_person = wdff.id_person
-  LEFT JOIN 
-    external_identifiers ei 
-        ON workers.id_person = ei.id_person
-WHERE
-  ei.id_person IS NULL
+  datalake_hr_system.employee_info AS emp_info
+LEFT JOIN 
+  cte_enrich_demographic_attributes AS da 
+      ON emp_info.id_person = da.id_person

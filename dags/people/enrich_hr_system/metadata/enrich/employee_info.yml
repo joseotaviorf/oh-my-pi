@@ -1,0 +1,61 @@
+---
+database_name: datalake_hr_system
+table_name: employee_info
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Enrich table with informatiion about name and birth of the employee
+columns:
+  id_person:
+    description: 'Id of the person'
+    lineage:
+    - datalake_hr_system_clean.workers.id_person
+  person_number:
+    description: 'Person number'
+    lineage:
+    - datalake_hr_system_clean.workers.person_number
+  first_name:
+    description: 'First name of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.names
+  last_name:
+    description: 'Last name of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.names
+  full_name:
+    description: 'Full name of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.names
+  first_social_name:
+    description: 'First social name of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.names
+  last_social_name:
+    description: 'Last social name of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.names
+  mother_name:
+    description: 'Mother name of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.workers_dff
+  father_name:
+    description: 'Father name of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.workers_dff
+  birth_town:
+    description: 'Birth town of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.birth_town
+  birth_state:
+    description: 'Birth state of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.birth_region
+  birth_country:
+    description: 'Birth country of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.birth_country
+  dt_birth:
+    description: 'Date of birth of the employee'
+    lineage:
+    - datalake_hr_system_clean.workers.dt_birth
+  ts_load:
+    description: 'Timestamp of the load'

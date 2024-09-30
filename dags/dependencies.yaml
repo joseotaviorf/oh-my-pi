@@ -452,6 +452,7 @@ bietlejuice.dw_employee:
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
   - bietlejuice.enrich_hr_system:load-enrich-disability
   - bietlejuice.enrich_hr_system:load-enrich-employee-ids
+  - bietlejuice.enrich_hr_system:load-enrich-employee-info
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
