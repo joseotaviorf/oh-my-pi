@@ -483,6 +483,11 @@ bietlejuice.dw_hiring:
 bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
+  - bietlejuice.ebdb_condo:load-clean-amenities
+  - bietlejuice.ebdb_condo:load-clean-condo-amenities
+  - bietlejuice.ebdb_condo:load-clean-info-amenities
+  - bietlejuice.ebdb_condo:load-clean-info-condo-amenities
+  - bietlejuice.ebdb_house:load-clean-house-maintenance-condition
 bietlejuice.dw_house_amenities:
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud

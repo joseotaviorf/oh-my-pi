@@ -1,0 +1,274 @@
+database_name: dw_house
+table_name: dim_house_amenities
+description: Information about house amenities. Each line has all the most recent amenities of a house.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  sk_house:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.id_house
+      - datalake_ebdb_clean.info_condo_amenities.id_house
+      - datalake_ebdb_clean.house_maintenance_condition.id_house
+    description: Id of the house.
+  maintenance_condition:
+    lineage:
+      - datalake_ebdb_clean.house_maintenance_condition.maintenance_condition
+    description: Describes the maintenance conditions of the house.
+  has_hot_tub:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has hot tub.
+  has_blindex_box:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has blindex box.
+  has_balcony:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has balcony.
+  has_stove_and_fridge:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has stove and fridge.
+  has_private_pool:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has private pool.
+  has_private_grill:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has private grill.
+  has_bedroom_cabinet:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has bedroom cabinet.
+  has_bathroom_cabinet:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has bathroom cabinet.
+  has_kitchen_cabinet:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has kitchen cabinet.
+  has_air_conditioner:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has air conditioner.
+  has_internet:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has internet connection.
+  has_gas_shower:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has gas shower.
+  has_pet:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has pets.
+  has_service_room:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has service room.
+  has_service_bathroom:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has service bathroom.
+  has_permanent_garage:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has permanent garage.
+  has_gourmet_balcony:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has gourmet balcony.
+  has_penthouse_apartment:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has penthouse apartment.
+  has_extra_reversible_bedroom:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has extra reversible bedroom.
+  has_stove:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has stove.
+  has_fridge:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has fridge.
+  has_morning_sun:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has morning sun.
+  has_afternoon_sun:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has afternoon sun.
+  has_blackout_curtain:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has blackout curtains.
+  has_decorative_curtain:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has decorative curtains.
+  has_soundproof_window:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has soundproof window.
+  has_ceiling_fan:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has ceiling fan.
+  has_natural_light:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has natural light.
+  has_free_view:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has free view.
+  has_silent_street:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has silent street.
+  has_eletric_shower:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has electric shower.
+  has_microwave:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has microwave.
+  has_sofa:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has sofa.
+  has_washing_machine:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has washing machine.
+  has_dryer_machine:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has dryer machine.
+  has_wash_dry_machine:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has wash and dry machine.
+  has_utility_sink:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has utility sink.
+  has_protection_net:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has protection net.
+  has_clothesline:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has clothesline.
+  has_new_outlet:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has new outlets.
+  has_television:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has television.
+  has_table_and_chair:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has table and chairs.
+  has_coffee_machine:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has coffee machine.
+  has_grill:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has grill.
+  has_step_free_access:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has step-free access.
+  has_cooktop:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has cooktop.
+  has_kitchen_utensils:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has kitchen utensils.
+  has_double_bed:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has double bed.
+  has_single_bed:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has single bed.
+  has_bathroom_mirror:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has bathroom mirror.
+  has_eletronic_lock:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has eletronic lock.
+  has_energy:
+    lineage:
+      - datalake_ebdb_clean.info_amenities.has_characteristic
+    description: Boolean indicating if the house has electrical energy.
+  has_playground:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house has playground.
+  has_condominium_swimming_pool:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house has swimming pool in the condominium.
+  has_condominium_grill:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house has grill in the condominium.
+  has_sports_court:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house has sports court.
+  has_gym:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house has gym.
+  has_party_room:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house has party room.
+  has_sauna:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house has sauna.
+  has_laundry:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house has laundry.
+  has_piped_gas:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house has piped gas.
+  has_automatic_gate:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house has automatic gate.
+  has_gourmet_space:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house has gourmet space.
+  is_subway_close:
+    lineage:
+      - datalake_ebdb_clean.info_condo_amenities.has_characteristic
+    description: Boolean indicating if the house is close to the subway.
+  ts_load:
+    description: Timestamp of when this table was loaded.
