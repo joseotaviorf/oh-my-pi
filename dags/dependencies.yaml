@@ -2621,11 +2621,16 @@ bietlejuice.enrich_sale_potential_listing:
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_listing_flow:load-enrich-sales-listing-flows-with-reprocessed-leads
   - bietlejuice.enrich_listing_jobs:load-enrich-house-photo-job-tasks
-bietlejuice.enrich_sale_stranded_listings:
+bietlejuice.enrich_sale_stranded_listings_status:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_offer:load-enrich-sale-offer
-  - bietlejuice.enrich_sale_closing_flows:load-enrich-closing-flow
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status
+  - bietlejuice.enrich_sale_stranded_listings_thresholds:load-enrich-thresholds
+bietlejuice.enrich_sale_stranded_listings_thresholds:
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status
 bietlejuice.enrich_sale_visit:
   - bietlejuice.ebdb:load-clean-real-estate-agent-rating

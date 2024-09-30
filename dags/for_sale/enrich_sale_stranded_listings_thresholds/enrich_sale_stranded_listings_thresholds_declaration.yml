@@ -1,0 +1,18 @@
+dag:
+  name: enrich_sale_stranded_listings_thresholds
+  schedule_start_date: 2021, 7, 20
+  owner: Data ForSale
+  documentation:
+    dag_purpose: This DAG creates the enriched tables for Stranded Listings context.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: sale_stranded_listings
+  default_extraction_type: incremental
+  short_circuit_customization:
+    function: CHECK_IS_SPECIFIC_DAY_OF_MONTH
+    execution_date: "{{ macros.ds_add(ds, 1) }}"
+    function_params:
+      day: 2
+cluster:
+  type: databricks_12_2_med_io-general_cluster

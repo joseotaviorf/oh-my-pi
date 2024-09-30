@@ -205,7 +205,7 @@ bietlejuice.dw_sale_listings:
   add:
     - bietlejuice.ebdb_house:load-clean-house
   remove:
-    - bietlejuice.enrich_sale_stranded_listings:load-enrich-stranded-status
+    - bietlejuice.enrich_sale_stranded_listings_status:load-enrich-stranded-status
 bietlejuice.dw_sale_offer_users:
   remove:
     - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-users
@@ -636,9 +636,10 @@ bietlejuice.enrich_sale_offer_flows:
     - bietlejuice.sales_flow:load-clean-brokerage
     - bietlejuice.sales_flow:load-clean-offer-aud
     - bietlejuice.sales_flow:load-clean-rescission
-bietlejuice.enrich_sale_stranded_listings:
-  add:
-    - bietlejuice.enrich_sale_closing_flows:load-enrich-closing-flow
+bietlejuice.enrich_sale_stranded_listings_status:
+  remove:
+    - bietlejuice.enrich_region:load-enrich-region
+bietlejuice.enrich_sale_stranded_listings_thresholds:
   remove:
     - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.enrich_sale_visit_hubs:
