@@ -12,6 +12,10 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.id_problem_ticket
     description: Problem ticket identification key.
+  sk_contract:
+    lineage:
+      - datalake_zendesk.tickets_current.id_contract
+    description: SK for the contract associated with the ticket
   subject:
     lineage:
       - datalake_zendesk.tickets_current.subject

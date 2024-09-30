@@ -432,7 +432,7 @@ ticket_sla_target AS (
 ticket_date_interval AS (
   SELECT
     id_ticket,
-    sla_target,
+    MAX(sla_target) OVER(PARTITION BY id_ticket) AS sla_target,
     SEQUENCE(DATE(ts_sla_started), COALESCE(DATE(ts_solved), CURRENT_DATE())) AS dt_interval,
     ts_sla_started,
     ts_solved
@@ -556,7 +556,7 @@ ticket_metrics AS (
     END AS is_ticket_rate,
     t.ts_budget,
     t.ts_created,
-    tdw.ts_sla_started,
+    COALESCE(tdw.ts_sla_started, t.ts_created) AS ts_sla_started,
     t.ts_solved,
     t.ts_closed,
     t.ts_updated,

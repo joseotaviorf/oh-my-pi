@@ -1,6 +1,7 @@
 SELECT
   CAST(id_ticket AS BIGINT) AS sk_ticket,
   CAST(COALESCE(id_problem_ticket, -1) AS BIGINT) AS sk_problem_ticket,
+  COALESCE(CAST(id_contract AS BIGINT), -1) AS sk_contract,
   status,
   type,
   tags,
