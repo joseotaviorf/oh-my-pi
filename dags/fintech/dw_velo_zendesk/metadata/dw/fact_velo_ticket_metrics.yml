@@ -13,7 +13,7 @@ columns:
     lineage:
       - datalake_velo_zendesk.ticket_metrics.id_assignee
   sk_group:
-    description: "Ticket group id"
+    description: "Ticket group id (team that will handle the request)"
     lineage:
       - datalake_velo_zendesk.ticket_metrics.id_group
   sk_requester:
@@ -29,15 +29,23 @@ columns:
     lineage:
       - datalake_velo_zendesk.ticket_metrics.id_propose
   request_type:
-    description: "Request type description"
+    description: "Request type description (termination, non-payment, etc.)"
     lineage:
       - datalake_velo_zendesk.ticket_metrics.request_type
   ticket_via:
-    description: "Ticket via description"
+    description: "Via in which the ticket was opened (web, whatsapp, mobile, etc.)"
     lineage:
       - datalake_velo_zendesk.ticket_metrics.ticket_via
   ticket_status:
     description: "Ticket status"
+    categories:
+      new: when the ticket is created.
+      open: when the ticket was assigned to an analyst.
+      pending: when a response from the user is pending.
+      hold: when on hold (rarely used).
+      deleted: when it was deleted by the analyst.
+      solved: when the analyst marks the ticket as resolved (in this status it is possible to reopen it if necessary).
+      closed: when the ticket has been closed (after going through the resolved status), when this happens, it is not possible to reopen it.
     lineage:
       - datalake_velo_zendesk.ticket_metrics.status
   group_stations:

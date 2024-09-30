@@ -13,7 +13,7 @@ columns:
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits.ticket_id
   sk_author:
-    description: "ID of the author of the audit identification number (ID)"
+    description: "ID of the author of the event"
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits.author_id
   id_event:
@@ -21,11 +21,11 @@ columns:
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.event
   event_type:
-    description: "Type of the event"
+    description: "Type of the event (it can be a comment, creation exclusion, status update, triggers, etc.)"
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.event
   field_name:
-    description: "Name of the field the event was applied"
+    description: "Name of the field where the event was applied"
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.event
   previous_value:
@@ -37,7 +37,7 @@ columns:
     lineage:
       - datalake_velo_zendesk_raw.ticket_audits.event
   event_via:
-    description: "Via of the event"
+    description: "Via of the event (web, whatsapp, mobile, etc.)"
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits.via
   sequence_number:
@@ -45,7 +45,7 @@ columns:
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits._sdc_sequence
   table_version:
-    description: "Number of table version"
+    description: "Number of table version (normally 0)"
     lineage:
       - datalake_velo_zendesk_clean.ticket_audits._sdc_table_version
   is_public:

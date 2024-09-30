@@ -29,11 +29,11 @@ columns:
     lineage:
       - datalake_velo_zendesk.ticket_details.id_delinquency
   request_error:
-    description: "Request error description"
+    description: "Description of the error on the request (for example, missing documents)"
     lineage:
       - datalake_velo_zendesk.ticket_details.request_error
   request_type:
-    description: "Request type description"
+    description: "Request type description (termination, non-payment, etc.)"
     lineage:
       - datalake_velo_zendesk.ticket_details.request_type
   cancellation_reason:
@@ -41,7 +41,7 @@ columns:
     lineage:
       - datalake_velo_zendesk.ticket_details.cancellation_reason
   rejection_reason:
-    description: "Description of the reason of rejection"
+    description: "Description of the reason of the request rejection"
     lineage:
       - datalake_velo_zendesk.ticket_details.rejection_reason
   broker_name:
@@ -61,15 +61,15 @@ columns:
     lineage:
       - datalake_velo_zendesk.ticket_details.client_request
   group_name:
-    description: "Ticket group name"
+    description: "Ticket group name (team that will handle the request)"
     lineage:
       - datalake_velo_zendesk.ticket_details.name
   ticket_type:
-    description: "Ticket type name"
+    description: "Ticket type (problem or incident)"
     lineage:
       - datalake_velo_zendesk.ticket_details.type
   sk_group:
-    description: "Ticket group id"
+    description: "Ticket group id (team that will handle the request)"
     lineage:
       - datalake_velo_zendesk.ticket_details.id_group
   satisfaction_rating:
@@ -91,11 +91,11 @@ columns:
   ticket_order:
     description: "Order of the current register according to ticket timeline"
   priority:
-    description: "Priority description of the ticket"
+    description: "Priority description of the ticket (low, normal, high or urgent)"
     lineage:
       - datalake_velo_zendesk.ticket_details.priority
   recipient:
-    description: "Recipient description"
+    description: "Recipient e-mail"
     lineage:
       - datalake_velo_zendesk.ticket_details.recipient
   is_last_register:
@@ -103,7 +103,7 @@ columns:
     lineage:
       - datalake_velo_zendesk.ticket_details.recipient
   ticket_via:
-    description: "Via in which the ticket was opened"
+    description: "Via in which the ticket was opened (web, whatsapp, mobile, etc.)"
     lineage:
       - datalake_velo_zendesk.ticket_details.ticket_via
   short_request_type:
@@ -111,7 +111,7 @@ columns:
     lineage:
       - datalake_velo_zendesk.ticket_details.short_request_type
   description:
-    description: "Ticket description"
+    description: "Ticket text content"
     lineage:
       - datalake_velo_zendesk.ticket_details.description
   ticket_url:
@@ -123,11 +123,19 @@ columns:
     lineage:
       - datalake_velo_zendesk.ticket_details.tags
   ticket_status:
-    description: "Ticket status"
+    description: "Ticket status (opened, closed, new, etc.)"
+    categories:
+      new: when the ticket is created.
+      open: when the ticket was assigned to an analyst.
+      pending: when a response from the user is pending.
+      hold: when on hold (rarely used).
+      deleted: when it was deleted by the analyst.
+      solved: when the analyst marks the ticket as resolved (in this status it is possible to reopen it if necessary).
+      closed: when the ticket has been closed (after going through the resolved status), when this happens, it is not possible to reopen it.
     lineage:
       - datalake_velo_zendesk.ticket_details.status
   subject:
-    description: "Ticket subject"
+    description: "Ticket e-mail subject"
     lineage:
       - datalake_velo_zendesk.ticket_details.subject
   has_incidents:
