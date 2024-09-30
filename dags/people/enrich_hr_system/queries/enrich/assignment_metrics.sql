@@ -371,8 +371,8 @@ cte_enrich_disability AS (
     id_person,
     has_self_declared_disability
   FROM disability
-  QUALIFY 
-    ts_last_updated = MAX(ts_last_updated) over (PARTITION BY id_person) 
+  QUALIFY
+    ts_last_updated = MAX(ts_last_updated) over (PARTITION BY id_person)
     OR ts_last_updated is null
 )
 SELECT
@@ -505,7 +505,7 @@ FROM
     datalake_hr_system.demographic_attributes AS da
       ON wr.id_person = da.id_person
         AND wr.legislation_code = da.legislation_code
-  LEFT JOIN 
+  LEFT JOIN
     cte_enrich_disability AS d
       ON wr.id_person = d.id_person
 WHERE
