@@ -1,0 +1,37 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: offer_variables
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table with information about offer variables.
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offer_variables.id
+  kind:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offer_variables.kind
+  POSITION:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offer_variables.POSITION
+  slug:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offer_variables.slug
+  visibility_mask:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offer_variables.visibility_mask
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offer_variables.created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offer_variables.updated_at
+  ts_load:
+    description: ''

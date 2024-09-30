@@ -35,7 +35,23 @@ workflow:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ['id', 'answer']
+    candidate_referrals:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
     candidates:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
+    departments:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
+    education_records:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
+    experience_records:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ['id']
@@ -60,6 +76,14 @@ workflow:
       extraction_type: incremental
       merge_on: ['id']
     members:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
+    offer_variables:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ['id']
+    offers:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ['id']
