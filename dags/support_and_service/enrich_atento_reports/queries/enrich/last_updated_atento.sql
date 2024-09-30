@@ -80,14 +80,6 @@ WITH atento_tables AS (
     UNION ALL
   
   SELECT
-    'tickets_transferred_total' AS table_name,
-    ts_load
-  FROM
-      reverse_atento.tickets_transferred_total
-  
-    UNION ALL
-  
-  SELECT
     'tmr' AS table_name,
     ts_load
   FROM

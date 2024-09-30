@@ -68,7 +68,7 @@ LEFT JOIN
     ON ft.sk_last_agent = da.sk_agent
     OR ft.sk_last_agent = da.sk_agent_twilio
 WHERE
-  DATE(ft.ts_started) >= DATE('2022-01-01')
+  DATE(ft.ts_started) >= CURRENT_DATE - INTERVAL '1' YEAR
 AND
   dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'

@@ -16,8 +16,8 @@ WITH base_tickets AS (
     ft.csat_score,
     da.email,
     CASE
-        WHEN LAG(ft.sk_ticket) OVER(PARTITION BY dzu.phone, dd.team ORDER BY ft.ts_started) IS NOT NULL THEN 1
-        ELSE 0
+      WHEN LAG(ft.sk_ticket) OVER(PARTITION BY dzu.phone, dd.team ORDER BY ft.ts_started) IS NOT NULL THEN 1
+      ELSE 0
     END AS recontact_flag,
     ft.total_minutes_handling_time,
     ft.total_minutes_queue_time,
@@ -35,24 +35,24 @@ WITH base_tickets AS (
     NOW() AS ts_load
   FROM
     dw_customer_support.fact_ticket AS ft
-      LEFT JOIN
-        dw_customer_support.dim_department AS dd
-          ON ft.sk_main_department = dd.sk_department
-      LEFT JOIN
-        dw_customer_support.dim_channel AS dc
-          ON ft.sk_channel = dc.sk_channel
-      LEFT JOIN
-        dw_customer_support.dim_taxonomy AS dt
-          ON ft.sk_taxonomy = dt.sk_taxonomy
-      LEFT JOIN
-        dw_customer_support.dim_agent AS da
-          ON ft.sk_last_agent = COALESCE(da.sk_agent, da.sk_agent_twilio)
-      INNER JOIN
-        dw_tickets.fact_tickets AS fts
-          ON ft.sk_ticket = fts.sk_ticket
-      LEFT JOIN
-        dw_tickets.dim_zendesk_user AS dzu
-          ON dzu.sk_zendesk_user = fts.sk_zendesk_requester_user
+    LEFT JOIN
+      dw_customer_support.dim_department AS dd
+        ON ft.sk_main_department = dd.sk_department
+    LEFT JOIN
+      dw_customer_support.dim_channel AS dc
+        ON ft.sk_channel = dc.sk_channel
+    LEFT JOIN
+      dw_customer_support.dim_taxonomy AS dt
+        ON ft.sk_taxonomy = dt.sk_taxonomy
+    LEFT JOIN
+      dw_customer_support.dim_agent AS da
+        ON ft.sk_last_agent = COALESCE(da.sk_agent, da.sk_agent_twilio)
+    INNER JOIN
+      dw_tickets.fact_tickets AS fts
+        ON ft.sk_ticket = fts.sk_ticket
+    LEFT JOIN
+      dw_tickets.dim_zendesk_user AS dzu
+        ON dzu.sk_zendesk_user = fts.sk_zendesk_requester_user
   WHERE
       ft.ts_started >= DATE('2023-01-01')
       AND dzu.phone IS NOT NULL
@@ -119,6 +119,4 @@ FROM
       AND fs.sk_ticket IS NOT NULL
       AND fs.is_last_segment = True
 GROUP BY
-  1,2,3,4,5,6,7,8,9,10
-  ,11,12,13,14,15,16,17,18,19,20
-  ,21,22,23,24,25,26,27,28,29,30
+  ALL

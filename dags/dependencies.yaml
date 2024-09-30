@@ -1099,7 +1099,6 @@ bietlejuice.enrich_atento_reports:
   - bietlejuice.reverse_atento:load-reverse-speech-chat
   - bietlejuice.reverse_atento:load-reverse-taxonomy
   - bietlejuice.reverse_atento:load-reverse-tickets-transferred
-  - bietlejuice.reverse_atento:load-reverse-tickets-transferred-total
   - bietlejuice.reverse_atento:load-reverse-tmr
   - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.enrich_atlas_pricing_report:
@@ -3041,12 +3040,12 @@ bietlejuice.enrich_webhelp_reports:
   - bietlejuice.reverse_webhelp:load-reverse-general-metric
   - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla
   - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks
+  - bietlejuice.reverse_webhelp:load-reverse-recontact
   - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
   - bietlejuice.reverse_webhelp:load-reverse-speech-call
   - bietlejuice.reverse_webhelp:load-reverse-speech-chat
-  - bietlejuice.reverse_webhelp:load-reverse-taxonomia-call
-  - bietlejuice.reverse_webhelp:load-reverse-taxonomia-chat
-  - bietlejuice.reverse_webhelp:load-reverse-taxonomia-email
+  - bietlejuice.reverse_webhelp:load-reverse-taxonomy
+  - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
 bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-contact
@@ -3323,6 +3322,7 @@ bietlejuice.metric_ss__tickets:
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
+  - bietlejuice.dw_call:load-dw-call-fact-call-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
@@ -3356,7 +3356,6 @@ bietlejuice.reverse_atento_access:
   - bietlejuice.reverse_atento:load-reverse-speech-chat
   - bietlejuice.reverse_atento:load-reverse-taxonomy
   - bietlejuice.reverse_atento:load-reverse-tickets-transferred
-  - bietlejuice.reverse_atento:load-reverse-tickets-transferred-total
   - bietlejuice.reverse_atento:load-reverse-tmr
   - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.reverse_atlas_pricing_report_access:
@@ -3495,8 +3494,7 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.reverse_webhelp:
   - bietlejuice.bigfone:load-clean-call
-  - bietlejuice.dw_call:load-dw-call-dim-call
-  - bietlejuice.dw_call:load-dw-call-fact-calls
+  - bietlejuice.dw_call:load-dw-call-fact-call-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
@@ -3504,16 +3502,16 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket-tags
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-segment
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
-  - bietlejuice.dw_tickets:load-dw-tickets-fact-ticket-tags
-  - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks
+  - bietlejuice.enrich_quinto_messenger:load-enrich-chat
   - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
-  - bietlejuice.enrich_quinto_messenger:load-enrich-tasks
   - bietlejuice.enrich_repairs:load-enrich-repair-tickets
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
@@ -3525,12 +3523,14 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-demand-metric
   - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
   - bietlejuice.reverse_webhelp:load-reverse-general-metric
+  - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla
+  - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks
+  - bietlejuice.reverse_webhelp:load-reverse-recontact
   - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
   - bietlejuice.reverse_webhelp:load-reverse-speech-call
   - bietlejuice.reverse_webhelp:load-reverse-speech-chat
-  - bietlejuice.reverse_webhelp:load-reverse-taxonomia-call
-  - bietlejuice.reverse_webhelp:load-reverse-taxonomia-chat
-  - bietlejuice.reverse_webhelp:load-reverse-taxonomia-email
+  - bietlejuice.reverse_webhelp:load-reverse-taxonomy
+  - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
 quintoml.growth.eltv.inference:
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned

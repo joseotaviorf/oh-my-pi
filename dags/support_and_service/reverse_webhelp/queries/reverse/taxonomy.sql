@@ -48,13 +48,13 @@ SELECT DISTINCT
   sub_journey AS area,
   email,
   ts_created,
-  YEAR(CURRENT_DATE) AS year,
-  MONTH(CURRENT_DATE) AS month,
-  DAY(CURRENT_DATE) AS day,
+  YEAR(CURRENT_DATE - 1) AS year,
+  MONTH(CURRENT_DATE - 1) AS month,
+  DAY(CURRENT_DATE - 1) AS day,
   NOW() AS ts_load
 FROM
   base
 WHERE
-  agent_organization IN ('atento')
+  agent_organization IN ('webhelp')
   AND front_or_back = 'front'
   AND DATE_TRUNC('month', ts_created) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTH

@@ -524,7 +524,6 @@ bietlejuice.enrich_atento_reports:
     - bietlejuice.reverse_atento:load-reverse-speech-call
     - bietlejuice.reverse_atento:load-reverse-speech-chat
     - bietlejuice.reverse_atento:load-reverse-taxonomy
-    - bietlejuice.reverse_atento:load-reverse-tickets-transferred-total
     - bietlejuice.reverse_atento:load-reverse-tickets-transferred
     - bietlejuice.reverse_atento:load-reverse-tmr
     - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
@@ -552,10 +551,10 @@ bietlejuice.enrich_webhelp_reports:
     - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
     - bietlejuice.reverse_webhelp:load-reverse-speech-call
     - bietlejuice.reverse_webhelp:load-reverse-speech-chat
-    - bietlejuice.reverse_webhelp:load-reverse-taxonomia-call
-    - bietlejuice.reverse_webhelp:load-reverse-taxonomia-chat
-    - bietlejuice.reverse_webhelp:load-reverse-taxonomia-email
+    - bietlejuice.reverse_webhelp:load-reverse-taxonomy
     - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
+    - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
+    - bietlejuice.reverse_webhelp:load-reverse-recontact
 bietlejuice.enrich_revenue_lines:
   add:
     - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
@@ -780,7 +779,6 @@ bietlejuice.reverse_atento_access:
     - bietlejuice.reverse_atento:load-reverse-speech-call
     - bietlejuice.reverse_atento:load-reverse-speech-chat
     - bietlejuice.reverse_atento:load-reverse-taxonomy
-    - bietlejuice.reverse_atento:load-reverse-tickets-transferred-total
     - bietlejuice.reverse_atento:load-reverse-tickets-transferred
     - bietlejuice.reverse_atento:load-reverse-tmr
     - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
@@ -845,13 +843,15 @@ bietlejuice.reverse_webhelp_access:
     - bietlejuice.reverse_webhelp:load-reverse-demand-metric
     - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
     - bietlejuice.reverse_webhelp:load-reverse-general-metric
+    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks
+    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla
     - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
     - bietlejuice.reverse_webhelp:load-reverse-speech-call
     - bietlejuice.reverse_webhelp:load-reverse-speech-chat
-    - bietlejuice.reverse_webhelp:load-reverse-taxonomia-call
-    - bietlejuice.reverse_webhelp:load-reverse-taxonomia-chat
-    - bietlejuice.reverse_webhelp:load-reverse-taxonomia-email
+    - bietlejuice.reverse_webhelp:load-reverse-taxonomy
     - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
+    - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
+    - bietlejuice.reverse_webhelp:load-reverse-recontact
 bietlejuice.enrich_wordpress_baroes:
   remove:
     - bietlejuice.wordpress_baroes:load-clean-meulugar-data

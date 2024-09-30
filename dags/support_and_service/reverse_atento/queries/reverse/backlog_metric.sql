@@ -44,7 +44,7 @@ LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON bmt.sk_agent = da.sk_agent
 WHERE
-  DATE(bmt.dt_metric_reference) >= '2022-07-19'
+  DATE(bmt.dt_metric_reference) >= CURRENT_DATE - INTERVAL '1' YEAR
 AND
   dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'
