@@ -7,7 +7,7 @@ dag:
       Retrieve data from Oracle HR System API, a sub product of Oracle Human Capital Resources (Oracle HCM).
       HCM is a cloud-based software application suite for human resources, talent management, and customer experience.
 cluster:
-  type: databricks_13_3_med_people_cluster
+  type: databricks_13_3_med_memory_people_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
