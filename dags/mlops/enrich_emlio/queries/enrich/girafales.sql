@@ -1,8 +1,8 @@
-SELECT 
-    service_version, 
-    id_service, 
-    year, 
-    month, 
+SELECT
+    service_version,
+    id_service,
+    year,
+    month,
     day,
     s_inputs.street,
     s_inputs.latitude,
@@ -122,9 +122,24 @@ SELECT
     s_inputs.h3_resolution_12__listing_sale_price_m2__q3_over_730_days_rolling_windows,
     s_inputs.h3_resolution_12__listing_sale_price_m2__max_over_730_days_rolling_windows,
     s_inputs.h3_resolution_12__listing_sale_price_m2__min_over_730_days_rolling_windows,
-    s_inputs.h3_resolution_12__listing__count_over_730_days_rolling_windows
+    s_inputs.h3_resolution_12__listing__count_over_730_days_rolling_windows,
+    s_keys.house_id,
+    s_keys.prediction_id,
+    s_keys.x_original_requester,
+    s_keys.x_request_via,
+    s_keys.request_method,
+    s_outputs.result.quantile_10,
+    s_outputs.result.quantile_20,
+    s_outputs.result.quantile_30,
+    s_outputs.result.quantile_40,
+    s_outputs.result.quantile_50,
+    s_outputs.result.quantile_60,
+    s_outputs.result.quantile_70,
+    s_outputs.result.quantile_80,
+    s_outputs.result.quantile_90,
+    s_outputs.result.certainty
 FROM (
-    SELECT 
+    SELECT
         from_json(inputs, "Struct<
                                 street: STRING,
                                 latitude: DOUBLE,
@@ -245,17 +260,32 @@ FROM (
                                 h3_resolution_12__listing_sale_price_m2__max_over_730_days_rolling_windows: DOUBLE,
                                 h3_resolution_12__listing_sale_price_m2__min_over_730_days_rolling_windows: DOUBLE,
                                 h3_resolution_12__listing__count_over_730_days_rolling_windows: INTEGER
-        >") as s_inputs, 
-        service_version, 
-        id_service, 
-        year, 
-        month, 
+        >") as s_inputs,
+        FROM_JSON(outputs, "Struct<result: Struct<quantile_10: DOUBLE,
+                                                  quantile_20: DOUBLE,
+                                                  quantile_30: DOUBLE,
+                                                  quantile_40: DOUBLE,
+                                                  quantile_50: DOUBLE,
+                                                  quantile_60: DOUBLE,
+                                                  quantile_70: DOUBLE,
+                                                  quantile_80: DOUBLE,
+                                                  quantile_90: DOUBLE,
+                                                  certainty: STRING>>") as s_outputs,
+        FROM_JSON(service_keys, "Struct<house_id: STRING,
+                                        prediction_id: STRING,
+                                        x_original_requester: STRING,
+                                        x_request_via: STRING,
+                                        request_method: STRING>") as s_keys,
+        service_version,
+        id_service,
+        year,
+        month,
         day
-    FROM 
-        datalake_emlio_clean.emlio_logs 
-    WHERE 
-        year = {year} 
-        AND month = {month} 
+    FROM
+        datalake_emlio_clean.emlio_logs
+    WHERE
+        year = {year}
+        AND month = {month}
         AND day = {day}
-        AND id_service = 'girafales' 
+        AND id_service = 'girafales'
 )
