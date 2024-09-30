@@ -94,6 +94,8 @@ columns:
   ts_execution:
     description: Date information in timestamp format that indicates when the cluster execution occurred.
     lineage:
+      - dw_analytical_costs.fact_bietlejuce_costs.ts_bietlejuice_first_execution
+      - dw_analytical_costs.fact_job_costs.ts_job_first_execution
       - dw_analytical_costs.fact_execution_costs.ts_execution
   year:
     description: Year when the data was loaded.

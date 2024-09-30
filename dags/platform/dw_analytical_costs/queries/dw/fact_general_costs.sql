@@ -15,7 +15,7 @@ SELECT
     is_dag_builder_migrated,
     ts_bietlejuice_first_execution AS ts_first_execution,
     ts_bietlejuice_last_execution AS ts_last_execution,
-    NULL AS ts_execution,
+    ts_bietlejuice_first_execution AS ts_execution,
     year,
     month,
     day
@@ -63,7 +63,7 @@ SELECT
     NULL AS is_dag_builder_migrated,
     ts_job_first_execution AS ts_first_execution,
     ts_job_last_execution AS ts_last_execution,
-    NULL AS ts_execution,
+    ts_job_first_execution AS ts_execution,
     year,
     month,
     day
