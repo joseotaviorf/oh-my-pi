@@ -35,6 +35,6 @@ workflow:
       extra_spark_job_arguments: 
         - facebook_ads_insights_by_region # table_name
 cluster:
-  type: databricks_13_3_min_io-general_cluster
+  type: databricks_13_3_med_general_2_workers_cluster
   custom_libraries:
     - whl: "{artifacts_bucket}/facebook-api-client-python/quintoandar_facebook_api_client-0.1.2-py2.py3-none-any.whl"
