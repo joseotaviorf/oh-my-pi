@@ -1,0 +1,79 @@
+---
+database_name: dw_charging_payment_quintocred
+table_name: fact_delinquecy
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_propose:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.id_propose
+  id:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.id
+  origin_table:
+    description: ''
+  id_array_delinquency:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.id
+  status:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.id_status
+  ordem_status:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.id_status
+  gateway:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.id_type
+  billing_type:
+    description: ''
+  delinquency_monthly_value:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.original_value
+  delinquency_amount_paid_monthly:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.amount_paid
+  open_amount_delinquency:
+    description: ''
+  discount_value_delinquency:
+    description: ''
+  total_quantity_delinquency:
+    description: ''
+  total_amount_delinquency:
+    description: ''
+  total_paid_delinquency:
+    description: ''
+  total_discount_value_delinquency:
+    description: ''
+  total_open_amount_delinquency:
+    description: ''
+  month_due_original:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.dt_due
+  month_delinquency_due:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.dt_due
+  is_delinquency_active:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.is_active
+  is_overdue:
+    description: ''
+  dt_created:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.ts_created
+  dt_paid:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency.dt_paid

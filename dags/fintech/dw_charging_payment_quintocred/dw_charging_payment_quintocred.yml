@@ -1,0 +1,19 @@
+dag:
+  name: dw_charging_payment_quintocred
+  schedule_start_date: 2024,10,01
+  owner: Data Fintech
+workflow:
+  type: query
+  layer: dw
+  custom_schema: charging_payment_quintocred
+  has_load_to_redshift_task: false
+  inner_dependencies:
+    fact_payment_delinquency:
+      - fact_direct_billing
+      - fact_charging_payment
+      - fact_delinquecy
+cluster:
+  type: databricks_12_2_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

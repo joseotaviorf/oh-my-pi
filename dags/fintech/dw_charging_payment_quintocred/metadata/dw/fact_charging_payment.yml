@@ -1,0 +1,61 @@
+---
+database_name: dw_charging_payment_quintocred
+table_name: fact_charging_payment
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.sk_payment
+  id_propose:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.sk_propose
+  origin_table:
+    description: ''
+  status:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.sk_status
+  order_status:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.sk_status
+  gateway:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.sk_payment_gateway
+  billing_type:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.sk_billing_type
+  category:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.sk_payment_category
+  value:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.due_amount
+  value_paid:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.value
+  is_overdue:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.dt_due
+  dt_paid:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.dt_paid
+  dt_created:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.dt_created
+  dt_due:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_payment.dt_due

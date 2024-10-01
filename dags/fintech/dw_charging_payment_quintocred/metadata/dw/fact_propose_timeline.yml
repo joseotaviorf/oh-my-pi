@@ -1,0 +1,61 @@
+---
+database_name: dw_charging_payment_quintocred
+table_name: fact_propose_timeline
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  sk_propose:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_propose.sk_propose
+  month_start:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_propose.dt_contract_started
+  months_life_contract:
+    description: ''
+  month_chargeble:
+    description: ''
+  monthly_guarantee_renewal:
+    description: ''
+  monthly_guarantee_propose_aud:
+    description: ''
+  monthly_value_propose:
+    description: ''
+  first_monthly_value_mod:
+    description: ''
+  first_annual_value_mod:
+    description: ''
+  annual_value_propose:
+    description: ''
+  total_package_amount:
+    description: ''
+    lineage:
+    - dw_velo.dim_velo_propose_values.total_package_amount
+  status_at_ref:
+    description: ''
+  mob_of_life:
+    description: ''
+  mob_of_death:
+    description: ''
+  annual_guarantee_renewal:
+    description: ''
+  annual_guarantee_propose_aud:
+    description: ''
+  is_direct_billing:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_propose.is_direct_billing
+  dt_contract_started:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_propose.dt_contract_started
+  dt_ended:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_propose.dt_contract_started.dt_ended
+  dt_cancellation_limit:
+    description: ''
+    lineage:
+    - dw_velo.fact_velo_propose.dt_contract_started

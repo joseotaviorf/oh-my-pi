@@ -1,0 +1,53 @@
+---
+database_name: dw_charging_payment_quintocred
+table_name: fact_direct_billing
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_propose:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.entry.propose
+  id:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.billing_report.id_boleto
+  origin_table:
+    description: ''
+  value:
+    description: ''
+    lineage:
+    - datalake_accounting_funnel.ledger.credit
+  value_paid:
+    description: ''
+    lineage:
+    - datalake_accounting_funnel.ledger.credit
+  status:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.bill.status
+  order_status:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.bill.status
+  gateway:
+    description: ''
+  billing_type:
+    description: ''
+  category:
+    description: ''
+  is_overdue:
+    description: ''
+    lineage:
+    - .cobranca_billing.DATE(dt_due) < CURRENT_DATE
+  dt_paid:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.bill.dt_due
+  dt_created:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.bill.ts_created
+  dt_due:
+    description: ''

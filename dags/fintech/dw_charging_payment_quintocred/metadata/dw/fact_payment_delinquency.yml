@@ -1,0 +1,83 @@
+---
+database_name: dw_charging_payment_quintocred
+table_name: fact_payment_delinquency
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  sk_propose_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_charging_payment.id_propose
+  sk_transaction:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_direct_billing.id
+  sk_propose_charge:
+    description: ''
+    lineage:
+    - .base_payment.COALESCE(p.id_propose, d.id_propose)
+  sk_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_delinquency.id
+  id_array_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_delinquency.id_array_delinquency
+  sk_propose_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_delinquency.id_propose
+  origin_table:
+    description: ''
+  status_payment:
+    description: ''
+  gateway_payment:
+    description: ''
+  billing_type_payment:
+    description: ''
+  status_delinquency:
+    description: ''
+  gateway_delinquency:
+    description: ''
+  total_amount_delinquency:
+    description: ''
+  delinquency_monthly_value:
+    description: ''
+  delinquency_amount_paid_monthly:
+    description: ''
+  total_paid_delinquency:
+    description: ''
+  open_amount_delinquency:
+    description: ''
+  total_open_amount_delinquency:
+    description: ''
+  discount_value_delinquency:
+    description: ''
+  total_discount_value_delinquency:
+    description: ''
+  value:
+    description: ''
+  value_paid:
+    description: ''
+  is_delinquency_charge_related:
+    description: ''
+  is_delinquency_active:
+    description: ''
+  is_overdue:
+    description: ''
+  month_charge:
+    description: ''
+  month_due_original:
+    description: ''
+  month_delinquency_due:
+    description: ''
+  dt_paid_delinquency:
+    description: ''
+  dt_created_payment:
+    description: ''
+  dt_due_payment:
+    description: ''
+  dt_paid_payment:
+    description: ''

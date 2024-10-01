@@ -114,6 +114,25 @@ bietlejuice.dw_call:
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
   - bietlejuice.enrich_bigfone_twilio:load-enrich-inbound-call-locations
+bietlejuice.dw_charging_payment_quintocred:
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-omie-client
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
+  - bietlejuice.dw_velo:load-dw-velo-fact-velo-payment
+  - bietlejuice.dw_velo:load-dw-velo-fact-velo-payment-legacy
+  - bietlejuice.dw_velo:load-dw-velo-fact-velo-propose
+  - bietlejuice.dw_velo:load-dw-velo-fact-velo-transaction-entries
+  - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
+  - bietlejuice.rental_guarantee_platform:load-clean-bill
+  - bietlejuice.rental_guarantee_platform:load-clean-billing-report
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency
+  - bietlejuice.rental_guarantee_platform:load-clean-entry
+  - bietlejuice.rental_guarantee_platform:load-clean-payment
+  - bietlejuice.rental_guarantee_platform:load-clean-propose
+  - bietlejuice.rental_guarantee_platform:load-clean-propose-aud
+  - bietlejuice.rental_guarantee_platform:load-clean-renewal
+  - bietlejuice.rental_guarantee_platform:load-clean-rev-info
+  - bietlejuice.velo_asaas:load-clean-payments
 bietlejuice.dw_chattermill:
   - bietlejuice.enrich_chattermill:load-enrich-responses
 bietlejuice.dw_collection_recovery:
