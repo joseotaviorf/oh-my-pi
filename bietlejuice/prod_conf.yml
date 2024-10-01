@@ -172,30 +172,24 @@ default_access_control_list:
     - group_name: analytics-engineers
       permission_level: CAN_MANAGE
 
+##### Cluster Pools #####
+
+pool_m5a_xlarge_on_demand: &pool_m5a_xlarge_on_demand 0909-205705-pelts9-pool-0fnxc9hu
+pool_m5a_xlarge_spot: &pool_m5a_xlarge_spot 0909-210021-must9-pool-419cr6z6
+
 ##### Clusters Configs #####
 cluster_template:
-    cluster: &cluster_anchor
-        enable_elastic_disk: "true"
+    # "cluster_anchor_base" is the one to use for clusters with instance pools
+    cluster_base: &cluster_anchor_base
         autotermination_minutes: 20
-        aws_attributes: &aws_anchor
-            availability: SPOT_WITH_FALLBACK
-            ebs_volume_count: 1
-            first_on_demand: 1
-            ebs_volume_size: 100
-            ebs_volume_type: GENERAL_PURPOSE_SSD
+        aws_attributes:
             instance_profile_arn: "{{ var.value.instance_profile_arn }}"
-            spot_bid_price_percent: 100
-            zone_id: us-east-1d
         cluster_log_conf:
             s3:
                 destination: s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id}}
                 region: us-east-1
         cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
         custom_tags:
-            - key: application
-              value: "{{ dag.dag_id }}"
-            - key: app
-              value: airflow
             - key: resource-name
               value: databricks
             - key: environment
@@ -246,9 +240,44 @@ cluster_template:
             ENVIRONMENT: "{{ var.value.environment }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
         ssh_public_keys: []
+        spark_version: 10.4.x-scala2.12
+
+    # "cluster_anchor" is the one to use for clusters without instance pools
+    cluster_template_no_pool: &cluster_anchor
+        <<: *cluster_anchor_base
+        enable_elastic_disk: "true"
+        aws_attributes: &aws_anchor
+            availability: SPOT_WITH_FALLBACK
+            ebs_volume_count: 1
+            first_on_demand: 1
+            ebs_volume_size: 100
+            ebs_volume_type: GENERAL_PURPOSE_SSD
+            instance_profile_arn: "{{ var.value.instance_profile_arn }}"
+            spot_bid_price_percent: 100
+            zone_id: us-east-1d
+        custom_tags:
+            - key: application
+              value: "{{ dag.dag_id }}"
+            - key: app
+              value: airflow
+            - key: resource-name
+              value: databricks
+            - key: environment
+              value: "{{ var.value.environment }}"
+            - key: owner
+              value: "{{ task.owner.lower().replace(' ', '-') }}"
+            - key: ecosystem
+              value: data-engineering
+            - key: data-classification
+              value: private
+            - key: sensitive-data
+              value: true
+            - key: cost-center
+              value: c052
+            - key: provisioner
+              value: bietlejuice
         node_type_id: m5a.large
         driver_node_type_id: m5a.large
-        spark_version: 10.4.x-scala2.12
 
 custom_cluster:
     <<: *cluster_anchor
@@ -282,14 +311,11 @@ databricks_13_3_min_general_2_workers_cluster:
     spark_version: 13.3.x-scala2.12
 
 databricks_10_4_med_general_cluster:
-    <<: *cluster_anchor
-    driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.xlarge
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_m5a_xlarge_on_demand
+    instance_pool_id: *pool_m5a_xlarge_spot
     num_workers: 3
     spark_version: 10.4.x-scala2.12
-    aws_attributes:
-        <<: *aws_anchor
-        ebs_volume_size: 200
 
 databricks_12_2_med_general_cluster:
     <<: *cluster_anchor
