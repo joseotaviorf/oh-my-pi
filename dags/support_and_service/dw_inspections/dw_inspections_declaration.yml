@@ -13,12 +13,14 @@ workflow:
   default_extraction_type: incremental
   default_partitions: [year, month]
   tables_customization:
-    dim_appointment:
+    dim_appointment_component:
       extraction_type: full
+      partitions: []
     dim_inspection:
       extraction_type: full
     dim_inspector:
       extraction_type: full
+      partitions: []
     fact_inspection:
       extraction_type: full
     fact_repair_request:

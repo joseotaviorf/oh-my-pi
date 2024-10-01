@@ -34,7 +34,10 @@ SELECT
     i.ts_termination_canceled,
     i.ts_created,
     i.ts_updated,
-    NOW() AS ts_load
+    NOW() AS ts_load,
+    YEAR(i.ts_updated) AS year,
+    MONTH(i.ts_updated) AS month,
+    DAY(i.ts_updated) AS day
 FROM
     datalake_inspections.inspection_booking i
 LEFT JOIN

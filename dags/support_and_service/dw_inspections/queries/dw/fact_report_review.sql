@@ -17,8 +17,8 @@ SELECT
     COUNT(DISTINCT rr.id_repair_request) FILTER(WHERE r.reviewer_type = 'OWNER') AS total_repair_request_by_owner,
     COUNT(DISTINCT c.id_repair_request) AS total_repair_contested,
     COUNT(DISTINCT re.id_repair_request) FILTER(WHERE re.is_exempted IS TRUE) AS total_repair_exempted,
-    COALESCE(ra.has_owners_approval, FALSE) AS has_owners_approval, 
-    COALESCE(ra.has_tenants_approval, FALSE) AS has_tenants_approval, 
+    COALESCE(ra.has_owners_approval, FALSE) AS has_owners_approval,
+    COALESCE(ra.has_tenants_approval, FALSE) AS has_tenants_approval,
     COALESCE(ra.has_analysts_approval, FALSE) AS has_analysts_approval,
     ira.has_owner_access_review,
     ira.has_tenant_access_review,
@@ -37,7 +37,10 @@ SELECT
     ira.ts_last_tenant_access_review,
     ra.ts_first_approval,
     ra.ts_last_approval,
-    NOW() AS ts_load
+    NOW() AS ts_load,
+    r.year,
+    r.month,
+    r.day
 FROM
     datalake_inspections.reviewer AS r
 LEFT JOIN
@@ -58,4 +61,5 @@ LEFT JOIN
 LEFT JOIN
     datalake_inspections.inspection_status_change AS is_status
         ON is_status.id_inspection = r.id_inspection
-GROUP BY 1, 2, 3, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28
+GROUP BY
+    1, 2, 3, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32

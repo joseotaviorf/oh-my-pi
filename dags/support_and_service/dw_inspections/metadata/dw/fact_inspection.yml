@@ -104,7 +104,7 @@ columns:
     is_executed_in_first_schedule:
         description: Indicates whether the inspection took place in the first scheduled time.
         lineage:
-            - datalake_inspections.inspection_booking.is_executed_in_first_schedule    
+            - datalake_inspections.inspection_booking.is_executed_in_first_schedule
     dt_contract_entrance:
         description: Date defined in the contract of when the tenant will enter in the property.
         lineage:
@@ -163,3 +163,15 @@ columns:
             - datalake_inspections.inspection_booking.ts_updated
     ts_load:
         description: Date and time when the data was loaded.
+    year:
+        description: Year referring to date of update.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_updated
+    month:
+        description: Month referring to date of update.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_updated
+    day:
+        description: Day referring to date of update.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_updated

@@ -92,3 +92,15 @@ columns:
       - datalake_inspections.inspection_booking.ts_updated
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_inspection.
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_inspections.inspection_booking.ts_updated
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_inspections.inspection_booking.ts_updated
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_inspections.inspection_booking.ts_updated
