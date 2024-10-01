@@ -7,169 +7,264 @@ columns:
   id_ticket:
     lineage:
       - datalake_zendesk.tickets_current.id_ticket
-    description: Ticket ID from Zendesk
+    description: Unique identifier for each ticket.
   id_problem_ticket:
-    description: Problem ticket linked with the current ticket, if exists. If this is filled, then the ticket is of 'incident' type
     lineage:
       - datalake_zendesk.tickets_current.id_problem_ticket
+    description: Identifier for the problem associated with the ticket.
+  id_user_main:
+    lineage:
+      - datalake_zendesk.tickets_current.id_user_main
+    description: Identifier for the main user associated with the ticket.
   id_contract:
-    description: Contract ID associated with the ticket
     lineage:
       - datalake_zendesk.tickets_current.id_contract
+    description: Contract identifier related to the ticket.
+  id_call:
+    lineage:
+      - datalake_zendesk.tickets_current.id_call
+    description: Call identifier associated with the ticket.
   id_session:
-    description: Session ID from Sauron
     lineage:
       - datalake_zendesk.tickets_current.id_session
+    description: Session identifier related to the ticket.
   id_twilio:
-    description: Twilio ID, either an id_task or id_call
     lineage:
+      - datalake_customer_support_test.chats.id_task
       - datalake_customer_support_test.calls.id_task
       - datalake_customer_support_test.calls.id_call
-      - datalake_customer_support_test.chats.id_task
+    description: Identifier from Twilio tasks or calls associated with the ticket.
+  first_queue:
+    lineage:
+      - datalake_customer_support_test.chats.queue_name
+      - datalake_customer_support_test.calls.queue_name
+      - datalake_zendesk.tickets_current.group_name
+    description: The first queue the ticket was assigned to.
+  last_queue:
+    lineage:
+      - datalake_customer_support_test.chats.queue_name
+      - datalake_customer_support_test.calls.queue_name
+      - datalake_zendesk.tickets_current.group_name
+    description: The most recent queue the ticket was assigned to.
   first_analyst_email:
     lineage:
       - datalake_zendesk.tickets_current.analyst_email
-    description: First agent email that answered the first reservation.
+    description: Email of the first analyst who handled the ticket.
   last_analyst_email:
     lineage:
       - datalake_zendesk.tickets_current.analyst_email
-    description: Last agent email that answered the last reservation.
+    description: Email of the most recent analyst who handled the ticket.
   front_or_back:
     lineage:
       - datalake_gsheets_clean.department_control.front_or_back
-    description: If the ticket is a front or back ticket
-  area:
+    description: Indicates if the ticket is related to front-end or back-end operations.
+  journey_step:
     lineage:
-      - datalake_gsheets_clean.department_control.area
-    description: Area of the queue of the ticket
+      - datalake_gsheets_clean.department_control.journey_step
+    description: The step in the customer journey related to the ticket.
   team:
     lineage:
       - datalake_gsheets_clean.department_control.team
-    description: Team of the queue of the ticket
+    description: The team responsible for handling the ticket.
+  area:
+    lineage:
+      - datalake_gsheets_clean.department_control.area
+    description: The area within the organization handling the ticket.
+  status:
+    lineage:
+      - datalake_zendesk.tickets_current.status
+    description: Current status of the ticket.
+  channel:
+    lineage:
+      - datalake_zendesk.tickets_current.channel
+    description: Communication channel through which the ticket was created.
   direction:
     lineage:
       - datalake_customer_support_test.calls.direction
+      - datalake_customer_support_test.calls.channel_type
       - datalake_zendesk.tickets_current.tags
-    description: Describes if the ticket is related to a contact started by the customer of by 5A
-    categories:
-      INBOUND: Customer contacted 5A
-      OUTBOUND: 5A contacted the customer
+    description: Direction of the communication, either inbound or outbound.
   ticket_origin:
     lineage:
       - datalake_customer_support_test.calls.origin
       - datalake_customer_support_test.chats.source
-    description: Where the ticket comes from, as in which channel
-    categories:
-      CHAT INAPP: Chat via app
-      CALL IN APP: Call via app
-      WHATSAPP: Whatsapp
-      CALL INBOUND: Direct call
-      CALL OUTBOUND: 5A called the customer
+    description: Origin of the ticket, indicating the source of the communication.
+  tags:
+    lineage:
+      - datalake_zendesk.tickets_current.tags
+    description: Tags associated with the ticket for categorization.
   type:
     lineage:
       - datalake_zendesk.tickets_current.type
-    description: Type of the ticket
-    categories:
-      incident: default ticket type
-      problem: a problem ticket references one or many incident tickets
+    description: Type of the ticket, such as problem or request.
+  description:
+    lineage:
+      - datalake_zendesk.tickets_current.description
+    description: Detailed description of the ticket issue.
+  request_type:
+    lineage:
+      - datalake_zendesk.tickets_current.request_type
+    description: Type of request made in the ticket.
   client_type:
-    description: Type of client, from custom_fields like 'Tipo de Cliente'
     lineage:
       - datalake_zendesk.tickets_current.client_type
+    description: Type of client associated with the ticket.
   step_tag:
-    description: Journey step of the client, from custom_fields
     lineage:
       - datalake_zendesk.tickets_current.step_tag
+    description: Tag indicating the step in the process related to the ticket.
   customer_type_tag:
-    description: Tag attached to the customer that requested the ticket, also from specific custom_fields
     lineage:
       - datalake_zendesk.tickets_current.customer_type_tag
+    description: Tag indicating the type of customer related to the ticket.
   contact_theme_tag:
-    description: Specific custom_fields associated with ticket taxonomy
     lineage:
       - datalake_zendesk.tickets_current.contact_theme_tag
+    description: Theme tag related to the contact in the ticket.
   contact_motivation_tag:
-    description: Tag attached to the reason the customer opened a ticket, also from specific custom_fields
     lineage:
       - datalake_zendesk.tickets_current.contact_motivation_tag
+    description: Motivation tag related to the contact in the ticket.
   contact_theme_detail_tag:
-    description: Specific custom_fields associated with ticket taxonomy
     lineage:
       - datalake_zendesk.tickets_current.contact_theme_detail_tag
+    description: Detailed theme tag related to the contact in the ticket.
+  custom_fields:
+    lineage:
+      - datalake_zendesk.tickets_current.custom_fields
+    description: Custom fields in JSON format associated with the ticket.
+  reopens:
+    lineage:
+      - datalake_zendesk.tickets_current.reopens
+    description: Number of times the ticket has been reopened.
+  replies:
+    lineage:
+      - datalake_zendesk.tickets_current.replies
+    description: Number of replies to the ticket.
+  back_ticket_list:
+    description: List of back office tickets associated with the front ticket.
+  total_backoffice_minutes_time:
+    description: Total time spent in back office operations for the ticket.
   sla_target:
     lineage:
-      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
       - datalake_gsheets_clean.tag_sla_target.sla
-    description:
-      Each task has an SLA target. For CRM tasks, the default SLA target is 5 days.
-      For Zendesk email tickets, it first considers the "tag sla target". If there is
-      no return, it then considers the "unique_theme_detail_sla_target", followed by
-      the "unique_theme_sla_target", and finally the "unique_journey_sla_target".
-  time_spent_solved_in_time:
-    description:
-      The total days worked on a task is calculated as the difference between the
-      task's start and end dates, not considering days off. If the total days worked
-      are less than or equal to the task's SLA target, the total days worked are
-      returned. Otherwise, the function returns 0.
-  time_spent_not_solved_in_time:
-    description:
-      The total days worked on a task is calculated as the difference between the
-      task's start and end dates, not considering days off. If the total days worked
-      are greater than the task's SLA target, the total days worked are returned.
-      Otherwise, the function returns 0.
+      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
+    description: Service Level Agreement target time for resolving the ticket.
   days_worked:
-    description: The difference between the task's start and end dates, not considering days off.
-  days_off:
-    description:
-      Total days off between the task's start and end dates, considering holidays
-      and weekend.
-  total_time_spent:
-    description:
-      The total worked days spent on the task, it assumes the same value as
-      days_worked field.
-  is_ticket_solved_in_time:
-    description:
-      If the total days worked are  less than or equal to the task's SLA target, it is
-      equal to TRUE, otherwise, it is FALSE.
-  is_ticket_not_solved_in_time:
-    description:
-      If the total days_worked are greater than the task's SLA target, it is equal to
-      TRUE, otherwise, it is FALSE.
-  is_received_demand:
-    description: If the task ts_started is not null, then it is TRUE, otherwise, it is FALSE.
-  is_solved_demand:
-    description: If the task ts_completed is not null, then it is TRUE, otherwise, it is FALSE.
-  is_closed_demand:
-    description: If the task ts_closed is not null, then it is TRUE, otherwise, it is FALSE.
-  is_ticket_rate:
-    description:
-      "Boolean flag indicating if the ticket is part of the ticket rate calculation.
-      In order to be part of, the ticket must follow several rules:
-      - The ticket area must be CX;
-      - The ticket team could be anyone but Ong Back;
-      - The ticket must be front or back, depending on the channel;
-      - The ticket must not belong to a few departments (Rescisão por Inadimplência [OFF][POS][BACK], Offboarding Reparos [OFF] [POS] [BACK],
-      Offboarding pré saída [OFF] [POS] [BACK], Proteção QuintoAndar [OFF] [POS] [BACK], Rescisão - Despejo [OFF][POS][BACK]
-      or Rescisão 1 [OFF] [POS] [BACK]);
-      - The date in which the ticket was solved must be later than 1st January/2022.
-      - If the ticket has channel email, then we accept all directions;
-      - If the ticket has channel chat, then we accept only direction inbound;
-      - If the ticket has channel call, we accept only directions inbound and outbound-api."
-  ts_sla_started:
-    description: Date in timestamp format that indicates when the SLA starts
     lineage:
-      - datalake_zendesk.tickets_current.ts_updated
+      - datalake_zendesk.tickets_current.ts_solved
+      - datalake_zendesk.tickets_current.ts_sla_started
+      - datalake_quintoandar.aux_date.dt_non_working
+      - datalake_gsheets_clean.service_city_holidays.dt_holiday
+    description: Number of business days worked on the ticket.
+  days_off:
+    lineage:
+      - datalake_quintoandar.aux_date.dt_non_working
+      - datalake_gsheets_clean.service_city_holidays.dt_holiday
+    description: Number of non-working days during the SLA period.
+  time_spent_solved_in_time:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_solved
+      - datalake_zendesk.tickets_current.ts_sla_started
+      - datalake_gsheets_clean.tag_sla_target.sla
+      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
+      - datalake_quintoandar.aux_date.dt_non_working
+      - datalake_gsheets_clean.service_city_holidays.dt_holiday
+    description: Time spent solving the ticket within the SLA target.
+  time_spent_not_solved_in_time:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_solved
+      - datalake_zendesk.tickets_current.ts_sla_started
+      - datalake_gsheets_clean.tag_sla_target.sla
+      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
+      - datalake_quintoandar.aux_date.dt_non_working
+      - datalake_gsheets_clean.service_city_holidays.dt_holiday
+    description: Time spent solving the ticket outside the SLA target.
+  is_ticket_solved_in_time:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_solved
+      - datalake_zendesk.tickets_current.ts_sla_started
+      - datalake_gsheets_clean.tag_sla_target.sla
+      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
+      - datalake_quintoandar.aux_date.dt_non_working
+      - datalake_gsheets_clean.service_city_holidays.dt_holiday
+    description: Indicates if the ticket was solved within the SLA target.
+  is_ticket_not_solved_in_time:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_solved
+      - datalake_zendesk.tickets_current.ts_sla_started
+      - datalake_gsheets_clean.tag_sla_target.sla
+      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
+      - datalake_quintoandar.aux_date.dt_non_working
+      - datalake_gsheets_clean.service_city_holidays.dt_holiday
+    description: Indicates if the ticket was not solved within the SLA target.
+  context:
+    lineage:
+      - datalake_gsheets_clean.ticket_rate_classification.sub_journey
+    description: Context category based on the sub-journey of the ticket.
+  ticket_rate_weight:
+    description: Weight assigned to the ticket rate based on various conditions.
+  has_open_back_ticket:
+    description: Indicates if there are any open back office tickets associated with the front ticket.
+  is_back_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.tags
+      - datalake_gsheets_clean.department_control.front_or_back
+    description: Indicates if the ticket is a back office ticket.
+  is_closed_by_merge:
+    lineage:
+      - datalake_zendesk.tickets_current.tags
+    description: Indicates if the ticket was closed by a merge operation.
+  is_call_answered:
+    lineage:
+      - datalake_customer_support_test.calls.is_call_answered
+    description: Indicates if the associated call was answered.
+  is_ticket_rate:
+    lineage:
+      - datalake_zendesk.tickets_current.channel
+      - datalake_zendesk.tickets_current.front_or_back
+      - datalake_zendesk.tickets_current.team
+      - datalake_zendesk.tickets_current.area
+      - datalake_zendesk.tickets_current.last_queue
+      - datalake_zendesk.tickets_current.ticket_origin
+      - datalake_zendesk.tickets_current.type
+      - datalake_zendesk.tickets_current.tags
+    description: Indicates if the ticket meets the rate criteria based on various conditions.
+  ts_budget:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_budget
+    description: Timestamp related to the budget allocation for the ticket.
+  ts_created:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created
+    description: Timestamp when the ticket was created.
+  ts_sla_started:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created
+      - datalake_gsheets_clean.tag_sla_target.sla
+      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
+    description: Timestamp when the SLA period started for the ticket.
   ts_solved:
     lineage:
       - datalake_zendesk.tickets_current.ts_solved
-    description: Timestamp of when the ticket was solved
+    description: Timestamp when the ticket was solved.
   ts_closed:
-    description: Date in timestamp format that indicates when the ticket was closed.
+    lineage:
+      - datalake_zendesk.tickets_current.ts_closed
+    description: Timestamp when the ticket was closed.
+  ts_updated:
     lineage:
       - datalake_zendesk.tickets_current.ts_updated
+    description: Timestamp when the ticket was last updated.
   year:
-    description: Partition column
+    lineage:
+      - datalake_zendesk.tickets_current.year
+    description: Year component of the ticket's creation date.
   month:
-    description: Partition column
+    lineage:
+      - datalake_zendesk.tickets_current.month
+    description: Month component of the ticket's creation date.
   day:
-    description: Partition column
+    lineage:
+      - datalake_zendesk.tickets_current.day
+    description: Day component of the ticket's creation date.

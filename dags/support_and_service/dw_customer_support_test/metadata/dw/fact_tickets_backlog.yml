@@ -1,0 +1,71 @@
+---
+database_name: dw_customer_support_test
+table_name: fact_tickets_backlog
+description:
+  This table contains all back-office tasks that are considered part of the backlog.
+  The table tracks the SLA compliance of each task day by day until it is solved.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_ticket:
+    lineage:
+      - datalake_customer_support_test.tickets.id_ticket
+  description: Surrogate key for the ticket, cast from id_ticket.
+  sk_taxonomy:
+    lineage:
+      - datalake_customer_support_test.tickets.step_tag
+      - datalake_customer_support_test.tickets.customer_type_tag
+      - datalake_customer_support_test.tickets.client_type
+      - datalake_customer_support_test.tickets.request_type
+      - datalake_customer_support_test.tickets.contact_motivation_tag
+      - datalake_customer_support_test.tickets.contact_theme_tag
+      - datalake_customer_support_test.tickets.contact_theme_detail_tag
+    description: MD5 hash combining various taxonomy tags for categorization.
+  sk_analyst:
+    lineage:
+      - datalake_customer_support_test.tickets.last_analyst_email
+    description: MD5 hash of the last analyst's email address.
+  sk_department:
+    lineage:
+      - datalake_customer_support_test.tickets.last_queue
+    description: MD5 hash of the last queue (department) associated with the ticket.
+  sla_target:
+    lineage:
+      - datalake_customer_support_test.tickets.sla_target
+    description: SLA target for resolving the ticket.
+  days_off:
+    lineage:
+      - datalake_customer_support_test.tickets.days_off
+    description: Number of days off related to the ticket processing.
+  days_elapsed_business:
+    lineage:
+      - datalake_customer_support_test.tickets.days_elapsed_business
+    description: Number of business days elapsed since the ticket was created.
+  days_elapsed_calendar:
+    lineage:
+      - datalake_customer_support_test.tickets.days_elapsed_calendar
+    description: Number of calendar days elapsed since the ticket was created.
+  is_backlog_within_sla:
+    lineage:
+      - datalake_customer_support_test.tickets.days_elapsed_business
+      - datalake_customer_support_test.tickets.sla_target
+    description: Flag indicating if the backlog is within the SLA target.
+  is_backlog_outside_sla:
+    lineage:
+      - datalake_customer_support_test.tickets.days_elapsed_business
+      - datalake_customer_support_test.tickets.sla_target
+    description: Flag indicating if the backlog is outside the SLA target.
+  dt_snapshot:
+    description: Date of the data snapshot, derived from the load_start_date parameter.
+  ts_created:
+    lineage:
+      - datalake_customer_support_test.tickets.ts_created
+    description: Timestamp when the ticket was created.
+  ts_sla_started:
+    lineage:
+      - datalake_customer_support_test.tickets.ts_sla_started
+    description: Timestamp when the SLA period started for the ticket.
+  ts_budget:
+    lineage:
+      - datalake_customer_support_test.tickets.ts_budget
+    description: Budget-related timestamp for the ticket.

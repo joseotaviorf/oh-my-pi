@@ -345,7 +345,7 @@ unique_theme_detail_sla_target AS (
     journey_step,
     contact_theme_detail_tag AS taxonomy_tag,
     sla_in_days,
-    EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
+    EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, "{load_end_date}"))) AS dt_reference
   FROM
     datalake_gsheets_clean.taxonomy_sla
   WHERE
@@ -357,7 +357,7 @@ unique_theme_sla_target AS (
       journey_step,
       contact_theme_tag AS taxonomy_tag,
       sla_in_days,
-      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
+      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, "{load_end_date}"))) AS dt_reference
     FROM
       datalake_gsheets_clean.taxonomy_sla
     WHERE
@@ -377,7 +377,7 @@ unique_journey_sla_target AS (
     SELECT
       journey_step,
       sla_in_days,
-      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE(NOW())))) AS dt_reference
+      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, "{load_end_date}"))) AS dt_reference
     FROM
       datalake_gsheets_clean.taxonomy_sla
     WHERE
@@ -394,7 +394,7 @@ unique_journey_sla_target AS (
 ticket_sla_target AS (
   SELECT /*+ RANGE_JOIN(t, 500) */
     t.id_ticket,
-    MIN(
+    MAX(
       CASE
         WHEN t.last_queue IN ('Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]') THEN 21
         ELSE COALESCE(tst.sla, tds.sla_in_days, ts.sla_in_days, ujst.sla_in_days)
@@ -404,7 +404,7 @@ ticket_sla_target AS (
       CASE
         WHEN t.ts_budget IS NOT NULL
           AND t.ts_budget >= ts_created - INTERVAL 3 HOUR
-          AND t.ts_budget < COALESCE(ts_solved, NOW()) THEN t.ts_budget
+          AND t.ts_budget < COALESCE(ts_solved, TIMESTAMP("{load_end_date}")) THEN t.ts_budget
         ELSE t.ts_created
       END
     ) AS ts_sla_started,
@@ -415,7 +415,7 @@ ticket_sla_target AS (
     datalake_gsheets_clean.tag_sla_target AS tst
       ON t.journey_step = tst.journey
       AND t.tags LIKE CONCAT('%', tst.tag, '%')
-      AND t.ts_created BETWEEN tst.dt_start AND COALESCE(tst.dt_end, NOW())
+      AND t.ts_created BETWEEN tst.dt_start AND COALESCE(tst.dt_end, TIMESTAMP("{load_end_date}"))
   LEFT JOIN
     unique_theme_detail_sla_target AS tds
       ON t.journey_step = tds.journey_step
@@ -445,7 +445,10 @@ ticket_date_interval AS (
   SELECT
     id_ticket,
     MAX(sla_target) OVER(PARTITION BY id_ticket) AS sla_target,
-    SEQUENCE(DATE(ts_sla_started), COALESCE(DATE(ts_solved), CURRENT_DATE())) AS dt_interval,
+    SEQUENCE(
+      DATE(ts_sla_started),
+      COALESCE(DATE(ts_solved), "{load_end_date}")
+    ) AS dt_interval,
     ts_sla_started,
     ts_solved
   FROM
@@ -455,21 +458,40 @@ ticket_days_off AS (
   SELECT
     id_ticket,
     sla_target,
-    ARRAY_SIZE(ARRAY_INTERSECT(dt_interval, (SELECT ARRAY_AGG(dt_non_working) FROM weekends_and_holidays))) AS days_off,
+    ARRAY_SIZE(
+      ARRAY_INTERSECT(dt_interval, (SELECT ARRAY_AGG(dt_non_working) FROM weekends_and_holidays))
+    ) AS days_off,
     ts_sla_started,
     ts_solved
   FROM
     ticket_date_interval
 ),
-ticket_days_worked AS (
+ticket_days_elapsed AS (
+  SELECT
+    id_ticket,
+    sla_target,
+    COALESCE(days_off, 0) AS days_off,
+    COALESCE(
+      DATEDIFF(COALESCE(ts_solved, "{load_end_date}"), DATE(ts_sla_started)),
+      0
+    ) AS days_elapsed_calendar,
+    ts_sla_started
+  FROM
+    ticket_days_off
+),
+ticket_sla_metrics AS (
   SELECT
     id_ticket,
     sla_target,
     days_off,
-    DATEDIFF(DATE(ts_solved), DATE(ts_sla_started)) - COALESCE(days_off, 0) AS days_worked,
+    days_elapsed_calendar,
+    CASE
+      WHEN days_elapsed_calendar - days_off < 0 THEN 0
+      ELSE days_elapsed_calendar - days_off
+    END AS days_elapsed_business,
     ts_sla_started
   FROM
-    ticket_days_off
+    ticket_days_elapsed
 ),
 ticket_metrics AS (
   SELECT DISTINCT
@@ -490,7 +512,7 @@ ticket_metrics AS (
     t.team,
     t.area,
     t.status,
-    UPPER(t.channel) AS channel,
+    t.channel AS channel,
     t.direction,
     t.ticket_origin,
     t.tags,
@@ -508,26 +530,18 @@ ticket_metrics AS (
     t.replies,
     btt.back_ticket_list,
     btt.total_backoffice_minutes_time,
-    tdw.sla_target,
-    IF(tdw.days_worked < 0, 0, tdw.days_worked) AS days_worked,
-    IF(tdw.days_off < 0, 0, tdw.days_off) AS days_off,
+    tsm.sla_target,
     CASE
-      WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) <= sla_target THEN IF(tdw.days_worked < 0, 0, tdw.days_worked)
-      ELSE 0
-    END AS time_spent_solved_in_time,
+      WHEN tsm.days_elapsed_business < 0
+        OR tsm.days_elapsed_business IS NULL THEN 0
+      ELSE tsm.days_elapsed_business
+    END AS days_elapsed_business,
+    tsm.days_elapsed_calendar,
+    COALESCE(tsm.days_off, 0) AS days_off,
     CASE
-      WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) > sla_target THEN IF(tdw.days_worked < 0, 0, tdw.days_worked)
-      ELSE 0
-    END AS time_spent_not_solved_in_time,
-    CASE
-      WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) <= sla_target THEN TRUE
+      WHEN tsm.days_elapsed_business <= tsm.sla_target THEN TRUE
       ELSE FALSE
-    END AS is_ticket_solved_in_time,
-    CASE
-      WHEN IF(tdw.days_worked < 0, 0, tdw.days_worked) <= sla_target
-        OR ISNULL(tdw.days_worked) THEN FALSE
-      ELSE TRUE
-    END AS is_ticket_not_solved_in_time,
+    END AS is_backlog_in_time,
     btt.has_open_back_ticket,
     t.is_back_ticket,
     t.tags LIKE '%closed_by_merge%' AS is_closed_by_merge,
@@ -568,7 +582,7 @@ ticket_metrics AS (
     END AS is_ticket_rate,
     t.ts_budget,
     t.ts_created,
-    COALESCE(tdw.ts_sla_started, t.ts_created) AS ts_sla_started,
+    COALESCE(tsm.ts_sla_started, t.ts_created) AS ts_sla_started,
     t.ts_solved,
     t.ts_closed,
     t.ts_updated,
@@ -581,8 +595,8 @@ ticket_metrics AS (
     back_ticket_timestamps AS btt
       ON btt.id_front_ticket = t.id_ticket
   LEFT JOIN
-    ticket_days_worked AS tdw
-      ON tdw.id_ticket = t.id_ticket
+    ticket_sla_metrics AS tsm
+      ON tsm.id_ticket = t.id_ticket
   LEFT JOIN
     datalake_gsheets_clean.ticket_rate_classification AS tr
       ON t.contact_theme_detail_tag = tr.micro_taxonomy
@@ -624,12 +638,9 @@ SELECT
   back_ticket_list,
   total_backoffice_minutes_time,
   sla_target,
-  days_worked,
+  days_elapsed_business,
+  days_elapsed_calendar,
   days_off,
-  time_spent_solved_in_time,
-  time_spent_not_solved_in_time,
-  is_ticket_solved_in_time,
-  is_ticket_not_solved_in_time,
   CASE
     WHEN sub_journey IN ('Contract to Entrance', 'Listing & Search', 'Offboarding', 'Onboarding', 'Visits to Offer')
       THEN 'FOR RENT'
@@ -655,6 +666,7 @@ SELECT
     ELSE NULL
   END AS ticket_rate_weight,
   has_open_back_ticket,
+  is_backlog_in_time,
   is_back_ticket,
   is_closed_by_merge,
   is_call_answered,
