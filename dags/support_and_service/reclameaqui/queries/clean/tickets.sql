@@ -18,7 +18,7 @@ SELECT
   REPLACE(
     REGEXP_REPLACE(
       REGEXP_REPLACE(
-        REGEXP_REPLACE(REGEXP_REPLACE(customer, "\\[\\{{", "{"), "\\}}\\]", "}"),
+        REGEXP_REPLACE(REGEXP_REPLACE(customer, "\\[\\{{", "{{"), "\\}}\\]", "}}"),
         "(\\[\\])",
         "null"
       ),

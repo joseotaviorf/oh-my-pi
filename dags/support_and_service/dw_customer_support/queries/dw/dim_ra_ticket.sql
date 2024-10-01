@@ -27,7 +27,7 @@ SELECT
 FROM
     datalake_reclameaqui_clean.tickets
 WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND {"load_end_date"}
+    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
 -- this QUALIFY enables backfills as id_hugme is not unique on clean
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_hugme ORDER BY ts_last_modification DESC) = 1
