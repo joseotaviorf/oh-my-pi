@@ -96,3 +96,15 @@ columns:
     lineage:
       - datalake_reclameaqui_clean.tickets.ts_last_modification
     description: Timestamp of the last modification.
+  year:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.year
+    description: Partition column, year when the data was extracted
+  month:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.month
+    description: Partition column, month when the data was extracted
+  day:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.day
+    description: Partition column, day when the data was extracted

@@ -23,7 +23,10 @@ SELECT
     ts_created,
     ts_last_replica,
     ts_rating,
-    ts_last_modification
+    ts_last_modification,
+    year,
+    month,
+    day
 FROM
     datalake_reclameaqui_clean.tickets
 WHERE
