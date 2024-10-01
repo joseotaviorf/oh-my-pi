@@ -507,6 +507,7 @@ bietlejuice.dw_hub_services:
   - bietlejuice.hub_services:load-clean-rev-info
 bietlejuice.dw_inspections:
   - bietlejuice.enrich_amplitude_inspections:load-enrich-inspection-review-access
+  - bietlejuice.enrich_inspections:load-enrich-appointment-inspection
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_inspections:load-enrich-inspection-status-change
   - bietlejuice.enrich_inspections:load-enrich-item

@@ -1,0 +1,26 @@
+---
+table_name: dw_inspections.dim_appointment_component
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_appointment_component:
+    is_complete:
+      severity_level: Error
+  type:
+    is_contained_in:
+      values:
+        - INSPECTION
+        - INSPECTION_EXTERNALLY_MANAGED
+      severity_level: Error
+  status:
+    is_contained_in:
+      values:
+        - DONE
+        - WAITING_CONFIRMATION
+        - SCHEDULED
+        - CANCELLED
+      severity_level: Error
+  source:
+    is_contained_in:
+      values:
+        - PWA
+        - IS

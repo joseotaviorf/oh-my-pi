@@ -1,0 +1,117 @@
+---
+database_name: dw_inspections
+table_name: fact_appointments
+description: |
+  Transactional fact table that gathers information about inspection schedules.
+  Each row in this table represents a schedule made in IS or main.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_appointment:
+    description: Unique scheduling identification key in IS or main.
+    lineage:
+      - datalake_inspections.appointment_inspection.id_appointment
+      - datalake_inspections.appointment_inspection.id_main_appointment
+  sk_is_appointment:
+    description: Identification key for the appointment made in IS.
+    lineage:
+      - datalake_inspections.appointment_inspection.id_appointment
+  sk_main_appointment:
+    description: Identification key for the appointment made in main.
+    lineage:
+      - datalake_inspections.appointment_inspection.id_main_appointment
+  sk_inspection:
+    description: Inspection identification key related to scheduling.
+    lineage:
+      - datalake_inspections.appointment_inspection.id_inspection
+  sk_inspector:
+    description: Inspector identification key linked to the appointment.
+    lineage:
+      - datalake_inspections.appointment_inspection.id_inspector
+  sk_appointment_component:
+    description: Unique identification key for the combination of descriptive data.
+    lineage:
+      - datalake_inspections.appointment_inspection.type
+      - datalake_inspections.appointment_inspection.status
+      - datalake_inspections.appointment_inspection.status_made_by
+      - datalake_inspections.appointment_inspection.status_description
+      - datalake_inspections.appointment_inspection.cancellation_reason
+      - datalake_inspections.appointment_inspection.source
+  slot_of_day:
+    description: Integer type information indicating in which inspector slot the appointment was made.
+    lineage:
+      - datalake_inspections.appointment_inspection.slot_of_day
+  duration_in_slots:
+    description: Integer information indicating how long the surveyor's appointment was scheduled.
+    lineage:
+      - datalake_inspections.appointment_inspection.duration_in_slots
+  is_fixed_agent:
+    description: Boolean information indicating whether the surveyor is fixed.
+    lineage:
+      - datalake_inspections.appointment_inspection.is_fixed_agent
+  is_confirmed:
+    description: Boolean information indicating whether the appointment was confirmed.
+    lineage:
+      - datalake_inspections.appointment_inspection.is_confirmed
+  is_first_schedule:
+    description: Boolean information indicating whether this is the first appointment for the contract.
+    lineage:
+      - datalake_inspections.appointment_inspection.is_first_schedule
+  is_d0_canceled:
+    description: Boolean information indicating whether the appointment was cancelled on the same day.
+    lineage:
+      - datalake_inspections.appointment_inspection.is_d0_canceled
+  is_d1_canceled:
+    description: Boolean information indicating whether the appointment was cancelled the following day.
+    lineage:
+      - datalake_inspections.appointment_inspection.is_d1_canceled
+  is_not_canceled_by_inspector:
+    description: Boolean information indicating whether the appointment was cancelled by the inspector.
+    lineage:
+      - datalake_inspections.appointment_inspection.is_not_canceled_by_inspector
+  ts_appointment_inspected_utc:
+    description: Timestamp (UTC) information indicating the date and time the inspection was carried out.
+    lineage:
+      - datalake_inspections.appointment_inspection.ts_appointment_inspected_utc
+  ts_appointment_inspected_local_tz:
+    description: Timestamp (Local Timezone) information indicating the date and time the inspection was carried out.
+    lineage:
+      - datalake_inspections.appointment_inspection.ts_appointment_inspected_local_tz
+  ts_appointment_created_utc:
+    description: Timestamp(UTC) information indicating when the inspection schedule was created.
+    lineage:
+      - datalake_inspections.appointment_inspection.ts_appointment_created_utc
+  ts_appointment_updated_utc:
+    description: Timestamp (UTC) information indicating when the inspection schedule was updated.
+    lineage:
+      - datalake_inspections.appointment_inspection.ts_appointment_updated_utc
+  ts_appointment_created_local_tz:
+    description: Timestamp (Local Timezone) information indicating when the inspection schedule was created.
+    lineage:
+      - datalake_inspections.appointment_inspection.ts_appointment_created_local_tz
+  ts_appointment_updated_local_tz:
+    description: Timestamp (Local Timezone) information indicating when the inspection schedule was updated.
+    lineage:
+      - datalake_inspections.appointment_inspection.ts_appointment_updated_local_tz
+  ts_first_appointment_cancelled_utc:
+    description: Timestamp (UTC) information indicating when the inspection schedule was cancelled.
+    lineage:
+      - datalake_inspections.appointment_inspection.ts_first_appointment_cancelled_utc
+  ts_first_appointment_cancelled_local_tz:
+    description: Timestamp (Local Timezone) information indicating when the inspection schedule was cancelled.
+    lineage:
+      - datalake_inspections.appointment_inspection.ts_first_appointment_cancelled_local_tz
+  ts_load:
+    description: Timestamp information indicating when the data was loaded.
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_inspections.appointment_inspection.year
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_inspections.appointment_inspection.month
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_inspections.appointment_inspection.day

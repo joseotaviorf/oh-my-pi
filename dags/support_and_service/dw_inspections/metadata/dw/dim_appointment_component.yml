@@ -1,0 +1,44 @@
+---
+database_name: dw_inspections
+table_name: dim_appointment_component
+description: |
+  Dimension table that creates a combination of descriptive data about the appointment context.
+  Each row in this table is a combination of descriptive appointment data.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_appointment_component:
+    description: Unique identification key for the combination of descriptive data.
+    lineage:
+      - datalake_inspections.appointment_inspection.type
+      - datalake_inspections.appointment_inspection.status
+      - datalake_inspections.appointment_inspection.status_made_by
+      - datalake_inspections.appointment_inspection.status_description
+      - datalake_inspections.appointment_inspection.cancellation_reason
+      - datalake_inspections.appointment_inspection.source
+  type:
+    description: Type of appointment made.
+    lineage:
+      - datalake_inspections.appointment_inspection.type
+  status:
+    description: Appointment status.
+    lineage:
+      - datalake_inspections.appointment_inspection.status
+  status_made_by:
+    description: |
+      Descriptive information indicating who was responsible for the status,
+      in the case of cancellation, for example, it would be who carried out the cancellation.
+    lineage:
+      - datalake_inspections.appointment_inspection.status_made_by
+  status_description:
+    description: Description of the scheduling status.
+    lineage:
+      - datalake_inspections.appointment_inspection.status_description
+  cancellation_reason:
+    description: Descriptive information indicating the reason for cancellation.
+    lineage:
+      - datalake_inspections.appointment_inspection.cancellation_reason
+  source:
+    description: Descriptive information indicating in which system the appointment was made.
+    lineage:
+      - datalake_inspections.appointment_inspection.source

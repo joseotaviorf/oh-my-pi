@@ -11,34 +11,20 @@ workflow:
   layer: dw
   custom_schema: inspections
   default_extraction_type: incremental
-  default_partitions: [year, month, day]
-  has_load_to_redshift_task: False
+  default_partitions: [year, month]
   tables_customization:
+    dim_appointment:
+      extraction_type: full
     dim_inspection:
       extraction_type: full
-      partitions: []
     dim_inspector:
       extraction_type: full
-      partitions: []
     fact_inspection:
       extraction_type: full
-      partitions: []
     fact_repair_request:
       extraction_type: full
-      partitions: []
     fact_report_review:
       extraction_type: full
-      partitions: []
 
 cluster:
-  type: custom_cluster
-  custom_configurations:
-    autotermination_minutes: 20
-    driver_node_type_id: r5d.xlarge
-    node_type_id: r5d.xlarge
-    runtime_engine: PHOTON
-    spark_version: 12.2.x-scala2.12
-    num_workers: 2
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
+  type: databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster
