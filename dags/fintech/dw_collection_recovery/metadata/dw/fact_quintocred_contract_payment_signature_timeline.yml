@@ -35,6 +35,8 @@ columns:
       - datalake_velo.payment_contracts.gateway
   gateway_memory_transaction:
     description: "Last contract payment gateway"
+  memory_origin_table:
+    description: "Last contract origin table"
   id_memory_transaction:
     description: "id_memory_transaction"
   value_memory_transaction:

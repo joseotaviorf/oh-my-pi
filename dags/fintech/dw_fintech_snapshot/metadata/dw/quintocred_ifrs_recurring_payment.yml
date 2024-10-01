@@ -26,7 +26,7 @@ columns:
     lineage:
       - dw_velo.quintocred_ifrs_occurrence.sk_transaction
   sk_key:
-    description: "ID created concatenating sk_propose and fatura_id for direct billing proposes"
+    description: "ID created according to the source sk_transaction (omie, sap, asaas), sk_delinquency (delinquency), sk_propose + id billing_report (direct billing)"
     lineage:
       - dw_velo.quintocred_ifrs_occurrence.sk_key
   client_cpf_cnpj:

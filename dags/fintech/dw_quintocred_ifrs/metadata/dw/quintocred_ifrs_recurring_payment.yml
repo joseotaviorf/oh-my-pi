@@ -15,7 +15,7 @@ columns:
   sk_transaction:
     description: "Delinquency ID from the delinquency table"
   sk_key:
-    description: "ID created concatenating sk_propose and fatura_id for direct billing proposes"
+    description: "ID created according to the source sk_transaction (omie, sap, asaas), sk_delinquency (delinquency), sk_propose + id billing_report (direct billing)"
   client_cpf_cnpj:
     description: "For 3.0 cases, it will be the delinquency entry id, for 2.0 cases, it will be the delinquency id."
   dt_register:

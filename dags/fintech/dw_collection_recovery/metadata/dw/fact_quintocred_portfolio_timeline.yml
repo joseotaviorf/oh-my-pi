@@ -17,6 +17,8 @@ columns:
     description: "Document number of the client"
     lineage:
       - datalake_velo.collections_wallet.document
+  memory_origin_table:
+    description: "Last contract origin table"
   mob:
     description: "Mob calculated between the date of reference (dt_base)"
     lineage:

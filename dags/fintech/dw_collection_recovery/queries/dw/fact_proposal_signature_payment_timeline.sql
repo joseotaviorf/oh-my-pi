@@ -56,7 +56,10 @@ step_3_cpts AS (
     CASE
       WHEN gateway IS NOT NULL AND gateway != 'DELINQUENCY' THEN gateway
       WHEN gateway IS NOT NULL AND gateway = 'DELINQUENCY' THEN CONCAT(gateway, '_', billing_type)
+      --Propagation of migration by annual delinquency
       WHEN memory_annual_valid_limit IS NOT NULL OR (memory_annual_limit IS NOT NULL AND gateway_memory_transaction = 'DELINQUENCY' AND memory_flag_annual_payment IN ('ANNUAL+ACTIVATION', 'ANNUAL')) THEN CONCAT(gateway_memory_transaction, '_ANNUAL')
+      --Propagation of migration by monthly renewal delinquency
+      WHEN memory_origin_table = 'A2. deliquency_monthly_renewal' and gateway_memory_transaction = 'DELINQUENCY' then CONCAT(gateway_memory_transaction, '_MONTHLY_RENEWAL')
       ELSE 'UNFOUND'
     END AS gateway_estimation
   FROM
@@ -129,6 +132,7 @@ SELECT
   gateway,
   gateway_clean,
   gateway_memory_transaction,
+  memory_origin_table,
   gateway_plataform_clean,
   current_plataform,
   current_plataform_ffil,
