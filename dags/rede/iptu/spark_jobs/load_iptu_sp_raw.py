@@ -127,10 +127,10 @@ def load_dataframe_into_datalake(
 
 def main(): 
     (
-    environment,
-    datalake_bucket,
-    source,
-    execution_date,
+        environment,
+        datalake_bucket,
+        source,
+        execution_date,
     ) = parse_arguments()
 
     logger.info(
@@ -142,8 +142,8 @@ def main():
     )
 
     config_service = ConfigurationService(source)
-    iptu_configs = config_service.get_config("tables")[IPTU_REGION]
-  
+    iptu_configs = config_service.get_config("tables_customization")[IPTU_REGION]
+
     table_name = IPTU_REGION
     source_url = iptu_configs["source"]["url"]
     source_url_to_download = iptu_configs["source"]["download_url"]
@@ -164,13 +164,13 @@ def main():
     last_ingested_year = spark.sql(f"SELECT MAX(year) AS year FROM datalake_iptu_raw.{table_name}").select("year").rdd.flatMap(lambda x: x).collect()[0]
 
     if last_iptu_available_year <= last_ingested_year:
-        
+    
         logger.info(
             f"""
             msg= This year's IPTU has already been downloaded, we're leaving the spark job.
-        """
+            """
         )
-        
+    
         return None
 
     dataframe = get_data(url=source_url + source_url_to_download, year=last_iptu_available_year, format=source_format)
@@ -179,7 +179,7 @@ def main():
         logger.info(
             f"""
             m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date}
-            msg=Dataframe imported with sucess.
+            msg=Dataframe imported with success.
             """
         )
 
