@@ -1,0 +1,29 @@
+dag:
+  name: growth_lab
+  schedule_start_date: 2020-12-21
+  schedule_interval: "0 2 * * *"
+  owner: Data Rede
+  documentation:
+    dag_purpose: "Growth Lab is an initiative that has been trying to understand our supply, using crawler data from Spinver, which is in GCP. This DAG is responsible for ingesting the data from GCP to our datalake."
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_growth_lab_raw
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{{ ds }}"
+  tables_customization:
+    supply_recurrence:
+      extra_spark_job_arguments:
+        - "growthlab-factory"
+        - "supply_recurrence/{yyyy_mm_dd}/supply_recurrence.csv"
+cluster:
+  type: databricks_12_2_med_general_cluster
+  custom_libraries:
+    - pypi:
+        package: "google-cloud-storage==2.11.0"
+        
