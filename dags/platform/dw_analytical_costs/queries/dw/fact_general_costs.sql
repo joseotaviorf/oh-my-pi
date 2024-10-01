@@ -19,8 +19,8 @@ SELECT
     year,
     month,
     day
-FROM 
-    dw_analytical_costs.fact_bietlejuce_costs
+FROM
+    dw_analytical_costs.fact_bietlejuice_costs
 UNION ALL
 SELECT
     sk_snapshot,
@@ -43,7 +43,7 @@ SELECT
     year,
     month,
     day
-FROM 
+FROM
     dw_analytical_costs.fact_execution_costs
 UNION ALL
 SELECT
@@ -67,5 +67,5 @@ SELECT
     year,
     month,
     day
-FROM 
+FROM
     dw_analytical_costs.fact_job_costs
