@@ -345,7 +345,7 @@ unique_theme_detail_sla_target AS (
     journey_step,
     contact_theme_detail_tag AS taxonomy_tag,
     sla_in_days,
-    EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, "{load_end_date}"))) AS dt_reference
+    EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE("{load_end_date}")))) AS dt_reference
   FROM
     datalake_gsheets_clean.taxonomy_sla
   WHERE
@@ -357,7 +357,7 @@ unique_theme_sla_target AS (
       journey_step,
       contact_theme_tag AS taxonomy_tag,
       sla_in_days,
-      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, "{load_end_date}"))) AS dt_reference
+      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE("{load_end_date}")))) AS dt_reference
     FROM
       datalake_gsheets_clean.taxonomy_sla
     WHERE
@@ -377,7 +377,7 @@ unique_journey_sla_target AS (
     SELECT
       journey_step,
       sla_in_days,
-      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, "{load_end_date}"))) AS dt_reference
+      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE("{load_end_date}")))) AS dt_reference
     FROM
       datalake_gsheets_clean.taxonomy_sla
     WHERE
@@ -447,7 +447,7 @@ ticket_date_interval AS (
     MAX(sla_target) OVER(PARTITION BY id_ticket) AS sla_target,
     SEQUENCE(
       DATE(ts_sla_started),
-      COALESCE(DATE(ts_solved), "{load_end_date}")
+      COALESCE(DATE(ts_solved), DATE("{load_end_date}"))
     ) AS dt_interval,
     ts_sla_started,
     ts_solved
@@ -472,7 +472,7 @@ ticket_days_elapsed AS (
     sla_target,
     COALESCE(days_off, 0) AS days_off,
     COALESCE(
-      DATEDIFF(COALESCE(ts_solved, "{load_end_date}"), DATE(ts_sla_started)),
+      DATEDIFF(COALESCE(ts_solved, DATE("{load_end_date}")), DATE(ts_sla_started)),
       0
     ) AS days_elapsed_calendar,
     ts_sla_started
