@@ -38,7 +38,7 @@ custom_libraries:
   - pypi:
       package: pytopojson
   - pypi:
-      package: apache-sedona
+      package: apache-sedona==1.6.0
 init_script:
   - s3:
       destination: "s3://artifacts.s3.data.quintoandar.com.br/sedona/sedona-init.sh"
