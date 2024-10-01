@@ -22,11 +22,11 @@ tables:
     context: speech_analytics
   speech_chat:
     context: speech_analytics
-  taxonomia_call:
+  taxonomy:
     context: cx
-  taxonomia_chat:
+  recontact:
     context: cx
-  taxonomia_email:
+  tickets_transferred:
     context: cx
   twilio_chat_aht:
     context: cx

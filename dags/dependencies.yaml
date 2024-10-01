@@ -481,13 +481,13 @@ bietlejuice.dw_hiring:
   - bietlejuice.workable_redshift:load-clean-candidates
   - bietlejuice.workable_redshift:load-clean-requisitions
 bietlejuice.dw_house:
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
   - bietlejuice.ebdb_condo:load-clean-amenities
   - bietlejuice.ebdb_condo:load-clean-condo-amenities
   - bietlejuice.ebdb_condo:load-clean-info-amenities
   - bietlejuice.ebdb_condo:load-clean-info-condo-amenities
   - bietlejuice.ebdb_house:load-clean-house-maintenance-condition
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
 bietlejuice.dw_house_amenities:
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
@@ -1474,8 +1474,8 @@ bietlejuice.enrich_cyber_homolog:
   - bietlejuice.cyber:load-clean-payments
   - bietlejuice.cyber:load-clean-users
   - bietlejuice.cyber_complement:load-clean-agency-group
-  - bietlejuice.cyber_complement:load-clean-logs-code-description
   - bietlejuice.cyber_complement:load-clean-campaign
+  - bietlejuice.cyber_complement:load-clean-logs-code-description
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-quintoandar-dim-house
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
@@ -3544,23 +3544,23 @@ quintoml.growth.eltv.inference:
   - bietlejuice.ebdb_location:load-clean-region
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-quintoml.growth.sale_conversion_model.inference:
-  - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
-  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
-  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
-  - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
+quintoml.growth.rent_conversion_model.inference:
   - bietlejuice.ebdb_house:load-clean-house-aud
-quintoml.growth.sale_discount_model.inference:
+  - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
+  - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+quintoml.growth.sale_conversion_model.inference:
+  - bietlejuice.ebdb_house:load-clean-house-aud
+  - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
+  - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
+quintoml.growth.sale_discount_model.inference:
   - bietlejuice.ebdb_location:load-clean-region
   - bietlejuice.enrich_offer:load-enrich-sale-offer
-quintoml.growth.rent_conversion_model.inference:
-  - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
-  - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
-  - bietlejuice.ebdb_house:load-clean-house-aud
-  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
 quintoml.recs.house_user_embeddings_quintoml.inference:
   - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
   - wonka.house_listing_business_context:load-house_listing_business_context
