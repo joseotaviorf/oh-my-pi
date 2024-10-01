@@ -12,4 +12,4 @@ workflow:
   spark_session_configs:
     udfs: [SF_REMOVE_ACCENTUATION]
 cluster:
-  type: databricks_12_2_min_general_photon_cluster
+  type: databricks_12_2_med_2_fixed_workers_general_photon_cluster
