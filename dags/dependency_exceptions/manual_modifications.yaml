@@ -84,7 +84,6 @@ bietlejuice.dw_datamarts_spark.for_sale:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
     - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
     - bietlejuice.ebdb:load-clean-map-region
-    - bietlejuice.ebdb:load-clean-partner
     - bietlejuice.ebdb:load-clean-polygon-region
   remove:
     - bietlejuice.dw_agents_availability:load-dw-agent-fact-agent-daily-allocations

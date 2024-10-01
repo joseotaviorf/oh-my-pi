@@ -428,7 +428,6 @@ bietlejuice.dw_datamarts_spark.for_sale:
   - bietlejuice.ebdb:load-clean-house-visit-status-aud
   - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
   - bietlejuice.ebdb:load-clean-map-region
-  - bietlejuice.ebdb:load-clean-partner
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.ebdb:load-clean-visit-fitting
   - bietlejuice.ebdb_condo:load-clean-info-amenities
