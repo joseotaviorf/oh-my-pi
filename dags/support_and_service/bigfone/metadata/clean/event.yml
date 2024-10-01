@@ -70,6 +70,9 @@ columns:
   csat_3:
     lineage:
       - datalake_bigfone_raw.event.metadata
+  waiting_time_sec:
+    lineage:
+      - datalake_bigfone_raw.event.metadata
   is_scheduled:
     lineage:
       - datalake_bigfone_raw.event.metadata

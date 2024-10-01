@@ -25,6 +25,7 @@ SELECT
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-1') AS INT) AS csat_1,
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-2') AS INT) AS csat_2,
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.csat-3') AS INT) AS csat_3,
+    CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.waiting_time') AS INT) AS waiting_time_sec,
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.scheduled') AS BOOLEAN) AS is_scheduled,
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.hasWrapup') AS BOOLEAN) AS has_wrapup,
     CAST(GET_JSON_OBJECT(metadata,'$.event_data.TaskAttributes.hasCsat') AS BOOLEAN) AS has_csat,

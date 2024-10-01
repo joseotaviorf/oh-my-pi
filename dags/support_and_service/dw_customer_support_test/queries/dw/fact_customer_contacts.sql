@@ -50,6 +50,7 @@ demand AS (
       WHEN direction = 'outbound' THEN to_phone_number
     END AS customer_phone_number,
     NULL AS customer_email,
+    waiting_time_sec,
     NULL AS is_per_team_task,
     is_call_answered AS is_contact_answered,
     is_reservation_answered AS is_interaction_answered,
@@ -84,6 +85,7 @@ demand AS (
     worker_email,
     customer_phone_number,
     customer_email,
+    NULL AS waiting_time_sec,
     is_per_team_task,
     TRUE AS is_contact_answered,
     CASE
@@ -136,7 +138,10 @@ contacts AS (
     tm.total_queue_time,
     tm.total_wrap_up_time,
     tm.total_waiting_time,
-    tm.first_reply_time,
+    CASE
+      WHEN channel = 'chat' THEN tm.first_reply_time,
+      WHEN channel = 'call' THEN d.waiting_time_sec,
+    END AS first_reply_time,
     tm.total_handling_time,
     d.is_per_team_task,
     d.is_contact_answered,

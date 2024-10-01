@@ -28,6 +28,7 @@ call_events AS (
       WHEN direction = 'outbound' THEN outbound_to_phone_number
       ELSE to_phone_number
     END AS to_phone_number,
+    MAX(waiting_time_sec) OVER(PARTITION BY id_reservation) AS waiting_time_sec,
     ts_created,
     MIN(ts_created) OVER(PARTITION BY id_task ORDER BY ts_created) AS ts_task_created,
     MAX(ts_created) OVER(PARTITION BY id_reservation ORDER BY ts_created) AS ts_reservation_ended
@@ -68,6 +69,7 @@ reservations AS (
     worker_email,
     from_phone_number,
     to_phone_number,
+    waiting_time_sec,
     COUNT(
       CASE
         WHEN event_type = 'reservation.accepted' OR event_type = 'reservation.completed' THEN id_reservation
@@ -126,6 +128,7 @@ unanswered_calls AS (
     NULL AS worker_email,
     from_phone_number,
     to_phone_number,
+    NULL AS waiting_time_sec,
     FALSE AS is_call_answered,
     FALSE AS is_reservation_answered,
     FALSE AS is_reservation_timeout,
@@ -154,6 +157,7 @@ calls AS (
     r.worker_email,
     r.from_phone_number,
     r.to_phone_number,
+    r.waiting_time_sec,
     caf.is_call_answered,
     r.is_reservation_answered,
     r.is_reservation_timeout,
@@ -180,6 +184,7 @@ calls AS (
     worker_email,
     from_phone_number,
     to_phone_number,
+    waiting_time_sec,
     is_call_answered,
     is_reservation_answered,
     is_reservation_timeout,
@@ -211,6 +216,7 @@ SELECT DISTINCT
   c.worker_email,
   c.from_phone_number,
   c.to_phone_number,
+  c.waiting_time_sec,
   c.is_call_answered,
   c.is_reservation_answered,
   c.is_reservation_timeout,
