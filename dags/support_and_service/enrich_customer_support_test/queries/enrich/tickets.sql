@@ -73,37 +73,37 @@ incoming_tickets AS (
 ),
 /* The following CTE is needed because a single call/chat can create multiple tickets. Also, there are
 two CTEs for call dedupping because sometimes the id_call on a ticket is actually an id_task */
-unique_twilio_tickets AS (
+chat_tickets AS (
   SELECT
+    it.id_ticket,
     it.id_session,
-    'chat' AS channel,
-    MAX(it.id_ticket) AS id_ticket
+    'chat' AS channel
   FROM
     incoming_tickets AS it
   INNER JOIN
     datalake_customer_support_test.chats AS ch
       ON ch.id_session = it.id_session
-  GROUP BY 1, 2
-  UNION ALL
+),
+call_tickets AS (
   SELECT
+    it.id_ticket,
     it.id_call,
-    'call' AS channel,
-    MAX(it.id_ticket) AS id_ticket
+    'call' AS channel
   FROM
     incoming_tickets AS it
-  INNER JOIN -- TODO: this OR yields poor performance but is needed as it.id_call is ambiguous
-    datalake_customer_support_test.calls AS ca
-      ON ca.id_call = it.id_call
-      OR ca.id_task = it.id_call
-  GROUP BY 1, 2
+  LEFT JOIN
+    datalake_customer_support_test.calls AS ca1
+      ON ca1.id_call = it.id_call
+      AND STARTSWITH(it.id_call, "CA")
+  LEFT JOIN
+    datalake_customer_support_test.calls AS ca2
+      ON ca2.id_task = it.id_call
+      AND STARTSWITH(it.id_call, "WT")
+  WHERE
+    ca1.id_call IS NOT NULL
+    OR ca2.id_task IS NOT NULL
 ),
-unique_tickets AS (
-  SELECT
-    id_ticket,
-    channel
-  FROM
-    unique_twilio_tickets
-  UNION ALL
+non_twilio_tickets AS (
   SELECT DISTINCT
     it.id_ticket,
     CASE
@@ -124,10 +124,44 @@ unique_tickets AS (
   FROM
     incoming_tickets AS it
   LEFT JOIN
-    unique_twilio_tickets AS dtt
-      ON dtt.id_ticket = it.id_ticket
+    call_tickets AS cat
+      ON cat.id_ticket = it.id_ticket
+  LEFT JOIN
+    chat_tickets AS cht
+      ON cht.id_ticket = it.id_ticket
   WHERE
-    dtt.id_ticket IS NULL
+    cht.id_ticket IS NULL
+    AND cat.id_ticket IS NULL
+),
+unique_twilio_tickets AS (
+  SELECT
+    id_session,
+    channel,
+    MAX(id_ticket) AS id_ticket
+  FROM
+    chat_tickets
+  GROUP BY 1, 2
+  UNION ALL
+  SELECT
+    id_call,
+    channel,
+    MAX(id_ticket) AS id_ticket
+  FROM
+    call_tickets
+  GROUP BY 1, 2
+),
+unique_tickets AS (
+  SELECT
+    id_ticket,
+    channel
+  FROM
+    unique_twilio_tickets
+  UNION ALL
+  SELECT
+    id_ticket,
+    channel
+  FROM
+    non_twilio_tickets
 ),
 tickets_per_task AS (
   SELECT
