@@ -1,0 +1,57 @@
+---
+database_name: datalake_ebdb_clean
+table_name: agent_with_keys_allocation_parameters_aud
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.revtype
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.agent_id
+  mod_id_agent:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.agent_id_mod
+  total_houses:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.total_houses
+  mod_total_houses:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.total_houses_mod
+  capacity:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.capacity
+  mod_capacity:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.capacity_mod
+  average_ticket:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_ticket
+  mod_average_ticket:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_ticket_mod
+  average_lat:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lat
+  mod_average_lat:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lat_mod
+  average_lng:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lng
+  mod_average_lng:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lng_mod
+  has_opted_out:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.has_opted_out
+  mod_has_opted_out:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.has_opted_out_mod

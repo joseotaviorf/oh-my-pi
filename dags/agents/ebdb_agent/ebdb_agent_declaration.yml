@@ -13,6 +13,14 @@ workflow:
   source_database: ebdb
   source_schema: ebdb
   tables_customization:
+    AgentLeadReferral:
+      clean_table_name: agent_lead_referral
+    AgentLeadReferral_AUD:
+      clean_table_name: agent_lead_referral_aud
+    AgentWithKeysAllocationParameters:
+      clean_table_name: agent_with_keys_allocation_parameters
+    AgentWithKeysAllocationParameters_AUD:
+      clean_table_name: agent_with_keys_allocation_parameters_aud
     DadosAgente:
       clean_table_name: agent_data
     DadosAgente_AUD:
@@ -25,10 +33,6 @@ workflow:
     DadosAgente_tipos:
       clean_table_name: agent_data_types
       raw_primary_keys: ["DadosAgente_id", "tipos"]
-    AgentLeadReferral:
-      clean_table_name: agent_lead_referral
-    AgentLeadReferral_AUD:
-      clean_table_name: agent_lead_referral_aud
     DadosAgente_Regiao_AUD:
       clean_table_name: agent_region_data_aud
     HouseAgentKeyTracking:

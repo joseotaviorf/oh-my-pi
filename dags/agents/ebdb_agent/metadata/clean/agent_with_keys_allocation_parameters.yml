@@ -1,0 +1,36 @@
+---
+database_name: datalake_ebdb_clean
+table_name: agent_with_keys_allocation_parameters
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters.id
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters.agent_id
+  total_houses:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters.total_houses
+  capacity:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters.capacity
+  average_ticket:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters.average_ticket
+  average_lat:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters.average_lat
+  average_lng:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters.average_lng
+  has_opted_out:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters.has_opted_out
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters.created_at
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.agentwithkeysallocationparameters.updated_at
