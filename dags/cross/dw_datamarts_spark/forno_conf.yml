@@ -41,15 +41,11 @@ dags:
     cluster_name: databricks_12_2_med_compute_cluster
     custom_libraries:
       - maven:
-          coordinates: "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.0-incubating"
+          coordinates: "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating"
       - maven:
           coordinates: "org.datasyslab:geotools-wrapper:1.1.0-25.2"
       - pypi:
-          package: geospark
-      - pypi:
-          package: pytopojson
-      - pypi:
-          package: apache-sedona
+          package: apache-sedona==1.2.1
     init_script:
       - s3:
           destination: "s3://artifacts.s3.forno.data.quintoandar.com.br/sedona/sedona-init.sh"
