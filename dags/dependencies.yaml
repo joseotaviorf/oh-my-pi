@@ -772,6 +772,7 @@ bietlejuice.dw_rental_payments:
   - bietlejuice.enrich_retsuko:load-enrich-bill-items
   - bietlejuice.enrich_retsuko:load-enrich-invoice
 bietlejuice.dw_repairs:
+  - bietlejuice.dw_tickets:load-dw-tickets-fact-ticket-events
   - bietlejuice.enrich_repairs:load-enrich-repair-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.repairs:load-clean-repair-request
@@ -2460,6 +2461,7 @@ bietlejuice.enrich_repairs:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
+  - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.enrich_survicate:load-enrich-repairs-surveys
   - bietlejuice.enrich_zendesk:load-enrich-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
@@ -3529,6 +3531,7 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-segment
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
+  - bietlejuice.dw_tickets:load-dw-tickets-fact-ticket-events
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla

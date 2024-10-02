@@ -16,9 +16,73 @@ repair_request_budget AS (
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY b.id_repair_request ORDER BY b.ts_updated DESC) = 1
 )
-
+,ticket_events AS (
+  SELECT
+    te.sk_ticket,
+    CASE
+      WHEN REGEXP_LIKE(te.tags,
+        'macro_ro_acao_backlog_full_prestador_interno|
+        acao_backlog_full_prestador_interno|
+        macro_ro_refluxo_tarefa_acionar_parceiro')
+      THEN MIN(te.ts_event - INTERVAL 3 HOUR)
+    END AS ts_reflux,
+    CASE
+      WHEN
+        REGEXP_LIKE (te.tags,
+        'pp_autosserviço_contestou|
+        iq_pp_autosserviço_contestou|
+        alteração_de_responsabilidade_criticidade|
+        acompanhamento_alteracao_responsabilidade_criticidade|
+        check_responsabilidade_reparos|
+        pp_autosserviço_contestou')
+      THEN MIN(te.ts_event - INTERVAL 3 HOUR)
+    END AS ts_contestation,
+    CASE
+      WHEN
+        REGEXP_LIKE(te.tags,
+        'macro_ro_cont_benfeitoria_pp|
+        macro_ro_cont_benfeitoria_iq|
+        macro_ro_cont_terceiros_pp|
+        macro_ro_cont_terceiros_iq|
+        macro_ro_cont_aprovada_iq|
+        macro_ro_cont_aprovada_pp|
+        macro_ro_cont_reprovada_pp|
+        macro_ro_cont_reprovada_iq|
+        macro_ro_cont_reprovada_iq|
+        closed_by_merge|
+        reprovado_ro|
+        aprovado_ro|
+        opcional_ro|
+        ação_backlog_contestação|
+        alteração_reprovada|
+        alteração_aprovada|
+        alteração_benfeitoria')
+      THEN MIN(te.ts_event - INTERVAL 3 HOUR)
+    END AS ts_resolution_contestation,
+    CASE
+      WHEN sk_group IN ('11373011255565','10567436267277')
+        THEN MIN(te.ts_event - INTERVAL 3 HOUR)
+    END AS ts_first_open
+  FROM
+    dw_tickets.fact_ticket_events AS te
+  WHERE
+    te.ts_ticket_created >= DATE('2024-01-01')
+  GROUP BY
+    te.sk_ticket, te.tags, te.sk_group
+)
+,status_fup AS (
+SELECT
+    rrtnf.id_repair_request,
+    rrtnf.ts_updated AS ts_help_request
+  FROM
+    datalake_repairs_clean.repair_request_tenant_negotiation_follow_up AS rrtnf
+  WHERE status = 'HELP_NEEDED'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY rrtnf.id_repair_request ORDER BY rrtnf.ts_updated ASC) = 1
+)
 SELECT
   CAST(rt.id_ticket AS BIGINT) AS sk_ticket,
+  COALESCE(rt.id_contact_ticket, -1) AS sk_contact_ticket,
   COALESCE(rt.id_request, -1) AS sk_request,
   COALESCE(rt.id_contract, -1) AS sk_contract,
   COALESCE(tc.id_user_main, -1) AS sk_user,
@@ -45,6 +109,13 @@ SELECT
   IF(rt.tags LIKE '%produto_responsabilidade_terceiros%', TRUE, FALSE) AS is_other_responsability,
   DATEDIFF(DAY, rt.ts_created_local, to_timestamp(CAST(GET_JSON_OBJECT(rt.custom_fields, '$["[Data] Data do first reply "]') AS STRING),'dd/MM/yy HH')) AS days_to_first_reply,
   tc.reply_time_min_calendar AS ldt_fr_minutes,
+  rt.dt_definition,
+  rt.dt_chat,
+  te.ts_reflux,
+  te.ts_contestation,
+  te.ts_resolution_contestation,
+  te.ts_first_open,
+  sf.ts_help_request,
   NOW() AS ts_load,
   rt.year AS year,
   rt.month AS month,
@@ -60,3 +131,11 @@ LEFT JOIN
 LEFT JOIN
   repair_request_chat AS rrc
     ON rrc.sk_repair_request = rt.id_request
+LEFT JOIN
+  ticket_events AS te
+    ON rt.id_ticket = te.sk_ticket
+LEFT JOIN
+  status_fup AS sf
+    ON sf.id_repair_request = rt.id_request
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY rt.id_ticket ORDER BY MAKE_DATE(rt.year,rt.month,rt.day) DESC) = 1

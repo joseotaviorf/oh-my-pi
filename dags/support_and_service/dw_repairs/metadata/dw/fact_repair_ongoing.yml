@@ -125,6 +125,36 @@ columns:
     description: Amount of calendar minutes the ticket took to be replied
     lineage:
       - datalake_zendesk.tickets_currentreply_time_min_calendar
+  dt_definition:
+    description: Date in timestamp format indicating when the ticket suplier was set
+    lineage:
+      - datalake_repairs.repair_tickets.dt_definition
+  dt_chat:
+    description: Date in timestamp format indicating when the chat was started.
+    lineage:
+      - datalake_repairs.repair_tickets.dt_chat
+  ts_reflux:
+    description: Date in timestamp format that indicates when the ticket was reopened.
+    lineage:
+      - dw_tickets.fact_ticket_events.ts_event
+  ts_contestation:
+    description: Date in timestamp informe such as date that indicates when the contestation was requested.
+    lineage:
+      - dw_tickets.fact_ticket_events.ts_event
+  ts_resolution_contestation:
+    description: Date in timestamp that indicates when the contestation demand was resolved.
+    lineage:
+      - dw_tickets.fact_ticket_events.ts_event
+  ts_first_open:
+    description: Date in timestamp format that indicates when the ticket was first opened.
+    lineage:
+      - dw_tickets.fact_ticket_events.ts_event
+  ts_help_request:
+    description: Date in timestamp format that indicates when the ticket was requested.
+    lineage:
+      - datalake_repairs_clean.repair_request_tenant_negotiation_follow_up.ts_updated
+  ts_load:
+    description: Date in timestamp format that indicates when the ticket was loaded.
   year:
     description: Partition data, referring to the year of the ticket update date.
     lineage:

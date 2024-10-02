@@ -13,9 +13,11 @@ workflow:
   tables_customization:
     dim_repair_ongoing:
       z_order_by: [sk_ticket]
+      merge_on: [sk_ticket]
     fact_repair_ongoing:
       z_order_by: [
         sk_ticket,
+        sk_contact_ticket,
         sk_request,
         sk_contract,
         sk_user,
@@ -33,5 +35,11 @@ workflow:
         sk_measurement,
         sk_first_reply_milestone,
         sk_first_public_comment]
+      merge_on: [sk_ticket]
 cluster:
-  type: databricks_12_2_med_io-memory_photon_cluster
+  type: custom_cluster
+  custom_configurations:
+    spark_version: 13.3.x-scala2.12
+    driver_node_type_id: r6gd.4xlarge
+    node_type_id: r6gd.4xlarge
+    num_workers: 4

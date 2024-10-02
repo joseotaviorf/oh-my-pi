@@ -54,6 +54,14 @@ columns:
     description: Descriptive data that indicates the analyst's email linked to the ticket.
     lineage:
       - datalake_zendesk.tickets_current.analyst_email
+  email_assigned:
+    description: Descriptive data that indicates the email of the analyst who answered the ticket.
+    lineage:
+      - datalake_support_users.zendesk_users.email
+  email_requester:
+    description: Descriptive data that indicates the email of the requester who opened the ticket.
+    lineage:
+      - datalake_support_users.zendesk_users.email
   agent_organization:
     description: Descriptive data that indicates the company in which the analyst linked to the ticket works.
     lineage:
@@ -144,6 +152,14 @@ columns:
     description: Integer type data that indicates the time in minutes until the first service response.
     lineage:
       - datalake_zendesk.tickets_current.reply_time_min_calendar
+  dt_definition:
+    description: Date in timestamp format indicating when the ticket suplier was set
+    lineage:
+      - datalake_zendesk.tickets_current.custom_fields
+  dt_chat:
+    description: Date in timestamp format indicating when the chat was started.
+    lineage:
+      - datalake_repairs_clean.repair_request_chat.ts_started
   entrance_date:
     description: Date on which the contract came into effect.
     lineage:

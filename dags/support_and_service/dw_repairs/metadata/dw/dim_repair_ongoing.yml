@@ -51,10 +51,34 @@ columns:
     description: Descriptive information that indicates whether the ticket is a back or front ticket.
     lineage:
       - datalake_repairs.repair_tickets.front_or_back
+  agent_name:
+    description: Descriptive data that indicates the analyst's name linked to the ticket.
+    lineage:
+      - datalake_zendesk.repair_tickets.agent_name
+  agent_email:
+    description: Descriptive data that indicates the analyst's email linked to the ticket.
+    lineage:
+      - datalake_zendesk.repair_tickets.agent_email
+  email_assigned:
+    description: Descriptive data that indicates the email of the analyst who answered the ticket.
+    lineage:
+      - datalake_zendesk.repair_tickets.email_assigned
+  email_requester:
+    description: Descriptive data that indicates the email of the requester who opened the ticket.
+    lineage:
+      - datalake_zendesk.repair_tickets.email_requester
+  agent_organization:
+    description: Descriptive data that indicates the company in which the analyst linked to the ticket works.
+    lineage:
+      - datalake_zendesk.repair_tickets.analyst_organization
   status_fup_iq:
     description: Current status of the tenant negotiation follow-up for the repair request.
     lineage:
       - datalake_repairs_clean.repair_request_tenant_negotiation_follow_up.status
+  reason_help_request:
+    description: Reason for the help request.
+    lineage:
+      - datalake_repairs_clean.repair_request_tenant_negotiation_follow_up.help_action
   owner_aproval:
     description: Approval status from the owner regarding the repair request.
     lineage:
