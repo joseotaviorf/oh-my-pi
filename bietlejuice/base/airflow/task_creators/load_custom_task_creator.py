@@ -20,8 +20,18 @@ class LoadCustomTaskCreator(BaseTaskCreator):
             spark_job_name,
             task_id,
             parameters,
-            spark_job_prefix=self.dag_execution_context.dag_args["name"],
+            spark_job_prefix=self._get_spark_job_prefix(table_attributes),
         )
+
+    def _get_spark_job_prefix(self, table_attributes: TableAttributes) -> str:
+        dag_name = self.dag_execution_context.dag_args["name"]
+        default_spark_job_prefix = self.dag_execution_context.workflow_args.get(
+            "spark_job_prefix", dag_name
+        )
+        table_load_spark_job_prefix = table_attributes.table_customization.get(
+            "spark_job_prefix", default_spark_job_prefix
+        )
+        return table_load_spark_job_prefix
 
     def _generate_spark_job_name(self, table_attributes: TableAttributes) -> str:
         """

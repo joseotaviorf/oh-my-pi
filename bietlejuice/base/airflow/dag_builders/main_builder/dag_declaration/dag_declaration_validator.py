@@ -107,6 +107,11 @@ class DAGDeclarationValidator(Validator):
                     "required": False,
                 },
                 "load_spark_job": {"type": "string", "empty": False, "required": False},
+                "spark_job_prefix": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                },
                 "spark_job_arguments": {
                     "type": "list",
                     "empty": False,
