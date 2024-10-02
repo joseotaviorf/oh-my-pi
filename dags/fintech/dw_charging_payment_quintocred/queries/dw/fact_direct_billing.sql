@@ -68,7 +68,7 @@ SELECT
     END AS order_status,
     "BILLING DIRETO" AS gateway,
     "BOLETO" AS billing_type,
-    NULL AS category,
+    CAST( NULL AS VARCHAR(20) ) AS category,
     DATE( dt_due ) < current_date() AS is_overdue,
     dt_paid,
     dt_boleto_created AS dt_created,

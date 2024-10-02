@@ -14,7 +14,7 @@ base_payment_asaas AS (
     status,
     value,
     dt_payment,
-    NULL AS category
+    CAST( NULL AS VARCHAR (20) ) AS category
   FROM 
     datalake_velo_asaas_clean.payments asaas
   LEFT JOIN 
