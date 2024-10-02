@@ -11,7 +11,10 @@ workflow:
     repair_tickets:
       partition_cols: ["year", "month", "day"]
       extraction_type: full
-      z_order_by: [id_ticket, id_contact_ticket, id_request, id_contract]
+      z_order_by: [
+        id_ticket,
+        id_request,
+        id_contract]
       merge_on: [id_ticket]
 cluster:
   type: custom_cluster

@@ -17,7 +17,6 @@ workflow:
     fact_repair_ongoing:
       z_order_by: [
         sk_ticket,
-        sk_contact_ticket,
         sk_request,
         sk_contract,
         sk_user,
