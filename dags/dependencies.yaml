@@ -132,6 +132,8 @@ bietlejuice.dw_charging_payment_quintocred:
   - bietlejuice.rental_guarantee_platform:load-clean-propose-aud
   - bietlejuice.rental_guarantee_platform:load-clean-renewal
   - bietlejuice.rental_guarantee_platform:load-clean-rev-info
+  - bietlejuice.sap_gateway:load-clean-feature
+  - bietlejuice.sap_gateway:load-clean-sync-sap-job
   - bietlejuice.velo_asaas:load-clean-payments
 bietlejuice.dw_chattermill:
   - bietlejuice.enrich_chattermill:load-enrich-responses

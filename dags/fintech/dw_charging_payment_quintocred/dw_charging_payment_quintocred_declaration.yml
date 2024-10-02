@@ -12,6 +12,9 @@ workflow:
       - fact_direct_billing
       - fact_charging_payment
       - fact_delinquecy
+    fact_theoretical_payment_delinquency:
+      - fact_propose_timeline
+      - fact_payment_delinquency
 cluster:
   type: databricks_12_2_med_general_cluster
   access_control_list:

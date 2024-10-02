@@ -1,0 +1,78 @@
+---
+database_name: dw_charging_payment_quintocred
+table_name: fact_accounting_funnel
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_business_entity:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.entry.id_business_entity
+    - datalake_rental_guarantee_platform_clean.billing_report
+    - datalake_rental_guarantee_platform_clean.propose
+  id_finance_entity:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.billing_report.id
+  id_finance_entity_entry:
+    description: ''
+  hash:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_clean.sync_sap_job
+  id_document:
+    description: ''
+    lineage:
+    - datalake_accounting_funnel.ledger.id_document
+  source_name:
+    description: ''
+  accounting_type:
+    description: ''
+  accounting_name:
+    description: ''
+  status:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_clean.sync_sap_job 
+  source_billing_type:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.payment.billing_type
+  source_payment_status:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.payment.status
+  rn_nf:
+    description: ''
+  source_amount:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.entry.amount
+    - datalake_rental_guarantee_platform_clean.payment.value
+  sap_amount:
+    description: ''
+    lineage:
+    - datalake_accounting_funnel.ledger
+  accrual_year_month:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.billing_report.dt_due
+    - datalake_rental_guarantee_platform_clean.payment.ts_due
+  accrual_year_month_sap:
+    description: ''
+    lineage:
+    - datalake_accounting_funnel.ledger
+  dt_source_trigger:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.billing_report.dt_due
+    - datalake_rental_guarantee_platform_clean.payment.ts_due
+  dt_sap_reference:
+    description: ''
+    lineage:
+    - datalake_accounting_funnel.ledger
+  dt_sap_created:
+    description: ''
+    lineage:
+    - datalake_accounting_funnel.ledger

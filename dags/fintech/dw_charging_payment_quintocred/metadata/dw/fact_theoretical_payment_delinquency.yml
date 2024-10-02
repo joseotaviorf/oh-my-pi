@@ -1,0 +1,205 @@
+---
+database_name: dw_charging_payment_quintocred
+table_name: fact_theoretical_payment_delinquency
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  sk_propose_theoretical:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.sk_propose
+  sk_array_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.id_array_delinquency
+  sk_propose_charge:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline
+  sk_propose_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.sk_propose_payment
+  sk_transaction:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.sk_transaction
+  sk_propose_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.sk_propose_delinquency
+  sk_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.sk_delinquency
+  gateway_final:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline
+  annual_timeline_renewal:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.pl.annual_guarantee_renewal
+  annual_timeline_propose_aud:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.pl.annual_guarantee_propose_aud
+  annual_value_propose:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.annual_value_propose
+  status_at_ref:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.status_at_ref
+  mob_of_life:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.mob_of_life
+  mob_of_death:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.mob_of_death
+  status_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.status_payment
+  gateway_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline
+  billing_type_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.billing_type_payment
+  status_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.status_delinquency
+  gateway_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.gateway_delinquency
+  value:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.value
+  value_paid:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.value_paid
+  total_amount_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.total_amount_delinquency
+  delinquency_monthly_value:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.delinquency_monthly_value
+  delinquency_amount_paid_monthly:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.delinquency_amount_paid_monthly
+  total_paid_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.total_paid_delinquency
+  open_amount_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.open_amount_delinquency
+  total_open_amount_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.total_open_amount_delinquency
+  discount_value_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.discount_value_delinquency
+  total_discount_value_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.total_discount_value_delinquency
+  is_delinquency_active:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.is_delinquency_active
+  is_retroactive_charging:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline
+  is_overdue:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.is_overdue
+  is_payment_charge_correct_amount:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.value
+  is_charged_on_contract_period:
+    description: ''
+  is_delinquency_charge_related:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.is_delinquency_charge_related
+  is_direct_billing:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.is_direct_billing
+  month_charge:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.month_charge
+  dt_contract_started:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.dt_contract_started
+  dt_ended:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.dt_ended
+  month_chargeble:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.month_chargeble
+  monthly_timeline_renewal:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.pl.monthly_guarantee_renewal
+  monthly_timeline_propose_aud:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.pl.monthly_guarantee_propose_aud
+  monthly_value_propose:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.monthly_value_propose
+  month_propose_life:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.pl.month_start
+  month_due_original:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.month_due_original
+  month_delinquency_due:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.month_delinquency_due
+  dt_paid_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.dt_paid_payment
+  dt_created_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.dt_created_payment
+  dt_due_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.dt_due_payment
+  dt_paid_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.dt_paid_delinquency
