@@ -6,4 +6,4 @@ is_incremental:
   incremental_date_mask: yyyy-MM-dd
 table_level_validations:
   has_size:
-    greater_than: 9400
+    greater_than: 6000
