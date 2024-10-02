@@ -10,7 +10,7 @@ dag:
       \ for the Vespúcio project, which aims to collect data from several sources\
       \ to create a source of truth.\n\nDocumentations about Vespúcio project [here](https://docs.google.com/spreadsheets/d/1v-6sGlfHUVeNyqMh28SXlLW7mUwDYuQNg0lul0Q28ck/edit#gid=396558073)."
 workflow:
-  type: query_delta
+  type: query
   layer: enrich
   load_spark_job: load_description_features
   spark_job_arguments:
