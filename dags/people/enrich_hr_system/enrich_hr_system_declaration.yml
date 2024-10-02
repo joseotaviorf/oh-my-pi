@@ -17,6 +17,7 @@ workflow:
       - assignments
       - demographic_attributes
       - disability
+      - salary_metrics
     assignment_salaries:
       - assignments
     employee_ids:
