@@ -1,6 +1,6 @@
 ---
-database_name: dw_offboarding
-table_name: fact_terminations
+database_name: dw_terminator
+table_name: fact_termination
 description: This table aims to store termination information, each line must contain the termination record in its most current state.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
@@ -64,37 +64,37 @@ columns:
     lineage:
       - datalake_terminator.termination.fee_final_amount
   fee_number_of_installments:
-    description: Numerical information that indicates the number of installments for the termination fee.
+    description:  Numerical information that indicates the number of installments for the termination fee.
     lineage:
       - datalake_terminator.termination.fee_number_of_installments
   total_tentant_repair_ar:
     description: Total repairs with tenant's responsibility in repair analysis.
     lineage:
-      - datalake_terminator.termination.total_tentant_repair_ar
+        - datalake_terminator.termination.total_tentant_repair_ar
   repairs_added_by_owner_review:
     description: Total repairs added by owner for review.
     lineage:
-      - datalake_terminator.termination.repairs_added_by_owner_review
+        - datalake_terminator.termination.repairs_added_by_owner_review
   repairs_exempted_by_owner_review:
     description: Total repairs exempted by the owner in the review.
     lineage:
-      - datalake_terminator.termination.repairs_exempted_by_owner_review
+        - datalake_terminator.termination.repairs_exempted_by_owner_review
   total_tentant_repair_review:
     description: Total repairs under tenant's responsibility under review.
     lineage:
-      - datalake_terminator.termination.total_tentant_repair_review
+        - datalake_terminator.termination.total_tentant_repair_review
   repairs_exempted_ac:
     description: Total repairs exempted in the contestation analysis.
     lineage:
-      - datalake_terminator.termination.repairs_exempted_ac
+        - datalake_terminator.termination.repairs_exempted_ac
   repairs_absorbed_ac:
     description: Total repairs absorbed in the contestation analysis.
     lineage:
-      - datalake_terminator.termination.repairs_absorbed_ac
+        - datalake_terminator.termination.repairs_absorbed_ac
   total_tentant_repair_ac:
     description: Total repairs are the tenant's responsibility in the contestation analysis.
     lineage:
-      - datalake_terminator.termination.total_tentant_repair_ac
+        - datalake_terminator.termination.total_tentant_repair_ac
   is_relisting:
     description: Boolean information that indicates whether the house is already being relisting.
     lineage:
@@ -148,7 +148,7 @@ columns:
     lineage:
       - datalake_terminator.termination.ts_fee_negotiation_updated
   ts_load:
-    description: This timestamp indicates when this data was loaded into dw_offboarding.
+    description: This timestamp indicates when this data was loaded into dw_terminator.
   year:
     description: Year when the data was loaded.
     lineage:
