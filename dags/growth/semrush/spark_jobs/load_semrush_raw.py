@@ -35,7 +35,11 @@ def _create_dataframe_with_standard_columns(response_data: dict, display_date: s
 
     url_parsed = urllib.parse.urlparse(response_data['url'])
     query_params = urllib.parse.parse_qs(url_parsed.query)
-    domain = query_params['subdomain'][0]
+    if query_params['type'][0] == 'subfolder_organic':
+        logger.info('Change subfolder to subdomain')
+        domain = query_params['subfolder'][0]
+    else:
+        domain = query_params['subdomain'][0]
 
     df = spark.read\
         .option("inferSchema",False)\

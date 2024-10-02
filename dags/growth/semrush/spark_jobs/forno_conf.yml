@@ -184,8 +184,8 @@ report_list:
     display_limit: 2
   olximoveis_organic_search_kw:
     configs:
-      subdomain: olx.com.br%2Fimoveis
-      type: subdomain_organic
+      subfolder: olx.com.br%2Fimoveis
+      type: subfolder_organic
       export_columns: Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tg,Tc,Co,Nr,Td,Kd,Fp,Fk,Ts,In,Pt
       database: br
       display_positions_type: organic
