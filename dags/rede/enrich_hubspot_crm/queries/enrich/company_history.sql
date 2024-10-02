@@ -186,7 +186,7 @@ SELECT
     NULLIF(GET_JSON_OBJECT(properties, '$.trabalha_com_financiamento_'), '') = 'Sim' AS has_financing,
     NULLIF(GET_JSON_OBJECT(properties, '$.trabalha_com_venda_e_locacao_'), '') LIKE '%Venda%' AS is_for_sale,
     NULLIF(GET_JSON_OBJECT(properties, '$.trabalha_com_venda_e_locacao_'), '') LIKE '%Locação%' AS is_for_rent,
-    NULLIF(GET_JSON_OBJECT(properties, '$.esta_no_leadgen_'), '') LIKE '' AS is_flagged_as_leadgen,
+    NULLIF(GET_JSON_OBJECT(properties, '$.esta_no_leadgen_'), '') = 'Sim' AS is_flagged_as_leadgen,
     NULLIF(GET_JSON_OBJECT(properties, '$.trabalha_em_parceria_com_outras_imobiliarias_'), '') = 'Sim' AS has_partnerships_with_other_agencies,
     NULLIF(GET_JSON_OBJECT(properties, '$.digito_creci'), '') = 'PF' AS is_natural_person,
     NULLIF(GET_JSON_OBJECT(properties, '$.digito_creci'), '') = 'PJ' AS is_juridical_person,
