@@ -8,7 +8,7 @@ dag:
       This DAG creates the enriched table that tells us the history of how a house was or was not in Rede.
       This DAG is triggered by Mediator and loads the table via full load.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_general_cluster
