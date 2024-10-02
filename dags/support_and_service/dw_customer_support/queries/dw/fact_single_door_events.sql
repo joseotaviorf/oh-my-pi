@@ -10,9 +10,23 @@ SELECT
   CASE
     WHEN event_type = 'ongoing_requests_timeline_page_viewed' THEN 'ONGOING REQUESTS'
     WHEN event_type = 'faq_article_page_viewed' THEN 'FAQ'
-    WHEN event_type IN ('owner_income_tax_shortcut_tapped', 'owner_urban_property_tax_shortcut_tapped') THEN 'SHORTCUT CENTER SEASONAL'
+    WHEN event_type IN ('owner_income_tax_shortcut_tapped', 'owner_urban_property_tax_shortcut_tapped')
+      THEN 'SHORTCUT CENTER SEASONAL'
+    WHEN event_type IN (
+      'help_center_pre_triage_new_subject_clicked',
+      'help_center_pre_triage_direct_routing_option_clicked',
+      'help_center_pre_triage_page_viewed',
+      'help_center_pre_triage_page_closed',
+      'help_center_triage_option_clicked',
+      'help_center_main_triage_page_closed',
+      'help_center_sub_triage_page_closed',
+      'help_center_triage_channel_offer_chosen',
+      'help_center_call_cancelled',
+      'help_center_call_exchanged_for_chat'
+    ) THEN 'CALL IN APP'
     ELSE 'SHORTCUT CENTER'
   END AS event_from,
+  event_properties,
   event_type,
   CASE
     WHEN id_app = 170698 THEN 'TENANT APP'
@@ -60,4 +74,14 @@ WHERE
     'menu_transfers_shortcut_tapped',
     'owner_income_tax_shortcut_tapped',
     'owner_urban_property_tax_shortcut_tapped'
+    'help_center_pre_triage_new_subject_clicked',
+    'help_center_pre_triage_direct_routing_option_clicked',
+    'help_center_pre_triage_page_viewed',
+    'help_center_pre_triage_page_closed',
+    'help_center_triage_option_clicked',
+    'help_center_main_triage_page_closed',
+    'help_center_sub_triage_page_closed',
+    'help_center_triage_channel_offer_chosen',
+    'help_center_call_cancelled',
+    'help_center_call_exchanged_for_chat'
   )

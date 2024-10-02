@@ -20,6 +20,10 @@ columns:
     description: Event type
   app:
     description: If the event is from the tenant or landlord app
+  event_properties:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Properties of the event, contains relevant metadata of the interaction performed by the user
   city:
     lineage:
       - datalake_amplitude_clean.events.city
