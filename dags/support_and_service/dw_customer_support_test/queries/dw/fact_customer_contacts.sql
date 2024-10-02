@@ -139,8 +139,8 @@ contacts AS (
     tm.total_wrap_up_time,
     tm.total_waiting_time,
     CASE
-      WHEN channel = 'chat' THEN tm.first_reply_time
-      WHEN channel = 'call' THEN d.waiting_time_sec
+      WHEN d.channel = 'chat' THEN tm.first_reply_time
+      WHEN d.channel = 'call' THEN d.waiting_time_sec
     END AS first_reply_time,
     tm.total_handling_time,
     d.is_per_team_task,
