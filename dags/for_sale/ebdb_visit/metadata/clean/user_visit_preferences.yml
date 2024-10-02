@@ -1,0 +1,18 @@
+database_name: datalake_ebdb_test_clean
+table_name: user_visit_preferences
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences.id
+  id_user:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences.user_id
+  is_preferred_fixed_agent_enabled:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences.preferredfixedagentenabled
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences.atualizadoem

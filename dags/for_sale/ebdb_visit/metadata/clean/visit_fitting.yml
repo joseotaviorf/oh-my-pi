@@ -1,0 +1,64 @@
+database_name: datalake_ebdb_test_clean
+table_name: visit_fitting
+domain: Data ForSale
+columns:
+  id:
+    description: Unique ID for this row.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.id
+  id_visit:
+    description: Visit ID looking for fit.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.fitted_visit_id
+  id_visitor:
+    description:
+    lineage: Visitor ID looking for fit.
+      - datalake_ebdb_test_raw.visitfitting.visitor_id
+  id_house:
+    description:
+    lineage: House ID.
+      - datalake_ebdb_test_raw.visitfitting.house_id
+  begin_slot:
+    description: Start slot for visit fitting.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.begin_slot
+  end_slot:
+    description: End slot for visit fitting.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.end_slot
+  business_context:
+    description: The business context of the visit.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.business_context
+  intention:
+    description: Main intention of the visit.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.intention
+  status:
+    description: Visit docking status.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.status
+  channel:
+    description: By which channel was the request made.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.channel
+  request_context:
+    description: If it is a fallback request, or the one made by the visitor.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.request_context
+  dt_visit:
+    description: Date of the visit.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.visit_date
+  ts_expiration:
+    description: Date of expiration.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.expiration_date
+  ts_created:
+    description: Date of creation.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.criadoEm
+  ts_updated:
+    description: Updated date.
+    lineage:
+      - datalake_ebdb_test_raw.visitfitting.atualizadoEm

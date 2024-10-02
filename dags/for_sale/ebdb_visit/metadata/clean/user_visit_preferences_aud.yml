@@ -1,0 +1,24 @@
+database_name: datalake_ebdb_test_clean
+table_name: user_visit_preferences_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences_aud.id
+  is_preferred_fixed_agent_enabled:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences_aud.preferredfixedagentenabled
+  mod_is_preferred_fixed_agent_enabled:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences_aud.preferredfixedagentenabled_mod
+  rev:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences_aud.revtype
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences_aud.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_raw.uservisitpreferences_aud.atualizadoem

@@ -1,0 +1,48 @@
+database_name: datalake_ebdb_test_clean
+table_name: visit_aud
+columns:
+  id_visit:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.revtype
+  id_agent:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.agente_id
+  id_last_update_origin:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.origemultimaatualizacao_id
+  is_fixed_agent:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.agentefixo
+  id_real_estate_agent_rating:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.realestateagentrating_id
+  status:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.status
+  structured:
+    lineage:
+      - datalake_ebdb_test_raw.visita.structured
+  computed_status:
+    lineage:
+      - datalake_ebdb_test_raw.visita.computed_status
+  mod_structured:
+    lineage:
+      - datalake_ebdb_test_raw.visita.structured_MOD
+  mod_status:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.status_mod
+  booking_type:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.bookingtype
+  id_house_rating:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.houserating_id
+  id_creation_origin:
+    lineage:
+      - datalake_ebdb_test_raw.visita_aud.origemcriacao_id

@@ -1,0 +1,58 @@
+dag:
+  name: ebdb_visit
+  schedule_start_date: 2024,01,01
+  schedule_interval: 10 21 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      Dag containing all tables from the Visits context.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_schema: ebdb
+  custom_schema: ebdb_test
+  dbutils_secret_key: EBDB_DB
+  tables_customization:
+    Agendamento:
+      clean_table_name: booking
+    Agendamento_AUD:
+      clean_table_name: booking_aud
+    MudancaStatusAgendamento:
+      clean_table_name: booking_status_change
+    Entrance:
+      clean_table_name: entrance
+    FollowUpDetails:
+      clean_table_name: follow_up_details
+    FeedbackTag:
+      clean_table_name: feedback_tag
+    FollowUpDetails_FeedbackTag:
+      clean_table_name: follow_up_details_feedback_tag
+    UserVisitPreferences:
+      clean_table_name: user_visit_preferences
+    UserVisitPreferences_AUD:
+      clean_table_name: user_visit_preferences_aud
+    Visita:
+      clean_table_name: visit
+    Visita_AUD:
+      clean_table_name: visit_aud
+    VisitCancellationDetails:
+      clean_table_name: visit_cancellation_details
+    VisitCancellationDetails_AUD:
+      clean_table_name: visit_cancellation_details_aud
+    VisitCheckin:
+      clean_table_name: visit_checkin
+    VisitCheckin_AUD:
+      clean_table_name: visit_checkin_aud
+    VisitFitting:
+      clean_table_name: visit_fitting
+    VisitaOrigem:
+      clean_table_name: visit_origin
+    VisitStatusLog:
+      clean_table_name: visit_status_log
+    Visitor:
+      clean_table_name: visitor
+    Visitor_AUD:
+      clean_table_name: visitor_aud
+cluster:
+  type: databricks_12_2_med_general_cluster
