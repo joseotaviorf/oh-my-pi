@@ -1483,6 +1483,7 @@ bietlejuice.enrich_cyber_homolog:
   - bietlejuice.cyber:load-clean-agreement-invoices
   - bietlejuice.cyber:load-clean-agreements
   - bietlejuice.cyber:load-clean-bill
+  - bietlejuice.cyber:load-clean-campaign
   - bietlejuice.cyber:load-clean-contracts
   - bietlejuice.cyber:load-clean-contracts-agreements
   - bietlejuice.cyber:load-clean-delinquent-master

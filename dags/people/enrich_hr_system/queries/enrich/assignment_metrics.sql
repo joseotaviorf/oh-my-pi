@@ -370,7 +370,7 @@ cte_enrich_disability AS (
     sk_disability,
     id_person,
     has_self_declared_disability
-  FROM disability
+  FROM datalake_hr_system.disability
   QUALIFY
     ts_last_updated = MAX(ts_last_updated) over (PARTITION BY id_person)
     OR ts_last_updated is null

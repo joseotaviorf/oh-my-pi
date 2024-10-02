@@ -1,0 +1,73 @@
+---
+database_name: datalake_hr_system
+table_name: salary_metrics
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "Table that contains metrics related to salary history, promotions, and adjustments for employee assignments."
+columns:
+  id_assignment:
+    description: "Unique identifier for the worker assignment."
+    lineage:
+      - datalake_hr_system_clean.salaries.id_assignment
+  sk_last_increase_date:
+    description: "Date of the last salary increase (excluding collective wage adjustments), formatted as YYYYMMDD."
+    lineage:
+      - datalake_hr_system_clean.salaries.dt_from
+  sk_first_promotion_date:
+    description: "Date of the first promotion for the assignment, formatted as YYYYMMDD."
+    lineage:
+      - datalake_hr_system_clean.salaries.dt_from
+  currency_code:
+    description: "Currency code for the most recent salary record."
+    lineage:
+      - datalake_hr_system_clean.salaries.currency_code
+  qnt_promotions:
+    description: "Total number of promotions the assignment has received."
+  qnt_movimentations:
+    description: "Total number of salary changes (excluding collective wage adjustments) for the assignment."
+  current_salary_amount:
+    description: "Current salary amount for the assignment."
+    lineage:
+      - datalake_hr_system_clean.salaries.salary_amount
+  first_salary_amount:
+    description: "First recorded salary amount for the assignment."
+    lineage:
+      - datalake_hr_system_clean.salaries.salary_amount
+  previous_salary_amount:
+    description: "Previous salary amount before the current one, excluding collective wage adjustments."
+    lineage:
+      - datalake_hr_system_clean.salaries.salary_amount
+  salary_reference:
+    description: "Salary range midpoint reference for the current salary."
+    lineage:
+      - datalake_hr_system_clean.salaries.salary_range_mid_point
+  last_salary_increase:
+    description: "Amount of the most recent salary increase (excluding collective wage adjustments)."
+    lineage:
+      - datalake_hr_system_clean.salaries.adjustment_amount
+  pct_last_salary_increase:
+    description: "Percentage of the most recent salary increase (excluding collective wage adjustments)."
+    lineage:
+      - datalake_hr_system_clean.salaries.adjustment_percentage
+  range_salary_movement:
+    description: "Difference between the current salary and the first recorded salary for the assignment."
+    lineage:
+      - datalake_hr_system_clean.salaries.salary_amount
+  first_promotion_salary:
+    description: "Salary amount during the first promotion."
+    lineage:
+      - datalake_hr_system_clean.salaries.salary_amount
+  nominal_increase_first_promotion:
+    description: "Nominal salary increase amount during the first promotion."
+    lineage:
+      - datalake_hr_system_clean.salaries.adjustment_amount
+  pct_increase_first_promotion:
+    description: "Percentage increase in salary during the first promotion."
+    lineage:
+      - datalake_hr_system_clean.salaries.adjustment_percentage
+  average_time_between_movimentations:
+    description: "Average time (in months) between promotions or salary changes for the assignment."
+  dt_first_promotion:
+    description: "Date of the first promotion for the assignment."
+    lineage:
+      - datalake_hr_system_clean.salaries.dt_from
