@@ -226,7 +226,7 @@ columns:
     description: "Original debt due date"
     lineage:
       - datalake_cyber_raw.tb_parcela.PADTVENORI
-  ts_invoice_due:
+  ts_installment_due:
     description: "Invoice due date"
     lineage:
       - datalake_cyber_raw.tb_parcela.PADTVENC

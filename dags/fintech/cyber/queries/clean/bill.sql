@@ -66,8 +66,7 @@ SELECT
     PANOSABOL AS drawer_name,
     PASEREARBOL AS bill_record_sequence_2,
     PASEQREARBOL AS bill_record_sequence_3,
-    PABIDTEXCLUSAO,
-    PABIFLGEXCLLOG,
+    PABIFLGEXCLLOG As is_bill_item_deleted,
     IFNULL(PAVLRORI, 0) AS due_amount,
     IFNULL(PAVLPRINC, 0) AS main_amount,
     IFNULL(PAVLJUR, 0) AS interest_amount,
@@ -85,7 +84,7 @@ SELECT
     PAVLRTOBOL AS bill_total_amount,
     PADTCRIPA AS ts_creation,
     PADTVENORI AS ts_due,
-    PADTVENC AS ts_invoice_due,
+    PADTVENC AS ts_installment_due,
     PADTVENCBOL AS ts_due_boleto,
     PABIDTVENC AS ts_entry_due,
     PADTENVFA AS ts_sent,
@@ -95,5 +94,6 @@ SELECT
     PABIDTUPDATE AS ts_entry_update,
     PADTINSERT AS ts_insert,
     PADTUPDATE AS ts_update,
+    PABIDTEXCLUSAO AS ts_bill_item_deleted,
     NOW() AS ts_load
 FROM datalake_cyber_raw.tb_parcela

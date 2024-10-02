@@ -47,8 +47,8 @@ SELECT
     CLLNG AS longitud_manager,
     CLLAT AS latitud_manager,
     IF(CLRONLY = 1, TRUE, FALSE) AS has_read_only_access,
-    CLCREUSER,
-    CLCHGUSER,
+    CLCREUSER AS ts_user_created,
+    CLCHGUSER AS ts_user_updated,
     CLLSTACSDT AS ts_last_access,
     NOW() AS ts_load
 FROM datalake_cyber_raw.collid

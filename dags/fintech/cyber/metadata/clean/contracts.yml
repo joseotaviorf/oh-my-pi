@@ -53,7 +53,7 @@ columns:
     description: "Return date"
     lineage:
       - datalake_cyber_raw.uda1.U1DTRETOR
-  has_negative_spc:
+  has_spc_credit_denial:
     description: "Indicates that there is a Negative action for the Bureau SPC"
     lineage:
       - datalake_cyber_raw.uda1.U1FLACNEGSPC
@@ -85,7 +85,7 @@ columns:
     description: "Guarantor Negative Date in the SPC"
     lineage:
       - datalake_cyber_raw.uda1.U1DTNEGAVSPC
-  has_negative_serasa:
+  has_serasa_credit_denial:
     description: "Indicates that there is a Negative action for Bureau Serasa"
     lineage:
       - datalake_cyber_raw.uda1.U1FLACNEGSER
@@ -117,7 +117,7 @@ columns:
     description: "Guarantor Negative Date in SERASA"
     lineage:
       - datalake_cyber_raw.uda1.U1DTNEGAVSER
-  has_negative_bvs:
+  has_bvs_credit_denial:
     description: "Indicates that there is a Negative action for the BVS Bureau"
     lineage:
       - datalake_cyber_raw.uda1.U1FLACNEGBVS
@@ -149,7 +149,7 @@ columns:
     description: "Guarantor Negative Date in the BVS"
     lineage:
       - datalake_cyber_raw.uda1.U1DTNEGAVBVS
-  has_negative_cdl:
+  has_cdl_credit_denial:
     description: "Negative Flag in the CDL Bureau"
     lineage:
       - datalake_cyber_raw.uda1.U1FLACNEGCDL
@@ -181,7 +181,7 @@ columns:
     description: "Guarantor Negative Date in the CDL"
     lineage:
       - datalake_cyber_raw.uda1.U1DTNEGAVCDL
-  has_negative_internal:
+  has_internal_credit_denial:
     description: "Negative Flag in the Internal Bureau"
     lineage:
       - datalake_cyber_raw.uda1.U1FLACNEGINT
@@ -457,15 +457,15 @@ columns:
     description: "(pt: Fluxo de cobrança)"
     lineage:
       - datalake_cyber_raw.uda1.U1TPCOB
-  days:
+  delay_contamined_days:
     description: "Days"
     lineage:
       - datalake_cyber_raw.uda1.U1DAYS
-  classification:
+  collection_classification:
     description: "Classification"
     lineage:
       - datalake_cyber_raw.uda1.U1CLASSCTR
-  restrictive_occurrence:
+  has_restrictive_evic_occurrence:
     description: "Restrictive occurrence (pt: ocorrência restritiva)"
     lineage:
       - datalake_cyber_raw.uda1.U1OCOREVIC

@@ -13,7 +13,6 @@ SELECT
         WHEN APFLAG2 = "C" THEN "Concluído"
         WHEN APFLAG2 = "R" THEN "Quebrado"
     END AS revalued_payment_flag,
-    APNOSSONUM AS our_number,
     APDETID AS installment_number,
     IFNULL(APAMZAMT,0) AS amortization_amount,
     IFNULL(APAMT,0) AS amount_to_pay,

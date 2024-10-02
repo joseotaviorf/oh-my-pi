@@ -124,19 +124,19 @@ columns:
     description: "relationship identifier. It is used to link the relationship with the address and phone tables."
     lineage:
       - datalake_cyber_raw.relations.RERID
-  spc_bureau:
+  has_spc_credit_denial:
     description: "SPC bureau"
     lineage:
       - datalake_cyber_raw.relations.RERFLACSPC
-  serasa_bureau:
+  has_serasa_credit_denial:
     description: "Serasa bureau"
     lineage:
       - datalake_cyber_raw.relations.RERFLACSER
-  cdl_bureau:
+  has_internal_credit_denial:
     description: "CDL bureau"
     lineage:
       - datalake_cyber_raw.relations.RERFLACCDL
-  bvs_bureau:
+  has_bvs_credit_denial:
     description: "BVS bureau"
     lineage:
       - datalake_cyber_raw.relations.RERFLACBVS

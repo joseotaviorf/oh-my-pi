@@ -25,8 +25,6 @@ SELECT
     PHRANK AS phone_rank,
     PHRELNUM AS related_number,
     PHRANKORDER AS hierarchical_sequence,
-    PHSELFCURE,
-    PHRERID,
     PHUPDDT AS ts_hierarchy_calculation,
     PHDATE AS ts_creation,
     PHSTATDT AS ts_status_update,

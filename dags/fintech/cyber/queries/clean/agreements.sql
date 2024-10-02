@@ -53,5 +53,6 @@ SELECT
     AHAUTDT AS ts_authorized,
     AHSTADT AS ts_status_update,
     AHDTQB AS ts_agreement_breach,
+    AHDTCANC AS ts_canceled,
     NOW() AS ts_load
 FROM datalake_cyber_raw.agrhdr
