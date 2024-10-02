@@ -4,7 +4,7 @@ dag:
   schedule_start_date: 2020, 8, 29
   schedule_interval: 0 16 15,30 * *
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_general_cluster

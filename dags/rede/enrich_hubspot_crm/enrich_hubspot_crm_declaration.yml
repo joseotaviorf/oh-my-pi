@@ -4,7 +4,7 @@ dag:
   schedule_start_date: 2021, 8, 24
   owner: Data Rede
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: hubspot
   inner_dependencies:
