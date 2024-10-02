@@ -1,5 +1,5 @@
 dag:
-  name: dw_terminator
+  name: dw_offboarding
   schedule_start_date: 2024, 05, 28
   owner: Data SS
   documentation:
@@ -9,7 +9,7 @@ dag:
 workflow:
   type: query_delta
   layer: dw
-  custom_schema: terminator
+  custom_schema: offboarding
   default_extraction_type: incremental
   default_partitions: [year, month, day]
 
