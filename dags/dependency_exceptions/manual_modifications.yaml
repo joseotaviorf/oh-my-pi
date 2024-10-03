@@ -20,6 +20,8 @@ bietlejuice.dw_call:
 bietlejuice.dw_casa_mineira_portal:
   remove:
     - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
+bietlejuice.dw_chattermill:
+  override: []
 bietlejuice.dw_country:
   override: []
 bietlejuice.dw_crm:
@@ -289,6 +291,8 @@ bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
     - bietlejuice.enrich_region:load-enrich-region
     - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
     - bietlejuice.casa_mineira_criteo_campaigns:load-clean-criteo-campaigns
+bietlejuice.enrich_chattermill:
+  override: []
 bietlejuice.enrich_consolidated_marketing_metrics:
   remove:
     - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes

@@ -31,7 +31,7 @@ DAG_OWNER = DAGOwnerEnum.DATA_SS
 MAIN_START_DATE = datetime(
     2020, 10, 1, 0, 0, 0, tzinfo=pendulum.timezone("America/Sao_Paulo")
 )
-MAIN_SCHEDULE_INTERVAL = "0 2 * * *"
+MAIN_SCHEDULE_INTERVAL = None
 
 config_service = ConfigurationService(DAG_NAME)
 
