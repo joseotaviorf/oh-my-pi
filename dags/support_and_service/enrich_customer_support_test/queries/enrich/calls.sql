@@ -24,6 +24,7 @@ call_events AS (
     queue_name,
     worker_email,
     from_phone_number,
+    task_cancelation_reason,
     CASE
       WHEN direction = 'outbound' THEN outbound_to_phone_number
       ELSE to_phone_number
@@ -142,6 +143,7 @@ unanswered_calls AS (
     call_events
   WHERE
     direction IS NOT NULL
+    AND task_cancelation_reason IS NOT NULL
   GROUP BY ALL
   HAVING COUNT(DISTINCT(id_reservation)) < 1
 ),
