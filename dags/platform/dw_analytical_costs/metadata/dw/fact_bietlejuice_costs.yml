@@ -1,9 +1,10 @@
 ---
 database_name: dw_analytical_costs
 table_name: fact_bietlejuice_costs
-description: Daily snapshot fact table with the aim of gathering the main cost information generated in Databricks by bietlejuice dags. 
+description:
+  Daily snapshot fact table with the aim of gathering the main cost information generated in Databricks by bietlejuice dags.
   Each row in this table represents a unique combination of date and dag key.
-domain: Data Platform 
+domain: Data Platform
 owner: data-platform-team@quintoandar.com.br
 columns:
   sk_snapshot:
@@ -15,6 +16,10 @@ columns:
     description: Dag identification key(dag_name).
     lineage:
       - datalake_databricks_usage_costs.usage_costs.id_dag
+  sk_line:
+    description: DAG line id, which is also known as the "DAG owner".
+    lineage:
+      - datalake_databricks_usage_costs.usage_costs.id_line
   sk_cluster_config:
     description: Unique identification key for a combination.
     lineage:

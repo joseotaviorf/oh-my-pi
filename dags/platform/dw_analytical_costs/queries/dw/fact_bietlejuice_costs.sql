@@ -1,10 +1,11 @@
 SELECT
     MD5(id_dag || dt_execution) AS sk_snapshot,
     id_dag AS sk_dag,
+    id_line AS sk_line,
     MD5(
-      COALESCE(cluster_compute_type, 'N/A') 
-      || COALESCE(execution_context, 'N/A') 
-      || COALESCE(spark_version, 'N/A') 
+      COALESCE(cluster_compute_type, 'N/A')
+      || COALESCE(execution_context, 'N/A')
+      || COALESCE(spark_version, 'N/A')
       || COALESCE(runtime_engine, 'N/A')
     ) AS sk_cluster_config,
     COALESCE(CAST(REPLACE(SUBSTRING(dt_execution, 1, 10),'-','') AS BIGINT), -1) AS sk_execution_date,
@@ -25,7 +26,7 @@ SELECT
 FROM
     datalake_databricks_usage_costs.usage_costs
 WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}') 
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND execution_context IN ("bietlejuice", "wonka dag")
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_dag, dt_execution ORDER BY ts_execution DESC) = 1

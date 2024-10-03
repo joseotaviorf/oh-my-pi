@@ -1,6 +1,7 @@
 SELECT
     sk_snapshot,
     sk_dag,
+    sk_line,
     NULL AS sk_cluster,
     NULL AS sk_job,
     sk_cluster_config,
@@ -25,6 +26,7 @@ UNION ALL
 SELECT
     sk_snapshot,
     NULL AS sk_dag,
+    NULL AS sk_line,
     sk_cluster,
     NULL AS sk_job,
     sk_cluster_config,
@@ -49,6 +51,7 @@ UNION ALL
 SELECT
     sk_snapshot,
     NULL AS sk_dag,
+    NULL AS sk_line,
     NULL AS sk_cluster,
     sk_job,
     sk_cluster_config,

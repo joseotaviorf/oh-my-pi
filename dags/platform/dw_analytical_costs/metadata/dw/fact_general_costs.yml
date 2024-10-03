@@ -17,6 +17,10 @@ columns:
     description: Identification key of the dag linked to the execution.
     lineage:
       - dw_analytical_costs.fact_bietlejuice_costs.sk_dag
+  sk_line:
+    description: DAG line id, which is also known as the "DAG owner".
+    lineage:
+      - dw_analytical_costs.fact_bietlejuice_costs.id_line
   sk_cluster:
     description: Databricks cluster key.
     lineage:

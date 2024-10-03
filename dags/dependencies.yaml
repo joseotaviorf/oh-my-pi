@@ -1513,6 +1513,7 @@ bietlejuice.enrich_databricks_usage_costs:
   - bietlejuice.databricks_usage:load-clean-billable-usage
   - bietlejuice.enrich_databricks:load-enrich-daily-clusters
   - bietlejuice.enrich_databricks:load-enrich-unique-clusters
+  - bietlejuice.enrich_pipeline:load-enrich-dag
   - bietlejuice.gsheets_platform:done-clean-databricks-contract-details
 bietlejuice.enrich_date:
   - bietlejuice.enrich_region:load-enrich-region
