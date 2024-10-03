@@ -19,7 +19,7 @@ amount_details AS (
 installments AS (
   SELECT
     ai.id_agreement,
-    MIN(IF(ai.status = 'Quebrado', DATE(ai.ts_due_installment), NULL)) AS ts_cancelation,
+    MIN(IF(ai.status = 'Quebrado', DATE(ai.ts_due_installment), NULL)) AS dt_cancelation,
     MAX(IF(ai.installment_number = 0, p.payment_method, NULL)) AS promisse_payment_method,
     COUNT(DISTINCT ai.id_agreement_installment) AS number_of_installments,
     MAX(IF(p.id_agreement_installment IS NOT NULL, ai.installment_number + 1, 0)) AS paid_installments,
@@ -53,6 +53,22 @@ total_invoices_negotiated AS (
     COUNT(DISTINCT id_invoice) AS total_invoices_negotiated
   FROM datalake_cyber_homolog.debt_negotiation_mapping
   GROUP BY 1
+),
+deduplicate_agency_group AS (
+  SELECT
+    agency_group,
+    id_agency
+  FROM datalake_cyber_clean.agency_group
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY agency_group ORDER BY percentage_remuneration DESC) = 1
+),
+get_agency_group_name AS (
+  SELECT
+    ag.agency_group,
+    a.id_agency,
+    a.agency_name
+  FROM deduplicate_agency_group AS ag
+  LEFT JOIN datalake_cyber_clean.agency AS a
+    ON ag.id_agency = a.id_agency
 )
 SELECT
     a.id_agreement AS id_negotiation,
@@ -60,8 +76,13 @@ SELECT
     c.id_contract_external,
     c.id_client AS id_customer,
     UPPER(a.id_user) AS id_operator,
+    CASE
+      WHEN COALESCE(agg.agency_name, ag.agency_name) LIKE "PASCH%" THEN "PASCHOALOTTO"
+      WHEN UPPER(a.id_user) LIKE "PSC%" THEN "PASCHOALOTTO"
+      WHEN UPPER(a.id_user) = "MIGRACAO" THEN "MIGRACAO"
+      ELSE COALESCE(agg.agency_name, ag.agency_name)
+    END AS advisory,
     cp.offer_number AS id_campaign,
-    ag.agency_name AS advisory,
     ca.contract_group AS creditor,
     a.frequency,
     a.agreement_type AS agreement_type,
@@ -76,6 +97,7 @@ SELECT
       WHEN ag.agency_type = "Portal" THEN "Portal Auto Negociação"
       WHEN ag.agency_type = "Cyber Credit" THEN "Operador Interno"
       WHEN cp.id_campaign IS NOT NULL OR UPPER(a.agreement_type) LIKE '%CAM%' THEN "Carta Campanha"
+      WHEN UPPER(a.id_user) = "MIGRACAO" THEN "Migração"
       ELSE ag.agency_type
     END AS origin_agreement,
     a.status AS original_negotiation_status,
@@ -121,7 +143,7 @@ SELECT
     i.dt_due_promisse,
     i.dt_down_payment,
     i.dt_paid_all,
-    COALESCE(DATE(a.ts_agreement_breach), i.ts_cancelation) AS dt_cancellation,
+    COALESCE(DATE(a.ts_agreement_breach), a.ts_canceled, i.dt_cancelation) AS dt_cancellation,
     NOW() AS ts_load
 FROM datalake_cyber_clean.agreements AS a
 INNER JOIN datalake_cyber_clean.contracts_agreements AS ca
@@ -132,6 +154,8 @@ LEFT JOIN datalake_cyber_clean.users AS u
   ON UPPER(a.id_user) = UPPER(u.id_user)
 LEFT JOIN datalake_cyber_clean.agency AS ag
   ON u.id_agency = ag.id_agency
+LEFT JOIN get_agency_group_name AS agg
+  ON ag.id_agency = agg.agency_group
 LEFT JOIN datalake_cyber_clean.agreement_type AS at
   ON a.agreement_type = at.id_agreement_type
 LEFT JOIN discount_type AS atd
@@ -143,4 +167,4 @@ LEFT JOIN installments AS i
 LEFT JOIN total_invoices_negotiated AS tin
   ON a.id_agreement = tin.id_negotiation
 LEFT JOIN datalake_cyber_clean.campaign AS cp
-  ON a.id_agreement = cp.id_negotiation
+  ON a.id_agreement = cp.id_agreement

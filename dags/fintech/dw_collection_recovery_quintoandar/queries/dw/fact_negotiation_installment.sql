@@ -3,7 +3,7 @@ deduplicate_trato_feito_negotiation AS (
   SELECT
     id_contract,
     id_negotiation,
-    id_negotiation_recupera,
+    id_negotiation_external,
     CASE
       WHEN debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
       WHEN debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
@@ -12,7 +12,7 @@ deduplicate_trato_feito_negotiation AS (
       datalake_debt_recovery.negotiation
   WHERE
     debtor != "velo_delinquency_tenant"
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_recupera ORDER BY ts_created_at DESC) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_external ORDER BY ts_created_at DESC) = 1
 ),
 deduplicate_invoice_extra AS (
   SELECT
@@ -29,7 +29,7 @@ trato_feito_installment AS (
   SELECT
     n.id_contract,
     i.id_negotiation,
-    n.id_negotiation_recupera,
+    n.id_negotiation_external,
     n.creditor,
     i.id AS id_installment,
     i.id_invoice_extra,
@@ -68,8 +68,8 @@ nexxera_confirmation AS (
       ROW_NUMBER() OVER(PARTITION BY our_number, occurrence_code ORDER BY dt_occurrence_code DESC) = 1
 )
 SELECT DISTINCT
-    CONCAT(COALESCE(i.id_negotiation, tfi.id_negotiation_recupera),"-",INT(COALESCE(i.installment_number, tfi.installment_number))) AS sk_negotiation_installment,
-    STRING(COALESCE(i.id_negotiation, tfi.id_negotiation_recupera)) AS sk_negotiation,
+    CONCAT(COALESCE(i.id_negotiation, tfi.id_negotiation_external),"-",INT(COALESCE(i.installment_number, tfi.installment_number))) AS sk_negotiation_installment,
+    STRING(COALESCE(i.id_negotiation, tfi.id_negotiation_external)) AS sk_negotiation,
     i.customer_document AS sk_debtor,
     tfi.id_installment,
     CAST(tfi.id_invoice_extra AS BIGINT) AS id_invoice_extra,
@@ -109,7 +109,7 @@ FROM
     datalake_recupera.installment AS i
 FULL OUTER JOIN
     trato_feito_installment AS tfi
-        ON tfi.id_negotiation_recupera = i.id_negotiation
+        ON tfi.id_negotiation_external = i.id_negotiation
         AND tfi.installment_number = i.installment_number
 LEFT JOIN
     nexxera_confirmation AS nx

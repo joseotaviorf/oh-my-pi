@@ -7,13 +7,13 @@ columns:
   sk_negotiation_installment:
     lineage:
       - datalake_recupera.installment.id_negotiation
-      - datalake_debt_recovery.negotiation.id_negotiation_recupera
+      - datalake_debt_recovery.negotiation.id_negotiation_external
       - datalake_recupera.installment.installment_number
     description: "Negotiation ID + Number of installment. Table surrogate key"
   sk_negotiation:
     lineage:
       - datalake_recupera.installment.id_negotiation
-      - datalake_debt_recovery.negotiation.id_negotiation_recupera
+      - datalake_debt_recovery.negotiation.id_negotiation_external
     description: "Negotiation ID. Foreign key to fact_negotiation"
   sk_debtor:
     lineage:

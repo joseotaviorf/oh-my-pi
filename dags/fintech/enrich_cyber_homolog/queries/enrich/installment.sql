@@ -84,7 +84,8 @@ split_fees_between_installments AS (
       DATE(p.ts_payment) AS dt_paid,
       DATE(ain.ts_document) AS dt_emission_boleto,
       DATE(ain.ts_due) AS dt_due_boleto,
-      DATE(ain.ts_processing) AS dt_processing_boleto
+      DATE(ain.ts_processing) AS dt_processing_boleto,
+      IF(ai.status = 'Quebrado', DATE(ai.ts_due_installment), NULL) AS dt_cancelation
     FROM datalake_cyber_clean.agreement_installments AS ai
     LEFT JOIN datalake_cyber_clean.agreements AS a
         ON ai.id_agreement = a.id_agreement
@@ -133,5 +134,6 @@ split_fees_between_installments AS (
     dt_creation,
     dt_due,
     dt_paid,
+    dt_cancelation,
     NOW() AS ts_load
   FROM calculate_fields

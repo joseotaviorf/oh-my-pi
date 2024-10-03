@@ -3,7 +3,7 @@ deduplicate_trato_feito_negotiation AS (
   SELECT
     id_contract,
     id_negotiation,
-    id_negotiation_recupera,
+    id_negotiation_external AS id_negotiation_recupera,
     CASE
       WHEN debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
       WHEN debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
@@ -11,7 +11,7 @@ deduplicate_trato_feito_negotiation AS (
     END AS creditor
   FROM
       datalake_debt_recovery.negotiation
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_recupera ORDER BY ts_created_at DESC) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_external ORDER BY ts_created_at DESC) = 1
 ),
 deduplicate_invoice_extra AS (
   SELECT

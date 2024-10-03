@@ -31,7 +31,7 @@ deduplicate_complementary_records_written_down AS (
 trato_feito_debts AS (
   SELECT
     d.id_external AS id_invoice,
-    n.id_negotiation_recupera AS id_negotiation,
+    n.id_negotiation_external AS id_negotiation,
     n.id_contract
   FROM datalake_trato_feito_clean.debt AS d
   LEFT JOIN datalake_debt_recovery.negotiation AS n

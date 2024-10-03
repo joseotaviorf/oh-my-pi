@@ -19,7 +19,7 @@ columns:
     description: Surrogate key of table. It is a sequencial number based on the id_creditor, id_contract and id_installment.
   sk_negotiation:
     lineage:
-      - datalake_debt_recovery.negotiation.id_negotiation_recupera
+      - datalake_debt_recovery.negotiation.id_negotiation_external
       - datalake_recupera_clean.creditor_pending.installment_code
       - datalake_recupera_clean.complementary_records.installment_code
       - datalake_recupera_clean.complementary_records_written_down.installment_code

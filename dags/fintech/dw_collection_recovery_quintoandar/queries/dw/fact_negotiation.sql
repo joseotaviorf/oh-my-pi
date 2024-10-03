@@ -1,7 +1,7 @@
 WITH
 trato_feito_negotiation AS (
   SELECT
-    id_negotiation_recupera,
+    id_negotiation_external,
     id_negotiation,
     id_contract,
     CASE
@@ -34,7 +34,7 @@ trato_feito_negotiation AS (
     DATE(ts_breach) AS dt_breach
   FROM datalake_debt_recovery.negotiation
   WHERE debtor != "velo_delinquency_tenant"
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_recupera ORDER BY ts_created_at DESC) = 1 -- removes the exception in which 1 Trato-Feito negotiation ID has more than one Recupera negotiation ID. Ex: 97080
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_external ORDER BY ts_created_at DESC) = 1 -- removes the exception in which 1 Trato-Feito negotiation ID has more than one Recupera negotiation ID. Ex: 97080
 ),
 creditor_pending As (
   SELECT
@@ -158,10 +158,10 @@ paschoalotto_operator AS (
 ),
 union_sources AS (
   SELECT
-    STRING(COALESCE(tfn.id_negotiation_recupera, rn.id_negotiation)) AS sk_negotiation,
+    STRING(COALESCE(tfn.id_negotiation_external, rn.id_negotiation)) AS sk_negotiation,
     rn.customer_document AS sk_debtor,
     tfn.id_negotiation AS id_negotiation_trato_feito,
-    rn.id_negotiation AS id_negotiation_recupera,
+    rn.id_negotiation AS id_negotiation_external,
     COALESCE(tfn.id_contract, invn.id_contract) AS id_contract,
     UPPER(rn.id_operator) AS id_operator,
     COALESCE(tfn.creditor,
@@ -225,7 +225,7 @@ union_sources AS (
     recupera_negotiation AS rn
   FULL OUTER JOIN
       trato_feito_negotiation AS tfn
-        ON rn.id_negotiation = tfn.id_negotiation_recupera
+        ON rn.id_negotiation = tfn.id_negotiation_external
   LEFT JOIN
       renegotiation AS r
         ON tfn.id_negotiation = r.id_negotiation
@@ -238,7 +238,7 @@ SELECT
   u.sk_negotiation,
   sk_debtor,
   id_negotiation_trato_feito,
-  id_negotiation_recupera,
+  id_negotiation_external,
   CAST(u.id_contract AS BIGINT) AS id_contract,
   COALESCE(po.operator_name, u.id_operator) AS id_operator,
   creditor,

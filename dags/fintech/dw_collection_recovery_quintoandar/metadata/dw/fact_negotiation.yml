@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_debt_recovery.negotiation.id_negotiation
     description: "Trato-Feito negotiation ID"
-  id_negotiation_recupera:
+  id_negotiation_external:
     lineage:
       - datalake_recupera.negotiation.id_negotiation
     description: "Recupera negotiation ID"

@@ -1,7 +1,7 @@
 WITH
 trato_feito_negotiation AS (
   SELECT
-    id_negotiation_recupera,
+    id_negotiation_external AS id_negotiation_recupera,
     id_negotiation,
     id_contract,
     CASE
@@ -34,7 +34,7 @@ trato_feito_negotiation AS (
     DATE(ts_paid_all) AS dt_paid_all,
     DATE(ts_breach) AS dt_breach
   FROM datalake_debt_recovery.negotiation
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_recupera ORDER BY ts_created_at DESC) = 1 -- removes the exception in which 1 Trato-Feito negotiation ID has more than one Recupera negotiation ID. Ex: 97080
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_external ORDER BY ts_created_at DESC) = 1 -- removes the exception in which 1 Trato-Feito negotiation ID has more than one Recupera negotiation ID. Ex: 97080
 ),
 creditor_pending As (
   SELECT

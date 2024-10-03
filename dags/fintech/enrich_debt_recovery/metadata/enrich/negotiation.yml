@@ -9,7 +9,7 @@ columns:
     description: "Negotiation unique ID"
     lineage:
       - datalake_trato_feito_clean.negotiation.id
-  id_negotiation_recupera:
+  id_negotiation_external:
     description: "The negotiation ID from Recupera"
     lineage:
       - datalake_trato_feito_clean.negotiation.id_collector_external

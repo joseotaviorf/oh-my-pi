@@ -67,10 +67,11 @@ cte_debts AS (
 
 SELECT
     n.`id` AS id_negotiation,
-    n.id_collector_external AS id_negotiation_recupera,
+    n.id_collector_external AS id_negotiation_external,
     n.id_debtor_external AS id_contract,
     CONCAT(d.origin, "_", d.type) AS debtor,
     c.name AS collector,
+    n.consultancy,
     n.status,
     i.qt_installments,
     i.qt_installments_paid,
