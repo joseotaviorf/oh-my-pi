@@ -7,7 +7,7 @@ WITH front_tickets_list AS (
     ft.sk_main_department,
     ft.sk_taxonomy,
     da.agent_organization,
-    da.email,
+    COALESCE(da.email, da2.email) AS email,
     dd.team,
     dd.department,
     dd.journey_step,
@@ -43,12 +43,14 @@ WITH front_tickets_list AS (
   LEFT JOIN
     dw_customer_support.dim_taxonomy AS dt
       ON ft.sk_taxonomy = dt.sk_taxonomy
-  LEFT JOIN
+  LEFT JOIN 
     dw_customer_support.dim_agent as da
-      ON ft.sk_last_agent = da.sk_agent
-      OR ft.sk_last_agent = da.sk_agent_twilio
+        ON ft.sk_last_agent = da.sk_agent
+    LEFT JOIN 
+      dw_customer_support.dim_agent as da2
+          ON ft.sk_last_agent = da2.sk_agent_twilio
   WHERE
-    ft.sk_user is NOT NULL
+    ft.sk_user IS NOT NULL
     AND dd.area = 'CX'
     AND ft.front_or_back = 'front'
     AND ( (dc.channel = 'chat' AND dc.direction = 'inbound')
@@ -81,9 +83,7 @@ recontact_check AS (
     theme,
     theme_detail,
     CASE
-      WHEN
-        LAG(rc.sk_ticket) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) IS NOT NULL
-      THEN 1
+      WHEN days_since_last_contact <= 3 THEN recontact_flag
       ELSE 0
     END AS recontact_flag,
     sk_ticket_previous_contact,
@@ -196,10 +196,7 @@ SELECT
           OR db.ts_solved IS NULL)
       THEN CAST(db.sk_ticket AS STRING)
       ELSE NULL END), '') AS ticket_back,
-  CASE
-    WHEN days_since_last_contact <= '3' THEN recontact_flag
-    ELSE 0
-  END AS recontact_flag,
+  recontact_flag,
   rc.search_window_from,
   rc.search_window_until,
   rc.ts_started_previous_contact AS ts_started_first_contact,
