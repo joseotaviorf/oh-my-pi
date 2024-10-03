@@ -15,6 +15,9 @@ workflow:
     fact_theoretical_payment_delinquency:
       - fact_propose_timeline
       - fact_payment_delinquency
+    fact_payment_full:
+      - fact_accounting_funnel
+      - fact_theoretical_payment_delinquency
 cluster:
   type: databricks_12_2_med_general_cluster
   access_control_list:

@@ -1,0 +1,274 @@
+---
+database_name: dw_charging_payment_quintocred
+table_name: fact_payment_full
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  sk_propose:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_accounting_funnel.id_business_entity
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_theoretical
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_charge
+  sk_propose_theoretical:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_theoretical
+  sk_propose_charge:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_charge
+  sk_propose_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_payment
+  sk_transaction:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_transaction
+  sk_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_delinquency
+  sk_array_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_array_delinquency
+  sk_propose_nf:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_accounting_funnel.id_business_entity
+  sk_propose_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_delinquency
+  id_document:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_accounting_funnel.id_document
+  id_array_document_canceled:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_accounting_funnel.id_array_document_canceled
+  gateway_final:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.gateway_final
+  not_consider_free_living:
+    description: ''
+  LEVEL_A:
+    description: ''
+  LEVEL_B:
+    description: ''
+  LEVEL_C:
+    description: ''
+  LEVEL_D:
+    description: ''
+  LEVEL_E:
+    description: ''
+  reason:
+    description: ''
+  reason_expanded:
+    description: ''
+  status_at_ref:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.status_at_ref
+  mob_of_life:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.mob_of_life
+  mob_of_death:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.mob_of_death
+  status_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.status_payment
+  gateway_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.gateway_payment
+  billing_type_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.billing_type_payment
+  status_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.status_delinquency
+  gateway_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.gateway_delinquency
+  hash:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_accounting_funnel.hash
+  sap_class:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_accounting_funnel.sap_class
+  SAP_CLASS_LEVEL_A:
+    description: ''
+  SAP_CLASS_LEVEL_A2:
+    description: ''
+  SAP_CLASS_LEVEL_B:
+    description: ''
+  monthly_timeline_renewal:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.monthly_timeline_renewal
+  monthly_timeline_propose_aud:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.monthly_timeline_propose_aud
+  monthly_value_propose:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.monthly_value_propose
+  annual_timeline_renewal:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.annual_timeline_renewal
+  annual_timeline_propose_aud:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.annual_timeline_propose_aud
+  annual_value_propose:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.annual_value_propose
+  value:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.value
+  value_paid:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.value_paid
+  total_amount_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.total_amount_delinquency
+  delinquency_monthly_value:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.delinquency_monthly_value
+  delinquency_amount_paid_monthly:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.delinquency_amount_paid_monthly
+  total_paid_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.total_paid_delinquency
+  open_amount_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.open_amount_delinquency
+  total_open_amount_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.total_open_amount_delinquency
+  discount_value_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.discount_value_delinquency
+  total_discount_value_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.total_discount_value_delinquency
+  qty_total:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_accounting_funnel.qty_total
+  qty_success:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_accounting_funnel.qty_success
+  qty_nf_canceled:
+    description: ''
+    lineage:
+    - datalake_accounting_funnel.ledger.id_document
+  total_value_cancellation:
+    description: ''
+    lineage:
+    - datalake_accounting_funnel.ledger.debit
+  sap_amount:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_accounting_funnel.sap_amount
+  flag_nf_canceled:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_accounting_funnel.id_document
+  flag_is_cancelled_num:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_accounting_funnel.id_document
+  flag_ignore_dismiss:
+    description: ''
+  is_charged_on_contract_period:
+    description: ''
+  is_payment_charge_correct_amount:
+    description: ''
+  is_retroactive_charging:
+    description: ''
+  is_overdue:
+    description: ''
+  is_delinquency_active:
+    description: ''
+  is_delinquency_charge_related:
+    description: ''
+  month:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_propose_life
+    - dw_charging_payment_quintocred.fact_accounting_funnel.accrual_year_month
+  month_propose_life:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_propose_life
+  month_chargeble:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_chargeble
+  month_charge:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_charge
+  month_due_original:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_due_original
+  month_delinquency_due:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_delinquency_due
+  dt_contract_started:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_contract_started
+  dt_ended:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_ended
+  dt_created_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_created_payment
+  dt_due_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_due_payment
+  dt_paid_payment:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_paid_payment
+  dt_paid_delinquency:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_paid_delinquency
