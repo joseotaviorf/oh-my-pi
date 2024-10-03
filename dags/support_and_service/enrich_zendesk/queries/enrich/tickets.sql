@@ -27,7 +27,8 @@ tickets AS (
                 ) THEN 'call'
             WHEN via_channel IN ('api')
                 AND tags LIKE '%form%' THEN 'form_faq'
-            WHEN via_channel IN ('web', 'email', 'chat', 'whatsapp') THEN via_channel
+            WHEN via_channel IN ('whatsapp', 'native_messaging') THEN 'whatsapp'
+            WHEN via_channel IN ('web', 'email', 'chat') THEN via_channel
             ELSE 'other'
         END AS channel,
         MAP_FILTER(
