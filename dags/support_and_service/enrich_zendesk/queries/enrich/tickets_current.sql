@@ -247,9 +247,9 @@ SELECT
     WHEN t.status = 'closed' THEN t.ts_updated
     ELSE NULL
   END AS ts_closed,
-  year,
-  month,
-  day
+  t.year,
+  t.month,
+  t.day
 FROM
   tickets AS t
 LEFT JOIN
