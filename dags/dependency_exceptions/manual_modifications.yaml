@@ -697,7 +697,7 @@ bietlejuice.enrich_top_of_funnel_supply:
     - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.enrich_tracked_events:
   remove:
-    - bietlejuice.enrich_greenseer:load-enrich-greenseer-session
+    - bietlejuice.enrich_greenseer:load-enrich-sessions
     - bietlejuice.greenseer:load-clean-session
 bietlejuice.enrich_tracksale:
   remove:

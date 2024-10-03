@@ -926,8 +926,6 @@ bietlejuice.dw_tenant_documentation:
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud
   - bietlejuice.ebdb_proposal:load-clean-proposal-document
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
-bietlejuice.dw_offboarding:
-  - bietlejuice.enrich_terminator:load-enrich-termination
 bietlejuice.dw_tickets:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
@@ -3148,7 +3146,7 @@ bietlejuice.looker_temp:
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_greenseer:load-enrich-greenseer-session
+  - bietlejuice.enrich_greenseer:load-enrich-sessions
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
   - bietlejuice.greenseer:load-clean-session
   - bietlejuice.gsheets_fintech:done-clean-owner-entrance-inspection-csat

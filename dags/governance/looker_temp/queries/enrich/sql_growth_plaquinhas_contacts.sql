@@ -16,20 +16,20 @@ WITH pre_chatbot_sessions AS (
     id_pipeline,
     id_session,
     id_user
-  FROM datalake_greenseer.greenseer_session AS pos_s
+  FROM datalake_greenseer.sessions AS pos_s
   WHERE
     pos_s.ts_started >= DATE('2023-03-20') /* data de inicio do bot de plaquinhas */
     AND pos_s.ts_started <= CURRENT_DATE - INTERVAL '3' DAY
     AND pos_s.id_pipeline IN ('whatsapp_real_state_signs', 'whatsapp_real_estate_signs')
 ), plaquinhas_sessions AS (
   SELECT
-    DATE(greenseer_session.ts_started) AS dt_session_started,
-    greenseer_session.id_pipeline,
-    greenseer_session.id_session,
-    greenseer_session.id_user
-  FROM datalake_greenseer.greenseer_session
+    DATE(sessions.ts_started) AS dt_session_started,
+    sessions.id_pipeline,
+    sessions.id_session,
+    sessions.id_user
+  FROM datalake_greenseer.sessions
   INNER JOIN pre_chatbot_sessions
-    ON pre_chatbot_sessions.id_session = greenseer_session.id_session
+    ON pre_chatbot_sessions.id_session = sessions.id_session
     AND pre_chatbot_sessions.rn = 1
   UNION ALL
   SELECT

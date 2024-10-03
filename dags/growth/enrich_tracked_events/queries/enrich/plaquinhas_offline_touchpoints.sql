@@ -33,7 +33,7 @@ pos_chatbot_sessions AS (
     id_session,
     ts_started
   FROM
-    datalake_greenseer.greenseer_session
+    datalake_greenseer.sessions
   WHERE
     ts_started >= DATE('2023-03-20') -- data de inicio do bot de plaquinhas
     AND LOWER(id_pipeline) IN ('whatsapp_real_state_signs', 'whatsapp_real_estate_signs')
@@ -44,7 +44,7 @@ plaquinhas_sessions AS (
     gs.id_user,
     gs.ts_started AS ts_event
   FROM
-    datalake_greenseer.greenseer_session AS gs
+    datalake_greenseer.sessions AS gs
   INNER JOIN
     pre_chatbot_sessions AS pcs
       ON pcs.id_session = gs.id_session
