@@ -78,7 +78,7 @@ task_group = DatalakeTaskGroup(
     relative_query_path=SOURCE,
     spark_jobs_path=BASE_SPARK_JOBS_PATH,
     athena_query_result_location=athena_query_results_bucket,
-    execution_timeout_hours=4,
+    execution_timeout_hours=6,
 )
 
 table_names = config_service.get_config("table_names")

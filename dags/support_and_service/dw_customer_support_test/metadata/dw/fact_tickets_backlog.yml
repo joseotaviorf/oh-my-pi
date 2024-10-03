@@ -10,7 +10,7 @@ columns:
   sk_ticket:
     lineage:
       - datalake_customer_support_test.tickets.id_ticket
-  description: Surrogate key for the ticket, cast from id_ticket.
+    description: Surrogate key for the ticket, cast from id_ticket.
   sk_taxonomy:
     lineage:
       - datalake_customer_support_test.tickets.step_tag
