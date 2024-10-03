@@ -22,7 +22,7 @@ sap AS (
         dt_tax AS dt_paid,
         SUM(debit_credit) AS amount
     FROM
-        datalake_accounting_funnel.ledger
+        datalake_pas.ledger
     WHERE
         account_number = '11102.01.11'
         AND id_finance_entity <> ''

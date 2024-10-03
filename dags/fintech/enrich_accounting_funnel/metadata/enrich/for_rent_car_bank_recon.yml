@@ -55,5 +55,5 @@ columns:
     description: "Paid date from Vans and Checkout"
   dt_sap_paid:
     lineage:
-      - datalake_pas.ledger.dt_reference
-    description: "Paid date from SAP/Ledger - RefDate"
+      - datalake_pas.ledger.dt_tax
+    description: "Paid date from SAP/Ledger - TaxDate"
