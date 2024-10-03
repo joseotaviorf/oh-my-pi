@@ -89,7 +89,10 @@ WITH tickets AS (
     dt_first_reply,
     ts_analyst_started,
     ts_created,
-    ts_updated
+    ts_updated,
+    year,
+    month,
+    day
   FROM
     datalake_zendesk.tickets
   WHERE
