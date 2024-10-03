@@ -95,6 +95,54 @@ columns:
       The total tickets proportional calculation related to the ticket, considering the ticket's weight,
       abandoned calls and tickets without theme.
       This column is exclusive for tickets that are part of the Ticket Rate metric.
+  first_resolution_time_min_business:
+    lineage:
+      - datalake_zendesk.tickets_current.first_resolution_time_min_business
+    description: Number of minutes to the first resolution time during business hours
+  first_resolution_time_min_calendar:
+    lineage:
+      - datalake_zendesk.tickets_current.first_resolution_time_min_calendar
+    description: Number of minutes to the first resolution time during calendar hours
+  full_resolution_time_min_business:
+    lineage:
+      - datalake_zendesk.tickets_current.full_resolution_time_min_business
+    description: Number of minutes to the full resolution during business hours
+  full_resolution_time_min_calendar:
+    lineage:
+      - datalake_zendesk.tickets_current.full_resolution_time_min_calendar
+    description: Number of minutes to the full resolution during calendar hours
+  requester_wait_time_min_business:
+    lineage:
+      - datalake_zendesk.tickets_current.requester_wait_time_min_business
+    description: Number of minutes the requester spent waiting during business hours
+  requester_wait_time_min_calendar:
+    lineage:
+      - datalake_zendesk.tickets_current.requester_wait_time_min_calendar
+    description: Number of minutes the requester spent waiting during calendar hours
+  agent_wait_time_min_business:
+    lineage:
+      - datalake_zendesk.tickets_current.agent_wait_time_min_business
+    description: Number of minutes the agent spent waiting during business hours
+  agent_wait_time_min_calendar:
+    lineage:
+      - datalake_zendesk.tickets_current.agent_wait_time_min_calendar
+    description: Number of minutes the agent spent waiting during calendar hours
+  on_hold_time_min_business:
+    lineage:
+      - datalake_zendesk.tickets_current.on_hold_time_min_business
+    description: Number of minutes on hold during business hours
+  on_hold_time_min_calendar:
+    lineage:
+      - datalake_zendesk.tickets_current.on_hold_time_min_calendar
+    description: Number of minutes on hold during calendar hours
+  reopens:
+    lineage:
+      - datalake_zendesk.tickets_current.reopens
+    description: Number of times the ticket was reopened
+  replies:
+    lineage:
+      - datalake_zendesk.tickets_current.replies
+    description: Number of public replies the agent added to the ticket
   is_ticket_rate:
     lineage:
       - datalake_customer_support_test.tickets.is_ticket_rate

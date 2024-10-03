@@ -69,6 +69,10 @@ columns:
       fields. It has JSON format with the form's field name and its value selected
       or inputted by agent. The value equal to false is related to the field that
       was not filled for the request
+  custom_fields_map:
+    lineage:
+      - datalake_zendesk.tickets_current.custom_fields
+    description: custom_fields column as a MAP
   has_public_comments:
     lineage:
       - datalake_zendesk.tickets_current.has_public_comments

@@ -11,6 +11,7 @@ SELECT
   priority,
   recipient,
   TO_JSON(custom_fields) AS custom_fields,
+  custom_fields AS custom_fields_map,
   subject,
   description,
   BOOLEAN(is_public) AS has_public_comments,

@@ -105,6 +105,20 @@ SELECT
   t.front_or_back,
   t.ticket_rate_weight,
   tr.total_tickets_proportional,
+  tc.reply_time_min_calendar,
+  tc.first_resolution_time_min_calendar,
+  tc.full_resolution_time_min_calendar,
+  tc.requester_wait_time_min_calendar,
+  tc.agent_wait_time_min_calendar,
+  tc.on_hold_time_min_calendar,
+  tc.reply_time_min_business,
+  tc.first_resolution_time_min_business,
+  tc.full_resolution_time_min_business,
+  tc.requester_wait_time_min_business,
+  tc.agent_wait_time_min_business,
+  tc.on_hold_time_min_business,
+  tc.replies,
+  tc.reopens,
   t.sla_target,
   t.days_elapsed_calendar,
   t.days_elapsed_business,
@@ -123,3 +137,6 @@ FROM
 LEFT JOIN
   ticket_rate_proportion AS tr
     ON tr.id_ticket = t.id_ticket
+LEFT JOIN
+  datalake_zendesk.tickets_current AS tc
+    ON tc.id_ticket = t.id_ticket
