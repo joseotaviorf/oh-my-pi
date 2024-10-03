@@ -1011,4 +1011,4 @@ databricks_12_2_med_mem_driver_high_mem_nodes:
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_FORNO_WEBHOOK
 
-vespucio_pipeline_version: 0.25.0
+vespucio_pipeline_version: 0.26.0

@@ -442,6 +442,16 @@ plugin_tasks = [
         ],
     ),
     create_task(
+        entry_point="plugins_address_details_indexer",
+        parameters=[
+            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
+            f"--update_alias",
+            f"--delete_old_indices",
+            f"--input_house_compounds={Tables.house_compounds}",
+            f"--output_index_prefix=vespucio_prod_address_details",
+        ],
+    ),
+    create_task(
         entry_point="plugins_rede_house_enrichment_consolidate",
         parameters=[
             f"--sqs_queue_url={config_service.get_config('sqs_url_house_enrichment')}",
