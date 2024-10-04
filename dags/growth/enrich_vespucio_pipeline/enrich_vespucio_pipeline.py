@@ -331,7 +331,7 @@ core_tasks = [
             f"--input_clustered_houses={Tables.cluster_step_houses}",
             f"--overwrite_schema",
             f"--output_source_predicted_houses={Tables.source_predict_step_houses}",
-        ]
+        ],
     ),
     create_task(
         entry_point="core_merge_step",
@@ -397,16 +397,6 @@ today = "{{ macros.ds_add(ds, 1)  }}"
 
 plugin_tasks = [
     create_task(
-        entry_point="plugins_classifieds",
-        parameters=[
-            f"--input_condo_compound={Tables.condo_compounds}",
-            f"--input_house_compound={Tables.house_compounds}",
-            f"--input_listing_compound={Tables.listings}",
-            f"--input_zordominium_compound={Tables.zordominium_compounds}",
-            f"--output_classified_compound={Tables.classified_compounds}",
-        ],
-    ),
-    create_task(
         entry_point="plugins_compound_indexer",
         parameters=[
             f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
@@ -426,18 +416,6 @@ plugin_tasks = [
             f"--delete_old_indices",
             f"--input_listings={Tables.listings}",
             f"--output_index_prefix=vespucio_prod",
-        ],
-    ),
-    create_task(
-        entry_point="plugins_classified_indexer",
-        parameters=[
-            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-            f"--update_alias",
-            f"--delete_old_indices",
-            f"--input_classifieds={Tables.classified_compounds}",
-            f"--output_index_prefix=vespucio_prod",
-            f"--number_of_shards=4",
-            f"--number_of_replicas=2"
         ],
     ),
     create_task(
@@ -525,6 +503,32 @@ plugin_tasks = [
     # ),
 ]
 
+
+classifieds_tasks = [
+    create_task(
+        entry_point="plugins_classifieds",
+        parameters=[
+            f"--input_condo_compound={Tables.condo_compounds}",
+            f"--input_house_compound={Tables.house_compounds}",
+            f"--input_listing_compound={Tables.listings}",
+            f"--input_zordominium_compound={Tables.zordominium_compounds}",
+            f"--output_classified_compound={Tables.classified_compounds}",
+        ],
+    ),
+    create_task(
+        entry_point="plugins_classified_indexer",
+        parameters=[
+            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
+            f"--update_alias",
+            f"--delete_old_indices",
+            f"--input_classifieds={Tables.classified_compounds}",
+            f"--output_index_prefix=vespucio_prod",
+            f"--number_of_shards=4",
+            f"--number_of_replicas=2",
+        ],
+    ),
+]
+
 join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 
 execute_job_cluster_task >> source_tasks
@@ -533,3 +537,5 @@ chain(*core_tasks)
 core_tasks[-1] >> after_link_tasks
 after_link_tasks >> join_plugins
 join_plugins >> plugin_tasks
+join_plugins >> classifieds_tasks[0]
+chain(*classifieds_tasks)
