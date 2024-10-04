@@ -402,10 +402,9 @@ plugin_tasks = [
             f"--input_condo_compound={Tables.condo_compounds}",
             f"--input_house_compound={Tables.house_compounds}",
             f"--input_listing_compound={Tables.listings}",
-            f"--input_zordominium_compound={Tables.zordominium_compounds}"
+            f"--input_zordominium_compound={Tables.zordominium_compounds}",
             f"--output_classified_compound={Tables.classified_compounds}",
-        ]
-
+        ],
     ),
     create_task(
         entry_point="plugins_compound_indexer",
