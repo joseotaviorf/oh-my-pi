@@ -318,14 +318,11 @@ databricks_10_4_med_general_cluster:
     spark_version: 10.4.x-scala2.12
 
 databricks_12_2_med_general_cluster:
-    <<: *cluster_anchor
-    driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.xlarge
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_m5a_xlarge_on_demand
+    instance_pool_id: *pool_m5a_xlarge_spot
     num_workers: 3
     spark_version: 12.2.x-scala2.12
-    aws_attributes:
-        <<: *aws_anchor
-        ebs_volume_size: 200
 
 databricks_12_2_med_2xlarge_general_cluster:
     <<: *cluster_anchor
@@ -338,14 +335,11 @@ databricks_12_2_med_2xlarge_general_cluster:
         ebs_volume_size: 200
 
 databricks_13_3_med_general_cluster:
-    <<: *cluster_anchor
-    driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.xlarge
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_m5a_xlarge_on_demand
+    instance_pool_id: *pool_m5a_xlarge_spot
     num_workers: 3
     spark_version: 13.3.x-scala2.12
-    aws_attributes:
-        <<: *aws_anchor
-        ebs_volume_size: 200
 
 databricks_13_3_med_memory_cluster:
     <<: *cluster_anchor
@@ -368,14 +362,11 @@ databricks_13_3_med_memory_2_workers_cluster:
         ebs_volume_size: 200
 
 databricks_13_3_med_general_2_workers_cluster:
-    <<: *cluster_anchor
-    driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.xlarge
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_m5a_xlarge_on_demand
+    instance_pool_id: *pool_m5a_xlarge_spot
     num_workers: 2
     spark_version: 13.3.x-scala2.12
-    aws_attributes:
-        <<: *aws_anchor
-        ebs_volume_size: 200
 
 databricks_13_3_med_general_driver_2_min_workers_cluster:
     <<: *cluster_anchor
@@ -901,14 +892,12 @@ databricks_13_3_min_memory_people_cluster:
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 
 databricks_13_3_med_people_cluster:
-    <<: *cluster_anchor
-    driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.xlarge
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_m5a_xlarge_on_demand
+    instance_pool_id: *pool_m5a_xlarge_spot
     num_workers: 3
     spark_version: 13.3.x-scala2.12
     aws_attributes:
-        <<: *aws_anchor
-        ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 
 databricks_13_3_med_memory_people_cluster:
