@@ -52,6 +52,9 @@ columns:
   behavior:
     lineage:
       - datalake_ebdb_raw.visita.behavior
+  business_model:
+    lineage:
+      - datalake_ebdb_raw.visita.business_model
   is_fixed_agent:
     lineage:
       - datalake_ebdb_raw.visita.agenteFixo
