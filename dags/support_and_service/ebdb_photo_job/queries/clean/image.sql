@@ -7,4 +7,4 @@ SELECT
     ordem as sequence,
     atualizadoEm as ts_updated,
     criadoEm as ts_created
-from datalake_ebdb_raw.imagem
+from datalake_ebdb_test_raw.imagem

@@ -1,43 +1,43 @@
 ---
-database_name: datalake_ebdb_clean
+database_name: datalake_ebdb_test_clean
 table_name: image_aud
 description: Table with auditory data from house images.
-domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
 columns:
   id_image:
     lineage:
-      - datalake_ebdb_raw.imagem_aud.id
+      - datalake_ebdb_test_raw.imagem_aud.id
     description: Id of the image.
   id_house:
     lineage:
-      - datalake_ebdb_raw.imagem_aud.imovel_id
+      - datalake_ebdb_test_raw.imagem_aud.imovel_id
     description: Id of the house.
   rev:
     lineage:
-      - datalake_ebdb_raw.imagem_aud.rev
+      - datalake_ebdb_test_raw.imagem_aud.rev
     description: Revision's id. Can be joined with datalake_ebdb_clean.user_revision_entity.id.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.imagem_aud.revtype
+      - datalake_ebdb_test_raw.imagem_aud.revtype
     description: Type of revision.
   subtitle:
     lineage:
-      - datalake_ebdb_raw.imagem_aud.legenda
+      - datalake_ebdb_test_raw.imagem_aud.legenda
     description: Image's subtitle.
   name:
     lineage:
-      - datalake_ebdb_raw.imagem_aud.nome
+      - datalake_ebdb_test_raw.imagem_aud.nome
     description: Image file name.
   image_order:
     lineage:
-      - datalake_ebdb_raw.imagem_aud.ordem
+      - datalake_ebdb_test_raw.imagem_aud.ordem
     description: Position of this image on the sequence of images related to this house.
   is_main:
     lineage:
-      - datalake_ebdb_raw.imagem_aud.principal
+      - datalake_ebdb_test_raw.imagem_aud.principal
     description: Boolean indicating if this is the main image of this house.
   mod_image_variants:
     lineage:
-      - datalake_ebdb_raw.imagem_aud.imageVariants_MOD
+      - datalake_ebdb_test_raw.imagem_aud.imageVariants_MOD
     description: Boolean indicating if this row correspond to some house variants modification.

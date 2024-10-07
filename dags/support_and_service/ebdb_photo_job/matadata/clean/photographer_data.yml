@@ -1,0 +1,24 @@
+database_name: datalake_ebdb_test_clean
+table_name: photographer_data
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_test_raw.dadosfotografo.id
+  contract_type:
+    lineage:
+      - datalake_ebdb_test_raw.dadosfotografo.tipocontrato
+  payment_preference:
+    lineage:
+      - datalake_ebdb_test_raw.dadosfotografo.preferenciapagamento
+  is_active:
+    lineage:
+      - datalake_ebdb_test_raw.dadosfotografo.ativo
+  ts_contract_started:
+    lineage:
+      - datalake_ebdb_test_raw.dadosfotografo.iniciocontrato
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_raw.dadosfotografo.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_raw.dadosfotografo.atualizadoem

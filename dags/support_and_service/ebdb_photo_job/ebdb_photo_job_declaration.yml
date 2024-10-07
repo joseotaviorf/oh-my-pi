@@ -1,0 +1,26 @@
+dag:
+  name: ebdb_photo_job
+  schedule_start_date: 2024, 10, 07
+  schedule_interval: 0 0 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Extraction of EBDB tables related to Photo Job into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_schema: public
+  custom_schema: ebdb_test
+  dbutils_secret_key: EBDB_DB
+  tables_customization:
+    DadosFotografo:
+      clean_table_name: photographer_data
+    Imagem:
+      clean_table_name: image
+    Imagem_AUD:
+      clean_table_name: image_aud
+      raw_primary_keys: [id, REV]
+      clean_primary_keys: [id, REV]
+cluster:
+  type: databricks_12_2_min_general_cluster
