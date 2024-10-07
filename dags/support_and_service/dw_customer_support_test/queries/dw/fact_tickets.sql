@@ -11,10 +11,10 @@ WITH missing_theme_tickets AS (
     contact_theme_detail_tag IS NULL
     AND (
       channel IN ('call', 'chat') AND front_or_back = 'front'
-      OR channel = 'email' AND front_or_back IN ('back', 'front')
+      OR channel = 'cs email' AND front_or_back IN ('back', 'front')
     )
     AND ts_solved >= '2022-01-01'
-    AND team <> 'Ong Back'
+    AND team != 'Ong Back'
     AND area = 'CX'
     AND last_queue NOT IN (
       'Rescisão por Inadimplência [OFF][POS][BACK]',

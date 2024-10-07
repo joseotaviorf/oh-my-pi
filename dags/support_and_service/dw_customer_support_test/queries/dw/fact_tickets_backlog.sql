@@ -32,6 +32,7 @@ SELECT
 FROM
   datalake_customer_support_test.tickets
 WHERE
-  ts_solved IS NULL
+  channel = 'cs email'
+  AND ts_solved IS NULL
   AND "{load_start_date}" >= DATE(ts_sla_started)
   AND "{load_start_date}" >= COALESCE(ts_solved, DATE("1900-01-01")) -- only select tickets with no ts_solved
