@@ -10,7 +10,8 @@ workflow:
   type: cdc
   layer: raw
   database_type: mysql
-  source_schema: public
+  source_database: ebdb
+  source_schema: ebdb
   custom_schema: ebdb_test
   dbutils_secret_key: EBDB_DB
   tables_customization:
