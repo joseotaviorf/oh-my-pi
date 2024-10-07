@@ -86,9 +86,9 @@ SELECT
   COALESCE(ss.user_phone, t.from_phone_number) AS customer_phone_number,
   t.twilio_phone_number,
   CASE
-    WHEN ias.id_session IS NOT NULL THEN 'IN APP'
-    WHEN ws.id_session IS NOT NULL THEN 'WHATSAPP'
-  END AS source,
+    WHEN ias.id_session IS NOT NULL THEN 'in app'
+    WHEN ws.id_session IS NOT NULL THEN 'whatsapp'
+  END AS origin,
   t.worker_email,
   t.channel_type,
   t.task_status,

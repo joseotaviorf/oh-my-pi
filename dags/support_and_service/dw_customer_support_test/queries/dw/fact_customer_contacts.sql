@@ -34,10 +34,7 @@ demand AS (
     id_reservation,
     id_user,
     queue_name,
-    CASE
-      WHEN channel_type = 'call-in-app' THEN 'inbound'
-      ELSE LOWER(direction)
-    END AS direction,
+    direction,
     'call' AS channel,
     CASE
       WHEN id_reservation IS NULL THEN 'abandoned'

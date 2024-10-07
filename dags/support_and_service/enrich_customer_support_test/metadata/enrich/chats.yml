@@ -4,441 +4,111 @@ description: Test table for chat data
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
-  id_segment:
+  id_channel:
     lineage:
-      - datalake_quinto_messenger.tasks.id_task
-    description:
-      This identifier corresponds to the Twilio task ID for both WhatsApp and chat_5A
-      origins. For WhatsApp tasks, it only includes Twilio channels created after
-      08/20/2020 with a status other than "missed". For chat_5A tasks, it only considers
-      chats created after 08/20/2020. In both cases, the tasks that have generated a
-      "reservation" event are taken into account, which means that the tasks were
-      created to assign a worker to handle a new chat conversation with a customer.
-  id_ticket:
+      - datalake_quinto_messenger_clean.task.id_channel
+    description: Twilio channel ID
+  id_task:
     lineage:
-      - datalake_zendesk.tickets_current.id_ticket
-    description:
-      To obtain the most recent information on the status of each chat and its
-      corresponding ticket, we retrieve the last ticket ID associated with each
-      session ID.
-  id_conversation:
-    lineage:
-      - datalake_quinto_messenger.tasks.id_conversation
-    description:
-      A Twilio Chat Conversation ID is a unique identifier that represents a
-      conversation session between one or more participants. It's generated when a
-      new conversation is initiated and remains constant throughout the entire
-      conversation. It's important to note that multiple Twilio Task IDs can be
-      associated with a single Conversation ID.
+      - datalake_quinto_messenger_clean.task.id_task
+    description: Twilio task ID
   id_session:
     lineage:
-      - datalake_quinto_messenger.tasks.id_source
-    description:
-      It is a unique identifier created by the Sauron service for each chat opened
-      in either WhatsApp or Chat_5A.
-  id_agent:
-    lineage:
-      - datalake_quinto_messenger.tasks.id_agent
-    description:
-      This is the unique identifier for the Twilio agent who is responsible for
-      the task.
-  first_agent_email:
-    lineage:
-      - datalake_quinto_messenger.tasks.id_agent
-    description:
-      When considering the first task of a conversation, the responsible agent for
-      that task is taken into account.
-  last_agent_email:
-    lineage:
-      - datalake_quinto_messenger.tasks.id_agent
-    description:
-      When considering the last task of a conversation, the responsible agent for
-      that task is taken into account.
+      - datalake_quinto_messenger_clean.chat.id_session
+      - datalake_quinto_messenger_clean.channel.id_session
+    description: Session identifier associated with the task, derived from chat or channel sessions.
   id_user:
     lineage:
-      - datalake_zendesk.tickets_current.id_user
-    description:
-      This is the unique identifier for the user associated with a Zendesk ticket,
-      who is registered in the main system (ebdb).
-  id_contract:
-    lineage:
-      - datalake_zendesk.tickets_current.id_contract
-    description: The respective contract associated with the Zendesk Ticket.
-  ticket_origin:
-    description: It is the origin of the ticket.
-    categories:
-      whatsapp: The ticket is related to a whatsapp session.
-      chat5a: The ticket is related to a chat 5A session.
-  agent_email:
-    lineage:
-      - datalake_quinto_messenger.tasks.agent_email
-    description: The email of the Twilio agent responsible for the task.
-  csat_comment:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.comment
-    description: The last csat survey comment for the Zendesk Chat Ticket, if available.
-  last_csat_comment:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.comment
-    description: The last csat survey comment for the Zendesk Chat Ticket, if available.
-  first_csat_comment:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.comment
-    description: The first csat survey comment for the Zendesk Chat Ticket, if available.
-  department:
-    lineage:
-      - datalake_quinto_messenger.tasks.task_queue_name
-    description: The department name of the Twilio task, defined in Twilio as the queue name.
-  country_code:
-    description: Identifies the country
-  zendesk_department:
-    lineage:
-      - datalake_zendesk.tickets_current.group_name
-    description: The department associated with the Zendesk Ticket.
-  first_department:
-    lineage:
-      - datalake_quinto_messenger.tasks.task_queue_name
-      - datalake_zendesk.tickets_current.id_ticket
-      - datalake_quinto_messenger.tasks.ts_created_local
-    description:
-      The first department in Twilio, or queue name, for the initial task created in
-      the conversation.
-  last_department:
-    lineage:
-      - datalake_quinto_messenger.tasks.task_queue_name
-      - datalake_zendesk.tickets_current.id_ticket
-      - datalake_quinto_messenger.tasks.ts_created_local
-    description:
-      The last department in Twilio, or queue name, for the final task created
-      in the conversation.
-  completion_reason:
-    lineage:
-      - datalake_quinto_messenger.tasks.task_completion_reason
-    description:
-      In Twilio Chat, a task event completion reason is the reason why a task has been
-      marked as completed. When a worker finishes a task, they must provide a
-      completion reason, which is a string that describes the reason why they completed
-      the task. Usually, the last task ID in the conversation will have a
-      completion reason.
-  transferred_from_dept:
-    lineage:
-      - datalake_quinto_messenger.tasks.task_queue_name
-    description: The department from which the task was transferred.
-  transferred_to_dept:
-    lineage:
-      - datalake_quinto_messenger.tasks.task_queue_name
-    description: The department to which the task was transferred.
-  transference_type:
-    description: The type of transfer, which could be internal-same-agent.
-  request_type:
-    lineage:
-      - datalake_zendesk.tickets_current.request_type
-    description: The classification of the user request in the Zendesk ticket.
-  client_type:
-    lineage:
-      - datalake_zendesk.tickets_current.client_type
-    description: The Zendesk Ticket client type obtained through the ticket's custom field.
-  step_tag:
-    lineage:
-      - datalake_zendesk.tickets_current.step_tag
-    description: The classification of the user journey step in the Zendesk ticket.
-  customer_type_tag:
-    lineage:
-      - datalake_zendesk.tickets_current.customer_type_tag
-    description: The classification of the Zendesk ticket user.
-  contact_motivation_tag:
-    lineage:
-      - datalake_zendesk.tickets_current.contact_motivation_tag
-    description: The classification of the motivation behind the Zendesk ticket user's request.
-  contact_theme_tag:
-    lineage:
-      - datalake_zendesk.tickets_current.contact_theme_tag
-    description:
-      The contact theme of the Zendesk Ticket, such as rent_contract_termination,
-      which is obtained through a custom field.
-  contact_theme_detail_tag:
-    lineage:
-      - datalake_zendesk.tickets_current.contact_theme_detail_tag
-    description:
-      The theme details of the Zendesk ticket contact, such as rental visit
-      rescheduling, can be obtained through a custom field.
-  tags:
-    lineage:
-      - datalake_zendesk.tickets_current.tags
-    description: A string field containing all ticket tags.
-  status:
-    lineage:
-      - datalake_zendesk.tickets_current.status
-    description: Current ticket status.
-  journey_step:
-    lineage:
-      - datalake_gsheets_clean.department_control.journey_step
-    description: Journey step in which the chat is.
-  team:
-    lineage:
-      - datalake_gsheets_clean.department_control.team
-    description: Team of which the chat belongs to.
-  area:
-    lineage:
-      - datalake_gsheets_clean.department_control.area
-    description: Area of which the chat belongs to.
-  custom_fields:
-    lineage:
-      - datalake_zendesk.tickets_current.custom_fields
-    description: The Zendesk ticket's custom field information.
-  frt:
-    lineage:
-      - datalake_zendesk.tickets_current.ts_solved_local
-      - datalake_quinto_messenger.tasks.ts_created_local
-      - datalake_sauron_clean.session.ts_created
-    description:
-      FRT (Full Resolution Time) is the total time from the start of support in the
-      front end until the end, considering the back-office time if there is a related
-      back ticket. For chat tasks, the front-end support starts when the bot reception
-      begins, and it ends when the back ticket is solved, or the task ends.
-  last_back_ticket:
-    lineage:
-      - datalake_zendesk.tickets_current.id_ticket
-    description: The last back ticket related to this ticket.
-  back_ticket_list:
-    lineage:
-      - datalake_zendesk.tickets_current.id_ticket
-    description: A list of back tickets related to this ticket.
-  seconds_first_reply:
-    lineage:
-      - datalake_quinto_messenger.tasks.seconds_to_first_response
-    description:
-      First response time (FRT) is the duration between the task's creation time and
-      the first response sent by a worker to a customer during a chat conversation,
-      measured in seconds.
-  total_minutes_reception_time:
-    lineage:
-      - datalake_sauron_clean.bot_outgoing_messages.ts_created
-    description:
-      The total time, in minutes, that the bot spent handling the chat conversation
-      before a Twilio task was created.
-  segment_minutes_wait_time:
-    lineage:
-      - datalake_quinto_messenger.tasks.seconds_to_first_response
-    description:
-      This metric represents the time it took for a worker to send the first response
-      to a customer, measured in minutes rather than seconds.
-  number_of_departments:
-    lineage:
-      - datalake_quinto_messenger.tasks.task_queue_name
-    description: The total number of departments that were involved in a chat session.
-  number_of_segments:
-    lineage:
-      - datalake_quinto_messenger.tasks.id_task
-    description: The total number of tasks created during a chat session.
-  sla_achieved:
-    lineage:
-      - datalake_quinto_messenger.tasks.seconds_to_first_response
-    description:
-      This field is a boolean value indicating whether the wait time for a task was
-      less than or equal to 15 minutes (TRUE) or not (FALSE). If the value cannot be
-      determined, it will be NULL.
-  minutes_full_resolution_time_calendar:
-    lineage:
-      - datalake_quinto_messenger.tasks.seconds_duration
-    description:
-      This metric measures the duration of a chat conversation from its creation to its
-      closure or termination, taking into account the total time for WhatsApp
-      or Chat 5A.
-  minutes_first_resolution_time_calendar:
-    lineage:
-      - datalake_zendesk.tickets_current.minutes_first_resolution_calendar
-    description:
-      This metric measures the time, in minutes, from the creation of a Zendesk Ticket
-      to its first resolution during calendar hours.
-  minutes_first_resolution_time_business:
-    lineage:
-      - datalake_zendesk.tickets_current.minutes_first_resolution_business
-    description:
-      This metric measures the time, in minutes, from the creation of a Zendesk Ticket
-      to its first resolution during business hours.
-  replies:
-    lineage:
-      - datalake_zendesk.tickets_current.replies
-    description: This metric counts the number of public replies that an agent has added to a ticket.
-  reopens:
-    lineage:
-      - datalake_zendesk.tickets_current.reopens
-    description: This metric counts the total number of times that a ticket has been reopened.
-  total_minutes_talk_time:
-    lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time
-    description:
-      The total talk time for a conversation is the sum of the durations of all
-      messages sent and received by all participants.
-  total_minutes_queue_time:
-    lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_queue_time
-    description:
-      The total queue time for a conversation is the time spent by a task waiting in
-      the queue for a worker to become available.
-  total_minutes_wrap_up_time:
-    lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_wrap_up_time
-    description:
-      The total wrap-up time for a conversation is the time that a worker spends on
-      post-chat tasks after the conversation has ended.
-  total_minutes_handling_time:
-    lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_handling_time
-    description:
-      The total handling time for a conversation is the sum of the queue time,
-      talk time, and wrap-up time for that conversation.
-  is_last_segment:
-    lineage:
-      - datalake_quinto_messenger.tasks.id_task
-    description: If this is the last task opened for its respective session.
-  is_first_segment:
-    lineage:
-      - datalake_quinto_messenger.tasks.id_task
-    description: If this is the first task opened for its respective session.
-  transference_reason:
-    lineage:
-      - datalake_insider_clean.review_feature.rating_selected
-    description: The reason for transferring the task.
-  has_transfers:
-    lineage:
-      - datalake_quinto_messenger.tasks.id_task
-    description: A boolean value indicating whether the ticket has more than one segment (task).
-  is_bot:
-    lineage:
-      - datalake_zendesk.tickets_current.tags
-    description: A boolean value indicating whether the ticket has the "bot_end_conversation" tag.
-  is_closed_by_merge:
-    lineage:
-      - datalake_zendesk.tickets_current.tags
-    description:
-      In Zendesk, a ticket closed by merge refers to a scenario where two or more
-      tickets are combined or merged into a single ticket, and the individual tickets
-      are closed as a result. This field contains a boolean value (TRUE or FALSE) to
-      indicate whether the ticket was closed by merge.
-  service_status:
-    lineage:
-      - datalake_zendesk.tickets_current.tags
-    description: Describes what was the final status of the front office service.
-  front_or_back:
-    lineage:
-      - datalake_gsheets_clean.department_control.front_or_back
-      - datalake_zendesk.tickets_current.tags
-    description:
-      Determine whether this ticket is a front or back ticket based on the department.
-      This field contains undefined values if there is no definition of this value in
-      the department_control sheet for this specific main department.
-  has_back_ticket:
-    lineage:
-      - datalake_zendesk.tickets_current.id_ticket
-    description: A boolean value indicating whether this ticket has a related backoffice ticket.
-  is_open_back_ticket:
-    lineage:
-      - datalake_zendesk.tickets_current.status
-      - datalake_zendesk.tickets_current.id_ticket
-    description:
-      A boolean value indicating whether any of the related backoffice tickets have a
-      status other than closed.
-  total_backoffice_minutes_time:
-    lineage:
-      - datalake_zendesk.tickets_current.ts_created_local
-      - datalake_zendesk.tickets_current.ts_solved_local
-    description: Time taken in minutes to close all related back-office tickets.
-  total_minutes_front_to_open_back_ticket_time:
-    lineage:
-      - datalake_zendesk.tickets_current.ts_created_local
-      - datalake_quinto_messenger.tasks.ts_created_local
-    description:
-      Time taken in minutes to open the related back-office ticket after solving the
-      front ticket.
-  is_csat_answered:
-    lineage:
-      - datalake_chat_fup_clean.chats_chat.id_ticket
-    description: A boolean value indicating whether the user has answered the CSAT survey.
-  is_solved:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.is_solved
-    description:
-      A boolean value indicating whether the chat CSAT survey answer is true for the
-      solved ticket solution.
-  csat_score:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.rating
-    description:
-      The CSAT score or rating for the respective chat. It considers the last CSAT
-      score (values range from 1 to 5).
-  first_csat_score:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.rating
-    description:
-      The CSAT score or rating for the respective chat. It considers the first CSAT
-      score (values range from 1 to 5).
-  last_csat_score:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.rating
-    description:
-      The CSAT score or rating for the respective chat. It considers the last CSAT
-      score (values range from 1 to 5).
-  group_name:
-    lineage:
-      - datalake_chat_fup_clean.chats_chat.group_name
-    description: The respective department for the ticket survey.
-  ts_survey:
-    lineage:
-      - datalake_chat_fup_clean.chats_chat.ts_attended
-    description:
-      The timestamp when the survey was created. This field contains a null value if
-      we don't have this information.
-  ts_csat_first_response:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.ts_created
-    description:
-      The first timestamp when the survey was answered by the user. This field contains a
-      null value if we don't have this information.
-  ts_csat_last_response:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.ts_created
-    description:
-      The last timestamp when the survey was answered by the user. This field contains a
-      null value if we don't have this information.
-  ts_csat_response:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.ts_created
-    description:
-      The timestamp when the survey was answered by the user. This field contains a
-      null value if we don't have this information.
+      - datalake_sauron_clean.session.id_user
+    description: ID for the user associated with the session.
+  id_worker:
+    lineage:
+      - datalake_quinto_messenger_clean.task.id_worker
+    description: Twilio worker ID
+  id_queue:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.id_queue
+    description: Twilio queue ID
+  queue_name:
+    lineage:
+      - datalake_quinto_messenger_clean.task_event.queue_name
+    description: Name of the queue to which the task is assigned.
+  customer_email:
+    lineage:
+      - datalake_sauron_clean.session.user_email
+      - datalake_quinto_messenger_clean.task.customer_email
+    description: Email address of the customer associated with the task, from session or task data.
+  customer_phone_number:
+    lineage:
+      - datalake_sauron_clean.session.user_phone
+      - datalake_quinto_messenger_clean.task.customer_contact_info
+    description: Phone number of the customer associated with the task, from session or task contact info.
+  twilio_phone_number:
+    lineage:
+      - datalake_quinto_messenger_clean.task.twilio_phone_number
+    description: Twilio phone number used for the task communication.
+  origin:
+    lineage:
+      - datalake_quinto_messenger_clean.chat.id_session
+      - datalake_quinto_messenger_clean.channel.id_session
+    description: Origin of the task communication, either 'in app' or 'whatsapp'.
+  worker_email:
+    lineage:
+      - datalake_quinto_messenger_clean.task.worker_email
+    description: Email address of the worker handling the task.
+  channel_type:
+    lineage:
+      - datalake_quinto_messenger_clean.task.channel_type
+    description: Type of communication channel, such as 'whatsapp'.
+  task_status:
+    lineage:
+      - datalake_quinto_messenger_clean.task.task_status
+    description: Current status of the task.
+  task_outcome:
+    lineage:
+      - datalake_quinto_messenger_clean.task.conversation_attributes
+    description: Outcome of the task derived from conversation attributes.
+  task_completion_reason:
+    lineage:
+      - datalake_quinto_messenger_clean.task.completion_reason
+    description: Reason for the task completion status.
+  bpo_name:
+    lineage:
+      - datalake_quinto_messenger_clean.task.bpo_name
+    description: Name of the BPO handling the task.
+  seconds_to_first_response:
+    lineage:
+      - datalake_quinto_messenger_clean.task.seconds_to_first_response
+    description: Time in seconds taken to provide the first response to the task.
+  is_forwarded:
+    lineage:
+      - datalake_quinto_messenger_clean.task.is_forwarded
+    description: Indicates if the task was forwarded to another team or worker.
+  is_per_team_task:
+    lineage:
+      - datalake_quinto_messenger_clean.task.conversation_attributes
+    description: Indicates if the task is assigned per team based on conversation attributes.
   ts_created:
     lineage:
-      - datalake_quinto_messenger.tasks.ts_created
-    description: The task creation timestamp in UTC-0.
-  ts_updated:
+      - datalake_quinto_messenger_clean.task.ts_created
+    description: Timestamp when the task was created.
+  ts_ended:
     lineage:
-      - datalake_quinto_messenger.tasks.ts_updated
-    description: The task last updated timestamp in UTC-0.
-  ts_ticket_started:
+      - datalake_quinto_messenger_clean.task.ts_updated
+    description: Timestamp when the task was ended.
+  task_attributes:
     lineage:
-      - datalake_quinto_messenger.tasks.ts_created_local
-    description:
-      The ticket started timestamp is the first event timestamp created for the
-      respective Twilio conversation, UTC-3. This field considers all the events
-      of the conversation.
-  ts_ticket_ended:
+      - datalake_quinto_messenger_clean.task.task_attributes
+    description: Attributes associated with the task in JSON format.
+  year:
     lineage:
-      - datalake_quinto_messenger.tasks.ts_created_local
-    description:
-      The ticket ended timestamp is the last event timestamp created for the respective
-      Twilio conversation, UTC-3. This field considers all the events of the
-      conversation.
-  ts_segment_closed:
+      - datalake_quinto_messenger_clean.task.ts_created
+    description: Year component of the task creation date.
+  month:
     lineage:
-      - datalake_quinto_messenger.tasks.ts_created_local
-    description:
-      The timestamp for the last event creation date of the task. This field considers
-      only events of type equal to "reservation".
-  ts_segment_created:
+      - datalake_quinto_messenger_clean.task.ts_created
+    description: Month component of the task creation date.
+  day:
     lineage:
-      - datalake_quinto_messenger.tasks.ts_created_local
-    description:
-      The timestamp for the first event creation date of the task. This field considers
-      only events of type equal to "reservation".
+      - datalake_quinto_messenger_clean.task.ts_created
+    description: Day component of the task creation date.

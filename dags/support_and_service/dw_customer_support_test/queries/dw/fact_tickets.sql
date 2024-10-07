@@ -28,7 +28,7 @@ WITH missing_theme_tickets AS (
       channel != 'call'
       OR (
         channel = 'call'
-        AND ticket_origin IN ('CALL INAPP', 'CALL INBOUND')
+        AND ticket_origin IN ('call inapp', 'call inbound')
       )
     )
   GROUP BY 1, 2, 4

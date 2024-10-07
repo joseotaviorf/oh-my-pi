@@ -189,19 +189,17 @@ tickets_per_task AS (
       WHEN ut.channel = 'call' THEN COALESCE(ca1.worker_email, ca2.worker_email)
       ELSE t.analyst_email
     END AS analyst_email,
-    ch.source,
     CASE
-      WHEN COALESCE(ca1.direction, ca2.direction) IN ('outbound-api', 'outbound')
-        OR COALESCE(ca1.channel_type, ca2.channel_type) = 'call-in-app' THEN 'OUTBOUND'
-      WHEN COALESCE(ca1.direction, ca2.direction) = 'inbound' THEN 'INBOUND'
-      WHEN t.tags LIKE '%"ticket_ativo"%' THEN 'OUTBOUND'
-      ELSE 'INBOUND'
+      WHEN t.tags LIKE '%"ticket_ativo"%' THEN 'outbound'
+      WHEN COALESCE(ca1.direction, ca2.direction) IS NOT NULL
+        THEN COALESCE(ca1.direction, ca2.direction)
+      ELSE 'inbound'
     END AS direction,
     CASE
-      WHEN COALESCE(ca1.origin, ca2.origin) IS NOT NULL THEN CONCAT('CALL ', COALESCE(ca1.origin, ca2.origin))
-      WHEN ch.source = 'IN APP' THEN 'CHAT INAPP'
-      WHEN ch.source = 'WHATSAPP' THEN ch.source
-      ELSE "N/A"
+      WHEN COALESCE(ca1.origin, ca2.origin) IS NOT NULL THEN CONCAT('call  ', COALESCE(ca1.origin, ca2.origin))
+      WHEN ch.origin = 'in app' THEN 'chat in app'
+      WHEN ch.origin = 'whatsapp' THEN ch.origin
+      ELSE "n/a"
     END AS ticket_origin,
     ut.channel,
     t.request_type,
@@ -242,32 +240,34 @@ tickets_per_task AS (
       ON ca2.id_call = t.id_call
       AND STARTSWITH(t.id_call, "CA")
 ),
-ticket_queue_attributes AS (
-  WITH queue_metrics AS (
+ticket_twilio_data AS (
+  WITH twilio_attr AS (
     SELECT DISTINCT
       id_ticket,
-      FIRST(queue) OVER (PARTITION BY id_ticket ORDER BY ts_created_twilio) AS first_queue,
-      FIRST(queue) OVER (PARTITION BY id_ticket ORDER BY ts_created_twilio DESC) AS last_queue,
-      FIRST(analyst_email) OVER (PARTITION BY id_ticket ORDER BY ts_created_twilio) AS first_analyst_email,
-      FIRST(analyst_email) OVER (PARTITION BY id_ticket ORDER BY ts_created_twilio DESC) AS last_analyst_email
+      FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_created_twilio) AS first_queue,
+      FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_created_twilio DESC) AS last_queue,
+      FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_created_twilio) AS first_analyst_email,
+      FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_created_twilio DESC) AS last_analyst_email,
+      MAX(ts_created_twilio) OVER(PARTITION BY id_ticket) AS ts_created_twilio
     FROM
       tickets_per_task
   )
   SELECT
-    tq.id_ticket,
-    tq.first_queue,
-    tq.last_queue,
-    tq.first_analyst_email,
-    tq.last_analyst_email,
+    ta.id_ticket,
+    ta.first_queue,
+    ta.last_queue,
+    ta.first_analyst_email,
+    ta.last_analyst_email,
     LOWER(NULLIF(NULLIF(dc.front_or_back, '-'), '')) AS front_or_back,
     dc.journey_step,
     dc.team,
-    dc.area
+    dc.area,
+    ta.ts_created_twilio
   FROM
-    queue_metrics AS tq
+    twilio_attr AS ta
   LEFT JOIN
     departments AS dc
-      ON dc.department = tq.last_queue
+      ON dc.department = ta.last_queue
 ),
 tickets AS (
   SELECT DISTINCT
@@ -316,6 +316,7 @@ tickets AS (
     t.is_call_answered,
     t.ts_budget,
     t.ts_created,
+    tq.ts_created_twilio,
     t.ts_solved,
     t.ts_closed,
     t.ts_updated,
@@ -325,7 +326,7 @@ tickets AS (
   FROM
     tickets_per_task AS t
   INNER JOIN
-    ticket_queue_attributes AS tq
+    ticket_twilio_data AS tq
       ON tq.id_ticket = t.id_ticket
 ),
 back_tickets AS (
@@ -594,8 +595,8 @@ ticket_metrics AS (
           'Rescisão - Despejo [OFF][POS][BACK]',
           'Rescisão 1 [OFF] [POS] [BACK]'
         )
-        AND t.ticket_origin != "CALL OUTBOUND" THEN TRUE
-      WHEN t.channel IN ('email', 'whatsapp')
+        AND t.ticket_origin != "call outbound" THEN TRUE
+      WHEN t.channel IN ('cs email', 'whatsapp')
         AND t.front_or_back IN ('front', 'back')
         AND DATE(t.ts_solved) >= DATE('2022-01-01')
         AND t.contact_theme_detail_tag IS NOT NULL
@@ -616,6 +617,7 @@ ticket_metrics AS (
     END AS is_ticket_rate,
     t.ts_budget,
     t.ts_created,
+    t.ts_created_twilio,
     COALESCE(tsm.ts_sla_started, t.ts_created) AS ts_sla_started,
     t.ts_solved,
     t.ts_closed,
@@ -707,6 +709,7 @@ SELECT
   is_ticket_rate,
   ts_budget,
   ts_created,
+  ts_created_twilio,
   ts_sla_started,
   ts_solved,
   ts_closed,

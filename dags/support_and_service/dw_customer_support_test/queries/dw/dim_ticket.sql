@@ -21,4 +21,4 @@ SELECT
   ts_updated - INTERVAL 3 HOUR AS ts_updated_brt,
   NOW() AS ts_load
 FROM
-  datalake_zendesk.tickets_current
+  datalake_customer_support_test.tickets
