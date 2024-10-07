@@ -3484,6 +3484,16 @@ bietlejuice.reverse_sale_unavailable_listings_load:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
   - bietlejuice.ebdb:load-clean-suspected-unavailability-listings
+bietlejuice.reverse_supply:
+  - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking
+  - bietlejuice.dw_supply:load-dw-growth-dim-funnel-step
+  - bietlejuice.dw_supply:load-dw-growth-dim-supply-operation-flow
+  - bietlejuice.dw_supply:load-dw-growth-dim-supply-recovery-flow
+  - bietlejuice.dw_supply:load-dw-growth-dim-supply-user-path
+  - bietlejuice.dw_supply:load-dw-growth-fact-supply-events
+  - bietlejuice.enrich_olos_dialer:load-enrich-outbound-contact-attempts
+bietlejuice.reverse_supply_access:
+  - bietlejuice.reverse_supply:load-reverse-supply-affiliates-volumetry
 bietlejuice.reverse_tiers:
   - bietlejuice.enrich_tiers:load-enrich-agent-performance
   - bietlejuice.enrich_tiers_classification:load-enrich-tiers

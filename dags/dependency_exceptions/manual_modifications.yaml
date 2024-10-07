@@ -862,6 +862,9 @@ bietlejuice.reverse_webhelp_access:
     - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
     - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
     - bietlejuice.reverse_webhelp:load-reverse-recontact
+bietlejuice.reverse_supply_access:
+  add:
+    - bietlejuice.reverse_supply:load-reverse-supply-affiliates-volumetry
 bietlejuice.enrich_wordpress_baroes:
   remove:
     - bietlejuice.wordpress_baroes:load-clean-meulugar-data
