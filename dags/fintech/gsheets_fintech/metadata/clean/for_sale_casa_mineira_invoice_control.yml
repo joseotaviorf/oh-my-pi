@@ -1,0 +1,48 @@
+---
+database_name: datalake_gsheets_fintech_clean
+table_name: for_sale_casa_mineira_invoice_control
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id_offer:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.offer
+  id_internal:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.id_interno
+  id_client_sap:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.codigo_cliente
+  id_house:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.id_imovel
+  rps_number:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.numero_rps
+  invoice_number:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.n_da_nfse
+  invoice_key:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.chave_da_nfenfse
+  batch_number:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.n_do_lote
+  client_name:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.nome
+  amount:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.valor_nfse
+  status:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.status
+  dt_due:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.data_do_documento
+  dt_created:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.data_de_criacao
+  ts_load:
+    lineage:
+    - datalake_gsheets_raw.for_sale_casa_mineira_invoice_control.ts_load

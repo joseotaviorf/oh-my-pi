@@ -1,0 +1,72 @@
+---
+database_name: datalake_gsheets_fintech_clean
+table_name: for_sale_closing_assistance
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id_ticket:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.id_do_ticket
+  id_offer:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_offer_proposta
+  id_ticket_signal_return:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_ticket_de_devolucao_do_sinal
+  aditive_reason:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_aditivo
+  cancellation_reason:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_distrato
+  payment_model:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_modelo_de_pagamento
+  assigned_name:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.nome_do_atribuido
+  request_category:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_solicitacao
+  hub_name:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_hub_
+  request_type:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_tipo_de_solicitacao
+  sale_price:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.apoio_valor_do_imovel
+  request_status:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_status_da_solicitacao
+  brokerage_amount:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_valor_da_corretagem_padrao_r_0000000
+  downpayment_amount:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_valor_do_sinal
+  cancellation_fine:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_multa
+  has_downpayment_reversal:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_devolucao_do_sinal
+  is_offer_canceled:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_offer_cancelada
+  has_brokerage_charge:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_cobranca_corretagem
+  dt_created:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_inicio_carimbo_de_datahora
+  dt_deadline:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.data_para_retorno_carimbo_de_datahora
+  dt_approved:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ca_fim_carimbo_de_datahora
+  ts_load:
+    lineage:
+    - datalake_gsheets_raw.for_sale_closing_assistance.ts_load

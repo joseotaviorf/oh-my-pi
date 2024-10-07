@@ -127,6 +127,24 @@ sheets_info:
     clean_table_name: for_sale_sap_invoices
     sheet_context: fintech
 
+  for_sale_platform_invoice_control:
+    sheet_id: 1fWnw9BVyyI6X3SES8VQq0wWpG60BUPLejuQxhiCzV7w
+    sheet_name: Plataforma
+    clean_table_name: for_sale_platform_invoice_control
+    sheet_context: fintech
+
+  for_sale_casa_mineira_invoice_control:
+    sheet_id: 1fWnw9BVyyI6X3SES8VQq0wWpG60BUPLejuQxhiCzV7w
+    sheet_name: Casa Mineira
+    clean_table_name: for_sale_casa_mineira_invoice_control
+    sheet_context: fintech
+
+  for_sale_closing_assistance:
+    sheet_id: 1OpAdK9YWNjc8WV0rKCTEaE0fN71EfqzZW463tttI0gA
+    sheet_name: BD_ZD
+    clean_table_name: for_sale_closing_assistance
+    sheet_context: fintech
+
   hub_bonus:
     sheet_id: 119wy7ALpdeoXjqL8hotNAszav13vqVST0spRCoo-opY
     sheet_name: hub_bonus

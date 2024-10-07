@@ -1,0 +1,25 @@
+SELECT
+    NULLIF(id_do_ticket, '') AS id_ticket,
+    NULLIF(ca_offer_proposta, '') AS id_offer,
+    NULLIF(ca_ticket_de_devolucao_do_sinal, '') AS id_ticket_signal_return,
+    NULLIF(ca_aditivo, '') AS aditive_reason,
+    NULLIF(ca_distrato, '') AS cancellation_reason,
+    NULLIF(ca_modelo_de_pagamento, '') AS payment_model,
+    NULLIF(nome_do_atribuido, '') AS assigned_name,
+    NULLIF(ca_solicitacao, '') AS request_category,
+    NULLIF(ca_hub_, '') AS hub_name,
+    NULLIF(ca_tipo_de_solicitacao, '') AS request_type,
+    NULLIF(apoio_valor_do_imovel, '') AS sale_price,
+    NULLIF(ca_status_da_solicitacao, '') AS request_status,
+    NULLIF(ca_valor_da_corretagem_padrao_r_0000000, '') AS brokerage_amount,
+    NULLIF(ca_valor_do_sinal, '') AS downpayment_amount,
+    NULLIF(ca_multa, '') AS cancellation_fine,
+    NULLIF(ca_devolucao_do_sinal, '') AS has_downpayment_reversal,
+    NULLIF(ca_offer_cancelada, '') AS is_offer_canceled,
+    NULLIF(ca_cobranca_corretagem, '') AS has_brokerage_charge,
+    TO_DATE(SPLIT(NULLIF(ca_inicio_carimbo_de_datahora, ''), " ")[0], 'd/M/y') AS dt_created,
+    TO_DATE(SPLIT(NULLIF(data_para_retorno_carimbo_de_datahora, ''), " ")[0], 'd/M/y') AS dt_deadline,
+    TO_DATE(SPLIT(NULLIF(ca_fim_carimbo_de_datahora, ''), " ")[0], 'd/M/y') AS dt_approved,
+    ts_load AS ts_load
+FROM
+    datalake_gsheets_raw.for_sale_closing_assistance

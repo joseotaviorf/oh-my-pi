@@ -1,0 +1,60 @@
+---
+database_name: datalake_gsheets_fintech_clean
+table_name: for_sale_platform_invoice_control
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id_offer:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.offer
+  invoice_key:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.chave
+  id_internal:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.id_interno
+  id_client_sap:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.contrapartida
+  id_house:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.id_imovel
+  id_account:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.conta
+  cost_center_code:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.cc
+  rps_number:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.rps
+  invoice_number:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.nf
+  transaction_number:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.no_transacao
+  client_name:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.nome_conta_contrap
+  description:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.descricao
+  comments:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.observacoes
+  amount:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.valor
+  accumulated_amount:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.saldo_acumulado
+  dt_due:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.vencimento
+  dt_created:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.data
+  ts_load:
+    lineage:
+    - datalake_gsheets_raw.for_sale_platform_invoice_control.ts_load
