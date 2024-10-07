@@ -12,6 +12,13 @@ workflow:
   custom_schema: offboarding
   default_extraction_type: incremental
   default_partitions: [year, month, day]
+  tables_customization:
+    fact_terminations:
+      z_order_by: [sk_termination]
+      merge_on: [sk_termination]
+    dim_termination:
+      z_order_by: [sk_termination]
+      merge_on: [sk_termination]
 
 cluster:
   type: databricks_12_2_min_general_photon_cluster
