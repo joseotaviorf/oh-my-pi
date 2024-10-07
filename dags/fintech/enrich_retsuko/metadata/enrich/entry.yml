@@ -41,6 +41,8 @@ columns:
     description: "Transactional entries are created in pairs (on the IQ and PP invoice). This hash can identify this pair."
     lineage:
       - datalake_retsuko_clean.entry.accounting_transaction_identifier
+  accounting_version:
+    description: "Identify accounting version in entry creation"
   amount:
     description: "Entry amount"
     lineage:

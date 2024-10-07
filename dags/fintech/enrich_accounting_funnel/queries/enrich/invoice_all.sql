@@ -6,13 +6,6 @@ WITH locale_ids AS (
     datalake_gsheets_clean.cod_locale
   GROUP BY 1
 ),
-deduplicate_sap_entity AS (
-  SELECT
-    DISTINCT id_finance_entity,
-    IF(version IS NULL, 'v1', version) AS version
-  FROM
-    datalake_retsuko_clean.sap_entity
-),
 pre_remove_reversed AS (
 SELECT
     e.sk_invoice_reversed_entry
@@ -171,7 +164,7 @@ SELECT DISTINCT
     WHEN CHARINDEX('.', c.version)> 0 THEN  SUBSTRING(c.version, 1, CHARINDEX('.', c.version)-1)
     ELSE COALESCE(c.version, 'no info')
   END AS version,
-  IF(sap.version IS NULL, 'v1', sap.version) as accounting_version,
+  e.accounting_version,
   c.is_contract_b2b,
   c.dt_start > c1.dt_termination AND c1.dt_termination IS NOT NULL AS ended_before_started,
   r.city_name AS locale,
@@ -196,7 +189,7 @@ SELECT DISTINCT
     ELSE 0
   END AS has_negotiation,
   CASE
-    WHEN (try_cast(reverse(CASE WHEN description like '%arcela%' THEN split(reverse(description), ' ed ')[1] ELSE '1' END) as bigint)) > 1 THEN 1
+    WHEN (try_cast(reverse(CASE WHEN ie.description like '%arcela%' THEN split(reverse(ie.description), ' ed ')[1] ELSE '1' END) as bigint)) > 1 THEN 1
     ELSE 0
   END AS has_installments,
   i.frequency AS purpose,
@@ -282,8 +275,8 @@ LEFT JOIN
   next_business_day AS nbd
     ON nbd.date = i.dt_paid
 LEFT JOIN
-    deduplicate_sap_entity sap
-    ON fie.sk_invoice_entry = sap.id_finance_entity
+  datalake_retsuko.entry AS e
+    ON e.id_external = fie.sk_invoice_entry
 LEFT JOIN
     remove_reversed rr
     ON rr.id_entry = fie.sk_invoice_entry

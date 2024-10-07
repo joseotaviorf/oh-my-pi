@@ -31,7 +31,7 @@ columns:
     description: "Contract version"
   accounting_version:
     lineage:
-      - datalake_retsuko_clean.sap_entity.version
+      - datalake_retsuko.entry.accounting_version
     description: "Information about sync with ERP Gateway"
   ended_before_started:
     description: "If the contract annulment happened before the start"
