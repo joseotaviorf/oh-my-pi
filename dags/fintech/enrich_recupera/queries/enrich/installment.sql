@@ -79,6 +79,11 @@ SELECT
         WHEN ns.open > 0 THEN "ABERTO"
         WHEN ns.open = 0 AND ns.paid > 0 THEN "LIQUIDADO"
     END AS negotiation_status,
+    CASE
+      WHEN i.boleto_emission_indicator = "Parcelamento em boleto" THEN 'BOLETO'
+      WHEN i.boleto_emission_indicator = "Pix" THEN 'PIX'
+      WHEN i.boleto_emission_indicator = "Cartão de crédito" THEN 'CARTÃO'
+    END AS payment_method,
     CAST(i.installments_amount AS INT) AS number_of_installments,
     (i.installments_amount+1) AS adjusted_number_of_installments,
     i.installment_number+1 AS installment_number,

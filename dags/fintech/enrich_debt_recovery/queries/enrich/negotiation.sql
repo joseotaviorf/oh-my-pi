@@ -38,6 +38,7 @@ cte_renegotiated AS (
 installments AS (
     SELECT
         id_negotiation,
+        MAX(IF(installment_number = 1, payment_type, NULL)) AS promisse_payment_method,
         SUM(IF(installment_number = 1 AND status = 'paid', total_amount, 0)) AS down_payment_amount,
         SUM(IF(status = 'paid', total_amount, 0)) AS paid_amount,
         COUNT(DISTINCT IF(status = 'paid', id, NULL)) AS qt_installments_paid,
@@ -73,6 +74,7 @@ SELECT
     c.name AS collector,
     n.consultancy,
     n.status,
+    i.promisse_payment_method,
     i.qt_installments,
     i.qt_installments_paid,
     i.total_expected_amount,

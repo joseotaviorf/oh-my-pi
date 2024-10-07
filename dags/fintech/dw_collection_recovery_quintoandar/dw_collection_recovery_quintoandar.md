@@ -15,8 +15,6 @@ This dag is triggered once per day via Mediator. More information about run time
 
 This pipeline produces the following output tables:
 
-- `dw_collection_recovery_quintoandar.dim_debtor`
-- `dw_collection_recovery_quintoandar.dim_eviction`
 - `dw_collection_recovery_quintoandar.fact_collection`
 - `dw_collection_recovery_quintoandar.fact_debt`
 - `dw_collection_recovery_quintoandar.fact_negotiation_installment`

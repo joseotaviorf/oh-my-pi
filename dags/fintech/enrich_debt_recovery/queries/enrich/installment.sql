@@ -10,6 +10,7 @@ deduplicate_payment AS (
 charges AS (
     SELECT DISTINCT
         id_installment,
+        id AS id_installment_charge,
         GET_JSON_OBJECT(metadata, "$.our-number") AS our_number
     FROM datalake_trato_feito_clean.installment_charges
 ),
@@ -41,7 +42,7 @@ SELECT
     cp.id_negotiation,
     COALESCE(external_index, DENSE_RANK() OVER(PARTITION BY cp.id_negotiation ORDER BY cp.ts_created, cp.id_external)) AS installment_number,
     ie.id_invoice_extra,
-    c.our_number,
+    COALESCE(cc.our_number, cp.id_external) AS our_number,
     cp.status,
     cp.adm_fee_amount,
     cp.installment_fee_amount,
@@ -57,7 +58,7 @@ SELECT
     cp.ts_payment_updated AS ts_paid
 FROM
     cte_pay AS cp
-LEFT JOIN charges AS c
-    ON c.id_installment = cp.id
+LEFT JOIN charges AS cc
+    ON cp.id_installment_charge = cc.id_installment_charge
 LEFT JOIN invoice_extra AS ie
     ON cp.id = ie.id_installment

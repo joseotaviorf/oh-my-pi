@@ -34,17 +34,6 @@ deduplicate_complementary_records_written_down AS (
     AND id_creditor NOT IN (3,5)
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, installment_code ORDER BY ts_last_debt_update DESC) = 1
 ),
-trato_feito_debts AS (
-  SELECT
-    d.id_external AS id_invoice,
-    n.id_negotiation_external AS id_negotiation,
-    n.id_contract
-  FROM datalake_trato_feito_clean.debt AS d
-  LEFT JOIN datalake_debt_recovery.negotiation AS n
-    ON d.id_negotiation = n.id_negotiation
-  WHERE d.id_negotiation IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY  n.id_contract, d.id_external, d.id_negotiation ORDER BY  d.ts_created DESC) = 1
-),
 recupera_debts AS (
   SELECT
     COALESCE(cp.id_invoice, cr.id_invoice, crwd.id_invoice) AS id_invoice,
@@ -61,19 +50,56 @@ recupera_debts AS (
       AND cp.id_negotiation = crwd.id_negotiation
   WHERE COALESCE(cp.id_negotiation, cr.id_negotiation, crwd.id_negotiation) IS NOT NULL
 ),
-debts AS (
- SELECT
-    COALESCE(tfd.id_contract, rd.id_contract) AS id_contract,
-    COALESCE(tfd.id_invoice, rd.id_invoice) AS id_invoice,
-    COALESCE(tfd.id_negotiation, rd.id_negotiation) AS id_negotiation
-  FROM trato_feito_debts AS tfd
-  FULL OUTER JOIN recupera_debts AS rd
-    ON rd.id_contract = tfd.id_contract
-        AND rd.id_invoice  = tfd.id_invoice
-        AND rd.id_negotiation = tfd.id_negotiation
+trato_feito_debts AS (
+  SELECT
+    d.id_external AS id_invoice,
+    n.id_negotiation_external AS id_negotiation,
+    n.id_contract
+  FROM datalake_trato_feito_clean.debt AS d
+  LEFT JOIN datalake_debt_recovery.negotiation AS n
+    ON d.id_negotiation = n.id_negotiation
+  WHERE
+    d.id_negotiation IS NOT NULL
+    AND n.debtor != "velo_delinquency_tenant"
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY  n.id_contract, d.id_external, d.id_negotiation ORDER BY  d.ts_created DESC) = 1
+),
+cyber_debts AS (
+  SELECT
+    id_contract,
+    id_negotiation,
+    id_invoice
+  FROM datalake_cyber_homolog.debt_negotiation_mapping
+),
+union_sources AS (
+  SELECT
+    CONCAT(id_contract, "-", id_invoice) AS sk_debt,
+    id_negotiation AS sk_negotiation,
+    "Cyber" AS source,
+    1 AS priority
+  FROM cyber_debts
+
+  UNION DISTINCT
+
+  SELECT
+    CONCAT(id_contract, "-", id_invoice) AS sk_debt,
+    id_negotiation AS sk_negotiation,
+    "Trato Feito" AS source,
+    2 AS priority
+  FROM trato_feito_debts
+
+  UNION DISTINCT
+
+  SELECT
+    CONCAT(id_contract, "-", id_invoice) AS sk_debt,
+    id_negotiation AS sk_negotiation,
+    "Recupera" AS source,
+    3 AS priority
+  FROM recupera_debts
 )
-SELECT DISTINCT
-  CONCAT(id_contract, "-", id_invoice) AS sk_debt,
-  id_negotiation AS sk_negotiation,
+SELECT
+  sk_debt,
+  sk_negotiation,
+  source,
   NOW() AS ts_load
-FROM debts
+FROM union_sources
+QUALIFY ROW_NUMBER() OVER(PARTITION BY sk_debt, sk_negotiation ORDER BY priority) = 1

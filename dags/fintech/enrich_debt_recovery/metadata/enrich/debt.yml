@@ -1,0 +1,80 @@
+---
+database_name: datalake_debt_recovery
+table_name: debt
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Debt table
+columns:
+  id_invoice:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.d.id_external
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.n.id_debtor_external
+  debtor:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.CONCAT(dt.origin, "_", dt.type)
+  our_number:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.our_number
+  external_sub_status:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.external_sub_status
+  external_status:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.external_status
+  purpose:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.purpose
+  due_amount:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.COALESCE(d.original_amount, ABS(b.due_amount))
+  interest_fee_amount:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.interest_fee_amount
+  fine_fee_amount:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.fine_fee_amount
+  discount_amount:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.discount_amount
+  debt_amount:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.d.original_amount + d.interest_fee_amount +
+        d.fine_fee_amount - d.discount_amount
+  paid_amount:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.paid_amount
+  dt_due:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.dt_due
+  dt_paid:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.dt_paid
+  dt_created:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.DATE(b.ts_created)
+  dt_debt_created:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.DATE(d.ts_created)
+  ts_load:
+    description: ""
+    lineage:
+      - datalake_trato_feito_clean.debt.NOW()

@@ -31,7 +31,8 @@ installments AS (
       WHEN COUNT(DISTINCT p.id_payment) = COUNT(DISTINCT ai.id_agreement_installment) THEN MAX(DATE(p.ts_payment))
     END AS dt_paid_all,
     MIN(IF(ai.installment_number = 0, DATE(ai.ts_due_installment), NULL)) AS dt_due_promisse,
-    MAX(IF(p.id_agreement_installment IS NOT NULL AND ai.installment_number = 0, DATE(p.ts_payment), NULL)) AS dt_down_payment
+    MAX(IF(p.id_agreement_installment IS NOT NULL AND ai.installment_number = 0, DATE(p.ts_payment), NULL)) AS dt_down_payment,
+    MAX(DATE(ai.ts_due_installment)) AS dt_expected_end
   FROM datalake_cyber_clean.agreement_installments AS ai
   LEFT JOIN datalake_cyber_clean.payments AS p
     ON ai.id_agreement_installment = p.id_agreement_installment
@@ -80,7 +81,7 @@ SELECT
       WHEN COALESCE(agg.agency_name, ag.agency_name) LIKE "PASCH%" THEN "PASCHOALOTTO"
       WHEN UPPER(a.id_user) LIKE "PSC%" THEN "PASCHOALOTTO"
       WHEN UPPER(a.id_user) = "MIGRACAO" THEN "MIGRACAO"
-      ELSE COALESCE(agg.agency_name, ag.agency_name)
+      ELSE UPPER(COALESCE(agg.agency_name, ag.agency_name))
     END AS advisory,
     cp.offer_number AS id_campaign,
     ca.contract_group AS creditor,
@@ -91,6 +92,7 @@ SELECT
     at.max_delay_days AS agreement_type_max_delay_days,
     at.payment_method AS agreement_type_payment_method,
     i.promisse_payment_method,
+    a.exception,
     at.min_down_payment_percentage,
     CASE
       WHEN ag.agency_type IN ("Assessoria Convencional", "Assessoria Digital") THEN "Assessoria"
@@ -143,6 +145,7 @@ SELECT
     i.dt_due_promisse,
     i.dt_down_payment,
     i.dt_paid_all,
+    i.dt_expected_end,
     COALESCE(DATE(a.ts_agreement_breach), a.ts_canceled, i.dt_cancelation) AS dt_cancellation,
     NOW() AS ts_load
 FROM datalake_cyber_clean.agreements AS a

@@ -7,57 +7,155 @@ deduplicate_trato_feito_negotiation AS (
     CASE
       WHEN debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
       WHEN debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
-    END AS creditor
+    END AS creditor,
+     CASE
+      WHEN LOWER(collector) LIKE '%cyber%' THEN "Trato Feito - Cyber"
+      WHEN LOWER(collector) LIKE '%recupera%' THEN "Trato Feito - Recupera"
+      WHEN UPPER(collector) LIKE '%5A%' THEN "Trato Feito - Self Service"
+    END AS source
   FROM
       datalake_debt_recovery.negotiation
   WHERE
     debtor != "velo_delinquency_tenant"
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_external ORDER BY ts_created_at DESC) = 1
-),
-deduplicate_invoice_extra AS (
-  SELECT
-    a.id_external AS id_invoice,
-    a.id_installment
-  FROM
-      datalake_trato_feito_clean.accounting_installment AS a
-  LEFT JOIN datalake_retsuko.invoice AS i
-    ON i.id_external = a.id_external
-  WHERE i.status != "canceled"
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY a.id_installment ORDER BY COALESCE(i.ts_payment_confirmation, i.ts_paid) DESC, i.ts_created ASC) = 1
+
 ),
 trato_feito_installment AS (
   SELECT
-    n.id_contract,
-    i.id_negotiation,
+    CONCAT(n.id_negotiation_external,"-",INT(i.installment_number)) AS id_negotiation_installment,
     n.id_negotiation_external,
-    n.creditor,
-    i.id AS id_installment,
+    i.id AS id_installment_trato_feito,
     i.id_invoice_extra,
     i.installment_number,
+    i.our_number,
+    n.creditor,
     i.status AS installment_status,
-    i.id_external AS id_receipt,
-    i.adm_fee_amount,
+    i.payment_type AS payment_method,
+    NULL AS delay_days,
+    NULL AS main_amount,
+    NULL AS updated_balance,
+    NULL AS fine_amount,
+    NULL AS interest_fee_amount,
+    NULL AS default_interest_amount,
+    i.adm_fee_amount AS credit_card_fee_amount,
     i.discount_amount,
-    i.total_amount,
+    i.total_amount AS amount_to_pay,
     IF(i.ts_paid IS NOT NULL, i.total_amount, NULL) AS paid_amount,
-    DATE(i.ts_created) AS dt_created,
+    DATE(i.ts_created) AS dt_creation,
     i.dt_due,
     DATE(i.ts_paid) AS dt_paid,
-    IF(i.status = "canceled", DATE(i.ts_updated), NULL) AS dt_canceled
+    IF(i.status = "canceled", DATE(i.ts_updated), NULL) AS dt_canceled,
+    n.source,
+    3 AS priority
   FROM
       datalake_debt_recovery.installment AS i
   INNER JOIN
       deduplicate_trato_feito_negotiation AS n
           ON i.id_negotiation = n.id_negotiation
-  LEFT JOIN
-      deduplicate_invoice_extra AS ai
-        ON ai.id_installment = i.id
+  LEFT JOIN datalake_trato_feito_clean.payment
+),
+union_external_sources AS (
+  SELECT DISTINCT
+    CONCAT(id_negotiation, "-" , installment_number) AS id_negotiation_installment,
+    id_negotiation AS id_negotiation_external,
+    installment_number,
+    our_number,
+    creditor,
+    installment_status,
+    payment_method,
+    NULL delay_days,
+    NULL AS main_amount,
+    agreement_balance_amount AS updated_balance,
+    fine_amount,
+    total_interest_amount AS interest_fee_amount,
+    NULL AS default_interest_amount,
+    credit_card_fee_amount,
+    discount_amount,
+    amount_to_pay,
+    paid_amount,
+    dt_creation,
+    dt_due,
+    dt_paid,
+    dt_cancelation AS dt_canceled,
+    'Cyber' AS source,
+    1 AS priority
+  FROM
+    datalake_cyber_homolog.installment AS i
+  WHERE creditor = "QuintoAndar"
+
+  UNION DISTINCT
+
+  SELECT DISTINCT
+    CONCAT(id_negotiation, "-", INT(installment_number)) AS id_negotiation_installment,
+    id_negotiation AS id_negotiation_external,
+    installment_number,
+    id_receipt AS our_number,
+    creditor,
+    CASE
+      WHEN installment_status = 'Pago' THEN 'paid'
+      WHEN installment_status = 'Quebrado' THEN 'canceled'
+      WHEN installment_status = 'Em aberto' THEN 'pending'
+      ELSE installment_status
+    END AS installment_status,
+    payment_method,
+    delay_days,
+    main_amount, -- renomear para debt amount?
+    updated_balance, -- talvez seja o agreement_balance_amount
+    amount_fine AS fine_amount,
+    interest_fee_amount,
+    default_interest_amount, -- Deletar?
+    adm_fee_amount AS credit_card_fee_amount, -- Deletar?
+    discount_amount,
+    amount_to_pay,
+    paid_amount,
+    dt_formalization AS dt_creation,
+    dt_due,
+    dt_paid,
+    dt_canceled,
+    'Recupera' AS source,
+    2 AS priority
+  FROM
+    datalake_recupera.installment AS i
+  WHERE LOWER(creditor) NOT LIKE "%quintocred%"
+
+),
+all_installments AS (
+  SELECT
+    COALESCE(ext.id_negotiation_installment, tf.id_negotiation_installment) AS id_negotiation_installment,
+    COALESCE(ext.id_negotiation_external, tf.id_negotiation_external) AS id_negotiation_external,
+    tf.id_installment_trato_feito,
+    COALESCE(ext.installment_number, tf.installment_number) AS installment_number,
+    COALESCE(ext.our_number, tf.our_number) AS our_number,
+    tf.id_invoice_extra,
+    COALESCE(ext.creditor, tf.creditor) AS creditor,
+    COALESCE(ext.installment_status, tf.installment_status) AS installment_status,
+    COALESCE(ext.payment_method, tf.payment_method) AS payment_method,
+    COALESCE(ext.delay_days, tf.delay_days) AS delay_days,
+    COALESCE(ext.main_amount, tf.main_amount) AS main_amount,
+    COALESCE(ext.updated_balance, tf.updated_balance) AS updated_balance,
+    COALESCE(ext.fine_amount, tf.fine_amount) AS fine_amount,
+    COALESCE(ext.interest_fee_amount, tf.interest_fee_amount) AS interest_fee_amount,
+    COALESCE(ext.default_interest_amount, tf.default_interest_amount) AS default_interest_amount,
+    COALESCE(ext.credit_card_fee_amount, tf.credit_card_fee_amount) AS credit_card_fee_amount,
+    COALESCE(ext.discount_amount, tf.discount_amount) AS discount_amount,
+    COALESCE(ext.amount_to_pay, tf.amount_to_pay) AS amount_to_pay,
+    COALESCE(ext.paid_amount, tf.paid_amount) AS paid_amount,
+    COALESCE(ext.dt_creation, tf.dt_creation) As dt_creation,
+    COALESCE(ext.dt_due, tf.dt_due) AS dt_due,
+    COALESCE(ext.dt_paid, tf.dt_paid) AS dt_paid,
+    COALESCE(ext.dt_canceled, tf.dt_canceled) AS dt_canceled,
+    COALESCE(ext.source, tf.source) AS source
+  FROM union_external_sources AS ext
+  FULL OUTER JOIN trato_feito_installment AS tf
+    ON ext.id_negotiation_external = tf.id_negotiation_external
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY ext.id_negotiation_installment ORDER BY ext.priority) = 1
+
 ),
 nexxera_confirmation AS (
   SELECT
       dt_due,
       dt_occurrence_code AS dt_paid,
-      substr(our_number, 1,8) AS id_receipt,
+      substr(our_number, 1,8) AS our_number,
       net_amount AS paid_amount,
       due_amount
   FROM
@@ -68,51 +166,46 @@ nexxera_confirmation AS (
       ROW_NUMBER() OVER(PARTITION BY our_number, occurrence_code ORDER BY dt_occurrence_code DESC) = 1
 )
 SELECT DISTINCT
-    CONCAT(COALESCE(i.id_negotiation, tfi.id_negotiation_external),"-",INT(COALESCE(i.installment_number, tfi.installment_number))) AS sk_negotiation_installment,
-    STRING(COALESCE(i.id_negotiation, tfi.id_negotiation_external)) AS sk_negotiation,
-    i.customer_document AS sk_debtor,
-    tfi.id_installment,
-    CAST(tfi.id_invoice_extra AS BIGINT) AS id_invoice_extra,
-    COALESCE(i.id_receipt, tfi.id_receipt) AS id_receipt,
-    CAST(COALESCE(i.installment_number, tfi.installment_number) AS INT) AS installment_number,
-    COALESCE(tfi.creditor, i.creditor) AS creditor,
-    i.is_special_installment,
+    i.id_negotiation_installment AS sk_negotiation_installment,
+    i.id_negotiation_external AS sk_negotiation,
+    id_installment_trato_feito,
+    CAST(i.id_invoice_extra AS BIGINT) AS id_invoice_extra,
+    i.installment_number,
+    i.our_number,
+    i.creditor,
+    i.source,
     CASE
-      WHEN tfi.installment_status = 'paid' OR i.installment_status = 'Pago' THEN 'paid'
-      WHEN tfi.installment_status IS NULL AND i.installment_status = 'Quebrado' THEN 'canceled'
-      WHEN (tfi.installment_status IN ('pending', 'registered') OR i.installment_status = 'Em aberto') AND nx.paid_amount IS NOT NULL THEN 'paid' -- Order of checks here matters!!!! Only use nexxera if others call it 'registered'
-      WHEN tfi.installment_status IS NULL AND i.installment_status = 'Em aberto' THEN 'pending'
-      ELSE tfi.installment_status
+      WHEN i.installment_status IN ('pending', 'registered') AND nx.paid_amount IS NOT NULL THEN 'paid' -- Only use nexxera if others call it 'registered'
+      WHEN ri.status = 'paid' THEN 'paid'
+      ELSE i.installment_status
     END AS installment_status,
+    i.payment_method,
     i.delay_days,
     i.main_amount,
     i.updated_balance,
-    i.amount_fine,
+    i.fine_amount,
     i.interest_fee_amount,
     i.default_interest_amount,
-    COALESCE(i.adm_fee_amount, tfi.adm_fee_amount) AS adm_fee_amount,
-    COALESCE(i.discount_amount, tfi.discount_amount) AS discount_amount,
-    COALESCE(i.amount_to_pay, tfi.total_amount) AS amount_to_pay,
+    i.credit_card_fee_amount,
+    i.discount_amount,
+    i.amount_to_pay,
     CASE
-      WHEN (tfi.installment_status IN ('pending', 'registered') OR i.installment_status = 'Em aberto') AND nx.paid_amount IS NOT NULL THEN nx.paid_amount -- Order of checks here matters!!!! Only use nexxera if others call it 'registered'
-      ELSE COALESCE(i.paid_amount, tfi.paid_amount)
+      WHEN i.installment_status IN ('pending', 'registered') AND nx.paid_amount IS NOT NULL THEN nx.paid_amount -- Only use nexxera if others call it 'registered'
+      ELSE i.paid_amount
     END AS paid_amount,
-    COALESCE(i.dt_formalization, tfi.dt_created) AS dt_creation,
-    COALESCE(i.dt_due, tfi.dt_due) AS dt_due,
+    i.dt_creation,
+    i.dt_due,
     CASE
-          WHEN (tfi.installment_status IN ('pending', 'registered') OR i.installment_status = 'Em aberto') AND nx.paid_amount IS NOT NULL THEN nx.dt_paid -- Order of checks here matters!!!! Only use nexxera if others call it 'registered'
-          ELSE COALESCE(i.dt_paid, tfi.dt_paid)
-      END AS dt_paid,
-    COALESCE(i.dt_canceled, tfi.dt_canceled) AS dt_canceled,
+      WHEN i.installment_status IN ('pending', 'registered') AND nx.paid_amount IS NOT NULL THEN nx.dt_paid -- Only use nexxera if others call it 'registered'
+      ELSE COALESCE(DATE(ri.ts_paid), i.dt_paid)
+    END AS dt_paid,
+    i.dt_canceled,
     NOW() AS ts_load
 FROM
-    datalake_recupera.installment AS i
-FULL OUTER JOIN
-    trato_feito_installment AS tfi
-        ON tfi.id_negotiation_external = i.id_negotiation
-        AND tfi.installment_number = i.installment_number
+    all_installments AS i
 LEFT JOIN
     nexxera_confirmation AS nx
-        ON nx.id_receipt = COALESCE(i.id_receipt, tfi.id_receipt)
+        ON nx.our_number = i.our_number
         AND nx.dt_due = i.dt_due
-WHERE i.creditor != "IQ QuintoCred"
+LEFT JOIN datalake_retsuko.invoice AS ri
+  ON i.id_invoice_extra = ri.id_external

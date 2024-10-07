@@ -6,6 +6,7 @@ domain: fintech
 description: |
   Historical table according to the contracts selected in the negotiation.
   This table will contain information about the contracts that were selected in the negotiation and will be updated when the agreement is recorded.
+  Read more at: https://docs.google.com/document/d/1ziYkmVC0XoFdxFh8p7KwCHgMX-P0QKII/edit#bookmark=id.2w5ecyt
 columns:
   id_agreement:
     description: ""
@@ -59,15 +60,15 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_raw.agr_hist.AHVLRPRCAG
-  main_amount_due:
+  main_due_amount:
     description: ""
     lineage:
       - datalake_cyber_raw.agr_hist.AHVLRPRCAVAG
-  residual_final_amount:
+  residual_fine_amount:
     description: ""
     lineage:
       - datalake_cyber_raw.agr_hist.AHVLRPRMUAGR
-  agreement_fine_amount:
+  contract_fine_amount:
     description: ""
     lineage:
       - datalake_cyber_raw.agr_hist.AHVLRMUAGR

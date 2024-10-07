@@ -57,16 +57,20 @@ ssn_original_payment AS (
         event_properties:contract_id IS NOT NULL
         AND event_properties:invoice_id IS NOT NULL
 ),
-ssn_boletao AS (
-    SELECT DISTINCT
-        d.id_external AS id_invoice,
-        n.id_contract
-    FROM
-        datalake_trato_feito_clean.debt AS d
-    LEFT JOIN
-        datalake_debt_recovery.negotiation AS n
-            ON d.id_negotiation = n.id_negotiation
-    WHERE n.collector = "5A-collector"
+negotiation_data AS (
+SELECT
+    d.id_invoice,
+    d.id_contract,
+    CASE
+      WHEN LOWER(n.promisse_payment_method) LIKE '%cartão%' THEN n.original_debt_amount
+      ELSE down_payment_amount_paid
+    END AS net_recovery_amount,
+    IF(origin_agreement = "Portal Auto Negociação", TRUE, FALSE) AS is_ssn_boletao
+  FROM dw_collection_recovery_quintoandar.fact_debt AS d
+  INNER JOIN dw_collection_recovery_quintoandar.bridge_map_debt_negotiation AS b
+    ON d.sk_debt = b.sk_debt
+  INNER JOIN dw_collection_recovery_quintoandar.fact_negotiation AS n
+    ON b.sk_negotiation = n.sk_negotiation
 ),
 add_all_dimensions AS (
 SELECT
@@ -79,12 +83,12 @@ SELECT
     o.payment_status,
     CASE
         WHEN possn.id_invoice IS NOT NULL AND o.reason NOT IN ("negotiation-recupera", "agreement") AND o.payment_status = "paid" THEN TRUE
-        WHEN bossn.id_invoice IS NOT NULL AND o.payment_status = "written-down" THEN TRUE
+        WHEN n.is_ssn_boletao IS NOT NULL AND o.payment_status = "written-down" THEN TRUE
         ELSE FALSE
     END AS is_ssn,
     CASE
         WHEN possn.id_invoice IS NOT NULL AND o.reason NOT IN ("negotiation-recupera", "agreement") AND o.payment_status = "paid" THEN "POSSN (payment of original)"
-        WHEN bossn.id_invoice IS NOT NULL AND o.payment_status = "written-down" THEN "BOSSN (single debt negotiation)"
+        WHEN n.is_ssn_boletao IS NOT NULL AND o.payment_status = "written-down" THEN "BOSSN (single debt negotiation)"
         ELSE NULL
     END AS type_ssn,
     CASE
@@ -92,23 +96,23 @@ SELECT
         AND o.payment_status = "paid"
         AND o.reason NOT IN ("negotiation-recupera", "agreement")
       THEN "Self Service Negotiation - Payment of original debt"
-      WHEN bossn.id_invoice IS NOT NULL
+      WHEN n.id_invoice IS NOT NULL
         AND o.payment_status = "written-down"
       THEN "Self Service Negotiation - Negotiation"
       WHEN possn.id_invoice IS NULL
-        AND bossn.id_invoice IS NULL
+        AND n.id_invoice IS NULL
         AND o.payment_status = 'paid'
         AND o.reason NOT IN ("negotiation-recupera", "agreement")
         AND o.invoice_type != "extra"
       THEN "Original debt"
       WHEN possn.id_invoice IS NULL
-        AND bossn.id_invoice IS NULL
+        AND n.id_invoice IS NULL
         AND o.payment_status = 'written-down'
         AND o.reason NOT IN ("negotiation-recupera", "agreement")
         AND o.invoice_type != "extra"
       THEN "Negotiation"
       WHEN possn.id_invoice IS NULL
-        AND bossn.id_invoice IS NULL
+        AND n.id_invoice IS NULL
         AND o.payment_status = 'paid'
         AND o.reason IN ("negotiation-recupera", "agreement")
         AND o.invoice_type = "extra"
@@ -122,6 +126,7 @@ SELECT
     o.due_amount,
     o.paid_amount,
     o.recovered_amount,
+    n.net_recovery_amount,
     o.contract_debt,
     o.business_day,
     o.is_last_business_days,
@@ -142,12 +147,11 @@ LEFT JOIN
     ssn_original_payment AS possn
         ON possn.id_invoice = o.id_invoice
         AND possn.id_contract = o.id_contract
-LEFT JOIN ssn_boletao AS bossn
-    ON bossn.id_invoice = o.id_invoice
-    AND bossn.id_contract = o.id_contract
 LEFT JOIN responsible_for_contract AS rc
   ON o.id_contract = rc.id_contract
   AND o.dt_reference = rc.dt_snapshot
+LEFT JOIN negotiation_data AS n
+  ON o.id_invoice = n.id_invoice AND o.id_contract = n.id_contract
 ),
 get_last_valid_partner AS (
   -- Get the last valid partner per invoice, to freeze the partner after the invoice payment date
