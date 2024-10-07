@@ -1,0 +1,29 @@
+dag:
+  name: listings_olx
+  schedule_start_date: 2021, 7, 20
+  schedule_interval: 0 2 * * 5
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG ingests data from OLX crawled data made by our partners.
+      The data is placed on a S3 bucket and this day gets the JSONs imputed with one week of interval (D-7).
+workflow:
+  layer: raw
+  type: custom_ingestion
+  spark_job_prefix: crawlers/listings
+  load_spark_job: load_crawlers_listings_into_datalake
+  custom_schema: crawlers_listings
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "crawlers" # Source
+    - "listings" # Context
+    - "{table_name}"
+    - "olx" # Origin
+    - "{{ ds }}"
+  default_extraction_type: incremental
+  default_partitions: ["city", "year", "month", "day"]
+  tables_customization:
+    olx: {}
+cluster:
+  type: databricks_12_2_med_general_cluster

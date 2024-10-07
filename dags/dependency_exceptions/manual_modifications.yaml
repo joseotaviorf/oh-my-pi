@@ -461,7 +461,7 @@ bietlejuice.enrich_olos_dialer:
     - bietlejuice.olos_dialer:load-clean-mailing
 bietlejuice.enrich_olx_crawler_listings:
   remove:
-    - bietlejuice.listings.olx:load-clean-olx
+    - bietlejuice.listings_olx:load-clean-olx
 bietlejuice.enrich_online_attribution:
   remove:
     - bietlejuice.amplitude:load-clean-170698-user-merge
