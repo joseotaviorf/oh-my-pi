@@ -17,7 +17,7 @@ base_payment_asaas AS (
     CAST( NULL AS VARCHAR (20) ) AS category
   FROM 
     datalake_velo_asaas_clean.payments asaas
-  LEFT JOIN 
+  INNER JOIN 
     dw_velo.fact_velo_propose p
     ON  IF(
         regexp_extract( description, '(?i)proposta\\s*(\\d+)', 1 ) > 0,

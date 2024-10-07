@@ -17,7 +17,7 @@ nf_cancellation AS (
     *
   FROM 
     dw_charging_payment_quintocred.fact_accounting_funnel acc
-  LEFT JOIN
+  INNER JOIN
     base_nf_cancellation c
     ON  acc.id_business_entity = c.sk_propose
     AND acc.id_document = c.id_document_cancellation
@@ -71,7 +71,7 @@ sap_nf AS (
       agg.sap_class
   FROM 
     agg_sap_nf agg
-  LEFT JOIN 
+  INNER JOIN 
     dw_charging_payment_quintocred.fact_accounting_funnel acc
     ON acc.id_business_entity = agg.sk_propose
     AND acc.accrual_year_month = agg.year_month_nf

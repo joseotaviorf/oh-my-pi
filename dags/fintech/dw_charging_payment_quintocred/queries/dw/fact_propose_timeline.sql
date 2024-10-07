@@ -104,7 +104,7 @@ first_renewal_value as (
     r.previous_monthly_amount * 12 AS first_annual_value_mod
   FROM
     renewal r
-  LEFT JOIN
+  INNER JOIN
     first_last_line_renewal fr
     ON  r.sk_propose = fr.sk_propose
     AND r.ts_created = fr.min_ts_created
@@ -165,7 +165,7 @@ first_propose_value AS (
     pm.annual_value_mod AS first_annual_value_mod
   FROM 
     propose_mod pm
-  LEFT JOIN
+  INNER JOIN
     first_line_propose_aud f
     ON  pm.id_propose = f.id_propose
     AND pm.ts_started_mod = f.ts_first_start_mod

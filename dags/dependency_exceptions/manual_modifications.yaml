@@ -20,6 +20,9 @@ bietlejuice.dw_call:
 bietlejuice.dw_casa_mineira_portal:
   remove:
     - bietlejuice.casa_mineira_portal:load-clean-real-estate-agency
+bietlejuice.dw_charging_payment_quintocred:
+  remove:
+    - bietlejuice.velo_asaas:load-clean-payments
 bietlejuice.dw_chattermill:
   override: []
 bietlejuice.dw_country:
