@@ -11,7 +11,7 @@ workflow:
   layer: dw
   custom_schema: inspections
   default_extraction_type: incremental
-  default_partitions: [year, month]
+  default_partitions: [year, month, day]
   tables_customization:
     dim_appointment_component:
       extraction_type: full
