@@ -1,5 +1,5 @@
 database_name: datalake_ebdb_test_clean
-table_name: visits_status_log
+table_name: visit_status_log
 columns:
   id_visit_status_log:
     lineage:

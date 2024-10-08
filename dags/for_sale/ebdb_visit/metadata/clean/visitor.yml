@@ -3,37 +3,37 @@ table_name: visitor
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.visitor.id
+      - datalake_ebdb_test_raw.Visitor.id
   id_booking:
     lineage:
-      - datalake_ebdb_test_raw.visitor.agendamento_id
+      - datalake_ebdb_test_raw.Visitor.agendamento_id
   id_user:
     lineage:
-      - datalake_ebdb_test_raw.visitor.usuario_id
+      - datalake_ebdb_test_raw.Visitor.usuario_id
   id_visit:
     lineage:
-      - datalake_ebdb_test_raw.visitor.visit_id
+      - datalake_ebdb_test_raw.Visitor.visit_id
   absence_reason:
     lineage:
-      - datalake_ebdb_test_raw.visitor.absenceReason
+      - datalake_ebdb_test_raw.Visitor.absenceReason
   has_attended:
     lineage:
-      - datalake_ebdb_test_raw.visitor.attended
+      - datalake_ebdb_test_raw.Visitor.attended
   type:
     lineage:
-      - datalake_ebdb_test_raw.visitor.type
+      - datalake_ebdb_test_raw.Visitor.type
   structured:
     lineage:
-      - datalake_ebdb_test_raw.visitor.structured
+      - datalake_ebdb_test_raw.Visitor.structured
   user_type:
     lineage:
-      - datalake_ebdb_test_raw.visitor.user_type
+      - datalake_ebdb_test_raw.Visitor.user_type
   current_response:
     lineage:
-      - datalake_ebdb_test_raw.visitor.current_response
+      - datalake_ebdb_test_raw.Visitor.current_response
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.visitor.atualizadoEm
+      - datalake_ebdb_test_raw.Visitor.atualizadoEm
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.visitor.criadoEm
+      - datalake_ebdb_test_raw.Visitor.criadoEm
