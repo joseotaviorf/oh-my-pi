@@ -3,10 +3,11 @@ dag:
   schedule_start_date: 2020, 8, 29
   owner: Data Rede
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     listing_accuracy:
       - listing_accuracy_history
 cluster:
-  type: databricks_12_2_min_memory_photon_cluster
+  type: databricks_12_2_xmin_memory_cluster
+  

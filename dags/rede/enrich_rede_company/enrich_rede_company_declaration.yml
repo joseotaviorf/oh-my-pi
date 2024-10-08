@@ -11,7 +11,7 @@ dag:
       These will be managed by us, and therefore will easily acommodate merging data from different sources.
       This DAG is triggered by Mediator and loads the table via full load.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_general_photon_cluster
