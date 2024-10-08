@@ -58,4 +58,4 @@ dags:
       - spark.kryo.registrator: "org.apache.sedona.core.serde.SedonaKryoRegistrator"
   for_sale_cross:
     owner: Data ForSale
-    cluster_name: databricks_12_2_med_compute_cluster
+    cluster_name: databricks_12_2_min_2xlarge_memory_cluster
