@@ -36,3 +36,10 @@ WHERE
   AND ts_solved IS NULL
   AND "{load_start_date}" >= DATE(ts_sla_started)
   AND "{load_start_date}" >= COALESCE(ts_solved, DATE("1900-01-01")) -- only select tickets with no ts_solved
+  AND (
+    last_queue <> 'Offboarding Reparos [OFF] [POS] [BACK]'
+    OR (
+      last_queue = 'Offboarding Reparos [OFF] [POS] [BACK]'
+      AND tags LIKE '%orçamentação_realizada%'
+    )
+  )

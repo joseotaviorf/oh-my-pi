@@ -427,7 +427,7 @@ unique_journey_sla_target AS (
   GROUP BY 1,3
 ),
 ticket_sla_target AS (
-  SELECT /*+ RANGE_JOIN(t, 500) */
+  SELECT
     t.id_ticket,
     MAX(
       CASE
