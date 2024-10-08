@@ -33,6 +33,8 @@ workflow:
     DadosAgente_tipos:
       clean_table_name: agent_data_types
       raw_primary_keys: ["DadosAgente_id", "tipos"]
+    DadosAgente_tipos_AUD:
+      clean_table_name: agent_data_types_aud
     DadosAgente_Regiao_AUD:
       clean_table_name: agent_region_data_aud
     HouseAgentKeyTracking:
