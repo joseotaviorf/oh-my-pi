@@ -1,6 +1,8 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: agent_data
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -20,6 +22,12 @@ columns:
   id_preferred_region:
     lineage:
       - datalake_ebdb_raw.dadosagente.preferredregion_id
+  uuid_company:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.companyuuid
+  code:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.code
   profile:
     lineage:
       - datalake_ebdb_raw.dadosagente.perfil
@@ -38,9 +46,15 @@ columns:
   is_active:
     lineage:
       - datalake_ebdb_raw.dadosagente.ativo
-  blocked_schedule_edition:
+  is_blocked_schedule_edition:
     lineage:
       - datalake_ebdb_raw.dadosagente.edicaoagendabloqueada
+  is_passive_lead_receiver:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.passiveleadreceiver
+  is_service_link_active:
+    lineage:
+      - datalake_ebdb_raw.dadosagente.servicelinkactive
   has_opted_for_online_support:
     lineage:
       - datalake_ebdb_raw.dadosagente.opted_for_online_support
