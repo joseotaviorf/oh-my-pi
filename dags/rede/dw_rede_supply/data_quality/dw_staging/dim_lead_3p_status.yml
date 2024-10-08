@@ -1,5 +1,5 @@
 ---
-table_name: dw_rede_staging.dim_lead_3p_status
+table_name: dw_rede.dim_lead_3p_status
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:

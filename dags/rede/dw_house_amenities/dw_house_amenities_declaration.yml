@@ -6,7 +6,7 @@ dag:
     dag_purpose: |
       This DAG loads data about amenities, such as pool or grill area, into the DW.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: house
   default_extraction_type: full

@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       This DAG imports the tables from Supply Processor, a platform responsible for bringing and processing properties from other real estate agencies in Rede QuintoAndar.
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   default_extraction_type: incremental

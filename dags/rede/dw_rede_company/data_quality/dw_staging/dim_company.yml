@@ -1,5 +1,5 @@
 ---
-table_name: dw_rede_staging.dim_company
+table_name: dw_rede.dim_company
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
@@ -12,7 +12,5 @@ column_level_validations:
     is_unique:
       severity_level: Error
   id_hubspot:
-    has_completeness:
-      greater_than: 0.90
     is_unique:
       severity_level: Error

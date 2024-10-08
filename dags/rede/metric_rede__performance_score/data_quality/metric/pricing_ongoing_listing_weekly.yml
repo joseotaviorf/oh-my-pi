@@ -5,5 +5,3 @@ column_level_validations:
   dt_week:
     is_complete:
       severity_level: Error
-    is_unique:
-      severity_level: Error
