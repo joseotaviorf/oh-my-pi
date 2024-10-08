@@ -6,64 +6,64 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
-      - datalake_customer_support_test.tickets.id_ticket
+      - datalake_zendesk.tickets_current.id_ticket
     description: Key of ticket that corresponds to the Zendesk ticket number
   sk_problem_ticket:
     lineage:
-      - datalake_customer_support_test.tickets.id_problem_ticket
+      - datalake_zendesk.tickets_current.id_problem_ticket
     description: Problem ticket identification key.
   sk_contract:
     lineage:
-      - datalake_customer_support_test.tickets.id_contract
+      - datalake_zendesk.tickets_current.id_contract
     description: SK for the contract associated with the ticket
   subject:
     lineage:
-      - datalake_customer_support_test.tickets.subject
+      - datalake_zendesk.tickets_current.subject
     description: The value of the subject field for the ticket
   description:
     lineage:
-      - datalake_customer_support_test.tickets.description
+      - datalake_zendesk.tickets_current.description
     description:
       The first comment on the ticket. This is the text of the support
       request or when an end-user submits a support request via email, the body of
       the email request is used as the description.
   ticket_via:
     lineage:
-      - datalake_customer_support_test.tickets.ticket_via
+      - datalake_zendesk.tickets_current.ticket_via
     description: The Zendesk's default source where the ticket was created
   channel:
     lineage:
-      - datalake_customer_support_test.tickets.channel
+      - datalake_zendesk.tickets_current.channel
     description: The source where the ticket was created from the company perspective
   group_name:
     lineage:
-      - datalake_customer_support_test.tickets.group_name
+      - datalake_zendesk.tickets_current.group_name
     description: The group the ticket is assigned to
   priority:
     lineage:
-      - datalake_customer_support_test.tickets.priority
+      - datalake_zendesk.tickets_current.priority
     description: The urgency with which the ticket should be addressed
   recipient:
     lineage:
-      - datalake_customer_support_test.tickets.recipient
+      - datalake_zendesk.tickets_current.recipient
     description: The original recipient e-mail address of the ticket
   tags:
     lineage:
-      - datalake_customer_support_test.tickets.tags
+      - datalake_zendesk.tickets_current.tags
     description: The list of all tags applied to the ticket
   status:
     lineage:
-      - datalake_customer_support_test.tickets.status
+      - datalake_zendesk.tickets_current.status
     description:
       The latest state of the ticket that can be set and updated either
       manually by an agent or automatically via business rules.
   type:
     lineage:
-      - datalake_customer_support_test.tickets.ticket_type
+      - datalake_zendesk.tickets_current.ticket_type
     description: Descriptive data about the type of ticket.
   custom_fields:
     lineage:
-      - datalake_customer_support_test.tickets.custom_fields
+      - datalake_zendesk.tickets_current.custom_fields
     description:
       The custom fields of the ticket that correspond to the Zendesk Forms
       fields. It has JSON format with the form's field name and its value selected
@@ -71,29 +71,29 @@ columns:
       was not filled for the request
   custom_fields_map:
     lineage:
-      - datalake_customer_support_test.tickets.custom_fields
+      - datalake_zendesk.tickets_current.custom_fields
     description: custom_fields column as a MAP
   has_public_comments:
     lineage:
-      - datalake_customer_support_test.tickets.has_public_comments
+      - datalake_zendesk.tickets_current.has_public_comments
     description:
       Flag that indicates true if any ticket comments are public or false
       otherwise
   ts_created:
     lineage:
-      - datalake_customer_support_test.tickets.ts_created
+      - datalake_zendesk.tickets_current.ts_created
     description: Timestamp of ticket's creation event (UTC timezone)
   ts_created_brt:
     lineage:
-      - datalake_customer_support_test.tickets.ts_created
+      - datalake_zendesk.tickets_current.ts_created
     description: ts_created in UTC-3 timezone
   ts_updated:
     lineage:
-      - datalake_customer_support_test.tickets.ts_updated
+      - datalake_zendesk.tickets_current.ts_updated
     description: Timestamp of latest ticket's update event (UTC timezone)
   ts_updated_brt:
     lineage:
-      - datalake_customer_support_test.tickets.ts_updated
+      - datalake_zendesk.tickets_current.ts_updated
     description: ts_updated in UTC-3 timezone
   ts_load:
     description: Timestamp of data load from database source (UTC timezone)
