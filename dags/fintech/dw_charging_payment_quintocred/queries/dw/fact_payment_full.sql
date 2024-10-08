@@ -158,14 +158,14 @@ level_b AS (
     canc.total_value_cancellation,
     IF(
       canc.qtd_nf_canceled > 0,
-      'Com NF cancelada',
-      'Sem NF cancelada'
-    ) AS flag_nf_canceled,
+      TRUE,
+      FALSE
+    ) AS is_nf_canceled,
     IF(
       canc.qtd_nf_canceled > 0, 
-      1, 
-      0
-    ) AS flag_is_cancelled_num
+      TRUE, 
+      FALSE
+    ) AS is_cancelled_num
   FROM 
     level_a b
   LEFT JOIN 
@@ -555,10 +555,6 @@ SELECT DISTINCT
   id_document,
   id_array_document_canceled,
   gateway_final,
-  IF(not_lf.sk_propose IS NOT NULL,
-    'Not Consider',
-    NULL
-  ) AS not_consider_free_living,
   LEVEL_A,
   LEVEL_B,
   LEVEL_C,
@@ -600,14 +596,18 @@ SELECT DISTINCT
   qtd_nf_canceled AS qty_nf_canceled,
   total_value_cancellation,
   sap_amount,
-  flag_nf_canceled,
-  flag_is_cancelled_num,
+  is_nf_canceled,
+  is_cancelled_num,
+  IF(not_lf.sk_propose IS NOT NULL,
+    TRUE,
+    FALSE
+  ) AS is_free_living,
   CASE 
     WHEN reason_expanded = 'DISMISS' 
     AND SAP_CLASS_LEVEL_B IN ( 'SEM FATURAMENTO', 'SEM FATURAMENTO - NO ATTEMPT' ) 
-      THEN 1 
-    ELSE 0 
-  END AS flag_ignore_dismiss,
+      THEN TRUE 
+    ELSE FALSE 
+  END AS is_ignore_dismiss,
   is_charged_on_contract_period,
   is_payment_charge_correct_amount,
   is_retroactive_charging,

@@ -55,8 +55,6 @@ columns:
     description: ''
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.gateway_final
-  not_consider_free_living:
-    description: ''
   LEVEL_A:
     description: ''
   LEVEL_B:
@@ -201,15 +199,17 @@ columns:
     description: ''
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.sap_amount
-  flag_nf_canceled:
+  is_nf_canceled:
     description: ''
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.id_document
-  flag_is_cancelled_num:
+  is_cancelled_num:
     description: ''
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.id_document
-  flag_ignore_dismiss:
+  is_free_living:
+    description: ''
+  is_ignore_dismiss:
     description: ''
   is_charged_on_contract_period:
     description: ''
