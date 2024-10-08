@@ -53,15 +53,15 @@ cte_type_aging AS (
         MAX(t.mob_delinquency) AS mob,
         array_distinct(array_agg(t.type_description)) AS type_description_array,
         CASE
-            WHEN MAX(t.dt_ended_propose) IS NOT NULL THEN "RECISAO"
-            WHEN array_contains(array_agg(t.type_description), 'TERMINATION') THEN 'RECISAO'
+            WHEN array_contains(array_agg(t.type_description), 'TERMINATION') THEN 'RESCISAO'
+            WHEN DATE_TRUNC('MONTH', MAX(t.dt_ended_propose)) < DATE_TRUNC('MONTH', t.`date`) AND array_contains(array_agg(t.type_description), 'GUARANTEE') THEN "RESCISAO"
             WHEN array_contains(array_agg(t.type_description), 'GUARANTEE') THEN 'GARANTIA'
             WHEN array_contains(array_agg(t.type_description), 'SIGNATURE') THEN 'ASSINATURA'
             ELSE 'CHECK'
         END AS major_type,
         CASE
-            WHEN MAX(m.dt_ended_propose) IS NOT NULL THEN "RECISAO"
-            WHEN array_contains(array_agg(m.type_description), 'TERMINATION') THEN 'RECISAO'
+            WHEN array_contains(array_agg(m.type_description), 'TERMINATION') THEN 'RESCISAO'
+            WHEN DATE_TRUNC('MONTH', MAX(t.dt_ended_propose)) < DATE_TRUNC('MONTH', t.`date`) AND array_contains(array_agg(t.type_description), 'GUARANTEE') THEN "RESCISAO"
             WHEN array_contains(array_agg(m.type_description), 'GUARANTEE') THEN 'GARANTIA'
             WHEN array_contains(array_agg(m.type_description), 'SIGNATURE') THEN 'ASSINATURA'
             ELSE 'CHECK'
