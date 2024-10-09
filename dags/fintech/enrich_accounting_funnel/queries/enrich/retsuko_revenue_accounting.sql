@@ -26,11 +26,17 @@ retsuko AS (
             WHEN e.bill_item IN ('entry.bill-item/rental-anticipation-fee') THEN '41102.01.06'
             WHEN e.bill_item IN ('entry.bill-item/property-damage-fine') THEN '41103.02.01'
             WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment') THEN '21104.01.07'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-partner-select',
+            'entry.bill-item/brokerage-estate-agent', 'entry.bill-item/brokerage-third-party-real-estate') THEN '61101.01.70'
+            WHEN e.bill_item IN ('entry.bill-item/adm-fee-adm-partner') THEN '61101.01.77'
         END AS revenue_account,
         CASE
             WHEN e.bill_item IN ('entry.bill-item/rental-anticipation-fee') THEN 'rental anticipation fee'
             WHEN e.bill_item IN ('entry.bill-item/property-damage-fine') THEN 'property damage fine'
             WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment') THEN 'pro guarantor 5A installment'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-partner-select',
+            'entry.bill-item/brokerage-estate-agent', 'entry.bill-item/brokerage-third-party-real-estate') THEN 'brokerage partners'
+            WHEN e.bill_item IN ('entry.bill-item/adm-fee-adm-partner') THEN 'adm fee partner'
         END AS revenue_name,
         i.accrual_year_month,
         DATE(e.ts_created) AS dt_source_trigger,
@@ -60,7 +66,12 @@ retsuko AS (
         AND SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                       'rental-anticipation-fee',
                       'property-damage-fine',
-                      'pro-guarantor-5A-installment'
+                      'pro-guarantor-5A-installment',
+                      'brokerage-adm-partner',
+                      'brokerage-partner-select',
+                      'brokerage-estate-agent',
+                      'brokerage-third-party-real-estate',
+                      'adm-fee-adm-partner'
                       )
         AND ct.country_code = 'BR'
         AND DATE(e.ts_created) >= '2024-01-01'
@@ -168,7 +179,7 @@ sap AS (
     FROM
         datalake_accounting_funnel.ledger
     WHERE
-        account_number IN ('41102.01.06', '41103.02.01', '41102.01.16', '41102.01.05', '31102.01.01', '41102.01.15', '21104.01.07')
+        account_number IN ('41102.01.06', '41103.02.01', '41102.01.16', '41102.01.05', '31102.01.01', '41102.01.15', '21104.01.07', '61101.01.70', '61101.01.77')
         AND document_number like 'JE %'
     GROUP BY 1, 2, 3, 5, 6
 ),
@@ -182,7 +193,7 @@ df AS (
         source_name,
         revenue_name,
         accrual_year_month,
-        sap.account_number,
+        r.revenue_account AS account_number,
         MIN(CASE
           WHEN sap.hash IS NOT NULL THEN 'SUCCESS'
           WHEN sap.hash IS NULL AND sap_gateway.id_feature IS NOT NULL THEN 'SG FAILURE'
@@ -217,6 +228,8 @@ df_final AS (
           WHEN revenue_name = 'interest' THEN '6'
           WHEN revenue_name = 'fine' THEN '7'
           WHEN revenue_name = 'pro guarantor 5A installment' THEN '8'
+          WHEN revenue_name = 'brokerage partners' THEN '9'
+          WHEN revenue_name = 'adm fee partner' THEN '10'
         END AS id_retsuko_revenue_accounting,
         id_contract AS id_business_entity,
         id_invoice AS id_finance_entity,
