@@ -27,7 +27,7 @@ MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = None
 CLUSTER_DESCRIPTION = "custom_cluster"
 
-EXECUTION_TIMEOUT_HOURS = 3
+EXECUTION_TIMEOUT_HOURS = 2
 
 config_service = ConfigurationService(SOURCE)
 PARTITION_COLS = config_service.get_config("partition_cols_dag")

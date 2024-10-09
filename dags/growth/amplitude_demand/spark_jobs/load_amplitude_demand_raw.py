@@ -25,7 +25,7 @@ JOB_NAME = "load_amplitude_demand_raw"
 # Timeout between retries in seconds.
 BACKOFF_FACTOR = 5
 # Maximum number of retries for errors.
-MAX_RETRIES = 5
+MAX_RETRIES = 2
 
 logger = QuintoAndarLogger(JOB_NAME)
 

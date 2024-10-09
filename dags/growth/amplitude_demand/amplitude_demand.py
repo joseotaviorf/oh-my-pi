@@ -22,7 +22,7 @@ MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "30 23 * * *"
 CLUSTER_DESCRIPTION = "custom_cluster"
 
-EXECUTION_TIMEOUT_HOURS = 3
+EXECUTION_TIMEOUT_HOURS = 2
 
 config_service = ConfigurationService(SOURCE)
 EXTRA_SPARK_CONF = config_service.get_config("spark_conf")
