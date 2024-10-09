@@ -35,7 +35,7 @@ s3_prefix = config_service.get_config("databricks_bietlejuice_repo_path")
 SPARK_JOBS_PATH = f"{s3_prefix}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{s3_prefix}/spark_jobs/{CONTEXT}/load_data_to_raw.py"
 cluster_description = config_service.get_config(
-    "databricks_10_4_min_memory_photon_cluster"
+    "databricks_12_2_min_memory_photon_cluster"
 )
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {

@@ -26,7 +26,7 @@ SOURCE = "dag_inventory"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 8, 21, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "10 21 * * *"
-CLUSTER_DESCRIPTION = "databricks_10_4_med_io-memory_photon_cluster"
+CLUSTER_DESCRIPTION = "databricks_12_2_med_io-memory_photon_cluster"
 PARTITION_COLS = ["year", "month", "day"]
 
 config_service = ConfigurationService(SOURCE)

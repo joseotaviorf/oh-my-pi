@@ -39,7 +39,7 @@ MAIN_START_DATE = datetime(2021, 1, 20, 0, 0, 0, tzinfo=LOCAL_TZ)
 MAIN_SCHEDULE_INTERVAL = "0 5,13 * * *"
 
 CLUSTER_DESCRIPTION = config_service.get_config(
-    "databricks_10_4_min_general_photon_cluster"
+    "databricks_12_2_min_general_photon_cluster"
 )
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {

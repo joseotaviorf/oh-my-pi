@@ -21,7 +21,7 @@ custom_cluster:
     zone_id: us-east-1d
     ebs_volume_size: 200
 
-databricks_10_4_max_memory_cluster:
+databricks_12_2_max_memory_cluster:
   autotermination_minutes: 20
   driver_node_type_id: r5d.8xlarge
   node_type_id: r5d.12xlarge
@@ -37,7 +37,7 @@ databricks_10_4_max_memory_cluster:
 dags:
   cross:
     owner: Data Engineering
-    cluster_name: databricks_10_4_med_memory_cluster
+    cluster_name: databricks_12_2_med_memory_cluster
   for_sale:
     owner: Data ForSale
     cluster_name: databricks_12_2_med_compute_cluster

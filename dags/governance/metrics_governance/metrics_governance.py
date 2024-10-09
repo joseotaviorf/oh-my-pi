@@ -36,7 +36,7 @@ BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 
 CLUSTER_DESCRIPTION = config_service.get_config(
-    "databricks_10_4_min_general_photon_cluster"
+    "databricks_12_2_min_general_photon_cluster"
 )
 EXECUTION_DATE = "{{ ds }}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [

@@ -43,7 +43,7 @@ RAW_SPARK_JOB_PATH = f"{BASE_PATH}/{SOURCE}/"
 RAW_SPARK_JOB_FILE = f"{RAW_SPARK_JOB_PATH}/load_parquet_into_datalake.py"
 
 default_libraries = config_service.get_config("default_libraries")
-cluster_description = config_service.get_config("databricks_10_4_med_general_cluster")
+cluster_description = config_service.get_config("databricks_12_2_med_general_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.DATA_PRODUCTS,
