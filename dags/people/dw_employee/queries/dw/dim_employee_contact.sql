@@ -6,7 +6,7 @@ WITH
       addresses,
       phones
     FROM
-      datalake_hr_system_clean.workers 
+      datalake_hr_system_clean.workers
     QUALIFY 2 = DENSE_RANK() OVER (
         PARTITION BY
           id_person
@@ -31,12 +31,16 @@ WITH
       TO_TIMESTAMP(
         SUBSTR(REPLACE(emails['LastUpdateDate'], 'T', ' '), 0, 19),
         'yyyy-MM-dd HH:mm:ss'
-      ) AS ts_last_update
+      ) AS ts_last_update,
+      ROW_NUMBER() OVER (
+        PARTITION BY id_person, emails ['EmailType']
+        ORDER BY emails ['LastUpdateDate'] DESC
+      ) AS row_number
     FROM
       emails_step1
     WHERE
       emails['ToDate'] IS NULL
-      OR emails['ToDate'] = '4712-12-31' 
+      OR emails['ToDate'] = '4712-12-31'
     QUALIFY emails['LastUpdateDate'] = MAX(emails['LastUpdateDate']) OVER (
         PARTITION BY
           id_person,
@@ -116,19 +120,20 @@ SELECT
   NOW() AS ts_load
 FROM
   hr_system_workers AS workers
-LEFT JOIN 
-  emails AS ew 
+LEFT JOIN
+  emails AS ew
     ON workers.id_person = ew.id_person
       AND ew.email_type = 'W1'
-LEFT JOIN 
-  emails AS eh 
+LEFT JOIN
+  emails AS eh
     ON workers.id_person = eh.id_person
       AND eh.email_type = 'H1'
-LEFT JOIN 
-  addresses 
+      AND eh.row_number = 1
+LEFT JOIN
+  addresses
     ON workers.id_person = addresses.id_person
-LEFT JOIN 
-  phones 
+LEFT JOIN
+  phones
     ON workers.id_person = phones.id_person
 WHERE
   GREATEST (
