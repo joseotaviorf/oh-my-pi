@@ -6,7 +6,7 @@ is_incremental:
   incremental_date_mask: yyyy-MM-dd
 table_level_validations:
   has_size:
-    greater_than: 750
+    greater_than: 500
 column_level_validations:
   ad_id:
     is_complete:

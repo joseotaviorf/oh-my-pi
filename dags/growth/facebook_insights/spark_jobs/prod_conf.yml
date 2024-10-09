@@ -16,6 +16,7 @@ fields:
     - reach
     - impressions
     - clicks
+    - actions
     - date_start
     - date_stop
     - inline_link_clicks

@@ -48,6 +48,10 @@ columns:
     description: Impression_device
     lineage:
       - datalake_facebook_insights_raw.facebook_insights.impression_device
+  actions:
+    description: The number of actions that were taken on your ads. Actions may include Page likes, app installs, conversions, event responses and more
+    lineage:
+      - datalake_facebook_insights_raw.facebook_insights.actions
   clicks:
     description: The number of clicks on your ads
     lineage:
