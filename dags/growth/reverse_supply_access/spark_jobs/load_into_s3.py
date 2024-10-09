@@ -1,7 +1,10 @@
 import logging
 import pandas as pd
-
+import boto3
+from io import StringIO
+from http.client import HTTPException
 from argparse import ArgumentParser
+from bietlejuice.services import S3Service
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -44,14 +47,31 @@ def load_table_into_s3(
     """
     Load the table into S3.
     """
+    s3_service = S3Service(boto3.resource("s3"))
+    csv_buffer = StringIO()
 
     df = spark.table(f"{database_name}.{table_name}")
 
     logger.info("msg=collect data from table and sending to S3")
 
-    df.toPandas().to_csv(s3_path, index=False)
+    df.toPandas().to_csv(csv_buffer, index=False)
+
+    file = csv_buffer.getvalue()
 
     logger.info(f"msg=table loaded into S3, path = {s3_path}")
+
+    try:
+        s3_service.upload_file(file, s3_path)
+
+        logger.info(
+            f"m=__main__, message=successful S3 put_object for table {table_name}"
+            )
+        
+    except Exception as e:
+
+        raise HTTPException(
+            f"m=__main__, message=UNSUCCESSFULL S3 put_object for table {table_name}, error={e}"
+        )
 
 if __name__ == "__main__":
     """
