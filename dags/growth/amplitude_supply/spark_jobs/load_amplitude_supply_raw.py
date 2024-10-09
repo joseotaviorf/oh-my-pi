@@ -20,7 +20,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 
 
-JOB_NAME = "load_amplitude_demand_raw"
+JOB_NAME = "load_amplitude_supply_raw"
 
 # Timeout between retries in seconds.
 BACKOFF_FACTOR = 5

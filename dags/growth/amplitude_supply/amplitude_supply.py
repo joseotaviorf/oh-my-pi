@@ -44,7 +44,6 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 cluster_configuration["spark_conf"].update(EXTRA_SPARK_CONF)
-source_path = SOURCE.split('_')[0]
 
 default_libraries = config_service.get_config("default_libraries")
 
@@ -88,7 +87,7 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": raw_spark_jobs_path + "load_amplitude_supply_raw.py",
-            "parameters": [ENV, datalake_bucket, source_path, "{{ ds }}"],
+            "parameters": [ENV, datalake_bucket, SOURCE, "{{ ds }}"],
         }
     },
     execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
