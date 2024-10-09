@@ -49,7 +49,6 @@ GAQL:
         segments.date,
         segments.device,
         metrics.impressions,
-        metrics.conversions,
         customer.descriptive_name,
         segments.month,
         campaign.labels,

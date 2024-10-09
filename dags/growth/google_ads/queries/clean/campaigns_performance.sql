@@ -10,7 +10,6 @@ SELECT
     segments.device,
     segments.adNetworkType AS ad_network_type,
     INT(metrics.impressions) AS impressions,
-    INT(metrics.conversions) AS conversions,
     customer.descriptiveName AS account_descriptive_name,
     campaign.labels,
     report_type,

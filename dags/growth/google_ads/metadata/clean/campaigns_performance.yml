@@ -25,10 +25,6 @@ columns:
     description: Cost from google ads platform
     lineage:
       - datalake_google_ads_raw.campaigns_performance.metrics
-  conversions:
-    description: The number of conversions that were taken on your ads.
-    lineage:
-      - datalake_google_ads_raw.campaigns_performance.metrics
   month:
     description: Month as represented by the date of the first day of a month. Formatted as yyyy-MM-dd
     lineage:
