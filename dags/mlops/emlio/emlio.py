@@ -45,7 +45,7 @@ RAW_SPARK_JOB_FILE = f"{RAW_SPARK_JOB_PATH}load_{SOURCE}_raw.py"
 
 
 # cluster setup
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_io-memory_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_io-memory_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.DATA_PRODUCTS,

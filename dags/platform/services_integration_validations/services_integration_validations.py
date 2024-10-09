@@ -22,7 +22,7 @@ MAIN_SCHEDULE_INTERVAL = "0 13,16,18,20 * * *"
 
 
 config_service = ConfigurationService()
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_general_cluster")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
