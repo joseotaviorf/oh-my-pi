@@ -66,7 +66,7 @@ mediator_dag = DAG(
         "depends_on_past": False,
     },
     start_date=datetime(2020, 5, 8, 0, 0, 0),
-    schedule_interval="*/10 * * * *",
+    schedule_interval="*/12 * * * *",
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=Variable.get("DOC_MD_BASE_URL"), dag_id=DAG_ID
     ),
