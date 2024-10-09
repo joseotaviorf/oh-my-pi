@@ -1,9 +1,8 @@
 ---
 database_name: datalake_ebdb_pricing
-table_name: listing_price_changes
+table_name: listing_price_change
 description: Enrich table that handles sale and rental price change information and enriches it with some comparison columns and pricing scheme information, as well as calculator and status information.
-  Where, each row represents a valid price exchange for the listing. By valid, we mean that we only keep the information from the last price change of the day when there was a price change
-  (if the price of this change is different from the first price of the day. If not, it will not count as a price change).
+  Where, each row represents a price exchange for the listing.
 domain: For Rent
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -94,10 +93,14 @@ columns:
       MEDIUM: If the prediction has a medium confidence interval, having a medium certainty in the prediction.
       LOW: If the prediction has a high confidence interval, having a low certainty in the prediction.
       NONE: If the prediction has no certainty at all.
+  is_last_status_of_day:
+    description: Boolean that tells if the status is the listing's most recent status of the day.
   is_first_price:
     description: Boolean that tells if the price is the first publication price of the listing.
   is_last_price:
     description: Boolean that tells if the price is the most recent publication price of the listing.
+  is_last_price_of_day:
+    description: Boolean that tells if the price is the listing's most recent publication price of the day.
   is_smart_price_change:
     description: Boolean indicating if this price change was motivated by Smart Price.
   ts_price_started:
