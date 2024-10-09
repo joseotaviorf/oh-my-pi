@@ -4,7 +4,8 @@ dag:
   schedule_start_date: 2023, 4, 26
   owner: Data Engineering
   documentation:
-    dag_purpose: "This DAG main responsibility is to provide all the QuintoAndar Personas,
+    dag_purpose:
+      "This DAG main responsibility is to provide all the QuintoAndar Personas,
       by Personas, the user type, which can be a property owner, tenant, broker,
       photographer, pp multi, prospect, among others. It provides a daily snapshot."
 workflow:
@@ -12,23 +13,23 @@ workflow:
   layer: enrich
   inner_dependencies:
     persona_type:
-    - broker_user
-    - tenant
-    - photographer_user
-    - landlord
+      - broker_user
+      - tenant
+      - photographer_user
+      - landlord
   default_extraction_type: incremental
   default_partitions:
-  - year
-  - month
-  - day
+    - year
+    - month
+    - day
   has_hive_sync: false
   tables_customization:
     persona_type:
       partitions:
-      - client_type
-      - year
-      - month
-      - day
+        - client_type
+        - year
+        - month
+        - day
       has_hive_sync: true
 cluster:
-  type: databricks_10_4_med_io-memory_photon_cluster
+  type: databricks_12_2_med_io-memory_photon_cluster
