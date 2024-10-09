@@ -3,34 +3,34 @@ table_name: visit_checkin
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.visitcheckin.id
+      - datalake_ebdb_test_raw.VisitCheckin.id
   id_user:
     lineage:
-      - datalake_ebdb_test_raw.visitcheckin.usuario_id
+      - datalake_ebdb_test_raw.VisitCheckin.usuario_id
   id_agent:
     lineage:
-      - datalake_ebdb_test_raw.visitcheckin.corretor_id
+      - datalake_ebdb_test_raw.VisitCheckin.corretor_id
   id_visit:
     lineage:
-      - datalake_ebdb_test_raw.visitcheckin.visita_id
+      - datalake_ebdb_test_raw.VisitCheckin.visita_id
   checkin_code:
     lineage:
-      - datalake_ebdb_test_raw.visitcheckin.checkin_code
+      - datalake_ebdb_test_raw.VisitCheckin.checkin_code
   checkin_status:
     lineage:
-      - datalake_ebdb_test_raw.visitcheckin.checkin_status
+      - datalake_ebdb_test_raw.VisitCheckin.checkin_status
   checkin_fail_reason:
     lineage:
-      - datalake_ebdb_test_raw.visitcheckin.checkin_fail_reason
+      - datalake_ebdb_test_raw.VisitCheckin.checkin_fail_reason
   checkin_fail_commentary:
     lineage:
-      - datalake_ebdb_test_raw.visitcheckin.checkin_fail_commentary
+      - datalake_ebdb_test_raw.VisitCheckin.checkin_fail_commentary
   ts_checkin:
     lineage:
-      - datalake_ebdb_test_raw.visitcheckin.checkin_date
+      - datalake_ebdb_test_raw.VisitCheckin.checkin_date
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.visitcheckin.created_at
+      - datalake_ebdb_test_raw.VisitCheckin.created_at
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.visitcheckin.updated_at
+      - datalake_ebdb_test_raw.VisitCheckin.updated_at

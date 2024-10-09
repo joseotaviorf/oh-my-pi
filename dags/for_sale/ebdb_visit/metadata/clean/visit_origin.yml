@@ -3,19 +3,19 @@ table_name: visit_origin
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.visitaorigem.id
+      - datalake_ebdb_test_raw.VisitaOrigem.id
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.visitaorigem.atualizadoem
+      - datalake_ebdb_test_raw.VisitaOrigem.atualizadoem
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.visitaorigem.criadoem
+      - datalake_ebdb_test_raw.VisitaOrigem.criadoem
   description:
     lineage:
-      - datalake_ebdb_test_raw.visitaorigem.descricao
+      - datalake_ebdb_test_raw.VisitaOrigem.descricao
   is_app:
     lineage:
-      - datalake_ebdb_test_raw.visitaorigem.isapp
+      - datalake_ebdb_test_raw.VisitaOrigem.isapp
   name:
     lineage:
-      - datalake_ebdb_test_raw.visitaorigem.nome
+      - datalake_ebdb_test_raw.VisitaOrigem.nome

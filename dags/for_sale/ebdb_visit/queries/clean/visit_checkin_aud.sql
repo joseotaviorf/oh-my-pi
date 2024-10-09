@@ -20,4 +20,4 @@ SELECT
     checkin_date_mod AS mod_ts_checkin,
     created_at AS ts_created
 FROM
-    datalake_ebdb_test_raw.visitcheckin_aud
+    datalake_ebdb_test_raw.VisitCheckin_AUD
