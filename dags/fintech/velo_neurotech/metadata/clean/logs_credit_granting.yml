@@ -56,6 +56,12 @@ columns:
   bigdataboost_document_status_list:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdataboost_taxidstatus_acumulado
+  status_bigdataboost:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigdataboost_status
+  matchrate:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_matchrate
   model_score:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_modelo_def
@@ -452,6 +458,9 @@ columns:
   is_document_federal:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.`rfpfimg_5andar.result.message`
+  ts_dh_processed:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.log_dh_processamento
   ts_operation:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.instante
