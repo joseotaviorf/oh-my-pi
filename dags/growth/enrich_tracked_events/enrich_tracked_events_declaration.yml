@@ -22,7 +22,7 @@ dag:
       * We consider `visit_schedule_confirmed` attribution over `debug_visit_schedule_confirmed` one if they have the same visit_code because `debug_visit_schedule_confirmed` is a backend input.
 
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     offline_attribution:
@@ -43,3 +43,6 @@ cluster:
     spark_version: 12.2.x-scala2.12
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: static
+    aws_attributes:
+      availability: ON_DEMAND
+
