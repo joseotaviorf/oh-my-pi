@@ -52,5 +52,6 @@ SELECT
         ELSE AVMODULE
     END AS module,
     AVINACCT,
-    AVRESULT
+    AVRESULT,
+    NOW() AS ts_load
 FROM datalake_cyber_raw.actvertb

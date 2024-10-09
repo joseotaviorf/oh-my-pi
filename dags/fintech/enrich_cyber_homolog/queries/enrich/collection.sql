@@ -35,14 +35,18 @@ get_agency_group_name AS (
     ON ag.id_agency = a.id_agency
 )
 SELECT
-  l.contract_group AS creditor,
+  l.creditor,
   l.id_contract,
   c.id_contract_external,
   c.id_client AS id_customer,
   UPPER(l.id_user) AS id_operator,
   u.user_email AS operator_email,
   u.user_type AS operator_type,
-  COALESCE(agg.agency_name, ag.agency_name) AS operator_agency,
+  CASE
+    WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name)) LIKE "PASCH%" THEN "PASCHOALOTTO"
+    WHEN UPPER(l.id_user) LIKE "PSC%" THEN "PASCHOALOTTO"
+    ELSE UPPER(COALESCE(agg.agency_name, ag.agency_name))
+  END AS operator_agency,
   UPPER(l.action) AS action,
   COALESCE(cda.code_type, cdaf.code_type) AS action_code_type,
   COALESCE(cda.code_description, cdaf.code_description) AS action_description,

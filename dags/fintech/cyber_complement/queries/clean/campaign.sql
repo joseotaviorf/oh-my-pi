@@ -2,36 +2,50 @@ SELECT
     CAID AS id_campaign,
     CASSNUM AS id_client,
     CAAHID AS id_agreement,
+    CAACCTCOB AS id_contract,
+    CAAGENCY AS id_agency,
+    CAGRUPO AS contract_group,
     CASE
-        WHEN CASTATUSCA = 1 THEN 'Vigente'
-        WHEN CASTATUSCA = 2 THEN 'Vencida'
-        WHEN CASTATUSCA = 3 THEN 'Aceita'
+        WHEN CAGRUPO = "1" THEN "QuintoAndar"
+        WHEN CAGRUPO = "2" THEN "QuintoCred"
+        ELSE CAGRUPO
+    END AS creditor,
+    CANUMOFERTA AS id_offer,
+    CASE
+        WHEN CASTATUSCA = 1 THEN "Vigente"
+        WHEN CASTATUSCA = 2 THEN "Vencida"
+        WHEN CASTATUSCA = 3 THEN "Aceita"
         ELSE CASTATUSCA
     END AS campaign_status,
-    CANUMOFERTA AS offer_number,
-    CAGRUPO AS billing_group,
     CACPFCGC AS cpf_cnpj,
     CATYPE AS agreement_type,
-    CARATE AS annual_interest_rate,
-    CAPYTYPE AS interest_quota_type,
-    CAORIGEM AS origin,
-    CAACCTCOB AS billing_account,
-    CAQUE AS campaign_queue,
-    CANOSSONUM AS our_number,
-    CAAGENCY AS agency,
+    CASE
+        WHEN UPPER(CAPYTYPE) = "NO_INT" THEN "Sem Juros"
+        WHEN UPPER(CAPYTYPE) = "EQUAL" THEN "Cota Constante (PRICE)"
+        WHEN UPPER(CAPYTYPE) = "INCR" THEN "Cota Crescente (SAC)"
+        WHEN UPPER(CAPYTYPE) = "DECR" THEN "Cota Decrescente"
+        ELSE CAPYTYPE
+    END AS type_interest_quota,
+    CASE
+      WHEN CAORIGEM = "I" THEN "Interna"
+      WHEN CAORIGEM = "E" THEN "Externa"
+    END AS origin,
+    CAQUE AS agreement_queue,
+    CANOSSONUM AS down_payment_our_number,
     CAFREQ AS frequency,
-    IF(CATIPOBOL = 'E', TRUE, FALSE) AS is_boletagem,
-    CAGRDAYS AS grace_period_days,
+    IF(CATIPOBOL = "E", TRUE, FALSE) AS is_boletagem,
     CAAGING AS contract_delay_days,
+    CAGRDAYS AS grace_period_days,
     CARATE2 AS grace_period_interest_rate,
+    CARATE AS installment_interest_rate,
     CAQTDOFER AS total_ofers,
     CATOTPARC AS total_invoices,
     CAQTDPA AS total_installments,
     CAPERENTR AS down_payment_percentage,
     CAVLRENTR AS down_payment_amount,
-    CATOTPMT AS total_negotiated_with_fees,
-    CATOTPMTSH AS total_negotiated_without_fees,
-    CAHONO AS fees_amount,
+    CATOTPMT AS total_negotiated_with_honorarium,
+    CATOTPMTSH AS total_negotiated_without_honorarium,
+    CAHONO AS honorarium_amount,
     CADTPROC AS ts_boletagem_sent,
     CADTVAL AS ts_due_boletagem,
     CADTVCENTR AS ts_due_down_payment,

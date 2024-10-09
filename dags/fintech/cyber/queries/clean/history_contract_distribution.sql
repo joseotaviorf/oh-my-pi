@@ -1,11 +1,12 @@
 SELECT
     HD_ACCT AS id_contract,
     HD_SSNUM AS id_client,
+    HD_ACCTG AS contract_group,
     CASE
         WHEN HD_ACCTG = "1" THEN "QuintoAndar"
         WHEN HD_ACCTG = "2" THEN "QuintoCred"
         ELSE HD_ACCTG
-    END AS contract_group,
+    END AS creditor,
     HD_CPFCNPJ AS cpf_cnpj_client,
     HD_MATRIZ AS head_office,
     HD_REGIONAL AS regional,

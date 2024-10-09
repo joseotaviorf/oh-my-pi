@@ -4,11 +4,12 @@ SELECT
     DMPROD AS id_product,
     DMAGENCY AS id_agency,
     DMWKFLAG AS id_user,
+    DMACCTG AS contract_group,
     CASE
         WHEN DMACCTG = "1" THEN "QuintoAndar"
         WHEN DMACCTG = "2" THEN "QuintoCred"
         ELSE DMACCTG
-    END AS contract_group,
+    END AS creditor,
     DMSEQNO AS sequence_number,
     CASE
         WHEN DMSTATUS = "R" THEN "Liberada"

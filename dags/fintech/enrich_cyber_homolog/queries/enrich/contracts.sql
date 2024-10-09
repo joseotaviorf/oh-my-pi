@@ -7,7 +7,7 @@ SELECT
     c.id_last_negative_installment,
     dm.status_agency_declined,
     c.delay_contamined_days,
-    c.contract_group,
+    c.creditor,
     c.is_boletagem,
     c.collection_classification,
     c.has_paused_collection,

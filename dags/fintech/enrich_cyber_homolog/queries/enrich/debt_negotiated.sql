@@ -2,7 +2,7 @@ WITH invoices AS (
   SELECT
     id_contract,
     id_invoice,
-    contract_group,
+    creditor,
     our_number,
     purpose,
     retsuko_status,
@@ -26,7 +26,7 @@ invoices_negotiated AS (
     id_invoice,
     id_contract,
     REGEXP_REPLACE(id_client,r'\.|\-', '') AS id_client,
-    contract_group,
+    creditor,
     invoice_due_amount AS due_amount,
     invoice_interest_amount AS interest_amount,
     invoice_fine_amount AS fine_amount
@@ -38,7 +38,7 @@ SELECT
   COALESCE(b.id_contract, i.id_contract) AS id_contract_cyber,
   COALESCE(c.id_contract_external, SPLIT(COALESCE(b.id_contract, i.id_contract),r'\.')[0]) AS id_contract,
   COALESCE(i.id_client, c.id_client) AS id_debtor,
-  COALESCE(i.contract_group, b.contract_group) AS creditor,
+  COALESCE(i.creditor, b.creditor) AS creditor,
   b.our_number,
   b.purpose,
   b.retsuko_status AS payment_status,

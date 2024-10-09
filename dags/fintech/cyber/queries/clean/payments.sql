@@ -3,11 +3,12 @@ SELECT
     PMACCT AS id_contract,
     BIGINT(PMTDDESC) AS id_agreement_installment,
     PMSSNUM AS id_client,
+    PMACCTG AS contract_group,
     CASE
         WHEN PMACCTG = "1" THEN "QuintoAndar"
         WHEN PMACCTG = "2" THEN "QuintoCred"
         ELSE PMACCTG
-    END AS contract_group,
+    END AS creditor,
     CASE
         WHEN PMTCODE = "PE" THEN "Pagamento espontâneo"
         WHEN PMTCODE = "PC" THEN "Pagamento Acordo"

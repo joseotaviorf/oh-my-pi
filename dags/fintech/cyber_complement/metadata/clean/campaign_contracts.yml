@@ -1,0 +1,128 @@
+---
+database_name: datalake_cyber_complement_clean
+table_name: campaign_contracts
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: |
+  Table with data on the contracts/installments involved in the campaign offer.
+  This table will contain information about the contracts involved in the campaign offer.
+  Read more at https://docs.google.com/document/d/1uSaG1Lc7px57KsEFQRT3thn-k-k2qM48/edit#heading=h.49x2ik5
+columns:
+  id_campaign:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCID
+  id_offer:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCNUMOFERTA
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCACCTCOB
+  id_client_id:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCSSNUM
+  id_invoice:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCIDPARC
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCGRUPO
+  creditor:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCGRUPO
+  contract_delay_days:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCDAYS
+  contract_total_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCCURBAL
+  contract_due_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCAMTDLQ
+  contract_interest_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLJURATRA
+  contract_fine_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCMULTCON
+  contract_debt_amount:
+    description: "valor devido + juros + multa"
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCPAYOFF
+  contract_cost_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLCUSTASAG
+  invoice_main_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLPRINC
+  invoice_interest_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLJUR
+  invoice_fine_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLMUL
+  invoice_cost_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLCUSTA
+  invoice_residual_honorarium_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCHONORARIOS
+  invoices_ouverdue_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLRPRCAG
+  invoices_due_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLRPRCAVAG
+  invoices_residual_fine_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLRPRMUAGR
+  invoices_residual_interest_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLRPRJUAG
+  invoices_residual_cost_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLRCUSAG
+  invoices_residual_honorarium_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLRHOREAG
+  agreement_fine_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLRMUAGR
+  agreement_interest_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLRJUAG
+  credit_card_fee_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCVLRTXCARAG
+  ts_due_contract_due:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_contrato.CCDLQDT
+  ts_load:
+    description: ""

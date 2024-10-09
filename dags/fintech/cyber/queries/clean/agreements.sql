@@ -3,11 +3,12 @@ SELECT
     AHACCT AS id_client,
     AHCOLLID AS id_user,
     AHTYPE AS agreement_type,
+    AHACCTG AS contract_group,
     CASE
         WHEN AHACCTG = "1" THEN "QuintoAndar"
         WHEN AHACCTG = "2" THEN "QuintoCred"
         ELSE AHACCTG
-    END AS contract_group,
+    END AS creditor,
     AHAUTCOLLID AS authorized_by_manager,
     AHSTACOLL AS manager_updated_status,
     AHFREQ AS frequency,
@@ -42,7 +43,7 @@ SELECT
     AHTOTPMT AS total_negotiated_amount_with_fees,
     AHTOTPMTSH AS total_negotiated_amount_without_fees,
     AGRHONO AS honorarium_amount,
-    AHRATE AS interest_rate,
+    AHRATE AS installment_interest_rate,
     AHRATE2 AS additional_interest_rate,
     AHGRPERTY AS payment_type_after_free_term,
     AHLVL AS level_agreement_authorization,

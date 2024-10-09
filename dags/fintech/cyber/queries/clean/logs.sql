@@ -1,11 +1,12 @@
 SELECT
     ACACCT AS id_contract,
     ACCIDNAM AS id_user,
+    ACACCTG AS contract_group,
     CASE
         WHEN ACACCTG = "1" THEN "QuintoAndar"
         WHEN ACACCTG = "2" THEN "QuintoCred"
         ELSE ACACCTG
-    END AS contract_group,
+    END AS creditor,
     ACARCOD AS region_code,
     ACACCODE AS action,
     ACRCCODE AS result,

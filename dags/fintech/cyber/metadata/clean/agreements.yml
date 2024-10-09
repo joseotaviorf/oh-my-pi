@@ -92,7 +92,7 @@ columns:
     description: "Fees (honorários) amount."
     lineage:
       - datalake_cyber_raw.agrhdr.AGRHONO
-  interest_rate:
+  installment_interest_rate:
     description: "Agreement installment interest rate"
     lineage:
       - datalake_cyber_raw.agrhdr.AHRATE

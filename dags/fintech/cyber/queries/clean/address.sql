@@ -3,11 +3,12 @@ SELECT
     ADRERID AS id_debtor,
     ADACCT AS id_contract,
     ADID AS id_address,
+    ADACCTG AS contract_group,
     CASE
         WHEN ADACCTG = "1" THEN "QuintoAndar"
         WHEN ADACCTG = "2" THEN "QuintoCred"
         ELSE ADACCTG
-    END AS contract_group,
+    END AS creditor,
     CASE
         WHEN ADTYPE = "0" THEN "Outra"
         WHEN ADTYPE = "1" THEN "Casa"

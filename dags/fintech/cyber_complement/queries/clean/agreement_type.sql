@@ -22,7 +22,7 @@ SELECT
   AGLSTPYDAYS AS days_until_last_payment,
   AGRATE AS agreement_interest_rate,
   AGRATE2 AS fine_rate,
-  AGGRDAYS As free_days,
+  AGGRDAYS As grace_period_days,
   AGMAXPMTS AS max_installments, --Número máximo de parcelas permitidas.
   AGFREQ AS valid_frequencies,
   AGINITDT AS ts_start_agreement,
@@ -34,5 +34,6 @@ SELECT
   AGSTATUS,
   AGMINPAR,
   AGCANALNEG AS agreement_channel, --Verificar definições existentes na estória de Multicanalidade.
-  AGFORMAPAG AS payment_method -- BOL = boleto, CAR =Cartão de crédito, DCO = débito em conta.
+  AGFORMAPAG AS payment_method, -- BOL = boleto, CAR =Cartão de crédito, DCO = débito em conta.
+  NOW() AS ts_load
 FROM datalake_cyber_raw.agrtype

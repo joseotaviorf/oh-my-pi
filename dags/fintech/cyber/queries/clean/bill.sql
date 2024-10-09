@@ -11,11 +11,12 @@ SELECT
         WHEN PATIPO = "B" THEN "Entry"
         ELSE PATIPO
     END invoice_or_entry,
+    PAACCTG AS contract_group,
     CASE
         WHEN PAACCTG = "1" THEN "QuintoAndar"
         WHEN PAACCTG = "2" THEN "QuintoCred"
         ELSE PAACCTG
-    END AS contract_group,
+    END AS creditor,
     CASE
         WHEN PASTATUS = 1 THEN "Ativa (em aberto)"
         WHEN PASTATUS = 2 THEN "Paga"

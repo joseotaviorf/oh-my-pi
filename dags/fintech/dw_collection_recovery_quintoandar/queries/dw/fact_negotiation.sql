@@ -62,6 +62,7 @@ union_external_sources AS (
     id_campaign,
     COUNT(id_contract) OVER(PARTITION BY id_negotiation) AS contracts_by_negotiation,
     "IQ QuintoAndar" AS creditor,
+    campaign_status,
     negotiation_status,
     n.exception,
     origin_agreement,
@@ -106,6 +107,7 @@ union_external_sources AS (
         WHEN id_creditor IN (2,6) THEN "PP QuintoAndar"
         ELSE "IQ QuintoAndar"
     END AS creditor,
+    NULL AS campaign_status,
     CASE
       WHEN negotiation_status = "ACORDO_LIQUIDADO" THEN "finished"
       WHEN negotiation_status = "ACORDO_CANCELADO"
@@ -207,14 +209,19 @@ union_sources AS (
     COALESCE(exs.advisory, tfn.advisory) AS advisory,
     exs.agreement_type,
     COALESCE(exs.origin_agreement, tfn.origin_agreement) AS origin_agreement,
+    exs.campaign_status,
     COALESCE(tfn.status, exs.negotiation_status) AS negotiation_status,
     CASE
-      WHEN COALESCE(exs.negotiation_status,tfn.status) = "canceled" THEN "PROMESSA QUEBRADA"
-      WHEN oi.total_invoices_negotiated >= 1 AND number_of_installments > 1 THEN "ACORDO"
-      WHEN oi.total_invoices_negotiated > 1 AND number_of_installments = 1 THEN "QUITAÇÃO"
-      WHEN oi.total_invoices_negotiated = 1 AND number_of_installments = 1 THEN "SUBSTITUIÇÃO"
-      WHEN COALESCE(exs.negotiation_status, tfn.status) = "started" THEN "PROMESSA"
-      ELSE "INDEFINIDO"
+      WHEN COALESCE(i.is_down_payment_paid, exs.is_down_payment_paid, tfn.is_down_payment_paid) IS NULL
+        AND COALESCE(exs.negotiation_status, tfn.status) = "started" THEN "PROMESSA"
+      WHEN COALESCE(i.is_down_payment_paid, exs.is_down_payment_paid, tfn.is_down_payment_paid) IS NULL
+        AND COALESCE(exs.negotiation_status,tfn.status) = "canceled" THEN "PROMESSA QUEBRADA"
+      WHEN COALESCE(i.is_down_payment_paid, exs.is_down_payment_paid, tfn.is_down_payment_paid) IS NOT NULL
+        AND oi.total_invoices_negotiated >= 1 AND number_of_installments > 1 THEN "ACORDO"
+      WHEN COALESCE(i.is_down_payment_paid, exs.is_down_payment_paid, tfn.is_down_payment_paid) IS NOT NULL
+        AND oi.total_invoices_negotiated > 1 AND number_of_installments = 1 THEN "QUITAÇÃO"
+      WHEN COALESCE(i.is_down_payment_paid, exs.is_down_payment_paid, tfn.is_down_payment_paid) IS NOT NULL
+        AND oi.total_invoices_negotiated = 1 AND number_of_installments = 1 THEN "SUBSTITUIÇÃO"
     END AS negotiation_classification,
     COALESCE(i.promisse_payment_method, exs.promisse_payment_method, tfn.promisse_payment_method) AS promisse_payment_method, -- add info no tf
     CASE
@@ -276,10 +283,10 @@ SELECT
   u.agreement_type,
   u.advisory,
   u.origin_agreement,
+  u.campaign_status,
   u.negotiation_status,
   u.negotiation_classification,
   u.promisse_payment_method,
-  IF(u.is_down_payment_paid IS TRUE, "ACORDO", "PROMESSA") AS agreement_promise,
   u.is_renegotiation,
   u.has_been_renegotiated,
   CASE

@@ -58,7 +58,7 @@ ssn_original_payment AS (
         AND event_properties:invoice_id IS NOT NULL
 ),
 negotiation_data AS (
-SELECT
+  SELECT
     d.id_invoice,
     d.id_contract,
     CASE

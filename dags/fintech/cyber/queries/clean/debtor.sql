@@ -3,11 +3,12 @@ SELECT
     RERACCT AS id_contract,
     RERNAME2 AS id_quintoandar,
     RERID AS id_phone,
+    RERACCTG AS contract_group,
     CASE
         WHEN RERACCTG = "1" THEN "QuintoAndar"
         WHEN RERACCTG = "2" THEN "QuintoCred"
         ELSE RERACCTG
-    END AS contract_group,
+    END AS creditor,
     CASE
         WHEN RERDESC  = 1 THEN "Proprietario"
         WHEN RERDESC  = 2 THEN "Inquilino"

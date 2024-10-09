@@ -4,6 +4,11 @@ SELECT
     AHIDPARC AS id_invoice,
     AHSSNUM AS id_client,
     HAACCTG AS contract_group,
+    CASE
+        WHEN HAACCTG = "1" THEN "QuintoAndar"
+        WHEN HAACCTG = "2" THEN "QuintoCred"
+        ELSE HAACCTG
+    END AS creditor,
     AHDAYS AS contract_delay_days,
     AHCURBAL AS total_contract_amount,
     AHAMTDLQ AS contract_main_overdue_amount,
@@ -26,5 +31,6 @@ SELECT
     AHVLRTXCARAG AS credit_card_fee,
     AHVLRHOREAG AS residual_honorarium,
     AHHONORARIOS AS honorarium,
-    AHDLQDT AS ts_due_contract
+    AHDLQDT AS ts_due_contract,
+    NOW() AS ts_load
 FROM datalake_cyber_raw.agr_hist

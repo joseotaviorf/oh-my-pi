@@ -1,0 +1,41 @@
+---
+database_name: datalake_cyber_complement_clean
+table_name: campaign_discounts
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: |
+  Table with data on the discount fields used in the campaign offer.
+  This table will contain information about the discount fields used in the offers generated in the campaigns.
+  Read more at https://docs.google.com/document/d/1uSaG1Lc7px57KsEFQRT3thn-k-k2qM48/edit#heading=h.1pxezwc
+columns:
+  id_campaign:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_desc.CDID
+  id_offer:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_desc.CDNUMOFERTA
+  field_name:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_desc.CDFIELD
+  amount_without_discount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_desc.CDORVL
+  amount_with_discount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_desc.CDDISCVL
+  discount:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_desc.CDORVL
+      - datalake_cyber_raw.tb_campanha_desc.CDDISCVL
+  discount_percentage:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.tb_campanha_desc.CDDISC
+  ts_load:
+    description: ""

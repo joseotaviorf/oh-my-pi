@@ -9,7 +9,7 @@ main_agency_in_group AS (
 get_agency_name AS (
 SELECT
     c.id_contract_external,
-    hr.contract_group,
+    hr.creditor,
     hr.agency AS agency_group,
     COALESCE(ag.id_agency, hr.agency) AS id_agency,
     a.agency_name AS agency_name,
@@ -40,7 +40,7 @@ order_changes AS (
 )
 SELECT
   id_contract_external,
-  contract_group,
+  creditor,
   agency_name,
   MAX(IF(first_row = 1, DATE(ts_distribution), NULL)) AS dt_start_interval,
   IFNULL(MAX(IF(last_row = 1, DATE_SUB(ts_redistribution,1), NULL)),CURRENT_DATE) AS dt_end_interval,

@@ -3,7 +3,9 @@ database_name: datalake_cyber_clean
 table_name: campaign
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: The table will contain information about the campaigns that were carried out by QuintoAndar/QuintoCred and Assessorias. The table will be updated through the massive billing process.
+description: |
+  The table will contain information about the campaigns that were carried out by QuintoAndar/QuintoCred and Assessorias. The table will be updated through the massive billing process.
+  Read more at: https://docs.google.com/document/d/13jNOuN0S-175ijdreKjRBBYL33ynspyL/edit#bookmark=id.26in1rg
 columns:
   id_campaign:
     description: "Campaign ID"

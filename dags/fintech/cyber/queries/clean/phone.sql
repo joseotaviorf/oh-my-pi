@@ -2,11 +2,12 @@ SELECT
     PHID AS id_phone,
     PHSSNUM AS id_client,
     PHACCT AS id_contract,
+    PHACCTG AS contract_group,
     CASE
         WHEN PHACCTG = "1" THEN "QuintoAndar"
         WHEN PHACCTG = "2" THEN "QuintoCred"
         ELSE PHACCTG
-    END AS contract_group,
+    END AS creditor,
     CASE
         WHEN PHTYPE = "0" THEN "Outra"
         WHEN PHTYPE = "1" THEN "Casa"

@@ -147,7 +147,7 @@ all_installments AS (
     COALESCE(ext.source, tf.source) AS source
   FROM union_external_sources AS ext
   FULL OUTER JOIN trato_feito_installment AS tf
-    ON ext.id_negotiation_external = tf.id_negotiation_external
+    ON ext.id_negotiation_installment = tf.id_negotiation_installment
   QUALIFY ROW_NUMBER() OVER(PARTITION BY ext.id_negotiation_installment ORDER BY ext.priority) = 1
 
 ),

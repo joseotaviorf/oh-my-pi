@@ -22,5 +22,6 @@ SELECT
     num_return,
     next_level,
     nxt_return,
-    queue
+    queue,
+    NOW() AS ts_load
   FROM datalake_cyber_raw.lbl_dectbl3

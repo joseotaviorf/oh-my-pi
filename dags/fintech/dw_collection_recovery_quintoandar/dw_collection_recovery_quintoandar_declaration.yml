@@ -10,6 +10,7 @@ workflow:
     fact_negotiation:
       - bridge_map_debt_negotiation
       - fact_debt
+      - fact_negotiation_installment
     fact_overdue_portfolio_timeline:
       - bridge_map_debt_negotiation
       - fact_debt

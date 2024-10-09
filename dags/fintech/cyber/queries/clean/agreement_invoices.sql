@@ -6,6 +6,11 @@ SELECT
     BLCODEMP AS id_company,
     BLAGENCIA AS id_agency,
     BLCCTG AS contract_group,
+    CASE
+        WHEN BLCCTG = "1" THEN "QuintoAndar"
+        WHEN BLCCTG = "2" THEN "QuintoCred"
+        ELSE BLCCTG
+    END AS creditor,
     BLCODCLIENTE AS client_code,
     BLCEDENTE AS assignor,
     BLDVAGENCIA AS dv_bank_agency,

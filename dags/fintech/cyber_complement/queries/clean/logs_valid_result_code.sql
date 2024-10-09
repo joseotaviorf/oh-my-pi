@@ -9,5 +9,6 @@ SELECT
         WHEN UPPER(VCMODULE) = 'L' THEN 'CyberLegal'
         WHEN UPPER(VCMODULE) = 'N' THEN 'Todos os demais'
         ELSE UPPER(VCMODULE)
-    END AS module
+    END AS module,
+    NOW() AS ts_load
 FROM datalake_cyber_raw.valcodes

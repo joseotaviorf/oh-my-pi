@@ -51,6 +51,12 @@ workflow:
       clean_table_name: pre_legal_label_decision_tree
     tb_campanha:
       clean_table_name: campaign
+    tb_campanha_ofer:
+      clean_table_name: campaign_installments
+    tb_campanha_desc:
+      clean_table_name: campaign_discounts
+    tb_campanha_contrato:
+      clean_table_name: campaign_contracts
 cluster:
   type: custom_cluster
   custom_configurations:

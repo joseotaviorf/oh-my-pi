@@ -6,11 +6,12 @@ SELECT
     U1IDFMAN AS id_oldest_negative_invoice,
     U1IDPARCNEG AS id_last_negative_installment,
     U1UUIDCLIE AS id_client_legacy,
+    U1ACCTG AS contract_group,
     CASE
         WHEN U1ACCTG = "1" THEN "QuintoAndar"
         WHEN U1ACCTG = "2" THEN "QuintoCred"
         ELSE U1ACCTG
-    END AS contract_group,
+    END AS creditor,
     CASE
         WHEN U1MOTBAIXA = "01" THEN "Pagamento"
         WHEN U1MOTBAIXA = "02" THEN "Outros"
