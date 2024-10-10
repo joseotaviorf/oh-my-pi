@@ -2,6 +2,7 @@ with base as(
 select
     smp.id_smart_price as sk_smart_price,
     smp.id_house_listing as sk_house_listing,
+    ure.id_user AS sk_user,
     cast(date_format(smp.ts_start_status, 'yMMdd') as bigint) as sk_status_started_date,
     cast(date_format(smp.ts_end_status, 'yMMdd') as bigint) as sk_status_ended_date,
     smp.status,
@@ -11,7 +12,7 @@ select
             and dpa.is_enabled = false
             and dpa.operation_mode = 'AUTO'
             and ts_start_status >= date '2020-05-11'
-            then 'Owner deactivated SmP operating in auto mode'    
+            then 'Owner deactivated SmP operating in auto mode'
         when dpa.status = 'INACTIVE'
             and dpa.mod_is_enabled = true
             and dpa.is_enabled = false
@@ -82,9 +83,10 @@ full join
     datalake_ebdb_clean.house_aud ha
         on ha.rev = ure.id
 )
-select 	
+select
 	sk_smart_price,
 	sk_house_listing,
+	sk_user,
 	sk_status_started_date,
 	sk_status_ended_date,
 	status,
@@ -97,5 +99,5 @@ select
 	now() as ts_load
 from
 	base
-where 
+where
 	sk_house_listing is not null

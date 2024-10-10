@@ -12,6 +12,10 @@ columns:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.id_house_listing
     description: Key to identify house's listing in website
+  sk_user:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user
+    description: ID of the user who made the change.
   sk_status_started_date:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
