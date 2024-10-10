@@ -12,6 +12,7 @@ inner_dependencies:
   respondent_attributes:
     - survey_responses
 
+workspaces: ["Production", "P&T | Prod"]
 tables:
   surveys:
     endpoint_enum: SURVEYS

@@ -3,7 +3,7 @@ import logging
 from argparse import ArgumentParser
 from bs4 import BeautifulSoup
 from datetime import datetime
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import lit, col
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.pipeline import LayerEnum
@@ -31,8 +31,22 @@ SCOPE = "quintoandar"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+def workspace_mapping_key(workspace_list: list) -> dict:
+    """
+    Creates a mapping dict to get API Key for each Workspace
+    """
+    api_key_mapping = {}
+    for workspace in workspace_list:
+        if workspace == "Production":
+            api_key_mapping[workspace] = APIEnum.SURVICATE
+        elif workspace == "P&T | Prod":
+            api_key_mapping[workspace] = APIEnum.SURVICATE_PET
+        else: 
+            logger.error('Could not retrieve API Key for workspace: {}'.format(workspace))
 
-def get_api_token():
+    return api_key_mapping
+
+def get_api_token(workspace_api_token):
     """
     This method is intended to return the api connection settings.
     """
@@ -42,7 +56,7 @@ def get_api_token():
         dbutils = base_dbutils.get_dbutils()
 
     api_token_object = json.loads(
-        dbutils.secrets.get(scope=SCOPE, key=APIEnum.SURVICATE)
+        dbutils.secrets.get(scope=SCOPE, key=workspace_api_token)
     )
 
     return api_token_object["api_token"]
@@ -50,7 +64,7 @@ def get_api_token():
 
 def _load_dataframe_into_datalake(args, force_recreate=True):
     """
-    This method takes the data from the table in the Survicate API, considering the
+    This method takes the data from the table in the Survicate API, for each workspace, considering the
     parameters if it is incremental or full load. In addition to also loading this data into the datalake.
     @param args: Detailing parameters of the tables..
     @param force_recreate: bool. Indicates if it must force table recreation in metastore.
@@ -66,6 +80,7 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
     config_service = ConfigurationService(source)
     partition_cols = config_service.get_config("partition_cols")
     tables = config_service.get_config("tables")
+    workspace_list = config_service.get_config("workspaces")
 
     table_config = tables.get(raw_table_name)
 
@@ -95,75 +110,84 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
         df = spark.sql(feedback_parameters_query)
 
         feedback_parameters = list(map(lambda row: row.asDict(), df.collect()))
+    
+    unioned_df = None
+    api_key_mapping = workspace_mapping_key(workspace_list)
+    for workspace in api_key_mapping:
+        workspace_api_token = api_key_mapping[workspace]
+        api_token = get_api_token(workspace_api_token)
+        spark_client = SparkClient()
 
-    api_token = get_api_token()
-    spark_client = SparkClient()
+        format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    format_options = SparkTableStorageFormat.DEFAULT_RAW
+        db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+        database_name = db_info["db_raw_databricks"]
+        database_location = db_info["db_raw_path"]
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
-    database_name = db_info["db_raw_databricks"]
-    database_location = db_info["db_raw_path"]
+        spark_metastore_service = SparkMetastoreService(spark_client)
 
-    spark_metastore_service = SparkMetastoreService(spark_client)
+        logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+        spark_metastore_service.create_database(database_name)
 
-    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    spark_metastore_service.create_database(database_name)
+        survicate_client = SurvicateClient(api_token=api_token)
+        survicate_consumer = SurvicateConsumer(survicate_client)
 
-    survicate_client = SurvicateClient(api_token=api_token)
-    survicate_consumer = SurvicateConsumer(survicate_client)
-
-    if not feedback_parameters_query or feedback_parameters != []:
-        response = survicate_consumer.sync(
-            endpoint_enum=endpoint_enum,
-            feedback_parameters=feedback_parameters,
-            params=optional_parameters,
-        )
-
-        if response:
-            for row in response:
-                for name, raw_text_html in row.items():
-                    clean_text = BeautifulSoup(
-                        str(raw_text_html), "html.parser"
-                    ).get_text(strip=True)
-                    row[name] = str(clean_text)
-
-            rdd_response = spark_client.conn.sparkContext.parallelize(response)
-            df = spark.read.json(rdd_response, multiLine=True)
-
-            df = df.withColumn("dt_load", lit(dt_execution))
-            df = (
-                SparkDataFrameService()
-                .input(df)
-                .create_year_month_day_columns_from_date(dt_execution)
-                .output()
+        if not feedback_parameters_query or feedback_parameters != []:
+            response = survicate_consumer.sync(
+                endpoint_enum=endpoint_enum,
+                feedback_parameters=feedback_parameters,
+                params=optional_parameters,
             )
 
-            IncrementalTableLoaderPipeline(
-                database_name=database_name,
-                table_name=raw_table_name,
-                database_location=database_location,
-                layer=LayerEnum.RAW,
-                query=None,
-                partitions=partition_cols,
-            ).load_and_register(df, format_options, force_recreate)
+            if response:
+                for row in response:
+                    for name, raw_text_html in row.items():
+                        clean_text = BeautifulSoup(
+                            str(raw_text_html), "html.parser"
+                        ).get_text(strip=True)
+                        row[name] = str(clean_text)
 
+                rdd_response = spark_client.conn.sparkContext.parallelize(response)
+                df = spark.read.json(rdd_response, multiLine=True)
+
+                df = df.withColumn("dt_load", lit(dt_execution))
+                df = (
+                    SparkDataFrameService()
+                    .input(df)
+                    .create_year_month_day_columns_from_date(dt_execution)
+                    .output()
+                )
+                if not unioned_df:
+                    unioned_df = df
+                else:
+                    unioned_df = unioned_df.union(df)
+
+                IncrementalTableLoaderPipeline(
+                    database_name=database_name,
+                    table_name=raw_table_name,
+                    database_location=database_location,
+                    layer=LayerEnum.RAW,
+                    query=None,
+                    partitions=partition_cols,
+                ).load_and_register(unioned_df, format_options, force_recreate)
+
+            else:
+                logger.warning(
+                    f"""
+                    m={JOB_NAME},
+                    environment=dag_execution_date={args.execution_date}, raw_table_name={raw_table_name}
+                    msg=The API request returned no data, so no data was loaded for the current execution date.
+                    """
+                )
+        
         else:
             logger.warning(
                 f"""
                 m={JOB_NAME},
-                environment=dag_execution_date={args.execution_date}, raw_table_name={raw_table_name}
-                msg=The API request returned no data, so no data was loaded for the current execution date.
+                environment={environment}, dag_execution_date={args.execution_date}, raw_table_name={raw_table_name}
+                msg=No data to feed back to the API, so no data was loaded for the current execution date.
                 """
             )
-    else:
-        logger.warning(
-            f"""
-            m={JOB_NAME},
-            environment={environment}, dag_execution_date={args.execution_date}, raw_table_name={raw_table_name}
-            msg=No data to feed back to the API, so no data was loaded for the current execution date.
-            """
-        )
 
 
 if __name__ == "__main__":
