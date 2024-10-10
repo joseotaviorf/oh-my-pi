@@ -21,6 +21,9 @@ workflow:
     dim_inspector:
       extraction_type: full
       partitions: []
+    fact_appointments:
+      z_order_by: [sk_appointment]
+      merge_on: [sk_appointment]
     fact_inspection:
       extraction_type: full
     fact_repair_request:

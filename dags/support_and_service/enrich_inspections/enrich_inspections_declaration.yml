@@ -27,6 +27,8 @@ workflow:
     appointment_inspection:
       partitions: [year, month, day]
       extraction_type: incremental
+      z_order_by: [id_appointment]
+      merge_on: [id_appointment]
     inspection_booking: {}
     inspection_status_change: {}
     item_group:
