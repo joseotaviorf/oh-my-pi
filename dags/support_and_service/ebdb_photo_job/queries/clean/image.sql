@@ -1,5 +1,5 @@
 SELECT
-    id as id_contract,
+    id as id_image,
     nome as name,
     principal as is_principal,
     imovel_id as id_house,
