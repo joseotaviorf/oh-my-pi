@@ -1,0 +1,13 @@
+dag:
+  name: dw_house_temp
+  schedule_start_date: 2020,08,29
+  owner: Data ForRent
+workflow:
+  type: query
+  layer: dw
+  custom_schema: house
+cluster:
+  type: databricks_13_3_min_memory_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

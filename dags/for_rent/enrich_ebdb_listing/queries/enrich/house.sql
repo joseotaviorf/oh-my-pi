@@ -148,6 +148,8 @@ SELECT
   h.complement,
   h.condo,
   condo.name AS condo_name,
+  h.building_floors,
+  h.houses_per_floor,
   local.name AS closest_station_name,
   h.contact_email,
   h.photo_session_email,

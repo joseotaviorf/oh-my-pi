@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_ebdb_pricing.rent_listing_price_changes.id_house
       - datalake_ebdb_listing.house.id_house
-    description:  Column referring to the house ID. Can be joined with dw_quintoandar.dim_house
+    description:  Column referring to the house ID. Can be joined with dw_house.dim_house
       and all other rent modeling tables.
   id_house_listing:
     lineage:

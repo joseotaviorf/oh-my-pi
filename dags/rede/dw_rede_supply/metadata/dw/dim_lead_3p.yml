@@ -30,7 +30,7 @@ columns:
   id_house:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.id_house
-    description: 'Identifier of the house in QuintoAndar, if it has already been created. Can be joined with dw_quintoandar.dim_house.'
+    description: 'Identifier of the house in QuintoAndar, if it has already been created. Can be joined with dw_house.dim_house.'
   id_by_real_estate:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.id_by_real_estate

@@ -10,7 +10,7 @@ columns:
       description: ID of the house listing.
     sk_house:
       lineage:
-        - dw_quintoandar.dim_house.sk_house
+        - datalake_ebdb_listing.house_listing.id_house
       description: ID of the house.
     sk_owner:
       lineage:

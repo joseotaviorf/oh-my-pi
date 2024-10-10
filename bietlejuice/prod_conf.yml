@@ -30,6 +30,7 @@ dags_out_of_pattern:
         "dw_fintech_snapshot",
         "dw_house",
         "dw_house_amenities",
+        "dw_house_temp",
         "dw_invoice_entries",
         "dw_lead",
         "dw_listing",

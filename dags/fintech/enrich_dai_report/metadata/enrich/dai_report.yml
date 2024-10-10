@@ -7,7 +7,7 @@ owner: marlon.simas@quintoandar.com.br
 columns:
   id_house:
     lineage:
-      - dw_quintoandar.dim_house.sk_house
+      - dw_house.dim_house.sk_house
       - datalake_ebdb_clean.house.id
     description: ""
   dt_transaction:
@@ -22,56 +22,56 @@ columns:
     description: ""
   address:
     lineage:
-      - dw_quintoandar.dim_house.address
+      - dw_house.dim_house.address
       - datalake_ebdb_clean.house.address
     description: ""
   address_number:
     lineage:
-      - dw_quintoandar.dim_house.number
+      - dw_house.dim_house.number
       - datalake_ebdb_clean.house.number
     description: ""
   address_complement:
     lineage:
-      - dw_quintoandar.dim_house.complement
+      - dw_house.dim_house.complement
       - datalake_ebdb_clean.house.complement
     description: ""
   address_neighborhood:
     lineage:
-      - dw_quintoandar.dim_house.neighborhood
+      - dw_house.dim_house.neighborhood
       - datalake_ebdb_clean.house.neighborhood
     description: ""
   address_zipcode:
     lineage:
-      - dw_quintoandar.dim_house.zipcode
+      - dw_house.dim_house.zipcode
       - datalake_ebdb_clean.house.zipcode
     description: ""
   useful_area:
     lineage:
-      - dw_quintoandar.dim_house.total_area
+      - dw_house.dim_house.total_area
       - datalake_ebdb_clean.house.total_area
     description: ""
   total_area:
     lineage:
-      - dw_quintoandar.dim_house.total_area
+      - dw_house.dim_house.total_area
       - datalake_ebdb_clean.house.total_area
     description: ""
   terrain_area:
     lineage:
-      - dw_quintoandar.dim_house.land_area
+      - dw_house.dim_house.construction_area
       - datalake_ebdb_clean.house.land_area
     description: ""
   parking_slots:
     lineage:
-      - dw_quintoandar.dim_house.parking_slots
+      - dw_house.dim_house.parking_slots
       - datalake_ebdb_clean.house.parking_slots
     description: ""
   bedrooms:
     lineage:
-      - dw_quintoandar.dim_house.bedrooms
+      - dw_house.dim_house.bedrooms
       - datalake_ebdb_clean.house.bedrooms
     description: ""
   bathrooms:
     lineage:
-      - dw_quintoandar.dim_house.bathrooms
+      - dw_house.dim_house.bathrooms
       - datalake_ebdb_clean.house.bathrooms
     description: ""

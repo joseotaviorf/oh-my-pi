@@ -10,7 +10,7 @@ columns:
       - datalake_ebdb_clean.listing_business_context.id_house
       - datalake_offer.sale_offer.id_house
     description:  > 
-      Column referring to the house ID. Can be joined with dw_quintoandar.dim_house and all other sale modeling tables.
+      Column referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.
   id_region:
     lineage:
       - datalake_ebdb_clean.house.id_region

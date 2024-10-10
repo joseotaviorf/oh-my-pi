@@ -517,6 +517,8 @@ bietlejuice.dw_house_amenities:
   - bietlejuice.enrich_ebdb_amenities:load-enrich-pivotted-amenities
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
+bietlejuice.dw_house_temp:
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
 bietlejuice.dw_hub_services:
   - bietlejuice.enrich_hub_services_agents:load-enrich-member-profile
   - bietlejuice.enrich_hub_services_agents:load-enrich-profile
@@ -1495,7 +1497,7 @@ bietlejuice.enrich_cyber_homolog:
   - bietlejuice.cyber_complement:load-clean-campaign
   - bietlejuice.cyber_complement:load-clean-logs-code-description
 bietlejuice.enrich_dai_report:
-  - bietlejuice.dw_house:load-dw-quintoandar-dim-house
+  - bietlejuice.dw_house_temp:load-dw-house-dim-house
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
@@ -3450,7 +3452,7 @@ bietlejuice.reverse_listings_report_load:
   - bietlejuice.dw_search_session_event:load-dw-public-fact-search-session-event
 bietlejuice.reverse_nazare:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
-  - bietlejuice.dw_house:load-dw-quintoandar-dim-house
+  - bietlejuice.dw_house_temp:load-dw-house-dim-house
   - bietlejuice.dw_rede_company:load-dw-rede-dim-company
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows

@@ -14,7 +14,7 @@ columns:
   sk_house:
     lineage:
     - datalake_sale_listings.sale_listing_price_changes.id_house
-    description: Foreign key referring to the house ID. Can be joined with dw_quintoandar.dim_house
+    description: Foreign key referring to the house ID. Can be joined with dw_house.dim_house
       and all other sale modeling tables.
   sk_user_revision:
     lineage:

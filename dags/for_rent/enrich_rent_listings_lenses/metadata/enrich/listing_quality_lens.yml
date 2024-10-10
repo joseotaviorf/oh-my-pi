@@ -14,7 +14,7 @@ columns:
       - datalake_ebdb_listing.house_entrance_history.id_house
       - datalake_ebdb_house.maintenance_condition_history.id_house
     description: > 
-       Column referring to the house ID. Can be joined with dw_quintoandar.dim_house and all other sale modeling tables.
+       Column referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing

@@ -99,7 +99,7 @@ LEFT JOIN
     dw_sale.fact_closing_flows fc
         ON fc.sk_offer = dof.sk_offer
 LEFT JOIN
-    dw_quintoandar.dim_house dh
+    dw_house.dim_house dh
         ON fo.sk_house = dh.sk_house
 LEFT JOIN
     dw_sale.dim_sale_agreement ds

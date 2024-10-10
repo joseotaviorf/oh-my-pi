@@ -113,6 +113,14 @@ columns:
     lineage:
       - datalake_ebdb_clean.condo.name
     description: 'Condo name of the house'
+  building_floors:
+    lineage:
+      - datalake_ebdb_clean.house.building_floors
+    description: Number of floors of the building.
+  houses_per_floor:
+    lineage:
+      - datalake_ebdb_clean.house.houses_per_floor
+    description: Number of houses per building floor.
   closest_station_name:
     lineage:
       - datalake_ebdb_clean.local.name

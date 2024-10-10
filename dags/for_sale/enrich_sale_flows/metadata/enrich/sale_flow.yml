@@ -27,7 +27,7 @@ columns:
       - datalake_talk_to_agent.talk_to_agent_events.id_house
       - datalake_booking.booking.id_house
       - datalake_offer.sale_offer.id_house
-    description: "ID of the listing. It can be joined with: dw_quintoandar.dim_house, dw_sale.dim_listing and etc."
+    description: "ID of the listing. It can be joined with: dw_house.dim_house, dw_sale.dim_listing and etc."
   id_seller:
     lineage:
       - datalake_ebdb_clean.house_aud.id_user

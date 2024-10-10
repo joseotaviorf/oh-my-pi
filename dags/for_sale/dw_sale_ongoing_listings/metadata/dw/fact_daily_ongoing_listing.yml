@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_sale_listings.sale_listing.id_sale_listing
   sk_house:
-    description: Key of the house. Can be joined with dw_quintoandar.dim_house.
+    description: Key of the house. Can be joined with dw_house.dim_house.
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.id_house
   sk_region:

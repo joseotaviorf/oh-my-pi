@@ -14,7 +14,7 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id_house
-    description: Foreign key referring to the house ID. Can be joined with dw_quintoandar.dim_house and all other sale modeling tables.
+    description: Foreign key referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.
   is_for_rent:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id_house

@@ -15,7 +15,7 @@ columns:
     lineage:
       - datalake_sale_listings.sale_listing_status.id_house
     description:  > 
-      Column referring to the house ID. Can be joined with dw_quintoandar.dim_house and all other sale modeling tables.
+      Column referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.
   id_region:
     lineage:
       - datalake_sale_listings.sale_listing_status.id_region

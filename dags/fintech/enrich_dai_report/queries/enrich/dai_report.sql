@@ -18,7 +18,7 @@ WITH for_sale AS (
         END AS house_type,
         dh.total_area AS useful_area,
         dh.total_area AS total_area,
-        COALESCE(dh.land_area) AS terrain_area,
+        COALESCE(dh.construction_area) AS terrain_area,
         dh.parking_slots AS parking_slots,
         dh.bedrooms AS bedrooms,
         dh.bathrooms AS bathrooms,
@@ -27,7 +27,7 @@ WITH for_sale AS (
     FROM
         dw_sale.fact_sale_flows AS fsf
     INNER JOIN
-        dw_quintoandar.dim_house AS dh
+        dw_house.dim_house AS dh
             ON fsf.sk_house = dh.sk_house
     INNER JOIN
         dw_public.dim_date AS dd

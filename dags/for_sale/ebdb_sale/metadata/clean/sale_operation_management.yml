@@ -13,7 +13,7 @@ columns:
     lineage:
       - datalake_ebdb_raw.SaleOperationManagement.houseId
     description:
-      Foreign key referring to the house ID. Can be joined with dw_quintoandar.dim_house and all other sale modeling tables.
+      Foreign key referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.
   type:
     lineage:
       - datalake_ebdb_raw.SaleOperationManagement.type

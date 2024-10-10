@@ -33,7 +33,7 @@ columns:
     lineage:
       - datalake_booking.booking.id_house
     description: >
-      Key referring to the house ID (It is also better known as id_house or sk_house). Can be joined with dw_quintoandar.dim_house.
+      Key referring to the house ID (It is also better known as id_house or sk_house). Can be joined with dw_house.dim_house.
   id_agent:
     lineage:
       - datalake_booking.booking.id_agent

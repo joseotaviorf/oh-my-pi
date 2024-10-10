@@ -224,7 +224,7 @@ quintoandar_transactions AS (
     dw_sale.dim_sale_agreement AS sa
       USING(sk_offer)
   INNER JOIN 
-    dw_quintoandar.dim_house AS h
+    dw_house.dim_house AS h
       USING(sk_house)
   INNER JOIN 
     region_display_name AS r 
