@@ -17,7 +17,7 @@ WITH
         d.amount_paid,
         d.value - d.amount_paid AS open_amount,
         IF(d.amount_paid > 0 AND (LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY COALESCE(r.ts_created, d.dt_paid)) <> d.amount_paid) , d.amount_paid - LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY COALESCE(r.ts_created, d.dt_paid)), 0) AS amount_paid_added,
-        d.value <= d.amount_paid AS is_finished,
+        IF(d.value <= d.amount_paid OR (d.id_status = 3 AND d.rev_end IS NULL), true, false) AS is_finished,
         del.is_legacy_agreement,
         del.id_propose < 5000000 AS is_legacy_propose,
         del.is_active AS is_currently_active,
@@ -47,7 +47,7 @@ WITH
             ON d.id_propose = p.id_propose
     WHERE
         (d.mod_amount_paid <> 0
-        OR d.rev_type = 0)
+        OR d.rev_type IN (0,1))
 ),
 cte_final AS (
     SELECT
