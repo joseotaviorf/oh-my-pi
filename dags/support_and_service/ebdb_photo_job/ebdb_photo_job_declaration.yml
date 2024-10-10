@@ -17,8 +17,12 @@ workflow:
   tables_customization:
     DadosFotografo:
       clean_table_name: photographer_data
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     Imagem:
       clean_table_name: image
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     Imagem_AUD:
       clean_table_name: image_aud
       raw_primary_keys: [id, REV]
