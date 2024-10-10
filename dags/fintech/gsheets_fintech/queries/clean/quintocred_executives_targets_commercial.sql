@@ -9,4 +9,4 @@ SELECT
     NULLIF(month, '') AS month,
     NULLIF(year, '') AS year
 FROM
-    datalake_gsheets_raw.executives_targets_commercial
+    datalake_gsheets_raw.quintocred_executives_targets_commercial
