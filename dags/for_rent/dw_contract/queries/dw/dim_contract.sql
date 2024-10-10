@@ -41,6 +41,7 @@ SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a futur
   c.is_exit_inspection_opted_out,
   ct.is_repair_tenant_duty,
   ca.is_anomaly,
+  c.has_tenant_ownership_swap,
   c.dt_started AS dt_start,
   c.dt_entered AS dt_entrance,
   c.dt_contract_expected_end AS dt_intended_end,
@@ -57,12 +58,12 @@ SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a futur
   DATE(COALESCE(c.ts_analyst_annulment_input,c.dt_termination)) AS dt_ended_rental_confirmed,
   NOW() AS ts_load
 FROM
-    datalake_ebdb_contract.contract c
+    datalake_ebdb_contract.contract AS c
 LEFT JOIN
-    datalake_ebdb_contract.contract_b2b contract_b2b
+    datalake_ebdb_contract.contract_b2b AS contract_b2b
         ON contract_b2b.id_contract = c.id
-LEFT JOIN 
-    datalake_b2b.house_listing b2b
+LEFT JOIN
+    datalake_b2b.house_listing AS b2b
       ON b2b.id_contract = c.id
 LEFT JOIN
     datalake_offboarding.contract_termination AS ct

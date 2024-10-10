@@ -150,6 +150,19 @@ terminations AS (
         datalake_terminator_clean.termination
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created DESC) = 1
+),
+tenant_ownership_swap AS (
+    SELECT
+        id_contract,
+        IF(MAX(id_previous_user_contract_person) IS NULL, FALSE, TRUE) AS has_tenant_ownership_swap
+    FROM
+        datalake_ebdb_contract.contract_person
+    WHERE
+        contract_role IN ('tenant', 'dweller')
+        AND is_living
+        AND id_user_contract_person IS NOT NULL
+    GROUP BY
+        1
 )
 SELECT
   c.id,
@@ -158,14 +171,14 @@ SELECT
   c.id_house,
   ch.country_code,
   c.rent,
-  CASE 
-    WHEN 
+  CASE
+    WHEN
       c.rent <= 1500 THEN 'LOW'
-    WHEN 
+    WHEN
       c.rent < 2500 THEN 'MEDIUM'
-    WHEN 
+    WHEN
       c.rent >= 2500 THEN 'HIGH'
-    ELSE 
+    ELSE
       'UNDEFINED'
   END AS value_segment,
   fre.first_rent AS first_rent_charged,
@@ -200,6 +213,7 @@ SELECT
   cm.is_ended,
   cm.is_full_service,
   cm.is_deal_only,
+  tos.has_tenant_ownership_swap,
   fc.monthly_administration_fee,
   ccr.cancellation_reason,
   ccr.ts_canceled,
@@ -245,3 +259,6 @@ JOIN
 LEFT JOIN
   terminations AS t
     ON t.id_contract = c.id
+LEFT JOIN
+    tenant_ownership_swap AS tos
+        ON tos.id_contract = c.id

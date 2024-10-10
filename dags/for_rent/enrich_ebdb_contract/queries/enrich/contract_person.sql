@@ -191,10 +191,39 @@ cpf_agg_contracts AS (
     FROM
         datalake_ebdb_clean.contract_person
     GROUP BY 1
+),
+get_previous_user AS (
+    SELECT DISTINCT
+        cp.id_contract,
+        cp.id AS id_contract_person,
+        cp.id_user AS id_user_contract_person,
+        LAG(cp.id_user) OVER (PARTITION BY cp.id_contract, cp.type, cp.will_live ORDER BY FROM_UNIXTIME(ure.ts_revision/1000) ASC) AS id_previous_user_contract_person,
+        cp.mod_id_user
+    FROM
+        datalake_ebdb_clean.contract_person_aud AS cp
+    LEFT JOIN
+        datalake_ebdb_clean.user_revision_entity AS ure
+            ON ure.id = cp.REV
+    WHERE
+        cp.id_user IS NOT NULL
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_contract, id_user_contract_person ORDER BY FROM_UNIXTIME(ure.ts_revision/1000) DESC) = 1
+),
+ownership_swap AS (
+    SELECT
+        id_contract,
+        id_contract_person,
+        id_user_contract_person,
+        id_previous_user_contract_person
+    FROM
+        get_previous_user
+    WHERE
+        mod_id_user
 )
 SELECT
     cp.id AS id_contract_person,
     cp.id_user AS id_user_contract_person,
+    os.id_previous_user_contract_person,
     cp.id_contract,
     u.id AS id_user,
     COALESCE(ch.country_code, 'Undefined') AS country_code,
@@ -236,6 +265,11 @@ SELECT
     cp.ts_updated
 FROM
     datalake_ebdb_clean.contract_person AS cp
+LEFT JOIN
+    ownership_swap AS os
+        ON os.id_contract = cp.id_contract
+        AND os.id_contract_person = cp.id
+        AND os.id_user_contract_person = cp.id_user
 LEFT JOIN
     datalake_ebdb_clean.user AS u
         ON u.id = cp.id_user

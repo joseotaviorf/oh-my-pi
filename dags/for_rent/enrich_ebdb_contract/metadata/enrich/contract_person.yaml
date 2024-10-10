@@ -12,6 +12,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract_person.id_user
     description: ID of the user related to the contract. It can be joined with dw_public.dim_user.
+  id_previous_user_contract_person:
+    lineage:
+      - datalake_ebdb_clean.contract_person_aud.id_user
+    description: ID of the previous user related to the contract. It can be joined with dw_public.dim_user.
   id_contract:
     lineage:
       - datalake_ebdb_clean.contract_person.id_contract

@@ -19,6 +19,10 @@ columns:
     - datalake_ebdb_contract.contract_person.id_user_contract_person
     description: The person's user id at QuintoAndar, if an user (client like owner,
       tenant or agent).
+  sk_previous_user:
+    lineage:
+      - datalake_ebdb_contract.contract_person.id_previous_user_contract_person
+    description: ID of the previous user related to the contract.
   sk_contract:
     lineage:
     - datalake_ebdb_contract.contract_person.id_contract
