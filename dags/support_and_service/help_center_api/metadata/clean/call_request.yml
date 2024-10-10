@@ -1,0 +1,27 @@
+database_name: datalake_help_center_api_clean
+table_name: call_request
+columns:
+  id:
+    lineage:
+      - datalake_help_center_api_raw.t_call_request.id
+  id_user:
+    lineage:
+      - datalake_help_center_api_raw.t_call_request.user_id
+  id_session:
+    lineage:
+      - datalake_help_center_api_raw.t_call_request.session_id
+  user_phone:
+    lineage:
+      - datalake_help_center_api_raw.t_call_request.user_phone
+  user_mode:
+    lineage:
+      - datalake_help_center_api_raw.t_call_request.user_mode
+  department:
+    lineage:
+      - datalake_help_center_api_raw.t_call_request.department
+  request_call_status:
+    lineage:
+      - datalake_help_center_api_raw.t_call_request.request_call_status
+  ts_requested:
+    lineage:
+      - datalake_help_center_api_raw.t_call_request.requested_at

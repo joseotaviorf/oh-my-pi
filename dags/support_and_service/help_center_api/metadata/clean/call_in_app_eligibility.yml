@@ -1,0 +1,15 @@
+database_name: datalake_help_center_api_clean
+table_name: call_in_app_eligibility
+columns:
+  id_user:
+    lineage:
+      - datalake_help_center_api_raw.t_call_in_app_eligibility.id
+  status:
+    lineage:
+      - datalake_help_center_api_raw.t_call_in_app_eligibility.status
+  ts_created:
+    lineage:
+      - datalake_help_center_api_raw.t_call_in_app_eligibility.created_at
+  ts_updated:
+    lineage:
+      - datalake_help_center_api_raw.t_call_in_app_eligibility.updated_at
