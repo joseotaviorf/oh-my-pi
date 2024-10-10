@@ -7,6 +7,6 @@ custom_cluster:
   num_workers: 3
   aws_attributes:
     availability: ON_DEMAND
-  spark_version: 13.3.x-scala2.12
+  spark_version: 12.2.x-scala2.12
 spark_conf:
   spark.driver.maxResultSize: "0"
