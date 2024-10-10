@@ -144,14 +144,6 @@ if __name__ == "__main__":
                 force_recreate=False,
             )
 
-            # For testing purposes
-            logger.info(f'''debug= parameters for create_new_partitions_from_df:
-                        database_name={database_name} 
-                        table_name={table_name}
-                        partition_cols={partition_cols}
-                        df_size = {df.count()}
-            ''')
-
             spark_metastore_service.create_new_partitions_from_df(
                 database_name, table_name, df, partition_cols
             )
