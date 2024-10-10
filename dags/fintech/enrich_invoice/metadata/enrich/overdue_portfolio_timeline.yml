@@ -20,6 +20,10 @@ columns:
     lineage:
       - datalake_retsuko.invoice.id_external
     description: Invoice ID
+  id_region:
+    lineage:
+      - datalake_ebdb_house.house.id_region
+    description: Region ID
   contract_status:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination

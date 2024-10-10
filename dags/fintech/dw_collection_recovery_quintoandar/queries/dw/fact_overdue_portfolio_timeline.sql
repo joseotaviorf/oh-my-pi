@@ -1,10 +1,4 @@
 WITH
-region_contract AS (
-  SELECT DISTINCT
-    id_contract,
-    id_region
-  FROM datalake_rent_demand_events.rent_demand_events
-),
 distinct_contract_customer AS (
   SELECT DISTINCT
     id_contract,
@@ -58,19 +52,23 @@ ssn_original_payment AS (
         AND event_properties:invoice_id IS NOT NULL
 ),
 negotiation_data AS (
-  SELECT
+  SELECT DISTINCT
     d.id_invoice,
     d.id_contract,
     CASE
       WHEN LOWER(n.promisse_payment_method) LIKE '%cartão%' THEN n.original_debt_amount
-      ELSE down_payment_amount_paid
+      ELSE n.down_payment_amount_paid
     END AS net_recovery_amount,
-    IF(origin_agreement = "Portal Auto Negociação", TRUE, FALSE) AS is_ssn_boletao
+    IF(n.origin_agreement = "Portal Auto Negociação", TRUE, FALSE) AS is_ssn_boletao
   FROM dw_collection_recovery_quintoandar.fact_debt AS d
   INNER JOIN dw_collection_recovery_quintoandar.bridge_map_debt_negotiation AS b
     ON d.sk_debt = b.sk_debt
   INNER JOIN dw_collection_recovery_quintoandar.fact_negotiation AS n
     ON b.sk_negotiation = n.sk_negotiation
+  WHERE
+    n.down_payment_amount_paid != 0
+    AND n.negotiation_status IN ("broken", "finished", "offset")
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_invoice, d.id_contract ORDER BY ABS(DATE_DIFF(n.dt_down_payment, d.dt_paid))) = 1
 ),
 add_all_dimensions AS (
 SELECT
@@ -78,6 +76,7 @@ SELECT
     o.id_contract,
     o.id_invoice,
     o.id_proposal,
+    o.id_region,
     o.contract_status,
     o.invoice_type,
     o.payment_status,
@@ -126,7 +125,12 @@ SELECT
     o.due_amount,
     o.paid_amount,
     o.recovered_amount,
-    n.net_recovery_amount,
+    CASE
+        WHEN o.dt_invoice_paid BETWEEN o.dt_month_start AND o.dt_reference
+            AND o.dt_invoice_paid > o.dt_invoice_due_adjust
+        THEN n.net_recovery_amount
+        ELSE 0
+    END AS net_recovery_amount,
     o.contract_debt,
     o.business_day,
     o.is_last_business_days,
@@ -151,7 +155,8 @@ LEFT JOIN responsible_for_contract AS rc
   ON o.id_contract = rc.id_contract
   AND o.dt_reference = rc.dt_snapshot
 LEFT JOIN negotiation_data AS n
-  ON o.id_invoice = n.id_invoice AND o.id_contract = n.id_contract
+  ON o.id_invoice = n.id_invoice
+    AND o.id_contract = n.id_contract
 ),
 get_last_valid_partner AS (
   -- Get the last valid partner per invoice, to freeze the partner after the invoice payment date
@@ -168,7 +173,7 @@ get_last_valid_partner AS (
 )
 SELECT
     a.sk_overdue_portfolio_timeline,
-    r.id_region AS sk_region,
+    a.id_region AS sk_region,
     a.id_contract AS sk_contract,
     a.id_invoice,
     a.id_proposal,
@@ -186,6 +191,7 @@ SELECT
     a.due_amount,
     a.paid_amount,
     a.recovered_amount,
+    a.net_recovery_amount,
     a.contract_debt,
     a.business_day,
     a.is_last_business_days,
@@ -204,5 +210,3 @@ FROM add_all_dimensions AS a
 LEFT JOIN get_last_valid_partner AS g
   ON a.id_contract = g.id_contract
     AND a.id_invoice = g.id_invoice
-LEFT JOIN region_contract AS r
-  ON r.id_contract = a.id_contract

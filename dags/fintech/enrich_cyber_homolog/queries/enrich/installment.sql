@@ -176,5 +176,6 @@ split_fees_between_installments AS (
     dt_emission_boleto,
     dt_due_boleto,
     dt_processing_boleto,
+    dt_cancelation,
     NOW() AS ts_load
   FROM calculate_fields

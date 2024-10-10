@@ -184,6 +184,10 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_cyber_homolog:load-enrich-collection
   - bietlejuice.enrich_cyber_homolog:load-enrich-installment
   - bietlejuice.enrich_cyber_homolog:load-enrich-negotiation
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-client
+  - bietlejuice.trato_feito:load-clean-contract
+  - bietlejuice.trato_feito:load-clean-debt
   - bietlejuice.enrich_debt_recovery:load-enrich-debt
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
@@ -192,7 +196,6 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_recupera:load-enrich-collection
   - bietlejuice.enrich_recupera:load-enrich-installment
   - bietlejuice.enrich_recupera:load-enrich-negotiation
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.paschoalotto:load-clean-agreement-detail
@@ -205,11 +208,6 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.recupera:load-clean-creditor-pending
   - bietlejuice.recupera:load-clean-operational-records
   - bietlejuice.recupera:load-clean-operators
-  - bietlejuice.trato_feito:load-clean-accounting-installment
-  - bietlejuice.trato_feito:load-clean-client
-  - bietlejuice.trato_feito:load-clean-contract
-  - bietlejuice.trato_feito:load-clean-debt
-  - bietlejuice.trato_feito:load-clean-payment
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract

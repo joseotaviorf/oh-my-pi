@@ -50,7 +50,8 @@ trato_feito_debts AS (
     paid_amount,
     dt_due,
     dt_paid,
-    dt_created
+    dt_created,
+    "Trato Feito" AS source
   FROM datalake_debt_recovery.debt
   WHERE debtor != "velo_delinquency_tenant"
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_invoice ORDER BY dt_debt_created DESC) = 1
@@ -62,7 +63,8 @@ recupera_debts AS (
     CASE
       WHEN COALESCE(cp.id_creditor, cr.id_creditor, crwd.id_creditor) IN (1,4,7,8,9) THEN "IQ QuintoAndar"
       WHEN COALESCE(cp.id_creditor, cr.id_creditor, crwd.id_creditor) IN (2,6) THEN "PP QuintoAndar"
-    END AS creditor
+    END AS creditor,
+    "Recupera" AS source
   FROM deduplicate_creditor_pending AS cp
   FULL OUTER JOIN deduplicate_complementary_records AS cr
       ON cp.id_contract = cr.id_contract
@@ -76,76 +78,35 @@ cyber_debts AS (
     id_invoice,
     id_contract,
     creditor,
-    payment_status,
     invoice_status,
     due_amount,
     interest_fee_amount,
     fine_fee_amount,
     debt_amount,
-    dt_invoice_due AS dt_due
+    dt_invoice_due AS dt_due,
+    "Cyber" AS source
   FROM datalake_cyber_homolog.debt_negotiated
 ),
 debts AS (
   SELECT
-    id_invoice,
-    id_contract,
-    creditor,
-    payment_status,
-    invoice_status,
-    NULL AS sub_status,
-    due_amount,
-    interest_fee_amount,
-    fine_fee_amount,
-    NULL AS discount_amount,
-    debt_amount,
-    NULL AS paid_amount,
-    dt_due,
-    NULL AS dt_paid,
-    "Cyber" AS source,
-    1 AS priority
-  FROM cyber_debts
-
-  UNION DISTINCT
-
-  SELECT
-    id_invoice,
-    id_contract,
-    creditor,
-    NULL AS payment_status,
-    NULL AS invoice_status,
-    NULL AS sub_status,
-    NULL AS due_amount,
-    interest_fee_amount,
-    fine_fee_amount,
-    discount_amount,
-    debt_amount,
-    NULL AS paid_amount,
-    dt_due,
-    dt_paid,
-    "Trato Feito" AS source,
-    2 AS priority
-  FROM trato_feito_debts
-
-  UNION DISTINCT
-
-  SELECT
-    id_invoice,
-    id_contract,
-    creditor,
-    NULL AS payment_status,
-    NULL AS invoice_status,
-    NULL AS sub_status,
-    NULL AS due_amount,
-    NULL AS interest_fee_amount,
-    NULL AS fine_fee_amount,
-    NULL AS discount_amount,
-    NULL AS debt_amount,
-    NULL AS paid_amount,
-    NULL AS dt_due,
-    NULL AS dt_paid,
-    "Recupera" AS source,
-    3 AS priority
-  FROM recupera_debts
+    COALESCE(tf.id_invoice, cd.id_invoice, rd.id_invoice) AS id_invoice,
+    COALESCE(tf.id_contract, cd.id_contract, rd.id_contract) AS id_contract,
+    COALESCE(tf.creditor, cd.creditor, rd.creditor) AS creditor,
+    COALESCE(tf.invoice_status, cd.invoice_status) AS invoice_status,
+    COALESCE(tf.due_amount, cd.due_amount) AS due_amount,
+    COALESCE(tf.interest_fee_amount, cd.interest_fee_amount) AS interest_fee_amount,
+    COALESCE(tf.fine_fee_amount, cd.fine_fee_amount) AS fine_fee_amount,
+    tf.discount_amount,
+    COALESCE(tf.debt_amount, cd.debt_amount) AS debt_amount,
+    tf.paid_amount,
+    COALESCE(tf.dt_due, cd.dt_due) AS dt_due,
+    tf.dt_paid,
+    COALESCE(tf.source, cd.source, rd.source) AS source
+  FROM trato_feito_debts AS tf
+  FULL OUTER JOIN cyber_debts AS cd
+    ON tf.id_invoice = cd.id_invoice
+  FULL OUTER JOIN recupera_debts AS rd
+    ON tf.id_invoice = rd.id_invoice
 ),
 retsuko AS (
   SELECT
@@ -169,9 +130,9 @@ SELECT
   COALESCE(d.id_contract, r.id_contract) AS id_contract,
   d.id_invoice,
   COALESCE(r.creditor, d.creditor) AS creditor,
-  COALESCE(r.payment_status, d.payment_status) AS payment_status,
+  r.payment_status,
   COALESCE(r.invoice_status, d.invoice_status) AS invoice_status,
-  COALESCE(r.sub_status, d.sub_status) AS sub_status,
+  r.sub_status AS sub_status,
   COALESCE(r.due_amount, d.due_amount) AS due_amount,
   d.interest_fee_amount,
   d.fine_fee_amount,
@@ -183,6 +144,5 @@ SELECT
   COALESCE(r.dt_paid, d.dt_paid) AS dt_paid,
   NOW() AS ts_load
 FROM debts AS d
-LEFT JOIN retsuko AS r
+INNER JOIN retsuko AS r
   ON d.id_invoice = r.id_invoice
-QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_contract, d.id_invoice ORDER BY d.priority) = 1

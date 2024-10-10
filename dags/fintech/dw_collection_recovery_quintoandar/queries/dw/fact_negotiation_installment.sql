@@ -1,6 +1,6 @@
 WITH
 deduplicate_trato_feito_negotiation AS (
-  SELECT
+  SELECT DISTINCT
     id_contract,
     id_negotiation,
     id_negotiation_external,
@@ -17,8 +17,6 @@ deduplicate_trato_feito_negotiation AS (
       datalake_debt_recovery.negotiation
   WHERE
     debtor != "velo_delinquency_tenant"
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_external ORDER BY ts_created_at DESC) = 1
-
 ),
 trato_feito_installment AS (
   SELECT
@@ -45,16 +43,14 @@ trato_feito_installment AS (
     i.dt_due,
     DATE(i.ts_paid) AS dt_paid,
     IF(i.status = "canceled", DATE(i.ts_updated), NULL) AS dt_canceled,
-    n.source,
-    3 AS priority
+    n.source
   FROM
       datalake_debt_recovery.installment AS i
   INNER JOIN
       deduplicate_trato_feito_negotiation AS n
           ON i.id_negotiation = n.id_negotiation
-  LEFT JOIN datalake_trato_feito_clean.payment
 ),
-union_external_sources AS (
+cyber_installments AS (
   SELECT DISTINCT
     CONCAT(id_negotiation, "-" , installment_number) AS id_negotiation_installment,
     id_negotiation AS id_negotiation_external,
@@ -77,14 +73,12 @@ union_external_sources AS (
     dt_due,
     dt_paid,
     dt_cancelation AS dt_canceled,
-    'Cyber' AS source,
-    1 AS priority
+    'Cyber' AS source
   FROM
     datalake_cyber_homolog.installment AS i
   WHERE creditor = "QuintoAndar"
-
-  UNION DISTINCT
-
+),
+recupera_installments AS (
   SELECT DISTINCT
     CONCAT(id_negotiation, "-", INT(installment_number)) AS id_negotiation_installment,
     id_negotiation AS id_negotiation_external,
@@ -112,43 +106,42 @@ union_external_sources AS (
     dt_due,
     dt_paid,
     dt_canceled,
-    'Recupera' AS source,
-    2 AS priority
+    'Recupera' AS source
   FROM
     datalake_recupera.installment AS i
   WHERE LOWER(creditor) NOT LIKE "%quintocred%"
-
 ),
 all_installments AS (
   SELECT
-    COALESCE(ext.id_negotiation_installment, tf.id_negotiation_installment) AS id_negotiation_installment,
-    COALESCE(ext.id_negotiation_external, tf.id_negotiation_external) AS id_negotiation_external,
+    COALESCE(tf.id_negotiation_installment, ci.id_negotiation_installment, ri.id_negotiation_installment) AS id_negotiation_installment,
+    COALESCE(tf.id_negotiation_external, ci.id_negotiation_external, ri.id_negotiation_external) AS id_negotiation_external,
     tf.id_installment_trato_feito,
-    COALESCE(ext.installment_number, tf.installment_number) AS installment_number,
-    COALESCE(ext.our_number, tf.our_number) AS our_number,
+    COALESCE(tf.installment_number, ci.installment_number, ri.installment_number) AS installment_number,
+    COALESCE(tf.our_number, ci.our_number, ri.our_number) AS our_number,
     tf.id_invoice_extra,
-    COALESCE(ext.creditor, tf.creditor) AS creditor,
-    COALESCE(ext.installment_status, tf.installment_status) AS installment_status,
-    COALESCE(ext.payment_method, tf.payment_method) AS payment_method,
-    COALESCE(ext.delay_days, tf.delay_days) AS delay_days,
-    COALESCE(ext.main_amount, tf.main_amount) AS main_amount,
-    COALESCE(ext.updated_balance, tf.updated_balance) AS updated_balance,
-    COALESCE(ext.fine_amount, tf.fine_amount) AS fine_amount,
-    COALESCE(ext.interest_fee_amount, tf.interest_fee_amount) AS interest_fee_amount,
-    COALESCE(ext.default_interest_amount, tf.default_interest_amount) AS default_interest_amount,
-    COALESCE(ext.credit_card_fee_amount, tf.credit_card_fee_amount) AS credit_card_fee_amount,
-    COALESCE(ext.discount_amount, tf.discount_amount) AS discount_amount,
-    COALESCE(ext.amount_to_pay, tf.amount_to_pay) AS amount_to_pay,
-    COALESCE(ext.paid_amount, tf.paid_amount) AS paid_amount,
-    COALESCE(ext.dt_creation, tf.dt_creation) As dt_creation,
-    COALESCE(ext.dt_due, tf.dt_due) AS dt_due,
-    COALESCE(ext.dt_paid, tf.dt_paid) AS dt_paid,
-    COALESCE(ext.dt_canceled, tf.dt_canceled) AS dt_canceled,
-    COALESCE(ext.source, tf.source) AS source
-  FROM union_external_sources AS ext
-  FULL OUTER JOIN trato_feito_installment AS tf
-    ON ext.id_negotiation_installment = tf.id_negotiation_installment
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY ext.id_negotiation_installment ORDER BY ext.priority) = 1
+    COALESCE(tf.creditor, ci.creditor, ri.creditor) AS creditor,
+    COALESCE(tf.installment_status, ci.installment_status, ri.installment_status) AS installment_status,
+    COALESCE(tf.payment_method, ci.payment_method, ri.payment_method) AS payment_method,
+    COALESCE(tf.delay_days, ci.delay_days, ri.delay_days) AS delay_days,
+    COALESCE(tf.main_amount, ci.main_amount, ri.main_amount) AS main_amount,
+    COALESCE(tf.updated_balance, ci.updated_balance, ri.updated_balance) AS updated_balance,
+    COALESCE(tf.fine_amount, ci.fine_amount, ri.fine_amount) AS fine_amount,
+    COALESCE(tf.interest_fee_amount, ci.interest_fee_amount, ri.interest_fee_amount) AS interest_fee_amount,
+    COALESCE(tf.default_interest_amount, ci.default_interest_amount, ri.default_interest_amount) AS default_interest_amount,
+    COALESCE(tf.credit_card_fee_amount, ci.credit_card_fee_amount, ri.credit_card_fee_amount) AS credit_card_fee_amount,
+    COALESCE(tf.discount_amount, ci.discount_amount, ri.discount_amount) AS discount_amount,
+    COALESCE(tf.amount_to_pay, ci.amount_to_pay, ri.amount_to_pay) AS amount_to_pay,
+    COALESCE(tf.paid_amount, ci.paid_amount, ri.paid_amount) AS paid_amount,
+    COALESCE(tf.dt_creation, ci.dt_creation, ri.dt_creation) As dt_creation,
+    COALESCE(tf.dt_due, ci.dt_due, ri.dt_due) AS dt_due,
+    COALESCE(tf.dt_paid, ci.dt_paid, ri.dt_paid) AS dt_paid,
+    COALESCE(tf.dt_canceled, ci.dt_canceled, ri.dt_canceled) AS dt_canceled,
+    COALESCE(tf.source, ci.source, ri.source) AS source
+  FROM trato_feito_installment AS tf
+  FULL OUTER JOIN cyber_installments AS ci
+    ON tf.id_negotiation_installment = ci.id_negotiation_installment
+  FULL OUTER JOIN recupera_installments AS ri
+    ON tf.id_negotiation_installment = ri.id_negotiation_installment
 
 ),
 nexxera_confirmation AS (

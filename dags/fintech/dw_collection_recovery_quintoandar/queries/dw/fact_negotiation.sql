@@ -24,39 +24,38 @@ trato_feito_negotiation AS (
     n.promisse_payment_method,
     n.status,
     n.has_renegotiated AS is_renegotiation,
-    IF(n.ts_first_payment IS NOT NULL, TRUE, FALSE) AS is_down_payment_paid,
-    n.qt_installments,
+    n.qt_installments AS number_of_installments,
     n.negotiation_original_amount AS original_debt_amount,
     n.interest_fee_amount,
     n.fine_fee_amount AS fine_amount,
     n.credit_card_fee_amount,
     ROUND(n.negotiation_original_amount + n.fine_fee_amount + n.interest_fee_amount, 2) AS debt_amount_without_adm_fee,
     ROUND(n.negotiation_original_amount + n.fine_fee_amount + n.interest_fee_amount + n.credit_card_fee_amount, 2) AS total_debt_amount,
-    n.negotiation_discount_amount AS total_discount_amount, -- Total debt (total_debt_amount = original + fine + fee + credit card) - Negotiated amount (total_expected_amount)
+    n.negotiation_discount_amount AS discount_amount, -- Total debt (total_debt_amount = original + fine + fee + credit card) - Negotiated amount (total_expected_amount)
     GREATEST(ROUND((n.negotiation_original_amount + n.fine_fee_amount + n.interest_fee_amount) - total_expected_amount, 2), 0) AS discount_amount_without_adm_fee, -- Total debt without credit card fee (debt_amount_without_adm_fee = original + fine + fee) - Negotiated amount (total_expected_amount)
     n.total_expected_amount AS negotiated_amount,
     n.down_payment_amount,
     n.paid_amount,
-    INT(n.qt_installments_paid) AS qt_installments_paid,
+    INT(n.qt_installments_paid) AS paid_installments,
     IF(n.breached_installment IS NOT NULL, INT(n.qt_installments) - INT(n.qt_installments_paid), 0) AS breached_installments,
     n.dt_expected_end,
     DATE(n.ts_created_at) AS dt_promisse,
-    DATE(n.ts_first_payment) AS dt_first_payment,
+    DATE(n.ts_first_payment) AS dt_down_payment,
     DATE(n.ts_paid_all) AS dt_paid_all,
-    DATE(n.ts_breach) AS dt_breach,
+    DATE(n.ts_breach) AS dt_cancellation,
     DATE(COALESCE(n.ts_breach, n.ts_paid_all)) AS dt_ending
   FROM datalake_debt_recovery.negotiation AS n
   LEFT JOIN datalake_trato_feito_clean.contract AS ct
     ON n.id_contract = ct.id_external
   LEFT JOIN datalake_trato_feito_clean.client AS cl
-    ON cl.id_contract = ct.id
+    ON cl.id_contract = ct.id AND cl.client_type = "main-tenant"
   WHERE n.debtor != "velo_delinquency_tenant"
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY n.id_contract, n.id_negotiation_external ORDER BY n.ts_created_at DESC) = 1 -- removes the exception in which 1 Trato-Feito negotiation ID has more than one Recupera negotiation ID. Ex: 97080
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY n.id_contract, n.id_negotiation_external ORDER BY n.ts_created_at DESC, cl.ts_created DESC) = 1 -- removes the exception in which 1 Trato-Feito negotiation ID has more than one Recupera negotiation ID. Ex: 97080, and when 1 contract has more then 1 main-tenant living in the house.
 ),
-union_external_sources AS (
+cyber_negotiation AS (
   SELECT
     id_negotiation,
-    id_contract_external AS id_contract,
+    id_contract,
     id_operator,
     id_customer,
     id_campaign,
@@ -64,12 +63,12 @@ union_external_sources AS (
     "IQ QuintoAndar" AS creditor,
     campaign_status,
     negotiation_status,
-    n.exception,
+    exception,
     origin_agreement,
     advisory,
     agreement_type,
     promisse_payment_method,
-    is_down_payment_paid,
+    NULL AS is_renegotiation,
     number_of_installments,
     paid_installments,
     breached_installments,
@@ -85,7 +84,7 @@ union_external_sources AS (
     dt_cancellation,
     dt_promisse,
     dt_due_promisse,
-    dt_expected_end AS dt_negotiation_expected_end,
+    dt_expected_end,
     dt_down_payment,
     dt_paid_all,
     COALESCE(dt_cancellation, dt_paid_all) AS dt_ending,
@@ -93,9 +92,8 @@ union_external_sources AS (
     1 AS priority
   FROM datalake_cyber_homolog.negotiation
   WHERE creditor = "QuintoAndar"
-
-  UNION DISTINCT
-
+),
+recupera_negotiation AS (
   SELECT
     CAST(id_negotiation AS STRING) AS id_negotiation,
     id_contract,
@@ -107,7 +105,6 @@ union_external_sources AS (
         WHEN id_creditor IN (2,6) THEN "PP QuintoAndar"
         ELSE "IQ QuintoAndar"
     END AS creditor,
-    NULL AS campaign_status,
     CASE
       WHEN negotiation_status = "ACORDO_LIQUIDADO" THEN "finished"
       WHEN negotiation_status = "ACORDO_CANCELADO"
@@ -123,7 +120,7 @@ union_external_sources AS (
     advisory,
     agreement_type,
     promisse_payment_method,
-    down_payment AS is_down_payment_paid,
+    NULL AS is_renegotiation,
     number_of_installments,
     paid_installments,
     breached_installments,
@@ -139,7 +136,7 @@ union_external_sources AS (
     dt_cancellation,
     dt_promisse,
     dt_due_promisse,
-    dt_negotiation_expected_end,
+    dt_negotiation_expected_end AS dt_expected_end,
     dt_down_payment,
     dt_paid_all,
     COALESCE(dt_cancellation, dt_paid_all) AS dt_ending,
@@ -164,7 +161,6 @@ installments_data AS (
     sk_negotiation AS id_negotiation,
     payment_method AS promisse_payment_method,
     paid_amount AS down_payment_amount,
-    IF(dt_paid IS NOT NULL, TRUE, FALSE) is_down_payment_paid,
     dt_paid AS dt_down_payment
   FROM dw_collection_recovery_quintoandar.fact_negotiation_installment
   WHERE installment_number = 1
@@ -198,77 +194,64 @@ paschoalotto_operator AS (
 ),
 union_sources AS (
   SELECT
-    COALESCE(exs.id_negotiation, tfn.id_negotiation) AS sk_negotiation,
-    COALESCE(exs.id_customer, tfn.id_customer) AS sk_debtor,
+    COALESCE(tfn.id_negotiation, cn.id_negotiation, rn.id_negotiation) AS sk_negotiation,
+    COALESCE(tfn.id_customer, cn.id_customer, rn.id_customer) AS sk_debtor,
     tfn.id_negotiation_trato_feito,
-    COALESCE(exs.id_contract, tfn.id_contract) AS id_contract,
-    exs.id_operator,
-    exs.id_campaign,
-    COALESCE(exs.source, tfn.source) AS source,
-    COALESCE(exs.creditor, tfn.creditor) AS creditor,
-    COALESCE(exs.advisory, tfn.advisory) AS advisory,
-    exs.agreement_type,
-    COALESCE(exs.origin_agreement, tfn.origin_agreement) AS origin_agreement,
-    exs.campaign_status,
-    COALESCE(tfn.status, exs.negotiation_status) AS negotiation_status,
+    COALESCE(tfn.id_contract, cn.id_contract, rn.id_contract) AS id_contract,
+    COALESCE(cn.id_operator, rn.id_operator) AS id_operator,
+    COALESCE(cn.id_campaign, rn.id_campaign) AS id_campaign,
+    COALESCE(tfn.source, cn.source, rn.source) AS source,
+    COALESCE(tfn.creditor, cn.creditor, rn.creditor) AS creditor,
+    COALESCE(tfn.advisory, cn.advisory, rn.advisory) AS advisory,
+    COALESCE(cn.agreement_type, rn.agreement_type) AS agreement_type,
+    COALESCE(tfn.origin_agreement, cn.origin_agreement, rn.origin_agreement) AS origin_agreement,
+    cn.campaign_status,
+    COALESCE(tfn.status, cn.negotiation_status, rn.negotiation_status) AS negotiation_status,
+    UPPER(COALESCE(i.promisse_payment_method, tfn.promisse_payment_method, cn.promisse_payment_method, rn.promisse_payment_method)) AS promisse_payment_method,
     CASE
-      WHEN COALESCE(i.is_down_payment_paid, exs.is_down_payment_paid, tfn.is_down_payment_paid) IS NULL
-        AND COALESCE(exs.negotiation_status, tfn.status) = "started" THEN "PROMESSA"
-      WHEN COALESCE(i.is_down_payment_paid, exs.is_down_payment_paid, tfn.is_down_payment_paid) IS NULL
-        AND COALESCE(exs.negotiation_status,tfn.status) = "canceled" THEN "PROMESSA QUEBRADA"
-      WHEN COALESCE(i.is_down_payment_paid, exs.is_down_payment_paid, tfn.is_down_payment_paid) IS NOT NULL
-        AND oi.total_invoices_negotiated >= 1 AND number_of_installments > 1 THEN "ACORDO"
-      WHEN COALESCE(i.is_down_payment_paid, exs.is_down_payment_paid, tfn.is_down_payment_paid) IS NOT NULL
-        AND oi.total_invoices_negotiated > 1 AND number_of_installments = 1 THEN "QUITAÇÃO"
-      WHEN COALESCE(i.is_down_payment_paid, exs.is_down_payment_paid, tfn.is_down_payment_paid) IS NOT NULL
-        AND oi.total_invoices_negotiated = 1 AND number_of_installments = 1 THEN "SUBSTITUIÇÃO"
-    END AS negotiation_classification,
-    COALESCE(i.promisse_payment_method, exs.promisse_payment_method, tfn.promisse_payment_method) AS promisse_payment_method, -- add info no tf
-    CASE
-      WHEN exs.contracts_by_negotiation > 1 THEN TRUE
-      WHEN exs.exception IS NOT NULL THEN TRUE
+      WHEN COALESCE(tfn.contracts_by_negotiation, cn.contracts_by_negotiation, rn.contracts_by_negotiation) > 1 THEN TRUE
+      WHEN COALESCE(cn.exception, rn.exception) IS NOT NULL THEN TRUE
       ELSE FALSE
-    END AS is_not_standard_negotiation, -- incluir TF
+    END AS is_not_standard_negotiation,
     CASE
-      WHEN exs.contracts_by_negotiation > 1 THEN "Multiple contracts included in negotiation"
-      ELSE exs.exception
-    END AS not_standard_reason, -- incluir TF
-    COALESCE(i.is_down_payment_paid, exs.is_down_payment_paid, tfn.is_down_payment_paid) AS is_down_payment_paid,
-    tfn.is_renegotiation, -- pegar dados de todas as fontes
-    r.has_been_renegotiated, -- pegar dados de todas as fontes
+      WHEN COALESCE(tfn.contracts_by_negotiation, cn.contracts_by_negotiation, rn.contracts_by_negotiation) > 1 THEN "Multiple contracts included in negotiation"
+      ELSE COALESCE(cn.exception, rn.exception)
+    END AS not_standard_reason,
+    COALESCE(tfn.is_renegotiation, cn.is_renegotiation, rn.is_renegotiation) AS is_renegotiation,
+    r.has_been_renegotiated,
     oi.total_invoices_negotiated,
-    COALESCE(exs.number_of_installments, tfn.qt_installments) AS number_of_installments,
-    COALESCE(exs.paid_installments, tfn.qt_installments_paid, 0) AS paid_installments,
-    COALESCE(exs.breached_installments, tfn.breached_installments, 0) AS breached_installments,
-    COALESCE(exs.original_debt_amount, tfn.original_debt_amount) AS original_debt_amount,
-    COALESCE(exs.fine_amount, tfn.fine_amount, 0) AS fine_fee_amount,
-    COALESCE(exs.interest_fee_amount, tfn.interest_fee_amount, 0) AS interest_fee_amount,
-    COALESCE(exs.credit_card_fee_amount, tfn.credit_card_fee_amount, 0) AS credit_card_fee_amount,
-    COALESCE(exs.total_debt_amount, tfn.total_debt_amount) AS total_debt_amount,
-    COALESCE(exs.discount_amount, tfn.total_discount_amount, 0) AS total_discount_amount,
-    COALESCE(exs.negotiated_amount, tfn.negotiated_amount) AS negotiated_amount,
-    COALESCE(i.down_payment_amount, exs.down_payment_amount, tfn.down_payment_amount) AS down_payment_amount,
-    COALESCE(tfn.paid_amount, exs.total_paid_amount, 0) AS paid_amount,
+    COALESCE(tfn.number_of_installments, cn.number_of_installments, rn.number_of_installments) AS number_of_installments,
+    COALESCE(tfn.paid_installments, cn.paid_installments, rn.paid_installments, 0) AS paid_installments,
+    COALESCE(tfn.breached_installments, cn.breached_installments, rn.breached_installments, 0) AS breached_installments,
+    COALESCE(tfn.original_debt_amount, cn.original_debt_amount, rn.original_debt_amount) AS original_debt_amount,
+    COALESCE(tfn.fine_amount, cn.fine_amount, rn.fine_amount, 0) AS fine_fee_amount,
+    COALESCE(tfn.interest_fee_amount, cn.interest_fee_amount, rn.interest_fee_amount, 0) AS interest_fee_amount,
+    COALESCE(tfn.credit_card_fee_amount, cn.credit_card_fee_amount, rn.credit_card_fee_amount, 0) AS credit_card_fee_amount,
+    COALESCE(tfn.total_debt_amount, cn.total_debt_amount, rn.total_debt_amount) AS total_debt_amount,
+    COALESCE(tfn.discount_amount, cn.discount_amount, rn.discount_amount, 0) AS total_discount_amount,
+    COALESCE(tfn.negotiated_amount, cn.negotiated_amount, rn.negotiated_amount) AS negotiated_amount,
+    COALESCE(i.down_payment_amount, tfn.down_payment_amount, cn.down_payment_amount, rn.down_payment_amount) AS down_payment_amount,
+    COALESCE(tfn.paid_amount, cn.total_paid_amount, rn.total_paid_amount, 0) AS paid_amount,
     oi.dt_due_invoice_anchor,
-    COALESCE(exs.dt_promisse, tfn.dt_promisse) AS dt_promisse,
-    exs.dt_due_promisse, -- pegar dado do trato feito
-    COALESCE(exs.dt_cancellation, tfn.dt_breach) AS dt_cancellation,
-    COALESCE(i.dt_down_payment, exs.dt_down_payment, tfn.dt_first_payment) AS dt_down_payment,
-    COALESCE(exs.dt_paid_all, tfn.dt_paid_all) AS dt_paid_all_installments,
-    COALESCE(exs.dt_negotiation_expected_end, tfn.dt_expected_end) AS dt_expected_ending,
-    COALESCE(exs.dt_ending, tfn.dt_ending) AS dt_ending
-  FROM
-    union_external_sources AS exs
-  FULL OUTER JOIN
-      trato_feito_negotiation AS tfn
-        ON exs.id_negotiation = tfn.id_negotiation
+    COALESCE(tfn.dt_promisse, cn.dt_promisse, rn.dt_promisse) AS dt_promisse,
+    COALESCE(cn.dt_due_promisse, rn.dt_due_promisse) AS dt_due_promisse, -- pegar dado do trato feito
+    COALESCE(tfn.dt_cancellation, cn.dt_cancellation, rn.dt_cancellation) AS dt_cancellation,
+    COALESCE(i.dt_down_payment, tfn.dt_down_payment, cn.dt_down_payment, rn.dt_down_payment) AS dt_down_payment,
+    COALESCE(tfn.dt_paid_all, cn.dt_paid_all, rn.dt_paid_all) AS dt_paid_all_installments,
+    COALESCE(tfn.dt_expected_end, cn.dt_expected_end, rn.dt_expected_end) AS dt_expected_ending,
+    COALESCE(tfn.dt_ending, cn.dt_ending) AS dt_ending
+  FROM  trato_feito_negotiation AS tfn
+  FULL OUTER JOIN cyber_negotiation AS cn
+      ON tfn.id_negotiation = cn.id_negotiation
+  FULL OUTER JOIN recupera_negotiation AS rn
+      ON tfn.id_negotiation = rn.id_negotiation
   LEFT JOIN
       renegotiation AS r
         ON tfn.id_negotiation = r.id_negotiation
   LEFT JOIN original_invoices AS oi
     ON tfn.id_negotiation = oi.id_negotiation
   LEFT JOIN installments_data AS i
-    ON COALESCE(exs.id_negotiation, tfn.id_negotiation) = i.id_negotiation
+    ON COALESCE(tfn.id_negotiation, cn.id_negotiation, rn.id_negotiation) = i.id_negotiation
 )
 SELECT
   u.sk_negotiation,
@@ -278,6 +261,7 @@ SELECT
   COALESCE(po.operator_name, u.id_operator) AS id_operator,
   u.id_campaign,
   u.creditor,
+  u.source,
   u.is_not_standard_negotiation,
   u.not_standard_reason,
   u.agreement_type,
@@ -285,7 +269,18 @@ SELECT
   u.origin_agreement,
   u.campaign_status,
   u.negotiation_status,
-  u.negotiation_classification,
+  CASE
+      WHEN u.dt_down_payment IS NULL
+        AND u.negotiation_status = "started" THEN "PROMESSA"
+      WHEN u.dt_down_payment IS NULL
+        AND u.negotiation_status = "canceled" THEN "PROMESSA QUEBRADA"
+      WHEN u.dt_down_payment IS NOT NULL
+        AND u.total_invoices_negotiated >= 1 AND u.number_of_installments > 1 THEN "ACORDO"
+      WHEN u.dt_down_payment IS NOT NULL
+        AND u.total_invoices_negotiated > 1 AND u.number_of_installments = 1 THEN "QUITAÇÃO"
+      WHEN u.dt_down_payment IS NOT NULL
+        AND u.total_invoices_negotiated = 1 AND u.number_of_installments = 1 THEN "SUBSTITUIÇÃO"
+    END AS negotiation_classification,
   u.promisse_payment_method,
   u.is_renegotiation,
   u.has_been_renegotiated,
@@ -317,7 +312,7 @@ SELECT
     0), 2) AS discount_to_original_amount,
   u.negotiated_amount,
   u.down_payment_amount,
-  IF(is_down_payment_paid IS NOT NULL, down_payment_amount, 0) AS down_payment_amount_paid,
+  IF(u.dt_down_payment IS NOT NULL, u.down_payment_amount, 0) AS down_payment_amount_paid,
   u.paid_amount,
   u.dt_due_invoice_anchor,
   u.dt_promisse,

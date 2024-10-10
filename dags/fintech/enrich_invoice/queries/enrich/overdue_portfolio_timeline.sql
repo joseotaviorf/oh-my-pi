@@ -4,6 +4,7 @@ target_invoices AS (
         i.id_contract_external AS id_contract,
         p.id AS id_proposal,
         i.id_external AS id_invoice,
+        eh.id_region,
         ii.invoice_user AS user,
         i.purpose AS invoice_type,
         i.status AS payment_status,
@@ -23,6 +24,8 @@ target_invoices AS (
             ON i.id_external = ii.id_invoice
     LEFT JOIN datalake_ebdb_contract.contract AS c
         ON c.id = i.id_contract_external
+    LEFT JOIN datalake_ebdb_clean.house AS eh
+        ON c.id_house = eh.id
     LEFT JOIN datalake_proposal.proposal AS p
         ON p.id = c.id_proposal
     WHERE
@@ -44,6 +47,7 @@ invoices_timeline AS (
         i.id_contract,
         i.id_proposal,
         i.id_invoice,
+        i.id_region,
         i.user,
         i.invoice_type,
         CASE
@@ -177,6 +181,7 @@ SELECT
     id_contract,
     id_proposal,
     id_invoice,
+    id_region,
     contract_status,
     user,
     invoice_type,
