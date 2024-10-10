@@ -95,9 +95,6 @@ if __name__ == "__main__":
         
         df = spark_client.conn.read.json(transient_path,  schema=transient_data_schema)
 
-        # For testing purposes
-        logger.info(f'debug={df.count()} in dataframe from JSON')
-
         if not(df.isEmpty()):
             logger.info(f'msg= events received from App ID {key["app_id"]} for this day.')
 
@@ -129,9 +126,6 @@ if __name__ == "__main__":
 
             df = df.na.drop(subset=partition_cols)
             
-            # For testing purposes
-            logger.info(f'debug={df.count()} in dataframe after transformations')
-
             s3_loader.load_df(
                 df=df,
                 s3_path=f"{database_location}{table_name}",
@@ -139,13 +133,6 @@ if __name__ == "__main__":
                 partitions=partition_cols,
                 optimize_dataframe=False,
             )
-
-            # For testing purposes
-            year = execution_date.split('-')[0]
-            month = execution_date.split('-')[1]
-            day = execution_date.split('-')[2]
-            size_in_bucket = len(dbutils.fs.ls(f"{database_location}{table_name}/year={year}/month={month}/day={day}"))
-            logger.info(f'debug={size_in_bucket} files in bucket')
 
             spark_metastore_loader.update_metastore(
                 df,
@@ -166,11 +153,10 @@ if __name__ == "__main__":
             ''')
 
             spark_metastore_service.create_new_partitions_from_df(
-                database_name, table_name, df, partition_cols, parallelism=8
+                database_name, table_name, df, partition_cols
             )
 
-            # For testing purposes
-            logger.info(f'msg=Concluded spark job')
+            logger.info(f'msg=Partitions added {key["app_id"]} for this day.')
 
         else:
             logger.info(f'msg=no events received from App ID {key["app_id"]} for this day.')
