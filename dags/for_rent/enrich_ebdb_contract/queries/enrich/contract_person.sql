@@ -198,7 +198,8 @@ get_previous_user AS (
         cp.id AS id_contract_person,
         cp.id_user AS id_user_contract_person,
         LAG(cp.id_user) OVER (PARTITION BY cp.id_contract, cp.type, cp.will_live ORDER BY FROM_UNIXTIME(ure.ts_revision/1000) ASC) AS id_previous_user_contract_person,
-        cp.mod_id_user
+        cp.mod_id_user,
+        FROM_UNIXTIME(ure.ts_revision/1000) AS ts_revision
     FROM
         datalake_ebdb_clean.contract_person_aud AS cp
     LEFT JOIN
@@ -206,19 +207,20 @@ get_previous_user AS (
             ON ure.id = cp.REV
     WHERE
         cp.id_user IS NOT NULL
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_contract, id_user_contract_person ORDER BY FROM_UNIXTIME(ure.ts_revision/1000) DESC) = 1
 ),
 ownership_swap AS (
     SELECT
         id_contract,
         id_contract_person,
         id_user_contract_person,
-        id_previous_user_contract_person
+        id_previous_user_contract_person,
+        ts_revision
     FROM
         get_previous_user
     WHERE
         mod_id_user
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_contract, id_user_contract_person ORDER BY ts_revision DESC) = 1
 )
 SELECT
     cp.id AS id_contract_person,
