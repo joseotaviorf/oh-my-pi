@@ -42,8 +42,8 @@ BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 default_libraries = config_service.get_config("default_libraries")
 
 # cluster setup
-CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_12_2_med_general_cluster", deserialize_json=True
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "databricks_12_2_med_general_cluster",
 )
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
