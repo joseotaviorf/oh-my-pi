@@ -59,6 +59,27 @@ workflow:
       extraction_type: incremental
       z_order_by: [sk_ra_ticket]
       merge_on: [sk_ra_ticket]
+    fact_tickets:
+      z_order_by:
+        [
+          sk_ticket,
+          sk_taxonomy,
+          sk_user,
+          sk_session,
+          sk_contract,
+          sk_department,
+          sk_analyst,
+        ]
+      merge_on: [sk_ticket]
+    fact_ivr_interactions:
+      z_order_by: [sk_task]
+      merge_on: [sk_interaction]
+    fact_customer_contacts:
+      z_order_by: [sk_contact, sk_interaction]
+      merge_on: [sk_contact, sk_interaction, sk_user, sk_department]
+    fact_tickets_backlog:
+      partitions: [dt_snapshot]
+      z_order_by: [sk_ticket, sk_taxonomy, sk_department, sk_analyst]
 
 cluster:
   type: custom_cluster
@@ -66,6 +87,6 @@ cluster:
     driver_node_type_id: r7g.2xlarge
     node_type_id: r7g.2xlarge
     spark_version: 13.3.x-scala2.12
-    num_workers: 3
+    num_workers: 4
     spark_conf:
       spark.sql.broadcastTimeout: "600"

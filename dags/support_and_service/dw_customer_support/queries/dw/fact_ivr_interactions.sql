@@ -14,6 +14,6 @@ SELECT
     ts_event,
     ts_ivr_started
 FROM
-    datalake_customer_support_test.ivr_interactions
+    datalake_customer_support.ivr_interactions
 WHERE
     MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

@@ -1,0 +1,43 @@
+database_name: dw_customer_support
+table_name: fact_ivr_interactions
+description: Fact table containing all IVR interactions of a call
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_interaction:
+    lineage:
+      - datalake_customer_support.ivr_interactions.id_task
+      - datalake_customer_support.ivr_interactions.step_name
+    description: MD5 hash of id_task concatenated with step_name for interaction surrogate key.
+  sk_task:
+    lineage:
+      - datalake_customer_support.ivr_interactions.id_task
+    description: MD5 hash of id_task for task surrogate key.
+  from_phone_number:
+    lineage:
+      - datalake_customer_support.ivr_interactions.from_phone_number
+    description: Source phone number for the interaction.
+  to_phone_number:
+    lineage:
+      - datalake_customer_support.ivr_interactions.to_phone_number
+    description: Destination phone number for the interaction.
+  step_name:
+    lineage:
+      - datalake_customer_support.ivr_interactions.step_name
+    description: Name of the step in the interaction process.
+  type:
+    lineage:
+      - datalake_customer_support.ivr_interactions.type
+    description: Type of interaction.
+  value:
+    lineage:
+      - datalake_customer_support.ivr_interactions.value
+    description: Value associated with the interaction.
+  ts_event:
+    lineage:
+      - datalake_customer_support.ivr_interactions.ts_event
+    description: Timestamp of when the event occurred.
+  ts_ivr_started:
+    lineage:
+      - datalake_customer_support.ivr_interactions.ts_ivr_started
+    description: Timestamp of when the IVR interaction started.

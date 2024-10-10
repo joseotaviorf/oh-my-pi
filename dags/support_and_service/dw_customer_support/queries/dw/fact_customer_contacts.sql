@@ -58,7 +58,7 @@ demand AS (
     month,
     day
   FROM
-    datalake_customer_support_test.calls
+    datalake_customer_support.calls
   WHERE
     MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
   UNION ALL
@@ -97,7 +97,7 @@ demand AS (
     month,
     day
   FROM
-    datalake_customer_support_test.chats
+    datalake_customer_support.chats
   WHERE
     MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ),
@@ -159,15 +159,15 @@ contacts AS (
       AND art.agent_email = d.worker_email
       AND d.channel = 'chat'
   LEFT JOIN
-    datalake_customer_support_test.tickets AS t1
+    datalake_customer_support.tickets AS t1
       ON t1.id_twilio = d.id_call
       AND STARTSWITH(t1.id_twilio, "WT")
   LEFT JOIN
-    datalake_customer_support_test.tickets AS t2
+    datalake_customer_support.tickets AS t2
       ON t2.id_twilio = d.id_task
       AND STARTSWITH(t2.id_twilio, "CA")
   LEFT JOIN
-    datalake_customer_support_test.tickets AS t3
+    datalake_customer_support.tickets AS t3
       ON t3.id_session = d.id_session
 )
 SELECT

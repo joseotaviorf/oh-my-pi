@@ -30,7 +30,7 @@ SELECT
   ts_sla_started,
   ts_budget
 FROM
-  datalake_customer_support_test.tickets
+  datalake_customer_support.tickets
 WHERE
   channel = 'cs email'
   AND ts_solved IS NULL

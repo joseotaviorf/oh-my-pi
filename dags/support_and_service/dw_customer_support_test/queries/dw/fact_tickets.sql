@@ -5,7 +5,7 @@ WITH missing_theme_tickets AS (
     COUNT(DISTINCT id_ticket) AS missing_theme_tickets,
     DATE(ts_solved) AS dt_started
   FROM
-    datalake_customer_support_test.tickets
+    datalake_customer_support.tickets
   WHERE
     -- It's necessary to apply all Ticket Rate rules but considering tickets that have no theme (taxonomy)
     contact_theme_detail_tag IS NULL
@@ -40,7 +40,7 @@ abandoned_calls AS (
     COUNT(DISTINCT(id_task)) AS contacts,
     DATE(ts_task_created) AS dt_started
   FROM
-    datalake_customer_support_test.calls AS c
+    datalake_customer_support.calls AS c
   LEFT JOIN
     datalake_gsheets_clean.department_control AS dc
       ON dc.department = c.queue_name
@@ -67,7 +67,7 @@ ticket_rate_proportion AS (
       ) AS DOUBLE
     ) AS total_tickets_proportional
   FROM
-    datalake_customer_support_test.tickets AS ut
+    datalake_customer_support.tickets AS ut
   LEFT JOIN
     missing_theme_tickets AS mt
       ON mt.dt_started = DATE(ut.ts_solved)
@@ -133,7 +133,7 @@ SELECT
   t.ts_closed,
   t.ts_updated
 FROM
-  datalake_customer_support_test.tickets AS t
+  datalake_customer_support.tickets AS t
 LEFT JOIN
   ticket_rate_proportion AS tr
     ON tr.id_ticket = t.id_ticket

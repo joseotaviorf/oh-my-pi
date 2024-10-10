@@ -280,11 +280,14 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_demand:load-enrich-demand-metrics-tasks
   - bietlejuice.enrich_customer_resolution:load-enrich-customer-resolution-static
   - bietlejuice.enrich_customer_support:load-enrich-call
+  - bietlejuice.enrich_customer_support:load-enrich-calls
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_customer_support:load-enrich-ivr-interactions
   - bietlejuice.enrich_customer_support:load-enrich-received-demand
   - bietlejuice.enrich_customer_support:load-enrich-unified-tickets
   - bietlejuice.enrich_greenseer:load-enrich-sessions
+  - bietlejuice.enrich_quinto_messenger:load-enrich-message
   - bietlejuice.enrich_satisfaction_rating:load-enrich-chat-fup-surveys
   - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
   - bietlejuice.enrich_support_users:load-enrich-analysts
@@ -292,14 +295,11 @@ bietlejuice.dw_customer_support:
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.reclameaqui:load-clean-tickets
   - bietlejuice.sauron:load-clean-session
+  - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
 bietlejuice.dw_customer_support_test:
-  - bietlejuice.enrich_customer_support_test:load-enrich-calls
-  - bietlejuice.enrich_customer_support_test:load-enrich-ivr-interactions
-  - bietlejuice.enrich_quinto_messenger:load-enrich-message
-  - bietlejuice.enrich_support_users:load-enrich-analysts
+  - bietlejuice.enrich_customer_support:load-enrich-calls
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
-  - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
 bietlejuice.dw_data_quality:
   - bietlejuice.enrich_data_quality:load-enrich-validations
 bietlejuice.dw_datamarts_for_rent:
@@ -1459,25 +1459,18 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.greenseer:load-clean-session
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
+  - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays
+  - bietlejuice.gsheets_support_and_service:done-clean-tag-sla-target
+  - bietlejuice.gsheets_support_and_service:done-clean-taxonomy-sla
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review
   - bietlejuice.insider:load-clean-review-feature
+  - bietlejuice.quinto_messenger:load-clean-channel
+  - bietlejuice.quinto_messenger:load-clean-chat
   - bietlejuice.sauron:load-clean-session
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
   - bietlejuice.zendesk:load-clean-satisfaction-ratings
   - bietlejuice.zendesk:load-clean-tickets
-bietlejuice.enrich_customer_support_test:
-  - bietlejuice.bigfone:load-clean-event
-  - bietlejuice.enrich_zendesk:load-enrich-tickets-current
-  - bietlejuice.gsheets_support_and_service:done-clean-department-control
-  - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays
-  - bietlejuice.gsheets_support_and_service:done-clean-tag-sla-target
-  - bietlejuice.gsheets_support_and_service:done-clean-taxonomy-sla
-  - bietlejuice.quinto_messenger:load-clean-channel
-  - bietlejuice.quinto_messenger:load-clean-chat
-  - bietlejuice.quinto_messenger:load-clean-task
-  - bietlejuice.quinto_messenger:load-clean-task-event
-  - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_cyber_homolog:
   - bietlejuice.cyber:load-clean-agency
   - bietlejuice.cyber:load-clean-agreement-discounts

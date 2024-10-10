@@ -22,7 +22,7 @@ SELECT DISTINCT
   tr.line_owner,
   NOW() AS ts_load
 FROM
-  datalake_customer_support_test.tickets AS t
+  datalake_customer_support.tickets AS t
 LEFT JOIN
   datalake_gsheets_clean.ticket_rate_classification AS tr
     ON t.contact_theme_detail_tag = tr.micro_taxonomy

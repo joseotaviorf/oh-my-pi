@@ -1,4 +1,4 @@
-database_name: dw_customer_support_test
+database_name: dw_customer_support
 table_name: fact_customer_contacts
 description: Test table that will replace fact_received_contact
 domain: Support and Service
@@ -6,50 +6,50 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_contact:
     lineage:
-      - datalake_customer_support_test.calls.id_call
-      - datalake_customer_support_test.calls.id_ticket
+      - datalake_customer_support.calls.id_call
+      - datalake_customer_support.calls.id_ticket
     description:
       MD5 unique ID generated for every group of interactions in call (using id_call),
       chat(using id_session).
   sk_interaction:
     lineage:
-      - datalake_customer_support_test.calls.id_reservation
-      - datalake_customer_support_test.chats.id_task
+      - datalake_customer_support.calls.id_reservation
+      - datalake_customer_support.chats.id_task
     description:
       MD5 unique ID generated to represent every interaction a customer had.
       This is basically an MD5 on top of id_task
   sk_user:
     lineage:
-      - datalake_customer_support_test.calls.id_user
-      - datalake_customer_support_test.chats.id_user
+      - datalake_customer_support.calls.id_user
+      - datalake_customer_support.chats.id_user
     description: User SK
   sk_ticket:
     lineage:
-      - datalake_customer_support_test.tickets.id_ticket
+      - datalake_customer_support.tickets.id_ticket
     description: User SK
   sk_department:
     lineage:
-      - datalake_customer_support_test.calls.queue
+      - datalake_customer_support.calls.queue
     description: SK for the queue of the interaction
   sk_prev_department:
     lineage:
-      - datalake_customer_support_test.calls.queue
+      - datalake_customer_support.calls.queue
     description: Previous queue, if exists
   sk_next_department:
     lineage:
-      - datalake_customer_support_test.calls.queue
+      - datalake_customer_support.calls.queue
     description: Next queue, if exists
   sk_first_department:
     lineage:
-      - datalake_customer_support_test.calls.queue
+      - datalake_customer_support.calls.queue
     description: First queue, if exists
   sk_last_department:
     lineage:
-      - datalake_customer_support_test.calls.queue
+      - datalake_customer_support.calls.queue
     description: Last queue, if exists
   average_reply_time:
     lineage:
-      - datalake_customer_support_test.calls.average_reply_time
+      - datalake_customer_support.calls.average_reply_time
     description: Average reply time for every agent on a task - considering all messages the agent exchanged with the customer.
   total_queue_time:
     lineage:
@@ -77,11 +77,11 @@ columns:
     description: Time until the first reply of the agent
   is_contact_answered:
     lineage:
-      - datalake_customer_support_test.calls.is_call_answered
+      - datalake_customer_support.calls.is_call_answered
     description: If the call or chat was answered
   is_interaction_answered:
     lineage:
-      - datalake_customer_support_test.calls.is_call_answered
+      - datalake_customer_support.calls.is_call_answered
     description: If the reservation or task for call or chat, respectively, was answered
   is_per_team_task:
     description:
@@ -89,32 +89,32 @@ columns:
       build the "segments per team" metric.
   is_first_interaction:
     lineage:
-      - datalake_customer_support_test.calls.id_call
-      - datalake_customer_support_test.calls.id_ticket
-      - datalake_customer_support_test.calls.id_session
+      - datalake_customer_support.calls.id_call
+      - datalake_customer_support.calls.id_ticket
+      - datalake_customer_support.calls.id_session
     description: Boolean if the interaction is the first of it's contact
   is_first_department_interaction:
     lineage:
-      - datalake_customer_support_test.calls.id_call
-      - datalake_customer_support_test.calls.id_ticket
-      - datalake_customer_support_test.calls.id_session
-      - datalake_customer_support_test.calls.department
+      - datalake_customer_support.calls.id_call
+      - datalake_customer_support.calls.id_ticket
+      - datalake_customer_support.calls.id_session
+      - datalake_customer_support.calls.department
     description: Boolean if in a contact, the interaction is the first of it's department
   is_last_interaction:
     lineage:
-      - datalake_customer_support_test.calls.id_call
-      - datalake_customer_support_test.calls.id_ticket
-      - datalake_customer_support_test.calls.id_session
+      - datalake_customer_support.calls.id_call
+      - datalake_customer_support.calls.id_ticket
+      - datalake_customer_support.calls.id_session
     description: Boolean if the interaction is the last of it's contact
   ts_reservation_created:
     lineage:
-      - datalake_customer_support_test.calls.ts_created
+      - datalake_customer_support.calls.ts_created
     description:
       For Twilio Events, the creation timestamp of every 'reservation.created' event.
       Only present in the 'chat' channel
   ts_task_created:
     lineage:
-      - datalake_customer_support_test.calls.ts_created
+      - datalake_customer_support.calls.ts_created
     description: Timestamp of when the Twilio task was created
   ts_load:
     description: Timestamp of when the data was loaded to the datalake

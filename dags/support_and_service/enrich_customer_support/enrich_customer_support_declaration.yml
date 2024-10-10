@@ -24,6 +24,22 @@ workflow:
             - call
             - chat
             - email
+        tickets:
+            - chats
+            - calls
+    tables_customization:
+        calls:
+            z_order_by: [id_task, id_reservation]
+            merge_on: [id_task, id_reservation]
+        chats:
+            z_order_by: [id_session, id_task, id_channel]
+            merge_on: [id_task]
+        ivr_interactions:
+            z_order_by: [id_task]
+            merge_on: [id_task, step_name]
+        tickets:
+            merge_on: [id_ticket]
+            z_order_by: [id_ticket, id_call, id_session]
 cluster:
     type: custom_cluster
     custom_configurations:
@@ -32,7 +48,7 @@ cluster:
         node_type_id: r5d.8xlarge
         runtime_engine: PHOTON
         spark_version: 12.2.x-scala2.12
-        num_workers: 3
+        num_workers: 4
         aws_attributes:
             first_on_demand: 1
             spot_bid_price_percent: 100

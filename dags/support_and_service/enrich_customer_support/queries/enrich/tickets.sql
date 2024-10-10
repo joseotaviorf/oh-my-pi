@@ -81,7 +81,7 @@ chat_tickets AS (
   FROM
     incoming_tickets AS it
   INNER JOIN
-    datalake_customer_support_test.chats AS ch
+    datalake_customer_support.chats AS ch
       ON ch.id_session = it.id_session
 ),
 call_tickets AS (
@@ -92,11 +92,11 @@ call_tickets AS (
   FROM
     incoming_tickets AS it
   LEFT JOIN
-    datalake_customer_support_test.calls AS ca1
+    datalake_customer_support.calls AS ca1
       ON ca1.id_call = it.id_call
       AND STARTSWITH(it.id_call, "CA")
   LEFT JOIN
-    datalake_customer_support_test.calls AS ca2
+    datalake_customer_support.calls AS ca2
       ON ca2.id_task = it.id_call
       AND STARTSWITH(it.id_call, "WT")
   WHERE
@@ -229,14 +229,14 @@ tickets_per_task AS (
     unique_tickets AS ut
       ON ut.id_ticket = t.id_ticket
   LEFT JOIN
-    datalake_customer_support_test.chats AS ch
+    datalake_customer_support.chats AS ch
       ON ch.id_task = t.twilio_task
   LEFT JOIN
-    datalake_customer_support_test.calls AS ca1
+    datalake_customer_support.calls AS ca1
       ON ca1.id_task = t.id_call
       AND STARTSWITH(t.id_call, "WT")
   LEFT JOIN
-    datalake_customer_support_test.calls AS ca2
+    datalake_customer_support.calls AS ca2
       ON ca2.id_call = t.id_call
       AND STARTSWITH(t.id_call, "CA")
 ),

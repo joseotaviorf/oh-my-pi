@@ -1,4 +1,4 @@
-database_name: datalake_customer_support_test
+database_name: datalake_customer_support
 table_name: tickes
 description: Test table for tickets data
 domain: Support and Service
@@ -30,20 +30,20 @@ columns:
     description: Session identifier related to the ticket.
   id_twilio:
     lineage:
-      - datalake_customer_support_test.chats.id_task
-      - datalake_customer_support_test.calls.id_task
-      - datalake_customer_support_test.calls.id_call
+      - datalake_customer_support.chats.id_task
+      - datalake_customer_support.calls.id_task
+      - datalake_customer_support.calls.id_call
     description: Identifier from Twilio tasks or calls associated with the ticket.
   first_queue:
     lineage:
-      - datalake_customer_support_test.chats.queue_name
-      - datalake_customer_support_test.calls.queue_name
+      - datalake_customer_support.chats.queue_name
+      - datalake_customer_support.calls.queue_name
       - datalake_zendesk.tickets_current.group_name
     description: The first queue the ticket was assigned to.
   last_queue:
     lineage:
-      - datalake_customer_support_test.chats.queue_name
-      - datalake_customer_support_test.calls.queue_name
+      - datalake_customer_support.chats.queue_name
+      - datalake_customer_support.calls.queue_name
       - datalake_zendesk.tickets_current.group_name
     description: The most recent queue the ticket was assigned to.
   first_analyst_email:
@@ -80,14 +80,14 @@ columns:
     description: Communication channel through which the ticket was created.
   direction:
     lineage:
-      - datalake_customer_support_test.calls.direction
-      - datalake_customer_support_test.calls.channel_type
+      - datalake_customer_support.calls.direction
+      - datalake_customer_support.calls.channel_type
       - datalake_zendesk.tickets_current.tags
     description: Direction of the communication, either inbound or outbound.
   ticket_origin:
     lineage:
-      - datalake_customer_support_test.calls.origin
-      - datalake_customer_support_test.chats.source
+      - datalake_customer_support.calls.origin
+      - datalake_customer_support.chats.source
     description: Origin of the ticket, indicating the source of the communication.
   tags:
     lineage:
@@ -217,7 +217,7 @@ columns:
     description: Indicates if the ticket was closed by a merge operation.
   is_call_answered:
     lineage:
-      - datalake_customer_support_test.calls.is_call_answered
+      - datalake_customer_support.calls.is_call_answered
     description: Indicates if the associated call was answered.
   is_ticket_rate:
     lineage:
@@ -240,8 +240,8 @@ columns:
     description: Timestamp when the ticket was created.
   ts_created_twilio:
     lineage:
-      - datalake_customer_support_test.calls.ts_created
-      - datalake_customer_support_test.chats.ts_created
+      - datalake_customer_support.calls.ts_created
+      - datalake_customer_support.chats.ts_created
     description: Timestamp when the Twilio task that originated the ticket was created
   ts_sla_started:
     lineage:
