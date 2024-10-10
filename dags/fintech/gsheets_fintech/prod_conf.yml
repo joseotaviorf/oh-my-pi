@@ -91,6 +91,12 @@ sheets_info:
     clean_table_name: early_termination_fee_fines
     sheet_context: fintech
 
+  quintocred_executives_targets_commercial:
+    sheet_id: 1lN9XZ16_-Ym2CwiV2-O0ocpTimH_z3S4DWA-G80Yfr4
+    sheet_name: executives_targets_commercial
+    clean_table_name: quintocred_executives_targets_commercial
+    sheet_context: fintech
+  
   fdic_acquisition_2023:
     sheet_id: 1Vu0vpRWjgzcr_e-R0WLmhyExZ4I05dk_jstdyagOaS4
     sheet_name: acquisition

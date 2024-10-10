@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: quintocred_executives_targets_commercial
+columns:
+  executive:
+    lineage:
+      - datalake_gsheets_raw.executives_targets_commercial.executive
+  brokers_wes:
+    lineage:
+      - datalake_gsheets_raw.executives_targets_commercial.brokers_wes
+  target_contatos:
+    lineage:
+      - datalake_gsheets_raw.executives_targets_commercial.target_contatos
+  target_evaluation_started:
+    lineage:
+      - datalake_gsheets_raw.executives_targets_commercial.target_evaluation_started
+  target_credit_approved:
+    lineage:
+      - datalake_gsheets_raw.executives_targets_commercial.target_credit_approved
+  target_new_contract:
+    lineage:
+      - datalake_gsheets_raw.executives_targets_commercial.target_credit_approved
+  month_trunc:
+    lineage:
+      - datalake_gsheets_raw.executives_targets_commercial.month_trunc
+  month:
+    lineage:
+      - datalake_gsheets_raw.executives_targets_commercial.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.executives_targets_commercial.year
