@@ -39,9 +39,11 @@ DOC_MD_BASE_URL = config_service.get_config("doc_md_chart_url")
 
 BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 
+default_libraries = config_service.get_config("default_libraries")
+
 # cluster setup
 CLUSTER_DESCRIPTION = Variable.get(
-    "databricks_9_1_med_general_cluster", deserialize_json=True
+    "databricks_12_2_med_general_cluster", deserialize_json=True
 )
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
@@ -85,7 +87,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
-    libraries=CUSTOM_LIBRARIES,
+    libraries=default_libraries + CUSTOM_LIBRARIES,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
