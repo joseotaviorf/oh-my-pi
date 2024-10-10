@@ -1,0 +1,131 @@
+---
+database_name: datalake_sap_gateway_clean
+table_name: invoice
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.id
+  id_feature:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.feature_id
+  id_consolidated:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.consolidated_id
+  id_business_entity:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.business_entity_id
+  id_finance_entity:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.finance_entity_id
+  id_external_payment:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.external_payment_id
+  id_person:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.person_id
+  amount:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.amount
+  business_place:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.business_place
+  user_type:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.user_type
+  source_client:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.source_client
+  status:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.status
+  city_state:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.city_state
+  city:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.city
+  accounting_rule:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.accounting_rule
+  accounting_type:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.accounting_type
+  person_card_code:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.person_card_code
+  person_document:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.person_document
+  person_document_type:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.person_document_type
+  sequence_code:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.sequence_code
+  description:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.description
+  cost_center:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.cost_center
+  account_code:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.account_code
+  account_cfop_code:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.account_cfop_code
+  account_managerial_center:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.account_managerial_center
+  reversed:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.reversed
+  reference_year_month:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.reference_year_month
+  dt_event:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.event_date
+  dt_due:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.due_date
+  ts_created:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.created_at
+  ts_updated:
+    description: ""
+    lineage:
+      - datalake_sap_gateway_raw.invoice.updated_at

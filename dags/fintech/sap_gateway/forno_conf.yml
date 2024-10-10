@@ -50,5 +50,11 @@ tables:
     extraction_type: incremental
     date_filter_column: updated_at
     clean_table_name: webhook_log
+  - table_name: invoice
+    extraction_type: full
+    clean_table_name: invoice
+  - table_name: consolidated_invoice
+    extraction_type: full
+    clean_table_name: consolidated_invoice
 partition_columns: [year, month, day]
 lineage_product_database_name: sapgateway
