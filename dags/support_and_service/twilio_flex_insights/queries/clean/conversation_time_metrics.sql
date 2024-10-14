@@ -6,7 +6,7 @@ SELECT
     CAST(total_talk_time AS FLOAT) AS total_talk_time,
     CAST(total_wrap_up_time AS FLOAT) AS total_wrap_up_time,
     CAST(total_handling_time AS FLOAT) AS total_handling_time,
-    CAST(`total_waiting_time_[deprecated]` AS FLOAT) AS total_waiting_time,
+    CAST(total_waiting_time AS FLOAT) AS total_waiting_time,
     CAST(first_reply_time AS FLOAT) AS first_reply_time,
     year,
     month,
