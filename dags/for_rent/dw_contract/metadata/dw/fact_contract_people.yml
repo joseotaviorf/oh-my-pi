@@ -87,5 +87,9 @@ columns:
     - datalake_ebdb_contract.contract_person.is_last_contract
     description: Flag to indicate whether the contract is the last of that person.
       Valid for users only.
+  ts_ownership_swap:
+    lineage:
+      - datalake_ebdb_contract.contract_person.ts_ownership_swap
+    description: Timestamp of when a swap of ownership occurred in the contract.
   ts_load:
     description: Timestamp in which the register was loaded in database.

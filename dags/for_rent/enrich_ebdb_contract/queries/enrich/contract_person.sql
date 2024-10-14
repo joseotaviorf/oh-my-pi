@@ -210,17 +210,20 @@ get_previous_user AS (
 ),
 ownership_swap AS (
     SELECT
-        id_contract,
-        id_contract_person,
-        id_user_contract_person,
-        id_previous_user_contract_person,
-        ts_revision
+        gpu.id_contract,
+        gpu.id_contract_person,
+        gpu.id_user_contract_person,
+        IF(ARRAY_CONTAINS(um.predecessor_user_list, gpu.id_previous_user_contract_person), NULL, gpu.id_previous_user_contract_person) AS id_previous_user_contract_person,
+        gpu.ts_revision
     FROM
-        get_previous_user
+        get_previous_user AS gpu
+    LEFT JOIN
+        datalake_ebdb_user.user_merge AS um
+          ON um.id_user = gpu.id_user_contract_person
     WHERE
-        mod_id_user
+        gpu.mod_id_user
     QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_contract, id_user_contract_person ORDER BY ts_revision DESC) = 1
+        ROW_NUMBER() OVER(PARTITION BY gpu.id_contract, gpu.id_user_contract_person ORDER BY gpu.ts_revision DESC) = 1
 )
 SELECT
     cp.id AS id_contract_person,
@@ -263,6 +266,7 @@ SELECT
     (cp.id_contract = COALESCE(uag.id_first_contract, cag.id_first_contract)) AS is_first_contract,
     (cp.id_contract = COALESCE(uag.id_last_contract, cag.id_last_contract)) AS is_last_contract,
     cp.dt_birth,
+    IF(os.id_previous_user_contract_person IS NULL, NULL, os.ts_revision) AS ts_ownership_swap,
     cp.ts_created,
     cp.ts_updated
 FROM

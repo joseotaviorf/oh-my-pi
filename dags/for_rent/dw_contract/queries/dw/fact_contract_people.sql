@@ -16,6 +16,7 @@ SELECT
     is_living,
     is_first_contract,
     is_last_contract,
+    ts_ownership_swap,
     NOW() AS ts_load
 FROM
     datalake_ebdb_contract.contract_person

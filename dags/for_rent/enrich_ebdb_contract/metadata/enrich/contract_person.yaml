@@ -97,6 +97,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract_person.dt_birth
     description: Date of birth of the person related to the contract.
+  ts_ownership_swap:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp of when a swap of ownership occurred in the contract.
   ts_created:
     lineage:
       - datalake_ebdb_clean.contract_person.ts_created

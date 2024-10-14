@@ -154,15 +154,16 @@ terminations AS (
 tenant_ownership_swap AS (
     SELECT
         id_contract,
-        IF(MAX(id_previous_user_contract_person) IS NULL, FALSE, TRUE) AS has_tenant_ownership_swap
+        id_previous_user_contract_person,
+        ts_ownership_swap
     FROM
         datalake_ebdb_contract.contract_person
     WHERE
         contract_role IN ('tenant', 'dweller')
         AND is_living
         AND id_user_contract_person IS NOT NULL
-    GROUP BY
-        1
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_ownership_swap DESC) = 1
 )
 SELECT
   c.id,
@@ -213,7 +214,7 @@ SELECT
   cm.is_ended,
   cm.is_full_service,
   cm.is_deal_only,
-  tos.has_tenant_ownership_swap,
+  IF(tos.id_previous_user_contract_person IS NULL, FALSE, TRUE) AS has_tenant_ownership_swap,
   fc.monthly_administration_fee,
   ccr.cancellation_reason,
   ccr.ts_canceled,
