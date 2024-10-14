@@ -1,0 +1,12 @@
+database_name: datalake_sorting_hat_clean
+table_name: processed_message
+columns:
+  id_subscriber:
+    lineage:
+      - datalake_sorting_hat_raw.processed_message.subscriber_id
+  id_message:
+    lineage:
+      - datalake_sorting_hat_raw.processed_message.message_id
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.processed_message.created_at

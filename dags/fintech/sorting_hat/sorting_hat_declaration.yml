@@ -22,6 +22,8 @@ workflow:
       clean_table_name: experiment
     Offer:
       clean_table_name: offer
+    ProcessedMessage:
+      clean_table_name: processed_message
     Proponent:
       clean_table_name: proponent
     Proponent_Version:
@@ -32,6 +34,8 @@ workflow:
       clean_table_name: proposal_error
     Proposal_Version:
       clean_table_name: proposal_version
+    Message:
+      clean_table_name: message
     ScreeningResult:
       clean_table_name: screening_result
     ScreeningResult_Version:

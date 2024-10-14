@@ -1,0 +1,24 @@
+database_name: datalake_sorting_hat_clean
+table_name: message
+columns:
+  id_message:
+    lineage:
+      - datalake_sorting_hat_raw.message.id
+  id_incremental:
+    lineage:
+      - datalake_sorting_hat_raw.message.incremental_id
+  destination:
+    lineage:
+      - datalake_sorting_hat_raw.message.destination
+  headers:
+    lineage:
+      - datalake_sorting_hat_raw.message.headers
+  payload:
+    lineage:
+      - datalake_sorting_hat_raw.message.payload
+  is_published:
+    lineage:
+      - datalake_sorting_hat_raw.message.published
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.message.creation_time
