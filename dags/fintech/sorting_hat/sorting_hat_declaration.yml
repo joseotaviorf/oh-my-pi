@@ -34,7 +34,7 @@ workflow:
       clean_table_name: proposal_error
     Proposal_Version:
       clean_table_name: proposal_version
-    Message:
+    message:
       clean_table_name: message
     ScreeningResult:
       clean_table_name: screening_result
