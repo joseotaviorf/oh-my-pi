@@ -118,22 +118,28 @@ customer_info AS (
     WHERE
         b.sk_user IS NOT NULL
 ),
-previous_sent_id_drivers AS (
-  SELECT id_driver
-    FROM customer_info
-    WHERE (
-      (payment_method IS NULL OR payment_method LIKE 'FINANCED%')
-      AND (ts_house_registry_ended IS NOT NULL AND DATE_ADD(dt_event, 114) <= CAST(ts_house_registry_ended AS TIMESTAMP))) 
-      OR (
-      (payment_method IS NULL OR payment_method LIKE 'CASH%')
-      AND ((dt_event < DATE('2024-05-18')) AND (ts_house_registry_ended IS NOT NULL AND DATE_ADD(dt_event, 45) <= CAST(ts_house_registry_ended AS TIMESTAMP))
-      ) OR ((dt_event >= DATE('2024-05-18')) AND (ts_house_registry_ended IS NOT NULL AND DATE_ADD(dt_event, 60) <= CAST(ts_house_registry_ended AS TIMESTAMP)))
-    ) OR (
-      (payment_method IS NULL OR payment_method LIKE 'CASH%') 
-      AND (dt_event < DATE('2024-05-18'))
-      AND (ts_house_registry_ended IS NULL OR DATE_ADD(CAST(ts_house_registry_ended AS TIMESTAMP), -2) <= DATE('2024-06-30'))
-    )
-)
+previous_sent_id_drivers AS
+  (SELECT id_driver
+   FROM customers_info
+   WHERE ((payment_method IS NULL
+           OR payment_method LIKE 'FINANCED%')
+          AND (ts_house_registry_ended IS NOT NULL
+               AND DATE_ADD(dt_event, 114) <= CAST(ts_house_registry_ended AS TIMESTAMP)))
+     OR (((payment_method IS NULL
+           OR payment_method LIKE 'CASH%')
+          AND ((dt_event < DATE('2024-05-18'))
+               AND (ts_house_registry_ended IS NOT NULL
+                    AND DATE_ADD(dt_event, 45) <= CAST(ts_house_registry_ended AS TIMESTAMP))))
+         OR ((payment_method IS NULL
+              OR payment_method LIKE 'CASH%')
+             AND ((dt_event >= DATE('2024-05-18'))
+                  AND (ts_house_registry_ended IS NOT NULL
+                       AND DATE_ADD(dt_event, 60) <= CAST(ts_house_registry_ended AS TIMESTAMP)))))
+     OR ((payment_method IS NULL
+          OR payment_method LIKE 'CASH%')
+         AND (dt_event < DATE('2024-05-18'))
+         AND (ts_house_registry_ended IS NULL
+              OR DATE_ADD(CAST(ts_house_registry_ended AS TIMESTAMP), -2) <= DATE('2024-06-30'))))
 SELECT
     customer_name,
     customer_email,
