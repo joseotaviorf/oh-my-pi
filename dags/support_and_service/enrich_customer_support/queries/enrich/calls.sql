@@ -119,16 +119,16 @@ call_answered_flag AS (
 ),
 unanswered_calls AS (
   SELECT
-    id_task,
-    MAX(id_call) id_call,
+    ce.id_task,
+    MAX(ce.id_call) id_call,
     NULL AS id_reservation,
     NULL AS id_worker,
-    direction,
-    channel_type,
-    MAX(bpo_name) AS bpo_name,
+    ce.direction,
+    ce.channel_type,
+    MAX(ce.bpo_name) AS bpo_name,
     NULL AS worker_email,
-    from_phone_number,
-    to_phone_number,
+    ce.from_phone_number,
+    ce.to_phone_number,
     NULL AS waiting_time_sec,
     FALSE AS is_call_answered,
     FALSE AS is_reservation_answered,
@@ -138,14 +138,18 @@ unanswered_calls AS (
     NULL AS ts_reservation_created,
     NULL AS ts_reservation_accepted,
     NULL AS ts_reservation_ended,
-    MIN(ts_task_created) AS ts_task_created
+    MIN(ce.ts_task_created) AS ts_task_created
   FROM
-    call_events
+    call_events AS ce
+  LEFT JOIN
+    reservations AS r
+      ON r.id_task = ce.id_task
   WHERE
-    direction IS NOT NULL
-    AND task_cancelation_reason IS NOT NULL
+    ce.direction IS NOT NULL
+    AND ce.task_cancelation_reason IS NOT NULL
+    AND r.id_task IS NULL
   GROUP BY ALL
-  HAVING COUNT(DISTINCT(id_reservation)) < 1
+  HAVING COUNT(DISTINCT(ce.id_reservation)) < 1
 ),
 calls AS (
   SELECT
