@@ -17,13 +17,6 @@ workflow:
       clean_table_name: call_request
     t_call_in_app_eligibility:
       clean_table_name: call_in_app_eligibility
-    t_article_recommendation:
-      clean_table_name: article_recommendation
-    t_article:
-      clean_table_name: article
-    t_ongoing_requests:
-      clean_table_name: ongoing_requests
-    t_whatsapp_migration_strategy:
-      clean_table_name: whatsapp_migration_strategy
+
 cluster:
   type: databricks_12_2_min_general_cluster
