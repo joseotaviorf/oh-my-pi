@@ -19,7 +19,7 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  invoice_due_amount:
+  due_amount:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error

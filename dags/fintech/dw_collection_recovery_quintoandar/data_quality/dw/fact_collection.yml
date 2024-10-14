@@ -17,6 +17,6 @@ column_level_validations:
   id_operator:
     is_complete:
       severity_level: Error
-  id_occurrence:
+  action:
     is_complete:
       severity_level: Error
