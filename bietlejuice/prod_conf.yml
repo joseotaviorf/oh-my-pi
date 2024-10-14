@@ -75,6 +75,8 @@ dags_out_of_pattern:
         "enrich_lost_listings",
         "enrich_marketing_costs_offline",
         "enrich_nps_reversion",
+        "enrich_table_dependency_tree",
+        "enrich_trino_table_usage",
         "enrich_vespucio",
         "enrich_vespucio_pipeline",
         "gsheets.fintech",

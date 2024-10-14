@@ -1,0 +1,16 @@
+dag:
+  name: enrich_trino_table_usage
+  owner: Data Ingestion
+  documentation: 
+    dag_purpose: |
+      Dag responsible for gathering and processing information related to the use of tables in Trino by counting downstream usages.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_12_2_med_io-general_analytical_costs_photon_cluster

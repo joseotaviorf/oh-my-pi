@@ -1,0 +1,31 @@
+---
+database_name: datalake_trino_table_usage
+table_name: total_table_usage_information
+owner: gustavo.akashi@quintoandar.com.br
+domain: Data Platform
+description: This table contains information about the number of visualization a table has according to Trino usage events counting dependent usages. For example, a raw table will probably not have any direct usage, but it has indirect usage by dependent clean, enrich, dw and metric layers.
+columns:
+  table_name:
+    lineage:
+      - datalake_trino.table_usage_information.database_name
+      - datalake_trino.table_usage_information.table_name
+    description: Table name with schema.
+  individual_usage:
+    lineage:
+      - datalake_trino.table_usage_information.count_visualization
+    description: Number of individual uses from a table. We're counting only direct usages, not including dependents.
+  accumulated_usage:
+    lineage:
+      - datalake_trino.table_usage_information.count_visualization
+  year:
+    lineage:
+      - datalake_trino.table_usage_information.year
+    description: Ingestion year. Also, a partition of the table.
+  month:
+    lineage:
+      - datalake_trino.table_usage_information.month
+    description: Ingestion month. Also, a partition of the table.
+  day:
+    lineage:
+      - datalake_trino.table_usage_information.day
+    description: Ingestion day. Also, a partition of the table.

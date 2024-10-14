@@ -2965,6 +2965,9 @@ bietlejuice.enrich_trino_detractor:
   - bietlejuice.enrich_trino:load-enrich-trino-detractor-queries
   - bietlejuice.superset_internal:load-clean-ab-user
   - bietlejuice.superset_internal:load-clean-logs
+bietlejuice.enrich_trino_table_usage:
+  - bietlejuice.enrich_table_dependency_tree:load-enrich-bietlejuice-table-dependencies-with-indirection
+  - bietlejuice.enrich_trino:load-enrich-table-usage-information
 bietlejuice.enrich_user:
   - bietlejuice.ebdb_agent:load-clean-agent-data
   - bietlejuice.ebdb_agent:load-clean-agent-data-business-contexts-served
