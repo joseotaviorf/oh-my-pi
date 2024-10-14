@@ -13,6 +13,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.factories.metric_factory
 from bietlejuice.base.airflow.dag_builders.main_builder.factories.enrich_factory import (
     EnrichFactory,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.factories.reverse_factory import (
+    ReverseFactory,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.factories.clean_factory import (
     CleanFactory,
 )
@@ -31,6 +34,7 @@ class FactoryDispatcher:
         LayerEnum.ENRICH: EnrichFactory,
         LayerEnum.DW: DWFactory,
         LayerEnum.METRIC: MetricFactory,
+        LayerEnum.REVERSE: ReverseFactory,
     }
 
     def __init__(self, layer: LayerEnum) -> None:

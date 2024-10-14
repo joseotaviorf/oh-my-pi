@@ -1,4 +1,7 @@
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
+from bietlejuice.base.airflow.task_creators.dag_execution_context import (
+    DagExecutionContext,
+)
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 import json
@@ -7,13 +10,20 @@ import json
 class LoadCustomTaskCreator(BaseTaskCreator):
     """Creates the task that loads a table using a custom Spark job"""
 
-    _TASK_ID_TEMPLATE = "load-{layer}-{table_name}"
+    def __init__(
+        self, dag_execution_context: DagExecutionContext, task_id_prefix: str = "load"
+    ) -> None:
+        super().__init__(dag_execution_context)
+        self.task_id_prefix = task_id_prefix
 
     def create_task(
         self, table_attributes: TableAttributes
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         spark_job_name = self._generate_spark_job_name(table_attributes)
-        task_id = self.generate_task_id(table_attributes)
+        task_id = self.generate_task_id(
+            table_attributes,
+            dynamic_template=f"{self.task_id_prefix}-{{layer}}-{{table_name}}",
+        )
         parameters = self._generate_parameters(table_attributes)
 
         return self._create_spark_job_task(
