@@ -126,7 +126,7 @@ deliquency AS (
         CASE
             WHEN id_type = 0 THEN 'deliquency'
             WHEN id_type = 4 THEN 'deliquency_renewal'
-            WHEN id_type = 5 THEN 'deliquency_monthly_renewal'
+            WHEN id_type = 5 or id_type = 6 THEN 'deliquency_monthly_renewal'
         END AS origin_table,
         original_value AS value,
         CASE
@@ -139,7 +139,7 @@ deliquency AS (
         CASE
             WHEN id_type = 0 THEN 'SIGNATURE'
             WHEN id_type = 4 THEN 'RENEWAL'
-            WHEN id_type = 5 THEN 'MONTHLY_RENEWAL'
+            WHEN id_type = 5 or id_type = 6  THEN 'MONTHLY_RENEWAL'
         END AS billing_type,
         'deliquency' AS category,
         CAST(ts_created AS DATE) AS dt_created,
@@ -150,7 +150,7 @@ deliquency AS (
     FROM
         datalake_rental_guarantee_platform_clean.delinquency
     WHERE
-        id_type IN (0,4,5)
+        id_type IN (0,4, 5, 6)
         AND id_propose > 0
         AND is_active
 ),
