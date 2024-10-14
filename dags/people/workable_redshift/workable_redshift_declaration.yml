@@ -22,7 +22,7 @@ workflow:
   dbutils_secret_key: WORKABLE_DB
   dbutils_secret_scope: people
   has_hive_sync: false
-  default_raw_partitions: ['year', 'month', 'day']
+  default_raw_partitions: ["year", "month", "day"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, yesterday_ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
@@ -30,72 +30,76 @@ workflow:
     activities:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     answers:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id', 'answer']
+      merge_on: ["id", "answer"]
     candidate_referrals:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     candidates:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     departments:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     education_records:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     experience_records:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     field_choices:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     field_value_choices:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     field_values:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     fields:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
+    hiring_team:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
     jobs:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     members:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     offer_variables:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     offers:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     pipelines:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     requisitions:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
     stages:
       date_filter_column: updated_at
       extraction_type: incremental
-      merge_on: ['id']
+      merge_on: ["id"]
