@@ -265,11 +265,11 @@ volumetry AS (
         week_start,
         sk_user_affiliate,
         CASE
-            WHEN COALESCE(prospects_l2w, 0) = 0 AND lifetime_p2o > 0.12 THEN 'Alta Conversão'
+            WHEN COALESCE(prospects_l2w, 0) = 0 AND lifetime_p2o > 0.090 THEN 'Alta Conversão'
             WHEN COALESCE(prospects_l2w, 0) = 0 AND lifetime_p2o > 0.029 THEN 'Média Conversão'
             WHEN COALESCE(prospects_l2w, 0) = 0 AND lifetime_p2o > 0.015 THEN 'Baixa Conversão'
             WHEN prospects_l2w IS NULL THEN 'Baixíssima Conversão'
-            WHEN p2o_l2w > 0.12 THEN 'Alta Conversão'
+            WHEN p2o_l2w > 0.090 THEN 'Alta Conversão'
             WHEN p2o_l2w > 0.029 THEN 'Média Conversão'
             WHEN p2o_l2w > 0.015 THEN 'Baixa Conversão' 
             ELSE 'Baixíssima Conversão' 
