@@ -21,6 +21,7 @@ class LoadCustomTaskCreator(BaseTaskCreator):
             task_id,
             parameters,
             spark_job_prefix=self._get_spark_job_prefix(table_attributes),
+            execution_timeout_hours=self._get_execution_timeout_hours(table_attributes),
         )
 
     def _get_spark_job_prefix(self, table_attributes: TableAttributes) -> str:

@@ -46,4 +46,9 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
         task_id = self.generate_task_id(table_attributes)
         parameters = self._get_parameters(table_attributes)
 
-        return self._create_spark_job_task(self.SPARK_JOB_NAME, task_id, parameters)
+        return self._create_spark_job_task(
+            self.SPARK_JOB_NAME,
+            task_id,
+            parameters,
+            execution_timeout_hours=self._get_execution_timeout_hours(table_attributes),
+        )

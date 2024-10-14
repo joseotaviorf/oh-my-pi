@@ -39,6 +39,7 @@ class BaseTaskCreator(ABC):
         task_id: str,
         job_parameters: list,
         spark_job_prefix: str = None,
+        execution_timeout_hours: int = _DEFAULT_EXECUTION_TIMEOUT_HOURS,
     ) -> QuintoAndarDatabricksCheckJobTaskOperator:
         """
         Returns a task that runs a Spark Job in the base spark jobs path, with the given name, task id, and parameters.
@@ -66,7 +67,7 @@ class BaseTaskCreator(ABC):
                     "parameters": job_parameters,
                 }
             },
-            execution_timeout=timedelta(hours=self._DEFAULT_EXECUTION_TIMEOUT_HOURS),
+            execution_timeout=timedelta(hours=execution_timeout_hours),
         )
 
     @classmethod
@@ -85,3 +86,17 @@ class BaseTaskCreator(ABC):
             table_name=table_attributes.table_name,
         )
         return StringFormatter.slugify(task_id)
+
+    def _get_execution_timeout_hours(self, table_attibutes: TableAttributes) -> float:
+        """
+        Gets the execution timeout in hours for the task. It will try to use the one in table_customization,
+        if it doesn't exist, it will use the default one in workflow_args. If none is provided, it will use the
+        default value in _DEFAULT_EXECUTION_TIMEOUT_HOURS, which is equal to 2.
+        """
+        custom_execution_timeout_hours = self.dag_execution_context.workflow_args.get(
+            "execution_timeout_hours", self._DEFAULT_EXECUTION_TIMEOUT_HOURS
+        )
+        table_execution_timeout_hours = table_attibutes.table_customization.get(
+            "execution_timeout_hours", custom_execution_timeout_hours
+        )
+        return table_execution_timeout_hours

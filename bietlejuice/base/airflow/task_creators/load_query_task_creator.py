@@ -23,7 +23,12 @@ class LoadQueryTaskCreator(BaseTaskCreator):
             task_id = self.generate_task_id(table_attributes)
         parameters = self._get_parameters(table_attributes)
 
-        return self._create_spark_job_task(spark_job_name, task_id, parameters)
+        return self._create_spark_job_task(
+            spark_job_name,
+            task_id,
+            parameters,
+            execution_timeout_hours=self._get_execution_timeout_hours(table_attributes),
+        )
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
         return [

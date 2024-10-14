@@ -50,6 +50,7 @@ class DAGDeclarationValidator(Validator):
                     "empty": False,
                     "allowed": LayerEnum.get_available_enum_values(),
                 },
+                "execution_timeout_hours": {"type": "float", "empty": False},
                 "source_schema": {"type": "string", "empty": False},
                 "source_database": {"type": "string", "empty": False},
                 "custom_schema": {"type": "string", "empty": False},
