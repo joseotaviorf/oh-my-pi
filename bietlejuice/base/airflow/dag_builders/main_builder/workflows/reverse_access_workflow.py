@@ -41,6 +41,10 @@ class ReverseAccessWorkflow(BaseWorkflow):
             export_reverse_task = self.export_task_creator.create_task(table)
             execute_job_cluster_task >> export_reverse_task >> dummy_terminate_job_cluster_task
 
+        if self._check_include_skip_run_task():
+            skip_run_task = self.skip_run_task_creator.create_task()
+            skip_run_task >> execute_job_cluster_task
+
         return dag
 
     def _get_tables(self) -> List[TableAttributes]:
@@ -56,6 +60,9 @@ class ReverseAccessWorkflow(BaseWorkflow):
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
         task_creator_factory = TaskCreatorFactory(dag_execution_context)
+        self.skip_run_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.SKIP_RUN
+        )
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,

@@ -13,6 +13,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.reverse_load_workflow import (
     ReverseLoadWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.reverse_load_access_workflow import (
+    ReverseLoadAccessWorkflow,
+)
 
 
 class ReverseFactory(BaseFactory):
@@ -23,6 +26,7 @@ class ReverseFactory(BaseFactory):
 
     _WORKFLOW_ENUM_TO_CLASS_MAPPING = {
         WorkflowEnum.ACCESS_WORKFLOW: ReverseAccessWorkflow,
+        WorkflowEnum.LOAD_ACCESS_WORKFLOW: ReverseLoadAccessWorkflow,
         WorkflowEnum.LOAD_WORKFLOW: ReverseLoadWorkflow,
     }
 

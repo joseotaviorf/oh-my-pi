@@ -13,6 +13,7 @@ class WorkflowEnum(Enum):
     DATABASE_PULL_WORKFLOW = "database_pull"
     DMS_CDC_WORKFLOW = "dms_cdc"
     GSHEETS_WORKFLOW = "gsheets"
+    LOAD_ACCESS_WORKFLOW = "load_access"
     LOAD_WORKFLOW = "load"
     QUERY_DELTA_WORKFLOW = "query_delta"
     QUERY_WORKFLOW = "query"
