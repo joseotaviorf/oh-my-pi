@@ -87,11 +87,14 @@ SELECT
     COALESCE(ct.default_timezone, 'UTC') AS default_timezone,
     visit_cancellation.reason AS cancellation_reason,
     visit_cancellation.on_behalf_of AS cancellation_on_behalf_of,
-    visit_log.nbr_reschedule,
+    CASE
+      WHEN visit_log.nbr_reschedule IS NULL THEN 0
+      ELSE visit_log.nbr_reschedule
+    END AS nbr_reschedule,
     DATEDIFF(DAY, visit_log.ts_first_event, visit_log.ts_last_event) AS journey_days,
     DATEDIFF(HOUR, visit_log.ts_first_event, visit_log.ts_visit_supply_answer) AS hours_waiting_for_answers,
     DATEDIFF(DAY, visit_log.ts_first_event, visit_log.ts_visit_supply_answer) AS days_waiting_for_answers,
-    visit_log.last_event <> 'ANSWER_PENDING' AS is_confirmed,
+    visit_log.ts_visit_confirmed IS NOT NULL AS is_confirmed,
     visit.computed_status = 'DONE'  AS is_completed,
     IF(nbr_reschedule >= 1, TRUE, FALSE) AS is_reschedule,
     visit.status = 'Canceled' AS is_canceled,
@@ -131,6 +134,7 @@ SELECT
     visit_log.ts_visit_demand_confirmed,
     visit_log.ts_visit_agent_confirmed,
     visit_log.ts_visit_tenant_confirmed,
+    visit_log.ts_visit_confirmed,
     visit_log.ts_visit_fup_collected,
     visit_log.ts_visit_canceled,
     visit_log.ts_visit_done,

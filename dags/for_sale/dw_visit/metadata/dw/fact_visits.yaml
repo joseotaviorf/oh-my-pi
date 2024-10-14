@@ -88,6 +88,34 @@ columns:
     description: Number of reschedules.
     lineage:
         - datalake_visit.visits.nbr_reschedule
+  nbr_bookings:
+    description: Number of bookings from this visit.
+    lineage:
+      - datalake_visit.visits.nbr_reschedule
+  is_waiting_for_response:
+    description: If is waiting for response.
+    lineage:
+      - datalake_visit.visits.is_waiting_for_response
+  is_confirmed:
+    description: If the visit is confirmed.
+    lineage:
+      - datalake_visit.visits.is_confirmed
+  is_completed:
+    description: If the visit is completed.
+    lineage:
+      - datalake_visit.visits.is_completed
+  is_reschedule:
+    description: If the visit is reschedule.
+    lineage:
+      - datalake_visit.visits.is_reschedule
+  is_canceled:
+    description: If the visit is canceled.
+    lineage:
+      - datalake_visit.visits.is_canceled
+  is_unsuccessful:
+    description: If the visit is unsuccessful.
+    lineage:
+      - datalake_visit.visits.is_unsuccessful
   journey_days:
     description: Journey days since the first created event.
     lineage:

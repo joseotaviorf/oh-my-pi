@@ -179,6 +179,8 @@ columns:
     description: Timestamp with the agent confirmed date of this visit.
   ts_visit_tenant_confirmed:
     description: Timestamp with the tenant confirmed date of this visit.
+  ts_visit_confirmed:
+    description: Timestamp with the confirmation date of this visit.
   ts_visit_fup_collected:
     description: Timestamp with the follow up collected date of this visit.
   ts_visit_canceled:
