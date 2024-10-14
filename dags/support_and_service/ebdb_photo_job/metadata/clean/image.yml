@@ -1,27 +1,27 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: image
 columns:
   id_image:
     lineage:
-      - datalake_ebdb_test_raw.imagem.id
+      - datalake_ebdb_raw.imagem.id
   name:
     lineage:
-      - datalake_ebdb_test_raw.imagem.nome
+      - datalake_ebdb_raw.imagem.nome
   is_principal:
     lineage:
-      - datalake_ebdb_test_raw.imagem.principal
+      - datalake_ebdb_raw.imagem.principal
   id_house:
     lineage:
-      - datalake_ebdb_test_raw.imagem.imovel_id
+      - datalake_ebdb_raw.imagem.imovel_id
   subtitle:
     lineage:
-      - datalake_ebdb_test_raw.imagem.legenda
+      - datalake_ebdb_raw.imagem.legenda
   sequence:
     lineage:
-      - datalake_ebdb_test_raw.imagem.ordem
+      - datalake_ebdb_raw.imagem.ordem
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.imagem.atualizadoem
+      - datalake_ebdb_raw.imagem.atualizadoem
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.imagem.criadoem
+      - datalake_ebdb_raw.imagem.criadoem

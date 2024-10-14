@@ -12,7 +12,7 @@ workflow:
   database_type: mysql
   source_database: ebdb
   source_schema: ebdb
-  custom_schema: ebdb_test
+  custom_schema: ebdb
   dbutils_secret_key: EBDB_DB
   tables_customization:
     DadosFotografo:

@@ -14,6 +14,7 @@ table_block_list:
   - tmp_update_AUD_01
   - _UsuarioRevisionEntity_new
   - ContractStartDateRequest
+  - DadosFotografo
   - Device_AUD
   - DocumentoProposta_AUD
   - Visitor_AUD
@@ -404,6 +405,8 @@ table_block_list:
   - Instalacao
   - InstalacaoInfo
   - InstalacaoInfo_AUD
+  - Imagem
+  - Imagem_AUD
   - HouseMaintenanceCondition
   - HouseMaintenanceCondition_AUD
   - HouseMedia

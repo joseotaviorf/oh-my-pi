@@ -1,9 +1,10 @@
-select
+SELECT
     id,
-    tipoContrato as contract_type,
-    preferenciaPagamento as payment_preference,
-    ativo as is_active,
-    inicioContrato as ts_contract_started,
-    criadoEm as ts_created,
-    atualizadoEm as ts_updated
-from datalake_ebdb_test_raw.dadosfotografo
+    tipoContrato AS contract_type,
+    preferenciaPagamento AS payment_preference,
+    ativo AS is_active,
+    inicioContrato AS ts_contract_started,
+    criadoEm AS ts_created,
+    atualizadoEm AS ts_updated
+FROM
+    datalake_ebdb_raw.dadosfotografo

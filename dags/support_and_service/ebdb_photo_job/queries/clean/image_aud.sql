@@ -9,4 +9,4 @@ SELECT
     principal AS is_main,
     imageVariants_MOD AS mod_image_variants
 FROM
-    datalake_ebdb_test_raw.imagem_aud
+    datalake_ebdb_raw.imagem_aud
