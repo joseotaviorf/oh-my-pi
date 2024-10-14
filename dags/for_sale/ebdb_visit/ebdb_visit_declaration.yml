@@ -25,10 +25,6 @@ workflow:
       clean_table_name: entrance
     FollowUpDetails:
       clean_table_name: follow_up_details
-    FeedbackTag:
-      clean_table_name: feedback_tag
-    FollowUpDetails_FeedbackTag:
-      clean_table_name: follow_up_details_feedback_tag
     UserVisitPreferences:
       clean_table_name: user_visit_preferences
     UserVisitPreferences_AUD:

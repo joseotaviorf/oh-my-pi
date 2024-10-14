@@ -1,9 +1,0 @@
-database_name: datalake_ebdb_test_clean
-table_name: follow_up_details_feedback_tag
-columns:
-  id_follow_up_details:
-    lineage:
-      - datalake_ebdb_test_raw.followupdetails_feedbacktag.followupdetails_id
-  id_tags:
-    lineage:
-      - datalake_ebdb_test_raw.followupdetails_feedbacktag.tags_id
