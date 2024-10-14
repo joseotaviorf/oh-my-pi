@@ -120,7 +120,7 @@ customer_info AS (
 ),
 previous_sent_id_drivers AS
   (SELECT id_driver
-   FROM customers_info
+   FROM customer_info
    WHERE ((payment_method IS NULL
            OR payment_method LIKE 'FINANCED%')
           AND (ts_house_registry_ended IS NOT NULL
