@@ -25,7 +25,7 @@ table_dependencies AS (
 downstream_table_usage AS (
 SELECT 
   td.dependency_table_name AS table_name,
-  SUM(tu.count_visualization) AS tu.count_visualization,
+  SUM(tu.count_visualization) AS count_visualization,
   td.year,
   td.month,
   td.day

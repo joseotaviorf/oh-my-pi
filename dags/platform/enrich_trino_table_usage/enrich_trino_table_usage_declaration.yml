@@ -13,4 +13,4 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
-  type: databricks_12_2_med_io-general_analytical_costs_photon_cluster
+  type: databricks_13_3_med_general_cluster
