@@ -17,7 +17,6 @@ This pipeline creates the following full tables in the schema `dw_datamarts` of 
 
 - `buyer_first_visit_intent`
 - `deal_making_funnel`
-- `dim_house_listing_amenities`
 - `house_media`
 - `liquidity_by_sk_region`
 - `repressed_demand_sale_booking_fit_in`
