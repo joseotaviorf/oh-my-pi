@@ -43,6 +43,10 @@ demand AS (
     END AS status,
     worker_email,
     CASE
+      WHEN direction = 'inbound' THEN to_phone_number
+      WHEN direction = 'outbound' THEN from_phone_number
+    END AS quinto_andar_phone_number,
+    CASE
       WHEN direction = 'inbound' THEN from_phone_number
       WHEN direction = 'outbound' THEN to_phone_number
     END AS customer_phone_number,
@@ -80,6 +84,7 @@ demand AS (
       ELSE 'transferred'
     END AS status,
     worker_email,
+    twilio_phone_number AS quinto_andar_phone_number,
     customer_phone_number,
     customer_email,
     NULL AS waiting_time_sec,
@@ -128,6 +133,7 @@ contacts AS (
     d.direction,
     d.status,
     d.worker_email,
+    d.quinto_andar_phone_number,
     d.customer_phone_number,
     d.customer_email,
     art.average_reply_time,
@@ -186,6 +192,7 @@ SELECT
   channel,
   status,
   worker_email,
+  quinto_andar_phone_number,
   customer_phone_number,
   customer_email,
   average_reply_time,
@@ -212,6 +219,7 @@ SELECT
   is_interaction_answered,
   ts_task_created,
   ts_reservation_created,
-  ts_reservation_ended
+  ts_reservation_ended,
+  NOW() AS ts_load
 FROM
   contacts

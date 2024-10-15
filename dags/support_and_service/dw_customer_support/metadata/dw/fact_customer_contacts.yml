@@ -1,120 +1,164 @@
 database_name: dw_customer_support
 table_name: fact_customer_contacts
-description: Test table that will replace fact_received_contact
+description:
+  Fact table that describes all contacts that happen in the front office. Each contact is made of
+  one or many interactions between the customer and an analyst. Time metrics for each interaction are
+  also present in this table
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_contact:
     lineage:
-      - datalake_customer_support.calls.id_call
-      - datalake_customer_support.calls.id_ticket
-    description:
-      MD5 unique ID generated for every group of interactions in call (using id_call),
-      chat(using id_session).
+      - datalake_customer_support.calls.id_session
+      - datalake_customer_support.calls.id_task
+      - datalake_customer_support.chats.id_session
+      - datalake_customer_support.chats.id_task
+    description: MD5 hash of channel, id_session, and id_task for contact surrogate key.
   sk_interaction:
     lineage:
+      - datalake_customer_support.calls.direction
+      - datalake_customer_support.calls.id_session
+      - datalake_customer_support.calls.id_task
       - datalake_customer_support.calls.id_reservation
+      - datalake_customer_support.chats.direction
+      - datalake_customer_support.chats.id_session
       - datalake_customer_support.chats.id_task
-    description:
-      MD5 unique ID generated to represent every interaction a customer had.
-      This is basically an MD5 on top of id_task
+    description: MD5 hash of direction, id_session, id_task, and id_reservation for interaction surrogate key.
+  sk_session:
+    lineage:
+      - datalake_customer_support.calls.id_session
+      - datalake_customer_support.chats.id_session
+    description: Session identifier associated with the contact.
+  sk_task:
+    lineage:
+      - datalake_customer_support.calls.id_task
+      - datalake_customer_support.chats.id_task
+    description: Task identifier associated with the contact.
+  sk_ticket:
+    lineage:
+      - datalake_customer_support.tickets.id_ticket
+    description: Ticket identifier associated with the contact.
   sk_user:
     lineage:
       - datalake_customer_support.calls.id_user
       - datalake_customer_support.chats.id_user
-    description: User SK
-  sk_ticket:
-    lineage:
-      - datalake_customer_support.tickets.id_ticket
-    description: User SK
-  sk_department:
-    lineage:
-      - datalake_customer_support.calls.queue
-    description: SK for the queue of the interaction
+    description: User identifier associated with the contact.
   sk_prev_department:
     lineage:
-      - datalake_customer_support.calls.queue
-    description: Previous queue, if exists
+      - datalake_customer_support.calls.queue_name
+      - datalake_customer_support.chats.queue_name
+    description: Previous department associated with the contact, based on task creation time.
+  sk_department:
+    lineage:
+      - datalake_customer_support.calls.queue_name
+      - datalake_customer_support.chats.queue_name
+    description: Current department associated with the contact.
   sk_next_department:
     lineage:
-      - datalake_customer_support.calls.queue
-    description: Next queue, if exists
+      - datalake_customer_support.calls.queue_name
+      - datalake_customer_support.chats.queue_name
+    description: Next department associated with the contact, based on task creation time.
   sk_first_department:
     lineage:
-      - datalake_customer_support.calls.queue
-    description: First queue, if exists
+      - datalake_customer_support.calls.queue_name
+      - datalake_customer_support.chats.queue_name
+    description: First department associated with the contact, based on task creation time.
   sk_last_department:
     lineage:
-      - datalake_customer_support.calls.queue
-    description: Last queue, if exists
+      - datalake_customer_support.calls.queue_name
+      - datalake_customer_support.chats.queue_name
+    description: Last department associated with the contact, based on task creation time.
+  direction:
+    lineage:
+      - datalake_customer_support.calls.direction
+    description: Direction of the contact.
+    categories:
+      inbound: Contacts initiated by the customer
+      outbound: Contacts initiated by 5A
+  channel:
+    description: Communication channel of the contact (call or chat).
+  status:
+    description: Status of the interaction - represents how that interaction ended
+  worker_email:
+    lineage:
+      - datalake_customer_support.calls.worker_email
+      - datalake_customer_support.chats.worker_email
+    description: Email of the analyst
+  quinto_andar_phone_number:
+    lineage:
+      - datalake_customer_support.calls.to_phone_number
+      - datalake_customer_support.calls.from_phone_number
+      - datalake_customer_support.chats.twilio_phone_number
+    description: Phone number from 5A
+  customer_phone_number:
+    lineage:
+      - datalake_customer_support.calls.from_phone_number
+      - datalake_customer_support.calls.to_phone_number
+      - datalake_customer_support.chats.customer_phone_number
+    description: Customer phone number associated with the contact.
+  customer_email:
+    lineage:
+      - datalake_customer_support.chats.customer_email
+    description: Customer email associated with the contact.
   average_reply_time:
     lineage:
-      - datalake_customer_support.calls.average_reply_time
-    description: Average reply time for every agent on a task - considering all messages the agent exchanged with the customer.
-  total_queue_time:
-    lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_queue_time
-    description: Total time of the conversation spent in queue
+      - datalake_quinto_messenger.message.reply_time
+    description: Average reply time for the contact.
   total_talk_time:
     lineage:
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time
-    description: Total time of the conversation spent talking
+    description: Total talk time during the contact.
+  total_queue_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_queue_time
+    description: Total queue time during the contact.
   total_wrap_up_time:
     lineage:
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_wrap_up_time
-    description: Wrap up time is the time spent by the agent after it has talked to the customer
-  total_handling_time:
-    lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_handling_time
-    description: Total time spent by the agent handled the customer task. This is the sum of talk, queue and wrap up time
+    description: Total wrap-up time during the contact.
   total_waiting_time:
     lineage:
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_waiting_time
-    description: Total time the customer spent waiting for an agent
+    description: Total waiting time during the contact.
   first_reply_time:
     lineage:
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.first_reply_time
-    description: Time until the first reply of the agent
+      - datalake_customer_support.calls.waiting_time_sec
+    description: First reply time during the contact.
+  total_handling_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_handling_time
+    description: Total handling time during the contact.
+  is_per_team_task:
+    lineage:
+      - datalake_customer_support.chats.is_per_team_task
+    description: Flag that matches the 'per team' field from Twilio Flex Insights
   is_contact_answered:
     lineage:
       - datalake_customer_support.calls.is_call_answered
-    description: If the call or chat was answered
+    description: Indicates if the contact was answered.
   is_interaction_answered:
     lineage:
-      - datalake_customer_support.calls.is_call_answered
-    description: If the reservation or task for call or chat, respectively, was answered
-  is_per_team_task:
-    description:
-      Boolean attribute in a task that defines if it is transfer between differente departments. This value is used to
-      build the "segments per team" metric.
+      - datalake_customer_support.calls.is_reservation_answered
+    description: Indicates if the interaction was answered.
   is_first_interaction:
-    lineage:
-      - datalake_customer_support.calls.id_call
-      - datalake_customer_support.calls.id_ticket
-      - datalake_customer_support.calls.id_session
-    description: Boolean if the interaction is the first of it's contact
-  is_first_department_interaction:
-    lineage:
-      - datalake_customer_support.calls.id_call
-      - datalake_customer_support.calls.id_ticket
-      - datalake_customer_support.calls.id_session
-      - datalake_customer_support.calls.department
-    description: Boolean if in a contact, the interaction is the first of it's department
+    description: Indicates if this is the first interaction in the contact.
   is_last_interaction:
-    lineage:
-      - datalake_customer_support.calls.id_call
-      - datalake_customer_support.calls.id_ticket
-      - datalake_customer_support.calls.id_session
-    description: Boolean if the interaction is the last of it's contact
-  ts_reservation_created:
-    lineage:
-      - datalake_customer_support.calls.ts_created
-    description:
-      For Twilio Events, the creation timestamp of every 'reservation.created' event.
-      Only present in the 'chat' channel
+    description: Indicates if this is the last interaction in the contact.
+  is_first_department_interaction:
+    description: Indicates if this is the first interaction in the department for the contact.
   ts_task_created:
     lineage:
-      - datalake_customer_support.calls.ts_created
-    description: Timestamp of when the Twilio task was created
+      - datalake_customer_support.calls.ts_task_created
+      - datalake_customer_support.chats.ts_created
+    description: Timestamp when the task was created.
+  ts_reservation_created:
+    lineage:
+      - datalake_customer_support.calls.ts_reservation_created
+    description: Timestamp when the reservation was created.
+  ts_reservation_ended:
+    lineage:
+      - datalake_customer_support.calls.ts_reservation_ended
+    description: Timestamp when the reservation ended.
   ts_load:
-    description: Timestamp of when the data was loaded to the datalake
+    description: Timestamp when the contact data was loaded.

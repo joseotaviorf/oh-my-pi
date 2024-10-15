@@ -18,7 +18,7 @@ call_events AS (
     id_queue,
     id_worker,
     event_type,
-    direction,
+    LOWER(direction) AS direction,
     channel_type,
     bpo_name,
     queue_name,
@@ -26,7 +26,7 @@ call_events AS (
     from_phone_number,
     task_cancelation_reason,
     CASE
-      WHEN direction = 'outbound' THEN outbound_to_phone_number
+      WHEN LOWER(direction) = 'outbound' THEN outbound_to_phone_number
       ELSE to_phone_number
     END AS to_phone_number,
     MAX(waiting_time_sec) OVER(PARTITION BY id_reservation) AS waiting_time_sec,
