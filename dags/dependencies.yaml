@@ -2354,7 +2354,6 @@ bietlejuice.enrich_rede_lead_acquisition:
 bietlejuice.enrich_rede_lead_crawler:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
-  - bietlejuice.growth_lab:load-clean-supply-recurrence
 bietlejuice.enrich_rede_supply:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail-aud
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p-aud

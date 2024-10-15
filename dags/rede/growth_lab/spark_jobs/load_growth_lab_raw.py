@@ -120,8 +120,8 @@ def get_spark_dataframe_from_csv_content(csv_content: str) -> DataFrame:
 def create_date_partitions(df: DataFrame, execution_date_str: str) -> DataFrame:
     """Creates the columns year, month and day using the execution date"""
     
-    execution_date_str = datetime.strptime(args.execution_date, "%Y-%m-%d")
-    df = df.withColumn('execution_date', lit(execution_date_str))
+    execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
+    df = df.withColumn('execution_date', lit(execution_date))
 
     return (
         SparkDataFrameService()

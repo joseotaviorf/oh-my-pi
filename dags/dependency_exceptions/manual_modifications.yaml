@@ -505,6 +505,9 @@ bietlejuice.enrich_rede_company_event:
     - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   remove:
     - bietlejuice.enrich_hubspot:load-enrich-company
+bietlejuice.enrich_rede_lead_crawler:
+  remove:
+    - bietlejuice.growth_lab:load-clean-supply-recurrence
 bietlejuice.enrich_rede_supply:
   remove:
     - bietlejuice.ebdb_user:load-clean-user
