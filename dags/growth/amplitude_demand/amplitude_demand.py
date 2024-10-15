@@ -19,7 +19,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 SOURCE = "amplitude_demand"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "30 23 * * *"
+MAIN_SCHEDULE_INTERVAL = "00 23 * * *"
 CLUSTER_DESCRIPTION = "custom_cluster"
 
 EXECUTION_TIMEOUT_HOURS = 2
