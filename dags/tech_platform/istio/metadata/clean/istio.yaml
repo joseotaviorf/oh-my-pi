@@ -1,0 +1,46 @@
+database_name: datalake_access_logs_clean
+table_name: istio
+description: Table with Envoy access logs.
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  namespace:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+    description: Kubernetes namespace
+  pod_name:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+    description: Kubernetes pod name
+  traceId:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+    description: Request trace id
+  method:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+    description: Request method
+  user_agent:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+    description: Request user agent
+  path:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+    description: Request path
+  start_time:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+    description: Request start time
+  duration:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+    description: Request duration
+  response_flags:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+    description: Response Flags
+  response_code:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+    description: Response Code

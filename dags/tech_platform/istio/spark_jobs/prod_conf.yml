@@ -1,0 +1,1 @@
+path: s3://auditlogs.s3.sre.quintoandar.com.br/proxy/k8s.core-prd-*/{}/{}/{}/{}/istio-proxy.*/*/*.gz
