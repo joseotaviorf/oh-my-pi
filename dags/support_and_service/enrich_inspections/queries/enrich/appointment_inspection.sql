@@ -43,7 +43,7 @@ appointment_history AS (
 ),
 appointment_union AS (
     SELECT
-        MD5(CONCAT(b.id, 'PWD')) AS id_appointment,
+        MD5(CONCAT(b.id, 'PWA')) AS id_appointment,
         a.id_appointment AS id_is_appointment,
         b.id AS id_main_appointment,
         is.id_inspection,
