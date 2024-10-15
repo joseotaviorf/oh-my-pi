@@ -1,5 +1,5 @@
 dag:
-  name: inspections 
+  name: inspections
   schedule_start_date: 2021, 11, 30
   schedule_interval: 15 3 * * *
   owner: Data SS
@@ -20,8 +20,10 @@ workflow:
     appointment_aud:
       date_filter_column: updated_at
     appointment:
+      merge_on: ["id_appointment"]
       date_filter_column: updated_at
     assessment:
+      merge_on: ["id_assessment"]
       date_filter_column: updated_at
     budget:
       merge_on: ["id_budget"]
@@ -34,51 +36,72 @@ workflow:
     budget_approval_payment_preference_aud:
       date_filter_column: updated_at
     contestation_media:
+      merge_on: ["id_contestation_media"]
       date_filter_column: updated_at
     contestation:
+      merge_on: ["id_contestation"]
       date_filter_column: updated_at
     inspection_aud:
       date_filter_column: updated_at
     inspection:
+      merge_on: ["id_inspection"]
       date_filter_column: updated_at
     issue_type:
+      merge_on: ["id_issue_type"]
       date_filter_column: updated_at
     item_group_type:
+      merge_on: ["id_item_group_type"]
       date_filter_column: updated_at
     item_group:
+      merge_on: ["id_item_group"]
       date_filter_column: updated_at
     item_group_state:
+      merge_on: ["id"]
       date_filter_column: updated_at
     item_group_state_aud:
       date_filter_column: updated_at
     item_issue:
+      merge_on: ["id_item_issue"]
       date_filter_column: updated_at
     item_media:
+      merge_on: ["id_item_media"]
       date_filter_column: updated_at
     item_type:
+      merge_on: ["id_item_type"]
       date_filter_column: updated_at
     item:
+      merge_on: ["id_item"]
       date_filter_column: updated_at
     repair_request_media:
+      merge_on: ["id_repair_request_media"]
       date_filter_column: updated_at
     repair_request:
       merge_on: ["id_repair_request"]
       date_filter_column: updated_at
     repair_suggestion:
+      merge_on: ["id"]
       date_filter_column: updated_at
     repair_suggestion_aud:
       date_filter_column: updated_at
     review_media:
+      merge_on: ["id_review_media"]
       date_filter_column: updated_at
     review:
+      merge_on: ["id_review"]
       date_filter_column: updated_at
     reviewer_aud:
       date_filter_column: updated_at
     reviewer:
+      merge_on: ["id_reviewer"]
       date_filter_column: updated_at
     room_type:
+      merge_on: ["id_room_type"]
       date_filter_column: updated_at
     room:
+      merge_on: ["id_room"]
       date_filter_column: updated_at
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_12_2_med_general_cluster

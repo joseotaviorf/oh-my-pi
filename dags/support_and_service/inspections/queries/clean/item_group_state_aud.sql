@@ -27,6 +27,4 @@ SELECT
 FROM
     datalake_inspections_raw.item_group_state_aud
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+	MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

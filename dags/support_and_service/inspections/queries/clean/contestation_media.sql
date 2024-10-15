@@ -12,6 +12,4 @@ SELECT
 FROM
     datalake_inspections_raw.contestation_media
 WHERE
-    year = {year}
-    and month = {month}
-    and day = {day}
+	MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
