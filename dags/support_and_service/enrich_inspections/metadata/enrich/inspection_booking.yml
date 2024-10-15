@@ -36,10 +36,10 @@ columns:
       It is observed that the extra Assessments are identical, with no data distinction between them.
     lineage:
       - datalake_inspections_clean.assessment.id_assessment
-  id_booking:
+  id_appointment:
     description: Unique identifier of the inspection date and time schedule.
     lineage:
-      - datalake_inspections_clean.inspection_aud.id_schedule
+      - datalake_inspections_clean.appointment.id_appointment
       - datalake_inspections.main_inspection_booking.id_booking
   id_contract:
     description: Unique identifier of the contract related to the property to be inspected.

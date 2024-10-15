@@ -12,7 +12,7 @@ WITH union_inspection_history AS (
         i.id_previous_inspection,
         i.id_external,
         i.id_inspector,
-        i.id_schedule AS id_booking,
+        NULL AS id_booking,
         i.id_contract,
         i.id_client_side,
         GET_JSON_OBJECT(i.house, '$.id') AS id_house,
@@ -32,9 +32,11 @@ WITH union_inspection_history AS (
         NULL AS ts_first_synced
     FROM
         last_inspection_update AS i
+    WHERE
+        DATE(i.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
     UNION
     SELECT
-        i.id_inspection,
+        MD5(CONCAT(i.id_inspection, 'IS')) AS id_inspection,
         NULL AS id_previous_inspection,
         i.id_external,
         i.id_inspector,
@@ -55,9 +57,11 @@ WITH union_inspection_history AS (
         i.ts_first_synced
     FROM
         datalake_inspections.main_inspection_booking AS i
+    WHERE
+        DATE(i.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ),
 appointment_data AS (
-    SELECT 
+    SELECT
         *,
         dt_scheduled AS ts_booking_inspected_utc,
         dt_scheduled - INTERVAL 3 HOURS AS ts_booking_inspected_local_tz,
@@ -65,7 +69,7 @@ appointment_data AS (
         ts_created - INTERVAL 3 HOURS AS ts_booking_created_local_tz,
         IF(status = "CANCELLED", FIRST(ts_updated) OVER (PARTITION BY id_inspection ORDER BY ts_updated), NULL) AS ts_booking_cancelled_utc,
         IF(status = "CANCELLED", FIRST(ts_updated - INTERVAL 3 HOURS) OVER (PARTITION BY id_inspection ORDER BY ts_updated), NULL) AS ts_booking_cancelled_local_tz
-    FROM 
+    FROM
         datalake_inspections_clean.appointment
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
@@ -103,7 +107,7 @@ inspection_contract AS (
     GROUP BY 1, 2, 3, 4, 9
 ),
 repairs AS (
-    SELECT 
+    SELECT
         ins.id_inspection,
         ins.id_contract,
         rr.id_repair_request,
@@ -115,85 +119,85 @@ repairs AS (
         rr.is_finished,
         rr.is_exempted,
         rev2.reviewer_type = 'OWNER' AS is_exempted_by_owner,
-        CASE 
-          WHEN rr.is_finished = false AND rev2.reviewer_type = 'ADMIN' AND rr.is_exempted = true THEN true 
-          ELSE false 
+        CASE
+          WHEN rr.is_finished = false AND rev2.reviewer_type = 'ADMIN' AND rr.is_exempted = true THEN true
+          ELSE false
         END AS exempted_on_ar,
-        ROW_NUMBER() OVER (PARTITION BY id_repair_request ORDER BY rr.ts_updated DESC) AS rn 
-    FROM 
-        datalake_inspections_clean.repair_request AS rr 
-    LEFT JOIN 
-        datalake_inspections_clean.item_group AS ig 
+        ROW_NUMBER() OVER (PARTITION BY id_repair_request ORDER BY rr.ts_updated DESC) AS rn
+    FROM
+        datalake_inspections_clean.repair_request AS rr
+    LEFT JOIN
+        datalake_inspections_clean.item_group AS ig
           ON rr.id_item_group = ig.id_item_group
-    LEFT JOIN 
-        datalake_inspections_clean.room AS ro 
-          ON ro.id_room = ig.id_room 
-    LEFT JOIN  
-        datalake_inspections_clean.assessment AS asm 
-          ON asm.id_assessment = ro.id_assessment 
-    LEFT JOIN 
-        datalake_inspections_clean.inspection AS ins 
-          ON ins.id_inspection = asm.id_inspection 
-    LEFT JOIN 
-        datalake_inspections_clean.reviewer AS rev1 
-          ON rev1.id_reviewer = rr.id_reviewer 
-    LEFT JOIN 
-        datalake_inspections_clean.reviewer AS rev2 
+    LEFT JOIN
+        datalake_inspections_clean.room AS ro
+          ON ro.id_room = ig.id_room
+    LEFT JOIN
+        datalake_inspections_clean.assessment AS asm
+          ON asm.id_assessment = ro.id_assessment
+    LEFT JOIN
+        datalake_inspections_clean.inspection AS ins
+          ON ins.id_inspection = asm.id_inspection
+    LEFT JOIN
+        datalake_inspections_clean.reviewer AS rev1
+          ON rev1.id_reviewer = rr.id_reviewer
+    LEFT JOIN
+        datalake_inspections_clean.reviewer AS rev2
           ON rev2.id_reviewer = rr.id_granted_by
 ),
 repair_metrics AS (
-    SELECT 
+    SELECT
         id_contract,
         id_inspection,
-        COUNT(CASE 
-          WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1 
+        COUNT(CASE
+          WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
         END) AS total_tentant_repair_ar,
-        COUNT(CASE 
-          WHEN requester_type = 'OWNER' THEN 1 
+        COUNT(CASE
+          WHEN requester_type = 'OWNER' THEN 1
         END) AS repairs_added_by_owner_review,
-        COUNT(CASE 
-          WHEN is_exempted_by_owner = true THEN 1 
+        COUNT(CASE
+          WHEN is_exempted_by_owner = true THEN 1
         END) AS repairs_exempted_by_owner_review,
-        COUNT(CASE 
-          WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1 
-        END) + 
-          COUNT(CASE 
-            WHEN requester_type = 'OWNER' THEN 1 
-          END) - 
-            COUNT(CASE 
-              WHEN is_exempted_by_owner = true THEN 1 
-            END) AS total_tentant_repair_review, 
-        COUNT(CASE 
-          WHEN is_finished = true AND is_exempted = true THEN 1 
+        COUNT(CASE
+          WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
+        END) +
+          COUNT(CASE
+            WHEN requester_type = 'OWNER' THEN 1
+          END) -
+            COUNT(CASE
+              WHEN is_exempted_by_owner = true THEN 1
+            END) AS total_tentant_repair_review,
+        COUNT(CASE
+          WHEN is_finished = true AND is_exempted = true THEN 1
         END) AS repairs_exempted_ac,
         COUNT(
-          CASE 
-            WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1 
+          CASE
+            WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1
         END) AS repairs_absorbed_ac,
         COUNT(
-          CASE 
-            WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1 
-        END) + 
-            COUNT(CASE 
-              WHEN requester_type = 'OWNER' THEN 1 
-            END) - 
-              COUNT(CASE 
-                WHEN is_exempted_by_owner = true THEN 1 
-              END) - 
+          CASE
+            WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
+        END) +
+            COUNT(CASE
+              WHEN requester_type = 'OWNER' THEN 1
+            END) -
+              COUNT(CASE
+                WHEN is_exempted_by_owner = true THEN 1
+              END) -
                 COUNT(
-                  CASE 
-                    WHEN is_finished = true AND is_exempted = true THEN 1 
-                END) - 
-                  COUNT(CASE 
-                    WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1 
+                  CASE
+                    WHEN is_finished = true AND is_exempted = true THEN 1
+                END) -
+                  COUNT(CASE
+                    WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1
                   END) AS total_tentant_repair_ac
-    FROM 
+    FROM
         repairs
-    WHERE 
-        comment IS NOT NULL 
-        AND responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')  
+    WHERE
+        comment IS NOT NULL
+        AND responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
         AND rn = 1
-    GROUP BY 
+    GROUP BY
           1,2
 )
 SELECT DISTINCT
@@ -201,7 +205,7 @@ SELECT DISTINCT
     i.id_previous_inspection,
     i.id_external,
     a.id_assessment,
-    i.id_booking,
+    COALESCE(MD5(CONCAT(ad.id_appointment, 'IS')), i.id_booking) AS id_appointment,
     i.id_contract,
     i.id_client_side,
     i.id_house,

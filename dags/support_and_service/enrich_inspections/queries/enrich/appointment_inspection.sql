@@ -43,7 +43,8 @@ appointment_history AS (
 ),
 appointment_union AS (
     SELECT
-        a.id_appointment,
+        MD5(CONCAT(b.id, 'PWD')) AS id_appointment,
+        a.id_appointment AS id_is_appointment,
         b.id AS id_main_appointment,
         is.id_inspection,
         b.id_agent AS id_inspector,
@@ -76,7 +77,7 @@ appointment_union AS (
         YEAR(b.ts_updated) AS year,
         MONTH(b.ts_updated) AS month,
         DAY(b.ts_updated) AS day
-    FROM 
+    FROM
         datalake_ebdb_clean.booking AS b
     LEFT JOIN
         datalake_inspections_clean.appointment AS a
@@ -99,7 +100,8 @@ appointment_union AS (
         AND DATE(b.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
     UNION ALL
     SELECT
-        a.id_appointment,
+        MD5(CONCAT(a.id_appointment, 'IS')) AS id_appointment,
+        a.id_appointment AS id_is_appointment,
         a.id_external_appointment AS id_main_appointment,
         a.id_inspection,
         a.id_inspector,
@@ -152,6 +154,7 @@ inspection_data AS (
 )
 SELECT
     a.id_appointment,
+    a.id_is_appointment,
     a.id_main_appointment,
     a.id_inspection,
     a.id_inspector,

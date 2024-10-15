@@ -2,12 +2,17 @@
 database_name: datalake_inspections
 table_name: appointment_inspection
 description: |
-    Enrichment table that aims to store the processed inspection scheduling data. 
-    Each line of this table contains a scheduling record linked to the inspection process.
+  Enrichment table that aims to store the processed inspection scheduling data.
+  Each line of this table contains a scheduling record linked to the inspection process.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_appointment:
+    lineage:
+      - datalake_inspections_clean.appointment.id_appointment
+      - datalake_ebdb_clean.booking.id
+    description: scheduling identification key in hash format that groups the main and IS ids.
+  id_is_appointment:
     lineage:
       - datalake_inspections_clean.appointment.id_appointment
     description: Unique scheduling identification key in IS.
@@ -38,7 +43,7 @@ columns:
     lineage:
       - datalake_schedules_clean.appointment_history.category_name
     description: |
-      Descriptive information indicating who is responsible for the status in question. 
+      Descriptive information indicating who is responsible for the status in question.
       In the case of a cancelled inspection, this column indicates who cancelled it.
   status_description:
     lineage:

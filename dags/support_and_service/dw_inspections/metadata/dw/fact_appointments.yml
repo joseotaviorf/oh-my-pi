@@ -11,11 +11,10 @@ columns:
     description: Unique scheduling identification key in IS or main.
     lineage:
       - datalake_inspections.appointment_inspection.id_appointment
-      - datalake_inspections.appointment_inspection.id_main_appointment
   sk_is_appointment:
     description: Identification key for the appointment made in IS.
     lineage:
-      - datalake_inspections.appointment_inspection.id_appointment
+      - datalake_inspections.appointment_inspection.id_is_appointment
   sk_main_appointment:
     description: Identification key for the appointment made in main.
     lineage:
