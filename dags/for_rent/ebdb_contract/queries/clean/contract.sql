@@ -9,6 +9,7 @@ SELECT
     administrationFeeType_id AS id_administration_fee_type,
     contractVersion_id AS id_contract_version,
     correspondencia_estado_id AS id_mailing_state,
+    dadosBanco_bankAccountValidation_id AS id_bank_account_validation_bank_data,
     emailFatura AS invoice_email,
     observacao AS observation,
     valorAluguel AS rent,

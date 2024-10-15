@@ -31,6 +31,9 @@ columns:
   id_mailing_state:
     lineage:
       - datalake_ebdb_raw.contrato.correspondencia_estado_id
+  id_bank_account_validation_bank_data:
+    lineage:
+      - datalake_ebdb_raw.contrato.dadosBanco_bankAccountValidation_id
   invoice_email:
     lineage:
       - datalake_ebdb_raw.contrato.emailfatura
