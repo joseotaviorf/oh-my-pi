@@ -1,6 +1,6 @@
 dag:
   name: growth_lab
-  schedule_start_date: 2020-12-21
+  schedule_start_date: 2020, 12, 21
   schedule_interval: "0 2 * * *"
   owner: Data Rede
   documentation:
@@ -15,12 +15,13 @@ workflow:
     - "{environment}"
     - "{bucket}"
     - "{dag_name}"
+    - "{table_name}"
     - "{{ ds }}"
   tables_customization:
     supply_recurrence:
       extra_spark_job_arguments:
         - "growthlab-factory"
-        - "supply_recurrence/{yyyy_mm_dd}/supply_recurrence.csv"
+        - "supply_recurrence/{{ macros.ds_add(ds, 1) | replace('-', '_') }}/supply_recurrence.csv"
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:

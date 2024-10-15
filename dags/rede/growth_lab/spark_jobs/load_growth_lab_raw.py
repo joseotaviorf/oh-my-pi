@@ -98,10 +98,7 @@ def get_csv_content_from_gcp_bucket(storage_client: storage.Client, args: Namesp
     """Returns the content of the CSV file in the GCP bucket"""
 
     bucket = storage_client.get_bucket(args.gcp_bucket_name)
-    execution_date = datetime.strptime(args.execution_date, "%Y-%m-%d") + timedelta(days=1)
-    prefix = args.prefix_template.format(
-        yyyy_mm_dd=execution_date.strftime("%Y_%m_%d")
-    )
+    prefix = args.prefix_template
     blob = bucket.get_blob(prefix)
     if blob is None:
         logger.info(f"No CSV found in the bucket {args.gcp_bucket_name}, prefix={prefix}")
@@ -122,9 +119,9 @@ def get_spark_dataframe_from_csv_content(csv_content: str) -> DataFrame:
 
 def create_date_partitions(df: DataFrame, execution_date_str: str) -> DataFrame:
     """Creates the columns year, month and day using the execution date"""
-
-    execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
-    df = df.withColumn('execution_date', lit(execution_date))
+    
+    execution_date_str = datetime.strptime(args.execution_date, "%Y-%m-%d")
+    df = df.withColumn('execution_date', lit(execution_date_str))
 
     return (
         SparkDataFrameService()
