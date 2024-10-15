@@ -46,15 +46,6 @@ dim_date AS (
   WHERE 
     date <= current_date()
 ),
-rescisao AS (
-  SELECT DISTINCT 
-    id_propose
-  FROM 
-    datalake_rental_guarantee_platform_clean.delinquency
-  WHERE 
-    id_type in (2)
-    AND is_active
-),
 all_renewal AS (
   SELECT DISTINCT 
     id,
@@ -175,21 +166,19 @@ base_propose AS (
     p.sk_propose,
     p.is_direct_billing,
     p.dt_contract_started,
-    IF( r.id_propose IS NULL, 
-      dt_ended, 
-      p.dt_analyst_annulment_input
-    ) AS dt_ended,
-    DATE( dateadd( DAY, 5, DATE( CONCAT( CAST( YEAR( 
-      IF(
-        r.id_propose IS NULL, 
-        dt_ended, 
-        p.dt_analyst_annulment_input )
-    ) AS VARCHAR(10)), '-', CAST( MONTH( 
-      IF(
-        r.id_propose IS NULL,
-        dt_ended,
-        p.dt_analyst_annulment_input )
-      ) AS VARCHAR(10) ), '-', day( dt_contract_started ) ) ) ) )  AS dt_cancellation_limit,
+    p.dt_ended_official AS dt_ended,
+    IF(
+      DAY( dt_contract_started )
+      >
+      DAY(LAST_DAY( p.dt_ended_official ) ),
+      DATE( dateadd( DAY, 5, DATE( LAST_DAY( p.dt_ended_official ) ) ) ),
+      DATE( dateadd( DAY, 5, DATE( CONCAT( 
+        CAST( YEAR( p.dt_ended_official) AS VARCHAR(10) ), 
+        '-', 
+        CAST( MONTH( p.dt_ended_official) AS VARCHAR(10) ), 
+        '-', 
+        DAY( dt_contract_started ) 
+      ) ) ) ) ) AS dt_cancellation_limit,
     IF(
       pv.monthly_guarantee = 0,
       omie.monthly_value,
@@ -205,9 +194,6 @@ base_propose AS (
     pv.total_package_amount
   FROM 
     dw_velo.fact_velo_propose p
-  LEFT JOIN 
-    rescisao r
-    ON r.id_propose = p.sk_propose
   LEFT JOIN 
     dw_velo.dim_velo_junk djk 
     ON p.sk_propose_status = djk.sk_junk

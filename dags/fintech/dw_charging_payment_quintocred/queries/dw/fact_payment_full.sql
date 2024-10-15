@@ -601,7 +601,7 @@ SELECT DISTINCT
   IF(not_lf.sk_propose IS NOT NULL,
     TRUE,
     FALSE
-  ) AS is_free_living,
+  ) AS is_falsely_living_for_free,
   CASE 
     WHEN reason_expanded = 'DISMISS' 
     AND SAP_CLASS_LEVEL_B IN ( 'SEM FATURAMENTO', 'SEM FATURAMENTO - NO ATTEMPT' ) 

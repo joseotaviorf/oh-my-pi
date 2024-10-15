@@ -207,7 +207,7 @@ columns:
     description: ''
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.id_document
-  is_free_living:
+  is_falsely_living_for_free:
     description: ''
   is_ignore_dismiss:
     description: ''
