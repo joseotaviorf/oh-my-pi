@@ -8,7 +8,7 @@ WITH union_inspection_history AS (
             ia.ts_updated = FIRST(ia.ts_updated) OVER (PARTITION BY ia.id_inspection ORDER BY ia.ts_updated DESC)
     )
     SELECT
-        i.id_inspection AS id_inspection,
+        i.id_inspection,
         i.id_previous_inspection,
         i.id_external,
         i.id_inspector,
