@@ -1,6 +1,6 @@
 SELECT
     COALESCE(id_appointment, -1) AS sk_appointment,
-    COALESCE(id_is_appointment, -1) AS sk_is_appointment
+    COALESCE(id_is_appointment, -1) AS sk_is_appointment,
     COALESCE(id_main_appointment, -1) AS sk_main_appointment,
     COALESCE(id_inspection, -1) AS sk_inspection,
     COALESCE(id_inspector, -1) AS sk_inspector,
