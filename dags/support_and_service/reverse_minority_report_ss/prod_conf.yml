@@ -1,21 +1,23 @@
 ---
 dag_documentation:
-  dag_purpose:
-    This DAG is responsible for compiling a list of phone numbers from customers that contacted the Inside Sales
-    channel and sending these phone numbers to Minority Report
+  dag_purpose: This DAG is responsible for sending data from S&S models to Minority Report
 
-minority_request_header:
-  Content-Type: application/json
-
-batch_size: 100
-
-tables_to_send:
+tables:
+  bic_ss:
+    key_name: userId
+    type: CUSTOMER_DATA
+  inspector_performance:
+    key_name: agentIdr
+    type: INSPECTORS_PERFORMANCE
   phone_numbers:
     key_name: phoneNumber
     type: CUSTOMER_PHONE_NUMBER_WHITELIST
   pp_multi_assistants:
     key_name: phoneNumber
     type: CUSTOMER_PHONE_NUMBER_WHITELIST
+  bpo_performance:
+    key_name: csatKey
+    type: BPO_PERFORMANCE
 
 custom_cluster:
   autotermination_minutes: 20

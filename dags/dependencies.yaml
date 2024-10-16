@@ -3384,14 +3384,6 @@ bietlejuice.reverse_atlas_pricing_report_access:
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-engagement
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-listing-price-history
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-region
-bietlejuice.reverse_bic_ss:
-  - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
-  - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
-  - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
-bietlejuice.reverse_bpo_performance:
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
 bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
   - bietlejuice.enrich_superset:load-enrich-dashboards
@@ -3417,19 +3409,6 @@ bietlejuice.reverse_dsat_report_load:
   - bietlejuice.enrich_survicate:load-enrich-response-content
   - bietlejuice.enrich_survicate:load-enrich-survey-questions
   - bietlejuice.enrich_survicate:load-enrich-survey-responses
-bietlejuice.reverse_inside_sales_whitelist:
-  - bietlejuice.dw_contract:load-dw-rent-dim-contract
-  - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
-  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
-  - bietlejuice.dw_user:load-dw-public-dim-user
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
-  - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
-  - bietlejuice.enrich_olos_dialer:load-enrich-outbound-contact-attempts
-  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
-  - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
-bietlejuice.reverse_inspections:
-  - bietlejuice.enrich_inspections_metrics:load-enrich-inspector-performance
 bietlejuice.reverse_listings_report_access:
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-sent
@@ -3453,6 +3432,22 @@ bietlejuice.reverse_listings_report_load:
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
   - bietlejuice.dw_search_session_event:load-dw-public-dim-search-session-event-type
   - bietlejuice.dw_search_session_event:load-dw-public-fact-search-session-event
+bietlejuice.reverse_minority_report_ss:
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
+  - bietlejuice.dw_user:load-dw-public-dim-user
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_inspections_metrics:load-enrich-inspector-performance
+  - bietlejuice.enrich_landlord_journey:load-enrich-landlord-journey-step
+  - bietlejuice.enrich_olos_dialer:load-enrich-outbound-contact-attempts
+  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
+  - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
+  - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
 bietlejuice.reverse_nazare:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_house_temp:load-dw-house-dim-house

@@ -792,19 +792,12 @@ bietlejuice.reverse_atento_access:
     - bietlejuice.reverse_atento:load-reverse-tickets-transferred
     - bietlejuice.reverse_atento:load-reverse-tmr
     - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
-bietlejuice.reverse_bic_ss:
-  add:
-    - bietlejuice.enrich_tenant_journey:load-enrich-tenant-journey-step
-    - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
 bietlejuice.reverse_dashboard_governance:
   add:
     - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
     - bietlejuice.enrich_superset:load-enrich-slices
     - bietlejuice.enrich_superset:load-enrich-dashboards
     - bietlejuice.enrich_superset:load-enrich-tables
-bietlejuice.reverse_inspections:
-  add:
-    - bietlejuice.enrich_inspections_metrics:load-enrich-inspector-performance
 bietlejuice.reverse_ccv_price_report_load:
   # We will remove these dependencies because we will only run this DAG once a month. So we don't want to trigger it every time these tables below are updated.
   override: []
