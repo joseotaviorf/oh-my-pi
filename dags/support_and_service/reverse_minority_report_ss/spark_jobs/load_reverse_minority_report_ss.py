@@ -314,7 +314,7 @@ if __name__ == "__main__":
         max_workers=max_cores, initializer=initialize_worker, initargs=(local,)
     ) as executor:
         future_to_batch = {
-            executor.submit(send_batch_data, len(data_payloa), local, batch_number, batch): (
+            executor.submit(send_batch_data, len(data_payload), local, batch_number, batch): (
                 batch_number,
                 batch,
             )
