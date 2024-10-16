@@ -289,6 +289,8 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_satisfaction_rating:load-enrich-chat-fup-surveys
   - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
   - bietlejuice.enrich_support_users:load-enrich-analysts
+  - bietlejuice.enrich_support_users:load-enrich-zendesk-users
+  - bietlejuice.enrich_zendesk:load-enrich-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.reclameaqui:load-clean-tickets

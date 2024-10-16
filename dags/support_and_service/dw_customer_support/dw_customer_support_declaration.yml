@@ -80,6 +80,9 @@ workflow:
     fact_tickets_backlog:
       partitions: [dt_snapshot]
       z_order_by: [sk_ticket, sk_taxonomy, sk_department, sk_analyst]
+    fact_ticket_events:
+      partitions: [year, month, day]
+      extraction_type: incremental
 
 cluster:
   type: custom_cluster

@@ -1,0 +1,89 @@
+database_name: dw_customer_support
+table_name: dim_zendesk_user
+description:
+  Dimension table that contains context data of all users created in Zendesk
+  Support, including assignees, admins and external users
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_zendesk_user:
+    lineage:
+      - datalake_support_users.zendesk_users.id_user
+    description: Key of user that corresponds to the Zendesk user's ID
+  url_user:
+    lineage:
+      - datalake_support_users.zendesk_users.url_user
+    description: The user's Zendesk API URL
+  name:
+    lineage:
+      - datalake_support_users.zendesk_users.name
+    description: The name of the user registered in Zendesk
+  alias:
+    lineage:
+      - datalake_support_users.zendesk_users.alias
+    description: The alias displayed to end users
+  email:
+    lineage:
+      - datalake_support_users.zendesk_users.email
+    description:
+      The user's primary email address registered in Zendesk. For agents
+      and admins, this should be the business email address (@quintoandar.com.br domain).
+      For end-users, the email address corresponds to the one which is addressed to
+      the ticket created whether the channel is web or email (that may be either the
+      QA user's email or not)
+  phone:
+    lineage:
+      - datalake_support_users.zendesk_users.phone
+    description:
+      The primary phone number of the user (that may be either the QA user's
+      email or not)
+  time_zone:
+    lineage:
+      - datalake_support_users.zendesk_users.time_zone
+    description: The user's time zone
+  locale:
+    lineage:
+      - datalake_support_users.zendesk_users.locale
+    description:
+      A BCP-47 compliant tag for the user's locale that indicates the primary
+      language and region subtags
+  tags:
+    lineage:
+      - datalake_support_users.zendesk_users.tags
+    description: The user's tags if the account has user tagging is enabled
+  role:
+    lineage:
+      - datalake_support_users.zendesk_users.role
+    description:
+      The role of the user at Zendesk. It could be agent for our customer
+      support analysts or end-user if they are our customers or partners
+  cost_center:
+    lineage:
+      - datalake_support_users.zendesk_users.organization
+    description: User cost center
+  is_active:
+    lineage:
+      - datalake_support_users.zendesk_users.is_active
+    description: It is not active if the user has been deleted at Zendesk
+  is_shared_phone_number:
+    lineage:
+      - datalake_support_users.zendesk_users.is_shared_phone_number
+    description: Flag that indicates whether the phone number is shared or not
+  ts_last_login:
+    lineage:
+      - datalake_support_users.zendesk_users.ts_last_login
+    description: Timestamp of latest admin or agent's login event (UTC timezone)
+  ts_created:
+    lineage:
+      - datalake_support_users.zendesk_users.ts_created
+    description: Timestamp of the user register's creation event (UTC timezone)
+  ts_created_local:
+    lineage:
+      - datalake_support_users.zendesk_users.ts_created
+    description: Timestamp of the user register's creation event (UTC-3/Brasilia timezone)
+  ts_updated:
+    lineage:
+      - datalake_support_users.zendesk_users.ts_updated
+    description: Timestamp of the user register's update event (UTC timezone)
+  ts_load:
+    description: Timestamp of data load from database source (UTC timezone)
