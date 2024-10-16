@@ -30,7 +30,8 @@ SELECT
     MD5(CONCAT(i.id, 'PWA')) AS id_inspection,
     i.id AS id_external,
     i.id_user_inspector AS id_inspector,
-    MD5(CONCAT(i.id_booking, 'PWA')) AS id_booking,
+    i.id_booking,
+    MD5(CONCAT(i.id_booking, 'PWA')) AS id_appointment,
     i.id_contract,
     i.id_house,
     CASE
