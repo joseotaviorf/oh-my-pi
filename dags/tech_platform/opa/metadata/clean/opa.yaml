@@ -1,0 +1,78 @@
+database_name: datalake_access_logs_clean
+table_name: opa
+description: Table with OPA decision logs.
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  namespace:
+    lineage:
+      - s3_auditlogs_bucket/opa.namespace
+    description: Kubernetes namespace
+  pod_name:
+    lineage:
+      - s3_auditlogs_bucket/opa.pod_name
+    description: Kubernetes pod name
+  ts_event:
+    lineage:
+      - s3_auditlogs_bucket/opa.timestamp
+    description: Authorizer timestamp
+  bundles:
+    lineage:
+      - s3_auditlogs_bucket/opa.bundles
+    description: Authorizer bundle versions
+  id_decision:
+    lineage:
+      - s3_auditlogs_bucket/opa.decision_id
+    description: Authorizer decision_id
+  erased:
+    lineage:
+      - s3_auditlogs_bucket/opa.erased
+    description: Authorizer erased data
+  request_source_principal:
+    lineage:
+      - s3_auditlogs_bucket/opa.input.attributes.source.principal
+    description: Requesting service principal
+  request_traceparent:
+    lineage:
+      - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.traceparent
+    description: Traceparent
+  request_path:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.dynamic_metadata.parameterized_path
+    description: Request parameterized path
+  request_authorized_by:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.principalinfo.authorized_by
+    description: Request authorized by (user|service)
+  request_provided_roles:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.principalinfo.provided_roles
+    description: Request provided roles
+  result_allowed:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.allowed
+    description: Authorizer allowed
+  result_http_status:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.http_status
+    description: Authorizer return status code
+  principal_user_email:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.principalinfo.user.payload.email
+    description: User Principal Email
+  principal_user_provided_roles:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.principalinfo.user.provided_roles
+    description: User Roles provided by principal
+  principal_user_idp:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.principalinfo.user.providerId
+    description: Identity Provider
+  principal_service:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.principalinfo.service.payload.id
+    description: Service Principal
+  principal_service_provided_roles:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.principalinfo.service.provided_roles
+    description: Roles provided by service principal
