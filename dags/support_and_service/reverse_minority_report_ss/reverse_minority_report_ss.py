@@ -89,6 +89,7 @@ for table in tables.keys():
                     minority_report_endpoint,
                     tables[table]["type"],
                     tables[table]["key_name"],
+                    tables[table]["key_value"],
                     table,
                     "{{ ds }}",
                 ],

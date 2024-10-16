@@ -219,7 +219,7 @@ def create_data_payload(item):
         "keyName": key_name,
         "type": api_type,
     }
-    data["keyValue"] = item["id_user"]
+    data["keyValue"] = item[key_value]
     data["contextFields"] = get_payload_context_fields(api_type, item)
     return data
 
@@ -257,6 +257,7 @@ if __name__ == "__main__":
     parser.add_argument("minority_report_endpoint")
     parser.add_argument("api_type")
     parser.add_argument("key_name")
+    parser.add_argument("key_value")
     parser.add_argument("table_name")
     parser.add_argument("execution_date")
 
@@ -267,6 +268,7 @@ if __name__ == "__main__":
     minority_report_endpoint = args.minority_report_endpoint
     api_type = args.api_type
     key_name = args.key_name
+    key_value = args.key_value
     table_name = args.table_name
     execution_date = args.execution_date
 

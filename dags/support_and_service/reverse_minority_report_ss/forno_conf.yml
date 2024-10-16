@@ -5,18 +5,23 @@ dag_documentation:
 tables:
   bic_ss:
     key_name: userId
+    key_value: id_user
     type: CUSTOMER_DATA
   inspector_performance:
     key_name: agentIdr
+    key_value: id_inspector
     type: INSPECTORS_PERFORMANCE
-  phone_numbers:
+  inside_sales_whitelist:
     key_name: phoneNumber
+    key_value: phone_number
     type: CUSTOMER_PHONE_NUMBER_WHITELIST
-  pp_multi_assistants:
+  pp_multi_assistants_whitelist:
     key_name: phoneNumber
+    key_value: phone_number
     type: CUSTOMER_PHONE_NUMBER_WHITELIST
   bpo_performance:
     key_name: csatKey
+    key_value: key_csat
     type: BPO_PERFORMANCE
 
 custom_cluster:
