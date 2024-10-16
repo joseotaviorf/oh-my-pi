@@ -118,7 +118,11 @@ class Tables:
     source_union_condo = "vespucio_sources_delta.source_union_condo"
     source_iptu_condo = "vespucio_sources_delta.source_iptu_condo"
     source_ebdb_house = "vespucio_sources_delta.source_ebdb_house"
-    source_navent_houses = "vespucio_sources_delta.source_navent_houses"
+    """
+    Instead of using `vespucio_sources_delta.source_navent_houses` we must use `_composed` version, which is
+    recreated every pipeline run with the increase of blocklist statuses
+    """
+    source_navent_houses_composed = "vespucio_sources_delta.source_navent_houses_composed"
     source_union_houses = "vespucio_sources_delta.source_union_house"
     source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
     source_iptu_houses = "vespucio_sources_delta.source_iptu_house"
@@ -273,6 +277,14 @@ source_tasks = [
         ],
         task_id="zap_house",
     ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=navent_house_composed.sql",
+            f"--output_table={Tables.source_navent_houses_composed}",
+        ],
+        task_id="navent_house_composed",
+    ),
 ]
 
 # dbutils = BaseDBUtils().get_dbutils()
@@ -292,7 +304,7 @@ core_tasks = [
             f"--input_source_kodak_metadata_condos={Tables.source_kodak_metadata_condo}",
             f"--input_source_sindiconet_condos={Tables.source_sindiconet_condo}",
             f"--input_source_ebdb_houses={Tables.source_ebdb_house}",
-            f"--input_source_navent_houses={Tables.source_navent_houses}",
+            f"--input_source_navent_houses_composed={Tables.source_navent_houses_composed}",
             f"--input_source_union_houses={Tables.source_union_houses}",
             f"--overwrite_schema",
             f"--output_staged_condos={Tables.stage_step_condos}",
