@@ -3396,6 +3396,15 @@ bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_superset:load-enrich-dashboards
   - bietlejuice.enrich_superset:load-enrich-slices
   - bietlejuice.enrich_superset:load-enrich-tables
+bietlejuice.reverse_demand_score:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
+  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
+  - bietlejuice.dw_sale_ongoing_listings:load-dw-sale-fact-daily-ongoing-listing
+  - bietlejuice.enrich_booking:load-enrich-house-available-hours
+  - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
 bietlejuice.reverse_dsat_report_access:
   - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report
 bietlejuice.reverse_dsat_report_load:
