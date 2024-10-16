@@ -11,7 +11,7 @@ workflow:
     dim_booking:
       partitions: [country_code]
 cluster:
-  type: databricks_12_2_med_general_photon_cluster
+  type: databricks_13_3_med_memory_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
