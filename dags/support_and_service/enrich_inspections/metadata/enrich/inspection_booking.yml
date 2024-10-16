@@ -38,6 +38,8 @@ columns:
       - datalake_inspections_clean.assessment.id_assessment
   id_booking:
     description: Identification key for scheduling the inspection on the main.
+    lineage:
+      - datalake_inspections_clean.inspection_aud.id_schedule
   id_appointment:
     description: Scheduling identification key in hash format that groups the main and IS ids.
     lineage:
