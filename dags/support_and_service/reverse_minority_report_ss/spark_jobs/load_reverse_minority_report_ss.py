@@ -203,7 +203,7 @@ def get_payload_context_fields(api_type, item):
             "has_published_listings": item.get("has_published_listings"),
             "whitelist_group": item.get("whitelist_group"),
         }
-    elif api_type == 'INSPECTOR_PERFORMANCE':
+    elif api_type == 'INSPECTORS_PERFORMANCE':
         return {
             "inspectionsConversion": item.get("inspections_conversion"),
             "eligibleInspections": item.get("eligible_inspections"),
