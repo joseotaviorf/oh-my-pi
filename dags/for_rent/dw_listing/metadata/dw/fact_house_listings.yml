@@ -1,42 +1,54 @@
 database_name: dw_rent
 table_name: fact_house_listings
-description: Information about events that happened during a house listing's lifetime.
+description:
+  Information about events that happened during a house listing's lifetime.
   Each line is a house listing identified by the sk_house_listing, followed by information related to its events.
 domain: For Rent
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   sk_house_listing:
     lineage:
-    - datalake_ebdb_listing.house_listing.id_house_listing
+      - datalake_ebdb_listing.house_listing.id_house_listing
     description: Key of house listing.
   sk_next_house_listing_rented:
     lineage:
-    - datalake_listing_contracts.listing_contracts.id_house_listing
-    description: Key of the next house listing with a valid contract, that is, a contract with status 'Ativo' or 'Finalizado'.
+      - datalake_listing_contracts.listing_contracts.id_house_listing
+    description:
+      Key of the next house listing with a valid contract, that is, a contract with status 'Ativo' or 'Finalizado'.
       This column was created to help to identify the next sk house listing because the sk_house_listing + 1 won't work with all the cases.
   sk_next_house_listing:
     lineage:
-    - datalake_listing_contracts.listing_contracts.id_house_listing
-    description: Key of the next published house listing and the rental wasn't extended.
+      - datalake_listing_contracts.listing_contracts.id_house_listing
+    description:
+      Key of the next published house listing and the rental wasn't extended.
       This column was created to help to identify the next sk house listing because the sk_house_listing + 1 won't work with all the cases.
       Due to the early demand, if a termination is canceled and the listing was published, a new version is created but it won't have a contract associated to it
       and the contract will continue.
+  sk_next_house_listing_consolidated:
+    lineage:
+      - datalake_listing_contracts.listing_contracts.id_house_listing
+      - datalake_ebdb_listing.house_listing.id_house_listing
+    description: Key of the next published house listing.
+      This column is the consolidated of the sk_next_house_listing and sk_next_house_listing_rented columns,
+      prioritizing the sk_next_house_listing_rented, but if it's -1, then it will get the value of sk_next_house_listing column,
+      if it's also -1, then the value of this column will be -1, that's it, the listing doesn't have a valid next listing.
   sk_owner:
     lineage:
-    - datalake_ebdb_listing.house.id_user
-    description: Key of user who's the house owner/responsible, the key can be the
+      - datalake_ebdb_listing.house.id_user
+    description:
+      Key of user who's the house owner/responsible, the key can be the
       partner's user.
   sk_region:
     lineage:
-    - datalake_ebdb_listing.house.id_region
+      - datalake_ebdb_listing.house.id_region
     description: Key of region where house listing is located in.
   sk_user_registration:
     lineage:
-    - datalake_ebdb_listing.house.id_user_registrant
+      - datalake_ebdb_listing.house.id_user_registrant
     description: Key of user who created the house listing.
   sk_contract:
     lineage:
-    - datalake_listing_contracts.listing_contracts.id_contract
+      - datalake_listing_contracts.listing_contracts.id_contract
     description: Key of rental contract for house listing. In this table, we'll only have contracts that the status is active or finished.
   sk_previous_contract:
     lineage:
@@ -48,63 +60,73 @@ columns:
     description: Key of the listing's next contract.
   sk_condo:
     lineage:
-    - datalake_ebdb_clean.condo.id
+      - datalake_ebdb_clean.condo.id
     description: Key of condominum building where house listing is located.
   sk_user_partner_agent:
     lineage:
-    - datalake_ebdb_clean.partner_agent.id_user
-    description: If house listing was added by a partner, key of user who's the partner's
+      - datalake_ebdb_clean.partner_agent.id_user
+    description:
+      If house listing was added by a partner, key of user who's the partner's
       agent. So if this key and sk_owner are equal, then the sk_owner is actually
       from the partner.
   sk_partner:
     lineage:
-    - datalake_ebdb_clean.partner_agent.id_partner
+      - datalake_ebdb_clean.partner_agent.id_partner
     description: If house listing was added by a partner, key of partner.
   sk_autonomous_agent:
     lineage:
-    - datalake_ebdb_clean.partner_agent.id_user
-    description: Key of autonomous agent user described at datalake_ebdb_clean.partner_agent
+      - datalake_ebdb_clean.partner_agent.id_user
+    description:
+      Key of autonomous agent user described at datalake_ebdb_clean.partner_agent
       table.
   sk_user_consultant:
     lineage:
-    - datalake_big_agent.house_rent_listing_consultant.id_user
+      - datalake_big_agent.house_rent_listing_consultant.id_user
     description: User key of consultant.
   sk_company_supply:
     lineage:
-    - datalake_rede_company.company_sks.sk_company
+      - datalake_rede_company.company_sks.sk_company
     description: Key of the Rede company that owns the house. Can be joined with dw_rede.dim_company.
   sk_stranded_date:
     lineage:
-    - datalake_ebdb_listing.house_listing.dt_stranded
-    description: Key of listing stranded date. A listing is considered stranded after
+      - datalake_ebdb_listing.house_listing.dt_stranded
+    description:
+      Key of listing stranded date. A listing is considered stranded after
       at least 8 week published and no contract signed.
   country_code:
     lineage:
-    - datalake_ebdb_listing.house.country_code
+      - datalake_ebdb_listing.house.country_code
     description: Country code of the listing.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
   days_listing_to_contract_signed:
-    description: Number of days between the listing's publication and the signature
+    description:
+      Number of days between the listing's publication and the signature
       of a rental contract for the listing.
   days_listing_to_depublication:
-    description: Number of days between the listing's publication and the depublication
+    description:
+      Number of days between the listing's publication and the depublication
       of the listing.
   days_ended_rental_to_relisting:
-    description: Number of days between the end of the rental contract for the listing.
+    description:
+      Number of days between the end of the rental contract for the listing.
       and the relisting
   days_relisting_to_re_rental:
-    description: Number of days between the relisting and a new rental contract for
+    description:
+      Number of days between the relisting and a new rental contract for
       the listing.
   days_ended_rental_to_re_rented:
-    description: Number of days between the end of the rental contract and a new rental.
+    description:
+      Number of days between the end of the rental contract and a new rental.
       contract for the listing
   nr_renting:
-    description: Number of different rental contracts that have been signed for the
+    description:
+      Number of different rental contracts that have been signed for the
       house, including the current contract if exists.
   order_renting:
-    description: The position of this rent contract among all contracts this house
+    description:
+      The position of this rent contract among all contracts this house
       already had.
   ts_load:
     description: Timestamp of when data was loaded.

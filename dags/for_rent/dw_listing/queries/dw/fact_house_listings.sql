@@ -55,7 +55,7 @@ house_listing_not_extended AS (
   FROM
     datalake_ebdb_listing.house_listing
   WHERE
-    has_termination_canceled = FALSE 
+    has_termination_canceled = FALSE
 ),
 lbc AS (
   SELECT
@@ -92,6 +92,7 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   hl.id_house_listing AS sk_house_listing,
   COALESCE(hlc.id_next_house_listing_rented, -1) AS sk_next_house_listing_rented,
   COALESCE(hlne.id_next_house_listing, -1) AS sk_next_house_listing,
+  COALESCE(hlc.id_next_house_listing_rented, hlne.id_next_house_listing, -1) AS sk_next_house_listing_consolidated,
   COALESCE(h.id_user, -1) AS sk_owner,
   COALESCE(h.id_region, -1) AS sk_region,
   COALESCE(h.id_user_registrant, -1) AS sk_user_registration,
@@ -155,7 +156,7 @@ LEFT JOIN
     AND hlco.is_last_ciq_on_listing = True
 LEFT JOIN
   datalake_rede_company.company_sks AS cs
-    ON h.is_rent_3p_supply 
+    ON h.is_rent_3p_supply
     AND ((
       h.uuid_company IS NOT NULL
       AND h.uuid_company = cs.uuid_company
