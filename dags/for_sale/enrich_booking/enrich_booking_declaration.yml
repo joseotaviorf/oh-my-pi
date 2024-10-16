@@ -3,7 +3,7 @@ dag:
   name: enrich_booking
   schedule_start_date: 2020, 7, 1
   owner: Data ForSale
-  documentation: 
+  documentation:
     dag_purpose: |
       Creates the enriched tables for the context `Booking` enriched from EBDB and gsheets.
       It'll track the user journey end to end with information about all booking status, changes, and the tenants.
@@ -14,9 +14,9 @@ workflow:
 cluster:
   type: custom_cluster
   custom_configurations:
-    driver_node_type_id: m5a.xlarge
+    driver_node_type_id: r5a.xlarge
     node_type_id: c5d.9xlarge
     num_workers: 2
     aws_attributes:
       availability: ON_DEMAND
-    spark_version: 12.2.x-scala2.12
+    spark_version: 13.3.x-scala2.12
