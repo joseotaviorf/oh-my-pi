@@ -5,8 +5,8 @@ description:
   Table extracted from the São Paulo City Hall website.It has all the records of
   transactions that were subject to the ITBI tax (Imposto de Transmissão de Bens Imóveis).
   The ingestion of ITBI BH data occurs on the 15th and 30th of each month.
-domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+domain: Growth
+owner: data-growth@quintoandar.com.br
 columns:
   iptu_sql_registration_number:
     lineage:

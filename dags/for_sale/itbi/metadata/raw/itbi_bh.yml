@@ -1,6 +1,0 @@
----
-database_name: datalake_itbi_raw
-table_name: itbi_bh
-description: ITBI - Belo Horizonte
-domain: For Sale
-owner: data-for-sale@quintoandar.com.br / guilherme.ventura@quintoandar.com.br

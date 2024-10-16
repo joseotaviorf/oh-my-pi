@@ -1,11 +1,13 @@
 ---
 tables:
   itbi_sp:
-    is_incremental: false
+    partition_cols: ["year", "month"]
     source:
-      site_download_page_url: "https://www.prefeitura.sp.gov.br/cidade/secretarias/fazenda/acesso_a_informacao/index.php?p=31501"
-      format: ".xlsx"
-      blacklist_urls:
+      base_url: "https://capital.sp.gov.br"
+      diff_year: 1
+      site_download_page_url: "/web/fazenda/w/acesso_a_informacao/31501"
+      format: "xlsx"
+      blocklist_urls:
         [
           "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2006.xlsx",
           "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2007.xlsx",

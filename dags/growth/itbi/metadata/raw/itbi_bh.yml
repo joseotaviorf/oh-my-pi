@@ -1,0 +1,6 @@
+---
+database_name: datalake_itbi_raw
+table_name: itbi_bh
+description: ITBI - Belo Horizonte
+domain: Growth
+owner: data-growth@quintoandar.com.br / andre.melo@quintoandar.com.br

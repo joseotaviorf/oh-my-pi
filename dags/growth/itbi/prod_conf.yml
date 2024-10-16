@@ -2,13 +2,14 @@
 dag_documentation:
   dag_purpose: |
     This DAG imports "Imposto de Transmissão de Bens Imóveis (ITBI)" information
-    from the public websites of São Paulo and Belo Horizonte cities.
+    from the public websites (https://capital.sp.gov.br/web/fazenda/w/acesso_a_informacao/31501)
+    of São Paulo and Belo Horizonte cities.
 custom_libraries:
   - pypi:
       package: openpyxl
 tables:
   itbi_sp:
-    is_incremental: false
+    is_incremental: True
   itbi_bh:
     is_incremental: false
 clean_partition_cols: ["year", "month"]
