@@ -2230,6 +2230,7 @@ bietlejuice.enrich_people_public:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.enrich_hr_system:load-enrich-managers
+  - bietlejuice.gsheets_people:done-clean-position-class
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
   - bietlejuice.hr_system:load-clean-organizations
 bietlejuice.enrich_pixar:

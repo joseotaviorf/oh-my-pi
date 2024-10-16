@@ -64,6 +64,7 @@ SELECT
   assignment_cte.manager_name,
   assignment_cte.manager_email,
   UPPER(assignment_cte.assignment_name) AS assignment_name,
+  pc.position_class AS job_class,
   assignment_cte.assignment_status_type,
   assignment_cte.business_unit_name,
   assignment_cte.cost_center_name,
@@ -94,7 +95,10 @@ LEFT JOIN
   assignment_cte
     ON employee.id_assignment = assignment_cte.id_assignment
 LEFT JOIN
+  datalake_gsheets_clean.position_class pc
+    ON UPPER(pc.position) = UPPER(assignment_cte.assignment_name)
+LEFT JOIN
   datalake_gsheets_clean.team_formation_product_tech sheets
     ON sheets.assignment_number = employee.assignment_number
-WHERE 
+WHERE
   employee.assignment_number NOT LIKE 'P%'
