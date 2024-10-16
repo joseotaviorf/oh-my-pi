@@ -9,7 +9,7 @@ daily_tof_metrics AS (
     CAST(NULL AS STRING) AS referral_type, 
     CAST(NULL AS STRING) AS utm_campaign, 
     CAST(NULL AS STRING) AS utm_term,
-    fdtof.utm_content,
+    CAST(NULL AS STRING) AS utm_content,
     fdtof.content_page,
     LOWER(fdtof.business_context) AS business_context,
     fdtof.funnel_side,
@@ -75,68 +75,36 @@ daily_prospect_metrics AS (
   WHERE 
     DATE(fdpe.ts_event) BETWEEN DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
   GROUP BY ALL
-), 
-daily_costs_metrics AS ( 
-  SELECT
-    dd.date, 
-    dc.country_code, 
-    dc.city_group, 
-    NULL AS operation_channel, 
-    NULL AS referral_type, 
-    NULL AS platform, 
-    dc.campaign_name AS utm_campaign,
-    dc.utm_term,
-    dc.utm_content,
-    CAST(NULL AS STRING) AS content_page,
-    LOWER(dc.business_context) AS business_context,
-    dc.funnel_side, 
-    dc.campaign_business_context, 
-    dc.campaign_strategy_intent, 
-    dc.behavior_type, 
-    dc.medium, 
-    dc.source,
-    dd.year,
-    dd.month,
-    dd.day,
-    SUM(dc.total_cost) AS cost
-  FROM 
-    datalake_growth_costs.daily_costs AS dc
-    INNER JOIN dw_public.dim_date AS dd 
-      ON dd.sk_date = dc.id_date
-  WHERE 
-    DATE(dd.date) BETWEEN DATE_SUB(MAKE_DATE({year},{month},{day}), 14) AND DATE(MAKE_DATE({year},{month},{day}))
-    AND LOWER(funnel_side) IN ('demand', 'branding')
-  GROUP BY ALL
 )
 SELECT
-  COALESCE(t.date, p.date, c.date) AS dt_event,
-  COALESCE(t.country_code, p.country_code, c.country_code) AS country_code,
-  COALESCE(t.city_group, p.city_group, c.city_group) AS city_group,
-  COALESCE(t.operation_channel, p.operation_channel, c.operation_channel) AS operation_channel,
-  COALESCE(t.referral_type, p.referral_type, c.referral_type) AS referral_type,
-  COALESCE(t.platform, p.platform, c.platform) AS platform,
-  COALESCE(t.utm_term, p.utm_term, c.utm_term) AS utm_term,
-  COALESCE(t.utm_content, p.utm_content, c.utm_content) AS utm_content,
-  COALESCE(t.content_page, p.content_page, c.content_page) AS content_page,
-  COALESCE(t.utm_campaign, p.utm_campaign, c.utm_campaign) AS utm_campaign,
-  COALESCE(t.business_context, p.business_context, c.business_context) AS business_context,
-  COALESCE(t.funnel_side, p.funnel_side, c.funnel_side) AS funnel_side,
-  COALESCE(t.campaign_business_context, p.campaign_business_context, c.campaign_business_context) AS campaign_business_context,
-  COALESCE(t.behavior_type, p.behavior_type, c.behavior_type) AS behavior_type,
-  COALESCE(t.campaign_strategy_intent, p.campaign_strategy_intent, c.campaign_strategy_intent) AS campaign_strategy_intent,
-  COALESCE(t.medium, p.medium, c.medium) AS medium,
-  COALESCE(t.source, p.source, c.source) AS source,
+  COALESCE(t.date, p.date) AS dt_event,
+  COALESCE(t.country_code, p.country_code) AS country_code,
+  COALESCE(t.city_group, p.city_group) AS city_group,
+  COALESCE(t.operation_channel, p.operation_channel) AS operation_channel,
+  COALESCE(t.referral_type, p.referral_type) AS referral_type,
+  COALESCE(t.platform, p.platform) AS platform,
+  COALESCE(t.utm_term, p.utm_term) AS utm_term,
+  COALESCE(t.utm_content, p.utm_content) AS utm_content,
+  COALESCE(t.content_page, p.content_page) AS content_page,
+  COALESCE(t.utm_campaign, p.utm_campaign) AS utm_campaign,
+  COALESCE(t.business_context, p.business_context) AS business_context,
+  COALESCE(t.funnel_side, p.funnel_side) AS funnel_side,
+  COALESCE(t.campaign_business_context, p.campaign_business_context) AS campaign_business_context,
+  COALESCE(t.behavior_type, p.behavior_type) AS behavior_type,
+  COALESCE(t.campaign_strategy_intent, p.campaign_strategy_intent) AS campaign_strategy_intent,
+  COALESCE(t.medium, p.medium) AS medium,
+  COALESCE(t.source, p.source) AS source,
   t.tof_users,
   t.tof_users_rede,
   t.tof_events,
   t.tof_events_rede,
   p.new_prospects,
   p.recovered_prospects,
-  p.flows,
-  c.cost,
-  COALESCE(t.year, p.year, c.year) AS year,
-  COALESCE(t.month, p.month, c.month) AS month,
-  COALESCE(t.day, p.day, c.day) AS day,
+  p.flows,  
+  CAST(NULL AS STRING) AS cost,
+  COALESCE(t.year, p.year) AS year,
+  COALESCE(t.month, p.month) AS month,
+  COALESCE(t.day, p.day) AS day,
   NOW() AS ts_load
 FROM 
   daily_tof_metrics t 
@@ -157,20 +125,3 @@ FROM
     AND t.campaign_strategy_intent = p.campaign_strategy_intent
     AND t.medium = p.medium
     AND t.source = p.source
-  FULL OUTER JOIN daily_costs_metrics c
-    ON t.date = c.date
-    AND t.city_group = c.city_group
-    AND t.operation_channel = c.operation_channel
-    AND t.referral_type = c.referral_type
-    AND t.platform = c.platform
-    AND t.utm_term = c.utm_term
-    AND t.utm_content = c.utm_content
-    AND t.content_page = c.content_page
-    AND t.utm_campaign = c.utm_campaign
-    AND t.business_context = c.business_context
-    AND t.funnel_side = c.funnel_side
-    AND t.campaign_business_context = c.campaign_business_context
-    AND t.behavior_type = c.behavior_type
-    AND t.campaign_strategy_intent = c.campaign_strategy_intent
-    AND t.medium = c.medium
-    AND t.source = c.source

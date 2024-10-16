@@ -772,10 +772,6 @@ bietlejuice.enrich_viva_real_crawler_listings:
 bietlejuice.enrich_zap_imoveis_crawler_listings:
   remove:
     - bietlejuice.listings.zap_imoveis:load-clean-zap-imoveis
-bietlejuice.metric_growth__demand:
-  remove:
-    - bietlejuice.enrich_growth_manual_daily_costs:load-enrich-daily-costs
-    - bietlejuice.enrich_growth_automatic_daily_costs:load-enrich-daily-costs
 bietlejuice.reverse_atento_access:
   add:
     - bietlejuice.reverse_atento:load-reverse-backlog-metric
