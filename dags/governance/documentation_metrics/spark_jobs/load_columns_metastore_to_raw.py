@@ -81,9 +81,13 @@ def list_metastore_databases(spark_client, schemas_skip_list):
         spark_client.get_records("SHOW DATABASES")
         .where(
             """databaseName not like '%_staging%'
-               and databaseName not like 'temp_%'
-               and databaseName not like 'igorgatis%'
-               """
+            and databaseName not like '%_temp%'
+            and (databaseName like 'datalake_%'
+            or databaseName like 'dw_%'
+            or databaseName like 'metric_%'
+            or databaseName like 'reverse_%'
+            or databaseName = 'sandbox')
+            """
         )
         .collect()
     )
