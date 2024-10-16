@@ -316,7 +316,6 @@ table_block_list:
   - Portability
   - Portability_AUD
   - WorkContract
-  - ProcessedMessage
   - CategoryImovel_AUD
   - CategoriesTag
   - CategoriesTag_AUD

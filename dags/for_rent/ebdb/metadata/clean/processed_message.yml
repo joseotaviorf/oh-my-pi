@@ -1,0 +1,12 @@
+database_name: datalake_ebdb_clean
+table_name: processed_message
+columns:
+  id_subscriber:
+    lineage:
+      - datalake_ebdb_raw.processedmessage.subscriber_id
+  id_message:
+    lineage:
+      - datalake_ebdb_raw.processedmessage.message_id
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.processedmessage.created_at
