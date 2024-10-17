@@ -20,6 +20,9 @@ columns:
   franchise_type:
     lineage:
       - datalake_atta_raw.franquia.tpfranquia
+  fowarding:
+    lineage:
+      - datalake_atta_raw.franquia.despachante
   fowarding_type:
     lineage:
       - datalake_atta_raw.franquia.despachante

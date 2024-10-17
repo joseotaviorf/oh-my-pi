@@ -5,6 +5,7 @@ SELECT
     Nome AS franchise_name,
     CategoriaFranquia AS franchise_category,
     TpFranquia AS franchise_type,
+    despachante AS fowarding,
     CASE
         WHEN despachante IS FALSE THEN 'retail'
         WHEN despachante IS TRUE THEN 'hubs'
