@@ -1,0 +1,30 @@
+dag:
+  name: wall_street
+  schedule_start_date: 2020, 12, 21
+  schedule_interval: 0 6 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG creates the full tables for Wall Street, a hub that integrates with financial servide providers.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_wall_street_into_datalake
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+  default_extraction_type: full
+  tables_customization:
+    charge_aud: {}
+    chargemundipagg:
+      clean_table_name: charge_mundipagg
+    charge: {}
+    subscription: {}
+    credittcard: {}
+    store: {}
+cluster:
+  type: databricks_12_2_med_general_cluster
+  custom_libraries:
+    - jar: "{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"

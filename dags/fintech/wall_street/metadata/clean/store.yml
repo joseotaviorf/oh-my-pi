@@ -1,0 +1,18 @@
+---
+database_name: datalake_wall_street_clean
+table_name: store
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_wall_street_raw.store.id
+  secret:
+    lineage:
+    - datalake_wall_street_raw.store.secret
+  description:
+    lineage:
+    - datalake_wall_street_raw.store.description
+  secret_hook:
+    lineage:
+    - datalake_wall_street_raw.store.secretHook

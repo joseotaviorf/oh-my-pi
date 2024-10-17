@@ -23,10 +23,12 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
+    parser.add_argument("table_name")
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
     source = args.source
+    table_name = args.table_name
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -51,20 +53,19 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(metastore_service)
 
-    for table in tables:
-        df = mysql_consumer.get_data_from_table(table.table_name)
-        # the table names in the datalake must be lowercase
-        s3_loader.load_full_table(
-            df=df,
-            database_name=database_name,
-            table_name=table.table_name.lower(),
-            format_options=format_options,
-            database_location=database_location,
-        )
-        spark_metastore_loader.update_metastore(
-            df,
-            database_name,
-            table.table_name.lower(),
-            format_options,
-            database_location,
-        )
+    df = mysql_consumer.get_data_from_table(table_name)
+    # the table names in the datalake must be lowercase
+    s3_loader.load_full_table(
+        df=df,
+        database_name=database_name,
+        table_name=table_name.lower(),
+        format_options=format_options,
+        database_location=database_location,
+    )
+    spark_metastore_loader.update_metastore(
+        df,
+        database_name,
+        table_name.lower(),
+        format_options,
+        database_location,
+    )

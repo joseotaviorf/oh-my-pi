@@ -1,0 +1,33 @@
+---
+database_name: datalake_wall_street_clean
+table_name: creditcard
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_wall_street_raw.creditcard.id
+  token:
+    lineage:
+    - datalake_wall_street_raw.creditcard.token
+  first_six_digits:
+    lineage:
+    - datalake_wall_street_raw.creditcard.firstSixDigits
+  last_four_digits:
+    lineage:
+    - datalake_wall_street_raw.creditcard.lastFourDigits
+  holder_name:
+    lineage:
+    - datalake_wall_street_raw.creditcard.holderName
+  holder_document:
+    lineage:
+    - datalake_wall_street_raw.creditcard.holderDocument
+  brand:
+    lineage:
+    - datalake_wall_street_raw.creditcard.brand
+  expiration_month:
+    lineage:
+    - datalake_wall_street_raw.creditcard.expirationMonth
+  expiration_year:
+    lineage:
+    - datalake_wall_street_raw.creditcard.expirationYear
