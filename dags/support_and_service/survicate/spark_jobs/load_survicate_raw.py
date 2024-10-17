@@ -190,7 +190,7 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
                 layer=LayerEnum.RAW,
                 query=None,
                 partitions=partition_cols,
-                ).load_and_register(df, format_options, force_recreate)
+                ).load_and_register(unioned_df, format_options, force_recreate)
     else:
        logger.warning(
                 f"""
