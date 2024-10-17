@@ -193,7 +193,7 @@ df_final AS (
         END AS status,
         IF(sap.hash IS NULL OR sap_gateway.id_feature IS NULL, FALSE, TRUE) AS is_completeness_compliance,
         source_amount,
-        sap.account_number,
+        df.account_number,
         debit_credit AS sap_amount,
         dt_source_trigger,
         dt_sap_created,

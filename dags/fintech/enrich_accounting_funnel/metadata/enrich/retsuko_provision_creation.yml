@@ -46,9 +46,7 @@ columns:
       - datalake_accounting_funnel.ledger.debit_credit
     description: "Provision that was created in SAP"
   account_number:
-    lineage:
-      - datalake_accounting_funnel.ledger.account_number
-    description: "Account Number from SAP"
+    description: "Account Number that was model based on bill-item from source"
   is_completeness_compliance:
     lineage:
       - datalake_accounting_funnel.ledger.hash

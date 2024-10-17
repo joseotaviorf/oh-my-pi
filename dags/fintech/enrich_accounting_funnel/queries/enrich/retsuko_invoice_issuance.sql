@@ -57,6 +57,11 @@ retsuko_pre AS (
         nf.id_invoice AS id_original,
         'seu barriga' AS source_name,
         CASE
+            WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN '31101.02.01'
+            WHEN e.bill_item = 'entry.bill-item/brokerage-quinto-andar' THEN '31101.01.01'
+            WHEN e.bill_item = 'entry.bill-item/brokerage-installment-fee' THEN '31101.01.16'
+        END AS revenue_account,
+        CASE
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN 'adm fee'
             WHEN e.bill_item = 'entry.bill-item/brokerage-quinto-andar' THEN 'brokerage quinto andar'
             WHEN e.bill_item = 'entry.bill-item/brokerage-installment-fee' THEN 'brokerage installment fee'
@@ -104,7 +109,7 @@ retsuko_pre AS (
     AND DATE(i.ts_created) >= '2024-01-01'
     AND NOT(ct.landlord_legal_person = 'physical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
     GROUP BY
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 12
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13
     HAVING
         SUM(amount) != 0
 ),
@@ -118,6 +123,10 @@ retsuko_pos AS (
         e.id_external AS id_entity,
         CAST(NULL AS INT) AS id_original,
         'seu barriga' AS source_name,
+        CASE
+            WHEN e.bill_item = 'entry.bill-item/service-fee' THEN '31101.05.01'
+            WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN '31101.02.01'
+        END AS revenue_account,
         CASE
             WHEN e.bill_item = 'entry.bill-item/service-fee' THEN 'service fee'
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN 'adm fee'
@@ -169,7 +178,7 @@ retsuko_pos AS (
     AND af.type IN ('contract', 'tenant','landlord')
     AND at.type IN ('contract', 'tenant','landlord')
     GROUP BY
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 12
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13
     HAVING
         SUM(amount) != 0
 ),
@@ -297,7 +306,7 @@ pre_df AS (
         r.id_finance_entity,
         r.id_finance_entity_entry,
         r.accounting_version AS version,
-        s.account_number,
+        r.revenue_account AS account_number,
         source_name,
         r.revenue_name,
         accrual_year_month,
