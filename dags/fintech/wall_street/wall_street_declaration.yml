@@ -17,13 +17,18 @@ workflow:
     - "{table_name}"
   default_extraction_type: full
   tables_customization:
-    charge_aud: {}
-    chargemundipagg:
+    Charge_AUD:
+      clean_table_name: charge_aud
+    ChargeMundipagg:
       clean_table_name: charge_mundipagg
-    charge: {}
-    subscription: {}
-    credittcard: {}
-    store: {}
+    Charge:
+      clean_table_name: charge
+    Subscription:
+      clean_table_name: subscription
+    CreditCard:
+      clean_table_name: creditcard
+    Store:
+      clean_table_name: store
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:
