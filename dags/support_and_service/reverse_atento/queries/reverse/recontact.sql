@@ -14,7 +14,7 @@ WITH front_tickets_list AS (
       WHEN ft.ticket_origin IN ('call inbound', 'chat5a') THEN 'INBOUND'
       WHEN ft.ticket_origin = 'call outbound' THEN 'OUTBOUND'
       ELSE UPPER(dc.direction)
-    END AS refined_direction
+    END AS refined_direction,
     dd.team,
     dd.department,
     dd.journey_step,
