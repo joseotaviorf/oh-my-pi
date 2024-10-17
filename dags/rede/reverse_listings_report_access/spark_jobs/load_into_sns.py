@@ -68,12 +68,11 @@ def load_table_into_sns(
     """
 
     df = spark.table(f"{database_name}.{table_name}")
-    # filtered_df = df.filter(
-    #     (df.year == execution_date.year)
-    #     & (df.month == execution_date.month)
-    #     & (df.day == execution_date.day)
-    # ).drop("year", "month", "day")
-    filtered_df = df.drop("year", "month", "day")
+    filtered_df = df.filter(
+        (df.year == execution_date.year)
+        & (df.month == execution_date.month)
+        & (df.day == execution_date.day)
+    ).drop("year", "month", "day")
     message_contents = filtered_df.collect()
     messages = [
         {"event_type": event_type, "payload": row.asDict()} for row in message_contents
