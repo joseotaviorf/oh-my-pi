@@ -6,269 +6,273 @@ domain: fintech
 description: null
 columns:
   sk_propose:
-    description: ''
+    description: 'Propose identification number (ID)'
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.id_business_entity
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_theoretical
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_charge
   sk_propose_theoretical:
-    description: ''
+    description: 'Propose identification number (ID) for the theoretical revenue'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_theoretical
   sk_propose_charge:
-    description: ''
+    description: 'Propose identification number (ID) that has a transaction payment or a delinquency'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_charge
   sk_propose_payment:
-    description: ''
+    description: 'Propose identification number (ID) that has a transaction payment'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_payment
   sk_transaction:
-    description: ''
+    description: 'Transaction payment identification number (ID)'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_transaction
   sk_delinquency:
-    description: ''
+    description: 'Delinquency identification number (ID), a delinquency is categorized based on how long the payment has been overdue'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_delinquency
   sk_array_delinquency:
-    description: ''
+    description: 'Identifier (ID) all active delinquencies relating to the proposal for a given month'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_array_delinquency
   sk_propose_nf:
-    description: ''
+    description: 'Propose identification number (ID) that has an invoice'
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.id_business_entity
   sk_propose_delinquency:
-    description: ''
+    description: 'Propose identification number (ID) that has a delinquency'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.sk_propose_delinquency
   id_document:
-    description: ''
+    description: 'Invoice document id'
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.id_document
   id_array_document_canceled:
-    description: ''
+    description: 'All invoice document id canceled'
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.id_array_document_canceled
   gateway_final:
-    description: ''
+    description: 'Payment or delinqunecy gateway for the proposal for the month. Possible returns: BILLING DIRETO, CREDIT_CARD, DELINQUENCY, PIXAR, ANNUAL_CREDIT_CARD, DELINQUENCY_RENEWAL, vivendo de graça, ASAAS Anual, ASAAS RAW, ASAAS, IUGU'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.gateway_final
   LEVEL_A:
-    description: ''
+    description: 'Clustering that classifies whether it is within the contract life period'
   LEVEL_B:
-    description: ''
+    description: 'Clustering that classifies whether the contract was charged or not in the month analyzed'
   LEVEL_C:
-    description: ''
+    description: 'Clustering that classifies whether the contract had payment or delinquency in the month analyzed'
   LEVEL_D:
-    description: ''
+    description: 'Clustering that classifies whether the contract had delinquency in the month analyzed'
   LEVEL_E:
-    description: ''
-  reason:
-    description: ''
-  reason_expanded:
-    description: ''
+    description: 'Clustering that classifies whether the contract had delinquency paid or not in the month analyzed'
+  reason_expanded_portuguese:
+    description: 'Description of clustering in Portuguese'
+  reason_expanded_english:
+    description: 'Description of clustering in english'
   status_at_ref:
-    description: ''
+    description: 'Propose status (FINALIZADO, ATIVO) in relation to the month analyzed'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.status_at_ref
   mob_of_life:
-    description: ''
+    description: 'number of months of propose life'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.mob_of_life
   mob_of_death:
-    description: ''
+    description: 'number of months of propose death'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.mob_of_death
   status_payment:
-    description: ''
+    description: 'Payment status. Possible returns: OVERDUE, EXPIRED, PAID_AFTER_DUE_DATE, CHARGEBACK, IMPROPER_BILLING, REFUNDED, REVERSED, SUCCESS, RECEIVED, WRITTEN_DOWN, SCHEDULED_REVERSAL, PAID, REFUND_PROCESSING, PROCESSING, REFUSED, RECEIVED_IN_CASH, OPEN, PENDING, CONFIRMED'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.status_payment
   gateway_payment:
-    description: ''
+    description: 'Payment gateway for the proposal for the month. Possible returns: BILLING DIRETO, CREDIT_CARD, PIXAR, ANNUAL_CREDIT_CARD, ASAAS Anual, ASAAS RAW, ASAAS, IUGU'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.gateway_payment
   billing_type_payment:
-    description: ''
+    description: 'Payment billing type. Possible returns: CREDIT_CARD, ANNUAL_CREDIT_CARD, BOLETO, DEBIT_CARD, PIX, UNDEFINED'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.billing_type_payment
   status_delinquency:
-    description: ''
+    description: 'Delinquency status. Possible returns: REGISTERED, FINISHED,UNDER_AGREEMENT, RECOVERING, REQUESTED_AGREEMENT, PROGRESS, FORGIVEN'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.status_delinquency
   gateway_delinquency:
-    description: ''
+    description: 'Delinquency classification between DELINQUENCY or DELINQUENCY_RENEWAL'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.gateway_delinquency
   hash:
-    description: ''
+    description: 'Invoice hash'
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.hash
   sap_class:
-    description: ''
+    description: 'Classification according to the number of existing invoices (cancelled and not canceled). Possible returns: SEM FATURAMENTO, SINGLE FATURAMENTO, FATURAMENTO DUPLICADO'
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.sap_class
   SAP_CLASS_LEVEL_A:
-    description: ''
+    description: 'Possible returns:SEM FATURAMENTO, SEM FATURAMENTO - NO ATTEMPT, SINGLE FATURAMENTO, FATURAMENTO DUPLICADO'
   SAP_CLASS_LEVEL_A2:
-    description: ''
+    description: 'Possible returns:SEM FATURAMENTO, SINGLE FATURAMENTO, FATURAMENTO DUPLICADO'
   SAP_CLASS_LEVEL_B:
-    description: ''
+    description: 'Possible returns:SEM FATURAMENTO, SEM FATURAMENTO - NO ATTEMPT, SINGLE FATURAMENTO - MISMATCH VALUES, SINGLE FATURAMENTO - SUCESS VALUES, FATURAMENTO DUPLICADO'
   monthly_timeline_renewal:
-    description: ''
+    description: 'Propose monthly guarantee value for the month analyzed based on the Renewal table'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.monthly_timeline_renewal
   monthly_timeline_propose_aud:
-    description: ''
+    description: 'Propose monthly guarantee value for the month analyzed based on the Propose table'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.monthly_timeline_propose_aud
   monthly_value_propose:
-    description: ''
+    description: 'Propose monthly guarantee value most up-to-date on Propose table'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.monthly_value_propose
   annual_timeline_renewal:
-    description: ''
+    description: 'Propose annual guarantee value for the month analyzed based on the Renewal table'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.annual_timeline_renewal
   annual_timeline_propose_aud:
-    description: ''
+    description: 'Propose annual guarantee value for the month analyzed based on the Propose table'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.annual_timeline_propose_aud
   annual_value_propose:
-    description: ''
+    description: 'Propose annual guarantee value most up-to-date on Propose table'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.annual_value_propose
   value:
-    description: ''
+    description: 'Billing amount in Payment table'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.value
   value_paid:
-    description: ''
+    description: 'Billing amount paid in Payment table'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.value_paid
   total_amount_delinquency:
-    description: ''
+    description: 'Total value for the delinquency actives'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.total_amount_delinquency
   delinquency_monthly_value:
-    description: ''
+    description: 'Monthly value for the delinquency active or not active'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.delinquency_monthly_value
   delinquency_amount_paid_monthly:
-    description: ''
+    description: 'Monthly value paid for the delinquency active or not active'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.delinquency_amount_paid_monthly
   total_paid_delinquency:
-    description: ''
+    description: 'Total paid value for the delinquency active'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.total_paid_delinquency
   open_amount_delinquency:
-    description: ''
+    description: 'Mensal open value (delinquency amount - paid amount) for the delinquency active or not active'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.open_amount_delinquency
   total_open_amount_delinquency:
-    description: ''
+    description: 'Total open value for all delinquencies active in the month analyzed.'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.total_open_amount_delinquency
   discount_value_delinquency:
-    description: ''
+    description: 'Mensal discount over the delinquency active or not active'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.discount_value_delinquency
   total_discount_value_delinquency:
-    description: ''
+    description: 'Total discount over the delinquency active or not active'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.total_discount_value_delinquency
-  qty_total:
-    description: ''
+  qty_nf_total:
+    description: 'Total number of invoices (cancelled and not canceled)'
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.qty_total
-  qty_success:
-    description: ''
+  qty_nf_success:
+    description: 'Number of invoices not canceled'
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.qty_success
   qty_nf_canceled:
-    description: ''
+    description: 'Number of invoices canceled'
     lineage:
     - datalake_accounting_funnel.ledger.id_document
   total_value_cancellation:
-    description: ''
+    description: 'Total value of canceled invoices'
     lineage:
     - datalake_accounting_funnel.ledger.debit
   sap_amount:
-    description: ''
+    description: 'Total value of canceled  and not canceled invoices'
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.sap_amount
   is_nf_canceled:
-    description: ''
+    description: 'Is invoice canceled, returning true or false'
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.id_document
   is_cancelled_num:
-    description: ''
+    description: 'Is invoice canceled, returning 1 if positive and 0 if negative.'
     lineage:
     - dw_charging_payment_quintocred.fact_accounting_funnel.id_document
   is_falsely_living_for_free:
-    description: ''
+    description: 'Flag that marks if the proposal is classified as free living, but it is not a month that the propose lived for free.'
   is_ignore_dismiss:
-    description: ''
+    description: 'Flag that checks if the charge is out of contract life period'
   is_charged_on_contract_period:
-    description: ''
+    description: 'Flag that marks if the propose has charge (payment or delinquency) on propose life period.'
   is_payment_charge_correct_amount:
-    description: ''
+    description: 'Flag that checks whether the amount charged is between 8% and 12% of the package value'
   is_retroactive_charging:
-    description: ''
+    description: 'Flag that checks whether the date of creation of the charge is after the month of charge'
   is_overdue:
-    description: ''
+    description: 'Flag that checks if charge payment is overdue'
   is_delinquency_active:
-    description: ''
+    description: 'Flag that checks if delinquecy is current active'
   is_delinquency_charge_related:
-    description: ''
+    description: 'Flag that checks if there is a payment charge for the same month as the delinquency'
   month:
-    description: ''
+    description: 'Month analyzed'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_propose_life
     - dw_charging_payment_quintocred.fact_accounting_funnel.accrual_year_month
   month_propose_life:
-    description: ''
+    description: 'Month that is within the propose life period'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_propose_life
   month_chargeble:
-    description: ''
+    description: 'Month that meets the business rules to consider it eligible for charge'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_chargeble
   month_charge:
-    description: ''
+    description: 'Month in which there is a charge on payment or delinquency active'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_charge
   month_due_original:
-    description: ''
+    description: 'Month of delinquency due date'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_due_original
   month_delinquency_due:
-    description: ''
+    description: 'Month of delinquency due date. If it is an annual delinquency, it will be a monthly due date.'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_delinquency_due
   dt_contract_started:
-    description: ''
+    description: 'Contract start date'
+    lineage:
+    - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_contract_started
+  year_month_nf:
+    description: 'Month and year of the invoice'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_contract_started
   dt_ended:
-    description: ''
+    description: 'Contract end date'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_ended
   dt_created_payment:
-    description: ''
+    description: 'Charge creation date'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_created_payment
   dt_due_payment:
-    description: ''
+    description: 'Charge due date'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_due_payment
   dt_paid_payment:
-    description: ''
+    description: 'Charge payment date'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_paid_payment
   dt_paid_delinquency:
-    description: ''
+    description: 'Delinquency payment date'
     lineage:
     - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_paid_delinquency
