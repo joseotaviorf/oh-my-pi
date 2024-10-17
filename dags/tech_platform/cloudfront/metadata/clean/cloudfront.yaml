@@ -1,0 +1,59 @@
+database_name: datalake_access_logs_clean
+table_name: cloudfront
+description: Table with Cloudfront logs.
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  ts_event:
+    lineage:
+      - s3_cloudfront_bucket/date
+      - s3_cloudfront_bucket/time
+    description: Request start time
+  request_duration_s:
+    lineage:
+      - s3_cloudfront_bucket/time-taken
+    description: Request duration
+  edge_locaction:
+    lineage:
+      - s3_cloudfront_bucket/x-edge-location
+    description: Edge location (where the request was handled by cloudfront)
+  principal_ip:
+    lineage:
+      - s3_cloudfront_bucket/c-ip
+    description: Principal IP
+  principal_port:
+    lineage:
+      - s3_cloudfront_bucket/c-port
+    description: Principal Port
+  request_method:
+    lineage:
+      - s3_cloudfront_bucket/cs-method
+    description: Request method
+  request_host:
+    lineage:
+      - s3_cloudfront_bucket/cs(Host)
+    description: Request host
+  request_path:
+    lineage:
+      - s3_cloudfront_bucket/cs-uri-stem
+    description: Request path
+  request_user_agent:
+    lineage:
+      - s3_cloudfront_bucket/cs(User-Agent)
+    description: Request user agent
+  request_query:
+    lineage:
+      - s3_cloudfront_bucket/cs-uri-query
+    description: Request query
+  response_status:
+    lineage:
+      - s3_cloudfront_bucket/sc-status
+    description: Response status
+  request_result_type:
+    lineage:
+      - s3_cloudfront_bucket/x-edge-result-type
+    description: Result type (hit|miss, for cache)
+  id_request:
+    lineage:
+      - s3_cloudfront_bucket/x-edge-request-id
+    description: Request ID
