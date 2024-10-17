@@ -1,0 +1,54 @@
+dag:
+  name: reverse_listings_report_access
+  schedule_start_date: 2022,7,12
+  owner: Data Rede
+workflow:
+  type: access
+  layer: reverse
+  custom_schema: listings_report
+  load_spark_job: load_into_sns
+  spark_job_arguments:
+    - "{dag_name}"
+    - "reverse_listings_report" # Database name
+    - "{table_name}"
+    - "{{ ds }}"
+  tables_customization:
+    sale_listing_traffic:
+      extra_spark_job_arguments:
+        - NEW_LISTING_TRAFFIC
+    sale_listing_published:
+      extra_spark_job_arguments:
+        - NEW_LISTING_PUBLISHED
+    sale_ongoing_listings:
+      extra_spark_job_arguments:
+        - ONGOING_LISTINGS
+    sale_listing_visit_scheduled:
+      extra_spark_job_arguments:
+        - NEW_LISTING_VISIT_SCHEDULED
+    sale_listing_visit_confirmed:
+      extra_spark_job_arguments:
+        - NEW_LISTING_VISIT_CONFIRMED
+    sale_listing_offer_sent:
+      extra_spark_job_arguments:
+        - NEW_LISTING_OFFER_SENT
+    sale_listing_offer_accepted:
+      extra_spark_job_arguments:
+        - NEW_LISTING_OFFER_ACCEPTED
+    sale_listing_signed_contract:
+      extra_spark_job_arguments:
+        - NEW_LISTING_SIGNED_CONTRACT
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    autotermination_minutes: 20
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        first_on_demand: 1
+        spot_bid_price_percent: 100
+        zone_id: us-east-1d
+        availability: SPOT_WITH_FALLBACK
+        ebs_volume_size: 200
+        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"

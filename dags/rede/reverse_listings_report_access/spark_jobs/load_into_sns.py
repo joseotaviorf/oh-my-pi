@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from datetime import datetime, date
 from typing import Tuple
 import boto3
-
+from bietlejuice.services import ConfigurationService
 from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_into_sns"
@@ -15,9 +15,11 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def main():
-    database_name, table_name, event_type, sns_topic_arn, execution_date = (
+    dag_name, database_name, table_name, event_type, execution_date = (
         parse_arguments()
     )
+    config_service = ConfigurationService(dag_name)
+    sns_topic_arn = config_service.get_config("sns_topic_arn")
     logger.info(
         f"""m=__main__, database_name={database_name}, table_name={table_name},
         event_type={event_type}, sns_topic_arn={sns_topic_arn}, execution_date={execution_date}"""
@@ -31,28 +33,27 @@ def main():
 def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     """
     Parse the arguments passed to the job.
-    Returns a tuple with the database name, table name, event type, ARN of the SNS topic and execution date.
+    Returns a tuple with the DAG name, database name, table name, event type, and execution date.
     """
 
     parser = ArgumentParser(description=JOB_NAME)
-
+    parser.add_argument("dag_name", help="Name of the DAG")
     parser.add_argument("database_name", help="Name of the database where the table is")
     parser.add_argument("table_name", help="Name of the table to be loaded")
-    parser.add_argument("event_type", help="Type of event to be sent to SNS")
-    parser.add_argument("sns_topic_arn", help="ARN of the SNS topic")
     parser.add_argument(
         "execution_date", help="Date of the execution in the format YYYY-MM-DD"
     )
+    parser.add_argument("event_type", help="Type of event to be sent to SNS")
 
     args = parser.parse_args()
 
+    dag_name = args.dag_name
     database_name = args.database_name
     table_name = args.table_name
     event_type = args.event_type
-    sns_topic_arn = args.sns_topic_arn
     execution_date = datetime.fromisoformat(args.execution_date)
 
-    return database_name, table_name, event_type, sns_topic_arn, execution_date
+    return dag_name, database_name, table_name, event_type, execution_date
 
 
 def load_table_into_sns(
