@@ -9,6 +9,7 @@ SELECT
     available_costs,
     paid_costs,
     seller_payment_status,
+    customer_follow_up,
     started_at AS ts_started,
     ended_at AS ts_ended,
     end_prevision_at AS ts_prevision_ended,

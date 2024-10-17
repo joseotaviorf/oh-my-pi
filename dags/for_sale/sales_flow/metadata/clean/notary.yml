@@ -32,6 +32,9 @@ columns:
   seller_payment_status:
     lineage:
       - datalake_sales_flow_raw.notary.seller_payment_status
+  customer_follow_up:
+    lineage:
+      - datalake_sales_flow_raw.notary.customer_follow_up
   ts_started:
     lineage:
       - datalake_sales_flow_raw.notary.started_at
