@@ -287,7 +287,7 @@ SELECT DISTINCT
     i.ts_updated,
     YEAR(i.ts_updated) AS year,
     MONTH(i.ts_updated) AS month,
-    DAY(i.ts_updated) AS month
+    DAY(i.ts_updated) AS day
 FROM
     union_inspection_history AS i
 LEFT JOIN
