@@ -1,4 +1,4 @@
-database_name: dw_customer_support_test
+database_name: dw_customer_support
 table_name: dim_ticket
 description: Dimension table that contains data on tickets created in Zendesk Support
 domain: Support and Service
@@ -73,6 +73,21 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.custom_fields
     description: custom_fields column as a MAP
+  score:
+    lineage:
+      - datalake_zendesk.tickets_current.score
+    description:
+      The customer satisfaction ratings that is sent to end-user requesters
+      by an email after the ticket has been set to solved that asks them to briefly
+      evaluate their experience
+  reason:
+    lineage:
+      - datalake_zendesk.tickets_current.reason
+    description: The reason for the rating given by the requester in a follow-up question
+  comment:
+    lineage:
+      - datalake_zendesk.tickets_current.comment
+    description: Additional (and optional) comment received with the rating
   has_public_comments:
     lineage:
       - datalake_zendesk.tickets_current.has_public_comments

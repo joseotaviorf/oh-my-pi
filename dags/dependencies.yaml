@@ -296,10 +296,6 @@ bietlejuice.dw_customer_support:
   - bietlejuice.reclameaqui:load-clean-tickets
   - bietlejuice.sauron:load-clean-session
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
-bietlejuice.dw_customer_support_test:
-  - bietlejuice.enrich_customer_support:load-enrich-calls
-  - bietlejuice.enrich_zendesk:load-enrich-tickets-current
-  - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.dw_data_quality:
   - bietlejuice.enrich_data_quality:load-enrich-validations
 bietlejuice.dw_datamarts_for_rent:
