@@ -8,10 +8,16 @@ WITH front_tickets_list AS (
     ft.sk_taxonomy,
     da.agent_organization,
     COALESCE(da.email, da2.email) AS email,
+    ft.channel,
+    CASE
+      WHEN ft.ticket_origin = 'call inapp' THEN UPPER(dc.direction)
+      WHEN ft.ticket_origin IN ('call inbound', 'chat5a') THEN 'INBOUND'
+      WHEN ft.ticket_origin = 'call outbound' THEN 'OUTBOUND'
+      ELSE UPPER(dc.direction)
+    END AS refined_direction
     dd.team,
     dd.department,
     dd.journey_step,
-    dc.channel,
     ft.ticket_origin,
     dt.theme,
     dt.theme_detail,
@@ -28,9 +34,13 @@ WITH front_tickets_list AS (
     LAG(dt.theme) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_taxonomy,
     LAG(da.email) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_email,
     LAG(ft.csat_score) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_csat,
-    DATE_DIFF(DATE(ft.ts_started), LAG(DATE(ft.ts_started)) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started)) AS days_since_last_contact,
+    DATE_DIFF(
+      DAY,
+      LAG(DATE(ft.ts_started)) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started),
+      DATE(ft.ts_started)
+    ) AS days_since_last_contact,
     LAG(ft.ts_started) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS ts_started_previous_contact,
-    DATE_SUB(ft.ts_started, 3) AS search_window_from,
+    DATE_ADD(DAY, -3, ft.ts_started) AS search_window_from,
     ft.ts_started
   FROM
     dw_customer_support.fact_ticket AS ft
@@ -43,18 +53,17 @@ WITH front_tickets_list AS (
   LEFT JOIN
     dw_customer_support.dim_taxonomy AS dt
       ON ft.sk_taxonomy = dt.sk_taxonomy
-  LEFT JOIN 
+  LEFT JOIN
     dw_customer_support.dim_agent as da
-        ON ft.sk_last_agent = da.sk_agent
-    LEFT JOIN 
-      dw_customer_support.dim_agent as da2
-          ON ft.sk_last_agent = da2.sk_agent_twilio
+      ON ft.sk_last_agent = da.sk_agent
+  LEFT JOIN
+    dw_customer_support.dim_agent as da2
+      ON ft.sk_last_agent = da2.sk_agent_twilio
   WHERE
     ft.sk_user IS NOT NULL
     AND dd.area = 'CX'
     AND ft.front_or_back = 'front'
-    AND ( (dc.channel = 'chat' AND dc.direction = 'inbound')
-        OR (ft.ticket_origin IN ('call inbound', 'call inapp')) )
+  AND ft.channel IN ('call', 'chat')
 ),
 tbl_completion_reason AS (
   SELECT
@@ -63,8 +72,8 @@ tbl_completion_reason AS (
   FROM
     dw_customer_support.fact_segment AS fs
   WHERE
-    fs.is_last_segment = True
-  GROUP BY ALL
+    fs.is_last_segment = TRUE
+  GROUP BY 1
 ),
 recontact_check AS (
   SELECT
@@ -89,7 +98,7 @@ recontact_check AS (
     sk_ticket_previous_contact,
     ts_started_previous_contact,
     previous_contact_channel,
-    COALESCE(flag_last_completion_reason_idled,0) AS flag_last_completion_reason_idled,
+    COALESCE(flag_last_completion_reason_idled, 0) AS flag_last_completion_reason_idled,
     previous_contact_taxonomy,
     csat_score,
     previous_contact_csat,
@@ -102,19 +111,19 @@ recontact_check AS (
     sk_ticket_contact_later,
     total_minutes_handling_time_previous_contact,
     CAST(sk_user AS STRING) || '-' ||
-        CASE
-        WHEN department IN (
-          'CX Mudança [FRONT] [POS]',
-          'CX Parceiros Compra e Venda [FRONT]',
-          'CX Parceiros [FRONT] [PRE]',
-          'CX Parceiros da Portaria [FRONT] [PRE]',
-          'CX Propostas [FRONT] [PRE]',
-          'CX Visitas [FRONT] [PRE]',
-          'Consultores imobiliários 5A',
-          'CX Pagamentos [FRONT] [POS]',
-          'CX Reparos [FRONT] [POS]',
-          'CX Rescisão [FRONT] [POS]')
-          THEN 'front'
+    CASE
+      WHEN department IN (
+        'CX Mudança [FRONT] [POS]',
+        'CX Parceiros Compra e Venda [FRONT]',
+        'CX Parceiros [FRONT] [PRE]',
+        'CX Parceiros da Portaria [FRONT] [PRE]',
+        'CX Propostas [FRONT] [PRE]',
+        'CX Visitas [FRONT] [PRE]',
+        'Consultores imobiliários 5A',
+        'CX Pagamentos [FRONT] [POS]',
+        'CX Reparos [FRONT] [POS]',
+        'CX Rescisão [FRONT] [POS]'
+      ) THEN 'front'
     END AS unificador_front,
     ts_started
   FROM
@@ -122,12 +131,12 @@ recontact_check AS (
   LEFT JOIN
     tbl_completion_reason
       ON tbl_completion_reason.sk_ticket = rc.sk_ticket_previous_contact
-      AND tbl_completion_reason.sk_ticket IS NOT NULL
   WHERE
     ts_started >= current_date - interval '45' day
     AND department NOT LIKE '%[WH]%' --caixas da WebHelp agora são identificadas assim
     AND department NOT LIKE '%[CNX]%'
-    AND agent_organization IN ('atn','atento')
+    AND agent_organization IN ('atn', 'atento')
+    AND refined_direction = 'INBOUND'
 ),
 demand_back_FRC AS (
   SELECT DISTINCT
@@ -135,8 +144,8 @@ demand_back_FRC AS (
     ft.ts_solved,
     ft.sk_ticket,
     ft.sk_user,
-    dd.department as department_back,
-    dd.team as team_back,
+    dd.department AS department_back,
+    dd.team AS team_back,
     dc.channel,
     CAST(ft.sk_user AS STRING) || '-' ||
     CASE
@@ -169,24 +178,24 @@ demand_back_FRC AS (
       'Alteração de dados bancários [BACK]')
     AND dd.front_or_back = 'back'
     AND ft.ts_started >= CURRENT_DATE - INTERVAL '6' month
-
 )
 SELECT
   rc.sk_ticket,
   rc.sk_ticket_previous_contact AS sk_ticket_first_contact,
-  rc.sk_ticket_contact_later as sk_ticket_contact_later,
+  rc.sk_ticket_contact_later AS sk_ticket_contact_later,
   rc.sk_user,
   rc.channel,
+  rc.department,
   rc.team,
   rc.email,
   rc.theme_detail,
   rc.previous_contact_taxonomy AS macrotaxo_first_contact,
-  rc.theme as macrotaxo_last_contact,
+  rc.theme AS macrotaxo_last_contact,
   rc.previous_contact_email AS email_first_contact,
   rc.total_minutes_handling_time,
-  rc.total_minutes_handling_time_previous_contact as total_minutes_handling_time_previous_contact,
+  rc.total_minutes_handling_time_previous_contact AS total_minutes_handling_time_previous_contact,
   rc.total_minutes_queue_time,
-  rc.previous_contact_csat as csat_first_contact,
+  rc.previous_contact_csat AS csat_first_contact,
   rc.csat_score,
   ARRAY_JOIN(
     ARRAY_AGG(
@@ -194,16 +203,17 @@ SELECT
         WHEN rc.ts_started >= DATE_TRUNC('hour', db.ts_started)
           AND (rc.ts_started <= DATE_TRUNC('hour', db.ts_solved)
           OR db.ts_solved IS NULL)
-      THEN CAST(db.sk_ticket AS STRING)
-      ELSE NULL END), '') AS ticket_back,
+        THEN CAST(db.sk_ticket AS STRING)
+      ELSE NULL
+    END), '') AS ticket_back,
   recontact_flag,
   rc.search_window_from,
   rc.search_window_until,
   rc.ts_started_previous_contact AS ts_started_first_contact,
-  rc.ts_started as ts_started,
-  YEAR(CURRENT_DATE) AS year,
-  MONTH(CURRENT_DATE) AS month,
-  DAY(CURRENT_DATE) AS day,
+  rc.ts_started AS ts_started,
+  YEAR(CURRENT_DATE()) AS year,
+  MONTH(CURRENT_DATE()) AS month,
+  DAY(CURRENT_DATE()) AS day,
   NOW() AS ts_load
 FROM
   recontact_check AS rc
