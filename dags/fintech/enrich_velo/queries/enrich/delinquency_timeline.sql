@@ -144,7 +144,7 @@ cte_timeline_daily AS (
         datalake_quintoandar.aux_date AS d
     LEFT JOIN
         timeline_base AS t
-            ON IF(t.is_finished, d.`date` >= t.dt_updated_paid AND d.`date` <= LAST_DAY(t.dt_updated_paid), IF(t.is_currently_active = true, d.`date` >= t.dt_fatura AND (d.`date` <= t.dt_delinquency_last_register OR t.dt_delinquency_last_register IS NULL), d.`date` >= IF(t.dt_created > t.dt_due, t.dt_due, t.dt_created) AND d.`date` <= t.dt_delinquency_last_register))
+            ON IF(t.is_finished, d.`date` >= t.dt_updated_paid AND d.`date` <= LAST_DAY(t.dt_updated_paid), IF(t.is_currently_active = true, d.`date` >= t.dt_fatura AND (d.`date` <= t.dt_delinquency_last_register OR t.dt_delinquency_last_register IS NULL), d.`date` >= t.dt_fatura AND d.`date` <= t.dt_delinquency_last_register))
     WHERE
         d.`date` > DATE('2020-01-01')
         AND d.`date` <= CURRENT_DATE()
@@ -209,7 +209,7 @@ cte_timeline_status AS (
         datalake_quintoandar.aux_date AS d
     LEFT JOIN
         base_cte_status s
-        ON IF( s.ts_ended_fixed IS NOT NULL OR s.ts_ended_3 IS NOT NULL, d.`date` >= s.dt_fatura AND IF(s.ts_ended_fixed IS NOT NULL, d.`date` < DATE(s.ts_ended_fixed), d.`date` <= DATE(s.ts_ended_3)), d.`date` >= IF(DATE(s.dt_payment_scheduled) < DATE(s.ts_created_local), DATE(s.dt_payment_scheduled), DATE(s.ts_created_local)))
+        ON IF(s.ts_ended_fixed IS NOT NULL OR s.ts_ended_3 IS NOT NULL, d.`date` >= s.dt_fatura AND IF(s.ts_ended_fixed IS NOT NULL, d.`date` < DATE(s.ts_ended_fixed), d.`date` <= DATE(s.ts_ended_3)), d.`date` >= s.dt_fatura)
     WHERE
         d.`date` > DATE('2020-01-01')
         AND d.`date` <= CURRENT_DATE()
