@@ -1,0 +1,75 @@
+
+---
+database_name: datalake_databricks
+table_name: load_table_costs
+description: |
+  Each row has the cost of loading a specific table on Databricks. It includes separate columns for individual
+  (direct) cost, and accumulated (direct + indirect) costs, which corresponds to the cost of the table + the cost
+  of all dependencies.
+  We consider that the cost of a table corresponds to the cost of the cluster divided proportionally to each
+  table based on the execution time of the load tasks.
+domain: Data Ops & Governance 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  dag_name:
+    description: Name of the bietlejuice DAG that loads the table
+    lineage:
+      - datalake_databricks.task_runs.bietlejuice_dag_name
+  task_name:
+    description: Name of the task that loads the table
+    lineage:
+      - datalake_databricks.task_runs.run_name
+  table_name:
+    description: Name of the table
+    lineage:
+      - datalake_dag_inventory_clean.table.table
+  individual_table_dbu_cost:
+    description: Direct DBU cost of loading the table
+    lineage:
+      - datalake_databricks.daily_clusters.total_dbu_cost
+  individual_table_ec2_cost:
+    description: Direct EC2 cost of loading the table
+    lineage:
+      - datalake_databricks.daily_clusters.total_ec2_cost
+  individual_table_cost:
+    description: Direct cost of loading the table (DBU + EC2)
+    lineage:
+      - datalake_databricks.daily_clusters.total_cost
+  accumulated_table_dbu_cost:
+    description: Accumulated DBU cost of loading the table and its dependencies
+    lineage:
+      - datalake_databricks.daily_clusters.total_dbu_cost
+  accumulated_table_ec2_cost:
+    description: Accumulated EC2 cost of loading the table and its dependencies
+    lineage:
+      - datalake_databricks.daily_clusters.total_ec2_cost
+  accumulated_table_cost:
+    description: Accumulated cost of loading the table and its dependencies (DBU + EC2)
+    lineage:
+      - datalake_databricks.daily_clusters.total_cost
+  execution_time_in_seconds:
+    description: Execution time of the load task, in seconds
+    lineage:
+      - datalake_databricks.task_runs.execution_time_in_seconds
+  total_runs_in_day:
+    description: Total number of runs of the task in the day
+  ts_min_task_started:
+    description: Timestamp of the start of the first run of the task in the day
+    lineage:
+      - datalake_databricks.task_runs.ts_task_started
+  ts_min_task_ended:
+    description: Timestamp of the end of the first run of the task in the day
+    lineage:
+      - datalake_databricks.task_runs.ts_task_ended
+  year:
+    description: Year of the snapshot
+    lineage:
+      - datalake_databricks.task_runs.year
+  month:
+    description: Month of the snapshot
+    lineage:
+      - datalake_databricks.task_runs.month
+  day:
+    description: Day of the snapshot
+    lineage:
+      - datalake_databricks.task_runs.day

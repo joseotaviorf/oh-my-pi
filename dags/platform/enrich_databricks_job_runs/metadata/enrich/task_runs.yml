@@ -1,0 +1,65 @@
+---
+database_name: datalake_databricks
+table_name: task_runs
+description: |
+  Each row corresponds to the execution of a task (or single-task job) on Databricks. This is obtained from
+  Overwatch.
+domain: Data Ops & Governance 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_job:
+    description: ID of the job
+    lineage:
+      - overwatch.jobrun.job_id
+  id_run:
+    description: ID of the run
+    lineage:
+      - overwatch.jobrun.run_id
+  id_cluster:
+    description: ID of the cluster
+    lineage:
+      - datalake_databricks.unique_clusters.id_cluster
+  bietlejuice_dag_name:
+    description: Name of the DAG, if it is a job from bietlejuice
+    lineage:
+      - datalake_databricks.unique_clusters.bietlejuice_dag_name
+  run_name:
+    description: Name of the task
+    lineage:
+      - overwatch.jobrun.run_name
+  terminal_state:
+    description: State of the task
+    lineage:
+      - overwatch.jobrun.terminal_state
+  task_dependencies:
+    description: Dependencies of the task
+    lineage:
+      - overwatch.jobrun.task_dependencies
+  task_detail:
+    description: Detailed information about the task
+    lineage:
+      - overwatch.jobrun.task_detail
+  execution_time_in_seconds:
+    description: Execution time of the task in seconds
+    lineage:
+      - overwatch.jobrun.task_runtime.runTimeS
+  ts_task_started:
+    description: Timestamp of the start of the task
+    lineage:
+      - overwatch.jobrun.task_runtime.startTS
+  ts_task_ended:
+    description: Timestamp of the end of the task
+    lineage:
+      - overwatch.jobrun.task_runtime.endTS
+  year:
+    description: Year of the start of the task
+    lineage:
+      - overwatch.jobrun.task_runtime.startTS
+  month:
+    description: Month of the start of the task
+    lineage:
+      - overwatch.jobrun.task_runtime.startTS
+  day:
+    description: Day of the start of the task
+    lineage:
+      - overwatch.jobrun.task_runtime.startTS

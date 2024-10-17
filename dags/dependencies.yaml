@@ -1503,6 +1503,10 @@ bietlejuice.enrich_dashboard_governance:
   - bietlejuice.metabase:load-clean-report-dashboard
   - bietlejuice.metabase:load-clean-report-dashboard-card
   - bietlejuice.metabase:load-clean-view-log
+bietlejuice.enrich_databricks_job_runs:
+  - bietlejuice.enrich_databricks:load-enrich-daily-clusters
+  - bietlejuice.enrich_databricks:load-enrich-unique-clusters
+  - bietlejuice.enrich_table_dependency_tree:load-enrich-bietlejuice-table-dependencies-with-indirection
 bietlejuice.enrich_databricks_usage_costs:
   - bietlejuice.databricks_usage:load-clean-billable-usage
   - bietlejuice.enrich_databricks:load-enrich-daily-clusters

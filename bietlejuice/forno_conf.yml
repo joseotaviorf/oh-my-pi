@@ -68,6 +68,7 @@ dags_out_of_pattern:
         "dw_velo",
         "dw_visit",
         "ebdb",
+        "enrich_databricks_job_runs",
         "enrich_ebdb_listing",
         "enrich_house_feature_inference",
         "enrich_hr_system_custom",
