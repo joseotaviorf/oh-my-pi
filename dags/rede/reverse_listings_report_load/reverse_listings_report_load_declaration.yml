@@ -1,0 +1,12 @@
+dag:
+  name: reverse_listings_report_load
+  schedule_start_date: 2022,7,12
+  owner: Data Rede
+workflow:
+  type: load
+  layer: reverse
+  custom_schema: listings_report
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+cluster:
+  type: databricks_12_2_med_general_cluster
