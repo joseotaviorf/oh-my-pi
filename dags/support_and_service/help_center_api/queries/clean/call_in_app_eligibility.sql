@@ -1,5 +1,5 @@
 SELECT
-    id AS id_user,
+    user_id AS id_user,
     status,
     created_at AS ts_created,
     updated_at AS ts_updated
