@@ -132,7 +132,7 @@ recontact_check AS (
     tbl_completion_reason
       ON tbl_completion_reason.sk_ticket = rc.sk_ticket_previous_contact
   WHERE
-    ts_started >= current_date - interval '45' day
+    ts_started >= '2024-07-01'
     AND department NOT LIKE '%[WH]%' --caixas da WebHelp agora são identificadas assim
     AND department NOT LIKE '%[CNX]%'
     AND agent_organization IN ('atn', 'atento')
