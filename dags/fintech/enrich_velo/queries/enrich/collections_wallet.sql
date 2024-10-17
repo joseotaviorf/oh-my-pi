@@ -22,7 +22,7 @@ min_dates AS (
     SELECT
         document,
         MIN(CASE WHEN type_description = 'GUARANTEE' THEN dt_base END) AS min_dt_guarantee,
-        MIN(CASE WHEN type_description = 'SIGNATURE' THEN dt_base END) AS min_dt_signature,
+        MIN(CASE WHEN type_description IN ('RENEWAL', 'SIGNATURE') THEN dt_base END) AS min_dt_signature,
         MIN(CASE WHEN type_description = 'RECISAO' THEN dt_base END) AS min_dt_termination
     FROM
         timeline
@@ -57,6 +57,7 @@ cte_type_aging AS (
             WHEN DATE_TRUNC('MONTH', MAX(t.dt_ended_propose)) < DATE_TRUNC('MONTH', t.`date`) AND array_contains(array_agg(t.type_description), 'GUARANTEE') THEN "RESCISAO"
             WHEN array_contains(array_agg(t.type_description), 'GUARANTEE') THEN 'GARANTIA'
             WHEN array_contains(array_agg(t.type_description), 'SIGNATURE') THEN 'ASSINATURA'
+            WHEN array_contains(array_agg(t.type_description), 'RENEWAL') THEN 'ASSINATURA'
             ELSE 'CHECK'
         END AS major_type,
         CASE
@@ -64,6 +65,7 @@ cte_type_aging AS (
             WHEN DATE_TRUNC('MONTH', MAX(t.dt_ended_propose)) < DATE_TRUNC('MONTH', t.`date`) AND array_contains(array_agg(t.type_description), 'GUARANTEE') THEN "RESCISAO"
             WHEN array_contains(array_agg(m.type_description), 'GUARANTEE') THEN 'GARANTIA'
             WHEN array_contains(array_agg(m.type_description), 'SIGNATURE') THEN 'ASSINATURA'
+            WHEN array_contains(array_agg(t.type_description), 'RENEWAL') THEN 'ASSINATURA'
             ELSE 'CHECK'
         END AS monthly_major_type,
         t.`date`

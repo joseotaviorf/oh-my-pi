@@ -9,7 +9,7 @@ WITH
             WHEN del.id_type = 1 THEN 'GUARANTEE'
             WHEN del.id_type = 2 THEN 'TERMINATION'
             WHEN del.id_type = 3 THEN 'BILLING'
-            WHEN del.id_type = 4 THEN 'RENEWAL'
+            WHEN del.id_type IN (4, 5) THEN 'RENEWAL'
             ELSE NULL
         END AS type_description,
         del.value AS delinquency_amount,
