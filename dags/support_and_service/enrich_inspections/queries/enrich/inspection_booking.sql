@@ -284,7 +284,10 @@ SELECT DISTINCT
         ELSE a.ts_created
     END AS ts_synced,
     i.ts_created,
-    i.ts_updated
+    i.ts_updated,
+    YEAR(i.ts_updated) AS year,
+    MONTH(i.ts_updated) AS month,
+    DAY(i.ts_updated) AS month
 FROM
     union_inspection_history AS i
 LEFT JOIN

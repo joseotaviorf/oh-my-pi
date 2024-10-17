@@ -241,3 +241,18 @@ columns:
     lineage:
       - datalake_inspections_clean.inspection_aud.ts_updated
       - datalake_inspections.main_inspection_booking.ts_updated
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspections.main_inspection_booking.ts_updated
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspections.main_inspection_booking.ts_updated
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspections.main_inspection_booking.ts_updated
