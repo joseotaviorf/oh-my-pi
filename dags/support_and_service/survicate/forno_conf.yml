@@ -12,7 +12,6 @@ inner_dependencies:
   respondent_attributes:
     - survey_responses
 
-workspace_list: ["Production", "P&T | Prod"]
 tables:
   surveys:
     endpoint_enum: SURVEYS
@@ -23,14 +22,14 @@ tables:
 
   survey_questions:
     endpoint_enum: SURVEY_QUESTIONS
-    feedback_parameters_query: SELECT DISTINCT id AS survey_id FROM datalake_survicate_raw.surveys WHERE workspace_name = '{workspace}'
+    feedback_parameters_query: SELECT DISTINCT id AS survey_id FROM datalake_survicate_raw.surveys
     optional_parameters:
       items_per_page: 100
       start: "{execution_date}T23:59:59.000000Z"
 
   survey_responses:
     endpoint_enum: SURVEY_RESPONSES
-    feedback_parameters_query: SELECT DISTINCT id AS survey_id FROM datalake_survicate_raw.surveys WHERE workspace_name = '{workspace}'
+    feedback_parameters_query: SELECT DISTINCT id AS survey_id FROM datalake_survicate_raw.surveys
     optional_parameters:
       items_per_page: 100
       start: "{execution_date}T23:59:59.000000Z"
