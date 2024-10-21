@@ -35,7 +35,7 @@ invoices_negotiated AS (
   FULL OUTER JOIN datalake_cyber_clean.campaign_contracts AS c
     ON h.id_invoice = c.id_invoice AND h.id_contract = c.id_contract
   QUALIFY ROW_NUMBER() OVER(PARTITION BY COALESCE(h.id_invoice, c.id_invoice) ORDER BY COALESCE(h.id_agreement, c.id_offer) ASC) = 1
-),
+)
 SELECT
   COALESCE(i.id_invoice, b.id_invoice) AS id_invoice,
   COALESCE(b.id_contract, i.id_contract) AS id_contract_cyber,
