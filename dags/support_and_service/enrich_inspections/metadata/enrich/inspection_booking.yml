@@ -40,7 +40,7 @@ columns:
     description: Identification key for scheduling the inspection on the main.
     lineage:
       - datalake_inspections_clean.inspection_aud.id_schedule
-      - datalake_inspections_clean.appointment.id_appointment
+      - datalake_inspections_clean.appointment.id_external_appointment
       - datalake_inspections.main_inspection_booking.id_booking
   id_appointment:
     description: Scheduling identification key in hash format that groups the main and IS ids.

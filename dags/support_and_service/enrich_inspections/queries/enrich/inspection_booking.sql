@@ -12,7 +12,7 @@ WITH union_inspection_history AS (
         i.id_previous_inspection,
         i.id_external,
         i.id_inspector,
-        COALESCE(a.id_appointment, i.id_schedule) AS id_booking,
+        COALESCE(a.id_external_appointment, i.id_schedule) AS id_booking,
         NULL AS id_appointment,
         i.id_contract,
         i.id_client_side,
