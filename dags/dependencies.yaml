@@ -3401,6 +3401,8 @@ bietlejuice.reverse_demand_score:
   - bietlejuice.dw_sale_ongoing_listings:load-dw-sale-fact-daily-ongoing-listing
   - bietlejuice.enrich_booking:load-enrich-house-available-hours
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
+bietlejuice.reverse_demand_score_access:
+  - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score
 bietlejuice.reverse_dsat_report_access:
   - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report
 bietlejuice.reverse_dsat_report_load:

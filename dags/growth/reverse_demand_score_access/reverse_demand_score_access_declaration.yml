@@ -1,0 +1,17 @@
+dag:
+  name: reverse_demand_score_access
+  schedule_start_date: 2024,10,16
+  owner: Data Growth
+workflow:
+  type: access
+  layer: reverse
+  custom_schema: reverse_demand_score
+  load_spark_job: load_into_sqs
+  spark_job_arguments:
+    - "{dag_name}"
+    - "reverse_demand_score" # Database name
+    - "{table_name}"
+  tables_customization:
+    listing_demand_score: {}
+cluster:
+  type: databricks_13_3_min_general_2_workers_cluster

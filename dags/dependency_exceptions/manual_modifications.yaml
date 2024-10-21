@@ -795,6 +795,9 @@ bietlejuice.reverse_dashboard_governance:
 bietlejuice.reverse_ccv_price_report_load:
   # We will remove these dependencies because we will only run this DAG once a month. So we don't want to trigger it every time these tables below are updated.
   override: []
+bietlejuice.reverse_demand_score_access:
+  add:
+    - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score
 bietlejuice.reverse_dsat_report_access:
   add:
     - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report
