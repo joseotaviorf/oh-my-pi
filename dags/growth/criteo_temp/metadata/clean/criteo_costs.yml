@@ -1,0 +1,98 @@
+database_name: datalake_gsheets_clean
+table_name: criteo_costs  
+owner: 'arthur.gonzaga@quintoandar.com.br'
+domain: Growth
+description: Table load Criteo Costs Report by region from gsheets sent by Criteo team.
+columns:
+  id_advertiser:
+    description: Advertiser id of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.advertiser_id
+  id_campaign:
+    description: Unique identifier of the campaign. Can be retrieved from Criteo Management Center
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.ad_set_id
+  advertiser_name:
+    description: Name of the Advertiser
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.advertiser
+  ad_set:
+    description: Name of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.ad_set
+  region:
+    description: Region of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.region
+  zip_code:
+    description: Zip code of the region
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.zip_code
+  cost:
+    description: Total cost of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.cost
+  sales:
+    description: Total sales of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.sales
+  audience:
+    description: Total audience of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.audience
+  clicks:
+    description: Total clicks of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.clicks
+  cpc:
+    description: Cost per click of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.cpc
+  ctr:
+    description: Click through rate of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.ctr
+  displays:
+    description: Total displays of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.displays
+  exposed_users:
+    description: Total exposed users of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.exposed_users
+  reach:
+    description: Total reach of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.reach
+  visits:
+    description: Total visits of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.visits
+  win_rate:
+    description: Win rate of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.win_rate
+  bounce_rate:
+    description: Bounce rate of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.bounce_rate
+  cost_per_visit:
+    description: Cost per visit of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.cost_per_visit
+  cpo:
+    description: Cost per order of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.cpo
+  cvr:
+    description: Conversion rate of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.cvr
+  dt_report:
+    description: Date of the results of campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.day
+  ts_load:
+    description: Timestamp of the load
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.ts_load

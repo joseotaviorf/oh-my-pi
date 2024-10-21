@@ -1,0 +1,26 @@
+SELECT 
+  advertiser_id AS id_advertiser,
+  ad_set_id AS id_ad_set,
+  advertiser AS advertiser_name,
+  ad_set,
+  region,
+  zip_code,
+  cost::DOUBLE,
+  sales::DOUBLE,
+  audience::DOUBLE,
+  clicks::DOUBLE,
+  cpc::DOUBLE,
+  ctr::DOUBLE,
+  displays::DOUBLE,
+  exposed_users::DOUBLE,
+  reach::DOUBLE,
+  visits::DOUBLE,
+  win_rate::DOUBLE,
+  bounce_rate::DOUBLE,
+  cost_per_visit::DOUBLE,
+  cpo::DOUBLE,
+  cvr::DOUBLE,
+  TO_DATE(day, 'MM/dd/yyyy') AS dt_report,
+  ts_load
+FROM 
+  datalake_gsheets_raw.criteo_costs

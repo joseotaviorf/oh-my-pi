@@ -1,0 +1,6 @@
+sheets_info:
+  criteo_costs:
+    sheet_id: 1J-e_CBwEFSIlYyLcXqmatlu9THindhEdQ7ip5D4VAI8
+    sheet_name: Download
+    clean_table_name: criteo_costs
+    sheet_context: growth
