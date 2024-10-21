@@ -104,7 +104,7 @@ responsible_for_contract AS (
     QUALIFY ROW_NUMBER() OVER(PARTITION BY c.id_contract, ors.dt_snapshot ORDER BY ors.ts_customer_status_last_update DESC) = 1
 )
 
-SELECT
+SELECT DISTINCT
     cw.id_propose AS sk_propose,
     cw.name,
     cw.document,
