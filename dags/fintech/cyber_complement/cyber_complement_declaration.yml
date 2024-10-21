@@ -13,50 +13,100 @@ workflow:
   type: custom_ingestion
   load_spark_job: load_cyber_raw
   custom_schema: cyber
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
+  default_extraction_type: full
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
     - "{schema}"
     - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{extraction_type}"
+    - "{partitions}"
   tables_customization:
     actvertb:
       clean_table_name: logs_code_description
-    tb_grupo_agency:
-      clean_table_name: agency_group
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - []
     agrtype:
       clean_table_name: agreement_type
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - []
+    tb_grupo_agency:
+      clean_table_name: agency_group
+      extra_spark_job_arguments:
+        - []
     agtpdsc:
       clean_table_name: agreement_type_discount
+      extra_spark_job_arguments:
+        - []
     que_dectbl:
       clean_table_name: segmentation_decision_tree
+      extra_spark_job_arguments:
+        - []
     que_dectbl3:
       clean_table_name: agreement_decision_tree
+      extra_spark_job_arguments:
+        - []
     que_dectbl4:
       clean_table_name: digital_channel_decision_tree
+      extra_spark_job_arguments:
+        - []
     que_dectbl5:
       clean_table_name: eviction_decision_tree
+      extra_spark_job_arguments:
+        - []
     que_dectbl6:
       clean_table_name: credit_denial_decision_tree
+      extra_spark_job_arguments:
+        - []
     agn_dectbl:
       clean_table_name: agency_decision_tree
+      extra_spark_job_arguments:
+        - []
     agrvalq:
       clean_table_name: queue_agreement_type
+      extra_spark_job_arguments:
+        - []
     valcodes:
       clean_table_name: logs_valid_result_code
+      extra_spark_job_arguments:
+        - []
     lbl_dectbl1:
       clean_table_name: olos_dialer_label_decision_tree
+      extra_spark_job_arguments:
+        - []
     lbl_dectbl3:
       clean_table_name: campaign_label_decision_tree
+      extra_spark_job_arguments:
+        - []
     lbl_dectbl5:
       clean_table_name: pre_legal_label_decision_tree
+      extra_spark_job_arguments:
+        - []
     tb_campanha:
       clean_table_name: campaign
+      extra_spark_job_arguments:
+        - []
     tb_campanha_ofer:
       clean_table_name: campaign_installments
+      extra_spark_job_arguments:
+        - []
     tb_campanha_desc:
       clean_table_name: campaign_discounts
+      extra_spark_job_arguments:
+        - []
     tb_campanha_contrato:
       clean_table_name: campaign_contracts
+      extra_spark_job_arguments:
+        - []
 cluster:
   type: custom_cluster
   custom_configurations:

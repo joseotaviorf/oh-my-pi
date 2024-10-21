@@ -26,15 +26,15 @@ columns:
     lineage:
       - datalake_cyber_raw.agrtype.AGCNDPAYM
   min_delay_days:
-    description: ""
+    description: "Minimum days of delay that the contract must have to be available for this type of agreement"
     lineage:
       - datalake_cyber_raw.agrtype.AGDMDAYSMIN
   max_delay_days:
-    description: ""
+    description: "Maximum days of delay that the contract must have to be available for this type of agreement"
     lineage:
       - datalake_cyber_raw.agrtype.AGDMDAYSMAX
   order_classification:
-    description: ""
+    description: "This is the sort order of the agreement. There is a standard agreement and it always has to be presented as the first one on the CyberAgreements screen."
     lineage:
       - datalake_cyber_raw.agrtype.AGSORTORD
   missed_payments_to_break_agreement:
@@ -82,7 +82,7 @@ columns:
     lineage:
       - datalake_cyber_raw.agrtype.AGGRDAYS
   max_installments:
-    description: ""
+    description: "Maximum number of installments allowed"
     lineage:
       - datalake_cyber_raw.agrtype.AGMAXPMTS
   valid_frequencies:
@@ -122,10 +122,10 @@ columns:
     lineage:
       - datalake_cyber_raw.agrtype.AGMINPAR
   agreement_channel:
-    description: ""
+    description: "Check existing settings in the Multichannel story."
     lineage:
       - datalake_cyber_raw.agrtype.AGCANALNEG
-  agreement_type:
-    description: ""
+  payment_method:
+    description: "BOL = bank slip, CAR = Credit card, DCO = debit account"
     lineage:
       - datalake_cyber_raw.agrtype.AGFORMAPAG

@@ -143,8 +143,8 @@ split_fees_between_installments AS (
       ON ai.id_agreement = f.id_agreement
   )
   SELECT
-    id_agreement_installment,
-    id_negotiation,
+    CAST(id_agreement_installment AS STRING) AS id_agreement_installment,
+    CAST(id_negotiation AS STRING) AS id_negotiation,
     id_contract,
     id_contract_external,
     id_debtor,

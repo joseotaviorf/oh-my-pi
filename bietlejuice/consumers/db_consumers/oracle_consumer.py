@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import textwrap
 
 from quintoandar_logger import QuintoAndarLogger
@@ -221,8 +221,9 @@ class OracleSparkConsumer(DBConsumer):
     def get_incremental_data_from_table(
         self,
         table_name: str,
-        date_filter_column: str,
-        date_filter_value: str,
+        date_filter_columns: list,
+        start_interval: str,
+        end_interval: str,
         unixtime_measure: str = None,
     ):
         """
@@ -239,25 +240,31 @@ class OracleSparkConsumer(DBConsumer):
         :return: A Spark DataFrame with the filtered table data.
         """
 
-        dt_filter_value = datetime.strptime(date_filter_value, "%Y-%m-%d")
-        dt_filter_value_day_after = dt_filter_value + timedelta(days=1)
+        dt_start_filter = datetime.strptime(start_interval, "%Y-%m-%d")
+        dt_end_filter = datetime.strptime(end_interval, "%Y-%m-%d")
 
         if unixtime_measure == "milliseconds":
-            filter_value = 1000 * int(dt_filter_value.timestamp())
-            filter_value_day_after = 1000 * int(dt_filter_value_day_after.timestamp())
+            start_range_date = 1000 * int(dt_start_filter.timestamp())
+            end_range_date = 1000 * int(dt_end_filter.timestamp())
         elif unixtime_measure == "seconds":
-            filter_value = int(dt_filter_value.timestamp())
-            filter_value_day_after = int(dt_filter_value_day_after.timestamp())
+            start_range_date = int(dt_start_filter.timestamp())
+            end_range_date = int(dt_end_filter.timestamp())
         else:
-            filter_value = dt_filter_value
-            filter_value_day_after = dt_filter_value_day_after
+            start_range_date = dt_start_filter
+            end_range_date = dt_end_filter
+
+        filters = ""
+        for date_filter in date_filter_columns:
+            filters += f"""
+                ({date_filter} >= TO_TIMESTAMP('{start_range_date}', 'YYYY-MM-DD HH24:MI:SS')
+                AND {date_filter} <= TO_TIMESTAMP('{end_range_date}', 'YYYY-MM-DD HH24:MI:SS'))"""
+            if date_filter != date_filter_columns[-1]:
+                filters += " OR "
 
         query = f"""
             SELECT *
             FROM {self.schema}.{table_name}
-            WHERE
-                {date_filter_column} >= TO_TIMESTAMP({filter_value}, 'YYYY-MM-DD HH24:MI:SS')
-                AND {date_filter_column} < TO_TIMESTAMP({filter_value_day_after}, 'YYYY-MM-DD HH24:MI:SS')
+            WHERE {filters}
         """
 
         return self.get_data_from_query(query)

@@ -21,7 +21,7 @@ union_collection AS (
         0 AS total_failure,
         'Cyber' AS source,
         1 AS priority
-    FROM datalake_cyber_homolog.collection
+    FROM datalake_cyber.collection
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 
     UNION DISTINCT

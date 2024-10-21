@@ -1,14 +1,14 @@
 WITH
 trato_feito_negotiation AS (
   SELECT
-    CAST(n.id_negotiation_external AS STRING) AS id_negotiation,
+    IFNULL(CAST(n.id_negotiation_external AS BIGINT),n.id_negotiation_external) AS id_negotiation,
     n.id_negotiation AS id_negotiation_trato_feito,
     n.id_contract,
-    REGEXP_REPLACE(cl.document,r'\.|\-', '') AS id_customer,
+    REGEXP_REPLACE(cl.document,r"\.|\-", "") AS id_customer,
     CASE
-      WHEN LOWER(n.collector) LIKE '%cyber%' THEN "Trato Feito - Cyber"
-      WHEN LOWER(n.collector) LIKE '%recupera%' THEN "Trato Feito - Recupera"
-      WHEN UPPER(n.collector) LIKE '%5A%' THEN "Trato Feito - Self Service"
+      WHEN LOWER(n.collector) LIKE "%cyber%" THEN "Trato Feito - Cyber"
+      WHEN LOWER(n.collector) LIKE "%recupera%" THEN "Trato Feito - Recupera"
+      WHEN UPPER(n.collector) LIKE "%5A%" THEN "Trato Feito - Self Service"
     END AS source,
     COUNT(n.id_contract) OVER(PARTITION BY n.id_negotiation_external) AS contracts_by_negotiation,
     CASE
@@ -54,7 +54,7 @@ trato_feito_negotiation AS (
 ),
 cyber_negotiation AS (
   SELECT
-    id_negotiation,
+    CAST(id_negotiation AS BIGINT) AS id_negotiation,
     id_contract,
     id_operator,
     id_customer,
@@ -88,14 +88,14 @@ cyber_negotiation AS (
     dt_down_payment,
     dt_paid_all,
     COALESCE(dt_cancellation, dt_paid_all) AS dt_ending,
-    'Cyber' AS source,
+    "Cyber" AS source,
     1 AS priority
-  FROM datalake_cyber_homolog.negotiation
+  FROM datalake_cyber.negotiation
   WHERE creditor = "QuintoAndar"
 ),
 recupera_negotiation AS (
   SELECT
-    CAST(id_negotiation AS STRING) AS id_negotiation,
+    CAST(id_negotiation AS BIGINT) AS id_negotiation,
     id_contract,
     UPPER(id_operator) AS id_operator,
     customer_document AS id_customer,
@@ -131,7 +131,7 @@ recupera_negotiation AS (
     ROUND(expense_amount,2) AS total_debt_amount, -- original_debt_amount + interest_fee_amount + fine_fee_amount + credit_card_fee
     GREATEST(ROUND(expense_amount - negotiated_amount, 2), 0) AS discount_amount,
     negotiated_amount,
-    down_payment_amount_without_fees AS down_payment_amount,
+    down_payment_amount,
     total_amount_paid AS total_paid_amount,
     dt_cancellation,
     dt_promisse,
@@ -140,7 +140,7 @@ recupera_negotiation AS (
     dt_down_payment,
     dt_paid_all,
     COALESCE(dt_cancellation, dt_paid_all) AS dt_ending,
-    'Recupera' AS source,
+    "Recupera" AS source,
     2 AS priority
   FROM datalake_recupera.negotiation
   WHERE id_creditor NOT IN (3,5)
@@ -161,13 +161,14 @@ installments_data AS (
     sk_negotiation AS id_negotiation,
     payment_method AS promisse_payment_method,
     paid_amount AS down_payment_amount,
+    net_amount AS down_payment_net_amount,
     dt_paid AS dt_down_payment
   FROM dw_collection_recovery_quintoandar.fact_negotiation_installment
   WHERE installment_number = 1
 ),
 renegotiation AS (
   SELECT
-    i.id_negotiation,
+    CAST(i.id_negotiation AS BIGINT) AS id_negotiation,
     IF(COUNT(DISTINCT d.id_negotiation) > 0, TRUE, FALSE) AS has_been_renegotiated
   FROM datalake_debt_recovery.installment AS i
   LEFT JOIN datalake_trato_feito_clean.accounting_installment AS ai
@@ -231,6 +232,7 @@ union_sources AS (
     COALESCE(tfn.discount_amount, cn.discount_amount, rn.discount_amount, 0) AS total_discount_amount,
     COALESCE(tfn.negotiated_amount, cn.negotiated_amount, rn.negotiated_amount) AS negotiated_amount,
     COALESCE(i.down_payment_amount, tfn.down_payment_amount, cn.down_payment_amount, rn.down_payment_amount) AS down_payment_amount,
+    i.down_payment_net_amount,
     COALESCE(tfn.paid_amount, cn.total_paid_amount, rn.total_paid_amount, 0) AS paid_amount,
     oi.dt_due_invoice_anchor,
     COALESCE(tfn.dt_promisse, cn.dt_promisse, rn.dt_promisse) AS dt_promisse,
@@ -242,19 +244,18 @@ union_sources AS (
     COALESCE(tfn.dt_ending, cn.dt_ending) AS dt_ending
   FROM  trato_feito_negotiation AS tfn
   FULL OUTER JOIN cyber_negotiation AS cn
-      ON tfn.id_negotiation = cn.id_negotiation
+    ON tfn.id_negotiation = cn.id_negotiation
   FULL OUTER JOIN recupera_negotiation AS rn
-      ON tfn.id_negotiation = rn.id_negotiation
-  LEFT JOIN
-      renegotiation AS r
-        ON tfn.id_negotiation = r.id_negotiation
+    ON tfn.id_negotiation = rn.id_negotiation
+  LEFT JOIN renegotiation AS r
+    ON tfn.id_negotiation = r.id_negotiation
   LEFT JOIN original_invoices AS oi
     ON tfn.id_negotiation = oi.id_negotiation
   LEFT JOIN installments_data AS i
     ON COALESCE(tfn.id_negotiation, cn.id_negotiation, rn.id_negotiation) = i.id_negotiation
 )
 SELECT
-  u.sk_negotiation,
+  CAST(u.sk_negotiation AS STRING) AS sk_negotiation,
   u.sk_debtor,
   u.id_negotiation_trato_feito,
   CAST(u.id_contract AS BIGINT) AS id_contract,
@@ -281,7 +282,10 @@ SELECT
       WHEN u.dt_down_payment IS NOT NULL
         AND u.total_invoices_negotiated = 1 AND u.number_of_installments = 1 THEN "SUBSTITUIÇÃO"
     END AS negotiation_classification,
-  u.promisse_payment_method,
+  CASE
+    WHEN UPPER(u.promisse_payment_method) IN ("CREDIT-CARD", "CARTÃO", "CARTÃO DE CRÉDITO") THEN "CARTÃO DE CRÉDITO"
+    ELSE UPPER(u.promisse_payment_method)
+  END AS promisse_payment_method,
   u.is_renegotiation,
   u.has_been_renegotiated,
   CASE
@@ -313,6 +317,8 @@ SELECT
   u.negotiated_amount,
   u.down_payment_amount,
   IF(u.dt_down_payment IS NOT NULL, u.down_payment_amount, 0) AS down_payment_amount_paid,
+  down_payment_net_amount,
+  IF(u.dt_down_payment IS NOT NULL, u.down_payment_net_amount, 0) AS down_payment_net_amount_paid,
   u.paid_amount,
   u.dt_due_invoice_anchor,
   u.dt_promisse,

@@ -12,46 +12,94 @@ workflow:
   layer: raw
   type: custom_ingestion
   load_spark_job: load_cyber_raw
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
+  default_extraction_type: full
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
     - "{dag_name}"
     - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{extraction_type}"
+    - "{partitions}"
   tables_customization:
-    relations:
-      clean_table_name: debtor
     delqmst:
       clean_table_name: delinquent_master
-    uda1:
-      clean_table_name: contracts
-    phone:
-      clean_table_name: phone
-    address:
-      clean_table_name: address
-    pmtfil:
-      clean_table_name: payments
-    actfil:
-      clean_table_name: logs
-    agrdm:
-      clean_table_name: contracts_agreements
-    agrhdr:
-      clean_table_name: agreements
-    agdscdet:
-      clean_table_name: agreement_discounts
-    agpmtdet:
-      clean_table_name: agreement_installments
-    tb_boleto:
-      clean_table_name: agreement_invoices
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - ["DMHOSTUP"]
     tb_historico_disponibilizacao:
       clean_table_name: history_contract_distribution
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - ["HD_DT_DISPONIBILIZACAO"]
+    actfil:
+      clean_table_name: logs
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - ["ACACTDTE"]
+    relations:
+      clean_table_name: debtor
+      extra_spark_job_arguments:
+        - []
+    uda1:
+      clean_table_name: contracts
+      extra_spark_job_arguments:
+        - []
+    phone:
+      clean_table_name: phone
+      extra_spark_job_arguments:
+        - []
+    address:
+      clean_table_name: address
+      extra_spark_job_arguments:
+        - []
+    pmtfil:
+      clean_table_name: payments
+      extra_spark_job_arguments:
+        - []
+    agrdm:
+      clean_table_name: contracts_agreements
+      extra_spark_job_arguments:
+        - []
+    agrhdr:
+      clean_table_name: agreements
+      extra_spark_job_arguments:
+        - []
+    agdscdet:
+      clean_table_name: agreement_discounts
+      extra_spark_job_arguments:
+        - []
+    agpmtdet:
+      clean_table_name: agreement_installments
+      extra_spark_job_arguments:
+        - []
+    tb_boleto:
+      clean_table_name: agreement_invoices
+      extra_spark_job_arguments:
+        - []
     tb_parcela:
       clean_table_name: bill
+      extra_spark_job_arguments:
+        - []
     collid:
       clean_table_name: users
+      extra_spark_job_arguments:
+        - []
     agency:
       clean_table_name: agency
+      extra_spark_job_arguments:
+        - []
     agr_hist:
       clean_table_name: historical_agreements
+      extra_spark_job_arguments:
+        - []
 cluster:
   type: custom_cluster
   custom_configurations:

@@ -1,8 +1,8 @@
 SELECT
     CCID AS id_campaign,
-    CCNUMOFERTA AS id_offer,
+    CAST(CCNUMOFERTA AS STRING) AS id_offer,
     CCACCTCOB AS id_contract,
-    CCSSNUM AS id_client_id,
+    CCSSNUM AS id_client,
     CCIDPARC AS id_invoice,
     CCGRUPO AS contract_group,
     CASE

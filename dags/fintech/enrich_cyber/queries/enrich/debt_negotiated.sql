@@ -4,7 +4,7 @@ WITH invoices AS (
     id_invoice,
     creditor,
     our_number,
-    purpose,
+    LOWER(purpose) AS purpose,
     retsuko_status,
     invoice_status,
     pause_reason,
@@ -20,19 +20,22 @@ WITH invoices AS (
     ts_limit_pause
   FROM datalake_cyber_clean.bill
   WHERE invoice_or_entry = "Invoice"
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_invoice, contract_group ORDER BY ts_insert DESC) = 1
 ),
 invoices_negotiated AS (
   SELECT
-    id_invoice,
-    id_contract,
-    REGEXP_REPLACE(id_client,r'\.|\-', '') AS id_client,
-    creditor,
-    invoice_due_amount AS due_amount,
-    invoice_interest_amount AS interest_amount,
-    invoice_fine_amount AS fine_amount
-  FROM datalake_cyber_clean.historical_agreements
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_invoice ORDER BY id_agreement ASC) = 1
-)
+    COALESCE(h.id_invoice, c.id_invoice) AS id_invoice,
+    COALESCE(h.id_contract, c.id_contract) AS id_contract,
+    COALESCE(REGEXP_REPLACE(h.id_client,r'\.|\-', ''), REGEXP_REPLACE(c.id_client,r'\.|\-', '')) AS id_client,
+    COALESCE(h.creditor, c.creditor) AS creditor,
+    COALESCE(h.invoice_due_amount, c.invoice_main_amount) AS due_amount,
+    COALESCE(h.invoice_interest_amount, c.invoice_interest_amount) AS interest_amount,
+    COALESCE(h.invoice_fine_amount, c.invoice_fine_amount) AS fine_amount
+  FROM datalake_cyber_clean.historical_agreements AS h
+  FULL OUTER JOIN datalake_cyber_clean.campaign_contracts AS c
+    ON h.id_invoice = c.id_invoice AND h.id_contract = c.id_contract
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY COALESCE(h.id_invoice, c.id_invoice) ORDER BY COALESCE(h.id_agreement, c.id_offer) ASC) = 1
+),
 SELECT
   COALESCE(i.id_invoice, b.id_invoice) AS id_invoice,
   COALESCE(b.id_contract, i.id_contract) AS id_contract_cyber,

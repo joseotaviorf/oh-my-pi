@@ -1,0 +1,37 @@
+---
+database_name: datalake_cyber
+table_name: agency_decision_tree
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Agency/advisory decision tree
+columns:
+  level:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agency_decision_tree.level
+  test:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agency_decision_tree.test
+  queue_type:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agency_decision_tree.queue_type
+  level_name:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agency_decision_tree.level_name
+  queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agency_decision_tree.queue
+  queue_name:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agency_decision_tree.queue_name
+  params:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agency_decision_tree.CONCAT_WS(' AND ', COLLECT_LIST(params))
+  ts_load:
+    description: ""

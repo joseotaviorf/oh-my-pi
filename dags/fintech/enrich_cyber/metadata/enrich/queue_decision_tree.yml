@@ -1,0 +1,93 @@
+---
+database_name: datalake_cyber
+table_name: queue_decision_tree
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Queue decision
+columns:
+  level:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.segmentation_decision_tree.level
+      - datalake_cyber_clean.agreement_decision_tree.level
+      - datalake_cyber_clean.digital_channel_decision_tree.level
+      - datalake_cyber_clean.eviction_decision_tree.level
+      - datalake_cyber_clean.credit_denial_decision_tree.level
+      - datalake_cyber_clean.olos_dialer_label_decision_tree.level
+      - datalake_cyber_clean.campaign_label_decision_tree.level
+      - datalake_cyber_clean.pre_legal_label_decision_tree.level
+  test:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.segmentation_decision_tree.test
+      - datalake_cyber_clean.agreement_decision_tree.test
+      - datalake_cyber_clean.digital_channel_decision_tree.test
+      - datalake_cyber_clean.eviction_decision_tree.test
+      - datalake_cyber_clean.credit_denial_decision_tree.test
+      - datalake_cyber_clean.olos_dialer_label_decision_tree.test
+      - datalake_cyber_clean.campaign_label_decision_tree.test
+      - datalake_cyber_clean.pre_legal_label_decision_tree.test
+  queue_type:
+    description: ""
+  level_name:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.segmentation_decision_tree.comment
+      - datalake_cyber_clean.agreement_decision_tree.comment
+      - datalake_cyber_clean.digital_channel_decision_tree.comment
+      - datalake_cyber_clean.eviction_decision_tree.comment
+      - datalake_cyber_clean.credit_denial_decision_tree.comment
+      - datalake_cyber_clean.olos_dialer_label_decision_tree.comment
+      - datalake_cyber_clean.campaign_label_decision_tree.comment
+      - datalake_cyber_clean.pre_legal_label_decision_tree.comment
+  queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.segmentation_decision_tree.queue
+      - datalake_cyber_clean.agreement_decision_tree.queue
+      - datalake_cyber_clean.digital_channel_decision_tree.queue
+      - datalake_cyber_clean.eviction_decision_tree.queue
+      - datalake_cyber_clean.credit_denial_decision_tree.queue
+      - datalake_cyber_clean.olos_dialer_label_decision_tree.queue
+      - datalake_cyber_clean.campaign_label_decision_tree.queue
+      - datalake_cyber_clean.pre_legal_label_decision_tree.queue
+  queue_name:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.segmentation_decision_tree.comment
+      - datalake_cyber_clean.agreement_decision_tree.comment
+      - datalake_cyber_clean.digital_channel_decision_tree.comment
+      - datalake_cyber_clean.eviction_decision_tree.comment
+      - datalake_cyber_clean.credit_denial_decision_tree.comment
+      - datalake_cyber_clean.olos_dialer_label_decision_tree.comment
+      - datalake_cyber_clean.campaign_label_decision_tree.comment
+      - datalake_cyber_clean.pre_legal_label_decision_tree.comment
+  params:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.segmentation_decision_tree.field_1
+      - datalake_cyber_clean.segmentation_decision_tree.field_2
+      - datalake_cyber_clean.segmentation_decision_tree.field_3
+      - datalake_cyber_clean.agreement_decision_tree.field_1
+      - datalake_cyber_clean.agreement_decision_tree.field_2
+      - datalake_cyber_clean.agreement_decision_tree.field_3
+      - datalake_cyber_clean.digital_channel_decision_tree.field_1
+      - datalake_cyber_clean.digital_channel_decision_tree.field_2
+      - datalake_cyber_clean.digital_channel_decision_tree.field_3
+      - datalake_cyber_clean.eviction_decision_tree.field_1
+      - datalake_cyber_clean.eviction_decision_tree.field_2
+      - datalake_cyber_clean.eviction_decision_tree.field_3
+      - datalake_cyber_clean.credit_denial_decision_tree.field_1
+      - datalake_cyber_clean.credit_denial_decision_tree.field_2
+      - datalake_cyber_clean.credit_denial_decision_tree.field_3
+      - datalake_cyber_clean.olos_dialer_label_decision_tree.field_1
+      - datalake_cyber_clean.olos_dialer_label_decision_tree.field_2
+      - datalake_cyber_clean.olos_dialer_label_decision_tree.field_3
+      - datalake_cyber_clean.campaign_label_decision_tree.field_1
+      - datalake_cyber_clean.campaign_label_decision_tree.field_2
+      - datalake_cyber_clean.campaign_label_decision_tree.field_3
+      - datalake_cyber_clean.pre_legal_label_decision_tree.field_1
+      - datalake_cyber_clean.pre_legal_label_decision_tree.field_2
+      - datalake_cyber_clean.pre_legal_label_decision_tree.field_3
+  ts_load:
+    description: ""

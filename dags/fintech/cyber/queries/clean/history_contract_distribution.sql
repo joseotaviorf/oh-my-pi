@@ -49,3 +49,4 @@ SELECT
     HD_DT_NOVA_DISPONIB AS ts_redistribution,
     NOW() AS ts_load
 FROM datalake_cyber_raw.tb_historico_disponibilizacao
+WHERE HD_DT_NOVA_DISPONIB BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

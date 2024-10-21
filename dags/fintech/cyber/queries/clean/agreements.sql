@@ -1,5 +1,5 @@
 SELECT
-    AHID AS id_agreement,
+    CAST(AHID AS STRING) AS id_agreement,
     AHACCT AS id_client,
     AHCOLLID AS id_user,
     AHTYPE AS agreement_type,

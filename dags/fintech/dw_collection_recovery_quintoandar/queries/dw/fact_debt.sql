@@ -85,7 +85,7 @@ cyber_debts AS (
     debt_amount,
     dt_invoice_due AS dt_due,
     "Cyber" AS source
-  FROM datalake_cyber_homolog.debt_negotiated
+  FROM datalake_cyber.debt_negotiated
 ),
 debts AS (
   SELECT
@@ -139,10 +139,10 @@ SELECT
   d.discount_amount,
   d.debt_amount,
   COALESCE(r.paid_amount, d.paid_amount) AS paid_amount,
-  COALESCE(r.source, d.source) AS source,
+  IF(r.source IS NULL, d.source, CONCAT(r.source, '-', d.source)) AS source,
   COALESCE(r.dt_due, d.dt_due) AS dt_due,
   COALESCE(r.dt_paid, d.dt_paid) AS dt_paid,
   NOW() AS ts_load
 FROM debts AS d
-INNER JOIN retsuko AS r
+LEFT JOIN retsuko AS r
   ON d.id_invoice = r.id_invoice

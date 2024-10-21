@@ -21,3 +21,4 @@ SELECT
     ACENTDTE AS ts_load_cyber,
     NOW() AS ts_load
 FROM datalake_cyber_raw.actfil
+WHERE ACACTDTE BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

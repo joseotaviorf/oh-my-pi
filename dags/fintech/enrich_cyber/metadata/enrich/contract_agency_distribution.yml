@@ -1,5 +1,5 @@
 ---
-database_name: datalake_cyber_homolog
+database_name: datalake_cyber
 table_name: contract_agency_distribution
 owner: bianca.martins@quintoandar.com.br
 domain: fintech

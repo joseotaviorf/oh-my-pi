@@ -91,29 +91,29 @@ SELECT
 FROM datalake_cyber_clean.contracts AS c
 LEFT JOIN datalake_cyber_clean.delinquent_master AS dm
  ON c.id_contract = dm.id_contract
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdts
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdts
     ON dm.segmentation_queue = qdts.queue AND qdts.queue_type = 'Segmentação'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdtps
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdtps
     ON dm.previous_segmentation_queue = qdtps.queue AND qdtps.queue_type = 'Segmentação'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdta
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdta
     ON dm.agreement_queue = qdta.queue AND qdta.queue_type = 'Acordo'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdtpa
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdtpa
     ON dm.previous_agreement_queue = qdtpa.queue AND qdtpa.queue_type = 'Acordo'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdtcd
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdtcd
     ON dm.digital_channel_queue = qdtcd.queue AND qdtcd.queue_type = 'Canais Digitais'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdtpcd
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdtpcd
     ON dm.previous_digital_channel_queue = qdtpcd.queue AND qdtpcd.queue_type = 'Canais Digitais'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdte
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdte
     ON dm.eviction_queue = qdte.queue AND qdte.queue_type = 'Eviction'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdtpe
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdtpe
     ON dm.previous_eviction_queue = qdtpe.queue AND qdtpe.queue_type = 'Eviction'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdtn
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdtn
     ON dm.credit_denial_queue = qdtn.queue AND qdtn.queue_type = 'Negativação'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdtpn
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdtpn
     ON dm.previous_credit_denial_queue = qdtpn.queue AND qdtpn.queue_type = 'Negativação'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdto
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdto
     ON dm.olos_dialer_label = qdto.queue AND qdto.queue_type = 'Discador Olos'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdtc
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdtc
     ON dm.campaign_label = qdtc.queue AND qdtc.queue_type = 'Campaign'
-LEFT JOIN datalake_cyber_homolog.queue_decision_tree AS qdtpj
+LEFT JOIN datalake_cyber.queue_decision_tree AS qdtpj
     ON dm.pre_legal_label = qdtpj.queue AND qdtpj.queue_type = 'Pré Jurídico'

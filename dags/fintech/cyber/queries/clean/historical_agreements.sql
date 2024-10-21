@@ -1,5 +1,5 @@
 SELECT
-    HAID AS id_agreement,
+    CAST(HAID AS STRING) AS id_agreement,
     HAACCT AS id_contract,
     AHIDPARC AS id_invoice,
     AHSSNUM AS id_client,

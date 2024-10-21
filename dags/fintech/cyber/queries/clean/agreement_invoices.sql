@@ -1,7 +1,7 @@
 SELECT
     BLID AS id_invoice,
     BLSSNUM AS id_client,
-    BLNUMACORDO AS id_agreement,
+    CAST(BLNUMACORDO AS STRING) AS id_agreement,
     BLCCT AS id_contract,
     BLCODEMP AS id_company,
     BLAGENCIA AS id_agency,

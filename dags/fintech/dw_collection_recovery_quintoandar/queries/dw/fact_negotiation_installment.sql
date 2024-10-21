@@ -3,7 +3,7 @@ deduplicate_trato_feito_negotiation AS (
   SELECT DISTINCT
     id_contract,
     id_negotiation,
-    id_negotiation_external,
+    IFNULL(CAST(id_negotiation_external AS BIGINT), id_negotiation_external) AS id_negotiation_external,
     CASE
       WHEN debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
       WHEN debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
@@ -52,15 +52,15 @@ trato_feito_installment AS (
 ),
 cyber_installments AS (
   SELECT DISTINCT
-    CONCAT(id_negotiation, "-" , installment_number) AS id_negotiation_installment,
-    id_negotiation AS id_negotiation_external,
+    CONCAT(CAST(id_negotiation AS BIGINT), "-" , installment_number) AS id_negotiation_installment,
+    CAST(id_negotiation AS BIGINT) AS id_negotiation_external,
     installment_number,
     our_number,
     creditor,
     installment_status,
     payment_method,
     NULL delay_days,
-    NULL AS main_amount,
+    amount_to_pay - fine_amount - total_interest_amount - credit_card_fee_amount AS main_amount,
     agreement_balance_amount AS updated_balance,
     fine_amount,
     total_interest_amount AS interest_fee_amount,
@@ -75,13 +75,13 @@ cyber_installments AS (
     dt_cancelation AS dt_canceled,
     'Cyber' AS source
   FROM
-    datalake_cyber_homolog.installment AS i
+    datalake_cyber.installment AS i
   WHERE creditor = "QuintoAndar"
 ),
 recupera_installments AS (
   SELECT DISTINCT
-    CONCAT(id_negotiation, "-", INT(installment_number)) AS id_negotiation_installment,
-    id_negotiation AS id_negotiation_external,
+    CONCAT(CAST(id_negotiation AS BIGINT), "-", INT(installment_number)) AS id_negotiation_installment,
+    CAST(id_negotiation AS BIGINT) AS id_negotiation_external,
     installment_number,
     id_receipt AS our_number,
     creditor,
@@ -160,7 +160,7 @@ nexxera_confirmation AS (
 )
 SELECT DISTINCT
     i.id_negotiation_installment AS sk_negotiation_installment,
-    i.id_negotiation_external AS sk_negotiation,
+    CAST(i.id_negotiation_external AS STRING) AS sk_negotiation,
     id_installment_trato_feito,
     CAST(i.id_invoice_extra AS BIGINT) AS id_invoice_extra,
     i.installment_number,
@@ -172,8 +172,12 @@ SELECT DISTINCT
       WHEN ri.status = 'paid' THEN 'paid'
       ELSE i.installment_status
     END AS installment_status,
-    i.payment_method,
+    CASE
+      WHEN UPPER(i.payment_method) IN ("CREDIT-CARD", "CARTÃO", "CARTÃO DE CRÉDITO") THEN "CARTÃO DE CRÉDITO"
+      ELSE UPPER(i.payment_method)
+    END AS payment_method,
     i.delay_days,
+    i.main_amount - i.discount_amount AS net_amount,
     i.main_amount,
     i.updated_balance,
     i.fine_amount,

@@ -181,17 +181,17 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.trato_feito:load-clean-eviction-data
 bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.enrich_cyber_homolog:load-enrich-collection
-  - bietlejuice.enrich_cyber_homolog:load-enrich-installment
-  - bietlejuice.enrich_cyber_homolog:load-enrich-negotiation
+  - bietlejuice.enrich_cyber:load-enrich-collection
+  - bietlejuice.enrich_cyber:load-enrich-installment
+  - bietlejuice.enrich_cyber:load-enrich-negotiation
+  - bietlejuice.trato_feito:load-clean-contract
+  - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-client
   - bietlejuice.enrich_debt_recovery:load-enrich-debt
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
   - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
-  - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
-  - bietlejuice.enrich_recupera:load-enrich-collection
-  - bietlejuice.enrich_recupera:load-enrich-installment
-  - bietlejuice.enrich_recupera:load-enrich-negotiation
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.paschoalotto:load-clean-agreement-detail
@@ -204,10 +204,10 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.recupera:load-clean-creditor-pending
   - bietlejuice.recupera:load-clean-operational-records
   - bietlejuice.recupera:load-clean-operators
-  - bietlejuice.trato_feito:load-clean-accounting-installment
-  - bietlejuice.trato_feito:load-clean-client
-  - bietlejuice.trato_feito:load-clean-contract
-  - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.enrich_recupera:load-enrich-collection
+  - bietlejuice.enrich_recupera:load-enrich-installment
+  - bietlejuice.enrich_recupera:load-enrich-negotiation
+  - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -1465,7 +1465,7 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
   - bietlejuice.zendesk:load-clean-satisfaction-ratings
   - bietlejuice.zendesk:load-clean-tickets
-bietlejuice.enrich_cyber_homolog:
+bietlejuice.enrich_cyber:
   - bietlejuice.cyber:load-clean-agency
   - bietlejuice.cyber:load-clean-agreement-discounts
   - bietlejuice.cyber:load-clean-agreement-installments
@@ -1522,6 +1522,7 @@ bietlejuice.enrich_debt_recovery:
   - bietlejuice.trato_feito:load-clean-installment-charges
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
+  - bietlejuice.trato_feito:load-clean-billing
 bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events

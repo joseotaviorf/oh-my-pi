@@ -61,7 +61,7 @@ total_invoices_negotiated AS (
   SELECT
     id_negotiation,
     COUNT(DISTINCT id_invoice) AS total_invoices_negotiated
-  FROM datalake_cyber_homolog.debt_negotiation_mapping
+  FROM datalake_cyber.debt_negotiation_mapping
   GROUP BY 1
 ),
 deduplicate_agency_group AS (
@@ -141,7 +141,7 @@ union_promisses_agreements AS (
     ON c.id_offer = ci.id_offer
 )
 SELECT
-    a.id_agreement AS id_negotiation,
+    CAST(a.id_agreement AS STRING) AS id_negotiation,
     a.id_contract AS id_contract_cyber,
     c.id_contract_external AS id_contract,
     COALESCE(c.id_client, a.id_client) AS id_customer,

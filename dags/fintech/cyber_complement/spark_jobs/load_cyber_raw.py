@@ -4,15 +4,16 @@ from argparse import ArgumentParser
 
 from bietlejuice.base.db import DatalakeMetastoreService, DatabaseEnum
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, SparkDataFrameService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import OracleSparkConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.pipeline import FullTableLoaderPipeline
+from bietlejuice.pipeline import FullTableLoaderPipeline, IncrementalTableLoaderPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.messaging_services.message import Message
 from bietlejuice.services.messaging_services.gchat_service import GChatService
+from pyspark.sql.functions import current_timestamp
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -60,6 +61,11 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
     parser.add_argument("table_name", help="name of the output table")
+    parser.add_argument("load_start_date", help="Start of date range: '%Y-%m-%d'")
+    parser.add_argument("load_end_date", help="End of date range: '%Y-%m-%d'")
+    parser.add_argument("extraction_type", help="extraction_type - full or incremental")
+    parser.add_argument("partitions", help="partition columns")
+    parser.add_argument("date_filter_columns", help="partition columns")
 
     args = parser.parse_args()
 
@@ -67,11 +73,18 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     table_name = args.table_name
+    load_start_date = args.load_start_date
+    load_end_date = args.load_end_date
+    extraction_type = args.extraction_type
+    partitions = json.loads(args.partitions)
+    date_filter_columns = json.loads(args.date_filter_columns)
 
     logger.info(
         f"""
                 m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
-                table_name={table_name},  msg=Starting spark job...
+                table_name={table_name}, load_start_date={load_start_date}, load_end_date={load_end_date}
+                extraction_type={extraction_type}, partitions={partitions}, date_filter_columns={date_filter_columns}
+                msg=Starting spark job...
         """
     )
 
@@ -84,10 +97,27 @@ if __name__ == "__main__":
     oracle_consumer = OracleSparkConsumer(conn_config, spark_client)
 
     oracle_table_name = table_name.upper()
-    df = oracle_consumer.get_data_from_table(oracle_table_name)
+    if extraction_type == "incremental" and date_filter_columns:
+        df = oracle_consumer.get_incremental_data_from_table(oracle_table_name, date_filter_columns, load_start_date, load_end_date)
+    else:
+        df = oracle_consumer.get_data_from_table(oracle_table_name)
     if df.rdd.isEmpty():
         _send_warning(dbutils, environment, table_name)
     else:
+        df = df.withColumn("ts_ingestion", current_timestamp())
+
+        if extraction_type == "incremental":
+            partition = date_filter_columns[0] if date_filter_columns else "ts_ingestion"
+            df.select(partition).distinct().show()
+
+            df = (
+                SparkDataFrameService()
+                .input(df)
+                .create_year_month_day_columns_from_dataframe_column(partition)
+                .output()
+            )
+            df.select('year', 'month', 'day').distinct().show()
+
         db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
         spark_metastore_service = SparkMetastoreService(SparkClient())
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
@@ -98,10 +128,20 @@ if __name__ == "__main__":
         database_location = db_info["db_raw_path"]
         spark_metastore_service.create_database(database_name)
 
-        FullTableLoaderPipeline(
-            database_name=database_name,
-            table_name=table_name,
-            database_location=database_location,
-            layer=LayerEnum.RAW,
-            query=None
-        ).load_and_register(df, format_options)
+        if extraction_type == "incremental":
+            IncrementalTableLoaderPipeline(
+                database_name=database_name,
+                table_name=table_name,
+                database_location=database_location,
+                layer=LayerEnum.RAW,
+                query=None,
+                partitions=partitions,
+            ).load_and_register(df, format_options)
+        else:
+            FullTableLoaderPipeline(
+                database_name=database_name,
+                table_name=table_name,
+                database_location=database_location,
+                layer=LayerEnum.RAW,
+                query=None
+            ).load_and_register(df, format_options)

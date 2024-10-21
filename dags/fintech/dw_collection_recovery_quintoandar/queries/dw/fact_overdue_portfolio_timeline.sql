@@ -57,7 +57,7 @@ negotiation_data AS (
     d.id_contract,
     CASE
       WHEN LOWER(n.promisse_payment_method) LIKE '%cartão%' THEN n.original_debt_amount
-      ELSE n.down_payment_amount_paid
+      ELSE n.down_payment_net_amount_paid
     END AS net_recovery_amount,
     IF(n.origin_agreement = "Portal Auto Negociação", TRUE, FALSE) AS is_ssn_boletao
   FROM dw_collection_recovery_quintoandar.fact_debt AS d
@@ -66,8 +66,7 @@ negotiation_data AS (
   INNER JOIN dw_collection_recovery_quintoandar.fact_negotiation AS n
     ON b.sk_negotiation = n.sk_negotiation
   WHERE
-    n.down_payment_amount_paid != 0
-    AND n.negotiation_status IN ("broken", "finished", "offset")
+    n.down_payment_net_amount_paid != 0
   QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_invoice, d.id_contract ORDER BY ABS(DATE_DIFF(n.dt_down_payment, d.dt_paid))) = 1
 ),
 add_all_dimensions AS (
@@ -126,8 +125,10 @@ SELECT
     o.paid_amount,
     o.recovered_amount,
     CASE
-        WHEN o.dt_invoice_paid BETWEEN o.dt_month_start AND o.dt_reference
-            AND o.dt_invoice_paid > o.dt_invoice_due_adjust
+        WHEN o.payment_status = "paid" THEN o.recovered_amount
+        WHEN o.payment_status = "written-down"
+          AND o.dt_invoice_paid BETWEEN o.dt_month_start AND o.dt_reference
+          AND o.dt_invoice_paid > o.dt_invoice_due_adjust
         THEN n.net_recovery_amount
         ELSE 0
     END AS net_recovery_amount,

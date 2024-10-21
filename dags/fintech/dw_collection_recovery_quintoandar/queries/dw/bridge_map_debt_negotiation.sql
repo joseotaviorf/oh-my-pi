@@ -36,9 +36,11 @@ deduplicate_complementary_records_written_down AS (
 ),
 recupera_debts AS (
   SELECT
+    CONCAT(COALESCE(cp.id_contract, cr.id_contract, crwd.id_contract), "-", COALESCE(cp.id_invoice, cr.id_invoice, crwd.id_invoice)) AS id_debt,
     COALESCE(cp.id_invoice, cr.id_invoice, crwd.id_invoice) AS id_invoice,
     COALESCE(cp.id_contract, cr.id_contract, crwd.id_contract) AS id_contract,
-    COALESCE(cp.id_negotiation, cr.id_negotiation, crwd.id_negotiation) AS id_negotiation
+    CAST(COALESCE(cp.id_negotiation, cr.id_negotiation, crwd.id_negotiation) AS BIGINT) AS id_negotiation,
+    "Recupera" AS source
   FROM deduplicate_creditor_pending AS cp
   FULL OUTER JOIN deduplicate_complementary_records AS cr
       ON cp.id_contract = cr.id_contract
@@ -52,9 +54,11 @@ recupera_debts AS (
 ),
 trato_feito_debts AS (
   SELECT
+    CONCAT(n.id_contract, "-", d.id_external) AS id_debt,
     d.id_external AS id_invoice,
-    n.id_negotiation_external AS id_negotiation,
-    n.id_contract
+    IFNULL(CAST(n.id_negotiation_external AS BIGINT),n.id_negotiation_external) AS id_negotiation,
+    n.id_contract,
+    "Trato Feito" AS source
   FROM datalake_trato_feito_clean.debt AS d
   LEFT JOIN datalake_debt_recovery.negotiation AS n
     ON d.id_negotiation = n.id_negotiation
@@ -65,41 +69,22 @@ trato_feito_debts AS (
 ),
 cyber_debts AS (
   SELECT
+    CONCAT(id_contract, "-", id_invoice) AS id_debt,
     id_contract,
-    id_negotiation,
-    id_invoice
-  FROM datalake_cyber_homolog.debt_negotiation_mapping
-),
-union_sources AS (
-  SELECT
-    CONCAT(id_contract, "-", id_invoice) AS sk_debt,
-    id_negotiation AS sk_negotiation,
-    "Cyber" AS source,
-    1 AS priority
-  FROM cyber_debts
-
-  UNION DISTINCT
-
-  SELECT
-    CONCAT(id_contract, "-", id_invoice) AS sk_debt,
-    id_negotiation AS sk_negotiation,
-    "Trato Feito" AS source,
-    2 AS priority
-  FROM trato_feito_debts
-
-  UNION DISTINCT
-
-  SELECT
-    CONCAT(id_contract, "-", id_invoice) AS sk_debt,
-    id_negotiation AS sk_negotiation,
-    "Recupera" AS source,
-    3 AS priority
-  FROM recupera_debts
+    CAST(id_negotiation AS BIGINT) AS id_negotiation,
+    id_invoice,
+    "Cyber" AS source
+  FROM datalake_cyber.debt_negotiation_mapping
 )
 SELECT
-  sk_debt,
-  sk_negotiation,
-  source,
+  COALESCE(t.id_debt, c.id_debt, r.id_debt) AS sk_debt,
+  CAST(COALESCE(t.id_negotiation, c.id_negotiation, r.id_negotiation) AS STRING) AS sk_negotiation,
+  COALESCE(t.source, c.source, r.source) AS source,
   NOW() AS ts_load
-FROM union_sources
-QUALIFY ROW_NUMBER() OVER(PARTITION BY sk_debt, sk_negotiation ORDER BY priority) = 1
+FROM trato_feito_debts AS t
+FULL OUTER JOIN cyber_debts AS c
+  ON CAST(t.id_negotiation AS BIGINT) = CAST(c.id_negotiation AS BIGINT)
+    AND t.id_invoice = c.id_invoice
+FULL OUTER JOIN recupera_debts AS r
+  ON CAST(t.id_negotiation AS BIGINT) = CAST(r.id_negotiation AS BIGINT)
+    AND t.id_invoice = r.id_invoice
