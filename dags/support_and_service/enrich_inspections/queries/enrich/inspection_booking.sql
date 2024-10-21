@@ -12,7 +12,7 @@ WITH union_inspection_history AS (
         i.id_previous_inspection,
         i.id_external,
         i.id_inspector,
-        i.id_schedule AS id_booking,
+        COALESCE(a.id_appointment, i.id_schedule) AS id_booking,
         NULL AS id_appointment,
         i.id_contract,
         i.id_client_side,
@@ -33,6 +33,9 @@ WITH union_inspection_history AS (
         NULL AS ts_first_synced
     FROM
         last_inspection_update AS i
+    LEFT JOIN
+        datalake_inspections_clean.appointment AS a
+          ON i.id_inspection = a.id_inspection
     WHERE
         DATE(i.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
     UNION
