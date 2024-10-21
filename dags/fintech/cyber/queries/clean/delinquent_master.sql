@@ -299,5 +299,8 @@ SELECT
     DMACDT3_5 AS ts_history_5_most_important_activity_class_3,
     DMPRVIDT AS ts_previous_interest_calculation,
     DMINTDT AS ts_last_interest_calculation,
+    year,
+    month,
+    day,
     NOW() AS ts_load
 FROM datalake_cyber_raw.delqmst

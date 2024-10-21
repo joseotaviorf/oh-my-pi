@@ -53,6 +53,9 @@ SELECT
     END AS module,
     AVINACCT,
     AVRESULT,
+    year,
+    month,
+    day,
     NOW() AS ts_load
 FROM datalake_cyber_raw.actvertb
 QUALIFY ROW_NUMBER() OVER(PARTITION BY AVCODE, AVTYPE, AVACCTG ORDER BY ts_ingestion DESC) = 1

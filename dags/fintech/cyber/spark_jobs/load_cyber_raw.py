@@ -1,6 +1,7 @@
 import json
 import logging
 from argparse import ArgumentParser
+import ast
 
 from bietlejuice.base.db import DatalakeMetastoreService, DatabaseEnum
 from bietlejuice.base.pipeline import LayerEnum
@@ -76,8 +77,8 @@ if __name__ == "__main__":
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
     extraction_type = args.extraction_type
-    partitions = json.loads(args.partitions)
-    date_filter_columns = json.loads(args.date_filter_columns)
+    partitions = ast.literal_eval(args.partitions)
+    date_filter_columns = ast.literal_eval(args.date_filter_columns)
 
     logger.info(
         f"""
