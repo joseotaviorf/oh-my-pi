@@ -223,7 +223,8 @@ for_rent_score AS (
     avg_lpv_days_pub_1d AS qt_lpv_1d_for_rent,
     avg_lpv_days_pub_3d AS qt_lpv_3d_for_rent,
     avg_lpv_days_pub_7d AS qt_lpv_7d_for_rent,
-    well_priced_score AS quality_score
+    well_priced_score AS quality_score,
+    listing_pub_dt AS dt_publication
   FROM 
     final_db
   WHERE 
@@ -262,9 +263,11 @@ results AS (
     fr.qt_lpv_1d_for_rent,
     fr.qt_lpv_3d_for_rent,
     fr.qt_lpv_7d_for_rent,
+    fr.dt_publication AS dt_publication_for_rent,
     fs.qt_lpv_1d_for_sale,
     fs.qt_lpv_3d_for_sale,
     fs.qt_lpv_7d_for_sale,
+    fs.dt_publication AS dt_publication_for_sale,
     CASE
       WHEN liquidity_score >= 0 AND liquidity_score < 10 THEN 'A'
       WHEN liquidity_score >= 10 AND liquidity_score < 20 THEN 'B'
