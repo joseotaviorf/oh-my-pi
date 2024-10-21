@@ -31,103 +31,103 @@ workflow:
       extraction_type: incremental
       partitions: [year, month, day]
       extra_spark_job_arguments:
-        - ["DMHOSTUP"]
+        - "['DMHOSTUP']"
     tb_historico_disponibilizacao:
       clean_table_name: history_contract_distribution
       extraction_type: incremental
       partitions: [year, month, day]
       extra_spark_job_arguments:
-        - ["HD_DT_DISPONIBILIZACAO"]
+        - "['HD_DT_DISPONIBILIZACAO']"
     actfil:
       clean_table_name: logs
       extraction_type: incremental
       partitions: [year, month, day]
       extra_spark_job_arguments:
-        - ["ACACTDTE"]
+        - "['ACACTDTE']"
     relations:
       clean_table_name: debtor
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     uda1:
       clean_table_name: contracts
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     phone:
       clean_table_name: phone
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     address:
       clean_table_name: address
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     pmtfil:
       clean_table_name: payments
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     agrdm:
       clean_table_name: contracts_agreements
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     agrhdr:
       clean_table_name: agreements
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     agdscdet:
       clean_table_name: agreement_discounts
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     agpmtdet:
       clean_table_name: agreement_installments
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     tb_boleto:
       clean_table_name: agreement_invoices
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     tb_parcela:
       clean_table_name: bill
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     collid:
       clean_table_name: users
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     agency:
       clean_table_name: agency
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
     agr_hist:
       clean_table_name: historical_agreements
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - []
+        - "[]"
 cluster:
   type: custom_cluster
   custom_configurations:
