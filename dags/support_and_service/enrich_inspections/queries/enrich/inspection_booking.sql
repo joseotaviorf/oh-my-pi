@@ -312,3 +312,5 @@ LEFT JOIN
 LEFT JOIN
     repair_metrics AS rm
       ON rm.id_inspection = i.id_inspection
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY i.id_inspection ORDER BY i.ts_updated DESC) = 1
