@@ -185,8 +185,6 @@ bietlejuice.dw_datamarts_spark.static:
 bietlejuice.dw_date:
   add:
     - bietlejuice.enrich_public_date:load-enrich-aux-date
-bietlejuice.dw_fact_conversion_metrics:
-  override: []
 bietlejuice.dw_photo_jobs:
   remove:
     - bietlejuice.ebdb:load-clean-booking
