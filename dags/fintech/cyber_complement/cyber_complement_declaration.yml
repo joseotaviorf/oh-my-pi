@@ -41,70 +41,104 @@ workflow:
         - []
     tb_grupo_agency:
       clean_table_name: agency_group
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     agtpdsc:
       clean_table_name: agreement_type_discount
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     que_dectbl:
       clean_table_name: segmentation_decision_tree
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     que_dectbl3:
       clean_table_name: agreement_decision_tree
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     que_dectbl4:
       clean_table_name: digital_channel_decision_tree
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     que_dectbl5:
       clean_table_name: eviction_decision_tree
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     que_dectbl6:
       clean_table_name: credit_denial_decision_tree
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     agn_dectbl:
       clean_table_name: agency_decision_tree
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     agrvalq:
       clean_table_name: queue_agreement_type
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     valcodes:
       clean_table_name: logs_valid_result_code
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     lbl_dectbl1:
       clean_table_name: olos_dialer_label_decision_tree
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     lbl_dectbl3:
       clean_table_name: campaign_label_decision_tree
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     lbl_dectbl5:
       clean_table_name: pre_legal_label_decision_tree
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     tb_campanha:
       clean_table_name: campaign
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     tb_campanha_ofer:
       clean_table_name: campaign_installments
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     tb_campanha_desc:
       clean_table_name: campaign_discounts
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
     tb_campanha_contrato:
       clean_table_name: campaign_contracts
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - []
 cluster:
