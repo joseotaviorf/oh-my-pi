@@ -58,10 +58,12 @@ extract_wololo AS (
         p.id_external AS id_lead_rene,
         'owner_conversion' AS origin,
         EXPLODE(
-            ARRAY(
-            IF(p.is_for_rent, 'RENT', NULL),
-            IF(p.is_for_sale, 'SALE', NULL)
-            )
+          CASE 
+            WHEN (p.is_for_rent IS FALSE) AND (p.is_for_sale IS FALSE) THEN ARRAY('RENT', 'SALE')
+            WHEN (p.is_for_rent IS TRUE) AND (p.is_for_sale IS FALSE) THEN ARRAY('RENT', NULL)
+            WHEN (p.is_for_rent IS FALSE) AND (p.is_for_sale IS TRUE) THEN ARRAY(NULL, 'SALE')
+            ELSE ARRAY('RENT', 'SALE')
+          END
         ) AS business_context,
         l.id_region
     FROM
