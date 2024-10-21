@@ -38,7 +38,7 @@ tables:
 
   respondent_attributes:
     endpoint_enum: RESPONDENT_ATTRIBUTES
-    feedback_parameters_query: SELECT DISTINCT GET_JSON_OBJECT(respondent, "$.uuid") AS respondent_uuid FROM datalake_survicate_raw.survey_responses WHERE DATE(dt_load) = DATE('{execution_date}')
+    feedback_parameters_query: SELECT DISTINCT GET_JSON_OBJECT(respondent, "$.uuid") AS respondent_uuid FROM datalake_survicate_raw.survey_responses WHERE DATE(dt_load) = DATE('{execution_date}') and workspace_name = '{workspace}'
     optional_parameters:
       items_per_page: 100
       start: "{execution_date}T23:59:59.000000Z"
