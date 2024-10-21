@@ -1,9 +1,0 @@
----
-table_name: datalake_demand_flows.demand_prospect_conversion_events
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  id_demand_prospect_conversion_event:
-    is_complete:
-      severity_level: Error
-    is_unique:
-      severity_level: Error
