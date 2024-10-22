@@ -1,0 +1,16 @@
+---
+dag:
+  name: enrich_demand_score_report
+  schedule_start_date: 2024, 10, 20
+  owner: Data Growth
+  documentation:
+    dag_purpose: 'Consolidate snapshot from reverse_demand_score'
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: ['dt_snapshot']
+  extra_query_template_params:
+    snapshot_date: "{{ get_date_param(dag_run, ds, 'snapshot_date') }}"
+cluster:
+  type: databricks_13_3_min_general_cluster

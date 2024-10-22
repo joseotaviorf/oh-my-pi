@@ -1,0 +1,59 @@
+---
+database_name: datalake_demand_score_report
+table_name: demand_score_report
+owner: arthur.gonzaga@quintoandar.com.br
+domain: Data Growth
+description: This table contains snapshot of reverse from demand_score in Masterfeed.
+columns:
+  id_house:
+    description: The unique identifier of the house.
+    lineage:
+      - reverse_demand_score.listing_demand_score.id_house
+  listing_age:
+    description: The age of the listing related in month in For Rent.
+    lineage:
+      - reverse_demand_score.listing_demand_score.listing_age
+  quality_score:
+    description: The quality score of the listing in For Rent.
+    lineage:
+      - reverse_demand_score.listing_demand_score.quality_score
+  qt_lpv_1d_for_rent:
+    description: The quantity of LPV in the last 1 day in For Rent.
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_1d_for_rent
+  qt_lpv_3d_for_rent:
+    description: The quantity of LPV in the last 3 days in For Rent.
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_3d_for_rent
+  qt_lpv_7d_for_rent:
+    description: The quantity of LPV in the last 7 days in For Rent.
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_7d_for_rent
+  dt_publication_for_rent:
+    description: The date of publication of the listing in For Rent.
+    lineage:
+      - reverse_demand_score.listing_demand_score.dt_publication_for_rent
+  qt_lpv_1d_for_sale:
+    description: The quantity of LPV in the last 1 day in For Sale.
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_1d_for_sale
+  qt_lpv_3d_for_sale:
+    description: The quantity of LPV in the last 3 days in For Sale.
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_3d_for_sale
+  qt_lpv_7d_for_sale:
+    description: The quantity of LPV in the last 7 days in For Sale.
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_7d_for_sale
+  dt_publication_for_sale:
+    description: The date of publication of the listing in For Sale.
+    lineage:
+      - reverse_demand_score.listing_demand_score.dt_publication_for_sale
+  demand_score:
+    description: The demand score of the listing.
+    lineage:
+      - reverse_demand_score.listing_demand_score.demand_score
+  dt_snapshot:
+    description: The date of the snapshot.
+    lineage:
+      - reverse_demand_score.listing_demand_score.dt_snapshot
