@@ -5,7 +5,7 @@ description: Enriched table that consolidates rent offer data from the Firestore
   related to an offer.
   Each line is an unique offer, its most recently update.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_firestore:
     description: Unique offer id that comes from the Firestore.

@@ -8,7 +8,7 @@ description:
   cohort conversions event metric.
   Each line has the total volume of the cohort conversion by its dimensions on a daily snapshot."
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_snapshot:
     description: "Date of the snapshot transformed into a number."

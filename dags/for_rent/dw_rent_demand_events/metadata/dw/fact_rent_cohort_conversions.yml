@@ -12,7 +12,7 @@ description: "Transactional fact table that registers a row for each conversion 
   weeks_to_conversion will be -1.
   Each line is an unique cohort conversion."
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   sk_cohort_conversion:
     lineage:

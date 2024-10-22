@@ -3,7 +3,7 @@ database_name: datalake_rent_demand_events
 table_name: rent_demand_events
 description: "This table shows the demand events of For Rent, each line is an event related to the scope and is partitioned by the country_code."
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_event:
     lineage:

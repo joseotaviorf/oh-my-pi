@@ -6,7 +6,7 @@ description: This table has information related to rent flow's type information.
   Each line is an unique combination of all the possible characteristics of a rent flow. The id_rent_flow_type it's a mutable id
   and should not be used for analysis purposes.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_rent_flow_type:
     description: Unique and mutable id related to the combination of characteristics of a rent flow.

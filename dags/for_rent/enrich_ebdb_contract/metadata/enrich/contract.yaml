@@ -2,7 +2,7 @@ database_name: datalake_ebdb_contract
 table_name: contract
 description: Information related to ForRent contracts. Each line is an unique contract.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: kleber.inoue@quintoandar.com.br
 columns:
   id:
     lineage:

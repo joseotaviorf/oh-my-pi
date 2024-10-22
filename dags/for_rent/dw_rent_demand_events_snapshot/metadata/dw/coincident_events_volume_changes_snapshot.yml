@@ -23,7 +23,7 @@ description: This table has the dailies snapshots data based on the rent demand 
   Each line has the total volume of the coincident conversions and its differences groupped by some dimensions (country_code, business_type,
   rent_flow_origin) on a daily snapshot.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   reference_type:
     description: Reference type of the current time visualization.

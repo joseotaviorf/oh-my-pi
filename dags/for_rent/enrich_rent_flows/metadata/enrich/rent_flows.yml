@@ -10,7 +10,7 @@ description: "This table has information related to a rent flow and its events (
   that was created but has no visits booked and the only offer wasn't sent yet).
   The id_rent_flow must not be unique, since it can have several visits, offers, etc."
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_rent_flow:
     lineage:

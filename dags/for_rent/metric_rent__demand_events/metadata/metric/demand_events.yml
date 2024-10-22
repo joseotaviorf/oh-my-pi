@@ -2,7 +2,7 @@ database_name: metric_rent
 table_name: demand_events
 description: This table contains the aggregated sum of demand events of For Rent, each line has the total volume of events related to the scope within the aggregation.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   halfyear:
     lineage:

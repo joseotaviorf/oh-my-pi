@@ -7,7 +7,7 @@ description:
   and it's possible to use the sk_event column to join with the dw_rent.dim_contract).
   Each line is the most recent update of an event related to the scope.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   pk_rent_demand_event:
     lineage:

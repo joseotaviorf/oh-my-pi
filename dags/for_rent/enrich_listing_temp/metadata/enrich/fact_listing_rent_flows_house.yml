@@ -5,7 +5,7 @@ description:
   It's very important to keep in mind that every line of this table is related to an event of the rent flow and it's possible to occur more than one event per type in the same rent flow, e.g. multiple bookings within the same rent flow.
   Each line is a rent flow composed by house listing + tenant prospect + event related to the rent flow.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   ods_id:
     lineage:

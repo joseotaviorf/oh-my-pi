@@ -2,7 +2,7 @@ database_name: dw_rent
 table_name: dim_rent_cohort_conversion_type
 description: "This dimension table has all the rent cohort conversions descriptions. Each line is an unique sk_cohort_type."
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   sk_cohort_type:
     description: "Key that indicates the type of cohort conversion."

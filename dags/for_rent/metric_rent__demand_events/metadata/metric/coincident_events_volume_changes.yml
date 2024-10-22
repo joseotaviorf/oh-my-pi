@@ -20,7 +20,7 @@ description: This table contains the aggregated sum of coincident events of For 
   query's performance.
   Each line has the total volume of the coincident events on different days within several dimensions.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   reference_type:
     lineage:

@@ -3,7 +3,7 @@ table_name: cohort_conversions_volumes
 description: This table contains the volume of ForRent Demand events that were converted or not.
   Each line has the total volume of the cohort related to the scope within the aggregation.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   halfyear:
     lineage:

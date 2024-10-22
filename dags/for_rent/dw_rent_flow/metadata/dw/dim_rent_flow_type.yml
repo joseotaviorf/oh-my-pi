@@ -6,7 +6,7 @@ description: Junk dimension table that contains information related to the rent 
     This table is partitioned by the country_code and first_touchpoint columns (in this exactly order), so make sure to
     use them as one of the first filters of the query (in the same order) in order to improve its performance.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   sk_rent_flow_type:
     lineage:

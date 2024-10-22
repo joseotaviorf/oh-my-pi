@@ -4,7 +4,7 @@ description: Table that consolidates coincident metrics related to contracts lif
   terminations created, terminations canceled, terminations ended and ended rentals.
   All these metrics are open by some dimensions, such as country code, city group, tier, date, week start and month.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: kleber.inoue@quintoandar.com.br
 columns:
   country_code:
     lineage:

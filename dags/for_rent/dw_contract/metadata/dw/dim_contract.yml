@@ -2,7 +2,7 @@ database_name: dw_rent
 table_name: dim_contract
 description: Information about ForRent contracts. Each line is a unique contract.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: kleber.inoue@quintoandar.com.br
 columns:
   sk_contract:
     lineage:

@@ -3,7 +3,7 @@ table_name: dim_contract_person
 description: Table with context information about people involved in a contract created
   (users or not). Each line is a register of a person, not necessarily unique in database
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: kleber.inoue@quintoandar.com.br
 columns:
   sk_contract_person:
     lineage:

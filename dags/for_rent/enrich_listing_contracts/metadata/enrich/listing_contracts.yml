@@ -7,7 +7,7 @@ description: This table contains the information about house listings (that were
   to different versions of the same listing (cases like extended rentals, for example).
   The table is partitioned by the country_code column, which should be used to improve analysis' performance.
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: kleber.inoue@quintoandar.com.br
 columns:
   id_house_listing:
     lineage:

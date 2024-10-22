@@ -6,7 +6,7 @@ description:
   data updates through time. The table has aggregated sums of demand events of the rental funnel, which is also the base used to build the rent demand event metric.
   Each line has the total volume of the aggregation by its dimensions on a daily snapshot."
 domain: For Rent
-owner: isadora.gallerani@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_snapshot:
     description: "Date of the snapshot transformed into a number."
