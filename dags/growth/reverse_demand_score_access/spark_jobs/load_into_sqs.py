@@ -66,6 +66,9 @@ def send_message(sqs_client, queue_url, data):
     try:
         for message in data:
             message_body = json.dumps(message)
+            
+            logger.info(f'Sending message to SQS: {message_body}')
+
             sqs_client.send_message(
                 QueueUrl=queue_url,
                 MessageBody=message_body,
