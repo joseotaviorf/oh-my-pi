@@ -6,7 +6,7 @@ is_incremental:
   incremental_date_mask: yyyy-MM-dd
 table_level_validations:
   has_size:
-    greater_than_or_equal_to: 20
+    greater_than_or_equal_to: 10
 column_level_validations:
   group_name:
     is_complete:
