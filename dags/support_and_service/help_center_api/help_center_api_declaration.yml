@@ -15,8 +15,10 @@ workflow:
   tables_customization:
     t_call_request:
       clean_table_name: call_request
+      merge_on: [id_user, id_session]
     t_call_in_app_eligibility:
       clean_table_name: call_in_app_eligibility
+      merge_on: [id_user, status]
 
 cluster:
   type: databricks_12_2_min_general_cluster
