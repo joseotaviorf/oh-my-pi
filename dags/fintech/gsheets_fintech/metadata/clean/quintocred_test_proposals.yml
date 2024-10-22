@@ -1,0 +1,13 @@
+---
+database_name: datalake_gsheets_clean
+table_name: quintocred_test_proposals
+columns:
+  executive:
+    lineage:
+      - datalake_gsheets_raw.quintocred_test_proposals.sk_propose
+  brokers_wes:
+    lineage:
+      - datalake_gsheets_raw.quintocred_test_proposals.name
+  target_contatos:
+    lineage:
+      - datalake_gsheets_raw.quintocred_test_proposals.email

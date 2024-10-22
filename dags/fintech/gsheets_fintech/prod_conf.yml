@@ -96,6 +96,12 @@ sheets_info:
     sheet_name: executives_targets_commercial
     clean_table_name: quintocred_executives_targets_commercial
     sheet_context: fintech
+
+  quintocred_test_proposals:
+    sheet_id: 1nqLwYeDxdq5lP9C2UCrOPO12B_X-B9rKYdY5HtJg2Gc
+    sheet_name: quintocred_test_proposals
+    clean_table_name: quintocred_test_proposals
+    sheet_context: fintech
   
   fdic_acquisition_2023:
     sheet_id: 1Vu0vpRWjgzcr_e-R0WLmhyExZ4I05dk_jstdyagOaS4
