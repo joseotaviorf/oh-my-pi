@@ -7,10 +7,13 @@ union_collection AS (
         operator_agency,
         "IQ QuintoAndar" AS creditor,
         action,
+        action_code_type,
         action_description,
         result,
+        result_code_type,
         result_description,
         complement,
+        complement_code_type,
         complement_description,
         DATE(ts_occurrence) AS dt_occurrence,
         SUM(IFNULL(esforco,0)) AS total_esforco,
@@ -22,7 +25,7 @@ union_collection AS (
         'Cyber' AS source,
         1 AS priority
     FROM datalake_cyber.collection
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 
     UNION DISTINCT
 
@@ -36,10 +39,13 @@ union_collection AS (
             WHEN c.id_creditor IN (2,6) THEN "PP QuintoAndar"
         END AS creditor,
         UPPER(c.id_occurrence) AS action,
+        NULL AS action_code_type,
         UPPER(c.occurrence) AS action_description,
         NULL AS result,
+        NULL AS result_code_type,
         NULL AS result_description,
         NULL AS complement,
+        NULL AS complement_code_type,
         NULL AS complement_description,
         DATE(c.ts_occurrence) AS dt_occurrence,
         SUM(IFNULL(c.esforco,0)) AS total_esforco,
@@ -54,7 +60,7 @@ union_collection AS (
     LEFT JOIN datalake_recupera_clean.operators AS o
         ON UPPER(c.operator_name) = UPPER(o.id_operator)
     WHERE c.id_creditor NOT IN (3,5)
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 
 )
 SELECT
@@ -65,10 +71,13 @@ SELECT
     operator_agency,
     source,
     action,
+    action_code_type,
     action_description,
     result,
+    result_code_type,
     result_description,
     complement,
+    complement_code_type,
     complement_description,
     total_esforco,
     total_alo,

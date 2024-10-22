@@ -32,7 +32,7 @@ workflow:
       raw_extraction_type: incremental
       raw_partitions: [year, month, day]
       clean_extraction_type: full
-      merge_on: ["AVCODE", "AVTYPE", "AVACCTG"]
+      merge_on: ["code", "code_type", "group"]
       extra_spark_job_arguments:
         - "[]"
     agrtype:
@@ -40,7 +40,7 @@ workflow:
       raw_extraction_type: incremental
       raw_partitions: [year, month, day]
       clean_extraction_type: full
-      merge_on: ["AGTYPE"]
+      merge_on: ["id_agreement_type"]
       extra_spark_job_arguments:
         - "[]"
     tb_grupo_agency:
