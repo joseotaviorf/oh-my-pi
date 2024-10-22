@@ -1,6 +1,6 @@
-WITH 
+WITH
 first_lbc_state AS (
-  SELECT 
+  SELECT
     bch.id_house,
     bch.status,
     bch.status_reason,
@@ -11,13 +11,13 @@ first_lbc_state AS (
     bch.country_code
   FROM
     datalake_ebdb_listing.business_context_history AS bch
-  WHERE 
+  WHERE
     bch.business_context = 'RENT'
-  QUALIFY 
-    ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC) = 1   
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC) = 1
 ),
 house AS (
-  SELECT 
+  SELECT
     house.id_house,
     house.status_history AS status,
     house.reason AS status_reason,
@@ -28,20 +28,20 @@ house AS (
     house.events_change_status,
     IF(
         (
-          house.events_change_status IS NOT NULL 
-          OR house.ts_status_changed_next = house.ts_first_publication 
+          house.events_change_status IS NOT NULL
+          OR house.ts_status_changed_next = house.ts_first_publication
           OR (
               (house.order_version = 0 OR house.order_status=1)
-              AND 
+              AND
               LEAD(house.status_history) OVER(PARTITION BY house.id_house ORDER BY house.ts_status_changed, house.ts_status_changed_next) = 'publicado'
           )
           OR (
-            house.order_status=1 
-            AND 
+            house.order_status=1
+            AND
             house.order_version=1
           )
-        ), 
-        1, 
+        ),
+        1,
         0
       ) AS trigger_new_version,
     MAX(house.order_status) OVER(PARTITION BY house.id_house) AS max_house_state_order,
@@ -49,7 +49,7 @@ house AS (
     house.ts_first_publication,
     house.rev,
     MAX(rev.reason) OVER(PARTITION BY house.id_house, house.status_history, house.ts_status_changed) AS revision_reason
-  FROM 
+  FROM
     datalake_ebdb_listing.house_status_version_order AS house
   LEFT JOIN
     datalake_ebdb_clean.user_revision_entity AS rev
@@ -58,7 +58,7 @@ house AS (
     CAST(FROM_UNIXTIME(CAST(ts_revision AS BIGINT)/1000) AS TIMESTAMP) < '2020-01-06 19:04:25' --Timestamp when table listing_business_context was created
 ),
 last_house_state AS (
-  SELECT 
+  SELECT
     h.id_house,
     h.status,
     h.status_reason,
@@ -87,7 +87,7 @@ last_house_state AS (
     house AS h
   LEFT JOIN first_lbc_state AS flbc
     ON flbc.id_house = h.id_house
-  WHERE 
+  WHERE
     h.state_order = h.max_house_state_order
 ),
 first_publication AS (
@@ -103,7 +103,7 @@ first_publication AS (
     id_house
 ),
 business_context_history AS (
-  SELECT 
+  SELECT
       bch.id_house,
       bch.country_code,
       bch.business_context,
@@ -117,12 +117,12 @@ business_context_history AS (
       bch.status,
       bch.status_reason,
       bch.suspension_reason,
-      CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_in_state, 
+      CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_in_state,
       IF(
         bch.status = LAG(bch.status) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, COALESCE(bch.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))),
         LAG(
             CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
-        ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, COALESCE(bch.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) 
+        ) OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started, COALESCE(bch.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY)))
         +
         CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER),
         CAST((CAST(CAST(COALESCE(bch.ts_state_ended, NOW()) AS TIMESTAMP) AS LONG) - CAST(CAST(bch.ts_state_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER)
@@ -156,9 +156,9 @@ business_context_history AS (
       MAX(bch.rev) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started, COALESCE(bch.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS rev,
       MAX(rev.reason) OVER(PARTITION BY bch.id_house, bch.status, bch.ts_state_started, COALESCE(bch.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS revision_reason,
       COALESCE(lhs.ts_first_publication, fp.ts_first_publication) AS ts_first_publication
-  FROM 
+  FROM
       datalake_ebdb_listing.business_context_history AS bch
-  LEFT JOIN 
+  LEFT JOIN
     last_house_state AS lhs
       ON lhs.id_house = bch.id_house
   LEFT JOIN
@@ -169,14 +169,14 @@ business_context_history AS (
       ON fp.id_house = bch.id_house
   WHERE
     bch.business_context = 'RENT'
-), 
+),
 status_change_time AS (
-  SELECT 
-    bch.id_house, 
+  SELECT
+    bch.id_house,
     bch.country_code,
     bch.status,
     IF(
-      bch.status <> bch.previous_state_status 
+      bch.status <> bch.previous_state_status
       OR bch.previous_state_status IS NULL
       , bch.ts_state_started
       , NULL
@@ -185,32 +185,32 @@ status_change_time AS (
     bch.ts_state_started,
     bch.ts_state_ended,
     bch.lbc_state_order
-  FROM 
+  FROM
     business_context_history AS bch
   WHERE
-    (bch.status <> bch.previous_state_status 
+    (bch.status <> bch.previous_state_status
       OR bch.previous_state_status IS NULL)
     OR
     (bch.status <> bch.next_status)
-), 
+),
 status_change AS (
   SELECT DISTINCT
     sct.id_house,
     sct.country_code,
     sct.status,
     COALESCE(
-        sct.start_time, 
+        sct.start_time,
         LAG(sct.start_time) OVER(PARTITION BY sct.id_house ORDER BY sct.ts_state_started, COALESCE(sct.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY)))
     ) AS ts_status_started,
     COALESCE(
-        sct.end_time, 
+        sct.end_time,
         LEAD(sct.end_time) OVER(PARTITION BY sct.id_house ORDER BY sct.ts_state_started, COALESCE(sct.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY)))
     ) AS ts_status_ended
-  FROM 
+  FROM
     status_change_time AS sct
-), 
+),
 status_order AS (
-  SELECT 
+  SELECT
     sc.id_house,
     sc.country_code,
     LAG(sc.status) OVER(PARTITION BY sc.id_house ORDER BY sc.ts_status_started, COALESCE(sc.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS prev_status,
@@ -219,7 +219,7 @@ status_order AS (
     sc.ts_status_started,
     sc.ts_status_ended,
     CAST((CAST(CAST(COALESCE(sc.ts_status_ended, now()) AS TIMESTAMP) AS LONG) - CAST(CAST(sc.ts_status_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_in_status
-  FROM 
+  FROM
     status_change AS sc
 ),
 trigger AS (
@@ -262,8 +262,8 @@ trigger AS (
             )
             OR
             ( --Recovered
-              bch.next_status = 'PUBLISHED' 
-              AND bch.status = 'UNPUBLISHED' 
+              bch.next_status = 'PUBLISHED'
+              AND bch.status = 'UNPUBLISHED'
               AND IF(lhs.status = 'despublicado' AND lhs.ts_first_publication IS NOT NULL, lhs.days_in_status + so.days_in_status, so.days_in_status) >= 84
               AND bch.ts_first_publication IS NOT NULL
             )
@@ -271,7 +271,7 @@ trigger AS (
             ( --Relisting
                 bch.next_status = 'PUBLISHED'
                 AND ( --Remove available_soon cases
-                        bch.next_status_reason <> 'RELISTING' 
+                        bch.next_status_reason <> 'RELISTING'
                         OR bch.next_status_reason IS NULL
                     )
                 AND bch.status = 'SUSPENDED'
@@ -296,8 +296,8 @@ trigger AS (
           (
             ( --First Listing
                 (
-                  bch.ts_first_publication IS NULL 
-                  OR 
+                  bch.ts_first_publication IS NULL
+                  OR
                   bch.ts_first_publication >= '2020-01-06 19:04:25'
                 )
                 AND
@@ -327,10 +327,10 @@ trigger AS (
                   )
                 )
             )
-            OR 
+            OR
             ( --Recovered
-                bch.next_status = 'PUBLISHED' 
-                AND bch.status = 'UNPUBLISHED' 
+                bch.next_status = 'PUBLISHED'
+                AND bch.status = 'UNPUBLISHED'
                 AND so.days_in_status >= 84
                 AND bch.ts_first_publication IS NOT NULL
             )
@@ -338,7 +338,7 @@ trigger AS (
             ( --Relisting
                 bch.next_status = 'PUBLISHED'
                 AND ( --Remove available_soon cases
-                        bch.next_status_reason <> 'RELISTING' 
+                        bch.next_status_reason <> 'RELISTING'
                         OR bch.next_status_reason IS NULL
                     )
                 AND bch.status = 'SUSPENDED'
@@ -356,8 +356,8 @@ trigger AS (
                 bch.next_status = 'PUBLISHED'
                 AND bch.next_status_reason LIKE 'RELISTING_%'
                 AND (
-                  bch.status = 'SUSPENDED' 
-                  AND 
+                  bch.status = 'SUSPENDED'
+                  AND
                   bch.status_reason = 'RENTED'
                 )
             )
@@ -367,7 +367,7 @@ trigger AS (
                 AND bch.next_status_reason LIKE 'RELISTING_%'
                 AND (
                   bch.status = 'SUSPENDED'
-                  AND 
+                  AND
                   bch.status_reason = 'Admin'
                   AND
                   (bch.previous_status_reason = 'RENTED' OR bch.previous_to_previous_status_reason = 'RENTED')
@@ -382,17 +382,17 @@ trigger AS (
     business_context_history AS bch
   LEFT JOIN
     status_order AS so
-      ON so.id_house = bch.id_house 
+      ON so.id_house = bch.id_house
         AND so.country_code = bch.country_code
         AND so.status = bch.status
         AND (bch.ts_state_started >= so.ts_status_started
             AND bch.ts_state_ended <= so.ts_status_ended)
-  LEFT JOIN 
+  LEFT JOIN
     last_house_state AS lhs
       ON lhs.id_house = bch.id_house
-  
+
 ), merge_version AS (
-  SELECT 
+  SELECT
     h.id_house,
     h.country_code,
     h.status,
@@ -410,7 +410,7 @@ trigger AS (
     h.rev,
     h.revision_reason,
     h.ts_first_publication
-  FROM 
+  FROM
     house AS h
   JOIN last_house_state AS lhs
     ON lhs.id_house = h.id_house
@@ -419,14 +419,14 @@ trigger AS (
 
   UNION ALL
 
-  SELECT 
+  SELECT
     bch.id_house,
     bch.country_code,
     bch.status,
     bch.status_reason,
     bch.ts_state_started,
     bch.ts_state_ended,
-    bch.days_in_state, 
+    bch.days_in_state,
     t.days_in_status,
     IF(bch.previous_state_status IS NULL, TRUE, FALSE) AS is_first_status,
     t.trigger_new_version,
@@ -439,7 +439,7 @@ trigger AS (
     bch.ts_first_publication
   FROM
     business_context_history AS bch
-  LEFT JOIN 
+  LEFT JOIN
     trigger AS t
       ON t.id_house = bch.id_house
         AND t.country_code = bch.country_code
@@ -447,7 +447,7 @@ trigger AS (
         AND COALESCE(t.status_reason, '') = COALESCE(bch.status_reason, '')
         AND t.ts_state_started = bch.ts_state_started
 ), versioning AS (
-  SELECT 
+  SELECT
       m.id_house,
       m.country_code,
       m.status,
@@ -456,7 +456,7 @@ trigger AS (
       m.rev,
       m.revision_reason,
       IF(
-          COALESCE( 
+          COALESCE(
             m.listing_version,
             COALESCE(
               COALESCE(lhs.listing_version, 0)
@@ -465,12 +465,12 @@ trigger AS (
                   m.trigger_new_version
               ) OVER (PARTITION BY m.id_house ORDER BY m.ts_state_started, COALESCE(m.ts_state_ended,(CURRENT_TIMESTAMP - INTERVAL 1 DAY)) ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
               , IF(
-                  m.lbc_state_order = 1 
-                  AND m.status = 'PUBLISHED' 
+                  m.lbc_state_order = 1
+                  AND m.status = 'PUBLISHED'
                   AND (lhs.trigger_new_version = 1 OR lhs.trigger_new_version IS NULL)
                   , COALESCE(lhs.listing_version, 0) + 1
                   , COALESCE(lhs.listing_version, 0) + 0
-                ) 
+                )
               , 0
             )
           ) > 0
@@ -483,7 +483,7 @@ trigger AS (
       m.days_in_state,
       m.days_in_status,
       m.trigger_new_version,
-      COALESCE( 
+      COALESCE(
         m.listing_version,
         COALESCE(
           COALESCE(lhs.listing_version, 0)
@@ -492,8 +492,8 @@ trigger AS (
               m.trigger_new_version
           ) OVER (PARTITION BY m.id_house ORDER BY m.ts_state_started, COALESCE(m.ts_state_ended,(CURRENT_TIMESTAMP - INTERVAL 1 DAY)) ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
           , IF(
-              m.lbc_state_order = 1 
-              AND m.status = 'PUBLISHED' 
+              m.lbc_state_order = 1
+              AND m.status = 'PUBLISHED'
               AND (lhs.trigger_new_version = 1 OR lhs.trigger_new_version IS NULL)
               , COALESCE(lhs.listing_version, 0) + 1
               , COALESCE(lhs.listing_version, 0) + 0
@@ -511,9 +511,9 @@ trigger AS (
         TRUE,
         FALSE
       ) AS is_last_state_of_day
-  FROM 
+  FROM
       merge_version AS m
-  LEFT JOIN 
+  LEFT JOIN
       last_house_state AS lhs
         ON lhs.id_house = m.id_house
 ),
@@ -521,10 +521,19 @@ early_demand_opt_out AS (
   SELECT DISTINCT
       v.id_house,
       v.listing_version
-  FROM 
+  FROM
       versioning AS v
   WHERE
       v.revision_reason LIKE '[ED OPT-OUT]%'
+),
+relisting_offer AS (
+  SELECT DISTINCT
+      v.id_house,
+      v.listing_version
+  FROM
+      versioning AS v
+  WHERE
+      v.status_reason LIKE 'RELISTING_%'
 )
 SELECT
     v.id_house,
@@ -557,7 +566,7 @@ SELECT
         (
           v.ts_listing_version_start < TIMESTAMP('2024-05-16T15:42:20.000+00:00') --Timestamp of when the OPT-OUT policy started
           AND
-          v.previous_status_reason LIKE 'RELISTING_%'
+          ro.id_house IS NOT NULL
           AND
           v.revision_reason LIKE '%TERMINATION_CANCELED%'
         )
@@ -566,24 +575,20 @@ SELECT
       , FALSE
     ) AS is_extended_rental,
     IF(
-      v.listing_version > 1
-      AND
       (
-        (
-          ed_opt_out.id_house IS NULL
-          AND
-          v.ts_listing_version_start >= TIMESTAMP('2024-05-16T15:42:20.000+00:00') --Timestamp of when the OPT-OUT policy started
-          AND
-          v.revision_reason LIKE '%TERMINATION_CANCELED%'
-        )
-        OR
-        (
-          v.ts_listing_version_start < TIMESTAMP('2024-05-16T15:42:20.000+00:00') --Timestamp of when the OPT-OUT policy started
-          AND
-          v.previous_status_reason LIKE 'RELISTING_%'
-          AND
-          v.revision_reason LIKE '%TERMINATION_CANCELED%'
-        )
+        ed_opt_out.id_house IS NULL
+        AND
+        v.ts_listing_version_start >= TIMESTAMP('2024-05-16T15:42:20.000+00:00') --Timestamp of when the OPT-OUT policy started
+        AND
+        v.revision_reason LIKE '%TERMINATION_CANCELED%'
+      )
+      OR
+      (
+        v.ts_listing_version_start < TIMESTAMP('2024-05-16T15:42:20.000+00:00') --Timestamp of when the OPT-OUT policy started
+        AND
+        ro.id_house IS NOT NULL
+        AND
+        v.revision_reason LIKE '%TERMINATION_CANCELED%'
       )
       , TRUE
       , FALSE
@@ -592,9 +597,13 @@ SELECT
     v.state_order,
     v.max_state_order,
     v.is_last_state_of_day
-FROM 
+FROM
     versioning AS v
 LEFT JOIN
     early_demand_opt_out AS ed_opt_out
       ON ed_opt_out.id_house = v.id_house
         AND ed_opt_out.listing_version = v.listing_version
+LEFT JOIN
+    relisting_offer AS ro
+      ON ro.id_house = v.id_house
+      AND ro.listing_version = v.listing_version
