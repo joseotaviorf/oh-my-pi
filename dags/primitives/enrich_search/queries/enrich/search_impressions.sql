@@ -16,8 +16,8 @@ WITH experiments AS (
         FROM (
             SELECT
                 *,
-                explode(map_keys(str_to_map(regexp_replace(config.variants, '\\{{|\\}}', '' )))) AS _variant_name,
-                str_to_map(regexp_replace(config.variants, '\\{{|\\}}', '' )) AS variants
+                explode(map_keys(str_to_map(regexp_replace(config.variants, '[{}]', '' )))) AS _variant_name,
+                str_to_map(regexp_replace(config.variants, '[{}]', '' )) AS variants
             FROM
                 datalake_search.experiment_config
             WHERE
@@ -87,6 +87,7 @@ duplicated_searches AS
         get_json_object(event_properties, '$.business_context') AS business_context,
         get_json_object(user_properties, '$.platform') AS device_type,
         get_json_object(event_properties, '$.sort_order') as sort_order,
+        get_json_object(event_properties, '$.copilot_session_id') as copilot_session_id,
 
         -- event_timestamps
         union_spvs.ts_event,
@@ -104,7 +105,8 @@ duplicated_searches AS
                 id_device,
                 get_json_object(event_properties, '$.business_context'),
                 get_json_object(user_properties, '$.platform'),
-                get_json_object(event_properties, '$.sort_order')
+                get_json_object(event_properties, '$.sort_order'),
+                get_json_object(event_properties, '$.copilot_session_id')
         ) AS row_n
 
     FROM union_spvs
@@ -148,7 +150,10 @@ duplicate_experiment_searches AS
     INNER JOIN
         experiments
         ON experiments.variant_name = get_json_object(union_spvs.user_properties, CONCAT('$.', experiments.experiment_name))
-        AND ts_event BETWEEN experiments.begin_date AND experiments.end_date
+        AND (
+            (ts_event >= experiments.begin_date)
+            AND (experiments.end_date IS NULL OR ts_event <= experiments.end_date)
+        )
 ),
 
 experiment_searches_not_json AS (
@@ -441,7 +446,8 @@ SELECT
             'absolute_position', exploded_houses.absolute_position,
             'page_number', exploded_houses.page_number,
             'page_position', exploded_houses.page_position,
-            'listing_age', exploded_houses.listing_age
+            'listing_age', exploded_houses.listing_age,
+            'copilot_session_id', searches.copilot_session_id
         )
     ) AS dimensions,
 

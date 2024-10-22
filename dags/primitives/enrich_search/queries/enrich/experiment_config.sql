@@ -60,6 +60,21 @@ FROM VALUES
             ),
             'filters', "business_context = 'rent'"
         )
+    ),
+    -- native_copilot_experiment
+    (
+        "native_copilot_experiment",
+        named_struct(
+            'begin_date', DATE('2024-07-19'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    'baseline', 'baseline',
+                    'treatment', 'treatment'
+                )
+            ),
+            'filters', NULL
+        )
     )
     -- Add new experiment here
 
