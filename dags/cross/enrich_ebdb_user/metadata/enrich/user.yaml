@@ -14,6 +14,10 @@ columns:
     lineage:
       - datalake_ebdb_country.user.id_country
     description: Country ID
+  uuid_person:
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+    description: Person ID. Joins with uuid_person on datalake_person_clean.person.
   id_facebook:
     lineage:
       - datalake_ebdb_clean.user.id_facebook

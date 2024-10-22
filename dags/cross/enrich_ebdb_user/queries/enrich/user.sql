@@ -106,6 +106,7 @@ user_state AS (
 SELECT
     u.id,
     ur.id_country,
+    u.uuid_person,
     u.id_facebook,
     u.id_linkedin,
     u.id_google,
