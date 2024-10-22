@@ -81,3 +81,10 @@ tables:
     is_incremental: true
     partition_cols:
       - dt_email_sent
+
+custom_cluster:
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
