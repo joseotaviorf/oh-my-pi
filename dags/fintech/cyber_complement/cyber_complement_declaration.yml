@@ -2,7 +2,7 @@
 dag:
   name: cyber_complement
   schedule_start_date: 2024, 8, 1
-  schedule_interval: 0 8 * * *
+  schedule_interval: 0 8,16 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: |
@@ -29,14 +29,18 @@ workflow:
   tables_customization:
     actvertb:
       clean_table_name: logs_code_description
-      extraction_type: incremental
-      partitions: [year, month, day]
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
+      merge_on: ["AVCODE", "AVTYPE", "AVACCTG"]
       extra_spark_job_arguments:
         - "[]"
     agrtype:
       clean_table_name: agreement_type
-      extraction_type: incremental
-      partitions: [year, month, day]
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
+      merge_on: ["AGTYPE"]
       extra_spark_job_arguments:
         - "[]"
     tb_grupo_agency:

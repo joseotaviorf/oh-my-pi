@@ -126,7 +126,7 @@ retsuko AS (
     ON i.id_external = ii.id_invoice
 )
 SELECT
-  CONCAT(COALESCE(d.id_contract, r.id_contract), "-", d.id_invoice) AS sk_debt,
+  CONCAT(COALESCE(d.id_contract, r.id_contract), d.id_invoice) AS sk_debt,
   COALESCE(d.id_contract, r.id_contract) AS id_contract,
   d.id_invoice,
   COALESCE(r.creditor, d.creditor) AS creditor,

@@ -36,10 +36,15 @@ deduplicate_complementary_records_written_down AS (
 ),
 recupera_debts AS (
   SELECT
-    CONCAT(COALESCE(cp.id_contract, cr.id_contract, crwd.id_contract), "-", COALESCE(cp.id_invoice, cr.id_invoice, crwd.id_invoice)) AS id_debt,
+    CONCAT(COALESCE(cp.id_contract, cr.id_contract, crwd.id_contract),
+      COALESCE(cp.id_invoice, cr.id_invoice, crwd.id_invoice)
+    ) AS id_debt,
     COALESCE(cp.id_invoice, cr.id_invoice, crwd.id_invoice) AS id_invoice,
     COALESCE(cp.id_contract, cr.id_contract, crwd.id_contract) AS id_contract,
-    CAST(COALESCE(cp.id_negotiation, cr.id_negotiation, crwd.id_negotiation) AS BIGINT) AS id_negotiation,
+    CONCAT(
+      COALESCE(cp.id_contract, cr.id_contract, crwd.id_contract),
+      CAST(COALESCE(cp.id_negotiation, cr.id_negotiation, crwd.id_negotiation) AS BIGINT)
+    ) AS id_negotiation,
     "Recupera" AS source
   FROM deduplicate_creditor_pending AS cp
   FULL OUTER JOIN deduplicate_complementary_records AS cr
@@ -54,9 +59,9 @@ recupera_debts AS (
 ),
 trato_feito_debts AS (
   SELECT
-    CONCAT(n.id_contract, "-", d.id_external) AS id_debt,
+    CONCAT(n.id_contract, d.id_external) AS id_debt,
     d.id_external AS id_invoice,
-    IFNULL(CAST(n.id_negotiation_external AS BIGINT),n.id_negotiation_external) AS id_negotiation,
+    CONCAT(n.id_contract, IFNULL(CAST(n.id_negotiation_external AS BIGINT),n.id_negotiation_external)) AS id_negotiation,
     n.id_contract,
     "Trato Feito" AS source
   FROM datalake_trato_feito_clean.debt AS d
@@ -69,9 +74,9 @@ trato_feito_debts AS (
 ),
 cyber_debts AS (
   SELECT
-    CONCAT(id_contract, "-", id_invoice) AS id_debt,
+    CONCAT(id_contract, id_invoice) AS id_debt,
     id_contract,
-    CAST(id_negotiation AS BIGINT) AS id_negotiation,
+    CONCAT(id_contract, CAST(id_negotiation AS BIGINT)) AS id_negotiation,
     id_invoice,
     "Cyber" AS source
   FROM datalake_cyber.debt_negotiation_mapping

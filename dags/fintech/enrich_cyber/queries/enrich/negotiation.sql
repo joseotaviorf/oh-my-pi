@@ -28,7 +28,7 @@ installments AS (
     SUM(ai.amount_to_pay) AS negotiated_amount,
     SUM(ai.credit_card_fee_amount) AS credit_card_fee_amount,
     SUM(ai.installment_interest_amount) AS installment_interest_fees_amount,
-    SUM(IF(p.id_agreement_installment IS NOT NULL AND ai.installment_number = 0, p.payment_amount, 0)) AS down_payment_amount,
+    SUM(IF(p.id_agreement_installment IS NOT NULL AND ai.installment_number = 0, ai.amount_to_pay, 0)) AS down_payment_amount,
     CASE
       WHEN COUNT(DISTINCT p.id_payment) = COUNT(DISTINCT ai.id_agreement_installment) THEN MAX(DATE(p.ts_payment))
     END AS dt_paid_all,
@@ -79,6 +79,16 @@ get_agency_group_name AS (
   FROM deduplicate_agency_group AS ag
   LEFT JOIN datalake_cyber_clean.agency AS a
     ON ag.id_agency = a.id_agency
+),
+deduplicate_agreement_type AS (
+  SELECT DISTINCT
+    id_agreement_type,
+    agreement_type_description,
+    min_delay_days,
+    max_delay_days,
+    payment_method,
+    min_down_payment_percentage
+  FROM datalake_cyber_clean.agreement_type
 ),
 union_promisses_agreements AS (
   SELECT
@@ -226,7 +236,7 @@ LEFT JOIN datalake_cyber_clean.agency AS ag
   ON COALESCE(u.id_agency, a.id_agency) = ag.id_agency
 LEFT JOIN get_agency_group_name AS agg
   ON ag.id_agency = agg.agency_group
-LEFT JOIN datalake_cyber_clean.agreement_type AS at
+LEFT JOIN deduplicate_agreement_type AS at
   ON a.agreement_type = at.id_agreement_type
 LEFT JOIN discount_type AS atd
   ON a.agreement_type = atd.id_agreement_type

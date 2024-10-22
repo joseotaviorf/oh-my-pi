@@ -39,4 +39,6 @@ SELECT
   day,
   NOW() AS ts_load
 FROM datalake_cyber_raw.agrtype
-QUALIFY ROW_NUMBER() OVER(PARTITION BY AGTYPE ORDER BY ts_ingestion DESC) = 1
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+QUALIFY ROW_NUMBER() OVER(PARTITION BY AGTYPE ORDER BY MAKE_DATE(year,month,day) DESC) = 1
