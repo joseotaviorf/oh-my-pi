@@ -2,7 +2,7 @@ WITH
 union_collection AS (
     SELECT
         id_customer,
-        id_contract,
+        id_contract_external AS id_contract,
         id_operator,
         operator_agency,
         "IQ QuintoAndar" AS creditor,
