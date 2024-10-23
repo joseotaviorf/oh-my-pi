@@ -81,6 +81,18 @@ columns:
     - datalake_workable_redshift_clean.fields.id
     - datalake_workable_redshift_clean.field_choices.label
     - datalake_workable_redshift_clean.field_values.data
+  quintoandar_department:
+    description: 'QuintoAndar department of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
+  position_budget:
+    description: 'Position budget of the requisition.'
+    lineage:
+    - datalake_workable_redshift_clean.fields.id
+    - datalake_workable_redshift_clean.field_choices.label
+    - datalake_workable_redshift_clean.field_values.data
   is_confidential:
     description: 'Requisition is confidential.'
     lineage:

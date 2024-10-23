@@ -476,6 +476,7 @@ bietlejuice.dw_fintech_snapshot:
 bietlejuice.dw_hiring:
   - bietlejuice.enrich_workable:load-enrich-cost-center
   - bietlejuice.enrich_workable:load-enrich-custom-fields
+  - bietlejuice.enrich_workable:load-enrich-info-source
   - bietlejuice.enrich_workable:load-enrich-requisition-details
   - bietlejuice.workable_redshift:load-clean-answers
   - bietlejuice.workable_redshift:load-clean-candidates

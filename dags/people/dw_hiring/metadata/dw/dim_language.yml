@@ -1,0 +1,15 @@
+---
+database_name: dw_hiring
+table_name: dim_language
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Dimension table that stores language data.
+columns:
+  sk_language:
+    description: 'Surrogate key for language'
+    lineage:
+    - datalake_workable_redshift_clean.answers.answer
+  candidate_language:
+    description: 'Language'
+    lineage:
+    - datalake_workable_redshift_clean.answers.answer

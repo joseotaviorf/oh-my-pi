@@ -1,0 +1,15 @@
+---
+database_name: dw_hiring
+table_name: dim_info_source
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: 'Dimension table that stores info source data.'
+columns:
+  sk_info_source:
+    description: 'Surrogate key for info source'
+    lineage:
+    - datalake_workable.info_source.sk_info_source
+  info_source:
+    description: 'Column that describe how the candidate knows about the job.'
+    lineage:
+    - datalake_workable.info_source.answer_normalized

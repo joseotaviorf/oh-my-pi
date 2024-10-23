@@ -25,7 +25,8 @@ WITH
         10846912,10846913,10846914,9705595,10846915,9715997,10846917,10846918,
         10846940,10846941,9708921,10846942,10846943,10846946,9715918,10846947,
         9715999,8391521,10943566,11347475,10852863,9715678,10846945,9715715,
-        11988194,11011710,10654611,10846948
+        11988194,11011710,10654611,10846948,10846887,9709906,8391522,9709906,
+        9708626,8391520,8451529
       )
   )
 SELECT
@@ -39,6 +40,11 @@ SELECT
     MAX(
       CASE
         WHEN id = 9703446 THEN response
+      END
+    ),
+    MAX(
+      CASE
+        WHEN id = 10846887 THEN response
       END
     )
   ) AS company,
@@ -188,15 +194,44 @@ SELECT
       WHEN id = 10846948 THEN response
     END
   ) AS candidate_source,
+  COALESCE(
+    MAX(
+      CASE
+        WHEN id = 9709906 THEN response
+      END
+    ),
+    MAX(
+      CASE
+        WHEN id = 8391522 THEN response
+      END
+    ),
+    MAX(
+      CASE
+        WHEN id = 9709906 THEN response
+      END
+    )
+  ) AS quintoandar_department,
+  MAX(
+    CASE
+      WHEN id = 9708626 THEN response
+    END
+  ) AS position_budget,
   MAX(
     CASE
       WHEN id = 10846889 THEN BOOLEAN(response)
     END
   ) AS is_confidential,
-  MAX(
-    CASE
-      WHEN id = 10654611 THEN BOOLEAN(response)
-    END
+  COALESCE(
+    MAX(
+      CASE
+        WHEN id = 10654611 THEN BOOLEAN(response)
+      END
+    ),
+    MAX(
+      CASE
+        WHEN id = 8451529 THEN BOOLEAN(response)
+      END
+    )
   ) AS is_hunted,
   MAX(
     CASE

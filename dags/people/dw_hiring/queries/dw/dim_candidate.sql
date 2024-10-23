@@ -1,12 +1,3 @@
-WITH opportunity_info_source AS (
-  SELECT
-    id_candidate,
-    answer
-  FROM
-    datalake_workable_redshift_clean.answers
-  WHERE
-    question LIKE '%Por onde você ficou sabendo dessa oportunidade?%'
-)
 SELECT
   MD5(CAST(c.id AS BINARY)) AS sk_candidate,
   COALESCE(c.headline, '-1') AS headline,
@@ -36,7 +27,6 @@ SELECT
     END,
     '-1'
   ) AS source_candidate,
-  COALESCE(ois.answer, '-1') AS opportunity_info_source,
   NOW() AS ts_load
 FROM
   datalake_workable_redshift_clean.candidates AS c
@@ -44,7 +34,7 @@ LEFT JOIN
   datalake_workable.custom_fields AS ecf_candidates 
     ON c.id = ecf_candidates.id_resource
 LEFT JOIN 
-  opportunity_info_source AS ois 
+  datalake_workable.info_source AS ois 
     ON c.id = ois.id_candidate
 LEFT JOIN 
   datalake_workable_redshift_clean.requisitions AS r 
