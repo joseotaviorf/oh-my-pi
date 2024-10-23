@@ -168,7 +168,7 @@ nexxera_confirmation AS (
 )
 SELECT DISTINCT
     CONCAT(i.id_contract, i.id_negotiation_installment) AS sk_negotiation_installment,
-    CONCAT(COALESCE(i.id_contract, 0) CAST(i.id_negotiation_external AS STRING)) AS sk_negotiation,
+    CONCAT(COALESCE(i.id_contract, 0), CAST(i.id_negotiation_external AS STRING)) AS sk_negotiation,
     i.id_contract AS sk_contract,
     CAST(i.id_negotiation_external AS STRING) AS id_negotiation,
     i.id_installment_trato_feito,
