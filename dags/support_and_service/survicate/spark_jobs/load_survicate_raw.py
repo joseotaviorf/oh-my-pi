@@ -164,7 +164,7 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
                 if unioned_df is None:
                     unioned_df = df
                 else:
-                    unioned_df = unioned_df.union(df)
+                    unioned_df = unioned_df.unionByName(df, allowMissingColumns=True)
 
             else:
                 logger.warning(
