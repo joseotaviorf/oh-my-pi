@@ -1,0 +1,30 @@
+SELECT 
+    id AS id_backoffice_record,
+    channel AS id_channel,
+    uniqueId AS id_contact,
+    tableId AS id_table,
+    campaignId AS id_campaign,
+    agentId AS id_agent,
+    lineMailingId AS id_line_mailing,
+    businessId AS id_business,
+    mailingId AS id_mailing,
+    phone AS phone_number,
+    option1 AS option_1,
+    option2 AS option_2,
+    option3 AS option_3,
+    option4 AS option_4,
+    option5 AS option_5,
+    option6 AS option_6,
+    option7 AS option_7,
+    option8 AS option_8,
+    option9 AS option_9,
+    crmAttributeJson AS crm_attribute_json,
+    crmTabJson AS crm_tab_json,
+    startTime AS ts_contact_start,
+    updatedAt AS ts_updated,
+    year,
+    month,
+    day
+FROM datalake_hmb_ada_raw.backoffices
+WHERE
+    DATE(startTime) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

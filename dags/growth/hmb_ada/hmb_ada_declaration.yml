@@ -1,0 +1,34 @@
+dag:
+  name: hmb_ada
+  owner: Data Growth
+  schedule_start_date: 2024, 10, 21
+  schedule_interval: "0 1 * * *"
+  documentation: 
+    dag_purpose: Extract and load data from the HMB-ADA S3 bucket
+      
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_hmb_ada_raw
+  default_partitions: [year, month, day]
+  default_extraction_type: incremental
+  has_hive_sync: false
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"  
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+    - "{load_start_date}" # load_start_date
+    - "{load_end_date}" # load_end_date
+  tables_customization:
+    backoffices:
+      extra_spark_job_arguments: 
+        -  backoffices # raw_table_name
+    report: 
+      extra_spark_job_arguments: 
+        - report_5andar # raw_table_name 
+cluster: 
+  type: databricks_13_3_min_general_cluster
+

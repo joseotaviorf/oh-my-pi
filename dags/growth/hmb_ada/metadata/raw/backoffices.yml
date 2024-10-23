@@ -1,0 +1,5 @@
+---
+database_name: datalake_hmb_ada_raw
+table_name: backoffices
+owner: isabela.matsumoto@quintoandar.com.br
+domain: Growth

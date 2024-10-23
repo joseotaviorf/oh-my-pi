@@ -1,0 +1,111 @@
+---
+database_name: datalake_hmb_ada_clean
+table_name: backoffices
+owner: isabela.matsumoto@quintoandar.com.br
+domain: Growth
+description: This table contains records of contact from HMB for backoffice operations.
+columns:
+  id_backoffice_record:
+    description: "Unique identifier of the backoffice record."
+    lineage:
+      - datalake_hmb_data_raw.id
+  id_channel:
+    description: "Identifier for the channel of communication."
+    lineage:
+      - datalake_hmb_data_raw.channel
+  id_contact:
+    description: "Unique identifier for the contact."
+    lineage:
+      - datalake_hmb_data_raw.uniqueId
+  id_table:
+    description: "Identifier for the associated table."
+    lineage:
+      - datalake_hmb_data_raw.tableId
+  id_campaign:
+    description: "Unique identifier for the campaign."
+    lineage:
+      - datalake_hmb_data_raw.campaignId
+  id_agent:
+    description: "Identifier for the agent handling the contact."
+    lineage:
+      - datalake_hmb_data_raw.agentId
+  id_line_mailing:
+    description: "Identifier for the line mailing associated with the contact."
+    lineage:
+      - datalake_hmb_data_raw.lineMailingId
+  id_business:
+    description: "Unique identifier for the business related to the contact."
+    lineage:
+      - datalake_hmb_data_raw.businessId
+  id_mailing:
+    description: "Identifier for the mailing record."
+    lineage:
+      - datalake_hmb_data_raw.mailingId
+  phone_number:
+    description: "CLient Phone number associated with the contact."
+    lineage:
+      - datalake_hmb_data_raw.phone
+  option_1:
+    description: "Option 1 provided during contact."
+    lineage:
+      - datalake_hmb_data_raw.option1
+  option_2:
+    description: "Option 2 provided during contact."
+    lineage:
+      - datalake_hmb_data_raw.option2
+  option_3:
+    description: "Option 3 provided during contact."
+    lineage:
+      - datalake_hmb_data_raw.option3
+  option_4:
+    description: "Option 4 provided during contact."
+    lineage:
+      - datalake_hmb_data_raw.option4
+  option_5:
+    description: "Option 5 provided during contact."
+    lineage:
+      - datalake_hmb_data_raw.option5
+  option_6:
+    description: "Option 6 provided during contact."
+    lineage:
+      - datalake_hmb_data_raw.option6
+  option_7:
+    description: "Option 7 provided during contact."
+    lineage:
+      - datalake_hmb_data_raw.option7
+  option_8:
+    description: "Option 8 provided during contact."
+    lineage:
+      - datalake_hmb_data_raw.option8
+  option_9:
+    description: "Option 9 provided during contact."
+    lineage:
+      - datalake_hmb_data_raw.option9
+  crm_attribute_json:
+    description: "JSON containing CRM attributes related to the contact."
+    lineage:
+      - datalake_hmb_data_raw.crmAttributeJson
+  crm_tab_json:
+    description: "JSON containing CRM tab information."
+    lineage:
+      - datalake_hmb_data_raw.crmTabJson
+  ts_contact_start:
+    description: "Time when the contact interaction started."
+    lineage:
+      - datalake_hmb_data_raw.startTime
+  ts_updated:
+    description: "Timestamp when the record was last updated."
+    lineage:
+      - datalake_hmb_data_raw.updatedAt
+  year:
+    description: "Year the contact interaction occurred."
+    lineage:
+      - datalake_hmb_data_raw.year
+  month:
+    description: "Month the contact interaction occurred."
+    lineage:
+      - datalake_hmb_data_raw.month
+  day:
+    description: "Day the contact interaction occurred."
+    lineage:
+      - datalake_hmb_data_raw.day

@@ -1,0 +1,123 @@
+---
+database_name: datalake_hmb_ada_clean
+table_name: report
+owner: isabela.matsumoto@quintoandar.com.br
+domain: Growth
+description: This table contains reporting data from WhatsApp communication, including interactions, agent information, and campaign details.
+columns:
+  id_contact:
+    description: "Unique identifier for the contact."
+    lineage:
+      - datalake_hmb_data_raw.uniqueid
+  id_other_unique:
+    description: "Other unique identifier for the interaction, if applicable."
+    lineage:
+      - datalake_hmb_data_raw.otheruniqueid
+  phone_number:
+    description: "Phone number associated with the interaction."
+    lineage:
+      - datalake_hmb_data_raw.number
+  id_integrated:
+    description: "Indicates whether the data is integrated."
+    lineage:
+      - datalake_hmb_data_raw.integrated
+  channel:
+    description: "Channel through which the interaction occurred."
+    lineage:
+      - datalake_hmb_data_raw.channel
+  type:
+    description: "Type of interaction."
+    lineage:
+      - datalake_hmb_data_raw.tipo
+  status:
+    description: "Current status of the interaction."
+    lineage:
+      - datalake_hmb_data_raw.status
+  total_time:
+    description: "Total duration of the interaction."
+    lineage:
+      - datalake_hmb_data_raw.total
+  error:
+    description: "Error information, if any."
+    lineage:
+      - datalake_hmb_data_raw.error
+  campaign:
+    description: "Campaign associated with the interaction."
+    lineage:
+      - datalake_hmb_data_raw.campaign
+  agent_login:
+    description: "Login of the agent handling the interaction."
+    lineage:
+      - datalake_hmb_data_raw.login
+  destination_login:
+    description: "Destination login for the interaction."
+    lineage:
+      - datalake_hmb_data_raw.loginDestino
+  model:
+    description: "Model associated with the interaction."
+    lineage:
+      - datalake_hmb_data_raw.model
+  max_response_delay:
+    description: "Maximum response delay for the interaction."
+    lineage:
+      - datalake_hmb_data_raw.maxresponsedelay
+  replied_message:
+    description: "Message replied by the user."
+    lineage:
+      - datalake_hmb_data_raw.repliedmessage
+  last_text:
+    description: "Last text sent in the interaction."
+    lineage:
+      - datalake_hmb_data_raw.lasttext
+  option_1:
+    description: "Option 1 provided during interaction."
+    lineage:
+      - datalake_hmb_data_raw.option1
+  option_2:
+    description: "Option 2 provided during interaction."
+    lineage:
+      - datalake_hmb_data_raw.option2
+  option_3:
+    description: "Option 3 provided during interaction."
+    lineage:
+      - datalake_hmb_data_raw.option3
+  option_4:
+    description: "Option 4 provided during interaction."
+    lineage:
+      - datalake_hmb_data_raw.option4
+  option_5:
+    description: "Option 5 provided during interaction."
+    lineage:
+      - datalake_hmb_data_raw.option5
+  option_6:
+    description: "Option 6 provided during interaction."
+    lineage:
+      - datalake_hmb_data_raw.option6
+  option_7:
+    description: "Option 7 provided during interaction."
+    lineage:
+      - datalake_hmb_data_raw.option7
+  option_8:
+    description: "Option 8 provided during interaction."
+    lineage:
+      - datalake_hmb_data_raw.option8
+  option_9:
+    description: "Option 9 provided during interaction."
+    lineage:
+      - datalake_hmb_data_raw.option9
+  ts_report:
+    description: "Timestamp when the report was created."
+    lineage:
+      - datalake_hmb_data_raw.dt
+  year:
+    description: "Year when the interaction occurred."
+    lineage:
+      - datalake_hmb_data_raw.year
+  month:
+    description: "Month when the interaction occurred."
+    lineage:
+      - datalake_hmb_data_raw.month
+  day:
+    description: "Day when the interaction occurred."
+    lineage:
+      - datalake_hmb_data_raw.day
