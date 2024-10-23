@@ -70,6 +70,3 @@ LEFT JOIN invoice_extra AS ie
     ON cp.id = ie.id_installment
 LEFT JOIN datalake_trato_feito_clean.negotiation AS n
     ON cp.id_negotiation = n.id_negotiation
-LEFT JOIN
-    datalake_trato_feito_clean.debtor AS d
-        ON n.id_debtor = d.id
