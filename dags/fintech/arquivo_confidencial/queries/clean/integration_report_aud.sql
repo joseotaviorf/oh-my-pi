@@ -1,15 +1,19 @@
-SELECT
+SELECT 
     id,
-    cpf,
+    cpf, 
     rev,
     revtype AS rev_type,
     revend AS rev_end,
-    integration_provider,
-    raw_data,
+    integration_provider, 
+    raw_data, 
     attributes,
     created_at AS ts_created,
     year,
     month,
     day
-FROM
+FROM 
     datalake_arquivo_confidencial_raw.integration_report_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
