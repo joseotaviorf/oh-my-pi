@@ -544,6 +544,9 @@ bietlejuice.enrich_data_quality:
   remove:
     - bietlejuice.dag_inventory:load-clean-table
     - bietlejuice.inmetro:load-clean-data-validations
+bietlejuice.enrich_demand_score_report:
+  add:
+    - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   add:
     - bietlejuice.gsheets_static:load-clean-ticket-rate-classification

@@ -1532,6 +1532,8 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
+bietlejuice.enrich_demand_score_report:
+  - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score
 bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-categories-documentation
   - bietlejuice.documentation_metrics:load-clean-columns-documentation
