@@ -32,6 +32,10 @@ columns:
     lineage:
       - s3_auditlogs_bucket/opa.input.attributes.source.principal
     description: Requesting service principal
+  request_destination_principal:
+    lineage:
+      - s3_auditlogs_bucket/opa.input.attributes.destination.principal
+    description: Requesting service principal
   request_traceparent:
     lineage:
       - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.traceparent
@@ -76,3 +80,7 @@ columns:
     lineage:
       - s3_auditlogs_bucket/opa.result.principalinfo.service.provided_roles
     description: Roles provided by service principal
+  app:
+    lineage:
+      - s3_auditlogs_bucket/app
+    description: App that handled the request

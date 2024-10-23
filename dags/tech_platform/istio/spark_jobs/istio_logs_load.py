@@ -29,13 +29,15 @@ def clean_cf(df):
                col("user_agent").alias("request_user_agent"),
                col("path").alias("request_path"),
                col("duration").alias("request_duration_ms"),
+               col("x_forwarded_for").alias("request_x_forwarded_for"),
                col("response_flags").alias("response_flags"),
                col("response_code").alias("response_code"),
+               col("app"),
                year(ts).alias("year"),
                month(ts).alias("month"),
                dayofmonth(ts).alias("day"),
                hour(ts).alias("hour")
-              )
+              ).where(col("start_time").isNotNull())
 
     return df
 

@@ -28,8 +28,8 @@ def clean_cf(df):
                col("data.decision_id").alias("id_decision"), 
                "data.erased", 
                col("data.input.attributes.source.principal").alias("request_source_principal"), 
+               col("data.input.attributes.destination.principal").alias("request_destination_principal"), 
                col("data.input.attributes.request.http.headers.traceparent").alias("request_traceparent"), 
-               col("data.input.attributes.source.principal").alias("request_principal"), 
                col("data.result.dynamic_metadata.parameterized_path").alias("request_path"), 
                col("data.result.principalinfo.authorized_by").alias("request_authorized_by"), 
                col("data.result.principalinfo.required_roles").alias("request_required_roles"), 
@@ -40,11 +40,12 @@ def clean_cf(df):
                col("data.result.principalinfo.user.payload.providerId").alias("principal_user_idp"), 
                col("data.result.principalinfo.service.provided_roles").alias("principal_service_provided_roles"), 
                col("data.result.principalinfo.service.id").alias("principal_service"),
+               col("app"),
                year(ts).alias("year"),
                month(ts).alias("month"),
                dayofmonth(ts).alias("day"),
                hour(ts).alias("hour")
-            )
+            ).where(col("data.timestamp").isNotNull())
     return df
 
 

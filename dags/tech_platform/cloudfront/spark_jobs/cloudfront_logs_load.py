@@ -37,7 +37,7 @@ def clean_cf(df):
                 month(ts).alias("month"),
                 dayofmonth(ts).alias("day"),
                 hour(ts).alias("hour")                
-              )
+              ).where(col("date").isNotNull())
 
     return df
 

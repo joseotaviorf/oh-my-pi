@@ -6,41 +6,49 @@ owner: identityplatform-team@quintoandar.com.br
 columns:
   namespace:
     lineage:
-      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/namespace
     description: Kubernetes namespace
   pod_name:
     lineage:
-      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/pod_name
     description: Kubernetes pod name
-  traceId:
+  request_traceparent:
     lineage:
-      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/traceId
     description: Request trace id
-  method:
+  reques_method:
     lineage:
-      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/method
     description: Request method
-  user_agent:
+  request_user_agent:
     lineage:
-      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/reqeust_user_agent
     description: Request user agent
-  path:
+  request_x_forwarded_fo:
     lineage:
-      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/x_forwarded_for
+    description: Request user agent
+  request_path:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/path
     description: Request path
-  start_time:
+  ts_event:
     lineage:
-      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/start_time
     description: Request start time
-  duration:
+  request_duration_ms:
     lineage:
-      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/duration
     description: Request duration
   response_flags:
     lineage:
-      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/response_flags
     description: Response Flags
   response_code:
     lineage:
-      - s3_auditlogs_bucket/proxy/.../istio-proxy/
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/response_code
     description: Response Code
+  app:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/app
+    description: App that handled the request

@@ -1,1 +1,1 @@
-path: s3://5a-cloudfront-access-logs/632540934959/*/*/*.{}-{}-{}-{}.*.gz
+path: s3://5a-aws-access-logs-cloudfront/632540934959/*/*.{}-{}-{}-{}.*.gz
