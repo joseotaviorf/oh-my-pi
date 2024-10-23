@@ -14,7 +14,7 @@ columns:
     description: Kubernetes pod name
   request_traceparent:
     lineage:
-      - s3_auditlogs_bucket/proxy/.../istio-proxy/traceId
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/traceparent
     description: Request trace id
   reques_method:
     lineage:
@@ -24,10 +24,10 @@ columns:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/reqeust_user_agent
     description: Request user agent
-  request_x_forwarded_fo:
+  request_x_forwarded_for:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/x_forwarded_for
-    description: Request user agent
+    description: Request forwarded for IPs
   request_path:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/path
@@ -52,3 +52,7 @@ columns:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/app
     description: App that handled the request
+  request_id:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/id_request
+    description: Request ID

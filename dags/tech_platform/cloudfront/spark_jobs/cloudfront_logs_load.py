@@ -21,7 +21,7 @@ def clean_cf(df):
 
     ts = to_timestamp(concat(col("date"), lit(" "), col("time")))
     df = df.select(ts.alias("ts_event"), 
-                col("time-taken").alias("request_duration_s"),
+                col("time_taken").alias("request_duration_s"),
                 col("x-edge-location").alias("edge_location"),
                 col("c_ip").alias("principal_ip"),
                 col("c_port").alias("principal_port"),

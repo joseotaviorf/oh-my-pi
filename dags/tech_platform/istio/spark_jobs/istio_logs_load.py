@@ -4,7 +4,7 @@ from dateutil import parser
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from pyspark.sql.functions import col, year, month, dayofmonth, hour, to_timestamp
+from pyspark.sql.functions import split, when, lit, element_at, col, year, month, dayofmonth, hour, to_timestamp
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.spark import (
     spark
@@ -21,10 +21,20 @@ def clean_cf(df):
     """
 
     ts = to_timestamp(col("start_time"))
-    df = df.select(ts.alias("ts_event"), 
+    traceparent = col("traceparent")
+    
+    trace_id = when(
+        traceparent.isNotNull() & 
+        traceparent.contains("-"),
+        element_at(split(traceparent, "-"), 2)
+    ).otherwise(lit(None))
+
+    df = df.select(
+               ts.alias("ts_event"), 
+               trace_id.alias("id_trace"),
+               traceparent.alias("request_traceparent"),
                col("namespace").alias("namespace"),
                col("pod_name").alias("pod_name"),
-               col("traceId").alias("request_traceparent"),
                col("method").alias("request_method"),
                col("user_agent").alias("request_user_agent"),
                col("path").alias("request_path"),
@@ -32,6 +42,7 @@ def clean_cf(df):
                col("x_forwarded_for").alias("request_x_forwarded_for"),
                col("response_flags").alias("response_flags"),
                col("response_code").alias("response_code"),
+               col("request_id").alias("id_request"),
                col("app"),
                year(ts).alias("year"),
                month(ts).alias("month"),

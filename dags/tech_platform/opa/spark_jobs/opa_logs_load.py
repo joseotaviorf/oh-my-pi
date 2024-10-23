@@ -4,7 +4,7 @@ from dateutil import parser
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from pyspark.sql.functions import col, from_json, year, month, dayofmonth, hour, to_timestamp
+from pyspark.sql.functions import split, when, element_at, lit, col, from_json, year, month, dayofmonth, hour, to_timestamp
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.spark import (
     spark
@@ -22,29 +22,40 @@ def clean_cf(df):
     dynamic_schema = spark.read.json(df.rdd.map(lambda row: row.message)).schema
     df = df.withColumn("data", from_json(col("message"), dynamic_schema))
     ts = to_timestamp(col("data.timestamp"))
+    traceparent = col("data.input.attributes.request.http.headers.traceparent")
 
-    df = df.select(ts.alias("ts_event"), 
-               col("data.bundles").alias("bundles"), 
-               col("data.decision_id").alias("id_decision"), 
-               "data.erased", 
-               col("data.input.attributes.source.principal").alias("request_source_principal"), 
-               col("data.input.attributes.destination.principal").alias("request_destination_principal"), 
-               col("data.input.attributes.request.http.headers.traceparent").alias("request_traceparent"), 
-               col("data.result.dynamic_metadata.parameterized_path").alias("request_path"), 
-               col("data.result.principalinfo.authorized_by").alias("request_authorized_by"), 
-               col("data.result.principalinfo.required_roles").alias("request_required_roles"), 
-               col("data.result.allowed").alias("result_http_allowed"), 
-               col("data.result.http_status").alias("result_http_status"), 
-               col("data.result.principalinfo.user.payload.email").alias("principal_user_email"), 
-               col("data.result.principalinfo.user.provided_roles").alias("principal_user_provided_roles"), 
-               col("data.result.principalinfo.user.payload.providerId").alias("principal_user_idp"), 
-               col("data.result.principalinfo.service.provided_roles").alias("principal_service_provided_roles"), 
-               col("data.result.principalinfo.service.id").alias("principal_service"),
-               col("app"),
-               year(ts).alias("year"),
-               month(ts).alias("month"),
-               dayofmonth(ts).alias("day"),
-               hour(ts).alias("hour")
+    trace_id = when(
+        traceparent.isNotNull() & 
+        traceparent.contains("-"),
+        element_at(split(traceparent, "-"), 2)
+    ).otherwise(lit(None))
+
+    df = df.select(
+        ts.alias("ts_event"), 
+        trace_id.alias("id_trace"),
+        traceparent.alias("request_traceparent"), 
+        col("data.bundles").alias("bundles"), 
+        col("data.decision_id").alias("id_decision"), 
+        "data.erased", 
+        col("data.input.attributes.source.principal").alias("request_source_principal"), 
+        col("data.input.attributes.destination.principal").alias("request_destination_principal"), 
+        col("data.input.attributes.request.http.headers.x-request-id").alias("id_request"), 
+        col("data.input.attributes.request.http.headers.x-amz-cf-id").alias("id_amz_cf"), 
+        col("data.result.dynamic_metadata.parameterized_path").alias("request_path"), 
+        col("data.result.principalinfo.authorized_by").alias("request_authorized_by"), 
+        col("data.result.principalinfo.required_roles").alias("request_required_roles"), 
+        col("data.result.allowed").alias("result_http_allowed"), 
+        col("data.result.http_status").alias("result_http_status"), 
+        col("data.result.principalinfo.user.payload.email").alias("principal_user_email"), 
+        col("data.result.principalinfo.user.provided_roles").alias("principal_user_provided_roles"), 
+        col("data.result.principalinfo.user.payload.providerId").alias("principal_user_idp"), 
+        col("data.result.principalinfo.service.provided_roles").alias("principal_service_provided_roles"), 
+        col("data.result.principalinfo.service.id").alias("principal_service"),
+        col("app"),
+        year(ts).alias("year"),
+        month(ts).alias("month"),
+        dayofmonth(ts).alias("day"),
+        hour(ts).alias("hour")
             ).where(col("data.timestamp").isNotNull())
     return df
 

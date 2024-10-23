@@ -40,6 +40,18 @@ columns:
     lineage:
       - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.traceparent
     description: Traceparent
+  id_trace:
+    lineage:
+      - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.traceparent
+    description: Request trace id
+  id_request:
+    lineage:
+      - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.x-request-id
+    description: Request ID
+  id_amz_cf:
+    lineage:
+      - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.x-amz-cf-id
+    description: Amazon CloudFront ID
   request_path:
     lineage:
       - s3_auditlogs_bucket/opa.result.dynamic_metadata.parameterized_path
