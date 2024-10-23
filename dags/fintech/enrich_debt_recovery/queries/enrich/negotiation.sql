@@ -89,11 +89,31 @@ SELECT
     i.down_payment_amount,
     i.paid_amount,
     d.negotiation_original_amount,
-    COALESCE(i.discount_amount, d.negotiation_discount_amount) AS negotiation_discount_amount,
-    COALESCE(i.installment_interest, d.interest_fee_amount) AS interest_fee_amount,
-    COALESCE(i.installment_fee_amount, d.fine_fee_amount) AS fine_fee_amount,
-    COALESCE(i.negotiation_fees_amount, d.negotiation_fees_amount) AS negotiation_fees_amount,
-    COALESCE(i.credit_card_fee_amount, cc.credit_card_fee_amount) AS credit_card_fee_amount,
+    CASE
+        WHEN LOWER(c.name) LIKE "%cyber%" THEN i.discount_amount
+        WHEN LOWER(c.name) LIKE "%recupera%" THEN d.negotiation_discount_amount
+        ELSE COALESCE(i.discount_amount, d.negotiation_discount_amount)
+    END AS negotiation_discount_amount,
+    CASE
+        WHEN LOWER(c.name) LIKE "%cyber%" THEN i.installment_interest
+        WHEN LOWER(c.name) LIKE "%recupera%" THEN d.interest_fee_amount
+        ELSE COALESCE(i.installment_interest, d.interest_fee_amount)
+    END AS interest_fee_amount,
+    CASE
+        WHEN LOWER(c.name) LIKE "%cyber%" THEN i.installment_fee_amount
+        WHEN LOWER(c.name) LIKE "%recupera%" THEN d.fine_fee_amount
+        ELSE COALESCE(i.installment_fee_amount, d.fine_fee_amount)
+    END AS fine_fee_amount,
+    CASE
+        WHEN LOWER(c.name) LIKE "%cyber%" THEN i.negotiation_fees_amount
+        WHEN LOWER(c.name) LIKE "%recupera%" THEN d.negotiation_fees_amount
+        ELSE COALESCE(i.negotiation_fees_amount, d.negotiation_fees_amount)
+    END AS negotiation_fees_amount,
+    CASE
+        WHEN LOWER(c.name) LIKE "%cyber%" THEN i.credit_card_fee_amount
+        WHEN LOWER(c.name) LIKE "%recupera%" THEN cc.credit_card_fee_amount
+        ELSE COALESCE(i.credit_card_fee_amount, cc.credit_card_fee_amount)
+    END AS credit_card_fee_amount,
     i.breached_installment,
     i.total_breached_installments,
     cr.recurrent AS is_contract_recurrent_debtor,
