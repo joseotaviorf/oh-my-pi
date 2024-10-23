@@ -156,7 +156,7 @@ original_invoices AS (
 ),
 installments_data AS (
   SELECT
-    sk_negotiation AS id_negotiation,
+    id_negotiation,
     payment_method AS promisse_payment_method,
     amount_to_pay AS down_payment_amount,
     net_amount AS down_payment_net_amount,
