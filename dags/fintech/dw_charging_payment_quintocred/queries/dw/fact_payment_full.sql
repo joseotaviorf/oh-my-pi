@@ -530,17 +530,23 @@ motivo_expandido AS (
     level_e
 ),
 bd_not_living_free AS (
-SELECT DISTINCT
-  sk_propose,
-  month
-FROM 
-  motivo_expandido
-WHERE 
-  is_direct_billing 
-  AND day( dt_contract_started ) BETWEEN 25 AND 31
-  AND month_propose_life = add_months( date_trunc( 'MONTH', dt_contract_started ), 1 )
-  AND motivo_expandido IN ('Vivendo de Graça')
-  AND sk_propose > 5000000
+  SELECT DISTINCT
+    sk_propose,
+    month
+  FROM 
+    motivo_expandido
+  WHERE 
+    is_direct_billing 
+    AND day( dt_contract_started ) BETWEEN 25 AND 31
+    AND month_propose_life = add_months( date_trunc( 'MONTH', dt_contract_started ), 1 )
+    AND motivo_expandido IN ('Vivendo de Graça')
+    AND sk_propose > 5000000
+),
+test_propose AS (
+  SELECT DISTINCT
+    sk_propose
+  FROM 
+    datalake_gsheets_clean.quintocred_test_proposals
 )
 SELECT DISTINCT
   m.sk_propose,
@@ -633,4 +639,9 @@ LEFT JOIN
   bd_not_living_free not_lf
   ON m.sk_propose = not_lf.sk_propose
   AND m.month = not_lf.month
+LEFT JOIN 
+  test_propose tp 
+  ON m.sk_propose = tp.sk_propose
+WHERE
+  tp.sk_propose IS NULL
   ORDER BY m.sk_propose, m.month

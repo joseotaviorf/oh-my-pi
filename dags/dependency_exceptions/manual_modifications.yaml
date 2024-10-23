@@ -23,6 +23,7 @@ bietlejuice.dw_casa_mineira_portal:
 bietlejuice.dw_charging_payment_quintocred:
   remove:
     - bietlejuice.velo_asaas:load-clean-payments
+    - bietlejuice.gsheets_fintech:done-clean-quintocred-test-proposals
 bietlejuice.dw_chattermill:
   override: []
 bietlejuice.dw_country:
