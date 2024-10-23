@@ -145,9 +145,11 @@ all_installments AS (
     COALESCE(tf.source, ci.source, ri.source) AS source
   FROM trato_feito_installment AS tf
   FULL OUTER JOIN cyber_installments AS ci
-    ON tf.id_negotiation_installment = ci.id_negotiation_installment AND tf.source = "Trato Feito - Cyber"
+    ON tf.id_negotiation_installment = ci.id_negotiation_installment
+      AND tf.id_contract = ci.id_contract
   FULL OUTER JOIN recupera_installments AS ri
-    ON tf.id_negotiation_installment = ri.id_negotiation_installment AND tf.source = "Trato Feito - Recupera"
+    ON tf.id_negotiation_installment = ri.id_negotiation_installment
+      AND tf.id_contract = ri.id_contract
 
 ),
 nexxera_confirmation AS (
@@ -166,7 +168,7 @@ nexxera_confirmation AS (
 )
 SELECT DISTINCT
     CONCAT(i.id_contract, i.id_negotiation_installment) AS sk_negotiation_installment,
-    CONCAT(i.id_contract, CAST(i.id_negotiation_external AS STRING)) AS sk_negotiation,
+    CONCAT(COALESCE(i.id_contract, 0) CAST(i.id_negotiation_external AS STRING)) AS sk_negotiation,
     i.id_contract AS sk_contract,
     CAST(i.id_negotiation_external AS STRING) AS id_negotiation,
     i.id_installment_trato_feito,

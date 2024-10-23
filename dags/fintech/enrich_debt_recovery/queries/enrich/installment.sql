@@ -40,6 +40,7 @@ SELECT
     cp.id,
     cp.id_external,
     cp.id_negotiation,
+    n.id_debtor_external AS id_contract,
     COALESCE(external_index + 1, DENSE_RANK() OVER(PARTITION BY cp.id_negotiation ORDER BY cp.ts_created, cp.id_external)) AS installment_number,
     ie.id_invoice_extra,
     COALESCE(cc.our_number, cp.id_external) AS our_number,
@@ -67,3 +68,8 @@ LEFT JOIN charges AS cc
     ON cp.id_installment_charge = cc.id_installment_charge
 LEFT JOIN invoice_extra AS ie
     ON cp.id = ie.id_installment
+LEFT JOIN datalake_trato_feito_clean.negotiation AS n
+    ON cp.id_negotiation = n.id_negotiation
+LEFT JOIN
+    datalake_trato_feito_clean.debtor AS d
+        ON n.id_debtor = d.id

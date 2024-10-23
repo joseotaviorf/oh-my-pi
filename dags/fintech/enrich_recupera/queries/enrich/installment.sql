@@ -23,6 +23,14 @@ deduplicate_installment_detail AS (
     FROM datalake_recupera_clean.installment_detail
     QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, id_customer, id_contract, dt_expiration_installment_agreement ORDER BY MAKE_DATE(year,month,day) DESC) = 1
 ),
+contract_data AS (
+  SELECT
+    id_customer,
+    id_contract,
+    id_creditor
+  FROM datalake_recupera_clean.contracts
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_customer, id_creditor ORDER BY dt_contract_start DESC) = 1
+),
 deduplicated_installment_canceled AS (
     SELECT
         id_installment,
@@ -48,7 +56,7 @@ creditor_pending AS (
 )
 SELECT
     STRING(i.id_installment) AS id_negotiation,
-    isd.id_contract AS id_contract,
+    COALESCE(isd.id_contract, cd.id_contract) AS id_contract,
     i.id_operator,
     i.id_customer AS customer_document,
     CASE
@@ -109,6 +117,9 @@ LEFT JOIN
     deduplicate_installment_detail AS isd
         ON i.id_installment = isd.id_installment
         AND i.dt_due = isd.dt_expiration_installment_agreement
+LEFT JOIN contract_data AS cd
+    ON i.id_creditor = cd.id_creditor
+    AND i.id_customer = cd.id_customer
 LEFT JOIN
     negotiation_status AS ns
         ON i.id_installment = ns.id_negotiation
