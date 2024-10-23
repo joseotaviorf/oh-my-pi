@@ -36,8 +36,6 @@ WITH union_inspection_history AS (
     LEFT JOIN
         datalake_inspections_clean.appointment AS a
           ON i.id_inspection = a.id_inspection
-    WHERE
-        DATE(i.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
     UNION
     SELECT
         i.id_inspection,
@@ -62,8 +60,6 @@ WITH union_inspection_history AS (
         i.ts_first_synced
     FROM
         datalake_inspections.main_inspection_booking AS i
-    WHERE
-        DATE(i.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ),
 appointment_data AS (
     SELECT
