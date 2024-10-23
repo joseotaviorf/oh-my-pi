@@ -16,7 +16,7 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 
 class RawCDCWorkflow(BaseWorkflow):
-    MAX_TABLES_PER_CLUSTER = 15
+    MAX_TABLES_PER_CLUSTER = 14
 
     def __init__(self, dag_args, workflow_args, cluster_args):
         super().__init__(dag_args, workflow_args, cluster_args)
