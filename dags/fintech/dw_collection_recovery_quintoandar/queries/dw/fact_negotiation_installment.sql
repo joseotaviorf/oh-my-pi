@@ -84,36 +84,40 @@ cyber_installments AS (
 ),
 recupera_installments AS (
   SELECT DISTINCT
-    CONCAT(CAST(id_negotiation AS BIGINT), LPAD(INT(installment_number), 3, '0')) AS id_negotiation_installment,
-    id_contract,
-    CAST(id_negotiation AS BIGINT) AS id_negotiation_external,
-    installment_number,
-    id_receipt AS our_number,
-    creditor,
+    CONCAT(CAST(ri.id_negotiation AS BIGINT), LPAD(INT(ri.installment_number), 3, '0')) AS id_negotiation_installment,
+    COALESCE(tf.id_contract, ri.id_contract) AS id_contract,
+    CAST(ri.id_negotiation AS BIGINT) AS id_negotiation_external,
+    ri.installment_number,
+    ri.id_receipt AS our_number,
+    ri.creditor,
     CASE
-      WHEN installment_status = 'Pago' THEN 'paid'
-      WHEN installment_status = 'Quebrado' THEN 'canceled'
-      WHEN installment_status = 'Em aberto' THEN 'pending'
-      ELSE installment_status
+      WHEN ri.installment_status = 'Pago' THEN 'paid'
+      WHEN ri.installment_status = 'Quebrado' THEN 'canceled'
+      WHEN ri.installment_status = 'Em aberto' THEN 'pending'
+      ELSE ri.installment_status
     END AS installment_status,
-    payment_method,
-    delay_days,
-    main_amount,
-    updated_balance,
-    amount_fine AS fine_amount,
-    default_interest_amount + interest_fee_amount AS interest_fee_amount,
-    adm_fee_amount AS credit_card_fee_amount,
-    discount_amount,
-    amount_to_pay,
-    paid_amount,
-    dt_formalization AS dt_creation,
-    dt_due,
-    dt_paid,
-    dt_canceled,
+    ri.payment_method,
+    ri.delay_days,
+    ri.main_amount,
+    ri.updated_balance,
+    ri.amount_fine AS fine_amount,
+    ri.default_interest_amount + ri.interest_fee_amount AS interest_fee_amount,
+    ri.adm_fee_amount AS credit_card_fee_amount,
+    ri.discount_amount,
+    ri.amount_to_pay,
+    ri.paid_amount,
+    ri.dt_formalization AS dt_creation,
+    ri.dt_due,
+    ri.dt_paid,
+    ri.dt_canceled,
     'Recupera' AS source
   FROM
-    datalake_recupera.installment AS i
-  WHERE LOWER(creditor) NOT LIKE "%quintocred%"
+    datalake_recupera.installment AS ri
+  LEFT JOIN trato_feito_installment AS tf
+    ON
+      tf.id_negotiation_installment =  CONCAT(CAST(ri.id_negotiation AS BIGINT), LPAD(INT(ri.installment_number), 3, '0'))
+      AND tf.source = "Trato Feito - Recupera"
+  WHERE LOWER(ri.creditor) NOT LIKE "%quintocred%"
 ),
 all_installments AS (
   SELECT

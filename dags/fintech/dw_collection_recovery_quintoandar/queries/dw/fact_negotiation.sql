@@ -1,7 +1,7 @@
 WITH
 trato_feito_negotiation AS (
   SELECT
-    IFNULL(CAST(n.id_negotiation_external AS BIGINT),n.id_negotiation_external) AS id_negotiation,
+    COALESCE(CAST(n.id_negotiation_external AS BIGINT), n.id_negotiation_external) AS id_negotiation,
     n.id_negotiation AS id_negotiation_trato_feito,
     n.id_contract,
     REGEXP_REPLACE(cl.document,r"\.|\-", "") AS id_customer,
@@ -96,60 +96,62 @@ cyber_negotiation AS (
 ),
 recupera_negotiation AS (
   SELECT
-    CAST(id_negotiation AS BIGINT) AS id_negotiation,
-    id_contract,
-    UPPER(id_operator) AS id_operator,
-    customer_document AS id_customer,
-    campaign_code AS id_campaign,
-    COUNT(id_contract) OVER(PARTITION BY id_negotiation) AS contracts_by_negotiation,
+    CAST(rn.id_negotiation AS BIGINT) AS id_negotiation,
+    COALESCE(n.id_contract, rn.id_contract) AS id_contract,
+    UPPER(rn.id_operator) AS id_operator,
+    rn.customer_document AS id_customer,
+    rn.campaign_code AS id_campaign,
+    COUNT(rn.id_contract) OVER(PARTITION BY rn.id_negotiation) AS contracts_by_negotiation,
     CASE
-        WHEN id_creditor IN (2,6) THEN "PP QuintoAndar"
+        WHEN rn.id_creditor IN (2,6) THEN "PP QuintoAndar"
         ELSE "IQ QuintoAndar"
     END AS creditor,
     CASE
-      WHEN negotiation_status = "ACORDO_LIQUIDADO" THEN "finished"
-      WHEN negotiation_status = "ACORDO_CANCELADO"
-        AND down_payment IS TRUE THEN "broken"
-      WHEN negotiation_status = "ACORDO_CANCELADO"
-        AND down_payment IS FALSE THEN "canceled"
-      WHEN negotiation_status = "ACORDO_EM_ANDAMENTO"
-        AND down_payment IS TRUE THEN "offset"
-      WHEN negotiation_status = "ACORDO_EM_ANDAMENTO" THEN "started"
+      WHEN rn.negotiation_status = "ACORDO_LIQUIDADO" THEN "finished"
+      WHEN rn.negotiation_status = "ACORDO_CANCELADO"
+        AND rn.down_payment IS TRUE THEN "broken"
+      WHEN rn.negotiation_status = "ACORDO_CANCELADO"
+        AND rn.down_payment IS FALSE THEN "canceled"
+      WHEN rn.negotiation_status = "ACORDO_EM_ANDAMENTO"
+        AND rn.down_payment IS TRUE THEN "offset"
+      WHEN rn.negotiation_status = "ACORDO_EM_ANDAMENTO" THEN "started"
     END AS negotiation_status,
-    IF(is_special_installment IS TRUE, "Special Installment", NULL) AS exception,
+    IF(rn.is_special_installment IS TRUE, "Special Installment", NULL) AS exception,
     CASE
-      WHEN REPLACE(origin_agreement, "_", " ") = "Portal Autonegociação" THEN "Portal Auto Negociação"
-      WHEN REPLACE(origin_agreement, "_", " ") =  "Operador" THEN "Operador Interno"
-      ELSE REPLACE(origin_agreement, "_", " ")
+      WHEN REPLACE(rn.origin_agreement, "_", " ") = "Portal Autonegociação" THEN "Portal Auto Negociação"
+      WHEN REPLACE(rn.origin_agreement, "_", " ") =  "Operador" THEN "Operador Interno"
+      ELSE REPLACE(rn.origin_agreement, "_", " ")
     END AS origin_agreement,
-    advisory,
-    agreement_type,
-    promisse_payment_method,
+    rn.advisory,
+    rn.agreement_type,
+    rn.promisse_payment_method,
     NULL AS is_renegotiation,
-    number_of_installments,
-    paid_installments,
-    breached_installments,
-    original_debt_amount,
-    interest_fee_amount,
-    IF(is_special_installment IS TRUE, fine_fee_amount, GREATEST(ROUND(expense_amount - original_debt_amount - interest_fee_amount - adm_fee_amount - negotiation_discount_amount, 2), 0))  AS fine_amount,
-    adm_fee_amount AS credit_card_fee_amount,
-    ROUND(expense_amount, 2) AS total_debt_amount, -- original_debt_amount + interest_fee_amount + fine_fee_amount + credit_card_fee
-    GREATEST(ROUND(expense_amount - negotiated_amount, 2), 0) AS discount_amount,
-    negotiated_amount,
-    down_payment_amount,
-    total_amount_paid AS total_paid_amount,
-    dt_cancellation,
-    dt_promisse,
-    dt_due_promisse,
-    dt_negotiation_expected_end AS dt_expected_end,
-    dt_down_payment,
-    dt_paid_all,
-    COALESCE(dt_cancellation, dt_paid_all) AS dt_ending,
+    rn.number_of_installments,
+    rn.paid_installments,
+    rn.breached_installments,
+    rn.original_debt_amount,
+    rn.interest_fee_amount,
+    IF(rn.is_special_installment IS TRUE, rn.fine_fee_amount, GREATEST(ROUND(rn.expense_amount - rn.original_debt_amount - rn.interest_fee_amount - rn.adm_fee_amount - rn.negotiation_discount_amount, 2), 0))  AS fine_amount,
+    rn.adm_fee_amount AS credit_card_fee_amount,
+    ROUND(rn.expense_amount, 2) AS total_debt_amount, -- original_debt_amount + interest_fee_amount + fine_fee_amount + credit_card_fee
+    GREATEST(ROUND(rn.expense_amount - rn.negotiated_amount, 2), 0) AS discount_amount,
+    rn.negotiated_amount,
+    rn.down_payment_amount,
+    rn.total_amount_paid AS total_paid_amount,
+    rn.dt_cancellation,
+    rn.dt_promisse,
+    rn.dt_due_promisse,
+    rn.dt_negotiation_expected_end AS dt_expected_end,
+    rn.dt_down_payment,
+    rn.dt_paid_all,
+    COALESCE(rn.dt_cancellation, rn.dt_paid_all) AS dt_ending,
     "Recupera" AS source,
     2 AS priority
-  FROM datalake_recupera.negotiation
+  FROM datalake_recupera.negotiation AS rn
+  LEFT JOIN trato_feito_negotiation AS n
+    ON CAST(rn.id_negotiation AS BIGINT) = n.id_negotiation AND n.source = "Trato Feito - Recupera"
   WHERE id_creditor NOT IN (3,5)
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_negotiation ORDER BY ts_snapshot DESC, id_contract DESC) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY rn.id_negotiation ORDER BY rn.ts_snapshot DESC, rn.id_contract DESC) = 1
 ),
 original_invoices AS (
   SELECT
