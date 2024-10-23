@@ -16,8 +16,8 @@ WITH experiments AS (
         FROM (
             SELECT
                 *,
-                explode(map_keys(str_to_map(regexp_replace(config.variants, '[{}]', '' )))) AS _variant_name,
-                str_to_map(regexp_replace(config.variants, '[{}]', '' )) AS variants
+                explode(map_keys(str_to_map(regexp_replace(config.variants, '\\{{|\\}}', '' )))) AS _variant_name,
+                str_to_map(regexp_replace(config.variants, '\\{{|\\}}', '' )) AS variants
             FROM
                 datalake_search.experiment_config
             WHERE
