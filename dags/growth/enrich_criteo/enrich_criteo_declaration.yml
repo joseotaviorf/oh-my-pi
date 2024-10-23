@@ -1,0 +1,20 @@
+---
+dag:
+  name: enrich_criteo
+  schedule_start_date: 2024, 10, 21
+  owner: Data Growth
+  documentation:
+    dag_purpose: This DAG is responsible to aggregate the criteo data because our ingestion process is not able to do it.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: ['year', 'month', 'day']
+  tables_customization:
+    criteo_campaigns:
+      z_order_by: ["id_advertiser", "id_ad_set", "advertiser_name", "ad_set", "dt_report"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_13_3_min_io-general_cluster
