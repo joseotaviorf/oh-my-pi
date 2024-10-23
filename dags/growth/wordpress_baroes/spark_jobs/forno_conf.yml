@@ -1,9 +1,0 @@
-blog_list:
-  meulugar:
-    endpoint: https://meulugar.quintoandar.com.br/wp-json/wp/v2/posts/
-  conteudos:
-    endpoint: https://conteudos.quintoandar.com.br/wp-json/wp/v2/posts/
-raw_partition_cols:
-  - year
-  - month
-  - day

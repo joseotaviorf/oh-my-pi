@@ -3067,8 +3067,6 @@ bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-prospect-dimension-aud
   - bietlejuice.wololo:load-clean-rev-info
   - bietlejuice.wololo:load-clean-round
-bietlejuice.enrich_wordpress_baroes:
-  - bietlejuice.wordpress_baroes:load-clean-conteudos-data
 bietlejuice.enrich_workable:
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids
   - bietlejuice.enrich_hr_system:load-enrich-employee-ids
