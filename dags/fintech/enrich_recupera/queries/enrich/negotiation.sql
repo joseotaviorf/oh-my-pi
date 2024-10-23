@@ -256,7 +256,7 @@ LEFT JOIN installment_detail AS pd
     ON a.id_creditor = pd.id_creditor
       AND a.id_customer = pd.id_customer
       AND a.id_negotiation = pd.id_installment
-LEFT JOIN contract_data AS c
+LEFT JOIN contract_data AS cd
   ON a.id_creditor = cd.id_creditor
     AND a.id_customer = cd.id_customer
 LEFT JOIN operational_records AS op

@@ -69,4 +69,4 @@ LEFT JOIN charges AS cc
 LEFT JOIN invoice_extra AS ie
     ON cp.id = ie.id_installment
 LEFT JOIN datalake_trato_feito_clean.negotiation AS n
-    ON cp.id_negotiation = n.id_negotiation
+    ON cp.id_negotiation = n.id
