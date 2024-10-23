@@ -11,7 +11,3 @@ SELECT
     day
 FROM
     datalake_arquivo_confidencial_raw.emailage_result_aud
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
