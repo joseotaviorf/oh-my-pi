@@ -25,12 +25,14 @@ WITH first_departament AS (
     frc.sk_ticket,
     frc.sk_contact,
     frc.sk_task AS sk_segment,
+    frc.sk_interaction,
     frc.agent_email,
     dt.theme,
     dt.theme_detail,
     frc.customer_phone,
     frc.transferred_from,
     dd.department,
+    LEAD(dd.team) OVER(PARTITION BY frc.sk_contact ORDER BY frc.ts_created) AS transferred_to_team,
     frc.transferred_to,
     CASE
       WHEN frc.channel = 'chat' THEN frc.status
@@ -38,7 +40,12 @@ WITH first_departament AS (
       WHEN frc.channel = 'call'AND frc.is_last_interaction = True THEN 'COMPLETED'
       WHEN frc.channel = 'call' THEN 'TRANSFERRED'
     END AS outcome,
+    da.agent_organization,
     dd.team,
+    frc.channel,
+    dd.area,
+    dd.front_or_back,
+    frc.status,
     fd.first_department,
     ld.last_department,
     CASE
@@ -59,6 +66,7 @@ WITH first_departament AS (
     END AS first_transfer,
     frc.is_last_interaction,
     frc.ts_created AS ts_started,
+    frc.is_first_department_interaction,
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS month,
     DAY(CURRENT_DATE) AS day,
@@ -88,9 +96,16 @@ WITH first_departament AS (
       ON frc.sk_taxonomy = dt.sk_taxonomy
   WHERE
     frc.channel = 'chat'
-    AND dd.front_or_back = 'front'
-    AND dd.area = 'CX'
-    AND dd.department IN (
+)
+,segments_final AS (
+  SELECT
+    *
+  FROM
+    segments
+  WHERE
+    front_or_back = 'front'
+    AND area = 'CX'
+    AND department IN (
       'CX Mudança [FRONT] [POS]',
       'CX Pagamentos [FRONT] [POS]',
       'CX Parceiros [FRONT] [PRE]',
@@ -101,8 +116,8 @@ WITH first_departament AS (
       'CX Visitas [FRONT] [PRE]',
       'Consultores imobiliários 5A',
       'CX Parceiros Compra e Venda [FRONT]')
-    AND DATE_TRUNC('month', frc.ts_created) >= CURRENT_DATE - INTERVAL '2' MONTH
-    AND (da.agent_organization = "atento" OR da.agent_organization = "atn")
+    AND DATE_TRUNC('month', ts_started) >= CURRENT_DATE - INTERVAL '2' MONTH
+    AND (agent_organization = 'atento' OR agent_organization = 'atn')
 )
 SELECT
   *,
@@ -110,20 +125,20 @@ SELECT
     WHEN
       (first_department = last_department
       OR (transferred_to != last_department))
-      AND outcome = 'TRANSFERRED' then 'human_error'
+      AND outcome = 'TRANSFERRED' THEN 'human_error'
     ELSE 'bot_error'
   END AS transfer_reason,
   CASE
     WHEN
       is_last_interaction = true
-      AND department != first_department then 'bot_error'
+      AND department != first_department THEN 'bot_error'
     WHEN
       is_last_interaction = false
       AND transferred_to != last_department
-      AND outcome = 'TRANSFERRED' then 'human_error'
+      AND outcome = 'TRANSFERRED' THEN 'human_error'
     WHEN
       is_last_interaction = false
       AND transferred_to = last_department
-      AND outcome = 'TRANSFERRED' then 'department_correction'
+      AND outcome = 'TRANSFERRED' THEN 'department_correction'
   END AS transfer_reason_detailed
-FROM segments
+FROM segments_final
