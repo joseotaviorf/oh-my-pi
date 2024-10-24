@@ -1,13 +1,16 @@
 SELECT
+    UUID() AS id,
     CAST(
-        CONCAT(
-            SUBSTRING(MD5(CAST((100000 * ROUND(fls.sk_sale_listing / 1000) + 1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 3) AS STRING)), 1, 8), '-',
-            SUBSTRING(MD5(CAST((100000 * ROUND(fls.sk_sale_listing / 1000) + 1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 3) AS STRING)), 9, 4), '-',
-            SUBSTRING(MD5(CAST((100000 * ROUND(fls.sk_sale_listing / 1000) + 1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 3) AS STRING)), 13, 4), '-',
-            SUBSTRING(MD5(CAST((100000 * ROUND(fls.sk_sale_listing / 1000) + 1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 3) AS STRING)), 17, 4), '-',
-            SUBSTRING(MD5(CAST((100000 * ROUND(fls.sk_sale_listing / 1000) + 1000 * COUNT(*) OVER(PARTITION BY fls.sk_sale_listing ORDER BY fls.ts_status_started ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) + 3) AS STRING)), 21, 12)
+        (
+            100000 * ROUND(fls.sk_sale_listing / 1000) +
+            1000 * COUNT(*) OVER (
+                PARTITION BY fls.sk_sale_listing 
+                ORDER BY fls.ts_status_started 
+                ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+            ) + 
+            3
         ) AS STRING
-    ) AS id,
+    ) AS business_id,
     fls.sk_region AS location_id,
     ROUND(fls.sk_sale_listing / 1000) AS property_id,
     COALESCE(dc.uuid_company, '1P') AS company_uuid,
@@ -25,6 +28,4 @@ WHERE
     status_history = 'PUBLISHED'
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY fls.sk_sale_listing, dc.uuid_company ORDER BY fls.ts_status_started) = 1
-    AND year = {year}
-    AND month = {month}
-    AND day = {day}
+    AND DATE(fls.ts_status_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

@@ -1,13 +1,6 @@
 SELECT
-    CAST(
-        CONCAT(
-            SUBSTRING(MD5(CAST(MIN(fsse.sk_event) AS STRING)), 1, 8), '-',
-            SUBSTRING(MD5(CAST(MIN(fsse.sk_event) AS STRING)), 9, 4), '-',
-            SUBSTRING(MD5(CAST(MIN(fsse.sk_event) AS STRING)), 13, 4), '-',
-            SUBSTRING(MD5(CAST(MIN(fsse.sk_event) AS STRING)), 17, 4), '-',
-            SUBSTRING(MD5(CAST(MIN(fsse.sk_event) AS STRING)), 21, 12)
-        ) AS STRING
-    ) AS id,
+    UUID() AS id,
+    CAST(MIN(fsse.sk_event) AS STRING) AS business_id,
     fsse.sk_house_region AS location_id,
     fsse.sk_house AS property_id,
     COALESCE(dc.uuid_company, '1P') AS company_uuid,
@@ -26,9 +19,7 @@ JOIN
     dw_rede.dim_company AS dc
         ON fsse.sk_company = dc.sk_company
 WHERE
-    fsse.year = {year}
-    AND fsse.month = {month}
-    AND fsse.day = {day}
+    MAKE_DATE(fsse.year, fsse.month, fsse.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND dsset.business_context = 'sale'
     AND dsset.event_type = 'Listing Page Viewed'
 GROUP BY

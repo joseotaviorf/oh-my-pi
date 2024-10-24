@@ -1,13 +1,6 @@
 SELECT
-    CAST(
-        CONCAT(
-            SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 1, 8), '-',
-            SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 9, 4), '-',
-            SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 13, 4), '-',
-            SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 17, 4), '-',
-            SUBSTRING(MD5(CAST(flsr.sk_reason_event AS STRING)), 21, 12)
-        ) AS STRING
-    ) AS id,
+    UUID() AS id,
+    CAST(flsr.sk_reason_event AS STRING) business_id,
     flsr.sk_region AS location_id,
     dl.id_house AS property_id,
     dc.uuid_company AS company_uuid,
@@ -35,8 +28,6 @@ JOIN
     dw_rede.dim_lead_3p AS dl
         ON dl.sk_lead_3p = flsr.sk_lead_3p
 WHERE
-    dlc.business_context = 'SALE'
+    MAKE_DATE(dd.year, dd.month, dd.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND dlc.business_context = 'SALE'
     AND dc.uuid_company IS NOT NULL
-    AND dd.year = {year}
-    AND dd.month = {month}
-    AND dd.day = {day}

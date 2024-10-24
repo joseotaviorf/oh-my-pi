@@ -1,13 +1,6 @@
 SELECT
-    CAST(
-        CONCAT(
-            SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 1, 8), '-',
-            SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 9, 4), '-',
-            SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 13, 4), '-',
-            SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 17, 4), '-',
-            SUBSTRING(MD5(CAST(fsde.sk_sale_demand_event AS STRING)), 21, 12)
-        ) AS STRING
-    ) AS id,
+    UUID() AS id,
+    CAST(fsde.sk_sale_demand_event AS STRING) AS business_id,
     fsde.sk_region AS location_id,
     fsde.sk_house AS property_id,
     COALESCE(dc.uuid_company, '1P') AS company_uuid,
@@ -25,7 +18,5 @@ JOIN
     dw_rede.dim_company AS dc
         ON fsde.sk_company_supply = dc.sk_company
 WHERE
-    fsde.year = {year}
-    AND fsde.month = {month}
-    AND fsde.day = {day}
+    MAKE_DATE(fsde.year, fsde.month, fsde.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND dset.event_name = 'OFFER_ACCEPTED'

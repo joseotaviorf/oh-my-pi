@@ -66,31 +66,43 @@ def load_table_into_sns(
     """
     Load the table into SNS.
     """
-
+    
     df = spark.table(f"{database_name}.{table_name}")
+
     filtered_df = df.filter(
         (df.year == execution_date.year)
         & (df.month == execution_date.month)
         & (df.day == execution_date.day)
-    ).drop("year", "month", "day")
-    message_contents = filtered_df.collect()
-    messages = [
-        {"event_type": event_type, "payload": row.asDict()} for row in message_contents
-    ]
+    ).drop("business_id", "year", "month", "day")
 
     region = sns_topic_arn.split(":")[3]
-    sns_client = boto3.client("sns", region_name=region)
-    for message in messages:
-        send_message_dict_to_sns(sns_client, sns_topic_arn, message)
+
+    def send_partition_to_sns(partition):
+        sns_client = boto3.client("sns", region_name=region)
+        batch = []
+
+        for row in partition:
+            message = {"event_type": event_type, "payload": row.asDict()}
+            batch.append(message)
+
+            if len(batch) >= BATCH_SIZE:
+                send_batch_to_sns(sns_client, sns_topic_arn, batch)
+                batch.clear() 
+
+        if batch:
+            send_batch_to_sns(sns_client, sns_topic_arn, batch)
+
+    filtered_df.foreachPartition(send_partition_to_sns)
 
 
-def send_message_dict_to_sns(sns_client, sns_topic_arn: str, message: dict):
+def send_batch_to_sns(sns_client, sns_topic_arn: str, batch: list):
     """
     Send a message to SNS.
     """
-    sns_client.publish(
-        TopicArn=sns_topic_arn, Message=json.dumps(message, default=json_serial)
-    )
+    for message in batch:
+        sns_client.publish(
+            TopicArn=sns_topic_arn, Message=json.dumps(message, default=json_serial)
+        )
 
 
 def json_serial(obj):
