@@ -9,14 +9,14 @@ columns:
     description: "The income extraction external source identifier"
     lineage:
       - datalake_docpilot_raw.incomeextraction_version.id_external
-  id_transactional:
-    description: "The transactional identifier"
+  id_transaction:
+    description: "The transaction identifier"
     lineage:
-      - datalake_docpilot_raw.incomeextraction_version.transactional_id
-  id_end_transactional:
-    description: "The end transactional identifier"
+      - datalake_docpilot_raw.incomeextraction_version.transaction_id
+  id_end_transaction:
+    description: "The end transaction identifier"
     lineage:
-      - datalake_docpilot_raw.incomeextraction_version.end_transactional_id
+      - datalake_docpilot_raw.incomeextraction_version.end_transaction_id
   external_source:
     description: "External source"
     lineage:

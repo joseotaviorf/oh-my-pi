@@ -1,7 +1,7 @@
 SELECT
   id_external,
-  transaction_id AS id_transactional,
-  end_transaction_id AS id_end_transactional,
+  transaction_id AS id_transaction,
+  end_transaction_id AS id_end_transaction,
   external_source,
   processing_result,
   documents_type,
