@@ -1,4 +1,4 @@
-WITH closing_infos AS (-- get all ccv with info about cancelled and rescued ccv
+WITH closing_infos AS (
     SELECT
         cf.sk_offer,
         CASE
@@ -118,28 +118,32 @@ customer_info AS (
     WHERE
         b.sk_user IS NOT NULL
 ),
-previous_sent_id_drivers AS
-  (SELECT id_driver
-   FROM customer_info
-   WHERE ((payment_method IS NULL
-           OR payment_method LIKE 'FINANCED%')
-          AND (ts_house_registry_ended IS NOT NULL
-               AND DATE_ADD(dt_event, 114) <= CAST(ts_house_registry_ended AS TIMESTAMP)))
-     OR (((payment_method IS NULL
-           OR payment_method LIKE 'CASH%')
-          AND ((dt_event < DATE('2024-05-18'))
-               AND (ts_house_registry_ended IS NOT NULL
-                    AND DATE_ADD(dt_event, 45) <= CAST(ts_house_registry_ended AS TIMESTAMP))))
-         OR ((payment_method IS NULL
-              OR payment_method LIKE 'CASH%')
-             AND ((dt_event >= DATE('2024-05-18'))
-                  AND (ts_house_registry_ended IS NOT NULL
-                       AND DATE_ADD(dt_event, 60) <= CAST(ts_house_registry_ended AS TIMESTAMP)))))
-     OR ((payment_method IS NULL
-          OR payment_method LIKE 'CASH%')
-         AND (dt_event < DATE('2024-05-18'))
-         AND (ts_house_registry_ended IS NULL
-              OR DATE_ADD(CAST(ts_house_registry_ended AS TIMESTAMP), -2) <= DATE('2024-06-30'))))
+previous_sent_id_drivers AS (
+ SELECT id_driver
+ FROM customer_info
+ WHERE
+   (
+     -- Caso de pagamento FINANCED
+     (payment_method IS NULL OR payment_method LIKE 'FINANCED%')
+     AND ts_house_registry_ended IS NOT NULL
+     AND DATE_ADD(dt_event, 114) <= CAST(ts_house_registry_ended AS TIMESTAMP)
+     AND DATE_ADD(dt_event, 114) <= CAST('2024-10-24' AS DATE)
+   )
+   OR
+   (
+     -- Caso de pagamento CASH
+     (payment_method IS NULL OR payment_method LIKE 'CASH%')
+     AND ts_house_registry_ended IS NOT NULL
+     AND DATE_ADD(dt_event, 60) <= CAST('2024-10-24' AS DATE)
+     AND DATE_ADD(dt_event, 60) <= CAST(ts_house_registry_ended AS TIMESTAMP)
+   )
+   OR
+   (
+     -- Regra para considerar pesquisas já enviadas
+     ts_house_registry_ended IS NOT NULL
+     AND DATEDIFF(CURRENT_DATE(), CAST(ts_house_registry_ended AS DATE)) > 2
+   )
+)
 SELECT
     customer_name,
     customer_email,
@@ -155,7 +159,8 @@ SELECT
 FROM
     customer_info
 WHERE
-  ((ts_house_registry_ended IS NOT NULL AND DATEDIFF(CURRENT_DATE, ts_house_registry_ended) = 2)
-  OR ((payment_method IS NULL OR payment_method LIKE 'FINANCED%') AND ts_house_registry_ended IS NULL AND DATEDIFF(CURRENT_DATE, dt_event) = 114)
-  OR (payment_method LIKE 'CASH%' AND ts_house_registry_ended IS NULL AND DATEDIFF(CURRENT_DATE, dt_event) = 60))
-  AND id_driver NOT IN (SELECT id_driver FROM previous_sent_id_drivers)
+    -- Casos com data de CRI FIM, enviar 2 dias após CRI FIM
+    (ts_house_registry_ended IS NOT NULL
+    AND DATEDIFF(CURRENT_DATE(), ts_house_registry_ended) = 2)
+    -- Garantir que não enviamos duplicado
+    AND id_driver NOT IN (SELECT id_driver FROM previous_sent_id_drivers)
