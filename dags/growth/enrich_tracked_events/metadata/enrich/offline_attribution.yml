@@ -13,6 +13,9 @@ columns:
       - datalake_demand_contact_submission_clean.contact_submissions.id_user
       - datalake_tqc_referral.unified_lead_referral_flow.id_user_lead
       - datalake_tqc_referral.unified_lead_referral_flow.lead_phone
+      - datalake_hmb_ada_clean.backoffices.phone_number
+      - datalake_hmb_ada_clean.backoffices.id_business
+      - datalake_ebdb_clean.user.id
   id_contact:
     description: Unique identifier for the contact related to the offline attribution event.
     lineage:
@@ -24,6 +27,7 @@ columns:
       - datalake_tqc_referral.unified_lead_referral_flow.id_user_lead
       - datalake_tqc_referral.unified_lead_referral_flow.lead_phone
       - datalake_tqc_referral.unified_lead_referral_flow.id_referral_flow
+      - datalake_hmb_ada_clean.backoffices.id_contact
   event_name:
     description: Name of the event.
     lineage:
@@ -53,6 +57,7 @@ columns:
       - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
       - datalake_demand_contact_submission_clean.contact_submissions.ts_event
       - datalake_tqc_referral.unified_lead_referral_flow.ts_created
+      - datalake_hmb_ada_clean.backoffices.ts_contact_start
   year:
     description: Year when the event was recorded.
     lineage:
@@ -60,6 +65,7 @@ columns:
       - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
       - datalake_demand_contact_submission_clean.contact_submissions.ts_event
       - datalake_tqc_referral.unified_lead_referral_flow.ts_created
+      - datalake_hmb_ada_clean.backoffices.ts_contact_start
   month:
     description: Month when the event was recorded.
     lineage:
@@ -67,6 +73,7 @@ columns:
       - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
       - datalake_demand_contact_submission_clean.contact_submissions.ts_event
       - datalake_tqc_referral.unified_lead_referral_flow.ts_created
+      - datalake_hmb_ada_clean.backoffices.ts_contact_start
   day:
     description: Day when the event was recorded.
     lineage:
@@ -74,3 +81,4 @@ columns:
       - datalake_tracked_events.secretaria_offline_touchpoints.ts_event
       - datalake_demand_contact_submission_clean.contact_submissions.ts_event
       - datalake_tqc_referral.unified_lead_referral_flow.ts_created
+      - datalake_hmb_ada_clean.backoffices.ts_contact_start

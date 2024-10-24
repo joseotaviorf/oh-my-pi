@@ -11,6 +11,8 @@ WITH adhoc_rules AS (
       THEN "sale.acq.nonorg.na.d.referral.tqc"
       WHEN dpce.product_origin = 'Corretores'
       THEN "hybr.acq.nonorg.na.d.referral.agents"
+      WHEN  dpce.utm_medium = 'plaquinhas_ada_whatsapp'   
+      THEN "hybr.acq.nonorg.na.d.placas.na"
       WHEN utm_campaign IS NULL
         AND utm_source IS NULL
         AND utm_medium IS NULL
@@ -31,7 +33,10 @@ WITH adhoc_rules AS (
     dpce.id_region,
     dpce.id_owner,
     dpce.id_agent,
-    dpce.utm_campaign, 
+    CASE WHEN dpce.utm_medium = 'plaquinhas_ada_whatsapp' AND dpce.utm_campaign = 'offline_table'
+      THEN "hybr.acq.nonorg.na.d.placas.na.ada_whatsapp"
+      ELSE dpce.utm_campaign
+    END AS utm_campaign, 
     dpce.utm_medium,
     dpce.utm_source,
     dpce.utm_term,
@@ -54,7 +59,7 @@ WITH adhoc_rules AS (
         THEN 'TQC'
       WHEN dpce.is_3p_demand = TRUE THEN 'Rede'
       WHEN dpce.booking_creator = 'Agent' AND dpce.is_3p_demand = FALSE THEN 'Agent'
-      ELSE 'NA'
+      ELSE 'NA' -- TQC
     END AS referral_type,
     CASE 
       WHEN dpce.product_origin IS NULL THEN 'Lost Tracking'
