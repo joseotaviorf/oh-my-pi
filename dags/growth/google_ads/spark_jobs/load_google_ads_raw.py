@@ -223,7 +223,7 @@ if __name__ == "__main__":
              format_options=SparkTableStorageFormat.DEFAULT_RAW,
              database_location=database_location,
              partitions=raw_partition_cols,
-             force_recreate=True,
+             force_recreate=False,
          )
 
         if raw_partition_cols is not None:
