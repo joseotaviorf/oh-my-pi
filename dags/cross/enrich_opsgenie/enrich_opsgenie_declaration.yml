@@ -4,19 +4,18 @@ dag:
   schedule_start_date: 2020, 1, 1
   owner: Data Engineering
   documentation:
-    dag_purpose: '
-    Get data from OpsGenie alerts and "acordamentos" to monitor Data Engineering Incidents.
-    History data is retrieved from the table:
-    - `datalake_opsgenie_clean.alerts`
-    Logs from each alert is retrieved from the table:
-    - `datalake_opsgenie_clean.logs`'
+    dag_purpose: 'Get data from OpsGenie alerts and "acordamentos" to monitor Data Engineering Incidents.'
 workflow:
   type: query_delta
   layer: enrich
-  default_extraction_type: incremental
-  default_partitions: 
-    - year
-    - month
-    - day
+  tables_customization:
+    alerts:
+      extraction_type: incremental
+      partitions:   
+        - year
+        - month
+        - day
+    acordamentos:
+      extraction_type: full
 cluster:
   type: databricks_12_2_min_general_cluster

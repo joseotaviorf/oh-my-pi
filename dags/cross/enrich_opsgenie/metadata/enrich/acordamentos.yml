@@ -1,0 +1,45 @@
+---
+database_name: datalake_opsgenie
+table_name: acordamentos
+domain: Cross
+owner: "vitor.musachio@quintoandar.com.br"
+description: This table groups all alerts relating to an incident, person on-call, email notifications and "acordamentos".
+columns:
+  id_incident:
+    description: The unique incident identifier, based on the grouping of all alerts from an incident.
+    lineage:
+      - datalake_opsgenie_clean.alerts.id
+      - datalake_opsgenie_clean.alerts.dag_name
+      - datalake_opsgenie_clean.alerts.ts_created
+  id_issue_jira:
+    description: The ticket identifier generated in Jira for the incident
+    lineage:
+      - datalake_opsgenie_clean.logs.log
+  dag_name:
+    description: The name of the DAG that generated the alert.
+    lineage:
+      - datalake_opsgenie_clean.alerts.dag_name
+  acknowledged_by:
+    description: The user of the person who acknowledged the alert.
+    lineage:
+      - datalake_opsgenie_clean.alerts.acknowledged_by
+  is_acknowledged:
+    description: True if the alert is acknowledged; otherwise, false.
+    lineage:
+      - datalake_opsgenie_clean.alerts.is_acknowledged
+  has_email_notification_sent:
+    description: True if an email was sent for this alert; otherwise, false.
+    lineage:
+      - datalake_opsgenie_clean.logs.has_email_notification_sent
+  has_call_notification_made:
+    description: True if a call notification was sent for this alert; otherwise, false.
+    lineage:
+      - datalake_opsgenie_clean.logs.has_call_notification_made.
+  ts_first_alert:
+    description: Timestamp of the first incident alert.
+    lineage:
+      - datalake_opsgenie_clean.alerts.ts_created
+  ts_last_alert:
+    description: Timestamp of the last incident alert.
+    lineage:
+      - datalake_opsgenie_clean.alerts.ts_created

@@ -2,7 +2,7 @@
 database_name: datalake_opsgenie
 table_name: alerts
 domain: Cross
-owner: "@data-cross"
+owner: "vitor.musachio@quintoandar.com.br"
 description: This table contains detailed information from OpsGenie alerts to monitor Data Engineering Incidents.
 columns:
   id:
@@ -16,7 +16,7 @@ columns:
   id_issue_jira:
     description: The ticket identifier generated in Jira for the incident
     lineage:
-      - datalake_opsgenie_clean.logs.id_issue_jira
+      - datalake_opsgenie_clean.logs.log
   dag_name:
     description: The name of the DAG that generated the alert
     lineage:
