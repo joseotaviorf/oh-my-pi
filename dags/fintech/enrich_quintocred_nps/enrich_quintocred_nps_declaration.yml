@@ -1,0 +1,22 @@
+---
+dag:
+  name: enrich_quintocred_nps
+  schedule_start_date: 2022, 8, 28
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Creates enriched tables for QuintoCred NPS context.
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    transaction_entries:
+      - propose
+      - propose_person
+    propose:
+      - junk
+      - payment
+      - occurrence
+      - propose_person
+cluster:
+  type: databricks_13_3_min_general_cluster

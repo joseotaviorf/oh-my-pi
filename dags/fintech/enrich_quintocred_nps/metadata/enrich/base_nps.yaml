@@ -1,0 +1,106 @@
+database_name: datalake_velo
+table_name: base_nps
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "This table is the base generated to set which brokers are goin to receive the NPS survey"
+columns:
+  id_broker:
+    description: "Broker's identification number (ID)"
+    lineage:
+      - datalake_velo.broker.id_broker
+  id_realtor:
+    description: "Realtor's identification number (ID)"
+    lineage:
+      - datalake_velo.user.uuid_user
+  broker_name:
+    description: "Broker's name"
+    lineage:
+      - datalake_velo.broker.broker_name
+  broker_comercial_name:
+    description: "Broker's comercial name"
+    lineage:
+      - datalake_velo.broker.broker_comercial_name
+  document:
+    description: "Broker's document number (CNPJ)"
+    lineage:
+      - datalake_velo.broker.cnpj
+  realtor:
+    description: "Realtor's full name"
+    lineage:
+      - datalake_velo.user.name
+  email:
+    description: "Realtor's e-mail"
+    lineage:
+      - datalake_velo.user.email
+  phone:
+    description: "Broker's phone"
+    lineage:
+      - datalake_person_clean.contact_info.contact_info
+  profile:
+    description: "User's role in Velo's platform"
+    lineage:
+      - datalake_velo.user.user_role
+  contracts:
+    description: "Number of active contracts for the corresponding broker"
+  p_generated_at_month:
+    description: "Number of proposes generated at the current month for the corresponding broker"
+  p2c_at_month:
+    description: "Number of proposes that became contracts at the current month for the corresponding broker"
+  drop_p2c_at_month:
+    description: "Number of proposes that didn't become contracts at the current month for the corresponding broker"
+  contracts_beginning_and_ending_at_month:
+    description: "Number of contracts that started and ended on the same month for the corresponding broker"
+  contracts_beginning_at_month:
+    description: "Number of contracts that began at the current month for the corresponding broker"
+  contracts_ending_at_month:
+    description: "Number of contracts that ended at the current month for the corresponding broker"
+  proposes_gen_at_M_1:
+    description: "Number of proposes created on the last month for the corresponding broker"
+  proposes_gen_at_M_2:
+    description: "Number of proposes created 2 months before the current month for the corresponding broker"
+  proposes_gen_at_M_3:
+    description: "Number of proposes created 3 months before the current month for the corresponding broker"
+  proposes_gen_at_M_4:
+    description: "Number of proposes created 4 months before the current month for the corresponding broker"
+  proposes_gen_at_M_5:
+    description: "Number of proposes created 5 months before the current month for the corresponding broker"
+  proposes_gen_at_M_6:
+    description: "Number of proposes created 6 months before the current month for the corresponding broker"
+  contracts_gen_at_M_1:
+    description: "Number of contracts created on the last month for the corresponding broker"
+  contracts_gen_at_M_2:
+    description: "Number of contracts created 2 months before the current month for the corresponding broker"
+  contracts_gen_at_M_3:
+    description: "Number of contracts created 3 months before the current month for the corresponding broker"
+  contracts_gen_at_M_4:
+    description: "Number of contracts created 4 months before the current month for the corresponding broker"
+  contracts_gen_at_M_5:
+    description: "Number of contracts created 5 months before the current month for the corresponding broker"
+  contracts_gen_at_M_6:
+    description: "Number of contracts created 6 months before the current month for the corresponding broker"
+  sum_proposes_gen_w3:
+    description: "Sum of all created proposes on the last 3 months for the corresponding broker"
+  sum_proposes_gen_w6:
+    description: "Sum of all created proposes on the last 6 months for the corresponding broker"
+  sum_contracts_gen_w3:
+    description: "Sum of all created contracts on the last 3 months for the corresponding broker"
+  sum_contracts_gen_w6:
+    description: "Sum of all created contracts on the last 6 months for the corresponding brokerr"
+  avg_proposes_gen_w3:
+    description: "Average of all created proposes on the last 3 months for the corresponding broker"
+  avg_proposes_gen_w6:
+    description: "Average of all created proposes on the last 6 months for the corresponding broker"
+  avg_contracts_gen_w3:
+    description: "Average of all created contracts on the last 3 months for the corresponding broker"
+  avg_contracts_gen_w6:
+    description: "Average of all created contracts on the last 6 months for the corresponding broker"
+  nps_type:
+    description: "Type of NPS (true or lost)"
+  mob_imob:
+    description: "MOB according to the first propose started for the corresponding broke"
+  dt_imob_activation:
+    description: "Date of the first propose started for the corresponding broke"
+    lineage:
+      - datalake_velo.propose.ts_propose_started
+  dt_reference:
+    description: "Reference date for the metrics calculation"

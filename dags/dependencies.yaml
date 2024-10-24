@@ -2277,6 +2277,19 @@ bietlejuice.enrich_quinto_messenger:
   - bietlejuice.quinto_messenger:load-clean-chat
   - bietlejuice.quinto_messenger:load-clean-task
   - bietlejuice.quinto_messenger:load-clean-task-event
+bietlejuice.enrich_quintocred_nps:
+  - bietlejuice.company:load-clean-company
+  - bietlejuice.company:load-clean-document
+  - bietlejuice.company:load-clean-member-profile
+  - bietlejuice.enrich_velo:load-enrich-broker
+  - bietlejuice.enrich_velo:load-enrich-junk
+  - bietlejuice.enrich_velo:load-enrich-neurotech-rating
+  - bietlejuice.enrich_velo:load-enrich-propose
+  - bietlejuice.enrich_velo:load-enrich-user
+  - bietlejuice.person:load-clean-contact-info
+  - bietlejuice.person:load-clean-person
+  - bietlejuice.rental_guarantee_platform:load-clean-company
+  - bietlejuice.rental_guarantee_platform:load-clean-company-executive
 bietlejuice.enrich_recommendations:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean

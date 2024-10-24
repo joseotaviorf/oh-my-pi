@@ -3,7 +3,12 @@ database_name: datalake_velo
 table_name: delinquency_timeline
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: Table made to help analysing the evolution of delinquencies payments and monitor the collection's wallet.
+description: |
+  Table made to help analysing the evolution of delinquencies payments and monitor the collection's wallet.
+  There are some differences between delinquency_timeline and dw_charging_payment_quintocred.fact_payment_full, the delinquency_timeline brings daily data and fact_payment_full brings monthly.
+  We do not consider Guarranty and Termination delinquencies in fact_payment_full.
+  The delinquency_timeline follows the life of the delinquency from the moment it is created until the moment it is paid/terminated, and fact_payment_full follows the life of the contract.
+  In delinquency_timeline, when a delinquency is paid, it continues to be recorded until the end of the payment month.
 columns:
   id_delinquency:
     description: "Table primary key"
