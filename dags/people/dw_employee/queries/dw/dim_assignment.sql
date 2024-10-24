@@ -110,15 +110,15 @@ SELECT
   s.action_reason AS reason_last_increase
 FROM
   datalake_hr_system.work_relationships wr
-  LEFT JOIN
-    assignments_present AS ap
-      ON wr.id_period_of_service = ap.id_period_of_service
-  LEFT JOIN
-    assignment_future AS af
-      ON wr.id_period_of_service = af.id_period_of_service
-  LEFT JOIN
-    salaries AS s
-      ON COALESCE(ap.id_assignment, af.id_assignment) = s.id_assignment
+LEFT JOIN
+  assignments_present AS ap
+    ON wr.id_period_of_service = ap.id_period_of_service
+LEFT JOIN
+  assignment_future AS af
+    ON wr.id_period_of_service = af.id_period_of_service
+LEFT JOIN
+  salaries AS s
+    ON COALESCE(ap.id_assignment, af.id_assignment) = s.id_assignment
 WHERE
   (
     wr.dt_start <= DATE ('{load_start_date}')

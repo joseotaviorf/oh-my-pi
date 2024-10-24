@@ -82,13 +82,13 @@ columns:
       "I": "Inactive cost center"
     lineage:
       - datalake_hr_system_clean.organizations.status
-  dt_effective_start:
+  dt_started:
     description: "Date when the cost center became effective."
     lineage:
       - datalake_hr_system_clean.organizations.dt_effective_start
-  dt_effective_end:
+  dt_ended:
     description: "Date when the cost center became ineffective."
     lineage:
       - datalake_hr_system_clean.organizations.dt_effective_end
-  ts_load:
+  ts_loaded:
     description: "Date and time when the record was loaded."

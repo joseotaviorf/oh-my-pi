@@ -3,7 +3,7 @@ WITH hr_system_workers AS (
     id_person,
     national_identifiers
   FROM
-    datalake_hr_system_clean.workers 
+    datalake_hr_system_clean.workers
   QUALIFY DENSE_RANK() OVER (
       PARTITION BY id_person
       ORDER BY
@@ -70,28 +70,28 @@ SELECT
     DATE(ni2_rg.ts_last_update),
     DATE(ni2_pis.ts_last_update),
     da.dt_effective_start
-  ) AS ts_last_update,
-  NOW() AS ts_load
+  ) AS ts_last_updated,
+  NOW() AS ts_loaded
 FROM
   hr_system_workers AS w
-LEFT JOIN 
-  national_identifiers_step2 ni2_cpf 
+LEFT JOIN
+  national_identifiers_step2 ni2_cpf
     ON w.id_person = ni2_cpf.id_person
   AND ni2_cpf.national_identifier_type = 'CPF'
-LEFT JOIN 
-  national_identifiers_step2 ni2_rg 
+LEFT JOIN
+  national_identifiers_step2 ni2_rg
     ON w.id_person = ni2_rg.id_person
     AND ni2_rg.national_identifier_type = 'RG'
-LEFT JOIN 
-  national_identifiers_step2 ni2_pis 
+LEFT JOIN
+  national_identifiers_step2 ni2_pis
     ON w.id_person = ni2_pis.id_person
     AND ni2_pis.national_identifier_type = 'PIS'
-LEFT JOIN 
-  national_identifiers_dff nidff 
+LEFT JOIN
+  national_identifiers_dff nidff
     ON w.id_person = nidff.id_person
     AND ni2_rg.id_national_identifier = nidff.id_national_identifier
-LEFT JOIN 
-  datalake_hr_system.demographic_attributes AS da 
+LEFT JOIN
+  datalake_hr_system.demographic_attributes AS da
     ON w.id_person = da.id_person
     AND da.legislation_code = 'BR'
 WHERE

@@ -8,52 +8,54 @@ columns:
   sk_job:
     description: "Surrogate key for the job."
     lineage:
-    - datalake_hr_system_clean.jobs.j.id_job
+      - datalake_hr_system_clean.jobs.j.id_job
   job_code:
     description: "Job code."
     lineage:
-    - datalake_hr_system_clean.jobs.job_code
+      - datalake_hr_system_clean.jobs.job_code
   job_name:
     description: "Job name."
     lineage:
-    - datalake_hr_system_clean.jobs.job_name
+      - datalake_hr_system_clean.jobs.job_name
   comp_ladder_directorate:
     description: "Job's band ladder name. The band ladder is a structure that defines the career path for the employees."
     lineage:
-    - datalake_hr_system_clean.jobs.comp_ladder_directorate
+      - datalake_hr_system_clean.jobs.comp_ladder_directorate
   comp_ladder_business_unit:
     description: "Job's set name. The set gathers jobs that belongs to the same company structure"
     lineage:
-    - datalake_hr_system_clean.jobs.id_set
+      - datalake_hr_system_clean.jobs.id_set
   job_category:
     description: "Job's family name. The job family is a structure that groups jobs that have similar characteristics."
     lineage:
-    - datalake_hr_system_clean.jobs.id_job_family
+      - datalake_hr_system_clean.jobs.id_job_family
   career_track:
     description: "Indicates the career_track that the job belongs to. Possible values are: 'Líder', 'Contribuidor Individual', 'UNKNOWN'"
     lineage:
-    - datalake_hr_system_clean.jobs.career_track
+      - datalake_hr_system_clean.jobs.career_track
   working_hours_regime:
     description: "Indicates the working hours regime of the job. Possible values are: '1 - Submetido a Jornada de Trabalho', '3 - Função de Confiança', '4 - Teletrabalho (Inciso III Art 62 CLT)', 'UNKNOWN'"
     lineage:
-    - datalake_hr_system_clean.jobs.working_hours_regime
+      - datalake_hr_system_clean.jobs.working_hours_regime
   workload:
     description: "Indicates the number of hours that the job requires, and further details"
     lineage:
-    - datalake_hr_system_clean.jobs.workload
+      - datalake_hr_system_clean.jobs.workload
   is_active:
     description: "Indicates if the job is active or not. Possible values are: TRUE, FALSE, NULL"
     lineage:
-    - datalake_hr_system_clean.jobs.active_status
+      - datalake_hr_system_clean.jobs.active_status
   has_clock_in:
     description: "Indicates if the job requires clock in. Possible values are: TRUE, FALSE, NULL"
     lineage:
-    - datalake_hr_system_clean.jobs.has_clock_in
-  dt_effective_start:
+      - datalake_hr_system_clean.jobs.has_clock_in
+  dt_started:
     description: "The date when the last change in the job was effective."
     lineage:
-    - datalake_hr_system_clean.jobs.dt_effective_start
-  dt_effective_end:
+      - datalake_hr_system_clean.jobs.dt_effective_start
+  dt_ended:
     description: "Date of validity of the last change in the job."
     lineage:
-    - datalake_hr_system_clean.jobs.dt_effective_end
+      - datalake_hr_system_clean.jobs.dt_effective_end
+  ts_loaded:
+    description: "Timestamp of when the record was loaded."

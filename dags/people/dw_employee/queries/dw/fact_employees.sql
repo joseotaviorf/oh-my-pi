@@ -290,9 +290,9 @@ SELECT
     am.sk_manager_assignment,
     am.sk_disability,
     REPLACE (am.dt_start_work_relationship, '-', '') AS sk_work_relationship_started_date,
-    REPLACE (am.dt_termination_work_relationship, '-', '') AS sk_dt_termination_work_relationship,
+    REPLACE (am.dt_termination_work_relationship, '-', '') AS sk_termination_work_relationship_date,
     am.sk_last_increase_date,
-    REPLACE (se.dt_first_promotion, '-', '') AS sk_dt_first_promotion,
+    REPLACE (se.dt_first_promotion, '-', '') AS sk_first_promotion_date,
     h.sk_hierarchy,
     am.assignment_number,
     am.salary_currency,
@@ -307,7 +307,7 @@ SELECT
     am.qnt_promotions,
     am.salary,
     am.target_plr,
-    am.salary_reference AS salary_range_midpoint,
+    am.salary_reference,
     se.qnt_movimentations,
     se.average_time_between_movimentations,
     am.last_increase,
@@ -319,7 +319,7 @@ SELECT
     se.nominal_increase_first_promotion,
     se.pct_increase_first_promotion,
     se.months_to_first_promotion,
-    NOW () AS ts_load
+    NOW () AS ts_loaded
 FROM
     datalake_hr_system.assignment_metrics AS am
 LEFT JOIN

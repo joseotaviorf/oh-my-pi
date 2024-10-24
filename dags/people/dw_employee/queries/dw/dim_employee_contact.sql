@@ -116,8 +116,8 @@ SELECT
     DATE(ew.ts_last_update),
     DATE(eh.ts_last_update),
     DATE(phones.ts_last_update)
-  ) AS ts_last_update,
-  NOW() AS ts_load
+  ) AS ts_last_updated,
+  NOW() AS ts_loaded
 FROM
   hr_system_workers AS workers
 LEFT JOIN

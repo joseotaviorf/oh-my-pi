@@ -42,9 +42,7 @@ WITH jobs AS (
     QUALIFY dt_effective_start = MAX(dt_effective_start) OVER (PARTITION BY id_band_ladder)
 )
 SELECT DISTINCT
-    -- ids
     j.id_job AS sk_job,
-    -- non-metrics
     j.job_code,
     j.job_name,
     COALESCE(bl.comp_ladder_directorate, 'UNKNOWN') AS comp_ladder_directorate,
@@ -78,7 +76,6 @@ SELECT DISTINCT
     COALESCE(jcf.career_track, 'UNKNOWN') AS career_track,
     COALESCE(jcf.working_hours_regime, 'UNKNOWN') AS working_hours_regime,
     jcf.workload,
-    -- metrics
     CASE
         WHEN j.active_status = 'A' THEN TRUE
         WHEN j.active_status = 'I' THEN TRUE
@@ -87,15 +84,14 @@ SELECT DISTINCT
         WHEN jcf.has_clock_in = 'Sim' THEN TRUE
         WHEN jcf.has_clock_in = 'Não' THEN FALSE
     END has_clock_in,
-    -- dates
-    j.dt_effective_start,
-    j.dt_effective_end,
-    NOW() AS ts_load
+    j.dt_effective_start AS dt_started,
+    j.dt_effective_end AS dt_ended,
+    NOW() AS ts_loaded
 FROM
     jobs AS j
-LEFT JOIN 
-    job_customer_flex AS jcf 
+LEFT JOIN
+    job_customer_flex AS jcf
         ON j.id_job = jcf.id_job
-LEFT JOIN 
-    band_ladder AS bl 
+LEFT JOIN
+    band_ladder AS bl
         ON j.id_grade_ladder = bl.id_band_ladder

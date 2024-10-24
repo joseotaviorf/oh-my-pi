@@ -5,26 +5,21 @@ WITH cte_enrich_demographic_attributes AS (
     highest_education_level,
     gender
   FROM
-    datalake_hr_system.demographic_attributes 
-  QUALIFY 
+    datalake_hr_system.demographic_attributes
+  QUALIFY
     ts_last_update = MAX(ts_last_update) OVER (PARTITION BY id_person)
 )
 SELECT
-  --  ids
   emp_info.id_person AS sk_employee,
-  -- -- non metric
   emp_info.person_number,
-  -- -- name information,
   emp_info.first_name,
   emp_info.last_name,
   emp_info.full_name,
   emp_info.first_social_name,
   emp_info.last_social_name,
-  -- -- birth info,
   emp_info.birth_town,
   emp_info.birth_state,
   emp_info.birth_country,
-  -- -- personal info,
   emp_info.mother_name,
   emp_info.father_name,
   COALESCE(da.gender, '-1') AS gender_code,
@@ -90,11 +85,10 @@ SELECT
     AND 55 * 365 THEN 'de 51 até 55 anos'
     ELSE 'mais de 55 anos'
   END AS age_range,
-  -- -- dates
-  DATE(emp_info.dt_birth) AS dt_birth,
-  NOW() AS ts_load
+  DATE(emp_info.dt_birth) AS dt_birthday,
+  NOW() AS ts_loaded
 FROM
   datalake_hr_system.employee_info AS emp_info
-LEFT JOIN 
-  cte_enrich_demographic_attributes AS da 
+LEFT JOIN
+  cte_enrich_demographic_attributes AS da
       ON emp_info.id_person = da.id_person

@@ -30,7 +30,7 @@ SELECT DISTINCT
   wi7.work_email AS email_leadership_7,
   wi8.work_email AS email_leadership_8,
   wi9.work_email AS email_leadership_9,
-  NOW() AS ts_load
+  NOW() AS ts_loaded
 FROM
   datalake_hr_system.hierarchy_ids AS h
 LEFT JOIN

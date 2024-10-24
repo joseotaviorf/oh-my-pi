@@ -144,7 +144,7 @@ columns:
     description: "Months to the first promotion."
     lineage:
       - datalake_hr_system.assignments_metrics.months_to_first_promotion_employee
-  ts_load:
+  ts_loaded:
     description: "Timestamp of when the data was loaded."
     lineage:
       - datalake_hr_system.assignments_metrics.NOW()
