@@ -5,6 +5,7 @@ SELECT
     launch,
     CAST(responses AS BIGINT) AS total_responses,
     CAST(enabled AS BOOLEAN) AS is_enabled,
+    workspace_name,
     TIMESTAMP(created_at) AS ts_created,
     DATE(dt_load) AS dt_load,
     INT(year) AS year,

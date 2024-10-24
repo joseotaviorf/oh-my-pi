@@ -71,6 +71,10 @@ columns:
       - content: Text of the answer option as displayed to the respondent.
     lineage:
       - datalake_survicate_raw.survey_questions.answer_choices
+  workspace_name:
+    description: Workspace where the question is from.
+    lineage:
+      - datalake_survicate_raw.survey_questions.workspace_name
   dt_load:
     description: Date and time when the data was loaded.
     lineage:

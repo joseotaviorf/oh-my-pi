@@ -3,6 +3,7 @@ SELECT
     respondent_uuid,
     name,
     value,
+    workspace_name,
     DATE(dt_load) AS dt_load,
     INT(year) AS year,
     INT(month) AS month,

@@ -5,6 +5,7 @@ SELECT
   question,
   introduction,
   answer_choices,
+  workspace_name,
   dt_load,
   year,
   month,

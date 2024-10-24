@@ -21,6 +21,10 @@ columns:
     description: The attribute's value.
     lineage:
       - datalake_survicate_raw.respondent_attributes.value
+  workspace_name:
+    description: The attribute's workspace.
+    lineage:
+      - datalake_survicate_raw.respondent_attributes.workspace_name
   dt_load:
     description: Date and time when the data was loaded.
     lineage:

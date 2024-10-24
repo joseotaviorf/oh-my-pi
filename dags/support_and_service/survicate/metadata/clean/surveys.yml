@@ -42,6 +42,10 @@ columns:
     description: Indicates whether a survey is available for respondents.
     lineage:
       - datalake_survicate_raw.surveys.enabled
+  workspace_name:
+    description: Workspace where the survey is from.
+    lineage:
+      - datalake_survicate_raw.surveys.workspace_name
   ts_created:
     description: The timestamp when the survey was creatd.
     lineage:

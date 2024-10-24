@@ -7,6 +7,7 @@ SELECT
     language,
     answers,
     respondent,
+    workspace_name,
     TIMESTAMP(collected_at) AS ts_collected,
     DATE(dt_load) AS dt_load,
     INT(year) AS year,

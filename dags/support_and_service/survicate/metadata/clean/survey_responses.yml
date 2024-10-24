@@ -65,6 +65,10 @@ columns:
       - "respondent_uuid": A unique, unchangeable identifier for the respondent who submitted the response.
     lineage:
       - datalake_survicate_raw.survey_responses.respondent
+  workspace_name:
+    description: Workspace where the response is from.
+    lineage:
+      - datalake_survicate_raw.survey_responses.workspace_name
   ts_collected:
     description: This timestamp marks the moment a survey response was received.
     lineage:
