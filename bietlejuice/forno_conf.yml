@@ -282,6 +282,20 @@ cluster_template:
 custom_cluster:
     <<: *cluster_anchor
 
+custom_cluster_with_sedona:
+    <<: *cluster_anchor
+    spark_conf:
+        spark.serializer: "org.apache.spark.serializer.KryoSerializer"
+        spark.sql.extensions: "org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions"
+        spark.kryo.registrator: "org.apache.sedona.core.serde.SedonaKryoRegistrator"
+    init_scripts:
+        - s3:
+            destination: "{{ var.value.artifacts_bucket }}/sedona/sedona-init.sh"
+            region: ""
+        - s3:
+            destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script_no_metrics.sh"
+            region: ""
+
 databricks_10_4_min_general_cluster:
     <<: *cluster_anchor
     node_type_id: m5a.large
