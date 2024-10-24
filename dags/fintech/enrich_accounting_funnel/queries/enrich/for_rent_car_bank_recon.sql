@@ -1,6 +1,6 @@
 WITH francesinha AS (
     SELECT
-        UPPER(REPLACE(document_number, 'C!', '')) AS company_use,
+        UPPER(REPLACE(REGEXP_REPLACE(document_number, '^0000', ''), 'C!', '')) AS company_use,
         dt_credit AS dt_paid,
         SUM(net_amount) AS amount
     FROM
@@ -70,7 +70,7 @@ vans_checkout_union AS (
 
 pre_vans_checkout AS (
     SELECT
-        UPPER(vc.company_use) AS company_use,
+        UPPER(REGEXP_REPLACE(vc.company_use, '^0000', '')) AS company_use,
         vc.id_invoice,
         DATE(dd.next_brz_fintech_business_day) AS dt_paid,
         vc.paid_amount
@@ -79,6 +79,8 @@ pre_vans_checkout AS (
     LEFT JOIN
         dw_public.dim_date dd
             ON vc.ts_paid = dd.date
+    WHERE 
+        UPPER(vc.company_use) NOT LIKE 'BY%'
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY our_number, paid_amount ORDER BY CASE WHEN id_invoice IS NOT NULL THEN company_use ELSE our_number END DESC) = 1
 ),
