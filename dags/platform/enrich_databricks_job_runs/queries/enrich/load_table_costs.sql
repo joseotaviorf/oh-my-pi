@@ -28,7 +28,7 @@ WITH load_tasks AS (
             AND tr.run_name = t.task
     WHERE
         tr.run_name LIKE 'load-%'
-        AND MAKE_DATE(tr.year, tr.month, tr.day) BETWEEN '{ load_start_date }' AND '{ load_end_date }'
+        AND MAKE_DATE(tr.year, tr.month, tr.day) BETWEEN '{load_start_date}' AND '{load_end_date}'
         AND tr.terminal_state = 'Succeeded'
 ),
 direct_costs AS (
