@@ -33,6 +33,10 @@ workflow:
     photo_aud:
       raw_extraction_type: full
       raw_partitions: []
+    photo_invalid_source:
+      date_filter_column: created_at
+      clean_extraction_type: incremental
+      clean_partitions: [year, month, day]
     photosphere:
       raw_extraction_type: full
       raw_partitions: []

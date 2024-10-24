@@ -1,0 +1,34 @@
+---
+database_name: datalake_kodak_clean
+table_name: photo_invalid_source
+description: This table contains all the photos that were not synced with the QuintoAndar Kodak Service.
+domain: Rede
+owner: andre.melo@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.photo_invalid_source.id
+  id_external_domain:
+    lineage:
+      - datalake_kodak_raw.photo_invalid_source.externaldomainid
+  external_domain:
+    lineage:
+      - datalake_kodak_raw.photo_invalid_source.externaldomain
+  source_url:
+    lineage:
+      - datalake_kodak_raw.photo_invalid_source.source_url
+  reason:
+    lineage:
+      - datalake_kodak_raw.photo_invalid_source.reason
+  ts_created:
+    lineage:
+      - datalake_kodak_raw.photo_invalid_source.created_at
+  year:
+    lineage:
+      - datalake_kodak_raw.photo_invalid_source.year
+  month:
+    lineage:
+      - datalake_kodak_raw.photo_invalid_source.month
+  day:
+    lineage:
+      - datalake_kodak_raw.photo_invalid_source.day
