@@ -202,7 +202,7 @@ ccvs AS (
 last_update_ccv_flow AS (
     SELECT
         *,
-        ROW_NUMBER() OVER (PARTITION BY id_ccv_flow ORDER BY ts_updated DESC) AS ROW
+        ROW_NUMBER() OVER (PARTITION BY id_sales_flow ORDER BY ts_updated DESC) AS ROW
     FROM
         datalake_sales_flow_clean.ccv_flow
 ),
