@@ -1,0 +1,39 @@
+---
+database_name: datalake_docpilot_clean
+table_name: income_extraction
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: "This table stores the income extractions in the DocPilot service"
+columns:
+  id_external:
+    description: "The income extraction external source identifier"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction.id_external
+  external_source:
+    description: "External source"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction.external_source
+  processing_result:
+    description: "The processing result of an income extraction"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction.processing_result
+  documents_type:
+    description: "The type of processed documents (ie bank statement or payslip)"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction.documents_type
+  extracted_data:
+    description: "The data extracted from the submitted document"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction.extracted_data
+  errors:
+    description: "If any error occured during the extraction process, its type will be recorded in this column"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction.errors
+  ts_created:
+    description: "The incomeextraction creation date"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction.ts_created
+  ts_updated:
+    description: "The incomeextraction creation date"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction.ts_updated

@@ -1,0 +1,11 @@
+SELECT
+    id_external,
+    external_source,
+    processing_result,
+    documents_type,
+    extracted_data,
+    errors,
+    ts_created,
+    ts_updated
+FROM
+    datalake_docpilot_raw.incomeextraction

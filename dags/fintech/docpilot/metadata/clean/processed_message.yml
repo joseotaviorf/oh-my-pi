@@ -1,0 +1,19 @@
+---
+database_name: datalake_docpilot_clean
+table_name: processed_message
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: "This table stores the messages received from the DocPilot worker"
+columns:
+  id_subscriber:
+    description: "The subscriber identifier"
+    lineage:
+      - datalake_docpilot_raw.processedmessage.subscriber_id
+  id_message:
+    description: "The message identifier"
+    lineage:
+      - datalake_docpilot_raw.processedmessage.message_id
+  ts_created:
+    description: "The processed_message creation date"
+    lineage:
+      - datalake_docpilot_raw.processedmessage.created_at

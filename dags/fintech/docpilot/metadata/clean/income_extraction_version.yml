@@ -1,0 +1,75 @@
+---
+database_name: datalake_docpilot_clean
+table_name: income_extraction_version
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: "This table stores any modification in the income extraction processed by the DocPilot service. It is an audit table."
+columns:
+  id_external:
+    description: "The income extraction external source identifier"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.id_external
+  id_transactional:
+    description: "The transactional identifier"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.transactional_id
+  id_end_transactional:
+    description: "The end transactional identifier"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.end_transactional_id
+  external_source:
+    description: "External source"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.external_source
+  processing_result:
+    description: "The processing result of an income extraction"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.processing_result
+  documents_type:
+    description: "The type of processed document (ie bank statement or payslip)"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.documents_type
+  extracted_data:
+    description: "The data extracted from the submitted document"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.extracted_data
+  errors:
+    description: "If any error occured during the extraction process, its type will be recorded in this column"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.errors
+  operation_type:
+    description: "The operation type"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.operation_type
+  processing_result_mod:
+    description: "Indicates any modification in the processing result of an income extraction"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.processing_result_mod
+  documents_type_mod:
+    description: "Indicates any modification in the type of processed documents (ie bank statement or payslip)"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.documents_type_mod
+  extracted_data_mod:
+    description: "Indicates any modification in the data extracted from the submitted document"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.extracted_data_mod
+  errors_mod:
+    description: "Indicates any modification in any error occured during the extraction process"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.errors_mod
+  ts_created:
+    description: "The income_extraction creation date"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.ts_created
+  ts_updated:
+    description: "The income_extraction update date"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.ts_updated
+  ts_created_mod:
+    description: "The income_extraction_version creation date"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.ts_created_mod
+  ts_updated_mod:
+    description: "The income_extraction_version update date"
+    lineage:
+      - datalake_docpilot_raw.incomeextraction_version.ts_updated_mod

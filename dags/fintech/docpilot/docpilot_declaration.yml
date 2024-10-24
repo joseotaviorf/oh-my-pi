@@ -1,0 +1,25 @@
+dag:
+  name: docpilot
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG extracts and process data from DocPilot. DocPilot is a system responsible for extracting, categorizing and calculating income data from bank statements and payslip documents.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  custom_schema: docpilot
+  dbutils_secret_key: DOCPILOT_DB
+  lineage_product_database_name: docpilot
+  tables_customization:
+    IncomeExtraction:
+      clean_table_name: income_extraction
+    IncomeExtraction_version:
+      clean_table_name: income_extraction_version
+    ProcessedMessage:
+      clean_table_name: processed_message
+    transaction:
+      clean_table_name: transaction
+cluster:
+  type: databricks_12_2_med_general_cluster
