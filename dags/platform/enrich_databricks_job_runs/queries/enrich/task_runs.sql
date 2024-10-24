@@ -20,4 +20,4 @@ JOIN
         ON jr.cluster_id = uc.id_cluster
 WHERE
     uc.bietlejuice_dag_name IS NOT NULL
-    AND jr.task_runtime.startTS::TIMESTAMP BETWEEN '{{ load_start_date }}' AND '{{ load_end_date }}'
+    AND jr.task_runtime.startTS::TIMESTAMP BETWEEN '{ load_start_date }' AND '{ load_end_date }'
