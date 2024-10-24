@@ -138,7 +138,7 @@ class TestPostgresConsumer:
                 pg_attribute a ON a.attrelid = i.indrelid
                 AND a.attnum = ANY(i.indkey)
             WHERE
-                i.indrelid = 'public.tabela_dummy'::regclass
+                i.indrelid = 'public."tabela_dummy"'::regclass
                 AND i.indisprimary
         """
             )

@@ -196,7 +196,7 @@ class PostgresConsumer(DBConsumer):
                 pg_attribute a ON a.attrelid = i.indrelid
                 AND a.attnum = ANY(i.indkey)
             WHERE
-                i.indrelid = '{self.conn_config["schema"]}.{table_name}'::regclass
+                i.indrelid = '{self.conn_config["schema"]}."{table_name}"'::regclass
                 AND i.indisprimary
         """
 
