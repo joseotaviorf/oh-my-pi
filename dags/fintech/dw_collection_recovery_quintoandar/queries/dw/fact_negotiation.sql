@@ -155,7 +155,7 @@ recupera_negotiation AS (
 ),
 original_invoices AS (
   SELECT
-    b.sk_negotiation AS id_negotiation,
+    b.sk_negotiation,
     d.id_contract,
     MIN(d.dt_due) AS dt_due_invoice_anchor,
     COUNT(DISTINCT d.id_invoice) AS total_invoices_negotiated
@@ -263,8 +263,7 @@ union_sources AS (
     ON tfn.id_negotiation = r.id_negotiation
       AND tfn.id_negotiation = r.id_contract
   LEFT JOIN original_invoices AS oi
-    ON COALESCE(tfn.id_negotiation, cn.id_negotiation, rn.id_negotiation) = oi.id_negotiation
-      AND COALESCE(tfn.id_contract, cn.id_contract, rn.id_contract) = oi.id_contract
+    ON oi.sk_negotiation = CONCAT(COALESCE(tfn.id_contract, cn.id_contract, rn.id_contract),COALESCE(tfn.id_negotiation, cn.id_negotiation, rn.id_negotiation))
   LEFT JOIN installments_data AS i
     ON COALESCE(tfn.id_negotiation, cn.id_negotiation, rn.id_negotiation) = i.id_negotiation
     AND COALESCE(tfn.id_contract, cn.id_contract, rn.id_contract) = sk_contract
