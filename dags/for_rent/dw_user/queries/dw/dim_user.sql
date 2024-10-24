@@ -61,6 +61,7 @@ SELECT -- [ODS] This table was migrated FROM ODS flow and needs a future refacto
     u.id AS sk_user,
     COALESCE(CAST(date_format(ad.ts_doorman_joined, 'yyyyMMdd') AS bigint), -1) AS sk_doorman_joined_date,
     u.id,
+    u.uuid_person,
     CAST(u.id_agent AS INTEGER) AS dados_agente_id,
     CAST(u.id_photographer_data AS INTEGER) AS dados_fotografo_id,
     CAST(u.id_sales_rep AS INTEGER) AS dados_vendedor_id,

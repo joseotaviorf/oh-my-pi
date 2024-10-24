@@ -16,6 +16,10 @@ columns:
     lineage:
     - datalake_ebdb_user.user.id
     description: Unique ID of user, it's the primary key of this table. It has the same value of sk_user.
+  uuid_person:
+    lineage:
+    - datalake_ebdb_user.user.uuid_person
+    description: Unique ID of user, in uuid format.
   dados_agente_id:
     lineage:
     - datalake_ebdb_user.user.id_agent
