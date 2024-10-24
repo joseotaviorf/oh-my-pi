@@ -15,6 +15,7 @@ SELECT
     metrics.clicks AS clicks,
     DOUBLE(metrics.costMicros)/1000 AS cost,
     metrics.impressions	AS impressions,
+    INT(metrics.conversions) AS conversions,
     metrics.interactions AS interactions,
     metrics.interactionEventTypes interaction_event_types,
     DATE(segments.date) AS dt_loaded,

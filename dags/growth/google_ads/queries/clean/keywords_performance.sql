@@ -10,6 +10,7 @@ SELECT
     segments.device AS device,
     segments.adNetworkType AS ad_network_type,
     INT(metrics.impressions) AS impressions,
+    INT(metrics.conversions) AS conversions,
     adGroupCriterion.keyword.matchType AS match_type,
     adGroupCriterion.keyword.text AS criteria,
     customer.descriptiveName AS account_descriptive_name,

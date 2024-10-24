@@ -7,6 +7,7 @@ SELECT
     campaign.name AS campaign_name,
     metrics.clicks AS clicks,
     metrics.costMicros AS cost,
+    INT(metrics.conversions) AS conversions,
     segments.device AS device,
     segments.adNetworkType AS ad_network_type,
     metrics.impressions AS impressions,

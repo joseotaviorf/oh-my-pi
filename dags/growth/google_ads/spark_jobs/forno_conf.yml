@@ -22,6 +22,7 @@ GAQL:
         campaign.name,
         metrics.clicks,
         metrics.cost_micros,
+        metrics.conversions,
         segments.date,
         ad_group_ad.ad.legacy_responsive_display_ad.description,
         ad_group_ad.ad.expanded_text_ad.description,
@@ -46,6 +47,7 @@ GAQL:
         campaign.name,
         metrics.clicks,
         metrics.cost_micros,
+        metrics.conversions,
         segments.date,
         segments.device,
         metrics.impressions,
@@ -74,6 +76,7 @@ GAQL:
         metrics.impressions,
         metrics.clicks,
         metrics.cost_micros,
+        metrics.conversions,
         segments.ad_network_type
     FROM keyword_view
     WHERE
@@ -88,6 +91,7 @@ GAQL:
           campaign.name,
           metrics.clicks,
           metrics.cost_micros,
+          metrics.conversions,
           segments.date,
           segments.device,
           metrics.impressions,
@@ -116,6 +120,7 @@ GAQL:
       metrics.impressions,
       metrics.clicks,
       metrics.cost_micros,
+      metrics.conversions,
       metrics.interactions,
       metrics.interaction_event_types
     FROM search_term_view

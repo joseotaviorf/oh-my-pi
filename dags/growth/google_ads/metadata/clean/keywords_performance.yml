@@ -78,6 +78,10 @@ columns:
     description: Country code the account belongs to.
     lineage:
       - datalake_google_ads_raw.keywords_performance.account_snake_case
+  conversions:
+    description: Number of conversions from google ads platform
+    lineage:
+      - datalake_google_ads_raw.keywords_performance.metrics
   dt_loaded:
     description: Date of loaded data
     lineage:
