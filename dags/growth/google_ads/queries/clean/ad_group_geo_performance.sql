@@ -27,3 +27,5 @@ SELECT
     dt_created::DATE
 FROM
     datalake_google_ads_raw.ad_group_geo_performance
+WHERE
+    DATE(dt_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
