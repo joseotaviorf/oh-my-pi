@@ -6,82 +6,82 @@ domain: people
 description: Dimension table with information about workers
 columns:
   sk_employee:
-    description: "Surrogate key for the employee"
+    description: 'Surrogate key for the employee'
     lineage:
-      - datalake_hr_system.employee_info.id_person
+    - datalake_hr_system.employee_info.id_person
   first_name:
-    description: "First name of the employee, if has social name it is not the same as the first social name"
+    description: 'First name of the employee, if has social name it is not the same as the first social name'
     lineage:
-      - datalake_hr_system.employee_info.first_name
+    - datalake_hr_system.employee_info.first_name
   last_name:
-    description: "Last name of the employee, if has social name it is not the same as the last social name"
+    description: 'Last name of the employee, if has social name it is not the same as the last social name'
     lineage:
-      - datalake_hr_system.employee_info.last_name
+    - datalake_hr_system.employee_info.last_name
   full_name:
-    description: "Full name of the employee, if has social name it is the same"
+    description: 'Full name of the employee, if has social name it is the same'
     lineage:
-      - datalake_hr_system.employee_info.full_name
+    - datalake_hr_system.employee_info.full_name
   first_social_name:
-    description: "First social name of the employee"
+    description: 'First social name of the employee'
     lineage:
-      - datalake_hr_system.employee_info.first_social_name
+    - datalake_hr_system.employee_info.first_social_name
   last_social_name:
-    description: "Last social name of the employee"
+    description: 'Last social name of the employee'
     lineage:
-      - datalake_hr_system.employee_info.last_social_name
+    - datalake_hr_system.employee_info.last_social_name
   birth_town:
-    description: "Birth town of the employee"
+    description: 'Birth town of the employee'
     lineage:
-      - datalake_hr_system.employee_info.birth_town
+    - datalake_hr_system.employee_info.birth_town
   birth_state:
-    description: "Birth region of the employee"
+    description: 'Birth region of the employee'
     lineage:
-      - datalake_hr_system.employee_info.birth_region
+    - datalake_hr_system.employee_info.birth_region
   birth_country:
-    description: "Birth country of the employee"
+    description: 'Birth country of the employee'
     lineage:
-      - datalake_hr_system.employee_info.birth_country
+    - datalake_hr_system.employee_info.birth_country
   mother_name:
-    description: "Mother name of the employee"
+    description: 'Mother name of the employee'
     lineage:
-      - datalake_hr_system.employee_info.mother_name
+    - datalake_hr_system.employee_info.mother_name
   father_name:
-    description: "Father name of the employee"
+    description: 'Father name of the employee'
     lineage:
-      - datalake_hr_system.employee_info.father_name
+    - datalake_hr_system.employee_info.father_name
   gender_code:
-    description: "gender of employee in document"
+    description: 'gender of employee in document'
     lineage:
-      - datalake_hr_system.demographic_attributes.gender
+    - datalake_hr_system.demographic_attributes.gender
   gender:
-    description: "gender of employee in document"
+    description: 'gender of employee in document'
     lineage:
-      - datalake_hr_system.demographic_attributes.gender
+    - datalake_hr_system.demographic_attributes.gender
   marital_status_code:
-    description: "Marital status of the employee"
+    description: 'Marital status of the employee'
     lineage:
-      - datalake_hr_system_clean.workers.marital_status
+    - datalake_hr_system_clean.workers.marital_status
   marital_status_description:
-    description: "Marital status description of the employee"
+    description: 'Marital status description of the employee'
     lineage:
-      - "datalake_hr_system_clean.workers.marital_status"
+    - "datalake_hr_system_clean.workers.marital_status"
   highest_education_level_code:
-    description: "Code for the highest education level of the employee"
+    description: 'Code for the highest education level of the employee'
     lineage:
-      - datalake_hr_system_clean.workers.highest_education_level
+    - datalake_hr_system_clean.workers.highest_education_level
   highest_education_level_description:
-    description: "Name for the highest education level of the employee"
+    description: 'Name for the highest education level of the employee'
     lineage:
-      - "datalake_hr_system_clean.workers.highest_education_level"
+    - "datalake_hr_system_clean.workers.highest_education_level"
   age_range:
-    description: "Age range of the employee"
+    description: 'Age range of the employee'
     lineage:
-      - "datalake_hr_system_clean.workers.workers.dt_birth"
-  dt_birthday:
-    description: "Date of birth of the employee"
+    - "datalake_hr_system_clean.workers.workers.dt_birth"
+  dt_birth:
+    description: 'Date of birth of the employee'
     lineage:
-      - datalake_hr_system.employee_info.dt_birth
-  ts_loaded:
-    description: "Datetime of the load of the record"
+    - datalake_hr_system.employee_info.dt_birth
+  ts_load:
+    description: 'Datetime of the load of the record'
     lineage:
-      - datalake_hr_system_clean.workers.NOW()
+    - datalake_hr_system_clean.workers.NOW()

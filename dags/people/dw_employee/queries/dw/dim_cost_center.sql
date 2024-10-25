@@ -11,9 +11,9 @@ SELECT
   COALESCE(o.directorate, '-1') AS directorate,
   COALESCE(o.subdirectorate, '-1') AS subdirectorate,
   o.status,
-  o.dt_effective_start AS dt_started,
-  o.dt_effective_end AS dt_ended,
-  NOW() AS ts_loaded
+  o.dt_effective_start,
+  o.dt_effective_end,
+  NOW() AS ts_load
 FROM
   datalake_hr_system_clean.organizations AS o
 LEFT JOIN

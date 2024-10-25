@@ -14,7 +14,7 @@ SELECT
     team_10,
     line_leader,
     team_leader,
-    NOW() AS ts_loaded
+    NOW() AS ts_load
 FROM
     datalake_gsheets_clean.team_formation_product_tech AS tfpt
 INNER JOIN

@@ -3,47 +3,48 @@ database_name: dw_employee
 table_name: dim_demographic_information
 owner: leonardo.soares@quintoandar.com.br
 domain: people
-description: "Dimension with demographic attributes of employees"
+description: 'Dimension with demographic attributes of employees'
 columns:
   sk_demographic_information:
-    description: "Surrogate key for the dimension, created with the MD5 of the concatenation of the demographic attributes"
+    description: 'Surrogate key for the dimension, created with the MD5 of the concatenation of the demographic attributes'
     lineage:
-      - datalake_hr_system.demographic_attributes.sk_demographic_information
+    - datalake_hr_system.demographic_attributes.sk_demographic_information
   ethnicity_code:
     description: Ethnicity code'
     lineage:
-      - datalake_hr_system.demographic_attributes.ethnicity
+    - datalake_hr_system.demographic_attributes.ethnicity
   ethnicity_description:
-    description: "Ethnicity description"
+    description: 'Ethnicity description'
     lineage:
-      - datalake_hr_system.demographic_attributes.ethnicity
+    - datalake_hr_system.demographic_attributes.ethnicity
   gender_identity:
-    description: "Gender identity"
+    description: 'Gender identity'
     lineage:
-      - datalake_hr_system.demographic_attributes.gender_identity
+    - datalake_hr_system.demographic_attributes.gender_identity
   sexual_orientation:
-    description: "Sexual orientation"
+    description: 'Sexual orientation'
     lineage:
-      - datalake_hr_system.demographic_attributes.sexual_orientation
+    - datalake_hr_system.demographic_attributes.sexual_orientation
   neurodiversity:
-    description: "Neurodiversity"
+    description: 'Neurodiversity'
     lineage:
-      - datalake_hr_system.demographic_attributes.neurodiversity
+    - datalake_hr_system.demographic_attributes.neurodiversity
   religion:
-    description: "Religion"
+    description: 'Religion'
     lineage:
-      - datalake_hr_system.demographic_attributes.religion
+    - datalake_hr_system.demographic_attributes.religion
   country_situation:
-    description: "Situation of the employee in the country"
+    description: 'Situation of the employee in the country'
     lineage:
-      - datalake_hr_system.demographic_attributes.country_situation
+    - datalake_hr_system.demographic_attributes.country_situation
   housing_type:
-    description: "Which type of housing the employee lives in"
+    description: 'Which type of housing the employee lives in'
     lineage:
-      - datalake_hr_system.demographic_attributes.housing_type
+    - datalake_hr_system.demographic_attributes.housing_type
   quinto_andar_joining_method:
-    description: "Method that the employee joined QuintoAndar"
+    description: 'Method that the employee joined QuintoAndar'
     lineage:
-      - datalake_hr_system.demographic_attributes.quinto_andar_joining_method
-  ts_loaded:
-    description: "Timestamp of when the record was loaded in the table"
+    - datalake_hr_system.demographic_attributes.quinto_andar_joining_method
+  ts_load:
+    description: 'Timestamp of when the record was loaded in the table'
+

@@ -53,10 +53,10 @@ columns:
     description: "Polling station of the employee."
     lineage:
       - datalake_hr_system.demographic_attributes.polling_station
-  ts_last_updated:
+  ts_last_update:
     description: "Timestamp of the last update of the document."
     lineage:
       - datalake_hr_system.demographic_attributes.dt_effective_start
       - datalake_hr_system_clean.workers.national_identifiers
-  ts_loaded:
+  ts_load:
     description: "Timestamp of the load."
