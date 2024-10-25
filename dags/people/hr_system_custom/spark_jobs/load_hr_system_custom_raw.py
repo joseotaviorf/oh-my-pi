@@ -94,6 +94,7 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     df = spark_client.create_dataframe(response_data)
     df = df.withColumn("ts_load", current_timestamp())
+    df = df.dropDuplicates()
     load_raw(
         spark_client,
         df,
