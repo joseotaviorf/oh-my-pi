@@ -75,6 +75,36 @@ FROM VALUES
             ),
             'filters', NULL
         )
+    ),
+    -- sale v2 vs v3 experiment
+    (
+        "ab_beakman_ranking_sale_pclick_v1",
+        named_struct(
+            'begin_date', DATE('2024-10-19'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'sale'"
+        )
+    ),
+    -- maestro one month slice of data
+    (
+        "ab_beakman_ranking_maestro_demand_balancer_v2",
+        named_struct(
+            'begin_date', DATE('2024-09-01'),
+            'end_date', DATE('2024-10-01'),
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'rent'"
+        )
     )
     -- Add new experiment here
 
