@@ -34,7 +34,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 
-cluster_description = config_service.get_config("databricks_13_3_med_general_cluster")
+cluster_description = config_service.get_config("databricks_13_3_med_memory_general_cluster")
 default_libraries = config_service.get_config("default_libraries")
 
 EXECUTION_DATE = "{{ds}}"
