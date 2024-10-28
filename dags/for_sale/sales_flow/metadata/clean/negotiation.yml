@@ -8,6 +8,9 @@ columns:
   id_sales_flow:
     lineage:
       - datalake_sales_flow_raw.negotiation.sales_flow_id
+  sent_to_operations_support_by:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.sent_to_operations_support_by      
   has_fgts_draft:
     lineage:
       - datalake_sales_flow_raw.negotiation.use_fgts
@@ -20,6 +23,12 @@ columns:
   is_buyer_pj:
     lineage:
       - datalake_sales_flow_raw.negotiation.is_buyer_pj
+  is_consorcio_payment:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.is_consorcio_payment
+  is_internal_financing:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.internal_financing
   ts_buyer_documentation_started:
     lineage:
       - datalake_sales_flow_raw.negotiation.buyer_documentation_started_at
@@ -38,6 +47,12 @@ columns:
   ts_buyer_credit_submitted:
     lineage:
       - datalake_sales_flow_raw.negotiation.buyer_credit_submitted_at
+  ts_seller_negotiation_ongoing_notification_submitted:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.seller_negotiation_ongoing_notification_submitted_at
+  ts_sent_to_operations_support:
+    lineage:
+      - datalake_sales_flow_raw.negotiation.sent_to_operations_support_at
   ts_created:
     lineage:
       - datalake_sales_flow_raw.negotiation.created_at
