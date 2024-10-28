@@ -118,7 +118,7 @@ reference_months AS (
 ),
 all_months AS (
     SELECT
-        SEQUENCE(earliest_start_date, current_date, INTERVAL 1 MONTH) AS ref_months
+        SEQUENCE(earliest_start_date, DATEADD(MONTH, 1, current_date), INTERVAL 1 MONTH) AS ref_months
     FROM
         reference_months
 ),
