@@ -70,76 +70,6 @@ remove_reversed AS (
     pre_remove_reversed_2
   GROUP BY 1
 ),
-invoiceable AS (
-    select
-        *,
-        SUM(ei.due_amount) OVER (PARTITION BY ei.sk_contract, ei.bill_item, ei.description, ei.accrual_year_month, ei.account_type) as balance
-    from
-        datalake_accounting_funnel.invoice_all ei
-),
-not_invoiceable AS (
-    select distinct
-        c.id_external as id_contract,
-        eni.id_external as not_invoiceable_entry,
-        eni.bill_item as not_invoiceable_bill_item,
-        eni.amount as not_invoiceable_amount,
-        eni.accrual_year_month as not_invoiceable_accrual
-    from
-        datalake_retsuko.entry eni -- entry not-invoiceable
-    inner join
-        datalake_retsuko_clean.contract c
-            on c.id = eni.id_contract
-    inner join
-        invoiceable ei
-            on ei.sk_contract = c.id
-            and eni.bill_item = ei.bill_item
-            and eni.description = ei.description
-            and ABS(eni.amount) = ABS(ei.due_amount)
-            and eni.accrual_year_month = ei.accrual_year_month -- entry invoiceable
-    left join
-        datalake_retsuko.invoice i
-            on i.id = ei.id_invoice
-    left join
-        datalake_retsuko.invoice_info ii
-            on i.id_external = ii.id_invoice
-    left join
-        remove_reversed rr
-            on rr.id_entry = eni.id_external
-    where
-        (
-            rr.id_entry is null
-        and
-            eni.accounting_transaction_identifier is not null
-        and
-            eni.id_invoice is null
-        and
-            ei.id_invoice is not null
-        and
-            (
-                (ei.accounting_transaction_identifier != eni.accounting_transaction_identifier and balance = 0) or
-                (ei.accounting_transaction_identifier is null and balance = 0) or
-                (ei.accounting_transaction_identifier = eni.accounting_transaction_identifier and ii.payment_status = 'canceled' and ii.invoice_user = 'tenant')
-            )
-        )
-        OR (eni.id_invoice is null AND eni.ts_created <= DATE('2023-11-30'))
-),
-remove_not_invoiceable AS (
-select
-      fie.sk_invoice_entry
-FROM
-    dw_payment.fact_invoice_entries fie
-INNER JOIN
-    dw_payment.dim_invoice_entry die
-        ON fie.sk_invoice_entry = die.sk_invoice_entry
-LEFT JOIN
-    not_invoiceable ni
-        ON ni.not_invoiceable_entry = fie.sk_invoice_entry
-LEFT JOIN
-    remove_reversed rr
-        ON rr.id_entry = fie.sk_invoice_entry
-WHERE
-    ((rr.id_entry IS NOT NULL) OR (ni.not_invoiceable_entry IS NOT NULL) OR (fie.sk_invoice < 0 AND die.sk_invoice_reversed_entry IS NOT NULL) OR (fie.sk_invoice < 0 AND DATE(fie.ts_created) <= DATE('2023-11-30')))
-),
 next_business_day AS (
   SELECT
     dd.date,
@@ -181,7 +111,7 @@ SELECT DISTINCT
     AS contract_status,
   ie.is_rental_paid_in_advance,
   IF(rr.id_entry IS NULL, False, True) AS is_reversed,
-  IF(rni.sk_invoice_entry IS NOT NULL, TRUE, FALSE) as is_not_invoiceable_inconsiderable,
+  FALSE as is_not_invoiceable_inconsiderable,
   ie.entry_type AS bill_item,
   ie.description,
   CASE
@@ -210,14 +140,7 @@ SELECT DISTINCT
     WHEN (ROUND(-1.0*i.due_amount,2) > 0 OR (ROUND(-1.0*i.due_amount,2) = 0 AND NOT(from_account_type = 'landlord' OR to_account_type= 'landlord') )) THEN 'receivable'
     ELSE 'payable'
   END AS account_classification,
-  CASE
-    WHEN
-        i.payment_status IS NULL
-        AND (ie.from_account_type = 'landlord' OR ie.to_account_type = 'landlord')
-        AND (dd_entry_created.date >= date_trunc('month',DATEADD(MONTH,-1,current_date)))
-    THEN 'preview'
-    ELSE COALESCE(i.payment_status, 'not-invoiceable')
-  END AS status,
+  COALESCE(i.payment_status, 'not-invoiceable') AS status,
   i.closing_mode,
   i.paid_via,
   ROUND(fie.brl_entry_due_amount,2) AS due_amount,
@@ -280,9 +203,6 @@ LEFT JOIN
 LEFT JOIN
     remove_reversed rr
     ON rr.id_entry = fie.sk_invoice_entry
-LEFT JOIN
-    remove_not_invoiceable AS rni
-        ON rni.sk_invoice_entry = fie.sk_invoice_entry
 WHERE
     c.country_code = 'BR'
     AND c.status IN ('Ativo','Finalizado')
