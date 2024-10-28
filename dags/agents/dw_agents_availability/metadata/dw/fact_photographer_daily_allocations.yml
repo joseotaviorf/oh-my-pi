@@ -1,8 +1,8 @@
 database_name: dw_agent
 table_name: fact_photographer_daily_allocations
 description: Photographer allocation on a day and region granularity. Each line corresponds to a region (sk_region) and daily slot (day) of a photographer (sk_agent).
-domain: For Rent
-owner: eduardo.bastiani@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_agent:
     lineage:

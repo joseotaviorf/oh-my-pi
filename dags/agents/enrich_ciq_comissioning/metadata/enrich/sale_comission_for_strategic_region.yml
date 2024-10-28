@@ -3,8 +3,8 @@ database_name: datalake_ciq_comissioning
 table_name: sale_comission_for_strategic_region
 description: Enriched table containing information about regions (neighborhoods), 
   indicating whether or not they are strategic in a given month, in the For Sale context.
-domain: Agents
-owner: allan.melao@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_sale_listing:
     lineage:

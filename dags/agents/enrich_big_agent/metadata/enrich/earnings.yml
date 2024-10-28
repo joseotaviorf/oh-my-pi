@@ -3,8 +3,8 @@ table_name: earnings
 description: Table with big agent earnings info. It receives the
   last update of a record. We're deduplicating the repeated IDs in this table, because
   our raw/clean DAG makes the ingestion via incremental load.
-domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id:
     lineage:

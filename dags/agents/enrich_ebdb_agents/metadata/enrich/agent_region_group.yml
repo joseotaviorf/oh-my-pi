@@ -2,8 +2,8 @@
 database_name: datalake_ebdb_agents
 table_name: agent_region_group
 description: Table with information about the agents areas of operation.
-domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   dt:
     description: Date of the agent's allocated slots.

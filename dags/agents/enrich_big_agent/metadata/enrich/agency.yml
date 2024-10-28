@@ -1,8 +1,7 @@
 database_name: datalake_big_agent
 table_name: agency
-description: Table with the association between houses and consultants (enrollments).
-domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id:
     description: ID of the association bewteen house and consultant (enrollment).

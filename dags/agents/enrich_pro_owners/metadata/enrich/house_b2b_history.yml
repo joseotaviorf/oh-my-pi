@@ -2,8 +2,8 @@
 database_name: datalake_pro_owners
 table_name: house_b2b_history
 description: Table with historical information about all the houses, with it's status, the historical of owner, B2B info like converted lead, partner.
-domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_house:
     description: ID of the house.

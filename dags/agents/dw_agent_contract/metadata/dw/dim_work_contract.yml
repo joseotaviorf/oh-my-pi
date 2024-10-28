@@ -8,8 +8,8 @@ This includes the work contract, but also the information if the agent user is m
 on Main, as well as the business context (Sale or Rent). That is because these last two are low-cardinality
 flags, and having them as separate dimensions or flags in fact tables would not be good for simplicity
 (in the first case) or good practice (second case).'
-owner: 'gustavo.miller@quintoandar.com.br'
-domain: Rede
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_work_contract:
     lineage:

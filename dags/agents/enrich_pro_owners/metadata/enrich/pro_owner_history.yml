@@ -3,8 +3,8 @@ database_name: datalake_pro_owners
 table_name: pro_owner_history
 description: Historical enriched table for rent context (PP Multi - Pro owner). Each
   row contains the changes of the status or the account manager associated with the PP Multi.
-domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_owner:
     lineage:

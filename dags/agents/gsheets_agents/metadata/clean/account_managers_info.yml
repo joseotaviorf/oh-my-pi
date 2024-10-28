@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: account_managers_info
 description: Information about account managers, which team they are allocated to and their current status.
-domain: Agents
+domain: Data Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_user:

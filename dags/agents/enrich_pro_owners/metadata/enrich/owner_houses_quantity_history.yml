@@ -2,8 +2,8 @@ database_name: datalake_pro_owners
 table_name: owner_houses_quantity_history
 description: Historical enriched table for rent context. It contains the changes of
   owner's quantity houses, just considering rent and not b2b houses
-domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_owner:
     lineage:

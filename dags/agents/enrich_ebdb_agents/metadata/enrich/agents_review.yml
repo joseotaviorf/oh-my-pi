@@ -2,8 +2,8 @@
 database_name: datalake_ebdb_agents
 table_name: agents_review
 description: Enrich table containing information about an agent's review related to a visit booked.
-domain: For Rent
-owner: bruna.prates@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_booking:
     lineage:

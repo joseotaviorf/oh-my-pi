@@ -3,8 +3,8 @@ database_name: datalake_ebdb_agents
 table_name: agent_unified_contract_changes
 description: Each row of this table is a change associated with the agent's contract, including business context,
   activations, and suspensions.
-domain: Cross
-owner: gustavo.miller@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:
     description: Foreign key of the agent. Can be joined with dw_public.dim_user.dados_agente_id and dw_public.dim_agent.sk_agent.

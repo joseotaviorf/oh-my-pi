@@ -3,8 +3,8 @@ database_name: datalake_ebdb_agents
 table_name: agent_contract
 description: Table with historical information about the agents work contracts.
   Each line represents a change in the agent's work contract.
-domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:
     description: ID of the agent (as found on dw_public.dim_user.dados_agente_id).

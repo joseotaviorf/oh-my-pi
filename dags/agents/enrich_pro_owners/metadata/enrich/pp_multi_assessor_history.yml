@@ -4,8 +4,8 @@ table_name: pp_multi_assessor_history
 description: Enrich table with historical informations of all PP Multi users and their respective assessors. 
   In this context, the assessor is the figure who is associated with the owner's property contract.
   This historical table has records of the last 6 months of each PP Multi and which assessors were associated with it.
-domain: Agents
-owner: data-agents@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_user:
     lineage:

@@ -3,8 +3,8 @@ database_name: datalake_ebdb_agents
 table_name: agents_region
 description: Enrich table that contains audit data of the agent-region relations. 
   Each row of this table is a revision.
-domain: Cross
-owner: matheus.baroni@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:
     lineage:

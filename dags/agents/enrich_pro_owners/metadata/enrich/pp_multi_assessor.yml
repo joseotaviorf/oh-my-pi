@@ -3,8 +3,8 @@ database_name: datalake_pro_owners
 table_name: pp_multi_assessor
 description: Enrich table with informations of all PP Multi users and their respective assessors. 
   In this context, the assessor is the figure who is associated with the owner's property contract.
-domain: Agents
-owner: data-agents@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_user:
     lineage:

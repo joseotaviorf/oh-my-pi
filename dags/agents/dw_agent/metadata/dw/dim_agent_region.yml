@@ -1,8 +1,8 @@
 database_name: dw_public
 table_name: dim_agent_region
 description: Macro regions which agent is allocated
-domain: For Rent
-owner: eduardo.bastiani@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_agent_region:
     lineage:

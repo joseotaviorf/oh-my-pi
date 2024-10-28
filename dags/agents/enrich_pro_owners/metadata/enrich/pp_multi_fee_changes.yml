@@ -3,8 +3,8 @@ database_name: datalake_pro_owners
 table_name: pp_multi_fee_changes
 description: Table with historical information about the PP Multi's administration fee.
   Each line represents the change of the adminstration_fee or is_active colum.
-domain: For Rent
-owner: kleber.inoue@quintoandar.com.br
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_owner:
     lineage:
