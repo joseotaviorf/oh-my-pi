@@ -36,8 +36,20 @@ listing_quality_tasks AS (
 ),
 general_base AS (
     SELECT
-        MD5(jb.id_house || lqt.id_ticket || jb.dt_uploaded) AS id_listing_quality_sla,
-        CONCAT(jb.id_house, '|', lqt.id_ticket, '|', jb.dt_uploaded) AS business_key,
+        MD5(
+            CONCAT(
+                COALESCE(jb.id_house, ''),
+                COALESCE(lqt.id_ticket, ''),
+                COALESCE(jb.dt_uploaded, '')
+            )
+        ) AS id_listing_quality_sla,
+        CONCAT(
+            COALESCE(jb.id_house, ''),
+            '|',
+            COALESCE(lqt.id_ticket, ''),
+            '|',
+            COALESCE(jb.dt_uploaded, '')
+        ) AS business_key,
         lqt.id_ticket,
         jb.id_house,
         lqt.agent_organization,
