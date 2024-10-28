@@ -4,6 +4,7 @@ dag:
   documentation:
     dag_purpose: |
       This DAG extracts and process data from DocPilot. DocPilot is a system responsible for extracting, categorizing and calculating income data from bank statements and payslip documents.
+  schedule_interval: 0 3 * * *
 workflow:
   type: cdc
   layer: raw
