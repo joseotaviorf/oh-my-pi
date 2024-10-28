@@ -108,7 +108,7 @@ bietlejuice.dw_datamarts_for_sale:
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
     - bietlejuice.kodak:load-clean-photo-sphere-aud
     - bietlejuice.kodak:load-clean-video-aud
-bietlejuice.dw_datamarts_spark.for_sale_cross:
+bietlejuice.dw_datamarts_for_sale_cross:
   add:
     - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region
   remove:
@@ -992,7 +992,9 @@ bietlejuice.dw_agent:
     - bietlejuice.sirena:load-clean-agents
     - bietlejuice.sirena:load-clean-prospects
     - bietlejuice.enrich_sirena:load-enrich-messages
-
 bietlejuice.looker_temps:
   remove:
+    - bietlejuice.dw_datamarts_for_sale_cross:load-dw-datamarts-temp-supply-flows
+    - bietlejuice.dw_datamarts_for_sale_cross:load-dw-datamarts-sale-cohort-conversions
+    - bietlejuice.dw_datamarts_for_sale_cross:load-dw-datamarts-sale-events-funnel
     - bietlejuice.dw_datamarts_for_sale:load-dw-datamarts-repressed-demand-sale-booking-fit-in

@@ -1,0 +1,12 @@
+dag:
+  name: dw_datamarts_for_sale_cross
+  owner: Data ForSale
+  documentation: 
+    dag_purpose: |
+      Creates/updates the datamart tables, for the context of Sale, in data lake.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: datamarts
+cluster:
+  type: databricks_12_2_med_2xlarge_general_cluster

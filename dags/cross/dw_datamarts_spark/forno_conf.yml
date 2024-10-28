@@ -36,6 +36,3 @@ dags:
   cross:
     owner: Data Engineering
     cluster_name: databricks_12_2_med_memory_cluster
-  for_sale_cross:
-    owner: Data ForSale
-    cluster_name: databricks_12_2_med_compute_cluster
