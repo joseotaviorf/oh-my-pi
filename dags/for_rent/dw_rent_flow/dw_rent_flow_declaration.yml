@@ -16,13 +16,10 @@ workflow:
     fact_rent_flows:
       partitions: [country_code]
 cluster:
-  type: custom_cluster
-  custom_configurations:
-    driver_node_type_id: m5d.4xlarge
-    node_type_id: m5d.8xlarge
-    runtime_engine: PHOTON
-    num_workers: 2
-    spark_version: 12.2.x-scala2.12
+  type: databricks_12_2_med_io-general_photon_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
+  custom_configurations:
+    spark_conf:
+      spark.sql.shuffle.partitions: 256
