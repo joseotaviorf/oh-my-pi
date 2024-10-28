@@ -1,0 +1,62 @@
+---
+database_name: dw_pipeline
+table_name: fact_daily_table
+description: Daily snapshot fact table with the aim of gathering the main cost information generated in Databricks by load tables. 
+domain: Data Platform 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  sk_snapshot:
+    description: Unique snapshot table key.
+    lineage:
+      - datalake_dag_inventory_clean.table.table
+      - datalake_databricks.task_runs.year
+      - datalake_databricks.task_runs.month
+      - datalake_databricks.task_runs.day
+  sk_table:
+    description: Table name.
+    lineage:
+      - datalake_dag_inventory_clean.table.table
+  sk_line:
+    description: Line for associated DAG.
+    lineage:
+      - datalake_pipeline.dag.id_line
+  sk_dag:
+    description: DAG associated with the table.
+    lineage:
+      - datalake_databricks.task_runs.dag_name
+  sk_snapshot_date:
+    description: Date of the snapshot.
+    lineage:
+      - datalake_databricks.task_runs.year
+      - datalake_databricks.task_runs.month
+      - datalake_databricks.task_runs.day
+  direct_cost:
+    description: Cost for the cluster to generate this table specifically that day.
+    lineage:
+      - datalake_databricks.daily_clusters.total_cost
+      - datalake_databricks.task_runs.execution_time_in_seconds
+  total_accumulated_cost:
+    description: Accumulated cost, summing the cost of the upstream tables that day.
+    lineage:
+      - datalake_databricks.daily_clusters.total_cost
+      - datalake_databricks.task_runs.execution_time_in_seconds
+  direct_usage_count:
+    description: How many times the table was used directly on Trino that day.
+    lineage:
+      - datalake_trino_table_usage.total_table_usage_information.direct_usage
+  total_accumulated_usage_count:
+    description: How many times the table or its dependents (downstream tables) were used on Trino that day.
+    lineage:
+      - datalake_trino_table_usage.total_table_usage_information.accumulated_usage
+  year:
+    description: Year when the data was loaded.
+    lineage:
+      - datalake_databricks.task_runs.year
+  month:
+    description: Month when the data was loaded.
+    lineage:
+      - datalake_databricks.task_runs.month
+  day:
+    description: Day when the data was loaded.
+    lineage:
+      - datalake_databricks.task_runs.day

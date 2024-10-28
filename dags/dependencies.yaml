@@ -905,6 +905,12 @@ bietlejuice.dw_supply:
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
 bietlejuice.dw_supply_outbound_contacts:
   - bietlejuice.enrich_supply_outbound_flows:load-enrich-supply-outbound-contacts
+bietlejuice.dw_table_snapshot:
+  - bietlejuice.composer:load-clean-dag
+  - bietlejuice.dag_inventory:load-clean-table
+  - bietlejuice.enrich_databricks_job_runs:load-enrich-load-table-costs
+  - bietlejuice.enrich_pipeline:load-enrich-dag
+  - bietlejuice.enrich_trino_table_usage:load-enrich-total-table-usage-information
 bietlejuice.dw_taxonomy:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
 bietlejuice.dw_tenant_documentation:
