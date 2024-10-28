@@ -1,0 +1,71 @@
+---
+database_name: datalake_survicate
+table_name: single_station_surveys
+description: Responses to survicate forms relating to analyst CES
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_response:
+    lineage:
+      - datalake_survicate.survey_responses.id_response
+    description: Answer unique identifier (uuid)
+  id_survey:
+    lineage:
+      - datalake_survicate.survey_responses.id_survey
+    description: Survey unique identifier
+  id_respondent:
+    lineage:
+      - datalake_survicate.survey_responses.id_respondent
+    description: Survey respondent unique identifier
+  survey_name:
+    lineage:
+      - datalake_survicate_clean.surveys.survey_name
+    description: Descriptive information indicating the name of the submitted survey.
+  respondent_type:
+    description: Respondent role, in this case, analyst
+  service_type:
+    description:
+      "For which service we are evaluating satisfaction. In this case,
+      single_station, a Shared Platform iniative."
+  service_context:
+    description:
+      "For which context we are evaluating satisfaction. In this case,
+      single_station, a Shared Platform iniative."
+  source_name:
+    description: Data source, in this case, Survicate
+  facility_satisfaction:
+    lineage:
+      - datalake_survicate.response_content.answer_content
+    description: Satisfaction about the facility of using the new system
+  time_satisfaction:
+    lineage:
+      - datalake_survicate.response_content.answer_content
+    description: Satisfaction about the time tasks are taking on the new system
+  support_satisfaction:
+    lineage:
+      - datalake_survicate.response_content.answer_content
+    description: Satisfaction about support and infos throughout new system usage
+  improvements_suggestions:
+    lineage:
+      - datalake_survicate.response_content.answer_content
+    description: Analyst improvements suggestion description
+  ts_submitted:
+    lineage:
+      - datalake_survicate.response_content.ts_collected
+    description: Analyst response date and time
+  dt_load:
+    lineage:
+      - datalake_survicate.response_content.answer_content
+    description: Data loading date into the datalake
+  year:
+    lineage:
+      - datalake_survicate.response_content.year
+    description: Year of response submission date
+  month:
+    lineage:
+      - datalake_survicate.response_content.month
+    description: Month of response submission date
+  day:
+    lineage:
+      - datalake_survicate.response_content.day
+    description: Day of response submission date

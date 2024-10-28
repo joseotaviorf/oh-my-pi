@@ -32,6 +32,9 @@ workflow:
         zendesk_email_surveys:
             - response_content
             - survey_responses
+        single_station_surveys:
+            - response_content
+            - survey_responses
 cluster:
     type: custom_cluster
     custom_configurations:
