@@ -23,7 +23,7 @@ min_dates AS (
         document,
         MIN(CASE WHEN type_description = 'GUARANTEE' THEN dt_base END) AS min_dt_guarantee,
         MIN(CASE WHEN type_description IN ('RENEWAL', 'SIGNATURE') THEN dt_base END) AS min_dt_signature,
-        MIN(CASE WHEN type_description = 'RECISAO' THEN dt_base END) AS min_dt_termination
+        MIN(CASE WHEN type_description = 'RESCISAO' THEN dt_base END) AS min_dt_termination
     FROM
         timeline
     GROUP BY 1
@@ -50,6 +50,7 @@ cte_type_aging AS (
     SELECT
         t.name,
         t.document,
+        t.id_propose,
         MAX(t.mob_delinquency) AS mob,
         array_distinct(array_agg(t.type_description)) AS type_description_array,
         CASE
@@ -74,18 +75,38 @@ cte_type_aging AS (
     LEFT JOIN
         monthly_timeline m
         ON m.document = t.document AND DATE_TRUNC('MONTH', t.`date`) = DATE_TRUNC('MONTH', m.`date`)
-    GROUP BY 1,2,7
+    GROUP BY 1,2,3,8
     ORDER BY 7,1
+),
+document_major_type AS (
+    SELECT
+        document,
+        `date`,
+        array_distinct(array_agg(major_type)) AS major_type_array,
+        array_distinct(array_agg(monthly_major_type)) AS monthly_major_type_array,
+        CASE
+            WHEN array_contains(array_agg(major_type), 'GARANTIA') THEN 'GARANTIA'
+            WHEN array_contains(array_agg(major_type), 'RESCISAO') THEN 'RESCISAO'
+            ELSE any_value(major_type)
+        END AS major_type,
+        CASE
+            WHEN array_contains(array_agg(monthly_major_type), 'GARANTIA') THEN 'GARANTIA'
+            WHEN array_contains(array_agg(monthly_major_type), 'RESCISAO') THEN 'RESCISAO'
+            ELSE any_value(monthly_major_type)
+        END AS monthly_major_type
+    FROM
+        cte_type_aging
+    GROUP BY 1,2
 ),
 timeline_final AS (
     SELECT
         t.name,
         t.document,
         t.id_propose,
-        ta.mob,
-        ta.type_description_array,
-        ta.major_type,
-        ta.monthly_major_type,
+        MAX(t.mob_delinquency) AS mob,
+        ta.type_description_array AS type_description_array,
+        mt.major_type,
+        mt.monthly_major_type,
         SUM(t.delinquency_amount) AS total_delinquency_amount,
         SUM(t.original_value) AS total_original_value,
         SUM(t.amount_paid) AS total_amount_paid,
@@ -98,8 +119,8 @@ timeline_final AS (
         t.`date` AS dt_base,
         array_agg(t.dt_paid) AS dt_paid_array,
         CASE
-            WHEN ta.major_type = 'RECISAO' AND md.min_dt_termination IS NULL THEN md.min_dt_guarantee
-            WHEN ta.major_type = 'RECISAO' THEN md.min_dt_termination
+            WHEN ta.major_type = 'RESCISAO' AND md.min_dt_termination IS NULL THEN md.min_dt_guarantee
+            WHEN ta.major_type = 'RESCISAO' THEN md.min_dt_termination
             WHEN ta.major_type = 'GARANTIA' THEN md.min_dt_guarantee
             WHEN ta.major_type = 'ASSINATURA' THEN md.min_dt_signature
         END AS dt_min_major_type,
@@ -109,14 +130,19 @@ timeline_final AS (
     LEFT JOIN
         cte_type_aging AS ta
         ON ta.document = t.document
+        AND ta.id_propose = t.id_propose
         AND t.`date` = ta.`date`
+    LEFT JOIN
+        document_major_type AS mt
+        ON mt.document = t.document
+        AND t.`date` = mt.`date`
     LEFT JOIN
         min_dates AS md
         ON t.document = md.document
     LEFT JOIN
         min_propose_date AS mpd
         ON t.id_propose = mpd.id_propose
-    GROUP BY 1,2,3,4,5,6,7,17,19
+    GROUP BY 1,2,3,5,6,7,17,19
 ),
 evictions_day AS (
     SELECT

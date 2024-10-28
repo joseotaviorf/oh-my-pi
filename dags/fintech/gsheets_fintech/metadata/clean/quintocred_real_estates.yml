@@ -22,3 +22,9 @@ columns:
   credit_segmentation:
     lineage:
       - datalake_gsheets_raw.quintocred_real_estates.credit_segmentation
+  status_imob:
+    lineage:
+      - datalake_gsheets_raw.quintocred_real_estates.status_imob
+  status:
+    lineage:
+      - datalake_gsheets_raw.quintocred_real_estates.status
