@@ -105,7 +105,8 @@ keywords_metrics AS (
         END) AS other_cost,
         SUM(cost/1000000) AS total_cost,
         SUM(impressions) AS impressions,
-        SUM(clicks) AS clicks
+        SUM(clicks) AS clicks, 
+        SUM(conversions) AS conversions
     FROM
         datalake_google_ads_clean.keywords_performance gkpr
     JOIN
@@ -163,7 +164,8 @@ ads_metrics AS (
         END) AS other_cost,
         SUM(cost/1000000) AS total_cost,
         SUM(impressions) AS impressions,
-        SUM(clicks) AS clicks
+        SUM(clicks) AS clicks, 
+        SUM(conversions) AS conversions
     FROM
         datalake_google_ads_clean.ads_performance gapr
     JOIN
@@ -207,7 +209,8 @@ campaigns_metrics AS (
         END) AS other_cost,
         SUM(cost/1000000) AS total_cost,
         SUM(impressions) AS impressions,
-        SUM(clicks) AS clicks
+        SUM(clicks) AS clicks, 
+        SUM(conversions) AS conversions
     FROM
         datalake_google_ads_clean.campaigns_performance gcpr
     JOIN
@@ -247,7 +250,8 @@ videos_metrics AS (
         END) AS other_cost,
         SUM(cost/1000000) AS total_cost,
         SUM(impressions) AS impressions,
-        SUM(clicks) AS clicks
+        SUM(clicks) AS clicks, 
+        SUM(conversions) AS conversions
     FROM
         datalake_google_ads_clean.videos_performance gvpr
     JOIN
