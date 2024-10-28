@@ -93,13 +93,6 @@ bietlejuice.dw_business_unit_region:
   - bietlejuice.enrich_hub_services:load-enrich-business-unit-region
 bietlejuice.dw_buyer_prospect:
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect
-bietlejuice.dw_call:
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-agents
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-events
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-flex-reservations
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-inbound-call-locations
 bietlejuice.dw_charging_payment_quintocred:
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-omie-client
@@ -627,11 +620,6 @@ bietlejuice.dw_proposal_temp:
   - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
   - bietlejuice.dw_proposal:load-dw-rent-dim-proposal-person
   - bietlejuice.dw_proposal:load-dw-rent-fact-proposal-people
-bietlejuice.dw_quinto_messenger:
-  - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
-  - bietlejuice.enrich_quinto_messenger:load-enrich-channel
-  - bietlejuice.enrich_quinto_messenger:load-enrich-task
-  - bietlejuice.enrich_quinto_messenger:load-enrich-task-event
 bietlejuice.dw_quintocred_ifrs:
   - bietlejuice.dw_velo:load-dw-velo-bridge-velo-propose-person
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker
@@ -3127,11 +3115,6 @@ bietlejuice.looker_temp:
   - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-dim-canvas
   - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-fact-campaign-user-dispatch
   - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-fact-canvas-user-dispatch
-  - bietlejuice.dw_call:load-dw-call-dim-call
-  - bietlejuice.dw_call:load-dw-call-dim-call-agent
-  - bietlejuice.dw_call:load-dw-call-dim-call-task
-  - bietlejuice.dw_call:load-dw-call-fact-call-tasks
-  - bietlejuice.dw_call:load-dw-call-fact-calls
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_contract:load-dw-rent-dim-contract-person
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
@@ -3161,9 +3144,7 @@ bietlejuice.looker_temp:
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_greenseer:load-enrich-sessions
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
-  - bietlejuice.greenseer:load-clean-session
   - bietlejuice.gsheets_fintech:done-clean-owner-entrance-inspection-csat
   - bietlejuice.gsheets_fintech:done-clean-owner-exit-inspection-csat
   - bietlejuice.gsheets_fintech:done-clean-tenant-entrance-inspection-csat
@@ -3185,10 +3166,6 @@ bietlejuice.looker_temps:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
-  - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-quinto-messenger-agent
-  - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-dim-task
-  - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-fact-chats
-  - bietlejuice.dw_quinto_messenger:load-dw-quinto-messenger-fact-tasks
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
   - bietlejuice.dw_rent_flow:load-dw-rent-dim-rent-flow-type
@@ -3343,7 +3320,6 @@ bietlejuice.metric_rent__tickets:
   - bietlejuice.metric_rent__contracts:load-metric-new-contracts-signed-daily
   - bietlejuice.metric_rent__contracts:load-metric-ongoing-rentals-daily
 bietlejuice.metric_ss__segments:
-  - bietlejuice.dw_call:load-dw-call-fact-call-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
@@ -3356,7 +3332,6 @@ bietlejuice.metric_ss__tickets:
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
-  - bietlejuice.dw_call:load-dw-call-fact-call-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
@@ -3544,7 +3519,6 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.reverse_webhelp:
   - bietlejuice.bigfone:load-clean-call
-  - bietlejuice.dw_call:load-dw-call-fact-call-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department

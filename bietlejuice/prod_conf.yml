@@ -15,7 +15,6 @@ dags_out_of_pattern:
         "dw_booking",
         "dw_braze_events_user_dispatch",
         "dw_business_unit_region",
-        "dw_call",
         "dw_contract",
         "dw_contract_temp",
         "dw_datamarts_spark.cross",
@@ -39,7 +38,6 @@ dags_out_of_pattern:
         "dw_offer",
         "dw_proposal",
         "dw_proposal_temp",
-        "dw_quinto_messenger",
         "dw_rede_company",
         "dw_rede_supply",
         "dw_region",
@@ -293,11 +291,11 @@ custom_cluster_with_sedona:
     <<: *cluster_anchor
     init_scripts:
         - s3:
-            destination: "{{ var.value.artifacts_bucket }}/sedona/sedona-init.sh"
-            region: ""
+              destination: "{{ var.value.artifacts_bucket }}/sedona/sedona-init.sh"
+              region: ""
         - s3:
-            destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
-            region: ""
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
+              region: ""
 
 databricks_10_4_min_general_cluster:
     <<: *cluster_anchor

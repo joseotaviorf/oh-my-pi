@@ -54,7 +54,7 @@ WITH first_departament AS (
     END AS session_expired,
     CASE
       WHEN frc.channel = 'chat' THEN frc.status
-      WHEN frc.channel = 'call' AND fct.sk_task IS NULL THEN 'ABANDONED'
+      WHEN frc.channel = 'call' AND frc.sk_task IS NULL THEN 'ABANDONED'
       WHEN frc.channel = 'call'AND frc.is_last_interaction = True THEN 'COMPLETED'
       WHEN frc.channel = 'call' THEN 'TRANSFERRED'
     END AS status,
@@ -79,9 +79,6 @@ WITH first_departament AS (
     LEFT JOIN
       last_departament ld
         ON ld.sk_contact = frc.sk_contact
-    LEFT JOIN
-      dw_call.fact_call_tasks AS fct
-        ON fct.sk_task = frc.sk_reservation
     LEFT JOIN
       dw_customer_support.dim_taxonomy AS dt
         ON frc.sk_taxonomy = dt.sk_taxonomy
