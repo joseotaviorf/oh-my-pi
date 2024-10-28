@@ -30,7 +30,7 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 def create_dataframe(source_bucket: str, table: str, dt: datetime) -> DataFrame:
-  file_path = f"{table}/{dt.year}/{dt.month:02}/{dt.day:02}"
+  file_path = f"{table}/{dt.year}/{dt.month}/{dt.day}"
   if checkPath(source_bucket, file_path):
     df = (
       spark
@@ -39,7 +39,7 @@ def create_dataframe(source_bucket: str, table: str, dt: datetime) -> DataFrame:
     )
     
     if len(df.head(1)) == 0:
-      logger.warning(f"m=__main__, msg=Empty dataframe for {table}.")
+      logger.warning(f"m=__main__, msg=Empty dataframe for {table} and date:{dt}.")
       return None
     
     return (
