@@ -1,0 +1,19 @@
+table_name: dw_listing.fact_price_changes
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 200
+    severity_level: Error
+column_level_validations:
+  sk_pricing:
+    is_complete:
+      severity_level: Error
+  sk_price_predicted:
+    is_complete:
+      severity_level: Error
+  sk_house:
+    is_complete:
+      severity_level: Error
+  ts_price_started:
+    is_complete:
+      severity_level: Error

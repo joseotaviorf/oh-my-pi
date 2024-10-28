@@ -1,0 +1,15 @@
+table_name: dw_listing.dim_price_predicted
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 200
+    severity_level: Error
+column_level_validations:
+  sk_price_predicted:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  estimated_price:
+    is_complete:
+      severity_level: Error

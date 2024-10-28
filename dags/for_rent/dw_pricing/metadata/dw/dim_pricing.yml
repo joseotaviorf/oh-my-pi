@@ -1,0 +1,40 @@
+database_name: dw_listing
+table_name: dim_pricing
+description: Dimensional table that consolidates the information about the listing price changes.
+domain: Cross
+owner: bruna.prates@quintoandar.com.br
+columns:
+  sk_pricing:
+    description: Primary key referring to a price change.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.id_price_change
+  price:
+    description: Published rental or sale price for a listing in a given time period.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.price
+  previous_price:
+    description: Price before the price of the referenced row.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.previous_price
+  last_price_variation:
+    description: Percent difference between the published price for the row and the previous published price.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.last_price_variation
+  first_price_variation:
+    description: Percent difference between the published price for the row and the first published price.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.first_price_variation
+  change_type:
+    description: Describes the type of price change.
+    categories:
+      First price: First price of the listing.
+      Price increase: Price of the listing went up.
+      Price decrease: Price of the listing went down.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.change_type
+  change_number:
+    description: The listing price modification number.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.change_number
+  ts_load:
+    description: Timestamp of when the table was loaded.

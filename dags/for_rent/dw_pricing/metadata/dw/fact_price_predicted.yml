@@ -1,0 +1,28 @@
+database_name: dw_listing
+table_name: fact_price_predicted
+description: This fact table consolidates all the prices predicted by the calculator to a house listing.
+domain: Cross
+owner: bruna.prates@quintoandar.com.br
+columns:
+  sk_price_predicted:
+    description: Primary key of the table, uniquely identifying a price prediction.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.id_prediction_change
+  sk_house:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+    description: Key referring to the house ID.
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.id_house_status
+    description: Key referring to the house listing ID. The last 3 numbers indicate the version of the listing.
+  ts_calculator_result_started:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of the beginning of the calculator price result observed in that row.
+  ts_calculator_result_ended:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of the end of the calculator price result observed in that row, if any.
+  ts_load:
+    description: Timestamp of when the table was loaded.

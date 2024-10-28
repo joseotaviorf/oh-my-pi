@@ -615,6 +615,9 @@ bietlejuice.dw_pipeline:
   - bietlejuice.enrich_pipeline:load-enrich-dag-run
   - bietlejuice.enrich_pipeline:load-enrich-dag-sla-information
   - bietlejuice.enrich_pipeline:load-enrich-line
+bietlejuice.dw_pricing:
+  - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-prediction-changes
+  - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-price-change
 bietlejuice.dw_proposal:
   - bietlejuice.ebdb_proposal:load-clean-proposal
   - bietlejuice.ebdb_user:load-clean-user

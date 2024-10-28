@@ -1,8 +1,8 @@
 ---
 database_name: datalake_ebdb_pricing
 table_name: listing_price_change
-description: Enrich table that handles sale and rental price change information and enriches it with some comparison columns and pricing scheme information, as well as calculator and status information.
-  Where, each row represents a price exchange for the listing.
+description: Enrich table that handles sale and rental price change information and enriches it with some comparison columns and pricing scheme information.
+  Each row represents a price exchange for the listing.
 domain: For Rent
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -18,14 +18,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user
     description: Foreign key referring to the author who made the price change.
-  id_owner:
-    lineage:
-      - datalake_ebdb_clean.house_aud.id_user
-    description: Foreign key referring to the owner user ID.
-  id_region:
-    lineage:
-      - datalake_ebdb_clean.house_aud.id_region
-    description: Foreign key of region where listing is located in.
   id_revision:
     lineage:
       - datalake_ebdb_clean.house_aud.rev
@@ -35,11 +27,6 @@ columns:
     categories:
       RENT: For rent.
       SALE: For sale.
-  status_history:
-    lineage:
-      - datalake_ebdb_clean.house_aud.status
-      - datalake_sale_listings.sale_status_version_order.status_history
-    description: Rent status linked to a certain point in time of the listing.
   price:
     lineage:
       - datalake_ebdb_clean.house_aud.sale_price
@@ -57,42 +44,13 @@ columns:
   change_type:
     description: Describes the type of price change.
     categories:
-      first price: Listing first price.
-      price up: Listing price went up.
-      price down: Listing price went down.
+      First price: First price of the listing.
+      Price increase: Price of the listing went up.
+      Price decrease: Price of the listing went down.
   change_number:
     description: Tells the number of listing price changes.
   days_with_pricing_scheme:
     description: Count how many days the listing stayed at that publication price. If it is the most recent price, it counts up to D-1.
-  calculator_min_price:
-    lineage:
-      - datalake_ebdb_clean.house_predicted_price_aud.p_10
-    description: Calculator column. Tells the minimum price estimated by the calculator output. May also be referred to as 'p_10'.
-  calculator_p30_price:
-    lineage:
-      - datalake_ebdb_clean.house_predicted_price_aud.p_30
-    description: Calculator column. Tells the estimated price related to the 30% percentile of the calculator's output. May also be referred to as just 'p_30'.
-  calculator_price:
-    lineage:
-      - datalake_ebdb_clean.house_predicted_price_aud.p_50
-    description: Column for calculator. Tells the most likely estimated price for the listing. Can also be referred to as just 'p_50'.
-  calculator_p70_price:
-    lineage:
-      - datalake_ebdb_clean.house_predicted_price_aud.p_70
-    description: Calculator column. Tells the estimated price related to the 70% percentile of the calculator's output. May also be referred to as just 'p_70'.
-  calculator_max_price:
-    lineage:
-      - datalake_ebdb_clean.house_predicted_price_aud.p_90
-    description: Calculator column. Tells the maximum price estimated by the calculator output. May also be referred to as 'p_90'.
-  calculator_certainty:
-    lineage:
-      - datalake_ebdb_clean.house_predicted_price_aud.certainty
-    description: Calculator column. Tells the certainty level of the prediction calculated by the calculator. It is strongly related to the intensity of the QuintoAndar performance with the listing region.
-    categories:
-      HIGH: If the prediction has a low confidence interval, having a high certainty in the prediction.
-      MEDIUM: If the prediction has a medium confidence interval, having a medium certainty in the prediction.
-      LOW: If the prediction has a high confidence interval, having a low certainty in the prediction.
-      NONE: If the prediction has no certainty at all.
   is_last_status_of_day:
     description: Boolean that tells if the status is the listing's most recent status of the day.
   is_first_price:
@@ -101,8 +59,6 @@ columns:
     description: Boolean that tells if the price is the most recent publication price of the listing.
   is_last_price_of_day:
     description: Boolean that tells if the price is the listing's most recent publication price of the day.
-  is_smart_price_change:
-    description: Boolean indicating if this price change was motivated by Smart Price.
   ts_price_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision

@@ -1,0 +1,41 @@
+database_name: dw_listing
+table_name: dim_price_predicted
+description: Dimensional table that consolidates all the information about the prices predicted by the calculator to a house listing.
+domain: Cross
+owner: bruna.prates@quintoandar.com.br
+columns:
+  sk_price_predicted:
+    description: Primary key of the table, uniquely identifying a price prediction.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.id_prediction_change
+  min_price:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_min_price
+    description: Minimum price estimated by the calculator output. May also be referred to as 'p_10'.
+  p30_price:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p30_price
+    description: Estimated price related to the 30% percentile of the calculator's output. May also be referred to as just 'p_30'.
+  estimated_price:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_price
+    description: Most likely estimated price of the calculator's output for the listing. Can also be referred to as just 'p_50'.
+  p70_price:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p70_price
+    description: Estimated price related to the 70% percentile of the calculator's output. May also be referred to as just 'p_70'.
+  max_price:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_max_price
+    description: Maximum price estimated by the calculator's output. May also be referred to as 'p_90'.
+  certainty:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_certainty
+    description: Certainty level of the prediction calculated by the calculator.
+    categories:
+      HIGH: If the prediction has a low confidence interval, having a high certainty in the prediction.
+      MEDIUM: If the prediction has a medium confidence interval, having a medium certainty in the prediction.
+      LOW: If the prediction has a high confidence interval, having a low certainty in the prediction.
+      NONE: If the prediction has no certainty at all.
+  ts_load:
+    description: Timestamp of when the table was loaded.

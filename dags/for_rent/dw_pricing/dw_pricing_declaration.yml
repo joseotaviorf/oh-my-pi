@@ -1,18 +1,17 @@
 dag:
-  name: enrich_ebdb_pricing
+  name: dw_pricing
+  schedule_start_date: 2022, 1, 1
   owner: Data ForRent
-  schedule_start_date: 2020, 8, 29
   documentation:
-    dag_purpose: |
-      The purpose of this DAG is to allocate the tables related to house rental prices on the platform.
+    dag_purpose: "This DAG loads to DW the pricing modeling, i.e., all the changes made to a listing price."
 workflow:
   type: query_delta
-  layer: enrich
+  layer: dw
+  custom_schema: listing
 cluster:
   type: custom_cluster
   custom_configurations:
     driver_node_type_id: r5d.2xlarge
     node_type_id: r5d.xlarge
     num_workers: 2
-    runtime_engine: PHOTON
     spark_version: 13.3.x-scala2.12

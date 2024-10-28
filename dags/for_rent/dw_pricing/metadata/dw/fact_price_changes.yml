@@ -1,0 +1,41 @@
+database_name: dw_listing
+table_name: fact_price_changes
+description: This fact table consolidates all the price changes of a house listing.
+  Each line is composed by a price change and a predicted price to the listing (sk_pricing + sk_price_predicted).
+domain: Cross
+owner: bruna.prates@quintoandar.com.br
+columns:
+  sk_pricing:
+    description: Key referring to a price change.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.id_price_change
+  sk_price_predicted:
+    description: Key referring to the the listing price predicted by calculator.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.id_prediction_change
+  sk_house:
+    description: Key referring to the house ID.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.id_house
+  sk_house_listing:
+    description: Key referring to the house listing ID. The last 3 numbers indicate the version of the listing.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.id_house_listing
+  sk_user:
+    description: Key referring to the author who made the price change.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.id_user_revision
+  days_with_pricing_scheme:
+    description: Number of days the listing remained at the price. If it's the most recent price, it counts up to D-1.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.days_with_pricing_scheme
+  ts_price_started:
+    description: Timestamp of when the price scheme started.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.ts_price_started
+  ts_price_ended:
+    description: Timestamp of when the price scheme ended.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.ts_price_ended
+  ts_load:
+    description: Timestamp of when the table was loaded.
