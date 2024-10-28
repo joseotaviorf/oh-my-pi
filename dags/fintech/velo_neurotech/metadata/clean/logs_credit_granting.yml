@@ -404,6 +404,129 @@ columns:
   status_foreign_filter:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.rgr_estrangeiro
+  bigid_court_type:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_court_type
+  bigid_court_type_first_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_court_type_1
+  bigid_court_type_second_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_court_type_2
+  bigid_court_type_third_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_court_type_3
+  bigid_court_type_forth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_court_type_4
+  bigid_main_subject:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_main_subject
+  bigid_main_subject_first_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_main_subject_1
+  bigid_main_subject_second_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_main_subject_2
+  bigid_main_subject_third_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_main_subject_3
+  bigid_main_subject_forth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_main_subject_4
+  bigid_process_details_civel:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_civel
+  bigid_process_details_civel_first_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_civel_1
+  bigid_process_details_civel_second_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_civel_2
+  bigid_process_details_civel_third_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_civel_3
+  bigid_process_details_civel_forth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_civel_4
+  bigid_process_details_criminal:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_criminal
+  bigid_process_details_criminal_first_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_criminal_1
+  bigid_process_details_criminal_second_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_criminal_2
+  bigid_process_details_criminal_third_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_criminal_3
+  bigid_process_details_criminal_forth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_criminal_4
+  bigid_process_details_tax:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_tributaria
+  bigid_process_details_tax_first_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_tributaria_1
+  bigid_process_details_tax_second_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_tributaria_2
+  bigid_process_details_tax_third_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_tributaria_3
+  bigid_process_details_tax_forth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_process_details_tributaria_4
+  bigid_type:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_type
+  bigid_type_first_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_type_1
+  bigid_type_second_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_type_2
+  bigid_type_third_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_type_3
+  bigid_type_forth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigid_type_4
+  subjects_predictus_first_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_predictus_assuntos_cnj_titulo_1
+  subjects_predictus_second_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_predictus_assuntos_cnj_titulo_2
+  subjects_predictus_third_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_predictus_assuntos_cnj_titulo_3
+  subjects_predictus_forth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_predictus_assuntos_cnj_titulo_4
+  proposal_document_type:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.prop_tipo_documento
+  located_registration_bigid:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.rgr_backgroundcheck_cad_localizado
+  sistem_reponse_bigig:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.rgr_backgroundcheck_sist_responde
+  located_processes_predictus:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.rgr_predictus_capa_processual_dados_localizados
+  sistem_response_predictus:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.rgr_predictus_capa_processual_sistema_responde
+  located_registration_federal:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.rgr_rfpf_cadastro_localizado
+  sistem_reponse_federal:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.rgr_rfpf_sistema_responde
   flag_cnpj:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.flag_cnpj
