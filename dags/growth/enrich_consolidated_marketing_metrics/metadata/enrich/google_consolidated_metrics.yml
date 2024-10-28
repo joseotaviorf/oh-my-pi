@@ -104,3 +104,10 @@ columns:
       - datalake_google_ads_clean.campaigns_performance.clicks
       - datalake_google_ads_clean.keywords_performance.clicks
       - datalake_google_ads_clean.videos_performance.clicks
+  conversions:
+    description: Conversions from google ads platform
+    lineage:
+      - datalake_google_ads_clean.ads_performance.conversions
+      - datalake_google_ads_clean.campaigns_performance.conversions
+      - datalake_google_ads_clean.keywords_performance.conversions
+      - datalake_google_ads_clean.videos_performance.conversions
