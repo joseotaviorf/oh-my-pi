@@ -177,23 +177,27 @@ default_access_control_list:
     - group_name: analytics-engineers
       permission_level: CAN_MANAGE
 
-##### Cluster Pools #####
-
-pool_m5a_large_spot: &pool_m5a_large_spot 0930-180247-hued456-pool-sge611jl
-
 ##### Clusters Configs #####
 cluster_template:
-    # "cluster_anchor_base" is the one to use for clusters with instance pools
-    cluster_base: &cluster_anchor_base
+    cluster: &cluster_anchor
+        enable_elastic_disk: "true"
         autotermination_minutes: 20
-        aws_attributes:
+        aws_attributes: &aws_anchor
+            availability: SPOT_WITH_FALLBACK
+            ebs_volume_count: 1
+            ebs_volume_size: 100
+            ebs_volume_type: GENERAL_PURPOSE_SSD
             instance_profile_arn: "{{ var.value.instance_profile_arn }}"
+            spot_bid_price_percent: 100
+            zone_id: us-east-1d
         cluster_log_conf:
             s3:
                 destination: s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id}}
                 region: us-east-1
         cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
         custom_tags:
+            - key: app
+              value: airflow
             - key: resource-name
               value: databricks
             - key: environment
@@ -243,41 +247,9 @@ cluster_template:
             ENVIRONMENT: "{{ var.value.environment }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
         ssh_public_keys: []
-        spark_version: 10.4.x-scala2.12
-
-    # "cluster_anchor" is the one to use for clusters without instance pools
-    cluster_template_no_pool: &cluster_anchor
-        <<: *cluster_anchor_base
-        enable_elastic_disk: "true"
         node_type_id: m5a.large
         driver_node_type_id: m5a.large
-        aws_attributes: &aws_anchor
-            availability: SPOT_WITH_FALLBACK
-            ebs_volume_count: 1
-            ebs_volume_size: 100
-            ebs_volume_type: GENERAL_PURPOSE_SSD
-            spot_bid_price_percent: 100
-            zone_id: us-east-1d
-            instance_profile_arn: "{{ var.value.instance_profile_arn }}"
-        custom_tags:
-            - key: app
-              value: airflow
-            - key: resource-name
-              value: databricks
-            - key: environment
-              value: "{{ var.value.environment }}"
-            - key: owner
-              value: "{{ task.owner.lower().replace(' ', '-') }}"
-            - key: ecosystem
-              value: data-engineering
-            - key: data-classification
-              value: private
-            - key: sensitive-data
-              value: true
-            - key: cost-center
-              value: c052
-            - key: provisioner
-              value: databricks
+        spark_version: 10.4.x-scala2.12
 
 custom_cluster:
     <<: *cluster_anchor
@@ -327,18 +299,26 @@ databricks_13_3_min_general_cluster:
         availability: SPOT_WITH_FALLBACK
 
 databricks_10_4_med_general_cluster:
-    <<: *cluster_anchor_base
-    driver_instance_pool_id: *pool_m5a_large_spot
-    instance_pool_id: *pool_m5a_large_spot
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.large
+    node_type_id: m5a.large
     num_workers: 1
     spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
+        ebs_volume_size: 200
 
 databricks_12_2_med_general_cluster:
-    <<: *cluster_anchor_base
-    driver_instance_pool_id: *pool_m5a_large_spot
-    instance_pool_id: *pool_m5a_large_spot
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.large
+    node_type_id: m5a.large
     num_workers: 1
     spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
+        ebs_volume_size: 200
 
 databricks_12_2_med_2xlarge_general_cluster:
     <<: *cluster_anchor
@@ -352,11 +332,14 @@ databricks_12_2_med_2xlarge_general_cluster:
         ebs_volume_size: 200
 
 databricks_13_3_med_general_cluster:
-    <<: *cluster_anchor_base
-    driver_instance_pool_id: *pool_m5a_large_spot
-    instance_pool_id: *pool_m5a_large_spot
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.large
+    node_type_id: m5a.large
     num_workers: 1
     spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
 
 databricks_13_3_med_memory_general_cluster:
     <<: *cluster_anchor
