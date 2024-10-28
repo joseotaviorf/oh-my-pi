@@ -14,4 +14,4 @@ CREATE TABLE datalake_ebdb_pricing.listing_prediction_changes (
     calculator_certainty STRING,
     ts_calculator_result_started TIMESTAMP,
     ts_calculator_result_ended TIMESTAMP
-) USING DELTA LOCATION 's3://5a-datalake-prod/enrich/ebdb_pricing/listing_prediction_change'
+) USING DELTA LOCATION 's3://5a-datalake-prod/enrich/ebdb_pricing/listing_prediction_changes'

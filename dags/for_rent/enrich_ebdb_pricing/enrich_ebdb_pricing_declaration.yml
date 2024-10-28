@@ -8,6 +8,11 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  tables_customization:
+    listing_price_change:
+      merge_on: [ 'id_house', 'id_house_listing', 'id_revision', 'business_context' ]
+    listing_prediction_changes:
+      merge_on: [ 'id_house', 'id_house_listing', 'id_revision', 'business_context' ]
 cluster:
   type: custom_cluster
   custom_configurations:
