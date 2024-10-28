@@ -16,5 +16,5 @@ SELECT
 FROM
     reverse_demand_score.listing_demand_score
 WHERE
-    DATE(dt_snapshot) = DATE('{snapshot_date}')
+    DATE(dt_snapshot) = CURRENT_DATE()
     -- TO-DO: Add filter for campaigns (collecting with BizOps team)

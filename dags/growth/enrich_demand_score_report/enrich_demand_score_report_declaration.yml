@@ -10,7 +10,5 @@ workflow:
   layer: enrich
   default_extraction_type: incremental
   default_partitions: ['dt_snapshot']
-  extra_query_template_params:
-    snapshot_date: "{{ get_date_param(dag_run, ds, 'snapshot_date') }}"
 cluster:
   type: databricks_13_3_min_general_cluster
