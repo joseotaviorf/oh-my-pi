@@ -85,7 +85,7 @@ bietlejuice.dw_datamarts_spark.fintech_cross:
     - bietlejuice.sorting_hat:load-clean-proponent
     - bietlejuice.sorting_hat:load-clean-proposal
     - bietlejuice.sorting_hat:load-clean-screening-result
-bietlejuice.dw_datamarts_spark.for_sale:
+bietlejuice.dw_datamarts_for_sale:
   add:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
     - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
@@ -992,3 +992,7 @@ bietlejuice.dw_agent:
     - bietlejuice.sirena:load-clean-agents
     - bietlejuice.sirena:load-clean-prospects
     - bietlejuice.enrich_sirena:load-enrich-messages
+
+bietlejuice.looker_temps:
+  remove:
+    - bietlejuice.dw_datamarts_for_sale:load-dw-datamarts-repressed-demand-sale-booking-fit-in

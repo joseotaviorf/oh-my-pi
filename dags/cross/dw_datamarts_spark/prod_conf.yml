@@ -38,24 +38,6 @@ dags:
   cross:
     owner: Data Engineering
     cluster_name: databricks_12_2_med_memory_cluster
-  for_sale:
-    owner: Data ForSale
-    cluster_name: databricks_12_2_med_compute_cluster
-    custom_libraries:
-      - maven:
-          coordinates: "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating"
-      - maven:
-          coordinates: "org.datasyslab:geotools-wrapper:1.1.0-25.2"
-      - pypi:
-          package: apache-sedona==1.2.1
-    init_script:
-      - s3:
-          destination: "s3://artifacts.s3.data.quintoandar.com.br/sedona/sedona-init.sh"
-          region: ""
-    spark_conf:
-      - spark.serializer: "org.apache.spark.serializer.KryoSerializer"
-      - spark.sql.extensions: "org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions"
-      - spark.kryo.registrator: "org.apache.sedona.core.serde.SedonaKryoRegistrator"
   for_sale_cross:
     owner: Data ForSale
     cluster_name: databricks_12_2_min_2xlarge_memory_cluster

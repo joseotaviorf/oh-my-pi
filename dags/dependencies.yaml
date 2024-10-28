@@ -315,6 +315,32 @@ bietlejuice.dw_datamarts_for_rent_cross:
   - bietlejuice.ebdb_house:load-clean-house-predicted-price
   - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
+bietlejuice.dw_datamarts_for_sale:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
+  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
+  - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
+  - bietlejuice.ebdb:load-clean-house-visit-status-aud
+  - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
+  - bietlejuice.ebdb:load-clean-map-region
+  - bietlejuice.ebdb:load-clean-polygon-region
+  - bietlejuice.ebdb:load-clean-visit-fitting
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_house:load-clean-house-aud
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
+  - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
+  - bietlejuice.enrich_sale_lead_flows:load-enrich-lead-flow
+  - bietlejuice.kodak:load-clean-photo-sphere
+  - bietlejuice.kodak:load-clean-user-revision-entity
+  - bietlejuice.kodak:load-clean-video
 bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_affiliate_costs:load-dw-quintoandar-dim-affiliate-cost
@@ -398,32 +424,6 @@ bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-last-contact
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-mailing
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
-bietlejuice.dw_datamarts_spark.for_sale:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.dw_booking:load-dw-public-dim-booking
-  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
-  - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
-  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
-  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
-  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
-  - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-  - bietlejuice.ebdb:load-clean-house-visit-status-aud
-  - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
-  - bietlejuice.ebdb:load-clean-map-region
-  - bietlejuice.ebdb:load-clean-polygon-region
-  - bietlejuice.ebdb:load-clean-visit-fitting
-  - bietlejuice.ebdb_house:load-clean-house
-  - bietlejuice.ebdb_house:load-clean-house-aud
-  - bietlejuice.ebdb_listing:load-clean-listing-business-context
-  - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
-  - bietlejuice.ebdb_user:load-clean-user-revision-entity
-  - bietlejuice.enrich_amplitude_sale_visit_intent:load-enrich-amplitude-sale-visit-intent
-  - bietlejuice.enrich_sale_lead_flows:load-enrich-lead-flow
-  - bietlejuice.kodak:load-clean-photo-sphere
-  - bietlejuice.kodak:load-clean-user-revision-entity
-  - bietlejuice.kodak:load-clean-video
 bietlejuice.dw_datamarts_spark.for_sale_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region
@@ -3182,7 +3182,6 @@ bietlejuice.looker_temps:
   - bietlejuice.dw_datamarts_for_rent:load-dw-datamarts-repressed-demand
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-performance-marketing-metrics-demand
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand
-  - bietlejuice.dw_datamarts_spark.for_sale:load-dw-datamarts-repressed-demand-sale-booking-fit-in
   - bietlejuice.dw_datamarts_spark.for_sale_cross:load-dw-datamarts-sale-cohort-conversions
   - bietlejuice.dw_datamarts_spark.for_sale_cross:load-dw-datamarts-sale-events-funnel
   - bietlejuice.dw_datamarts_spark.for_sale_cross:load-dw-datamarts-temp-supply-flows
