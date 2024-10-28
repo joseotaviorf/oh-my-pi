@@ -37,6 +37,8 @@ workflow:
       custom_schema: fintech_auditing
     quintocred_aging_recurring_payment_renewal:
       custom_schema: fintech_auditing
+    quintocred_payment_full:
+      custom_schema: fintech_auditing
 cluster:
   type: databricks_12_2_med_general_photon_cluster
   access_control_list:
