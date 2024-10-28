@@ -34,6 +34,10 @@ cluster:
     node_type_id: c5a.2xlarge
     num_workers: 3
     spark_version: 12.2.x-scala2.12
+    spark_conf:
+      spark.serializer: "org.apache.spark.serializer.KryoSerializer"
+      spark.sql.extensions: "org.apache.sedona.viz.sql.SedonaVizExtensions,org.apache.sedona.sql.SedonaSqlExtensions"
+      spark.kryo.registrator: "org.apache.sedona.core.serde.SedonaKryoRegistrator"
   custom_libraries:
     - maven:
         coordinates: "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating"
