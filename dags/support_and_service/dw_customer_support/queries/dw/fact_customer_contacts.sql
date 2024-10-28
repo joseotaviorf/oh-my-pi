@@ -108,25 +108,18 @@ demand AS (
 ),
 contacts AS (
   SELECT
-    MD5(
-      CONCAT(
-        d.channel,
-        d.id_session,
-        d.id_task
-      )
-    ) AS sk_contact,
-    MD5(
-      CONCAT(
-        d.direction,
-        d.id_session,
-        d.id_task,
-        IFNULL(d.id_reservation, '')
-      )
-    ) AS sk_interaction,
+    CASE
+      WHEN d.channel = 'call' THEN MD5(COALESCE(d.id_call, d.id_task))
+      WHEN d.channel = 'chat' THEN MD5(d.id_session)
+    END AS sk_contact,
+    CASE
+      WHEN d.channel = 'call' THEN MD5(COALESCE(d.id_reservation, CONCAT(COALESCE(d.id_call, d.id_task), 'n/a')))
+      WHEN d.channel = 'chat' THEN MD5(d.id_task)
+    END AS sk_interaction,
     MD5(d.queue_name) AS sk_department,
     d.id_session AS sk_session,
     d.id_task AS sk_task,
-    CAST(COALESCE(t1.id_ticket, t2.id_ticket, t3.id_ticket) AS BIGINT) AS sk_ticket,
+    CAST(COALESCE(t1.id_ticket, t2.id_ticket) AS BIGINT) AS sk_ticket,
     CAST(d.id_user AS BIGINT) AS sk_user,
     d.queue_name,
     d.channel,
@@ -172,9 +165,7 @@ contacts AS (
     datalake_customer_support.tickets AS t2
       ON t2.id_twilio = d.id_task
       AND STARTSWITH(t2.id_twilio, "CA")
-  LEFT JOIN
-    datalake_customer_support.tickets AS t3
-      ON t3.id_session = d.id_session
+      AND d.channel = 'call'
 )
 SELECT
   sk_contact,
