@@ -43,7 +43,7 @@ class BietlejuiceDependencyHelper:
             table_group_number = 3
         else:
             task_name_pattern = (
-                "bietlejuice\.(.*):(load|done)-(enrich|raw|clean|dw)*-(.*)"
+                "bietlejuice\.(.*):(load|done)-(enrich|raw|clean|dw|metric)*-(.*)"
             )
 
         match = re.search(task_name_pattern, task_name)
@@ -54,11 +54,11 @@ class BietlejuiceDependencyHelper:
 
         dag_name = match.group(1)
 
-        match_layer = re.search("(dw|enrich|clean|raw)", task_name)
+        match_layer = re.search("(dw|enrich|clean|raw|metric)", task_name)
         if match_layer is None:
             return dag_name, None
 
-        layer = match_layer.group(1)
+        layer = match.group(table_group_number - 1)
         if layer == "dw":
             table_name = BietlejuiceDependencyHelper._get_table_name_from_dw_task(
                 dag_name, layer, match.group(table_group_number)
@@ -74,6 +74,10 @@ class BietlejuiceDependencyHelper:
         """
         Clean the DW task in order to retrieve the table name being loaded
         """
+        if "fact" in task or "dim" in task:
+            match = re.search("(fact|dim)(.*)", task)
+            return (match.group(1) + match.group(2)).replace("-", "_")
+
         dag_context = dag_name.replace(f"{layer}_", "")
         table_name = task.replace("-", "_").replace(f"{dag_context}_", "")
         return table_name

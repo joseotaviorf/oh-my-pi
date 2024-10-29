@@ -304,7 +304,7 @@ class CrossDAGDependenciesValidator:
         dependencies_without_tasks = []
         for dependent in dependencies:
             dependency_without_task = getattr(
-                re.search("bietlejuice.[^:]*$", dependent), "string", ""
+                re.search("\bbietlejuice.[^:]*$", dependent), "string", ""
             )
             dependency_without_task_name = dependency_without_task.split(".")[-1]
             if (
