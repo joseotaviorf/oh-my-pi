@@ -16,8 +16,8 @@ cluster:
     - pypi:
         package: apache-sedona==1.2.1
   custom_configurations:
-    driver_node_type_id: c5a.2xlarge
-    node_type_id: c5a.2xlarge
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.2xlarge
     num_workers: 3
     spark_version: 12.2.x-scala2.12
     spark_conf:
