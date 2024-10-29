@@ -251,6 +251,14 @@ columns:
     lineage:
       - datalake_ebdb_clean.proposal_aud.is_proposal
     description: "True if the sk_proposal has any resend request."
+  is_single_tenant:
+    lineage:
+      - datalake_sorting_hat_clean.proponent
+    description: "True if the proposal has only one tenant."
+  total_proposal_proponents:
+    lineage:
+      - datalake_sorting_hat_clean.proponent
+    description: "The number of proponents in a proposal."
   dt_last_credit_evaluation_init:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract_signed_date

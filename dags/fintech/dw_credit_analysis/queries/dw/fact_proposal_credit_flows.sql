@@ -68,12 +68,12 @@ credit_engine AS (
     ON ch.id_analysis_request = ar.id_analysis_request
   WHERE ch.is_current_checklist = TRUE
 ),
-direct_offer AS ( 
-  SELECT  
-    f.sk_tenant_prospect AS sk_client, 
+direct_offer AS (
+  SELECT
+    f.sk_tenant_prospect AS sk_client,
     f.sk_house,
     d.first_touchpoint
-  FROM 
+  FROM
     dw_rent.fact_rent_flows f
   LEFT JOIN
     dw_rent.dim_rent_flow_type d
@@ -84,25 +84,35 @@ direct_offer AS (
 ),
 early_demand AS (
   SELECT
-    id_house AS sk_house, 
+    id_house AS sk_house,
     ts_early_demand_started
   FROM
     dw_public.dim_house_listing
-  WHERE 
+  WHERE
     ts_early_demand_started IS NOT NULL
   QUALIFY
       ROW_NUMBER () OVER (PARTITION BY id_house ORDER BY sk_house_listing DESC) = 1
 ),
 resend_request AS (
-  SELECT 
-    id_proposal AS sk_proposal, 
-    count(*) AS resend_request 
+  SELECT
+    id_proposal AS sk_proposal,
+    count(*) AS resend_request
   FROM
-    datalake_ebdb_clean.proposal_aud 
-  WHERE 
+    datalake_ebdb_clean.proposal_aud
+  WHERE
     tenant_documentation_status = 'ReenvioDocumentos'
-    AND mod_tenant_documentation_status = TRUE  
-  GROUP BY 1 
+    AND mod_tenant_documentation_status = TRUE
+  GROUP BY 1
+),
+proposal_proponents AS (
+  SELECT
+    id_proposal,
+    COUNT(DISTINCT cpf) AS total_proposal_proponents,
+    IF(COUNT(DISTINCT cpf) = 1, TRUE, FALSE) AS is_single_tenant
+  FROM
+    datalake_sorting_hat_clean.proponent
+  GROUP BY
+    id_proposal
 ),
 rent_flows AS (
   SELECT
@@ -179,7 +189,9 @@ rent_flows AS (
       WHEN ca.guarantee_accepted = 'CLEAR_NO' OR ca.guarantee_accepted = 'NOT_ACCEPTED' THEN FALSE
       WHEN ca.guarantee_accepted IS NULL THEN FALSE
       ELSE TRUE
-    END AS is_guarantee_accepted --fix rule: IF(g.guarantee_not_accepted = 1, TRUE, FALSE)
+    END AS is_guarantee_accepted, --fix rule: IF(g.guarantee_not_accepted = 1, TRUE, FALSE)
+    pp.is_single_tenant,
+    pp.total_proposal_proponents
   FROM
     dw_rent.fact_listing_rent_flows AS flrf
   LEFT JOIN
@@ -203,6 +215,9 @@ rent_flows AS (
   LEFT JOIN
     credit_engine AS ce
       ON ce.id_proposal = flrf.sk_proposal
+  LEFT JOIN
+    proposal_proponents AS pp
+      ON pp.id_proposal = flrf.sk_proposal
 ),
 proposal_credit_flows AS (
   SELECT
@@ -280,9 +295,11 @@ proposal_credit_flows AS (
     rf.is_last_credit_evaluation,
     rf.is_bypass,
     CASE
-      WHEN eca.sk_early_credit_analysis IS NULL THEN FALSE 
+      WHEN eca.sk_early_credit_analysis IS NULL THEN FALSE
       ELSE TRUE
     END AS is_early_credit,
+    rf.is_single_tenant,
+    rf.total_proposal_proponents,
     rf.dt_tenant_doc_complete_date,
     rf.dt_credit_analysis_approved_date,
     rf.dt_offer_approved_date,
@@ -290,8 +307,8 @@ proposal_credit_flows AS (
     rf.dt_guarantee_paid_date,
     rf.dt_contract_created_date,
     rf.dt_contract_signed_date,
-    eca.dt_early_credit_created,
-    eca.dt_early_credit_expired,
+    CAST(eca.dt_early_credit_created AS DATE) AS dt_early_credit_created,
+    CAST(eca.dt_early_credit_expired AS DATE) AS dt_early_credit_expired,
     rf.dt_offer_submitted_date,
     rf.country_code,
     rf.rental_administrator,
@@ -311,11 +328,11 @@ proposal_credit_flows AS (
       ON  rf.sk_offer = eca.sk_offer
 ),
 house_listing AS (
-  SELECT 
+  SELECT
     id_house,
     country_code,
     rental_administrator
-  FROM 
+  FROM
     dw_rent.dim_house_listing
   QUALIFY ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY sk_house_listing DESC) = 1
 ),
@@ -364,6 +381,8 @@ early_credit_full (
     TRUE AS is_last_credit_evaluation,
     CAST(NULL AS BOOLEAN) AS is_bypass,
     TRUE AS is_early_credit,
+    CAST(NULL AS BOOLEAN) AS is_single_tenant,
+    CAST(NULL AS INTEGER) AS total_proposal_proponents,
     eca.dt_early_credit_created,
     eca.dt_early_credit_expired,
     CAST(NULL AS DATE) AS dt_last_credit_evaluation_init,
@@ -381,7 +400,7 @@ early_credit_full (
     NOW() AS ts_load
   FROM
     dw_credit.fact_early_credit AS eca
-  LEFT JOIN 
+  LEFT JOIN
     house_listing AS hl
       ON  hl.id_house = eca.sk_house
   LEFT JOIN
@@ -389,7 +408,7 @@ early_credit_full (
       ON  pcf.sk_early_credit_analysis = eca.sk_early_credit_analysis
   WHERE pcf.sk_early_credit_analysis IS NULL
 ),
-final_flow AS ( 
+final_flow AS (
 SELECT
   sk_client,
   sk_house_listing,
@@ -438,6 +457,8 @@ SELECT
   is_last_credit_evaluation,
   is_bypass,
   is_early_credit,
+  is_single_tenant,
+  total_proposal_proponents,
   dt_early_credit_created,
   dt_early_credit_expired,
   dt_last_credit_evaluation_init,
@@ -459,11 +480,11 @@ WHERE
   sk_offer_submitted_date > 0
   AND linsting_rank = 1
 UNION
-SELECT 
-  * 
-FROM 
+SELECT
+  *
+FROM
   early_credit_full
-), 
+),
 add_dt_reference AS (
 SELECT
   sk_client,
@@ -500,7 +521,7 @@ SELECT
   sk_early_credit_expired,
   funnel_step,
   funnel_drop_step,
-  CASE 
+  CASE
     WHEN funnel_drop_step = 'EC2OS' THEN 'A. EC2OS'
     WHEN funnel_drop_step = 'OS2OA' THEN 'B. OS2OA'
     WHEN funnel_drop_step = 'OA2ES' THEN 'C. OA2ES'
@@ -519,6 +540,8 @@ SELECT
   is_last_credit_evaluation,
   is_bypass,
   is_early_credit,
+  is_single_tenant,
+  total_proposal_proponents,
   dt_early_credit_created,
   dt_early_credit_expired,
   dt_last_credit_evaluation_init,
@@ -542,9 +565,9 @@ SELECT
   sk_client AS sk_client_max_funnel,
   DATE_TRUNC('month', dt_reference) AS dt_reference_user_max_funnel,
   funnel_drop_step_ordered AS client_max_funnel_drop_step
-FROM 
+FROM
   add_dt_reference
-WHERE 
+WHERE
   country_code = 'BR' AND
 	rental_administrator = 'QUINTOANDAR' AND
   is_last_credit_evaluation = TRUE
@@ -592,48 +615,48 @@ SELECT
   guarantee_accepted,
   country_code,
   rental_administrator,
-  CASE 
-    WHEN sk_early_credit_analysis <> -1 
-    THEN 1 ELSE 0 
+  CASE
+    WHEN sk_early_credit_analysis <> -1
+    THEN 1 ELSE 0
   END AS ec_flag,
-  CASE 
+  CASE
     WHEN sk_offer <> -1
-    THEN 1 ELSE 0 
+    THEN 1 ELSE 0
   END AS os_flag,
-  CASE 
-    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA') 
-    THEN 0 ELSE 1 
+  CASE
+    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA')
+    THEN 0 ELSE 1
   END AS oa_flag,
-  CASE 
+  CASE
     WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES')
-    THEN 0 ELSE 1 
+    THEN 0 ELSE 1
   END AS es_flag,
-  CASE 
+  CASE
     WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES',  'D. ES2EP')
-    THEN 0 ELSE 1 
+    THEN 0 ELSE 1
   END AS ep_flag,
-  CASE 
-    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES',  'D. ES2EP',  'E. EP2DS') 
-    THEN 0 ELSE 1 
+  CASE
+    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES',  'D. ES2EP',  'E. EP2DS')
+    THEN 0 ELSE 1
   END AS ds_flag,
-  CASE 
-    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES',  'D. ES2EP',  'E. EP2DS',  'F. DS2CA')  
-    THEN 0 ELSE 1 
+  CASE
+    WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES',  'D. ES2EP',  'E. EP2DS',  'F. DS2CA')
+    THEN 0 ELSE 1
   END AS ca_flag,
-  CASE 
+  CASE
     WHEN funnel_drop_step_ordered IN ('A. EC2OS',  'B. OS2OA',  'C. OA2ES',  'D. ES2EP',  'E. EP2DS',  'F. DS2CA',  'G. CA2CS')
-    THEN 0 ELSE 1 
+    THEN 0 ELSE 1
   END AS cs_flag,
   is_guarantee_accepted,
   is_first_credit_evaluation,
   is_last_credit_evaluation,
   is_bypass,
   is_early_credit,
-  CASE 
-    WHEN 
+  CASE
+    WHEN
     ROW_NUMBER() OVER (
-      PARTITION BY 
-        adr.sk_client, 
+      PARTITION BY
+        adr.sk_client,
         date_trunc('MONTH',adr.dt_reference),
         umf.client_max_funnel_drop_step
       ORDER BY
@@ -648,6 +671,8 @@ SELECT
   IF(df.first_touchpoint IS NULL, FALSE, TRUE) AS is_direct_offer,
   IF(ed.ts_early_demand_started IS NULL, FALSE, TRUE) AS is_early_demand,
   IF(dt_tenant_first_doc_sent_date IS NOT NULL AND rr.resend_request IS NOT NULL, TRUE, FALSE) AS is_resend_request,
+  is_single_tenant,
+  total_proposal_proponents,
   dt_early_credit_created,
   dt_early_credit_expired,
   dt_last_credit_evaluation_init,
@@ -665,7 +690,7 @@ SELECT
   ts_load
 FROM
   add_dt_reference adr
-LEFT JOIN 
+LEFT JOIN
   client_max_funnel_drop_step umf
   ON adr.sk_client = umf.sk_client_max_funnel
   AND DATE_TRUNC('month', adr.dt_reference) = umf.dt_reference_user_max_funnel
