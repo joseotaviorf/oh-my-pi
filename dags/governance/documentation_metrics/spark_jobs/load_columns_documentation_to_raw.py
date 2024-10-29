@@ -5,6 +5,7 @@ import yaml
 from datetime import datetime
 from argparse import ArgumentParser
 from pyspark.sql import Row
+from botocore.exceptions import IncompleteReadError
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -58,16 +59,21 @@ def get_documentation_paths_from_bucket(bucket, prefix, s3_client):
 
 
 def get_content_from_paths(bucket, documentation_paths, s3_client):
-    s3_objects = []
-    for file_path in documentation_paths:
-        file_object = s3_client.get_object(Bucket=bucket, Key=file_path)
-        s3_objects.append(file_object["Body"])
-
     documentation_contents = []
-    for obj in s3_objects:
-        documentation_contents.append(yaml.safe_load(obj))
+    for file_path in documentation_paths:
+        try:
+          documentation_contents.append(load_yaml_from_bucket(bucket, file_path, s3_client))
+        except IncompleteReadError as e:
+          logger.error(f"Error getting stream for {file_path}")
+          logger.error(e)
+          raise e
 
     return documentation_contents
+
+
+def load_yaml_from_bucket(bucket, prefix, s3_client):
+    file_object = s3_client.get_object(Bucket=bucket, Key=prefix)
+    return yaml.safe_load(file_object["Body"])
 
 
 def extract_rows_from_docs(docs):
