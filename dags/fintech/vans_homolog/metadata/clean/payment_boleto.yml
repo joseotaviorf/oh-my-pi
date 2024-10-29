@@ -1,0 +1,66 @@
+database_name: datalake_vans_homolog_clean
+table_name: payment_boleto
+columns:
+  id:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.id
+  requested_by:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.requested_by
+  related_document_type:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.related_document_type
+  id_related_document:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.related_document_id
+  related_document_status:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.related_document_status
+  company_use:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.company_use
+  our_number:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.our_number
+  occurrence_code:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.occurrence_code
+  occurrence_reason:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.occurrence_reason
+  payee_name:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.payee_name
+  ts_created:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.created_at
+  ts_updated:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.updated_at
+  status:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.status
+  dt_paid:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.paid_at
+  original_response:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.original_response
+  paid_amount:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.paid_amount
+  bank_payment_code:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.bank_payment_code
+  type:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.type
+  style:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.style
+  id_bank_payment:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.bank_payment_id
+  barcode:
+    lineage:
+      - datalake_vans_homolog_raw.paymentboleto.barcode

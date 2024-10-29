@@ -1,0 +1,15 @@
+database_name: datalake_vans_homolog_clean
+table_name: bank
+columns:
+  id:
+    lineage:
+      - datalake_vans_homolog_raw.bank.id
+  name:
+    lineage:
+      - datalake_vans_homolog_raw.bank.name
+  acronym:
+    lineage:
+      - datalake_vans_homolog_raw.bank.acronym
+  code:
+    lineage:
+      - datalake_vans_homolog_raw.bank.code

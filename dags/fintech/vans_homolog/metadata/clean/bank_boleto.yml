@@ -1,0 +1,21 @@
+database_name: datalake_vans_homolog_clean
+table_name: bank_boleto
+columns:
+  id:
+    lineage:
+      - datalake_vans_homolog_raw.bankboleto.id
+  id_bank:
+    lineage:
+      - datalake_vans_homolog_raw.bankboleto.bank_id
+  agency:
+    lineage:
+      - datalake_vans_homolog_raw.bankboleto.agency
+  account:
+    lineage:
+      - datalake_vans_homolog_raw.bankboleto.account
+  is_active:
+    lineage:
+      - datalake_vans_homolog_raw.bankboleto.active
+  account_digit:
+    lineage:
+      - datalake_vans_homolog_raw.bankboleto.account_digit

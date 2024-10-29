@@ -1,0 +1,117 @@
+database_name: datalake_vans_homolog_clean
+table_name: payment_status_log
+columns:
+  id:
+    lineage:
+      - datalake_vans_homolog_raw..payment_status_log.id
+  id_bank_payment:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.bank_payment_id
+  id_file:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.file_id
+  id_payment:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.payment_id
+  id_related_document:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.related_document_id
+  company_use:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.company_use
+  our_number:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.our_number
+  due_amount:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.due_amount
+  paid_amount:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.paid_amount
+  bank_payment_code:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.bank_payment_code
+  occurrence_code:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.occurrence_code
+  payee_bank_code:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.payee_bank_code
+  payee_account:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.payee_account
+  payee_agency:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.payee_agency
+  payee_document:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.payee_document
+  payee_name:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.payee_name
+  bank_info_status:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.bank_info_status
+  related_document_type:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.related_document_type
+  related_document_status:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.related_document_status
+  requested_by:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.requested_by
+  occurrence_reason:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.occurrence_reason
+  original_response:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.original_response
+  return_file_number:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.return_file_number
+  status:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.status
+  style:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.style
+  type:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.type
+  is_payee_savings_acc:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.payee_savings_acc
+  dt_return_file:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.return_file_date
+  ts_created:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.created_at
+  ts_updated:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.updated_at
+  ts_payment_created:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.created_at_payment
+  ts_issued:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.issue_date_time
+  ts_due:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.due_date
+  ts_paid:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.paid_at
+  year:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.year
+  month:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.month
+  day:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.day
+  hour:
+    lineage:
+      - datalake_vans_homolog_raw.payment_status_log.hour

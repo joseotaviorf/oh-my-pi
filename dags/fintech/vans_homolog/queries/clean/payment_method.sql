@@ -1,0 +1,10 @@
+SELECT
+    id,
+    acronym,
+    description,
+    year,
+    month,
+    day,
+    hour
+FROM
+    datalake_vans_homolog_raw.paymentmethod
