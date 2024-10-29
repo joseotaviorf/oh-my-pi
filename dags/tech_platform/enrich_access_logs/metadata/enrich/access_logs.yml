@@ -1,0 +1,94 @@
+database_name: datalake_access_logs
+table_name: access_logs
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+description: "This table stores the combined information from access logs"
+columns:
+  id_trace:
+    lineage:
+      - datalake_access_logs_clean.opa.id_trace
+    description: Trace ID
+  ts_event:
+    lineage:
+      - datalake_access_logs_clean.istio.start_time
+    description: Request start time
+  request_traceparent:
+    lineage:
+      - datalake_access_logs_clean.istio.request_traceparent
+    description: Request traceparent
+  request_x_forwarded_for:
+    lineage:
+      - datalake_access_logs_clean.istio.x_forwarded_for
+    description: Request forwarded for IPs
+  request_method:
+    lineage:  
+      - datalake_access_logs_clean.istio.request_method
+    description: Request method
+  request_user_agent:
+    lineage:  
+      - datalake_access_logs_clean.istio.request_user_agent
+    description: Request user agent
+  request_path:
+    lineage:
+      - datalake_access_logs_clean.istio.path
+    description: Request path
+  request_duration_ms:
+    lineage:
+      - datalake_access_logs_clean.istio.request_duration_ms
+    description: Request duration
+  response_flags:
+    lineage:
+      - datalake_access_logs_clean.istio.response_flags
+    description: Response Flags
+  response_code:
+    lineage:
+       - datalake_access_logs_clean.istio.response_code
+    description: Response Code
+  request_source_principal:
+    lineage:
+      - datalake_access_logs_clean.opa.request_source_principal
+    description: Request source principal
+  request_destination_principal:
+    lineage:
+      - datalake_access_logs_clean.opa.request_destination_principal
+    description: Request destination principal
+  request_parameterized_path:
+    lineage:
+      - datalake_access_logs_clean.opa.request_path
+    description: Request path (parameterized without request parameters)
+  request_required_roles:
+    lineage:
+      - datalake_access_logs_clean.opa.request_required_roles
+    description: Required roles in request
+  result_http_allowed:
+    lineage:
+      - datalake_access_logs_clean.opa.result_http_allowed
+    description: Authorization result
+  result_http_status:
+    lineage:
+      - datalake_access_logs_clean.opa.result_http_status
+    description: HTTP status code (only used when result_http_allowed is false)
+  principal_user_email:
+    lineage:
+      - datalake_access_logs_clean.opa.principal_user_email
+    description: Principal user email 
+  principal_user_idp:
+    lineage:
+      - data_access_logs_clean.opa.principal_user_idp
+    description: Principal user IDP
+  principal_service:
+    lineage: 
+      - datalake_access_logs_clean.opa.principal_service
+    description: Principal service
+  principal_user_provided_roles:
+    lineage:
+      - datalake_access_logs_clean.opa.principal_user_provided_roles
+    description: Role provided by principal user
+  principal_service_provided_roles:
+    lineage:
+       - datalake_access_logs_clean.opa.principal_service_provided_roles
+    description: Roles provided by principal service
+  app:
+    lineage:
+      - datalake_access_logs_clean.opa.app
+    description: App that handled the request 

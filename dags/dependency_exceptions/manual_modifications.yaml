@@ -228,6 +228,10 @@ bietlejuice.dw_tenant_documentation:
 bietlejuice.dw_user_affiliate:
   remove:
     - bietlejuice.ebdb:load-clean-partner-agent
+bietlejuice.enrich_access_logs:
+  remove:
+    - bietlejuice.istio:load-clean-istio
+    - bietlejuice.opa:load-clean-opa
 bietlejuice.enrich_accounting_funnel:
   remove:
     - bietlejuice.sap:load-clean-users

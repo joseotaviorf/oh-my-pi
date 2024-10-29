@@ -16,6 +16,10 @@ columns:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/traceparent
     description: Request trace id
+  id_trace:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/traceparent
+    description: Request trace id
   reques_method:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/method
