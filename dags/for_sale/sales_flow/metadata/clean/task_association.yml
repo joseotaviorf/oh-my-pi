@@ -1,0 +1,47 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: task_association
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: Table with the association between tasks and users
+columns:
+  id:
+    description: 'Id of the task association'
+    lineage:
+    - datalake_sales_flow_raw.task_association.id
+  id_subtask:
+    description: 'Id of the subtask'
+    lineage:
+    - datalake_sales_flow_raw.task_association.subtask_id
+  id_main_user:
+    description: 'Id of the main user'
+    lineage:
+    - datalake_sales_flow_raw.task_association.main_user_id
+  id_sales_flow:
+    description: 'Id of the sales flow'
+    lineage:
+    - datalake_sales_flow_raw.task_association.sales_flow_id
+  status:
+    description: 'Status of the task association'
+    lineage:
+    - datalake_sales_flow_raw.task_association.status
+  attributes:
+    description: 'Attributes of the task association'
+    lineage:
+    - datalake_sales_flow_raw.task_association.attributes
+  ts_released:
+    description: 'Timestamp of the release of the task'
+    lineage:
+    - datalake_sales_flow_raw.task_association.released_at
+  ts_concluded:
+    description: 'Timestamp of the conclusion of the task'
+    lineage:
+    - datalake_sales_flow_raw.task_association.concluded_at
+  ts_created:
+    description: 'Timestamp of the creation of the task'
+    lineage:
+    - datalake_sales_flow_raw.task_association.created_at
+  ts_updated:
+    description: 'Timestamp of the last update of the task'
+    lineage:
+    - datalake_sales_flow_raw.task_association.updated_at

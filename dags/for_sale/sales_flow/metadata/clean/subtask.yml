@@ -1,0 +1,43 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: subtask
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: Table with the subtasks of the sales flow
+columns:
+  id:
+    description: 'Id of the subtask'
+    lineage:
+    - datalake_sales_flow_raw.subtask.id
+  id_task:
+    description: 'Id of the parent task'
+    lineage:
+    - datalake_sales_flow_raw.subtask.task_id
+  label:
+    description: 'Label of the subtask'
+    lineage:
+    - datalake_sales_flow_raw.subtask.label
+  type:
+    description: 'Type of the subtask'
+    lineage:
+    - datalake_sales_flow_raw.subtask.type
+  target:
+    description: 'Target of the subtask'
+    lineage:
+    - datalake_sales_flow_raw.subtask.target
+  deadline:
+    description: 'Deadline of the subtask'
+    lineage:
+    - datalake_sales_flow_raw.subtask.deadline
+  activation_trigger:
+    description: 'Activation trigger of the subtask'
+    lineage:
+    - datalake_sales_flow_raw.subtask.activation_trigger
+  ts_created:
+    description: 'Timestamp of the creation of the subtask'
+    lineage:
+    - datalake_sales_flow_raw.subtask.created_at
+  ts_updated:
+    description: 'Timestamp of the last update of the subtask'
+    lineage:
+    - datalake_sales_flow_raw.subtask.updated_at

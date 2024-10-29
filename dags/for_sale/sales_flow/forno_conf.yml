@@ -159,9 +159,15 @@ tables:
     extraction_type: incremental
   status_record_aud:
     extraction_type: incremental
+  subtask:
+    extraction_type: incremental
   tag:
     extraction_type: incremental
   tag_aud:
+    extraction_type: incremental
+  task:
+    extraction_type: incremental
+  task_association:
     extraction_type: incremental
   user_sample:
     extraction_type: incremental
