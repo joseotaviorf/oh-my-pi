@@ -191,44 +191,10 @@ cpf_agg_contracts AS (
     FROM
         datalake_ebdb_clean.contract_person
     GROUP BY 1
-),
-get_previous_user AS (
-    SELECT DISTINCT
-        cp.id_contract,
-        cp.id AS id_contract_person,
-        cp.id_user AS id_user_contract_person,
-        LAG(cp.id_user) OVER (PARTITION BY cp.id_contract, cp.type, cp.will_live ORDER BY FROM_UNIXTIME(ure.ts_revision/1000) ASC) AS id_previous_user_contract_person,
-        cp.mod_id_user,
-        FROM_UNIXTIME(ure.ts_revision/1000) AS ts_revision
-    FROM
-        datalake_ebdb_clean.contract_person_aud AS cp
-    LEFT JOIN
-        datalake_ebdb_clean.user_revision_entity AS ure
-            ON ure.id = cp.REV
-    WHERE
-        cp.id_user IS NOT NULL
-),
-ownership_swap AS (
-    SELECT
-        gpu.id_contract,
-        gpu.id_contract_person,
-        gpu.id_user_contract_person,
-        IF(ARRAY_CONTAINS(um.predecessor_user_list, gpu.id_previous_user_contract_person), NULL, gpu.id_previous_user_contract_person) AS id_previous_user_contract_person,
-        gpu.ts_revision
-    FROM
-        get_previous_user AS gpu
-    LEFT JOIN
-        datalake_ebdb_user.user_merge AS um
-          ON um.id_user = gpu.id_user_contract_person
-    WHERE
-        gpu.mod_id_user
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY gpu.id_contract, gpu.id_user_contract_person ORDER BY gpu.ts_revision DESC) = 1
 )
 SELECT
     cp.id AS id_contract_person,
     cp.id_user AS id_user_contract_person,
-    os.id_previous_user_contract_person,
     cp.id_contract,
     u.id AS id_user,
     COALESCE(ch.country_code, 'Undefined') AS country_code,
@@ -266,16 +232,10 @@ SELECT
     (cp.id_contract = COALESCE(uag.id_first_contract, cag.id_first_contract)) AS is_first_contract,
     (cp.id_contract = COALESCE(uag.id_last_contract, cag.id_last_contract)) AS is_last_contract,
     cp.dt_birth,
-    IF(os.id_previous_user_contract_person IS NULL, NULL, os.ts_revision) AS ts_ownership_swap,
     cp.ts_created,
     cp.ts_updated
 FROM
     datalake_ebdb_clean.contract_person AS cp
-LEFT JOIN
-    ownership_swap AS os
-        ON os.id_contract = cp.id_contract
-        AND os.id_contract_person = cp.id
-        AND os.id_user_contract_person = cp.id_user
 LEFT JOIN
     datalake_ebdb_clean.user AS u
         ON u.id = cp.id_user

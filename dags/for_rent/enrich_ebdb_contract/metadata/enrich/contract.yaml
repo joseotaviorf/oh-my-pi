@@ -213,10 +213,6 @@ columns:
     lineage:
     - datalake_ebdb_clean.contract.type
     description: Boolean indicating if the contract is DealOnly type.
-  has_tenant_ownership_swap:
-    lineage:
-      - datalake_ebdb_contract.contract_person.id_previous_user_contract_person
-    description: Boolean indicating if the contract has a change of ownership of the tenant.
   monthly_administration_fee:
     lineage:
     - datalake_ebdb_clean.full_contract.monthly_administration_fee

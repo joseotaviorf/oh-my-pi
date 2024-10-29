@@ -12,9 +12,6 @@ workflow:
   layer: enrich
   default_partitions:
   - country_code
-  inner_dependencies:
-    contract:
-      - contract_person
 cluster:
   type: custom_cluster
   custom_configurations:

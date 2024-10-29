@@ -12,10 +12,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract_person.id_user
     description: ID of the user related to the contract. It can be joined with dw_public.dim_user.
-  id_previous_user_contract_person:
-    lineage:
-      - datalake_ebdb_clean.contract_person_aud.id_user
-    description: ID of the previous user related to the contract. It can be joined with dw_public.dim_user.
   id_contract:
     lineage:
       - datalake_ebdb_clean.contract_person.id_contract
@@ -97,10 +93,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract_person.dt_birth
     description: Date of birth of the person related to the contract.
-  ts_ownership_swap:
-    lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: Timestamp of when a swap of ownership occurred in the contract.
   ts_created:
     lineage:
       - datalake_ebdb_clean.contract_person.ts_created

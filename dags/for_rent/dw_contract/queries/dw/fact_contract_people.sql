@@ -2,7 +2,6 @@ SELECT
     id_contract_person AS sk_contract_person,
     personal_document AS sk_personal_document,
     COALESCE(id_user_contract_person, -1) AS sk_user,
-    COALESCE(id_previous_user_contract_person, -1) AS sk_previous_user,
     id_contract AS sk_contract,
     COALESCE(CAST(DATE_FORMAT(dt_birth, 'yyyyMMdd') AS BIGINT), -1) AS sk_birth_date,
     COALESCE(CAST(DATE_FORMAT(ts_created, 'yyyyMMdd') AS BIGINT), -1) AS sk_created_date,
@@ -16,7 +15,6 @@ SELECT
     is_living,
     is_first_contract,
     is_last_contract,
-    ts_ownership_swap,
     NOW() AS ts_load
 FROM
     datalake_ebdb_contract.contract_person

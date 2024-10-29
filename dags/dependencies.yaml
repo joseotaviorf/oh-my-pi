@@ -1605,7 +1605,6 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb_contract:load-clean-contract-aud
   - bietlejuice.ebdb_contract:load-clean-contract-partnership-data
   - bietlejuice.ebdb_contract:load-clean-contract-person
-  - bietlejuice.ebdb_contract:load-clean-contract-person-aud
   - bietlejuice.ebdb_contract:load-clean-contract-version
   - bietlejuice.ebdb_contract:load-clean-full-contract
   - bietlejuice.ebdb_house:load-clean-house

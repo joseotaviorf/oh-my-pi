@@ -41,7 +41,6 @@ SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a futur
   c.is_exit_inspection_opted_out,
   ct.is_repair_tenant_duty,
   ca.is_anomaly,
-  c.has_tenant_ownership_swap,
   c.dt_started AS dt_start,
   c.dt_entered AS dt_entrance,
   c.dt_contract_expected_end AS dt_intended_end,
