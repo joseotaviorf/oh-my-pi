@@ -1,8 +1,8 @@
-database_name: dw_quintoandar
+database_name: dw_house
 table_name: dim_house
 description: Table that contains the information about the house. Each row in this table is a house in QuintoAndar.
 domain: For Rent
-owner: mariana.kralco@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   address:
     lineage:
@@ -16,10 +16,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.bedrooms
     description: Number of bedrooms of the house.
-  built_period:
+  building_floors:
     lineage:
-      - datalake_ebdb_listing.house.dt_built
-    description: The date the house was built.
+      - datalake_ebdb_listing.house.building_floors
+    description: Number of floors of the building.
   city:
     lineage:
       - datalake_ebdb_listing.house.city
@@ -48,10 +48,18 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.does_photographer_fill_information
     description: If the photographer fills the information.
-  doorman_type:
+  dt_built:
+    lineage:
+      - datalake_ebdb_listing.house.dt_built
+    description: The date the house was built.
+  entrance:
     lineage:
       - datalake_ebdb_listing.house.doorman_type
     description: Type of doorman of the house.
+  floor:
+    lineage:
+      - datalake_ebdb_listing.house.floor
+    description: Indicates in wich floor the apartment is located.
   geo_hash:
     lineage:
       - datalake_ebdb_listing.house.geo_hash
@@ -72,10 +80,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.has_visit_restriction
     description: Boolean value to check if the house has a visit restriction.
-  id_short_house:
+  houses_per_floor:
     lineage:
-      - datalake_ebdb_listing.house.id
-    description: Shortened version of the Id of the house.
+      - datalake_ebdb_listing.house.houses_per_floor
+    description: Number of houses per building floor.
   iptu:
     lineage:
       - datalake_ebdb_listing.house.iptu
@@ -108,7 +116,7 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.key_type
     description: Key type of the house.
-  land_area:
+  construction_area:
     lineage:
       - datalake_ebdb_listing.house.land_area
     description: Land area of the house (in m2).

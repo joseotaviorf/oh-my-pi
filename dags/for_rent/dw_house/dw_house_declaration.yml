@@ -5,12 +5,10 @@ dag:
 workflow:
   type: query
   layer: dw
-  custom_schema: quintoandar
+  custom_schema: house
   tables_customization:
     dim_house_status:
       custom_schema: rent
-    dim_house_amenities:
-      custom_schema: house
 cluster:
   type: databricks_13_3_min_memory_cluster
   access_control_list:
