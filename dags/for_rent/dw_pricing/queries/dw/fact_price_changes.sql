@@ -6,7 +6,7 @@ SELECT
     COALESCE(pri.id_user_revision, -1) AS sk_user,
     pri.days_with_pricing_scheme,
     pri.ts_price_started,
-    COALESCE(pri.ts_price_ended, -1) AS ts_price_ended,
+    ts_price_ended,
     NOW() AS ts_load
 FROM
     datalake_ebdb_pricing.listing_price_change AS pri
