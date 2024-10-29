@@ -1,0 +1,77 @@
+---
+database_name: datalake_quintocred_collections
+table_name: collections_wallet
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Major table that builds a daily timeline of QuintoCred collections on the granularity of client"
+columns:
+  name:
+    description: "Client name related to debts"
+    lineage:
+      - datalake_velo.propose_person.name
+  document:
+    description: "Client document related to debts"
+    lineage:
+      - datalake_velo.propose_person.document
+  mob:
+    description: "MOB based on the oldest delinquency active"
+  type_description_array:
+    description: "Array with all of the delinquencies types"
+    lineage:
+      - datalake_velo.delinquency_timeline.type_description
+  major_type:
+    description: "Major delinquency type selected for this client, based on Collections Rules"
+  total_delinquency_amount:
+    description: "Sum of all delinquencies amount"
+    lineage:
+      - datalake_velo.delinquency_timeline.delinquency_amount
+  total_original_value:
+    description: "Sum of all delinquencies original values"
+    lineage:
+      - datalake_velo.delinquency_timeline.original_value
+  total_amount_paid:
+    description: "Sum of all delinquencies paid amounts"
+    lineage:
+      - datalake_velo.delinquency_timeline.amount_paid
+  amount_paid_added:
+    description: "How much paid amount was added on this line/date"
+    lineage:
+      - datalake_velo.delinquency_timeline.amount_paid_added
+  total_open_amount:
+    description: "Sum of all delinquencies open amount"
+    lineage:
+      - datalake_velo.delinquency_timeline.open_amount
+  is_finished_array:
+    description: "Array containing BOOL values for all the client delinquencies referencing if they are totally paid (open_amount <= 0)"
+    lineage:
+      - datalake_velo.delinquency_timeline.is_finished
+  dt_base:
+    description: "Date base of the timeline evolution for this client"
+    lineage:
+      - datalake_quintoandar.aux_date.date
+  dt_ended_propose:
+    description: "Max date that a propose ended for this client, if exists"
+    lineage:
+      - datalake_velo.delinquency_timeline.dt_ended_propose
+  dt_paid_array:
+    description: "Array with all the dt_paid for each delinquency active of the client"
+    lineage:
+      - datalake_velo.delinquency_timeline.dt_paid
+  monthly_major_type:
+    description: "Major delinquency type selected for this client, based on Collections Rules, aggregated by month"
+  lead_time_major_type:
+    description: "The first date of the main invoice until the first day of the current month"
+  lead_time_propose:
+    description: "The first date of the contract until the first day of the current month"
+  is_active_day_eviction:
+    description: "Daily control of contracts that are active in evictions"
+  is_active_month_eviction:
+    description: "Monthly control of contracts that are active in evictions"
+  dt_min_major_type:
+    description: "The first date of the major invoice type"
+    lineage:
+      - datalake_velo.delinquency_timeline.dt_base
+  dt_min_propose:
+    description: "The first date of the propose"
+    lineage:
+      - datalake_velo.delinquency_timeline.dt_base

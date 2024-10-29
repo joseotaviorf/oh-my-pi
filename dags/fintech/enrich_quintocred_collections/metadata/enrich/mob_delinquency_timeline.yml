@@ -1,0 +1,101 @@
+---
+database_name: datalake_quintocred_collections
+table_name: mob_delinquency_timeline
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Intermediate table to create collections_wallet"
+columns:
+  name:
+    description: "Client name related to debts"
+    lineage:
+      - datalake_velo.propose_person.name
+  date:
+    description: "Reference date for the timeline"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.dt_base
+  document:
+    description: "Client document related to debts"
+    lineage:
+      - datalake_velo.propose_person.document
+  mob_delinquency:
+    description: "MOB based on the oldest active delinquency"
+  id_delinquency:
+    description: "Table primary key"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.id_delinquency
+  id_propose:
+    description: "ID of related propose"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.id_propose
+  id_status:
+    description: "Status of the delinquency on the moment of the base date"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.id_status
+  type_description:
+    description: "Description of this delinquency`s type"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.type_description
+  delinquency_amount:
+    description: "Total delinquency amount to be charged"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.delinquency_amount
+  original_value:
+    description: "Original debt value"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.original_value
+  amount_paid:
+    description: "Amount already paid on the dt_updated window"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.amount_paid
+  amount_paid_added:
+    description: "Amount that was added on this update to the amount_paid column"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.amount_paid_added
+  open_amount:
+    description: "Open amount on the dt_updated window (delinquency_amount - open_amount)"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.open_amount
+  open_amount_first_day_of_month:
+    description: "Open amount on the first day of the month according to the dt_updated window (delinquency_amount - open_amount)"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.open_amount_first_day_of_month
+  is_finished:
+    description: "If the amount_paid completed the delinquency_amount value"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.is_finished
+  is_legacy_agreement:
+    description: "If this delinquency is legacy"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.is_legacy_agreement
+  is_legacy_propose:
+    description: "If this propose is legacy"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.is_legacy_propose
+  is_currently_active:
+    description: "If this propose was active on the moment of the base date"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.is_currently_active
+  dt_due:
+    description: "Date Due for this debt"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.dt_due
+  dt_paid:
+    description: "Date of the last payment for this debt on the dt_updated window"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.dt_paid
+  dt_ended_propose:
+    description: "Date the propose/contract related ended"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.dt_ended_propose
+  dt_updated:
+    description: "Date reference of this line`s update. Basically this orders the table to build a timeline"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.dt_updated
+  dt_created:
+    description: "Date of creation for this delinquency"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.dt_created
+  dt_base:
+    description: "Reference date for the timeline"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.dt_base

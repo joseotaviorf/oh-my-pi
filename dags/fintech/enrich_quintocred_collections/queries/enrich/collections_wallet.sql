@@ -1,31 +1,11 @@
-WITH timeline AS (
-    SELECT
-        t.dt_base AS `date`,
-        pp.name,
-        pp.document,
-        CASE
-            WHEN is_legacy_agreement THEN INT(months_between(date_trunc('MONTH', t.dt_base), t.dt_due))
-            WHEN t.type_description = 'SIGNATURE' AND t.dt_created >= DATE('2024-02-01') THEN INT(months_between(date_trunc('MONTH', t.dt_base), t.dt_due))
-            ELSE INT(months_between(date_trunc('MONTH', t.dt_base), t.dt_created))
-        END AS mob_delinquency,
-        t.*
-    FROM
-        datalake_velo.delinquency_timeline AS t
-    LEFT JOIN
-        datalake_velo.propose AS p
-            ON t.id_propose = p.id_propose
-    LEFT JOIN
-        datalake_velo.propose_person AS pp
-            ON p.id_primary_person = pp.id_person
-),
-min_dates AS (
+WITH min_dates AS (
     SELECT
         document,
         MIN(CASE WHEN type_description = 'GUARANTEE' THEN dt_base END) AS min_dt_guarantee,
         MIN(CASE WHEN type_description IN ('RENEWAL', 'SIGNATURE') THEN dt_base END) AS min_dt_signature,
         MIN(CASE WHEN type_description = 'RESCISAO' THEN dt_base END) AS min_dt_termination
     FROM
-        timeline
+        datalake_quintocred_collections.mob_delinquency_timeline
     GROUP BY 1
 ),
 min_propose_date AS (
@@ -33,7 +13,7 @@ min_propose_date AS (
         id_propose,
         MIN(dt_base) AS min_dt_propose
     FROM
-        timeline
+        datalake_quintocred_collections.mob_delinquency_timeline
     GROUP BY 1
 ),
 monthly_timeline AS (
@@ -43,13 +23,14 @@ monthly_timeline AS (
         t.type_description,
         t.dt_ended_propose
     FROM
-        timeline AS t
+        datalake_quintocred_collections.mob_delinquency_timeline AS t
 ),
 -- major type and aging are calculed per person, not per propose
 cte_type_aging AS (
     SELECT
         t.name,
         t.document,
+        t.id_propose,
         MAX(t.mob_delinquency) AS mob,
         array_distinct(array_agg(t.type_description)) AS type_description_array,
         CASE
@@ -70,22 +51,42 @@ cte_type_aging AS (
         END AS monthly_major_type,
         t.`date`
     FROM
-        timeline t
+        datalake_quintocred_collections.mob_delinquency_timeline t
     LEFT JOIN
         monthly_timeline m
         ON m.document = t.document AND DATE_TRUNC('MONTH', t.`date`) = DATE_TRUNC('MONTH', m.`date`)
-    GROUP BY 1,2,7
+    GROUP BY 1,2,3,8
     ORDER BY 7,1
+),
+document_major_type AS (
+    SELECT
+        document,
+        `date`,
+        array_distinct(array_agg(major_type)) AS major_type_array,
+        array_distinct(array_agg(monthly_major_type)) AS monthly_major_type_array,
+        CASE
+            WHEN array_contains(array_agg(major_type), 'GARANTIA') THEN 'GARANTIA'
+            WHEN array_contains(array_agg(major_type), 'RESCISAO') THEN 'RESCISAO'
+            ELSE any_value(major_type)
+        END AS major_type,
+        CASE
+            WHEN array_contains(array_agg(monthly_major_type), 'GARANTIA') THEN 'GARANTIA'
+            WHEN array_contains(array_agg(monthly_major_type), 'RESCISAO') THEN 'RESCISAO'
+            ELSE any_value(monthly_major_type)
+        END AS monthly_major_type
+    FROM
+        cte_type_aging
+    GROUP BY 1,2
 ),
 timeline_final AS (
     SELECT
         t.name,
         t.document,
         t.id_propose,
-        ta.mob,
-        ta.type_description_array,
-        ta.major_type,
-        ta.monthly_major_type,
+        MAX(t.mob_delinquency) AS mob,
+        ta.type_description_array AS type_description_array,
+        mt.major_type,
+        mt.monthly_major_type,
         SUM(t.delinquency_amount) AS total_delinquency_amount,
         SUM(t.original_value) AS total_original_value,
         SUM(t.amount_paid) AS total_amount_paid,
@@ -105,18 +106,23 @@ timeline_final AS (
         END AS dt_min_major_type,
         MIN(mpd.min_dt_propose) AS dt_min_propose
     FROM
-        timeline AS t
+        datalake_quintocred_collections.mob_delinquency_timeline AS t
     LEFT JOIN
         cte_type_aging AS ta
         ON ta.document = t.document
+        AND ta.id_propose = t.id_propose
         AND t.`date` = ta.`date`
+    LEFT JOIN
+        document_major_type AS mt
+        ON mt.document = t.document
+        AND t.`date` = mt.`date`
     LEFT JOIN
         min_dates AS md
         ON t.document = md.document
     LEFT JOIN
         min_propose_date AS mpd
         ON t.id_propose = mpd.id_propose
-    GROUP BY 1,2,3,4,5,6,7,17,19
+    GROUP BY 1,2,3,5,6,7,17,19
 ),
 evictions_day AS (
     SELECT

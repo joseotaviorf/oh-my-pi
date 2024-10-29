@@ -1,0 +1,19 @@
+---
+dag:
+  name: enrich_quintocred_collections
+  schedule_start_date: 2022, 8, 28
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Creates enriched tables for QuintoCred Collection context.
+workflow:
+  type: query
+  layer: enrich
+  inner_dependencies:
+    mob_delinquency_timeline:
+      - delinquency_timeline
+    collections_wallet:
+      - delinquency_timeline
+      - mob_delinquency_timeline
+cluster:
+  type: databricks_13_3_med_memory_cluster

@@ -2272,6 +2272,12 @@ bietlejuice.enrich_quinto_messenger:
   - bietlejuice.quinto_messenger:load-clean-chat
   - bietlejuice.quinto_messenger:load-clean-task
   - bietlejuice.quinto_messenger:load-clean-task-event
+bietlejuice.enrich_quintocred_collections:
+  - bietlejuice.enrich_velo:load-enrich-propose
+  - bietlejuice.enrich_velo:load-enrich-propose-person
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-aud
+  - bietlejuice.rental_guarantee_platform:load-clean-rev-info
 bietlejuice.enrich_quintocred_nps:
   - bietlejuice.company:load-clean-company
   - bietlejuice.company:load-clean-document

@@ -9,14 +9,5 @@ dag:
 workflow:
   type: query
   layer: enrich
-  inner_dependencies:
-    transaction_entries:
-      - propose
-      - propose_person
-    propose:
-      - junk
-      - payment
-      - occurrence
-      - propose_person
 cluster:
   type: databricks_13_3_min_general_cluster

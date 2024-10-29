@@ -1,0 +1,78 @@
+---
+database_name: datalake_quintocred_collections
+table_name: delinquency_timeline
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: |
+  Table made to help analysing the evolution of delinquencies payments and monitor the collection's wallet.
+  There are some differences between delinquency_timeline and dw_charging_payment_quintocred.fact_payment_full, the delinquency_timeline brings daily data and fact_payment_full brings monthly.
+  We do not consider Guarranty and Termination delinquencies in fact_payment_full.
+  The delinquency_timeline follows the life of the delinquency from the moment it is created until the moment it is paid/terminated, and fact_payment_full follows the life of the contract.
+  In delinquency_timeline, when a delinquency is paid, it continues to be recorded until the end of the payment month.
+columns:
+  id_delinquency:
+    description: "Table primary key"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency_aud.id
+  id_propose:
+    description: "ID of related propose"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.id_propose
+  id_status:
+    description: "Status of the delinquency on the moment of the base date"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency_aud.id_status
+  type_description:
+    description: "Description of this delinquency`s type"
+  delinquency_amount:
+    description: "Total delinquency amount to be charged"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.value
+  original_value:
+    description: "Original debt value"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.original_value
+  amount_paid:
+    description: "Amount already paid on the dt_updated window"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency_aud.amount_paid
+  amount_paid_added:
+    description: "Amount that was added on this update to the amount_paid column"
+  open_amount:
+    description: "Open amount on the dt_updated window (delinquency_amount - open_amount)"
+  open_amount_first_day_of_month:
+    description: "Open amount on the first day of the month according to the dt_updated window (delinquency_amount - open_amount)"
+  is_finished:
+    description: "If the amount_paid completed the delinquency_amount value"
+  is_legacy_agreement:
+    description: "If this delinquency is legacy"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.is_legacy_agreement
+  is_legacy_propose:
+    description: "If this propose is legacy"
+  is_currently_active:
+    description: "If this propose was active on the moment of the base date"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency_aud.is_active
+  dt_due:
+    description: "Date Due for this debt"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.dt_due
+  dt_paid:
+    description: "Date of the last payment for this debt on the dt_updated window"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency_aud.dt_paid
+  dt_ended_propose:
+    description: "Date the propose/contract related ended"
+    lineage:
+      - datalake_velo.propose.dt_ended
+  dt_updated:
+    description: "Date reference of this line`s update. Basically this orders the table to build a timeline"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.rev_info.ts_created
+  dt_created:
+    description: "Date of creation for this delinquency"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency.ts_created
+  dt_base:
+    description: "Reference date for the timeline"
