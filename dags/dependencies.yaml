@@ -892,7 +892,6 @@ bietlejuice.dw_supply:
 bietlejuice.dw_supply_outbound_contacts:
   - bietlejuice.enrich_supply_outbound_flows:load-enrich-supply-outbound-contacts
 bietlejuice.dw_table_snapshot:
-  - bietlejuice.composer:load-clean-dag
   - bietlejuice.dag_inventory:load-clean-table
   - bietlejuice.enrich_databricks_job_runs:load-enrich-load-table-costs
   - bietlejuice.enrich_pipeline:load-enrich-dag
