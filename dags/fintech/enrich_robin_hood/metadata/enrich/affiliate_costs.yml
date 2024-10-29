@@ -5,6 +5,10 @@ owner: ae-fintech@quintoandar.com.br
 domain: Fintech
 description: Affiliate costs enriched data from Robin Hood.
 columns:
+  source_name:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry_source.source_name
+    description: The source of the accounting entry.
   id_rh_accounting_entry:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id

@@ -1,0 +1,35 @@
+database_name: datalake_robin_hood_clean
+table_name: tax_ratio
+columns:
+  id:
+    lineage:
+      - datalake_robin_hood_raw.tax_ratio.id
+    description: Unique identifier for the tax ratio.
+  id_tax:
+    lineage:
+      - datalake_robin_hood_raw.tax_ratio.tax_id
+    description: Foreign key that references the tax identifier.
+  id_source:
+    lineage:
+      - datalake_robin_hood_raw.tax_ratio.source_id
+    description: Foreign key that references the source identifier.
+  locale:
+    lineage:
+      - datalake_robin_hood_raw.tax_ratio.locale
+    description: Location of the tax ratio.
+  cost_center_code:
+    lineage:
+      - datalake_robin_hood_raw.tax_ratio.cost_center_code
+    description: Code of the cost center.
+  amount:
+    lineage:
+      - datalake_robin_hood_raw.tax_ratio.amount
+    description: Amount of the tax ratio.
+  ts_created: 
+    lineage:
+      - datalake_robin_hood_raw.tax_ratio.created_at
+    description: Timestamp when the tax ratio was created.
+  ts_synced:
+    lineage:
+      - datalake_robin_hood_raw.tax_ratio.synced_at
+    description: Timestamp when the tax ratio was synced.

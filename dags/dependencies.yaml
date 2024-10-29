@@ -2494,6 +2494,7 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.retsuko:load-clean-credit-card-payment
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
+  - bietlejuice.robin_hood:load-clean-accounting-entry-source
   - bietlejuice.robin_hood:load-clean-payee
   - bietlejuice.robin_hood:load-clean-tax
 bietlejuice.enrich_sale_available_booking_hours:

@@ -23,5 +23,6 @@ workflow:
     payment_request: {}
     payment_request_lot: {}
     tax: {}
+    tax_ratio: {}
 cluster:
   type: databricks_12_2_med_general_cluster

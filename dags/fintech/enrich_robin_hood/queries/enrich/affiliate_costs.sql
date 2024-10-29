@@ -1,5 +1,6 @@
-SELECT
-    DISTINCT ae.id AS id_rh_accounting_entry,
+SELECT 
+    aes.source_name,
+    ae.id AS id_rh_accounting_entry,
     p.id_external,
     ae.id_payee,
     ae.locale AS city_group,
@@ -24,7 +25,7 @@ SELECT
         WHEN ae.source_bill_item in
             ('comissaoUnicaSobreAfiliadoIndicado',
             'comissaoSobreAfiliadoIndicado') THEN 'Commission MGM'
-        ELSE NULL
+        ELSE ae.source_bill_item
     END AS commission_type,
     ae.cost_center_code,
     CASE
@@ -38,25 +39,14 @@ SELECT
     CAST(DATE_FORMAT(ae.dt_occurrence, 'yyyyMMdd') AS BIGINT) AS dt_transaction
 FROM
     datalake_robin_hood_clean.accounting_entry AS ae
-    LEFT JOIN
-        datalake_robin_hood_clean.payee AS p
-            ON ae.id_payee = p.id
-WHERE
+JOIN
+    datalake_robin_hood_clean.payee AS p
+    ON ae.id_payee = p.id
+JOIN 
+    datalake_robin_hood_clean.accounting_entry_source aes
+    ON ae.id_source = aes.id
+WHERE 
     ae.description NOT LIKE '%que não foi enviada%'
-    AND ae.source_bill_item IN
-        ('comissaoUnicaSobreAfiliadoIndicado',
-        'comissaoSobreAfiliadoIndicado',
-        'valorFixoPorIndicacaoDeImovelForSale',
-        'valorFixoPorIndicacaoDeImovel',
-        'valorFixoPorIndicacaoDeImovelManual',
-        'porcentagem Por Indicacao De Imovel Manual',
-        'porcentagemPorIndicacaoDeImovelManual',
-        'porcentagemPorIndicacaoDeImovel',
-        'valorFixoPorLocacaoDeImovelManual',
-        'valorFixoPorLocacaoDeImovel',
-        'valorFixoPorVendaDeImovelManual',
-        'valorFixoPorVendaDeImovel',
-        'comissaoSobreImovelVendido',
-        'valorFixoPorVendaDeImovelForSale')
     AND ae.dt_occurrence >= DATE('2020-01-01')
-ORDER BY dt_transaction ASC
+    AND LOWER(aes.source_name) IN ('indica aí', 'indica aí agents', 'porteiros')
+GROUP BY ALL
