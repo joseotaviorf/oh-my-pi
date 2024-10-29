@@ -1,0 +1,12 @@
+database_name: dw_visit
+table_name: dim_visit_status
+description: This dimension table has the status types of the visits .
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_visit_status:
+    description: Id of the event.
+  status_name:
+    description: Name of the status.
+  ts_load:
+    description: Timestamp of the ingestion data.
