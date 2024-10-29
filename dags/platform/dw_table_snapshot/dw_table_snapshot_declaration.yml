@@ -11,7 +11,7 @@ workflow:
   custom_schema: pipeline
   default_extraction_type: incremental
   tables_customization:
-    fact_daily_tables:
+    fact_daily_table:
       merge_on: ['sk_snapshot']
 cluster:
   type: databricks_12_2_min_general_cluster
