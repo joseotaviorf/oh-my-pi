@@ -4,7 +4,7 @@ description: Historical daily enriched table for rent context.
   Each row is presented with the category of the owner, which can have less or more than 5 houses.
   The owner be classified as amateur ou multi.
   Each change in this table about the owner results in a new category.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_owner_category:

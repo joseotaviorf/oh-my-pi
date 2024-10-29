@@ -4,7 +4,7 @@ table_name: operation_points
 description: 
   This table applies rules to the performance of For Sales agents, to find the final value 
   achieved in each type of program/operation.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:

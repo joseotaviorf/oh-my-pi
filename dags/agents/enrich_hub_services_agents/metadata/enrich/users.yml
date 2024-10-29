@@ -3,7 +3,7 @@ database_name: datalake_hub_services
 table_name: users
 description: |
   Crosses user data from Hub Services and user data from main/ebdb. 
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_user:

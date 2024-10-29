@@ -3,7 +3,7 @@ database_name: datalake_ebdb_agents
 table_name: agent_unified_contract_changes
 description: Each row of this table is a change associated with the agent's contract, including business context,
   activations, and suspensions.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:

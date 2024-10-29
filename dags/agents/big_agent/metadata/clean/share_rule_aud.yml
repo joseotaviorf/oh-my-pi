@@ -5,7 +5,7 @@ description: Audit table.
   Table containing the rules for agent compensation ranges. 
   These rules determine increases and bonuses in compensation based on performance rules. 
   This data reflects what these ranges are and what the conditions are for them to be achieved.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id:

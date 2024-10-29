@@ -1,7 +1,7 @@
 database_name: dw_agent
 table_name: fact_agent_hourly_allocations
 description: Agent hour allocation on hour granularity
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_agent:

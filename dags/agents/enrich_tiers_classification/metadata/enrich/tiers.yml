@@ -4,7 +4,7 @@ table_name: tiers
 description: 
   This table calculates the tier range achieved by the agent in a given two-month period. 
   This range can imply increases in the final income paid by 5A.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:

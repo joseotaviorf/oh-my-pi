@@ -5,7 +5,7 @@ description:
   Raw data relating to Referrals made via the Chama Corretor form. 
   Consolidates all information regarding the Referrer (who indicated) and the Referee. 
   Central base for managing program participants and validity of referrals
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_airtable_record:

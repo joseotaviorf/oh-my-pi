@@ -1,7 +1,7 @@
 database_name: datalake_airtable
 table_name: cr_occurrences
 description: This table contains information about cr_occurences.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_airtable_record:

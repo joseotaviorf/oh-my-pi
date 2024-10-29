@@ -6,7 +6,7 @@ description: 'This dimension brings data from all users generated in the operati
   Each line is unique per user, being represented by sk_user.
   Attention: non-merged users are considered here, so this table does not have a connector 
   with the ebdb user table, only with the user audit.'
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_user:

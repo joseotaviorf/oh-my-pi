@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_work_contract
 table_name: work_contract
 description: Table with information of partner's work contracts.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id:

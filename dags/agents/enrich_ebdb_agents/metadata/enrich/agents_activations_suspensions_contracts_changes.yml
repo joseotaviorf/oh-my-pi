@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_agents
 table_name: agents_activations_suspensions_contracts_changes
 description: Enriched table that consolidates the changes made to the agents' contracts and who made them.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:

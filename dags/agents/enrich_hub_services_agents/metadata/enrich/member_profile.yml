@@ -2,7 +2,7 @@
 database_name: datalake_hub_services
 table_name: member_profile
 description: History of member profile links with business units and their parent members.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_member_relationship:

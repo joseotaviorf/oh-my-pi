@@ -7,7 +7,7 @@ description: Table containing the rules for hub agents compensation ranges.
   Unlike the source table, this enrichment is designed to update the tier rules per hub on a bimonthly basis. 
   When the bimonthly period ends, the rule is frozen and can no longer be changed retroactively, except in 
   cases of data reprocessing.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_share_rule:

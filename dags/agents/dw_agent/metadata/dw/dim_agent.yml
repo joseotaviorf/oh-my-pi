@@ -2,7 +2,7 @@ database_name: dw_public
 table_name: dim_agent
 description: Shrunken dimension of dim_user, containing only agents (users with dados_agente_id
   not null).
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_agent:

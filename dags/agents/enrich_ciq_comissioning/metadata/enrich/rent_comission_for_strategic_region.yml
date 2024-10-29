@@ -3,7 +3,7 @@ database_name: datalake_ciq_comissioning
 table_name: rent_comission_for_strategic_region
 description: Enriched table containing information about regions (neighborhoods), 
   indicating whether or not they are strategic in a given month, in the For rent context.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_house_listing:

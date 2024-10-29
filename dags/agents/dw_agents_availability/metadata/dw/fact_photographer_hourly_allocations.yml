@@ -2,7 +2,7 @@
 database_name: dw_agent
 table_name: fact_photographer_hourly_allocations
 description: Photographer allocation on a hour and region granularity. Each line corresponds to a region (sk_region) and hour slot (ts_hour_slot) of an photographer (sk_agent).
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_agent:

@@ -2,7 +2,7 @@
 database_name: datalake_brokerage
 table_name: partner_brokerage
 description: This table has data on the brokers related to an offer, and the full or shared commission of these.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_offer:

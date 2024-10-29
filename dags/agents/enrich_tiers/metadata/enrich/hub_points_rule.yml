@@ -5,7 +5,7 @@ description: This table contains data on the agent's performance requirements fo
   These cumulative points from operations can be used to check which compensation range the agent fits into, in the share_rule table.
   Unlike the source table, this enrichment is designed to update the tier rules per hub on a bimonthly basis. 
   When the bimonthly period ends, the rule is frozen and can no longer be changed retroactively, except in cases of data reprocessing.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_points_rule:

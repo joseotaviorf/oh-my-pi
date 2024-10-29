@@ -2,8 +2,8 @@
 database_name: datalake_sale_flows
 table_name: house_offers
 description: This table lists houses with offers, sellers, buyers and sale flow
-domain: Data Agents
-owner: data-ae-agents@quintoandar.com.br
+domain: For Sale
+owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:
     lineage:

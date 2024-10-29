@@ -7,7 +7,7 @@ description: Each row of this table is a period in which the agent belonged to c
   This is different from the table agent_business_context_history, since that one
   generates a row for each different context, whereas this one merges both in a single
   row with a specified validity period.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent_data:

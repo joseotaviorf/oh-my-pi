@@ -4,7 +4,7 @@ table_name: fact_agent_contract
 description: 'Transactional fact table about the agent, such as the work contract and the company, accompanied by a validity period of the information.
   Every change in the agent''s contract, activation, business context, or company creates a new row in this table.
   Note that contract, activation and business context are contained in the dimension table dw_agent.dim_work_contract.'
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_agent:

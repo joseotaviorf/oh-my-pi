@@ -2,7 +2,7 @@ database_name: datalake_airtable_clean
 table_name: activated
 description: This table contains information about activated agents. It comes to replace
   the sheet aux_agents.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_airtable_record:

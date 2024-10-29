@@ -1,7 +1,7 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: agent_data
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id:

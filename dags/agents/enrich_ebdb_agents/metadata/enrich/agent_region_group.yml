@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_agents
 table_name: agent_region_group
 description: Table with information about the agents areas of operation.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   dt:

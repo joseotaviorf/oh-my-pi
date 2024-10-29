@@ -4,7 +4,7 @@ table_name: agents_weekly_schedule_history
 description: Enrich table with the weekly schedule history for agent booking. 
   Each row of this table is a time slot for a agent. 
   A slot is a 15 minute slice of an hour (e.g. 08:00, 08:15, 08:30 and 08:45).
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:

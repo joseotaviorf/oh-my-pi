@@ -2,7 +2,7 @@
 database_name: datalake_hub_services
 table_name: agent_hub_alocation
 description: 
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_member_profile:

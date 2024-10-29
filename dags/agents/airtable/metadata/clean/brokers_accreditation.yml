@@ -4,7 +4,7 @@ table_name: brokers_accreditation
 description: 
   Raw data relating to lead registrations in our LP. On this basis we have various information related to the 
   accreditation process of our brokers, from the lead qualification flow to its activation and onboarding.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_airtable_record:

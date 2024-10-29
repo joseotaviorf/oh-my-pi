@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_agents
 table_name: agent_business_context_history
 description: Enrich table that contains the history of agent's relation to sale and rental business contexts. Each row is a period that the agent served in a business context.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent_data:

@@ -3,7 +3,7 @@ database_name: datalake_tiers
 table_name: agent_performance
 description: |
   This table calculates the performance indicators of Broker and Negotiation Executive agents.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:

@@ -3,7 +3,7 @@ database_name: datalake_ebdb_agents
 table_name: rating_label
 description: Table that has rating labels information related to a rental agent or a property.
   Each line is an unique rating label identified by its id.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id:

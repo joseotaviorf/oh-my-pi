@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_agents
 table_name: ciq_agents
 description: Each line represents a CIQ that is also present in the demand context, whether as a real estate agent or photographer, also detailing whether it belongs to rent or sale.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_partner:

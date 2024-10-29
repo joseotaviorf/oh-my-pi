@@ -6,7 +6,7 @@ description: This fact brings up the relationship between the members of the hub
   It also provides information whether this link is active, when it started and ended.
   Each line is unique due to the relationship between the hub member, the hub and its 
   parent member, this relationship being represented by sk_member_relationship.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_member_profile:

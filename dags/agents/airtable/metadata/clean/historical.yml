@@ -1,7 +1,7 @@
 database_name: datalake_airtable_clean
 table_name: historical
 description: This table contains information about the historical of activated agents.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_historical:

@@ -3,7 +3,7 @@ table_name: daily_owner_houses_quantity_history
 description: Historical enriched table for rent context (PP Multi - Pro owner). Each
   row contains the changes of owner's quantity houses per day, just considering rent
   and excluding b2b houses.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_owner:

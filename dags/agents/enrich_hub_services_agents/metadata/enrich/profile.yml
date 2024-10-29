@@ -2,7 +2,7 @@
 database_name: datalake_hub_services
 table_name: profile
 description: Auxiliary table to create a single-valued index for the categorical value of profile types.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_profile:

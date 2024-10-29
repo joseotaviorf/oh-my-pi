@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_agents
 table_name: autonomous_agent_info
 description: Information related to autonomous agents. Each line indicates an autonomous agent responsible for the listing.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_house:

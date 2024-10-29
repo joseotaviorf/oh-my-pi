@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_agents
 table_name: agents_slots_hourly
 description: Table with information about the agents allocated slots hourly.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:

@@ -2,7 +2,7 @@
 database_name: datalake_tiers
 table_name: ciq_first_listing
 description: Data from houses recommended by CIQ agents that had a first publication.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_house:

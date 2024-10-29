@@ -3,7 +3,7 @@ database_name: dw_hub_services
 table_name: dim_profile
 description: This dimension brings data from all types of business unit member profiles. 
   Each line is unique per profile, being represented by sk_profile.
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_profile:

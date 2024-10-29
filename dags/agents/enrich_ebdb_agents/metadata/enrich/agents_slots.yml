@@ -2,7 +2,7 @@ database_name: datalake_ebdb_agents
 table_name: agents_slots
 description: Table for the criation of the fact_agent_allocations. Contains infos
   on agent allocation hours on the slot granularity
-domain: Data Agents
+domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:
