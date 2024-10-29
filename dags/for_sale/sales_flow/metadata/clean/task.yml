@@ -37,3 +37,12 @@ columns:
     description: 'Timestamp of the last update of the task'
     lineage:
     - datalake_sales_flow_raw.task.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_raw.task.year
+  month:
+    lineage:
+      - datalake_sales_flow_raw.task.month
+  day:
+    lineage:
+      - datalake_sales_flow_raw.task.day

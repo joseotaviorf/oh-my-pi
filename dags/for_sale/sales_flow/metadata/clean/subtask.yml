@@ -41,3 +41,13 @@ columns:
     description: 'Timestamp of the last update of the subtask'
     lineage:
     - datalake_sales_flow_raw.subtask.updated_at
+  year:
+    lineage:
+    - datalake_sales_flow_raw.subtask.year
+  month:
+    lineage:
+    - datalake_sales_flow_raw.subtask.month
+  day:
+    lineage:
+    - datalake_sales_flow_raw.subtask.day
+
