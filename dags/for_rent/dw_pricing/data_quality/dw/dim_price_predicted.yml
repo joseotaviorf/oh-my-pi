@@ -10,6 +10,3 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  estimated_price:
-    is_complete:
-      severity_level: Error
