@@ -9,6 +9,7 @@ from bietlejuice.services import ConfigurationService
 from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_into_sns"
+BATCH_SIZE = 1000
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
