@@ -9,12 +9,3 @@ column_level_validations:
   id_reconciliation:
     is_complete:
       severity_level: Error
-  id_proposal:
-    is_complete:
-      severity_level: Error
-  id_closing:
-    is_complete:
-      severity_level: Error
-  id_closing_file:
-    is_complete:
-      severity_level: Error
