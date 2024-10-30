@@ -1557,6 +1557,8 @@ bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-columns-metastore
   - bietlejuice.documentation_metrics:load-clean-dag-metadata
   - bietlejuice.documentation_metrics:load-clean-lineage-and-tags
+bietlejuice.enrich_docpilot:
+  - bietlejuice.docpilot:load-clean-income-extraction
 bietlejuice.enrich_docx:
   - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
   - bietlejuice.docx_user_documents:load-clean-document

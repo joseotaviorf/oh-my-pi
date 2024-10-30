@@ -1,0 +1,71 @@
+database_name: datalake_docpilot
+table_name: income_extraction_processing
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: "This table stores the results returned by DocPilot regarding the processing of an income extraction."
+columns:
+  id_external:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.id_external
+    description: "External ID"
+  external_source:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.external_source
+    description: "The external source of the extracted incomes (i.e: DOCX)"
+  processing_result:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.processing_result
+    description: "The processing result"
+    categories:
+      SUCCESS: When the income extraction is successful
+      FAILURE: When there is any failure in the income extraction process
+      PARTIAL_SUCCESS: When the income extraction is partially successful
+  documents_type:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.documents_type
+    description: "The type of document to be processed"
+    categories:
+      PAYSLIP: ""
+      BANK_STATEMENT: ""
+  number_of_documents_with_errors:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The number of documents with errors"
+  number_of_processed_documents:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The number of documents submitted"
+  error_type:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The type of error found"
+  bank_statement_type:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "Bank statement type"
+  extracted_incomes:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The extracted incomes from the submitted document"
+  avg_extracted_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The average of the extracted incomes"
+  any_suspicious_document:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "Based on the metadata analysis, indicates if there is any suspicious document"
+  any_divergent_date:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "Based on the metadata analysis, indicates if there is any divergent date"
+  ts_created:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.ts_created
+    description: "Creation timestamp"
+  ts_updated:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.ts_updated
+    description: "Updated timestamp"
+  ts_load:
+    description: "Load timestamp"
