@@ -1,11 +1,11 @@
 database_name: datalake_expected_contribution_margin
-table_name: fs_ecm_by_events
-description: This table contains the estimated revenue that each ForSale contract will bring to QuintoAndar.
+table_name: fr_ecm_by_events
+description: This table contains the estimated revenue that each ForRent contract will bring to QuintoAndar.
 columns:
   id_flow:
     lineage:
       - datalake_batch_inference_clean.batch_inference.input_data
-    description: Unique key of the sale flow
+    description: Unique key of the rent flow
   id_house:
     lineage:
       - datalake_batch_inference_clean.batch_inference.input_data
@@ -13,15 +13,15 @@ columns:
   id_prospect:
     lineage:
       - datalake_batch_inference_clean.batch_inference.input_data
-    description: Unique key of the buyer prospect (also known as id_user or id_buyer in other tables)
+    description: Unique key of the tenant prospect (also known as id_user or id_tenant_prospect in other tables)
   id_event:
     lineage:
       - datalake_batch_inference_clean.batch_inference.input_data
-    description: Unique key of the event (equal to the id_booking)
+    description: Unique key of the event (equal to the id_booking or id_offer depending on the event_type)
   event_type:
     lineage:
       - datalake_batch_inference_clean.batch_inference.input_data
-    description: Always equals to VB (Visit Booked)
+    description: Can be VB for a Visit Booked event or OS for an Offer Sent event.
   ts_event:
     lineage:
       - datalake_batch_inference_clean.batch_inference.input_data
@@ -31,11 +31,11 @@ columns:
       - datalake_batch_inference_clean.batch_inference.input_data
       - datalake_batch_inference_clean.batch_inference.output_data
     description: The estimated probability of conversion of the event.
-  estimated_discount:
+  estimated_contract_duration:
     lineage:
       - datalake_batch_inference_clean.batch_inference.input_data
       - datalake_batch_inference_clean.batch_inference.output_data
-    description: The estimated discount that will be negotiated on the listing price.
+    description: The estimated contract duration in months.
   estimated_gross_revenue:
     lineage:
       - datalake_batch_inference_clean.batch_inference.input_data
@@ -46,6 +46,11 @@ columns:
       - datalake_batch_inference_clean.batch_inference.input_data
       - datalake_batch_inference_clean.batch_inference.output_data
     description: The estimated total revenue minus the Sales Tax and the Revenue Sharing on Brokerage costs.
+  estimated_net_revenue_after_losses:
+    lineage:
+      - datalake_batch_inference_clean.batch_inference.input_data
+      - datalake_batch_inference_clean.batch_inference.output_data
+    description: The estimated net_revenue that will be received by QuintoAndar minus the losses.
   estimated_contribution_margin:
     lineage:
       - datalake_batch_inference_clean.batch_inference.input_data

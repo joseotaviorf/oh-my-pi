@@ -15,6 +15,11 @@ workflow:
       extra_query_template_params:
         start_date: "{{ get_date_param(dag_run, yesterday_ds, 'start_date') }}"
         end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
+    fr_ecm_by_events:
+      partitions: [dt_event_time]
+      extra_query_template_params:
+        start_date: "{{ get_date_param(dag_run, yesterday_ds, 'start_date') }}"
+        end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
     fs_ecm_by_events:
       partitions: [dt_event_time]
       extra_query_template_params:

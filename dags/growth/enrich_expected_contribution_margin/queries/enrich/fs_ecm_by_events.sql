@@ -6,7 +6,8 @@ WITH raw_predicted_conversions AS (
         input_data.id_event::INT AS id_event,
         max_by(from_unixtime(input_data.ts_event / 1000)::TIMESTAMP, ts_inference) AS ts_event,
         max_by(input_data.listing_price::DOUBLE, ts_inference) AS listing_price,
-        max_by(prediction, ts_inference) AS predicted_conversion
+        max_by(prediction, ts_inference) AS predicted_conversion,
+        CAST(max(ts_inference) AS DATE) AS dt_inference
     FROM (
         SELECT
             ts_inference,
@@ -52,10 +53,11 @@ WITH raw_predicted_conversions AS (
 )
 
 SELECT
-    id_sale_flow,
-    id_buyer,
+    id_sale_flow AS id_flow,
+    id_buyer AS id_prospect,
     id_house,
     id_event,
+    'VB' AS event_type,
     ts_event,
     predicted_conversion AS estimated_conversion,
     predicted_discount AS estimated_discount,
@@ -85,6 +87,7 @@ SELECT
         * listing_price
         - 11342.35887052643  -- Operational Costs Per CCV
     ) AS estimated_contribution_margin,
-    CAST(ts_event AS DATE) AS dt_event_time
+    CAST(ts_event AS DATE) AS dt_event_time,
+    dt_inference
 FROM
     all_predictions_table
