@@ -4,3 +4,8 @@ sheets_info:
     sheet_name: Download
     clean_table_name: criteo_costs
     sheet_context: growth
+  criteo_region_lookup:
+    sheet_id: 1XtMDh78cffWnwUJrOihYP592p8v-JcK1UIg1pCBgwoc
+    sheet_name: reference_table
+    clean_table_name: criteo_region_lookup
+    sheet_context: growth

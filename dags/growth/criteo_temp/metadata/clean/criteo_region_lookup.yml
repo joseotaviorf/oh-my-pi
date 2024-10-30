@@ -1,0 +1,26 @@
+database_name: datalake_gsheets_clean
+table_name: criteo_region_lookup  
+owner: 'arthur.gonzaga@quintoandar.com.br'
+domain: Growth
+description: This table load the region lookup table from gsheets sent by Criteo team.
+columns:
+  postcode_range:
+    lineage: 
+      - datalake_gsheets_raw.criteo_region_lookup.postcode_range
+    description: Postcode range of the region
+  start_range:
+    lineage: 
+      - datalake_gsheets_raw.criteo_region_lookup.start_range
+    description: Start range of the zipcode
+  end_range:
+    lineage: 
+      - datalake_gsheets_raw.criteo_region_lookup.end_range
+    description: End range of the zipcode
+  state:
+    lineage: 
+      - datalake_gsheets_raw.criteo_region_lookup.state
+    description: State related of the region by zipcode
+  locality:
+    lineage: 
+      - datalake_gsheets_raw.criteo_region_lookup.locality
+    description: Locality related of the region by zipcode
