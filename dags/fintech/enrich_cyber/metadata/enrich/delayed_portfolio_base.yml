@@ -1,0 +1,114 @@
+---
+database_name: datalake_cyber
+table_name: delayed_portfolio_base
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: |
+  This report is a list of overdue invoices, whether original, or ongoing or broken agreements. It is basically the active billing portfolio.
+  Invoices that are left out: paid, to due, paused.
+  The aim is to allow the operation to analyze these bases and create charging and operating strategies and generate new bases for communications.
+columns:
+  contract_group:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.contract_group
+  product:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.creditor
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.id_contract
+  id_client:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.id_client
+  debtor_name:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.debtor_name
+  id_invoice:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.bill.id_invoice
+  ts_installment_due:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.bill.ts_installment_due
+  main_amount:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.bill.main_amount
+  purpose:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.bill.purpose
+  invoice_status:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.bill.invoice_status
+  retsuko_status:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.bill.retsuko_status
+  has_negotiation:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement.id_agreement
+  id_agreement:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement.id_agreement
+  negotiation_status:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement.status
+  number_of_installments:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement.number_of_installments
+  ts_due_agreement_installment:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement_installments.ts_due_installment
+  agreement_installment_status:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement_installmentsstatus
+  total_negotiated_amount_with_fees:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.agreement.total_negotiated_amount_with_fees
+  segmentation_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.segmentation_queue
+  commission_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.commission_queue
+  agreement_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.agreement_queue
+  digital_channel_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.digital_channel_queue
+  eviction_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.eviction_queue
+  credit_denial_queue:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.credit_denial_queue
+  olos_dialer_label:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.olos_dialer_label
+  id_agency:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.delinquent_master.id_agency
