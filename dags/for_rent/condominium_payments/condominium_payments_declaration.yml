@@ -18,6 +18,22 @@ workflow:
   database_type: postgres
   lineage_product_database_name: condominium_payments
   tables_customization:
+    attachment:
+      clean_table_name: attachment
+    internalization:
+      clean_table_name: internalization
+    non_payment_report_invoice:
+      clean_table_name: non_payment_report_invoice
+    non_payment_report:
+      clean_table_name: non_payment_report
+    condo_monitoring_actions:
+      clean_table_name: condo_monitoring_actions
+    condo_monitoring_actions_aud:
+      clean_table_name: condo_monitoring_actions_aud
+    condo_monitoring_eligibility:
+      clean_table_name: condo_monitoring_eligibility
+    condo_monitoring_eligibility_aud:
+      clean_table_name: condo_monitoring_eligibility_aud
     revinfo:
       clean_table_name: rev_info
 cluster:
