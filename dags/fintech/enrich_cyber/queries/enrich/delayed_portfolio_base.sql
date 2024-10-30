@@ -21,7 +21,7 @@ SELECT
     dm.id_client,
     b.id_invoice,
     a.id_agreement,
-    ha.id_invoice,
+    ha.id_invoice AS id_agreement_invoice,
     ai.installment_number,
     dm.contract_group,
     dm.creditor AS product,

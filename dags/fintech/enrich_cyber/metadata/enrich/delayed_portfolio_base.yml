@@ -32,6 +32,10 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_clean.bill.id_invoice
+  id_agreement_invoice:
+    description: ""
+    lineage:
+      - datalake_cyber_clean.historical_agreements.id_invoice
   ts_installment_due:
     description: ""
     lineage:
