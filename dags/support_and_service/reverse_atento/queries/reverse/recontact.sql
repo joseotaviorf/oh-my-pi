@@ -26,10 +26,6 @@ WITH front_tickets_list AS (
     ft.total_minutes_queue_time,
     ft.total_minutes_talk_time,
     LAG(ft.total_minutes_handling_time) OVER(PARTITION BY ft.sk_user ORDER BY ft.ts_started) AS total_minutes_handling_time_previous_contact,
-    CASE
-      WHEN LAG(ft.sk_ticket) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) IS NOT NULL THEN 1
-      ELSE 0
-    END AS recontact_flag,
     LAG(dc.channel) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_channel,
     LAG(dt.theme) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_taxonomy,
     LAG(da.email) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_email,
@@ -63,7 +59,7 @@ WITH front_tickets_list AS (
     ft.sk_user IS NOT NULL
     AND dd.area = 'CX'
     AND ft.front_or_back = 'front'
-  AND ft.channel IN ('call', 'chat')
+    AND ft.channel IN ('call', 'chat')
 ),
 tbl_completion_reason AS (
   SELECT
@@ -78,41 +74,42 @@ tbl_completion_reason AS (
 recontact_check AS (
   SELECT
     rc.sk_ticket,
-    channel,
-    ticket_origin,
-    sk_main_department,
-    sk_taxonomy,
-    sk_user,
-    agent_organization,
-    team,
-    journey_step,
-    search_window_from,
+    rc.channel,
+    rc.ticket_origin,
+    rc.sk_main_department,
+    rc.sk_taxonomy,
+    rc.sk_user,
+    rc.agent_organization,
+    rc.team,
+    rc.journey_step,
+    rc.search_window_from,
     rc.ts_started AS search_window_until,
-    days_since_last_contact,
-    theme,
-    theme_detail,
+    rc.days_since_last_contact,
+    rc.theme,
+    rc.theme_detail,
     CASE
-      WHEN days_since_last_contact <= 3 THEN recontact_flag
+      WHEN DATE_DIFF(DAY, LAG(DATE(rc.ts_started)) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started), DATE(rc.ts_started)) <= 3 THEN 1
       ELSE 0
     END AS recontact_flag,
-    sk_ticket_previous_contact,
-    ts_started_previous_contact,
-    previous_contact_channel,
+    rc.sk_ticket_previous_contact,
+    rc.ts_started_previous_contact,
+    rc.previous_contact_channel,
     COALESCE(flag_last_completion_reason_idled, 0) AS flag_last_completion_reason_idled,
-    previous_contact_taxonomy,
-    csat_score,
-    previous_contact_csat,
-    total_minutes_handling_time,
-    total_minutes_queue_time,
-    total_minutes_talk_time,
-    email,
-    previous_contact_email,
-    department,
-    sk_ticket_contact_later,
-    total_minutes_handling_time_previous_contact,
-    CAST(sk_user AS STRING) || '-' ||
+    rc.previous_contact_taxonomy,
+    rc.csat_score,
+    rc.previous_contact_csat,
+    rc.total_minutes_handling_time,
+    rc.total_minutes_queue_time,
+    rc.total_minutes_talk_time,
+    rc.email,
+    rc.previous_contact_email,
+    rc.department,
+    rc.sk_ticket_contact_later,
+    rc.total_minutes_handling_time_previous_contact,
+    rc.refined_direction,
+    CAST(rc.sk_user AS STRING) || '-' ||
     CASE
-      WHEN department IN (
+      WHEN rc.department IN (
         'CX Mudança [FRONT] [POS]',
         'CX Parceiros Compra e Venda [FRONT]',
         'CX Parceiros [FRONT] [PRE]',
@@ -125,7 +122,7 @@ recontact_check AS (
         'CX Rescisão [FRONT] [POS]'
       ) THEN 'front'
     END AS unificador_front,
-    ts_started
+    rc.ts_started
   FROM
     front_tickets_list AS rc
   LEFT JOIN
@@ -133,9 +130,6 @@ recontact_check AS (
       ON tbl_completion_reason.sk_ticket = rc.sk_ticket_previous_contact
   WHERE
     ts_started >= '2024-07-01'
-    AND department NOT LIKE '%[WH]%' --caixas da WebHelp agora são identificadas assim
-    AND department NOT LIKE '%[CNX]%'
-    AND agent_organization IN ('atn', 'atento')
     AND refined_direction = 'INBOUND'
 ),
 demand_back_FRC AS (
@@ -211,6 +205,7 @@ SELECT
   rc.search_window_until,
   rc.ts_started_previous_contact AS ts_started_first_contact,
   rc.ts_started AS ts_started,
+  refined_direction,
   YEAR(CURRENT_DATE()) AS year,
   MONTH(CURRENT_DATE()) AS month,
   DAY(CURRENT_DATE()) AS day,
@@ -220,4 +215,8 @@ FROM
 LEFT JOIN
   demand_back_FRC AS db
     ON rc.unificador_front = db.unificador_back
+WHERE
+  department NOT LIKE '%[WH]%' --caixas da WebHelp agora são identificadas assim
+  AND department NOT LIKE '%[CNX]%'
+  AND agent_organization IN ('atn', 'atento')
 GROUP BY ALL
