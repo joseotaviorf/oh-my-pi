@@ -1,8 +1,6 @@
 WITH front_tickets_list AS (
   SELECT DISTINCT
     ft.sk_ticket,
-    LAG(ft.sk_ticket) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS sk_ticket_previous_contact,
-    LEAD(ft.sk_ticket) OVER(PARTITION BY ft.sk_user ORDER BY ft.ts_started) AS sk_ticket_contact_later,
     ft.sk_user,
     ft.sk_main_department,
     ft.sk_taxonomy,
@@ -25,17 +23,6 @@ WITH front_tickets_list AS (
     ft.total_minutes_handling_time,
     ft.total_minutes_queue_time,
     ft.total_minutes_talk_time,
-    LAG(ft.total_minutes_handling_time) OVER(PARTITION BY ft.sk_user ORDER BY ft.ts_started) AS total_minutes_handling_time_previous_contact,
-    LAG(dc.channel) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_channel,
-    LAG(dt.theme) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_taxonomy,
-    LAG(da.email) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_email,
-    LAG(ft.csat_score) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_csat,
-    DATE_DIFF(
-      DAY,
-      LAG(DATE(ft.ts_started)) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started),
-      DATE(ft.ts_started)
-    ) AS days_since_last_contact,
-    LAG(ft.ts_started) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS ts_started_previous_contact,
     DATE_ADD(DAY, -3, ft.ts_started) AS search_window_from,
     ft.ts_started
   FROM
@@ -60,18 +47,8 @@ WITH front_tickets_list AS (
     AND dd.area = 'CX'
     AND ft.front_or_back = 'front'
     AND ft.channel IN ('call', 'chat')
-),
-tbl_completion_reason AS (
-  SELECT
-    fs.sk_ticket,
-    MAX(CASE WHEN fs.completion_reason = 'task idled' THEN 1 ELSE 0 END) AS flag_last_completion_reason_idled
-  FROM
-    dw_customer_support.fact_segment AS fs
-  WHERE
-    fs.is_last_segment = TRUE
-  GROUP BY 1
-),
-recontact_check AS (
+)
+,recontact_check AS (
   SELECT
     rc.sk_ticket,
     rc.channel,
@@ -84,28 +61,31 @@ recontact_check AS (
     rc.journey_step,
     rc.search_window_from,
     rc.ts_started AS search_window_until,
-    rc.days_since_last_contact,
+    DATE_DIFF(
+      DAY,
+      LAG(DATE(rc.ts_started)) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started),
+      DATE(rc.ts_started)
+    ) AS days_since_last_contact,    
     rc.theme,
     rc.theme_detail,
     CASE
       WHEN DATE_DIFF(DAY, LAG(DATE(rc.ts_started)) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started), DATE(rc.ts_started)) <= 3 THEN 1
       ELSE 0
     END AS recontact_flag,
-    rc.sk_ticket_previous_contact,
-    rc.ts_started_previous_contact,
-    rc.previous_contact_channel,
-    COALESCE(flag_last_completion_reason_idled, 0) AS flag_last_completion_reason_idled,
-    rc.previous_contact_taxonomy,
+    LAG(rc.sk_ticket) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) AS sk_ticket_previous_contact,
+    LAG(rc.ts_started) OVER(PARTITION BY rc.sk_user,rc.team ORDER BY rc.ts_started) AS ts_started_previous_contact,
+    LAG(rc.channel) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) AS previous_contact_channel,
+    LAG(rc.theme) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) AS previous_contact_taxonomy,
     rc.csat_score,
-    rc.previous_contact_csat,
+    LAG(rc.csat_score) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) AS previous_contact_csat,
     rc.total_minutes_handling_time,
     rc.total_minutes_queue_time,
     rc.total_minutes_talk_time,
     rc.email,
-    rc.previous_contact_email,
+    LAG(rc.email) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started) AS previous_contact_email,
     rc.department,
-    rc.sk_ticket_contact_later,
-    rc.total_minutes_handling_time_previous_contact,
+    LEAD(rc.sk_ticket) OVER(PARTITION BY rc.sk_user ORDER BY rc.ts_started) AS sk_ticket_contact_later,
+    LAG(rc.total_minutes_handling_time) OVER(PARTITION BY rc.sk_user ORDER BY rc.ts_started) AS total_minutes_handling_time_previous_contact,
     rc.refined_direction,
     CAST(rc.sk_user AS STRING) || '-' ||
     CASE
@@ -125,11 +105,9 @@ recontact_check AS (
     rc.ts_started
   FROM
     front_tickets_list AS rc
-  LEFT JOIN
-    tbl_completion_reason
-      ON tbl_completion_reason.sk_ticket = rc.sk_ticket_previous_contact
+
   WHERE
-    ts_started >= '2024-07-01'
+    ts_started >= DATE('2024-06-01')
     AND refined_direction = 'INBOUND'
 ),
 demand_back_FRC AS (
