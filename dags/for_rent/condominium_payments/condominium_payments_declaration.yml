@@ -18,14 +18,7 @@ workflow:
   database_type: postgres
   lineage_product_database_name: condominium_payments
   tables_customization:
-    attachment:
-      extraction_type: full
-    internalization:
-      extraction_type: full
-    non_payment_report_invoice:
-      extraction_type: full
-    non_payment_report:
-      extraction_type: full
-
+    revinfo:
+      clean_table_name: rev_info
 cluster:
   type: databricks_12_2_min_memory_photon_cluster
