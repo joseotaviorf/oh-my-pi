@@ -1,0 +1,32 @@
+dag:
+  name: dw_collection_recovery_quintocred
+  schedule_start_date: 2023,11,11
+  owner: Data Fintech
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: collection_recovery_quintocred
+  tables_customization:
+    fact_collection:
+      partitions: ["year", "month", "day"]
+      extra_query_template_params:
+        load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+        load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  inner_dependencies:
+    fact_proposal_signature_payment_timeline:
+      - fact_quintocred_contract_payment_signature_timeline
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    autotermination_minutes: 20
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+      first_on_demand: 1
+      spot_bid_price_percent: 100
+      zone_id: us-east-1d
+      ebs_volume_size: 200
+      availability: SPOT_WITH_FALLBACK

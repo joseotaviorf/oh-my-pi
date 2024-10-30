@@ -188,6 +188,26 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.trato_feito:load-clean-client
   - bietlejuice.trato_feito:load-clean-contract
   - bietlejuice.trato_feito:load-clean-debt
+bietlejuice.dw_collection_recovery_quintocred:
+  - bietlejuice.dw_collection_recovery:load-dw-collection-recovery-fact-negotiation
+  - bietlejuice.dw_collection_recovery:load-dw-collection-recovery-fact-negotiation-installment
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-house
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-person
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
+  - bietlejuice.dw_velo:load-dw-velo-fact-velo-propose
+  - bietlejuice.enrich_quintocred_collections:load-enrich-collections-wallet
+  - bietlejuice.enrich_recupera:load-enrich-changes-debts-distribution
+  - bietlejuice.enrich_recupera:load-enrich-snapshot-daily-debts
+  - bietlejuice.enrich_velo:load-enrich-payment-contracts
+  - bietlejuice.person:load-clean-person
+  - bietlejuice.recupera:load-clean-contracts
+  - bietlejuice.recupera:load-clean-operational-records
+  - bietlejuice.rental_guarantee_platform:load-clean-company
+  - bietlejuice.rental_guarantee_platform:load-clean-company-executive
+  - bietlejuice.rental_guarantee_platform:load-clean-propose
+  - bietlejuice.rental_guarantee_platform:load-clean-propose-aud
+  - bietlejuice.rental_guarantee_platform:load-clean-rev-info
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
