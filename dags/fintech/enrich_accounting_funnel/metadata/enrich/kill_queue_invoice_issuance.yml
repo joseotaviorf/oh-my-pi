@@ -1,0 +1,80 @@
+---
+database_name: datalake_accounting_funnel
+table_name: kill_queue_invoice_issuance
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_kill_queue_invoice_issuance:
+    description: ''
+    lineage:
+    - .df_final.id_kill_queue_invoice_issuance
+  id_business_entity:
+    description: ''
+    lineage:
+    - .df_final.id_business_entity
+  id_finance_entity:
+    description: ''
+    lineage:
+    - .df_final.id_finance_entity
+  id_finance_entity_entry:
+    description: ''
+    lineage:
+    - .df_final.id_finance_entity_entry
+  source_name:
+    description: ''
+    lineage:
+    - .df_final.source_name
+  revenue_name:
+    description: ''
+    lineage:
+    - .df_final.revenue_name
+  accrual_year_month:
+    description: ''
+    lineage:
+    - .df_final.accrual_year_month
+  status:
+    description: ''
+    lineage:
+    - .df_final.status
+  source_amount:
+    description: ''
+    lineage:
+    - .df_final.source_amount
+  sap_amount:
+    description: ''
+    lineage:
+    - .df_final.sap_amount
+  account_number:
+    description: ''
+    lineage:
+    - .df_final.account_number
+  is_completeness_compliance:
+    description: ''
+    lineage:
+    - .df_final.is_completeness_compliance
+  is_correctness_compliance:
+    description: ''
+    lineage:
+    - .df_final.is_correctness_compliance
+  is_temporality_compliance:
+    description: ''
+    lineage:
+    - .df_final.is_temporality_compliance
+  is_compliance:
+    description: ''
+    lineage:
+    - .df_final.CASE WHEN is_completeness_compliance IS TRUE AND is_correctness_compliance
+      IS TRUE AND is_temporality_compliance IS TRUE THEN TRUE ELSE FALSE END
+  dt_source_trigger:
+    description: ''
+    lineage:
+    - .df_final.dt_source_trigger
+  dt_sap_created:
+    description: ''
+    lineage:
+    - .df_final.dt_sap_created
+  dt_sap_reference:
+    description: ''
+    lineage:
+    - .df_final.dt_sap_reference

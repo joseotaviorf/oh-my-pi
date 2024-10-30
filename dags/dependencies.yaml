@@ -6,6 +6,7 @@ bietlejuice.amplitude_supply:
 bietlejuice.demand_balancer_service:
   - quintoml.search.maestro.inference:batch-predict
 bietlejuice.dw_accounting_funnel:
+  - bietlejuice.enrich_accounting_funnel:load-enrich-kill-queue-invoice-issuance
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-invoice-issuance
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-provision-creation
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-revenue-accounting
@@ -1028,6 +1029,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_sap_gateway:load-enrich-feature
   - bietlejuice.enrich_sap_gateway:load-enrich-sync-sap-job
   - bietlejuice.gsheets_fintech:done-clean-cod-locale
+  - bietlejuice.kill_queue:load-clean-reservation
   - bietlejuice.monopoly:load-clean-accounting-entry
   - bietlejuice.monopoly:load-clean-sale
   - bietlejuice.monopoly:load-clean-sale-revision
