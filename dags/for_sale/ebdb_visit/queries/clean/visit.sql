@@ -17,6 +17,7 @@ SELECT
     bookingType AS booking_type,
     behavior,
     business_model,
+    business_context,
     agenteFixo AS is_fixed_agent,
     structured,
     dia AS dt_visit,

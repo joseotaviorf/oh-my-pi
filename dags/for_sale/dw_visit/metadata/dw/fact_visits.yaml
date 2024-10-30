@@ -44,6 +44,10 @@ columns:
     description: Entrance type Id.
     lineage:
         - datalake_visit.visits.id_entrance_type
+  sk_business_context:
+    description: Context type Id.
+    lineage:
+      - dw_visit.dim_business_context.sk_business_context
   sk_cancellation_detail:
     description: Id of cancellation of the visit. (If applicable)
     lineage:
