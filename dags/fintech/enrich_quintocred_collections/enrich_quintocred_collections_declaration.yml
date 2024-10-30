@@ -10,10 +10,10 @@ workflow:
   type: query
   layer: enrich
   inner_dependencies:
-    mob_delinquency_timeline:
+    major_type_distribution:
       - delinquency_timeline
     collections_wallet:
       - delinquency_timeline
-      - mob_delinquency_timeline
+      - major_type_distribution
 cluster:
   type: databricks_13_3_med_memory_cluster
