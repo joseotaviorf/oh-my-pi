@@ -28,7 +28,7 @@ WITH timeline AS (
         t.dt_base AS `date`,
         t.dt_created
     FROM
-        datalake_quintocred_collections.delinquency_timeline AS t
+        datalake_collections_quintocred.delinquency_timeline AS t
     LEFT JOIN
         datalake_velo.propose AS p
             ON t.id_propose = p.id_propose
@@ -43,7 +43,7 @@ min_dates AS (
         MIN(CASE WHEN type_description IN ('RENEWAL', 'SIGNATURE') THEN dt_base END) AS min_dt_signature,
         MIN(CASE WHEN type_description = 'RESCISAO' THEN dt_base END) AS min_dt_termination
     FROM
-        datalake_quintocred_collections.mob_delinquency_timeline
+        datalake_collections_quintocred.mob_delinquency_timeline
     GROUP BY 1
 ),
 min_propose_date AS (
@@ -51,7 +51,7 @@ min_propose_date AS (
         id_propose,
         MIN(dt_base) AS min_dt_propose
     FROM
-        datalake_quintocred_collections.mob_delinquency_timeline
+        datalake_collections_quintocred.mob_delinquency_timeline
     GROUP BY 1
 ),
 document_major_type AS (
@@ -71,7 +71,7 @@ document_major_type AS (
             ELSE any_value(monthly_major_type)
         END AS monthly_major_type
     FROM
-        datalake_quintocred_collections.major_type_distribution
+        datalake_collections_quintocred.major_type_distribution
     GROUP BY 1,2
 ),
 timeline_final AS (
@@ -104,7 +104,7 @@ timeline_final AS (
     FROM
         timeline AS t
     LEFT JOIN
-        datalake_quintocred_collections.major_type_distribution AS ta
+        datalake_collections_quintocred.major_type_distribution AS ta
         ON ta.document = t.document
         AND ta.id_propose = t.id_propose
         AND t.`date` = ta.`date`

@@ -166,7 +166,7 @@ SELECT DISTINCT
     cw.dt_min_propose,
     cw.dt_paid_array
 FROM
-    datalake_quintocred_collections.collections_wallet AS cw
+    datalake_collections_quintocred.collections_wallet AS cw
 LEFT JOIN
     collection_recovery_team AS rt
         ON rt.document = cw.document

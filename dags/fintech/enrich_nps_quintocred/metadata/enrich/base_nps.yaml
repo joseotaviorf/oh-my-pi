@@ -1,4 +1,4 @@
-database_name: datalake_quintocred_nps
+database_name: datalake_nps_quintocred
 table_name: base_nps
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech

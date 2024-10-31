@@ -28,7 +28,7 @@ WITH timeline AS (
         t.dt_base AS `date`,
         t.dt_created
     FROM
-        datalake_quintocred_collections.delinquency_timeline AS t
+        datalake_collections_quintocred.delinquency_timeline AS t
     LEFT JOIN
         datalake_velo.propose AS p
             ON t.id_propose = p.id_propose

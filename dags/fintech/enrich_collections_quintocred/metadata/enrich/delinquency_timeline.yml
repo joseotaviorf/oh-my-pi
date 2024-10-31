@@ -1,5 +1,5 @@
 ---
-database_name: datalake_quintocred_collections
+database_name: datalake_collections_quintocred
 table_name: delinquency_timeline
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
