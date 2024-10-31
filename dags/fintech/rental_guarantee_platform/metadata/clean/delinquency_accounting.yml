@@ -1,0 +1,42 @@
+---
+database_name: datalake_rental_guarantee_platform_clean
+table_name: delinquency_accounting
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - public.delinquency_accounting.CAST(id AS BIGINT)
+  id_agreement_payment:
+    lineage:
+    - public.delinquency_accounting.agreement_payment_id
+  id_delinquency:
+    lineage:
+    - public.delinquency_accounting.delinquency_id
+  delinquency_paid_amount:
+    lineage:
+    - public.delinquency_accounting.delinquency_paid_amount
+  interest:
+    lineage:
+    - public.delinquency_accounting.interest
+  fine:
+    lineage:
+    - public.delinquency_accounting.fine
+  late_fee:
+    lineage:
+    - public.delinquency_accounting.late_fee
+  version:
+    lineage:
+    - public.delinquency_accounting.version
+  condition:
+    lineage:
+    - public.delinquency_accounting.condition
+  dt_paid:
+    lineage:
+    - public.delinquency_accounting.paid_date
+  ts_created:
+    lineage:
+    - public.delinquency_accounting.created_at
+  ts_updated:
+    lineage:
+    - public.delinquency_accounting.updated_at

@@ -260,5 +260,8 @@ workflow:
     bill_payment:
       raw_extraction_type: full
       raw_partitions: []
+    delinquency_accounting:
+      raw_extraction_type: full
+      raw_partitions: []
 cluster:
   type: databricks_12_2_med_general_cluster
