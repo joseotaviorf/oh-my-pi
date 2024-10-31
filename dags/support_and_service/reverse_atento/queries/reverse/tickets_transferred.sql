@@ -1,26 +1,5 @@
-WITH first_departament AS (
-  SELECT
-    a.sk_contact,
-    dd.department as first_department
-  FROM
-    dw_customer_support.fact_received_contact a
-    LEFT JOIN
-      dw_customer_support.dim_department dd
-        ON dd.sk_department = a.sk_department
-  WHERE is_first_interaction = true
-)
-,last_departament AS (
-  SELECT
-    a.sk_contact,
-    dd.department as last_department
-  FROM
-    dw_customer_support.fact_received_contact a
-  LEFT JOIN
-    dw_customer_support.dim_department dd
-      ON dd.sk_department = a.sk_department
-  WHERE is_last_interaction = true
-)
-,segments AS (
+
+WITH segments AS (
   SELECT DISTINCT
     frc.sk_ticket,
     frc.sk_contact,
@@ -46,8 +25,8 @@ WITH first_departament AS (
     dd.area,
     dd.front_or_back,
     frc.status,
-    fd.first_department,
-    ld.last_department,
+    fd.department AS first_department,
+    ld.department AS last_department,
     CASE
       WHEN frc.status = 'TRANSFERRED'
         AND dd2.team <> 'Inside Sales'
@@ -82,12 +61,15 @@ WITH first_departament AS (
   LEFT JOIN
     dw_customer_support.dim_agent da
       ON frc.agent_email = da.email
-  LEFT JOIN
-    first_departament fd
-      ON fd.sk_contact = frc.sk_contact
-  LEFT JOIN
-    last_departament ld
-      ON ld.sk_contact = frc.sk_contact
+  LEFT JOIN 
+    dw_customer_support.fact_ticket AS ft
+      ON frc.sk_ticket = ft.sk_ticket
+  LEFT JOIN 
+      dw_customer_support.dim_department AS fd
+        ON fd.sk_department = ft.sk_first_department
+  LEFT JOIN 
+      dw_customer_support.dim_department AS ld
+        ON ld.sk_department = ft.sk_main_department
   LEFT JOIN
     dw_customer_support.dim_taxonomy AS dt
       ON frc.sk_taxonomy = dt.sk_taxonomy
