@@ -84,6 +84,14 @@ columns:
     lineage:
       - s3_auditlogs_bucket/opa.result.principalinfo.user.providerId
     description: Identity Provider
+  principal_user_issuer:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.principalinfo.user.issuer
+    description: Identity Provider Issuer
+  id_principal_user_impersonated_by:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.principalinfo.user.impersonated_by
+    description: User impersonated by
   principal_service:
     lineage:
       - s3_auditlogs_bucket/opa.result.principalinfo.service.payload.id

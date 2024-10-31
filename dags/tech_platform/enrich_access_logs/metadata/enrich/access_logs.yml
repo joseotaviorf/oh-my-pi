@@ -84,6 +84,14 @@ columns:
     lineage:
       - datalake_access_logs_clean.opa.principal_user_provided_roles
     description: Role provided by principal user
+  principal_user_issuer:
+    lineage:
+      - datalake_access_logs_clean.opa.principal_user_issuer
+    description: Principal user issuer
+  id_principal_user_impersonated_by:
+    lineage:
+      - datalake_access_logs_clean.opa.id_principal_user_impersonated_by
+    description: Principal user impersonated by
   principal_service_provided_roles:
     lineage:
        - datalake_access_logs_clean.opa.principal_service_provided_roles

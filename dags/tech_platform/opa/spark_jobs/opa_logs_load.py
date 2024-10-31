@@ -49,6 +49,8 @@ def clean_cf(df):
         col("data.result.principalinfo.user.payload.email").alias("principal_user_email"), 
         col("data.result.principalinfo.user.provided_roles").alias("principal_user_provided_roles"), 
         col("data.result.principalinfo.user.payload.providerId").alias("principal_user_idp"), 
+        col("data.result.principalinfo.user.payload.iss").alias("principal_user_issuer"), 
+        col("data.result.principalinfo.user.payload.sudoed_by_id").alias("id_principal_user_impersonated_by"), 
         col("data.result.principalinfo.service.provided_roles").alias("principal_service_provided_roles"), 
         col("data.result.principalinfo.service.id").alias("principal_service"),
         col("app"),
