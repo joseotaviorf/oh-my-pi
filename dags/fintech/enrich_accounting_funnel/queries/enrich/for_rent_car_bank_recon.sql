@@ -116,7 +116,7 @@ seu_barriga AS (
         payment_company_use_number IS NOT NULL
         AND TRIM(payment_company_use_number) != ''
         AND lower(reason) NOT IN ('negotiation-5a', 'negotiation-recupera')
-        AND paid_via NOT IN ('collector-5A', 'credit-card', 'unknown', 'paypal', 'bank-transfer')
+        AND paid_via NOT IN ('cyber-boleto', 'cyber-pix', 'collector-5A', 'credit-card', 'unknown', 'paypal', 'bank-transfer')
         AND due_amount <= 0
         AND payment_status != 'canceled'
         AND status != 'canceled'
