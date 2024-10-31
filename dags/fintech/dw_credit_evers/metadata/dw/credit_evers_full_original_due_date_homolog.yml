@@ -1,6 +1,6 @@
-database_name: datalake_credit_evers_homolog
-table_name: credit_evers_full_original_due_date
-owner: ae-finance-fintech@quintoandar.com.br
+database_name: dw_credit_evers
+table_name: credit_evers_full_original_due_date_homolog
+owner: guilherme.sacramento@quintoandar.com.br
 domain: Fintech
 description: Credit Evers (delinquency) contracts with original due date. It reports Ever 'sujo', i.e, contains all kinds of invoices (extra, pos-rental, monthly and onboarding). The granularity of table is contract, mob and ever.
 columns:

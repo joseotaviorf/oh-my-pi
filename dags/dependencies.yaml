@@ -250,6 +250,8 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat_credit_engine:load-clean-variant
+bietlejuice.dw_credit_evers:
+  - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
 bietlejuice.dw_crm:
   - bietlejuice.ebdb_inspections:load-clean-inspection
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal
@@ -1384,9 +1386,6 @@ bietlejuice.enrich_credit_analysis:
   - bietlejuice.sorting_hat_credit_engine:load-clean-checklist-group
   - bietlejuice.sorting_hat_credit_engine:load-clean-checklist-item
 bietlejuice.enrich_credit_evers:
-  - bietlejuice.enrich_invoice:load-enrich-credit-invoice
-  - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
-bietlejuice.enrich_credit_evers_homolog:
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
 bietlejuice.enrich_criteo:
