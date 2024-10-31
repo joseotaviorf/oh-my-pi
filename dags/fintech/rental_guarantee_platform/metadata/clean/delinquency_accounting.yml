@@ -6,7 +6,7 @@ domain: fintech
 columns:
   id:
     lineage:
-    - datalake_rental_guarantee_platform_raw.delinquency_accounting.CAST(id AS BIGINT)
+    - datalake_rental_guarantee_platform_raw.delinquency_accounting.id
   id_agreement_payment:
     lineage:
     - datalake_rental_guarantee_platform_raw.delinquency_accounting.agreement_payment_id
