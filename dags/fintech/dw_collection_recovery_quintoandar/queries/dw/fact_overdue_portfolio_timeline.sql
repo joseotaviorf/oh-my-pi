@@ -1,45 +1,4 @@
 WITH
-distinct_contract_customer AS (
-  SELECT DISTINCT
-    id_contract,
-    id_customer
-  FROM datalake_recupera_clean.contracts
-),
-operational_records AS (
-  SELECT DISTINCT
-    id_customer,
-    advisory_code AS advisory,
-    distributor_code AS distributor,
-    ts_customer_status_last_update,
-    MAKE_DATE(year, month, day) AS dt_snapshot
-  FROM datalake_recupera_clean.operational_records
-  WHERE id_creditor = '1' -- filter quintoandar
-    AND MAKE_DATE(year, month, day) BETWEEN DATE_TRUNC("month", CURRENT_DATE - INTERVAL "48" MONTH) AND CURRENT_DATE - INTERVAL "1" DAY
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_customer, MAKE_DATE(year, month, day) ORDER BY ts_last_update DESC) = 1
-),
-responsible_for_contract AS (
-  SELECT DISTINCT
-    c.id_contract,
-    ors.advisory,
-    ors.distributor,
-    CASE
-        WHEN COALESCE(ors.advisory,ors.distributor) IN ("DACORDEV","DEVICEX","DEVICTIO", "DEVICFIN") THEN "EVICTIONS"
-        WHEN COALESCE(ors.advisory,ors.distributor) = "DASSES" THEN "EXTERNO"
-        WHEN COALESCE(ors.advisory,ors.distributor) IN ("DAT130","DAT3160","DAT61","DONBOARD","DACOINTE","DBOLPULA","DPREEVIC", "DACOVNQB") THEN "INTERNO"
-        WHEN COALESCE(ors.advisory,ors.distributor) IN ("DLEGAL","DPCOB","DPCOBFR") THEN "INTERNO BLOQUEADO"
-        WHEN COALESCE(ors.advisory,ors.distributor) IN ("V5PASCHW", "QPASCHWS","VPASCHWS") THEN "PASCHOALOTTO"
-        WHEN COALESCE(ors.advisory,ors.distributor) IN ("VIAFWS","V5IAFWS", 'QIAFWS') THEN "IAF"
-        WHEN COALESCE(ors.advisory,ors.distributor) IN ("DESPBXQT","DACOBLGQ","DCBINTQT") THEN "QUITEI BLOQUEADO"
-        WHEN COALESCE(ors.advisory,ors.distributor) IN ("QWHELPWS","WEBHELP") THEN "WEBHELP"
-        ELSE COALESCE(ors.advisory,ors.distributor)
-    END AS partner,
-    ors.dt_snapshot
-  FROM operational_records As ors
-  LEFT JOIN distinct_contract_customer AS c
-    ON ors.id_customer = c.id_customer
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY c.id_contract, ors.dt_snapshot ORDER BY ors.ts_customer_status_last_update DESC) = 1
-
-),
 ssn_original_payment AS (
     -- Service Self Negotiation where customer paid the original invoice
     SELECT DISTINCT
@@ -55,10 +14,8 @@ negotiation_data AS (
   SELECT DISTINCT
     d.id_invoice,
     d.id_contract,
-    CASE
-      WHEN LOWER(n.promisse_payment_method) LIKE '%cartão%' THEN n.original_debt_amount
-      ELSE n.down_payment_net_amount_paid
-    END AS net_recovery_amount,
+    n.sk_negotiation,
+    CAST(n.net_paid_amount / n.original_debt_amount AS DECIMAL(14,2))  AS net_rate,
     IF(n.origin_agreement = "Portal Auto Negociação", TRUE, FALSE) AS is_ssn_boletao
   FROM dw_collection_recovery_quintoandar.fact_debt AS d
   INNER JOIN dw_collection_recovery_quintoandar.bridge_map_debt_negotiation AS b
@@ -76,6 +33,12 @@ SELECT
     o.id_invoice,
     o.id_proposal,
     o.id_region,
+    CASE
+      WHEN o.payment_status = "written-down"
+        AND o.dt_invoice_paid BETWEEN o.dt_month_start AND o.dt_reference
+        AND o.dt_invoice_paid > o.dt_invoice_due_adjust
+      THEN n.sk_negotiation
+    END AS sk_negotiation,
     o.contract_status,
     o.invoice_type,
     o.payment_status,
@@ -121,23 +84,22 @@ SELECT
     o.delay_contamined_range,
     o.delay_contract_range,
     o.contract_overdue_invoices,
-    o.due_amount,
+    ABS(o.due_amount) AS due_amount,
     o.paid_amount,
-    o.recovered_amount,
-    CASE
-        WHEN o.payment_status = "paid" THEN o.recovered_amount
+    ABS(o.recovered_amount) AS recovered_amount,
+    ROUND(CASE
+        WHEN o.payment_status = "paid" THEN ABS(o.recovered_amount)
         WHEN o.payment_status = "written-down"
           AND o.dt_invoice_paid BETWEEN o.dt_month_start AND o.dt_reference
           AND o.dt_invoice_paid > o.dt_invoice_due_adjust
-        THEN n.net_recovery_amount
+        THEN n.net_rate * ABS(o.recovered_amount)
         ELSE 0
-    END AS net_recovery_amount,
+    END, 2) AS net_recovered_amount,
     o.contract_debt,
     o.business_day,
     o.is_last_business_days,
-    rc.advisory,
-    rc.distributor,
-    COALESCE(rc.partner, LAG(rc.partner) IGNORE NULLS OVER(PARTITION BY o.id_contract ORDER BY o.dt_reference)) AS partner,
+    rc.distributor AS segmentation_queue,
+    COALESCE(cad.advisory, rc.partner, LAG(rc.partner) IGNORE NULLS OVER(PARTITION BY o.id_contract ORDER BY o.dt_reference)) AS advisory,
     MAX(o.dt_invoice_paid) OVER(PARTITION BY o.id_contract, o.id_invoice) AS max_dt_invoice_paid, -- get the dt_paid of invoice, since dt_invoice_paid is only filled in when dt_reference >= dt_paid
     o.dt_invoice_paid,
     o.dt_invoice_due,
@@ -152,9 +114,12 @@ LEFT JOIN
     ssn_original_payment AS possn
         ON possn.id_invoice = o.id_invoice
         AND possn.id_contract = o.id_contract
-LEFT JOIN responsible_for_contract AS rc
+LEFT JOIN datalake_recupera.contract_advisory_distribution AS rc
   ON o.id_contract = rc.id_contract
   AND o.dt_reference = rc.dt_snapshot
+LEFT JOIN datalake_cyber.contract_agency_distribution AS cad
+  ON o.id_contract = cad.id_contract
+    AND o.dt_reference BETWEEN cad.dt_start_interval AND cad.dt_end_interval
 LEFT JOIN negotiation_data AS n
   ON o.id_invoice = n.id_invoice
     AND o.id_contract = n.id_contract
@@ -165,17 +130,17 @@ get_last_valid_partner AS (
     id_contract,
     id_invoice,
     advisory,
-    distributor,
-    partner
+    segmentation_queue
   FROM add_all_dimensions
   WHERE dt_reference BETWEEN DATE_ADD(max_dt_invoice_paid,-1) AND max_dt_invoice_paid
-  AND partner IS NULL OR partner NOT IN ("DBAIXAS", "DCARGA") -- ignore DBAIXAS, because it references to the paid invoices, and we want the last valid partner before the invoice payment.
+  AND advisory IS NULL OR advisory NOT IN ("DBAIXAS", "DCARGA") -- ignore DBAIXAS, because it references to the paid invoices, and we want the last valid partner before the invoice payment.
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice ORDER BY dt_reference DESC) = 1
 )
 SELECT
     a.sk_overdue_portfolio_timeline,
     a.id_region AS sk_region,
     a.id_contract AS sk_contract,
+    a.sk_negotiation,
     a.id_invoice,
     a.id_proposal,
     a.contract_status,
@@ -192,13 +157,12 @@ SELECT
     a.due_amount,
     a.paid_amount,
     a.recovered_amount,
-    a.net_recovery_amount,
+    a.net_recovered_amount,
     a.contract_debt,
     a.business_day,
     a.is_last_business_days,
+    IF(a.dt_reference >= a.dt_invoice_paid, g.segmentation_queue, a.segmentation_queue) AS segmentation_queue,
     IF(a.dt_reference >= a.dt_invoice_paid, g.advisory, a.advisory) AS advisory,
-    IF(a.dt_reference >= a.dt_invoice_paid, g.distributor, a.distributor) AS distributor,
-    IF(a.dt_reference >= a.dt_invoice_paid, g.partner, a.partner) AS partner,
     IF(ROW_NUMBER() OVER(PARTITION BY a.id_contract, a.id_invoice, a.dt_month_start ORDER BY a.dt_reference DESC) = 1, TRUE, FALSE) AS is_most_recent_record_month,
     a.dt_invoice_paid,
     a.dt_invoice_due,

@@ -45,17 +45,22 @@ SELECT
     ie.id_invoice_extra,
     COALESCE(cc.our_number, cp.id_external) AS our_number,
     cp.status,
-    cp.total_amount + cp.discount_amount - (cp.installment_interest + cp.installment_fee_amount + cp.installment_costs + cp.installment_lawyers_fee) AS original_debt_amount,
+    cp.payment_type,
     cp.adm_fee_amount,
     cp.installment_fee_amount,
-    cp.debts_fee_amount,
-    cp.discount_amount,
-    cp.total_amount,
     cp.installment_interest,
     cp.installment_costs,
     cp.installment_lawyers_fee,
     cp.credit_card_fee,
-    cp.payment_type,
+    CASE
+        WHEN LOWER(c.name) LIKE "%recupera%"
+            OR (LOWER(c.name) LIKE "%cyber%" AND BIGINT(n.id_collector_external) < 10000000) -- migration from recupera to cyber
+            OR LOWER(c.name) = "5a-collector"
+            THEN cp.debts_fee_amount
+        WHEN LOWER(c.name) LIKE "%cyber%" THEN (cp.installment_interest + cp.installment_fee_amount + cp.installment_costs + cp.installment_lawyers_fee)
+    END AS debts_fee_amount,
+    cp.discount_amount,
+    cp.total_amount,
     cp.dt_due,
     cp.ts_paid_diff as ts_paid_difference,
     cp.ts_expired,
@@ -70,3 +75,5 @@ LEFT JOIN invoice_extra AS ie
     ON cp.id = ie.id_installment
 LEFT JOIN datalake_trato_feito_clean.negotiation AS n
     ON cp.id_negotiation = n.id
+LEFT JOIN datalake_trato_feito_clean.collector AS c
+    ON n.id_collector = c.id

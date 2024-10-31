@@ -3,13 +3,15 @@ deduplicate_trato_feito_negotiation AS (
   SELECT DISTINCT
     id_contract,
     id_negotiation,
+    qt_installments AS number_of_installments,
     IFNULL(CAST(id_negotiation_external AS BIGINT), id_negotiation_external) AS id_negotiation_external,
     CASE
       WHEN debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
       WHEN debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
     END AS creditor,
-     CASE
-      WHEN LOWER(collector) LIKE '%cyber%' THEN "Trato Feito - Cyber"
+    CASE
+      WHEN LOWER(collector) LIKE '%cyber%' AND BIGINT(id_negotiation_external) < 10000000 THEN "Trato Feito - Cyber (Migração)"
+      WHEN LOWER(collector) LIKE '%cyber%' AND BIGINT(id_negotiation_external) >= 10000000 THEN "Trato Feito - Cyber"
       WHEN LOWER(collector) LIKE '%recupera%' THEN "Trato Feito - Recupera"
       WHEN UPPER(collector) LIKE '%5A%' THEN "Trato Feito - Self Service"
     END AS source
@@ -25,17 +27,16 @@ trato_feito_installment AS (
     n.id_negotiation_external,
     i.id AS id_installment_trato_feito,
     i.id_invoice_extra,
+    n.number_of_installments,
     i.installment_number,
     i.our_number,
     n.creditor,
     i.status AS installment_status,
     i.payment_type AS payment_method,
-    NULL AS delay_days,
-    original_debt_amount AS main_amount,
-    NULL AS updated_balance,
     installment_fee_amount AS fine_amount,
     installment_interest AS interest_fee_amount,
-    i.adm_fee_amount AS credit_card_fee_amount,
+    i.debts_fee_amount,
+    IFNULL(i.adm_fee_amount, 0) AS credit_card_fee_amount,
     i.installment_costs,
     i.installment_lawyers_fee,
     i.discount_amount,
@@ -52,6 +53,60 @@ trato_feito_installment AS (
       deduplicate_trato_feito_negotiation AS n
           ON i.id_negotiation = n.id_negotiation
 ),
+tf_negotiation_with_all_amounts_in_first_installment AS (
+  SELECT
+    id_negotiation_external,
+    number_of_installments,
+    SUM(debts_fee_amount) FILTER (WHERE installment_number = 1) AS debts_fee_amount_first_installment,
+    SUM(debts_fee_amount) FILTER (WHERE installment_number > 1) AS debts_fee_amount_other_installments,
+    SUM(discount_amount) FILTER (WHERE installment_number = 1) AS discount_amount_first_installment,
+    SUM(discount_amount) FILTER (WHERE installment_number > 1) AS discount_amount_other_installments
+  FROM
+    trato_feito_installment
+  WHERE
+    number_of_installments > 1
+    AND source IN ("Trato Feito - Recupera", "Trato Feito - Cyber (Migração)")
+  GROUP BY 1,2
+  HAVING (debts_fee_amount_first_installment > 0 AND debts_fee_amount_other_installments = 0)
+    OR (discount_amount_first_installment > 0 AND discount_amount_other_installments = 0)
+),
+tf_divide_amount_by_installments AS (
+  SELECT
+    id_negotiation_external,
+    FLOOR(debts_fee_amount_first_installment/number_of_installments,2) AS debt_fees,
+    debts_fee_amount_first_installment - FLOOR(debts_fee_amount_first_installment/number_of_installments,2) * (number_of_installments - 1) AS last_debt_fees,
+    FLOOR(discount_amount_first_installment/number_of_installments,2) AS discount,
+    discount_amount_first_installment - FLOOR(discount_amount_first_installment/number_of_installments,2) * (number_of_installments - 1) AS last_discount
+  FROM
+    tf_negotiation_with_all_amounts_in_first_installment
+),
+tf_fix_debt_and_discount AS (
+  SELECT
+    i.* EXCEPT (i.debts_fee_amount, i.discount_amount),
+    i.debts_fee_amount AS debts_fee_amount_original,
+    CASE
+      WHEN f.id_negotiation_external IS NOT NULL AND i.installment_number = i.number_of_installments THEN f.last_debt_fees
+      WHEN f.id_negotiation_external IS NOT NULL AND i.installment_number != i.number_of_installments THEN f.debt_fees
+      ELSE i.debts_fee_amount
+    END AS debts_fee_amount,
+    CASE
+      WHEN f.id_negotiation_external IS NOT NULL AND i.installment_number = i.number_of_installments THEN f.last_discount
+      WHEN f.id_negotiation_external IS NOT NULL AND i.installment_number != i.number_of_installments THEN f.discount
+      ELSE i.discount_amount
+    END AS discount_amount
+  FROM
+    trato_feito_installment AS i
+  LEFT JOIN
+    tf_divide_amount_by_installments AS f
+      ON i.id_negotiation_external = f.id_negotiation_external
+),
+tf_all_fields_fix AS (
+  SELECT
+    *,
+    amount_to_pay + discount_amount - debts_fee_amount AS main_amount
+  FROM
+    tf_fix_debt_and_discount
+),
 cyber_installments AS (
   SELECT DISTINCT
     CONCAT(CAST(id_negotiation AS BIGINT), LPAD(INT(installment_number), 3, '0')) AS id_negotiation_installment,
@@ -62,7 +117,6 @@ cyber_installments AS (
     creditor,
     installment_status,
     payment_method,
-    NULL delay_days,
     original_amount AS main_amount,
     agreement_balance_amount AS updated_balance,
     fine_amount,
@@ -70,6 +124,8 @@ cyber_installments AS (
     credit_card_fee_amount,
     eviction_costs_amount AS installment_costs,
     honorarium_amount AS installment_lawyers_fee,
+    fine_amount + total_interest_amount + eviction_costs_amount + honorarium_amount  AS debts_fee_amount,
+    discount_to_original_amount,
     discount_amount,
     amount_to_pay,
     paid_amount,
@@ -97,11 +153,11 @@ recupera_installments AS (
       ELSE ri.installment_status
     END AS installment_status,
     ri.payment_method,
-    ri.delay_days,
     ri.main_amount,
     ri.updated_balance,
     ri.amount_fine AS fine_amount,
     ri.default_interest_amount + ri.interest_fee_amount AS interest_fee_amount,
+    ri.amount_fine + ri.default_interest_amount + ri.interest_fee_amount AS debts_fee_amount,
     ri.adm_fee_amount AS credit_card_fee_amount,
     ri.discount_amount,
     ri.amount_to_pay,
@@ -113,7 +169,7 @@ recupera_installments AS (
     'Recupera' AS source
   FROM
     datalake_recupera.installment AS ri
-  LEFT JOIN trato_feito_installment AS tf
+  LEFT JOIN tf_all_fields_fix AS tf
     ON
       tf.id_negotiation_installment =  CONCAT(CAST(ri.id_negotiation AS BIGINT), LPAD(INT(ri.installment_number), 3, '0'))
       AND tf.source = "Trato Feito - Recupera"
@@ -131,13 +187,14 @@ all_installments AS (
     COALESCE(tf.creditor, ci.creditor, ri.creditor) AS creditor,
     COALESCE(tf.installment_status, ci.installment_status, ri.installment_status) AS installment_status,
     COALESCE(tf.payment_method, ci.payment_method, ri.payment_method) AS payment_method,
-    COALESCE(tf.delay_days, ci.delay_days, ri.delay_days) AS delay_days,
-    COALESCE(tf.main_amount, ci.main_amount, ri.main_amount) AS main_amount,
-    COALESCE(tf.updated_balance, ci.updated_balance, ri.updated_balance) AS updated_balance,
-    COALESCE(tf.fine_amount, ci.fine_amount, ri.fine_amount, 0) AS fine_amount,
-    COALESCE(tf.interest_fee_amount, ci.interest_fee_amount, ri.interest_fee_amount, 0) AS interest_fee_amount,
-    COALESCE(tf.credit_card_fee_amount, ci.credit_card_fee_amount, ri.credit_card_fee_amount, 0) AS credit_card_fee_amount,
-    COALESCE(tf.discount_amount, ci.discount_amount, ri.discount_amount) AS discount_amount,
+    COALESCE(ci.main_amount, tf.main_amount, ri.main_amount) AS main_amount,
+    COALESCE(ci.updated_balance, ri.updated_balance) AS updated_balance,
+    COALESCE(ci.fine_amount, ri.fine_amount, tf.fine_amount, 0) AS fine_amount,
+    COALESCE(ci.interest_fee_amount, ri.interest_fee_amount, tf.interest_fee_amount, 0) AS interest_fee_amount,
+    COALESCE(ci.debts_fee_amount, tf.debts_fee_amount, ri.debts_fee_amount)AS debts_fee_amount,
+    COALESCE(ci.credit_card_fee_amount, ri.credit_card_fee_amount, tf.credit_card_fee_amount, 0) AS credit_card_fee_amount,
+    COALESCE(ci.discount_amount, tf.discount_amount, ri.discount_amount) AS discount_amount,
+    ci.discount_to_original_amount,
     COALESCE(tf.installment_costs, ci.installment_costs, 0) AS installment_costs,
     COALESCE(tf.installment_lawyers_fee, ci.installment_lawyers_fee, 0) AS installment_lawyers_fee,
     COALESCE(tf.amount_to_pay, ci.amount_to_pay, ri.amount_to_pay) AS amount_to_pay,
@@ -147,7 +204,7 @@ all_installments AS (
     COALESCE(tf.dt_paid, ci.dt_paid, ri.dt_paid) AS dt_paid,
     COALESCE(tf.dt_canceled, ci.dt_canceled, ri.dt_canceled) AS dt_canceled,
     COALESCE(tf.source, ci.source, ri.source) AS source
-  FROM trato_feito_installment AS tf
+  FROM tf_all_fields_fix AS tf
   FULL OUTER JOIN cyber_installments AS ci
     ON tf.id_negotiation_installment = ci.id_negotiation_installment
       AND tf.id_contract = ci.id_contract
@@ -169,7 +226,8 @@ nexxera_confirmation AS (
       occurrence_code = '06'
   QUALIFY
       ROW_NUMBER() OVER(PARTITION BY our_number, occurrence_code ORDER BY dt_occurrence_code DESC) = 1
-)
+),
+calculate_discounts AS (
 SELECT DISTINCT
     CONCAT(i.id_contract, i.id_negotiation_installment) AS sk_negotiation_installment,
     CONCAT(COALESCE(i.id_contract, 0), CAST(i.id_negotiation_external AS STRING)) AS sk_negotiation,
@@ -190,21 +248,21 @@ SELECT DISTINCT
       WHEN UPPER(i.payment_method) IN ("CREDIT-CARD", "CARTÃO", "CARTÃO DE CRÉDITO") THEN "CARTÃO DE CRÉDITO"
       ELSE UPPER(i.payment_method)
     END AS payment_method,
-    i.delay_days,
     i.main_amount,
     i.updated_balance,
     i.fine_amount,
     i.interest_fee_amount,
+    i.debts_fee_amount,
     i.credit_card_fee_amount,
     i.installment_costs,
     i.installment_lawyers_fee,
-    i.discount_amount,
-    i.main_amount -
-      ROUND(CASE
-        WHEN i.discount_amount >= (i.fine_amount + i.interest_fee_amount + i.installment_costs + i.installment_lawyers_fee)
-          THEN i.discount_amount - (i.fine_amount + i.interest_fee_amount + i.installment_costs + i.installment_lawyers_fee)
-        ELSE 0 END
-      , 2) AS net_amount,
+    i.main_amount + i.debts_fee_amount AS debt_amount,
+    CASE
+        WHEN source IN ("Trato Feito - Recupera", "Trato Feito - Cyber (Migração)", "Recupera")
+          THEN (i.main_amount + i.debts_fee_amount) - i.amount_to_pay
+      ELSE i.discount_amount
+    END AS discount_amount,
+    i.discount_to_original_amount,
     i.amount_to_pay,
     CASE
       WHEN i.installment_status IN ('pending', 'registered') AND nx.paid_amount IS NOT NULL THEN nx.paid_amount -- Only use nexxera if others call it 'registered'
@@ -216,8 +274,7 @@ SELECT DISTINCT
       WHEN i.installment_status IN ('pending', 'registered') AND nx.paid_amount IS NOT NULL THEN nx.dt_paid -- Only use nexxera if others call it 'registered'
       ELSE COALESCE(DATE(ri.ts_paid), i.dt_paid)
     END AS dt_paid,
-    i.dt_canceled,
-    NOW() AS ts_load
+    i.dt_canceled
 FROM
     all_installments AS i
 LEFT JOIN
@@ -226,3 +283,47 @@ LEFT JOIN
         AND nx.dt_due = i.dt_due
 LEFT JOIN datalake_retsuko.invoice AS ri
   ON i.id_invoice_extra = ri.id_external
+)
+SELECT DISTINCT
+    sk_negotiation_installment,
+    sk_negotiation,
+    sk_contract,
+    id_negotiation,
+    id_installment_trato_feito,
+    id_invoice_extra,
+    installment_number,
+    our_number,
+    creditor,
+    source,
+    installment_status,
+    payment_method,
+    CAST(main_amount AS DECIMAL(14,2)) AS main_amount,
+    CAST(updated_balance AS DECIMAL(14,2)) AS updated_balance,
+    fine_amount,
+    interest_fee_amount,
+    CAST(debts_fee_amount AS DECIMAL(14,2)) AS debts_fee_amount,
+    CAST(credit_card_fee_amount AS DECIMAL(14,2)) AS credit_card_fee_amount,
+    installment_costs,
+    installment_lawyers_fee,
+    CAST(debt_amount AS DECIMAL(14,2)) AS debt_amount,
+    CAST(discount_amount AS DECIMAL(14,2)) AS discount_amount,
+    CAST(COALESCE(discount_to_original_amount,
+      CASE
+        WHEN discount_amount >= (debts_fee_amount + credit_card_fee_amount)
+          THEN discount_amount - (debts_fee_amount + credit_card_fee_amount)
+        ELSE 0
+    END) AS DECIMAL(14,2)) AS discount_to_original,
+    CAST(main_amount - COALESCE(discount_to_original_amount,
+      CASE
+        WHEN discount_amount >= (debts_fee_amount + credit_card_fee_amount)
+          THEN discount_amount - (debts_fee_amount + credit_card_fee_amount)
+        ELSE 0
+    END) AS DECIMAL(14,2)) AS net_amount,
+    amount_to_pay,
+    paid_amount,
+    dt_creation,
+    dt_due,
+    dt_paid,
+    dt_canceled,
+    NOW() AS ts_load
+FROM calculate_discounts

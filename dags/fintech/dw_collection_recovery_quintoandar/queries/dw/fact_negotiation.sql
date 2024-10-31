@@ -6,7 +6,8 @@ trato_feito_negotiation AS (
     n.id_contract,
     REGEXP_REPLACE(cl.document,r"\.|\-", "") AS id_customer,
     CASE
-      WHEN LOWER(n.collector) LIKE "%cyber%" THEN "Trato Feito - Cyber"
+      WHEN LOWER(n.collector) LIKE "%cyber%" AND BIGINT(n.id_negotiation_external) < 10000000 THEN "Trato Feito - Cyber (Migração)"
+      WHEN LOWER(n.collector) LIKE "%cyber%" AND BIGINT(n.id_negotiation_external) >= 10000000 THEN "Trato Feito - Cyber"
       WHEN LOWER(n.collector) LIKE "%recupera%" THEN "Trato Feito - Recupera"
       WHEN UPPER(n.collector) LIKE "%5A%" THEN "Trato Feito - Self Service"
     END AS source,
@@ -29,7 +30,9 @@ trato_feito_negotiation AS (
     n.interest_fee_amount,
     n.fine_fee_amount AS fine_amount,
     n.credit_card_fee_amount,
-    ROUND(n.negotiation_original_amount + n.fine_fee_amount + n.interest_fee_amount + n.credit_card_fee_amount, 2) AS total_debt_amount,
+    n.installment_costs AS installment_eviction_costs,
+    n.installment_lawyers_fee,
+    n.negotiation_original_amount + n.fine_fee_amount + n.interest_fee_amount + n.installment_costs + n.installment_lawyers_fee AS total_debt_amount,
     n.negotiation_discount_amount AS discount_amount, -- Total debt (total_debt_amount = original + fine + fee + credit card) - Negotiated amount (total_expected_amount)
     n.total_expected_amount AS negotiated_amount,
     n.down_payment_amount,
@@ -73,12 +76,21 @@ cyber_negotiation AS (
     number_of_installments,
     paid_installments,
     breached_installments,
-    debt_amount - total_interest_fees_amount - fine_amount - credit_card_fee_amount AS original_debt_amount,
+    original_amount AS original_debt_amount,
     total_interest_fees_amount AS interest_fee_amount,
     fine_amount,
     credit_card_fee_amount,
+    eviction_costs_amount AS installment_eviction_costs,
+    honorarium_amount AS installment_lawyers_fee,
     debt_amount AS total_debt_amount,
     discount_amount,
+    discount_to_original_amount,
+    discount_to_fees_amount + discount_to_fine_amount + discount_to_eviction_costs AS discount_to_fees_amount,
+    CASE
+      WHEN discount_amount > discount_to_original_amount + discount_to_fees_amount + discount_to_fine_amount + discount_to_eviction_costs
+       THEN discount_amount - (discount_to_original_amount + discount_to_fees_amount + discount_to_fine_amount + discount_to_eviction_costs)
+      ELSE 0
+    END AS discount_to_credit_fee_amount,
     negotiated_amount,
     down_payment_amount,
     percentage_paid_agreement/100 * negotiated_amount AS total_paid_amount,
@@ -131,10 +143,10 @@ recupera_negotiation AS (
     rn.breached_installments,
     rn.original_debt_amount,
     rn.interest_fee_amount,
-    IF(rn.is_special_installment IS TRUE, rn.fine_fee_amount, GREATEST(ROUND(rn.expense_amount - rn.original_debt_amount - rn.interest_fee_amount - rn.adm_fee_amount - rn.negotiation_discount_amount, 2), 0))  AS fine_amount,
+    IF(rn.is_special_installment IS TRUE, rn.fine_fee_amount, GREATEST(rn.expense_amount - rn.original_debt_amount - rn.interest_fee_amount - rn.adm_fee_amount - rn.negotiation_discount_amount, 0))  AS fine_amount,
     rn.adm_fee_amount AS credit_card_fee_amount,
-    ROUND(rn.expense_amount, 2) AS total_debt_amount, -- original_debt_amount + interest_fee_amount + fine_fee_amount + credit_card_fee
-    GREATEST(ROUND(rn.expense_amount - rn.negotiated_amount, 2), 0) AS discount_amount,
+    rn.expense_amount AS total_debt_amount, -- original_debt_amount + interest_fee_amount + fine_fee_amount + credit_card_fee
+    GREATEST(rn.expense_amount - rn.negotiated_amount, 0) AS discount_amount,
     rn.negotiated_amount,
     rn.down_payment_amount,
     rn.total_amount_paid AS total_paid_amount,
@@ -169,6 +181,7 @@ installments_data AS (
     id_negotiation,
     sk_contract,
     payment_method AS promisse_payment_method,
+    main_amount AS down_payment_original_amount,
     amount_to_pay AS down_payment_amount,
     net_amount AS down_payment_net_amount,
     dt_paid AS dt_down_payment
@@ -238,9 +251,15 @@ union_sources AS (
     COALESCE(tfn.fine_amount, cn.fine_amount, rn.fine_amount, 0) AS fine_fee_amount,
     COALESCE(tfn.interest_fee_amount, cn.interest_fee_amount, rn.interest_fee_amount, 0) AS interest_fee_amount,
     COALESCE(tfn.credit_card_fee_amount, cn.credit_card_fee_amount, rn.credit_card_fee_amount, 0) AS credit_card_fee_amount,
+    COALESCE(tfn.installment_eviction_costs, cn.installment_eviction_costs, 0) AS installment_eviction_costs,
+    COALESCE(tfn.installment_lawyers_fee, cn.installment_lawyers_fee, 0) AS installment_lawyers_fee,
     COALESCE(tfn.total_debt_amount, cn.total_debt_amount, rn.total_debt_amount) AS total_debt_amount,
     COALESCE(tfn.discount_amount, cn.discount_amount, rn.discount_amount, 0) AS total_discount_amount,
+    cn.discount_to_original_amount,
+    cn.discount_to_fees_amount,
+    cn.discount_to_credit_fee_amount,
     COALESCE(tfn.negotiated_amount, cn.negotiated_amount, rn.negotiated_amount) AS negotiated_amount,
+    i.down_payment_original_amount,
     COALESCE(i.down_payment_amount, tfn.down_payment_amount, cn.down_payment_amount, rn.down_payment_amount) AS down_payment_amount,
     i.down_payment_net_amount,
     COALESCE(tfn.paid_amount, cn.total_paid_amount, rn.total_paid_amount, 0) AS paid_amount,
@@ -267,85 +286,233 @@ union_sources AS (
   LEFT JOIN installments_data AS i
     ON COALESCE(tfn.id_negotiation, cn.id_negotiation, rn.id_negotiation) = i.id_negotiation
     AND COALESCE(tfn.id_contract, cn.id_contract, rn.id_contract) = sk_contract
+),
+calculations AS (
+  SELECT
+    CONCAT(COALESCE(CAST(u.id_contract AS BIGINT), 0), CAST(u.id_negotiation AS STRING)) AS sk_negotiation,
+    CAST(u.id_contract AS BIGINT) AS sk_contract,
+    u.id_debtor AS sk_debtor,
+    CAST(u.id_negotiation AS STRING) AS id_negotiation,
+    u.id_negotiation_trato_feito,
+    COALESCE(po.operator_name, u.id_operator) AS id_operator,
+    u.id_campaign,
+    u.creditor,
+    u.source,
+    u.is_not_standard_negotiation,
+    u.not_standard_reason,
+    u.agreement_type,
+    u.advisory,
+    u.origin_agreement,
+    u.campaign_status,
+    u.negotiation_status,
+    CASE
+        WHEN u.dt_down_payment IS NULL
+          AND u.negotiation_status = "started" THEN "PROMESSA"
+        WHEN u.dt_down_payment IS NULL
+          AND u.negotiation_status = "canceled" THEN "PROMESSA QUEBRADA"
+        WHEN u.dt_down_payment IS NOT NULL
+          AND u.total_invoices_negotiated >= 1 AND u.number_of_installments > 1 THEN "ACORDO"
+        WHEN u.dt_down_payment IS NOT NULL
+          AND u.total_invoices_negotiated > 1 AND u.number_of_installments = 1 THEN "QUITAÇÃO"
+        WHEN u.dt_down_payment IS NOT NULL
+          AND u.total_invoices_negotiated = 1 AND u.number_of_installments = 1 THEN "SUBSTITUIÇÃO"
+      END AS negotiation_classification,
+    CASE
+      WHEN UPPER(u.promisse_payment_method) IN ("CREDIT-CARD", "CARTÃO", "CARTÃO DE CRÉDITO") THEN "CARTÃO DE CRÉDITO"
+      ELSE UPPER(u.promisse_payment_method)
+    END AS promisse_payment_method,
+    u.is_renegotiation,
+    u.has_been_renegotiated,
+    CASE
+      WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 0 THEN "Current"
+      WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 30  THEN "1-30"
+      WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 60  THEN "31-60"
+      WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 90  THEN "61-90"
+      WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 120 THEN "91-120"
+      WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 180 THEN "121-180"
+      WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) IS NULL THEN NULL
+      ELSE "over 180"
+    END AS delay_contamined_range,
+    u.total_invoices_negotiated,
+    u.number_of_installments,
+    u.paid_installments,
+    u.breached_installments,
+    u.original_debt_amount,
+    u.fine_fee_amount,
+    u.interest_fee_amount,
+    u.credit_card_fee_amount,
+    u.installment_eviction_costs,
+    u.installment_lawyers_fee,
+    u.total_debt_amount,
+    CASE
+      WHEN u.total_discount_amount = 0
+         AND LOWER(source) NOT IN ("Trato Feito - Cyber", "Cyber")
+         AND u.negotiated_amount < u.total_debt_amount
+        THEN u.total_debt_amount - u.negotiated_amount
+      ELSE u.total_discount_amount
+    END AS total_discount_amount,
+    u.discount_to_original_amount,
+    u.discount_to_fees_amount,
+    u.discount_to_credit_fee_amount,
+    u.negotiated_amount,
+    u.down_payment_original_amount,
+    u.down_payment_amount,
+    u.down_payment_net_amount,
+    IF(u.dt_down_payment IS NOT NULL, u.down_payment_net_amount, 0) AS down_payment_net_amount_paid,
+    u.paid_amount,
+    u.dt_due_invoice_anchor,
+    u.dt_promisse,
+    u.dt_due_promisse,
+    u.dt_cancellation,
+    u.dt_down_payment,
+    u.dt_paid_all_installments,
+    u.dt_expected_ending,
+    u.dt_ending
+  FROM union_sources AS u
+  LEFT JOIN paschoalotto_operator AS po
+    ON
+      UPPER(u.id_operator) LIKE "%PASCH%"
+      AND po.id_contract = u.id_contract
+      AND po.id_negotiation = u.id_negotiation
+      AND po.dt_promisse = u.dt_promisse
+),
+calculate_discounts AS (
+  SELECT
+    sk_negotiation,
+    sk_contract,
+    sk_debtor,
+    id_negotiation,
+    id_negotiation_trato_feito,
+    id_operator,
+    id_campaign,
+    creditor,
+    source,
+    is_not_standard_negotiation,
+    not_standard_reason,
+    agreement_type,
+    advisory,
+    origin_agreement,
+    campaign_status,
+    negotiation_status,
+    negotiation_classification,
+    promisse_payment_method,
+    is_renegotiation,
+    has_been_renegotiated,
+    delay_contamined_range,
+    total_invoices_negotiated,
+    number_of_installments,
+    paid_installments,
+    breached_installments,
+    original_debt_amount,
+    fine_fee_amount,
+    interest_fee_amount,
+    credit_card_fee_amount,
+    installment_eviction_costs,
+    installment_lawyers_fee,
+    total_debt_amount,
+    total_discount_amount,
+    COALESCE(discount_to_fees_amount,
+      CASE
+        WHEN total_discount_amount >= (fine_fee_amount + interest_fee_amount)
+          THEN (fine_fee_amount + interest_fee_amount)
+        ELSE total_discount_amount
+      END) AS discount_to_fees_amount,
+    COALESCE(discount_to_credit_fee_amount,
+      CASE
+        WHEN credit_card_fee_amount != 0 AND total_discount_amount = (fine_fee_amount + interest_fee_amount + credit_card_fee_amount) THEN credit_card_fee_amount
+        ELSE 0
+      END) AS discount_to_credit_fee_amount,
+    COALESCE(discount_to_original_amount,
+      CASE
+        WHEN credit_card_fee_amount != 0 AND total_discount_amount = (fine_fee_amount + interest_fee_amount + credit_card_fee_amount) THEN total_discount_amount - (fine_fee_amount + interest_fee_amount + credit_card_fee_amount)
+        WHEN total_discount_amount >= (fine_fee_amount + interest_fee_amount) THEN total_discount_amount - (fine_fee_amount + interest_fee_amount)
+        ELSE 0
+      END) AS discount_to_original_amount,
+    negotiated_amount,
+    down_payment_original_amount,
+    down_payment_amount,
+    down_payment_net_amount,
+    down_payment_net_amount_paid,
+    paid_amount,
+    dt_due_invoice_anchor,
+    dt_promisse,
+    dt_due_promisse,
+    dt_cancellation,
+    dt_down_payment,
+    dt_paid_all_installments,
+    dt_expected_ending,
+    dt_ending
+  FROM calculations
 )
 SELECT
-  CONCAT(COALESCE(CAST(u.id_contract AS BIGINT), 0), CAST(u.id_negotiation AS STRING)) AS sk_negotiation,
-  CAST(u.id_contract AS BIGINT) AS sk_contract,
-  u.id_debtor AS sk_debtor,
-  CAST(u.id_negotiation AS STRING) AS id_negotiation,
-  u.id_negotiation_trato_feito,
-  COALESCE(po.operator_name, u.id_operator) AS id_operator,
-  u.id_campaign,
-  u.creditor,
-  u.source,
-  u.is_not_standard_negotiation,
-  u.not_standard_reason,
-  u.agreement_type,
-  u.advisory,
-  u.origin_agreement,
-  u.campaign_status,
-  u.negotiation_status,
-  CASE
-      WHEN u.dt_down_payment IS NULL
-        AND u.negotiation_status = "started" THEN "PROMESSA"
-      WHEN u.dt_down_payment IS NULL
-        AND u.negotiation_status = "canceled" THEN "PROMESSA QUEBRADA"
-      WHEN u.dt_down_payment IS NOT NULL
-        AND u.total_invoices_negotiated >= 1 AND u.number_of_installments > 1 THEN "ACORDO"
-      WHEN u.dt_down_payment IS NOT NULL
-        AND u.total_invoices_negotiated > 1 AND u.number_of_installments = 1 THEN "QUITAÇÃO"
-      WHEN u.dt_down_payment IS NOT NULL
-        AND u.total_invoices_negotiated = 1 AND u.number_of_installments = 1 THEN "SUBSTITUIÇÃO"
-    END AS negotiation_classification,
-  CASE
-    WHEN UPPER(u.promisse_payment_method) IN ("CREDIT-CARD", "CARTÃO", "CARTÃO DE CRÉDITO") THEN "CARTÃO DE CRÉDITO"
-    ELSE UPPER(u.promisse_payment_method)
-  END AS promisse_payment_method,
-  u.is_renegotiation,
-  u.has_been_renegotiated,
-  CASE
-    WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 0 THEN "Current"
-    WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 30  THEN "1-30"
-    WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 60  THEN "31-60"
-    WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 90  THEN "61-90"
-    WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 120 THEN "91-120"
-    WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) <= 180 THEN "121-180"
-    WHEN DATEDIFF(u.dt_promisse, u.dt_due_invoice_anchor) IS NULL THEN NULL
-    ELSE "over 180"
-  END AS delay_contamined_range,
-  u.total_invoices_negotiated,
-  u.number_of_installments,
-  u.paid_installments,
-  u.breached_installments,
-  u.original_debt_amount,
-  u.fine_fee_amount,
-  u.interest_fee_amount,
-  u.credit_card_fee_amount,
-  ROUND(u.total_debt_amount,2) AS total_debt_amount,
-  u.total_discount_amount,
-  ROUND(IF(u.total_discount_amount >= (u.fine_fee_amount + u.interest_fee_amount),
-    (u.fine_fee_amount + u.interest_fee_amount),
-    u.total_discount_amount), 2) AS discount_to_fees_amount,
-  ROUND(IF(u.total_discount_amount >= (u.fine_fee_amount + u.interest_fee_amount),
-    u.total_discount_amount - (u.fine_fee_amount + u.interest_fee_amount),
-    0), 2) AS discount_to_original_amount,
-  u.negotiated_amount,
-  ROUND(u.down_payment_amount,2) AS down_payment_amount,
-  IF(u.dt_down_payment IS NOT NULL, ROUND(u.down_payment_net_amount, 2), 0) AS down_payment_net_amount_paid,
-  u.paid_amount,
-  u.dt_due_invoice_anchor,
-  u.dt_promisse,
-  u.dt_due_promisse,
-  u.dt_cancellation,
-  u.dt_down_payment,
-  u.dt_paid_all_installments,
-  u.dt_expected_ending,
-  u.dt_ending,
+  sk_negotiation,
+  sk_contract,
+  sk_debtor,
+  id_negotiation,
+  id_negotiation_trato_feito,
+  id_operator,
+  id_campaign,
+  creditor,
+  source,
+  is_not_standard_negotiation,
+  not_standard_reason,
+  agreement_type,
+  advisory,
+  origin_agreement,
+  campaign_status,
+  negotiation_status,
+  negotiation_classification,
+  promisse_payment_method,
+  is_renegotiation,
+  has_been_renegotiated,
+  delay_contamined_range,
+  total_invoices_negotiated,
+  number_of_installments,
+  paid_installments,
+  breached_installments,
+  CAST(original_debt_amount AS DECIMAL(14,2)) AS original_debt_amount,
+  CAST(fine_fee_amount AS DECIMAL(14,2)) AS fine_fee_amount,
+  CAST(interest_fee_amount AS DECIMAL(14,2)) AS interest_fee_amount,
+  CAST(credit_card_fee_amount AS DECIMAL(14,2)) AS credit_card_fee_amount,
+  CAST(installment_eviction_costs AS DECIMAL(14,2)) AS installment_eviction_costs,
+  CAST(installment_lawyers_fee AS DECIMAL(14,2)) AS installment_lawyers_fee,
+  CAST(total_debt_amount AS DECIMAL(14,2)) AS total_debt_amount,
+  CAST(total_discount_amount AS DECIMAL(14,2)) AS total_discount_amount,
+  CAST(discount_to_fees_amount AS DECIMAL(14,2)) AS discount_to_fees_amount,
+  CAST(discount_to_credit_fee_amount AS DECIMAL(14,2)) AS discount_to_credit_fee_amount,
+  CAST(discount_to_original_amount AS DECIMAL(14,2)) AS discount_to_original_amount,
+  CAST(negotiated_amount AS DECIMAL(14,2)) AS negotiated_amount,
+  CAST(down_payment_original_amount AS DECIMAL(14,2)) AS down_payment_original_amount,
+  CAST(down_payment_amount AS DECIMAL(14,2)) AS down_payment_amount,
+  CAST(CASE
+    WHEN number_of_installments = 1
+        THEN original_debt_amount - discount_to_original_amount
+    ELSE down_payment_net_amount
+  END AS DECIMAL(14,2)) AS down_payment_net_amount,
+  CAST(CASE
+    WHEN number_of_installments = 1
+      AND dt_down_payment IS NOT NULL
+        THEN original_debt_amount - discount_to_original_amount
+    ELSE down_payment_net_amount_paid
+  END AS DECIMAL(14,2)) AS down_payment_net_amount_paid,
+  CAST(CASE
+    WHEN (promisse_payment_method = "CARTÃO DE CRÉDITO" OR number_of_installments = 1)
+      AND dt_down_payment IS NOT NULL
+        THEN original_debt_amount - discount_to_original_amount
+    WHEN promisse_payment_method != "CARTÃO DE CRÉDITO"
+      AND number_of_installments != 1
+      AND down_payment_net_amount_paid != 0
+        THEN down_payment_net_amount_paid
+    ELSE 0
+  END AS DECIMAL(14,2)) AS net_paid_amount,
+  CAST(paid_amount AS DECIMAL(14,2)) AS paid_amount,
+  dt_due_invoice_anchor,
+  dt_promisse,
+  dt_due_promisse,
+  dt_cancellation,
+  dt_down_payment,
+  dt_paid_all_installments,
+  dt_expected_ending,
+  dt_ending,
   NOW() AS ts_load
-FROM union_sources AS u
-LEFT JOIN paschoalotto_operator AS po
-  ON
-    UPPER(u.id_operator) LIKE "%PASCH%"
-    AND po.id_contract = u.id_contract
-    AND po.id_negotiation = u.id_negotiation
-    AND po.dt_promisse = u.dt_promisse
+FROM calculate_discounts

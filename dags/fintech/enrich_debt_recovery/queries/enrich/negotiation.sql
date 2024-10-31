@@ -90,30 +90,46 @@ SELECT
     i.paid_amount,
     d.negotiation_original_amount,
     CASE
+        WHEN LOWER(c.name) LIKE "%recupera%"
+            OR (LOWER(c.name) LIKE "%cyber%" AND BIGINT(n.id_collector_external) < 10000000)  -- migration from recupera to cyber
+            OR LOWER(c.name) = "5a-collector"
+        THEN d.negotiation_discount_amount
         WHEN LOWER(c.name) LIKE "%cyber%" THEN i.discount_amount
-        WHEN LOWER(c.name) LIKE "%recupera%" THEN d.negotiation_discount_amount
         ELSE COALESCE(i.discount_amount, d.negotiation_discount_amount)
     END AS negotiation_discount_amount,
     CASE
+        WHEN LOWER(c.name) LIKE "%recupera%"
+            OR (LOWER(c.name) LIKE "%cyber%" AND BIGINT(n.id_collector_external) < 10000000)  -- migration from recupera to cyber
+            OR LOWER(c.name) = "5a-collector"
+        THEN d.interest_fee_amount
         WHEN LOWER(c.name) LIKE "%cyber%" THEN i.installment_interest
-        WHEN LOWER(c.name) LIKE "%recupera%" THEN d.interest_fee_amount
         ELSE COALESCE(i.installment_interest, d.interest_fee_amount)
     END AS interest_fee_amount,
     CASE
+        WHEN LOWER(c.name) LIKE "%recupera%"
+            OR (LOWER(c.name) LIKE "%cyber%" AND BIGINT(n.id_collector_external) < 10000000) -- migration from recupera to cyber
+            OR LOWER(c.name) = "5a-collector"
+        THEN d.fine_fee_amount
         WHEN LOWER(c.name) LIKE "%cyber%" THEN i.installment_fee_amount
-        WHEN LOWER(c.name) LIKE "%recupera%" THEN d.fine_fee_amount
         ELSE COALESCE(i.installment_fee_amount, d.fine_fee_amount)
     END AS fine_fee_amount,
     CASE
+        WHEN LOWER(c.name) LIKE "%recupera%"
+            OR (LOWER(c.name) LIKE "%cyber%" AND BIGINT(n.id_collector_external) < 10000000) -- migration from recupera to cyber
+            OR LOWER(c.name) = "5a-collector"
+        THEN d.negotiation_fees_amount
         WHEN LOWER(c.name) LIKE "%cyber%" THEN i.negotiation_fees_amount
-        WHEN LOWER(c.name) LIKE "%recupera%" THEN d.negotiation_fees_amount
         ELSE COALESCE(i.negotiation_fees_amount, d.negotiation_fees_amount)
     END AS negotiation_fees_amount,
     CASE
+        WHEN LOWER(c.name) LIKE "%recupera%"
+            OR (LOWER(c.name) LIKE "%cyber%" AND BIGINT(n.id_collector_external) < 10000000) -- Migração
+            OR LOWER(c.name) = "5a-collector" THEN cc.credit_card_fee_amount
         WHEN LOWER(c.name) LIKE "%cyber%" THEN i.credit_card_fee_amount
-        WHEN LOWER(c.name) LIKE "%recupera%" THEN cc.credit_card_fee_amount
         ELSE COALESCE(i.credit_card_fee_amount, cc.credit_card_fee_amount)
     END AS credit_card_fee_amount,
+    i.installment_costs,
+    i.installment_lawyers_fee,
     i.breached_installment,
     i.total_breached_installments,
     cr.recurrent AS is_contract_recurrent_debtor,

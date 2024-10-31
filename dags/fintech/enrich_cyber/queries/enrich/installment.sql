@@ -3,10 +3,12 @@ amount_details AS (
   SELECT
     ad.id_agreement,
     SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Juros Residuais", "Juros Acordo"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS contract_interest_fees_amount,
-    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Multa Residual", "Multa Acordo"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS fine_amount,
+    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Multa Residuais", "Multa Acordo"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS fine_amount,
     SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Parcelas Vencidas", "Parcelas a Vencer"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS original_amount,
     SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Custas Residuais", "Custas Acordo"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS eviction_costs_amount,
-    SUM(COALESCE(ad.discount, ad.discount)) AS discount_amount
+    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Parcelas Vencidas", "Parcelas a Vencer"), COALESCE(ad.discount, cd.discount), 0)) AS discount_to_original_amount,
+    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Juros Residuais", "Juros Acordo", "Multa Residuais", "Multa Acordo", "Custas Residuais", "Custas Acordo"), COALESCE(ad.discount, cd.discount), 0)) AS discount_to_fees_amount,
+    SUM(COALESCE(ad.discount, cd.discount)) AS discount_amount
   FROM datalake_cyber_clean.agreement_discounts AS ad
   FULL OUTER JOIN datalake_cyber_clean.campaign_discounts AS cd
     ON ad.id_agreement = cd.id_offer
@@ -32,6 +34,10 @@ split_fees_between_installments AS (
       a.fine_amount - FLOOR(a.fine_amount/i.total_installments,2) * (i.total_installments - 1) AS last_installment_fee,
       FLOOR(a.eviction_costs_amount/i.total_installments,2) AS installment_costs,
       a.eviction_costs_amount - FLOOR(a.eviction_costs_amount/i.total_installments,2) * (i.total_installments - 1) AS last_installment_costs,
+      FLOOR(a.discount_to_original_amount/i.total_installments,2) AS installment_discount_to_original,
+      a.discount_to_original_amount - FLOOR(a.discount_to_original_amount/i.total_installments,2) * (i.total_installments - 1) AS last_installment_discount_to_original,
+      FLOOR(a.discount_to_fees_amount/i.total_installments,2) AS installment_discount_to_fees,
+      a.discount_to_fees_amount - FLOOR(a.discount_to_fees_amount/i.total_installments,2) * (i.total_installments - 1) AS last_installment_discount_to_fees,
       FLOOR(a.discount_amount/i.total_installments,2) AS installment_discount,
       a.discount_amount - FLOOR(a.discount_amount/i.total_installments,2) * (i.total_installments - 1) AS last_installment_discount
     FROM amount_details AS a
@@ -116,6 +122,14 @@ split_fees_between_installments AS (
       END AS eviction_costs_amount,
       ai.honorarium_amount,
       CASE
+        WHEN ai.installment_number + 1 = f.total_installments THEN f.last_installment_discount_to_original
+        ELSE f.installment_discount_to_original
+      END AS discount_to_original_amount,
+      CASE
+        WHEN ai.installment_number + 1 = f.total_installments THEN f.last_installment_discount_to_fees
+        ELSE f.installment_discount_to_fees
+      END AS discount_to_fees_amount,
+      CASE
         WHEN ai.installment_number + 1 = f.total_installments THEN f.last_installment_discount
         ELSE f.installment_discount
       END AS discount_amount,
@@ -166,6 +180,8 @@ split_fees_between_installments AS (
     credit_card_fee_amount,
     eviction_costs_amount,
     honorarium_amount,
+    discount_to_original_amount,
+    discount_to_fees_amount,
     discount_amount,
     amount_to_pay,
     agreement_balance_amount,

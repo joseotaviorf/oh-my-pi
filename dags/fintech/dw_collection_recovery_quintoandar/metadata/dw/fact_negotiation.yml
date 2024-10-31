@@ -163,7 +163,7 @@ columns:
     lineage:
       - datalake_debt_recovery.negotiation.negotiation_original_amount
       - datalake_recupera.negotiation.original_debt_amount
-    description: Original debt amount (due amount of Seu Barriga)
+    description: Original debt amount (Total due amount from Seu Barriga of all invoices negotiated )
   fine_fee_amount:
     lineage:
       - datalake_debt_recovery.negotiation.fine_fee_amount
@@ -189,30 +189,12 @@ columns:
       - datalake_debt_recovery.negotiation.fine_fee_amount
       - datalake_debt_recovery.negotiation.interest_fee_amount
       - datalake_debt_recovery.negotiation.credit_card_fee_amount
-    description: "Total debt amount that is going to be negotiated, i.e, original amount + fees"
-  total_debt_amount_without_adm_fee:
-    lineage:
-      - datalake_debt_recovery.negotiation.negotiation_original_amount
-      - datalake_debt_recovery.negotiation.fine_fee_amount
-      - datalake_debt_recovery.negotiation.interest_fee_amount
-      - datalake_recupera.negotiation.expense_amount
-      - datalake_recupera.negotiation.adm_fee_amount
-    description: Total debt amount that is going to be negotiated disregarding credit card fee in the calculation
+    description: "Total debt amount that is going to be negotiated, i.e, original amount + fees. It ignores the credit card fee"
   total_discount_amount:
     lineage:
       - datalake_debt_recovery.negotiation.negotiation_discount_amount
       - datalake_recupera.negotiation.negotiation_discount_amount
     description: "Discount Amount, considering all fees applied to the negotiation."
-  discount_amount_without_adm_fee:
-    lineage:
-      - datalake_debt_recovery.negotiation.negotiation_original_amount
-      - datalake_debt_recovery.negotiation.fine_fee_amount
-      - datalake_debt_recovery.negotiation.interest_fee_amount
-      - datalake_debt_recovery.negotiation.total_expected_amount
-      - datalake_recupera.negotiation.expense_amount
-      - datalake_recupera.negotiation.adm_fee_amount
-      - datalake_recupera.negotiation.negotiated_amount
-    description: "Discount Amount, disregarding credit card fee in the calculation"
   discount_to_fees_amount:
     lineage:
       - datalake_debt_recovery.negotiation.negotiation_discount_amount

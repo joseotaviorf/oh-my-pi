@@ -3,16 +3,16 @@ amount_details AS (
   SELECT
     COALESCE(ad.id_agreement, cd.id_offer) AS id_agreement,
     SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Juros Residuais", "Juros Acordo"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS contract_interest_fees_amount,
-    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Multa Residual", "Multa Acordo"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS fine_amount,
+    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Multa Residuais", "Multa Acordo"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS fine_amount,
     SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Parcelas Vencidas", "Parcelas a Vencer"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS original_amount,
     SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Custas Residuais", "Custas Acordo"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS eviction_costs_amount,
     SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Parcelas Vencidas", "Parcelas a Vencer"), COALESCE(ad.discount, cd.discount), 0)) AS discount_to_original_amount,
     SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Juros Residuais", "Juros Acordo"), COALESCE(ad.discount, cd.discount), 0)) AS discount_to_fees_amount,
-    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Multa Residual", "Multa Acordo"), COALESCE(ad.discount, cd.discount), 0)) AS discount_to_fine_amount,
+    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Multa Residuais", "Multa Acordo"), COALESCE(ad.discount, cd.discount), 0)) AS discount_to_fine_amount,
     SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Custas Residuais", "Custas Acordo"), COALESCE(ad.discount, cd.discount), 0)) AS discount_to_eviction_costs,
-    SUM(COALESCE(ad.amount_without_discount, ad.amount_without_discount)) AS debt_amount,
-    SUM(COALESCE(ad.amount_with_discount, ad.amount_with_discount)) AS negotiated_amount,
-    SUM(COALESCE(ad.discount, ad.discount)) AS discount_amount
+    SUM(COALESCE(ad.amount_without_discount, cd.amount_without_discount)) AS debt_amount,
+    SUM(COALESCE(ad.amount_with_discount, cd.amount_with_discount)) AS negotiated_amount,
+    SUM(COALESCE(ad.discount, cd.discount)) AS discount_amount
   FROM datalake_cyber_clean.agreement_discounts AS ad
   FULL OUTER JOIN datalake_cyber_clean.campaign_discounts AS cd
     ON ad.id_agreement = cd.id_offer

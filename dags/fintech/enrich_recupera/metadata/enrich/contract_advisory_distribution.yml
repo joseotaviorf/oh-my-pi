@@ -1,0 +1,30 @@
+---
+database_name: datalake_recupera
+table_name: contract_advisory_distribution
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Contract distribution between advisories
+columns:
+  id_contract:
+    description: ""
+    lineage:
+      - datalake_recupera_clean.contracts.id_contract
+  advisory:
+    description: ""
+    lineage:
+      - datalake_recupera_clean.operational_records.advisory_code
+  distributor:
+    description: ""
+    lineage:
+      - datalake_recupera_clean.operational_records.distributor_code
+  partner:
+    description: ""
+    lineage:
+      - datalake_recupera_clean.operational_records.advisory_code
+      - datalake_recupera_clean.operational_records.distributor_code
+  dt_snapshot:
+    description: ""
+    lineage:
+      - datalake_recupera_clean.operational_records.year
+      - datalake_recupera_clean.operational_records.month
+      - datalake_recupera_clean.operational_records.day
