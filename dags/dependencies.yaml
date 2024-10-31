@@ -373,7 +373,6 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.wololo:load-clean-conversion
   - bietlejuice.wololo:load-clean-prospect
 bietlejuice.dw_datamarts_growth_cross:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_affiliate_costs:load-dw-quintoandar-dim-affiliate-cost
   - bietlejuice.dw_affiliate_costs:load-dw-quintoandar-fact-affiliate-costs
   - bietlejuice.dw_booking:load-dw-public-dim-booking
@@ -382,11 +381,15 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-affiliates-clusters
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-buyer-prospect-status
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
-  - bietlejuice.dw_house:load-dw-quintoandar-dim-house
   - bietlejuice.dw_lead:load-dw-public-dim-lead
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_offer:load-dw-rent-dim-offer
   - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
+  - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
+  - bietlejuice.dw_sale_listing_flow:load-dw-sale-fact-listing-flows
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
@@ -395,17 +398,14 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
-  - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliates-cost-attributions
-  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-listing-page-viewed
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
   - bietlejuice.enrich_listing_temp:load-enrich-fact-house-listing-status-house
   - bietlejuice.enrich_listing_temp:load-enrich-fact-listing-rent-flows-house
-  - bietlejuice.enrich_lost_listings:load-enrich-lost-listings
   - bietlejuice.enrich_marketing_automatic_daily_costs:load-enrich-daily-costs
-  - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
   - bietlejuice.gsheets_for_sale:done-clean-sale-tof-daily-targets
   - bietlejuice.gsheets_for_sale:done-clean-sale-tof-monthly-targets
@@ -413,8 +413,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets_growth:done-clean-affiliates-extra-user-bonus
   - bietlejuice.gsheets_growth:done-clean-branding-where-is-plaquinha
   - bietlejuice.gsheets_growth:done-clean-ciq-costs
-  - bietlejuice.gsheets_growth:done-clean-city-share
-  - bietlejuice.gsheets_growth:done-clean-local-holidays
   - bietlejuice.gsheets_growth:done-clean-mkt-cost-per-source
   - bietlejuice.gsheets_growth:done-clean-plaquinhas-cover-targets
   - bietlejuice.gsheets_growth:done-clean-plaquinhas-installation-pp-organic
@@ -426,10 +424,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets_growth:done-clean-rental-tof-daily-targets
   - bietlejuice.gsheets_growth:done-clean-rental-tof-weekly-targets
   - bietlejuice.gsheets_growth:done-clean-sale-flows-targets
-  - bietlejuice.gsheets_growth:done-clean-targets-casa-mineira-nbp
-  - bietlejuice.gsheets_growth:done-clean-week-volumes-supply
-  - bietlejuice.gsheets_growth:done-clean-weekday-holiday-share-supply
-  - bietlejuice.gsheets_growth:done-clean-weekday-supply-channel-share
 bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
