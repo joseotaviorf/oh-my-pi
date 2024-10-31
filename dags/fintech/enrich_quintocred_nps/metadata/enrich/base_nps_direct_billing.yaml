@@ -1,8 +1,8 @@
 database_name: datalake_quintocred_nps
-table_name: base_nps
+table_name: base_nps_direct_billing
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: "This table is the base generated to set which brokers are goin to receive the NPS survey"
+description: "This table is the base generated to set which brokers are goin to receive the NPS survey (Direct Billing proposes only)"
 columns:
   id_broker:
     description: "Broker's identification number (ID)"

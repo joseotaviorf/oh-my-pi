@@ -46,8 +46,8 @@ contact_info AS (
 realstate_production_timeline AS (
     SELECT
         b.id_broker,
-        COUNT(DISTINCT CASE WHEN dt_contract_started IS NOT NULL THEN id_propose END) AS contracts,
-        COUNT(DISTINCT CASE WHEN dt_contract_started IS NOT NULL AND dt_ended IS NULL THEN id_propose END) AS active_contracts,
+        COUNT(DISTINCT CASE WHEN dt_contract_started IS NOT NULL AND is_direct_billing = true THEN id_propose END) AS contracts,
+        COUNT(DISTINCT CASE WHEN dt_contract_started IS NOT NULL AND dt_ended IS NULL AND is_direct_billing = true THEN id_propose END) AS active_contracts,
         CAST(MIN(ts_propose_started) AS DATE) AS dt_imob_activation,
         MAX(dt_contract_started) AS last_contract
     FROM
@@ -55,6 +55,8 @@ realstate_production_timeline AS (
     LEFT JOIN
         datalake_velo.broker b
           ON pr.id_broker = b.id_broker
+    WHERE
+        pr.is_direct_billing = true
     GROUP BY
         b.id_broker
 ),
@@ -69,6 +71,7 @@ base_propose AS (
         ts_signed,
         dt_contract_started,
         is_contract,
+        is_direct_billing,
         dt_ended
     FROM
         datalake_velo.propose
@@ -83,6 +86,7 @@ base_propose AS (
         ts_signed,
         dt_contract_started,
         is_contract,
+        is_direct_billing,
         dt_ended
     FROM
         datalake_velo.propose_legacy
@@ -97,6 +101,7 @@ base AS (
         b.state,
         b.is_broker_active,
         co.status AS status_broker,
+        pr.is_direct_billing,
         b.ts_created,
         pr.id_propose,
         pr.ts_propose_started,
@@ -218,13 +223,13 @@ imob_aggregated AS (
         month_start AS month_ref,
         id_broker,
         dt_imob_activation,
-        COUNT(DISTINCT CASE WHEN is_contract THEN id_propose END) AS contracts,
-        COUNT(DISTINCT CASE WHEN is_month_begin THEN id_propose END) AS p_generated_at_month,
-        COUNT(DISTINCT CASE WHEN is_contract AND is_month_begin THEN id_propose END) AS p2c_at_month,
-        COUNT(DISTINCT CASE WHEN NOT is_contract AND is_month_begin THEN id_propose END) AS drop_p2c_at_month,
-        COUNT(DISTINCT CASE WHEN is_contract AND is_month_begin AND is_month_end THEN id_propose END) AS contracts_beginning_and_ending_at_month,
-        COUNT(DISTINCT CASE WHEN is_contract AND is_month_begin AND NOT is_month_end THEN id_propose END) AS contracts_beginning_at_month,
-        COUNT(DISTINCT CASE WHEN is_contract AND is_month_end AND NOT is_month_begin THEN id_propose END) AS contracts_ending_at_month
+        COUNT(DISTINCT CASE WHEN is_contract AND is_direct_billing = true THEN id_propose END) AS contracts,
+        COUNT(DISTINCT CASE WHEN is_month_begin AND is_direct_billing = true THEN id_propose END) AS p_generated_at_month,
+        COUNT(DISTINCT CASE WHEN is_contract AND is_month_begin AND is_direct_billing = true THEN id_propose END) AS p2c_at_month,
+        COUNT(DISTINCT CASE WHEN NOT is_contract AND is_month_begin AND is_direct_billing = true THEN id_propose END) AS drop_p2c_at_month,
+        COUNT(DISTINCT CASE WHEN is_contract AND is_month_begin AND is_month_end AND is_direct_billing = true THEN id_propose END) AS contracts_beginning_and_ending_at_month,
+        COUNT(DISTINCT CASE WHEN is_contract AND is_month_begin AND NOT is_month_end AND is_direct_billing = true THEN id_propose END) AS contracts_beginning_at_month,
+        COUNT(DISTINCT CASE WHEN is_contract AND is_month_end AND NOT is_month_begin AND is_direct_billing = true THEN id_propose END) AS contracts_ending_at_month
     FROM
         timeline_adjusted
     GROUP BY
