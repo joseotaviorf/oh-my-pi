@@ -592,7 +592,7 @@ affiliates AS (
             ON dd.sk_date = iac.sk_date
         WHERE
             iac.cost IS NOT NULL
-            AND dd.month_start >= date_trunc('month',CURRENT_DATE) - interval '24 month'
+            AND dd.month_start >= date_trunc('month',CURRENT_DATE) - interval '72 month'
          GROUP BY 1,2,3,4,5,6,7,8,9,11
          HAVING costs>0
      ),
