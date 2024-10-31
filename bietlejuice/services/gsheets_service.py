@@ -30,12 +30,20 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 DEPS_YAML_PATH = os.path.join(DAG_PACKAGES_ROOT, "dependencies.yaml")
+GSHEETS_DATALAKE_RAW_SCHEMA = "datalake_{schema}_raw"
+GSHEETS_DATALAKE_CLEAN_SCHEMA = "datalake_{schema}_clean"
 
 
 class GsheetsService:
-    GSHEETS_DATA_LAKE_RAW_SCHEMA = "datalake_gsheets_raw"
-    GSHEETS_DATA_LAKE_CLEAN_SCHEMA = "datalake_gsheets_clean"
     TEMPORARY_TABLE_PREFIX = "temp_"
+
+    def __init__(self, schema="gsheets"):
+        self.gsheets_datalake_raw_schema = GSHEETS_DATALAKE_RAW_SCHEMA.format(
+            schema=schema
+        )
+        self.gsheets_data_lake_clean_schema = GSHEETS_DATALAKE_CLEAN_SCHEMA.format(
+            schema=schema
+        )
 
     def get_recently_modified_gsheet(self, drive_service) -> Dict:
         """
@@ -188,7 +196,7 @@ class GsheetsService:
         :param tmp_table_name: Table name for sheet on temporary table
         :param clean_query: SQL query for clean layer
         """
-        raw_table = f"{self.GSHEETS_DATA_LAKE_RAW_SCHEMA}.{raw_table_name}"
+        raw_table = f"{self.gsheets_datalake_raw_schema}.{raw_table_name}"
         tmp_table = f"{self.TEMPORARY_TABLE_PREFIX}{tmp_table_name}"
 
         return clean_query.replace(raw_table, tmp_table)
@@ -205,7 +213,7 @@ class GsheetsService:
         :param clean_query: SQL query for clean layer
         """
         databricks_consumer = DatabricksConsumer(
-            conn_config={"db": self.GSHEETS_DATA_LAKE_CLEAN_SCHEMA},
+            conn_config={"db": self.gsheets_data_lake_clean_schema},
             spark_client=spark_client,
         )
         databricks_consumer.get_data_from_query(clean_query)

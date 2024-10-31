@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: quinto_andar_companies
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,12 +8,12 @@ columns:
   original_company_name:
     description: ''
     lineage:
-    - datalake_gsheets_raw.quinto_andar_companies.empresa
+    - datalake_gsheets_people_raw.quinto_andar_companies.empresa
   final_company_name:
     description: ''
     lineage:
-    - datalake_gsheets_raw.quinto_andar_companies.empresa_final
+    - datalake_gsheets_people_raw.quinto_andar_companies.empresa_final
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.quinto_andar_companies.ts_load
+    - datalake_gsheets_people_raw.quinto_andar_companies.ts_load

@@ -80,4 +80,4 @@ SELECT
     birth_date AS dt_birth,
     ctps_emission_date AS dt_ctps_emission,
     ts_load
-FROM datalake_gsheets_raw.pre_full_merge_dismissals
+FROM datalake_gsheets_people_raw.pre_full_merge_dismissals

@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: position_class
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,12 +8,12 @@ columns:
   position:
     description: ''
     lineage:
-    - datalake_gsheets_raw.position_class.cargo
+    - datalake_gsheets_people_raw.position_class.cargo
   position_class:
     description: ''
     lineage:
-    - datalake_gsheets_raw.position_class.classe_cargo
+    - datalake_gsheets_people_raw.position_class.classe_cargo
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.position_class.ts_load
+    - datalake_gsheets_people_raw.position_class.ts_load

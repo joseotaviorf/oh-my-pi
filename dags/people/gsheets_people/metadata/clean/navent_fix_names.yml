@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: navent_fix_names
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,20 +8,20 @@ columns:
   employee_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_fix_names.email
+    - datalake_gsheets_people_raw.navent_fix_names.email
   employee_name:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_fix_names.nome
+    - datalake_gsheets_people_raw.navent_fix_names.nome
   employee_band:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_fix_names.banda
+    - datalake_gsheets_people_raw.navent_fix_names.banda
   manager_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_fix_names.email_gestor
+    - datalake_gsheets_people_raw.navent_fix_names.email_gestor
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_fix_names.ts_load
+    - datalake_gsheets_people_raw.navent_fix_names.ts_load

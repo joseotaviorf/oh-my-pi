@@ -28,4 +28,4 @@ SELECT
     function AS employee_function,
     new_company_name AS employee_new_company,
     ts_load
-FROM datalake_gsheets_raw.dismissal_forms_voluntary
+FROM datalake_gsheets_people_raw.dismissal_forms_voluntary

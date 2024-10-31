@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: executive_leadership_list
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,12 +8,12 @@ columns:
   employee_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.executive_leadership_list.email
+    - datalake_gsheets_people_raw.executive_leadership_list.email
   employee_type:
     description: ''
     lineage:
-    - datalake_gsheets_raw.executive_leadership_list.etlt
+    - datalake_gsheets_people_raw.executive_leadership_list.etlt
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.executive_leadership_list.ts_load
+    - datalake_gsheets_people_raw.executive_leadership_list.ts_load

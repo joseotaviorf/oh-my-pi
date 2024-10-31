@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: dismissal_forms_bp
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,52 +8,52 @@ columns:
   bp_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.form_collected_email
+    - datalake_gsheets_people_raw.dismissal_forms_bp.form_collected_email
   employee_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.employee_email
+    - datalake_gsheets_people_raw.dismissal_forms_bp.employee_email
   dismissal_reason:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.dismissal_reason
+    - datalake_gsheets_people_raw.dismissal_forms_bp.dismissal_reason
   company_evaluation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.company_evaluation
+    - datalake_gsheets_people_raw.dismissal_forms_bp.company_evaluation
   last_semester_evaluation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.last_semester_evaluation
+    - datalake_gsheets_people_raw.dismissal_forms_bp.last_semester_evaluation
   what_should_be_different:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.what_should_be_different
+    - datalake_gsheets_people_raw.dismissal_forms_bp.what_should_be_different
   what_was_more_important:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.what_was_more_important
+    - datalake_gsheets_people_raw.dismissal_forms_bp.what_was_more_important
   specific_difficulties:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.specific_difficulties
+    - datalake_gsheets_people_raw.dismissal_forms_bp.specific_difficulties
   company_culture_evaluation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.company_culture_evaluation
+    - datalake_gsheets_people_raw.dismissal_forms_bp.company_culture_evaluation
   management_evaluation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.management_evaluation
+    - datalake_gsheets_people_raw.dismissal_forms_bp.management_evaluation
   what_should_be_better:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.what_should_be_better
+    - datalake_gsheets_people_raw.dismissal_forms_bp.what_should_be_better
   ts_fill_forms:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.timestamp
+    - datalake_gsheets_people_raw.dismissal_forms_bp.timestamp
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_bp.ts_load
+    - datalake_gsheets_people_raw.dismissal_forms_bp.ts_load

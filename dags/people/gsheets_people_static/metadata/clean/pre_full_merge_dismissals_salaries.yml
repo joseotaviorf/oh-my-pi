@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_people_static_clean
+database_name: datalake_gsheets_people_clean
 table_name: pre_full_merge_dismissals_salaries
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,72 +8,72 @@ columns:
   id_employee:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.id
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.id
   name:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.name
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.name
   last_name:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.last_name
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.last_name
   registration:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.registration
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.registration
   email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.email
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.email
   status:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.status
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.status
   contract_type:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.registro
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.registro
   department:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.departamento
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.departamento
   office:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.cargo
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.cargo
   cost_center:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.centro_de_custo
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.centro_de_custo
   reason:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.motivo
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.motivo
   description:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.descricao
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.descricao
   company:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.company
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.company
   salary:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.salary
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.salary
   is_active:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.esta_ativo
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.esta_ativo
   dt_from:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.date_from
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.date_from
   dt_to:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.date_to
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.date_to
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.pre_full_merge_dismissals_salaries.ts_load
+    - datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries.ts_load

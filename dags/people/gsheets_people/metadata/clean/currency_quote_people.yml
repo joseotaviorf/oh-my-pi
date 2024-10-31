@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: currency_quote_people
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,12 +8,12 @@ columns:
   currency:
     description: ''
     lineage:
-    - datalake_gsheets_raw.currency_quote_people.moeda
+    - datalake_gsheets_people_raw.currency_quote_people.moeda
   cotation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.currency_quote_people.cotacao
+    - datalake_gsheets_people_raw.currency_quote_people.cotacao
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.currency_quote_people.ts_load
+    - datalake_gsheets_people_raw.currency_quote_people.ts_load

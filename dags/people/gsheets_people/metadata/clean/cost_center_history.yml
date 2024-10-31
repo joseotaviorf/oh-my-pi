@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: cost_center_history
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,36 +8,36 @@ columns:
   id_employee:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_history.id_colaborador
+    - datalake_gsheets_people_raw.cost_center_history.id_colaborador
   employee_name:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_history.nome
+    - datalake_gsheets_people_raw.cost_center_history.nome
   employee_registration:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_history.matricula
+    - datalake_gsheets_people_raw.cost_center_history.matricula
   employee_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_history.email
+    - datalake_gsheets_people_raw.cost_center_history.email
   old_cost_center:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_history.cc_antigo
+    - datalake_gsheets_people_raw.cost_center_history.cc_antigo
   new_cost_center:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_history.cc_novo
+    - datalake_gsheets_people_raw.cost_center_history.cc_novo
   change_type:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_history.tipo_alteracao
+    - datalake_gsheets_people_raw.cost_center_history.tipo_alteracao
   dt_change:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_history.data_alteracao
+    - datalake_gsheets_people_raw.cost_center_history.data_alteracao
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_history.ts_load
+    - datalake_gsheets_people_raw.cost_center_history.ts_load

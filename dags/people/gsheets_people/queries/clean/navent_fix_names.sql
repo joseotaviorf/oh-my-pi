@@ -4,4 +4,4 @@ SELECT
     banda AS employee_band,
     email_gestor AS manager_email,
     ts_load AS ts_load
-FROM datalake_gsheets_raw.navent_fix_names
+FROM datalake_gsheets_people_raw.navent_fix_names

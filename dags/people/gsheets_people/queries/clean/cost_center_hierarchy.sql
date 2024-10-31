@@ -13,4 +13,4 @@ SELECT
     hrbp,
     codigo_cc_long AS cost_center_code_description,
     ts_load
-FROM datalake_gsheets_raw.cost_center_hierarchy
+FROM datalake_gsheets_people_raw.cost_center_hierarchy

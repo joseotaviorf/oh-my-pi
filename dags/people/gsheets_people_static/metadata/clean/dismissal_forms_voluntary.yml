@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: dismissal_forms_voluntary
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,116 +8,116 @@ columns:
   employee_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.email
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.email
   employee_name:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.name
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.name
   employee_registration:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.registration
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.registration
   employee_personal_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.personal_email
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.personal_email
   company_grade:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.company_grade
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.company_grade
   happiness_grade:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.happiness_grade
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.happiness_grade
   happiness_reason:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.happiness_reason
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.happiness_reason
   current_leadership_time:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.time_under_leadership
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.time_under_leadership
   frequency_one_one:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.period_1on1
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.period_1on1
   healthy_leadership_relation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.healthy_leadership_relation
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.healthy_leadership_relation
   healthy_team_relation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.healthy_team_relation
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.healthy_team_relation
   work_was_recognized:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.my_work_was_recognized
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.my_work_was_recognized
   applied_knowledge:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.applied_knowledge
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.applied_knowledge
   development_satisfaction:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.opportunity_and_development_satisfaction
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.opportunity_and_development_satisfaction
   had_onboarding_support:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.had_onboarding_support
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.had_onboarding_support
   high_stress_level:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.high_stress_level
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.high_stress_level
   stress_influence:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.stress_influence
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.stress_influence
   had_available_channels:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.had_available_channels
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.had_available_channels
   felt_comfortable_with_my_leadership:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.felt_comfortable_with_my_leadership
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.felt_comfortable_with_my_leadership
   comments_about_leadership_support:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.comments_about_leadership_support
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.comments_about_leadership_support
   has_new_job:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.have_a_new_job
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.have_a_new_job
   is_compensation_factor:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.compensation_was_a_factor
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.compensation_was_a_factor
   reason_exit:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.main_reason_for_exit
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.main_reason_for_exit
   additional_comments:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.additional_comments
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.additional_comments
   employee_director:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.directory
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.directory
   employee_vertical:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.vertical
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.vertical
   employee_function:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.function
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.function
   employee_new_company:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.new_company_name
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.new_company_name
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.dismissal_forms_voluntary.ts_load
+    - datalake_gsheets_people_raw.dismissal_forms_voluntary.ts_load

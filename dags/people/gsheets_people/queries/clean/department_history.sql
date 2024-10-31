@@ -8,4 +8,4 @@ SELECT
     tipo_alteracao AS change_type,
     make_date(split(data_alteracao, '/')[2], split(data_alteracao, '/')[0], split(data_alteracao, '/')[1]) AS dt_change,
     ts_load
-FROM datalake_gsheets_raw.department_history
+FROM datalake_gsheets_people_raw.department_history

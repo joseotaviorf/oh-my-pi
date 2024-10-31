@@ -6,4 +6,4 @@ SELECT
     vertical_a AS employee_vertical,
     hrbp_a AS hrbp,
     ts_load
-FROM datalake_gsheets_raw.nominal_fix
+FROM datalake_gsheets_people_raw.nominal_fix

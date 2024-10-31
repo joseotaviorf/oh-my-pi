@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: performance_review
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,120 +8,120 @@ columns:
   name:
     description: 'The name of the individual being evaluated'
     lineage:
-    - datalake_gsheets_raw.performance_review.nome
+    - datalake_gsheets_people_raw.performance_review.nome
   impact:
     description: "A measure of the individual's impact or influence within the organization or team."
     lineage:
-    - datalake_gsheets_raw.performance_review.impacto
+    - datalake_gsheets_people_raw.performance_review.impacto
   email:
     description: 'The email address associated with the individual.'
     lineage:
-    - datalake_gsheets_raw.performance_review.email
+    - datalake_gsheets_people_raw.performance_review.email
   behavior:
     description: "Evaluation of the individual's behavior or conduct within the workplace."
     lineage:
-    - datalake_gsheets_raw.performance_review.comportamento
+    - datalake_gsheets_people_raw.performance_review.comportamento
   leadership:
     description: "Assessment of the individual's leadership abilities or qualities."
     lineage:
-    - datalake_gsheets_raw.performance_review.lideranca
+    - datalake_gsheets_people_raw.performance_review.lideranca
   distribution_range:
     description: 'The range within which evaluations are distributed'
     lineage:
-    - datalake_gsheets_raw.performance_review.faixa_de_distribuicao
+    - datalake_gsheets_people_raw.performance_review.faixa_de_distribuicao
   comment_manager:
     description: "Comments provided by the manager or evaluator regarding the individual's performance."
     lineage:
-    - datalake_gsheets_raw.performance_review.comentario_gestor
+    - datalake_gsheets_people_raw.performance_review.comentario_gestor
   cycle:
     description: 'The evaluation cycle or period during which the assessment was conducted.'
     lineage:
-    - datalake_gsheets_raw.performance_review.ciclo
+    - datalake_gsheets_people_raw.performance_review.ciclo
   evaluator_email:
     description: 'The email address of the evaluator or manager providing the assessment.'
     lineage:
-    - datalake_gsheets_raw.performance_review.email_avaliador
+    - datalake_gsheets_people_raw.performance_review.email_avaliador
   calibration_impact:
     description: 'Calibration score for impact, used to ensure consistency and fairness in evaluations.'
     lineage:
-    - datalake_gsheets_raw.performance_review.calibracao_impacto
+    - datalake_gsheets_people_raw.performance_review.calibracao_impacto
   calibration_behavior:
     description: 'Calibration score for behavior, used to ensure consistency and fairness in evaluations.'
     lineage:
-    - datalake_gsheets_raw.performance_review.calibracao_comportamento
+    - datalake_gsheets_people_raw.performance_review.calibracao_comportamento
   calibration_leadership:
     description: 'Calibration score for leadership, used to ensure consistency and fairness in evaluations.'
     lineage:
-    - datalake_gsheets_raw.performance_review.calibracao_lideranca
+    - datalake_gsheets_people_raw.performance_review.calibracao_lideranca
   gender:
     description: 'The gender identity of the individual.'
     lineage:
-    - datalake_gsheets_raw.performance_review.genero
+    - datalake_gsheets_people_raw.performance_review.genero
   sexual_orientation:
     description: 'The sexual orientation of the individual.'
     lineage:
-    - datalake_gsheets_raw.performance_review.orientacao_sexual
+    - datalake_gsheets_people_raw.performance_review.orientacao_sexual
   sex:
     description: 'The biological sex of the individual.'
     lineage:
-    - datalake_gsheets_raw.performance_review.sexo
+    - datalake_gsheets_people_raw.performance_review.sexo
   ethnicity:
     description: 'The racial or ethnic background of the individual.'
     lineage:
-    - datalake_gsheets_raw.performance_review.raca
+    - datalake_gsheets_people_raw.performance_review.raca
   age_range:
     description: 'The age range of the individual.'
     lineage:
-    - datalake_gsheets_raw.performance_review.faixa_etaria
+    - datalake_gsheets_people_raw.performance_review.faixa_etaria
   tenure:
     description: 'The length of time the individual has been employed by the organization.'
     lineage:
-    - datalake_gsheets_raw.performance_review.tenure
+    - datalake_gsheets_people_raw.performance_review.tenure
   position_class:
     description: "The class or level of the individual's position within the organization."
     lineage:
-    - datalake_gsheets_raw.performance_review.classe_cargo
+    - datalake_gsheets_people_raw.performance_review.classe_cargo
   band:
     description: "The band or salary range associated with the individual's position."
     lineage:
-    - datalake_gsheets_raw.performance_review.banda
+    - datalake_gsheets_people_raw.performance_review.banda
   cost_center:
     description: 'The cost center or department to which the individual belongs.'
     lineage:
-    - datalake_gsheets_raw.performance_review.centro_de_custo
+    - datalake_gsheets_people_raw.performance_review.centro_de_custo
   sub_board:
     description: ' Subordinate board or committee to which the individual may belong.'
     lineage:
-    - datalake_gsheets_raw.performance_review.sub_diretoria
+    - datalake_gsheets_people_raw.performance_review.sub_diretoria
   board:
     description: 'The board or committee to which the individual may belong.'
     lineage:
-    - datalake_gsheets_raw.performance_review.diretoria
+    - datalake_gsheets_people_raw.performance_review.diretoria
   vice_presidency:
     description: The vice presidency or division within the organization.'
     lineage:
-    - datalake_gsheets_raw.performance_review.vice_presidencia
+    - datalake_gsheets_people_raw.performance_review.vice_presidencia
   vertical:
     description: 'The vertical or business unit within the organization.'
     lineage:
-    - datalake_gsheets_raw.performance_review.vertical
+    - datalake_gsheets_people_raw.performance_review.vertical
   country:
     description: 'The country in which the individual is located.'
     lineage:
-    - datalake_gsheets_raw.performance_review.pais
+    - datalake_gsheets_people_raw.performance_review.pais
   performance_score:
     description: 'The overall performance score assigned to the individual.'
     lineage:
-    - datalake_gsheets_raw.performance_review.performance_score
+    - datalake_gsheets_people_raw.performance_review.performance_score
   has_disabilty:
     description: 'Indicates whether the individual has a disability.'
     lineage:
-    - datalake_gsheets_raw.performance_review.pcd
+    - datalake_gsheets_people_raw.performance_review.pcd
   is_active:
     description: 'Status if the individual is in the company'
     lineage:
-    - datalake_gsheets_raw.performance_review.status
+    - datalake_gsheets_people_raw.performance_review.status
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.performance_review.ts_load
+    - datalake_gsheets_people_raw.performance_review.ts_load

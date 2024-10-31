@@ -69,4 +69,4 @@ SELECT
     END AS dt_dismissal,
     TO_DATE(dt_nascimento, 'M/d/yyyy') AS dt_birth,
     NOW() AS ts_load
-FROM datalake_gsheets_raw.navent_convenia_like
+FROM datalake_gsheets_people_raw.navent_convenia_like

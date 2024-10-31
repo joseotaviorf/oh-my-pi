@@ -61,4 +61,4 @@ SELECT
     anomes_saida AS year_month_employee_dismissal,
     anomes_fechamento AS year_month_closing,
     ts_load AS ts_load
-FROM datalake_gsheets_raw.company_snapshots
+FROM datalake_gsheets_people_raw.company_snapshots

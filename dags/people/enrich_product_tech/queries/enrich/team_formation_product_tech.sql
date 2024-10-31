@@ -41,7 +41,7 @@ SELECT
   ts_load AS ts_updated,
   NOW() AS ts_load
 FROM
-  datalake_gsheets_clean.team_formation_product_tech AS gsheets_pt
+  datalake_gsheets_people_clean.team_formation_product_tech AS gsheets_pt
   LEFT JOIN 
     enrich_pt 
       ON gsheets_pt.email = enrich_pt.email

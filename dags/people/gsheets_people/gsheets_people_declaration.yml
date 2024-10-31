@@ -16,7 +16,7 @@ cluster:
 workflow:
   type: gsheets
   layer: raw
-  custom_schema: gsheets
   has_hive_sync: False
   credentials_scope: people
   bucket_config_name: people_bucket
+  custom_schema: gsheets_people

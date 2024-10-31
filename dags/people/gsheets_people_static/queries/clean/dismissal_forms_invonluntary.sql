@@ -20,4 +20,4 @@ SELECT
     people_team_contact,
     to_timestamp(timestamp, 'dd/MM/yyyy HH:mm:ss') AS ts_fill_forms,
     ts_load
-FROM datalake_gsheets_raw.dismissal_forms_invonluntary
+FROM datalake_gsheets_people_raw.dismissal_forms_invonluntary

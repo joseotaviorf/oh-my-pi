@@ -67,5 +67,5 @@ SELECT
     to_timestamp(hora_desligamento_inv, 'dd/MM/yyyy HH:mm:ss') AS ts_dismissal_involuntary,
     to_timestamp(data_preenchimento_forms, 'dd/MM/yyyy HH:mm:ss') AS ts_fill_forms,
     ts_load
-FROM datalake_gsheets_raw.dismissal_forms_manager
+FROM datalake_gsheets_people_raw.dismissal_forms_manager
 WHERE email_colabb != 'E-mail QuintoAndar da pessoa colaboradora'

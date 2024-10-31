@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: edc_roles
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,12 +8,12 @@ columns:
   special_role:
     description: ''
     lineage:
-    - datalake_gsheets_raw.edc_roles.special_role
+    - datalake_gsheets_people_raw.edc_roles.special_role
   email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.edc_roles.email
+    - datalake_gsheets_people_raw.edc_roles.email
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.edc_roles.ts_load
+    - datalake_gsheets_people_raw.edc_roles.ts_load

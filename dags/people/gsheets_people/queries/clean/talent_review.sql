@@ -51,4 +51,4 @@ SELECT
       ELSE FALSE
     END AS has_disability,
     NOW() AS ts_load
-FROM datalake_gsheets_raw.talent_review
+FROM datalake_gsheets_people_raw.talent_review

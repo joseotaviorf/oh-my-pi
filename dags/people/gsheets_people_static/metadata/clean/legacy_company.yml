@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: legacy_company
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,12 +8,12 @@ columns:
   id_employee:
     description: ''
     lineage:
-    - datalake_gsheets_raw.legacy_company.id_colaborador
+    - datalake_gsheets_people_raw.legacy_company.id_colaborador
   legacy_company:
     description: ''
     lineage:
-    - datalake_gsheets_raw.legacy_company.empresa_legado
+    - datalake_gsheets_people_raw.legacy_company.empresa_legado
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.legacy_company.ts_load
+    - datalake_gsheets_people_raw.legacy_company.ts_load

@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: targets_turnover
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,48 +8,48 @@ columns:
   closure:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.fechamento
+    - datalake_gsheets_people_raw.targets_turnover.fechamento
   quarter:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.quarter
+    - datalake_gsheets_people_raw.targets_turnover.quarter
   target_rl_group:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.target_rl_grupo
+    - datalake_gsheets_people_raw.targets_turnover.target_rl_grupo
   target_rl_acquired:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.target_rl_adquiridas
+    - datalake_gsheets_people_raw.targets_turnover.target_rl_adquiridas
   target_3_mo_to:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.target_3_mo_to
+    - datalake_gsheets_people_raw.targets_turnover.target_3_mo_to
   target_turnover:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.target_turnover
+    - datalake_gsheets_people_raw.targets_turnover.target_turnover
   pwd_target:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.pwd_target
+    - datalake_gsheets_people_raw.targets_turnover.pwd_target
   target_enps:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.target_enps
+    - datalake_gsheets_people_raw.targets_turnover.target_enps
   voluntary_rt_group:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.voluntary_rt_grupo
+    - datalake_gsheets_people_raw.targets_turnover.voluntary_rt_grupo
   voluntary_rt_navent:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.voluntary_rt_nave
+    - datalake_gsheets_people_raw.targets_turnover.voluntary_rt_nave
   current_enps:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.actual_enps
+    - datalake_gsheets_people_raw.targets_turnover.actual_enps
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_turnover.ts_load
+    - datalake_gsheets_people_raw.targets_turnover.ts_load

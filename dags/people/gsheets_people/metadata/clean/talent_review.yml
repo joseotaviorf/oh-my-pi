@@ -8,158 +8,158 @@ columns:
   person_number:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.person_number
+    - datalake_gsheets_people_raw.talent_review.person_number
   cycle:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.ciclo
+    - datalake_gsheets_people_raw.talent_review.ciclo
   email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.email
+    - datalake_gsheets_people_raw.talent_review.email
   evaluator_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.email_avaliador
+    - datalake_gsheets_people_raw.talent_review.email_avaliador
   readiness:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.prontidao
+    - datalake_gsheets_people_raw.talent_review.prontidao
   loss_risk:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.risco_de_perda
+    - datalake_gsheets_people_raw.talent_review.risco_de_perda
   potential:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.potencial
+    - datalake_gsheets_people_raw.talent_review.potencial
   criticality:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.criticidade
+    - datalake_gsheets_people_raw.talent_review.criticidade
   evolution_potential:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.evo_potencial
+    - datalake_gsheets_people_raw.talent_review.evo_potencial
   evolution_criticality:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.evo_criticidade
+    - datalake_gsheets_people_raw.talent_review.evo_criticidade
   evolution_loss_risk:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.evo_risco_de_perda
+    - datalake_gsheets_people_raw.talent_review.evo_risco_de_perda
   evolution_readiness:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.evo_prontidao
+    - datalake_gsheets_people_raw.talent_review.evo_prontidao
   gender:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.genero
+    - datalake_gsheets_people_raw.talent_review.genero
   sexual_orientation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.orientacao_sexual
+    - datalake_gsheets_people_raw.talent_review.orientacao_sexual
   sex:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.sexo
+    - datalake_gsheets_people_raw.talent_review.sexo
   race:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.raca
+    - datalake_gsheets_people_raw.talent_review.raca
   age_range:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.faixa_etaria
+    - datalake_gsheets_people_raw.talent_review.faixa_etaria
   tenure:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.tenure
+    - datalake_gsheets_people_raw.talent_review.tenure
   job_class:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.classe_cargo
+    - datalake_gsheets_people_raw.talent_review.classe_cargo
   band:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.banda
+    - datalake_gsheets_people_raw.talent_review.banda
   cost_center:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.centro_de_custo
+    - datalake_gsheets_people_raw.talent_review.centro_de_custo
   sub_board:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.sub_diretoria
+    - datalake_gsheets_people_raw.talent_review.sub_diretoria
   board:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.diretoria
+    - datalake_gsheets_people_raw.talent_review.diretoria
   vice_presidency:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.vice_presidencia
+    - datalake_gsheets_people_raw.talent_review.vice_presidencia
   vertical:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.vertical
+    - datalake_gsheets_people_raw.talent_review.vertical
   country:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.pais
+    - datalake_gsheets_people_raw.talent_review.pais
   enterprise:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.empresa
+    - datalake_gsheets_people_raw.talent_review.empresa
   generation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.geracao
+    - datalake_gsheets_people_raw.talent_review.geracao
   l1_n:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.l1_n
+    - datalake_gsheets_people_raw.talent_review.l1_n
   l2_n:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.l2_n
+    - datalake_gsheets_people_raw.talent_review.l2_n
   l3_n:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.l3_n
+    - datalake_gsheets_people_raw.talent_review.l3_n
   l4_n:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.l4_n
+    - datalake_gsheets_people_raw.talent_review.l4_n
   l5_n:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.l5_n
+    - datalake_gsheets_people_raw.talent_review.l5_n
   l6_n:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.l6_n
+    - datalake_gsheets_people_raw.talent_review.l6_n
   l7_n:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.l7_n
+    - datalake_gsheets_people_raw.talent_review.l7_n
   l8_n:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.l8_n
+    - datalake_gsheets_people_raw.talent_review.l8_n
   is_evaluated_in_las_cycle:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.ult_ciclo_avaliado
+    - datalake_gsheets_people_raw.talent_review.ult_ciclo_avaliado
   status:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.status
+    - datalake_gsheets_people_raw.talent_review.status
   has_disability:
     description: ''
     lineage:
-    - datalake_gsheets_raw.talent_review.pcd = 'sim'
+    - datalake_gsheets_people_raw.talent_review.pcd = 'sim'
   ts_load:
     description: ''

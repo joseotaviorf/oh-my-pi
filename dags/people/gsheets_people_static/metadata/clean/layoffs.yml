@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: layoffs
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,12 +8,12 @@ columns:
   id_employee:
     description: ''
     lineage:
-    - datalake_gsheets_raw.layoffs.id_colaborador
+    - datalake_gsheets_people_raw.layoffs.id_colaborador
   is_layoff:
     description: ''
     lineage:
-    - datalake_gsheets_raw.layoffs.layoffs
+    - datalake_gsheets_people_raw.layoffs.layoffs
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.layoffs.ts_load
+    - datalake_gsheets_people_raw.layoffs.ts_load

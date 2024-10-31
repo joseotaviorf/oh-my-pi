@@ -4,4 +4,4 @@ SELECT
     nome_social AS employee_social_name,
     alterar AS has_to_change,
     ts_load
-FROM datalake_gsheets_raw.transgender_people_list
+FROM datalake_gsheets_people_raw.transgender_people_list

@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: targets_pwd
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,16 +8,16 @@ columns:
   closure:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_pwd.fechamento
+    - datalake_gsheets_people_raw.targets_pwd.fechamento
   quarter:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_pwd.quarter
+    - datalake_gsheets_people_raw.targets_pwd.quarter
   targer_pwd:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_pwd.target_pwd
+    - datalake_gsheets_people_raw.targets_pwd.target_pwd
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.targets_pwd.ts_load
+    - datalake_gsheets_people_raw.targets_pwd.ts_load

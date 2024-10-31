@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: people_reference_column
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,16 +8,16 @@ columns:
   base:
     description: ''
     lineage:
-    - datalake_gsheets_raw.people_reference_column.base
+    - datalake_gsheets_people_raw.people_reference_column.base
   column_old:
     description: ''
     lineage:
-    - datalake_gsheets_raw.people_reference_column.col_old
+    - datalake_gsheets_people_raw.people_reference_column.col_old
   column_new:
     description: ''
     lineage:
-    - datalake_gsheets_raw.people_reference_column.col_new
+    - datalake_gsheets_people_raw.people_reference_column.col_new
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.people_reference_column.ts_load
+    - datalake_gsheets_people_raw.people_reference_column.ts_load

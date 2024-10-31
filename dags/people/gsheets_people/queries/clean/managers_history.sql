@@ -10,4 +10,4 @@ SELECT
     tipo_alteracao AS change_type,
     data_alteracao AS dt_change,
     ts_load
-FROM datalake_gsheets_raw.managers_history
+FROM datalake_gsheets_people_raw.managers_history

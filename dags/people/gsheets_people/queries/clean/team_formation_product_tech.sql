@@ -46,6 +46,6 @@ SELECT
     TO_DATE(admission, 'dd/MM/yyyy') AS dt_admissioned,
     NOW() AS ts_load
 FROM
-    datalake_gsheets_raw.team_formation_product_tech
+    datalake_gsheets_people_raw.team_formation_product_tech
 WHERE
     employees_name <> ''

@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: cost_center_hierarchy
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,56 +8,56 @@ columns:
   id_cost_center:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.numero_centro_de_custo
+    - datalake_gsheets_people_raw.cost_center_hierarchy.numero_centro_de_custo
   department:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.departamento
+    - datalake_gsheets_people_raw.cost_center_hierarchy.departamento
   cost_center_short:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.centro_de_custo_short
+    - datalake_gsheets_people_raw.cost_center_hierarchy.centro_de_custo_short
   cost_center:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.centro_de_custo
+    - datalake_gsheets_people_raw.cost_center_hierarchy.centro_de_custo
   sub_board:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.sub_diretoria
+    - datalake_gsheets_people_raw.cost_center_hierarchy.sub_diretoria
   board:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.diretoria
+    - datalake_gsheets_people_raw.cost_center_hierarchy.diretoria
   vice_presidency:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.vice_presidencia
+    - datalake_gsheets_people_raw.cost_center_hierarchy.vice_presidencia
   vertical:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.vertical
+    - datalake_gsheets_people_raw.cost_center_hierarchy.vertical
   cost_center_status:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.status_centro_de_custo
+    - datalake_gsheets_people_raw.cost_center_hierarchy.status_centro_de_custo
   business:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.business
+    - datalake_gsheets_people_raw.cost_center_hierarchy.business
   product:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.product
+    - datalake_gsheets_people_raw.cost_center_hierarchy.product
   hrbp:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.hrbp
+    - datalake_gsheets_people_raw.cost_center_hierarchy.hrbp
   cost_center_code_description:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.codigo_cc_long
+    - datalake_gsheets_people_raw.cost_center_hierarchy.codigo_cc_long
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.cost_center_hierarchy.ts_load
+    - datalake_gsheets_people_raw.cost_center_hierarchy.ts_load

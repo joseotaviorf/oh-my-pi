@@ -128,7 +128,8 @@ if __name__ == "__main__":
             sheet_details.get("preload_time_in_seconds"),
         )
         # validate data before loading
-        GsheetsService().validate_clean_query_against_raw(
+        service = GsheetsService(schema=schema)
+        service.validate_clean_query_against_raw(
             dag_name,
             spark_client,
             df,

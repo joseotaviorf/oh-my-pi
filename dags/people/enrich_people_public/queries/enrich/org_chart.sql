@@ -95,10 +95,10 @@ LEFT JOIN
   assignment_cte
     ON employee.id_assignment = assignment_cte.id_assignment
 LEFT JOIN
-  datalake_gsheets_clean.position_class pc
+  datalake_gsheets_people_clean.position_class pc
     ON UPPER(pc.position) = UPPER(assignment_cte.assignment_name)
 LEFT JOIN
-  datalake_gsheets_clean.team_formation_product_tech sheets
+  datalake_gsheets_people_clean.team_formation_product_tech sheets
     ON sheets.assignment_number = employee.assignment_number
 WHERE
   employee.assignment_number NOT LIKE 'P%'

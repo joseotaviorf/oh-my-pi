@@ -8,215 +8,214 @@ columns:
   assignment_number:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.id_colaborador
+    - datalake_gsheets_people_raw.navent_convenia_like.id_colaborador
   id_navent:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.id_navent
+    - datalake_gsheets_people_raw.navent_convenia_like.id_navent
   person_number:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.person_number
+    - datalake_gsheets_people_raw.navent_convenia_like.person_number
   manager_assignment_number:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.id_gestor
+    - datalake_gsheets_people_raw.navent_convenia_like.id_gestor
   company:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.empresa
+    - datalake_gsheets_people_raw.navent_convenia_like.empresa
   employee_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.email
+    - datalake_gsheets_people_raw.navent_convenia_like.email
   employee_email_navent:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.email_navent
+    - datalake_gsheets_people_raw.navent_convenia_like.email_navent
   employee_name:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.nome
+    - datalake_gsheets_people_raw.navent_convenia_like.nome
   employee_status:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.status
+    - datalake_gsheets_people_raw.navent_convenia_like.status
   employee_position:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.cargo
+    - datalake_gsheets_people_raw.navent_convenia_like.cargo
   employee_position_class:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.classe_cargo
+    - datalake_gsheets_people_raw.navent_convenia_like.classe_cargo
   employee_manager:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.gestor
+    - datalake_gsheets_people_raw.navent_convenia_like.gestor
   employee_nacionality:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.nacionalidade
+    - datalake_gsheets_people_raw.navent_convenia_like.nacionalidade
   employee_dismissal_reason:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.motivo_desligamento
+    - datalake_gsheets_people_raw.navent_convenia_like.motivo_desligamento
   employee_sex:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.sexo
+    - datalake_gsheets_people_raw.navent_convenia_like.sexo
   employee_cost_center:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.centro_de_custo
+    - datalake_gsheets_people_raw.navent_convenia_like.centro_de_custo
   employee_sub_directorate:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.sub_diretoria
+    - datalake_gsheets_people_raw.navent_convenia_like.sub_diretoria
   employee_directorate:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.diretoria
+    - datalake_gsheets_people_raw.navent_convenia_like.diretoria
   employee_vice_presidency:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.vice_presidencia
+    - datalake_gsheets_people_raw.navent_convenia_like.vice_presidencia
   employee_vertical:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.vertical
+    - datalake_gsheets_people_raw.navent_convenia_like.vertical
   employee_product_brand:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.marca_produto_dedicado
+    - datalake_gsheets_people_raw.navent_convenia_like.marca_produto_dedicado
   employee_business_navent:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.business_navent
+    - datalake_gsheets_people_raw.navent_convenia_like.business_navent
   employee_country:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.pais
+    - datalake_gsheets_people_raw.navent_convenia_like.pais
   employee_hbrp:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.hrbp
+    - datalake_gsheets_people_raw.navent_convenia_like.hrbp
   employee_band:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.banda
+    - datalake_gsheets_people_raw.navent_convenia_like.banda
   employee_job_code:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.cod_cargo
+    - datalake_gsheets_people_raw.navent_convenia_like.cod_cargo
   employee_birth_city:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.naturalidade_cidade
+    - datalake_gsheets_people_raw.navent_convenia_like.naturalidade_cidade
   employee_dietary_restrictions:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.restricciones_alimentarias
+    - datalake_gsheets_people_raw.navent_convenia_like.restricciones_alimentarias
   employee_resident_country:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.residencia_pais
+    - datalake_gsheets_people_raw.navent_convenia_like.residencia_pais
   employee_ethnicity:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.origen_etnico
+    - datalake_gsheets_people_raw.navent_convenia_like.origen_etnico
   employee_gender_identity:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.identidade_genero
+    - datalake_gsheets_people_raw.navent_convenia_like.identidade_genero
   employee_sexual_orientation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.orientacao_sexual
+    - datalake_gsheets_people_raw.navent_convenia_like.orientacao_sexual
   employee_disability_type:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.tipo_deficiencia
+    - datalake_gsheets_people_raw.navent_convenia_like.tipo_deficiencia
   employee_neurodiversity:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.neurodiversidade
+    - datalake_gsheets_people_raw.navent_convenia_like.neurodiversidade
   employee_marital_status:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.estado_civil
+    - datalake_gsheets_people_raw.navent_convenia_like.estado_civil
   employee_religion:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.religiosidade
+    - datalake_gsheets_people_raw.navent_convenia_like.religiosidade
   employee_housing_type:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.tipo_de_vivienda
+    - datalake_gsheets_people_raw.navent_convenia_like.tipo_de_vivienda
   employee_potential:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.potencial
+    - datalake_gsheets_people_raw.navent_convenia_like.potencial
   employee_criticality:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.criticidade
+    - datalake_gsheets_people_raw.navent_convenia_like.criticidade
   employee_age_range:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.faixa_etaria
+    - datalake_gsheets_people_raw.navent_convenia_like.faixa_etaria
   manager_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.email_gestor
+    - datalake_gsheets_people_raw.navent_convenia_like.email_gestor
   email_left:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.email_left
+    - datalake_gsheets_people_raw.navent_convenia_like.email_left
   employee_country_situation:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.situacion_en_el_pais
+    - datalake_gsheets_people_raw.navent_convenia_like.situacion_en_el_pais
   tenure:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.tenure
+    - datalake_gsheets_people_raw.navent_convenia_like.tenure
   currency:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.salario_moeda_local
+    - datalake_gsheets_people_raw.navent_convenia_like.salario_moeda_local
   salary_local_currency:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.salario_moeda_local
+    - datalake_gsheets_people_raw.navent_convenia_like.salario_moeda_local
   salary:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.salario
+    - datalake_gsheets_people_raw.navent_convenia_like.salario
   is_leader:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.fl_lider
+    - datalake_gsheets_people_raw.navent_convenia_like.fl_lider
   is_manager_active:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.status_gestor
+    - datalake_gsheets_people_raw.navent_convenia_like.status_gestor
   employee_age:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.idade_pessoa
+    - datalake_gsheets_people_raw.navent_convenia_like.idade_pessoa
   dt_start:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.CASE WHEN CONTAINS(dt_inicio, '/')
-      THEN TO_DATE(dt_inicio, 'M/d/yyyy') ELSE DATE(dt_inicio) END
+    - datalake_gsheets_people_raw.navent_convenia_like.dt_inicio
   dt_dismissal:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.dt_desligamento
+    - datalake_gsheets_people_raw.navent_convenia_like.dt_desligamento
   dt_birth:
     description: ''
     lineage:
-    - datalake_gsheets_raw.navent_convenia_like.dt_nascimento
+    - datalake_gsheets_people_raw.navent_convenia_like.dt_nascimento
   ts_load:
     description: ''

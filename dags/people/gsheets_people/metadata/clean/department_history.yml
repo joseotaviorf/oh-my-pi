@@ -1,5 +1,5 @@
 ---
-database_name: datalake_gsheets_clean
+database_name: datalake_gsheets_people_clean
 table_name: department_history
 owner: leonardo.soares@quintoandar.com.br
 domain: people
@@ -8,36 +8,36 @@ columns:
   id_employee:
     description: ''
     lineage:
-    - datalake_gsheets_raw.department_history.id_colaborador
+    - datalake_gsheets_people_raw.department_history.id_colaborador
   employee_name:
     description: ''
     lineage:
-    - datalake_gsheets_raw.department_history.nome
+    - datalake_gsheets_people_raw.department_history.nome
   employee_registration:
     description: ''
     lineage:
-    - datalake_gsheets_raw.department_history.matricula
+    - datalake_gsheets_people_raw.department_history.matricula
   employee_email:
     description: ''
     lineage:
-    - datalake_gsheets_raw.department_history.email
+    - datalake_gsheets_people_raw.department_history.email
   old_department:
     description: ''
     lineage:
-    - datalake_gsheets_raw.department_history.departamento_antigo
+    - datalake_gsheets_people_raw.department_history.departamento_antigo
   new_department:
     description: ''
     lineage:
-    - datalake_gsheets_raw.department_history.departamento_novo
+    - datalake_gsheets_people_raw.department_history.departamento_novo
   change_type:
     description: ''
     lineage:
-    - datalake_gsheets_raw.department_history.tipo_alteracao
+    - datalake_gsheets_people_raw.department_history.tipo_alteracao
   dt_change:
     description: ''
     lineage:
-    - datalake_gsheets_raw.department_history.data_alteracao
+    - datalake_gsheets_people_raw.department_history.data_alteracao
   ts_load:
     description: ''
     lineage:
-    - datalake_gsheets_raw.department_history.ts_load
+    - datalake_gsheets_people_raw.department_history.ts_load

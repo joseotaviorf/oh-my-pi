@@ -37,4 +37,4 @@ SELECT
         ELSE FALSE
     END AS is_active,
     ts_load
-FROM datalake_gsheets_raw.performance_review
+FROM datalake_gsheets_people_raw.performance_review

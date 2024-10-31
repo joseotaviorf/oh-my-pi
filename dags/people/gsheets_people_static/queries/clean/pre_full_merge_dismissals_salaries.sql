@@ -17,4 +17,4 @@ SELECT
     date_from AS dt_from,
     date_to AS dt_to,
     ts_load
-FROM datalake_gsheets_raw.pre_full_merge_dismissals_salaries
+FROM datalake_gsheets_people_raw.pre_full_merge_dismissals_salaries

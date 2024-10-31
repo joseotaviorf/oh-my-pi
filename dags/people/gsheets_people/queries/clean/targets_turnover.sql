@@ -11,4 +11,4 @@ SELECT
     voluntary_rt_navent,
     actual_enps AS current_enps,
     ts_load
-FROM datalake_gsheets_raw.targets_turnover
+FROM datalake_gsheets_people_raw.targets_turnover
