@@ -47,6 +47,7 @@ union_spvs AS (
         AND get_json_object(event_properties, '$.search_id') IS NOT NULL
         AND get_json_object(event_properties, '$.search_results_list') IS NOT NULL
         AND get_json_object(event_properties, '$.search_results_list') <> '[]'
+        AND get_json_object(user_properties, '$.country') = 'BR'
 
     UNION ALL
 
@@ -67,6 +68,7 @@ union_spvs AS (
         AND get_json_object(event_properties, '$.search_id') IS NOT NULL
         AND get_json_object(event_properties, '$.search_results_list') IS NOT NULL
         AND get_json_object(event_properties, '$.search_results_list') <> '[]'
+        AND get_json_object(user_properties, '$.country') = 'BR'
 ),
 
 -----------------
@@ -428,7 +430,8 @@ SELECT
             'id_user', searches.id_user,
             'id_session', searches.id_session,
             'id_amplitude', searches.id_amplitude,
-            'id_device', searches.id_device
+            'id_device', searches.id_device,
+            'copilot_session_id', searches.copilot_session_id
         )
     ) AS ids,
 
@@ -447,7 +450,7 @@ SELECT
             'page_number', exploded_houses.page_number,
             'page_position', exploded_houses.page_position,
             'listing_age', exploded_houses.listing_age,
-            'copilot_session_id', searches.copilot_session_id
+            'has_copilot_session', CASE WHEN searches.copilot_session_id IS NOT NULL THEN 1 ELSE 0 END
         )
     ) AS dimensions,
 

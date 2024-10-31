@@ -21,25 +21,29 @@ WITH houses_catalog AS (
     WHERE
         status_history IN ('publicado', 'PUBLISHED')
         AND ts_status_start IS NOT NULL
+        AND country_code = 'BR'
 
     UNION ALL
 
     SELECT DISTINCT
         CAST(
             SUBSTRING(
-                CAST(sk_sale_listing AS STRING),
+                CAST(fact_listing_status.sk_sale_listing AS STRING),
                 1, 9
             )
             AS INTEGER
         )
         AS id_house,
         'sale' AS business_context,
-        ts_status_started AS ts_house_published
+        fact_listing_status.ts_status_started AS ts_house_published
     FROM
-        dw_sale.fact_listing_status
+        dw_sale.fact_listing_status AS fact_listing_status
+    LEFT JOIN dw_public.dim_region AS dim_region
+        ON fact_listing_status.sk_region = dim_region.sk_region
     WHERE
-        status_history = 'PUBLISHED'
-        AND ts_status_started IS NOT NULL
+        fact_listing_status.status_history = 'PUBLISHED'
+        AND fact_listing_status.ts_status_started IS NOT NULL
+        AND dim_region.country_code = 'BR'
 ),
 
 house_published_repeated AS (
