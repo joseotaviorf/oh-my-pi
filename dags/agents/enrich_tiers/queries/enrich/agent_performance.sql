@@ -3,6 +3,8 @@ WITH filter_bimester AS (
         ad.bimester_name,
         ad.date,
         ad.bimester,
+        ad.bimester_start,
+        ad.bimester_end,
         ad.year
     FROM 
         datalake_quintoandar.aux_date AS ad
@@ -81,10 +83,10 @@ member_profile AS (
     JOIN
         datalake_hub_services_clean.business_unit AS bu
             ON bu.id = mp.id_business_unit
-    JOIN
+    JOIN 
         filter_bimester AS fb
-            ON fb.date BETWEEN DATE(mp.ts_relationship_started) 
-            AND DATE(COALESCE(mp.ts_relationship_ended, mp.ts_load))
+            ON (DATE(mp.ts_relationship_ended) BETWEEN fb.bimester_start AND fb.bimester_end)
+            OR mp.ts_relationship_ended IS NULL
     WHERE
         mp.profile IN ('AGENT', 'NEGOTIATION_EXECUTIVE')
 ),
