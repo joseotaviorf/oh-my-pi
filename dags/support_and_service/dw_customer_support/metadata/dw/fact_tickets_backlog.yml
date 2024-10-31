@@ -1,5 +1,5 @@
 ---
-database_name: dw_customer_support_test
+database_name: dw_customer_support
 table_name: fact_tickets_backlog
 description:
   This table contains all back-office tasks that are considered part of the backlog.
