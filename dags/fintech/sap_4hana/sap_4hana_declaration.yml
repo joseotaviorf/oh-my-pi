@@ -27,7 +27,7 @@ workflow:
       extraction_type: incremental
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
-        - table_api_path: "http/DEV/QueryDatasphere"
+        - table_api_path: "http/PRD/QueryDatasphere"
 cluster:
   type: databricks_13_3_med_general_cluster
   access_control_list:
