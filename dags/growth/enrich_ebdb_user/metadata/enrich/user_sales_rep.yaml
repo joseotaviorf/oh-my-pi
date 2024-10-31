@@ -1,8 +1,8 @@
 database_name: datalake_ebdb_user
 table_name: user_sales_rep
 description: For each line of the table we have a sales representative user, who will assist in selling the property.
-domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
 columns:
   id_user_sales_rep:
     lineage:

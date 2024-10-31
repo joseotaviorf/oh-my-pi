@@ -1,8 +1,8 @@
 database_name: datalake_ebdb_user
 table_name: agent_data
 description: Table with more information about the agents. Each row represents an agent.
-domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
 columns:
   id:
     description: ID of the agent.

@@ -3,8 +3,8 @@ table_name: user
 description:
   Enrich table with information of every user from EBDB along with timestamps of
   relevant events, contact, bank account and address information
-domain: Cross
-owner: data-ae@quintoandar.com.br
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
 columns:
   id:
     lineage:

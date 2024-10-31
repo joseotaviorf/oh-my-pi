@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_user
 table_name: user_revision_entity
-domain: Cross
-owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
 description: Enriched table that has all the revisions (updates in audit tables) made by an user from EBDB.
   Using the id column, it's possible to join with another aud table that has the rev column.
 columns:

@@ -2,7 +2,7 @@ dag:
   name: ebdb_user
   schedule_start_date: 2021, 2, 20
   schedule_interval: 20 21 * * *
-  owner: Data Engineering
+  owner: Data Growth
   documentation:
     dag_purpose: Extraction of EBDB tables related to User into data lake. EBDB is the main database for QuintoAndar.
 workflow:

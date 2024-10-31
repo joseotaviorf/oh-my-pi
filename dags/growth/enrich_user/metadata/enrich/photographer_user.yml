@@ -1,11 +1,11 @@
 ---
 database_name: datalake_user
-table_name: broker_user
+table_name: photographer_user
 description:
-  Ebdb Users daily snapshot classified as active brokers, considering agents that are
-  in the sale or rental context.
-domain: Cross
-owner: data-ae-ss@quintoandar.com.br
+  Ebdb Users daily snapshot classified as active photographers, considering
+  photographers that are active.
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
 columns:
   id_snapshot:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd"
@@ -18,7 +18,7 @@ columns:
       - datalake_ebdb_clean.user.id_country
     description: The user country id.
   client_type:
-    description: Client type defined as broker.
+    description: Client type defined as photographer.
   country_code:
     lineage:
       - datalake_ebdb_clean.country.country_code

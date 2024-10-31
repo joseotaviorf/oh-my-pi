@@ -2,8 +2,8 @@
 database_name: datalake_user
 table_name: persona_type
 description: QuintoAndar Users daily snapshot unifying all personas types.
-domain: Cross
-owner: data-ae-ss@quintoandar.com.br
+domain: Growth
+owner: arthur.gonzaga@quintoandar.com.br
 columns:
   id_snapshot:
     lineage:
