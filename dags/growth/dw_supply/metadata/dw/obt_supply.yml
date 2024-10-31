@@ -68,6 +68,11 @@ columns:
   tp_business_event:
     description: Type of business event associated with the flow.
     lineage: dw_growth.dim_funnel_step.tp_business_event
+  business_event:
+    description: Description of the business event associated with the flow.
+    lineage: 
+      - dw_growth.dim_funnel_step.cd_funnel_inter_step
+      - dw_growth.dim_funnel_step.tp_business_event
   campaign_strategy_intent:
     description: Strategic intent of the campaign associated with the lead.
     lineage: dw_growth.dim_media_setup.campaign_strategy_intent

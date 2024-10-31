@@ -63,6 +63,7 @@ base AS (
         dal.tp_lead,
         dfs.cd_funnel_step,
         dfs.tp_business_event,
+        CONCAT_WS('_', tp_business_event, cd_funnel_inter_step) AS business_event,
         dms.campaign_strategy_intent,
         dms.campaign_business_context,
         dms.campaign_landing_page,
