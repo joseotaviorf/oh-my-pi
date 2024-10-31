@@ -20,3 +20,6 @@ columns:
   mod_rental_administrator:
     lineage:
       - datalake_ebdb_raw.listingrentmodel_aud.rentalAdministrator_MOD
+  is_early_relisting:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel_aud.isEarlyRelisting

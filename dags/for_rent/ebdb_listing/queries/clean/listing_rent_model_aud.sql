@@ -4,6 +4,7 @@ SELECT
     rev,
     revtype AS rev_type,
     rentalAdministrator AS rental_administrator,
-    rentalAdministrator_MOD AS mod_rental_administrator
+    rentalAdministrator_MOD AS mod_rental_administrator,
+    isEarlyRelisting AS is_early_relisting
 FROM
     datalake_ebdb_raw.listingrentmodel_aud

@@ -11,6 +11,9 @@ columns:
   rental_administrator:
     lineage:
       - datalake_ebdb_raw.listingrentmodel.rentalAdministrator
+  is_early_relisting:
+    lineage:
+      - datalake_ebdb_raw.listingrentmodel.isEarlyRelisting
   ts_created:
     lineage:
       - datalake_ebdb_raw.listingrentmodel.created_at
