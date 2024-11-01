@@ -36,6 +36,7 @@ demand AS (
     queue_name,
     direction,
     'call' AS channel,
+    origin,
     CASE
       WHEN id_reservation IS NULL THEN 'abandoned'
       WHEN ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_task_created DESC) = 1 THEN 'completed'
@@ -75,6 +76,7 @@ demand AS (
     queue_name,
     'inbound' AS direction,
     'chat' AS channel,
+    origin,
     CASE
       WHEN task_completion_reason = 'task idled' THEN 'idled'
       WHEN task_completion_reason = 'session expired' THEN 'expired'
@@ -124,6 +126,7 @@ contacts AS (
     d.queue_name,
     d.channel,
     d.direction,
+    d.origin,
     d.status,
     d.worker_email,
     d.quinto_andar_phone_number,
@@ -181,6 +184,7 @@ SELECT
   FIRST(sk_department) OVER (PARTITION BY sk_contact ORDER BY ts_task_created DESC) AS sk_last_department,
   direction,
   channel,
+  origin,
   status,
   worker_email,
   quinto_andar_phone_number,

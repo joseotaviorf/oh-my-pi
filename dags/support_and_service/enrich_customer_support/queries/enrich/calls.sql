@@ -215,10 +215,7 @@ SELECT DISTINCT
     WHEN c.channel_type = 'call-in-app' OR c.direction = 'outbound-api' THEN 'in app'
     ELSE c.direction
   END AS origin,
-  CASE
-    WHEN c.channel_type = 'call-in-app' OR c.direction = 'outbound-api' THEN 'inbound'
-    ELSE c.direction
-  END AS direction,
+  c.direction,
   c.channel_type,
   c.bpo_name,
   COALESCE(rq.queue_name, tq.queue_name) AS queue_name,
