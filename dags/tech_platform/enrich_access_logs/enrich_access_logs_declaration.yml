@@ -15,7 +15,7 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
   tables_customization:
     access_logs:
-      merge_on: [year, month, day, id_trace]
+      merge_on: [year, month, day, id_decision]
       when_matched_update_condition: target.ts_event IS NULL OR source.ts_event IS NOT NULL
 cluster:
   type: custom_cluster

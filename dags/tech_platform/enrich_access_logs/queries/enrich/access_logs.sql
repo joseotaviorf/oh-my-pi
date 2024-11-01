@@ -6,8 +6,10 @@ WITH istio AS (
         MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 )
 SELECT 
+    opa.id_decision,
     opa.id_trace,
-    istio.ts_event, 
+    opa.ts_event as ts_decision,
+    istio.ts_event as ts_mesh_request, 
     istio.request_traceparent, 
     istio.request_x_forwarded_for,
     istio.request_method, 
@@ -35,6 +37,7 @@ SELECT
     opa.day, 
     opa.hour
 FROM datalake_access_logs_clean.opa as opa
-LEFT JOIN istio on opa.id_trace = istio.id_trace
+LEFT JOIN istio on opa.id_request = istio.id_request AND opa.app = istio.app
 WHERE
     MAKE_DATE(opa.year, opa.month, opa.day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+QUALIFY ROW_NUMBER() OVER (PARTITION BY opa.id_decision ORDER BY istio.ts_event DESC) = 1

@@ -4,13 +4,21 @@ domain: Tech Platform
 owner: identityplatform-team@quintoandar.com.br
 description: "This table stores the combined information from access logs"
 columns:
+  id_decision:
+    lineage:
+      - datalake_access_logs_clean.opa.id_decision
+    description: Decision ID
   id_trace:
     lineage:
       - datalake_access_logs_clean.opa.id_trace
     description: Trace ID
-  ts_event:
+  ts_decision:
     lineage:
-      - datalake_access_logs_clean.istio.start_time
+      - datalake_access_logs_clean.opa.ts_event
+    description: Decision timestamp
+  ts_mesh_request:
+    lineage:
+      - datalake_access_logs_clean.istio.ts_event
     description: Request start time
   request_traceparent:
     lineage:
