@@ -6,6 +6,8 @@ dag:
   documentation: 
     dag_purpose: |
       This DAG generates the manual costs (i.e. gathered from gsheets tables) and saves its part in the final Fact Marketing Daily Costs aside Enrich Marketing Automatic Daily Costs. 
+      At the day 2024-10-04, we copy gsheets to the table `datalake_growth_costs.historical_marketing_manual_costs_name_convention` and `datalake_growth_costs.historical_marketing_manual_costs`
+      We added this as historical data.
 workflow:
   type: query
   layer: enrich
