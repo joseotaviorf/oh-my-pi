@@ -1,0 +1,30 @@
+database_name: datalake_braze_events_test_clean
+table_name: events_tenants
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
+description: This table contains details about events related/realized by tenants, e.g. disptaches or clicks.
+columns:
+  id:
+    description: Unique code to identify an event (dispatch or interaction of the user with the communication).
+    lineage:
+      - datalake_braze_events_test_raw.events_tenants.id
+  event_info:
+    description: JSON with relevant information about the event.
+    lineage:
+      - datalake_braze_events_test_raw.events_tenants.event_info
+  event_type:
+    description: Type of event that occured (complete).
+    lineage:
+      - datalake_braze_events_test_raw.events_tenants.event_type
+  year:
+    description: Year of when the event occurred.
+    lineage:
+      - datalake_braze_events_test_raw.events_tenants.year
+  month:
+    description: Month of when the event occurred.
+    lineage:
+      - datalake_braze_events_test_raw.events_tenants.month
+  day:
+    description: Day of when the event occurred.
+    lineage:
+      - datalake_braze_events_test_raw.events_tenants.day

@@ -1,0 +1,11 @@
+database_name: datalake_braze_events_test_raw
+table_name: events_tenants
+columns:
+  id:
+    tags:
+    - PII
+    - Confidential
+  event_info:
+    tags:
+    - PII
+    - Confidential
