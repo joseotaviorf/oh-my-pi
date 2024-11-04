@@ -1353,7 +1353,6 @@ bietlejuice.enrich_consolidated_marketing_metrics:
 bietlejuice.enrich_content_funnel:
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-performance-marketing-metrics-demand
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand
-  - bietlejuice.ebdb_visit:load-clean-visit
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
 bietlejuice.enrich_copilot_service:
@@ -2755,7 +2754,6 @@ bietlejuice.enrich_secretariat:
 bietlejuice.enrich_seo_funnel:
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-performance-marketing-metrics-demand
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand
-  - bietlejuice.ebdb_visit:load-clean-visit
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
 bietlejuice.enrich_sirena:
@@ -2978,7 +2976,6 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.hub_services:load-clean-lead
   - bietlejuice.hub_services:load-clean-visitor
 bietlejuice.enrich_tracksale:
-  - bietlejuice.ebdb_visit:load-clean-booking
   - bietlejuice.tracksale:load-clean-answer
   - bietlejuice.tracksale:load-clean-dispatch
 bietlejuice.enrich_tracksale_dispatches:

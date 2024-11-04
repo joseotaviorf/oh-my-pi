@@ -69,7 +69,7 @@ bietlejuice.dw_datamarts_spark.cross:
     - bietlejuice.dw_offer:load-dw-rent-dim-offer
     - bietlejuice.dw_region:load-dw-public-dim-region
     - bietlejuice.dw_user:load-dw-quintoandar-dim-user-sales-rep
-    - bietlejuice.ebdb:load-clean-booking
+    - bietlejuice.ebdb_visit:load-clean-booking
     - bietlejuice.ebdb_house:load-clean-house
 
 bietlejuice.dw_datamarts_spark.fintech_cross:
@@ -136,7 +136,7 @@ bietlejuice.dw_date:
     - bietlejuice.enrich_public_date:load-enrich-aux-date
 bietlejuice.dw_photo_jobs:
   remove:
-    - bietlejuice.ebdb:load-clean-booking
+    - bietlejuice.ebdb_visit:load-clean-booking
     - bietlejuice.ebdb:load-clean-inspection
     - bietlejuice.ebdb_house:load-clean-house
 bietlejuice.dw_losses:
@@ -261,7 +261,7 @@ bietlejuice.enrich_content_funnel:
   remove:
     - bietlejuice.dw_booking:load-dw-public-dim-booking
     - bietlejuice.dw_region:load-dw-public-dim-region
-    - bietlejuice.ebdb:load-clean-visit
+    - bietlejuice.ebdb_visit:load-clean-visit
 bietlejuice.enrich_crawlers_listings:
   override: []
 bietlejuice.enrich_crawlers_listings_deduplicated:
@@ -331,7 +331,7 @@ bietlejuice.enrich_growth_costs_sharing_rules:
     - bietlejuice.dw_supply:load-dw-growth-fact-supply-events
 bietlejuice.enrich_growth_taxonomy:
   remove:
-    - bietlejuice.ebdb:load-clean-visit-origin
+    - bietlejuice.ebdb_visit:load-clean-visit-origin
     - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
     - bietlejuice.enrich_booking:load-enrich-booking
 bietlejuice.enrich_health_metrics:
@@ -618,7 +618,7 @@ bietlejuice.enrich_seo_funnel:
   remove:
     - bietlejuice.dw_booking:load-dw-public-dim-booking
     - bietlejuice.dw_region:load-dw-public-dim-region
-    - bietlejuice.ebdb:load-clean-visit
+    - bietlejuice.ebdb_visit:load-clean-visit
 bietlejuice.enrich_ss_logic_model:
   add:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -661,7 +661,7 @@ bietlejuice.enrich_tracked_events:
     - bietlejuice.greenseer:load-clean-session
 bietlejuice.enrich_tracksale:
   remove:
-    - bietlejuice.ebdb:load-clean-booking
+    - bietlejuice.ebdb_visit:load-clean-booking
     - bietlejuice.ebdb_contract:load-clean-contract
     - bietlejuice.ebdb_house:load-clean-house
     - bietlejuice.ebdb_offer:load-clean-offer
