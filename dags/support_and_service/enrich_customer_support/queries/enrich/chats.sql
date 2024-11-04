@@ -6,7 +6,7 @@ WITH task_queues AS (
   FROM
     datalake_quinto_messenger_clean.task_event
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY AND "{load_end_date}"
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
 ),
@@ -37,7 +37,7 @@ sauron_sessions AS (
   FROM
     datalake_sauron_clean.session
   WHERE
-    year >= 2023 -- we need to check all sessions as they do not have a fixed lifetime
+    year >= YEAR(DATE("{load_start_date}") - INTERVAL 1 YEAR) -- we need to check all sessions as they do not have a fixed lifetime
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_updated DESC) = 1
 ),
