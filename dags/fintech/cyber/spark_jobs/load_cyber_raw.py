@@ -1,20 +1,21 @@
+import ast
 import json
 import logging
 from argparse import ArgumentParser
-import ast
 
-from bietlejuice.base.db import DatalakeMetastoreService, DatabaseEnum
-from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, SparkDataFrameService
+from pyspark.sql.functions import col, current_timestamp, greatest, to_date
+
+from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
+from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.spark import BaseDBUtils, SparkDataFrameService, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import OracleSparkConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.pipeline import FullTableLoaderPipeline, IncrementalTableLoaderPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services.messaging_services.message import Message
 from bietlejuice.services.messaging_services.gchat_service import GChatService
-from pyspark.sql.functions import current_timestamp
+from bietlejuice.services.messaging_services.message import Message
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -108,8 +109,16 @@ if __name__ == "__main__":
         df = df.withColumn("ts_ingestion", current_timestamp())
 
         if extraction_type == "incremental":
-            partition = date_filter_columns[0] if date_filter_columns else "ts_ingestion"
-            df.select(partition).distinct().show()
+            if date_filter_columns:
+                if len(date_filter_columns) > 1:
+                    df = df.withColumn("table_partition", (greatest(*[col(c) for c in date_filter_columns])))
+                else:
+                    df = df.withColumn("table_partition", (col(date_filter_columns[0])))
+                partition = "table_partition"
+            else:
+                partition = "ts_ingestion"
+
+            df.select(to_date(partition)).distinct().show()
 
             df = (
                 SparkDataFrameService()

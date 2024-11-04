@@ -44,6 +44,12 @@ workflow:
       partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['ACACTDTE']"
+    tb_parcela:
+      clean_table_name: bill
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - "['PADTUPDATE', 'PADTINSERT', 'PABIDTUPDATE', 'PABIDTINSERT']"
     relations:
       clean_table_name: debtor
       extraction_type: full
@@ -100,12 +106,6 @@ workflow:
         - "[]"
     tb_boleto:
       clean_table_name: agreement_invoices
-      extraction_type: full
-      partitions: []
-      extra_spark_job_arguments:
-        - "[]"
-    tb_parcela:
-      clean_table_name: bill
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:

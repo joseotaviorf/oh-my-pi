@@ -96,5 +96,10 @@ SELECT
     PADTINSERT AS ts_insert,
     PADTUPDATE AS ts_update,
     PABIDTEXCLUSAO AS ts_bill_item_deleted,
+    year,
+    month,
+    day,
     NOW() AS ts_load
 FROM datalake_cyber_raw.tb_parcela
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
