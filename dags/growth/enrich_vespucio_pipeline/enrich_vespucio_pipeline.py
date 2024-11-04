@@ -18,7 +18,6 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
 
-# from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.services.configuration_service import ConfigurationService
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
@@ -46,9 +45,7 @@ VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
 
-CLUSTER_DESCRIPTION = config_service.get_config(
-    "databricks_13_3_med_general_photon_cluster"
-)
+CLUSTER_DESCRIPTION = config_service.get_config("custom_cluster")
 CLUSTER_DESCRIPTION["spark_conf"].update(
     {"spark.metrics.namespace": "data_products.enrich_vespucio_pipeline"}
 )
@@ -122,7 +119,9 @@ class Tables:
     Instead of using `vespucio_sources_delta.source_navent_houses` we must use `_composed` version, which is
     recreated every pipeline run with the increase of blocklist statuses
     """
-    source_navent_houses_composed = "vespucio_sources_delta.source_navent_houses_composed"
+    source_navent_houses_composed = (
+        "vespucio_sources_delta.source_navent_houses_composed"
+    )
     source_union_houses = "vespucio_sources_delta.source_union_house"
     source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
     source_iptu_houses = "vespucio_sources_delta.source_iptu_house"
@@ -157,6 +156,9 @@ class Tables:
     # golden_set_condo_compounds_diff = (
     #     "vespucio_goldenset_delta.condo_compounds_goldenset_diff"
     # )
+
+    kodak_photo = "datalake_kodak_clean.photo"
+    kodak_photo_invalid_source = "datalake_kodak_clean.photo_invalid_source"
 
     ebdb_clean_house_enrichment = "datalake_ebdb_clean.house_enrichment"
     ebdb_clean_house = "datalake_ebdb_clean.house"
@@ -287,14 +289,6 @@ source_tasks = [
     ),
 ]
 
-# dbutils = BaseDBUtils().get_dbutils()
-# if dbutils is None:
-#    raise RuntimeError("DBUtils not found")
-
-kodak_api_key = ""
-# @toodo fix dbutils secret loading
-# kodak_api_key = dbutils.secrets.get("quintoandar", APIEnum.KODAK)
-
 core_tasks = [
     create_task(
         entry_point="core_stage_step",
@@ -362,11 +356,13 @@ core_tasks = [
         entry_point="core_images_step",
         parameters=[
             f"--input_merged_houses={Tables.merge_step_houses}",
-            f"--input_images_houses={Tables.images_step_houses}",
+            f"--input_kodak_photo_invalid_source={Tables.kodak_photo_invalid_source}",
+            f"--input_kodak_photo={Tables.kodak_photo}",
             "--overwrite_schema",
             f"--output_images_houses={Tables.images_step_houses}",
-            f"--kodak_auth_token={kodak_api_key}",
-            "--kodak_api_url=https://kodak.quintoandar.com.br/s2s/v1",
+            f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
+            f"--kodak_photo_sns_arn={config_service.get_config('kodak_photo_sns_arn')}",
+            "--kodak_photo_sns_region=us-east-1",
             "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
         ],
     ),

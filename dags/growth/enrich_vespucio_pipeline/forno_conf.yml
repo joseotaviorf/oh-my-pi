@@ -4,3 +4,15 @@ dag_documentation:
     [Vespucio Repository](https://github.com/quintoandar/vespucio)"
 elastic_search_url: "https://vpc-vespucio-forno-us-east-1-3l2ywytq5dagy7tdeitbyxew7m.us-east-1.es.amazonaws.com/"
 sqs_url_house_enrichment: "https://sqs.us-east-1.amazonaws.com/632540934959/DevMainHouseEnrichmentHousesToBeReEnriched"
+kodak_photo_sns_arn: "arn:aws:sns:us-east-1:569412621543:FornoKodakPhoto"
+
+
+custom_cluster:
+  driver_node_type_id: m5d.large
+  node_type_id: m5d.large
+  num_workers: 1
+  runtime_engine: PHOTON
+  spark_version: 13.3.x-scala2.12
+  aws_attributes:
+    ebs_volume_size: 200
+    instance_profile_arn: "{{ var.value.instance_profile_secret_arn_vespucio }}"
