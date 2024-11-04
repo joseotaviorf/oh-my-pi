@@ -450,6 +450,23 @@ table_block_list:
   - PartnerAgent_AUD
   - DadosAfiliado
   - DadosAfiliado_AUD
+  - Agendamento
+  - Agendamento_AUD
+  - MudancaStatusAgendamento
+  - Entrance
+  - FollowUpDetails
+  - UserVisitPreferences
+  - UserVisitPreferences_AUD
+  - Visita
+  - Visita_AUD
+  - VisitCancellationDetails
+  - VisitCancellationDetails_AUD
+  - VisitCheckin
+  - VisitCheckin_AUD
+  - VisitFitting
+  - VisitaOrigem
+  - VisitStatusLog
+  - Visitor
 
 view_allow_list:
   - MapRegiao
