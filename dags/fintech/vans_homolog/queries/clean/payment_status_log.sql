@@ -15,7 +15,7 @@ SELECT
     payee_agency,
     payee_document,
     payee_name,
-    bank_info_status,
+    payee_bank_info_status,
     related_document_type,
     related_document_status,
     requested_by,

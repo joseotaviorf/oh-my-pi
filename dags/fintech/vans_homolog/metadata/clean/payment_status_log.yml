@@ -49,9 +49,9 @@ columns:
   payee_name:
     lineage:
       - datalake_vans_homolog_raw.payment_status_log.payee_name
-  bank_info_status:
+  payee_bank_info_status:
     lineage:
-      - datalake_vans_homolog_raw.payment_status_log.bank_info_status
+      - datalake_vans_homolog_raw.payment_status_log.payee_bank_info_status
   related_document_type:
     lineage:
       - datalake_vans_homolog_raw.payment_status_log.related_document_type
