@@ -77,10 +77,10 @@ sheets_info:
     clean_table_name: owner_exit_inspection_csat
     sheet_context: fintech
 
-  evictions_processes_forrent:
-    sheet_id: 13D27A-NeWnDC2-army_6c-mc-ORy5KEzrnVZfJv9aDM
-    sheet_name: GSHEETS_INGESTION_DATALAKE
-    clean_table_name: evictions_processes_forrent
+  evictions_base:
+    sheet_id: 1Qhvkif3kgYFlP51qQMKp-FqGXHUJIRTE4l7reMnJwbg
+    sheet_name: Base Evictions
+    clean_table_name: evictions_base
     sheet_context: fintech
     preload_time_in_seconds: 30
 
@@ -102,7 +102,7 @@ sheets_info:
     sheet_name: quintocred_test_proposals
     clean_table_name: quintocred_test_proposals
     sheet_context: fintech
-  
+
   fdic_acquisition_2023:
     sheet_id: 1Vu0vpRWjgzcr_e-R0WLmhyExZ4I05dk_jstdyagOaS4
     sheet_name: acquisition

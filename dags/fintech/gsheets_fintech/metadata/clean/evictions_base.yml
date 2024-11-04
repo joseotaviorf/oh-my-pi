@@ -1,0 +1,179 @@
+---
+database_name: datalake_gsheets_fintech_clean
+table_name: evictions_base
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Gsheet with E-law eviction data. It replaces the evictions_processes_forrent (Processos - v3)
+columns:
+  id_process:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.ID_Processo
+  contract:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Contrato
+  process:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Processo
+  input_type:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Tipo_entrada
+  action_type:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Tipo_acao
+  action:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Acao
+  office:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Escritorio
+  chamber:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Camara
+  region:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Regiao
+  city:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Cidade
+  contract_status:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Status_contrato
+  elaw_status:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Status_elaw
+  passage_status:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Status_passagem
+  procedure:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Procedimento
+  termination_reason:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Motivo_encerramento
+  consolidated_reason:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Motivo_consolidado
+  standardized_reason:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Motivo_padronizado
+  result:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Resultado
+  succumbency_fee:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Honorario_sucumbencia
+  correspondent:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Correspondente
+  notice_of_receipt:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Aviso_recebimento
+  total_package:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Total_pacote
+  date_registered:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Data_registrado
+  distribution_protocol_date:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Data_distribuicao_protocolo
+  arbitral_citation:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Citacao_Arbitral
+  chamber_contestation:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Contestacao_Camara
+  arbitral_sentence:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Sentenca_Arbitral
+  res_judicata:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Transito_em_Julgado
+  cs_pre_registration:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Pre_Cadastro_CS
+  cs_distribution:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Distribuicao_CS
+  cs_waiting_for_sentence:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Aguardando_sentenca_CS
+  cs_impeachment:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Impugnacao_CS
+  order_issuance:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Expedicao_mandado
+  cs_intimation:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Intimacao_CS
+  coercive_issuance:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Emissao_coercitivo
+  date_finalizing:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.data_finalizando
+  date_finalized_erc:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.data_finalizado_ERC
+  date_payment:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Data_quitacao
+  elaw_closure_date:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Data_encerramento_elaw
+  ldt_stock:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_Estoque
+  stock_range:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Faixa_Estoque
+  ldt_resolution:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_Resolucao
+  resolution_range:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Faixa_Resolucao
