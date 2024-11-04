@@ -26,7 +26,6 @@ SELECT
   v.id_house_listing AS sk_house_listing,
   v.id_company_demand AS sk_company_demand,
   v.id_company_supply AS sk_company_supply,
-  v.id_entrance_type AS sk_entrance_type,
   bc.sk_business_context,
   et.sk_entrance_type,
   bm.sk_business_model,
