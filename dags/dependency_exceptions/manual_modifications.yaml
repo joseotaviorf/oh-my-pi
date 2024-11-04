@@ -708,8 +708,6 @@ bietlejuice.enrich_velo:
     - bietlejuice.velo:load-clean-fiancavelo-propose
     - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
     - bietlejuice.velo_asaas:load-clean-payments
-bietlejuice.enrich_vespucio:
-  override: []
 bietlejuice.enrich_vespucio_pipeline:
   add:
     - bietlejuice.ebdb_condo:load-clean-amenities
