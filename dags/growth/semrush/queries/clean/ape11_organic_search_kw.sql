@@ -28,4 +28,3 @@ WHERE
     domain = '{domain}'
     AND year = {year}
     AND month = {month}
-    AND day = {day}
