@@ -93,11 +93,11 @@ columns:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Total_pacote
-  date_registered:
+  dt_registered:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Data_registrado
-  distribution_protocol_date:
+  dt_distribution_protocol:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Data_distribuicao_protocolo
@@ -145,19 +145,19 @@ columns:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Emissao_coercitivo
-  date_finalizing:
+  dt_finalizing:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.data_finalizando
-  date_finalized_erc:
+  dt_finalized_erc:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.data_finalizado_ERC
-  date_payment:
+  dt_payment:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Data_quitacao
-  elaw_closure_date:
+  dt_elaw_closure:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Data_encerramento_elaw

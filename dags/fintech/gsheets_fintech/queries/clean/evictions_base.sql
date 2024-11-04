@@ -21,8 +21,6 @@ SELECT
     Correspondente AS correspondent,
     Aviso_recebimento AS notice_of_receipt,
     Total_pacote AS total_package,
-    Data_registrado AS date_registered,
-    Data_distribuicao_protocolo AS distribution_protocol_date,
     Citacao_Arbitral AS arbitral_citation,
     Contestacao_Camara AS chamber_contestation,
     Sentenca_Arbitral AS arbitral_sentence,
@@ -34,13 +32,16 @@ SELECT
     Expedicao_mandado AS order_issuance,
     Intimacao_CS AS cs_intimation,
     Emissao_coercitivo AS coercive_issuance,
-    data_finalizando AS date_finalizing,
-    data_finalizado_ERC AS date_finalized_erc,
-    Data_quitacao AS date_payment,
-    Data_encerramento_elaw AS elaw_closure_date,
     LDT_Estoque AS ldt_stock,
     Faixa_Estoque AS stock_range,
     LDT_Resolucao AS ldt_resolution,
-    Faixa_Resolucao AS resolution_range
+    Faixa_Resolucao AS resolution_range,
+    data_finalizando AS dt_finalizing,
+    data_finalizado_ERC AS dt_finalized_erc,
+    Data_quitacao AS dt_payment,
+    Data_encerramento_elaw AS dt_elaw_closure,
+    Data_registrado AS dt_registered,
+    Data_distribuicao_protocolo AS dt_distribution_protocol,
+    NOW() AS ts_load
 FROM
     datalake_gsheets_raw.evictions_base
