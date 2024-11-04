@@ -212,14 +212,14 @@ accounting_funnel_qc AS (
     FROM 
         accounting_funnel_billing
 
-    UNION ALL
+    UNION
 
     SELECT 
         * 
     FROM 
         accounting_funnel_no_ws
 
-    UNION ALL
+    UNION
 
     SELECT 
         * 
