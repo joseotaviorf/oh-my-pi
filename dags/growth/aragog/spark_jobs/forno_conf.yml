@@ -1,7 +1,0 @@
----
-bucket_path: file:/dbfs/FileStore/data_growth/supply
-raw_partition_cols:
- - year
- - month
- - day
-

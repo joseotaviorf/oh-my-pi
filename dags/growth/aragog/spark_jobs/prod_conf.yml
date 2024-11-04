@@ -1,7 +1,0 @@
----
-bucket_path: s3://5a-aragog-raw-data-prod
-raw_partition_cols:
- - year
- - month
- - day
-

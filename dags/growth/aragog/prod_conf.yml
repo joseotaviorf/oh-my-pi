@@ -1,9 +1,0 @@
----
-extracted_tables:
-  123i:
-    - condominium
-cluster_description: databricks_12_2_min_general_cluster
-clean_partition_cols:
-  - year
-  - month
-  - day
