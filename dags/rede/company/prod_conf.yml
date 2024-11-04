@@ -102,14 +102,6 @@ tables:
     unixtime_measure: milliseconds
     raw_extraction_type: incremental
     clean_extraction_type: incremental
-#  - table_name: user_requirements
-#    date_filter_column: updated_at
-#    raw_extraction_type: incremental
-#    clean_extraction_type: full
-#  - table_name: user_requirements_aud
-#    date_filter_column: created_at
-#    raw_extraction_type: incremental
-#    clean_extraction_type: incremental
 inner_dependencies:
   address:
     - address_aud
@@ -131,6 +123,4 @@ inner_dependencies:
     - profile_hierarchy_aud
   revenue_share:
     - revenue_share_aud
-#  user_requirements:
-#    - user_requirements_aud
 partition_cols: ["year", "month", "day"]

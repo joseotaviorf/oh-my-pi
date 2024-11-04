@@ -9,7 +9,3 @@ SELECT
     day
 FROM
     datalake_company_raw.profile
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
