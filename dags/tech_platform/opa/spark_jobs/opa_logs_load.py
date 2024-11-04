@@ -5,6 +5,7 @@ from dateutil import parser
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from pyspark.sql.functions import split, when, element_at, lit, col, from_json, year, month, dayofmonth, hour, to_timestamp
+from pyspark.sql.types import StructType, StructField, StringType, ArrayType, LongType, DoubleType, BooleanType
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.spark import (
     spark
@@ -19,8 +20,7 @@ def clean_cf(df):
     """
     Transform json to struct data and extract only the necessary columns.
     """
-    dynamic_schema = spark.read.json(df.rdd.map(lambda row: row.message)).schema
-    df = df.withColumn("data", from_json(col("message"), dynamic_schema))
+    df = df.withColumn("data", from_json(col("message"), get_opa_schema()))
     ts = to_timestamp(col("data.timestamp"))
     traceparent = col("data.input.attributes.request.http.headers.traceparent")
 
@@ -113,6 +113,240 @@ def main():
         partition_by=args.partition_cols,
     )
 
+
+def get_opa_schema():
+    return StructType([
+        StructField('bundles', StructType([
+            StructField('app', StructType([
+                StructField('revision', StringType(), True)
+            ]), True),
+            StructField('data', StructType([
+                StructField('revision', StringType(), True)
+            ]), True),
+            StructField('idm', StructType([
+                StructField('revision', StringType(), True)
+            ]), True)
+        ]), True),
+        StructField('client_addr', StringType(), True),
+        StructField('current_version', StringType(), True),
+        StructField('decision_id', StringType(), True),
+        StructField('download_opa', StringType(), True),
+        StructField('erased', ArrayType(StringType(), True), True),
+        StructField('error', StructType([
+            StructField('code', StringType(), True),
+            StructField('message', StringType(), True)
+        ]), True),
+        StructField('file', StringType(), True),
+        StructField('input', StructType([
+            StructField('attributes', StructType([
+                StructField('destination', StructType([
+                    StructField('address', StructType([
+                        StructField('socketAddress', StructType([
+                            StructField('address', StringType(), True),
+                            StructField('portValue', LongType(), True)
+                        ]), True)
+                    ]), True),
+                    StructField('principal', StringType(), True)
+                ]), True),
+                StructField('request', StructType([
+                    StructField('http', StructType([
+                        StructField('headers', StructType([
+                            StructField(':authority', StringType(), True),
+                            StructField(':method', StringType(), True),
+                            StructField(':path', StringType(), True),
+                            StructField(':scheme', StringType(), True),
+                            StructField('accept', StringType(), True),
+                            StructField('accept-charset', StringType(), True),
+                            StructField('accept-encoding', StringType(), True),
+                            StructField('accept-language', StringType(), True),
+                            StructField('alt-used', StringType(), True),
+                            StructField('apikey-cdn', StringType(), True),
+                            StructField('authority', StringType(), True),
+                            StructField('b3', StringType(), True),
+                            StructField('baggage', StringType(), True),
+                            StructField('cloudfront-forwarded-proto', StringType(), True),
+                            StructField('cloudfront-is-desktop-viewer', StringType(), True),
+                            StructField('cloudfront-is-mobile-viewer', StringType(), True),
+                            StructField('cloudfront-is-smarttv-viewer', StringType(), True),
+                            StructField('cloudfront-is-tablet-viewer', StringType(), True),
+                            StructField('cloudfront-viewer-asn', StringType(), True),
+                            StructField('cloudfront-viewer-country', StringType(), True),
+                            StructField('content-length', StringType(), True),
+                            StructField('content-type', StringType(), True),
+                            StructField('dnt', StringType(), True),
+                            StructField('origin', StringType(), True),
+                            StructField('priority', StringType(), True),
+                            StructField('purpose', StringType(), True),
+                            StructField('referer', StringType(), True),
+                            StructField('save-data', StringType(), True),
+                            StructField('sec-ch-ua', StringType(), True),
+                            StructField('sec-ch-ua-mobile', StringType(), True),
+                            StructField('sec-ch-ua-platform', StringType(), True),
+                            StructField('sec-fetch-dest', StringType(), True),
+                            StructField('sec-fetch-mode', StringType(), True),
+                            StructField('sec-fetch-site', StringType(), True),
+                            StructField('sec-gpc', StringType(), True),
+                            StructField('sec-purpose', StringType(), True),
+                            StructField('sentry-trace', StringType(), True),
+                            StructField('traceparent', StringType(), True),
+                            StructField('tracestate', StringType(), True),
+                            StructField('user-agent', StringType(), True),
+                            StructField('via', StringType(), True),
+                            StructField('x-amz-cf-id', StringType(), True),
+                            StructField('x-amzn-trace-id', StringType(), True),
+                            StructField('x-b3-parentspanid', StringType(), True),
+                            StructField('x-b3-sampled', StringType(), True),
+                            StructField('x-b3-spanid', StringType(), True),
+                            StructField('x-b3-traceid', StringType(), True),
+                            StructField('x-consumer-id', StringType(), True),
+                            StructField('x-consumer-username', StringType(), True),
+                            StructField('x-country-code', StringType(), True),
+                            StructField('x-credential-identifier', StringType(), True),
+                            StructField('x-envoy-attempt-count', StringType(), True),
+                            StructField('x-envoy-internal', StringType(), True),
+                            StructField('x-forwarded-client-cert', StringType(), True),
+                            StructField('x-forwarded-for', StringType(), True),
+                            StructField('x-forwarded-host', StringType(), True),
+                            StructField('x-forwarded-path', StringType(), True),
+                            StructField('x-forwarded-port', StringType(), True),
+                            StructField('x-forwarded-proto', StringType(), True),
+                            StructField('x-instana-l', StringType(), True),
+                            StructField('x-instana-s', StringType(), True),
+                            StructField('x-instana-t', StringType(), True),
+                            StructField('x-kong-token', StringType(), True),
+                            StructField('x-original-requester', StringType(), True),
+                            StructField('x-prometheus-scrape-timeout-seconds', StringType(), True),
+                            StructField('x-real-ip', StringType(), True),
+                            StructField('x-request-id', StringType(), True),
+                            StructField('x-requested-with', StringType(), True),
+                            StructField('x-trace-data', StringType(), True)
+                        ]), True),
+                        StructField('host', StringType(), True),
+                        StructField('id', StringType(), True),
+                        StructField('method', StringType(), True),
+                        StructField('path', StringType(), True),
+                        StructField('protocol', StringType(), True),
+                        StructField('scheme', StringType(), True)
+                    ]), True),
+                    StructField('time', StringType(), True)
+                ]), True),
+                StructField('source', StructType([
+                    StructField('address', StructType([
+                        StructField('socketAddress', StructType([
+                            StructField('address', StringType(), True),
+                            StructField('portValue', LongType(), True)
+                        ]), True)
+                    ]), True),
+                    StructField('principal', StringType(), True)
+                ]), True)
+            ]), True)
+        ]), True),
+        StructField('parsed_path', ArrayType(StringType(), True), True),
+        StructField('version', StructType([
+            StructField('encoding', StringType(), True),
+            StructField('ext_authz', StringType(), True)
+        ]), True),
+        StructField('labels', StructType([
+            StructField('app_name', StringType(), True),
+            StructField('app_revision', StringType(), True),
+            StructField('env', StringType(), True),
+            StructField('id', StringType(), True),
+            StructField('version', StringType(), True)
+        ]), True),
+        StructField('latest_version', StringType(), True),
+        StructField('level', StringType(), True),
+        StructField('metrics', StructType([
+            StructField('timer_rego_external_resolve_ns', LongType(), True),
+            StructField('timer_rego_query_eval_ns', LongType(), True),
+            StructField('timer_server_handler_ns', LongType(), True)
+        ]), True),
+        StructField('msg', StringType(), True),
+        StructField('path', StringType(), True),
+        StructField('plugin', StringType(), True),
+        StructField('release_notes', StringType(), True),
+        StructField('req_id', LongType(), True),
+        StructField('req_method', StringType(), True),
+        StructField('req_path', StringType(), True),
+        StructField('resp_bytes', LongType(), True),
+        StructField('resp_duration', DoubleType(), True),
+        StructField('resp_status', LongType(), True),
+        StructField('result', StructType([
+            StructField('allowed', BooleanType(), True),
+            StructField('dynamic_metadata', StructType([
+                StructField('parameterized_path', StringType(), True)
+            ]), True),
+            StructField('error', StringType(), True),
+            StructField('http_status', LongType(), True),
+            StructField('principalinfo', StructType([
+                StructField('authorized_by', StringType(), True),
+                StructField('required_roles', ArrayType(StringType(), True), True),
+                StructField('service', StructType([
+                    StructField('id', StringType(), True),
+                    StructField('provided_roles', ArrayType(StringType(), True), True)
+                ]), True),
+                StructField('user', StructType([
+                    StructField('payload', StructType([
+                        StructField('agent_id', LongType(), True),
+                        StructField('aud', ArrayType(StringType(), True), True),
+                        StructField('auth_time', LongType(), True),
+                        StructField('azp', StringType(), True),
+                        StructField('clientAddress', StringType(), True),
+                        StructField('clientHost', StringType(), True),
+                        StructField('clientId', StringType(), True),
+                        StructField('created_timestamp', StringType(), True),
+                        StructField('creationDate', StringType(), True),
+                        StructField('email', StringType(), True),
+                        StructField('email_verified', BooleanType(), True),
+                        StructField('exp', LongType(), True),
+                        StructField('family_name', StringType(), True),
+                        StructField('firstname', StringType(), True),
+                        StructField('given_name', StringType(), True),
+                        StructField('iat', LongType(), True),
+                        StructField('id', LongType(), True),
+                        StructField('iss', StringType(), True),
+                        StructField('jti', StringType(), True),
+                        StructField('kubernetes.io', StructType([
+                            StructField('namespace', StringType(), True),
+                            StructField('pod', StructType([
+                                StructField('name', StringType(), True),
+                                StructField('uid', StringType(), True)
+                            ]), True),
+                            StructField('serviceaccount', StructType([
+                                StructField('name', StringType(), True),
+                                StructField('uid', StringType(), True)
+                            ]), True)
+                        ]), True),
+                        StructField('main_user_id', StringType(), True),
+                        StructField('name', StringType(), True),
+                        StructField('nbf', LongType(), True),
+                        StructField('nonce', StringType(), True),
+                        StructField('partner_id', LongType(), True),
+                        StructField('personUUID', StringType(), True),
+                        StructField('preferred_username', StringType(), True),
+                        StructField('providerId', StringType(), True),
+                        StructField('roles', StringType(), True),
+                        StructField('scope', StringType(), True),
+                        StructField('session_state', StringType(), True),
+                        StructField('sid', StringType(), True),
+                        StructField('sub', StringType(), True),
+                        StructField('sudoed_by_id', LongType(), True),
+                        StructField('telefone', StringType(), True),
+                        StructField('titulo', StringType(), True),
+                        StructField('typ', StringType(), True),
+                        StructField('userCreatedAt', StringType(), True),
+                        StructField('userId', StringType(), True)
+                    ]), True),
+                    StructField('provided_roles', ArrayType(StringType(), True), True)
+                ]), True)
+            ]), True),
+            StructField('request_headers_to_remove', ArrayType(StringType(), True), True)
+        ]), True),
+        StructField('span_id', StringType(), True),
+        StructField('time', StringType(), True),
+        StructField('timestamp', StringType(), True),
+        StructField('trace_id', StringType(), True),
+        StructField('type', StringType(), True)
+])
 
 if __name__ == "__main__":
     main()
