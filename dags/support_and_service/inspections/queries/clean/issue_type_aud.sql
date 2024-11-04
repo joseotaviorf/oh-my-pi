@@ -1,0 +1,38 @@
+SELECT
+    id AS id_issue_type,
+    item_type_id AS id_item_type,
+    inspection_type,
+    repair_suggestion,
+    require_manual_analysis,
+    responsibility,
+    severity,
+    type,
+    order AS number_order,
+    rev,
+    revtype,
+    revend,
+    enabled AS is_enabled,
+    protected AS is_protected,
+    deleted AS is_deleted,
+    enabled_mod AS mod_is_enabled,
+    inspection_type_mod AS mod_inspection_type,
+    issue_protected_mod AS mod_is_protected,
+    repair_suggestion_mod AS mod_repair_suggestion,
+    require_manual_analysis_mod AS mod_require_manual_analysis,
+    responsibility_mod AS mod_responsibility,
+    severity_mod AS mod_severity,
+    type_mod AS mod_type,
+    item_type_mod AS mod_item_type,
+    deleted_mod AS mod_is_deleted,
+    order_mod AS mod_number_order,
+    created_at_mod AS mod_ts_created,
+    updated_at_mod AS mod_ts_updated,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_inspections_raw.issue_type_aud
+WHERE
+	MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

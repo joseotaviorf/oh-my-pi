@@ -1,0 +1,163 @@
+---
+database_name: datalake_inspections_clean
+table_name: item_group_aud
+description:
+  This table deals with the items that were evaluated during the inspection. It is worth emphasizing
+  that, when dealing with IS data, the item_group object refers to an item, such as window, door, floor, etc.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_item_group:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.id
+    description: Item Group unique identifier (number)
+  id_room:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.room_id
+    description: Unique identifier of the room the Item Group belongs to
+  id_type:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.type_id
+    description: Indicates the type of the evaluated object
+  id_main:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.main_id
+    description: Item Group correlational unique identifier in the PWA database
+  id_reviewer:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.id_reviewer
+    description: Identification key of the user who reviewed.
+  uuid:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.uuid
+    description: Item Group unique identifier (uuid)
+  name:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.name
+    description:
+      Description of the item group, for example floor, paint, lighting,
+      etc. (typed by inspector)
+  comment:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.comment
+    description: Displays the comment typed by the inspector
+  status:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.status
+    description: Indicates the condition of the object for comparative surveys.
+    categories:
+      ABSENT: Object removed.
+      SAME: Object in the same conditions as the previous inspection.
+      REPLACED: Replaced object.
+  rev:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.rev
+    description: Foreign key of the RevInfo table, which indicates when the record was changed
+  revtype:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.revtype
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+  revend:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.revend
+    description: Number of the next revision of this id.
+  is_inferior_quality:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.is_inferior_quality
+    description: indicates the quality of the object in case of replacement
+  is_active_status:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.active_status
+    description: indicates the quality of the object in case of replacement
+  is_active_inferior_quality:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.active_is_inferior_quality
+    description: indicates the quality of the object in case of replacement
+  mod_id_main:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.main_id_mod
+    description: Indicates if the id_main field has been changed
+  mod_id_reviewer:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.reviewer_id_mod
+    description: Indicates if the id_reviewer field has been changed
+  mod_uuid:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.uuid_mod
+    description: Indicates if the uuid field has been changed
+  mod_name:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.name_mod
+    description: Indicates if the name field has been changed
+  mod_comment:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.comment_mod
+    description: Indicates if the comment field has been changed
+  mod_status:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.status_mod
+    description: Indicates if the status field has been changed
+  mod_room:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.room_mod
+    description: Indicates if the room field has been changed
+  mod_type:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.type_mod
+    description: Indicates if the type field has been changed
+  mod_items:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.items_mod
+    description: Indicates if the items field has been changed
+  mod_repair_request:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.repair_requests_mod
+    description: Indicates if the repair_request field has been changed
+  mod_reviewer:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.reviewer_mod
+    description: Indicates if the reviewer field has been changed
+  mod_is_inferior_quality:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.is_inferior_quality_mod
+    description: Indicates if the is_inferior_quality field has been changed
+  mod_is_active_status:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.active_status_mod
+    description: Indicates if the is_active_status field has been changed
+  mod_is_active_inferior_quality:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.active_is_inferior_quality_mod
+    description: Indicates if the is_active_inferior_quality field has been changed
+  mod_ts_created:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.created_at_mod
+    description: Indicates if the ts_created field has been changed
+  mod_ts_updated:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.updated_at_mod
+    description: Indicates if the ts_updated field has been changed
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.created_at
+    description: Creation date
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.updated_at
+    description: Update date
+  year:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspections_raw.item_group_aud.day
+    description: Day of update date.
