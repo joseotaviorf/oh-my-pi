@@ -21,43 +21,52 @@ repair_request_media AS (
 contestation AS (
     SELECT
         c.id_repair_request,
-        COUNT(DISTINCT id_contestation) FILTER(WHERE ir.reviewer_type = "TENANT") AS total_tenant_contestation,
-        COUNT(DISTINCT id_contestation) FILTER(WHERE ir.reviewer_type = "OWNER") AS total_owner_contestation
+        COUNT(DISTINCT id_contestation) FILTER(WHERE ir.reviewer_type = "TENANT" AND origin = "BUDGET_APPROVAL") AS total_tenant_budget_approval_contestation,
+        COUNT(DISTINCT id_contestation) FILTER(WHERE ir.reviewer_type = "OWNER" AND origin = "BUDGET_APPROVAL") AS total_owner_budget_approval_contestation,
+        COUNT(DISTINCT id_contestation) FILTER(WHERE ir.reviewer_type = "TENANT" AND (origin = "REVIEW" OR origin IS NULL)) AS total_tenant_contestation,
+        COUNT(DISTINCT id_contestation) FILTER(WHERE ir.reviewer_type = "OWNER" AND (origin = "REVIEW" OR origin IS NULL)) AS total_owner_contestation
     FROM
         datalake_inspections_clean.contestation AS c
     JOIN
         inspection_reviewer AS ir
         ON ir.id_reviewer = c.id_reviewer
-    GROUP BY 1
+    GROUP BY all
 )
 SELECT DISTINCT
     rr.id_repair_request AS sk_repair_request,
+    c_clean.id_contestation AS sk_contestation,
     rr.id_item_group AS sk_item_group,
     ig.id_room AS sk_room,
     ir.id_assessment AS sk_assessment,
     ir.id_inspection AS sk_inspection,
     rr.id_reviewer AS sk_requester,
     rr.id_granted_by AS sk_granted_by,
+    c_clean.id_reviewer AS sk_contestation_requester,
+    c.total_tenant_contestation,
+    c.total_tenant_budget_approval_contestation,
+    c.total_owner_budget_approval_contestation,
     COALESCE(rrm.total_media, 0) <> 0 AS has_media,
     COALESCE(c.total_tenant_contestation, 0) <> 0 AS has_tenant_contestation,
     COALESCE(c.total_owner_contestation, 0) <> 0 AS has_owner_contestation,
+    COALESCE(c.total_tenant_budget_approval_contestation, 0) <> 0 AS has_tenant_budget_approval_contestation,
+    COALESCE(c.total_owner_budget_approval_contestation, 0) <> 0 AS has_owner_budget_approval_contestation,
     CASE
         WHEN rr.responsibility = "ABSORBED_BY_COMPANY" THEN TRUE
-        WHEN rr.is_exempted IS TRUE 
+        WHEN rr.is_exempted IS TRUE
             OR rr.responsibility <> "ABSORBED_BY_COMPANY"
             THEN FALSE
     END AS is_cost_absorbed_by_company,
     CASE
         WHEN rr.responsibility = "TENANT" THEN TRUE
-        WHEN rr.is_exempted IS TRUE 
+        WHEN rr.is_exempted IS TRUE
             OR rr.responsibility <> "TENANT"
             THEN FALSE
     END AS is_cost_absorbed_by_tenant,
     CASE
-        WHEN rr.is_exempted IS TRUE 
+        WHEN rr.is_exempted IS TRUE
             OR rr.responsibility = "OWNER"
             THEN TRUE
-        WHEN rr.is_exempted IS FALSE 
+        WHEN rr.is_exempted IS FALSE
             OR rr.responsibility <> "OWNER"
             THEN FALSE
     END AS is_cost_absorbed_by_owner,
@@ -91,5 +100,8 @@ LEFT JOIN
 LEFT JOIN
     contestation AS c
         ON c.id_repair_request = rr.id_repair_request
+LEFT JOIN
+    datalake_inspections_clean.contestation AS c_clean
+        ON rr.id_repair_request = c_clean.id_repair_request
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY rr.id_repair_request ORDER BY rr.ts_updated DESC) = 1

@@ -2,8 +2,8 @@
 database_name: dw_inspections
 table_name: fact_repair_request
 description: |
-  This table provides indicators of the current status of the repair request, such as: 
-  whether the repair was contested, who will absorb the costs involved, whether there 
+  This table provides indicators of the current status of the repair request, such as:
+  whether the repair was contested, who will absorb the costs involved, whether there
   is related media, etc.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
@@ -12,6 +12,10 @@ columns:
     lineage:
       - datalake_inspections_clean.repair_request.id_repair_request
     description: Repair Request unique identifier (number)
+  sk_contestation:
+    lineage:
+      - datalake_inspections_clean.contestation.id_contestation
+    description: Identification key of the contestation related to the repair request.
   sk_item_group:
     lineage:
       - datalake_inspections_clean.repair_request.id_item_group
@@ -38,12 +42,26 @@ columns:
     description:
       Reviewer who assessed whether a repair was exempted. Being an owner
       or member of AN1
+  sk_contestation_requester:
+    lineage:
+      - datalake_inspections_clean.contestation.id_reviewer
+    description: Identification key of the user who made the contestation.
+  total_tenant_contestation:
+    description: Numerical information indicating the total number of objections made by the tenant during the review.
+  total_tenant_budget_approval_contestation:
+    description: Numerical information indicating the total number of objections made by the tenant during the budget approval step.
+  total_owner_budget_approval_contestation:
+    description: Numerical information indicating the total number of objections made by the owner during the budget approval step.
   has_media:
     description: Indicates whether media was generated for the repair request
-  has_tenant_contestation:  
-    description: Indicates that there are objections from the tenant to the repair request
+  has_tenant_contestation:
+    description: Indicates that there are objections from the tenant to the repair request during the review.
   has_owner_contestation:
-    description: Indicates that there are disputes from the owner to the repair request
+    description: ""
+  has_tenant_budget_approval_contestation:
+    description: Boolean information indicating whether the tenant contested the repair in question at the budget approval stage.
+  has_owner_budget_approval_contestation:
+    description: Boolean information indicating whether the owner contested the repair in question at the budget approval stage.
   is_cost_absorbed_by_company:
     description: The cost of the repair will be absorbed by the 5A
   is_cost_absorbed_by_tenant:
