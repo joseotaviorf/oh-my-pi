@@ -1,0 +1,13 @@
+database_name: dw_visit
+table_name: dim_business_model
+description: This dimension table has the business_model of the events on visits.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_business_model:
+    description: Id of the entrance type.
+  business_model:
+    description: Identify the business model of the visit.
+  ts_load:
+    description: Timestamp of the ingestion data.
+

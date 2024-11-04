@@ -34,6 +34,34 @@ WITH
         GROUP BY
             id_visit
     ),
+    entrance_method AS (
+        SELECT
+          heh.id_house AS sk_house,
+          DATE(heh.ts_entrance_started) AS date_start,
+          DATE(COALESCE(heh.ts_entrance_ended, NOW())) AS date_end,
+          MAX(heh.key_location) AS method,
+          MAX(heh.key_type) AS key_type
+        FROM
+          datalake_ebdb_listing.house_entrance_history heh
+        WHERE
+          heh.is_last_status_of_day
+          AND heh.ts_entrance_started < NOW()
+          AND COALESCE(heh.ts_entrance_ended, NOW()) >= DATE_SUB(NOW(), 400)
+        GROUP BY ALL
+),
+    entrance_method_treatment(
+        SELECT
+            l.id AS id_house,
+            DATE(COALESCE(em.date_start, l.dt_creation)) AS start_date,
+            DATE(COALESCE(em.date_end, l.ts_updated)) AS end_date,
+            TRIM(LOWER(MAX(COALESCE(em.method, l.key_location)))) AS method
+        FROM
+           datalake_ebdb_listing.house AS l
+        LEFT JOIN
+            entrance_method AS em
+                ON l.id = em.sk_house
+        GROUP BY ALL
+),
     visit_3p_demand_agent AS (
         SELECT
             v.id AS id_visit,
@@ -75,7 +103,16 @@ SELECT
     visit.status,
     visit.computed_status,
     visit.behavior,
+    visit.business_model,
     visit_log.first_event,
+    CASE emt.method
+        WHEN 'frontdoor' THEN 'Front Door'
+        WHEN 'keyswithagent' THEN 'Keys with Agent'
+        WHEN 'lockbox' THEN 'Lockbox'
+        WHEN 'password' THEN 'Password'
+        WHEN 'keyslocker' THEN 'Keys Locker'
+        ELSE 'Owner Present'
+    END AS method,
     CASE
         WHEN visit_log.ts_visit_fup_collected IS NOT NULL THEN 'FOLLOW_UP_COLLECTED'
         WHEN visit_log.ts_visit_fup_collected IS NULL
@@ -164,6 +201,10 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_clean.country AS ct
         ON ct.code = hl.country_code
+LEFT JOIN
+    entrance_method_treatment AS emt
+        ON visit.id_house = emt.id_house
+        AND visit.dt_visit BETWEEN emt.start_date AND emt.end_date
 WHERE
     visit.structured IS TRUE
     AND visit.ts_created >= '2024-04-01'

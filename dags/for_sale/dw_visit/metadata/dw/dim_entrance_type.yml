@@ -6,28 +6,8 @@ owner: matheus.sampaio@quintoandar.com.br
 columns:
   sk_entrance_type:
     description: Id of the entrance type.
-    lineage:
-      - datalake_ebdb_clean.entrance.id
-  utilized_access_type:
+  entrance_type:
     description: Identify the method of access used to enter the house
-    lineage:
-      - datalake_ebdb_clean.entrance.details
-  current_access_type:
-    description: Identifies the current form of access used to enter the house
-    lineage:
-      - datalake_ebdb_clean.entrance.details
-  entrance_problem:
-    description: If the visitor has had a problem upon arriving at the house, this field identifies the problem.
-    lineage:
-      - datalake_ebdb_clean.entrance.problem
-  is_successful:
-    description: Identifies whether the entry was successful
-    lineage:
-      - datalake_ebdb_clean.entrance.is_successful
-  has_occured_with_saved_access_authorization:
-    description: Here identifies whether the visit occurred with saved access authorization.
-    lineage:
-      - datalake_ebdb_clean.entrance.details
   ts_load:
     description: Timestamp of the ingestion data.
 

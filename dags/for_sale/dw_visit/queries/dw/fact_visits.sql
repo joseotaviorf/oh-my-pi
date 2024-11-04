@@ -28,6 +28,8 @@ SELECT
   v.id_company_supply AS sk_company_supply,
   v.id_entrance_type AS sk_entrance_type,
   bc.sk_business_context,
+  et.sk_entrance_type,
+  bm.sk_business_model,
   dvs.sk_visit_status,
   v.id_cancellation_detail AS sk_cancellation_detail,
   COALESCE(CAST(REPLACE(SUBSTRING(v.ts_visit_requested,1, 10),'-','') AS BIGINT), -1) AS sk_visit_request_date,
@@ -66,3 +68,9 @@ LEFT JOIN
 LEFT JOIN
   dim_business_context AS bc
     ON v.business_context = bc.business_context
+LEFT JOIN
+    dim_entrance_type AS et
+        ON v.method = et.entrance_type
+LEFT JOIN
+    dim_business_model AS bm
+        ON v.business_model = bm.business_model

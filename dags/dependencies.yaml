@@ -1001,7 +1001,6 @@ bietlejuice.dw_velo_zendesk:
   - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-metrics
   - bietlejuice.velo_zendesk:load-clean-users
 bietlejuice.dw_visit:
-  - bietlejuice.ebdb:load-clean-entrance
   - bietlejuice.ebdb:load-clean-feedback-tag
   - bietlejuice.ebdb:load-clean-visit
   - bietlejuice.ebdb:load-clean-visit-cancellation-details
@@ -3080,6 +3079,7 @@ bietlejuice.enrich_visit:
   - bietlejuice.ebdb_location:load-clean-country
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
 bietlejuice.enrich_webhelp_reports:

@@ -1,10 +1,29 @@
 SELECT
-  id AS sk_entrance_type,
-  GET_JSON_OBJECT(details,'$.accessAuthorizationTypeUtilized') AS utilized_access_type,
-  GET_JSON_OBJECT(details,'$.currentAccessAuthorizationType') AS current_access_type,
-  problem AS entrance_problem,
-  is_successful,
-  GET_JSON_OBJECT(details,'$.entranceOccurredWithSavedAccessAuthorization') AS has_occured_with_saved_access_authorization,
-  NOW() AS ts_load
-FROM
-  datalake_ebdb_clean.entrance
+    1 AS sk_entrance_type,
+    'Front Door' AS entrance_type,
+    NOW() AS ts_load
+UNION ALL
+SELECT
+    2 AS sk_entrance_type,
+    'Keys with Agent' AS entrance_type,
+    NOW() AS ts_load
+UNION ALL
+SELECT
+    3 AS sk_entrance_type,
+    'Lockbox' AS entrance_type,
+    NOW() AS ts_load
+UNION ALL
+SELECT
+    4 AS sk_entrance_type,
+    'Password' AS entrance_type,
+    NOW() AS ts_load
+UNION ALL
+SELECT
+    5 AS sk_entrance_type,
+    'Keys Locker' AS entrance_type,
+    NOW() AS ts_load
+UNION ALL
+SELECT
+    6 AS sk_entrance_type,
+    'Owner Present' AS entrance_type,
+    NOW() AS ts_load
