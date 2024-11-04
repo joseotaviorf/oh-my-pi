@@ -9,5 +9,5 @@ CREATE TABLE datalake_amplitude_raw.183047_user_merge (
 )
 USING JSON
 OPTIONS (
-  path 's3://amplitude-merged-users-external/183047'
+  path 's3://amplitude-merged-users-external.s3.data.quintoandar.com.br/183047'
 )
