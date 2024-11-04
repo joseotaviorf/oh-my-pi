@@ -1,5 +1,6 @@
 SELECT
     id_house,
+    id_house_listing,
     listing_age,
     quality_score,
     liquidity_score,

@@ -220,6 +220,7 @@ for_rent_score AS (
   SELECT 
     id_house,
     listing_age,
+    sk_house_listing,
     avg_lpv_days_pub_1d AS qt_lpv_1d_for_rent,
     avg_lpv_days_pub_3d AS qt_lpv_3d_for_rent,
     avg_lpv_days_pub_7d AS qt_lpv_7d_for_rent,
@@ -257,6 +258,7 @@ for_sale_score AS (
 results AS (
   SELECT 
     COALESCE(fr.id_house, fs.id_house) AS id_house,
+    fr.sk_house_listing AS id_house_listing,
     fr.listing_age,
     fr.quality_score,
     fs.liquidity_score,
@@ -290,41 +292,110 @@ results AS (
       WHEN quality_score >= 4 THEN 'E'
       ELSE 'X'
     END AS quality_score_result,
+    -- 7 days
     CASE
-      WHEN qt_lpv_7d_for_rent >= 0 AND qt_lpv_7d_for_rent < 10 THEN 'A'
-      WHEN qt_lpv_7d_for_rent >= 10 AND qt_lpv_7d_for_rent < 20 THEN 'B'
-      WHEN qt_lpv_7d_for_rent >= 20 AND qt_lpv_7d_for_rent < 30 THEN 'C'
-      WHEN qt_lpv_7d_for_rent >= 30 AND qt_lpv_7d_for_rent < 40 THEN 'D'
-      WHEN qt_lpv_7d_for_rent >= 40 AND qt_lpv_7d_for_rent < 50 THEN 'E'
-      WHEN qt_lpv_7d_for_rent >= 50 AND qt_lpv_7d_for_rent < 60 THEN 'F'
-      WHEN qt_lpv_7d_for_rent >= 60 AND qt_lpv_7d_for_rent < 70 THEN 'G'
-      WHEN qt_lpv_7d_for_rent >= 70 AND qt_lpv_7d_for_rent < 80 THEN 'H'
-      WHEN qt_lpv_7d_for_rent >= 80 AND qt_lpv_7d_for_rent < 90 THEN 'I'
-      WHEN qt_lpv_7d_for_rent >= 90 AND qt_lpv_7d_for_rent < 100 THEN 'J'
-      WHEN qt_lpv_7d_for_rent >= 100 THEN 'K'
+      WHEN qt_lpv_7d_for_rent >= 0 AND qt_lpv_7d_for_rent < 5 THEN 'A'
+      WHEN qt_lpv_7d_for_rent >= 5 AND qt_lpv_7d_for_rent < 10 THEN 'B'
+      WHEN qt_lpv_7d_for_rent >= 10 AND qt_lpv_7d_for_rent < 20 THEN 'C'
+      WHEN qt_lpv_7d_for_rent >= 20 AND qt_lpv_7d_for_rent < 30 THEN 'D'
+      WHEN qt_lpv_7d_for_rent >= 30 AND qt_lpv_7d_for_rent < 40 THEN 'E'
+      WHEN qt_lpv_7d_for_rent >= 40 AND qt_lpv_7d_for_rent < 50 THEN 'F'
+      WHEN qt_lpv_7d_for_rent >= 50 AND qt_lpv_7d_for_rent < 60 THEN 'G'
+      WHEN qt_lpv_7d_for_rent >= 60 AND qt_lpv_7d_for_rent < 70 THEN 'H'
+      WHEN qt_lpv_7d_for_rent >= 70 AND qt_lpv_7d_for_rent < 80 THEN 'I'
+      WHEN qt_lpv_7d_for_rent >= 80 AND qt_lpv_7d_for_rent < 90 THEN 'J'
+      WHEN qt_lpv_7d_for_rent >= 90 AND qt_lpv_7d_for_rent < 100 THEN 'K'
+      WHEN qt_lpv_7d_for_rent >= 100 THEN 'L'
       ELSE 'X'
     END AS lpv_7d_for_rent,
     CASE
-      WHEN qt_lpv_7d_for_sale >= 0 AND qt_lpv_7d_for_sale < 10 THEN 'A'
-      WHEN qt_lpv_7d_for_sale >= 10 AND qt_lpv_7d_for_sale < 20 THEN 'B'
-      WHEN qt_lpv_7d_for_sale >= 20 AND qt_lpv_7d_for_sale < 30 THEN 'C'
-      WHEN qt_lpv_7d_for_sale >= 30 AND qt_lpv_7d_for_sale < 40 THEN 'D'
-      WHEN qt_lpv_7d_for_sale >= 40 AND qt_lpv_7d_for_sale < 50 THEN 'E'
-      WHEN qt_lpv_7d_for_sale >= 50 AND qt_lpv_7d_for_sale < 60 THEN 'F'
-      WHEN qt_lpv_7d_for_sale >= 60 AND qt_lpv_7d_for_sale < 70 THEN 'G'
-      WHEN qt_lpv_7d_for_sale >= 70 AND qt_lpv_7d_for_sale < 80 THEN 'H'
-      WHEN qt_lpv_7d_for_sale >= 80 AND qt_lpv_7d_for_sale < 90 THEN 'I'
-      WHEN qt_lpv_7d_for_sale >= 90 AND qt_lpv_7d_for_sale < 100 THEN 'J'
-      WHEN qt_lpv_7d_for_sale >= 100 THEN 'K'
+      WHEN qt_lpv_7d_for_sale >= 0 AND qt_lpv_7d_for_sale < 5 THEN 'A'
+      WHEN qt_lpv_7d_for_sale >= 5 AND qt_lpv_7d_for_sale < 10 THEN 'B'
+      WHEN qt_lpv_7d_for_sale >= 10 AND qt_lpv_7d_for_sale < 20 THEN 'C'
+      WHEN qt_lpv_7d_for_sale >= 20 AND qt_lpv_7d_for_sale < 30 THEN 'D'
+      WHEN qt_lpv_7d_for_sale >= 30 AND qt_lpv_7d_for_sale < 40 THEN 'E'
+      WHEN qt_lpv_7d_for_sale >= 40 AND qt_lpv_7d_for_sale < 50 THEN 'F'
+      WHEN qt_lpv_7d_for_sale >= 50 AND qt_lpv_7d_for_sale < 60 THEN 'G'
+      WHEN qt_lpv_7d_for_sale >= 60 AND qt_lpv_7d_for_sale < 70 THEN 'H'
+      WHEN qt_lpv_7d_for_sale >= 70 AND qt_lpv_7d_for_sale < 80 THEN 'I'
+      WHEN qt_lpv_7d_for_sale >= 80 AND qt_lpv_7d_for_sale < 90 THEN 'J'
+      WHEN qt_lpv_7d_for_sale >= 90 AND qt_lpv_7d_for_sale < 100 THEN 'K'
+      WHEN qt_lpv_7d_for_sale >= 100 THEN 'L'
       ELSE 'X'
     END AS lpv_7d_for_sale,
+    -- 3 days
+    CASE
+      WHEN qt_lpv_3d_for_rent >= 0 AND qt_lpv_3d_for_rent < 5 THEN 'A'
+      WHEN qt_lpv_3d_for_rent >= 5 AND qt_lpv_3d_for_rent < 10 THEN 'B'
+      WHEN qt_lpv_3d_for_rent >= 10 AND qt_lpv_3d_for_rent < 20 THEN 'C'
+      WHEN qt_lpv_3d_for_rent >= 20 AND qt_lpv_3d_for_rent < 30 THEN 'D'
+      WHEN qt_lpv_3d_for_rent >= 30 AND qt_lpv_3d_for_rent < 40 THEN 'E'
+      WHEN qt_lpv_3d_for_rent >= 40 AND qt_lpv_3d_for_rent < 50 THEN 'F'
+      WHEN qt_lpv_3d_for_rent >= 50 AND qt_lpv_3d_for_rent < 60 THEN 'G'
+      WHEN qt_lpv_3d_for_rent >= 60 AND qt_lpv_3d_for_rent < 70 THEN 'H'
+      WHEN qt_lpv_3d_for_rent >= 70 AND qt_lpv_3d_for_rent < 80 THEN 'I'
+      WHEN qt_lpv_3d_for_rent >= 80 AND qt_lpv_3d_for_rent < 90 THEN 'J'
+      WHEN qt_lpv_3d_for_rent >= 90 AND qt_lpv_3d_for_rent < 100 THEN 'K'
+      WHEN qt_lpv_3d_for_rent >= 100 THEN 'L'
+      ELSE 'X'
+    END AS lpv_3d_for_rent,
+    CASE
+      WHEN qt_lpv_3d_for_sale >= 0 AND qt_lpv_3d_for_sale < 5 THEN 'A'
+      WHEN qt_lpv_3d_for_sale >= 5 AND qt_lpv_3d_for_sale < 10 THEN 'B'
+      WHEN qt_lpv_3d_for_sale >= 10 AND qt_lpv_3d_for_sale < 20 THEN 'C'
+      WHEN qt_lpv_3d_for_sale >= 20 AND qt_lpv_3d_for_sale < 30 THEN 'D'
+      WHEN qt_lpv_3d_for_sale >= 30 AND qt_lpv_3d_for_sale < 40 THEN 'E'
+      WHEN qt_lpv_3d_for_sale >= 40 AND qt_lpv_3d_for_sale < 50 THEN 'F'
+      WHEN qt_lpv_3d_for_sale >= 50 AND qt_lpv_3d_for_sale < 60 THEN 'G'
+      WHEN qt_lpv_3d_for_sale >= 60 AND qt_lpv_3d_for_sale < 70 THEN 'H'
+      WHEN qt_lpv_3d_for_sale >= 70 AND qt_lpv_3d_for_sale < 80 THEN 'I'
+      WHEN qt_lpv_3d_for_sale >= 80 AND qt_lpv_3d_for_sale < 90 THEN 'J'
+      WHEN qt_lpv_3d_for_sale >= 90 AND qt_lpv_3d_for_sale < 100 THEN 'K'
+      WHEN qt_lpv_3d_for_sale >= 100 THEN 'L'
+      ELSE 'X'
+    END AS lpv_3d_for_sale,
+    -- 1 day
+    CASE
+      WHEN qt_lpv_1d_for_rent >= 0 AND qt_lpv_1d_for_rent < 5 THEN 'A'
+      WHEN qt_lpv_1d_for_rent >= 5 AND qt_lpv_1d_for_rent < 10 THEN 'B'
+      WHEN qt_lpv_1d_for_rent >= 10 AND qt_lpv_1d_for_rent < 20 THEN 'C'
+      WHEN qt_lpv_1d_for_rent >= 20 AND qt_lpv_1d_for_rent < 30 THEN 'D'
+      WHEN qt_lpv_1d_for_rent >= 30 AND qt_lpv_1d_for_rent < 40 THEN 'E'
+      WHEN qt_lpv_1d_for_rent >= 40 AND qt_lpv_1d_for_rent < 50 THEN 'F'
+      WHEN qt_lpv_1d_for_rent >= 50 AND qt_lpv_1d_for_rent < 60 THEN 'G'
+      WHEN qt_lpv_1d_for_rent >= 60 AND qt_lpv_1d_for_rent < 70 THEN 'H'
+      WHEN qt_lpv_1d_for_rent >= 70 AND qt_lpv_1d_for_rent < 80 THEN 'I'
+      WHEN qt_lpv_1d_for_rent >= 80 AND qt_lpv_1d_for_rent < 90 THEN 'J'
+      WHEN qt_lpv_1d_for_rent >= 90 AND qt_lpv_1d_for_rent < 100 THEN 'K'
+      WHEN qt_lpv_1d_for_rent >= 100 THEN 'L'
+      ELSE 'X'
+    END AS lpv_1d_for_rent,
+    CASE
+      WHEN qt_lpv_1d_for_sale >= 0 AND qt_lpv_1d_for_sale < 5 THEN 'A'
+      WHEN qt_lpv_1d_for_sale >= 5 AND qt_lpv_1d_for_sale < 10 THEN 'B'
+      WHEN qt_lpv_1d_for_sale >= 10 AND qt_lpv_1d_for_sale < 20 THEN 'C'
+      WHEN qt_lpv_1d_for_sale >= 20 AND qt_lpv_1d_for_sale < 30 THEN 'D'
+      WHEN qt_lpv_1d_for_sale >= 30 AND qt_lpv_1d_for_sale < 40 THEN 'E'
+      WHEN qt_lpv_1d_for_sale >= 40 AND qt_lpv_1d_for_sale < 50 THEN 'F'
+      WHEN qt_lpv_1d_for_sale >= 50 AND qt_lpv_1d_for_sale < 60 THEN 'G'
+      WHEN qt_lpv_1d_for_sale >= 60 AND qt_lpv_1d_for_sale < 70 THEN 'H'
+      WHEN qt_lpv_1d_for_sale >= 70 AND qt_lpv_1d_for_sale < 80 THEN 'I'
+      WHEN qt_lpv_1d_for_sale >= 80 AND qt_lpv_1d_for_sale < 90 THEN 'J'
+      WHEN qt_lpv_1d_for_sale >= 90 AND qt_lpv_1d_for_sale < 100 THEN 'K'
+      WHEN qt_lpv_1d_for_sale >= 100 THEN 'L'
+      ELSE 'X'
+    END AS lpv_1d_for_sale,
     CONCAT_WS(
       '-',
       COALESCE(listing_age, 'X'),
       COALESCE(quality_score_result, 'X'),
       COALESCE(liquidity_score_result, 'X'),
       COALESCE(lpv_7d_for_rent, 'X'),
-      COALESCE(lpv_7d_for_sale, 'X')
+      COALESCE(lpv_7d_for_sale, 'X'),
+      COALESCE(lpv_3d_for_rent, 'X'),
+      COALESCE(lpv_3d_for_sale, 'X'),
+      COALESCE(lpv_1d_for_rent, 'X'),
+      COALESCE(lpv_1d_for_sale, 'X')
     ) AS demand_score,
     CURRENT_DATE AS dt_snapshot
   FROM for_rent_score AS fr
