@@ -7,6 +7,9 @@ columns:
   id_credit_evaluation:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent.credit_evaluation_id
+  id_reference:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.reference_id
   name:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent.name
@@ -31,6 +34,18 @@ columns:
   monthly_income:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent.monthly_income
+  score:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.score
+  phone:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.phone
+  identity_number:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.identity_number
+  reference_type:
+    lineage:
+      - datalake_docx_raw.credit_evaluation_proponent.reference_type
   ts_created:
     lineage:
       - datalake_docx_raw.credit_evaluation_proponent.created_at

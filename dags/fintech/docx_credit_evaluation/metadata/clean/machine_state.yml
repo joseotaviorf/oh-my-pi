@@ -1,0 +1,48 @@
+database_name: datalake_docx_clean
+table_name: machine_state
+columns:
+  id_machine_state:
+    lineage:
+      - datalake_docx_raw.machine_state.id
+  id_input_source:
+    lineage:
+      - datalake_docx_raw.machine_state.input_source_id
+  id_context_external:
+    lineage:
+      - datalake_docx_raw.machine_state.context_external_id
+  id_group:
+    lineage:
+      - datalake_docx_raw.machine_state.group_id
+  id_scope:
+    lineage:
+      - datalake_docx_raw.machine_state.scope_id
+  type:
+    lineage:
+      - datalake_docx_raw.machine_state.type
+  status:
+    lineage:
+      - datalake_docx_raw.machine_state.status
+  input_source_type:
+    lineage:
+      - datalake_docx_raw.machine_state.input_source_type
+  input_description:
+    lineage:
+      - datalake_docx_raw.machine_state.input_description
+  version:
+    lineage:
+      - datalake_docx_raw.machine_state.version
+  scope_type:
+    lineage:
+      - datalake_docx_raw.machine_state.scope_type
+  is_active:
+    lineage:
+      - datalake_docx_raw.machine_state.active
+  ts_expires:
+    lineage:
+      - datalake_docx_raw.machine_state.expires_at
+  ts_created:
+    lineage:
+      - datalake_docx_raw.machine_state.created_at
+  ts_updated:
+    lineage:
+      - datalake_docx_raw.machine_state.updated_at

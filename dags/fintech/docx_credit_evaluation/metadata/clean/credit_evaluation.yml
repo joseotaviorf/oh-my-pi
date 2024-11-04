@@ -13,18 +13,42 @@ columns:
   id_user:
     lineage:
       - datalake_docx_raw.credit_evaluation.user_id
+  id_city:
+    lineage:
+      - datalake_docx_raw.credit_evaluation.city_id
+  id_group:
+    lineage:
+      - datalake_docx_raw.credit_evaluation.group_id
+  scope:
+    lineage:
+      - datalake_docx_raw.credit_evaluation.scope
   reason:
     lineage:
       - datalake_docx_raw.credit_evaluation.reason
+  limit_value:
+    lineage:
+      - datalake_docx_raw.credit_evaluation.limit_value
+  proponent_group_type:
+    lineage:
+      - datalake_docx_raw.credit_evaluation.proponent_group_type
   result:
     lineage:
       - datalake_docx_raw.credit_evaluation.result
   status:
     lineage:
       - datalake_docx_raw.credit_evaluation.status
+  automatic:
+    lineage:
+      - datalake_docx_raw.credit_evaluation.automatic
+  type:
+    lineage:
+      - datalake_docx_raw.credit_evaluation.type
   early_result:
     lineage:
       - datalake_docx_raw.credit_evaluation.early_result
+  ts_expires:
+    lineage:
+      - datalake_docx_raw.credit_evaluation.expires_at
   ts_created:
     lineage:
       - datalake_docx_raw.credit_evaluation.created_at

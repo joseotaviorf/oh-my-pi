@@ -1,6 +1,9 @@
 dag:
   name: docx_credit_evaluation
   owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Extraction of Docx tables into data lake, in which the data is related to the credit evaluation process. Docx is the backend application for documents and credit simulation.
   schedule_interval: 0 0 * * *
 workflow:
   type: database_pull
@@ -19,5 +22,6 @@ workflow:
         count: id
     message: {}
     processed_message: {}
+    machine_state: {}
 cluster:
   type: databricks_13_3_med_general_cluster
