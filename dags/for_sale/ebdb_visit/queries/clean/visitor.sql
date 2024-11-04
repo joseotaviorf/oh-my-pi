@@ -12,4 +12,4 @@ SELECT
     atualizadoEm AS ts_updated,
     criadoEm AS ts_created
 FROM
-    datalake_ebdb_test_raw.`Visitor`
+    datalake_ebdb_raw.`Visitor`

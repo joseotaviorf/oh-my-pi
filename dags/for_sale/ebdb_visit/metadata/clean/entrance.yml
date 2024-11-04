@@ -1,21 +1,21 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: entrance
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.entrance.id
+      - datalake_ebdb_raw.entrance.id
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.entrance.atualizadoem
+      - datalake_ebdb_raw.entrance.atualizadoem
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.entrance.criadoem
+      - datalake_ebdb_raw.entrance.criadoem
   details:
     lineage:
-      - datalake_ebdb_test_raw.entrance.details
+      - datalake_ebdb_raw.entrance.details
   problem:
     lineage:
-      - datalake_ebdb_test_raw.entrance.problem
+      - datalake_ebdb_raw.entrance.problem
   is_successful:
     lineage:
-      - datalake_ebdb_test_raw.entrance.successful
+      - datalake_ebdb_raw.entrance.successful

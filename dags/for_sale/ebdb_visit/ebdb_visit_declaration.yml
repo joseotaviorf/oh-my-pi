@@ -12,8 +12,7 @@ workflow:
   database_type: mysql
   source_database: ebdb
   source_schema: ebdb
-  custom_schema: ebdb_test
-  dbutils_secret_key: EBDB_DB
+  custom_schema: ebdb
   tables_customization:
     Agendamento:
       clean_table_name: booking

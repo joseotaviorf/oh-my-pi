@@ -15,4 +15,4 @@ SELECT
     houseRating_id AS id_house_rating,
     origemCriacao_id AS id_creation_origin
 FROM
-    datalake_ebdb_test_raw.Visita_AUD
+    datalake_ebdb_raw.Visita_AUD

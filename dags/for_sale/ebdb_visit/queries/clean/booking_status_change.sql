@@ -10,4 +10,4 @@ SELECT
     reasonCategory_id as id_reason_category,
     reasonEnum as reason_enum
 FROM
-    datalake_ebdb_test_raw.`mudancastatusagendamento`
+    datalake_ebdb_raw.`mudancastatusagendamento`

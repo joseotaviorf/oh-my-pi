@@ -10,4 +10,4 @@ SELECT
   on_behalf_of_MOD AS mod_on_behalf_of,
   criadoEm AS ts_created
 FROM
-  datalake_ebdb_test_raw.VisitCancellationDetails_AUD
+  datalake_ebdb_raw.VisitCancellationDetails_AUD

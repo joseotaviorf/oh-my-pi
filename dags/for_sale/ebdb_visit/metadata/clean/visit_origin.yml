@@ -1,21 +1,21 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: visit_origin
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.VisitaOrigem.id
+      - datalake_ebdb_raw.VisitaOrigem.id
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.VisitaOrigem.atualizadoem
+      - datalake_ebdb_raw.VisitaOrigem.atualizadoem
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.VisitaOrigem.criadoem
+      - datalake_ebdb_raw.VisitaOrigem.criadoem
   description:
     lineage:
-      - datalake_ebdb_test_raw.VisitaOrigem.descricao
+      - datalake_ebdb_raw.VisitaOrigem.descricao
   is_app:
     lineage:
-      - datalake_ebdb_test_raw.VisitaOrigem.isapp
+      - datalake_ebdb_raw.VisitaOrigem.isapp
   name:
     lineage:
-      - datalake_ebdb_test_raw.VisitaOrigem.nome
+      - datalake_ebdb_raw.VisitaOrigem.nome

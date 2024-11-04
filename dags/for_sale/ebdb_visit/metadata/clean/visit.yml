@@ -1,57 +1,57 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: visit
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.visita.id
+      - datalake_ebdb_raw.visita.id
   id_real_estate_agent_rating:
     lineage:
-      - datalake_ebdb_test_raw.visita.realEstateAgentRating_id
+      - datalake_ebdb_raw.visita.realEstateAgentRating_id
   id_visitor:
     lineage:
-      - datalake_ebdb_test_raw.visita.visitante_id
+      - datalake_ebdb_raw.visita.visitante_id
   id_agent:
     lineage:
-      - datalake_ebdb_test_raw.visita.agente_id
+      - datalake_ebdb_raw.visita.agente_id
   id_creation_origin:
     lineage:
-      - datalake_ebdb_test_raw.visita.origemCriacao_id
+      - datalake_ebdb_raw.visita.origemCriacao_id
   id_last_update_origin:
     lineage:
-      - datalake_ebdb_test_raw.visita.origemUltimaAtualizacao_id
+      - datalake_ebdb_raw.visita.origemUltimaAtualizacao_id
   id_house_rating:
     lineage:
-      - datalake_ebdb_test_raw.visita.houseRating_id
+      - datalake_ebdb_raw.visita.houseRating_id
   id_house:
     lineage:
-      - datalake_ebdb_test_raw.visita.house_id
+      - datalake_ebdb_raw.visita.house_id
   code:
     lineage:
-      - datalake_ebdb_test_raw.visita.codigo
+      - datalake_ebdb_raw.visita.codigo
   slot:
     lineage:
-      - datalake_ebdb_test_raw.visita.slot
+      - datalake_ebdb_raw.visita.slot
   slot_count:
     lineage:
-      - datalake_ebdb_test_raw.visita.numeroSlots
+      - datalake_ebdb_raw.visita.numeroSlots
   slot_request:
     lineage:
-      - datalake_ebdb_test_raw.visita.request_slot
+      - datalake_ebdb_raw.visita.request_slot
   type:
     lineage:
-      - datalake_ebdb_test_raw.visita.tipo
+      - datalake_ebdb_raw.visita.tipo
   status:
     lineage:
-      - datalake_ebdb_test_raw.visita.status
+      - datalake_ebdb_raw.visita.status
   computed_status:
     lineage:
-      - datalake_ebdb_test_raw.visita.computed_status
+      - datalake_ebdb_raw.visita.computed_status
   booking_type:
     lineage:
-      - datalake_ebdb_test_raw.visita.bookingType
+      - datalake_ebdb_raw.visita.bookingType
   behavior:
     lineage:
-      - datalake_ebdb_test_raw.visita.behavior
+      - datalake_ebdb_raw.visita.behavior
   business_model:
     lineage:
       - datalake_ebdb_raw.visita.business_model
@@ -60,22 +60,22 @@ columns:
       - datalake_ebdb_raw.visita.business_context
   is_fixed_agent:
     lineage:
-      - datalake_ebdb_test_raw.visita.agenteFixo
+      - datalake_ebdb_raw.visita.agenteFixo
   structured:
     lineage:
-      - datalake_ebdb_test_raw.visita.structured
+      - datalake_ebdb_raw.visita.structured
   dt_visit:
     lineage:
-      - datalake_ebdb_test_raw.visita.dia
+      - datalake_ebdb_raw.visita.dia
   dt_request:
     lineage:
-      - datalake_ebdb_test_raw.visita.request_date
+      - datalake_ebdb_raw.visita.request_date
   dt_confirmation_expiration:
     lineage:
-      - datalake_ebdb_test_raw.visita.confirmation_expiration_date
+      - datalake_ebdb_raw.visita.confirmation_expiration_date
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.visita.criadoEm
+      - datalake_ebdb_raw.visita.criadoEm
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.visita.atualizadoEm
+      - datalake_ebdb_raw.visita.atualizadoEm

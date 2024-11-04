@@ -14,4 +14,4 @@ SELECT
     structured,
     user_type
 FROM
-    datalake_ebdb_test_raw.`Visitor_AUD`
+    datalake_ebdb_raw.`Visitor_AUD`

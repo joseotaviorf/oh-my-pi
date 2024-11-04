@@ -1,27 +1,27 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: visit_cancellation_details
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails.id
+      - datalake_ebdb_raw.VisitCancellationDetails.id
   id_visit:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails.visita_id
+      - datalake_ebdb_raw.VisitCancellationDetails.visita_id
   id_visits_status_log:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails.visit_status_log_id
+      - datalake_ebdb_raw.VisitCancellationDetails.visit_status_log_id
   reason:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails.reason
+      - datalake_ebdb_raw.VisitCancellationDetails.reason
   on_behalf_of:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails.on_behalf_of
+      - datalake_ebdb_raw.VisitCancellationDetails.on_behalf_of
   channel:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails.channel
+      - datalake_ebdb_raw.VisitCancellationDetails.channel
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails.criadoEm
+      - datalake_ebdb_raw.VisitCancellationDetails.criadoEm
   ts_updated:
       lineage:
-        - datalake_ebdb_test_raw.VisitCancellationDetails.atualizadoEm
+        - datalake_ebdb_raw.VisitCancellationDetails.atualizadoEm

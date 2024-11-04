@@ -1,64 +1,64 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: visit_fitting
 domain: Data ForSale
 columns:
   id:
     description: Unique ID for this row.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.id
+      - datalake_ebdb_raw.VisitFitting.id
   id_visit:
     description: Visit ID looking for fit.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.fitted_visit_id
+      - datalake_ebdb_raw.VisitFitting.fitted_visit_id
   id_visitor:
     description:
     lineage: Visitor ID looking for fit.
-      - datalake_ebdb_test_raw.VisitFitting.visitor_id
+      - datalake_ebdb_raw.VisitFitting.visitor_id
   id_house:
     description:
     lineage: House ID.
-      - datalake_ebdb_test_raw.VisitFitting.house_id
+      - datalake_ebdb_raw.VisitFitting.house_id
   begin_slot:
     description: Start slot for visit fitting.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.begin_slot
+      - datalake_ebdb_raw.VisitFitting.begin_slot
   end_slot:
     description: End slot for visit fitting.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.end_slot
+      - datalake_ebdb_raw.VisitFitting.end_slot
   business_context:
     description: The business context of the visit.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.business_context
+      - datalake_ebdb_raw.VisitFitting.business_context
   intention:
     description: Main intention of the visit.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.intention
+      - datalake_ebdb_raw.VisitFitting.intention
   status:
     description: Visit docking status.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.status
+      - datalake_ebdb_raw.VisitFitting.status
   channel:
     description: By which channel was the request made.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.channel
+      - datalake_ebdb_raw.VisitFitting.channel
   request_context:
     description: If it is a fallback request, or the one made by the visitor.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.request_context
+      - datalake_ebdb_raw.VisitFitting.request_context
   dt_visit:
     description: Date of the visit.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.visit_date
+      - datalake_ebdb_raw.VisitFitting.visit_date
   ts_expiration:
     description: Date of expiration.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.expiration_date
+      - datalake_ebdb_raw.VisitFitting.expiration_date
   ts_created:
     description: Date of creation.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.criadoEm
+      - datalake_ebdb_raw.VisitFitting.criadoEm
   ts_updated:
     description: Updated date.
     lineage:
-      - datalake_ebdb_test_raw.VisitFitting.atualizadoEm
+      - datalake_ebdb_raw.VisitFitting.atualizadoEm

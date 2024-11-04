@@ -26,4 +26,4 @@ SELECT
     criadoEm AS ts_created,
     atualizadoEm AS ts_updated
 FROM
-    datalake_ebdb_test_raw.Visita
+    datalake_ebdb_raw.Visita

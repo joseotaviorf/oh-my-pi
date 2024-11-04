@@ -1,45 +1,45 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: visitor_aud
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.id
+      - datalake_ebdb_raw.Visitor_AUD.id
   id_booking:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.agendamento_id
+      - datalake_ebdb_raw.Visitor_AUD.agendamento_id
   id_user:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.usuario_id
+      - datalake_ebdb_raw.Visitor_AUD.usuario_id
   id_visit:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.visit_id
+      - datalake_ebdb_raw.Visitor_AUD.visit_id
   company_uuid:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.company_uuid
+      - datalake_ebdb_raw.Visitor_AUD.company_uuid
   company_uuid_MOD:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.company_uuid_MOD
+      - datalake_ebdb_raw.Visitor_AUD.company_uuid_MOD
   rev:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.rev
+      - datalake_ebdb_raw.Visitor_AUD.rev
   rev_type:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.revtype
+      - datalake_ebdb_raw.Visitor_AUD.revtype
   absence_reason:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.absenceReason
+      - datalake_ebdb_raw.Visitor_AUD.absenceReason
   has_attended:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.attended
+      - datalake_ebdb_raw.Visitor_AUD.attended
   type:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.type
+      - datalake_ebdb_raw.Visitor_AUD.type
   current_response:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.current_response
+      - datalake_ebdb_raw.Visitor_AUD.current_response
   structured:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.structured
+      - datalake_ebdb_raw.Visitor_AUD.structured
   user_type:
     lineage:
-      - datalake_ebdb_test_raw.Visitor_AUD.user_type
+      - datalake_ebdb_raw.Visitor_AUD.user_type

@@ -6,4 +6,4 @@ select
   visittype as visit_type,
   criadoem as ts_created,
   atualizadoem as ts_updated
-from datalake_ebdb_test_raw.FollowUpDetails
+from datalake_ebdb_raw.FollowUpDetails

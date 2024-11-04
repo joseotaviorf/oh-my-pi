@@ -1,63 +1,63 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: visit_checkin_aud
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.id
+      - datalake_ebdb_raw.VisitCheckin_AUD.id
   id_user:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.usuario_id
+      - datalake_ebdb_raw.VisitCheckin_AUD.usuario_id
   id_agent:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.corretor_id
+      - datalake_ebdb_raw.VisitCheckin_AUD.corretor_id
   id_visit:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.visita_id
+      - datalake_ebdb_raw.VisitCheckin_AUD.visita_id
   rev:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.rev
+      - datalake_ebdb_raw.VisitCheckin_AUD.rev
   rev_type:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.revtype
+      - datalake_ebdb_raw.VisitCheckin_AUD.revtype
   checkin_code:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.checkin_code
+      - datalake_ebdb_raw.VisitCheckin_AUD.checkin_code
   checkin_status:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.checkin_status
+      - datalake_ebdb_raw.VisitCheckin_AUD.checkin_status
   checkin_fail_reason:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.checkin_fail_reason
+      - datalake_ebdb_raw.VisitCheckin_AUD.checkin_fail_reason
   checkin_fail_commentary:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.checkin_fail_commentary
+      - datalake_ebdb_raw.VisitCheckin_AUD.checkin_fail_commentary
   ts_checkin:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.checkin_date
+      - datalake_ebdb_raw.VisitCheckin_AUD.checkin_date
   mod_id_user:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.usuario_id_mod
+      - datalake_ebdb_raw.VisitCheckin_AUD.usuario_id_mod
   mod_id_agent:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.corretor_id_mod
+      - datalake_ebdb_raw.VisitCheckin_AUD.corretor_id_mod
   mod_id_visit:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.visita_id_mod
+      - datalake_ebdb_raw.VisitCheckin_AUD.visita_id_mod
   mod_checkin_code:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.checkin_code_mod
+      - datalake_ebdb_raw.VisitCheckin_AUD.checkin_code_mod
   mod_checkin_status:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.checkin_status_mod
+      - datalake_ebdb_raw.VisitCheckin_AUD.checkin_status_mod
   mod_checkin_fail_reason:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.checkin_fail_reason_mod
+      - datalake_ebdb_raw.VisitCheckin_AUD.checkin_fail_reason_mod
   mod_checkin_fail_commentary:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.checkin_fail_commentary_mod
+      - datalake_ebdb_raw.VisitCheckin_AUD.checkin_fail_commentary_mod
   mod_ts_checkin:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.checkin_date_mod
+      - datalake_ebdb_raw.VisitCheckin_AUD.checkin_date_mod
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.VisitCheckin_AUD.created_at
+      - datalake_ebdb_raw.VisitCheckin_AUD.created_at

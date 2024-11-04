@@ -1,24 +1,24 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: follow_up_details
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.followupdetails.id
+      - datalake_ebdb_raw.followupdetails.id
   id_entrance:
     lineage:
-      - datalake_ebdb_test_raw.followupdetails.entrance_id
+      - datalake_ebdb_raw.followupdetails.entrance_id
   comment:
     lineage:
-      - datalake_ebdb_test_raw.followupdetails.comment
+      - datalake_ebdb_raw.followupdetails.comment
   is_submitted:
     lineage:
-      - datalake_ebdb_test_raw.followupdetails.submitted
+      - datalake_ebdb_raw.followupdetails.submitted
   visit_type:
     lineage:
-      - datalake_ebdb_test_raw.followupdetails.visittype
+      - datalake_ebdb_raw.followupdetails.visittype
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.followupdetails.criadoem
+      - datalake_ebdb_raw.followupdetails.criadoem
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.followupdetails.atualizadoem
+      - datalake_ebdb_raw.followupdetails.atualizadoem

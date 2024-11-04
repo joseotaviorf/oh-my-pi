@@ -33,4 +33,4 @@ select
   tipo as type,
   structured as structured,
   structured_MOD AS mod_structured
-from datalake_ebdb_test_raw.Agendamento_AUD
+from datalake_ebdb_raw.Agendamento_AUD

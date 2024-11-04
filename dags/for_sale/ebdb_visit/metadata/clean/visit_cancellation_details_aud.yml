@@ -1,33 +1,33 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: visit_cancellation_details_aud
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails_AUD.id
+      - datalake_ebdb_raw.VisitCancellationDetails_AUD.id
   id_visit:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails_AUD.visita_id
+      - datalake_ebdb_raw.VisitCancellationDetails_AUD.visita_id
   rev:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails_AUD.REV
+      - datalake_ebdb_raw.VisitCancellationDetails_AUD.REV
   rev_type:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails_AUD.REVTYPE
+      - datalake_ebdb_raw.VisitCancellationDetails_AUD.REVTYPE
   reason:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails_AUD.reason
+      - datalake_ebdb_raw.VisitCancellationDetails_AUD.reason
   on_behalf_of:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails_AUD.on_behalf_of
+      - datalake_ebdb_raw.VisitCancellationDetails_AUD.on_behalf_of
   mod_id_visit:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails_AUD.visita_id_MOD
+      - datalake_ebdb_raw.VisitCancellationDetails_AUD.visita_id_MOD
   mod_reason:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails_AUD.reason_MOD
+      - datalake_ebdb_raw.VisitCancellationDetails_AUD.reason_MOD
   mod_on_behalf_of:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails_AUD.on_behalf_of_MOD
+      - datalake_ebdb_raw.VisitCancellationDetails_AUD.on_behalf_of_MOD
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.VisitCancellationDetails_AUD.criadoEm
+      - datalake_ebdb_raw.VisitCancellationDetails_AUD.criadoEm

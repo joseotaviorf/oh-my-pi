@@ -6,4 +6,4 @@ SELECT
     problem,
     successful as is_successful
 FROM
-    datalake_ebdb_test_raw.`Entrance`
+    datalake_ebdb_raw.`Entrance`

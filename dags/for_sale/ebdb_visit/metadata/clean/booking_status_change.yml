@@ -1,33 +1,33 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: booking_status_change
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.mudancastatusagendamento.id
+      - datalake_ebdb_raw.mudancastatusagendamento.id
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.mudancastatusagendamento.data
+      - datalake_ebdb_raw.mudancastatusagendamento.data
   reason:
     lineage:
-      - datalake_ebdb_test_raw.mudancastatusagendamento.motivo
+      - datalake_ebdb_raw.mudancastatusagendamento.motivo
   status:
     lineage:
-      - datalake_ebdb_test_raw.mudancastatusagendamento.status
+      - datalake_ebdb_raw.mudancastatusagendamento.status
   id_booking:
     lineage:
-      - datalake_ebdb_test_raw.mudancastatusagendamento.agendamento_id
+      - datalake_ebdb_raw.mudancastatusagendamento.agendamento_id
   id_user:
     lineage:
-      - datalake_ebdb_test_raw.mudancastatusagendamento.usuario_id
+      - datalake_ebdb_raw.mudancastatusagendamento.usuario_id
   can_visitor_see:
     lineage:
-      - datalake_ebdb_test_raw.mudancastatusagendamento.visitantepodever
+      - datalake_ebdb_raw.mudancastatusagendamento.visitantepodever
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.mudancastatusagendamento.atualizadoem
+      - datalake_ebdb_raw.mudancastatusagendamento.atualizadoem
   id_reason_category:
     lineage:
-      - datalake_ebdb_test_raw.mudancastatusagendamento.reasoncategory_id
+      - datalake_ebdb_raw.mudancastatusagendamento.reasoncategory_id
   reason_enum:
     lineage:
-      - datalake_ebdb_test_raw.mudancastatusagendamento.reasonenum
+      - datalake_ebdb_raw.mudancastatusagendamento.reasonenum

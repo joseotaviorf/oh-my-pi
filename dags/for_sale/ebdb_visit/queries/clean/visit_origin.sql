@@ -6,4 +6,4 @@ SELECT
     isApp AS is_app,
     nome AS name
 FROM
-    datalake_ebdb_test_raw.VisitaOrigem
+    datalake_ebdb_raw.VisitaOrigem

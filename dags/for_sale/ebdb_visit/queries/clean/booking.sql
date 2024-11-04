@@ -38,4 +38,4 @@ select
   avisadoentrouemnegociacao as ts_negotiation_start_notified,
   criadoem as ts_created,
   atualizadoem as ts_updated
-from datalake_ebdb_test_raw.Agendamento
+from datalake_ebdb_raw.Agendamento
