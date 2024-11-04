@@ -11,7 +11,7 @@ direct_billing AS (
         e.propose AS id_business_entity,
         br.dt_due,  
         br.status AS payment_status,
-        cast( br.id AS varchar(10) ) AS id_finance_entity, 
+        cast( br.id AS VARCHAR(10) ) AS id_finance_entity, 
         e.amount AS source_amount
     FROM 
         datalake_rental_guarantee_platform_clean.billing_report br
