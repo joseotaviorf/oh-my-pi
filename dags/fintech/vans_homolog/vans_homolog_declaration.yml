@@ -1,6 +1,7 @@
 dag:
     name: vans_homolog
     schedule_start_date: 2019,10,1
+    schedule_interval: 0 8 * * *
     owner: Data Fintech
     documentation:
         dag_purpose: |
