@@ -112,7 +112,7 @@ if __name__ == "__main__":
     events = get_events_from_app_group(app_group_path, dbutils)
 
     for event in events:
-        df = get_event_data(app_group_path, event, dt_execution)
+        df = get_event_data(app_group_path, event, execution_date)
         if df:
             partitions["event_type"] = event
 
