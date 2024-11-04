@@ -9,7 +9,7 @@ propose AS (
 direct_billing AS (
     SELECT 
         e.propose AS id_business_entity,
-        br.dt_due, 
+        br.dt_due,  
         br.status AS payment_status,
         cast( br.id AS varchar(10) ) AS id_finance_entity, 
         e.amount AS source_amount
@@ -49,7 +49,7 @@ payment_no_ws AS (
     AND p.product_type IN ( 'GUARANTEE', 'ACTIVATION')
     QUALIFY
         ROW_NUMBER() OVER (
-            PARTITION BY p.id_propose, COALESCE( date_trunc( 'MONTH', DATE( p.ts_due ) ), date_trunc('MOMTH', date( p.ts_created ) ) ) ORDER BY p.ts_updated DESC
+            PARTITION BY p.id_propose, COALESCE( date_trunc( 'MONTH', DATE( p.ts_due ) ), date_trunc('MONTH', date( p.ts_created ) ) ) ORDER BY p.ts_updated DESC
         ) = 1
 ),
 payment_ws AS (
