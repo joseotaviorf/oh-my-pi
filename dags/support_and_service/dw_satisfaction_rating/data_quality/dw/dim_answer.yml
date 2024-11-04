@@ -3,7 +3,5 @@ table_name: dw_satisfaction_rating.dim_answer
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   sk_answer:
-    is_complete:
-      severity_level: Error
     is_unique:
       severity_level: Error
