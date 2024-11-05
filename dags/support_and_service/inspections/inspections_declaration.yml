@@ -25,8 +25,6 @@ workflow:
     assessment:
       merge_on: ["id_assessment"]
       date_filter_column: updated_at
-    assessment_aud:
-      date_filter_column: updated_at
     budget:
       merge_on: ["id_budget"]
       date_filter_column: updated_at
@@ -40,12 +38,8 @@ workflow:
     contestation_media:
       merge_on: ["id_contestation_media"]
       date_filter_column: updated_at
-    contestation_media_aud:
-      date_filter_column: updated_at
     contestation:
       merge_on: ["id_contestation"]
-      date_filter_column: updated_at
-    contestation_aud:
       date_filter_column: updated_at
     inspection_aud:
       date_filter_column: updated_at
@@ -55,17 +49,11 @@ workflow:
     issue_type:
       merge_on: ["id_issue_type"]
       date_filter_column: updated_at
-    issue_type_aud:
-      date_filter_column: updated_at
     item_group_type:
       merge_on: ["id_item_group_type"]
       date_filter_column: updated_at
-    item_group_type_aud:
-      date_filter_column: updated_at
     item_group:
       merge_on: ["id_item_group"]
-      date_filter_column: updated_at
-    item_group_aud:
       date_filter_column: updated_at
     item_group_state:
       merge_on: ["id"]
@@ -75,32 +63,20 @@ workflow:
     item_issue:
       merge_on: ["id_item_issue"]
       date_filter_column: updated_at
-    item_issue_aud:
-      date_filter_column: updated_at
     item_media:
       merge_on: ["id_item_media"]
-      date_filter_column: updated_at
-    item_media_aud:
       date_filter_column: updated_at
     item_type:
       merge_on: ["id_item_type"]
       date_filter_column: updated_at
-    item_type_aud:
-      date_filter_column: updated_at
     item:
       merge_on: ["id_item"]
-      date_filter_column: updated_at
-    item_aud:
       date_filter_column: updated_at
     repair_request_media:
       merge_on: ["id_repair_request_media"]
       date_filter_column: updated_at
-    repair_request_media_aud:
-      date_filter_column: updated_at
     repair_request:
       merge_on: ["id_repair_request"]
-      date_filter_column: updated_at
-    repair_request_aud:
       date_filter_column: updated_at
     repair_suggestion:
       merge_on: ["id"]
@@ -110,12 +86,8 @@ workflow:
     review_media:
       merge_on: ["id_review_media"]
       date_filter_column: updated_at
-    review_media_aud:
-      date_filter_column: updated_at
     review:
       merge_on: ["id_review"]
-      date_filter_column: updated_at
-    review_aud:
       date_filter_column: updated_at
     reviewer_aud:
       date_filter_column: updated_at
@@ -125,12 +97,8 @@ workflow:
     room_type:
       merge_on: ["id_room_type"]
       date_filter_column: updated_at
-    room_type_aud:
-      date_filter_column: updated_at
     room:
       merge_on: ["id_room"]
-      date_filter_column: updated_at
-    room_aud:
       date_filter_column: updated_at
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
