@@ -44,12 +44,12 @@ SELECT
     o.payment_status,
     CASE
         WHEN possn.id_invoice IS NOT NULL AND o.reason NOT IN ("negotiation-recupera", "agreement") AND o.payment_status = "paid" THEN TRUE
-        WHEN n.is_ssn_boletao IS NOT NULL AND o.payment_status = "written-down" THEN TRUE
+        WHEN n.is_ssn_boletao IS NOT NULL AND n.is_ssn_boletao IS TRUE AND o.payment_status = "written-down" THEN TRUE
         ELSE FALSE
     END AS is_ssn,
     CASE
         WHEN possn.id_invoice IS NOT NULL AND o.reason NOT IN ("negotiation-recupera", "agreement") AND o.payment_status = "paid" THEN "POSSN (payment of original)"
-        WHEN n.is_ssn_boletao IS NOT NULL AND o.payment_status = "written-down" THEN "BOSSN (single debt negotiation)"
+        WHEN n.is_ssn_boletao IS NOT NULL AND n.is_ssn_boletao IS TRUE AND o.payment_status = "written-down" THEN "BOSSN (single debt negotiation)"
         ELSE NULL
     END AS type_ssn,
     CASE
@@ -93,6 +93,9 @@ SELECT
           AND o.dt_invoice_paid BETWEEN o.dt_month_start AND o.dt_reference
           AND o.dt_invoice_paid > o.dt_invoice_due_adjust
         THEN n.net_rate * ABS(o.recovered_amount)
+        WHEN o.payment_status = "written-down"
+          AND n.sk_negotiation IS NULL
+          THEN ABS(o.recovered_amount)
         ELSE 0
     END, 2) AS net_recovered_amount,
     o.contract_debt,
