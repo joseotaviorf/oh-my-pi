@@ -122,7 +122,7 @@ columns:
     description: Total waiting time during the contact.
   first_reply_time:
     lineage:
-      - datalake_twilio_flex_insights_clean.conversation_time_metrics.first_reply_time
+      - datalake_customer_support.chats.seconds_to_first_response
       - datalake_customer_support.calls.waiting_time_sec
     description: First reply time during the contact.
   total_handling_time:

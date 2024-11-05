@@ -53,6 +53,7 @@ demand AS (
     END AS customer_phone_number,
     NULL AS customer_email,
     waiting_time_sec,
+    NULL AS seconds_to_first_response,
     NULL AS is_per_team_task,
     is_call_answered AS is_contact_answered,
     is_reservation_answered AS is_interaction_answered,
@@ -90,6 +91,7 @@ demand AS (
     customer_phone_number,
     customer_email,
     NULL AS waiting_time_sec,
+    seconds_to_first_response,
     is_per_team_task,
     TRUE AS is_contact_answered,
     CASE
@@ -138,7 +140,7 @@ contacts AS (
     tm.total_wrap_up_time,
     tm.total_waiting_time,
     CASE
-      WHEN d.channel = 'chat' THEN tm.first_reply_time
+      WHEN d.channel = 'chat' THEN d.seconds_to_first_response
       WHEN d.channel = 'call' THEN d.waiting_time_sec
     END AS first_reply_time,
     tm.total_handling_time,
