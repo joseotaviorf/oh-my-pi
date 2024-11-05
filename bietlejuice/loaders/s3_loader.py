@@ -155,6 +155,7 @@ class S3Loader:
         write_mode="overwrite",
         max_records_per_file=None,
         optimize_dataframe=True,
+        full_table_name: str = None,
         **options,
     ):
         """
@@ -236,7 +237,15 @@ class S3Loader:
         for op, val in options.items():
             df_writer = df_writer.option(op, val)
 
-        df_writer.save(path=s3_path)
+        if full_table_name:
+            logger.info(
+                f"m=load_df, full_table_name={full_table_name}, "
+                "msg=loading files into S3."
+            )
+            df_writer.saveAsTable(full_table_name, path=s3_path)
+        else:
+            logger.info(f"m=load_df, s3_path={s3_path}, " "msg=loading files into S3.")
+            df_writer.save(path=s3_path)
 
         logger.info(
             "m=load_df, s3_path={}, " "msg=loaded files into S3.".format(s3_path)

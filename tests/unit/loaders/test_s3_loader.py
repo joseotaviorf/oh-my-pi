@@ -228,3 +228,62 @@ class TestS3Loader:
 
         # then
         df_writer.save.assert_called_with(path=s3_path)
+
+    @mock.patch.object(S3Loader, "_optimize_dataframe_partitions")
+    @pytest.mark.parametrize(
+        "table_name, s3_path, format_options, partitions, write_mode, max_records_per_file, options, optimize_dataframe",
+        [
+            (
+                "mock_table_name",
+                "path/to/file",
+                "csv",
+                ["particao_a", "particao_b"],
+                "overwrite",
+                10,
+                {"delimiter": ";"},
+                False,
+            )
+        ],
+    )
+    def test_load_df_incremental_with_success_passing_table_name(
+        self,
+        mocked_optimization,
+        table_name,
+        s3_path,
+        format_options,
+        partitions,
+        write_mode,
+        max_records_per_file,
+        options,
+        optimize_dataframe,
+        mocked_write_df,
+        s3_loader,
+    ):
+
+        # arrange
+        spark = BaseSparkContext.spark
+        spark.conf.set("spark.sql.sources.partitionOverwriteMode", "dynamic")
+        mocked_optimization.return_value = mocked_write_df
+        df_writer = (
+            mocked_write_df.write.mode(write_mode)
+            .format(format_options)
+            .option("maxRecordsPerFile", max_records_per_file)
+            .partitionBy(*partitions)
+            .option(**options)
+        )
+
+        # act
+        s3_loader.load_df(
+            mocked_write_df,
+            s3_path,
+            format_options,
+            partitions,
+            write_mode,
+            max_records_per_file,
+            optimize_dataframe,
+            full_table_name=table_name,
+            **options,
+        )
+
+        # then
+        df_writer.saveAsTable.assert_called_with(table_name, path=s3_path)

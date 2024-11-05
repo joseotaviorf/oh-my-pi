@@ -1,4 +1,5 @@
 from bietlejuice.base.spark import BaseSparkContext
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -19,6 +20,14 @@ class FullTableLoaderPipeline(TableLoaderPipeline):
         else:
             optimize_dataframe = self._should_optimize_dataframe()
 
+        save_to_unity_catalog = UnityCatalogHelper.is_default_catalog_using_unity()
+        if save_to_unity_catalog:
+            # With unity Catalog, we're supposed to save directly as table, not save the files and update
+            # the metastore separately
+            load_options[
+                "full_table_name"
+            ] = f"{self.target_database_name}.{self.table_name}"
+
         s3_loader.load_df(
             df=df,
             format_options=format_options,
@@ -28,15 +37,17 @@ class FullTableLoaderPipeline(TableLoaderPipeline):
             **load_options,
         )
 
-        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-        spark_metastore_loader.update_metastore(
-            df=df,
-            database_name=self.target_database_name,
-            table_name=self.table_name,
-            format_options=format_options,
-            database_location=self.target_database_location,
-            partitions=self.partitions,
-        )
+        if not save_to_unity_catalog:
+            # Again, if we're using Unity Catalog, the metastore will already have been updated when saving the table
+            spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+            spark_metastore_loader.update_metastore(
+                df=df,
+                database_name=self.target_database_name,
+                table_name=self.table_name,
+                format_options=format_options,
+                database_location=self.target_database_location,
+                partitions=self.partitions,
+            )
 
         spark_metastore_service.refresh_table(
             self.target_database_name, self.table_name

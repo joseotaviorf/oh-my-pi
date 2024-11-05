@@ -33,6 +33,14 @@ class TestFullTableLoaderPipeline:
             base_spark_context.spark.version = "3.3.0"
             yield base_spark_context
 
+    @pytest.fixture(autouse=True)
+    def mock_unity_catalog_helper(self):
+        with mock.patch(
+            "bietlejuice.pipeline.full_table_loader_pipeline.UnityCatalogHelper"
+        ) as unity_catalog_helper:
+            unity_catalog_helper.is_default_catalog_using_unity.return_value = False
+            yield unity_catalog_helper
+
     def test_load_and_register_should_optimize_when_spark_version_is_below_3_3(
         self, mock_s3_loader, mock_base_spark_context
     ):
@@ -145,4 +153,36 @@ class TestFullTableLoaderPipeline:
             s3_path="s3://bucket/dbtable",
             partitions=[],
             optimize_dataframe=True,
+        )
+
+    def test_load_and_register_should_pass_table_name_when_uc_enabled(
+        self, mock_s3_loader, mock_base_spark_context, mock_unity_catalog_helper
+    ):
+        # arrange
+        pipeline = FullTableLoaderPipeline(
+            database_name="db",
+            table_name="table",
+            database_location="s3://bucket/db",
+            layer="layer",
+            query="query",
+            partitions=[],
+        )
+        mock_base_spark_context.spark.version = "3.3.0"
+        mock_unity_catalog_helper.is_default_catalog_using_unity.return_value = True
+
+        # act
+        pipeline.load_and_register(
+            df=mock.MagicMock(),
+            format_options={"format": "parquet"},
+            optimize_dataframe=True,
+        )
+
+        # assert
+        mock_s3_loader.return_value.load_df.assert_called_once_with(
+            df=mock.ANY,
+            format_options={"format": "parquet"},
+            s3_path="s3://bucket/dbtable",
+            partitions=[],
+            optimize_dataframe=True,
+            full_table_name="db.table",
         )

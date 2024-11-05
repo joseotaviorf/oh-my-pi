@@ -4,6 +4,7 @@ from bietlejuice.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.pipeline.abstract_pipeline import AbstractPipeline
 from bietlejuice.services.schema_service import SchemaService
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 
 
 class DefaultRowAdditionPipeline(AbstractPipeline):
@@ -33,12 +34,21 @@ class DefaultRowAdditionPipeline(AbstractPipeline):
 
         format_options = SparkTableStorageFormat.get_storage(self.layer)
         s3_loader = S3Loader()
-        s3_loader.load_full_table(
-            df,
-            self.database_name,
-            self.table_name,
-            format_options,
-            self.database_location,
+
+        save_to_unity_catalog = UnityCatalogHelper.is_default_catalog_using_unity()
+        if save_to_unity_catalog:
+            # With unity Catalog, we're supposed to save directly as table, not save the files and update
+            # the metastore separately
+            full_table_name = f"{self.target_database_name}.{self.table_name}"
+        else:
+            full_table_name = None
+
+        s3_loader.load_df(
+            df=df,
+            format_options=format_options,
+            s3_path=self.database_location + self.table_name,
+            optimize_dataframe=False,
+            full_table_name=full_table_name,
         )
 
     def add_default_row(self, spark_client, dataframe):
