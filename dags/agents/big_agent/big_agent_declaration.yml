@@ -9,7 +9,7 @@ dag:
       This DAG imports data from [Big Agent](https://github.com/quintoandar/big-agent), which is an internal microservice responsible for handling the agent and house relationship.
       This DAG is triggered by Airflow and all the output tables are ingested via Incremental load and they are partitioned by year, month and day columns.
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   dbutils_secret_key: BIG_AGENT_DB
