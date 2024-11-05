@@ -88,5 +88,10 @@ SELECT
     BLDTVENC AS ts_due,
     BLDTDOC AS ts_document,
     BLDTPROC AS ts_processing,
+    year,
+    month,
+    day,
     NOW() AS ts_load
 FROM datalake_cyber_raw.tb_boleto
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

@@ -118,7 +118,6 @@ if __name__ == "__main__":
             else:
                 partition = "ts_ingestion"
 
-            df.select(to_date(partition)).distinct().show()
 
             df = (
                 SparkDataFrameService()
@@ -126,7 +125,6 @@ if __name__ == "__main__":
                 .create_year_month_day_columns_from_dataframe_column(partition)
                 .output()
             )
-            df.select('year', 'month', 'day').distinct().show()
 
         db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
         spark_metastore_service = SparkMetastoreService(SparkClient())
