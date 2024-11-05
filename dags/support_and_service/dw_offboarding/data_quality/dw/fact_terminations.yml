@@ -1,5 +1,5 @@
 ---
-table_name: dw_offboarding.fact_termination
+table_name: dw_offboarding.fact_terminations
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   sk_termination:
