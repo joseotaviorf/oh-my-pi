@@ -1,0 +1,26 @@
+---
+table_name: dw_offboarding.dim_termination
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_termination:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  status:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - INSPECTION_OPTED_OUT
+        - REQUESTED
+        - DONE
+        - INSPECTION_CANCELED
+        - INSPECTION_SCHEDULED
+        - CANCELED
+        - INSPECTION_UNDER_REVIEW
+        - INSPECTION_EXECUTED
+      severity_level: Error
+  requested_by:
+    is_complete:
+      severity_level: Error

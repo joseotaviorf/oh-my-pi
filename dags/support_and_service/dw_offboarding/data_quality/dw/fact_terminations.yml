@@ -1,0 +1,18 @@
+---
+table_name: dw_offboarding.fact_termination
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_termination:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_contract:
+    is_complete:
+      severity_level: Error
+  sk_house:
+    is_complete:
+      severity_level: Error
+  ts_termination_updated:
+    is_complete:
+      severity_level: Error
