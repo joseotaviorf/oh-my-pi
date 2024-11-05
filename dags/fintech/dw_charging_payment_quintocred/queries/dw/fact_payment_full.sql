@@ -620,7 +620,7 @@ SELECT DISTINCT
   m.is_overdue,
   m.is_delinquency_active,
   m.is_delinquency_charge_related,
-  m.month,
+  m.month_reference,
   m.month_propose_life,
   m.month_chargeble,
   m.month_charge,

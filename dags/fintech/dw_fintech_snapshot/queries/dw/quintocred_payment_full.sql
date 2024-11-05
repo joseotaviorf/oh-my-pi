@@ -62,7 +62,7 @@ SELECT DISTINCT
     is_overdue,
     is_delinquency_active,
     is_delinquency_charge_related,
-    month AS month_reference,
+    month_reference,
     month_propose_life,
     month_chargeble,
     month_charge,

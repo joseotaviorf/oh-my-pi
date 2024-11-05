@@ -227,7 +227,7 @@ columns:
     description: "Flag that checks if delinquecy is current active"
   is_delinquency_charge_related:
     description: "Flag that checks if there is a payment charge for the same month as the delinquency"
-  month:
+  month_reference:
     description: "Month analyzed"
     lineage:
       - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.month_propose_life
