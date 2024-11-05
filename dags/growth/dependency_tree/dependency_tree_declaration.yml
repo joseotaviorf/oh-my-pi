@@ -1,0 +1,23 @@
+dag:
+  name: dependency_tree
+  owner: Data Growth
+  schedule_start_date: 2020, 11, 1
+  schedule_interval: "0 6 * * *"
+  documentation: 
+    dag_purpose: |    
+      This DAG ingest the `dependencies.yaml` file and generates a tabular table.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_dependency_tree_raw
+  default_extraction_type: full
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+  tables_customization:
+    dependency_tree:
+      extra_spark_job_arguments: 
+        - dependency_tree # raw_table_name
+cluster:
+  type: databricks_13_3_min_general_cluster
