@@ -1,0 +1,243 @@
+---
+database_name: datalake_sorting_hat
+table_name: policy_report_tenant_income
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: This table stores all the data about the tenant income policy. The data is processed by the income engine, which gets information from several sources (bureau, docx, main) to calculate the elected income from a proposal.
+columns:
+  id_analysis_machine:
+    description: "ID of the analysis machine responsible to process the tenant income data."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.tenants.analysis_machine_id
+  id_analysis_request:
+    description: "ID of the analysis request responsible to handle the tenant income analysis."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.tenants.analysis_request_id
+  id_policy_report:
+    description: "Policy report ID."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.id
+  id_proposal:
+    description: "Proposal ID."
+    lineage:
+      - .datalake_sorting_hat_clean.policy_report.id_external
+  id_boavista_score_p6:
+    description: "ID Boavista score P6"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.boavistaScoreP6.id
+  id_serasa_score_hspi:
+    description: "ID Serasa score hspi."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.serasaScoreHspi.scoreHspi.id
+  id_transunion_book3d:
+    description: "ID Transunion book3d"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.transunionBook3d.id
+  id_neoway_income_report:
+    description: "ID neowayIncomeReport"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.neowayIncomeReport.id
+  id_bigdatacorp_basic_data:
+    description: " ID bigdatacorpBasicData."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.bigdatacorpBasicData.id
+  id_boavista_score_vehicle_v6:
+    description: ""
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.boavistaScoreVehicleV6.id
+  id_boavista_scpc_query_count:
+    description: "ID boavistaScpcQueryCount"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.boavistaScpcQueryCount.id
+  id_crivo_income_report:
+    description: "ID Crivo income report"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.crivoIncomeReport.id
+  policy_name:
+    description: "Policy type name. In this table the records are exclusively from TENANT_INCOME type."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.type
+  proposal_elected_income_sum:
+    description: "Sum of the elected income of a proposal. This column stores the calculated value by the income engine for the proposal elected income."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.elected_income_sum
+  proposal_declared_income_sum:
+    description: "Sum of the declared income of a proposal. This column stores the calculated value by the income engine for the proposal declared income."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.declared_income_sum
+  number_of_tenants:
+    description: "Number of tenants in a proposal."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.tenants
+  version:
+    description: "Version of the tenant income policy."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.version
+  tenant_changes:
+    description: "Number of changes done by a tenant."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.changes
+  tenant_bureau_income:
+    description: "Tenant bureau income"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.bureauIncome
+  tenant_elected_income:
+    description: "Tenant elected income"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.electedIncome
+  tenant_income_changes:
+    description: "Number of income changes done by the tenant."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.incomeChanges
+  tenant_internal_debts:
+    description: "Tenant internal debts, if any."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.internalDebts
+  tenant_declared_income:
+    description: "Tenant declared income."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.declaredIncome
+  tenant_verified_income:
+    description: "Tenant verified income"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.verifiedIncome
+  tenant_boavista_scoreP6:
+    description: "Tenant boavista score P6"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.boavistaScoreP6.scoreP6
+  tenant_boavista_integration_provider:
+    description: "Boavista Score P6 Integration Provider."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.boavistaScoreP6.integrationProvider
+  tenant_max_bureau_income:
+    description: "Tenant maximum bureau income."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.maxBureauIncome
+  tenant_serasa_score_hspi:
+    description: "Tenant Serasa score hspi."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.serasaScoreHspi.scoreHspi
+  tenant_serasa_integration_provider:
+    description: "Serasa score hspi integration provider."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.serasaScoreHspi.scoreHspi.integrationProvider
+  tenant_homogeneous_group:
+    description: "Tenant homogeneous group"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.homogeneousGroup
+  tenant_net_elected_income:
+    description: "Tenant net elected income."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.netElectedIncome
+  tenant_transunion_book3d_cpf_emission_time:
+    description: "Transunion book3d CPF emission time."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.transunionBook3d.tempoEmissaoCpf
+  tenant_transunion_book3d_classBancUltDecl:
+    description: "Transunion book3d classBancUltDecl"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.transunionBook3d.classBancUltDecl
+  tenant_transunion_book3d_integration_provider:
+    description: "Transunion book3d integration provider"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.transunionBook3d.classBancUltDecl.integrationProvider
+  tenant_transunion_book3d_scPercentConsultas12Fin02:
+    description: "Transunion book3d scPercentConsultas12Fin02"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.transunionBook3d.scPercentConsultas12Fin02
+  tenant_crivo_income_report_source:
+    description: "Crivo income report source."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.crivoIncomeReport.source
+  tenant_crivo_income_report_presumed_income:
+    description: "Crivo income report presumed income"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.crivoIncomeReport.presumedIncome
+  tenant_crivo_income_report_income_range_lower_value:
+    description: "Crivo income range lower value."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.crivoIncomeReport.incomeRangeLowerValue
+  tenant_crivo_income_report_income_range_higher_value:
+    description: "Crivo income range higher value."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.crivoIncomeReport.incomeRangeHigherValue
+  tenant_neoway_income_report_source:
+    description: "Source neowayIncomeReport."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.neowayIncomeReport.source
+  tenant_neoway_income_report_presumed_income:
+    description: "neowayIncomeReport presumed income."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.neowayIncomeReport.presumedIncome
+  tenant_neoway_income_report_income_range_lower_value:
+    description: "neowayIncomeReport income range lower value"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.neowayIncomeReport.incomeRangeLowerValue
+  tenant_neoway_income_report_income_range_higher_value:
+    description: "neowayIncomeReport income range higher value"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.neowayIncomeReport.incomeRangeHigherValue
+  tenant_income_verifier_score:
+    description: "The tenant income verifier score."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.incomeVerifierScore
+  tenant_bigdatacorp_basic_data_tenant_age:
+    description: "Age bigdatacorpBasicData"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.bigdatacorpBasicData.age
+  tenant_bigdatacorp_basic_data_integration_provider:
+    description: "bigdatacorpBasicData integration provider."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.bigdatacorpBasicData.integrationProvider
+  tenant_boavista_presumed_income:
+    description: "Tenant Boavista presumed income."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.boavistaPresumedIncome
+  tenant_boavista_score_vehicle_v6:
+    description: ""
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.scoreVehicleV6
+  tenant_boavista_score_vehicle_v6_integration_provider:
+    description: "scoreVehicleV6 integration provider"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.scoreVehicleV6.integrationProvider
+  tenant_boavista_scpc_query_count:
+    description: "scpcQueryCount"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.scpcQueryCount
+  tenant_boavista_scpc_query_count_integration_provider:
+    description: "Tenant boavista scpc query count integration provider."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.scpcQueryCount.integrationProvider
+  tenant_bureau_and_declared_ratio:
+    description: "Ratio between the tenant bureau and declared incomes. This ratio is the result calculated by the income engine."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.bureauAndDeclaredRatio
+  tenant_internal_debts_on_default:
+    description: "Internal debts on default, if any."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.internalDebtsOnDefault
+  has_scr_report:
+    description: "Boolean indicating if the tenant has a SCR report."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.hasScrReport
+  is_demoted_group:
+    description: "Boolean indicating if a tenant is from a demoted group."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.isDemotedGroup
+  is_retenant:
+    description: "Boolean indicating if the tenant has already signed a contract with 5A (i.e. retenant)."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.isRetenant
+  proposal_has_exception:
+    description: "Boolean indicating if the proposal has any exception."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.has_exception
+  ts_created:
+    description: "Timestamp creation date of the tenant income policy"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.ts_created
+  ts_updated:
+    description: "Timestamp updated date of the tenant income policy"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.version.ts_updated
