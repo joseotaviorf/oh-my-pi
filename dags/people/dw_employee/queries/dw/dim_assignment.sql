@@ -86,6 +86,7 @@ WITH
   )
 SELECT
   wr.id_period_of_service AS sk_assignment,
+  ei.legacy_registration,
   wr.legislation_code,
   wr.worker_type,
   COALESCE(ap.band, af.band) AS band,
@@ -119,6 +120,9 @@ FROM
   LEFT JOIN
     salaries AS s
       ON COALESCE(ap.id_assignment, af.id_assignment) = s.id_assignment
+  LEFT JOIN
+    datalake_hr_system.employee_ids AS ei
+      ON ei.id_period_of_service = wr.id_period_of_service
 WHERE
   (
     wr.dt_start <= DATE ('{load_start_date}')

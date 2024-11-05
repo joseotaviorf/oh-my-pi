@@ -47,6 +47,12 @@ sheets_info:
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: legacy_company
 
+  legacy_registration:
+    clean_table_name: legacy_registration
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: legacy_registration
+
   quinto_andar_companies:
     clean_table_name: quinto_andar_companies
     sheet_context: people

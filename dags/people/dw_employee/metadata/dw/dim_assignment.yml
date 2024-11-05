@@ -9,6 +9,10 @@ columns:
     description: "Surrogate key for the assignment. Just the id_period_of_service"
     lineage:
       - datalake_hr_system.work_relationships.id_period_of_service
+  legacy_registration:
+    description: "Legacy employee registration at TMF."
+    lineage:
+      - datalake_hr_system.employee_ids.legacy_registration
   worker_type:
     description: "Worker type"
     categories:

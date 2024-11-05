@@ -17,6 +17,10 @@ columns:
     description: "Id person of employee"
     lineage:
       - datalake_hr_system.assignments.id_person
+  legacy_registration:
+    description: "Legacy employee registration at TMF."
+    lineage:
+      - datalake_gsheets_people_clean.workers_registration.legacy_registration
   assignment_number:
     description: "Employee registration number"
     lineage:
