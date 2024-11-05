@@ -1,0 +1,152 @@
+---
+database_name: datalake_inspections_clean
+table_name: item_aud
+description:
+  The item object found in the database refers to a sub-item or sub-conditions within an item,
+  for example breakdowns, humidity, door problem, etc.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_item:
+    lineage:
+      - datalake_inspections_raw.item_aud.id
+    description: Item unique identifier (number)
+  id_item_group:
+    lineage:
+      - datalake_inspections_raw.item_aud.item_group_id
+    description: Item Group unique identifier (number)
+  id_previous_item:
+    lineage:
+      - datalake_inspections_raw.item_aud.previous_item_id
+    description:
+      If there is a previous evaluation for the item in the same contract,
+      it will be indicated in this column. It is usually completed in offboarding
+      inspections, bringing information from the onboarding or dispute inspection.
+  id_type:
+    lineage:
+      - datalake_inspections_raw.item_aud.type_id
+    description: Indicates the type of problem
+  id_main:
+    lineage:
+      - datalake_inspections_raw.item_aud.main_id
+    description: Item correlational unique identifier in the PWA database
+  uuid:
+    lineage:
+      - datalake_inspections_raw.item_aud.uuid
+    description: Item unique identifier (uuid)
+  comment:
+    lineage:
+      - datalake_inspections_raw.item_aud.comment
+    description: Displays a inspector's comment
+  count:
+    lineage:
+      - datalake_inspections_raw.item_aud.count
+    description: Indicates the number of parts with problems
+  status:
+    lineage:
+      - datalake_inspections_raw.item_aud.status
+    description: " "
+  is_present:
+    lineage:
+      - datalake_inspections_raw.item_aud.present
+    description: Indicates if the issue checklist item was checked by the inspector
+  is_active:
+    lineage:
+      - datalake_inspections_raw.item_aud.active
+    description: Boolean information with the aim of indicating whether the item is active or not.
+  rev:
+    lineage:
+      - datalake_inspections_raw.item_aud.rev
+    description: Foreign key of the RevInfo table, which indicates when the record was changed
+  revtype:
+    lineage:
+      - datalake_inspections_raw.item_aud.revtype
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+  revend:
+    lineage:
+      - datalake_inspections_raw.item_aud.revend
+    description: Number of the next revision of this id.
+  mod_id_main:
+    lineage:
+      - datalake_inspections_raw.item_aud.main_id_mod
+    description: Indicates if the id_main field has been changed
+  mod_uuid:
+    lineage:
+      - datalake_inspections_raw.item_aud.uuid_mod
+    description: Indicates if the uuid field has been changed
+  mod_item_group:
+    lineage:
+      - datalake_inspections_raw.item_aud.item_group_mod
+    description: Indicates if the item_group field has been changed
+  mod_type:
+    lineage:
+      - datalake_inspections_raw.item_aud.type_mod
+    description: Indicates if the type field has been changed
+  mod_previous_item:
+    lineage:
+      - datalake_inspections_raw.item_aud.previous_item_mod
+    description: Indicates if the previous_item field has been changed
+  mod_comment:
+    lineage:
+      - datalake_inspections_raw.item_aud.comment_mod
+    description: Indicates if the comment field has been changed
+  mod_count:
+    lineage:
+      - datalake_inspections_raw.item_aud.count_mod
+    description: Indicates if the count field has been changed
+  mod_status:
+    lineage:
+      - datalake_inspections_raw.item_aud.status_mod
+    description: Indicates if the status field has been changed
+  mod_is_present:
+    lineage:
+      - datalake_inspections_raw.item_aud.present_mod
+    description: Indicates if the is_present field has been changed
+  mod_id_active:
+    lineage:
+      - datalake_inspections_raw.item_aud.active_mod
+    description: Indicates if the id_active field has been changed
+  mod_item_issue:
+    lineage:
+      - datalake_inspections_raw.item_aud.item_issues_mod
+    description: Indicates if the item_issue field has been changed
+  mod_reviews:
+    lineage:
+      - datalake_inspections_raw.item_aud.reviews_mod
+    description: Indicates if the reviews field has been changed
+  mod_item_medias:
+    lineage:
+      - datalake_inspections_raw.item_aud.item_medias_mod
+    description: Indicates if the item_medias field has been changed
+  mod_ts_created:
+    lineage:
+      - datalake_inspections_raw.item_aud.created_at_mod
+    description: Indicates if the ts_created field has been changed
+  mod_ts_updated:
+    lineage:
+      - datalake_inspections_raw.item_aud.updated_at_mod
+    description: Indicates if the ts_updated field has been changed
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.item_aud.created_at
+    description: Creation timestamp
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.item_aud.updated_at
+    description: Update timestamp
+  year:
+    lineage:
+      - datalake_inspections_raw.item_aud.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspections_raw.item_aud.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspections_raw.item_aud.day
+    description: Day of update date.

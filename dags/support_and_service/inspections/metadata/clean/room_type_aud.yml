@@ -1,0 +1,95 @@
+---
+database_name: datalake_inspections_clean
+table_name: room_type_aud
+description: It brings the standard types of room that we can have within the application.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_room_type:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.id
+    description: Room Type unique identifier (number)
+  type:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.type
+    description: Room type name, for example kitchen bedroom, etc
+  number_order:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.order
+    description: Defines the display order for the inspector
+  is_deletable:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.deletable
+    description: Identifies whether the record can be deleted via IS
+  is_deleted:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.deleted
+    description: Identifies whether the record is deleted
+  is_default:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.is_default
+    description: Defines whether room is loaded by default on non-comparative inspections
+  rev:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.rev
+    description: Foreign key of the RevInfo table, which indicates when the record was changed
+  revtype:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.revtype
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+  revend:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.revend
+    description: Number of the next revision of this id.
+  mod_type:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.type_mod
+    description: Indicates if the mod_type field has been changed
+  mod_number_order:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.order_mod
+    description: Indicates if the mod_number_order field has been changed
+  mod_is_deletable:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.deletable_mod
+    description: Indicates if the mod_is_deletable field has been changed
+  mod_is_deleted:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.deleted_mod
+    description: Indicates if the mod_is_deleted field has been changed
+  mod_is_default:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.is_default_mod
+    description: Indicates if the mod_is_default field has been changed
+  mod_ts_created:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.created_at_mod
+    description: Indicates if the mod_ts_created field has been changed
+  mod_ts_updated:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.updated_at_mod
+    description: Indicates if the mod_ts_updated field has been changed
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.created_at
+    description: Creation date
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.updated_at
+    description: Update date
+  year:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspections_raw.room_type_aud.day
+    description: Day of update date.

@@ -1,0 +1,99 @@
+---
+database_name: datalake_inspections_clean
+table_name: review_media_aud
+description: Tenants and owners can detail their review comments with photos.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_review_media:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.id
+    description: Review Media unique identifier (number)
+  id_review:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.review_id
+    description: Indicates which review the media belongs to
+  id_main:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.main_id
+    description: Item id in Main monolith
+  uuid:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.uuid
+    description: Review Media unique identifier (uuid)
+  type:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.type
+    description: Indicates whether the media is a photo or a video
+  path:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.path
+    description: Path of the photo in the inspection image bucket
+  rev:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.rev
+    description: Foreign key of the RevInfo table, which indicates when the record was changed
+  revtype:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.revtype
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+  revend:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.revend
+    description: Number of the next revision of this id.
+  mod_id_review:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.review_id_mod
+    description: Indicates if the mod_id_review field has been changed
+  mod_id_main:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.main_id_mod
+    description: Indicates if the mod_id_main field has been changed
+  mod_uuid:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.uuid_mod
+    description: Indicates if the mod_uuid field has been changed
+  mod_type:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.type_mod
+    description: Indicates if the mod_type field has been changed
+  mod_path:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.path_mod
+    description: Indicates if the mod_path field has been changed
+  mod_review:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.review_mod
+    description: Indicates if the mod_review field has been changed
+  mod_ts_created:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.created_at_mod
+    description: Indicates if the mod_ts_created field has been changed
+  mod_ts_updated:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.updated_at_mod
+    description: Indicates if the mod_ts_updated field has been changed
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.created_at
+    description: Creation date
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.updated_at
+    description: Update date
+  year:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspections_raw.review_media_aud.day
+    description: Day of update date.
