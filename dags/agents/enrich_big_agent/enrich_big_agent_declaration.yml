@@ -9,7 +9,7 @@ dag:
       Some tables are deduplicated versions from the clean layer, but there are some table enriching the data.
       This DAG is triggered by Mediator and loads the table via full load.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     house_consultant_history:

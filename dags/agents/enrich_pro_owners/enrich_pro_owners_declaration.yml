@@ -10,7 +10,7 @@ dag:
           Basically, a SCD type 2.
   owner: Data Agents
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     daily_owner_houses_quantity_history:
