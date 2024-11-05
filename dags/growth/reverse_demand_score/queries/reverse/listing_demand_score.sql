@@ -390,12 +390,12 @@ results AS (
       COALESCE(listing_age, 'X'),
       COALESCE(quality_score_result, 'X'),
       COALESCE(liquidity_score_result, 'X'),
-      COALESCE(lpv_7d_for_rent, 'X'),
-      COALESCE(lpv_7d_for_sale, 'X'),
+      -- COALESCE(lpv_7d_for_rent, 'X'), -- Removed at the request of SH on 2024-11-05
+      -- COALESCE(lpv_7d_for_sale, 'X'), -- Removed at the request of SH on 2024-11-05
       COALESCE(lpv_3d_for_rent, 'X'),
-      COALESCE(lpv_3d_for_sale, 'X'),
-      COALESCE(lpv_1d_for_rent, 'X'),
-      COALESCE(lpv_1d_for_sale, 'X')
+      COALESCE(lpv_3d_for_sale, 'X')
+      -- COALESCE(lpv_1d_for_rent, 'X'), -- Removed at the request of SH on 2024-11-05
+      -- COALESCE(lpv_1d_for_sale, 'X') -- Removed at the request of SH on 2024-11-05
     ) AS demand_score,
     CURRENT_DATE AS dt_snapshot
   FROM for_rent_score AS fr
