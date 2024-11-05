@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: Creates enriched tables for the context `Agents` of ebdb. Mainly, related to agents availability/slots.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     agent_coincident_business_contexts:
@@ -28,6 +28,9 @@ workflow:
     - agents_slots
     ciq_agents:
     - ciq_users
+  extra_query_template_params:
+      load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+      load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   tables_customization:
     agents_activations_suspensions_contracts_changes:
       extraction_type: incremental

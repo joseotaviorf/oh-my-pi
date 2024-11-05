@@ -100,4 +100,4 @@ SELECT
 FROM
     agent_action
 WHERE
-    DATE(ts_revision) = DATE('{year}-{month}-{day}')
+    DATE(ts_revision) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
