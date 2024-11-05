@@ -28,7 +28,7 @@ def clean_cf(df):
                 col("cs_method").alias("request_method"),
                 col("cs_host").alias("request_host"),
                 col("cs_uri_stem").alias("request_path"),
-                col("cs_user_agent)").alias("request_user_agent"),
+                col("cs_user_agent").alias("request_user_agent"),
                 col("cs_uri_query").alias("request_query"),
                 col("sc_status").alias("response_code"),
                 col("x_edge_result_type").alias("request_result_type"),
