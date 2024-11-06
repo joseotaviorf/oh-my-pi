@@ -14,16 +14,6 @@ charges AS (
         GET_JSON_OBJECT(metadata, "$.our-number") AS our_number
     FROM datalake_trato_feito_clean.installment_charges
 ),
-invoice_extra AS (
-    SELECT
-        ai.id_external AS id_invoice_extra,
-        ai.id_installment
-    FROM datalake_trato_feito_clean.accounting_installment AS ai
-    LEFT JOIN datalake_trato_feito_clean.bill AS b
-        ON ai.id_external = b.id_external
-    WHERE b.external_status != 'canceled'
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY ai.id_installment ORDER BY IFNULL(b.dt_paid, DATE("2900-12-31"))) = 1
-),
 cte_pay AS (
     SELECT
         i.*,
@@ -35,6 +25,17 @@ cte_pay AS (
     LEFT JOIN
         deduplicate_payment AS p
             ON p.id_installment = i.id
+),
+deduplicate_invoice_extra AS (
+    SELECT
+    a.id_external AS id_invoice_extra,
+    a.id_installment
+  FROM
+      datalake_trato_feito_clean.accounting_installment AS a
+  LEFT JOIN datalake_retsuko.invoice AS i
+    ON i.id_external = a.id_external
+  WHERE i.status != "canceled"
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY a.id_installment ORDER BY COALESCE(i.ts_payment_confirmation, i.ts_paid) DESC, i.ts_created ASC) = 1
 )
 SELECT
     cp.id,
@@ -71,7 +72,7 @@ FROM
     cte_pay AS cp
 LEFT JOIN charges AS cc
     ON cp.id_installment_charge = cc.id_installment_charge
-LEFT JOIN invoice_extra AS ie
+LEFT JOIN deduplicate_invoice_extra AS ie
     ON cp.id = ie.id_installment
 LEFT JOIN datalake_trato_feito_clean.negotiation AS n
     ON cp.id_negotiation = n.id
