@@ -1,11 +1,9 @@
 SELECT
   id,
-  session_id AS id_session,
+  call_id AS id_call,
   message_id AS id_message,
-  message_payload,
+  call_payload,
   user_phone,
-  media_url,
-  mime_type,
   year_month,
   created_at AS ts_created,
   updated_at AS ts_updated,
@@ -13,4 +11,4 @@ SELECT
   month,
   day
 FROM
-  datalake_sauron_raw.incomingmessages
+  datalake_sauron_raw.callevents

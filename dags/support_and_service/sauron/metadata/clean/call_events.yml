@@ -1,24 +1,18 @@
 database_name: datalake_sauron_clean
-table_name: incoming_messages
+table_name: call_events
 columns:
   id:
     lineage:
       - datalake_sauron_raw.incomingmessages.id
-  id_session:
+  id_call:
     lineage:
-      - datalake_sauron_raw.incomingmessages.session_id
+      - datalake_sauron_raw.incomingmessages.call_id
   id_message:
     lineage:
       - datalake_sauron_raw.incomingmessages.message_id
-  message_payload:
+  call_payload:
     lineage:
-      - datalake_sauron_raw.incomingmessages.message_payload
-  media_url:
-    lineage:
-      - datalake_sauron_raw.incomingmessages.media_url
-  mime_type:
-    lineage:
-      - datalake_sauron_raw.incomingmessages.mime_type
+      - datalake_sauron_raw.incomingmessages.call_payload
   user_phone:
     lineage:
       - datalake_sauron_raw.incomingmessages.user_phone
