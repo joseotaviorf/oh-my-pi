@@ -51,7 +51,8 @@ trato_feito_debts AS (
     dt_due,
     dt_paid,
     dt_created,
-    "Trato Feito" AS source
+    "Trato Feito" AS source,
+    1 AS priority
   FROM datalake_debt_recovery.debt
   WHERE debtor != "velo_delinquency_tenant"
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_invoice ORDER BY dt_debt_created DESC) = 1
@@ -64,7 +65,8 @@ recupera_debts AS (
       WHEN COALESCE(cp.id_creditor, cr.id_creditor, crwd.id_creditor) IN (1,4,7,8,9) THEN "IQ QuintoAndar"
       WHEN COALESCE(cp.id_creditor, cr.id_creditor, crwd.id_creditor) IN (2,6) THEN "PP QuintoAndar"
     END AS creditor,
-    "Recupera" AS source
+    "Recupera" AS source,
+    3 AS priority
   FROM deduplicate_creditor_pending AS cp
   FULL OUTER JOIN deduplicate_complementary_records AS cr
       ON cp.id_contract = cr.id_contract
@@ -77,14 +79,18 @@ cyber_debts AS (
   SELECT
     id_invoice,
     id_contract,
-    creditor,
+    CASE
+      WHEN creditor = "QuintoAndar" THEN "IQ QuintoAndar"
+      ELSE creditor
+    END AS creditor,
     invoice_status,
     due_amount,
     interest_fee_amount,
     fine_fee_amount,
     debt_amount,
     dt_invoice_due AS dt_due,
-    "Cyber" AS source
+    "Cyber" AS source,
+    2 AS priority
   FROM datalake_cyber.debt_negotiated
 ),
 debts AS (
@@ -101,7 +107,8 @@ debts AS (
     tf.paid_amount,
     COALESCE(tf.dt_due, cd.dt_due) AS dt_due,
     tf.dt_paid,
-    COALESCE(tf.source, cd.source, rd.source) AS source
+    COALESCE(tf.source, cd.source, rd.source) AS source,
+    COALESCE(tf.priority, cd.priority, rd.priority) AS priority
   FROM trato_feito_debts AS tf
   FULL OUTER JOIN cyber_debts AS cd
     ON tf.id_invoice = cd.id_invoice
@@ -146,3 +153,4 @@ SELECT
 FROM debts AS d
 LEFT JOIN retsuko AS r
   ON d.id_invoice = r.id_invoice
+QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_invoice, d.id_contract ORDER BY d.priority) = 1

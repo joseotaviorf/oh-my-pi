@@ -44,7 +44,7 @@ capture_changes AS (
     id_agency,
     agency_name,
     ts_distribution,
-    IF(ts_next_distribution IS NULL, DATE(current_timestamp), ts_redistribution) AS ts_redistribution,
+    IF(ts_next_distribution IS NULL, DATE(current_timestamp), DATE_SUB(ts_redistribution, 1)) AS ts_redistribution,
     IF(IFNULL(LAG(agency_name) OVER (PARTITION BY creditor, id_contract ORDER BY ts_distribution), "") != agency_name, 1, 0) AS has_changed
   FROM get_agency_name
 ),

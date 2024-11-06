@@ -28,7 +28,7 @@ negotiation_data AS (
 ),
 add_all_dimensions AS (
 SELECT
-    CONCAT(o.id_invoice, "-", DATE_FORMAT(o.dt_reference, 'yyyyMMdd')) AS sk_overdue_portfolio_timeline,
+    CONCAT(o.id_invoice, o.id_contract, DATE_FORMAT(o.dt_reference, 'yyyyMMdd')) AS sk_overdue_portfolio_timeline,
     o.id_contract,
     o.id_invoice,
     o.id_proposal,
