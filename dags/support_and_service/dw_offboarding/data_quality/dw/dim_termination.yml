@@ -21,6 +21,3 @@ column_level_validations:
         - INSPECTION_UNDER_REVIEW
         - INSPECTION_EXECUTED
       severity_level: Error
-  requested_by:
-    is_complete:
-      severity_level: Error
