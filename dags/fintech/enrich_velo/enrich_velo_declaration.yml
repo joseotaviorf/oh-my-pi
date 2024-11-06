@@ -27,12 +27,6 @@ workflow:
       - junk
     occurrence:
       - junk
-    delinquency_timeline:
-      - propose
-    collections_wallet:
-      - delinquency_timeline
-      - propose
-      - propose_person
     propose_legacy:
       - junk
       - payment_legacy

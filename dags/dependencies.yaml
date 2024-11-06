@@ -125,15 +125,12 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
   - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
-  - bietlejuice.enrich_recupera:load-enrich-changes-debts-distribution
   - bietlejuice.enrich_recupera:load-enrich-collection
   - bietlejuice.enrich_recupera:load-enrich-installment
   - bietlejuice.enrich_recupera:load-enrich-negotiation
-  - bietlejuice.enrich_recupera:load-enrich-snapshot-daily-debts
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
-  - bietlejuice.enrich_velo:load-enrich-collections-wallet
   - bietlejuice.enrich_velo:load-enrich-junk
   - bietlejuice.enrich_velo:load-enrich-occurrence
   - bietlejuice.enrich_velo:load-enrich-payment-contracts
@@ -1518,6 +1515,7 @@ bietlejuice.enrich_date:
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays
 bietlejuice.enrich_debt_recovery:
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.trato_feito:load-clean-accounting-installment
   - bietlejuice.trato_feito:load-clean-bill
   - bietlejuice.trato_feito:load-clean-billing
@@ -1528,7 +1526,6 @@ bietlejuice.enrich_debt_recovery:
   - bietlejuice.trato_feito:load-clean-installment-charges
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
-  - bietlejuice.enrich_retsuko:load-enrich-invoice
 bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events
@@ -3029,7 +3026,6 @@ bietlejuice.enrich_velo:
   - bietlejuice.rental_guarantee_platform:load-clean-contract
   - bietlejuice.rental_guarantee_platform:load-clean-contract-status
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
-  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-aud
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency-has-agreement
   - bietlejuice.rental_guarantee_platform:load-clean-entry
   - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-fianca-legacy
