@@ -1,0 +1,30 @@
+dag:
+  name: criteo_campaigns
+  owner: Data Growth
+  schedule_start_date: 2019, 1, 1
+  schedule_interval: "0 2 * * *"
+  documentation: 
+    dag_purpose: |    
+      Criteo Campaigns DAG retrieves Quinto Andar's marketing campaign statistics from Criteo platform. It uses data extracted from [Criteo API Analytics endpoint](https://developers.criteo.com/marketing-solutions/reference/analytics-1) using [Quinto Andar's Criteo API Client](https://github.com/quintoandar/criteo-api-client-python), with credentials from [DataEng App](https://partners.criteo.com/dashboard/1706/apps/1841).
+      Criteo is a retargeting platform - serves ads based on people that have already visited our site - used to show ads to our clients.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_criteo_campaigns_raw
+  default_partitions: ['dt_attribution']
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"  
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+    - "{load_start_date}" # load_start_date
+    - "{load_end_date}" # load_end_date
+  tables_customization:
+    criteo_campaigns: {}
+cluster:
+  type: databricks_13_3_min_io-general_cluster
+  custom_libraries:
+    - whl: "{artifacts_bucket}/criteo-api-client-python/quintoandar_criteo_api_client-0.1.0-py2.py3-none-any.whl"
