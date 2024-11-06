@@ -1,5 +1,5 @@
 database_name: datalake_gsheets_clean
-table_name: encm_conversion_probability
+table_name: encm_coefficients
 columns:
   date_start:
     lineage:
@@ -16,18 +16,15 @@ columns:
   event_name:
     lineage:
       - datalake_gsheets_raw.encm_coefficients.event_name
-  price_range:
+  coefficient:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients.price_range
-  prob_conv:
+      - datalake_gsheets_raw.encm_coefficients.coefficient
+  constant:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients.prob_conv
-  tm_conv:
+      - datalake_gsheets_raw.encm_coefficients.constant
+  gross_takerate:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients.tm_conv
-  min_range:
+      - datalake_gsheets_raw.encm_coefficients.gross_takerate
+  survival_curve:
     lineage:
-      - datalake_gsheets_raw.encm_coefficients.min_range
-  max_range:
-    lineage:
-      - datalake_gsheets_raw.encm_coefficients.max_range
+      - datalake_gsheets_raw.encm_coefficients.survival_curve

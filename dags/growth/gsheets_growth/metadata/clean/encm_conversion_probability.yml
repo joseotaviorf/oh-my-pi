@@ -16,9 +16,18 @@ columns:
   event_name:
     lineage:
       - datalake_gsheets_raw.encm_conversion_probability.event_name
-  coefficient:
+  price_range:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability.coefficient
-  constant:
+      - datalake_gsheets_raw.encm_conversion_probability.price_range
+  prob_conv:
     lineage:
-      - datalake_gsheets_raw.encm_conversion_probability.constant
+      - datalake_gsheets_raw.encm_conversion_probability.prob_conv
+  tm_conv:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability.tm_conv
+  min_range:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability.min_range
+  max_range:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability.max_range
