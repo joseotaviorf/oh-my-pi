@@ -49,7 +49,7 @@ visit AS(
     lh.uuid_company AS uuid_company_supply,
     lh.partner_3p_supply,
     lh.id_user AS id_owner,
-    hl.id_house_listing,
+    COALESCE(hl.id_house_listing, -1) AS id_house_listing,
     hl.country_code
   FROM
     datalake_ebdb_clean.visit AS v
@@ -62,11 +62,11 @@ visit AS(
   LEFT JOIN
     datalake_ebdb_clean.visit_cancellation_details AS vcd
       ON vsl.id_visit = vcd.id_visit
-  INNER JOIN
+  LEFT JOIN
     datalake_ebdb_listing.house_listing AS hl
       ON v.id_house = hl.id_house
-      AND v.ts_created >= hl.ts_listing_version_start
-      AND (v.ts_created <= hl.ts_listing_version_end OR hl.ts_listing_version_end IS NULL)
+      AND DATE(v.ts_created) >= DATE(hl.ts_listing_version_start)
+      AND (DATE(v.ts_created) <= DATE(hl.ts_listing_version_end) OR hl.ts_listing_version_end IS NULL)
 ),
 booking_3p_demand_agent AS (
     SELECT
