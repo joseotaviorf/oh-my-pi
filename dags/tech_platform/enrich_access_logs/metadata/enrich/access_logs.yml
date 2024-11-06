@@ -30,7 +30,7 @@ columns:
     description: Request forwarded for IPs
   request_method:
     lineage:  
-      - datalake_access_logs_clean.istio.request_method
+      - datalake_access_logs_clean.opa.request_method
     description: Request method
   request_user_agent:
     lineage:  
@@ -38,7 +38,7 @@ columns:
     description: Request user agent
   request_path:
     lineage:
-      - datalake_access_logs_clean.istio.path
+      - datalake_access_logs_clean.opa.path
     description: Request path
   request_duration_ms:
     lineage:

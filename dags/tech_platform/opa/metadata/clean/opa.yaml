@@ -52,10 +52,18 @@ columns:
     lineage:
       - s3_auditlogs_bucket/opa.input.attributes.request.http.headers.x-amz-cf-id
     description: Amazon CloudFront ID
-  request_path:
+  request_parameterized_path:
     lineage:
       - s3_auditlogs_bucket/opa.result.dynamic_metadata.parameterized_path
     description: Request parameterized path
+  request_path:
+    lineage:
+      - s3_auditlogs_bucket/opa.input.attributes.request.path
+    description: Request path
+  request_method:
+    lineage:
+      - s3_auditlogs_bucket/opa.input.attributes.request.method
+    description: Request method
   request_authorized_by:
     lineage:
       - s3_auditlogs_bucket/opa.result.principalinfo.authorized_by
