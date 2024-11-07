@@ -16,6 +16,9 @@ columns:
   bank_code:
     lineage:
       - datalake_robin_hood_raw.financial_data.bank_code
+  bank_name:
+    lineage:
+      - datalake_robin_hood_raw.financial_data.bank_name
   account_type:
     lineage:
       - datalake_robin_hood_raw.financial_data.account_type
