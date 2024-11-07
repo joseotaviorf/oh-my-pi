@@ -1,0 +1,56 @@
+database_name: dw_listing
+table_name: fact_house_listing_daily_available_hours
+description: Daily available hours of house listings whose latest status of the day is published. Each row is a listing
+  related to a house on a specific date and the most recent available hours for that date. The sk_house_listing is not
+  unique in this table, but the sk_house_listing_date is unique. This column is the concatenation of sk_house_listing + sk_date.
+domain: For Rent
+owner: bruna.prates@quintoandar.com.br
+columns:
+  sk_house_listing_date:
+    lineage:
+    - dw_rent.fact_house_listing_status.sk_house_listing
+    - dw_public.dim_date.sk_date
+    description: Primary key of the table. It's the concatenation of sk_house_listing and sk_date.
+  sk_house:
+    lineage:
+      - dw_rent.fact_house_listing_status.sk_house_listing
+    description: Key of the house.
+  sk_house_listing:
+    lineage:
+      - dw_rent.fact_house_listing_status.sk_house_listing
+    description: Key of the house listing.
+  sk_date:
+    lineage:
+      - dw_public.dim_date.sk_date
+    description: Key of the referenced date.
+  day_available_hours:
+    lineage:
+      - datalake_booking.house_available_hours.day_hours_available
+    description: Number of available hours for a house listing on a specific day. Only includes days (up to D-1) when the listing is published.
+  week_available_hours:
+    lineage:
+      - datalake_booking.house_available_hours.day_hours_available
+    description: Number of available hours for a house listing on a specific week. Only includes days (up to D-1) when the listing is published.
+  workdays_available_hours:
+    lineage:
+      - datalake_booking.house_available_hours.day_hours_available
+      - dw_public.dim_date.is_brz_business_day
+    description: Number of available hours for a house listing on work/business days in a specific week. Only includes days (up to D-1) when the listing is published.
+  week_day:
+    lineage:
+      - dw_public.dim_date.week_day
+    description: The number of the day of the week, from 0 (Sunday) to 6 (Saturday).
+  ts_load:
+    description: Timestamp when the data was loaded into this table.
+  year:
+    lineage:
+      - dw_public.dim_date.year
+    description: Year associated with the referenced date. Also, it's a partition of this table.
+  month:
+    lineage:
+      - dw_public.dim_date.month
+    description: Month associated with the referenced date. Also, it's a partition of this table.
+  day:
+    lineage:
+      - dw_public.dim_date.day
+    description: Day associated with the referenced date. Also, it's a partition of this table.

@@ -16,6 +16,7 @@ This pipeline produces the following output table in DW, via full load:
 
 - `dw_public.dim_condo`
 - `dw_rent.dim_house_listing`
+- `dw_rent.fact_house_listing_daily_available_hours`
 - `dw_rent.fact_house_listing_daily_infos`
 - `dw_rent.fact_house_listing_status`
 - `dw_rent.fact_house_listings`

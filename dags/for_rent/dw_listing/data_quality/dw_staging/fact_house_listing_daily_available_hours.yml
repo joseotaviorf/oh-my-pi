@@ -1,0 +1,21 @@
+table_name: dw_listing_staging.fact_house_listing_daily_available_hours
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 70000000
+    severity_level: Error
+column_level_validations:
+  sk_house_listing_date:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_house:
+    is_complete:
+      severity_level: Error
+  sk_house_listing:
+    is_complete:
+      severity_level: Error
+  sk_date:
+    is_complete:
+      severity_level: Error
