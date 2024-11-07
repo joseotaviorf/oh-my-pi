@@ -6,8 +6,8 @@ WITH hr_system_workers AS (
     ethnicities,
     religions
   FROM
-    datalake_hr_system_clean.workers 
-QUALIFY 
+    datalake_hr_system_clean.workers
+  QUALIFY
     DENSE_RANK() OVER (
       PARTITION BY id_person
       ORDER BY
@@ -104,6 +104,7 @@ legislative_info_dff AS (
     legislative_info_dff ["orientacaoSexual"] AS sexual_orientation,
     legislative_info_dff ["genero"] AS gender_identity,
     legislative_info_dff ["neurodiversidade"] AS neurodiversity,
+    legislative_info_dff ["neurodiversidade_Display"] AS neurodiversity_name,
     legislative_info_dff ["__FLEX_Context"] AS nationality,
     legislative_info_dff ["desejaReceberAdiantamentoSalar"] AS has_salary_advance,
     legislative_info_dff ["situacaoNoPais"] AS country_situation,
@@ -198,7 +199,7 @@ SELECT
       COALESCE(lidff.quinto_andar_joining_method, '-1'),
       COALESCE(li.legislation_code, '-1')
     )
-  ) AS sk_demographic_information, 
+  ) AS sk_demographic_information,
   li.id_person_legislative,
   eth.id_ethnicity,
   rel.id_religion,
@@ -209,7 +210,7 @@ SELECT
   li.legislation_code,
   lidff.sexual_orientation,
   lidff.gender_identity,
-  lidff.neurodiversity,
+  IF(CAST(lidff.neurodiversity AS STRING) RLIKE '^[0-9]+$', lidff.neurodiversity_name, lidff.neurodiversity) AS neurodiversity,
   lidff.nationality,
   lidff.disability_self_declaration_code,
   lidff.disability_self_declaration_description,
@@ -248,15 +249,24 @@ SELECT
   NOW() AS ts_load
 FROM
   legislative_info AS li
-  LEFT JOIN legislative_info_ddf AS liddf 
-      ON li.id_person = liddf.id_person
-  AND li.id_person_legislative = liddf.id_person_legislative
-  LEFT JOIN legislative_info_dff AS lidff ON li.id_person = lidff.id_person
-  AND li.id_person_legislative = lidff.id_person_legislative
-  LEFT JOIN ethnicities AS eth ON li.id_person = eth.id_person
-  AND li.legislation_code = eth.legislation_code
-  LEFT JOIN religions AS rel ON li.id_person = rel.id_person
-  AND li.legislation_code = rel.legislation_code
-  LEFT JOIN external_identifiers AS ei ON li.id_person = ei.id_person
+LEFT JOIN
+  legislative_info_ddf AS liddf
+    ON li.id_person = liddf.id_person
+    AND li.id_person_legislative = liddf.id_person_legislative
+LEFT JOIN
+  legislative_info_dff AS lidff
+    ON li.id_person = lidff.id_person
+    AND li.id_person_legislative = lidff.id_person_legislative
+LEFT JOIN
+  ethnicities AS eth
+    ON li.id_person = eth.id_person
+    AND li.legislation_code = eth.legislation_code
+LEFT JOIN
+  religions AS rel
+    ON li.id_person = rel.id_person
+    AND li.legislation_code = rel.legislation_code
+LEFT JOIN
+  external_identifiers AS ei
+    ON li.id_person = ei.id_person
 WHERE
   ei.id_person IS NULL
