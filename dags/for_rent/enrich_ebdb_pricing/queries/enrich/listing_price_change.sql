@@ -40,7 +40,7 @@ price_changes_raw AS (
         sale_price,
         rent_price,
         reason,
-        IF(ROW_NUMBER() OVER (PARTITION BY id_house, dt_change ORDER BY ts_revision DESC) = 1, TRUE, FALSE) AS is_last_price_of_day,
+        dt_change,
         ts_revision
     FROM
         house_aud
@@ -60,8 +60,8 @@ rent_price_changes_clean AS (
         rent_price,
         LAG(rent_price) OVER (PARTITION BY id_house ORDER BY ts_revision) AS lag_price,
         reason,
-        is_last_price_of_day,
-        ts_revision AS ts_price_started
+        dt_change,
+        ts_revision
     FROM
         price_changes_raw
     WHERE
@@ -101,9 +101,9 @@ rent_price_changes_enriched AS (
         (rent_price - lag_price)/NULLIF(lag_price, 0) AS last_price_variation,
         (rent_price - MIN(IF(lag_price IS NULL, rent_price, NULL)) OVER (PARTITION BY id_house))/NULLIF(MIN(IF(lag_price IS NULL, rent_price, NULL)) OVER (PARTITION BY id_house), 0) AS first_price_variation,
         IF(lag_price IS NULL, TRUE, FALSE) AS is_first_price,
-        is_last_price_of_day,
-        ts_price_started,
-        LEAD(ts_price_started) OVER (PARTITION BY id_house ORDER BY ts_price_started) AS ts_price_ended
+        IF(ROW_NUMBER() OVER (PARTITION BY id_house, dt_change ORDER BY ts_revision DESC) = 1, TRUE, FALSE) AS is_last_price_of_day,
+        ts_revision AS ts_price_started,
+        LEAD(ts_revision) OVER (PARTITION BY id_house ORDER BY ts_revision) AS ts_price_ended
     FROM
         rent_price_changes_clean
 ),
