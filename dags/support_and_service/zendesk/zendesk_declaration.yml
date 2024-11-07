@@ -34,6 +34,7 @@ workflow:
       z_order_by: [id_satisfaction_rating]
     tickets:
       z_order_by: [id_ticket]
+      load_spark_job: add_data_from_airbyte_to_raw
     ticket_metrics:
       z_order_by: [id_ticket]
     ticket_fields:
