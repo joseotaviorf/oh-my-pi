@@ -620,7 +620,7 @@ SELECT DISTINCT
   m.is_overdue,
   m.is_delinquency_active,
   m.is_delinquency_charge_related,
-  m.month_reference,
+  m.month AS month_reference,
   m.month_propose_life,
   m.month_chargeble,
   m.month_charge,
@@ -644,4 +644,4 @@ LEFT JOIN
   ON m.sk_propose = tp.sk_propose
 WHERE
   tp.sk_propose IS NULL
-  ORDER BY m.sk_propose, m.month
+  ORDER BY m.sk_propose, month_reference
