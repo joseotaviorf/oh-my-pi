@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: Creates an enriched table containing the ForSale demand events, in which each line is an event related to the scope.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_general_photon_cluster

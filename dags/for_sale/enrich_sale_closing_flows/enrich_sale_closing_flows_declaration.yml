@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the enriched table for Sale Closing Flows, in order to create metrics for monitor and analyze the closing funnel in For Sale.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_general_cluster

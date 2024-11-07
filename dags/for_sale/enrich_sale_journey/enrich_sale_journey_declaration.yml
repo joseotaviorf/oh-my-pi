@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the enriched tables to Sale Journey, getting all data about the demand ForSale context.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     sale_journey:

@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the enriched table for Sale Flows, getting all data about the demand ForSale context.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   tables_customization:
     house_address_data:

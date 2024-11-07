@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This dag is intended to handle the enriched table for sale of available times for booking for each listing.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_memory_cluster
