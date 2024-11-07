@@ -268,6 +268,13 @@ bietlejuice.dw_crm:
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.heimdall:load-clean-activity
+bietlejuice.dw_crm_inspections:
+  - bietlejuice.ebdb_contract:load-clean-contract
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
+  - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
+  - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
+  - bietlejuice.enrich_inspections:load-enrich-inspection-booking
+  - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
 bietlejuice.dw_customer_support:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.bigfone:load-clean-ivr-closed-history
@@ -3142,9 +3149,9 @@ bietlejuice.looker_temp:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract-person
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
   - bietlejuice.dw_crm:load-dw-crm-dim-closing-task
-  - bietlejuice.dw_crm:load-dw-crm-dim-inspection-task
   - bietlejuice.dw_crm:load-dw-crm-fact-closing-tasks
-  - bietlejuice.dw_crm:load-dw-crm-fact-inspection-tasks
+  - bietlejuice.dw_crm_inspections:load-dw-crm-dim-inspection-task
+  - bietlejuice.dw_crm_inspections:load-dw-crm-fact-inspection-tasks
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing

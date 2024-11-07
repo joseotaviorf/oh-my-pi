@@ -48,13 +48,6 @@ tables_customization:
             year: "{year}"
             month: "{month}"
             day: "{day}"
-    fact_inspection_tasks:
-        extraction_type: incremental
-        partitions: [year, month, day]
-        extra_query_template_params:
-            year: "{year}"
-            month: "{month}"
-            day: "{day}"
     fact_lead_task_actions:
         extraction_type: incremental
         partitions: [year, month, day]
