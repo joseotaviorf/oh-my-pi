@@ -1,4 +1,4 @@
-dag: 
+dag:
     name: checkout
     owner: Data Fintech
     schedule_interval: 0 3 * * *
@@ -19,6 +19,8 @@ workflow:
         clean_table_name: charge_status_log
       charge:
         clean_table_name: charge
+      credit_card:
+        clean_table_name: credit_card
       order:
         clean_table_name: order
       payment_config:

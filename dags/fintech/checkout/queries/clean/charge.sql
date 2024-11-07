@@ -1,11 +1,13 @@
-SELECT 
+SELECT
     id,
     order_id AS id_order,
     user_external_id AS id_user_external,
     due_amount,
     paid_amount,
+    refund_amount,
     status,
     payment_method,
+    paid_via,
     user_name,
     user_provider,
     user_identifiable_document,
@@ -22,5 +24,5 @@ SELECT
     TIMESTAMP(canceled_at) AS ts_canceled,
     TIMESTAMP(deleted_at) AS ts_deleted,
     TIMESTAMP(updated_at) AS ts_updated
-FROM 
+FROM
     datalake_checkout_raw.charge

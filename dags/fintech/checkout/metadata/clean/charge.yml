@@ -16,12 +16,18 @@ columns:
   paid_amount:
     lineage:
       - datalake_checkout_raw.charge.paid_amount
+  refund_amount:
+    lineage:
+      - datalake_checkout_raw.charge.refund_amount
   status:
     lineage:
       - datalake_checkout_raw.charge.status
   payment_method:
     lineage:
       - datalake_checkout_raw.charge.payment_method
+  paid_via:
+    lineage:
+      - datalake_checkout_raw.charge.paid_via
   user_name:
     lineage:
       - datalake_checkout_raw.charge.user_name
