@@ -40,6 +40,8 @@ workflow:
         tickets:
             merge_on: [id_ticket]
             z_order_by: [id_ticket, id_call, id_session]
+        csat:
+            merge_on: [id_ticket]
 cluster:
     type: custom_cluster
     custom_configurations:

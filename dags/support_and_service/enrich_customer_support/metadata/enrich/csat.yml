@@ -7,67 +7,63 @@ domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_ticket:
+  lineage:
+    - datalake_zendesk_clean.tickets.id_ticket
+    - datalake_survicate.zendesk_email_surveys.id_ticket
+    - datalake_customer_support.tickets.id_ticket
+    - datalake_chat_fup_clean.chats_chat.id_ticket
+  description: Unique identifier for the customer support ticket.
+  first_csat_score:
     lineage:
-      - datalake_chat_fup_clean.chats_chat.id_ticket
-      - datalake_zendesk.tickets_current.id_ticket
-      - datalake_survicate.zendesk_email_surveys.id_ticket
-      - datalake_zendesk.tickets_current.id_ticket
-    description:
-      This unique identifier for Zendesk Tickets considers all tickets that have a chat
-      survey, email survey, or call survey associated with them. In the case of call
-      tickets, it considers the last ticket created for a specific Twilio Call ID.
-  channel:
-    description:
-      The ticket channel indicates the method by which the customer contacted support
-      and can be classified as either "chat", "call", or "email".
-  csat_comment:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.comment
-      - datalake_zendesk.tickets_current.satisfaction_rating
-      - datalake_survicate.zendesk_email_surveys.user_comment
-    description:
-      This field contains the comment provided by the customer in response to the first
-      CSAT question of the survey. Note that for surveys originating from the Bigfone
-      source, this field will have a null value.
-  source:
-    description:
-      This field indicates the source of the CSAT score and can have different values
-      depending on the ticket channel.
-    categories:
-      chat_fup: For chat tickets.
-      zendesk: For email tickets.
-      survicate: For email ticket.
-      bigfone: For call tickets.
-  resolution_survey:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.is_solved
-      - datalake_zendesk.tickets_current.satisfaction_rating
-      - datalake_survicate.zendesk_email_surveys.is_solved
-      - datalake_bigfone_twilio.call_ivr_events.csat_1
-    description: This boolean value indicates whether the ticket has been solved or not.
-  csat_score:
-    lineage:
-      - datalake_chat_fup_clean.surveys_answer.rating
-      - datalake_zendesk.tickets_current.satisfaction_rating
+      - datalake_zendesk_clean.tickets.satisfaction_rating.score
       - datalake_survicate.zendesk_email_surveys.csat_score
-      - datalake_bigfone_twilio.call_ivr_events.csat_2
-    description:
-      This field represents the CSAT score or rating for the respective chat and
-      considers the last CSAT score received (rated from 1 to 5).
-  ts_survey:
+      - datalake_bigfone_clean.event.csat_2
+      - datalake_chat_fup_clean.surveys_answer.rating
+    description: The initial customer satisfaction score recorded for the ticket.
+  last_csat_score:
     lineage:
-      - datalake_chat_fup_clean.surveys_survey.ts_created
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-    description:
-      Timestamp indicating when the survey was created. If this information is not
-      available, the field will be null.
-  ts_response:
+      - datalake_zendesk_clean.tickets.satisfaction_rating.score
+      - datalake_survicate.zendesk_email_surveys.csat_score
+      - datalake_bigfone_clean.event.csat_2
+      - datalake_chat_fup_clean.surveys_answer.rating
+    description: The most recent customer satisfaction score recorded for the ticket.
+  first_csat_comment:
     lineage:
-      - datalake_chat_fup_clean.surveys_answer.ts_created
-      - datalake_zendesk_clean.satisfaction_ratings.ts_updated
-      - datalake_zendesk.tickets_current.id_ticket
+      - datalake_zendesk_clean.tickets.satisfaction_rating.comment
+      - datalake_survicate.zendesk_email_surveys.user_comment
+      - datalake_chat_fup_clean.surveys_answer.comment
+    description: The first customer comment associated with the satisfaction score.
+  last_csat_comment:
+    lineage:
+      - datalake_zendesk_clean.tickets.satisfaction_rating.comment
+      - datalake_survicate.zendesk_email_surveys.user_comment
+      - datalake_chat_fup_clean.surveys_answer.comment
+    description: The most recent customer comment associated with the satisfaction score.
+  is_answered:
+    lineage:
+      - datalake_zendesk_clean.tickets.satisfaction_rating.score
+      - datalake_survicate.zendesk_email_surveys.user_comment
+      - datalake_survicate.zendesk_email_surveys.csat_score
+      - datalake_survicate.zendesk_email_surveys.is_solved
+    description: Indicates whether the ticket has been answered based on satisfaction data.
+  is_solved:
+    lineage:
+      - datalake_zendesk_clean.tickets.satisfaction_rating.score
+      - datalake_survicate.zendesk_email_surveys.is_solved
+      - datalake_bigfone_clean.event.csat_1
+      - datalake_chat_fup_clean.surveys_answer.is_solved
+    description: Indicates whether the ticket has been resolved or solved.
+  ts_first_response:
+    lineage:
+      - datalake_zendesk_clean.tickets.ts_updated
       - datalake_survicate.zendesk_email_surveys.ts_first_response
-      - datalake_bigfone_twilio.call_ivr_events.ts_created_local
-    description:
-      Timestamp indicating when the user answered the survey. If this information is not
-      available, the field will be null.
+      - datalake_bigfone_clean.event.ts_created
+      - datalake_chat_fup_clean.surveys_answer.ts_created
+    description: Timestamp of the first response recorded for the ticket.
+  ts_last_response:
+    lineage:
+      - datalake_zendesk_clean.tickets.ts_updated
+      - datalake_survicate.zendesk_email_surveys.ts_first_response
+      - datalake_bigfone_clean.event.ts_created
+      - datalake_chat_fup_clean.surveys_answer.ts_created
+    description: Timestamp of the most recent response recorded for the ticket.

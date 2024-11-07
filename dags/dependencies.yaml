@@ -575,8 +575,8 @@ bietlejuice.dw_listing:
   - bietlejuice.ebdb_partner:load-clean-partner-agent
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_b2b:load-enrich-house-listing
-  - bietlejuice.enrich_booking:load-enrich-house-available-hours
   - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
+  - bietlejuice.enrich_booking:load-enrich-house-available-hours
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-agents-with-keys
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -1448,7 +1448,6 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.chat_fup:load-clean-surveys-survey
   - bietlejuice.enrich_bigfone:load-enrich-ivr-tasks
   - bietlejuice.enrich_bigfone:load-enrich-reservations
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-events
   - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
   - bietlejuice.enrich_quinto_messenger:load-enrich-channel
@@ -1473,7 +1472,6 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.quinto_messenger:load-clean-chat
   - bietlejuice.sauron:load-clean-session
   - bietlejuice.twilio_flex_insights:load-clean-conversation-time-metrics
-  - bietlejuice.zendesk:load-clean-satisfaction-ratings
   - bietlejuice.zendesk:load-clean-tickets
 bietlejuice.enrich_cyber:
   - bietlejuice.cyber:load-clean-agency
