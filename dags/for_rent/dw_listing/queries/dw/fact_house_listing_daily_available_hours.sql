@@ -16,7 +16,9 @@ WITH house_listings AS (
         datalake_quintoandar.aux_date AS d
             ON d.date BETWEEN DATE(hls.ts_status_started) AND COALESCE(DATE(hls.ts_status_ended), CURRENT_DATE) - 1
     WHERE
-        MAKE_DATE(d.year, d.month, d.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        d.year = {year}
+        AND d.month = {month}
+        AND d.day = {day}
         AND hls.status_history IN ('publicado', 'PUBLISHED')
         AND hls.version <> 0
     QUALIFY
@@ -42,8 +44,6 @@ available_hours AS (
             ON hah.id_house = hl.sk_house
             AND hl.date BETWEEN hah.dt_available_started AND COALESCE(hah.dt_available_ended, CURRENT_DATE)
             AND hl.week_day = IF(hah.day_of_week = 7, 0, hah.day_of_week)
-    WHERE
-        MAKE_DATE(hl.year, hl.month, hl.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY hl.sk_house_listing, hl.sk_date ORDER BY hah.dt_available_started DESC) = 1
 )

@@ -23,8 +23,9 @@ workflow:
       extraction_type: incremental
       custom_schema: listing
       extra_query_template_params:
-        load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-        load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+        year: "{year}"
+        month: "{month}"
+        day: "{day}"
 cluster:
   type: databricks_12_2_med_general_photon_cluster
   access_control_list:
