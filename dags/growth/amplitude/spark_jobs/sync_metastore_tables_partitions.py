@@ -115,14 +115,6 @@ if __name__ == "__main__":
         if table_metadata["partition_keys"]
     }
 
-    for table in tables_partition_values:
-        if not tables_partition_values[table]:
-            # logs were not being register in parallel with logger, thus using print
-            print(
-                f"m={JOB_NAME}, table_name={table}, "
-                f"partition_values={tables_partition_values[table]}, msg=Table partition values are empty"
-            )
-
     hive_ms_host = get_hive_metastore_host()
     hive_ms_client = HiveMetastoreClient(hive_ms_host)
     hive_ms_service = HiveMetastoreService(hive_ms_client)
