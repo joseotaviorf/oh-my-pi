@@ -77,8 +77,8 @@ sale_price_changes_clean AS (
         sale_price,
         LAG(sale_price) OVER (PARTITION BY id_house ORDER BY ts_revision) AS lag_sale_price,
         reason,
-        is_last_price_of_day,
-        ts_revision AS ts_price_started
+        dt_change,
+        ts_revision
     FROM
         price_changes_raw
     WHERE
@@ -122,9 +122,9 @@ sale_price_changes_enriched AS (
         (sale_price - lag_sale_price)/NULLIF(lag_sale_price, 0) AS last_price_variation,
         (sale_price - MIN(IF(lag_sale_price IS NULL, sale_price, null)) OVER (PARTITION BY id_house))/NULLIF(MIN(IF(lag_sale_price IS NULL, sale_price, null)) OVER (PARTITION BY id_house), 0) AS first_price_variation,
         IF(lag_sale_price IS NULL, TRUE, FALSE) AS is_first_price,
-        is_last_price_of_day,
-        ts_price_started,
-        LEAD(ts_price_started) OVER (PARTITION BY id_house ORDER BY ts_price_started) AS ts_price_ended
+        IF(ROW_NUMBER() OVER (PARTITION BY id_house, dt_change ORDER BY ts_revision DESC) = 1, TRUE, FALSE) AS is_last_price_of_day,
+        ts_revision AS ts_price_started,
+        LEAD(ts_revision) OVER (PARTITION BY id_house ORDER BY ts_revision) AS ts_price_ended
     FROM
         sale_price_changes_clean
 ),
