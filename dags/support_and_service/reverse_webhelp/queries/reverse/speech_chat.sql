@@ -52,7 +52,8 @@ WITH message_summary AS (
       'ProOwners [FRONT] [PRE] [POS]'
       )
     AND a.organization IN ('webhelp', 'webhelpbr')
-    AND DATE(cht.ts_segment_closed) BETWEEN DATE('{load_start_date}') - 1 AND DATE('{load_end_date}')
+    AND DATE(cht.ts_segment_closed) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+)
 SELECT
   id_ticket,
   country_code,

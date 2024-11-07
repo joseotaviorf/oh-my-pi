@@ -106,7 +106,7 @@ recontact_check AS (
       ON tbl_completion_reason.sk_ticket = rc.sk_ticket_previous_contact
       AND tbl_completion_reason.sk_ticket IS NOT NULL
   WHERE
-    rc.ts_started BETWEEN DATE(rc.ts_started'{load_start_date}') - INTERVAL '45' DAY AND DATE('{load_end_date}')
+    rc.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL '45' DAY AND DATE('{load_end_date}')
     AND department NOT LIKE '%[CNX]%'
     AND team IN ('CX Expert', 'Rental Manager', 'Rental Manager Gold')
     AND agent_organization IN ('wh','webhelp','webhelpbr')
