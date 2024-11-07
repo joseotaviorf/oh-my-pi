@@ -2893,6 +2893,7 @@ bietlejuice.enrich_support_users:
 bietlejuice.enrich_survicate:
   - bietlejuice.gsheets_support_and_service:done-clean-owner-offboarding-keys-csat
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-onboarding-keys-csat
+  - bietlejuice.survicate:load-clean-respondent-attributes
   - bietlejuice.survicate:load-clean-survey-questions
   - bietlejuice.survicate:load-clean-survey-responses
   - bietlejuice.survicate:load-clean-surveys

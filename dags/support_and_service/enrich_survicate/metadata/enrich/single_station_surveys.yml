@@ -17,16 +17,24 @@ columns:
     lineage:
       - datalake_survicate.survey_responses.id_respondent
     description: Survey respondent unique identifier
+  user_id:
+    lineage:
+      - datalake_survicate_clean.respondent_attributes.value
+    description: Respondent user_id
+  email:
+    lineage:
+      - datalake_survicate_clean.respondent_attributes.value
+    description: Respondent email
   survey_name:
     lineage:
-      - datalake_survicate_clean.surveys.survey_name
+      - datalake_survicate.survey_responses.survey_name
     description: Descriptive information indicating the name of the submitted survey.
   respondent_type:
     description: Respondent role, in this case, analyst
   service_type:
     description:
       "For which service we are evaluating satisfaction. In this case,
-      single_station, a Shared Platform iniative."
+      Magic Link 2.0 platform."
   service_context:
     description:
       "For which context we are evaluating satisfaction. In this case,
