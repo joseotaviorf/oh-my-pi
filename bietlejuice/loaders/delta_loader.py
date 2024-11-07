@@ -23,6 +23,8 @@ class DeltaLoader:
         when_not_matched_insert_condition: str = None,
         when_matched_update_condition: str = None,
         when_matched_delete_condition: str = None,
+        when_matched_operation: dict = None,
+        when_not_matched_operation: dict = None,
     ) -> None:
         """
         Load a DataFrame into a Delta table.
@@ -38,6 +40,10 @@ class DeltaLoader:
         in the source dataframe as source.<column_name>, and the columns in the target table as target.<column_name>.
         - when_matched_delete_condition: it will add an operation to delete, but only if this condition is true. Again, source and
         target dataframe columns can be referred to respectively as source.<column_name> and target.<column_name>
+        - when_matched_operation: Specifies the columns to update on a match, along with their values. This should be a dictionary,
+        where keys represent columns to update and values specify the new values. You can use source.<column_name> or target.<column_name> to differentiate between the source and target data.
+        - when_not_matched_operation: Specifies the columns and values to insert when there is no match. This should also be a dictionary,
+        where keys are the columns to insert, and values are the data to be inserted. Again, source.<column_name> or target.<column_name> can be used to clarify data origin.
         """
         database_name = table_name.split(".")[0].replace("`", "")
         BaseSparkContext.spark.sql(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
@@ -69,6 +75,8 @@ class DeltaLoader:
                 when_not_matched_insert_condition,
                 when_matched_update_condition,
                 when_matched_delete_condition,
+                when_matched_operation,
+                when_not_matched_operation,
             )
         logger.info(f"Load of table {table_name} completed successfully.")
 
@@ -142,6 +150,8 @@ class DeltaLoader:
         when_not_matched_insert_condition: str = None,
         when_matched_update_condition: str = None,
         when_matched_delete_condition: str = None,
+        when_matched_operation: dict = None,
+        when_not_matched_operation: dict = None,
     ) -> None:
         """
         Merge a source dataframe to a Delta table, using the list of columns in "merge_on" as merge keys.
@@ -153,6 +163,10 @@ class DeltaLoader:
         in the source dataframe as source.<column_name>, and the columns in the target table as target.<column_name>.
         - when_matched_delete_condition: it will add an operation to delete, but only if this condition is true. Again, source and
         target dataframe columns can be referred to respectively as source.<column_name> and target.<column_name>
+        - when_matched_operation: Specifies the columns to update on a match, along with their values. This should be a dictionary,
+        where keys represent columns to update and values specify the new values. You can use source.<column_name> or target.<column_name> to differentiate between the source and target data.
+        - when_not_matched_operation: Specifies the columns and values to insert when there is no match. This should also be a dictionary,
+        where keys are the columns to insert, and values are the data to be inserted. Again, source.<column_name> or target.<column_name> can be used to clarify data origin.
         """
 
         # Necessary for schema evolution
@@ -172,9 +186,26 @@ class DeltaLoader:
                 condition=when_matched_delete_condition
             )
 
-        merge_builder.whenMatchedUpdateAll(
-            condition=when_matched_update_condition
-        ).whenNotMatchedInsertAll(condition=when_not_matched_insert_condition).execute()
+        if when_matched_operation:
+            merge_builder = merge_builder.whenMatchedUpdate(
+                condition=when_matched_update_condition, set=when_matched_operation
+            )
+        else:
+            merge_builder = merge_builder.whenMatchedUpdateAll(
+                condition=when_matched_update_condition
+            )
+
+        if when_not_matched_operation:
+            merge_builder = merge_builder.whenNotMatchedInsert(
+                condition=when_not_matched_insert_condition,
+                values=when_not_matched_operation,
+            )
+        else:
+            merge_builder = merge_builder.whenNotMatchedInsertAll(
+                condition=when_not_matched_insert_condition
+            )
+
+        merge_builder.execute()
 
     def vacuum_table(self, table_name: str, retention_hours: int) -> None:
         """Vacuum a Delta table"""

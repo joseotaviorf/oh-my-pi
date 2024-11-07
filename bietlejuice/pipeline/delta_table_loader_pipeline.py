@@ -25,6 +25,8 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         when_not_matched_insert_condition: str = None,
         when_matched_update_condition: str = None,
         when_matched_delete_condition: str = None,
+        when_matched_operation: dict = None,
+        when_not_matched_operation: dict = None,
     ):
         """
         By default, it will simply do a write operation of a Delta table.
@@ -54,6 +56,8 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         :param when_not_matched_insert_condition: condition to insert when not matched
         :param when_matched_update_condition: condition to update when matched
         :param when_matched_delete_condition: condition to delete when matched
+        :param when_matched_operation: Dictionary specifying columns and values to update on a match.
+        :param when_not_matched_operation: Dictionary specifying columns and values to insert on no match.
         """
         super().__init__(
             database_name=database_name,
@@ -72,6 +76,8 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         self.when_not_matched_insert_condition = when_not_matched_insert_condition
         self.when_matched_update_condition = when_matched_update_condition
         self.when_matched_delete_condition = when_matched_delete_condition
+        self.when_matched_operation = when_matched_operation
+        self.when_not_matched_operation = when_not_matched_operation
 
     def load_and_register(self, df, format_options):
         spark_client = SparkClient()
@@ -95,6 +101,8 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
             when_not_matched_insert_condition=self.when_not_matched_insert_condition,
             when_matched_update_condition=self.when_matched_update_condition,
             when_matched_delete_condition=self.when_matched_delete_condition,
+            when_matched_operation=self.when_matched_operation,
+            when_not_matched_operation=self.when_not_matched_operation,
         )
 
         spark_metastore_service.refresh_table(

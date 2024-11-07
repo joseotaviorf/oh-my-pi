@@ -52,6 +52,8 @@ class TestDeltaTableLoaderPipeline:
             when_not_matched_insert_condition="when_not_matched_insert_condition",
             when_matched_update_condition="when_matched_update_condition",
             when_matched_delete_condition="when_matched_delete_condition",
+            when_matched_operation=None,
+            when_not_matched_operation=None,
         )
         mock_spark_metastore_service.assert_called_once()
         mock_spark_metastore_service.return_value.refresh_table.assert_called_once()

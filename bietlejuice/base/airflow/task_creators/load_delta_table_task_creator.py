@@ -25,6 +25,12 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
         when_matched_delete_condition = table_attributes.table_customization.get(
             "when_matched_delete_condition", None
         )
+        when_matched_operation = table_attributes.table_customization.get(
+            "when_matched_operation", None
+        )
+        when_not_matched_operation = table_attributes.table_customization.get(
+            "when_not_matched_operation", None
+        )
 
         return [
             self.dag_execution_context.environment,
@@ -46,6 +52,8 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
             json.dumps(when_not_matched_insert_condition),
             json.dumps(when_matched_update_condition),
             json.dumps(when_matched_delete_condition),
+            json.dumps(when_matched_operation),
+            json.dumps(when_not_matched_operation),
         ]
 
     def _get_extra_query_template_params(

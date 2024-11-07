@@ -23,7 +23,11 @@ def main():
         + f"database_base_name={args.database_base_name}, relative_query_path={args.relative_query_path}, "
         + f"table_name={args.table_name}, extraction_type={args.extraction_type}, merge_on={args.merge_on}, "
         + f"when_not_matched_insert_condition={args.when_not_matched_insert_condition}, "
-        + f"when_matched_update_condition={args.when_matched_update_condition}, when_matched_delete_condition={args.when_matched_delete_condition}, msg=Job execution started"
+        + f"when_matched_update_condition={args.when_matched_update_condition}, "
+        + f"when_matched_delete_condition={args.when_matched_delete_condition}, "
+        + f"when_matched_operation={args.when_matched_operation}, "
+        + f"when_not_matched_operation={args.when_not_matched_operation}, "
+        + "msg=Job execution started"
     )
 
     merge_on = json.loads(args.merge_on)
@@ -56,7 +60,9 @@ def main():
         merge_on=merge_on,
         when_not_matched_insert_condition=json.loads(args.when_not_matched_insert_condition),
         when_matched_update_condition=json.loads(args.when_matched_update_condition),
-        when_matched_delete_condition=json.loads(args.when_matched_delete_condition)
+        when_matched_delete_condition=json.loads(args.when_matched_delete_condition),
+        when_matched_operation=json.loads(args.when_matched_operation),
+        when_not_matched_operation=json.loads(args.when_not_matched_operation)
     )
     table_loader_pipeline.run()
 
@@ -108,6 +114,22 @@ def parse_arguments() -> Namespace:
         "when_matched_delete_condition",
         type=str,
         help="Condition to be used for delete operation",
+    )
+    parser.add_argument(
+        "when_matched_operation",
+        type=str,
+        help="Which columns to update when there is a match, and with which values. "
+           + "Should be a dictionary, with the keys being the columns to be updated, and "
+           + "the values being what to update them with. You can use source.<column_name> "
+           + "or target.<column_name> to disambiguate between the query result and the existing value.",
+    )
+    parser.add_argument(
+        "when_not_matched_operation",
+        type=str,
+        help="Which columns to insert when there is not a match, and with which values. "
+           + "Should be a dictionary, with the keys being the columns to be updated, and "
+           + "the values being what to update them with. You can use source.<column_name> "
+           + "or target.<column_name> to disambiguate between the query result and the existing value.",
     )
 
     return parser.parse_args()
