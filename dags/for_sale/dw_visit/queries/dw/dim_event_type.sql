@@ -57,3 +57,23 @@ SELECT
     12 AS sk_event_type,
     'VISIT_CONFIRMED' AS event_name,
     NOW() AS ts_load
+UNION ALL
+SELECT
+    13 AS sk_event_type,
+    'VISIT_FITTED' AS event_name,
+    NOW() AS ts_load
+UNION ALL
+SELECT
+    14 AS sk_event_type,
+    'VISIT_SCHEDULED' AS event_name,
+    NOW() AS ts_load
+UNION ALL
+SELECT
+    15 AS sk_event_type,
+    'VISIT_CONTESTED' AS event_name,
+    NOW() AS ts_load
+UNION ALL
+SELECT
+    16 AS sk_event_type,
+    'ANSWER_PENDING' AS event_name,
+    NOW() AS ts_load

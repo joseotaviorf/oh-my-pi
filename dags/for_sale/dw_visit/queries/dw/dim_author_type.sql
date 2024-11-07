@@ -22,6 +22,8 @@ CROSS JOIN
     SELECT 4 AS sk_seq, 'SUPPLY' AS author_user_role
     UNION ALL
     SELECT 5 AS sk_seq, NULL AS author_user_role
+    UNION ALL
+    SELECT 6 AS sk_seq, 'TENANT_LIVING' AS author_user_role
 ) AS author_role_seq
 CROSS JOIN
 (
@@ -30,6 +32,8 @@ CROSS JOIN
     SELECT 2 AS sk_seq, 'DEMAND' AS on_behalf_of
     UNION ALL
     SELECT 3 AS sk_seq, 'SUPPLY' AS on_behalf_of
+    UNION ALL
+    SELECT 4 AS sk_seq, 'TENANT_LIVING' AS on_behalf_of
 ) AS on_behalf_seq
 CROSS JOIN
 (
