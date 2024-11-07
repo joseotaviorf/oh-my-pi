@@ -10,6 +10,9 @@ columns:
   id_message:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.message_id
+  id_incoming_message:
+    lineage:
+      - datalake_sauron_raw.botoutgoingmessages.id_incoming_message
   message_payload:
     lineage:
       - datalake_sauron_raw.botoutgoingmessages.message_payload

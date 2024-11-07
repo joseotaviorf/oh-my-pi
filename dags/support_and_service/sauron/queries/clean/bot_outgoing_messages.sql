@@ -1,7 +1,8 @@
 SELECT
   id,
-  session_id AS id_session,
   message_id AS id_message,
+  incoming_message_id AS id_incoming_message,
+  session_id AS id_session,
   message_payload,
   bot_response,
   user_phone,
@@ -13,7 +14,3 @@ SELECT
   day
 FROM
   datalake_sauron_raw.botoutgoingmessages
-WHERE
-  year = {year}
-  AND month = {month}
-  AND day = {day}

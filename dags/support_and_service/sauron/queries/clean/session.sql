@@ -11,6 +11,8 @@ SELECT
   context,
   source_identity,
   created_by,
+  ticket_comments,
+  metadata,
   last_message_at AS ts_last_message,
   first_message_at AS ts_first_message,
   created_at AS ts_created,
@@ -20,7 +22,3 @@ SELECT
   day
 FROM
   datalake_sauron_raw.session
-WHERE
-  year = {year}
-  AND month = {month}
-  AND day = {day}
