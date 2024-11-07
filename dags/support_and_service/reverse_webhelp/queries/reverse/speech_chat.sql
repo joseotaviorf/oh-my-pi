@@ -65,9 +65,9 @@ SELECT
     WHEN message_from LIKE '%whatsapp%' THEN 'client'
     ELSE message_from
   END AS message_from,
-  YEAR(cht.ts_segment_closed) AS year,
-  MONTH(cht.ts_segment_closed) AS month,
-  DAY(cht.ts_segment_closed) AS day,
+  YEAR(ts_segment_closed) AS year,
+  MONTH(ts_segment_closed) AS month,
+  DAY(ts_segment_closed) AS day,
   NOW() AS ts_load
 FROM
   message_summary

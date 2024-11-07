@@ -85,8 +85,8 @@ WITH email_base AS (
         ON da.sk_agent = ft.sk_agent
   WHERE
     cs.channel IN ('email', 'form_faq', 'web', 'other')
-    AND ((DATE(ft.ts_solved_local) DATE_TRUNC('MONTH', ,DATE('{load_start_date}')) - INTERVAL '6' MONTH) AND DATE('{load_end_date}')
-      OR (DATE(cs.ts_started) DATE_TRUNC('MONTH', ,DATE('{load_start_date}')) - INTERVAL '6' MONTH)) AND DATE('{load_end_date}')
+    AND (DATE(ft.ts_solved_local) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH AND DATE('{load_end_date}')
+      OR DATE(cs.ts_started) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH AND DATE('{load_end_date}'))
     
     AND team IS NOT NULL
 )
