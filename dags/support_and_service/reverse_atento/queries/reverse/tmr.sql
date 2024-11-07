@@ -119,9 +119,9 @@ SELECT
       ELSE NULL
   END) AS volume_message_less_than_5min,
   COUNT(DISTINCT event.id) AS total_message_volume,
-  YEAR(CURRENT_DATE) AS year,
-  MONTH(CURRENT_DATE) AS month,
-  DAY(CURRENT_DATE) AS day,
+  YEAR(cm.chat_ts_created) AS year,
+  MONTH(cm.chat_ts_created) AS month,
+  DAY(cm.chat_ts_created) AS day,
   NOW() AS ts_load
 FROM chat_messenger AS cm
   LEFT JOIN
@@ -131,7 +131,7 @@ FROM chat_messenger AS cm
       AND event.ts_created >= cm.ts_segment_created
       AND event.ts_created < cm.ts_segment_closed
 WHERE
-  CAST(cm.chat_ts_created AS DATE) >= DATE_SUB(CURRENT_DATE(), 90)
+  CAST(cm.chat_ts_created AS DATE) BETWEEN DATE('{load_start_date}') - INTERVAL '90' DAY AND DATE('{load_end_date}')
   AND REGEXP_LIKE(event.message_to, '((@quintoandar\.com\.br)|(@atento\.com\.br))') = true
   AND REGEXP_LIKE(event.message_from, '((@quintoandar\.com\.br)|(@atento\.com\.br))') = false
 GROUP BY ALL

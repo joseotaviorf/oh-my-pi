@@ -71,6 +71,6 @@ LEFT JOIN
   ticket_events AS te
     ON te.sk_ticket = rt.id_ticket
 WHERE
-  MAKE_DATE(year, month, day) >= CURRENT_DATE - INTERVAL '1' YEAR
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY rt.id_ticket ORDER BY MAKE_DATE(rt.year,rt.month,rt.day) DESC) = 1

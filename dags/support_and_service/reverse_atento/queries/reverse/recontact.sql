@@ -65,7 +65,7 @@ WITH front_tickets_list AS (
       DAY,
       LAG(DATE(rc.ts_started)) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started),
       DATE(rc.ts_started)
-    ) AS days_since_last_contact,    
+    ) AS days_since_last_contact,
     rc.theme,
     rc.theme_detail,
     CASE
@@ -107,7 +107,7 @@ WITH front_tickets_list AS (
     front_tickets_list AS rc
 
   WHERE
-    ts_started >= DATE('2024-06-01')
+    ts_started BETWEEN DATE('{load_start_date}') - INTERVAL '6' MONTH AND DATE('{load_end_date}')
     AND refined_direction = 'INBOUND'
 ),
 demand_back_FRC AS (
@@ -149,7 +149,7 @@ demand_back_FRC AS (
       'CX Pagamentos Ativo [POS] [BACK] [PAY]',
       'Alteração de dados bancários [BACK]')
     AND dd.front_or_back = 'back'
-    AND ft.ts_started >= CURRENT_DATE - INTERVAL '6' month
+    AND ft.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL '6' MONTH AND DATE('{load_end_date}')
 )
 SELECT
   rc.sk_ticket,
@@ -184,9 +184,9 @@ SELECT
   rc.ts_started_previous_contact AS ts_started_first_contact,
   rc.ts_started AS ts_started,
   refined_direction,
-  YEAR(CURRENT_DATE()) AS year,
-  MONTH(CURRENT_DATE()) AS month,
-  DAY(CURRENT_DATE()) AS day,
+  YEAR(rc.ts_started) AS year,
+  MONTH(rc.ts_started) AS month,
+  DAY(rc.ts_started) AS day,
   NOW() AS ts_load
 FROM
   recontact_check AS rc

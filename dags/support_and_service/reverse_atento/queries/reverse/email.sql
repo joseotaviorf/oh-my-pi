@@ -85,8 +85,8 @@ WITH email_base AS (
         ON da.sk_agent = ft.sk_agent
   WHERE
     cs.channel IN ('email', 'form_faq', 'web', 'other')
-    AND ((DATE(ft.ts_solved_local) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' month)
-    OR (DATE(cs.ts_started) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' month))
+    AND ((DATE(ft.ts_solved_local) >= BETWEEN DATE_TRUNC('month',DATE('{load_start_date}') - INTERVAL '6' MONTH) AND DATE('{load_end_date}')
+      OR (DATE(cs.ts_started) >= BETWEEN DATE_TRUNC('month',DATE('{load_start_date}') - INTERVAL '6' MONTH) AND DATE('{load_end_date}')))
     AND team IS NOT NULL
 )
 SELECT
@@ -125,9 +125,9 @@ SELECT
 	hour_solved,
   ts_started,
   ts_solved_local,
-  YEAR(CURRENT_DATE) AS year,
-  MONTH(CURRENT_DATE) AS month,
-  DAY(CURRENT_DATE) AS day,
+  YEAR(ts_solved_local) AS year,
+  MONTH(ts_solved_local) AS month,
+  DAY(ts_solved_local) AS day,
   NOW() AS ts_load
 FROM email_base
 WHERE
