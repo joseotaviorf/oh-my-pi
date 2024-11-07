@@ -46,6 +46,7 @@ taxonomy_demand AS (
 filtered_events AS (
     SELECT DISTINCT
         COALESCE(business_context, 'rent') AS business_context,
+        tof_event_type,
         COALESCE(CAST(ep_house_id AS STRING), top5_house_id[1]) AS id_house,
         entrance_uri,
         referrer,
@@ -100,6 +101,7 @@ SELECT
     COALESCE(td.mkt_medium, 'Not Mapped') AS mkt_medium,
     COALESCE(td.mkt_source, 'Not Mapped') AS mkt_source,
     COALESCE(td.mkt_platform, 'Not Mapped') AS mkt_platform,
+    evt.tof_event_type,
     evt.business_context,
     evt.entrance_uri,
     evt.referrer,

@@ -54,6 +54,9 @@ columns:
   app_type:
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.up_platform
+  tof_event_type: 
+    lineage: 
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.tof_event_type
   utm_source:
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_source

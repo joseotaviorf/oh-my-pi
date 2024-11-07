@@ -1,4 +1,5 @@
 SELECT  
+    'schedule_page_viewed' AS tof_event_type,
     ep_house_id,
     id_user,
     id_device,
@@ -20,6 +21,7 @@ FROM
     datalake_amplitude_clean.170698_schedule_page_viewed_events 
 UNION ALL
 SELECT  
+    'search_page_viewed' AS tof_event_type,
     id_house as ep_house_id,
     id_user,
     id_device,
@@ -40,7 +42,8 @@ SELECT
 FROM 
     datalake_amplitude_clean.170698_search_page_viewed_events 
 UNION ALL
-SELECT  
+SELECT 
+    'search_results_page_viewed' AS tof_event_type,
     ep_house_id,
     id_user,
     id_device,
@@ -62,6 +65,7 @@ FROM
     datalake_amplitude_clean.170698_search_results_page_viewed_events 
 UNION ALL
 SELECT      
+    'listing_page_viewed' AS tof_event_type,
     ep_house_id,
     id_user,
     id_device,
