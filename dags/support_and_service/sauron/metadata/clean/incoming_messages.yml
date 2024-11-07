@@ -13,12 +13,6 @@ columns:
   message_payload:
     lineage:
       - datalake_sauron_raw.incomingmessages.message_payload
-  media_url:
-    lineage:
-      - datalake_sauron_raw.incomingmessages.media_url
-  mime_type:
-    lineage:
-      - datalake_sauron_raw.incomingmessages.mime_type
   user_phone:
     lineage:
       - datalake_sauron_raw.incomingmessages.user_phone
