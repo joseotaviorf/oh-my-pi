@@ -18,18 +18,8 @@ tables:
   # <raw_table_name>:
   #   table_name: <table_name>
   #   partitioned_table: <True> #optional
-  activesessions:
-    table_name: ActiveSessions
   botoutgoingmessages:
     table_name: BotOutgoingMessages_{year}{month}
-    partitioned_table: True
-  expiredsessions:
-    table_name: ExpiredSessions
-  incomingmessagestatus:
-    table_name: IncomingMessageStatus_{year}{month}
-    partitioned_table: True
-  incomingmessages:
-    table_name: IncomingMessages_{year}{month}
     partitioned_table: True
   session:
     table_name: Session
