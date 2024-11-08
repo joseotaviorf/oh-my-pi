@@ -39,16 +39,16 @@ SELECT DISTINCT
   ft.ts_csat_first_response AS ts_csat_response,
   ft.ts_solved,
   ft.ts_closed,
-  YEAR(ft.ts_started) AS year,
-  MONTH(ft.ts_started) AS month,
-  DAY(ft.ts_started) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load,
   t.minutes_requester_wait_time_business,
   t.minutes_first_reply_time_business,
   t.minutes_full_resolution_time_business
 FROM
   dw_customer_support.fact_ticket AS ft
-LEFT JOIN
+LEFT JOIN 
   dw_tickets.fact_tickets AS t
     ON ft.sk_ticket = t.sk_ticket
 LEFT JOIN
@@ -68,7 +68,7 @@ LEFT JOIN
     ON ft.sk_last_agent = da.sk_agent
     OR ft.sk_last_agent = da.sk_agent_twilio
 WHERE
-  DATE(ft.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
+  DATE(ft.ts_started) >= CURRENT_DATE - INTERVAL '1' YEAR
 AND
   dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'
