@@ -33,6 +33,9 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
         source_schema = self.dag_execution_context.workflow_args.get(
             "source_schema", "public"
         )
+        primary_keys = ",".join(
+            table_attributes.table_customization.get("raw_primary_keys", [])
+        )
         dbutils_secret_key = self.dag_execution_context.workflow_args.get(
             "dbutils_secret_key", f"{table_attributes.schema.upper()}_DB"
         )
@@ -49,6 +52,7 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
             self.dag_execution_context.load_start_date,
             self.dag_execution_context.load_end_date,
             str(partitions),
+            primary_keys,
             dbutils_secret_key,
         ]
         return parameters

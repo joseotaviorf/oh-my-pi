@@ -21,7 +21,7 @@ from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from datetime import datetime
-from pyspark.sql.functions import col, to_timestamp, lit
+from pyspark.sql.functions import col, to_timestamp, lit, struct
 
 JOB_NAME = "load_cdc_transactional"
 
@@ -42,6 +42,7 @@ def parse_arguments():
     parser.add_argument("start_date")
     parser.add_argument("end_date")
     parser.add_argument("partitions")
+    parser.add_argument("primary_keys", help="Comma separated list of primary keys")
     parser.add_argument("dbutils_secret_key")
 
     return parser.parse_args()
@@ -112,7 +113,7 @@ def get_incoming_data(
         return None
 
 
-def format_and_deduplicate_df(df, partitions, database_type):
+def format_and_deduplicate_df(df, partitions, database_type, primary_key_columns):
     """
     Extract and format informations from Debezium payload
     and Deduplicate
@@ -137,6 +138,14 @@ def format_and_deduplicate_df(df, partitions, database_type):
     elif df_deletes.isEmpty():
         incoming_df = df_without_delete_op
     else:
+        # This gets only the primary key columns from deletes
+        primary_key_columns_formatted = []
+        for pk_name in primary_key_columns:
+            primary_key_columns_formatted.append(col("data." + pk_name).alias(pk_name))
+        df_deletes = df_deletes.withColumn(
+            "data", struct(*primary_key_columns_formatted)
+        )
+
         incoming_df = df_without_delete_op.unionByName(
             df_deletes, allowMissingColumns=True
         )
@@ -179,12 +188,27 @@ def main():
     partitions = json.loads(args.partitions.replace("'", '"'))
     dbutils_secret_key = args.dbutils_secret_key
     full_table_name = f"datalake_{schema}_transactional.{table_name}"
+    schema_finder = CdcSchemaFinderFactory(
+        dbutils_secret_key=dbutils_secret_key
+    ).get_cdc_schema_finder(DatabaseTypeEnum(database_type))
+
+    if args.primary_keys:
+        primary_keys = [key.strip() for key in args.primary_keys.split(",")]
+    else:
+        table_metadata = schema_finder.find_latest_table_definition(table_name)
+        primary_keys = table_metadata["primaryKeyColumnNames"]
+    if not primary_keys:
+        raise ValueError(
+            f"The primary keys of the table {table_name} could not be automatically identified."
+            "Please, provide the primary keys manually in DAG Declaration file."
+        )
 
     logger.info(
         f"""
         m=__main__, environment={environment},  datalake_bucket={datalake_bucket}, database_type={database_type},
         source_database={source_database}, source_schema={source_schema}, incoming_bucket={incoming_bucket}, schema={schema},
         table_name={table_name}, start_date={start_date}, end_date={end_date}, partitions={partitions}, dbutils_secret_key={dbutils_secret_key},
+        primary_keys={primary_keys},
         msg=Starting spark job...
         """
     )
@@ -223,14 +247,14 @@ def main():
         )
         return
 
-    transactional_df = format_and_deduplicate_df(df, partitions, database_type)
+    transactional_df = format_and_deduplicate_df(
+        df, partitions, database_type, primary_keys
+    )
 
     logger.info("m=__main__, msg=Applying schema pre treatment...")
 
     pre_treatment = CdcSchemaTreatmentFactory(
-        schema_finder=CdcSchemaFinderFactory(
-            dbutils_secret_key=dbutils_secret_key,
-        ).get_cdc_schema_finder(DatabaseTypeEnum(database_type)),
+        schema_finder=schema_finder,
         datalake_table_schema=f"datalake_{schema}_transactional",
     ).get_cdc_schema_treatment(DatabaseTypeEnum(database_type))
     transactional_df = pre_treatment.treat_dataframe(table_name, transactional_df)
