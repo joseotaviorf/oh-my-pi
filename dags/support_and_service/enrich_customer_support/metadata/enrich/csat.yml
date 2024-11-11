@@ -7,12 +7,12 @@ domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_ticket:
-  lineage:
-    - datalake_zendesk_clean.tickets.id_ticket
-    - datalake_survicate.zendesk_email_surveys.id_ticket
-    - datalake_customer_support.tickets.id_ticket
-    - datalake_chat_fup_clean.chats_chat.id_ticket
-  description: Unique identifier for the customer support ticket.
+    lineage:
+      - datalake_zendesk_clean.tickets.id_ticket
+      - datalake_survicate.zendesk_email_surveys.id_ticket
+      - datalake_customer_support.tickets.id_ticket
+      - datalake_chat_fup_clean.chats_chat.id_ticket
+    description: Unique identifier for the customer support ticket.
   first_csat_score:
     lineage:
       - datalake_zendesk_clean.tickets.satisfaction_rating.score
