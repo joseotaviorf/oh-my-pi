@@ -6,30 +6,34 @@ domain: Fintech
 description: Table with information about the credit policy proponents.
 columns:
   id_policy_evaluation:
-    description: 'Policy report ID'
+    description: "Policy report ID"
     lineage:
-    - datalake_sorting_hat_clean.policy_report.id
+      - datalake_sorting_hat_clean.policy_report.id
   id_retenant_contract:
-    description: 'Retenant contract ID'
+    description: "Retenant contract ID"
     lineage:
-    - datalake_sorting_hat_clean.policy_report.result.retenant_contract_id
+      - datalake_sorting_hat_clean.policy_report.result.retenant_contract_id
   id_retenant_contract_proposal:
-    description: 'Retenant contract proposal ID'
+    description: "Retenant contract proposal ID"
     lineage:
-    - datalake_sorting_hat_clean.policy_report.result.retenant_contract_proposal_id
+      - datalake_sorting_hat_clean.policy_report.result.retenant_contract_proposal_id
   id_retenant_contract_user:
-    description: 'Retenant contract user ID'
+    description: "Retenant contract user ID"
     lineage:
-    - datalake_sorting_hat_clean.policy_report.result.retenant_contract_user_id
-  sk_user:
-    description: 'Unique identifier of user with the most recent creation date'
+      - datalake_sorting_hat_clean.policy_report.result.retenant_contract_user_id
+  id_user:
+    description: "Unique identifier of user with the most recent creation date. This value is null for new users."
     lineage:
-    - datalake_ebdb_user.user.id
+      - datalake_ebdb_user.user.id
   retenant_score:
-    description: 'Retenant Score'
+    description: "Retenant Score"
     lineage:
-    - datalake_sorting_hat_clean.policy_report.result.retenant_score
+      - datalake_sorting_hat_clean.policy_report.result.retenant_score
+  proponent_document_number:
+    description: "The document number of the proponent (i.e CPF)"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.document_number
   is_retenant:
-    description: 'True if user is retenant'
+    description: "True if user is retenant"
     lineage:
-    - datalake_sorting_hat_clean.policy_report.result.is_retenant
+      - datalake_sorting_hat_clean.policy_report.result.is_retenant
