@@ -115,6 +115,11 @@ base AS (
   SELECT * FROM trovit
   UNION ALL
   SELECT * FROM rtb
+),
+base_deduplicated AS (
+  SELECT 
+    *
+  FROM base
   QUALIFY ROW_NUMBER() OVER (PARTITION BY origin, id_campaign ORDER BY dt_start DESC) = 1
 )
 SELECT 
@@ -125,7 +130,7 @@ SELECT
   TRUE::BOOLEAN AS is_current,
   dt_start,
   NULL::DATE AS dt_end
-FROM base
+FROM base_deduplicated
 UNION ALL
 SELECT 
   NULL AS merge_key,
@@ -136,7 +141,7 @@ SELECT
   b.dt_start,
   NULL::DATE AS dt_end
 FROM 
-  base b
+  base_deduplicated b
   LEFT JOIN 
     datalake_growth_media_platform.campaign_name_history cn 
       ON b.id_campaign = cn.id_campaign
