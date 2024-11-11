@@ -28,6 +28,10 @@ columns:
     lineage:
       - datalake_reclameaqui_clean.tickets.complaint_title
     description: The title of the complaint.
+  company:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.company
+    description: Company the complaint was addressed to.
   customer_cpf:
     lineage:
       - datalake_reclameaqui_clean.tickets.customer_data
@@ -76,6 +80,10 @@ columns:
     lineage:
       - datalake_reclameaqui_clean.tickets.is_resolved
     description: Indicates whether the complaint is resolved.
+  is_internal_process:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.ra
+    description: Indicates whether the complaint is an internal process
   would_do_business_again:
     lineage:
       - datalake_reclameaqui_clean.tickets.would_do_business_again
@@ -88,6 +96,10 @@ columns:
     lineage:
       - datalake_reclameaqui_clean.tickets.ts_last_replica
     description: Timestamp of the last replication.
+  ts_complaint_response:
+    lineage:
+      - datalake_reclameaqui_clean.tickets.ts_complaint_response
+    description: Timestamp of the complaint response.
   ts_rating:
     lineage:
       - datalake_reclameaqui_clean.tickets.ts_rating
