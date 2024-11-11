@@ -5,6 +5,8 @@ from pyspark.sql.functions import col
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.services.metastore_services.metastore_service import MetastoreService
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+
 
 logger = QuintoAndarLogger("SparkMetastoreService")
 
@@ -310,3 +312,19 @@ class SparkMetastoreService(MetastoreService):
             f"m=create_external_table, table={database_name}.{table_name}, msg=the "
             f"table was created successfully in the metastore."
         )
+
+    def create_new_partitions_from_df(
+        self, database_name, table_name, df, partition_cols, parallelism=1
+    ):
+        super().create_new_partitions_from_df(
+            database_name, table_name, df, partition_cols, parallelism
+        )
+
+        if (
+            UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+            and not UnityCatalogHelper.is_default_catalog_using_unity()
+            and bool(partition_cols)
+        ):
+            UnityCatalogHelper.sync_table_to_unity_catalog(
+                f"{database_name}.{table_name}"
+            )
