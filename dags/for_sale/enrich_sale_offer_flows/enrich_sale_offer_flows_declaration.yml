@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: Creates enriched tables for the context `sale_offer_flows` enriching from sale_flows.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     sale_offer_flows:

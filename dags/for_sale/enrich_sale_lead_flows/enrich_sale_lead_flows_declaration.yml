@@ -7,7 +7,7 @@ dag:
     dag_purpose: Creates enriched tables for the context `sale_lead_flows`, enriching
       leads from Casa Mineira, Classifieds, Hub Services and QuintoAndar.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     lead_flow:

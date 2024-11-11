@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the enriched tables for Sale Listings context.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     sale_listing:

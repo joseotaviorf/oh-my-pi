@@ -4,7 +4,7 @@ dag:
   schedule_start_date: 2022, 6, 20
   owner: Data ForSale
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     sellability_lens:
