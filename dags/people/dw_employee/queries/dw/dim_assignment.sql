@@ -102,9 +102,9 @@ SELECT
   COALESCE(
     CASE
       WHEN wr.dt_termination < DATE ('{load_start_date}')
-      AND wr.worker_type = 'E' THEN ap.action_description
+      AND wr.worker_type IN ('E', 'C') THEN ap.action_description
       WHEN wr.dt_termination >= DATE ('{load_start_date}')
-      AND wr.worker_type = 'E' THEN af.action_description
+      AND wr.worker_type IN ('E', 'C') THEN af.action_description
     END,
     '-1'
   ) AS dismissal_type,
