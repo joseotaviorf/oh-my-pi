@@ -2,7 +2,7 @@ dag:
     name: enrich_date
     schedule_start_date: 2022, 1, 19
     owner: Data SS
-    documentation: 
+    documentation:
         dag_purpose: |
           Creation of workday windows, considering holidays at city level, for construction and calculation of SLA metrics.
 workflow:
@@ -12,4 +12,4 @@ workflow:
       workday_window:
         - cities_calendar
 cluster:
-    type: databricks_12_2_min_general_photon_cluster
+    type: databricks_13_3_min_general_cluster

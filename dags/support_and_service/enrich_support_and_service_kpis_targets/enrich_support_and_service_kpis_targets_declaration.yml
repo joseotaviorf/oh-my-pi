@@ -12,4 +12,4 @@ workflow:
     kpis_target:
       extraction_type: full
 cluster:
-  type: databricks_12_2_min_memory_photon_cluster
+  type: databricks_13_3_min_general_cluster

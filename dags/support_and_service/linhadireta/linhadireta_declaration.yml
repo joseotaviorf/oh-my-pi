@@ -27,7 +27,7 @@ workflow:
       clean_table_name: user
       extraction_type: full
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_13_3_med_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

@@ -28,4 +28,4 @@ workflow:
       partitions: [year, month, day]
 
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_13_3_med_general_cluster
