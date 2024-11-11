@@ -1,0 +1,69 @@
+dag:
+  name: dw_crm
+  schedule_start_date: 2020, 11, 1
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Creates DW fact and dimension tables for CRM context.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: crm
+  default_extraction_type: full
+  inner_dependencies:
+    fact_lead_tasks:
+      - fact_lead_task_actions
+  tables_customization:
+    dim_closing_task_transition:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    dim_closing_task_workflow:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_closing_tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_closing_tasks_workflows_transitions:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_collection_tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_credit_tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_lead_task_actions:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_linhadireta_chat_tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_offboarding_tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_onboarding_tenant_tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_payment_tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_photo_job_tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_repair_tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_ungrouped_manual_tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    fact_visit_tasks:
+      extraction_type: incremental
+      partitions: [year, month, day]
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
