@@ -187,6 +187,12 @@ bietlejuice.enrich_accounting_funnel:
   remove:
     - bietlejuice.sap:load-clean-users
     - bietlejuice.sap:load-clean-chart-of-accounts
+bietlejuice.enrich_amplitude_agents_app:
+  add:
+    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+    - bietlejuice.enrich_ebdb_agents:load-clean-business-context
+  remove:
+    - bietlejuice.amplitude:load-clean-events
 bietlejuice.enrich_amplitude_lead:
   remove:
     - bietlejuice.amplitude:load-clean-events

@@ -1085,6 +1085,9 @@ bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated
   - bietlejuice.airtable:load-clean-cr-occurrences
   - bietlejuice.airtable:load-clean-jira-tickets
+bietlejuice.enrich_amplitude_agents_app:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.enrich_ebdb_agents:load-clean-business-context
 bietlejuice.enrich_amplitude_inspections:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.inspections:load-clean-inspection-aud

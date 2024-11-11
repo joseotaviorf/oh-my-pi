@@ -1,0 +1,10 @@
+---
+table_name: datalake_amplitude_agents_app.agents_native_events
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_user:
+    is_complete:
+      severity_level: Error
+  id_app:
+    is_complete:
+      severity_level: Error

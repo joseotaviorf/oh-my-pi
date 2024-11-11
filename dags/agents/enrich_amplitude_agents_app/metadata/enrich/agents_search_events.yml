@@ -1,0 +1,63 @@
+---
+database_name: datalake_amplitude_agents_app
+table_name: agents_search_events
+description: This table contains data from Agents' property search events that were redirected from the Agents application to the Tenant application.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+    description: User unique identifier.
+  id_app:
+    lineage:
+      - datalake_amplitude_clean.events.id_app
+    description: App unique identifier
+  city:
+    lineage:
+      - datalake_amplitude_clean.events.city
+    description: City of origin of the event
+  platform:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Type of platform on which the event occurred
+  os_name:
+    lineage:
+      - datalake_amplitude_clean.events.os_name
+    description: By which system/application the event was generated
+  event_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_type
+    description: Indicates the type of event generated in the application
+  user_properties:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Properties of the user who generated the event
+  event_properties:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Properties of the generated event
+  is_sale_agent:
+    lineage:
+      - datalake_ebdb_agents.business_context.business_context
+    description: Indicates whether the user is an agent in the Sale business context
+  is_rent_agent:
+    lineage:
+      - datalake_ebdb_agents.business_context.business_context
+    description: Indicates whether the user is an agent in the Rent business context
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Event datetime
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+    description: Year of event
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+    description: Month of event
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
+    description: Day of event
