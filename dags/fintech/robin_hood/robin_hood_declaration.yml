@@ -13,6 +13,7 @@ workflow:
   database_type: postgres
   custom_schema: robin_hood
   dbutils_secret_key: ROBIN_HOOD_DB
+  lineage_product_database_name: robin_hood
   tables_customization:
     accounting_entry: {}
     accounting_entry_balance: {}
