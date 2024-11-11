@@ -1,8 +1,8 @@
 dag:
-  name: braze_events_test
+  name: braze_events
   owner: Data Growth
   schedule_start_date: 2020, 11, 1
-  schedule_interval: "0 3 * * *"
+  schedule_interval: "30 0 * * *"
   documentation: 
     dag_purpose: |    
       Retrieves data from events streamed by [Braze's Currents tool](https://www.braze.com/docs/user_guide/data_and_analytics/braze_currents/).
@@ -11,10 +11,9 @@ dag:
 workflow:
   layer: raw
   type: custom_ingestion
-  load_spark_job: load_braze_events_test_raw
+  load_spark_job: load_braze_events_raw
   default_partitions: [event_type, year, month, day]
   default_extraction_type: incremental
-  custom_schema: braze_events_test
   #extra_query_template_params:
   #  load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
   #  load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"

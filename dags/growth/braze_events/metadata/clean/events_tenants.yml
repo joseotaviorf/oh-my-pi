@@ -1,8 +1,8 @@
 database_name: datalake_braze_events_clean
 table_name: events_tenants
-owner: data-growth
-domain: growth
-description: This table contains details about event related/realized by tenants, e.g. disptaches or clicks.
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
+description: This table contains details about events related/realized by tenants, e.g. disptaches or clicks.
 columns:
   id:
     description: Unique code to identify an event (dispatch or interaction of the user with the communication).

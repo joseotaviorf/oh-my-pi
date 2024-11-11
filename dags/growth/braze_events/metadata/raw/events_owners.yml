@@ -1,5 +1,7 @@
 database_name: datalake_braze_events_raw
 table_name: events_owners
+owner: isadora.gallerani@quintoandar.com.br
+domain: Growth
 columns:
   id:
     tags:

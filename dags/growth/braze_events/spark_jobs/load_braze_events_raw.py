@@ -7,6 +7,7 @@ from pyspark.sql.functions import to_json, struct
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -20,7 +21,7 @@ from bietlejuice.base.spark import (
 )
 
 
-JOB_NAME = "load_braze_events_into_datalake"
+JOB_NAME = "load_braze_events_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -59,17 +60,22 @@ if __name__ == "__main__":
     parser.add_argument("environment")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
-    parser.add_argument("braze_bucket")
-    parser.add_argument("app_group")
     parser.add_argument("execution_date")
+    #parser.add_argument("load_start_date")
+    #parser.add_argument("load_end_date")
+    parser.add_argument("app_group")
     args = parser.parse_args()
 
     environment = args.environment
-    source = args.source
     datalake_bucket = args.datalake_bucket
-    braze_bucket = args.braze_bucket
-    app_group = args.app_group
+    source = args.source
     execution_date = args.execution_date
+    #load_start_date = args.load_start_date
+    #load_end_date = args.load_end_date
+    app_group = args.app_group
+
+    config_service = ConfigurationService(source)
+    braze_bucket = config_service.get_config("braze_events_bucket")
 
     logger.info(
         f"""
@@ -113,7 +119,9 @@ if __name__ == "__main__":
 
     for event in events:
         df = get_event_data(app_group_path, event, execution_date)
+
         if df:
+            logger.info("msg=Dataframe not empty, starting load...")
             partitions["event_type"] = event
 
             df = (
