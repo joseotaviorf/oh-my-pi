@@ -38,7 +38,8 @@ LEFT JOIN
     ON pe.event_type = p_det.event_name
 INNER JOIN
   dw_visit.dim_author_type AS at
-    ON vse.author_user_role = at.author_user_role
+    ON (vse.author_user_role = at.author_user_role
+        OR vse.author_user_role IS NULL AND at.author_user_role IS NULL)
     AND vse.author_user_type = at.author_type
     AND vse.channel = at.channel
     AND vse.on_behalf_of = at.on_behalf_of
