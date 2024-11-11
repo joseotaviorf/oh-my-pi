@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the enriched table for Sirena, getting all data about the manual messages and flat some jsons structs.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_general_photon_cluster

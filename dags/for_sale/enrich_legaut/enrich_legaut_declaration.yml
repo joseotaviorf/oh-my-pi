@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the table used by the product team to track their KR's.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_general_cluster

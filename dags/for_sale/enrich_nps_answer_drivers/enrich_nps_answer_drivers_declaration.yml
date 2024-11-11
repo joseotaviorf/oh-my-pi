@@ -7,7 +7,7 @@ dag:
     dag_purpose: Prepares [Tracksale](https://www.tracksale.co/) and EBDB ([Main's](https://github.com/quintoandar/main) database)
        data for business utilization. Tracksale is an external service that manages NPS data.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_general_cluster

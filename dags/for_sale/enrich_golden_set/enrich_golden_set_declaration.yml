@@ -8,7 +8,7 @@ dag:
       We want to validate the information we see in Vespúcio. To do this, Growth's Product and Technology teams and Rede QuintoAndar
       created a forms to collect condo (later, houses) data from employees, to gather correct information from these condos.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_min_memory_cluster

@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG creates the enriched table for Sale Visit, getting all data about the visit ForSale context that will be used in other enrichs and fact tables.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_2_fixed_workers_general_photon_cluster

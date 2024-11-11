@@ -6,7 +6,7 @@ dag:
     dag_purpose: |
        TQC referral process
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     sale_events_flow:

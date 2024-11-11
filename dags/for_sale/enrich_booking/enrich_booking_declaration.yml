@@ -9,7 +9,7 @@ dag:
       It'll track the user journey end to end with information about all booking status, changes, and the tenants.
       This DAG is triggered by Mediator and loads the table via full load.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: custom_cluster

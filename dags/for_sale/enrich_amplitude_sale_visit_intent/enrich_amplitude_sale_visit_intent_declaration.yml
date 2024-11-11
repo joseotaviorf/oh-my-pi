@@ -7,7 +7,7 @@ dag:
     dag_purpose: Enrich sale visit intent context events in Amplitude and load into Data Lake.
       This DAG enriches data coming from Amplitude events that have a Sale context and a visit intent type.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: incremental
   default_partitions:
