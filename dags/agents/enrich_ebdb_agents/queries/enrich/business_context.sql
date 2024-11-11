@@ -98,7 +98,6 @@ SELECT
         WHEN adbc.business_context = 'SALE_PRIMARY_MARKET' THEN 'SALE'
         ELSE adbc.business_context
     END AS business_context,
-    adh.is_active,
     COALESCE(MIN(adbc.date), MIN(adh.dt_started)) AS dt_started,
     COALESCE(MAX(adbc.date), MAX(adh.dt_ended)) AS dt_ended
 FROM

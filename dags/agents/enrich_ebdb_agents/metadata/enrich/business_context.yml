@@ -1,0 +1,37 @@
+---
+database_name: datalake_ebdb_agents
+table_name: business_context
+description: This table is the source of truth for the periods in which each agent acted in each business context.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id_agent_data
+    description: Agent unique identifier.
+  id_user:
+    lineage:
+      - datalake_ebdb_user.user.id_user
+    description: User unique identifier.
+  agent_type:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.agent_type
+    description: Type of the agent.
+    categories:
+      CheckUpLar: ''
+      SessaoFotos: ''
+      Visita: ''
+      Vistoria: ''
+      VistoriaQuarteirizada: ''
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.agent_data_business_contexts_served_aud.business_context
+    description: Business context served
+    categories:
+      RENT: For Rent business context
+      SALE: For Sale business context
+      REDE: Rede business context
+  dt_started:
+    description: Beginning of the period in which the business context and type of agent was or is valid
+  dt_ended:
+    description: End of the period in which the business context and agent type was or is valid
