@@ -22,7 +22,10 @@ SELECT
       'help_center_sub_triage_page_closed',
       'help_center_triage_channel_offer_chosen',
       'help_center_call_cancelled',
-      'help_center_call_exchanged_for_chat'
+      'help_center_call_exchanged_for_chat',
+      'chat_menu_item_clicked',
+      'help_center_call_channel_drawer_button_confirm',
+      'help_center_call_channel_drawer_button_back'
     ) THEN 'CALL IN APP'
     ELSE 'SHORTCUT CENTER'
   END AS event_from,
@@ -83,5 +86,8 @@ WHERE
     'help_center_sub_triage_page_closed',
     'help_center_triage_channel_offer_chosen',
     'help_center_call_cancelled',
-    'help_center_call_exchanged_for_chat'
+    'help_center_call_exchanged_for_chat',
+    'chat_menu_item_clicked',
+    'help_center_call_channel_drawer_button_confirm',
+    'help_center_call_channel_drawer_button_back'
   )
