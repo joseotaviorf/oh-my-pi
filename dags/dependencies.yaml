@@ -889,6 +889,7 @@ bietlejuice.dw_sale_visits:
   - bietlejuice.enrich_sale_visit:load-enrich-sale-visit
 bietlejuice.dw_satisfaction_rating:
   - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers
+  - bietlejuice.enrich_survicate:load-enrich-single-station-surveys
 bietlejuice.dw_search_session_event:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_rede_company:load-enrich-company-sks

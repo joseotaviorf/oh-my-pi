@@ -1,0 +1,57 @@
+---
+database_name: dw_satisfaction_rating
+table_name: fact_analyst_answers
+description: This table contains information about analyst's satisfaction responses. Its granularity is given by the sk_answer column.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_answer:
+    description: Unique identifier of the satisfaction response.
+    lineage:
+      - datalake_survicate.single_station_surveys.id_response
+  sk_analyst:
+    description: Unique identifier 
+    lineage:
+      - datalake_survicate.single_station_surveys.email
+  sk_survey:
+    description: Unique identifier of the satisfaction survey.
+    lineage:
+      - datalake_survicate.single_station_surveys.id_survey
+  facility_satisfaction:
+    description: Analyst satisfaction about how easy is to execute tasks in the new platform.
+    lineage:
+      - datalake_survicate.single_station_surveys.facility_satisfaction
+  time_satisfaction:
+    description: Analyst satisfaction about the time that takes executing tasks in the new platform.
+    lineage:
+      - datalake_survicate.single_station_surveys.time_satisfaction
+  support_satisfaction:
+    description: Analyst satisfaction about information and suppport inside the new platform.
+    lineage:
+      - datalake_survicate.single_station_surveys.support_satisfaction
+  improvements_suggestions:
+    description: Improvements suggestions given by respondent.
+    lineage:
+      - datalake_survicate.single_station_surveys.improvements_suggestions
+  ts_submitted:
+    description: Date the satisfaction response was submitted.
+    lineage:
+      - datalake_survicate.single_station_surveys.ts_submitted
+  week_month:
+    description: In which week of the month the survey response was submitted.
+    lineage:
+      - datalake_survicate.single_station_surveys.ts_submitted
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_satisfaction_rating.
+  year:
+    description: Year referring to the data loading day.
+    lineage:
+      - datalake_survicate.single_station_surveys.year
+  month:
+    description: Month referring to the data loading day.
+    lineage:
+      - datalake_survicate.single_station_surveys.month
+  day:
+    description: Day referring to the data loading day.
+    lineage:
+      - datalake_survicate.single_station_surveys.day

@@ -12,37 +12,46 @@ columns:
     description: Unique identifier of the satisfaction survey.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.id_survey
+      - datalake_survicate.single_station_surveys.id_survey
   service_type:
     description: Indicates the service that originated the satisfaction response.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.service_type
+      - datalake_survicate.single_station_surveys.service_type
   service_context:
     description: The context in which this service occurred.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.service_context
+      - datalake_survicate.single_station_surveys.service_context
   source_name:
     description: Satisfaction form source.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.source_name
+      - datalake_survicate.single_station_surveys.source_name
   survey_name:
     description: Name of the satisfaction form, used to identify different forms from the same source, if they have a description.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.survey_name
+      - datalake_survicate.single_station_surveys.survey_name
   ts_first_submitted:
     description: Date when the survey was first submitted by the respondent.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.ts_submitted
+      - datalake_survicate.single_station_surveys.ts_submitted
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_satisfaction_rating.
   year:
     description: Year referring to the data loading day.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.ts_submitted
+      - datalake_survicate.single_station_surveys.ts_submitted
   month:
     description: Month referring to the data loading day.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.ts_submitted
+      - datalake_survicate.single_station_surveys.ts_submitted
   day:
     description: Day referring to the data loading day.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.ts_submitted
+      - datalake_survicate.single_station_surveys.ts_submitted
