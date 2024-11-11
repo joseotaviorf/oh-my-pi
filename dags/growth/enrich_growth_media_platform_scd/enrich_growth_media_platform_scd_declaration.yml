@@ -20,23 +20,23 @@ workflow:
   tables_customization:
     campaign_name_history:  
       merge_on: ['merge_key', 'is_current', 'origin']
-      z_order_by: ['id_campaign', 'start_date']
+      z_order_by: ['id_campaign', 'dt_start']
       vacuum_retention_hours: 168
       when_matched_update_condition: "source.merge_key = target.id_campaign AND source.origin = target.origin AND target.is_current = true AND source.campaign_name <> target.campaign_name"
       when_not_matched_insert_condition: "source.merge_key IS NULL"
  
       when_matched_operation: {
         "is_current": 'False', 
-        "end_date": "source.start_date"
+        "dt_end": "source.dt_start"
       }
       when_not_matched_operation: {
         "merge_key": "source.id_campaign",
         "id_campaign": "source.id_campaign", 
         "campaign_name": "source.campaign_name",
         "origin": "source.origin",
-        "start_date": "source.start_date", 
-        "end_date": "source.end_date", 
-        "is_current": "source.is_current"
+        "is_current": "source.is_current",
+        "dt_start": "source.dt_start", 
+        "dt_end": "source.dt_end"
       }
 cluster:
   type: databricks_13_3_med_general_cluster
