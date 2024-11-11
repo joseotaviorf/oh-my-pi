@@ -20,6 +20,8 @@ workflow:
   tables_customization:
     attachment:
       clean_table_name: attachment
+    boleto:
+      clean_table_name: invoice
     internalization:
       clean_table_name: internalization
     non_payment_report_invoice:
