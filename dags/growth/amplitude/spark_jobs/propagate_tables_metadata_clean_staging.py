@@ -6,8 +6,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service import ServiceEnum
-from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
-from bietlejuice.base.spark import BaseSparkContext
+from bietlejuice.base.spark import BaseSparkContext, SparkMetastoreHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.metadata_propagator_pipeline.full_content_lineage_pipeline import (
     FullContentLineagePipeline,

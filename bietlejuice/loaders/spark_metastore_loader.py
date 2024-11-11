@@ -1,7 +1,6 @@
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.services.schema_service import SchemaService
-from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 
 logger = QuintoAndarLogger("SparkMetastoreLoader")
 
@@ -113,18 +112,6 @@ class SparkMetastoreLoader:
                 database_name, table_name
             )
         )
-
-        # We want to sync to Unity Catalog when possible
-        # Except if the table is partitioned. We're going to call the sync in create_new_partitions_from_df,
-        # not here.
-        if (
-            UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-            and not UnityCatalogHelper.is_default_catalog_using_unity()
-            and not partitions
-        ):
-            UnityCatalogHelper.sync_table_to_unity_catalog(
-                f"{database_name}.{table_name}"
-            )
 
     def is_table_in_metastore(self, database_name, table_name):
         return table_name in self.metastore_service.get_table_names(database_name)
