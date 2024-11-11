@@ -1,0 +1,41 @@
+---
+dag:
+  name: enrich_growth_media_platform_scd
+  schedule_start_date: 2024, 10, 25
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for loading campaign data into the enriched layer
+      and maintaining historical records using SCD type 2 logic for growth campaigns.
+
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: growth_media_platform
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, yesterday_ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"  
+  tables_customization:
+    campaign_name_history:  
+      merge_on: ['merge_key', 'is_current', 'origin']
+      z_order_by: ['id_campaign', 'start_date']
+      vacuum_retention_hours: 168
+      when_matched_update_condition: "source.merge_key = target.id_campaign AND source.origin = target.origin AND target.is_current = true AND source.campaign_name <> target.campaign_name"
+      when_not_matched_insert_condition: "source.merge_key IS NULL"
+ 
+      when_matched_operation: {
+        "is_current": 'False', 
+        "end_date": "source.start_date"
+      }
+      when_not_matched_operation: {
+        "merge_key": "source.id_campaign",
+        "id_campaign": "source.id_campaign", 
+        "campaign_name": "source.campaign_name",
+        "origin": "source.origin",
+        "start_date": "source.start_date", 
+        "end_date": "source.end_date", 
+        "is_current": "source.is_current"
+      }
+cluster:
+  type: databricks_13_3_med_general_cluster

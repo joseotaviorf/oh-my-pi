@@ -1820,6 +1820,16 @@ bietlejuice.enrich_growth_manual_daily_costs:
   - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules
   - bietlejuice.gsheets_growth_intraday:done-clean-marketing-manual-costs
   - bietlejuice.gsheets_growth_intraday:done-clean-marketing-manual-costs-name-convetion
+bietlejuice.enrich_growth_media_platform_scd:
+  - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
+  - bietlejuice.facebook_insights:load-clean-facebook-insights
+  - bietlejuice.google_ads:load-clean-ads-performance
+  - bietlejuice.google_ads:load-clean-campaigns-performance
+  - bietlejuice.google_ads:load-clean-keywords-performance
+  - bietlejuice.google_ads:load-clean-videos-performance
+  - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
+  - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
+  - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
 bietlejuice.enrich_growth_taxonomy:
   - bietlejuice.gsheets_growth:done-clean-dict-taxonomy-supply
   - bietlejuice.gsheets_growth:done-clean-taxonomy-levels-values
