@@ -1,49 +1,4 @@
-WITH base_phones AS (
-    SELECT DISTINCT
-        p.uuid_person,
-        ci.contact_info AS phone
-    FROM
-        datalake_rental_guarantee_platform_clean.company co
-    LEFT JOIN
-        datalake_company_clean.company c
-          ON c.uuid_company = co.uuid_company
-    LEFT JOIN
-        datalake_company_clean.member_profile mp
-          ON c.id = mp.id_company
-    LEFT JOIN
-        datalake_person_clean.person p
-          ON mp.uuid_person = p.uuid_person
-    LEFT JOIN
-        datalake_person_clean.contact_info ci
-          ON p.id = ci.id_person
-          AND ci.category = 'PHONE'
-),
-contact_info AS (
-    SELECT DISTINCT
-        b.id_broker,
-        b.broker_name,
-        b.broker_comercial_name,
-        b.cnpj AS document,
-        u.uuid_user AS id_realtor,
-        u.name AS realtor,
-        u.email,
-        t.phone AS phone,
-        u.user_role AS profile
-    FROM
-        datalake_velo.propose p
-    LEFT JOIN
-        datalake_velo.broker b
-          ON b.id_broker = p.id_broker
-    LEFT JOIN
-        datalake_velo.user u
-          ON u.id_user = p.id_agent
-    LEFT JOIN
-        base_phones t
-          ON t.uuid_person = u.uuid_user
-    WHERE
-        u.user_role = 'admin'
-),
-realstate_production_timeline AS (
+WITH realstate_production_timeline AS (
     SELECT
         b.id_broker,
         COUNT(DISTINCT CASE WHEN dt_contract_started IS NOT NULL AND is_direct_billing = true THEN id_propose END) AS contracts,
@@ -268,15 +223,7 @@ final_base AS (
     ORDER BY month_ref
 )
 SELECT
-    f.id_broker,
-    f.id_realtor,
-    f.broker_name,
-    f.broker_comercial_name,
-    f.document,
-    f.realtor,
-    f.email,
-    f.phone,
-    f.profile,
+    m.id_broker,
     m.contracts,
     m.p_generated_at_month,
     m.p2c_at_month,
@@ -304,17 +251,8 @@ SELECT
     m.avg_proposes_gen_w6,
     m.avg_contracts_gen_w3,
     m.avg_contracts_gen_w6,
-    CASE
-        WHEN (m.proposes_gen_at_M_1 + m.proposes_gen_at_M_2) > 0 THEN 'nps_true'
-        WHEN (m.proposes_gen_at_M_1 + m.proposes_gen_at_M_2) = 0 THEN 'nps_lost'
-    END AS nps_type,
     m.mob_imob,
     m.dt_imob_activation,
     m.month_ref AS dt_reference
 FROM
     final_base m
-LEFT JOIN
-    contact_info f ON CAST(f.id_broker AS INT) = CAST(m.id_broker AS INT)
-WHERE
-    ((m.proposes_gen_at_M_1 + m.proposes_gen_at_M_2) > 0 AND f.email IS NOT NULL)
-    OR ((m.proposes_gen_at_M_1 + m.proposes_gen_at_M_2) = 0 AND f.email IS NOT NULL AND m.mob_imob > 3)

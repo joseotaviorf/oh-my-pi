@@ -8,38 +8,6 @@ columns:
     description: "Broker's identification number (ID)"
     lineage:
       - datalake_velo.broker.id_broker
-  id_realtor:
-    description: "Realtor's identification number (ID)"
-    lineage:
-      - datalake_velo.user.uuid_user
-  broker_name:
-    description: "Broker's name"
-    lineage:
-      - datalake_velo.broker.broker_name
-  broker_comercial_name:
-    description: "Broker's comercial name"
-    lineage:
-      - datalake_velo.broker.broker_comercial_name
-  document:
-    description: "Broker's document number (CNPJ)"
-    lineage:
-      - datalake_velo.broker.cnpj
-  realtor:
-    description: "Realtor's full name"
-    lineage:
-      - datalake_velo.user.name
-  email:
-    description: "Realtor's e-mail"
-    lineage:
-      - datalake_velo.user.email
-  phone:
-    description: "Broker's phone"
-    lineage:
-      - datalake_person_clean.contact_info.contact_info
-  profile:
-    description: "User's role in Velo's platform"
-    lineage:
-      - datalake_velo.user.user_role
   contracts:
     description: "Number of active contracts for the corresponding broker"
   p_generated_at_month:
@@ -94,8 +62,6 @@ columns:
     description: "Average of all created contracts on the last 3 months for the corresponding broker"
   avg_contracts_gen_w6:
     description: "Average of all created contracts on the last 6 months for the corresponding broker"
-  nps_type:
-    description: "Type of NPS (true or lost)"
   mob_imob:
     description: "MOB according to the first propose started for the corresponding broke"
   dt_imob_activation:
