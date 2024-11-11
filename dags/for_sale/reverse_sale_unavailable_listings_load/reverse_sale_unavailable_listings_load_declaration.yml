@@ -1,0 +1,15 @@
+dag:
+  name: reverse_sale_unavailable_listings_load
+  schedule_start_date: 2022,7,12
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      This DAG consolidates data from various sources on the demand for listings and their behavior and creates tables that generate a list of possibly unavailable listings.
+workflow:
+  type: load
+  layer: reverse
+  custom_schema: sale_unavailable_listings
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+cluster:
+  type: databricks_12_2_xmin_memory_cluster
