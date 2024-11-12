@@ -2,7 +2,7 @@ dag:
   name: dw_sale_offer_users
   owner: Data ForSale
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: sale
 cluster:

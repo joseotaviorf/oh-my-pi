@@ -1,19 +1,21 @@
 ---
-table_name: dw_sale_staging.fact_listing_price_changes
+table_name: dw_sale.fact_daily_ongoing_listing
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than_or_equal_to: 641710 
+    greater_than: 51000000
 column_level_validations:
+  sk_snapshot:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_snapshot_date:
+    is_complete:
+      severity_level: Error
+  sk_sale_listing:
+    is_complete:
+      severity_level: Error
   sk_house:
-    is_complete:
-      severity_level: Error
-  sk_owner:
-    is_complete:
-      severity_level: Error
-  sk_price_started_date:
-    is_complete:
-      severity_level: Error
-  price:
     is_complete:
       severity_level: Error

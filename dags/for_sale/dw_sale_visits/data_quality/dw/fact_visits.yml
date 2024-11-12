@@ -1,5 +1,5 @@
 ---
-table_name: dw_sale_staging.fact_visits
+table_name: dw_sale.fact_visits
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:

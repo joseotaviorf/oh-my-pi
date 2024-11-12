@@ -1,0 +1,24 @@
+---
+table_name: dw_sale.dim_offer
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 50000
+    severity_level: Error
+column_level_validations:
+  sk_offer:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sale_price:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  ts_load:
+    has_completeness:
+      greater_than: 0.99  # Won't be 100% because of the default row
+      severity_level: Error

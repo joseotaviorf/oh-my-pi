@@ -1,9 +1,9 @@
 ---
-table_name: dw_sale_staging.dim_sale_agreement
+table_name: dw_sale.fact_offers
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 10000
+    greater_than: 50000
     severity_level: Error
 column_level_validations:
   sk_offer:
@@ -12,6 +12,5 @@ column_level_validations:
     is_unique:
       severity_level: Error
   ts_load:
-    has_completeness:
-      greater_than: 0.99  # Won't be 100% because of the default row
+    is_complete:
       severity_level: Error

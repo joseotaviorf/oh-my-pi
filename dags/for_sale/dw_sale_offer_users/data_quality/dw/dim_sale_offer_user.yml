@@ -1,11 +1,16 @@
 ---
-table_name: dw_sale_staging.fact_sale_offer_users
+table_name: dw_sale.dim_sale_offer_user
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
     greater_than_or_equal_to: 70000
     severity_level: Error
 column_level_validations:
-  sk_sale_offer_user:
-    is_complete:
+  sk_user_sales_flow:
+    has_completeness:
+      greater_than: 0.99
+    is_unique:
       severity_level: Error
+  name:
+    has_completeness:
+      greater_than: 0.99
