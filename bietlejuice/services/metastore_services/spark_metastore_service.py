@@ -1,10 +1,12 @@
 import copy
+import importlib
 from collections import OrderedDict
 
 from pyspark.sql.functions import col
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.services.metastore_services.metastore_service import MetastoreService
+
 
 logger = QuintoAndarLogger("SparkMetastoreService")
 
@@ -310,3 +312,25 @@ class SparkMetastoreService(MetastoreService):
             f"m=create_external_table, table={database_name}.{table_name}, msg=the "
             f"table was created successfully in the metastore."
         )
+
+    def create_new_partitions_from_df(
+        self, database_name, table_name, df, partition_cols, parallelism=1
+    ):
+        super().create_new_partitions_from_df(
+            database_name, table_name, df, partition_cols, parallelism
+        )
+
+        # Import needs to be internal, otherwise this class is not serializable
+        # it must be sereializable, since it is implicitly imported by a Spark job that uses parallelize
+        # (sync_metadata.py)
+        unity_catalog_helper = importlib.import_module(
+            "bietlejuice.base.spark.unity_catalog_helper"
+        ).UnityCatalogHelper
+        if (
+            unity_catalog_helper.is_cluster_unity_catalog_enabled()
+            and not unity_catalog_helper.is_default_catalog_using_unity()
+            and bool(partition_cols)
+        ):
+            unity_catalog_helper.sync_table_to_unity_catalog(
+                f"{database_name}.{table_name}"
+            )
