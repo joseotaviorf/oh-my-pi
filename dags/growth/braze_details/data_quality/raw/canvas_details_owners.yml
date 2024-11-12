@@ -6,7 +6,7 @@ table_level_validations:
     greater_than: 0
     severity_level: Error
 column_level_validations:
-  id_canvas:
+  canvas_id:
     is_complete:
       severity_level: Error
     is_unique:
