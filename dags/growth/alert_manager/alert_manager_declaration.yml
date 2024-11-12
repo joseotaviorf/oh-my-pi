@@ -1,0 +1,29 @@
+dag:
+  name: alert_manager
+  owner: Data Growth
+  schedule_start_date: 2019, 1, 1
+  schedule_interval: "0 6 * * *"
+  documentation: 
+    dag_purpose: |    
+      This DAG collects data from AlertManager, a tool to create alerts from Prometheus monitoring data. Currently, the data are collected from S3 bucket.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_alert_manager_raw
+  default_partitions: ['year', 'month', 'day']
+  default_extraction_type: incremental
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+    - "{load_start_date}" # load_start_date
+    - "{load_end_date}" # load_end_date
+  tables_customization:
+    alerts: {}
+    alerts_databricks_cluster: 
+      raw_table_dependency: alerts
+cluster:
+  type: databricks_13_3_min_general_cluster
+  custom_configurations:
+    spark_conf:
+      spark.sql.caseSensitive: "true"

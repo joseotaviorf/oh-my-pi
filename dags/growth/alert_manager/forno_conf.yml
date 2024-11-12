@@ -1,5 +1,0 @@
----
-partition_cols: [year, month, day]
-
-spark_conf:
-  spark.sql.caseSensitive: "true"
