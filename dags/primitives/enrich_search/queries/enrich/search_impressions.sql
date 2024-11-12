@@ -48,6 +48,7 @@ union_spvs AS (
         AND get_json_object(event_properties, '$.search_results_list') IS NOT NULL
         AND get_json_object(event_properties, '$.search_results_list') <> '[]'
         AND get_json_object(user_properties, '$.country') = 'BR'
+        AND id_user IS NOT NULL
 
     UNION ALL
 
@@ -69,6 +70,7 @@ union_spvs AS (
         AND get_json_object(event_properties, '$.search_results_list') IS NOT NULL
         AND get_json_object(event_properties, '$.search_results_list') <> '[]'
         AND get_json_object(user_properties, '$.country') = 'BR'
+        AND id_user IS NOT NULL
 ),
 
 -----------------
@@ -466,7 +468,16 @@ SELECT
             'click', COALESCE(clicks.click, 0),
             'offer', CASE WHEN COALESCE(rent_flow.ts_offer, sale_flow.ts_offer) >= searches.ts_event THEN 1 ELSE 0 END,
             'visit_completed', CASE WHEN COALESCE(rent_flow.ts_visit_completed, sale_flow.ts_visit_completed) >= searches.ts_event THEN 1 ELSE 0 END,
-            'contract_signed', CASE WHEN COALESCE(rent_flow.ts_contract_signed, sale_flow.ts_contract_signed) >= searches.ts_event THEN 1 ELSE 0 END
+            'contract_signed', CASE WHEN COALESCE(rent_flow.ts_contract_signed, sale_flow.ts_contract_signed) >= searches.ts_event THEN 1 ELSE 0 END,
+            'relevant_search',
+            MAX(
+                CASE WHEN (
+                    clicks.click = 1
+                    OR COALESCE(rent_flow.ts_offer, sale_flow.ts_offer) >= searches.ts_event
+                    OR COALESCE(rent_flow.ts_visit_completed, sale_flow.ts_visit_completed) >= searches.ts_event
+                    OR COALESCE(rent_flow.ts_contract_signed, sale_flow.ts_contract_signed) >= searches.ts_event
+                ) THEN 1 ELSE 0 END
+            ) OVER(PARTITION BY searches.id_search)
         )
     ) AS metrics,
 
