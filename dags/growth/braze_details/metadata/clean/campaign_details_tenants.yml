@@ -1,8 +1,8 @@
 database_name: datalake_braze_details_clean
 table_name: campaign_details_tenants
-owner: data-growth
-domain: growth
-description: Relevant information on a specified campaign.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+description: Table that consolidates Tenants campaign details from Braze.
 columns:
   id_campaign:
     description: Campaign ID as given by the Braze Platform.

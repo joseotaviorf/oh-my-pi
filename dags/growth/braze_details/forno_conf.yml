@@ -1,8 +1,0 @@
----
-app_groups_list:
-  - tenants
-  - owners
-  - indica_ai
-identifiers:
-  - campaign
-  - canvas

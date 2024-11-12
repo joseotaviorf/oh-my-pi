@@ -1,52 +1,74 @@
 database_name: datalake_braze_details_clean
 table_name: campaign_details_indica_ai
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+description: Table that consolidates IndicaAi campaign details from Braze.
 columns:
   id_campaign:
+    description: Campaign ID as given by the Braze Platform.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.campaign_id
   campaign_name:
+    description: The campaign name as defined in Braze Platform.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.name
   campaign_description:
+    description: The campaign description as defined in Braze Platform.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.description
   country_code:
+    description: Country code the campaign belongs to.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.name
   schedule_type:
+    description: Describes what triggers the campaign to be sent.
+    categories:
+      action_based: When a campaign is sent after a user completes a certain event.
+      api_triggered: When a campaign is sent after a API trigger.
+      time_based: When a campaign is sent in a scheduled time.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.schedule_type
   tags:
+    description: The tag names associated with the campaign.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.tags
   journey_step:
+    description: The journey step associated with the campaign.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.tags
-    description: The journey step associated with the campaign.
   channels:
+    description: The list of channels to send via.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.channels
   conversion_behaviors:
+    description: Array with information about each conversion event behavior set for the campaign.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.conversion_behaviors
   messages:
+    description: JSON with information about each message.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.messages
   archived:
+    description: Whether the campaign is archived.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.archived
   draft:
+    description: Whether this campaign is a draft.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.draft
   ts_last_sent:
+    description: Timestamp of when the campaign was send for the last time.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.last_sent
   ts_first_sent:
+    description: Timestamp of when the campaign was send for the first time.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.first_sent
   ts_created:
+    description: Timestamp of when the campaign was created.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.created_at
   ts_updated:
+    description: Timestamp of when the campaign was last updated.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.updated_at

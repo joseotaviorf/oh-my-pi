@@ -1,3 +1,4 @@
+import ast
 import logging
 
 from argparse import ArgumentParser
@@ -15,7 +16,7 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat, BaseDBUtils, sc
 
 
-JOB_NAME = "load_braze_details_into_datalake"
+JOB_NAME = "load_braze_details_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -85,25 +86,18 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("app_group")
-    parser.add_argument("identifier")
-    parser.add_argument("execution_datetime")
+    parser.add_argument("identifiers")
     args = parser.parse_args()
 
     environment = args.environment
     source = args.source
     datalake_bucket = args.datalake_bucket
     app_group = args.app_group
-    identifier = args.identifier
-    execution_datetime = args.execution_datetime
+    identifiers = ast.literal_eval(args.identifiers)
 
     logger.info(
-        f"m={JOB_NAME}, "
-        f"environment={environment}, "
-        f"source={source}, "
-        f"datalake_bucket={datalake_bucket}, "
-        f"app_group={app_group}, "
-        f"identifier={identifier}, "
-        f"msg=Spark job arguments"
+        f"""m={JOB_NAME}, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
+        app_group={app_group}, identifiers={identifiers}"""
     )
 
     base_dbutils = BaseDBUtils()
@@ -128,36 +122,40 @@ if __name__ == "__main__":
     )
     instance = "US-03"
     endpoint = "details"
-    table_name = f"{identifier}_{endpoint}_{app_group}"
 
     braze_client = BrazeClient(api_token=api_token, instance=instance)
     factory = EndpointFactory(braze_client)
-    list_consumer = factory.build(identifier, "list")
-    consumer = factory.build(identifier, endpoint)
 
-    id_list = list_consumer.sync(reduce_key="id")
+    for identifier in identifiers:
 
-    chunk_size = 100
-    id_chunks = [
-        id_list[x: x + chunk_size] for x in range(0, len(id_list), chunk_size)
-    ]
+      table_name = f"{identifier}_{endpoint}_{app_group}"
+      list_consumer = factory.build(identifier, "list")
+      consumer = factory.build(identifier, endpoint)
 
-    raw_results = [consumer.sync(id_values=chunk, executor_type="spark", spark_context=sc) for chunk in id_chunks]
-    results = [item for sublist in raw_results for item in sublist]
+      id_list = list_consumer.sync(reduce_key="id")
 
-    if len(results) > 0:
-        df = _schema_enforcement(identifier, results)
-        s3_loader.load_df(
-            df=df, s3_path=f"{filesystem_path}{table_name}", format_options=file_type
-        )
+      chunk_size = 100
+      id_chunks = [
+          id_list[x: x + chunk_size] for x in range(0, len(id_list), chunk_size)
+      ]
 
-        spark_metastore_loader.update_metastore(
-            df=df,
-            database_name=database_name,
-            table_name=table_name,
-            format_options=file_type,
-            database_location=filesystem_path,
-            force_recreate=True,
-        )
+      raw_results = [consumer.sync(id_values=chunk, executor_type="spark", spark_context=sc) for chunk in id_chunks]
+      results = [item for sublist in raw_results for item in sublist]
 
-        spark_metastore_service.refresh_table(database_name, table_name)
+      if len(results) > 0:
+          logger.info("msg=Starting dataframe load.")
+          df = _schema_enforcement(identifier, results)
+          s3_loader.load_df(
+              df=df, s3_path=f"{filesystem_path}{table_name}", format_options=file_type
+          )
+
+          spark_metastore_loader.update_metastore(
+              df=df,
+              database_name=database_name,
+              table_name=table_name,
+              format_options=file_type,
+              database_location=filesystem_path,
+              force_recreate=True,
+          )
+
+          spark_metastore_service.refresh_table(database_name, table_name)

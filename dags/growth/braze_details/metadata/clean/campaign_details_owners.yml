@@ -1,22 +1,35 @@
 database_name: datalake_braze_details_clean
 table_name: campaign_details_owners
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+description: Table that consolidates Owners campaign details from Braze.
 columns:
   id_campaign:
+    description: Campaign ID as given by the Braze Platform.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.campaign_id
   campaign_name:
+    description: The campaign name as defined in Braze Platform.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.name
   campaign_description:
+    description: The campaign description as defined in Braze Platform.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.description
   country_code:
+    description: Country code the campaign belongs to.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.name
   schedule_type:
+    description: Describes what triggers the campaign to be sent.
+    categories:
+      action_based: When a campaign is sent after a user completes a certain event.
+      api_triggered: When a campaign is sent after a API trigger.
+      time_based: When a campaign is sent in a scheduled time.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.schedule_type
   tags:
+    description: The tag names associated with the campaign.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.tags
   journey_step:
@@ -24,29 +37,38 @@ columns:
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.tags
   channels:
+    description: The list of channels to send via.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.channels
   conversion_behaviors:
+    description: Array with information about each conversion event behavior set for the campaign.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.conversion_behaviors
   messages:
+    description: JSON with information about each message.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.messages
   archived:
+    description: Whether the campaign is archived.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.archived
   draft:
+    description: Whether this campaign is a draft.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.draft
   ts_last_sent:
+    description: Timestamp of when the campaign was send for the last time.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.last_sent
   ts_first_sent:
+    description: Timestamp of when the campaign was send for the first time.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.first_sent
   ts_created:
+    description: Timestamp of when the campaign was created.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.created_at
   ts_updated:
+    description: Timestamp of when the campaign was last updated.
     lineage:
       - datalake_braze_details_raw.campaign_details_owners.updated_at

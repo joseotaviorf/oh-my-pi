@@ -1,31 +1,49 @@
 database_name: datalake_braze_details_clean
 table_name: canvas_details_owners
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+description: Table that consolidates Owners canvas details from Braze.
 columns:
   id_canvas:
+    description: Canvas ID as given by the Braze Platform.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.canvas_id
   canvas_name:
+    description: The canvas name as defined in Braze Platform.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.name
   canvas_description:
+    description: The Canvas description as defined in Braze Platform.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.description
   country_code:
+    description: Country code the canvas belongs to.
     lineage:
       - datalake_braze_details_raw.campaign_details_indica_ai.name
   variants:
+    description: A variant is the path each customer follows on their journey. Canvas supports up to eight variants with a control group.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.variants
   schedule_type:
+    description: Describes what triggers the canvas to be sent.
+    categories:
+      action_based: When a canvas is sent after an user completes a certain event.
+      api_triggered: When a canvas is sent after an API trigger.
+      time_based: When a canvas is sent in a scheduled time.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.schedule_type
   steps:
+    description: A step in Canvas is a marketing decision point that determines the user journey.
+      Within a step, it can be set triggers or schedule delivery, refine targeting by adding filters
+      or marking exception events and add channels from email to push to webhooks.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.steps
   channels:
+    description: Array of step channels used with Canvas.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.channels
   tags:
+    description: The tag names associated with the canvas.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.tags
   journey_step:
@@ -33,20 +51,26 @@ columns:
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.tags
   archived:
+    description: Whether the Canvas is archived.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.archived
   draft:
+    description: Whether this Canvas is a draft.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.draft
   ts_first_entry:
+    description: Timestamp of when the date of first entry.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.first_entry
   ts_last_entry:
+    description: Timestamp of when the date of last entry.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.last_entry
   ts_created:
+    description: Timestamp of when the canvas was created.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.created_at
   ts_updated:
+    description: Timestamp of when the canvas was last updated.
     lineage:
       - datalake_braze_details_raw.canvas_details_owners.updated_at

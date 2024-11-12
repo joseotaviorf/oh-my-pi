@@ -1,8 +1,8 @@
 database_name: datalake_braze_details_clean
 table_name: canvas_details_tenants
-owner: data-growth
-domain: growth
-description: Metadata about a Canvas, such as the name, time created, current status, and more.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+description: Table that consolidates Tenants canvas details from Braze.
 columns:
   id_canvas:
     description: Canvas ID as given by the Braze Platform.
@@ -27,8 +27,8 @@ columns:
   schedule_type:
     description: Describes what triggers the canvas to be sent.
     categories:
-      action_based: When a canvas is sent after a user completes a certain event.
-      api_triggered: When a canvas is sent after a API trigger.
+      action_based: When a canvas is sent after an user completes a certain event.
+      api_triggered: When a canvas is sent after an API trigger.
       time_based: When a canvas is sent in a scheduled time.
     lineage:
       - datalake_braze_details_raw.canvas_details_tenants.schedule_type
