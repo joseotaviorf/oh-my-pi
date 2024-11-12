@@ -224,47 +224,88 @@ get_active_contract_per_credit_analysis AS (
     COUNT(DISTINCT last_active_contract) AS number_of_contracts
   FROM
     proposal_contract_label
-  GROUP BY sk_credit_analysis
+  GROUP BY
+    sk_credit_analysis
+),
+get_retenant_policy_report AS (
+  SELECT
+    id_external,
+    average_retenants_score,
+    proponent_group_class_detail,
+    is_retenant AS is_retenant_policy_report,
+    retenant_classification
+  FROM
+    datalake_sorting_hat.policy_report
+),
+add_retenant_historical_tags AS (
+  SELECT
+    pcl.sk_credit_analysis,
+    pcl.last_active_contract,
+    cpca.number_of_contracts,
+    pcl.contract_age,
+    CASE
+      WHEN(
+        pcl.main_proponent_with_more_proponents_in_proposal = "retenant"
+        OR pcl.main_proponent_with_different_proponents_in_proposal = "retenant"
+        OR pcl.main_proponent_with_fewer_proponents_in_proposal = "retenant"
+      ) THEN "new_group_same_main_proponent"
+      WHEN pcl.main_proponent = "retenant"
+      AND pcl.equal_proponents_in_proposal = "retenant" THEN "same_group_same_main_proponent"
+      WHEN pcl.main_proponent = "retenant" THEN "main_proponent_only"
+      WHEN pcl.any_proponent = "retenant" THEN "group_member_only"
+      ELSE "newcostumer"
+    END AS retenant_type,
+    pcl.any_proponent,
+    pcl.main_proponent,
+    pcl.main_proponent_with_more_proponents_in_proposal,
+    pcl.main_proponent_with_different_proponents_in_proposal,
+    pcl.main_proponent_with_fewer_proponents_in_proposal,
+    pcl.equal_proponents_in_proposal,
+    pcl.retenant_policy,
+    CASE
+      WHEN pcl.main_proponent = "retenant" THEN TRUE
+      WHEN pcl.any_proponent = "retenant" THEN TRUE
+      ELSE FALSE
+    END AS is_retenant,
+    pcl.dt_contract_annulment,
+    pcl.ts_proposal_created,
+    pcl.ts_last_contract_created,
+    NOW() AS ts_load
+  FROM
+    proposal_contract_label AS pcl
+    LEFT JOIN get_active_contract_per_credit_analysis AS cpca ON cpca.sk_credit_analysis = pcl.sk_credit_analysis
+    AND pcl.sk_credit_analysis IS NOT NULL QUALIFY ROW_NUMBER() OVER (
+      PARTITION BY pcl.sk_credit_analysis
+      ORDER BY
+        pcl.ts_last_contract_created DESC
+    ) = 1
 )
 SELECT
-  pcl.sk_credit_analysis,
-  pcl.last_active_contract,
-  cpca.number_of_contracts,
-  pcl.contract_age,
-  CASE 
-    WHEN( pcl.main_proponent_with_more_proponents_in_proposal = "retenant" 
-    OR    pcl.main_proponent_with_different_proponents_in_proposal = "retenant" 
-    OR    pcl.main_proponent_with_fewer_proponents_in_proposal = "retenant" )
-      THEN  "new_group_same_main_proponent"
-    WHEN  pcl.main_proponent = "retenant" 
-    AND   pcl.equal_proponents_in_proposal = "retenant"
-      THEN "same_group_same_main_proponent"
-    WHEN  pcl.main_proponent = "retenant"
-      THEN "main_proponent_only"
-    WHEN  pcl.any_proponent = "retenant"
-      THEN "group_member_only"
-    ELSE  "newcustomer"
-  END AS retenant_type,
-  pcl.any_proponent,
-  pcl.main_proponent,
-  pcl.main_proponent_with_more_proponents_in_proposal,
-  pcl.main_proponent_with_different_proponents_in_proposal,
-  pcl.main_proponent_with_fewer_proponents_in_proposal,
-  pcl.equal_proponents_in_proposal,
-  pcl.retenant_policy,
-  CASE 
-    WHEN pcl.main_proponent = "retenant" THEN TRUE
-    WHEN pcl.any_proponent  = "retenant" THEN TRUE
-    ELSE FALSE
+  ht.sk_credit_analysis,
+  ht.last_active_contract,
+  ht.number_of_contracts,
+  ht.contract_age,
+  ht.retenant_type,
+  ht.any_proponent,
+  ht.main_proponent,
+  ht.main_proponent_with_more_proponents_in_proposal,
+  ht.main_proponent_with_different_proponents_in_proposal,
+  ht.main_proponent_with_fewer_proponents_in_proposal,
+  ht.equal_proponents_in_proposal,
+  ht.retenant_policy,
+  pr.retenant_classification,
+  CASE
+    WHEN pr.is_retenant_policy_report IS NOT NULL THEN pr.is_retenant_policy_report
+    ELSE ht.is_retenant
   END AS is_retenant,
-  pcl.dt_contract_annulment,
-  pcl.ts_proposal_created,
-  pcl.ts_last_contract_created,
-  NOW() AS ts_load
+  pr.average_retenants_score,
+  pr.proponent_group_class_detail,
+  ht.dt_contract_annulment,
+  ht.ts_proposal_created,
+  ht.ts_last_contract_created,
+  ht.ts_load
 FROM
-  proposal_contract_label AS pcl
-LEFT JOIN
-  get_active_contract_per_credit_analysis AS cpca
-    ON cpca.sk_credit_analysis = pcl.sk_credit_analysis
-WHERE pcl.sk_credit_analysis IS NOT NULL
-QUALIFY ROW_NUMBER() OVER (PARTITION BY pcl.sk_credit_analysis ORDER BY pcl.ts_last_contract_created DESC) = 1
+  add_retenant_historical_tags AS ht
+  LEFT JOIN
+    get_retenant_policy_report AS pr
+      ON pr.id_external = ht.id_proposal

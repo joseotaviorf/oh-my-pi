@@ -28,6 +28,10 @@ columns:
       same_group_same_main_proponent: "All the group is retenant."
       main_proponent_only: "Only the main proponent in the proposal is retenant."
       group_member_only: "Only a group member is retenant."
+  proponent_group_class_detail:
+    description: "Group and subgroup of the proponent"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.full_type
   any_proponent:
     description: "Classification of the proposal based on the proponents CPF and the previous contract, if applied. If any proponent present in the proposal has ever signed a contract with QuintoAndar, the proposal is classified as 'retenant'. Otherwise none of the proponents has ever signed a contract, which means that they are new users."
   main_proponent:
@@ -42,8 +46,21 @@ columns:
     description: "Classification of the proposal based on the proponents CPF and the previous contract, if applied. If the main proponent present in the proposal has ever signed a contract with QuintoAndar, and all proponents in the proposal are the same as in the previous one, this column is classified as 'retenant'. Otherwise it is classified as new user."
   retenant_policy:
     description: "Indicates which policy was applied to the proposal: the new retenant policy or the old one. All proposals created before 2023-12-06 are classified as 'old_retenant_policy'."
+  retenant_classification:
+    description: "Retenants classification based on their score and previous experience with 5A (any pending bills, credit experience, etc). It is null for new users and historical data in which de retenant policy was not implemented yet (old retenant policy)."
+    categories:
+      GOOD_RETENANT: ""
+      BAD_RETENANT: ""
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.classification
+  average_retenants_score:
+    description: "Average score of all the proponents in the credit policy"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.proponents.retenant_score
   is_retenant:
     description: "TRUE if one or more proponents are retenants."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.type
   dt_contract_annulment:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
