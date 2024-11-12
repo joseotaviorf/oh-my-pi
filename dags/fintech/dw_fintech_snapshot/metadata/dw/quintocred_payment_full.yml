@@ -309,6 +309,10 @@ columns:
     description: 'Delinquency payment date'
     lineage:
     - dw_charging_payment_quintocred.fact_payment_full
+  dt_sap_created:
+    description: 'SAP nf creation date'
+    lineage:
+    - dw_charging_payment_quintocred.fact_payment_full
   ts_snapshot:
     description: "Timestamp that snapshot was taken."
   day:

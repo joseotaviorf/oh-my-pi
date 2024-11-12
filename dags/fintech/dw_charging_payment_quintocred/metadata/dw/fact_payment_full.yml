@@ -280,3 +280,7 @@ columns:
     description: "Delinquency payment date"
     lineage:
       - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.dt_paid_delinquency
+  dt_sap_created:
+    description: "SAP nf creation date"
+    lineage:
+      - dw_charging_payment_quintocred.fact_accounting_funnel.dt_sap_created

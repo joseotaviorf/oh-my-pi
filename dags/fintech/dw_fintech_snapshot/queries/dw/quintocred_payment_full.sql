@@ -75,6 +75,7 @@ SELECT DISTINCT
     dt_due_payment,
     dt_paid_payment,
     dt_paid_delinquency,
+    dt_sap_created,
     NOW() AS ts_snapshot,
     YEAR(CURRENT_DATE()) AS year,
     MONTH(CURRENT_DATE()) AS month,

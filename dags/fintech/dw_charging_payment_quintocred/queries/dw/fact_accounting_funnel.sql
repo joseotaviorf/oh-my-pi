@@ -206,6 +206,31 @@ accounting_funnel_billing AS (
         ON sf.hash = l.hash 
         AND l.account_number = '31101.07.07'
 ),
+accounting_funnel_wo_payment AS (
+    SELECT DISTINCT
+        sf.id_business_entity,
+        sf.id_finance_entity,
+        '' AS id_finance_entity_entry,
+        sf.hash,
+        l.id_document,
+        'rental guarantee platform - billing' AS source_name,
+        'revenue accounting' AS accounting_type,
+        'Serviços Prestados - Velo' AS accounting_name,
+        sf.sync_sap_status AS status,
+        '' AS source_billing_type,
+        '' AS source_payment_status,
+        '' AS source_amount,
+        l.debit_credit AS sap_amount,
+        date(concat(LEFT(l.accrual_year_month,4),'-',RIGHT(l.accrual_year_month,2),'-',01)) AS accrual_year_month,
+        l.accrual_year_month AS accrual_year_month_sap,
+        '' AS dt_source_trigger,
+        l.dt_reference AS dt_sap_reference,
+        l.dt_created AS dt_sap_created
+    FROM sap_feature sf 
+    LEFT JOIN sap_ledger l 
+        ON sf.hash = l.hash 
+        AND l.account_number = '31101.07.07'
+),
 accounting_funnel_qc AS (
     SELECT 
         * 
@@ -225,6 +250,27 @@ accounting_funnel_qc AS (
         * 
     FROM 
         accounting_funnel_ws
+),
+accounting_funnel_wo_payment_missing AS (
+    SELECT 
+        b.* 
+    FROM 
+        accounting_funnel_qc a
+    RIGHT JOIN 
+        accounting_funnel_wo_payment b
+        ON CONCAT( a.id_business_entity, DATE( a.accrual_year_month ) ) = concat( b.id_business_entity, b.accrual_year_month )
+    WHERE CONCAT( a.id_business_entity, DATE( a.accrual_year_month ) ) IS NULL
+),
+accounting_funnel_qc_final AS (
+    SELECT 
+        * 
+    FROM 
+        accounting_funnel_qc
+    UNION
+    SELECT 
+        * 
+    FROM 
+        accounting_funnel_wo_payment_missing
 )
 SELECT 
     id_business_entity,
@@ -250,4 +296,4 @@ SELECT
     dt_sap_reference,
     dt_sap_created
 FROM 
-    accounting_funnel_qc
+    accounting_funnel_qc_final

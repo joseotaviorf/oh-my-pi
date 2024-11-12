@@ -68,7 +68,8 @@ sap_nf AS (
       agg.qty_total,
       agg.qty_success,
       agg.sap_amount,
-      agg.sap_class
+      agg.sap_class,
+      acc.dt_sap_created
   FROM 
     agg_sap_nf agg
   INNER JOIN 
@@ -109,7 +110,8 @@ level_a AS (
       sap_nf.sap_class IS NULL,
       'SEM FATURAMENTO ',
       sap_nf.sap_class
-    ) AS SAP_CLASS_LEVEL_A2
+    ) AS SAP_CLASS_LEVEL_A2,
+    sap_nf.dt_sap_created
   FROM 
     dw_charging_payment_quintocred.fact_theoretical_payment_delinquency base
   FULL OUTER JOIN 
@@ -632,7 +634,8 @@ SELECT DISTINCT
   m.dt_created_payment,
   m.dt_due_payment,
   m.dt_paid_payment,
-  m.dt_paid_delinquency
+  m.dt_paid_delinquency,
+  m.dt_sap_created
 FROM 
   motivo_expandido m
 LEFT JOIN 
