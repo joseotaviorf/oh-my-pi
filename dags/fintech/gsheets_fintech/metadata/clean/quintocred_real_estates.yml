@@ -28,3 +28,6 @@ columns:
   status:
     lineage:
       - datalake_gsheets_raw.quintocred_real_estates.status
+  executivo:
+    lineage:
+      - datalake_gsheets_raw.quintocred_real_estates.executivo
