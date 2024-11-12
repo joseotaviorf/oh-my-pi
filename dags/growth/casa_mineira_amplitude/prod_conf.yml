@@ -1,2 +1,0 @@
----
-partition_cols_dag: [year, month, day]
