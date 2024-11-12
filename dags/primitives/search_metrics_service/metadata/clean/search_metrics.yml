@@ -1,0 +1,37 @@
+---
+database_name: datalake_search
+table_name: search_metrics
+owner: joao.fidalgo@quintoandar.com.br
+domain: primitives
+
+columns:
+  business_context:
+    lineage:
+      - datalake_search.search_metrics.business_context
+  dimension_name:
+    lineage:
+      - datalake_search.search_metrics.dimension_name
+  dimension_value:
+    lineage:
+      - datalake_search.search_metrics.dimension_value
+  agg_id:
+    lineage:
+      - datalake_search.search_metrics.agg_id
+  metric_name:
+    lineage:
+      - datalake_search.search_metrics.metric_name
+  metric_numerator:
+    lineage:
+      - datalake_search.search_metrics.metric_numerator
+  metric_denominator:
+    lineage:
+      - datalake_search.search_metrics.metric_denominator
+  metric_value:
+    lineage:
+      - datalake_search.search_metrics.metric_value
+  date_granularity:
+    lineage:
+      - datalake_search.search_metrics.date_granularity
+  date:
+    lineage:
+      - datalake_search.search_metrics.date

@@ -1,0 +1,37 @@
+dag:
+  name: search_metrics_service
+  schedule_start_date: 2022, 1, 1
+  owner: Data Primitives
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_parquet_batch_inference_into_datalake
+  default_partitions: [date_granularity, date]
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - s3://data-science.s3.data.quintoandar.com.br/search_monitoring/data/metrics
+    - "{{ next_ds }}"
+    - "{table_name}"
+    - "{partitions}"
+    - parquet
+
+  default_extraction_type: incremental
+
+  tables_customization:
+    search_metrics:
+      partitions:
+      - data_granularity
+      - date
+
+cluster:
+  type: databricks_12_2_med_memory_photon_cluster
+  access_control_list:
+      group_name: data-products
+      permission_level: CAN_MANAGE
+  custom_configurations:
+    spark_conf:
+      spark.metrics.namespace: "data_products.search"
