@@ -86,18 +86,18 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("app_group")
-    parser.add_argument("identifiers")
+    parser.add_argument("identifier")
     args = parser.parse_args()
 
     environment = args.environment
     source = args.source
     datalake_bucket = args.datalake_bucket
     app_group = args.app_group
-    identifiers = ast.literal_eval(args.identifiers)
+    identifier = args.identifier
 
     logger.info(
         f"""m={JOB_NAME}, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
-        app_group={app_group}, identifiers={identifiers}"""
+        app_group={app_group}, identifier={identifier}"""
     )
 
     base_dbutils = BaseDBUtils()
@@ -126,36 +126,34 @@ if __name__ == "__main__":
     braze_client = BrazeClient(api_token=api_token, instance=instance)
     factory = EndpointFactory(braze_client)
 
-    for identifier in identifiers:
+    table_name = f"{identifier}_{endpoint}_{app_group}"
+    list_consumer = factory.build(identifier, "list")
+    consumer = factory.build(identifier, endpoint)
 
-      table_name = f"{identifier}_{endpoint}_{app_group}"
-      list_consumer = factory.build(identifier, "list")
-      consumer = factory.build(identifier, endpoint)
+    id_list = list_consumer.sync(reduce_key="id")
 
-      id_list = list_consumer.sync(reduce_key="id")
+    chunk_size = 100
+    id_chunks = [
+        id_list[x: x + chunk_size] for x in range(0, len(id_list), chunk_size)
+    ]
 
-      chunk_size = 100
-      id_chunks = [
-          id_list[x: x + chunk_size] for x in range(0, len(id_list), chunk_size)
-      ]
+    raw_results = [consumer.sync(id_values=chunk, executor_type="spark", spark_context=sc) for chunk in id_chunks]
+    results = [item for sublist in raw_results for item in sublist]
 
-      raw_results = [consumer.sync(id_values=chunk, executor_type="spark", spark_context=sc) for chunk in id_chunks]
-      results = [item for sublist in raw_results for item in sublist]
+    if len(results) > 0:
+        logger.info("msg=Starting dataframe load.")
+        df = _schema_enforcement(identifier, results)
+        s3_loader.load_df(
+            df=df, s3_path=f"{filesystem_path}{table_name}", format_options=file_type
+        )
 
-      if len(results) > 0:
-          logger.info("msg=Starting dataframe load.")
-          df = _schema_enforcement(identifier, results)
-          s3_loader.load_df(
-              df=df, s3_path=f"{filesystem_path}{table_name}", format_options=file_type
-          )
+        spark_metastore_loader.update_metastore(
+            df=df,
+            database_name=database_name,
+            table_name=table_name,
+            format_options=file_type,
+            database_location=filesystem_path,
+            force_recreate=True,
+        )
 
-          spark_metastore_loader.update_metastore(
-              df=df,
-              database_name=database_name,
-              table_name=table_name,
-              format_options=file_type,
-              database_location=filesystem_path,
-              force_recreate=True,
-          )
-
-          spark_metastore_service.refresh_table(database_name, table_name)
+        spark_metastore_service.refresh_table(database_name, table_name)
