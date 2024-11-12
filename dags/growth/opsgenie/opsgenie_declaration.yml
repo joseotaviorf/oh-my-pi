@@ -1,0 +1,32 @@
+dag:
+  name: opsgenie
+  owner: Data Governance
+  schedule_start_date: 2019, 1, 1
+  schedule_interval: "0 6 * * *"
+  documentation: 
+    dag_purpose: |    
+      This DAG collects data from OpsGenie, the 5A tool to manage on-call schedules, incidents, and alerts. More information about columns and labels can be found in [API documentation](https://docs.opsgenie.com/docs/alert-api).
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_opsgenie_raw
+  default_partitions: ['year', 'month', 'day']
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"  
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+    - "{load_start_date}" # load_start_date
+    - "{load_end_date}" # load_end_date
+  tables_customization:
+    alerts: {}
+    logs: 
+      raw_table_dependency: alerts
+cluster:
+  type: databricks_13_3_min_general_cluster
+  custom_libraries:
+    - pypi:
+        package: "opsgenie_sdk"
