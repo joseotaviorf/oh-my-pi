@@ -1,5 +1,5 @@
 ---
-table_name: dw_atta_staging.dim_client_atta
+table_name: dw_atta.dim_client_atta
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
     has_size:
