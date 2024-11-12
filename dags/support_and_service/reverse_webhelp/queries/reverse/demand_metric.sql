@@ -48,8 +48,8 @@ LEFT JOIN
 LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON dmt.sk_agent = da.sk_agent
-LEFT JOIN 
-  dw_tickets.dim_ticket AS dti
+LEFT JOIN
+  dw_customer_support.dim_ticket AS dti
     ON dti.sk_ticket = dmt.sk_task
 WHERE
   DATE(dmt.ts_started) >= CURRENT_DATE - INTERVAL '1' YEAR

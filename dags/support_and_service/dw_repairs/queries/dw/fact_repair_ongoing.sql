@@ -64,7 +64,7 @@ repair_request_budget AS (
         THEN MIN(te.ts_event - INTERVAL 3 HOUR)
     END AS ts_first_open
   FROM
-    dw_tickets.fact_ticket_events AS te
+    dw_customer_support.fact_ticket_events AS te
   WHERE
     te.ts_ticket_created >= DATE('2024-01-01')
   GROUP BY

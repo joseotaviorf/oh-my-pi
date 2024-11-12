@@ -27,7 +27,7 @@ crisis_users AS (
 	SELECT
 		ft.sk_contract
 	FROM
-		dw_tickets.dim_ticket dt
+		dw_customer_support.dim_ticket dt
 	INNER JOIN
 		dw_tickets.fact_tickets ft
 			ON dt.sk_ticket = ft.sk_ticket

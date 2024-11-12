@@ -66,10 +66,10 @@ WITH email_base AS (
     cs.ts_started
   FROM dw_tickets.fact_tickets AS ft
     LEFT JOIN
-      dw_tickets.dim_ticket AS dt
+      dw_customer_support.dim_ticket AS dt
         ON dt.sk_ticket = ft.sk_ticket
     LEFT JOIN
-      dw_tickets.dim_zendesk_user AS dzu
+      dw_customer_support.dim_zendesk_user AS dzu
         ON ft.sk_zendesk_submitter_user = dzu.sk_zendesk_user
     LEFT JOIN
       dw_customer_support.dim_department gdc

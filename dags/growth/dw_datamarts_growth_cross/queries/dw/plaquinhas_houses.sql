@@ -50,8 +50,8 @@ sale_ongoing_listings AS (
     h.type
   FROM
     dw_sale.fact_listing_status AS f
-    JOIN 
-      dw_public.dim_date AS d 
+    JOIN
+      dw_public.dim_date AS d
         ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) AND COALESCE(DATE_FORMAT(TO_DATE(NULLIF(sk_status_end_date, -1)::STRING, 'yyyyMMdd') - INTERVAL '1' day, 'yyyyMMdd')::BIGINT, DATE_FORMAT(CURRENT_DATE - INTERVAL '1' day, 'yyyyMMdd')::BIGINT)
     LEFT JOIN
       dw_public.dim_region AS dr
@@ -95,7 +95,7 @@ ol AS (
 installs_aux AS (
   -- Histórico de instalações inputados no GSheets --
   SELECT
-    DISTINCT 
+    DISTINCT
     p.id_house,
     "boa instalação" AS plaquinha,
     NULL AS ressalva,
@@ -111,20 +111,20 @@ installs_aux AS (
     REGEXP_EXTRACT(d.subject, '(\\d+)', 0) AS id_house,
     GET_JSON_OBJECT(d.custom_fields, '$["[AQ] Tem plaquinha"]') AS plaquinha,
     GET_JSON_OBJECT(d.custom_fields, '$["[AQ] Ressalva de plaquinha"]') AS ressalva,
-    CASE 
+    CASE
       WHEN GET_JSON_OBJECT(d.custom_fields, '$["[AQ] Tem plaquinha"]') IN ('fraude_de_plaquinha', 'não_identificada', 'plaquinha_duplicada') THEN 0
       WHEN GET_JSON_OBJECT(d.custom_fields, '$["[AQ] Ressalva de plaquinha"]') IN ('pp_ou_condomínio_não_autoriza_instalação', 'placa_duplicada_aq', 'placa_de_ponta_cabeça_aq') THEN 0
       WHEN GET_JSON_OBJECT(d.custom_fields, '$["[AQ] Tem plaquinha"]') IN ('área_comum') AND GET_JSON_OBJECT(d.custom_fields, '$["[AQ] Ressalva de plaquinha"]') IN ('instalações_em_postes_e_árvores_aq', 'placa_colada_em_cima_de_outra_aq') THEN 0
-      ELSE 1 
+      ELSE 1
     END AS tem_plaquinha_flg,
-    CASE 
+    CASE
       WHEN GET_JSON_OBJECT(d.custom_fields, '$["[AQ] Tem plaquinha"]') IN ('área_comum', 'fora_do_padrão', 'não_identificada', 'no_imóvel') AND GET_JSON_OBJECT(d.custom_fields, '$["[AQ] Ressalva de plaquinha"]') IN ('pp_ou_condomínio_não_autoriza_instalação') THEN 1
       ELSE 0
     END AS condo_nao_permite_flg,
     "photographer" AS tipo_install,
     MAX(DATE(p.dt_photos_uploaded)) AS dt_install
   FROM
-    dw_tickets.dim_ticket d
+    dw_customer_support.dim_ticket d
     LEFT JOIN
       dw_public.dim_photo_job p
         ON REGEXP_EXTRACT(d.subject, '(\\d+)', 0) = p.imovel_id
@@ -140,21 +140,21 @@ installs_aux AS (
     COALESCE(CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Código do Imóvel"]') AS BIGINT), REGEXP_EXTRACT(subject, '(\\d+)', 0)) AS id_house,
     CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Instalação realizada"]') AS VARCHAR(30)) AS plaquinha,
     CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) AS ressalva,
-    CASE 
+    CASE
       WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Instalação realizada"]') AS VARCHAR(30)) = 'sim_instalação_realizada' AND CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) IS NULL THEN 1
       WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Instalação realizada"]') AS VARCHAR(30)) = 'não_instalação_realizada' AND CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) = 'já_tem_placa' THEN 1
       WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Instalação realizada"]') AS VARCHAR(30)) = 'com_ressalva_instalação_realizada' AND CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) IN ('adesivo_em_parede/portão', 'entregue_à_portaria_ressalva', 'entregue_ao_pp_ressalva', 'instalação_em_poste/arvore', 'placa_randômica_ressalva', 'placa_sobre_placa') THEN 1
-      ELSE 0 
+      ELSE 0
     END AS tem_plaquinha_flg,
-    CASE 
+    CASE
       WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) IN ('pp_ou_condomínio_não_autoriza_instalação') THEN 1
       WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) IN ('condôminio_não_permite') THEN 1
-      ELSE 0 
+      ELSE 0
     END AS condo_nao_permite_flg,
     "motoboy" AS tipo_install,
     CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Data de instalação"]') AS VARCHAR(30)) AS dt_install
   FROM
-    dw_tickets.dim_ticket AS t
+    dw_customer_support.dim_ticket AS t
   WHERE
     group_name = 'Plaquinhas - Pedidos da FAQ [SO]'
     AND CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Serviço solicitado"]') AS VARCHAR(30)) = 'instalação_serviço_solicitado'
@@ -177,7 +177,7 @@ installs_aux AS (
 ),
 installs AS (
   SELECT
-    DISTINCT 
+    DISTINCT
     id_house,
     plaquinha,
     ressalva,
@@ -204,22 +204,22 @@ manutencao_aux AS (
     COALESCE(CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Código do Imóvel"]') AS BIGINT), REGEXP_EXTRACT(subject, '(\\d+)', 0)) AS id_house,
     CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Instalação realizada"]') AS VARCHAR(30)) AS plaquinha,
     CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) AS ressalva,
-    CASE 
-      WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) IN ('condôminio_não_permite') THEN 0 
+    CASE
+      WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) IN ('condôminio_não_permite') THEN 0
       WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Instalação realizada"]') AS VARCHAR(30)) = 'sim_instalação_realizada' THEN 1
       WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Instalação realizada"]') AS VARCHAR(30)) = 'não_instalação_realizada' AND CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) IN ('endereço_não_encontrado', 'imóvel_indisponível', 'recusa_de_pp', 'instalação_em_poste/arvore') THEN 0
       WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Instalação realizada"]') AS VARCHAR(30)) = 'com_ressalva_instalação_realizada' AND CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) IN ('imóvel_indisponível', 'placa_incompatível_com_o_imóvel') THEN 0
-      ELSE 1 
+      ELSE 1
     END AS tem_plaquinha_flg,
-    CASE 
+    CASE
       WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) IN ('pp_ou_condomínio_não_autoriza_instalação') THEN 1
       WHEN CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Ressalva"]') AS VARCHAR(30)) IN ('condôminio_não_permite') THEN 1
-      ELSE 0 
+      ELSE 0
     END as condo_nao_permite_flg,
     CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Serviço solicitado"]') AS VARCHAR(30)) AS tipo_manutencao,
     CAST(GET_JSON_OBJECT(custom_fields, '$["[SO] Data de instalação"]') AS VARCHAR(30)) as dt_manutencao
   FROM
-    dw_tickets.dim_ticket AS t
+    dw_customer_support.dim_ticket AS t
     LEFT JOIN
       datalake_ebdb_clean.house AS h
         ON COALESCE(CAST(GET_JSON_OBJECT(t.custom_fields, '$["[SO] Código do Imóvel"]') AS BIGINT), REGEXP_EXTRACT(t.subject, '(\\d+)', 0)) = h.id
@@ -357,57 +357,57 @@ cover AS (
     o.city_name,
     o.neighborhood,
     o.type AS listing_type,
-    CASE 
-      WHEN (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01')) 
-            AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_manutencao, '1900-01-01')) 
-            AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
-        AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01')) 
+    CASE
+      WHEN (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01'))
+            AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_manutencao, '1900-01-01'))
+            AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01'))
+        AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01'))
             AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01'))
-        OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
+        OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
             AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')))
         THEN 'com placa'
-      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_install, '1900-01-01')) 
-            AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01')) 
-            AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
-        AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_install, '1900-01-01'))
+            AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01'))
+            AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01'))
+        AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01'))
             AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01'))
-        OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
+        OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
             AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')))
         THEN 'com placa'
       ELSE 'sem placa'
     END AS placa_unica,
-    CASE 
-      WHEN (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')) 
+    CASE
+      WHEN (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01'))
         THEN 'com placa'
-      WHEN (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01'))
         THEN 'com placa'
       ELSE 'sem placa'
     END AS imovel_coberto,
-    CASE 
+    CASE
       WHEN condo_max_dt_install IS NULL AND condo_max_dt_sem_install IS NULL AND condo_max_dt_manutencao IS NULL AND condo_max_dt_sem_manutencao IS NULL THEN 0
-      WHEN (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01'))
         THEN 0
-      WHEN (COALESCE(condo_max_dt_sem_install, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_sem_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_sem_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(condo_max_dt_sem_install, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_sem_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_sem_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01'))
         THEN condo_max_proibe_sem_install
-      WHEN (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01'))
         THEN 0
-      WHEN (COALESCE(condo_max_dt_sem_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_sem_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
-            AND (COALESCE(condo_max_dt_sem_manutencao, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(condo_max_dt_sem_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_sem_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
+            AND (COALESCE(condo_max_dt_sem_manutencao, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01'))
         THEN condo_max_proibe_sem_manutencao
       ELSE 0
     END AS install_not_allowed,
@@ -415,83 +415,83 @@ cover AS (
     tipo_install AS agent_install,
     ressalva_sem_install AS not_install_reason,
     min_dt_manutencao AS first_maintenance,
-    CASE 
+    CASE
       WHEN max_dt_manutencao IS NULL AND max_dt_sem_manutencao IS NULL THEN NULL
       WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01')) THEN max_dt_manutencao
       WHEN (COALESCE(max_dt_manutencao, '1900-01-01') < COALESCE(max_dt_sem_manutencao, '1900-01-01')) THEN max_dt_sem_manutencao
-      ELSE NULL 
+      ELSE NULL
     END AS last_maintenance,
-    CASE 
+    CASE
       -- WHEN max_dt_manutencao IS NULL AND max_dt_sem_manutencao IS NULL THEN NULL
-      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01'))
             AND LOWER(o.business_context) = 'rent'
-            AND DATEDIFF(current_date, max_dt_manutencao) >= 30 
+            AND DATEDIFF(current_date, max_dt_manutencao) >= 30
         THEN TRUE -- com manutenção
-      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01'))
             AND LOWER(o.business_context) = 'sale'
-            AND DATEDIFF(current_date, max_dt_manutencao) >= 90 
+            AND DATEDIFF(current_date, max_dt_manutencao) >= 90
         THEN TRUE -- com manutenção
-      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') < COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') < COALESCE(max_dt_sem_manutencao, '1900-01-01'))
             AND LOWER(o.business_context) = 'rent'
             AND DATEDIFF(current_date, max_dt_sem_manutencao) >= 30
         THEN TRUE -- com manutenção
-      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') < COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') < COALESCE(max_dt_sem_manutencao, '1900-01-01'))
             AND LOWER(o.business_context) = 'sale'
             AND DATEDIFF(current_date, max_dt_sem_manutencao) >= 90
         THEN TRUE -- com manutenção
-      WHEN (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01')) 
-              AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_manutencao, '1900-01-01')) 
-              AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
-          AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
-              AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01'))
+              AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_manutencao, '1900-01-01'))
+              AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01'))
+          AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
+              AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01'))
               AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01'))
-          OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01')) 
-              AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
+          OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01'))
+              AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
               AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')))
           AND max_dt_manutencao IS NULL AND max_dt_sem_manutencao IS NULL
           AND LOWER(o.business_context) = 'rent'
           AND DATEDIFF(current_date, max_dt_install) >= 30
         THEN TRUE -- com instalação e sem manutenção
-      WHEN (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01')) 
-              AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_manutencao, '1900-01-01')) 
-              AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
-          AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
-              AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01'))
+              AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_manutencao, '1900-01-01'))
+              AND (COALESCE(max_dt_install, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01'))
+          AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
+              AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01'))
               AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01'))
-          OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01')) 
-              AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
+          OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01'))
+              AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
               AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')))
           AND max_dt_manutencao IS NULL AND max_dt_sem_manutencao IS NULL
           AND LOWER(o.business_context) = 'sale'
           AND DATEDIFF(current_date, max_dt_install) >= 90
         THEN TRUE -- com instalação e sem manutenção
-      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_install, '1900-01-01')) 
-              AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01')) 
-              AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
-          AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
-              AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_install, '1900-01-01'))
+              AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01'))
+              AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01'))
+          AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
+              AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01'))
               AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01'))
-          OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01')) 
-              AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
+          OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01'))
+              AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
               AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')))
           AND max_dt_manutencao IS NULL AND max_dt_sem_manutencao IS NULL
           AND LOWER(o.business_context) = 'rent'
           AND DATEDIFF(current_date, max_dt_manutencao) >= 30
         THEN TRUE -- com instalação e sem manutenção
-      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_install, '1900-01-01')) 
-              AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01')) 
-              AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01')) 
-          AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
-              AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01')) 
+      WHEN (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_install, '1900-01-01'))
+              AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_install, '1900-01-01'))
+              AND (COALESCE(max_dt_manutencao, '1900-01-01') > COALESCE(max_dt_sem_manutencao, '1900-01-01'))
+          AND ((COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
+              AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_manutencao, '1900-01-01'))
               AND (COALESCE(condo_max_dt_install, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01'))
-          OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01')) 
-              AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01')) 
+          OR (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_install, '1900-01-01'))
+              AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_install, '1900-01-01'))
               AND (COALESCE(condo_max_dt_manutencao, '1900-01-01') > COALESCE(condo_max_dt_sem_manutencao, '1900-01-01')))
           AND max_dt_manutencao IS NULL AND max_dt_sem_manutencao IS NULL
           AND LOWER(o.business_context) = 'sale'
           AND DATEDIFF(current_date, max_dt_manutencao) >= 90
         THEN TRUE -- com instalação e sem manutenção
-      ELSE NULL 
+      ELSE NULL
     END AS is_ready_for_maintenance,
     ressalva_sem_manutencao AS not_maintenance_reason,
     qtd_manutencoes AS total_maintenances,

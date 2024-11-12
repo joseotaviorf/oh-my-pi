@@ -104,7 +104,7 @@ sale_flows AS (
 crisis_users AS (
     SELECT DISTINCT
     ft.sk_user AS id_user
-    FROM dw_tickets.dim_ticket dt
+    FROM dw_customer_support.dim_ticket dt
     INNER JOIN dw_tickets.fact_tickets ft
         ON dt.sk_ticket  = ft.sk_ticket
     INNER JOIN dw_customer_support.dim_department dc

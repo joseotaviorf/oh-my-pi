@@ -93,7 +93,7 @@ WITH ticket_perspective AS (
     dw_customer_support.dim_channel AS dc
       ON dc.sk_channel = ft.sk_channel
   LEFT JOIN
-    dw_tickets.dim_ticket AS dit
+    dw_customer_support.dim_ticket AS dit
       ON CAST(dit.sk_ticket AS STRING) = ft.sk_ticket
   WHERE
     ft.sk_ticket IS NOT NULL

@@ -51,7 +51,7 @@ WITH base_tickets AS (
       dw_tickets.fact_tickets AS fts
         ON ft.sk_ticket = fts.sk_ticket
     LEFT JOIN
-      dw_tickets.dim_zendesk_user AS dzu
+      dw_customer_support.dim_zendesk_user AS dzu
         ON dzu.sk_zendesk_user = fts.sk_zendesk_requester_user
   WHERE
       ft.ts_started >= DATE('2023-01-01')

@@ -384,6 +384,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-affiliates-clusters
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-buyer-prospect-status
   - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
@@ -401,7 +402,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
   - bietlejuice.ebdb_house:load-clean-house
@@ -771,7 +771,7 @@ bietlejuice.dw_rental_payments:
   - bietlejuice.enrich_retsuko:load-enrich-bill-items
   - bietlejuice.enrich_retsuko:load-enrich-invoice
 bietlejuice.dw_repairs:
-  - bietlejuice.dw_tickets:load-dw-tickets-fact-ticket-events
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events
   - bietlejuice.enrich_repairs:load-enrich-repair-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.repairs:load-clean-repair-request
@@ -932,7 +932,6 @@ bietlejuice.dw_tenant_documentation:
 bietlejuice.dw_tickets:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
-  - bietlejuice.enrich_zendesk:load-enrich-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.zendesk:load-clean-ticket-comments
 bietlejuice.dw_tracksale:
@@ -3371,23 +3370,23 @@ bietlejuice.metric_ss__tickets:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
-  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket-tags
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-zendesk-user
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-segment
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
-  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
-  - bietlejuice.dw_tickets:load-dw-tickets-dim-zendesk-user
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
@@ -3536,6 +3535,7 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
@@ -3548,7 +3548,6 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
-  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.ebdb_contract:load-clean-contract-person
@@ -3567,14 +3566,14 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket-tags
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-segment
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
-  - bietlejuice.dw_tickets:load-dw-tickets-dim-ticket
-  - bietlejuice.dw_tickets:load-dw-tickets-fact-ticket-events
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla

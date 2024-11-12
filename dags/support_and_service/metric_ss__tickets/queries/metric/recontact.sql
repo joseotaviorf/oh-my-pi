@@ -32,7 +32,7 @@ WITH tickets_perspective AS (
     dw_customer_support.dim_taxonomy AS dt
       ON dt.sk_taxonomy = ft.sk_taxonomy
   LEFT JOIN
-    dw_tickets.dim_ticket AS dit
+    dw_customer_support.dim_ticket AS dit
       ON dit.sk_ticket = ft.sk_ticket
   LEFT JOIN
     dw_customer_support.dim_channel AS dc

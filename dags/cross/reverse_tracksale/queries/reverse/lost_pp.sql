@@ -61,7 +61,7 @@ crisis_users AS (
 	SELECT DISTINCT
 		ft.sk_user
 	FROM
-		dw_tickets.dim_ticket AS dt
+		dw_customer_support.dim_ticket AS dt
 	JOIN
 		dw_tickets.fact_tickets AS ft
 			ON dt.sk_ticket  = ft.sk_ticket

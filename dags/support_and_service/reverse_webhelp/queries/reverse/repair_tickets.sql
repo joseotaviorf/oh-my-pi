@@ -9,7 +9,7 @@ WITH ticket_events AS (
       THEN MIN(te.ts_event - INTERVAL 3 HOUR)
     END AS ts_reflux
   FROM
-    dw_tickets.fact_ticket_events AS te
+    dw_customer_support.fact_ticket_events AS te
   WHERE
     te.ts_ticket_created >= DATE('2024-01-01')
   GROUP BY
@@ -67,7 +67,7 @@ SELECT
   NOW() AS ts_load
 FROM
   datalake_repairs.repair_tickets AS rt
-LEFT JOIN 
+LEFT JOIN
   ticket_events AS te
     ON te.sk_ticket = rt.id_ticket
 WHERE
