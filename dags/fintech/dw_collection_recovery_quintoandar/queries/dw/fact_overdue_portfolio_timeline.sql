@@ -33,12 +33,7 @@ SELECT
     o.id_invoice,
     o.id_proposal,
     o.id_region,
-    CASE
-      WHEN o.payment_status = "written-down"
-        AND o.dt_invoice_paid BETWEEN o.dt_month_start AND o.dt_reference
-        AND o.dt_invoice_paid > o.dt_invoice_due_adjust
-      THEN n.sk_negotiation
-    END AS sk_negotiation,
+    IF(o.payment_status = "written-down", n.sk_negotiation, NULL) AS sk_negotiation,
     o.contract_status,
     o.invoice_type,
     o.payment_status,
@@ -88,15 +83,10 @@ SELECT
     o.paid_amount,
     ABS(o.recovered_amount) AS recovered_amount,
     ROUND(CASE
-        WHEN o.payment_status = "paid" THEN ABS(o.recovered_amount)
-        WHEN o.payment_status = "written-down"
-          AND o.dt_invoice_paid BETWEEN o.dt_month_start AND o.dt_reference
-          AND o.dt_invoice_paid > o.dt_invoice_due_adjust
-        THEN n.net_rate * ABS(o.recovered_amount)
-        WHEN o.payment_status = "written-down"
-          AND n.sk_negotiation IS NULL
-          THEN ABS(o.recovered_amount)
-        ELSE 0
+      WHEN o.payment_status = "paid" THEN ABS(o.recovered_amount)
+      WHEN o.payment_status = "written-down" AND n.sk_negotiation IS NULL THEN ABS(o.recovered_amount)
+      WHEN o.payment_status = "written-down" THEN n.net_rate * ABS(o.recovered_amount)
+      ELSE 0
     END, 2) AS net_recovered_amount,
     o.contract_debt,
     o.business_day,
