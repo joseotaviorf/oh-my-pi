@@ -23,6 +23,8 @@ SELECT
     sispag_file,
     payment_company_use_number,
     payment_bank_code,
+    write_off AS is_write_off,
+    write_off_at AS ts_write_off,
     timestamp(paid_date) AS ts_paid,
     timestamp(payment_confirmation_at) AS ts_payment_confirmation,
     timestamp(payment_event_at) AS ts_payment_event,

@@ -89,6 +89,14 @@ columns:
     description: "Paying Bank Code"
     lineage:
       - datalake_retusko_raw.invoice.payment_bank_code
+  is_write_off:
+    description: "Boolean to indicate an uncollectible overdue credit, applicable under specific conditions related contract age. Read more at: https://docs.google.com/document/d/1mfqO6suQSHPNM-bBcQi0_iR_RC-xjRwlnHTBpQ66FGw/"
+    lineage:
+      - datalake_retsuko_raw.invoice.write_off
+  ts_write_off:
+    description: "Timestamp when the invoice was flagged as write-off"
+    lineage:
+      - datalake_retsuko_raw.invoice.write_off_at
   ts_paid:
     lineage:
       - datalake_retsuko_raw.invoice.paid_date
