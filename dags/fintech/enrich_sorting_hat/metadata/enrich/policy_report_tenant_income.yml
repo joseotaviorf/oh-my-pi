@@ -217,6 +217,10 @@ columns:
     description: "Internal debts on default, if any."
     lineage:
       - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.internalDebtsOnDefault
+  tenant_scr_income:
+    description: "Tenant SCR Income, when available."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.aggregated_structured_results.scrIncome
   has_scr_report:
     description: "Boolean indicating if the tenant has a SCR report."
     lineage:
