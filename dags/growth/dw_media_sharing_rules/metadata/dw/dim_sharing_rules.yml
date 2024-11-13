@@ -1,0 +1,43 @@
+---
+database_name: dw_growth
+table_name: dim_sharing_rules
+owner: isabela.matsumoto@quintoandar.com.br
+domain: growth
+description: This dimension consolidates cost-sharing rules by date and segmentation attributes.
+columns:
+  bk_sharing_rules:
+    description: Business key for each sharing rule, combining date and rule ID.
+    lineage:
+      - datalake_growth_costs_sharing_rules.sharing_rules.share
+      - datalake_growth_costs_sharing_rules.sharing_rules.id_date    
+  business_context:
+    description: Business context of the rule.
+    lineage:
+      - datalake_growth_costs_sharing_rules.sharing_rules.business_context
+  city_group:
+    description: city_group segmentation
+    lineage:
+      - datalake_growth_costs_sharing_rules.sharing_rules.city_group
+  country_code:
+    description: country_code segmentation
+    lineage: 
+  funnel_side:
+    description: Marketplace side of business
+    lineage:
+      - datalake_growth_costs_sharing_rules.sharing_rules.funnel_side
+  rule_code:
+    description: Id rule
+    lineage:
+      - datalake_growth_costs_sharing_rules.sharing_rules.id_rule
+  share:
+    description: Percentage of cost that will be applied to specific city_group
+    lineage:
+      - datalake_growth_costs_sharing_rules.sharing_rules.share
+  utm_campaign_modified:
+    description: utm_campaign segmentation
+    lineage: 
+      - datalake_growth_costs_sharing_rules.sharing_rules.utm_campaign_modified
+  dt_rule_costs:
+    description: Date segmentation
+    lineage:
+      - datalake_growth_costs_sharing_rules.sharing_rules.id_date    

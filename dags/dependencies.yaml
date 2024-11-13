@@ -608,6 +608,8 @@ bietlejuice.dw_losses:
   - bietlejuice.enrich_losses:load-enrich-delay
   - bietlejuice.enrich_losses:load-enrich-historical-closing
   - bietlejuice.enrich_losses:load-enrich-provision
+bietlejuice.dw_media_sharing_rules:
+  - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules
 bietlejuice.dw_offboarding:
   - bietlejuice.enrich_terminator:load-enrich-termination
 bietlejuice.dw_offer:

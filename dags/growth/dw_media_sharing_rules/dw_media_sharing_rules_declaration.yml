@@ -1,0 +1,15 @@
+dag:
+  name: dw_media_sharing_rules
+  schedule_start_date: 2024,11,11
+  owner: Data Growth
+  documentation: 
+    dag_purpose: |
+      This DAG is responsible for processing and loading data into a dimension tables related to media cost-sharing rules in the Growth context. 
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: growth
+  default_extraction_type: full
+  default_partitions: ["rule_code"]
+cluster:
+  type: databricks_13_3_med_general_cluster
