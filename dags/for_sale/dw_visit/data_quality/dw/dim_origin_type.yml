@@ -1,0 +1,15 @@
+---
+table_name: dw_visit.dim_origin_type
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_origin_type:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  origin_name:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

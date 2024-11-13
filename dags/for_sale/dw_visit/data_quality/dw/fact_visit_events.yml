@@ -1,0 +1,32 @@
+---
+table_name: dw_visit.fact_visit_events
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_event:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_visits_status_log:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_visit:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_schedule:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_house:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

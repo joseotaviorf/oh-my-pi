@@ -1,0 +1,12 @@
+database_name: dw_visit
+table_name: dim_visit_type
+description: This dimension table has the types of the visits .
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_visit_type:
+    description: Id of the visit type.
+  type_name:
+    description: Name of the type.
+  ts_load:
+    description: Timestamp of the ingestion data.

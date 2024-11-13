@@ -1,0 +1,22 @@
+---
+table_name: dw_visit.dim_author_type
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 1000
+    severity_level: Error
+column_level_validations:
+  sk_author_type:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  author_type:
+    is_complete:
+      severity_level: Error
+  channel:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

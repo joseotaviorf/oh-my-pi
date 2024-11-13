@@ -1,0 +1,75 @@
+database_name: dw_visit
+table_name: fact_visit_schedules
+description: This fact table has all the schedules of the visits with some important keys. Each line is an unique visit schedule identified by the key sk_schedule.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_schedule:
+    lineage:
+      - datalake_visits.visit_status_events.id_schedule
+    description:
+      Is the booking key. Joins with booking table.
+  sk_visit:
+    lineage:
+      - datalake_visits.visit_status_events.id_visit
+    description:
+      Is the visit unique key. Joins with visit table.
+  sk_visitor:
+    description: Visitor's id. (Connect with dim_user)
+    lineage:
+      - datalake_visit.visit_status_events.id_visitor
+  sk_owner:
+    sk_owner:
+      description: Owner's id. (Connect with dim_user)
+      lineage:
+        - datalake_visit.visit_status_events.id_owner
+  sk_agent:
+    lineage:
+      - datalake_visits.visit_status_events.id_agent
+    description:
+      Is the unique key of the agent. Joins with dim_user.
+  sk_house:
+    description: House's Id.
+    lineage:
+      - datalake_visit.visits.id_house
+  sk_house_listing:
+    description: House's Listing Id.
+    lineage:
+      - datalake_visit.visits.id_house_listing
+  sk_author_creator:
+    lineage:
+      - datalake_visits.visit_status_events.id_author_user
+    description:
+      Is the key of the responsible for the event.
+  sk_succeed_schedule:
+    description:
+      Is the next schedule.
+  sk_origin_type:
+    lineage:
+      - dw_visit.dim_origin_type
+    description:
+      Is the key of origin of the event.
+  is_reschedule:
+    description:
+      If is a reschedule.
+  is_confirmed:
+    description:
+      If the schedule was confirmed.
+  is_completed:
+    description:
+      If the schedule was completed.
+  is_canceled:
+    description:
+      If the schedule was canceled.
+  sk_schedule_created:
+    description:
+      Sk with the creation date.
+  sk_schedule_confirmed:
+    description:
+      Sk with the confirmed date.
+  sk_schedule_completed:
+    description:
+      Sk with the completed date.
+  sk_schedule_canceled:
+    description:
+      Sk with the canceled date.

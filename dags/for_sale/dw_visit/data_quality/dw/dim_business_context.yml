@@ -1,0 +1,15 @@
+---
+table_name: dw_visit.dim_business_context
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_business_context:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

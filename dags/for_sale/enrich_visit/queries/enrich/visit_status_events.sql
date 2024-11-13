@@ -31,7 +31,7 @@ visit AS(
     -1 AS id_rent_flow,
     'NA' AS id_sale_flow, --esse id é um coalesce
     -1 AS id_fup_details,
-    'NA' AS business_context,
+    v.business_context,
     v.ts_created,
     vsl.id_visit_status_log,
     vsl.id_author_user,

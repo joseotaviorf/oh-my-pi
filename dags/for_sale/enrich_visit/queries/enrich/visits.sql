@@ -87,7 +87,7 @@ SELECT
     visit.id_visitor,
     lh.id_user AS id_owner,
     visit.id_house,
-    hl.id_house_listing,
+    COALESCE(hl.id_house_listing, -1) AS id_house_listing,
     -1 AS id_rent_flow,
     -1 AS id_sale_flow,
     lh.id_company_hubspot AS id_company_supply,
@@ -186,12 +186,9 @@ LEFT JOIN
         ON lh.id = visit.id_house
 LEFT JOIN
     datalake_ebdb_listing.house_listing AS hl
-        ON visit.id_house = hl.id_house
-        AND visit.ts_created >= hl.ts_listing_version_start
-        AND (
-            visit.ts_created <= hl.ts_listing_version_end
-            OR hl.ts_listing_version_end IS NULL
-        )
+      ON visit.id_house = hl.id_house
+      AND DATE(visit.ts_created) >= DATE(hl.ts_listing_version_start)
+      AND (DATE(visit.ts_created) <= DATE(hl.ts_listing_version_end) OR hl.ts_listing_version_end IS NULL)
 LEFT JOIN
     visit_3p_demand_agent AS visit_demand
         ON visit.id = visit_demand.id_visit

@@ -1,0 +1,12 @@
+database_name: dw_visit
+table_name: dim_origin_type
+description: This dimension table has the origin of the schedule.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_origin_type:
+    description: Id of the visit type.
+  origin_name:
+    description: Name of the type.
+  ts_load:
+    description: Timestamp of the ingestion data.
