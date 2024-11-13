@@ -7,6 +7,12 @@ columns:
     - datalake_amplitude_clean.170698_search_page_viewed_events.id_house
     - datalake_amplitude_clean.170698_search_results_page_viewed_events.ep_id_house
     - datalake_amplitude_clean.170698_listing_page_viewed_events.ep_house_id
+  id_amplitude:
+    lineage:
+    - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_amplitude
+    - datalake_amplitude_clean.170698_search_page_viewed_events.id_amplitude
+    - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_amplitude
+    - datalake_amplitude_clean.170698_listing_page_viewed_events.id_amplitude
   id_user:
     lineage:
     - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_user
