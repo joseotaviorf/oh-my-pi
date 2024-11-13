@@ -1,6 +1,6 @@
 dag:
   name: dependency_tree
-  owner: Data Growth
+  owner: Data Ingestion
   schedule_start_date: 2020, 11, 1
   schedule_interval: "0 6 * * *"
   documentation: 

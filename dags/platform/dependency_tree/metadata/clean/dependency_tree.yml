@@ -1,7 +1,7 @@
 database_name: datalake_dependency_tree_clean
 table_name: dependency_tree
-owner: marcio.gomes@quintoandar.com.br
-domain: growth
+owner: mario.abreu@quintoandar.com.br
+domain: Data Ingestion
 description: Dependency relation between DAGs.
 columns:
   dag:
