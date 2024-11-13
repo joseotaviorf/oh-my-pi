@@ -1,7 +1,7 @@
 database_name: datalake_health_metrics
 table_name: top_reference_sla_days
-owner: marcio.gomes@quintoandar.com.br
-domain: Data Growth
+owner: wesley.doliveira@quintoandar.com.br
+domain: Data Governance
 description: WIP
 columns:
   dag_owner:

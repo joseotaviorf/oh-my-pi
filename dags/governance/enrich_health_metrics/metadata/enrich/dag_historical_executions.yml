@@ -1,7 +1,7 @@
 database_name: datalake_health_metrics
 table_name: dag_historical_executions
-owner: marcio.gomes@quintoandar.com.br
-domain: Data Growth
+owner: wesley.doliveira@quintoandar.com.br
+domain: Data Governance
 description: This table contains the historical of each DAG execution.
 columns:
   dag_name:

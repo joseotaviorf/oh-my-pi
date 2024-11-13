@@ -3,7 +3,7 @@ dag:
   name: enrich_health_metrics
   schedule_start_date: 2019, 1, 1
   schedule_interval: 0 12 * * *
-  owner: Data Growth
+  owner: Data Governance
   documentation:
     dag_purpose: The enrich purpose is to concatenate information about DAG's health.
 workflow:
