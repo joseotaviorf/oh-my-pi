@@ -41,7 +41,7 @@ SELECT DISTINCT
   FIRST(csat_comment) OVER(PARTITION BY id_ticket ORDER BY ts_response) AS first_csat_comment,
   FIRST(csat_comment) OVER(PARTITION BY id_ticket ORDER BY ts_response DESC) AS last_csat_comment,
   is_answered,
-  is_solved,
+  MAX(is_solved) OVER(PARTITION BY id_ticket) AS is_solved,
   MIN(ts_response) OVER(PARTITION BY id_ticket) AS ts_first_response,
   MAX(ts_response) OVER(PARTITION BY id_ticket) AS ts_last_response
 FROM
