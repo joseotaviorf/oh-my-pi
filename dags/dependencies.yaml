@@ -240,8 +240,8 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_proposal:load-enrich-proposal
   - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
-  - bietlejuice.enrich_sorting_hat:load-enrich-policy-report
   - bietlejuice.enrich_sorting_hat:load-enrich-early-credit-analysis
+  - bietlejuice.enrich_sorting_hat:load-enrich-policy-report
   - bietlejuice.rental_guarantee:load-clean-risk-category
   - bietlejuice.sorting_hat:load-clean-credit-analysis
   - bietlejuice.sorting_hat:load-clean-experiment
@@ -1346,7 +1346,6 @@ bietlejuice.enrich_consolidated_growth_metrics:
   - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
   - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
-  - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
 bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
   - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-sharing-rules
@@ -1358,7 +1357,6 @@ bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
   - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
-  - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
 bietlejuice.enrich_content_funnel:
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-performance-marketing-metrics-demand
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand
@@ -1833,7 +1831,6 @@ bietlejuice.enrich_growth_media_platform_scd:
   - bietlejuice.google_ads:load-clean-videos-performance
   - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
-  - bietlejuice.rtb_campaigns:load-clean-rtb-campaigns
 bietlejuice.enrich_growth_taxonomy:
   - bietlejuice.gsheets_growth:done-clean-dict-taxonomy-supply
   - bietlejuice.gsheets_growth:done-clean-taxonomy-levels-values
