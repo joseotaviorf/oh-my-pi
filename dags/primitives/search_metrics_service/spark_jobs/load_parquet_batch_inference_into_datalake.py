@@ -2,7 +2,7 @@ import json
 import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col, year, month, dayofmonth
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -78,6 +78,12 @@ def main():
     dt_start = dt_end - timedelta(days=90)
 
     df = spark_client.conn.read.parquet(source_root_path).filter(col('date') >= dt_start)
+    df = (
+        df
+        .withColumn('year', year('date'))
+        .withColumn('month', month('date'))
+        .withColumn('day', dayofmonth('date'))
+    )
 
     s3_loader.load_df(
         df=df,
