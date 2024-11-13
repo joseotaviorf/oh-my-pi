@@ -11,4 +11,3 @@ select
     date
 from
   datalake_search_metrics_service_raw.search_metrics
-where MAKE_DATE(year, month, day) = DATE_ADD(MAKE_DATE({year}, {month}, {day}), 1)
