@@ -1,5 +1,5 @@
 ---
-table_name: dw_sale_staging.fact_daily_listings_available_hours
+table_name: dw_sale.fact_daily_listings_available_hours
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   sk_date:

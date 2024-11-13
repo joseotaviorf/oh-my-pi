@@ -3,7 +3,7 @@ dag:
   schedule_start_date: 2020,08,29
   owner: Data ForSale
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: sale
 cluster:

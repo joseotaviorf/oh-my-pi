@@ -1,5 +1,5 @@
 ---
-table_name: dw_sale_staging.fact_listing_sale_flows
+table_name: dw_sale.fact_listing_sale_flows
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
