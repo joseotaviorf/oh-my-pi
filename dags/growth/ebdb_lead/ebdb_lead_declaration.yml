@@ -14,9 +14,6 @@ workflow:
   custom_schema: ebdb_test
   dbutils_secret_key: EBDB_DB
   tables_customization:
-    AgrupamentoLeadsPorTelefone:
-      raw_primary_keys: ["id"]
-      clean_table_name: leads_grouped_by_phone
     ConversaoLead:
       raw_primary_keys: ["id"]
       clean_table_name: conversion_lead
