@@ -1,53 +1,74 @@
 dag:
   name: trato_feito
-  owner: Data Fintech
   schedule_interval: 0 3 * * *
+  owner: Data Fintech
   documentation:
     dag_purpose: |
       [Trato Feito](https://github.com/quintoandar/trato-feito) is a microservice that manages the negotiation flows between QuintoAndar and its debtors.
 workflow:
-  type: database_pull
+  type: cdc
   layer: raw
   database_type: postgres
-  custom_schema: trato_feito
-  dbutils_secret_key: TRATO_FEITO_DB
+  source_schema: public
+  dbutils_secret_key: TRATOFEITO_DB
   lineage_product_database_name: tratofeito
+  source_database: tratofeito
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 0), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
   tables_customization:
     accounting_installment:
       get_table_metrics:
-        count: id
+        count: "id"
     bill:
       get_table_metrics:
-        count: id
-    billing: {}
-    client: {}
-    contract: {}
+        count: "id"
+    billing:
+      get_table_metrics:
+        count: "id"
+    client:
+      get_table_metrics:
+        count: "id"
+    contract:
+      get_table_metrics:
+        count: "id"
     debt:
       get_table_metrics:
-        count: id
-    debtor: {}
+        count: "id"
+    debtor:
+      get_table_metrics:
+        count: "id"
     eviction_data:
       get_table_metrics:
-        count: id
+        count: "id"
     eviction:
       get_table_metrics:
-        count: id
-    evictions_report: {}
+        count: "id"
+    evictions_report:
+      get_table_metrics:
+        count: "id"
     eviction_aud: {}
     installment:
       get_table_metrics:
-        count: id
-    installment_charges: {}
+        count: "id"
+    installment_charges:
+      get_table_metrics:
+        count: "id"
     negotiation:
       get_table_metrics:
-        count: id
-    payment: {}
+        count: "id"
+    payment:
+      get_table_metrics:
+        count: "id"
     collector_load: {}
-    collector: {}
+    collector:
+      get_table_metrics:
+        count: "id"
     events_batch: {}
     status_sync: {}
     document_generation: {}
     document_generation_aud: {}
+    rollout_cyber_contract: {}
 cluster:
   type: custom_cluster
   custom_configurations:

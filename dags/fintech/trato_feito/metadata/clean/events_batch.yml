@@ -8,40 +8,40 @@ columns:
   id:
     description: "Unique identifier"
     lineage:
-      - datalake_trato_feito_raw.tmp_blocklist.id
+      - datalake_trato_feito_raw.events_batch.id
   id_batch:
     description: "Unique ID of the generated batch"
     lineage:
-      - datalake_trato_feito_raw.tmp_blocklist.batch_id
+      - datalake_trato_feito_raw.events_batch.batch_id
   origin:
     description: "Identifies the origin of the generated event (product)"
     lineage:
-      - datalake_trato_feito_raw.tmp_blocklist.origin
+      - datalake_trato_feito_raw.events_batch.origin
   batch_type:
     description: "Type of batch processed"
     lineage:
-      - datalake_trato_feito_raw.tmp_blocklist.batch_type
+      - datalake_trato_feito_raw.events_batch.batch_type
   batch_payload:
     description: "Batch event payload"
     lineage:
-      - datalake_trato_feito_raw.tmp_blocklist.batch_payload
+      - datalake_trato_feito_raw.events_batch.batch_payload
   batch_size:
     description: "Number of events processed in the batch"
     lineage:
-      - datalake_trato_feito_raw.tmp_blocklist.batch_size
+      - datalake_trato_feito_raw.events_batch.batch_size
   dt_started:
     description: "Batch processing start date and time"
     lineage:
-      - datalake_trato_feito_raw.tmp_blocklist.started_at
+      - datalake_trato_feito_raw.events_batch.started_at
   dt_finished:
     description: "Batch processing end date and time"
     lineage:
-      - datalake_trato_feito_raw.tmp_blocklist.finished_at
+      - datalake_trato_feito_raw.events_batch.finished_at
   ts_created:
     description: "Created at"
     lineage:
-      - datalake_trato_feito_raw.tmp_blocklist.created_at
+      - datalake_trato_feito_raw.events_batch.created_at
   ts_updated:
     description: "Updated at"
     lineage:
-      - datalake_trato_feito_raw.tmp_blocklist.updated_at
+      - datalake_trato_feito_raw.events_batch.updated_at
