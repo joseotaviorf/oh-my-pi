@@ -1,0 +1,11 @@
+SELECT
+    funnel_side,
+    campaign_business_context,
+    campaign_strategy_intent,
+    behavior_type,
+    medium, 
+    source,
+    taxonomy_aggregation_level_1, 
+    taxonomy_aggregation_level_2
+FROM
+    datalake_gsheets_raw.demand_taxonomy_management_aggregation

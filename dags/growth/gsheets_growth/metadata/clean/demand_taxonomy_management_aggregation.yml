@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: demand_taxonomy_management_aggregation
+columns:
+  funnel_side:
+    lineage:
+      - datalake_gsheets_raw.demand_taxonomy_management_aggregation.funnel_side
+  campaign_business_context:
+    lineage:
+      - datalake_gsheets_raw.demand_taxonomy_management_aggregation.campaign_business_context
+  campaign_strategy_intent:
+    lineage:
+      - datalake_gsheets_raw.demand_taxonomy_management_aggregation.campaign_strategy_intent
+  behavior_type:
+    lineage:
+      - datalake_gsheets_raw.demand_taxonomy_management_aggregation.behavior_type
+  medium:
+    lineage:
+      - datalake_gsheets_raw.demand_taxonomy_management_aggregation.medium
+  source:
+    lineage:
+      - datalake_gsheets_raw.demand_taxonomy_management_aggregation.source
+  taxonomy_aggregation_level_1:
+    lineage:
+      - datalake_gsheets_raw.demand_taxonomy_management_aggregation.taxonomy_aggregation_level_1
+  taxonomy_aggregation_level_2:
+    lineage:
+      - datalake_gsheets_raw.demand_taxonomy_management_aggregation.taxonomy_aggregation_level_2

@@ -1,4 +1,5 @@
 sheets_info:
+
   affiliates_active_segmentation:
     sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
     sheet_name: ativos
@@ -136,7 +137,13 @@ sheets_info:
     sheet_name: demand_retention_ab_tests
     clean_table_name: demand_retention_ab_tests
     sheet_context: growth
-  
+
+  demand_taxonomy_management_aggregation:
+    sheet_id: 14UunGBscdK3sRgRBXj-5ADDxD32OKUeh6WW3FYJeYVQ
+    sheet_name: aquisition_channel
+    clean_table_name: demand_taxonomy_management_aggregation
+    sheet_context: growth
+
   dict_taxonomy_supply:
     sheet_id: 1xhbRZ_W4GIy78LlT_yBlYV-WN7LikLFM7I2wRgMogg4
     sheet_name: mapped
