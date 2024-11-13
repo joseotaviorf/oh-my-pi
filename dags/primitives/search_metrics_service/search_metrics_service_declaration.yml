@@ -24,7 +24,7 @@ workflow:
   tables_customization:
     search_metrics:
       partitions:
-      - data_granularity
+      - date_granularity
       - date
 
 cluster:
