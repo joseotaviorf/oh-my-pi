@@ -1,0 +1,32 @@
+dag:
+  name: ebdb_lead
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 0 0 * * *
+  owner: Data Growth
+  documentation:
+    dag_purpose: Extraction of EBDB tables related to Lead into data lake. EBDB is the main database of QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  custom_schema: ebdb_test
+  tables_customization:
+    AgrupamentoLeadsPorTelefone:
+      raw_primary_keys: ["id"]
+      clean_table_name: leads_grouped_by_phone
+    ConversaoLead:
+      raw_primary_keys: ["id"]
+      clean_table_name: conversion_lead
+    ConversaoLead_AUD:
+      raw_primary_keys: ["id",  "REV"]
+      clean_table_name: conversion_lead_aud
+    Lead:
+      raw_primary_keys: ["id"]
+      clean_table_name: lead
+    Lead_AUD:
+      raw_primary_keys: ["id", "REV"]
+      clean_table_name: lead_aud
+cluster:
+  type: databricks_13_3_min_general_2_workers_cluster
