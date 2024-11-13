@@ -4,7 +4,6 @@ raw_partition_cols:
   - acc
   - dt
 clean_tables_list:
-  - mitula_campaigns
   - trovit_campaigns
 partition_cols:
   - id_account

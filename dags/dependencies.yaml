@@ -1346,7 +1346,6 @@ bietlejuice.enrich_consolidated_growth_metrics:
   - bietlejuice.google_ads:load-clean-videos-performance
   - bietlejuice.gsheets_growth:done-clean-cost-taxonomy-translation-dictionary
   - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
-  - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
 bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
@@ -1357,7 +1356,6 @@ bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.google_ads:load-clean-keywords-performance
   - bietlejuice.google_ads:load-clean-videos-performance
   - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
-  - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
 bietlejuice.enrich_content_funnel:
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-performance-marketing-metrics-demand
@@ -1831,7 +1829,6 @@ bietlejuice.enrich_growth_media_platform_scd:
   - bietlejuice.google_ads:load-clean-campaigns-performance
   - bietlejuice.google_ads:load-clean-keywords-performance
   - bietlejuice.google_ads:load-clean-videos-performance
-  - bietlejuice.lifull_campaigns:load-clean-mitula-campaigns
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
 bietlejuice.enrich_growth_taxonomy:
   - bietlejuice.gsheets_growth:done-clean-dict-taxonomy-supply
