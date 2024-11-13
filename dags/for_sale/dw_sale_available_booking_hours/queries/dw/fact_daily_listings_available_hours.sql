@@ -20,10 +20,8 @@ WITH snapshot AS (
     JOIN
         dw_public.dim_date AS d
             ON d.date BETWEEN w.dt_schedule_started AND COALESCE(w.dt_schedule_ended, NOW())
-    WHERE
-        d.year = {year}
-        AND d.month = {month}
-        AND d.day = {day}
+    WHERE        
+        MAKE_DATE(d.year, d.month, d.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     QUALIFY 
         ROW_NUMBER() OVER (PARTITION BY sk_house, year, month, day ORDER BY dt_schedule_started DESC) = 1
 ),
@@ -40,10 +38,8 @@ sale_status AS (
     JOIN 
         dw_public.dim_date AS d
             ON d.date BETWEEN DATE(f.ts_status_started) AND COALESCE(DATE(f.ts_status_ended), NOW())
-    WHERE 
-        d.year = {year}
-        AND d.month = {month}
-        AND d.day = {day}
+    WHERE        
+        MAKE_DATE(d.year, d.month, d.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     QUALIFY 
         ROW_NUMBER() OVER (PARTITION BY f.sk_sale_listing, d.date ORDER BY f.ts_status_started DESC) = 1
 )

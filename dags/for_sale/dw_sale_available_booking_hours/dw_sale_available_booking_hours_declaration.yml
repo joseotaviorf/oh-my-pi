@@ -12,9 +12,8 @@ workflow:
       extraction_type: incremental
       partitions: [year, month, day]
       extra_query_template_params:
-        year: "{year}"
-        month: "{month}"
-        day: "{day}"
+        load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+        load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_12_2_min_general_cluster
   access_control_list:
