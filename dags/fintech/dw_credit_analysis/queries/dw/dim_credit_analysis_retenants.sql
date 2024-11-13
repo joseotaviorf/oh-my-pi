@@ -240,6 +240,7 @@ get_retenant_policy_report AS (
 add_retenant_historical_tags AS (
   SELECT
     pcl.sk_credit_analysis,
+    pcl.id_proposal,
     pcl.last_active_contract,
     cpca.number_of_contracts,
     pcl.contract_age,
