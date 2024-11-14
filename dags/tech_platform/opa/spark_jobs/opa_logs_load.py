@@ -4,7 +4,7 @@ from dateutil import parser
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from pyspark.sql.functions import split, when, element_at, lit, col, from_json, year, month, dayofmonth, hour, to_timestamp
+from pyspark.sql.functions import split, when, element_at, lit, col, from_json, year, month, dayofmonth, hour, to_timestamp, translate
 from pyspark.sql.types import StructType, StructField, StringType, ArrayType, LongType, DoubleType, BooleanType
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.spark import (
