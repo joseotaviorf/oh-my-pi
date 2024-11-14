@@ -14,28 +14,6 @@ columns:
       - datalake_visits.visit_status_events.id_visit
     description:
       Is the visit unique key. Joins with visit table.
-  sk_visitor:
-    description: Visitor's id. (Connect with dim_user)
-    lineage:
-      - datalake_visit.visit_status_events.id_visitor
-  sk_owner:
-    sk_owner:
-      description: Owner's id. (Connect with dim_user)
-      lineage:
-        - datalake_visit.visit_status_events.id_owner
-  sk_agent:
-    lineage:
-      - datalake_visits.visit_status_events.id_agent
-    description:
-      Is the unique key of the agent. Joins with dim_user.
-  sk_house:
-    description: House's Id.
-    lineage:
-      - datalake_visit.visits.id_house
-  sk_house_listing:
-    description: House's Listing Id.
-    lineage:
-      - datalake_visit.visits.id_house_listing
   sk_author_creator:
     lineage:
       - datalake_visits.visit_status_events.id_author_user
