@@ -20,7 +20,9 @@ def clean_cf(df):
     """
     Transform json to struct data and extract only the necessary columns.
     """
-    df = df.withColumn("data", from_json(col("message"), get_opa_schema()))
+    # Make sure we handle escaped quotes
+    message = translate(col("message"), '\\"', '"')
+    df = df.withColumn("data", from_json(message, get_opa_schema()))
     ts = to_timestamp(col("data.timestamp"))
     traceparent = col("data.input.attributes.request.http.headers.traceparent")
 

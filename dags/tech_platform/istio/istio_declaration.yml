@@ -23,7 +23,8 @@ workflow:
   default_extraction_type: incremental
   default_partitions: [year, month, day, hour]
   tables_customization:
-    istio: {}
+    istio:
+      merge_on: [year, month, day, hour, id_request]
 
 cluster:
   type: custom_cluster
