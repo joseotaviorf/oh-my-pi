@@ -47,10 +47,6 @@ payment_no_ws AS (
     WHERE
     ( p.gateway != 'WALLSTREET' OR p.billing_type = 'ANNUAL_CREDIT_CARD')
     AND p.product_type IN ( 'GUARANTEE', 'ACTIVATION')
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY p.id_propose, COALESCE( date_trunc( 'MONTH', DATE( p.ts_due ) ), date_trunc('MONTH', date( p.ts_created ) ) ) ORDER BY p.ts_updated DESC
-        ) = 1
 ),
 payment_ws AS (
     SELECT 
