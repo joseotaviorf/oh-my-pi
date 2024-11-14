@@ -10,16 +10,12 @@ WITH
         ON ev1.id_visit = ev2.id_visit
         AND ev1.ranking = (ev2.ranking-1)
         AND ev2.event_type = 'VISIT_RESCHEDULED'
+      GROUP BY ALL
     ),
     schedule_events AS
       (SELECT
         id_schedule,
         id_visit,
-        id_visitor,
-        id_owner,
-        id_agent,
-        id_house,
-        id_house_listing,
         MIN_BY(id_author_user, ts_event_created) AS id_author_creator,
         CASE
           WHEN MIN(ts_event_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') IS NULL THEN 'RESCHEDULE'
@@ -34,21 +30,11 @@ WITH
         datalake_visit.visit_status_events
       GROUP BY
         id_schedule,
-        id_visit,
-        id_visitor,
-        id_owner,
-        id_agent,
-        id_house,
-        id_house_listing
+        id_visit
 )
 SELECT
   schedule_events.id_schedule AS sk_schedule,
   id_visit AS sk_visit,
-  id_visitor AS sk_visitor,
-  id_owner AS sk_owner,
-  id_agent AS sk_agent,
-  id_house AS sk_house,
-  id_house_listing AS sk_house_listing,
   id_author_creator AS sk_author_creator,
   reschedules.id_succeed_schedule AS sk_succeed_schedule,
   sk_origin_type,
@@ -59,12 +45,13 @@ SELECT
   COALESCE(CAST(REPLACE(SUBSTRING(COALESCE(ts_schedule_requested, ts_schedule_rescheduled),1, 10),'-','') AS BIGINT), -1) AS sk_schedule_created,
   COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_confirmed,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_confirmed,
   COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_completed,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_completed,
-  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_canceled,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_canceled
+  COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_canceled,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_canceled,
+  NOW() AS ts_load
 FROM
   schedule_events
 LEFT JOIN
   reschedules
     ON reschedules.id_schedule = schedule_events.id_schedule
 INNER JOIN
-   dim_origin_type AS dot
+   dw_visit.dim_origin_type AS dot
     ON schedule_events.schedule_origin = dot.origin_name

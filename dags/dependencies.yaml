@@ -1009,7 +1009,6 @@ bietlejuice.dw_velo_zendesk:
   - bietlejuice.enrich_velo_zendesk:load-enrich-ticket-metrics
   - bietlejuice.velo_zendesk:load-clean-users
 bietlejuice.dw_visit:
-  - bietlejuice.ebdb:load-clean-feedback-tag
   - bietlejuice.ebdb_visit:load-clean-visit
   - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
   - bietlejuice.enrich_ebdb_listing:load-enrich-house

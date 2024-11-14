@@ -142,3 +142,6 @@ columns:
     description: Hours waiting for the answers.
     lineage:
         -datalake_visit.visits.hours_waiting_for_answers
+  ts_load:
+    description:
+      Timestamp of the load of the table.

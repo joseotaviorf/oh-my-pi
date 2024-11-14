@@ -55,7 +55,8 @@ SELECT
   DATEDIFF(HOUR, vse.ts_first_booked, v.ts_visit_canceled) AS hours_between_first_booked_and_visit_day,
   DATEDIFF(HOUR, vse.ts_last_booked, v.ts_visit_canceled) AS hours_between_last_booked_and_visit_day,
   DATEDIFF(HOUR, v.ts_visit_canceled, v.ts_visit_local_tz) AS hours_between_cancellation_and_visit_date,
-  v.hours_waiting_for_answers
+  v.hours_waiting_for_answers,
+  NOW() AS ts_load
 FROM
   datalake_visit.visits AS v
 INNER JOIN

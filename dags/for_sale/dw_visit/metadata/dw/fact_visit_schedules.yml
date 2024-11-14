@@ -73,3 +73,6 @@ columns:
   sk_schedule_canceled:
     description:
       Sk with the canceled date.
+  ts_load:
+    description:
+      Timestamp of the load of the table.

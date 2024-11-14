@@ -1,4 +1,4 @@
-SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
+SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renaming
   CAST(id AS INT) AS sk_visit,
   CAST(id  AS INT) AS id_visit,
   code AS cd_visit,
