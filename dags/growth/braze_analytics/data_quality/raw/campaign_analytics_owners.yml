@@ -1,0 +1,11 @@
+---
+table_name: datalake_braze_analytics_raw.campaign_analytics_owners
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  campaign_id:
+    is_complete:
+      severity_level: Error

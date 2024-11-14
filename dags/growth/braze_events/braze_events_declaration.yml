@@ -28,14 +28,11 @@ workflow:
     events_indica_ai:
       extra_spark_job_arguments: 
         - indica_ai # app group
-      #partitions: [year, month, day]
     events_owners: 
       extra_spark_job_arguments: 
         - owners # app group
-      #partitions: [year, month, day]
     events_tenants:
       extra_spark_job_arguments: 
         - tenants # app group
-      #partitions: [year, month, day]
 cluster:
   type: databricks_12_2_med_mem_driver_high_mem_nodes

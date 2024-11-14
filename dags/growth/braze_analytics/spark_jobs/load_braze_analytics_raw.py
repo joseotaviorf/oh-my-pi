@@ -21,7 +21,7 @@ from bietlejuice.base.spark import (
 )
 
 
-JOB_NAME = "load_braze_analytis_into_datalake"
+JOB_NAME = "load_braze_analytis_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -32,27 +32,22 @@ if __name__ == "__main__":
     parser.add_argument("environment")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
+    parser.add_argument("execution_date")
     parser.add_argument("app_group")
     parser.add_argument("identifier")
-    parser.add_argument("execution_date")
     args = parser.parse_args()
 
     environment = args.environment
-    source = args.source
     datalake_bucket = args.datalake_bucket
+    source = args.source
+    execution_date = args.execution_date
     app_group = args.app_group
     identifier = args.identifier
-    execution_date = args.execution_date
     partition_cols = ["year", "month", "day"]
 
     logger.info(
-        f"m={JOB_NAME}, "
-        f"environment={environment}, "
-        f"source={source}, "
-        f"datalake_bucket={datalake_bucket}, "
-        f"app_group={app_group}, "
-        f"identifier={identifier}, "
-        f"msg=Spark job arguments"
+        f"""m={JOB_NAME}, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
+        app_group={app_group}, identifier={identifier}, execution_date={execution_date}, msg=Spark job arguments"""
     )
 
     base_dbutils = BaseDBUtils()
