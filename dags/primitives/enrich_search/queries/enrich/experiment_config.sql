@@ -62,20 +62,20 @@ FROM VALUES
         )
     ),
     -- native_copilot_experiment
-    (
-        "native_copilot_experiment",
-        named_struct(
-            'begin_date', DATE('2024-07-19'),
-            'end_date', NULL,
-            'variants', to_json(
-                named_struct(
-                    'baseline', 'baseline',
-                    'treatment', 'treatment'
-                )
-            ),
-            'filters', NULL
-        )
-    ),
+--    (
+--        "native_copilot_experiment",
+--        named_struct(
+--            'begin_date', DATE('2024-07-19'),
+--            'end_date', NULL,
+--            'variants', to_json(
+--                named_struct(
+--                    'baseline', 'baseline',
+--                    'treatment', 'treatment'
+--                )
+--            ),
+--            'filters', NULL
+--        )
+--    ),
     -- sale v2 vs v3 experiment
     (
         "ab_beakman_ranking_sale_pclick_v1",
