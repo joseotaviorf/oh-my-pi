@@ -72,7 +72,7 @@ def get_df_raw(table_name, source_root_path, date_to_ingest):
         df = spark_client.conn.read.parquet(f"{source_root_path}/metrics").filter(col('date') >= dt_start)
     elif table_name == 'search_experiments':
         list_experiments = (
-            spark_client.conn.read.parquet(source_root_path)
+            spark_client.conn.read.parquet(f"{source_root_path}/experiments")
             .filter(col('date') >= dt_start)
             .select('exp_name')
             .distinct()
