@@ -38,4 +38,4 @@ select
     significance_marginal,
     exp_name
 from
-  datalake_search_experiments_service_raw.search_experiments
+  datalake_search_metrics_service_raw.search_experiments
