@@ -7,13 +7,12 @@ workflow:
   layer: raw
   type: custom_ingestion
   load_spark_job: load_parquet_batch_inference_into_datalake
-  default_partitions: [date_granularity, date]
 
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
     - "{dag_name}"
-    - s3://data-science.s3.data.quintoandar.com.br/search_monitoring/data/metrics
+    - s3://data-science.s3.data.quintoandar.com.br/search_monitoring/data
     - "{{ next_ds }}"
     - "{table_name}"
     - "{partitions}"
@@ -24,8 +23,11 @@ workflow:
   tables_customization:
     search_metrics:
       partitions:
-      - date_granularity
-      - date
+        - date_granularity
+        - date
+    search_experiments:
+      partitions:
+        - exp_name
 
 cluster:
   type: databricks_12_2_med_memory_photon_cluster

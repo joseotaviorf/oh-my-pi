@@ -1,0 +1,121 @@
+---
+database_name: datalake_search
+table_name: search_experiments
+owner: joao.fidalgo@quintoandar.com.br
+domain: primitives
+
+columns:
+  business_context:
+    lineage:
+      - datalake_search.search_experiments.business_context
+  dimension_name:
+    lineage:
+      - datalake_search.search_experiments.dimension_name
+  dimension_value:
+    lineage:
+      - datalake_search.search_experiments.dimension_value
+  agg_id:
+    lineage:
+      - datalake_search.search_experiments.agg_id
+  metric_name:
+    lineage:
+      - datalake_search.search_experiments.metric_name
+  baseline:
+    lineage:
+      - datalake_search.search_experiments.baseline
+  treatment:
+    lineage:
+      - datalake_search.search_experiments.treatment
+  date:
+    lineage:
+      - datalake_search.search_experiments.date
+  hypothesis_test:
+    lineage:
+      - datalake_search.search_experiments.hypothesis_test
+  params:
+    lineage:
+      - datalake_search.search_experiments.params
+  baseline_observations:
+    lineage:
+      - datalake_search.search_experiments.baseline_observations
+  baseline_conversions:
+    lineage:
+      - datalake_search.search_experiments.baseline_conversions
+  treatment_observations:
+    lineage:
+      - datalake_search.search_experiments.treatment_observations
+  treatment_conversions:
+    lineage:
+      - datalake_search.search_experiments.treatment_conversions
+  binary_or_continuous:
+    lineage:
+      - datalake_search.search_experiments.binary_or_continuous
+  baseline_conversion_rate:
+    lineage:
+      - datalake_search.search_experiments.baseline_conversion_rate
+  treatment_conversion_rate:
+    lineage:
+      - datalake_search.search_experiments.treatment_conversion_rate
+  conversion_rate_diff_abs:
+    lineage:
+      - datalake_search.search_experiments.conversion_rate_diff_abs
+  conversion_rate_diff_rel:
+    lineage:
+      - datalake_search.search_experiments.conversion_rate_diff_rel
+  ci_lower_bound_rel:
+    lineage:
+      - datalake_search.search_experiments.ci_lower_bound_rel
+  ci_upper_bound_rel:
+    lineage:
+      - datalake_search.search_experiments.ci_upper_bound_rel
+  mde_rel:
+    lineage:
+      - datalake_search.search_experiments.mde_rel
+  significance:
+    lineage:
+      - datalake_search.search_experiments.significance
+  has_significance:
+    lineage:
+      - datalake_search.search_experiments.has_significance
+  p_treatment_win:
+    lineage:
+      - datalake_search.search_experiments.p_treatment_win
+  decision:
+    lineage:
+      - datalake_search.search_experiments.decision
+  baseline_observations_cumulative:
+    lineage:
+      - datalake_search.search_experiments.baseline_observations_cumulative
+  baseline_conversions_cumulative:
+    lineage:
+      - datalake_search.search_experiments.baseline_conversions_cumulative
+  treatment_observations_cumulative:
+    lineage:
+      - datalake_search.search_experiments.treatment_observations_cumulative
+  treatment_conversions_cumulative:
+    lineage:
+      - datalake_search.search_experiments.treatment_conversions_cumulative
+  baseline_conversion_rate_cumulative:
+    lineage:
+      - datalake_search.search_experiments.baseline_conversion_rate_cumulative
+  treatment_conversion_rate_cumulative:
+    lineage:
+      - datalake_search.search_experiments.treatment_conversion_rate_cumulative
+  conversion_rate_diff_abs_cumulative:
+    lineage:
+      - datalake_search.search_experiments.conversion_rate_diff_abs_cumulative
+  conversion_rate_diff_rel_cumulative:
+    lineage:
+      - datalake_search.search_experiments.conversion_rate_diff_rel_cumulative
+  ci_lower_bound_rel_marginal:
+    lineage:
+      - datalake_search.search_experiments.ci_lower_bound_rel_marginal
+  ci_upper_bound_rel_marginal:
+    lineage:
+      - datalake_search.search_experiments.ci_upper_bound_rel_marginal
+  significance_marginal:
+    lineage:
+      - datalake_search.search_experiments.significance_marginal
+  exp_name:
+    lineage:
+      - datalake_search.search_experiments.exp_name
