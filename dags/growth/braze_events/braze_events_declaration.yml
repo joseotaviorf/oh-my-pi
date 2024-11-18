@@ -2,7 +2,7 @@ dag:
   name: braze_events
   owner: Data Growth
   schedule_start_date: 2020, 11, 1
-  schedule_interval: "30 0 * * *"
+  schedule_interval: "15 0 * * *"
   documentation: 
     dag_purpose: |    
       Retrieves data from events streamed by [Braze's Currents tool](https://www.braze.com/docs/user_guide/data_and_analytics/braze_currents/).
@@ -35,4 +35,4 @@ workflow:
       extra_spark_job_arguments: 
         - tenants # app group
 cluster:
-  type: databricks_12_2_med_mem_driver_high_mem_nodes
+  type: databricks_13_3_med_memory_2_workers_general_cluster

@@ -2,7 +2,7 @@ dag:
   name: braze_details
   owner: Data Growth
   schedule_start_date: 2020, 11, 1
-  schedule_interval: "30 0 * * *"
+  schedule_interval: "20 0 * * *"
   documentation: 
     dag_purpose: |    
       Retrieves Details data from [Campaigns](https://www.braze.com/docs/api/endpoints/export/campaigns/get_campaign_details/)
@@ -51,6 +51,6 @@ workflow:
         - tenants # app group
         - canvas # identifier
 cluster:
-  type: databricks_12_2_med_mem_driver_high_mem_nodes
+  type: databricks_13_3_med_memory_2_workers_general_cluster
   custom_libraries:
     - whl: "{artifacts_bucket}/braze-api-client-python/quintoandar_braze_api_client-0.1.0-py2.py3-none-any.whl"
