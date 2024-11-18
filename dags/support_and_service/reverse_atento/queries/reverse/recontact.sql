@@ -102,7 +102,8 @@ WITH front_tickets_list AS (
         'CX Rescisão [FRONT] [POS]'
       ) THEN 'front'
     END AS unificador_front,
-    rc.ts_started
+    rc.ts_started,
+    ROW_NUMBER() OVER(PARTITION BY rc.sk_ticket, rc.sk_user, rc.team ORDER BY rc.ts_started DESC) AS rn
   FROM
     front_tickets_list AS rc
 
@@ -197,4 +198,5 @@ WHERE
   department NOT LIKE '%[WH]%' --caixas da WebHelp agora são identificadas assim
   AND department NOT LIKE '%[CNX]%'
   AND agent_organization IN ('atn', 'atento')
+  AND rn = 1
 GROUP BY ALL
