@@ -3,10 +3,14 @@ dag:
   schedule_start_date: 2022,08,01
   owner: Data Fintech
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: losses
   has_load_to_redshift_task: false
+  inner_dependencies:
+    fact_losses:
+      - fact_provision
+      - fact_closing
 cluster:
   type: databricks_13_3_med_general_photon_cluster
   access_control_list:
