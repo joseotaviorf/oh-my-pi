@@ -1,0 +1,30 @@
+database_name: datalake_chatmanager_clean
+table_name: chat_user
+columns:
+  id:
+    lineage:
+      - datalake_chatmanager_raw.chat_user.id
+  uuid:
+    lineage:
+      - datalake_chatmanager_raw.chat_user.uuid
+  id_participant:
+    lineage:
+      - datalake_chatmanager_raw.chat_user.participant_id
+  id_origin:
+    lineage:
+      - datalake_chatmanager_raw.chat_user.origin_id
+  origin_type:
+    lineage:
+      - datalake_chatmanager_raw.chat_user.origin_type
+  attributes:
+    lineage:
+      - datalake_chatmanager_raw.chat_user.attributes
+  version:
+    lineage:
+      - datalake_chatmanager_raw.chat_user.version
+  ts_created:
+    lineage:
+      - datalake_chatmanager_raw.chat_user.created_at
+  ts_updated:
+    lineage:
+      - datalake_chatmanager_raw.chat_user.updated_at

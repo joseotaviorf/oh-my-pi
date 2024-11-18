@@ -1,0 +1,66 @@
+database_name: datalake_chatmanager_clean
+table_name: call
+columns:
+  id:
+    lineage:
+      - datalake_chatmanager_raw.call.id
+  uuid:
+    lineage:
+      - datalake_chatmanager_raw.call.uuid
+  id_chat_group:
+    lineage:
+      - datalake_chatmanager_raw.call.chat_group_id
+  id_from_chat_user:
+    lineage:
+      - datalake_chatmanager_raw.call.from_chat_user_id
+  id_to_chat_user:
+    lineage:
+      - datalake_chatmanager_raw.call.to_chat_user_id
+  id_vendor:
+    lineage:
+      - datalake_chatmanager_raw.call.vendor_id
+  version:
+    lineage:
+      - datalake_chatmanager_raw.call.version
+  state:
+    lineage:
+      - datalake_chatmanager_raw.call.state
+  result:
+    lineage:
+      - datalake_chatmanager_raw.call.result
+  from_leg_type:
+    lineage:
+      - datalake_chatmanager_raw.call.from_leg_type
+  from_leg_state:
+    lineage:
+      - datalake_chatmanager_raw.call.from_leg_state
+  from_leg_result:
+    lineage:
+      - datalake_chatmanager_raw.call.from_leg_result
+  from_leg_duration:
+    lineage:
+      - datalake_chatmanager_raw.call.from_leg_duration
+  to_leg_type:
+    lineage:
+      - datalake_chatmanager_raw.call.to_leg_type
+  to_leg_state:
+    lineage:
+      - datalake_chatmanager_raw.call.to_leg_state
+  to_leg_result:
+    lineage:
+      - datalake_chatmanager_raw.call.to_leg_result
+  to_leg_duration:
+    lineage:
+      - datalake_chatmanager_raw.call.to_leg_duration
+  to_voip_rang:
+    lineage:
+      - datalake_chatmanager_raw.call.to_voip_rang
+  vendor_name:
+    lineage:
+      - datalake_chatmanager_raw.call.vendor_name
+  ts_created:
+    lineage:
+      - datalake_chatmanager_raw.call.created_at
+  ts_updated:
+    lineage:
+      - datalake_chatmanager_raw.call.updated_at

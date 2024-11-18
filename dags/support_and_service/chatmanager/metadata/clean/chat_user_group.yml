@@ -1,0 +1,33 @@
+database_name: datalake_chatmanager_clean
+table_name: chat_user_group
+columns:
+  id_chat_group:
+    lineage:
+      - datalake_chatmanager_raw.chat_user_group.chat_group_id
+  id_chat_user:
+    lineage:
+      - datalake_chatmanager_raw.chat_user_group.chat_user_id
+  state:
+    lineage:
+      - datalake_chatmanager_raw.chat_user_group.state
+  visible:
+    lineage:
+      - datalake_chatmanager_raw.chat_user_group.visible
+  profile:
+    lineage:
+      - datalake_chatmanager_raw.chat_user_group.profile
+  last_read_index:
+    lineage:
+      - datalake_chatmanager_raw.chat_user_group.last_read_index
+  attributes:
+    lineage:
+      - datalake_chatmanager_raw.chat_user_group.attributes
+  ts_last_read:
+    lineage:
+      - datalake_chatmanager_raw.chat_user_group.last_read_at
+  ts_created:
+    lineage:
+      - datalake_chatmanager_raw.chat_user_group.created_at
+  ts_updated:
+    lineage:
+      - datalake_chatmanager_raw.chat_user_group.updated_at

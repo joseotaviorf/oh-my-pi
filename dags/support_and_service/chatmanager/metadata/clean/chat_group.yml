@@ -1,0 +1,60 @@
+database_name: datalake_chatmanager_clean
+table_name: chat_group
+columns:
+  id:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.id
+  id_last_chat_vendor:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.last_chat_vendor_id
+  id_chat_subtype:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.chat_subtype_id
+  uuid:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.uuid
+  version:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.version
+  chat_group:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.chat_group
+  state:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.state
+  last_message_sent_by:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.last_message_sent_by
+  last_message_type:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.last_message_type
+  last_message_body:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.last_message_body
+  last_message_index:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.last_message_index
+  last_message_data:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.last_message_data
+  attributes:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.attributes
+  last_message_media_content_type:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.customer_name
+  last_chat_vendor_name:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.last_chat_vendor_name
+  chat_subtype:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.chat_subtype
+  ts_created:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.created_at
+  ts_last_message_sent:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.last_message_sent_at
+  ts_updated:
+    lineage:
+      - datalake_chatmanager_raw.chat_group.updated_at
