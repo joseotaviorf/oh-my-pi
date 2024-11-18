@@ -10,8 +10,7 @@ workflow:
   type: custom_ingestion
   layer: raw
   load_spark_job: load_cozy_metrics_raw
-  default_partitions: [year, month, day]
-  default_extraction_type: incremental
+  default_extraction_type: full
   has_hive_sync: false
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
