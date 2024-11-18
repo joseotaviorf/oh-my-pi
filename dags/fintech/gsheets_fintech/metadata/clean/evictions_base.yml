@@ -93,6 +93,14 @@ columns:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Total_pacote
+  total_payment:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Total_pagamento
+  total_due_amount:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Total_divida
   dt_registered:
     description: ""
     lineage:
@@ -177,3 +185,7 @@ columns:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Faixa_Resolucao
+  dt_asset_attachment:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Data_penhora

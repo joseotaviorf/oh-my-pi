@@ -21,6 +21,8 @@ SELECT
     Correspondente AS correspondent,
     Aviso_recebimento AS notice_of_receipt,
     Total_pacote AS total_package,
+    Total_pagamento AS total_payment,
+    Total_divida AS total_due_amount,
     Citacao_Arbitral AS arbitral_citation,
     Contestacao_Camara AS chamber_contestation,
     Sentenca_Arbitral AS arbitral_sentence,
@@ -42,6 +44,7 @@ SELECT
     Data_encerramento_elaw AS dt_elaw_closure,
     Data_registrado AS dt_registered,
     Data_distribuicao_protocolo AS dt_distribution_protocol,
+    Data_penhora AS dt_asset_attachment,
     NOW() AS ts_load
 FROM
     datalake_gsheets_raw.evictions_base
