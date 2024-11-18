@@ -1,0 +1,83 @@
+---
+database_name: datalake_growth_media_platform
+table_name: facebook_metrics
+owner: arthur.gonzaga@quintoandar.com.br
+domain: Data Growth
+description: This table contains metrics like clicks, impressions, and spend from Facebook Ads Insights by region.
+columns:
+  id_account:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.id_account
+    description: The account id of the Facebook Ads platform.
+  id_campaign:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.id_campaign
+    description: The id of the campaign in Facebook Ads.
+  id_adset:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.id_adset
+    description: The id of the adset in Facebook Ads.
+  id_ad:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.id_ad
+    description: The id of the ad in Facebook Ads.
+  account_name:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.account_name
+    description: The name of the account in Facebook Ads.
+  origin:
+    description: The origin of the data. For this table, it is always Facebook.
+  report_type:
+    description: The type of report. For this table, it is always ads_insights_by_region.
+  utm_campaign:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.campaign_name
+    description: The UTM campaign name of the ad.
+  utm_term:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.adset_name
+    description: The UTM term of the adset in Facebook Ads.
+  utm_content:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.ad_name
+    description: The UTM content of the ad in Facebook Ads.
+  country_code:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.country_code
+    description: The country code of the report.
+  state:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.region
+    description: The state of the spend in the report. Parentheses in the name are removed for formatting.
+  city:
+    description: City of the spend in the report. This information is not available for this table.
+  clicks:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.clicks
+    description: Number of clicks in Facebook Ads.
+  conversions:
+    description: Number of conversions in Facebook Ads. This information is not available for this table.
+  impressions:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.impressions
+    description: Number of impressions in Facebook Ads.
+  total_cost:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.spend
+    description: Total cost of the ads in Facebook Ads.
+  dt_cost:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.dt_start
+    description: Date of the cost.
+  year:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.dt_start
+    description: Year of the report.
+  month:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.dt_start
+    description: Month of the report.
+  day:
+    lineage:
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.dt_start
+    description: Day of the report.

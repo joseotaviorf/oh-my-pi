@@ -1,0 +1,26 @@
+---
+dag:
+  name: enrich_growth_media_platform_metrics
+  schedule_start_date: 2024, 10, 14
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for consolidate metrics like clicks, impressions and cost from 
+      Media Platforms like Google, Facebook, Criteo and Trovit.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: growth_media_platform
+  default_extraction_type: incremental
+  default_partitions: ["origin", "year", "month", "day"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  inner_dependencies:
+    consolidated_metrics:
+      - google_metrics
+      - facebook_metrics
+      - criteo_metrics
+      - trovit_metrics 
+cluster:
+  type: databricks_13_3_med_general_cluster

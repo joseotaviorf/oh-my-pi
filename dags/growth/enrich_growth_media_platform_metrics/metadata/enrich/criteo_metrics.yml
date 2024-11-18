@@ -1,0 +1,99 @@
+---
+database_name: datalake_growth_media_platform
+table_name: criteo_metrics
+owner: arthur.gonzaga@quintoandar.com.br
+domain: Data Growth
+description: This table contains consolidated metrics like clicks, impressions and cost from Media Platforms from Criteo.
+columns:
+  id_account:
+    lineage:
+      - datalake_criteo.criteo_campaigns.id_advertiser
+    description:
+      - The account id of the media platform.
+  id_campaign:
+    lineage:
+      - datalake_criteo.criteo_campaigns.id_ad_set
+    description:
+      - The id of the campaign in media platform.
+  id_adset:
+    lineage:
+      - datalake_criteo.criteo_campaigns.id_ad_set
+    description:
+      - The id of the adset in media platform.
+  id_ad:
+    description: 
+      - The id of the ad in media platform, for this table is null.
+  account_name:
+    lineage:
+      - datalake_criteo.criteo_campaigns.advertiser_name
+    description:
+      - The name of the account in media platform.
+  origin:
+    description:
+      - The origin of the data, its always Criteo.
+  report_type:
+    description:
+      - The type of report, its always campaigns.
+  utm_campaign:
+    lineage:
+      - datalake_criteo.criteo_campaigns.ad_set
+    description:
+      - The utm_campaign of the media platform.
+  utm_term:
+    description:
+      - The utm_term of the media platform. For this table is null.
+  utm_content:
+    description:
+      - The utm_content of the media platform. For this table is null.
+  country_code:
+    description:
+      - The country code of the report. Its always BR.
+  state:
+    lineage:
+      - datalake_criteo.criteo_campaigns.region
+    description:
+      - State of spend in the report.
+  city:
+    lineage:
+      - datalake_gsheets_clean.criteo_region_lookup.locality
+    description:
+      - City of spend in the report.
+  clicks:
+    lineage:
+      - datalake_criteo.criteo_campaigns.clicks
+    description:
+      - Number of clicks in media on ads.
+  conversions:
+    description:
+      - Number of conversions in media on ads. But we don't have this data for this report.
+  impressions:
+    lineage:
+      - datalake_criteo.criteo_campaigns.displays
+    description:
+      - Number of impressions in media on ads.
+  total_cost:
+    lineage:
+      - datalake_criteo.criteo_campaigns.cost
+    description:
+      - Total cost of the media on ads.
+  dt_cost:
+    lineage:
+      - datalake_criteo.criteo_campaigns.dt_report
+    description:
+      - Date of the cost.
+  year:
+    lineage:
+      - datalake_criteo.criteo_campaigns.dt_report
+    description:
+      - Year of the report.
+  month:
+    lineage:
+      - datalake_criteo.criteo_campaigns.dt_report
+    description:
+      - Month of the report.
+  day:
+    lineage:
+      - datalake_criteo.criteo_campaigns.dt_report
+    description:
+      - Day of the report.
+      

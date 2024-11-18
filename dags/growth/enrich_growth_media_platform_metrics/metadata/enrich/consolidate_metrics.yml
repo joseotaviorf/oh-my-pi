@@ -1,0 +1,176 @@
+---
+database_name: datalake_growth_media_platform
+table_name: consolidated_metrics
+owner: arthur.gonzaga@quintoandar.com.br
+domain: Data Growth
+description: This table contains consolidated metrics like clicks, impressions and cost from Media Platforms like Google, Facebook, Criteo and Trovit.
+columns:
+  id_account:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.id_account
+      - datalake_growth_media_platform.facebook_metrics.id_account
+      - datalake_growth_media_platform.google_metrics.id_account
+      - datalake_growth_media_platform.trovit_metrics.id_account
+    description:
+      - The account id of the media platform.
+  id_campaign:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.id_campaign
+      - datalake_growth_media_platform.facebook_metrics.id_campaign
+      - datalake_growth_media_platform.google_metrics.id_campaign
+      - datalake_growth_media_platform.trovit_metrics.id_campaign
+    description:
+      - The id of the campaign in media platform.
+  id_adset:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.id_adset
+      - datalake_growth_media_platform.facebook_metrics.id_adset
+      - datalake_growth_media_platform.google_metrics.id_adset
+      - datalake_growth_media_platform.trovit_metrics.id_adset
+    description:
+      - The id of the adset in media platform.
+  id_ad:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.id_ad
+      - datalake_growth_media_platform.facebook_metrics.id_ad
+      - datalake_growth_media_platform.google_metrics.id_ad
+      - datalake_growth_media_platform.trovit_metrics.id_ad
+    description: 
+      - The id of the ad in media platform.
+  account_name:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.account_name
+      - datalake_growth_media_platform.facebook_metrics.account_name
+      - datalake_growth_media_platform.google_metrics.account_name
+      - datalake_growth_media_platform.trovit_metrics.account_name
+    description:
+      - The name of the account in media platform.
+  origin:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.origin
+      - datalake_growth_media_platform.facebook_metrics.origin
+      - datalake_growth_media_platform.google_metrics.origin
+      - datalake_growth_media_platform.trovit_metrics.origin
+    description:
+      - The origin of the data, could be Google, Criteo, Facebook or Trovit.
+  report_type:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.report_type
+      - datalake_growth_media_platform.facebook_metrics.report_type
+      - datalake_growth_media_platform.google_metrics.report_type
+      - datalake_growth_media_platform.trovit_metrics.report_type
+    description:
+      - The type of report, generally is the name of clean table.
+  utm_campaign:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.utm_campaign
+      - datalake_growth_media_platform.facebook_metrics.utm_campaign
+      - datalake_growth_media_platform.google_metrics.utm_campaign
+      - datalake_growth_media_platform.trovit_metrics.utm_campaign
+    description:
+      - The utm_campaign of the media platform.
+  utm_term:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.utm_term
+      - datalake_growth_media_platform.facebook_metrics.utm_term
+      - datalake_growth_media_platform.google_metrics.utm_term
+      - datalake_growth_media_platform.trovit_metrics.utm_term
+    description:
+      - The utm_term of the media platform.
+  utm_content:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.utm_content
+      - datalake_growth_media_platform.facebook_metrics.utm_content
+      - datalake_growth_media_platform.google_metrics.utm_content
+      - datalake_growth_media_platform.trovit_metrics.utm_content
+    description:
+      - The utm_content of the media platform.
+  country_code:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.country_code
+      - datalake_growth_media_platform.facebook_metrics.country_code
+      - datalake_growth_media_platform.google_metrics.country_code
+      - datalake_growth_media_platform.trovit_metrics.country_code
+    description:
+      - The country code of the report.
+  state:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.state
+      - datalake_growth_media_platform.facebook_metrics.state
+      - datalake_growth_media_platform.google_metrics.state
+      - datalake_growth_media_platform.trovit_metrics.state
+    description:
+      - State of spend in the report.
+  city:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.city
+      - datalake_growth_media_platform.facebook_metrics.city
+      - datalake_growth_media_platform.google_metrics.city
+      - datalake_growth_media_platform.trovit_metrics.city
+    description:
+      - City of spend in the report.
+  clicks:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.clicks
+      - datalake_growth_media_platform.facebook_metrics.clicks
+      - datalake_growth_media_platform.google_metrics.clicks
+      - datalake_growth_media_platform.trovit_metrics.clicks
+    description:
+      - Number of clicks in media on ads.
+  conversions:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.conversions
+      - datalake_growth_media_platform.facebook_metrics.conversions
+      - datalake_growth_media_platform.google_metrics.conversions
+      - datalake_growth_media_platform.trovit_metrics.conversions
+    description:
+      - Number of conversions in media on ads.
+  impressions:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.impressions
+      - datalake_growth_media_platform.facebook_metrics.impressions
+      - datalake_growth_media_platform.google_metrics.impressions
+      - datalake_growth_media_platform.trovit_metrics.impressions
+    description:
+      - Number of impressions in media on ads.
+  total_cost:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.total_cost
+      - datalake_growth_media_platform.facebook_metrics.total_cost
+      - datalake_growth_media_platform.google_metrics.total_cost
+      - datalake_growth_media_platform.trovit_metrics.total_cost
+    description:
+      - Total cost of the media on ads.
+  dt_cost:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.dt_cost
+      - datalake_growth_media_platform.facebook_metrics.dt_cost
+      - datalake_growth_media_platform.google_metrics.dt_cost
+      - datalake_growth_media_platform.trovit_metrics.dt_cost
+    description:
+      - Date of the cost.
+  year:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.year
+      - datalake_growth_media_platform.facebook_metrics.year
+      - datalake_growth_media_platform.google_metrics.year
+      - datalake_growth_media_platform.trovit_metrics.year
+    description:
+      - Year of the report.
+  month:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.month
+      - datalake_growth_media_platform.facebook_metrics.month
+      - datalake_growth_media_platform.google_metrics.month
+      - datalake_growth_media_platform.trovit_metrics.month
+    description:
+      - Month of the report.
+  day:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.day
+      - datalake_growth_media_platform.facebook_metrics.day
+      - datalake_growth_media_platform.google_metrics.day
+      - datalake_growth_media_platform.trovit_metrics.day
+    description:
+      - Day of the report.
+      
