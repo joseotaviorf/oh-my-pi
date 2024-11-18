@@ -165,11 +165,11 @@ contacts AS (
   LEFT JOIN
     datalake_customer_support.tickets AS t1
       ON t1.id_twilio = d.id_call
-      AND STARTSWITH(t1.id_twilio, "WT")
+      AND STARTSWITH(t1.id_twilio, "CA")
   LEFT JOIN
     datalake_customer_support.tickets AS t2
       ON t2.id_twilio = d.id_task
-      AND STARTSWITH(t2.id_twilio, "CA")
+      AND STARTSWITH(t2.id_twilio, "WT")
       AND d.channel = 'call'
 )
 SELECT
