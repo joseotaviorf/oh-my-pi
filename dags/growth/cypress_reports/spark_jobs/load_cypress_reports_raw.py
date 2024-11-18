@@ -105,7 +105,7 @@ if __name__ == "__main__":
                 df.createOrReplaceTempView(temp_table_raw)
                 df = spark_client.conn.sql(raw_sql.format(table_name=temp_table_raw))
 
-                logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, msg=Loading raw data on bucket...""")
+                logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, table_name={temp_table_raw}, msg=Loading raw data on bucket...""")
                 s3_loader.load_df(
                     df=df,
                     format_options=SparkTableStorageFormat.DEFAULT_RAW,
@@ -114,7 +114,7 @@ if __name__ == "__main__":
                     compression="gzip"
                 )
                 
-                logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, msg=Update metastore...""")
+                logger.info(f"""m={JOB_NAME}, source_bucket={cypress_bucket}, table_name={source}, msg=Update metastore...""")
                 spark_metastore_loader.update_metastore(
                     df=df,
                     database_name=database_name,
