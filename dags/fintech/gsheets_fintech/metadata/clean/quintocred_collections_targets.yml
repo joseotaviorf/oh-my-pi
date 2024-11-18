@@ -1,0 +1,110 @@
+---
+database_name: datalake_gsheets_clean
+table_name: quintocred_collections_targets
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  claims_recovery:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.claims_recovery
+  subscriptions_recovery:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.subscriptions_recovery
+  claims_fct:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.claims_fct
+  recovery_over_claims:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.recovery_over_claims
+  pct_active_recovery:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_active_recovery
+  pct_active_rec_001_030:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_001_030
+  pct_active_rec_031_060:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_031_060
+  pct_active_rec_061_090:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_061_090
+  pct_active_rec_091_180:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_091_180
+  pct_active_rec_over_180:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_over_180
+  pct_active_rec_001_180:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_001_180
+  pct_active_rec_001_090:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_001_090
+  pct_active_rec_over_090:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_active_rec_over_090
+  pct_termination_recovery:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_recovery
+  pct_termination_rec_001_030:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_001_030
+  pct_termination_rec_031_060:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_031_060
+  pct_termination_rec_061_090:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_061_090
+  pct_termination_rec_091_180:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_091_180
+  pct_termination_rec_over_180:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_over_180
+  pct_termination_rec_001_180:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_001_180
+  pct_termination_rec_001_090:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_001_090
+  pct_termination_rec_over_090:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_termination_rec_over_090
+  pct_subscription_recovery:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_recovery
+  pct_subscription_rec_001_030:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_001_030
+  pct_subscription_rec_031_060:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_031_060
+  pct_subscription_rec_061_090:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_061_090
+  pct_subscription_rec_091_180:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_091_180
+  pct_subscription_rec_over_180:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_over_180
+  pct_subscription_rec_031_090:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_031_090
+  pct_subscription_rec_001_090:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_001_090
+  pct_subscription_rec_over_090:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.pct_subscription_rec_over_090
+  week:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.seman
+  month:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.mes
+  business_day:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.dia_util
+  dt_reference:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_targets.date

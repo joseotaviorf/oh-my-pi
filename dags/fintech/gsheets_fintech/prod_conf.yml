@@ -284,3 +284,15 @@ sheets_info:
     sheet_name: Aux
     clean_table_name: quintocred_aux_form
     sheet_context: fintech
+
+  quintocred_collections_targets:
+    sheet_id: 19U8w20GDJjIaT-zzWXoBch3MPpx6POS22OenBRNEvDM
+    sheet_name: collections_targets
+    clean_table_name: quintocred_collections_targets
+    sheet_context: fintech
+
+  quintocred_collections_capacity_plan:
+    sheet_id: 19U8w20GDJjIaT-zzWXoBch3MPpx6POS22OenBRNEvDM
+    sheet_name: collections_capacity_plan
+    clean_table_name: quintocred_collections_capacity_plan
+    sheet_context: fintech

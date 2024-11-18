@@ -1,0 +1,34 @@
+database_name: datalake_gsheets_clean
+table_name: quintocred_collections_capacity_plan
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  internal_team:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_capacity_plan.internal_team
+  outsourcing:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_capacity_plan.outsourcing
+  iaf_subscriptions:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_capacity_plan.iaf_subscriptions
+  iaf_active:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_capacity_plan.iaf_active
+  iaf_termination:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_capacity_plan.iaf_termination
+  iaf_evictions:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_capacity_plan.iaf_evictions
+  week:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_capacity_plan.seman
+  month:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_capacity_plan.mes
+  business_day:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_capacity_plan.dia_util
+  dt_reference:
+    lineage:
+      - datalake_gsheets_raw.quintocred_collections_capacity_plan.data
