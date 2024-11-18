@@ -29,6 +29,8 @@ workflow:
       clean_table_name: creditcard
     Store:
       clean_table_name: store
+    Chargeback:
+      clean_table_name: chargeback
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:

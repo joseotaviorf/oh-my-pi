@@ -1,0 +1,67 @@
+---
+database_name: datalake_wall_street_clean
+table_name: chargeback
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+
+columns:
+  id:
+    lineage:
+    - datalake_wall_street_raw.chargeback.id
+  id_charge:
+    lineage:
+    - datalake_wall_street_raw.chargeback.chargeId
+  id_trasaction:
+    lineage:
+    - datalake_wall_street_raw.chargeback.transactionId
+  id_external:
+    lineage:
+    - datalake_wall_street_raw.chargeback.externalId
+  id_process:
+    lineage:
+    - datalake_wall_street_raw.chargeback.processId
+  acquirer:
+    lineage:
+    - datalake_wall_street_raw.chargeback.acquirer
+  acquirer_code:
+    lineage:
+    - datalake_wall_street_raw.chargeback.acquirerCode
+  nsu:
+    lineage:
+    - datalake_wall_street_raw.chargeback.nsu
+  card_code:
+    lineage:
+    - datalake_wall_street_raw.chargeback.cardCode
+  card_first_six_digits:
+    lineage:
+    - datalake_wall_street_raw.chargeback.cardFirstSixDigits
+  card_last_four_digits:
+    lineage:
+    - datalake_wall_street_raw.chargeback.cardLastFourDigits
+  authorization_code:
+    lineage:
+    - datalake_wall_street_raw.chargeback.authorizationCode
+  company_document:
+    lineage:
+    - datalake_wall_street_raw.chargeback.companyDocument
+  metadata:
+    lineage:
+    - datalake_wall_street_raw.chargeback.metadata
+  adjustment_amount:
+    lineage:
+    - datalake_wall_street_raw.chargeback.adjustmentAmount
+  total_installments:
+    lineage:
+    - datalake_wall_street_raw.chargeback.totalInstallments
+  installment:
+    lineage:
+    - datalake_wall_street_raw.chargeback.installment
+  dt_sent_to_bank:
+    lineage:
+    - datalake_wall_street_raw.chargeback.sentToBankDate
+  dt_acquirer_reference_date:
+    lineage:
+    - datalake_wall_street_raw.chargeback.acquirerReferenceDate
+  dt_adjustment_entry:
+    lineage:
+    - datalake_wall_street_raw.chargeback.adjustmentEntryDate
