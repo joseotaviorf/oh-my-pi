@@ -1,0 +1,47 @@
+---
+database_name: datalake_agreement_hourly
+table_name: negotiation
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Table updated hourly with Trato Feito negotiation data.
+columns:
+  id_negotiation:
+    description: "Negotiation ID"
+    lineage:
+      - datalake_trato_feito_hourly_clean.installment.id_negotiation
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_trato_feito_hourly_clean.negotiation.id_debtor_external
+  agency:
+    description: "Agency/consultancy/advisory that created the negotiation"
+    lineage:
+      - datalake_trato_feito_hourly_clean.negotiation.consultancy
+  down_payment_amount:
+    description: "First installment total amount"
+    lineage:
+      - datalake_trato_feito_hourly_clean.installment.total_amount
+  total_negotiated_amount:
+    description: "Total amount to be paid in the negotiation."
+    lineage:
+      - datalake_trato_feito_hourly_clean.installment.total_amount
+  dt_down_payment_due:
+    description: "Due date of the first installment, that is, the due date of the promise."
+    lineage:
+      - datalake_trato_feito_hourly_clean.installment.dt_due
+  dt_down_payment:
+    description: "Payment date of the first installment."
+    lineage:
+      - datalake_trato_feito_hourly_clean.installment.dt_paid
+  dt_data_updated:
+    description: "Reference date of the data."
+    lineage:
+      - datalake_trato_feito_hourly_clean.negotiation.year
+      - datalake_trato_feito_hourly_clean.negotiation.month
+      - datalake_trato_feito_hourly_clean.negotiation.day
+  ts_negotiation_creation:
+    description: ""
+    lineage:
+      - datalake_trato_feito_hourly_clean.negotiation.ts_created
+  ts_load:
+    description: "Timestamp when this table was updated"

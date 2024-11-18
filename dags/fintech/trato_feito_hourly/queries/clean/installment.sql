@@ -1,0 +1,28 @@
+SELECT
+    id,
+    external_id AS id_external,
+    negotiation_id AS id_negotiation,
+    installment_charge_id AS id_installment_charge,
+    billing_id AS id_billing,
+    status,
+    status_reason,
+    external_index,
+    rev,
+    adm_fee_amount,
+    installment_fee_amount,
+    debts_fee_amount,
+    discount_amount,
+    total_amount,
+    installment_interest,
+    installment_costs,
+    installment_lawyers_fee,
+    credit_card_fee,
+    due_date AS dt_due,
+    expired_at AS ts_expired,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    NOW() AS ts_load
+FROM
+    datalake_trato_feito_hourly_raw.installment
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

@@ -1,0 +1,18 @@
+---
+dag:
+  name: enrich_agreement_hourly
+  schedule_start_date: 2022, 3, 1
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Enrich pipe for get hourly  Trato Feito negotiation data
+workflow:
+  type: query_delta
+  layer: enrich
+  tables_customization:
+    negotiation:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      merge_on: [id_negotiation]
+cluster:
+  type: databricks_13_3_med_general_cluster

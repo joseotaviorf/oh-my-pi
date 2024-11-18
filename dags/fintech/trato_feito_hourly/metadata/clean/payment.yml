@@ -1,0 +1,28 @@
+---
+database_name: datalake_trato_feito_hourly_clean
+table_name: payment
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: "Data about the payment of the negotiation installments"
+columns:
+  id:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.id
+  id_installment:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.installment_id
+  type:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.type
+  metadata:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.metadata
+  status:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.status
+  ts_created:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.created_at
+  ts_updated:
+    lineage:
+      - datalake_trato_feito_hourly_raw.payment.updated_at

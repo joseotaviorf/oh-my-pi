@@ -1096,6 +1096,10 @@ bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-accounting-entry-source
   - bietlejuice.robin_hood:load-clean-payee
+bietlejuice.enrich_agreement_hourly:
+  - bietlejuice.trato_feito_hourly:load-clean-installment
+  - bietlejuice.trato_feito_hourly:load-clean-negotiation
+  - bietlejuice.trato_feito_hourly:load-clean-payment
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated
   - bietlejuice.airtable:load-clean-cr-occurrences

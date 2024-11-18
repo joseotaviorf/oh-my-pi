@@ -1,0 +1,40 @@
+---
+database_name: datalake_trato_feito_hourly_clean
+table_name: negotiation
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: "Data about negotiations of debts"
+columns:
+  id:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.id
+  id_collector:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.collector_id
+  id_collector_external:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.collector_external_id
+  id_debtor:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.debtor_id
+  id_debtor_external:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.debtor_external_id
+  status:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.status
+  currency:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.currency
+  status_reason:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.status_reason
+  consultancy:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.consultancy
+  ts_created:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.created_at
+  ts_updated:
+    lineage:
+      - datalake_trato_feito_hourly_raw.negotiation.updated_at
