@@ -544,6 +544,7 @@ bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-item-media
   - bietlejuice.enrich_inspections:load-enrich-item-review
   - bietlejuice.enrich_inspections:load-enrich-repair-exempted
+  - bietlejuice.enrich_inspections:load-enrich-repair-request
   - bietlejuice.enrich_inspections:load-enrich-report-approval
   - bietlejuice.enrich_inspections:load-enrich-report-review-media
   - bietlejuice.enrich_inspections:load-enrich-reviewer
@@ -622,6 +623,7 @@ bietlejuice.dw_losses:
 bietlejuice.dw_media_sharing_rules:
   - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules
 bietlejuice.dw_offboarding:
+  - bietlejuice.enrich_inspections:load-enrich-repair-request
   - bietlejuice.enrich_terminator:load-enrich-termination
 bietlejuice.dw_offer:
   - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events

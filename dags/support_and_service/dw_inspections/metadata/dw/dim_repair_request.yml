@@ -7,11 +7,11 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_repair_request:
     lineage:
-      - datalake_inspections_clean.repair_request.id_repair_request
+      - datalake_inspections.repair_request.id_repair_request
     description: Repair Request unique identifier (number)
   type:
     lineage:
-      - datalake_inspections_clean.repair_request.type
+      - datalake_inspections.repair_request.type
     description: A repair request type.
     categories:
       REPAIR: Make item repair.
@@ -21,43 +21,43 @@ columns:
       OTHER: Other types not listed.
   cost:
     lineage:
-      - datalake_inspections_clean.repair_request.cost
+      - datalake_inspections.repair_request.cost
     description: Estimated repair cost
   repair_type:
     lineage:
-      - datalake_inspections_clean.repair_request.type
+      - datalake_inspections.repair_request.type
     description:
   comment:
     lineage:
-      - datalake_inspections_clean.repair_request.comment
+      - datalake_inspections.repair_request.comment
     description: Commentary detailing the repair needed
   responsibility:
     lineage:
-      - datalake_inspections_clean.repair_request.responsibility
+      - datalake_inspections.repair_request.responsibility
     description: Descriptive information indicating who is responsible for the repair request.
   repair_service:
     lineage:
-      - datalake_inspections_clean.repair_request.repair_service
+      - datalake_inspections.repair_request.repair_service
     description: Repair service requested
   ts_created:
     lineage:
-      - datalake_inspections_clean.repair_request.ts_created
+      - datalake_inspections.repair_request.ts_created
     description: Creation date
   ts_updated:
     lineage:
-      - datalake_inspections_clean.repair_request.ts_updated
+      - datalake_inspections.repair_request.ts_updated
     description: Updated date in timestamp format
   ts_load:
     description: Date and time when the data was loaded.
   year:
     lineage:
-      - datalake_inspections_clean.repair_request.year
+      - datalake_inspections.repair_request.year
     description: Year of update date.
   month:
     lineage:
-      - datalake_inspections_clean.repair_request.month
+      - datalake_inspections.repair_request.month
     description: Month of update date.
   day:
     lineage:
-      - datalake_inspections_clean.repair_request.day
+      - datalake_inspections.repair_request.day
     description: Day of update date.

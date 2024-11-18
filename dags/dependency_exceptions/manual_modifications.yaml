@@ -134,6 +134,9 @@ bietlejuice.dw_datamarts_spark.static:
 bietlejuice.dw_date:
   add:
     - bietlejuice.enrich_public_date:load-enrich-aux-date
+bietlejuice.dw_offboarding:
+  add:
+    - bietlejuice.enrich_inspections:load-enrich-repair-request
 bietlejuice.dw_photo_jobs:
   remove:
     - bietlejuice.ebdb_visit:load-clean-booking

@@ -50,6 +50,11 @@ workflow:
     repair_exempted:
       partitions: [year, month, day]
       extraction_type: incremental
+    repair_request:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      z_order_by: [id_repair_request]
+      merge_on: [id_repair_request]
     report_approval: {}
     report_review_media:
       partitions: [year, month, day]

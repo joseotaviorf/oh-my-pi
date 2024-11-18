@@ -13,7 +13,7 @@ SELECT DISTINCT
     MONTH(rr.ts_updated) AS month,
     DAY(rr.ts_updated) AS day
 FROM
-    datalake_inspections_clean.repair_request AS rr
+    datalake_inspections.repair_request AS rr
 WHERE
     DATE(rr.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY
