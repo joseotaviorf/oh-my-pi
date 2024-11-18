@@ -1577,10 +1577,6 @@ bietlejuice.enrich_documentation_metrics:
 bietlejuice.enrich_docx:
   - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
   - bietlejuice.docx_user_documents:load-clean-document
-bietlejuice.enrich_ebdb_affiliate:
-  - bietlejuice.ebdb_user:load-clean-user
-  - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data
-  - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads
 bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb:load-clean-account-transaction
   - bietlejuice.ebdb:load-clean-lead
