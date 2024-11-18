@@ -27,4 +27,9 @@ workflow:
       raw_primary_keys: ["id", "REV"]
       clean_table_name: lead_aud
 cluster:
-  type: databricks_13_3_min_general_2_workers_cluster
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.2xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
