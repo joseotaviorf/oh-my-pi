@@ -110,6 +110,7 @@ BASE_CLOSING_DRAFT AS (
             CASE
               WHEN coalesce(c.dt_annulment, current_date) <= (date_trunc('month', m.dt_snapshot) - interval '1' day) THEN 'Finalizado'
             ELSE 'Ativo' END AS status_mes_fechamento,
+            cr.city,
             c.contract_signature_date,
             c.contract_guarantee,
             c.dt_annulment
@@ -149,6 +150,7 @@ SELECT
             WHEN frequency = 'pos rental' THEN 'Pos_rental'
             ELSE frequency
       END AS invoice_type,
+      city,
       contract_guarantee,
       guarantee_type AS is_guarantee_paid,
       flag_is_before_started AS is_before_started,

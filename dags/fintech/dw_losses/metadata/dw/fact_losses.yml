@@ -1,0 +1,122 @@
+---
+database_name: dw_losses
+table_name: fact_losses
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Table that apply all necessary filters and add all necessary columns to calculate losses
+columns:
+  sk_contract:
+    description: "Contract ID"
+    lineage:
+      - dw_losses.fact_provision.sk_contract
+  sk_invoice:
+    description: "Invoice ID"
+    lineage:
+      - dw_losses.fact_provision.sk_invoice
+  invoice_account_type:
+    description: "Account type information associated with the user information"
+    lineage:
+      - dw_losses.fact_provision.invoice_account_type
+  payment_status:
+    description: "Invoice status of payment i.e if it is open, paid, canceled or was written down"
+    lineage:
+      - dw_losses.fact_provision.payment_status
+  invoice_status:
+    description: "Invoice status information related to the payment status."
+    lineage:
+      - dw_losses.fact_provision.invoice_status
+  invoice_type:
+    description: "Type of the invoice according to the frequency information."
+    lineage:
+      - dw_losses.fact_closing.invoice_type
+  contract_closing_month_status:
+    description: "Contract status of the closing month."
+    lineage:
+      - dw_losses.fact_closing.closing_month_status
+  is_before_started:
+    description: "Flag to show if the invoice is before started."
+    lineage:
+      - dw_losses.fact_provision.is_before_started
+  is_international:
+    description: "Flag to show if the invoice is international."
+    lineage:
+      - dw_losses.fact_provision.is_international
+  is_writtendown_in_dead_time:
+    description: "Flag to show if the invoice is writtendown in dead time."
+    lineage:
+      - dw_losses.fact_provision.is_writtendown_in_dead_time
+  has_repair_offboarding_bill_item:
+    description: "Flag to indicate the existence of 'repair offboarding' bill item for an invoice"
+    lineage:
+      - dw_losses.fact_provision.has_repair_offboarding_bill_item
+  city:
+    description: "City name where the house is located"
+    lineage:
+      - datalake_retsuko_clean.contract.city
+  risk_group:
+    description: "Group of risk type of the deal (low or high)"
+    lineage:
+      - dw_losses.fact_provision.risk_type
+  guarantee_group:
+    description: "Flag to show if the guarantee is paid"
+    lineage:
+      - dw_losses.fact_closing.is_guarantee_paid
+  provisional_group:
+    description: "Provisional group based on risk type of the deal and type of guarantee (paid or free)"
+    lineage:
+      - dw_losses.fact_provision.risk_type
+      - dw_losses.fact_closing.is_guarantee_paid
+  delay_contaminated_range:
+    description: "Delay Contamined Range calculated based on dt_promisse and dt_due_invoice_anchor"
+    lineage:
+      - dw_losses.fact_provision.delay_contamined_range
+  provision_factor:
+    description: "Provision factor being applied to the invoice"
+    lineage:
+      - dw_losses.fact_provision.provision_factor
+  provision_balance:
+    description: "Provision balance being applied to the invoice"
+    lineage:
+      - dw_losses.fact_provision.provision_balance
+  previous_month_provision_balance:
+    description: "Provision balance being applied to the invoice in the previous month"
+    lineage:
+      - dw_losses.fact_provision.provision_balance
+  losses:
+    description: "Losses by invoice: previous provision balance (PDD) - current provision balance (PDD)"
+    lineage:
+      - dw_losses.fact_provision.provision_balance
+  due_amount:
+    description: "Total value of the invoice"
+    lineage:
+      - dw_losses.fact_provision.due_amount
+  dt_cohort:
+    description: "First day of the month"
+    lineage:
+      - dw_losses.fact_provision.dt_closing
+  dt_closing:
+    description: "Last day of the month"
+    lineage:
+      - dw_losses.fact_provision.dt_closing
+  dt_snapshot:
+    description: "Date of the snapshot"
+    lineage:
+      - dw_losses.fact_provision.dt_snapshot
+  dt_due_invoice_adjusted:
+    description: "Due date of the deal"
+    lineage:
+      - dw_losses.fact_provision.dt_due_adjs
+  dt_paid_invoice_adjusted:
+    description: "Payment date of the deal"
+    lineage:
+      - dw_losses.fact_provision.dt_paid_adjs
+  dt_contract_signature:
+    description: "Date of the contract signature"
+    lineage:
+      - dw_losses.fact_closing.dt_contract_signature
+  dt_contract_annulment:
+    description: "Contract annulment date"
+    lineage:
+      - dw_losses.fact_closing.dt_annulment
+  ts_load:
+    description: "Timestamp when table was updated"

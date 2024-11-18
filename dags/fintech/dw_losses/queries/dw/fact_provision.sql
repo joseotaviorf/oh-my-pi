@@ -5,6 +5,8 @@ SELECT
     invoice_account_type,
     payment_status,
     invoice_status,
+    risk_type,
+    delay_contamined_range,
     provision_balance_p1_delay_d,
     provision_balance_p2_delay_d,
     provision_balance_p3_delay_d,
@@ -42,6 +44,11 @@ SELECT
     is_international,
     is_writtendown_in_dead_time,
     has_repair_offboarding_bill_item,
+    dt_due_adjs,
+    dt_due_deal_anchor,
+    dt_due_general_accrual,
+    dt_paid_adjs,
+    dt_snapshot,
     dt_closing,
     NOW() AS ts_load
 FROM
