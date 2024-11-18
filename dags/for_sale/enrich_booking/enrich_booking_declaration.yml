@@ -12,11 +12,4 @@ workflow:
   type: query_delta
   layer: enrich
 cluster:
-  type: custom_cluster
-  custom_configurations:
-    driver_node_type_id: r5a.xlarge
-    node_type_id: c5d.9xlarge
-    num_workers: 2
-    aws_attributes:
-      availability: ON_DEMAND
-    spark_version: 13.3.x-scala2.12
+  type: databricks_12_2_min_2xlarge_memory_cluster
