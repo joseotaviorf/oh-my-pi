@@ -1,0 +1,100 @@
+database_name: dw_delta_test
+table_name: fact_contract_people
+description:
+  Table with events and metrics about people involved in a contract created
+  (users or not). Each line is a register of a person, not necessarily unique in database.
+  This is a test table using delta.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  sk_contract_person:
+    lineage:
+      - datalake_ebdb_contract.contract_person.id_contract_person
+    description:
+      Id of the register of a person involved in a contract created. Note
+      that any unique person might appear in multiple lines.
+  sk_personal_document:
+    lineage:
+      - datalake_ebdb_contract.contract_person.personal_document
+    description: Personal document number (CPF or CNPJ).
+  sk_user:
+    lineage:
+      - datalake_ebdb_contract.contract_person.id_user_contract_person
+    description:
+      The person's user id at QuintoAndar, if an user (client like owner,
+      tenant or agent).
+  sk_contract:
+    lineage:
+      - datalake_ebdb_contract.contract_person.id_contract
+    description: Id of the contract where people were registered.
+  sk_birth_date:
+    lineage:
+      - datalake_ebdb_contract.contract_person.dt_birth
+    description: Key for the contract person's birth date, if specified.
+  sk_created_date:
+    lineage:
+      - datalake_ebdb_contract.contract_person.ts_created
+    description: Key for the date in which a contract person's register was created.
+  sk_updated_date:
+    lineage:
+      - datalake_ebdb_contract.contract_person.ts_updated
+    description:
+      Key for the date in which a contract person's register was updated
+      in database
+  country_code:
+    lineage:
+      - datalake_ebdb_contract.contract_person.country_code
+    description: Country code of the user
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
+  contract_role:
+    lineage:
+      - datalake_ebdb_contract.contract_person.contract_role
+    description:
+      Role that person performs in contract, such as owner, tenant, dweller
+      (resident), sponsor ("fiador").
+  is_user:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_user
+    description:
+      Flag to indicate whether the person is an user in QuintoAndar (uses
+      any app).
+  is_valid_cpf:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_valid_cpf
+    description:
+      Flag to indicate whether the personal document is a valid CPF, according
+      to the last 2 verification digits.
+  is_valid_cnpj:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_valid_cnpj
+    description:
+      Flag to indicate whether the personal document is a valid CNPJ, according
+      to the last 2 verification digits.
+  is_contract_user:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_contract_user
+    description:
+      Flag to indicate whether the person is the contract main user (main
+      owner or main tenant). Valid for users only.
+  is_living:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_living
+    description:
+      Flag to indicate if the person will live in the house associated
+      to the contract.
+  is_first_contract:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_first_contract
+    description:
+      Flag to indicate whether the contract is the first of that person.
+      Valid for users only.
+  is_last_contract:
+    lineage:
+      - datalake_ebdb_contract.contract_person.is_last_contract
+    description:
+      Flag to indicate whether the contract is the last of that person.
+      Valid for users only.
+  ts_load:
+    description: Timestamp in which the register was loaded in database.

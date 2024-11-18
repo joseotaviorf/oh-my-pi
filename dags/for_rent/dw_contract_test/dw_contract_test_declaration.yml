@@ -1,0 +1,21 @@
+dag:
+  name: dw_contract_test
+  schedule_start_date: 2021,08,03
+  owner: Data ForRent
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: delta_test
+  default_partitions: [country_code]
+  tables_customization:
+    dim_contract:
+      z_order_by: [sk_contract]
+    dim_contract_person:
+      z_order_by: [sk_contract_person]
+    fact_contrat_people:
+      z_order_by: [sk_contract_person]
+cluster:
+  type: databricks_12_2_min_memory_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

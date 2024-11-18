@@ -1,0 +1,88 @@
+database_name: dw_delta_test
+table_name: dim_contract_person
+description:
+  Table with context information about people involved in a contract created
+  (users or not). Each line is a register of a person, not necessarily unique in database
+  This is a test table using delta.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  sk_contract_person:
+    lineage:
+      - datalake_ebdb_contract.ongoing_contracts.id_contract_person
+    description:
+      Id of the register of a person involved in a contract created. Note
+      that any unique person might appear in multiple lines.
+  country_code:
+    lineage:
+      - datalake_ebdb_contract.contract_person.country_code
+      - datalake_ebdb_contract.ongoing_contracts.country_code
+    description: Country code of the user
+    categories:
+      BR: Brazil's country code
+      MX: Mexico's country code
+  full_name:
+    lineage:
+      - datalake_ebdb_contract.ongoing_contracts.full_name
+    description: Contract person's full name such as registered in the contract.
+  phone_number:
+    lineage:
+      - datalake_ebdb_contract.ongoing_contracts.phone_number
+    description:
+      Main phone number of the contract person, such as registered. Since
+      it is a custom field, might not be formatted with digits only.
+  email:
+    lineage:
+      - datalake_ebdb_contract.ongoing_contracts.email
+    description: Main email address of the contract person, such as registered.
+  personal_document:
+    lineage:
+      - datalake_ebdb_contract.contract_person.personal_document
+    description:
+      Contract person's personal id registered in the contract, such as
+      CPF, CNPJ, RG, RNE.
+  personal_document_type:
+    lineage:
+      - datalake_ebdb_contract.contract_person.personal_document_type
+    description:
+      Type of the personal document registered, such as CPF, CPNJ, RG,
+      RNE.
+  has_ongoing_contract:
+    lineage:
+      - datalake_ebdb_contract.ongoing_contracts.has_ongoing_contract
+    description:
+      Flag to indicate if contract person has at least one ongoing contract
+      currently, valid for users only.
+  gender:
+    lineage:
+      - datalake_ebdb_contract.contract_person.gender
+    description:
+      Contract person's gender, if specified. It might have a high null
+      rate since it is an optional info.
+    categories:
+      feminine: ""
+      masculine: ""
+  marital_status:
+    lineage:
+      - datalake_ebdb_contract.contract_person.marital_status
+    description: Contract person's marital status at the contract time, if specified.
+  state_code:
+    lineage:
+      - datalake_ebdb_contract.contract_person.state_code
+    description:
+      Contract person's Brazilian state id at the contract time, if specified.
+      Nulls might be either foreign or unknown.
+  dt_birth:
+    lineage:
+      - datalake_ebdb_contract.contract_person.dt_birth
+    description: Contract person's birth date, if specified.
+  ts_created:
+    lineage:
+      - datalake_ebdb_contract.contract_person.ts_created
+    description: Timestamp in which a contract person's register was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_contract.contract_person.ts_updated
+    description: Timestamp in which a contract person's register was updated in database.
+  ts_load:
+    description: Timestamp in which the register was loaded into database.

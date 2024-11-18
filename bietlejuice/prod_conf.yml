@@ -6,6 +6,7 @@ dags_out_of_pattern:
         "amplitude",
         "amplitude_demand",
         "amplitude_supply",
+        "dw_contract_test",
         "dw_datamarts_for_rent",
         "dw_datamarts_growth_cross",
         "dw_datamarts_spark.cross",
