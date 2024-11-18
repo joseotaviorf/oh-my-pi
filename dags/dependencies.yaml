@@ -1134,6 +1134,7 @@ bietlejuice.enrich_amplitude_user:
 bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_app_installed:
+  - bietlejuice.amplitude:load-clean-events
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_arquivo_confidencial:
   - bietlejuice.arquivo_confidencial:load-clean-integration-report

@@ -1,43 +1,21 @@
 SELECT DISTINCT
   REGEXP_REPLACE(id_user, "\\.", "") AS id_user,
-  user_properties:["[AppsFlyer] app_version"] AS app_version,
+  CASE -- remove values on version_name that are timestamps and not version numbers
+    WHEN TIMESTAMP(version_name) IS NULL
+      OR SIZE(SPLIT(version_name, '.')) = 3 THEN version_name
+    ELSE NULL
+  END AS app_version,
   ts_event
 FROM
-  datalake_amplitude_clean_staging.170698_af_app_opened_events
+  datalake_amplitude_clean.events
 WHERE
-  year >= 2022
-  AND platform IN ('Android', 'iOS')
+  MAKE_DATE(year, month, day) >= DATE('{load_start_date}') - INTERVAL 6 MONTH
+  AND id_user NOT IN ('false', 'userId')
   AND id_user IS NOT NULL
-UNION ALL
-SELECT DISTINCT
-  REGEXP_REPLACE(id_user, "\\.", "") AS id_user,
-  user_properties:["[adjust] app_version"] AS app_version,
-  ts_event
-FROM
-  datalake_amplitude_clean_staging.170698_home_page_viewed_events
-WHERE
-  year >= 2022
-  AND platform IN ('Android', 'iOS')
-  AND id_user IS NOT NULL
-UNION ALL
-SELECT DISTINCT
-  REGEXP_REPLACE(id_user, "\\.", "") AS id_user,
-  user_properties:["[AppsFlyer] app_version"] AS app_version,
-  ts_event
-FROM
-  datalake_amplitude_clean_staging.170698_search_page_viewed_events
-WHERE
-  year >= 2022
-  AND platform IN ('Android', 'iOS')
-  AND id_user IS NOT NULL
-UNION ALL
-SELECT DISTINCT
-  REGEXP_REPLACE(id_user, "\\.", "") AS id_user,
-  user_properties:["[AppsFlyer] app_version"] AS app_version,
-  ts_event
-FROM
-  datalake_amplitude_clean_staging.170698_login_page_viewed_events
-WHERE
-  year >= 2022
-  AND platform IN ('Android', 'iOS')
-  AND id_user IS NOT NULL
+  AND id_app IN (170698, 183047)
+  AND event_type IN (
+    'search_page_viewed',
+    'af_app_opened',
+    'home_page_viewed',
+    'login_page_viewed'
+  )

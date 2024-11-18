@@ -6,22 +6,13 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_user:
     lineage:
-      - datalake_amplitude_clean_staging.170698_af_app_opened_events.id_user
-      - datalake_amplitude_clean_staging.170698_home_page_viewed_events.id_user
-      - datalake_amplitude_clean_staging.170698_search_page_viewed_events.id_user
-      - datalake_amplitude_clean_staging.170698_login_page_viewed_events.id_user
+      - datalake_amplitude_clean.events.id_user
     description: ID of the user
   app_version:
     lineage:
-      - datalake_amplitude_clean_staging.170698_af_app_opened_events.user_properties
-      - datalake_amplitude_clean_staging.170698_home_page_viewed_events.user_properties
-      - datalake_amplitude_clean_staging.170698_search_page_viewed_events.user_properties
-      - datalake_amplitude_clean_staging.170698_login_page_viewed_events.user_properties
+      - datalake_amplitude_clean.events.version_name
     description: Version of the app installed on the users device at the time of the event
   ts_event:
     lineage:
-      - datalake_amplitude_clean_staging.170698_af_app_opened_events.ts_client_event
-      - datalake_amplitude_clean_staging.170698_home_page_viewed_events.ts_client_event
-      - datalake_amplitude_clean_staging.170698_search_page_viewed_events.ts_client_event
-      - datalake_amplitude_clean_staging.170698_login_page_viewed_events.ts_client_event
+      - datalake_amplitude_clean.events.ts_event
     description: Timestamp registered for the event
