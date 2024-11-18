@@ -506,6 +506,18 @@ columns:
   subjects_predictus_forth_proponent:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_predictus_assuntos_cnj_titulo_4
+  status_message_federal_first_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_rfpf_status_message_1
+  status_message_federal_second_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_rfpf_status_message_2
+  status_message_federal_third_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_rfpf_status_message_3
+  status_message_federal_fourth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_rfpf_status_message_4
   proposal_document_type:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.prop_tipo_documento
