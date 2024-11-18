@@ -3,7 +3,7 @@ dag:
   schedule_interval: 20 00 * * *
   owner: Data Agents
 cluster:
-  type: databricks_12_2_min_memory_cluster
+  type: databricks_12_2_xmin_memory_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
