@@ -545,16 +545,32 @@ affiliates AS (
     ),
     manual_tax AS (
         SELECT
-            CAST(REPLACE(dt_tax_cost, '-', '') AS BIGINT) AS sk_date,
+            CAST(CONCAT(CAST(accounting_year_month AS STRING), '01') AS BIGINT) AS sk_date,
             'manual_tax' AS table_origin,
-            mkt_origin,
-            city_group,
-            vertical,
-            source,
-            business_context,
-            costs
-        FROM
-            datalake_gsheets_clean.indicaai_tax_costs
+            CASE 
+                WHEN lower(aes.source_name) = 'porteiros' THEN 'Doorman'
+                WHEN lower(aes.source_name) = 'indica aí agents' THEN 'Indica Aí - Agents'
+                WHEN lower(aes.source_name) = 'indica aí' THEN 'Indica Aí - General'
+                ELSE NULL
+            END AS mkt_origin,
+            tr.locale AS city_group,
+            'engagement' AS vertical,
+            'IRRF' AS source,
+            CASE WHEN tr.cost_center_code IN ('C023','R01305','R02305') THEN 'Rent' ELSE 'Sale' END AS business_context,
+            tr.amount AS cost
+        FROM 
+            datalake_robin_hood_clean.tax_ratio tr
+        LEFT JOIN 
+            datalake_robin_hood_clean.tax t
+                ON tr.id_tax = t.id
+        LEFT JOIN 
+            datalake_robin_hood_clean.accounting_entry_source aes
+                ON tr.id_source = aes.id
+        WHERE 
+            tr.amount > 0
+            AND t.ts_disabled IS NULL
+            AND ts_blocked IS NULL
+            AND LOWER(source_name) IN ('porteiros', 'indica aí agents', 'indica aí')
     ),
     ia_total_cost AS (
         SELECT  * FROM ia_fact_cost

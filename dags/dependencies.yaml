@@ -439,6 +439,9 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets_growth:done-clean-rental-tof-daily-targets
   - bietlejuice.gsheets_growth:done-clean-rental-tof-weekly-targets
   - bietlejuice.gsheets_growth:done-clean-sale-flows-targets
+  - bietlejuice.robin_hood:load-clean-accounting-entry-source
+  - bietlejuice.robin_hood:load-clean-tax
+  - bietlejuice.robin_hood:load-clean-tax-ratio
 bietlejuice.dw_datamarts_spark.cross:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
