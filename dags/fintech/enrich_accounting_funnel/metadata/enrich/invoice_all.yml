@@ -61,7 +61,6 @@ columns:
   contract_status:
     lineage:
       - dw_rent.dim_contract.status
-      - dw_rent.dim_contract.ts_expected_termination
     description: "Contract status description"
   is_rental_paid_in_advance:
     lineage:

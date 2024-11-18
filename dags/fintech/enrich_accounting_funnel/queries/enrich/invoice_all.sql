@@ -101,14 +101,7 @@ SELECT DISTINCT
   cl.id_locale AS localidade,
   c.guarantee,
   c.rental_administrator,
-  CASE
-    WHEN
-        c.status='Ativo' and c.ts_expected_termination is null THEN 'Ativo'
-    WHEN
-        c.status='Ativo' and c.ts_expected_termination is not null THEN 'Finalizando'
-    ELSE
-        c.status END
-    AS contract_status,
+  c.status AS contract_status,
   ie.is_rental_paid_in_advance,
   IF(rr.id_entry IS NULL, False, True) AS is_reversed,
   FALSE as is_not_invoiceable_inconsiderable,
