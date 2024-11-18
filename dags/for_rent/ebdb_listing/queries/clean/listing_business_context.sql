@@ -6,13 +6,14 @@ SELECT
   statusReason AS status_reason,
   closingStatus AS status_closing,
   suspensionReason AS suspension_reason,
-  criadoEm AS ts_created,
-  atualizadoEm AS ts_updated,
-  firstPublicationDate AS ts_first_publication,
-  lastPublicationDate AS ts_last_publication,
   shortUrl AS short_url,
   calculatorPrice AS calculator_price,
   selectedAction AS selected_action,
-  ownership
+  ownership,
+  dealObjective AS deal_objective,
+  criadoEm AS ts_created,
+  atualizadoEm AS ts_updated,
+  firstPublicationDate AS ts_first_publication,
+  lastPublicationDate AS ts_last_publication
 FROM
   datalake_ebdb_raw.listingbusinesscontext

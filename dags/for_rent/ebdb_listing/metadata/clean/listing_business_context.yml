@@ -22,18 +22,6 @@ columns:
   suspension_reason:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.suspensionReason
-  ts_created:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext.criadoem
-  ts_updated:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext.atualizadoem
-  ts_first_publication:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext.firstpublicationdate
-  ts_last_publication:
-    lineage:
-      - datalake_ebdb_raw.listingbusinesscontext.lastpublicationdate
   short_url:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.shorturl
@@ -46,3 +34,18 @@ columns:
   ownership:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext.ownership
+  deal_objective:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.dealObjective
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.atualizadoem
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.firstpublicationdate
+  ts_last_publication:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext.lastpublicationdate
