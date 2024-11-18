@@ -29,9 +29,9 @@ SELECT DISTINCT
   dmt.ts_started,
   dmt.ts_solved,
   dmt.ts_closed,
-  YEAR(CURRENT_DATE) AS year,
-  MONTH(CURRENT_DATE) AS month,
-  DAY(CURRENT_DATE) AS day,
+  YEAR(dmt.ts_started) AS year,
+  MONTH(dmt.ts_started) AS month,
+  DAY(dmt.ts_started) AS day,
   NOW() AS ts_load
 FROM
   dw_customer_support.fact_demand_metrics_tasks AS dmt
@@ -48,7 +48,7 @@ LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON dmt.sk_agent = da.sk_agent
 WHERE
-  DATE(dmt.ts_started) >= CURRENT_DATE - INTERVAL '1' YEAR
+  DATE(dmt.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
 AND
   dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'

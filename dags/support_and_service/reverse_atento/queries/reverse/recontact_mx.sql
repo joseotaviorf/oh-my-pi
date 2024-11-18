@@ -29,9 +29,9 @@ WITH base_tickets AS (
     DATEDIFF(DATE(ft.ts_started),LAG(DATE(ft.ts_started)) OVER(PARTITION BY dzu.phone, dd.team ORDER BY ft.ts_started)) AS days_since_last_contact,
     LAG(ft.ts_started) OVER(PARTITION BY dzu.phone, dd.team ORDER BY ft.ts_started) AS ts_started_previous_contact,
     ft.ts_started,
-    YEAR(CURRENT_DATE) AS year,
-    MONTH(CURRENT_DATE) AS month,
-    DAY(CURRENT_DATE) AS day,
+    YEAR(ft.ts_started) AS year,
+    MONTH(ft.ts_started) AS month,
+    DAY(ft.ts_started) AS day,
     NOW() AS ts_load
   FROM
     dw_customer_support.fact_ticket AS ft
@@ -54,7 +54,7 @@ WITH base_tickets AS (
       dw_customer_support.dim_zendesk_user AS dzu
         ON dzu.sk_zendesk_user = fts.sk_zendesk_requester_user
   WHERE
-      ft.ts_started >= DATE('2023-01-01')
+      ft.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
       AND dzu.phone IS NOT NULL
       AND ((dc.channel = 'chat' AND dc.direction = 'inbound')
         OR (ft.ticket_origin IN ('call inbound', 'call inapp')))

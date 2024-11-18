@@ -1,0 +1,23 @@
+dag:
+  name: reverse_atento
+  schedule_start_date: 2022,7,12
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This dag aims to load a copy of the databases that will be sent to Atento to our datalake, before actually sending them.
+workflow:
+  type: load
+  layer: reverse
+  custom_schema: atento
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r6g.4xlarge
+    node_type_id: r6g.4xlarge
+    spark_version: 13.3.x-scala2.12
+    num_workers: 4

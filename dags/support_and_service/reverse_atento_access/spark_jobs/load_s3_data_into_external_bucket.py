@@ -1,6 +1,6 @@
 import io
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from argparse import ArgumentParser
 from http.client import HTTPException
 
@@ -42,7 +42,7 @@ def __build_warning_messages(environment, s3_path_prefix, table_list):
             f"Validation: `{s3_path_prefix}/{table_name}`\n"
             f"Environment: *{environment}*\n"
             f"Status: *FAILED*\n"
-            f"*Existence validation failed for `{datetime.now().strftime('%Y-%m-%d')}`\n"
+            f"*Existence validation failed for `{(datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')}`\n"
         )
 
     return messages
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
 
-    execution_date = datetime.now()
+    execution_date = (datetime.now() - timedelta(days=1))
     tables = __get_first_layer_folders_s3(datalake_bucket, datalake_path_prefix)
 
     s3_client = boto3.client("s3")

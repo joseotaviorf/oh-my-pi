@@ -39,9 +39,9 @@ SELECT DISTINCT
   ft.ts_csat_first_response AS ts_csat_response,
   ft.ts_solved,
   ft.ts_closed,
-  YEAR(CURRENT_DATE - 1) AS year,
-  MONTH(CURRENT_DATE - 1) AS month,
-  DAY(CURRENT_DATE - 1) AS day,
+  YEAR(ft.ts_started) AS year,
+  MONTH(ft.ts_started) AS month,
+  DAY(ft.ts_started) AS day,
   NOW() AS ts_load
 FROM
   dw_customer_support.fact_ticket AS ft
@@ -61,7 +61,7 @@ LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON ft.sk_last_agent = da.sk_agent
 WHERE
-  DATE(ft.ts_started) >= CURRENT_DATE - INTERVAL '1' YEAR
+  DATE(ft.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
   AND dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'
   AND da.agent_organization IN ('webhelp', 'webhelpbr')
