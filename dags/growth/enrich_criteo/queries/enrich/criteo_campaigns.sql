@@ -1,7 +1,9 @@
 SELECT 
     id_advertiser,
+    id_campaign,
     id_ad_set,
     advertiser_name,
+    campaign_name,
     ad_set,
     region,
     zip_code,

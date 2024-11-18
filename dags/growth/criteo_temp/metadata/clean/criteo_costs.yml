@@ -8,10 +8,14 @@ columns:
     description: Advertiser id of the campaign
     lineage:
       - datalake_gsheets_raw.criteo_costs.advertiser_id
-  id_campaign:
-    description: Unique identifier of the campaign. Can be retrieved from Criteo Management Center
+  id_ad_set:
+    description: Unique identifier of the ad_set. 
     lineage:
       - datalake_gsheets_raw.criteo_costs.ad_set_id
+  id_campaign:
+    description: Unique identifier of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.campaign_id
   advertiser_name:
     description: Name of the Advertiser
     lineage:
@@ -20,6 +24,10 @@ columns:
     description: Name of the campaign
     lineage:
       - datalake_gsheets_raw.criteo_costs.ad_set
+  campaign_name:
+    description: Name of the campaign
+    lineage:
+      - datalake_gsheets_raw.criteo_costs.campaign
   region:
     description: Region of the campaign
     lineage:
