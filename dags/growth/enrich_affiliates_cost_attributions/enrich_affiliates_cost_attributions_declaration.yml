@@ -4,18 +4,19 @@ dag:
   schedule_start_date: 2020, 1, 1
   owner: Data Growth
   documentation:
-    dag_purpose: '
-    Affiliates Cost Attributions DAG pivots QuintoAndars EBDB affiliate engagement commission costs, also adding manual data and history data into it.
-    History data is retrieved from the table:
-    - `datalake_gsheets_clean.affiliates_manual_cost_engagement_history`
-    
-    Custom manual data is retrieved from the table:
-    - `datalake_gsheets_clean.affiliates_manual_cost_engagement`
-    
-    Commission rate values applied onto commission costs are retrived from the table:
-    - `datalake_gsheets_clean.affiliates_cost_tradecom_configuration`'
+    dag_purpose: |
+      Affiliates Cost Attributions DAG pivots QuintoAndars EBDB affiliate engagement commission costs, also adding manual data and history data into it.
+      History data is retrieved from the table:
+      - `datalake_gsheets_clean.affiliates_manual_cost_engagement_history`
+      Custom manual data is retrieved from the table:
+      - `datalake_gsheets_clean.affiliates_manual_cost_engagement`
+      Commission rate values applied onto commission costs are retrived from the table:
+      - `datalake_gsheets_clean.affiliates_cost_tradecom_configuration`'
 workflow:
   type: query_delta
   layer: enrich
+  tables_customization:
+    affiliate_costs:
+      custom_schema: robin_hood
 cluster:
   type: databricks_12_2_med_general_photon_cluster

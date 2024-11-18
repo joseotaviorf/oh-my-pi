@@ -12,7 +12,7 @@ bietlejuice.dw_accounting_funnel:
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-revenue-accounting
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-reversion-creation
 bietlejuice.dw_affiliate_costs:
-  - bietlejuice.enrich_robin_hood:load-enrich-affiliate-costs
+  - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliate-costs
   - bietlejuice.robin_hood:load-clean-tax
 bietlejuice.dw_agent:
   - bietlejuice.dw_user:load-dw-public-dim-user
@@ -1082,6 +1082,9 @@ bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.gsheets_growth:done-clean-affiliates-cost-tradecom-configuration
   - bietlejuice.gsheets_growth:done-clean-affiliates-manual-cost-engagement
   - bietlejuice.gsheets_growth:done-clean-affiliates-manual-cost-engagement-history
+  - bietlejuice.robin_hood:load-clean-accounting-entry
+  - bietlejuice.robin_hood:load-clean-accounting-entry-source
+  - bietlejuice.robin_hood:load-clean-payee
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated
   - bietlejuice.airtable:load-clean-cr-occurrences
@@ -2530,8 +2533,6 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.retsuko:load-clean-credit-card-payment
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
-  - bietlejuice.robin_hood:load-clean-accounting-entry-source
-  - bietlejuice.robin_hood:load-clean-payee
   - bietlejuice.robin_hood:load-clean-tax
 bietlejuice.enrich_sale_available_booking_hours:
   - bietlejuice.ebdb_house:load-clean-house

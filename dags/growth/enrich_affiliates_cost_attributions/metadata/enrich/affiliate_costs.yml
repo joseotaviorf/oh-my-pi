@@ -1,8 +1,8 @@
 ---
 database_name: datalake_robin_hood
 table_name: affiliate_costs
-owner: ae-fintech@quintoandar.com.br
-domain: Fintech
+owner: arthur.gonzaga@quintoandar.com.br
+domain: Data Growth
 description: Affiliate costs enriched data from Robin Hood.
 columns:
   source_name:
