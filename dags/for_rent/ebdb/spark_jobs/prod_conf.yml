@@ -3,6 +3,7 @@ partition_size: 1024
 nb_threads: 15
 
 table_block_list:
+  - AgrupamentoLeadsPorTelefone
   - date_range
   - ENT_REVTYPE
   - REVCHANGES

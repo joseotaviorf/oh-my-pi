@@ -122,7 +122,6 @@ Produces the following output tables:
     `lead`
     `lead_aud`
     `lead_reason`
-    `leads_grouped_by_phone`
     `listing_business_context`
     `listing_business_context_aud`
     `listing_info`
