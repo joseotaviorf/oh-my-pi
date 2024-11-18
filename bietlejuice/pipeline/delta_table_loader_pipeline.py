@@ -1,7 +1,11 @@
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.pipeline.table_loader_pipeline import TableLoaderPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services.spark_metastore_service import (
+    SparkMetastoreService,
+)
 from quintoandar_logger import QuintoAndarLogger
 
 logger = QuintoAndarLogger("DeltaTableLoaderPipeline")
@@ -27,6 +31,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         when_matched_delete_condition: str = None,
         when_matched_operation: dict = None,
         when_not_matched_operation: dict = None,
+        table_privileges: TablePrivileges = None,
     ):
         """
         By default, it will simply do a write operation of a Delta table.
@@ -70,6 +75,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
             target_database_name=target_database_name,
             target_database_location=target_database_location,
             spark_session_configs=spark_session_configs,
+            table_privileges=table_privileges,
         )
         self.merge_schema = merge_schema
         self.merge_on = merge_on
@@ -108,3 +114,9 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         spark_metastore_service.refresh_table(
             self.target_database_name, self.table_name
         )
+
+        if (
+            self.table_privileges
+            and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+        ):
+            self.table_privileges.apply()

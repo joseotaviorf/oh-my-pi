@@ -5,6 +5,7 @@ from bietlejuice.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.pipeline.abstract_pipeline import AbstractPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.base.udfs.udf_enum import UDFEnum
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 
 
 class TableLoaderPipeline(AbstractPipeline):
@@ -14,16 +15,17 @@ class TableLoaderPipeline(AbstractPipeline):
 
     def __init__(
         self,
-        database_name,
-        table_name,
-        database_location,
-        layer,
-        query,
-        partitions=None,
-        query_template_params=None,
-        target_database_name=None,
-        target_database_location=None,
-        spark_session_configs=None,
+        database_name: str,
+        table_name: str,
+        database_location: str,
+        layer: str,
+        query: str,
+        partitions: list = None,
+        query_template_params: dict = None,
+        target_database_name: str = None,
+        target_database_location: str = None,
+        spark_session_configs: dict = None,
+        table_privileges: TablePrivileges = None,
     ):
         """
         :param database_name: database name to create the enriched table
@@ -36,6 +38,7 @@ class TableLoaderPipeline(AbstractPipeline):
         :param target_database_name: target database name
         :param target_database_location: target database location in S3
         :param spark_session_configs: custom config parameters to be set in spark session
+        :param table_privileges: TablePrivileges object to apply table privileges after loading the table
         """
         self.database_name = database_name
         self.table_name = table_name
@@ -47,6 +50,7 @@ class TableLoaderPipeline(AbstractPipeline):
         self.target_database_location = target_database_location or database_location
         self.partitions = partitions or []
         self.spark_session_configs = spark_session_configs or {}
+        self.table_privileges = table_privileges
 
     def run(self):
         """

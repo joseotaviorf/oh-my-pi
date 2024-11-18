@@ -186,3 +186,59 @@ class TestFullTableLoaderPipeline:
             optimize_dataframe=True,
             full_table_name="db.table",
         )
+
+    def test_load_and_register_should_not_apply_privileges_if_uc_disabled(
+        self, mock_base_spark_context, mock_unity_catalog_helper
+    ):
+        privileges = mock.MagicMock()
+        # arrange
+        pipeline = FullTableLoaderPipeline(
+            database_name="db",
+            table_name="table",
+            database_location="s3://bucket/db",
+            layer="layer",
+            query="query",
+            partitions=[],
+            table_privileges=privileges,
+        )
+        mock_base_spark_context.spark.version = "3.3.0"
+        mock_unity_catalog_helper.is_default_catalog_using_unity.return_value = False
+        mock_unity_catalog_helper.is_cluster_unity_catalog_enabled.return_value = False
+
+        # act
+        pipeline.load_and_register(
+            df=mock.MagicMock(),
+            format_options={"format": "parquet"},
+            optimize_dataframe=True,
+        )
+
+        # assert
+        privileges.apply.assert_not_called()
+
+    def test_load_and_register_should_apply_privileges_if_uc_enabled(
+        self, mock_base_spark_context, mock_unity_catalog_helper
+    ):
+        privileges = mock.MagicMock()
+        # arrange
+        pipeline = FullTableLoaderPipeline(
+            database_name="db",
+            table_name="table",
+            database_location="s3://bucket/db",
+            layer="layer",
+            query="query",
+            partitions=[],
+            table_privileges=privileges,
+        )
+        mock_base_spark_context.spark.version = "3.3.0"
+        mock_unity_catalog_helper.is_default_catalog_using_unity.return_value = False
+        mock_unity_catalog_helper.is_cluster_unity_catalog_enabled.return_value = True
+
+        # act
+        pipeline.load_and_register(
+            df=mock.MagicMock(),
+            format_options={"format": "parquet"},
+            optimize_dataframe=True,
+        )
+
+        # assert
+        privileges.apply.assert_called_once_with()

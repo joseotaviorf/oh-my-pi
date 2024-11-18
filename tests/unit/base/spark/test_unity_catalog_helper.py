@@ -1,6 +1,7 @@
 import unittest
 import os
 from unittest.mock import patch
+from bietlejuice.base.databricks.table_privilege_type_enum import TablePrivilegeTypeEnum
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 
 
@@ -104,6 +105,21 @@ class TestUnityCatalogHelper(unittest.TestCase):
         UnityCatalogHelper.sync_table_to_unity_catalog(
             table_name, source_catalog, destination_catalog
         )
+
+        # assert
+        mock_base_spark_context.spark.sql.assert_called_once_with(expected)
+
+    @patch.dict(os.environ, {"ENVIRONMENT": "forno"})
+    @patch("bietlejuice.base.spark.unity_catalog_helper.BaseSparkContext")
+    def test_grant_table_permission(self, mock_base_spark_context):
+        # arrange
+        table_name = "default.table_name"
+        privilege_type = TablePrivilegeTypeEnum.ALL_PRIVILEGES
+        principal = "principal"
+        expected = f"GRANT ALL PRIVILEGES ON TABLE quintoandar_forno.default.table_name TO `principal`"
+
+        # act
+        UnityCatalogHelper.grant_table_permission(privilege_type, table_name, principal)
 
         # assert
         mock_base_spark_context.spark.sql.assert_called_once_with(expected)

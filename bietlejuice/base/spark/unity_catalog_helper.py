@@ -1,4 +1,5 @@
 import os
+from bietlejuice.base.databricks.table_privilege_type_enum import TablePrivilegeTypeEnum
 from bietlejuice.base.spark import BaseSparkContext
 from quintoandar_logger import QuintoAndarLogger
 
@@ -56,3 +57,21 @@ class UnityCatalogHelper:
         if env not in UnityCatalogHelper.CATALOGS:
             raise ValueError(f"Environment {env} not supported.")
         return UnityCatalogHelper.CATALOGS[env]
+
+    @staticmethod
+    def grant_table_permission(
+        privilege_type: TablePrivilegeTypeEnum,
+        table_name: str,
+        principal: str,
+        catalog: str = None,
+    ) -> None:
+        """Grants permissions for a user or group on a table in Unity Catalog"""
+        if not catalog:
+            catalog = UnityCatalogHelper.get_environment_unity_catalog()
+
+        BaseSparkContext.spark.sql(
+            f"GRANT {privilege_type.value} ON TABLE {catalog}.{table_name} TO `{principal}`"
+        )
+        UnityCatalogHelper.logger.info(
+            f"Granted {privilege_type.value} on {catalog}.{table_name} to {principal}"
+        )

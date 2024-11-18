@@ -53,6 +53,12 @@ class FullTableLoaderPipeline(TableLoaderPipeline):
             self.target_database_name, self.table_name
         )
 
+        if (
+            self.table_privileges
+            and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+        ):
+            self.table_privileges.apply()
+
     def _should_optimize_dataframe(self) -> bool:
         """
         This determines whether S3Loader should run the logic to optimize the number of files in the dataframe before saving or not.

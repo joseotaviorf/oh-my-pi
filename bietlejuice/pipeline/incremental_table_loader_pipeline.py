@@ -56,3 +56,9 @@ class IncrementalTableLoaderPipeline(TableLoaderPipeline):
         spark_metastore_service.refresh_table(
             self.target_database_name, self.table_name
         )
+
+        if (
+            self.table_privileges
+            and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+        ):
+            self.table_privileges.apply()
