@@ -12,6 +12,7 @@ CREATE TABLE datalake_ebdb_pricing.listing_prediction_changes (
     calculator_p70_price INT,
     calculator_max_price INT,
     calculator_certainty STRING,
+    is_last_prediction_of_day BOOLEAN,
     ts_calculator_result_started TIMESTAMP,
     ts_calculator_result_ended TIMESTAMP
 ) USING DELTA LOCATION 's3://5a-datalake-prod/enrich/ebdb_pricing/listing_prediction_changes'

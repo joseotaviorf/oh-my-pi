@@ -14,8 +14,9 @@ columns:
     description: Foreign key referring to the house ID.
   id_house_listing:
     lineage:
-      - datalake_ebdb_listing.house_listing_status.id_house_status
-    description: Foreign key of the listing. The last 3 numbers indicate the version of the listing.
+      - datalake_ebdb_listing.house_listing.id_house_listing
+      - datalake_sale_listings.sale_listing_status.id_sale_listing
+    description: Foreign key of the listing. The last 3 numbers indicate the version of the listing when the prediction started.
   id_revision:
     lineage:
       - datalake_ebdb_clean.house_aud.rev
@@ -54,6 +55,8 @@ columns:
       MEDIUM: If the prediction has a medium confidence interval, having a medium certainty in the prediction.
       LOW: If the prediction has a high confidence interval, having a low certainty in the prediction.
       NONE: If the prediction has no certainty at all.
+  is_last_prediction_of_day:
+    description: Boolean indicating whether is the last prediction of the day made by the calculator.
   ts_calculator_result_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
