@@ -1,9 +1,0 @@
----
-tables_list:
-  [
-    "library_versions",
-    "count_cozy_imports",
-    "cozy_vs_bp_coverage",
-    "styled_usage",
-  ]
-cluster_description: databricks_13_3_med_general_2_workers_cluster

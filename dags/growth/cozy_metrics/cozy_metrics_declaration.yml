@@ -1,0 +1,39 @@
+dag:
+  name: cozy_metrics
+  owner: Data Growth
+  schedule_start_date: 2022, 10, 3
+  schedule_interval: "0 0 * * *"
+  documentation: 
+    dag_purpose: This is a pipeline to collect and transform data for measuring the evolution of Cozy at the Design Systems team. With these data, they can be monitoring libraries' versions and other metrics in PWAs.
+      
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_cozy_metrics_raw
+  default_partitions: [year, month, day]
+  default_extraction_type: incremental
+  has_hive_sync: false
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}" 
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+    - "{load_start_date}" # load_start_date
+    - "{load_end_date}" # load_end_date
+  tables_customization:
+    library_versions:
+      extra_spark_job_arguments: 
+        -  library_versions # table_name
+    count_cozy_imports: 
+      extra_spark_job_arguments: 
+        - count_cozy_imports # table_name 
+    cozy_vs_bp_coverage: 
+      extra_spark_job_arguments: 
+        - cozy_vs_bp_coverage # table_name     
+    styled_usage: 
+      extra_spark_job_arguments: 
+        - styled_usage # table_name      
+cluster: 
+  type: databricks_13_3_med_general_2_workers_cluster

@@ -35,9 +35,9 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket", type=str, help="target bucket")
     parser.add_argument("source")
-    parser.add_argument("table_name")
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
+    parser.add_argument("table_name")
 
     args = parser.parse_args()
 
