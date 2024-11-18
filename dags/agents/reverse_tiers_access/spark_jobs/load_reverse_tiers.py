@@ -1,6 +1,5 @@
 import io
 import logging
-import json
 from argparse import ArgumentParser
 from datetime import datetime
 from http.client import HTTPException
@@ -12,6 +11,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
 
@@ -50,10 +50,9 @@ if __name__ == "__main__":
     parser.add_argument("environment", help="forno/prod values ")
     parser.add_argument("source", help="source name")
     parser.add_argument("datalake_bucket", help="bucket for forno/prod datalake")
-    parser.add_argument("external_bucket", help="bucket destination for files")
     parser.add_argument("table_to_send")
-    parser.add_argument("webhook_key")
     parser.add_argument("execution_date")
+    parser.add_argument("external_bucket", help="bucket destination for files")
 
     args = parser.parse_args()
 
@@ -62,13 +61,17 @@ if __name__ == "__main__":
     source = args.source
     external_bucket = args.external_bucket
     table_to_send = args.table_to_send
-    webhook_key = args.webhook_key
     execution_date = args.execution_date
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
     bimester = int((execution_date.month / 2) + 0.5)
 
     datalake_path_prefix = f"reverse/{source}"
+
+    config_service = ConfigurationService(source)
+    webhook_key = config_service.get_config("notification_webhooks_keys")[
+        "data_quality"
+    ]
 
     logger.info(
         f"""m=__main__, environment={environment}, source={source},

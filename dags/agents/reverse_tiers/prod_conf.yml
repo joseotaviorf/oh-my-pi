@@ -1,7 +1,0 @@
----
-dag_documentation:
-  dag_purpose: |
-    Sending of performance categorization data for agents: brokers and trade executors. The data is sent to a bucket, where it will be consumed by Nazaré.
-
-partition_cols: ['year', 'bimester']
-range_of_days_to_run: [1, 15]

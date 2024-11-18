@@ -1,0 +1,29 @@
+dag:
+  name: reverse_tiers_access
+  schedule_start_date: 2024, 8, 23
+  owner: Data Agents
+  documentation:
+    dag_purpose: "Sending of performance categorization data for agents: brokers and trade executors. The data is sent to a bucket, where it will be consumed by Nazaré."
+    additional_information: This pipeline also exports Agents Tiers results do Nazaré bucket (`s3://nazare-revenue-share-{environment}`).
+workflow:
+  type: access
+  layer: reverse
+  load_spark_job: load_reverse_tiers
+  default_extraction_type: incremental
+  default_partitions: ['year', 'bimester']
+  spark_job_arguments:
+    - "{environment}"
+    - "{dag_name}"
+    - "{bucket}"
+    - "{table_name}"
+    - "{{ ds }}"
+    - "nazare-revenue-share-{environment}" #external_s3_bucket
+  tables_customization:
+    tiers: {}
+  short_circuit_customization:
+    function: CHECK_IS_IN_RANGE_OF_DAYS
+    execution_date: "{{ macros.ds_add(ds, 1) }}"
+    function_params:
+      range_of_days: [1, 15]
+cluster:
+  type: databricks_12_2_med_general_cluster

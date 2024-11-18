@@ -5,7 +5,7 @@ WITH filter_bimester AS (
     FROM 
         datalake_quintoandar.aux_date AS ad
     WHERE
-        ad.date = MAKE_DATE({year}, {month}, {day})
+        ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
     t.id_agent,
