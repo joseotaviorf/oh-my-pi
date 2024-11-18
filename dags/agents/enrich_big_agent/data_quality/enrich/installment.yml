@@ -1,13 +1,16 @@
 ---
-table_name: dw_agent_staging.dim_work_contract
+table_name: datalake_big_agent.installment
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 1700
+    greater_than: 480000
     severity_level: Error
 column_level_validations:
-  sk_work_contract:
+  id:
+    is_complete:
+      severity_level: Error
     is_unique:
       severity_level: Error
+  id_external_invoice:
     is_complete:
       severity_level: Error

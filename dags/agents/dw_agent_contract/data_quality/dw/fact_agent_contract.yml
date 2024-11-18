@@ -1,5 +1,5 @@
 ---
-table_name: dw_agent_staging.fact_agent_contract
+table_name: dw_agent.fact_agent_contract
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:

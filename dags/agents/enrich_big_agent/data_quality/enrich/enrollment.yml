@@ -1,16 +1,19 @@
 ---
-table_name: datalake_big_agent.agent_current_program
+table_name: datalake_big_agent.enrollment
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 18000
+    greater_than: 9000
     severity_level: Error
 column_level_validations:
-  id_user:
+  id:
     is_complete:
       severity_level: Error
     is_unique:
       severity_level: Error
   id_agent:
+    is_complete:
+      severity_level: Error
+  id_program:
     is_complete:
       severity_level: Error

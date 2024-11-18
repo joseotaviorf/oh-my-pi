@@ -1,26 +1,19 @@
 ---
-table_name: dw_agent_staging.fact_daily_accredited_agent
+table_name: datalake_big_agent.agency
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 10000000
+    greater_than: 600000
     severity_level: Error
 column_level_validations:
-  sk_date:
+  id:
     is_complete:
       severity_level: Error
-  sk_agent:
+    is_unique:
+      severity_level: Error
+  id_agent:
     is_complete:
       severity_level: Error
-  sk_work_contract:
-    is_complete:
-      severity_level: Error
-  sk_company:
-    is_complete:
-      severity_level: Error
-  allocated_slots:
-    is_complete:
-      severity_level: Error
-  is_last_status_of_day:
+  id_enrollment:
     is_complete:
       severity_level: Error

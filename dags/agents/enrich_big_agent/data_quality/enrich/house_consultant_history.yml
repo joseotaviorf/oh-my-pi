@@ -1,0 +1,26 @@
+---
+table_name: datalake_big_agent.house_consultant_history
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 800000
+    severity_level: Error
+column_level_validations:
+  id_agency:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_enrollment:
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  id_partner:
+    is_complete:
+      severity_level: Error
+  id_user:
+    is_complete:
+      severity_level: Error
+

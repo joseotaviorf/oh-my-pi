@@ -1,16 +1,23 @@
 ---
-table_name: datalake_big_agent.agent_current_program
+table_name: datalake_big_agent.house_sale_listing_consultant
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 18000
+    greater_than: 360000
     severity_level: Error
 column_level_validations:
   id_user:
     is_complete:
       severity_level: Error
-    is_unique:
+  id_partner:
+    is_complete:
       severity_level: Error
-  id_agent:
+  id_enrollment:
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  id_sale_listing:
     is_complete:
       severity_level: Error
