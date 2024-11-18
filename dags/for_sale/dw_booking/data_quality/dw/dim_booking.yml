@@ -1,5 +1,5 @@
 ---
-table_name: dw_public_staging.dim_booking
+table_name: dw_public.dim_booking
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
