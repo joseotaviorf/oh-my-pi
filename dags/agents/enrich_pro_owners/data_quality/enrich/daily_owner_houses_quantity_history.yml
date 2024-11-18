@@ -1,0 +1,11 @@
+---
+table_name: datalake_pro_owners.daily_owner_houses_quantity_history
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 800000000
+    severity_level: Error
+column_level_validations:
+  id_owner:
+    is_complete:
+      severity_level: Error

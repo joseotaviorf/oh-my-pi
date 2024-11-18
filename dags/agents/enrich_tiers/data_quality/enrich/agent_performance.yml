@@ -1,0 +1,11 @@
+---
+table_name: datalake_tiers.agent_performance
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 85000
+    severity_level: Error
+column_level_validations:
+  id_user:
+    is_complete:
+      severity_level: Error

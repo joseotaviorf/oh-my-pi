@@ -1,0 +1,14 @@
+---
+table_name: datalake_tiers.ciq_first_listing
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 145000
+    severity_level: Error
+column_level_validations:
+  id_user:
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error

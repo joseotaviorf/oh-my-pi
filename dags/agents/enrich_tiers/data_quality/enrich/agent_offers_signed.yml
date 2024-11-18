@@ -1,0 +1,14 @@
+---
+table_name: datalake_tiers.agent_offers_signed
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 85000
+    severity_level: Error
+column_level_validations:
+  id_offer:
+    is_complete:
+      severity_level: Error
+  id_user:
+    is_complete:
+      severity_level: Error
