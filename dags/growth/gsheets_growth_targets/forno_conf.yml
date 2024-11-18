@@ -1,10 +1,9 @@
 sheets_info:
-
   forecast_costs_supply_daily:
     sheet_id: 1-d6ETiprXYx6DRYIfg2PblFODxNwsIZHO6WnY9f8pfY
     sheet_name: forecast_supply_costs
     clean_table_name: forecast_costs_supply_daily
-    sheet_context: growth  
+    sheet_context: growth
 
   forecast_supply_daily:
     sheet_id: 1JzGUC-BCSkRP5jiFrnrksdBKkPfPHqDzEvOGXkXVgQ8
@@ -12,28 +11,10 @@ sheets_info:
     clean_table_name: forecast_supply_daily
     sheet_context: growth
 
-  forecast_cohort_supply:
-    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
-    sheet_name: forecast_cohort_supply
-    clean_table_name: rental_forecast_cohort_supply
-    sheet_context: growth
-
-  forecast_diario_supply:
-    sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
-    sheet_name: forecast_diário_supply
-    clean_table_name: rental_forecast_daily_supply
-    sheet_context: growth
-  
   mkt_cost_target:
     sheet_id: 1lOcpeZ2YBrpqFi_sIJxt98sgbMfGEES7uhAASxzOuyg
     sheet_name: targets
     clean_table_name: mkt_cost_target
-    sheet_context: growth
-  
-  rental_ciq_target:
-    sheet_id: 1euvSgRryIdnfrWJMW-TcJf6MnzQjR2ZzlU7FbNku-Ck
-    sheet_name: Targets Supply per CIQ Type[For Rent] [CIQ]
-    clean_table_name: rental_ciq_target
     sheet_context: growth
 
   rental_prospect_target:
@@ -83,12 +64,6 @@ sheets_info:
     sheet_name: supply_targets_2024
     clean_table_name: rent_supply_budget_2024
     sheet_context: for_rent_targets
-
-  sale_ciq_target:
-    sheet_id: 1euvSgRryIdnfrWJMW-TcJf6MnzQjR2ZzlU7FbNku-Ck
-    sheet_name: Targets Supply per CIQ Type[For Sale] [CIQ]
-    clean_table_name: sale_ciq_target
-    sheet_context: growth
 
   sale_prospect_target:
     sheet_id: 1KT6ZqNaxqWWc8V9vdBUjHQbiV_PsHKRxkN9_6IsBL8g

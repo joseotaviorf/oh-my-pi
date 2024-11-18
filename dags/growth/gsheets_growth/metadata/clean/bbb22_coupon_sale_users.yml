@@ -1,9 +1,0 @@
-database_name: datalake_gsheets_clean
-table_name: bbb22_coupon_sale_users
-columns:
-  id_user:
-    lineage:
-      - datalake_gsheets_raw.bbb22_coupon_for_sale.sk_user
-  ts_coupon_expired:
-    lineage:
-      - datalake_gsheets_raw.bbb22_coupon_for_sale.ts_coupon_expired

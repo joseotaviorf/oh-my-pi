@@ -1,5 +1,4 @@
 sheets_info:
-
   affiliates_active_segmentation:
     sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
     sheet_name: ativos
@@ -10,12 +9,6 @@ sheets_info:
     sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
     sheet_name: inativos
     clean_table_name: affiliates_inactive_segmentation
-    sheet_context: growth
-
-  affiliate_pro_registration:
-    sheet_id: 196BCLJ7rwRAgb50IEdYB_b4KGnilleeCU8WMKghxddY
-    sheet_name: affiliate_pro
-    clean_table_name: affiliate_pro_registration
     sheet_context: growth
 
   affiliates_extra_user_bonus:
@@ -42,76 +35,16 @@ sheets_info:
     clean_table_name: daily_target_supply_sale
     sheet_context: growth
 
-  bbb22_giveaway_for_rent:
-    sheet_id: 1O1vB9XgOsaI3ORga8suJmHO8ukA-tf_2iNxH9Uof8S0
-    sheet_name: users
-    clean_table_name: bbb22_giveaway_rent_users
-    sheet_context: growth
-
-  bbb22_coupon_for_sale:
-    sheet_id: 1ZnRK-EXvUVNneRtoyCZ0y1ET-Cc859JokFIEFZUfacQ
-    sheet_name: users
-    clean_table_name: bbb22_coupon_sale_users
-    sheet_context: growth
-
   branding_where_is_plaquinha:
     sheet_id: 1_jHpsbQx1J24l7TNxoMgHH-FgAgQMphVLW9_HVgQi-4
     sheet_name: branding_where_is_plaquinha
     clean_table_name: branding_where_is_plaquinha
     sheet_context: growth
 
-  braze_campaign_creative:
-    sheet_id: 1i3Vlk5JcFinW5p0uGr3AJeL60KaVh9XkfhckVweGkSg
-    sheet_name: campaign_dimensions
-    clean_table_name: braze_campaign_creative
-    sheet_context: growth
-
-  braze_canvas_creative:
-    sheet_id: 1i3Vlk5JcFinW5p0uGr3AJeL60KaVh9XkfhckVweGkSg
-    sheet_name: canvas_dimensions
-    clean_table_name: braze_canvas_creative
-    sheet_context: growth
-
-  casa_mineira_marketing_cost_taxonomy:
-    sheet_id: 1F3HTv0rxdInhIs0JNs0GTyCN0_-jsE_3hNSKhzu_RM8
-    sheet_name: casa_mineira_marketing_cost_taxonomy
-    clean_table_name: casa_mineira_marketing_cost_taxonomy
-    sheet_context: growth
-
-  casa_mineira_inside_sales_pipe:
-    sheet_id: 1sV89IeTziUUafu32NxVVBIDcLUQbzlwaZowqDacaPb0
-    sheet_name: negocios
-    clean_table_name: casa_mineira_inside_sales_pipe
-    sheet_context: growth
-
   ciq_costs:
     sheet_id: 1ZkPABh53UrzKn4aQudZzr5QpJsBXhCZDnJkDZob2Rqc
     sheet_name: ciq_costs
     clean_table_name: ciq_costs
-    sheet_context: growth
-
-  city_share:
-    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
-    sheet_name: city_share
-    clean_table_name: city_share
-    sheet_context: growth
-
-  criteo_abtest_rj:
-    sheet_id: 1nwZh9Z-1t2HFLCsxqUThGpgdgbjHCVlhsKVK_mt-IkQ
-    sheet_name: criteo_abtest_rj
-    clean_table_name: criteo_abtest_rj
-    sheet_context: growth
-
-  crm_iptu_wave4:
-    sheet_id: 1jz2kwgaE4qCi9aL1UaK2osdVv30ryWQI_sJ9qZARIqM
-    sheet_name: crm_iptu_wave4
-    clean_table_name: crm_iptu_wave4
-    sheet_context: growth
-
-  contract_attribution_models:
-    sheet_id: 1bDOmN1K_wrfTJnvzwK-sYSdBQ3oozhf4KgO_UQrJHME
-    sheet_name: contract_attribution_models
-    clean_table_name: contract_attribution_models
     sheet_context: growth
 
   cost_taxonomy_translation_dictionary:
@@ -124,12 +57,6 @@ sheets_info:
     sheet_id: 1g_HngmcykZuj-c5PfhGeBo0m969ipBEQ04Hy2diIns4
     sheet_name: costs_targets
     clean_table_name: costs_targets
-    sheet_context: growth
-
-  demand_channel_share:
-    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
-    sheet_name: demand_channel_share
-    clean_table_name: demand_channel_share
     sheet_context: growth
 
   demand_retention_ab_tests:
@@ -150,46 +77,16 @@ sheets_info:
     clean_table_name: dict_taxonomy_supply
     sheet_context: growth
 
-  ecglobal_active_users:
-    sheet_id: 1S4QBYxMLTAfjre0xd5jS9kaT5YjL4KsE3sRKmvHFNjM
-    sheet_name: base
-    clean_table_name: ecglobal_active_users
-    sheet_context: growth
-
   encm_coefficients:
     sheet_id: 1qAmeLFiO_W2vufA2oNK0326W5V_wbSjIYY7z32ahXns
     sheet_name: coefficients
     clean_table_name: encm_coefficients
-    sheet_context: growth  
+    sheet_context: growth
 
   encm_conversion_probability:
     sheet_id: 1XZK73ooCchsUEDnpn5YhcVfdTU7Owz0GPniGKykX4gY
     sheet_name: conversion_probability
     clean_table_name: encm_conversion_probability
-    sheet_context: growth  
-
-  full_taxonomy:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Full_Taxonomy
-    clean_table_name: taxonomy_mkt_cost
-    sheet_context: growth
-
-  full_taxonomy_new_test:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Full_Taxonomy_New_Test
-    clean_table_name: taxonomy_mkt_cost_new_test
-    sheet_context: growth
-
-  google_costs:
-    sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
-    sheet_name: Google Costs
-    clean_table_name: marketing_manual_costs_google
-    sheet_context: growth
-
-  google_searches_share_of_interest:
-    sheet_id: 1eDqOTxQqgQOJVA6CnPa8ZuuriCaYe5MrUpFYni2BpeM
-    sheet_name: google_searches_share_of_interest
-    clean_table_name: google_searches_share_of_interest
     sheet_context: growth
 
   households_per_city_ibge:
@@ -198,40 +95,10 @@ sheets_info:
     clean_table_name: households_per_city_ibge
     sheet_context: growth
 
-  historic_national_costs:
-    sheet_id: 1mcTp6mmjNBpsaEiwn1ZepnhkyGozDEC5HAmVWeeArGA
-    sheet_name: historic_national_costs
-    clean_table_name: affiliates_national_costs_history
-    sheet_context: growth
-
   indicaai_tax_costs:
     sheet_id: 1-ivCkEwGfATx6sza4t5LlPPjStH_CgPgBbR4aGwfLZ4
     sheet_name: Output
     clean_table_name: indicaai_tax_costs
-    sheet_context: growth
-
-  inside_sale_supply_targets:
-    sheet_id: 1AMY3biIPE8bD32xaYVv7lh-LbSZNGhA8P9L7kse3Poc
-    sheet_name: inside_sale_supply_targets
-    clean_table_name: inside_sale_supply_targets
-    sheet_context: growth
-
-  ipsos_brandtracking_questions:
-    sheet_id: 19RfjayG4z4qKpS6HMUTyYJbaM3LYmJB-rRl2dyTTSqw
-    sheet_name: ipsos_brandtracking_questions
-    clean_table_name: ipsos_brandtracking_questions
-    sheet_context: growth
-
-  kenshoo_configuration:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Kenshoo_Configuration
-    clean_table_name: marketing_kenshoo_configuration
-    sheet_context: growth
-
-  local_holidays:
-    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
-    sheet_name: local_holidays
-    clean_table_name: local_holidays
     sheet_context: growth
 
   ltvoutput:
@@ -252,40 +119,16 @@ sheets_info:
     clean_table_name: affiliates_manual_cost_engagement_history
     sheet_context: growth
 
-  marketing_costs_campaign_city:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Campaign_City
-    clean_table_name: marketing_costs_campaign_city
-    sheet_context: growth
-
-  marketing_costs_manual_costs_google:
-    sheet_id: 1e1FoBoCN0XYH3vo8u0aZ-GocU453gkfDIasX0ivDonc
-    sheet_name: Google Costs
-    clean_table_name: marketing_costs_manual_costs_google
-    sheet_context: growth
-
   marketing_costs_google_ad_type_flags:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: ad_type_flags
     clean_table_name: marketing_costs_google_ad_type_flags
     sheet_context: growth
 
-  marketing_costs_kenshoo_configuration:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Kenshoo_Configuration
-    clean_table_name: marketing_costs_kenshoo_configuration
-    sheet_context: growth
-
   marketing_cost_taxonomy:
     sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
     sheet_name: Oficial Taxonomy Composer
     clean_table_name: marketing_cost_taxonomy
-    sheet_context: growth
-
-  marketing_manual_campaign_cities:
-    sheet_id: 1PHE3TovFGfvkMviimTmpytJKo3JOWrIHsdQtH86GEn4
-    sheet_name: Campaign_City
-    clean_table_name: marketing_manual_campaign_cities
     sheet_context: growth
 
   marketing_offline_manual_costs:
@@ -312,28 +155,10 @@ sheets_info:
     clean_table_name: marketing_offline_budget
     sheet_context: growth
 
-  marketing_social_media_costs:
-    sheet_id: 1yleDGeVtbzrT5rM0zo9AomOZKIGTOiYm-FK0_GNnGNs
-    sheet_name: social_media_costs
-    clean_table_name: marketing_social_media_costs
-    sheet_context: growth
-
   marketshare_units_and_tenants:
     sheet_id: 1VGMK09ibXDkB85srTUbD8a4JsX6iA90BFmKWpon5nsE
     sheet_name: Market Share
     clean_table_name: marketshare_units_and_tenants
-    sheet_context: growth
-
-  marketshare_seasonality:
-    sheet_id: 1VGMK09ibXDkB85srTUbD8a4JsX6iA90BFmKWpon5nsE
-    sheet_name: Sazonalidade
-    clean_table_name: marketshare_seasonality
-    sheet_context: growth
-
-  media_plan:
-    sheet_id: 1aief4f2Iu0vEZ68ZOxq7cRjkzdz1ePOhZf2lN6rcITQ
-    sheet_name: media_plan
-    clean_table_name: media_plan_current_quarter
     sheet_context: growth
 
   mkt_cost_per_source:
@@ -342,48 +167,18 @@ sheets_info:
     clean_table_name: mkt_cost_per_source
     sheet_context: growth
 
-  mta_budget:
-    sheet_id: 16HF0DnPTkCIG8oexncHizjhmoGyAJapvGVeA46mUCa4
-    sheet_name: mta_budget
-    clean_table_name: mta_budget_october_2020
-    sheet_context: growth
-
-  offline_manual_costs:
-    sheet_id: 1gneeE6l30lv4om6FBEUe23YGfbMCCNe8IwpbCRL6vXQ
-    sheet_name: offline_manual_costs
-    clean_table_name: offline_manual_costs
-    sheet_context: growth
-
-  offline_manual_share_city_group:
-    sheet_id: 1zUM7FIxpNXmnTsbWZoX1wV7S_C49XMO8Vo68ElSqipo
-    sheet_name: offline_manual_share_city_group
-    clean_table_name: offline_manual_share_city_group
-    sheet_context: growth
-
-  offline_manual_share_cost_center:
-    sheet_id: 1zUM7FIxpNXmnTsbWZoX1wV7S_C49XMO8Vo68ElSqipo
-    sheet_name: offline_manual_share_cost_center
-    clean_table_name: offline_manual_share_cost_center
-    sheet_context: growth
-
   plaquinhas_cover_targets:
     sheet_id: 1GEaj4YMe9sgRiJmqgoJuOvkb8H8hjEcEgsTyv9GLzmg
     sheet_name: cobertura
     clean_table_name: plaquinhas_cover_targets
     sheet_context: growth
-    
-  plaquinhas_demand_targets:
-    sheet_id: 1PTguTGckx6mboWC2-AaFSH6yFAYCKBrdEDP1gpF5EUQ
-    sheet_name: targets
-    clean_table_name: plaquinhas_demand_targets
-    sheet_context: growth
-  
+
   plaquinhas_installation_pp_organic:
     sheet_id: 138ywKh8sHd2owgr6dxdkzDhGWqR0XHYaw0MkkSct_R8
     sheet_name: pp_organico
     clean_table_name: plaquinhas_installation_pp_organic
     sheet_context: growth
-    
+
   plaquinhas_installation_targets:
     sheet_id: 1GEaj4YMe9sgRiJmqgoJuOvkb8H8hjEcEgsTyv9GLzmg
     sheet_name: instalacoes
@@ -402,28 +197,10 @@ sheets_info:
     clean_table_name: promotional_bonus_user_cluster_targets
     sheet_context: growth
 
-  promotional_bonus_segmentation_targets:
-    sheet_id: 15SKrchR92WDs0I4Ia5_qmfkYl8jS6sutsAiX2HB445E
-    sheet_name: promotional_bonus_segmentation_targets
-    clean_table_name: promotional_bonus_segmentation_targets
-    sheet_context: growth
-
-  promotional_bonus_user_targets:
-    sheet_id: 15SKrchR92WDs0I4Ia5_qmfkYl8jS6sutsAiX2HB445E
-    sheet_name: promotional_bonus_user_targets
-    clean_table_name: promotional_bonus_user_targets
-    sheet_context: growth
-
   provisioned_costs_import:
     sheet_id: 1KZWx_b3tn754ImagBnGj4rJo16kXgxzg-lQFpYTolOs
     sheet_name: provisioned_costs_import
     clean_table_name: provisioned_costs_import
-    sheet_context: growth
-
-  rental_cohort_supply:
-    sheet_id: 1qz4QZD4OYSfXV_mMiAUH9okYT5hodlwfP3edmeyldO4
-    sheet_name: rental_cohort_supply
-    clean_table_name: rental_cohort_supply
     sheet_context: growth
 
   rental_flows_targets:
@@ -468,18 +245,6 @@ sheets_info:
     clean_table_name: rental_tof_monthly_targets
     sheet_context: growth
 
-  rent_criteo_eng_ab_test:
-    sheet_id: 17PonK69vjOYru-xD0acbVqD0bkl_LPuGodhR2AHmn5I
-    sheet_name: rent_criteo_eng_ab_test
-    clean_table_name: rent_criteo_eng_ab_test
-    sheet_context: growth
-
-  sale_criteo_eng_ab_test:
-    sheet_id: 1_Lbgnyz8-1BMs3eq6KteLCND1uvLbidzE1hXLAiVFmI
-    sheet_name: sale_criteo_eng_ab_test
-    clean_table_name: sale_criteo_eng_ab_test
-    sheet_context: growth
-
   sale_flows_targets:
     sheet_id: 1V316dJUIlf4xv3tOBVRIGdSn38NqKRPcS1emTCQlBYE
     sheet_name: sale_flows_targets
@@ -490,18 +255,6 @@ sheets_info:
     sheet_id: 1PDY6WpRj2DmkxfjT81cd1jdA8HWSGu3U0hYGnoHPVtM
     sheet_name: sale_nbp_source_targets
     clean_table_name: sale_nbp_source_targets
-    sheet_context: growth
-
-  sale_rbp_targets:
-    sheet_id: 1dbPJT39JNkgakOE95INVipThMe-vLDDXHZ4aOp3q4pg
-    sheet_name: sale_rbp_targets
-    clean_table_name: sale_rbp_targets
-    sheet_context: growth
-
-  sale_buyer_prospects_budget_2024:
-    sheet_id: 10fnWFzOQacP4TafxRWS3oGi6KIhP_6B1AhPO9YDetJU
-    sheet_name: sale_demand_targets_bps_2024
-    clean_table_name: sale_buyer_prospects_budget_2024
     sheet_context: growth
 
   supply_listing_cross_historical:
@@ -516,88 +269,10 @@ sheets_info:
     clean_table_name: supply_listing_historical_reprocessing
     sheet_context: growth
 
-  targets_acquisition_cumulative_autonomous_agent:
-    sheet_id: 1eDioFikgifTfeFIH7nXqbCuoJ1lohXmjLiFrfrojoW8
-    sheet_name: targets_acquisition_cumulative_autonomous_agent
-    clean_table_name: targets_acquisition_cumulative_autonomous_agent
-    sheet_context: growth
-
-  targets_agents_engagement:
-    sheet_id: 1Nf3OlUhvk8TiIN0T6uvQ_ES99yyB9D3K6anj5Hdr-ys
-    sheet_name: targets_agents_engagement
-    clean_table_name: targets_agents_engagement
-    sheet_context: growth
-
-  targets_casa_mineira_cost:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: Cost
-    clean_table_name: targets_casa_mineira_cost
-    sheet_context: growth
-
-  targets_casa_mineira_nbp:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: NBP
-    clean_table_name: targets_casa_mineira_nbp
-    sheet_context: growth
-
-  targets_casa_mineira_ncp:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: NCP
-    clean_table_name: targets_casa_mineira_ncp
-    sheet_context: growth
-
-  targets_casa_mineira_tof_daily:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: ToF - Daily
-    clean_table_name: targets_casa_mineira_tof_daily
-    sheet_context: growth
-
-  targets_casa_mineira_tof_monthly:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: ToF - Monthly
-    clean_table_name: targets_casa_mineira_tof_monthly
-    sheet_context: growth
-
-  targets_casa_mineira_tof_weekly:
-    sheet_id: 1lYMt9heU4DE5wCj_Nu25ClCI25wKWMMHKchzq6pnJl0
-    sheet_name: ToF - Weekly
-    clean_table_name: targets_casa_mineira_tof_weekly
-    sheet_context: growth
-
-  targets_portal_casa_mineira:
-    sheet_id: 1KrV8H7PzhUzevUhYHw2ycL9Ai8tTV7uv1aenH5oadvM
-    sheet_name: targets
-    clean_table_name: targets_portal_casa_mineira_cost_cf
-    sheet_context: growth
-
-  target_supply_and_demand_autonomous_agent:
-    sheet_id: 1i2cHxc4h9c8FKEORH4K_0n_ho-3haXH04fWhdDHE2nU
-    sheet_name: target_supply_and_demand_autonomous_agent
-    clean_table_name: target_supply_and_demand_autonomous_agent
-    sheet_context: growth
-
-  target_supply_historical_rent:
-    sheet_id: 1Tik3MWlzXufDLEb5CoeXCX_r_5H5a5J-XgnOEcI8w3U
-    sheet_name: Rent
-    clean_table_name: target_supply_historical_rent
-    sheet_context: growth
-
-  target_supply_historical_sale:
-    sheet_id: 1Tik3MWlzXufDLEb5CoeXCX_r_5H5a5J-XgnOEcI8w3U
-    sheet_name: Sale
-    clean_table_name: target_supply_historical_sale
-    sheet_context: growth   
-
   taxonomy_affiliates:
     sheet_id: 1e3806Tog1avS6uVO6ACUqqcqRpwcJffDZhRvgE8A3V4
     sheet_name: taxonomy_affiliates
     clean_table_name: taxonomy_affiliates
-    sheet_context: growth
-
-  taxonomy_crm_casa_mineira:
-    sheet_id: 12_zyljMVOTLUvBSCen6QXSx23bXSd6krs8_fpxueqNU
-    sheet_name: taxonomy_crm_casa_mineira
-    clean_table_name: taxonomy_crm_casa_mineira
     sheet_context: growth
 
   taxonomy_demand:
@@ -624,80 +299,14 @@ sheets_info:
     clean_table_name: taxonomy_levels_values
     sheet_context: growth
 
-  taxonomy_portal_casa_mineira:
-    sheet_id: 12_zyljMVOTLUvBSCen6QXSx23bXSd6krs8_fpxueqNU
-    sheet_name: taxonomy_portal_casa_mineira
-    clean_table_name: taxonomy_portal_casa_mineira
-    sheet_context: growth
-
-  tof_supply_targets:
-    sheet_id: 13iYK42dvdIiMG5DEsjhMPP5BbYo5S15ytRztLGiGUfY
-    sheet_name: tof_supply_paid
-    clean_table_name: tof_supply_targets
-    sheet_context: growth
-
   tradecom_configuration:
     sheet_id: 1Op2q1c9biiiTGBYd1Mai967yPFkIrHYOKUWaXFOovY4
     sheet_name: tradecom_configuration
     clean_table_name: affiliates_cost_tradecom_configuration
     sheet_context: growth
 
-  tv_ads:
-    sheet_id: 1HEbApdK1ydVMbAPzmdmN5b850aCVVRhUyjLZp6Ny4kE
-    sheet_name: base_clean
-    clean_table_name: tv_ads
-    sheet_context: growth
-
-  unit_economics_amortization_curve:
-    sheet_id: 1Xoc-FhCfD3QgXiCSze3XT95BGr1SWqLqLyYTmyUGnHI
-    sheet_name: amortization_curve
-    clean_table_name: unit_economics_amortization_curve
-    sheet_context: growth
-  
-  unique_volume_targets_day:
-    sheet_id: 1SjcFoTw-306AFjs1a0JEBWy6gpFZG4jYstBrZ1umY1M
-    sheet_name: unique_not_official_target
-    clean_table_name: unique_volume_targets_day
-    sheet_context: growth
-
   voucherify_users:
     sheet_id: 1qvnfJswKdOvscd9hhGBsCThVzimTIOEP47sJWBeyqiY
     sheet_name: voucherify_users
     clean_table_name: voucherify_users
-    sheet_context: growth
-
-  weekday_demand_share:
-    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
-    sheet_name: weekday_demand_share
-    clean_table_name: weekday_demand_share
-    sheet_context: growth
-
-  week_volumes_supply:
-    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
-    sheet_name: week_volumes_supply
-    clean_table_name: week_volumes_supply
-    sheet_context: growth
-
-  weekday_holiday_share:
-    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
-    sheet_name: weekday_holiday_share
-    clean_table_name: weekday_holiday_share
-    sheet_context: growth
-
-  weekday_holiday_share_supply:
-    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
-    sheet_name: weekday_holiday_share_supply
-    clean_table_name: weekday_holiday_share_supply
-    sheet_context: growth
-
-  weekday_supply_channel_share:
-    sheet_id: 1Kq-1flAT8YljbtZOD4s1GV5AQg-kkbBrDNdeUtAKwGA
-    sheet_name: weekday_supply_channel_share
-    clean_table_name: weekday_supply_channel_share
-    sheet_context: growth
-
-  week_volumes_demand:
-    sheet_id: 10ECqjm6qRKl_WYOVtEVlNHc6eo4P1ogtFhFQ11kOf5c
-    sheet_name: week_volumes_demand
-    clean_table_name: week_volumes_demand
     sheet_context: growth

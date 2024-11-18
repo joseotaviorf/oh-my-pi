@@ -1,9 +1,0 @@
-SELECT
-    account_name,
-    campaign_name,
-    desktop_cost,
-    mobile_cost,
-    tablet_cost,
-    date
-FROM
-    datalake_gsheets_raw.marketing_manual_costs_google

@@ -1,7 +1,0 @@
-database_name: datalake_gsheets_raw
-table_name: casa_mineira_inside_sales_pipe
-columns:
-  consultor:
-    tags:
-      - PII
-      - Confidential

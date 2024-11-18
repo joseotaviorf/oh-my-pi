@@ -1,8 +1,0 @@
----
-database_name: datalake_gsheets_raw
-table_name: offline_manual_costs
-columns:
-  email:
-    tags:
-      - PII
-      - Confidential
