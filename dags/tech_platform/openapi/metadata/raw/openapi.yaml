@@ -1,0 +1,24 @@
+database_name: datalake_access_logs_raw
+table_name: openapi
+description: Table with openapi definitions.
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  file_path:
+    lineage:
+      - s3_openapi_bucket
+    path:
+      lineage:
+        - s3_openapi_bucket/<env>/<repo_owner>/<repo_name>/<app_name>/openapi/latest/original/openapi.yaml.paths
+    method:
+      lineage:
+        - s3_openapi_bucket/<env>/<repo_owner>/<repo_name>/<app_name>/openapi/latest/original/openapi.yaml.paths.method
+    operationId:
+      lineage:
+        - s3_openapi_bucket/<env>/<repo_owner>/<repo_name>/<app_name>/openapi/latest/original/openapi.yaml.paths.method.operationId
+    operation_description:
+      lineage:
+        -s3_openapi_bucket/<env>/<repo_owner>/<repo_name>/<app_name>/openapi/latest/original/openapi.yaml.paths.method.description
+    security:
+      lineage:
+        - s3_openapi_bucket/<env>/<repo_owner>/<repo_name>/<app_name>/openapi/latest/original/openapi.yaml.paths.method.security
