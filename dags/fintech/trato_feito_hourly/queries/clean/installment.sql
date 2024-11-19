@@ -21,8 +21,9 @@ SELECT
     expired_at AS ts_expired,
     created_at AS ts_created,
     updated_at AS ts_updated,
+    year,
+    month,
+    day,
     NOW() AS ts_load
 FROM
     datalake_trato_feito_hourly_raw.installment
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
