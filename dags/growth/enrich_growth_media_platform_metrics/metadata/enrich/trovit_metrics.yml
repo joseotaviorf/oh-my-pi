@@ -8,85 +8,64 @@ columns:
   id_account:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.id_account
-    description:
-      - The account id of the Trovit platform.
+    description: The account id of the Trovit platform.
   id_campaign:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.id_campaign
-    description:
-      - The id of the campaign in Trovit.
+    description: The id of the campaign in Trovit.
   id_adset:
-    description:
-      - The id of the adset in Trovit. This information is not available for this table.
+    description: The id of the adset in Trovit. This information is not available for this table.
   id_ad:
-    description:
-      - The id of the ad in Trovit. This information is not available for this table.
+    description: The id of the ad in Trovit. This information is not available for this table.
   account_name:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.account_name
-    description:
-      - The name of the account in Trovit.
+    description: The name of the account in Trovit.
   origin:
-    description:
-      - The origin of the data. For this table, it is always Trovit.
+    description: The origin of the data. For this table, it is always Trovit.
   report_type:
-    description:
-      - The type of report. For this table, it is always trovit_campaigns.
+    description: The type of report. For this table, it is always trovit_campaigns.
   utm_campaign:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.campaign_name
-    description:
-      - The UTM campaign name of the ad.
+    description: The UTM campaign name of the ad.
   utm_term:
-    description:
-      - The UTM term of the adset in Trovit. This information is not available for this table.
+    description: The UTM term of the adset in Trovit. This information is not available for this table.
   utm_content:
-    description:
-      - The UTM content of the ad in Trovit. This information is not available for this table.
+    description: The UTM content of the ad in Trovit. This information is not available for this table.
   country_code:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.country_code
-    description:
-      - The country code of the report.
+    description: The country code of the report.
   state:
-    description:
-      - The state of the spend in the report. This information is not available for this table.
+    description: The state of the spend in the report. This information is not available for this table.
   city:
-    description:
-      - The city of the spend in the report. This information is not available for this table.
+    description: The city of the spend in the report. This information is not available for this table.
   clicks:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.clicks
-    description:
-      - Number of clicks in Trovit campaigns.
+    description: Number of clicks in Trovit campaigns.
   conversions:
-    description:
-      - Number of conversions in Trovit campaigns. This information is not available for this table.
+    description: Number of conversions in Trovit campaigns. This information is not available for this table.
   impressions:
-    description:
-      - Number of impressions in Trovit campaigns. This information is not available for this table.
+    description: Number of impressions in Trovit campaigns. This information is not available for this table.
   total_cost:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.total_cost
-    description:
-      - Total cost of the ads in Trovit campaigns.
+    description: Total cost of the ads in Trovit campaigns.
   dt_cost:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.dt_attribution
-    description:
-      - Date when the cost data was attributed.
+    description: Date when the cost data was attributed.
   year:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.dt_attribution
-    description:
-      - Year of the report.
+    description: Year of the report.
   month:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.dt_attribution
-    description:
-      - Month of the report.
+    description: Month of the report.
   day:
     lineage:
       - datalake_lifull_campaigns_clean.trovit_campaigns.dt_attribution
-    description:
-      - Day of the report.
+    description: Day of the report.
