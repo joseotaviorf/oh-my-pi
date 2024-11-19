@@ -29,8 +29,10 @@ deduplicate_negotiation AS (
     id AS id_negotiation,
     id_debtor_external AS id_contract,
     consultancy AS agency,
-    MAKE_DATE(year, month, day) AS dt_data_updated,
-    ts_created AS ts_negotiation_creation
+    ts_created AS ts_negotiation_creation,
+    year,
+    month,
+    day
   FROM datalake_trato_feito_hourly_clean.negotiation
   WHERE
     MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
@@ -41,26 +43,30 @@ installment_group_by_negotiation AS (
     i.id_negotiation,
     n.id_contract,
     n.agency AS id_agency,
-    n.dt_data_updated,
     n.ts_negotiation_creation,
+    n.year,
+    n.month,
+    n.day,
     SUM(IF(i.installment_number = 1 AND i.status = 'paid', i.total_amount, 0)) AS down_payment_amount,
     SUM(i.total_amount) AS total_negotiated_amount,
     MIN(i.dt_due) AS dt_down_payment_due,
     MIN(IF(i.installment_number = 1 AND i.status = 'paid', i.dt_paid, NULL)) AS dt_down_payment
-  FROM installments AS i
-  INNER JOIN deduplicate_negotiation AS n
+  FROM deduplicate_negotiation AS n
+  INNER JOIN installments AS i
     ON i.id_negotiation = n.id_negotiation
-  GROUP BY 1,2,3,4,5
+  GROUP BY 1,2,3,4,5,6,7
 )
 SELECT
-  i.id_negotiation,
-  i.id_contract,
-  i.id_agency,
-  i.down_payment_amount,
-  i.total_negotiated_amount,
-  i.dt_down_payment_due,
-  i.dt_down_payment,
-  i.dt_data_updated,
-  i.ts_negotiation_creation,
+  id_negotiation,
+  id_contract,
+  id_agency,
+  down_payment_amount,
+  total_negotiated_amount,
+  dt_down_payment_due,
+  dt_down_payment,
+  ts_negotiation_creation,
+  year,
+  month,
+  day,
   NOW() AS ts_load
-FROM installment_group_by_negotiation AS i
+FROM installment_group_by_negotiation
