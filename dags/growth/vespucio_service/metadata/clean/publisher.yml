@@ -1,0 +1,29 @@
+---
+database_name: datalake_vespucio_service_clean
+table_name: publisher
+description:
+  Table that store the publisher status from Vespucio Service Application.
+  It is an append only table.
+domain: Growth
+owner: andre.melo@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_vespucio_service_raw.publisher.id
+    description: "The table primary key and row identification."
+  id_portal:
+    lineage:
+      - datalake_vespucio_service_raw.publisher.portal_id
+    description: "The portal identification userd by the publisher."
+  id_publisher:
+    lineage:
+      - datalake_vespucio_service_raw.publisher.publisher_id
+    description: "The publisher identification."
+  listing_status:
+    lineage:
+      - datalake_vespucio_service_raw.publisher.listing_status
+    description: "The listing status of the publisher."
+  ts_created:
+    lineage:
+      - datalake_vespucio_service_raw.publisher.created_at
+    description: "Publisher status creation timestamp."

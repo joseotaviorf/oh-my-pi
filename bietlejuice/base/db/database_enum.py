@@ -76,6 +76,7 @@ class DatabaseEnum:
     TRINO = "TRINO"
     VANS = "VANS_DB"
     VELO = "VELO_DB"
+    VESPUCIO_SERVICE = "VESPUCIO_SERVICE_DB"
     WALL_STREET = "WALL_STREET_DB"
     WOLOLO = "WOLOLO"
     CYBER = "CYBER_DB"

@@ -1,0 +1,19 @@
+dag:
+  name: vespucio_service
+  schedule_start_date: 2024, 11, 7
+  schedule_interval: 30 0 * * *
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG imports the tables from the Vespucio Service Application.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  dbutils_secret_key: VESPUCIO_SERVICE_DB
+  lineage_product_database_name: vespucio_service
+  tables_customization:
+    publisher: {}
+cluster:
+  type: databricks_13_3_med_general_cluster
