@@ -51,7 +51,7 @@ installment_group_by_negotiation AS (
   INNER JOIN deduplicate_negotiation AS n
     ON i.id_negotiation = n.id_negotiation
   GROUP BY 1,2,3,4,5
-),
+)
 SELECT
   i.id_negotiation,
   i.id_contract,
