@@ -12,7 +12,7 @@ external_identifiers_step1 AS (
     id_person,
     EXPLODE (external_identifiers) external_identifiers
   FROM
-    hr_system_workers 
+    hr_system_workers
   QUALIFY dt_effective = MAX(dt_effective) OVER (PARTITION BY id_person)
 ),
 external_identifiers AS (
@@ -269,15 +269,15 @@ SELECT DISTINCT
   NOW() AS ts_load
 FROM
   assignments AS a
-  LEFT JOIN 
-    assignments_dff AS adff 
-      ON a.id_person = adff.id_person
-      AND a.id_period_of_service = adff.id_period_of_service
-      AND a.id_assignment = adff.id_assignment
-      AND a.dt_effective = adff.dt_effective
-  LEFT JOIN 
-    external_identifiers AS ei 
-      ON a.id_person = ei.id_person
+LEFT JOIN
+  assignments_dff AS adff
+    ON a.id_person = adff.id_person
+    AND a.id_period_of_service = adff.id_period_of_service
+    AND a.id_assignment = adff.id_assignment
+    AND a.dt_effective = adff.dt_effective
+LEFT JOIN
+  external_identifiers AS ei
+    ON a.id_person = ei.id_person
 WHERE
   ei.id_person IS NULL
   AND (
@@ -290,3 +290,5 @@ WHERE
     OR DATE(adff.ts_last_update) BETWEEN DATE_SUB(DATE('{load_start_date}'), 35)
     AND DATE('{load_end_date}')
   )
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY id_assignment, dt_effective_start ORDER BY dt_effective_start DESC) = 1
