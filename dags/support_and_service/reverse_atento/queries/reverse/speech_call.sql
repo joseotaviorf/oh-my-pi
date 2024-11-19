@@ -9,9 +9,9 @@ SELECT DISTINCT
   bc.recording_url,
   bc.ts_started,
   bc.ts_ended,
-  YEAR(bc.ts_started) AS year,
-  MONTH(bc.ts_started) AS month,
-  DAY(bc.ts_started) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   datalake_bigfone_clean.call AS bc
@@ -23,4 +23,4 @@ LEFT JOIN
     ON c.agent_email = a.email
 WHERE
   a.organization IN ('atento', 'atn')
-  AND DATE(bc.ts_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  AND DATE(bc.ts_started) = CURRENT_DATE() - 1

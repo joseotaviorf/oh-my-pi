@@ -15,9 +15,9 @@ SELECT DISTINCT
   DATE(ts_started) AS ts_started,
   DATE(ts_closed) AS ts_closed,
   DATE(ts_csat_first_response) AS ts_response,
-  YEAR(ft.ts_csat_response) AS year,
-  MONTH(ft.ts_csat_response) AS month,
-  DAY(ft.ts_csat_response) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   dw_customer_support.fact_ticket AS ft
@@ -31,7 +31,7 @@ LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON ft.sk_last_agent = da.sk_agent
 WHERE
-  ft.ts_csat_response BETWEEN DATE_TRUNC('month',DATE('{load_start_date}') - INTERVAL '3' MONTH) AND DATE('{load_end_date}')
+  ft.ts_csat_response >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '3' months)
   AND dd.is_partner IS TRUE
   AND dd.front_or_back = 'front'
   AND (da.agent_organization = "atento" OR da.agent_organization = "atn")

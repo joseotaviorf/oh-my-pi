@@ -23,9 +23,9 @@ SELECT DISTINCT
   ft.ts_survey,
   ft.ts_solved,
   ft.ts_closed,
-  YEAR(ft.ts_started) AS year,
-  MONTH(ft.ts_started) AS month,
-  DAY(ft.ts_started) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   dw_customer_support.fact_ticket AS ft
@@ -40,7 +40,7 @@ LEFT JOIN
     ON ft.sk_last_agent = da.sk_agent
     OR ft.sk_last_agent = da.sk_agent_twilio
 WHERE
-  DATE(ft.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
+  DATE(ft.ts_started) >= CURRENT_DATE - INTERVAL '1' YEAR
   AND (da.agent_organization = "atento" OR da.agent_organization = "atn")
   AND (ft.front_or_back IS NULL OR ft.front_or_back <> 'back')
   AND dd.area = 'CX'

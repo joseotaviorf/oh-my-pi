@@ -8,9 +8,9 @@ SELECT
   ca.average_concurrency,
   ca.average_handling_time_seconds,
   dc.team AS area_aux,
-  YEAR(ca.dt_task_created_local) AS year,
-  MONTH(ca.dt_task_created_local) AS month,
-  DAY(ca.dt_task_created_local) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   datalake_quinto_messenger.chat_aht ca
@@ -19,5 +19,5 @@ LEFT JOIN
     ON ca.department_name = dc.department
     AND dc.channel = 'Twillio'
 WHERE
-  ca.dt_task_created_local BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  ca.dt_task_created_local = CURRENT_DATE - 1
   AND ca.agent_organization IN ("atento", "atn")

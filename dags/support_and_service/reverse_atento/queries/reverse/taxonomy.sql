@@ -48,13 +48,13 @@ SELECT DISTINCT
   sub_journey AS area,
   email,
   ts_created,
-  YEAR(ts_created) AS year,
-  MONTH(ts_created) AS month,
-  DAY(ts_created) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   base
 WHERE
   agent_organization IN ('atento')
   AND front_or_back = 'front'
-  AND DATE_TRUNC('month', ts_created) BETWEEN DATE_TRUNC('month', DATE('{load_start_date}')) - INTERVAL '6' MONTH AND DATE('{load_end_date}')
+  AND DATE_TRUNC('month', ts_created) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTH

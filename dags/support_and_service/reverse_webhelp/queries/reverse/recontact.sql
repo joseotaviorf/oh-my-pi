@@ -106,7 +106,7 @@ recontact_check AS (
       ON tbl_completion_reason.sk_ticket = rc.sk_ticket_previous_contact
       AND tbl_completion_reason.sk_ticket IS NOT NULL
   WHERE
-    rc.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL '45' DAY AND DATE('{load_end_date}')
+    rc.ts_started >= CURRENT_DATE - INTERVAL '45' DAY
     AND department NOT LIKE '%[CNX]%'
     AND team IN ('CX Expert', 'Rental Manager', 'Rental Manager Gold')
     AND agent_organization IN ('wh','webhelp','webhelpbr')
@@ -135,9 +135,9 @@ SELECT
   rc.search_window_until,
   rc.ts_started_previous_contact AS ts_started_first_contact,
   rc.ts_started as ts_started,
-  YEAR(rc.ts_started) AS year,
-  MONTH(rc.ts_started) AS month,
-  DAY(rc.ts_started) AS day,
+  YEAR(CURRENT_DATE - 1) AS year,
+  MONTH(CURRENT_DATE - 1) AS month,
+  DAY(CURRENT_DATE - 1) AS day,
   NOW() AS ts_load
 FROM
   recontact_check AS rc

@@ -5,7 +5,6 @@ WITH message_summary AS (
     CAST(GET_JSON_OBJECT(evt.event_payload, '$.DateCreated') AS TIMESTAMP) AS ts_created_message,
     cht.ts_ticket_started,
     cht.ts_ticket_ended,
-    cht.ts_segment_closed,
     REPLACE(GET_JSON_OBJECT(evt.event_payload, '$.Body'), ';', ',') AS message,
     GET_JSON_OBJECT(evt.event_payload, '$.From') AS message_from
   FROM
@@ -52,7 +51,7 @@ WITH message_summary AS (
       'ProOwners [FRONT] [PRE] [POS]'
       )
     AND a.organization IN ('atento', 'atn')
-    AND DATE(cht.ts_segment_closed) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND DATE(cht.ts_segment_closed) = CURRENT_DATE() - 1
 )
 SELECT
   id_ticket,
@@ -65,9 +64,9 @@ SELECT
     ELSE message_from
   END AS message_from,
   country_code,
-  YEAR(ts_segment_closed) AS year,
-  MONTH(ts_segment_closed) AS month,
-  DAY(ts_segment_closed) AS day,
+  YEAR(CURRENT_DATE) AS year,
+  MONTH(CURRENT_DATE) AS month,
+  DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
   message_summary
