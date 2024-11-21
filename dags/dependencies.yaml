@@ -688,6 +688,7 @@ bietlejuice.dw_rede_company:
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-history
+  - bietlejuice.enrich_hubspot_management:load-enrich-owner
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.dw_rede_company_lead:
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
