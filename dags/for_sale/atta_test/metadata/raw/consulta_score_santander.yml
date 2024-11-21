@@ -1,0 +1,33 @@
+database_name: datalake_atta_test_raw
+table_name: consulta_score_santander
+columns:
+  ID_USUARIO:
+    tags:
+      - PII
+      - Confidential
+  CPF:
+    tags:
+      - PII
+      - Confidential
+  CPF2:
+    tags:
+      - PII
+      - Confidential
+  EMAIL_SOLICITANTE:
+    tags:
+      - Confidential
+  UF:
+    tags:
+      - Restricted
+  R_NOME:
+    tags:
+      - PII
+      - Confidential
+  R_SCORE:
+    tags:
+      - PII
+      - Confidential
+  R_IDADE:
+    tags:
+      - PII
+      - Confidential

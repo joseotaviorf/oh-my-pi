@@ -1,0 +1,25 @@
+---
+database_name: datalake_atta_test_clean
+table_name: log_isolve_v2
+columns:
+  id:
+    lineage:
+      - datalake_atta_test_raw.entidade_log.id
+  id_user:
+    lineage:
+      - datalake_atta_test_raw.entidade_log.usuarioid
+  id_proposal:
+    lineage:
+      - datalake_atta_test_raw.entidade_log.entidadeid
+  type_operation:
+    lineage:
+      - datalake_atta_test_raw.entidade_log.topico
+  from:
+    lineage:
+      - datalake_atta_test_raw.entidade_log.de
+  to:
+    lineage:
+      - datalake_atta_test_raw.entidade_log.para
+  ts_created:
+    lineage:
+      - datalake_atta_test_raw.entidade_log.criadoem

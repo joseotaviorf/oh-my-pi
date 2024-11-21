@@ -1,0 +1,8 @@
+---
+database_name: datalake_atta_test_raw
+table_name: analisesenriquecimento
+columns:
+  CPF:
+    tags:
+      - PII
+      - Confidential 

@@ -1,0 +1,43 @@
+---
+database_name: datalake_atta_test_clean
+table_name: closing_file
+description: This table contains information about the closing file.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  id_file:
+    description: Id of the file.
+    lineage:
+      - datalake_atta_test_raw.closing_file.id
+  id_closing:
+    description: Id of the closing.
+    lineage:
+      - datalake_atta_test_raw.closing_file.closing_id
+  id_user:
+    description: Id of the user.
+    lineage:
+      - datalake_atta_test_raw.closing_file.user_id
+  id_document:
+    description: Id of the document.
+    lineage:
+      - datalake_atta_test_raw.closing_file.storage_documento_id
+  file_key:
+    description: Key of the file.
+    lineage:
+      - datalake_atta_test_raw.closing_file.file_key
+  file_hash:
+    description: Hash of the file.
+    lineage:
+      - datalake_atta_test_raw.closing_file.file_hash
+  file_name:
+    description: Name of the file.
+    lineage:
+      - datalake_atta_test_raw.closing_file.file_name
+  comments:
+    description: Comments made.
+    lineage:
+      - datalake_atta_test_raw.closing_file.comments
+  ts_created:
+    description: Timestamp of when the file was created.
+    lineage:
+      - datalake_atta_test_raw.closing_file.created_at

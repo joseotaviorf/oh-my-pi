@@ -1,0 +1,87 @@
+dag:
+  name: atta_test
+  schedule_start_date: 2022, 9, 20
+  schedule_interval: 0 21 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      This DAG imports data from Atta which is one of 5A's acquisitions. Its main product is called iSolve which main focus is to manage the fluxes regarding internal financing options in ForSale contracts.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: atta
+  source_schema: atta
+  custom_schema: atta_test
+  dbutils_secret_key: ATTA_DB
+  tables_customization:
+    banktracking:
+      clean_table_name: bank_tracking
+    cliente:
+      clean_table_name: client_info
+    closing:
+      clean_table_name: closing
+    closing_file:
+      clean_table_name: closing_file
+    commission_revenue_share_params:
+      clean_table_name: commission_revenue_share_params
+    commission_revenue_share_periods:
+      clean_table_name: commission_revenue_share_periods
+    consulta_score:
+      clean_table_name: pre_analysis
+    consulta_score_bradesco:
+      clean_table_name: pre_analysis_bradesco
+    consulta_score_bradesco_params:
+      clean_table_name: pre_analysis_bradesco_params
+    consulta_score_bradesco_ratings:
+      clean_table_name: pre_analysis_bradesco_ratings
+    consulta_score_caixa:
+      clean_table_name: pre_analysis_caixa
+    consulta_score_cliente_ctrl:
+      clean_table_name: pre_analysis_client_ctrl
+    consulta_score_ctrl:
+      clean_table_name: pre_analysis_ctrl
+    consulta_score_itau:
+      clean_table_name: pre_analysis_itau
+    consulta_score_itau_ratings:
+      clean_table_name: pre_analysis_itau_ratings
+    consulta_score_santander:
+      clean_table_name: pre_analysis_santander
+    consulta_score_santander_matriz_decisao:
+      clean_table_name: pre_analysis_santander_matrix
+    consulta_score_santander_ratings:
+      clean_table_name: pre_analysis_santander_ratings
+    entidade_log:
+      clean_table_name: log_isolve_v2
+    fornecedores:
+      clean_table_name: providers_info
+    franquia:
+      clean_table_name: franchise_info
+    log_proposta_esteira:
+      clean_table_name: log_isolve_v1
+    max_usuarios:
+      clean_table_name: users_info
+    parceiro:
+      clean_table_name: partner_info
+    parceiro_categoria:
+      clean_table_name: partner_category
+    produto:
+      clean_table_name: product_info
+    produto_esteira:
+      clean_table_name: track_step_detail
+    proposta:
+      clean_table_name: proposal
+    proposta_credimob_confval:
+      clean_table_name: financing_proposal_check
+    proposta_itau:
+      clean_table_name: financing_proposal
+    proposta_observacao:
+      clean_table_name: proposal_notes
+    reconciliation_item:
+      clean_table_name: reconciliation_item
+    storagedocumentos:
+      clean_table_name: storage_documents
+    inspections:
+      clean_table_name: inspections
+cluster:
+  type: databricks_12_2_min_xlarge_io-memory_cluster

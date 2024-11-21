@@ -1,0 +1,73 @@
+---
+database_name: datalake_atta_test_clean
+table_name: pre_analysis_caixa
+columns:
+  id_pre_analysis_caixa:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.id
+  id_registration_user:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.id_usuario
+  id_partner:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.idparceiro
+  id_franchise:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.idfranquia
+  id_request:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.idsolicitacao
+  id_segment:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.id_segmento
+  client_cpf:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.cpf
+  client_cpf_secondary:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.cpf2
+  product:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.produto
+  state:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.uf
+  house_type:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.tpimovel
+  r_name:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.r_nome
+  r_score:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.r_score
+  error:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.erro
+  pre_analysis_status:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.status
+  deadline:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.prazo
+  ltv_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.vl_ltv
+  fee_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.vl_taxa
+  house_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.vlrimovel
+  down_payment_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.vlrentrada
+  financing_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.vlrfinanciado
+  ts_returned:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.data_retorno
+  ts_registration:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_caixa.data_solicitacao

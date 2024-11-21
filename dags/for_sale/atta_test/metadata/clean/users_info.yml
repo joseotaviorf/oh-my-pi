@@ -1,0 +1,31 @@
+---
+database_name: datalake_atta_test_clean
+table_name: users_info
+columns:
+  id_user:
+    lineage:
+      - datalake_atta_test_raw.max_usuarios.id
+  id_user_registration:
+    lineage:
+      - datalake_atta_test_raw.max_usuarios.id_usuario_cadastro
+  id_partner:
+    lineage:
+      - datalake_atta_test_raw.max_usuarios.idparceiro
+  id_franchise:
+    lineage:
+      - datalake_atta_test_raw.max_usuarios.idfranquia
+  user_name:
+    lineage:
+      - datalake_atta_test_raw.max_usuarios.nome
+  user_last_name:
+    lineage:
+      - datalake_atta_test_raw.max_usuarios.sobrenome
+  user_email:
+    lineage:
+      - datalake_atta_test_raw.max_usuarios.email
+  user_status:
+    lineage:
+      - datalake_atta_test_raw.max_usuarios.status
+  ts_last_updated:
+    lineage:
+      - datalake_atta_test_raw.max_usuarios.data_ultima_atualizacao

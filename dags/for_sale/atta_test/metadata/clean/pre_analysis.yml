@@ -1,0 +1,64 @@
+---
+database_name: datalake_atta_test_clean
+table_name: pre_analysis
+columns:
+  id_pre_analysis:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.id
+  id_franchise:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.idfranquia
+  id_partner:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.idparceiro
+  id_client:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.id_cliente
+  id_consultant:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.attributedconsultant
+  id_offer:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.idpreanaliseext
+  id_registration_user:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.idusuario
+  client_cpf:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.cpf
+  status:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.status
+  created_source:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.created_source
+  priority_status:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.priority
+  situation:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.situacao
+  archive_reason:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.ArchiveReason
+  archive_complement:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.ArchiveComplement
+  donw_payment_amount:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.vlrentrada
+  financing_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.vlrfinanciado
+  house_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.vlrimovel
+  is_archived:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.archived
+  ts_archived:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.archivedat
+  ts_registration:
+    lineage:
+      - datalake_atta_test_raw.consulta_score.data_solicitacao

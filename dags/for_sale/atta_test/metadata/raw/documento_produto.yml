@@ -1,0 +1,3 @@
+---
+database_name: datalake_atta_test_raw
+table_name: documento_produto

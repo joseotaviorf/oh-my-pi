@@ -1,0 +1,16 @@
+---
+database_name: datalake_atta_test_clean
+table_name: pre_analysis_ctrl
+columns:
+  id_request:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_ctrl.idsolicitacao
+  id_supplier:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_ctrl.idfornecedor
+  id_check:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_ctrl.idconsulta
+  id_proposal:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_ctrl.idpropostaprd

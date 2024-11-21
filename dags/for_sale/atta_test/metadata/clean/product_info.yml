@@ -1,0 +1,19 @@
+---
+database_name: datalake_atta_test_clean
+table_name: product_info
+columns:
+  id_product:
+    lineage:
+      - datalake_atta_test_raw.produto.id
+  product_name:
+    lineage:
+      - datalake_atta_test_raw.produto.descricao
+  profile_doc:
+    lineage:
+      - datalake_atta_test_raw.produto.perfildoc
+  is_active:
+    lineage:
+      - datalake_atta_test_raw.produto.ativo
+  ts_registration:
+    lineage:
+      - datalake_atta_test_raw.produto.dtcadastro

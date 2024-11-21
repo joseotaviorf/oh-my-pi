@@ -1,0 +1,7 @@
+database_name: datalake_atta_test_raw
+table_name: proposta_observacao
+columns:
+  IDUsuario:
+    tags:
+      - PII
+      - Confidential

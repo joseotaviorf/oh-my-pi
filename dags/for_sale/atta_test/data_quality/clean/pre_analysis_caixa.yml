@@ -1,0 +1,22 @@
+---
+table_name: datalake_atta_test_clean.pre_analysis_caixa
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_pre_analysis_caixa:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_partner:
+    is_complete:
+      severity_level: Error
+  id_request:
+    is_complete:
+      severity_level: Error
+  id_segment:
+    is_complete:
+      severity_level: Error

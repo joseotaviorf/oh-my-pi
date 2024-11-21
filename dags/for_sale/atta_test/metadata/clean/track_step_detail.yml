@@ -1,0 +1,22 @@
+---
+database_name: datalake_atta_test_clean
+table_name: track_step_detail
+columns:
+  id:
+    lineage:
+      - datalake_atta_test_raw.produto_esteira.ID
+  id_product:
+    lineage:
+      - datalake_atta_test_raw.produto_esteira.IDProduto
+  decision_number:
+    lineage:
+      - datalake_atta_test_raw.produto_esteira.NrDecisao
+  proposal_status:
+    lineage:
+      - datalake_atta_test_raw.produto_esteira.Descricao
+  id_proposal_status:
+    lineage:
+      - datalake_atta_test_raw.produto_esteira.PrxStatus
+  id_proposal_situation:
+    lineage:
+      - datalake_atta_test_raw.produto_esteira.Situacao

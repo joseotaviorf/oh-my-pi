@@ -1,0 +1,40 @@
+---
+database_name: datalake_atta_test_clean
+table_name: pre_analysis_santander_ratings
+columns:
+  id_ratings_santander:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.id
+  id_user_started:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.idusuarioini
+  id_user_ended:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.idusuariofim
+  rating:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.rating
+  apr_max_res_percentage:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.percaprmaxres
+  apr_auto_res_percentage:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.peraprautores
+  apr_max_com_percentage:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.percaprmaxcom
+  apr_auto_com_percentage:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.peraprautocom
+  cpmr_income_res_percentage:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.percpmrrendares
+  cpmr_income_com_percentage:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.percpmrrendacom
+  ts_started:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.dtinivigencia
+  ts_ended:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_ratings.dtfimvigencia

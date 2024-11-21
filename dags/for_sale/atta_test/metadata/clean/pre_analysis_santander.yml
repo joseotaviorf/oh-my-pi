@@ -1,0 +1,115 @@
+---
+database_name: datalake_atta_test_clean
+table_name: pre_analysis_santander
+columns:
+  id_pre_analysis_santander:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.id
+  id_registration_user:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.id_usuario
+  id_return_user:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.id_usuarioretorno
+  id_partner:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.idparceiro
+  id_franchise:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.idfranquia
+  id_request:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.idsolicitacao
+  id_segment:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.id_segmento
+  client_cpf:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.cpf
+  client_cpf_secondary:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.cpf2
+  client_cpf_masked:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.cpf_mascara
+  requester_email:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.email_solicitante
+  state:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.uf
+  house_type:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.tpimovel
+  operation_type:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.tipo_operacao
+  r_name:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.r_nome
+  r_score:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.r_score
+  r_origin:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.r_origem
+  r_age:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.r_idade
+  error:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.erro
+  pre_analysis_status:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.status
+  deadline:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.prazo
+  ltv_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.vl_ltv
+  fee_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.vl_taxa
+  house_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.vlrimovel
+  down_payment_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.vlrentrada
+  financing_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.vlrfinanciado
+  r_approved_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.r_vlr_aprovado
+  s_first_installment_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.s_priparc
+  s_last_installment_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.s_ultparc
+  s_ribti_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.s_vlribti
+  s_tax_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.s_vlrtarifa
+  s_iof_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.s_vlriof
+  s_min_income_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.s_vlrrendamin
+  s_fee_value:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.s_taxa
+  is_read:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.lido
+  ts_returned:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.data_retorno
+  ts_registration:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander.data_solicitacao

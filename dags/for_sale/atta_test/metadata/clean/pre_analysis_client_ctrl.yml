@@ -1,0 +1,22 @@
+---
+database_name: datalake_atta_test_clean
+table_name: pre_analysis_client_ctrl
+columns:
+  id_control:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_cliente_ctrl.id_controle
+  id_client:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_cliente_ctrl.id_cliente
+  id_request:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_cliente_ctrl.id_solicitacao
+  ts_register:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_cliente_ctrl.dt_cadastro
+  ts_inactive:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_cliente_ctrl.dt_inativo
+  has_income:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_cliente_ctrl.compoerenda

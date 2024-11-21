@@ -1,0 +1,49 @@
+---
+database_name: datalake_atta_test_clean
+table_name: franchise_info
+columns:
+  id_franchise:
+    lineage:
+      - datalake_atta_test_raw.franquia.id
+  id_registration_user:
+    lineage:
+      - datalake_atta_test_raw.franquia.idusucad
+  id_franchise_status:
+    lineage:
+      - datalake_atta_test_raw.franquia.status
+  franchise_name:
+    lineage:
+      - datalake_atta_test_raw.franquia.nome
+  franchise_category:
+    lineage:
+      - datalake_atta_test_raw.franquia.categoriafranquia
+  franchise_type:
+    lineage:
+      - datalake_atta_test_raw.franquia.tpfranquia
+  fowarding:
+    lineage:
+      - datalake_atta_test_raw.franquia.despachante
+  fowarding_type:
+    lineage:
+      - datalake_atta_test_raw.franquia.despachante
+  royalties_percentage_value:
+    lineage:
+      - datalake_atta_test_raw.franquia.percroyalties
+  martketing_fund_percentage:
+    lineage:
+      - datalake_atta_test_raw.franquia.percfundomarketing
+  grace_period_royalties:
+    lineage:
+      - datalake_atta_test_raw.franquia.carenciaroyalties
+  grace_period_tec:
+    lineage:
+      - datalake_atta_test_raw.franquia.carenciatec
+  ts_contract_deadline:
+    lineage:
+      - datalake_atta_test_raw.franquia.prazocontrato
+  ts_registration:
+    lineage:
+      - datalake_atta_test_raw.franquia.dtcadastro
+  ts_franchise_signature:
+    lineage:
+      - datalake_atta_test_raw.franquia.dtassinatura

@@ -1,0 +1,39 @@
+---
+database_name: datalake_atta_test_clean
+table_name: closing
+description: This table contains information about the closing.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  id_closing:
+    description: Id of the closing.
+    lineage:
+      - datalake_atta_test_raw.closing.id
+  id_user_started:
+    description: Id of the user who started the closing.
+    lineage:
+      - datalake_atta_test_raw.closing.started_by_user_id
+  id_user_finished:
+    description: Id of the user who finished the closing.
+    lineage:
+      - datalake_atta_test_raw.closing.finished_by_user_id
+  id_user_conciliation_finished:
+    description: Id of the user who finished the conciliation.
+    lineage:
+      - datalake_atta_test_raw.closing.conciliation_finished_by_user_id
+  dt_closing:
+    description: Date of closing.
+    lineage:
+      - datalake_atta_test_raw.closing.closing_date
+  ts_started:
+    description: Timestamp of when the closing period started.
+    lineage:
+      - datalake_atta_test_raw.closing.initialized_at
+  ts_ended:
+    description: Timestamp of when the closing period ended.
+    lineage:
+      - datalake_atta_test_raw.closing.finished_at
+  ts_conciliation_ended:
+    description: Timestamp of when the conciliation ended.
+    lineage:
+      - datalake_atta_test_raw.closing.conciliation_finished_at

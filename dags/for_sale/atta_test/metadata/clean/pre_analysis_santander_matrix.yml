@@ -1,0 +1,16 @@
+---
+database_name: datalake_atta_test_clean
+table_name: pre_analysis_santander_matrix
+columns:
+  id_pre_analysis_matrix:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_matriz_decisao.id
+  itau:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_matriz_decisao.itau
+  bradesco:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_matriz_decisao.bradesco
+  santander:
+    lineage:
+      - datalake_atta_test_raw.consulta_score_santander_matriz_decisao.santander

@@ -1,0 +1,15 @@
+database_name: datalake_atta_test_raw
+table_name: systemlogs
+columns:
+  UserId:
+    tags:
+      - PII
+      - Confidential
+  ClientId:
+    tags:
+      - PII
+      - Confidential
+  Content:
+    tags:
+      - PII
+      - Confidential

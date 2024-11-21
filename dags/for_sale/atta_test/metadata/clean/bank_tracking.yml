@@ -1,0 +1,44 @@
+---
+database_name: datalake_atta_test_clean
+table_name: bank_tracking
+columns:
+  id:
+    lineage:
+      - datalake_atta_test_raw.banktracking.id
+    description: Id to identifies the bank tracking.
+  id_bank:
+    lineage:
+      - datalake_atta_test_raw.banktracking.bankid
+    description: Id to identifies the bank.
+  id_proposal:
+    lineage:
+      - datalake_atta_test_raw.banktracking.proposalId
+    description: Id of the proposal.
+  id_bank_proposal:
+    lineage:
+      - datalake_atta_test_raw.banktracking.bankProposalId
+    description: Id for the relation between bank and proposal.
+  proposal_status:
+    lineage:
+      - datalake_atta_test_raw.banktracking.proposalStatus
+    description: Status of the proposal.
+  proposal_situation:
+    lineage:
+      - datalake_atta_test_raw.banktracking.proposalSituation
+    description: Situation about the proposal.
+  global_status:
+    lineage:
+      - datalake_atta_test_raw.banktracking.status
+    description: The status of the credit contract.
+  status_description_itau:
+    lineage:
+      - datalake_atta_test_raw.banktracking.itauStatusDescription
+    description: Description used by Itau.
+  ts_created:
+    lineage:
+      - datalake_atta_test_raw.banktracking.createdAt
+    description: Created timestamp.
+  ts_updated:
+    lineage:
+      - datalake_atta_test_raw.banktracking.updatedAt
+    description: Updated timestamp.
