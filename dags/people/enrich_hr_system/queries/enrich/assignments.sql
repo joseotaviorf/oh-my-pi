@@ -291,4 +291,4 @@ WHERE
     AND DATE('{load_end_date}')
   )
 QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY id_assignment, dt_effective_start ORDER BY dt_effective_start DESC) = 1
+  ROW_NUMBER() OVER (PARTITION BY a.id_assignment, a.dt_effective_start ORDER BY a.dt_effective_start DESC) = 1
