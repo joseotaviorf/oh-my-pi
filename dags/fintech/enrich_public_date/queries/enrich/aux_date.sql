@@ -92,7 +92,6 @@ base_date AS (
                             END) = 'Weekend'
                             OR (CASE
                                     WHEN LOWER(br_holiday_name) LIKE "%carnival end (until 2pm)%" THEN 'No holiday'
-                                    WHEN LOWER(br_holiday_name) LIKE "%black awareness day%" THEN 'No holiday'
                                     WHEN LOWER(br_holiday_name) LIKE "%christmas eve (from 2pm)" THEN 'No holiday'
                                     WHEN DATE_FORMAT(dt, 'MMdd') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225') OR is_br_holliday IS TRUE THEN 'Holiday'
                                     ELSE 'No holiday'
@@ -107,7 +106,6 @@ base_date AS (
         END AS is_brz_holiday,
         CASE
             WHEN LOWER(br_holiday_name) LIKE "%carnival end (until 2pm)%" THEN 'No holiday'
-            WHEN LOWER(br_holiday_name) LIKE "%black awareness day%" THEN 'No holiday'
             WHEN LOWER(br_holiday_name) LIKE "%christmas eve (from 2pm)" THEN 'No holiday'
             WHEN DATE_FORMAT(dt, 'MMdd') IN ('0101', '0421', '0501', '0907', '1012', '1102', '1115', '1225') OR is_br_holliday IS TRUE THEN 'Holiday'
             ELSE 'No holiday'
