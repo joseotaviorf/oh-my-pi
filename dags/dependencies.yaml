@@ -2011,6 +2011,10 @@ bietlejuice.enrich_kodak:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.kodak:load-clean-image-inspection
   - bietlejuice.kodak:load-clean-image-inspection-group
+bietlejuice.enrich_kong:
+  - bietlejuice.kong:load-clean-kong-logs
+bietlejuice.enrich_kong_ss:
+  - bietlejuice.kong:load-clean-kong-logs
 bietlejuice.enrich_landlord_journey:
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_house:load-clean-house

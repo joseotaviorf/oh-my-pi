@@ -1,0 +1,97 @@
+---
+database_name: datalake_kong_ss
+table_name: kong_ss_logs
+description: S&S Access Logs, not considering warning and notice messages. Only magiclink, imoveis and crm logs.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  app:
+    lineage:
+      - datalake_kong_clean.kong_logs.app
+    description: The application log, in this case, kong ingress.
+  cluster_name:
+    lineage:
+      - datalake_kong_clean.kong_logs.cluster_name
+    description: The cluster name that registrated the logs.
+  container_name:
+    lineage:
+      - datalake_kong_clean.kong_logs.container_name
+    description: The container name responsible for the logs.
+  endpoint:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: The endpoint requested.
+  generic_endpoint:
+    description: The endpoint generic form, such as api/contract/id.
+  description:
+    lineage:
+      - datalake_gsheets_clean.kong_ss_endpoints.description
+    description: S&S endpoints description.
+  entity:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: The endpoint entity.
+  entity_code:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: The endpoint entity code.
+  env:
+    lineage:
+      - datalake_kong_clean.kong_logs.env
+    description: The log environment.
+  host:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: The host address.
+  ip_address:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: The log's respective ip_address.
+  message:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: Details about the log, such as, request method, app url, among others.
+  method:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: The method used in the access.
+  namespace:
+    lineage:
+      - datalake_kong_clean.kong_logs.namespace
+    description: The log space name.
+  pod_name:
+    lineage:
+      - datalake_kong_clean.kong_logs.pod_name
+    description: The pod name.
+  request_user:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: The request user email.
+  status_code:
+    lineage:
+      - datalake_kong_clean.kong_logs.message
+    description: The status code received from the request.
+  stream:
+    lineage:
+      - datalake_kong_clean.kong_logs.stream
+    description: The log stream type.
+  ts_event:
+    lineage:
+      - datalake_kong_clean.kong_logs.ts_event
+    description: The event time.
+  year:
+    lineage:
+      - datalake_kong_clean.kong_logs.year
+    description: Partition column.
+  month:
+    lineage:
+      - datalake_kong_clean.kong_logs.month
+    description: Partition column.
+  day:
+    lineage:
+      - datalake_kong_clean.kong_logs.day
+    description: Partition column.
+  hour:
+    lineage:
+      - datalake_kong_clean.kong_logs.hour
+    description: Partition column.

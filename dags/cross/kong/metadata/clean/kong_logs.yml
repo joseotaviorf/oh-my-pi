@@ -1,0 +1,58 @@
+database_name: datalake_kong_clean
+table_name: kong_logs
+description: Table with 5A applications logs.
+domain: Cross
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  app:
+    lineage:
+      - datalake_kong_raw.kong_logs.app
+    description: The application log, in this case, kong ingress.
+  cluster_name:
+    lineage:
+      - datalake_kong_raw.kong_logs.cluster_name
+    description: The cluster name that registrated the logs.
+  container_name:
+    lineage:
+      - datalake_kong_raw.kong_logs.container_name
+    description: The container name responsible for the logs.
+  env:
+    lineage:
+      - datalake_kong_raw.kong_logs.env
+    description: The log environment.
+  message:
+    lineage:
+      - datalake_kong_raw.kong_logs.message
+    description: Details about the log, such as, request method, app url, among others.
+  namespace:
+    lineage:
+      - datalake_kong_raw.kong_logs.namespace
+    description: The log space name.
+  pod_name:
+    lineage:
+      - datalake_kong_raw.kong_logs.pod_name
+    description: The pod name.
+  stream:
+    lineage:
+      - datalake_kong_raw.kong_logs.stream
+    description: The log stream type.
+  ts_event:
+    lineage:
+      - datalake_kong_raw.kong_logs.time
+    description: The event time.
+  year:
+    lineage:
+      - datalake_kong_raw.kong_logs.year
+    description: Partition column.
+  month:
+    lineage:
+      - datalake_kong_raw.kong_logs.month
+    description: Partition column.
+  day:
+    lineage:
+      - datalake_kong_raw.kong_logs.day
+    description: Partition column.
+  hour:
+    lineage:
+      - datalake_kong_raw.kong_logs.hour
+    description: Partition column.

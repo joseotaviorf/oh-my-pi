@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_clean
+table_name: kong_ss_endpoints
+description: "S&S Endpoints Relations."
+domain: Support and Service
+owner: andre.melo@quintoandar.com.br
+columns:
+  host:
+    lineage:
+      - datalake_gsheets_raw.kong_ss_endpoints.host
+    description: "The host address."
+  endpoint:
+    lineage:
+      - datalake_gsheets_raw.kong_ss_endpoints.endpoint
+    description: "The endpoint requested."
+  description:
+    lineage:
+      - datalake_gsheets_raw.kong_ss_endpoints.description
+    description: "The endpoint description."
