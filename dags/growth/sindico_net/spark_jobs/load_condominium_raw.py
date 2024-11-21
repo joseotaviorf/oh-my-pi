@@ -147,8 +147,8 @@ if __name__ == "__main__":
     parser.add_argument("env", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
-    parser.add_argument("table_name", help="entity to load data")
     parser.add_argument("execution_date", help="time to load data")
+    parser.add_argument("table_name", help="entity to load data")
 
     args = parser.parse_args()
     env = args.env
