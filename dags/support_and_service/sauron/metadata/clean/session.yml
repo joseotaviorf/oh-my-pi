@@ -37,6 +37,12 @@ columns:
   created_by:
     lineage:
       - datalake_sauron_raw.session.created_by
+  ticket_comments:
+    lineage:
+      - datalake_sauron_raw.session.ticket_comments
+  metadata:
+    lineage:
+      - datalake_sauron_raw.session.metadata
   ts_last_message:
     lineage:
       - datalake_sauron_raw.session.last_message_at

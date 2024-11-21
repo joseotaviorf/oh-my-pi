@@ -1,10 +1,8 @@
 SELECT
   id,
+  call_id AS id_call,
   message_id AS id_message,
-  incoming_message_id AS id_incoming_message,
-  session_id AS id_session,
-  message_payload,
-  bot_response,
+  call_payload,
   user_phone,
   year_month,
   created_at AS ts_created,
@@ -13,4 +11,4 @@ SELECT
   month,
   day
 FROM
-  datalake_sauron_raw.botoutgoingmessages
+  datalake_sauron_raw.callevents
