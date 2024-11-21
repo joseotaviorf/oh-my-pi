@@ -98,7 +98,6 @@ cluster:
     autotermination_minutes: 20
     driver_node_type_id: m5d.2xlarge
     node_type_id: r5d.2xlarge
-    runtime_engine: PHOTON
     num_workers: 3
     spark_conf:
       spark.sql.broadcastTimeout: 1200

@@ -19,5 +19,4 @@ cluster:
     driver_node_type_id: r5d.2xlarge
     node_type_id: r5d.xlarge
     num_workers: 2
-    runtime_engine: PHOTON
     spark_version: 13.3.x-scala2.12
