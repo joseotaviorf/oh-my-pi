@@ -12,6 +12,7 @@ SELECT
     segments.device,
     segments.adNetworkType AS ad_network_type,
     metrics.impressions::BIGINT AS impressions,
+    metrics.conversions::BIGINT AS conversions,
     customer.descriptiveName AS account_descriptive_name,
     campaign.labels,
     report_type,

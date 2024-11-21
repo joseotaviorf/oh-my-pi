@@ -18,6 +18,7 @@ SELECT
     INT(impressions) AS impressions,
     INT(inline_link_clicks) AS inline_link_clicks,
     INT(reach) AS reach,
+    actions,
     DOUBLE(spend) AS spend,
     SMALLINT(YEAR(date_start)) AS year,
     TINYINT(MONTH(date_start)) AS month,

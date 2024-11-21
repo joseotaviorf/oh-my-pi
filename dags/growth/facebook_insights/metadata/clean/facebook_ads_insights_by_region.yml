@@ -69,6 +69,10 @@ columns:
     description: The estimated total amount of money you've spent on your campaign, ad set or ad during its schedule. This metric is estimated
     lineage:
       - datalake_facebook_insights_raw.facebook_ads_insights_by_region.spend
+  actions:
+    description: The number of actions taken on your ads. Actions may include Page likes, app installs, conversions, event responses or link clicks
+    lineage:
+      - datalake_facebook_insights_raw.facebook_ads_insights_by_region.actions
   dt_start:
     description: The start date for your data. This is controlled by the date range you've selected for your reporting view
     lineage:
