@@ -44,39 +44,7 @@ to
 SELECT
     *
 FROM VALUES
-    -- ab_search_services_mono_pclick
-    (
-        "ab_search_services_mono_pclick",
-        named_struct(
-            'begin_date', DATE('2024-05-22'),
-            'end_date', DATE('2024-06-01'),
-            'variants', to_json(
-                named_struct(
-                    'baseline', 'baseline',
-                    '0', 'baseline',
-                    'treatment', 'treatment_1',
-                    '1', 'treatment_1'
-                )
-            ),
-            'filters', "business_context = 'rent'"
-        )
-    ),
-    -- native_copilot_experiment
---    (
---        "native_copilot_experiment",
---        named_struct(
---            'begin_date', DATE('2024-07-19'),
---            'end_date', NULL,
---            'variants', to_json(
---                named_struct(
---                    'baseline', 'baseline',
---                    'treatment', 'treatment'
---                )
---            ),
---            'filters', NULL
---        )
---    ),
-    -- sale v2 vs v3 experiment
+    -- ab_beakman_ranking_sale_pclick_v1
     (
         "ab_beakman_ranking_sale_pclick_v1",
         named_struct(
@@ -89,21 +57,6 @@ FROM VALUES
                 )
             ),
             'filters', "business_context = 'sale'"
-        )
-    ),
-    -- maestro one month slice of data
-    (
-        "ab_beakman_ranking_maestro_demand_balancer_v2",
-        named_struct(
-            'begin_date', DATE('2024-09-01'),
-            'end_date', DATE('2024-10-01'),
-            'variants', to_json(
-                named_struct(
-                    '0', 'baseline',
-                    '1', 'treatment'
-                )
-            ),
-            'filters', "business_context = 'rent'"
         )
     )
     -- Add new experiment here
