@@ -338,10 +338,9 @@ bietlejuice.enrich_growth_costs_sharing_rules:
     - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking
     - bietlejuice.dw_supply:load-dw-growth-fact-supply-events
 bietlejuice.enrich_growth_media_platform_metrics:
-  # remove:
-  #   - bietlejuice.criteo_temp:load-clean-criteo-region-lookup
-  #   - bietlejuice.enrich_criteo:load-enrich-criteo-campaigns
-  override: []
+  remove:
+    - bietlejuice.criteo_temp:load-clean-criteo-region-lookup
+    - bietlejuice.enrich_criteo:load-enrich-criteo-campaigns
 bietlejuice.enrich_growth_taxonomy:
   remove:
     - bietlejuice.ebdb_visit:load-clean-visit-origin
