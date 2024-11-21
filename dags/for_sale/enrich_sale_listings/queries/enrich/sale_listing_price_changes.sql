@@ -189,6 +189,10 @@ SELECT
     pc.id_owner,
     pc.id_region,
     COALESCE(pc.status, sls.status_history, 'PUBLISHED') AS status_history, 
+    CASE 
+        WHEN sale_price >= 1000000 THEN 'High Ticket'
+        ELSE 'Low Ticket'
+    END ticket_segmentation
     pc.sale_price,
     pc.lag_sale_price,
     pc.last_price_variation,
