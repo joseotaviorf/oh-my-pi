@@ -24,6 +24,7 @@ class TableAttributes:
             "load_spark_job" in workflow_args
             or "load_spark_job" in self.table_customization
         )
+        self.table_privileges = self._get_table_privileges()
 
     @staticmethod
     def from_attributes(
@@ -126,3 +127,39 @@ class TableAttributes:
             )
 
         return table_partitions
+
+    def _get_table_privileges(self):
+        """
+        Follows this order of priority:
+        1. Table customization for that specific layer
+        2. Table customization
+        3. Default for that specific layer
+        4. Default
+        If none of the above are set, it defaults to None
+        """
+
+        default_table_privileges = self._workflow_args.get(
+            "default_table_privileges", None
+        )
+        if self.layer == LayerEnum.RAW:
+            default_table_privileges = self._workflow_args.get(
+                "default_raw_table_privileges", default_table_privileges
+            )
+        elif self.layer == LayerEnum.CLEAN:
+            default_table_privileges = self._workflow_args.get(
+                "default_clean_table_privileges", default_table_privileges
+            )
+
+        table_privileges = self.table_customization.get(
+            "table_privileges", default_table_privileges
+        )
+        if self.layer == LayerEnum.RAW:
+            table_privileges = self.table_customization.get(
+                "raw_table_privileges", table_privileges
+            )
+        elif self.layer == LayerEnum.CLEAN:
+            table_privileges = self.table_customization.get(
+                "clean_table_privileges", table_privileges
+            )
+
+        return table_privileges

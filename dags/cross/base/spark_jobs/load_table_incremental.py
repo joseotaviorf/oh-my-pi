@@ -5,6 +5,7 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService, MetricMetastoreMapping
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
@@ -52,11 +53,18 @@ if __name__ == "__main__":
         type=lambda arg: None if not arg else arg,
         help="table schema used in the query path",
     )
-
     parser.add_argument(
         "tree_path",
         type=lambda arg: None if not arg else arg,
         help="path to reach the query place",
+    )
+    parser.add_argument(
+        "-tp",
+        "--table-privileges",
+        type=lambda arg: None if not arg else arg,
+        help="json string mapping each principal to a list of permissions for the table",
+        required=False,
+        default=None,
     )
 
     args = parser.parse_args()
@@ -76,11 +84,16 @@ if __name__ == "__main__":
         args.additional_query_template_params.replace("'", '"')
     )
     spark_session_configs = json.loads(args.spark_session_configs)
+    if args.table_privileges is not None:
+        table_privileges_dict = json.loads(args.table_privileges)
+    else:
+        table_privileges_dict = None
 
     logger.info(
         f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, layer={layer}, "
         + f"database_base_name={database_base_name}, relative_query_path={relative_query_path}, "
-        + f"table_name={table_name}, schema={schema}, tree_path={tree_path}, msg=Job execution started"
+        + f"table_name={table_name}, schema={schema}, tree_path={tree_path}, "
+        + f"msg=Job execution started"
     )
     if execution_date:
         dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
@@ -132,6 +145,13 @@ if __name__ == "__main__":
         table_name=table_name,
     )
 
+    if table_privileges_dict is not None:
+        table_privileges = TablePrivileges.from_input_dict(
+            table_privileges_dict, f"{database_name}.{table_name}"
+        )
+    else:
+        table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{table_name}")
+
     table_loader_pipeline = IncrementalTableLoaderPipeline(
         database_name=database_name,
         table_name=table_name,
@@ -143,5 +163,6 @@ if __name__ == "__main__":
         target_database_name=target_database_name,
         target_database_location=target_database_location,
         spark_session_configs=spark_session_configs,
+        table_privileges=table_privileges,
     )
     table_loader_pipeline.run()

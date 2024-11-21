@@ -5,6 +5,7 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.pipeline.delta_table_loader_pipeline import DeltaTableLoaderPipeline
@@ -17,6 +18,10 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 def main():
     args = parse_arguments()
+    if args.table_privileges is not None:
+        table_privileges_dict = json.loads(args.table_privileges)
+    else:
+        table_privileges_dict = None
 
     logger.info(
         f"m={JOB_NAME}, env={args.env}, bucket={args.bucket}, layer={args.layer}, "
@@ -47,6 +52,13 @@ def main():
         table_name=args.table_name,
     )
 
+    if table_privileges_dict is not None:
+        table_privileges = TablePrivileges.from_input_dict(
+            table_privileges_dict, f"{database_name}.{args.table_name}"
+        )
+    else:
+        table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{args.table_name}")
+
     table_loader_pipeline = DeltaTableLoaderPipeline(
         database_name=database_name,
         table_name=args.table_name,
@@ -62,7 +74,8 @@ def main():
         when_matched_update_condition=json.loads(args.when_matched_update_condition),
         when_matched_delete_condition=json.loads(args.when_matched_delete_condition),
         when_matched_operation=json.loads(args.when_matched_operation),
-        when_not_matched_operation=json.loads(args.when_not_matched_operation)
+        when_not_matched_operation=json.loads(args.when_not_matched_operation),
+        table_privileges=table_privileges,
     )
     table_loader_pipeline.run()
 
@@ -130,6 +143,14 @@ def parse_arguments() -> Namespace:
            + "Should be a dictionary, with the keys being the columns to be updated, and "
            + "the values being what to update them with. You can use source.<column_name> "
            + "or target.<column_name> to disambiguate between the query result and the existing value.",
+    )
+    parser.add_argument(
+        "-tp",
+        "--table-privileges",
+        type=lambda arg: None if not arg else arg,
+        help="json string mapping each principal to a list of permissions for the table",
+        required=False,
+        default=None,
     )
 
     return parser.parse_args()

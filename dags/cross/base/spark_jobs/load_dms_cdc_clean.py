@@ -1,3 +1,4 @@
+import json
 import re
 
 from argparse import ArgumentParser, Namespace
@@ -6,7 +7,9 @@ from typing import List
 from bietlejuice.base.cdc.primary_key_identifiers.clean_primary_key_identifier import (
     CleanPrimaryKeyIdentifier,
 )
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
 
 from pyspark.sql.functions import col
@@ -30,6 +33,14 @@ def parse_arguments():
     parser.add_argument("start_date")
     parser.add_argument("end_date")
     parser.add_argument("primary_keys", help="Comma separated list of primary keys for the clean table")
+    parser.add_argument(
+        "-tp",
+        "--table-privileges",
+        type=lambda arg: None if not arg else arg,
+        help="json string mapping each principal to a list of permissions for the table",
+        required=False,
+        default=None,
+    )
 
     return parser.parse_args()
 
@@ -75,6 +86,10 @@ def main():
     start_date = args.start_date
     end_date = args.end_date
     clean_primary_keys = get_primary_keys_from_args(args)
+    if args.table_privileges is not None:
+        table_privileges_dict = json.loads(args.table_privileges)
+    else:
+        table_privileges_dict = None
 
     logger.info(
         f"""
@@ -98,6 +113,13 @@ def main():
     clean_updates_df = spark.sql(query_with_cdc_columns).filter(col("event_timestamp").cast("date").between(start_date, end_date))
 
     full_clean_table_name = f"datalake_{schema}_clean.{table_name}"
+    if table_privileges_dict is not None:
+        table_privileges = TablePrivileges.from_input_dict(
+            table_privileges_dict, full_clean_table_name
+        )
+    else:
+        table_privileges = TablePrivileges.from_environment_default(full_clean_table_name)
+
     loader = DeltaLoader()
     loader.load_table(
         table_name=full_clean_table_name,
@@ -108,6 +130,12 @@ def main():
         when_matched_update_condition="source.event_timestamp >= target.event_timestamp",
         when_matched_delete_condition="source.Op = 'D'",
     )
+
+    if (
+        table_privileges
+        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+    ):
+        table_privileges.apply()
 
 
 if __name__ == "__main__":

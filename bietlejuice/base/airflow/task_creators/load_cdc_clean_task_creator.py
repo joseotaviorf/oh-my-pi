@@ -1,3 +1,4 @@
+import json
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
@@ -38,6 +39,8 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
             self.dag_execution_context.load_start_date,
             self.dag_execution_context.load_end_date,
             clean_primary_keys,
+            "--table-privileges",
+            json.dumps(table_attributes.table_privileges),
         ]
 
     def create_task(

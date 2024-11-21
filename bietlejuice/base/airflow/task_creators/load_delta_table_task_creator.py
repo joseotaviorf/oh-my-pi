@@ -54,6 +54,8 @@ class LoadDeltaTableTaskCreator(BaseTaskCreator):
             json.dumps(when_matched_delete_condition),
             json.dumps(when_matched_operation),
             json.dumps(when_not_matched_operation),
+            "--table-privileges",
+            json.dumps(table_attributes.table_privileges),
         ]
 
     def _get_extra_query_template_params(

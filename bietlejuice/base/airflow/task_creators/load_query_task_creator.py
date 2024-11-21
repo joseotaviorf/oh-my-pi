@@ -50,6 +50,8 @@ class LoadQueryTaskCreator(BaseTaskCreator):
             json.dumps(self._get_extra_query_template_params(table_attributes)),
             "",  # Schema. This is out of pattern, and used in very few DAGs. We're going to force it to be empty to require a refactor
             "",  # Tree path. This is out of pattern, and used in very few DAGs. We're going to force it to be empty to require a refactor
+            "--table-privileges",
+            json.dumps(table_attributes.table_privileges),
         ]
 
     def _get_extra_query_template_params(
