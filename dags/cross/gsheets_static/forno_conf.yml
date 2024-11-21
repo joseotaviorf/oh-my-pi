@@ -251,6 +251,12 @@ sheets_info:
     clean_table_name: sale_business_unit_standardization
     sheet_context: static
 
+  sale_buyer_prospects_budget_2024:
+    sheet_id: 10fnWFzOQacP4TafxRWS3oGi6KIhP_6B1AhPO9YDetJU
+    sheet_name: sale_demand_targets_bps_2024
+    clean_table_name: sale_buyer_prospects_budget_2024
+    sheet_context: static
+
   sale_demand_targets_bps_retro:
     sheet_id: 1mPwAGGO718zyor0el6KcknTOhRZaNv_xMqpbA7p2Gy4
     sheet_name: sale_demand_targets_bps_retro

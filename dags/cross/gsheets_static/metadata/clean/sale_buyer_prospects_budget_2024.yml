@@ -1,0 +1,31 @@
+---
+database_name: datalake_gsheets_clean
+table_name: sale_buyer_prospects_budget_2024
+owner: gustavo.alencar@quintoandar.com.br
+domain: Growth
+description: Transformed table created from a Google Sheets file in order to input sale buyer prospects budgets into datalake
+columns:
+  city_group:
+    description: City group
+    lineage:
+      - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.city_group
+  hub_offer:
+    description: Hub associated to the buyer prospect
+    lineage:
+      - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.hub_offer
+  is_rede:
+    description: Identifies if the buyer prospect comes from 1P or 3P supply (Rede)
+    lineage:
+      - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.is_rede  
+  new_buyer_prospect:
+    description: Budget volume of new buyer prospects
+    lineage:
+      - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.new_buyer_prospect
+  recovered_buyer_prospect:
+    description: Budget volume of recovered buyer prospects
+    lineage:
+      - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.recovered_buyer_prospect
+  dt_budget:
+    description: Date of the budget
+    lineage:
+      - datalake_gsheets_raw.sale_buyer_prospects_budget_2024.date
