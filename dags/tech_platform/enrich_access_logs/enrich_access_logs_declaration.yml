@@ -16,7 +16,6 @@ workflow:
   tables_customization:
     access_logs:
       merge_on: [year, month, day, id_decision]
-      when_matched_update_condition: target.ts_event IS NULL OR source.ts_event IS NOT NULL
 cluster:
   type: custom_cluster
   custom_configurations:
