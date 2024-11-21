@@ -1,51 +1,28 @@
 sheets_info:
-  brokerage_fee_tiers:
-    sheet_id: 1TF99ftLp13tFxtoNZAv4ieb9400G30RiOihv5iYRY3k
-    sheet_name: Tiers
-    clean_table_name: brokerage_fee_tiers
-    sheet_context: agents
-  broker_score_by_quartiles:
-    sheet_id: 16GyMIRBWwvhkcbTAPatLEWLHkdIibybmiot3vXlTzmY
-    sheet_name: Resumo Quartis
-    clean_table_name: broker_score_by_quartiles
-    sheet_context: agents
-  rent_comission_for_strategic_region:
-    sheet_id: 1ygsGwDlMQZXKUGkXB54ZPno_N2dANJrms1Qki42NGYE
-    sheet_name: for_rent
-    clean_table_name: rent_comission_for_strategic_region
-    sheet_context: agents
-    partitioned: true
-  sale_comission_for_strategic_region:
-    sheet_id: 1ygsGwDlMQZXKUGkXB54ZPno_N2dANJrms1Qki42NGYE
-    sheet_name: for_sale
-    clean_table_name: sale_comission_for_strategic_region
-    sheet_context: agents
-    partitioned: true
-  tqc_pro_pilot_program_cognito_form:
-    sheet_id: 1SjZ0bCKopwhhEv2RLrLEHNHsT_vrP0Kn_9g3hY2qe2U
-    sheet_name: Programa Piloto Traz Quem Compra Pro
-    clean_table_name: tqc_pro_pilot_program_cognito_form
-    sheet_context: agents
   account_managers_info:
     sheet_id: 1u-blwq-Ct5cRMIuyJFaSdnbCfMf9hXNaSwpznyi2ycc
     sheet_name: analistas
     clean_table_name: account_managers_info
     sheet_context: agents
-  sale_listings_date:
-    sheet_id: 1beK8cE7kXJ-fdbrJQB6LkdPtVxhMG7jsoQmNEkpSGXQ
-    sheet_name: listings_date
-    clean_table_name: sale_listings_date
-    sheet_context: agents
-  sale_ongoing_listings_date:
-    sheet_id: 1p-LDBU61HTO6qEjW2lujKHfyVIIxlpnZVwyupCJcbN8
-    sheet_name: listings_date_ol
-    clean_table_name: sale_ongoing_listings_date
-    sheet_context: agents
+
   asp_consultants_allocation:
     sheet_id: 1xEMHNMbTb6tBLghGSDwv5kLi0vid66oUNEirUY672oY
     sheet_name: aux_table
     clean_table_name: asp_consultants_allocation
     sheet_context: agents
+
+  broker_score_by_quartiles:
+    sheet_id: 16GyMIRBWwvhkcbTAPatLEWLHkdIibybmiot3vXlTzmY
+    sheet_name: Resumo Quartis
+    clean_table_name: broker_score_by_quartiles
+    sheet_context: agents
+
+  brokerage_fee_tiers:
+    sheet_id: 1TF99ftLp13tFxtoNZAv4ieb9400G30RiOihv5iYRY3k
+    sheet_name: Tiers
+    clean_table_name: brokerage_fee_tiers
+    sheet_context: agents
+
   ciq_portfolio:
     sheet_id: 1-1lJbv5430DWWVswf9AHTsi4dzAXvL2VBRqoaSv0j-A
     sheet_name: carteira_ciq
@@ -53,3 +30,40 @@ sheets_info:
     sheet_context: agents
     partitioned: true
 
+  rent_comission_for_strategic_region:
+    sheet_id: 1ygsGwDlMQZXKUGkXB54ZPno_N2dANJrms1Qki42NGYE
+    sheet_name: for_rent
+    clean_table_name: rent_comission_for_strategic_region
+    sheet_context: agents
+    partitioned: true
+
+  sale_comission_for_strategic_region:
+    sheet_id: 1ygsGwDlMQZXKUGkXB54ZPno_N2dANJrms1Qki42NGYE
+    sheet_name: for_sale
+    clean_table_name: sale_comission_for_strategic_region
+    sheet_context: agents
+    partitioned: true
+
+  sale_listings_date:
+    sheet_id: 1beK8cE7kXJ-fdbrJQB6LkdPtVxhMG7jsoQmNEkpSGXQ
+    sheet_name: listings_date
+    clean_table_name: sale_listings_date
+    sheet_context: agents
+
+  sale_ongoing_listings_date:
+    sheet_id: 1p-LDBU61HTO6qEjW2lujKHfyVIIxlpnZVwyupCJcbN8
+    sheet_name: listings_date_ol
+    clean_table_name: sale_ongoing_listings_date
+    sheet_context: agents
+
+  subhub_regions:
+    sheet_id: 1-9okIQsfHo1kcc51msMYEa7Xw35wYWXDKcrWdCmdW8k
+    sheet_name: Detalhamento de SubHubs
+    clean_table_name: subhub_regions
+    sheet_context: agents
+
+  tqc_pro_pilot_program_cognito_form:
+    sheet_id: 1SjZ0bCKopwhhEv2RLrLEHNHsT_vrP0Kn_9g3hY2qe2U
+    sheet_name: Programa Piloto Traz Quem Compra Pro
+    clean_table_name: tqc_pro_pilot_program_cognito_form
+    sheet_context: agents

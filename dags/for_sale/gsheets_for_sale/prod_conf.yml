@@ -185,12 +185,6 @@ sheets_info:
     clean_table_name: split_ciq_bh
     sheet_context: for_sale
 
-  subhub_regions:
-    sheet_id: 1-9okIQsfHo1kcc51msMYEa7Xw35wYWXDKcrWdCmdW8k
-    sheet_name: Detalhamento de SubHubs
-    clean_table_name: subhub_regions
-    sheet_context: for_sale
-
   target_sale_cohort_demand:
     sheet_id: 1IzXMT2uzLovZ6sI30a_dfFsBuWaffBAoid6rFdIszC0
     sheet_name: target_sale_cohort_demand
