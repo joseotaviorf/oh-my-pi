@@ -44,6 +44,22 @@ to
 SELECT
     *
 FROM VALUES
+    -- dummy experiment to have the field types correct.
+    -- Otherwise if all end_date are null it raises error due to unknown data type
+    (
+        "dummy_experiment",
+        named_struct(
+            'begin_date', DATE('2001-01-01'),
+            'end_date', DATE('2001-01-02'),
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'sale'"
+        )
+    ),
     -- ab_beakman_ranking_sale_pclick_v1
     (
         "ab_beakman_ranking_sale_pclick_v1",
