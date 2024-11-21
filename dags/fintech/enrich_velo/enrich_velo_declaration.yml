@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       Creates enriched tables for Velo Propose and Transactions context.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     transaction_entries:
