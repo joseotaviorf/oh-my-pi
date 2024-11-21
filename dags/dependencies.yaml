@@ -3614,6 +3614,8 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-taxonomy
   - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
+bietlejuice.search_metrics_service:
+  - quintoml.search.search_monitoring.inference:batch-predict
 quintoml.growth.eltv.inference:
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
   - bietlejuice.ebdb_house:load-clean-house

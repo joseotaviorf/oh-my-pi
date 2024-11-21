@@ -825,6 +825,9 @@ bietlejuice.reverse_webhelp_access:
 bietlejuice.reverse_supply_access:
   add:
     - bietlejuice.reverse_supply:load-reverse-supply-affiliates-volumetry
+bietlejuice.search_metrics_service:
+  add:
+    - quintoml.search.search_monitoring.inference:batch-predict
 bietlejuice.enrich_wordpress_baroes:
   remove:
     - bietlejuice.wordpress_baroes:load-clean-meulugar-data
