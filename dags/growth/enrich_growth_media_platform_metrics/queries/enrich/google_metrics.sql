@@ -19,7 +19,7 @@ SELECT
     gt_city.name AS city,
     -- Metrics
     ad_group.clicks,
-    NULL::BIGINT AS conversions, -- add conversions
+    ad_group.conversions AS conversions,
     ad_group.impressions,
     (ad_group.cost/1000000) AS total_cost,
     -- Date Reference

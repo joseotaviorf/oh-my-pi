@@ -152,3 +152,19 @@ columns:
       - datalake_growth_media_platform.google_metrics.day
       - datalake_growth_media_platform.trovit_metrics.day
     description: Day of the report.
+  type_flow_media_setup:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.utm_campaign
+      - datalake_growth_media_platform.facebook_metrics.utm_campaign
+      - datalake_growth_media_platform.google_metrics.utm_campaign
+      - datalake_growth_media_platform.trovit_metrics.utm_campaign
+      - datalake_gsheets_clean.cost_taxonomy_translation_dictionary.campaign_name
+    description: Type of flow used to create key for media setup
+  name_convention_suffix:
+    lineage:
+      - datalake_growth_media_platform.criteo_metrics.utm_campaign
+      - datalake_growth_media_platform.facebook_metrics.utm_campaign
+      - datalake_growth_media_platform.google_metrics.utm_campaign
+      - datalake_growth_media_platform.trovit_metrics.utm_campaign
+      - datalake_gsheets_clean.cost_taxonomy_translation_dictionary.campaign_name
+    description: Suffix of the name convention used to create key for media setup

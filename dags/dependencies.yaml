@@ -1846,6 +1846,7 @@ bietlejuice.enrich_growth_media_platform_metrics:
   - bietlejuice.facebook_insights:load-clean-facebook-ads-insights-by-region
   - bietlejuice.google_ads:load-clean-ad-group-geo-performance
   - bietlejuice.google_ads:load-clean-geo-target-constant
+  - bietlejuice.gsheets_growth:done-clean-cost-taxonomy-translation-dictionary
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
 bietlejuice.enrich_growth_media_platform_scd:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
