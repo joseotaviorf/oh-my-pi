@@ -24,7 +24,10 @@ workflow:
     - "{load_start_date}"
     - "{load_end_date}"
   tables_customization:
-    cypress_reports: {}
+    cypress_reports:
+      raw_table_dependency: cypress_reports
+      extraction_type: full
+      partitions: []
     executions:
       raw_table_dependency: cypress_reports
       extraction_type: full
