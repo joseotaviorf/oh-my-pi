@@ -1,6 +1,6 @@
 SELECT
     NULLIF(id_proposta,'') AS id_propose,
-    NULLIF(id_da_imobiliaria_,'') AS id_broker,
+    NULLIF(id_da_imobiliaria,'') AS id_broker,
     NULLIF(ticket_rescisao,'') AS id_ticket_termination,
     NULLIF(inquilino,'') AS tenant,
     NULLIF(cpf,'') AS document,
