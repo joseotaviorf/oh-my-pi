@@ -1,0 +1,67 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: sync_sap_job
+columns:
+  id_sync_sap_job:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.id
+  id_feature:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.feature_id
+  id_consolidated:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.consolidated_id
+  hash:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.hash
+  idoc:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.idoc
+  response:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.response
+  type:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.type
+  status:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.status
+  erp_solution:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.erp_solution
+  sap_payload:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.sap_payload
+  charge_back_of:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.charge_back_of
+  error:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.error
+  retryable:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.retryable
+  num_retry:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.num_retry
+  ts_updated_from_webhook:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.updated_from_webhook_at
+  ts_synced:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.synced_at
+  ts_created:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.created_at
+  ts_updated:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.updated_at
+  year:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.year
+  month:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.month
+  day:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.sync_sap_job.day

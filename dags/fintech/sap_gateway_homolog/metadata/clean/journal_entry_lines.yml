@@ -1,0 +1,43 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: journal_entry_lines
+columns:
+  id:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.id
+  id_journal_entry:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.journal_entry_id
+  id_finance_entity_entry:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.finance_entity_entry_id
+  id_person:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.person_id
+  id_branch:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.branch_id
+  account_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.account_code
+  costing_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.costing_code
+  location_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.location_code
+  accounting_rule:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.accounting_rule
+  operation_type:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.operation_type
+  amount:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.amount
+  ts_created:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.created_at
+  ts_updated:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry_lines.updated_at

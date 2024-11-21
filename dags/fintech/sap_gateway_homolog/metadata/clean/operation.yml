@@ -1,0 +1,43 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: operation
+columns:
+  id_operation:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.id
+  id_feature:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.feature_id
+  id_business_partner:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.business_partner_id
+  id_sync_sap_job:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.sync_sap_job_id
+  description:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.description
+  feature_op_ident:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.feature_op_ident
+  ts_reference:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.reference_date
+  ts_due:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.due_date
+  ts_created:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.created_at
+  ts_updated:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.updated_at
+  year:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.year
+  month:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.month
+  day:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.operation.day

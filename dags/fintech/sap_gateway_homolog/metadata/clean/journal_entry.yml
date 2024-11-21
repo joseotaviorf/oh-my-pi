@@ -1,0 +1,52 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: journal_entry
+columns:
+  id:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.id
+  id_feature:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.feature_id
+  id_consolidated:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.consolidated_id
+  id_business_entity:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.business_entity_id
+  id_finance_entity:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.finance_entity_id
+  id_external_payment:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.external_payment_id
+  source_client:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.source_client
+  status:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.status
+  city_state:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.city_state
+  city:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.city
+  description:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.description
+  year_month:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.year_month
+  dt_event:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.event_date
+  dt_due:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.due_date
+  ts_created:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.created_at
+  ts_updated:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.journal_entry.updated_at

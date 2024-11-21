@@ -1,0 +1,52 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: person
+columns:
+  id_person:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.id
+  id_tax:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.tax_id
+  id_tax_type:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.tax_id_type
+  name_person:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.name
+  email:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.email
+  phone:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.phone
+  ts_created:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.created_at
+  ts_updated:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.updated_at
+  address:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.address
+  address_complement:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.address_complement
+  address_street_sufix:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.address_street_sufix
+  address_number:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.address_number
+  address_block:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.address_block
+  city:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.city
+  state:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.state
+  zip_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.person.zip_code

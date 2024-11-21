@@ -1,0 +1,31 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: card_code
+columns:
+  id_tax:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.card_code.tax_id
+  id_tax_type:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.card_code.tax_id_type
+  supplier_landlord_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.card_code.supplier_landlord_code
+  supplier_tenant_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.card_code.supplier_tenant_code
+  supplier_estate_agent_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.card_code.supplier_estate_agent_code
+  customer_landlord_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.card_code.customer_landlord_code
+  customer_tenant_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.card_code.customer_tenant_code
+  customer_reservation_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.card_code.customer_reservation_code
+  customer_seller_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.card_code.customer_seller_code

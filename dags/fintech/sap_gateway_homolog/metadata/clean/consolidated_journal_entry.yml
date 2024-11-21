@@ -1,0 +1,34 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: consolidated_journal_entry
+columns:
+  id:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.id
+  id_sync_sap_job:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.sync_sap_job_id
+  source_client:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.source_client
+  status:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.status
+  city_state:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.city_state
+  city:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.city
+  dt_event:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.event_date
+  dt_due:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.due_date
+  created_at:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.created_at
+  ts_updated:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.updated_at

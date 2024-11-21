@@ -1,0 +1,43 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: webhook_log
+columns:
+  id_webhook_log:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.id
+  webhook_status:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.webhook_status
+  status:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.status
+  status_reason:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.status_reason
+  error:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.error
+  error_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.error_code
+  idoc:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.idoc
+  payload:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.payload
+  ts_created:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.created_at
+  ts_updated:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.updated_at
+  year:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.year
+  month:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.month
+  day:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.webhook_log.day

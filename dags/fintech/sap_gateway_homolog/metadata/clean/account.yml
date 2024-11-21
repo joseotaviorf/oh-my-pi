@@ -1,0 +1,25 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: account
+columns:
+  id_account:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.account.id
+  account_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.account.code
+  account_description:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.account.description
+  cfop_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.account.cfop_code
+  managerial_center:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.account.managerial_center
+  ts_created:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.account.created_at
+  ts_updated:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.account.updated_at

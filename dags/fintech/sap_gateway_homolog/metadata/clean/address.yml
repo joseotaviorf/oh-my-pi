@@ -1,0 +1,37 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: address
+columns:
+  id_address:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.address.id
+  ibge_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.address.ibge_code
+  zip_code:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.address.zip_code
+  address_description:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.address.address
+  address_block:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.address.block
+  address_city:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.address.city
+  address_complement:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.address.complement
+  address_country:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.address.country
+  address_state:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.address.state
+  street_suffix:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.address.street_suffix
+  address_number:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.address.number

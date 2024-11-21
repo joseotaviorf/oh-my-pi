@@ -1,0 +1,34 @@
+dag:
+  name: sap_gateway_homolog
+  schedule_start_date: 2020,10,1
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG creates the raw and clean layer to import data from SAP Gateway. SAP Gateway is an structure used to connect devices, environments, and platforms to SAP systems.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  custom_schema: sap_gateway_homolog
+  source_database: sapgateway
+  dbutils_secret_key: SAP_GATEWAY_DB
+  tables_customization:
+    account: {}
+    address: {}
+    business_partner: {}
+    card_code: {}
+    consolidated_journal_entry_lines: {}
+    consolidated_journal_entry: {}
+    feature: {}
+    journal_entry_lines: {}
+    journal_entry: {}
+    operation: {}
+    person: {}
+    rule_account_type: {}
+    rule_modifier: {}
+    rule: {}
+    sync_sap_job: {}
+    webhook_log: {}
+cluster:
+  type: databricks_13_3_med_general_cluster

@@ -1,0 +1,13 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: rule_account_type
+columns:
+  id_rule:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.rule_account_type.rule_id
+  id_account:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.rule_account_type.account_id
+  type:
+    lineage:
+      - datalake_sap_gateway_homolog_raw.rule_account_type.type
