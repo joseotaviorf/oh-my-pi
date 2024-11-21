@@ -98,6 +98,8 @@ tables:
     extraction_type: incremental
   payment_aud:
     extraction_type: incremental
+  payment_rules:
+    extraction_type: incremental
   reject_reason:
     extraction_type: incremental
   reject_reason_aud:

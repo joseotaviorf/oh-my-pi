@@ -1,0 +1,145 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: payment_rules
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: "The payment_rules table contains data related to the 'Triagem CCV' process within the Sales department. This 
+  process involves the creation of CCVs (Contracts) through LegalOps team input, where client and property information is entered. Based 
+  on this information, a CCV is generated automatically"
+columns:
+  id:
+    description: 'Identifier for the payment rule.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.id
+  id_payment:
+    description: 'Identifier for the payment.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.payment_id
+  cash_first_installment_day_count_type:
+    description: 'Cash first installment day count type.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.cash_first_installment_day_count_type
+  cash_second_installment_condition:
+    description: 'Cash second installment condition.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.cash_second_installment_condition
+  cash_second_installment_day_count_type:
+    description: 'Cash second installment day count type.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.cash_second_installment_day_count_type
+  cash_value_payment_extension_markdown:
+    description: 'Cash value payment extension markdown.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.cash_value_payment_extension_markdown
+  entry_amount_first_installment_day_count_type:
+    description: 'Entry amount first installment day count type.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.entry_amount_first_installment_day_count_type
+  entry_amount_second_installment_condition:
+    description: 'Entry amount second installment condition.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.entry_amount_second_installment_condition
+  entry_amount_second_installment_day_count_type:
+    description: 'Entry amount second installment day count type.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.entry_amount_second_installment_day_count_type
+  entry_amount_payment_extension_markdown:
+    description: 'Entry amount payment extension markdown.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.entry_amount_payment_extension_markdown
+  entry_amount_payment_extension_day_count_type:
+    description: 'Entry amount payment extension day count type.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.entry_amount_payment_extension_day_count_type
+  down_payment_day_count_type:
+    description: 'Down payment day count type.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.down_payment_day_count_type
+  cash_value_payment_extension_day_count_type:
+    description: 'Cash value payment extension day count type.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.cash_value_payment_extension_day_count_type
+  down_payment_term:
+    description: 'Down payment term.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.down_payment_term
+  cash_first_installment_value:
+    description: 'Cash first installment value.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.cash_first_installment_value
+  cash_first_installment_term:
+    description: 'Cash first installment term.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.cash_first_installment_term
+  cash_second_installment_value:
+    description: 'Cash second installment value.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.cash_second_installment_value
+  cash_second_installment_term:
+    description: 'Cash second installment term.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.cash_second_installment_term
+  cash_value_payment_extension_term:
+    description: 'Cash value payment extension term.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.cash_value_payment_extension_term
+  entry_amount_first_installment_value:
+    description: 'Entry amount first installment value.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.entry_amount_first_installment_value
+  entry_amount_first_installment_term:
+    description: 'Entry amount first installment term.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.entry_amount_first_installment_term
+  entry_amount_second_installment_value:
+    description: 'Entry amount second installment value.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.entry_amount_second_installment_value
+  entry_amount_second_installment_term:
+    description: 'Entry amount second installment term.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.entry_amount_second_installment_term
+  entry_amount_payment_extension_term:
+    description: 'Entry amount payment extension term.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.entry_amount_payment_extension_term
+  has_down_payment_extension:
+    description: 'Boolean indicating if the payment has a down payment extension.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.has_down_payment_extension
+  has_cash_value_installment:
+    description: 'Boolean indicating if the payment has a cash value installment.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.has_cash_value_installment
+  has_cash_value_payment_extension:
+    description: 'Boolean indicating if the payment has a cash value payment extension.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.has_cash_value_payment_extension
+  has_entry_amount_installment:
+    description: 'Boolean indicating if the payment has an entry amount installment.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.has_entry_amount_installment
+  has_entry_amount_payment_extension:
+    description: 'Boolean indicating if the payment has an entry amount payment extension.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.has_entry_amount_payment_extension
+  ts_created:
+    description: 'Timestamp indicating when the payment rule was created.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.created_at
+  ts_updated:
+    description: 'Timestamp indicating when the payment rule was last updated.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.updated_at
+  year:
+    description: 'Year of the payment rule.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.year
+  month:
+    description: 'Month of the payment rule.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.month
+  day:
+    description: 'Day of the payment rule.'
+    lineage:
+    - datalake_sales_flow_raw.payment_rules.day
