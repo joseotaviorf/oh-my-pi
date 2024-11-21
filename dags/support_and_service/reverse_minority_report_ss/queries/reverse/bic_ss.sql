@@ -293,10 +293,9 @@ FROM
   bic
 WHERE
   id_snapshot = DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd')
-EXCEPT ALL
-SELECT
-  * EXCEPT(id_snapshot)
-FROM
-  bic
-WHERE
-  id_snapshot = DATE_FORMAT(DATE_SUB('{year}-{month}-{day}', 1), 'yyyyMMdd')
+  AND app_version IS NOT NULL
+  AND (
+    app_version LIKE '8.117%'
+    OR app_version LIKE '8.118%'
+    OR app_version LIKE '8.119%'
+  )
