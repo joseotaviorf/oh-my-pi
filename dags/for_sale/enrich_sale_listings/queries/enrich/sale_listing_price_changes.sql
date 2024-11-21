@@ -192,7 +192,7 @@ SELECT
     CASE 
         WHEN sale_price >= 1000000 THEN 'High Ticket'
         ELSE 'Low Ticket'
-    END ticket_segmentation
+    END ticket_segmentation,
     pc.sale_price,
     pc.lag_sale_price,
     pc.last_price_variation,
