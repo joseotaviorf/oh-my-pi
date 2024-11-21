@@ -121,3 +121,5 @@ FROM
 LEFT JOIN
   booking_3p_demand_agent AS b3da
     ON v.id_visit = b3da.id_visit
+WHERE
+    DATE(v.ts_event_created) >= '2024-11-01'

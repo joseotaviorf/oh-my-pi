@@ -203,5 +203,4 @@ LEFT JOIN
         ON visit.id_house = emt.id_house
         AND visit.dt_visit BETWEEN emt.start_date AND emt.end_date
 WHERE
-    visit.structured IS TRUE
-    AND visit.ts_created >= '2024-04-01'
+    DATE(visit.ts_created) >= '2024-11-01'
