@@ -5,6 +5,7 @@ SELECT
     GET_JSON_OBJECT(task_attributes,'$.chat_id') AS id_chat,
     GET_JSON_OBJECT(assigned_to,'$.worker_sid') AS id_worker,
     task_status,
+    GET_JSON_OBJECT(task_attributes,'$.conversations.outcome') AS task_outcome,
     GET_JSON_OBJECT(task_attributes,'$.customers') AS customer_metadata,
     GET_JSON_OBJECT(task_attributes,'$.from') AS customer_contact_info,
     GET_JSON_OBJECT(task_attributes,'$.email') AS customer_email,
@@ -22,6 +23,8 @@ SELECT
     assigned_to,
     seconds_to_first_response,
     CAST(GET_JSON_OBJECT(task_attributes,'$.forwarding') AS BOOLEAN) AS is_forwarded,
+    CAST(GET_JSON_OBJECT(task_attributes,'$.conversations.conversation_attribute_2') AS BOOLEAN) AS is_per_team_task,
+    COALESCE(CAST(GET_JSON_OBJECT(task_attributes,'$.is_spoc') AS BOOLEAN), FALSE) AS is_spoc_task,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
@@ -30,4 +33,4 @@ SELECT
 FROM
     datalake_quinto_messenger_raw.task
 WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

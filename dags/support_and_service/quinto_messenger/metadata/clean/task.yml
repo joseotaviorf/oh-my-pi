@@ -19,6 +19,9 @@ columns:
   task_status:
     lineage:
       - datalake_quinto_messenger_raw.task.task_status
+  task_outcome:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
   customer_metadata:
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
@@ -68,6 +71,12 @@ columns:
     lineage:
       - datalake_quinto_messenger_raw.task.seconds_to_first_response
   is_forwarded:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  is_per_team_task:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
+  is_spoc_task:
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
   ts_created:

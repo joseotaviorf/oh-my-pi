@@ -17,7 +17,7 @@ inapp_sessions AS (
   FROM
     datalake_quinto_messenger_clean.chat
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY AND "{load_end_date}"
 ),
 whatsapp_sessions AS (
   SELECT DISTINCT
@@ -26,7 +26,7 @@ whatsapp_sessions AS (
   FROM
     datalake_quinto_messenger_clean.channel
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY AND "{load_end_date}"
 ),
 sauron_sessions AS (
   SELECT
@@ -56,14 +56,14 @@ tasks AS (
     customer_email,
     channel_type,
     task_status,
-    GET_JSON_OBJECT(conversation_attributes,'$.outcome') AS task_outcome,
+    task_outcome,
     completion_reason AS task_completion_reason,
     channel_status,
     bpo_name,
     assigned_to,
     seconds_to_first_response,
     is_forwarded,
-    GET_JSON_OBJECT(conversation_attributes,'$.conversation_attribute_2') AS is_per_team_task,
+    is_per_team_task,
     ts_created,
     ts_updated,
     task_attributes
@@ -71,6 +71,7 @@ tasks AS (
     datalake_quinto_messenger_clean.task
   WHERE
     MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+    AND is_spoc_task IS FALSE
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
 )
