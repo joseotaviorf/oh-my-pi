@@ -2,7 +2,7 @@
 dag:
   name: enrich_hub_services
   schedule_start_date: 2022, 7, 22
-  owner: Data ForSale
+  owner: Data Agents
   documentation:
     dag_purpose: This DAG creates the enriched tables for HubServices.
 workflow:
