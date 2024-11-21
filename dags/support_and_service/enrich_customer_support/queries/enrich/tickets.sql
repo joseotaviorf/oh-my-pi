@@ -71,8 +71,7 @@ incoming_tickets AS (
   WHERE
     MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ),
-/* The following CTE is needed because a single call/chat can create multiple tickets. Also, there are
-two CTEs for call dedupping because sometimes the id_call on a ticket is actually an id_task */
+-- The following CTEs are needed because a single call/chat can create multiple tickets.
 chat_tickets AS (
   SELECT
     it.id_ticket,
@@ -171,7 +170,11 @@ tickets_per_task AS (
     t.id_contract,
     t.id_call,
     t.id_session,
-    COALESCE(ch.id_task, ca1.id_task, ca2.id_call) AS id_twilio,
+    COALESCE(
+      FIRST(ch.id_task) OVER(PARTITION BY ch.id_session ORDER BY ch.ts_created DESC),
+      ca1.id_task,
+      ca2.id_call
+    ) AS id_twilio,
     CASE
       WHEN ut.channel = 'chat' THEN ch.queue_name
       WHEN ut.channel = 'call' THEN COALESCE(ca1.queue_name, ca2.queue_name)
@@ -230,7 +233,8 @@ tickets_per_task AS (
       ON ut.id_ticket = t.id_ticket
   LEFT JOIN
     datalake_customer_support.chats AS ch
-      ON ch.id_task = t.twilio_task
+      ON ch.id_session = t.id_session
+      AND ch.task_status <> 'canceled'
   LEFT JOIN
     datalake_customer_support.calls AS ca1
       ON ca1.id_task = t.id_call
