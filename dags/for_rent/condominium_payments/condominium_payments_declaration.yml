@@ -22,6 +22,20 @@ workflow:
       clean_table_name: attachment
     boleto:
       clean_table_name: invoice
+    boleto_aud:
+      clean_table_name: invoice_aud
+    boleto_issuer:
+      clean_table_name: invoice_issuer
+    boleto_issuer_aud:
+      clean_table_name: invoice_issuer_aud
+    boleto_user:
+      clean_table_name: invoice_user
+    boleto_user_aud:
+      clean_table_name: invoice_user_aud
+    boleto_user_issuer:
+      clean_table_name: invoice_user_issuer
+    boleto_user_issuer_aud:
+      clean_table_name: invoice_user_issuer_aud
     internalization:
       clean_table_name: internalization
     non_payment_report_invoice:

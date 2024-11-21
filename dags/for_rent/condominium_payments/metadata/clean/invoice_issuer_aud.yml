@@ -1,0 +1,31 @@
+---
+database_name: datalake_condominium_payments_clean
+table_name: invoice_issuer_aud
+columns:
+  id:
+    lineage:
+      - datalake_condominium_payments_raw.boleto_issuer_aud.id
+  name:
+    lineage:
+      - datalake_condominium_payments_raw.boleto_issuer_aud.name
+  document:
+    lineage:
+      - datalake_condominium_payments_raw.boleto_issuer_aud.document
+  document_type:
+    lineage:
+      - datalake_condominium_payments_raw.boleto_issuer_aud.document_type
+  rev:
+    lineage:
+      - datalake_condominium_payments_raw.boleto_issuer_aud.rev
+  rev_end:
+    lineage:
+      - datalake_condominium_payments_raw.boleto_issuer_aud.revend
+  rev_type:
+    lineage:
+      - datalake_condominium_payments_raw.boleto_issuer_aud.revtype
+  ts_created:
+    lineage:
+      - datalake_condominium_payments_raw.boleto_issuer_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_condominium_payments_raw.boleto_issuer_aud.updated_at
