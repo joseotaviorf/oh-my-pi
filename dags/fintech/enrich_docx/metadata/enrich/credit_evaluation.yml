@@ -7,39 +7,81 @@ columns:
   id:
     lineage:
       - datalake_docx_clean.credit_evaluation.id
-    description: "Id of the income documentation"  
+    description: "Id of the income documentation"
   id_proposal:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_proposal
-    description: "Id of the proposal" 
+    description: "Id of the proposal"
   id_house:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_house
-    description: "Id of the house" 
+    description: "Id of the house"
   id_user:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_user
-    description: "Id of the user" 
+    description: "Id of the user"
+  id_group:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_group
+    description: "Id of the group of tenants that are part of a credit passport."
+  id_city:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_city
+    description: "Id of the city within the credit passport is valid."
   reason:
     lineage:
       - datalake_docx_clean.credit_evaluation.reason
-    description: "Reason of the evaluation" 
+    description: "Reason of the evaluation"
+  scope:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.scope
+    description: "Scope of the credit evaluation. The credit model can evaluate a credit risk based on the house information or city."
+  limit_value:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.limit_value
+    description: "The credit value risk that the user is interested in being evaluated for."
+  proponent_group_type:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.proponent_group_type
+    description: "The type of the group."
+    categories:
+      MYSELF: "Indicates that the user is interested in renting a property alone"
+      MYSELF_WITH_OTHERS: "When the user is interested in renting a property with other proponents."
+      OTHERS: "When the user is renting a house on behalf of others."
   result:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
-    description: "Result of the evaluation" 
+    description: "Result of the credit evaluation"
+    categories:
+      PRE_APPROVED: ""
+      REGULAR: ""
+      PRE_REJECTED: ""
+      INVALID_SCORE: ""
   status:
     lineage:
       - datalake_docx_clean.credit_evaluation.status
-    description: "Status of the evaluation" 
+    description: "Status of the credit evaluation"
+    categories:
+      NOT_SENT: ""
+      PROCESSING: ""
+      FINISHED: ""
+      FAILED: ""
   proposal_last_result:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
-    description: "Last result of the proposal" 
+    description: "Last result of the credit evaluation of the proposal"
   proposal_number_evaluations:
     lineage:
       - datalake_docx_clean.credit_evaluation.id
-    description: "Last result of the proposal" 
+    description: "Number of distinct evaluations submitted within the proposal"
+  group_last_result:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.result
+    description: "Last result of the credit evaluation of the group"
+  group_number_evaluations:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id
+    description: "Number of distinct evaluations submitted within the group"
   ts_created:
     lineage:
       - datalake_docx_clean.credit_evaluation.ts_created
@@ -48,14 +90,27 @@ columns:
     lineage:
       - datalake_docx_clean.credit_evaluation.ts_updated
     description: "Updated timestamp"
+  ts_expires:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.ts_expires
+    description: "Timestamp of the group expiration"
   ts_proposal_first_credit_evaluation_positive:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
       - datalake_docx_clean.credit_evaluation.ts_updated
-    description: "Timestamp of the positive first credit evaluation"
+    description: "Timestamp of the first positive credit evaluation in the proposal"
   ts_proposal_last_credit_evaluation_positive:
     lineage:
       - datalake_docx_clean.credit_evaluation.result
       - datalake_docx_clean.credit_evaluation.ts_updated
-    description: "Timestamp of the positive last credit evaluation"
- 
+    description: "Timestamp of the last positive credit evaluation in the proposal"
+  ts_group_first_credit_evaluation_positive:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.result
+      - datalake_docx_clean.credit_evaluation.ts_updated
+    description: "Timestamp of the first positive credit evaluation in the group"
+  ts_group_last_credit_evaluation_positive:
+    lineage:
+      - datalake_docx_clean.credit_evaluation.result
+      - datalake_docx_clean.credit_evaluation.ts_updated
+    description: "Timestamp of the last positive credit evaluation in the group"
