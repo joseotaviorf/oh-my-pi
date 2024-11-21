@@ -2,7 +2,7 @@ dag:
   name: dw_banking
   owner: Data Fintech
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: bank
 cluster:
