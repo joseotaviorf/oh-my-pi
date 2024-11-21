@@ -1,6 +1,0 @@
----
-inner_dependencies:
-  ticket_details:
-    - custom_fields
-  ticket_metrics:
-    - custom_fields

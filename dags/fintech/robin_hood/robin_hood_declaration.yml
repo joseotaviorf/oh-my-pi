@@ -4,11 +4,12 @@ dag:
   schedule_interval: 0 3 * * *
   owner: Data Fintech
   documentation:
-    dag_purpose: 'This DAG creates the full tables for Robin Hood, a digital wallet
+    dag_purpose:
+      "This DAG creates the full tables for Robin Hood, a digital wallet
       that has two main features: users financial data management and management of
-      payment requests.'
+      payment requests."
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   custom_schema: robin_hood

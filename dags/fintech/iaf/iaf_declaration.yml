@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: This DAG imports the tables from IAF, one of QuintoCred's payment consultings.
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   custom_schema: iaf

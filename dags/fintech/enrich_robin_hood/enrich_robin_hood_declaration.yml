@@ -4,10 +4,11 @@ dag:
   schedule_start_date: 2020, 8, 29
   owner: Data Fintech
   documentation:
-    dag_purpose: 'Enrich pipe for Robin Hood, a digital wallet that has two main features:
-      users financial data management and management of payment requests.'
+    dag_purpose:
+      "Enrich pipe for Robin Hood, a digital wallet that has two main features:
+      users financial data management and management of payment requests."
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_general_cluster

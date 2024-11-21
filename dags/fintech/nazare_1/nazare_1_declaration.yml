@@ -8,7 +8,7 @@ dag:
     dag_purpose: |
       This DAG load tables from Nazare, the service that calculates the Revenue Share with external partners and executives.
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   custom_schema: nazare

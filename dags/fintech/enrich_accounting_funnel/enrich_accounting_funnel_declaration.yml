@@ -4,7 +4,7 @@ dag:
   schedule_start_date: 2020, 7, 1
   owner: Data Fintech
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     for_rent_cap_bank_recon:
