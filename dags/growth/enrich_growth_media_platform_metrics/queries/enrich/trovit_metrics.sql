@@ -7,7 +7,7 @@ SELECT
     account_name,
     'trovit' AS origin,
     'trovit_campaigns' AS report_type,
-    campaign_name AS utm_campaign,
+    REGEXP_REPLACE(campaign_name, '	', '') AS utm_campaign,
     NULL::STRING AS utm_term,
     NULL::STRING AS utm_content,
     -- Regions
