@@ -16,8 +16,6 @@ workflow:
   tables_customization:
     BotOutgoingMessages:
       clean_table_name: bot_outgoing_messages
-    IncomingMessages:
-      clean_table_name: incoming_messages
     Session:
       clean_table_name: session
     CallEvents:
