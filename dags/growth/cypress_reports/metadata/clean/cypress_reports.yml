@@ -1,0 +1,26 @@
+database_name: datalake_cypress_reports_clean
+table_name: cypress_reports
+description: This table contains information of the Cypress reports.
+domain: Platform
+owner: thiago.nakamura@quintoandar.com.br
+columns:
+  id_test_execution:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.id_test_execution
+    description: The ID of the execution.
+  results:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.results
+    description: JSON with results information.
+  stats:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.stats
+    description: JSON with stats information.
+  pwa:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.pwa
+    description: The name of the project of this execution.
+  dt_created:
+    lineage:
+      - datalake_cypress_reports_raw.cypress_reports.dt
+    description: The date the tests were executed.

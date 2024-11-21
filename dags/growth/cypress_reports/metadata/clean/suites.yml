@@ -6,15 +6,15 @@ owner: thiago.nakamura@quintoandar.com.br
 columns:
   pwa:
     lineage:
-      - datalake_cypress_reports_raw.cypress_reports.results.pwa
+      - datalake_cypress_reports_raw.cypress_reports.pwa
     description: The name of the project of this execution.
   dt:
     lineage:
-      - datalake_cypress_reports_raw.cypress_reports.results.dt
+      - datalake_cypress_reports_raw.cypress_reports.dt
     description: The date the tests were executed.
-  test_execution_id:
+  id_test_execution:
     lineage:
-      - datalake_cypress_reports_raw.cypress_reports.results
+      - datalake_cypress_reports_raw.cypress_reports.id_test_execution
     description: The ID of the execution.
   file:
     lineage:
