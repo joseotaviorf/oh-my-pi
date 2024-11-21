@@ -26,7 +26,7 @@ workflow:
     logs: 
       raw_table_dependency: alerts
 cluster:
-  type: databricks_13_3_min_general_cluster
+  type: databricks_13_3_min_io-memory_cluster
   custom_libraries:
     - pypi:
         package: "opsgenie_sdk"
