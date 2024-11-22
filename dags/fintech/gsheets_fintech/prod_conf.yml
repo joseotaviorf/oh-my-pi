@@ -244,7 +244,7 @@ sheets_info:
     sheet_context: fintech
 
   quintocred_pre_evictions:
-    sheet_id: 1ChYP2E2qvVmn0NRHeDjFvgOa31a4SPLhuFKmjUnS2B0
+    sheet_id: 1kFQ7c0a4eaI3mILuQ56I6-hdwbfWDIUrcdGLLgMaR8w
     sheet_name: Trancamento Vigentes
     clean_table_name: quintocred_pre_evictions
     sheet_context: fintech
