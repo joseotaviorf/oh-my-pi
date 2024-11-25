@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       Creates enriched tables for the `Credit Analysis` context.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     credit_analysis:

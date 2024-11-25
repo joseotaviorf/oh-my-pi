@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       Creates enriched tables for the `Bureau` context, transforming data for each of 5A's bureau provider and consolidating them into `all_bureau_analysis` table.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     all_bureau_analysis:

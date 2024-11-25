@@ -3,7 +3,7 @@ dag:
   schedule_start_date: 2020,02,20
   owner: Data Fintech
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: credit
   spark_session_configs:
