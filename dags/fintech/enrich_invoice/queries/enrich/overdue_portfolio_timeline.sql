@@ -10,6 +10,7 @@ target_invoices AS (
         i.status AS payment_status,
         i.substatus,
         i.reason,
+        i.paid_via,
         i.due_amount,
         i.paid_amount,
         c.status AS contract_status,
@@ -60,6 +61,7 @@ invoices_timeline AS (
         END AS payment_status,
         i.substatus,
         i.reason,
+        i.paid_via,
         CASE
             WHEN dd.date < i.dt_contract_annulled THEN "Active"
             WHEN dd.date >= i.dt_contract_annulled THEN "Finished"
@@ -188,6 +190,7 @@ SELECT
     payment_status,
     substatus,
     reason,
+    paid_via,
     debtor_type,
     due_amount,
     CASE

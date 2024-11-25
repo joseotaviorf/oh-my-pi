@@ -26,6 +26,15 @@ negotiation_data AS (
     n.down_payment_net_amount_paid != 0
   QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_invoice, d.id_contract ORDER BY ABS(DATE_DIFF(n.dt_down_payment, d.dt_paid))) = 1
 ),
+negotiation_installment AS (
+  SELECT
+    id_invoice_extra AS id_invoice,
+    sk_contract AS id_contract,
+    sk_negotiation AS sk_origin_negotiation,
+    installment_number
+  FROM dw_collection_recovery_quintoandar.fact_negotiation_installment
+  WHERE id_invoice_extra IS NOT NULL
+),
 add_all_dimensions AS (
 SELECT
     CONCAT(o.id_invoice, o.id_contract, DATE_FORMAT(o.dt_reference, 'yyyyMMdd')) AS sk_overdue_portfolio_timeline,
@@ -34,9 +43,13 @@ SELECT
     o.id_proposal,
     o.id_region,
     IF(o.payment_status = "written-down", n.sk_negotiation, NULL) AS sk_negotiation,
+    IF(o.invoice_type = "extra", ni.sk_origin_negotiation, NULL) AS sk_origin_negotiation,
+    IF(o.invoice_type = "extra", ni.installment_number, NULL) AS negotiation_installment_number,
     o.contract_status,
     o.invoice_type,
     o.payment_status,
+    o.reason,
+    o.paid_via,
     CASE
         WHEN possn.id_invoice IS NOT NULL AND o.reason NOT IN ("negotiation-recupera", "agreement") AND o.payment_status = "paid" THEN TRUE
         WHEN n.is_ssn_boletao IS NOT NULL AND n.is_ssn_boletao IS TRUE AND o.payment_status = "written-down" THEN TRUE
@@ -52,23 +65,25 @@ SELECT
         AND o.payment_status = "paid"
         AND o.reason NOT IN ("negotiation-recupera", "agreement")
       THEN "Self Service Negotiation - Payment of original debt"
-      WHEN n.id_invoice IS NOT NULL
+      WHEN
+        n.is_ssn_boletao IS NOT NULL
+        AND n.is_ssn_boletao IS TRUE
         AND o.payment_status = "written-down"
       THEN "Self Service Negotiation - Negotiation"
       WHEN possn.id_invoice IS NULL
-        AND n.id_invoice IS NULL
+        AND (n.is_ssn_boletao IS NULL OR n.is_ssn_boletao IS FALSE)
         AND o.payment_status = 'paid'
         AND o.reason NOT IN ("negotiation-recupera", "agreement")
         AND o.invoice_type != "extra"
       THEN "Original debt"
       WHEN possn.id_invoice IS NULL
-        AND n.id_invoice IS NULL
+        AND (n.is_ssn_boletao IS NULL OR n.is_ssn_boletao IS FALSE)
         AND o.payment_status = 'written-down'
         AND o.reason NOT IN ("negotiation-recupera", "agreement")
         AND o.invoice_type != "extra"
       THEN "Negotiation"
       WHEN possn.id_invoice IS NULL
-        AND n.id_invoice IS NULL
+        AND (n.is_ssn_boletao IS NULL OR n.is_ssn_boletao IS FALSE)
         AND o.payment_status = 'paid'
         AND o.reason IN ("negotiation-recupera", "agreement")
         AND o.invoice_type = "extra"
@@ -105,17 +120,24 @@ FROM
     datalake_invoice.overdue_portfolio_timeline AS o
 LEFT JOIN
     ssn_original_payment AS possn
-        ON possn.id_invoice = o.id_invoice
-        AND possn.id_contract = o.id_contract
-LEFT JOIN datalake_recupera.contract_advisory_distribution AS rc
-  ON o.id_contract = rc.id_contract
-  AND o.dt_reference = rc.dt_snapshot
-LEFT JOIN datalake_cyber.contract_agency_distribution AS cad
-  ON o.id_contract = cad.id_contract
-    AND o.dt_reference BETWEEN cad.dt_start_interval AND cad.dt_end_interval
-LEFT JOIN negotiation_data AS n
-  ON o.id_invoice = n.id_invoice
-    AND o.id_contract = n.id_contract
+      ON possn.id_invoice = o.id_invoice
+      AND possn.id_contract = o.id_contract
+LEFT JOIN
+    datalake_recupera.contract_advisory_distribution AS rc
+      ON o.id_contract = rc.id_contract
+      AND o.dt_reference = rc.dt_snapshot
+LEFT JOIN
+    datalake_cyber.contract_agency_distribution AS cad
+      ON o.id_contract = cad.id_contract
+      AND o.dt_reference BETWEEN cad.dt_start_interval AND cad.dt_end_interval
+LEFT JOIN
+    negotiation_data AS n
+      ON o.id_invoice = n.id_invoice
+      AND o.id_contract = n.id_contract
+LEFT JOIN
+  negotiation_installment AS ni
+    ON o.id_invoice = ni.id_invoice
+    AND o.id_contract = ni.id_contract
 ),
 get_last_valid_partner AS (
   -- Get the last valid partner per invoice, to freeze the partner after the invoice payment date
@@ -134,11 +156,15 @@ SELECT
     a.id_region AS sk_region,
     a.id_contract AS sk_contract,
     a.sk_negotiation,
+    a.sk_origin_negotiation,
     a.id_invoice,
     a.id_proposal,
+    a.negotiation_installment_number,
     a.contract_status,
     a.invoice_type,
     a.payment_status,
+    a.reason,
+    a.paid_via,
     a.is_ssn,
     a.type_ssn,
     a.recovery_method,
@@ -168,3 +194,7 @@ FROM add_all_dimensions AS a
 LEFT JOIN get_last_valid_partner AS g
   ON a.id_contract = g.id_contract
     AND a.id_invoice = g.id_invoice
+WHERE
+  sk_origin_negotiation IS NULL
+  OR (sk_origin_negotiation IS NOT NULL
+    AND negotiation_installment_number <> 1)
