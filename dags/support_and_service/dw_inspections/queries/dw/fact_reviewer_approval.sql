@@ -14,7 +14,6 @@ SELECT DISTINCT
 FROM
     datalake_inspections.reviewer AS r
 WHERE
-    r.mod_is_approved IS TRUE
-    AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_reviewer ORDER BY COALESCE(r.ts_approved, r.ts_updated) DESC) = 1
