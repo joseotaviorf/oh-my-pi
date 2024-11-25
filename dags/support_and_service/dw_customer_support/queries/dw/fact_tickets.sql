@@ -80,6 +80,20 @@ ticket_rate_proportion AS (
       AND ac.department = ut.last_queue
   WHERE
     ut.is_ticket_rate = TRUE
+),
+ticket_comment_metrics AS (
+  SELECT
+    tc.id_ticket,
+    SUM(CASE WHEN tc.is_public THEN 1 ELSE 0 END) AS total_public_comments,
+    SUM(CASE WHEN NOT tc.is_public THEN 1 ELSE 0 END) AS total_private_comments,
+    MAX(CASE WHEN is_public AND zu.role = 'end-user' THEN tc.ts_created END) AS ts_latest_customer_comment,
+    MAX(CASE WHEN is_public AND zu.role = 'agent' THEN tc.ts_created END) AS ts_latest_analyst_comment
+  FROM
+    datalake_zendesk_clean.ticket_comments AS tc
+  LEFT JOIN
+    datalake_support_users.zendesk_users AS zu
+      ON zu.id_user_zendesk = tc.id_author
+  GROUP BY 1
 )
 SELECT
   CAST(t.id_ticket AS BIGINT) AS sk_ticket,
@@ -123,15 +137,21 @@ SELECT
   t.days_elapsed_calendar,
   t.days_elapsed_business,
   t.days_off,
+  tcm.total_public_comments,
+  tcm.total_private_comments,
   t.is_backlog_in_time,
+  t.is_call_answered,
   t.is_ticket_rate,
   t.is_back_ticket,
   t.has_open_back_ticket,
   t.ts_created,
+  t.ts_created_twilio,
   t.ts_sla_started,
   t.ts_solved,
   t.ts_closed,
-  t.ts_updated
+  t.ts_updated,
+  tcm.ts_latest_customer_comment,
+  tcm.ts_latest_analyst_comment
 FROM
   datalake_customer_support.tickets AS t
 LEFT JOIN
@@ -140,3 +160,6 @@ LEFT JOIN
 LEFT JOIN
   datalake_zendesk.tickets_current AS tc
     ON tc.id_ticket = t.id_ticket
+LEFT JOIN
+  ticket_comment_metrics AS tcm
+    ON tcm.id_ticket = t.id_ticket

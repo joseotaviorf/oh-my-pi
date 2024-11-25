@@ -143,6 +143,10 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.replies
     description: Number of public replies the agent added to the ticket
+  total_public_comments:
+    description: Total number of public comments in a ticket
+  total_private_comments:
+    description: Total number of private comments in a ticket
   is_ticket_rate:
     lineage:
       - datalake_customer_support.tickets.is_ticket_rate
@@ -159,6 +163,10 @@ columns:
       - If the ticket has channel email, then we accept all directions;
       - If the ticket has channel chat, then we accept only direction inbound;
       - If the ticket has channel call, we accept only directions inbound and outbound-api."
+  is_call_answered:
+    lineage:
+      - datalake_customer_support.calls.is_call_answered
+    description: Boolean indicating if the call was answered
   has_open_back_ticket:
     lineage:
       - datalake_customer_support.tickets.has_open_back_ticket
@@ -172,10 +180,11 @@ columns:
   ts_created:
     lineage:
       - datalake_customer_support.tickets.ts_created
-    description:
-      Start timestamp. Note - for chat and call tickets this value is the
-      first timestamp in our event tables. For email tickets we get the timestamp
-      directly from zendesk.
+    description: Timestamp of when the ticket was created.
+  ts_created_twilio:
+    lineage:
+      - datalake_customer_support.tickets.ts_created_twilio
+    description: Timestamp of when the twilio task that originated the ticket was created
   ts_sla_started:
     lineage:
       - datalake_customer_support.tickets.ts_sla_started
@@ -200,5 +209,9 @@ columns:
     lineage:
       - datalake_customer_support.tickets.ts_updated
     description: Timestamp of when the ticket was last updated
+  ts_latest_customer_comment:
+    description: Timestamp of the latest comment in a ticket made by a customer/end user
+  ts_latest_analyst_comment:
+    description: Timestamp of the latest comment in a ticket made by an analyst
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_customer_support.
