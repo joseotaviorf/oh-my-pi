@@ -47,11 +47,11 @@ columns:
     description: Indicates that all analysts involved approved the inspection report
   has_owner_access_review:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_access.has_owner_access_review
+      - datalake_amplitude_inspections.inspection_stages_access.has_owner_access_review
     description: Indicates whether the owner has already accessed the inspection report review home page
   has_tenant_access_review:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_access.has_tenant_access_review
+      - datalake_amplitude_inspections.inspection_stages_access.has_tenant_access_review
     description: Indicates whether the tenant has already accessed the inspection report review home page
   dt_owner_limit_revision:
     lineage:
@@ -98,19 +98,19 @@ columns:
       In onboarding: When the review deadline is reached
   ts_first_owner_access_review:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_access.ts_first_owner_access_review
+      - datalake_amplitude_inspections.inspection_stages_access.ts_first_owner_access_review
     description: Timestamp of the first time the owner accessed the inspection report review home page
   ts_last_owner_access_review:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_access.ts_last_owner_access_review
+      - datalake_amplitude_inspections.inspection_stages_access.ts_last_owner_access_review
     description: Timestamp of the last time the owner accessed the inspection report review home page
   ts_first_tenant_access_review:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_access.ts_first_tenant_access_review
+      - datalake_amplitude_inspections.inspection_stages_access.ts_first_tenant_access_review
     description: Timestamp of the first time the tenant accessed the inspection report review home page
   ts_last_tenant_access_review:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_access.ts_last_tenant_access_review
+      - datalake_amplitude_inspections.inspection_stages_access.ts_last_tenant_access_review
     description: Timestamp of the last time the tenant accessed the inspection report review home page
   ts_first_approval:
     lineage:

@@ -56,7 +56,7 @@ LEFT JOIN
     datalake_inspections.report_approval AS ra
         ON ra.id_assessment = r.id_assessment
 LEFT JOIN
-    datalake_amplitude_inspections.inspection_review_access AS ira
+    datalake_amplitude_inspections.inspection_stages_access AS ira
         ON ira.id_inspection = r.id_inspection
 LEFT JOIN
     datalake_inspections.inspection_status_change AS is_status

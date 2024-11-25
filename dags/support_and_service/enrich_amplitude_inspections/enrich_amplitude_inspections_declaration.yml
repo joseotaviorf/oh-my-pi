@@ -10,10 +10,14 @@ workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
-    inspection_review_access:
+    inspection_stages_access:
       - inspection_review_page_viewed_events
   tables_customization:
-    inspection_review_access: {}
+    inspection_stages_access:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      z_order_by: [id_inspection]
+      merge_on: [id_inspection]
     inspection_review_page_viewed_events:
       partitions: [year, month, day]
       extraction_type: incremental

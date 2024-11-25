@@ -1,0 +1,19 @@
+---
+table_name: datalake_amplitude_inspections.inspection_stages_access
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_inspection:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  inspection_type:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - onboarding
+        - verification
+        - offboarding
+        - portability
+      severity_level: Error
