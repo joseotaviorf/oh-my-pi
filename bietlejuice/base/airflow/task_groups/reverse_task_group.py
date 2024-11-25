@@ -27,6 +27,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         relative_query_path,
         spark_jobs_path,
         execution_timeout_hours=BaseTaskGroup.DEFAULT_EXECUTION_TIMEOUT_HOURS,
+        databricks_conn_id="databricks_default",
     ):
         """
         :param dag: main dag instance
@@ -47,6 +48,7 @@ class ReverseTaskGroup(BaseTaskGroup):
             dag, env, relative_query_path, spark_jobs_path, execution_timeout_hours
         )
         self.s3_bucket = s3_bucket
+        self.databricks_conn_id = databricks_conn_id
 
     def _build_task_group(
         self,
@@ -127,6 +129,7 @@ class ReverseTaskGroup(BaseTaskGroup):
                 }
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            databricks_conn_id=self.databricks_conn_id,
         )
 
         final_tasks = [load_table_task]
@@ -161,6 +164,7 @@ class ReverseTaskGroup(BaseTaskGroup):
                     }
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
+                databricks_conn_id=self.databricks_conn_id,
             )
 
             load_table_task.set_downstream([data_quality_tests_task])

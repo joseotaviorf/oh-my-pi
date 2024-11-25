@@ -27,6 +27,7 @@ class DWTaskGroupAllPurpose(BaseTaskGroup):
         relative_query_path,
         spark_jobs_path,
         execution_timeout_hours=BaseTaskGroup.DEFAULT_EXECUTION_TIMEOUT_HOURS,
+        databricks_conn_id="databricks_job_cluster",
     ):
 
         super().__init__(
@@ -34,6 +35,7 @@ class DWTaskGroupAllPurpose(BaseTaskGroup):
         )
         self.dw_bucket = dw_bucket
         self.dw_schema = dw_schema
+        self.databricks_conn_id = databricks_conn_id
 
     def __get_schema(self, table_customization):
         table_schema = table_customization.get("custom_schema", self.dw_schema)
@@ -71,7 +73,7 @@ class DWTaskGroupAllPurpose(BaseTaskGroup):
         updating a table in Databricks Metastore with the same name of the query file.
         """
         load_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            databricks_conn_id="databricks_job_cluster",
+            databricks_conn_id=self.databricks_conn_id,
             dag=self.dag,
             task_id=self.generate_default_task_id(
                 task_prefix=self.LOAD_TASK_PREFIX,
@@ -110,7 +112,7 @@ class DWTaskGroupAllPurpose(BaseTaskGroup):
         if layer != LayerEnum.DW.value:
             return
         sync_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
-            databricks_conn_id="databricks_job_cluster",
+            databricks_conn_id=self.databricks_conn_id,
             task_id=self.generate_default_task_id(
                 task_prefix=self.SYNC_METADATA_TASK_PREFIX,
                 layer=LayerEnum(layer),
@@ -162,7 +164,7 @@ class DWTaskGroupAllPurpose(BaseTaskGroup):
             inmetro_bucket = config_service.get_config("inmetro_bucket")
 
             data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
-                databricks_conn_id="databricks_job_cluster",
+                databricks_conn_id=self.databricks_conn_id,
                 dag=self.dag,
                 task_id=self.generate_default_task_id(
                     task_prefix=self.DATA_QUALITY_TESTS_TASK_PREFIX,
@@ -212,7 +214,7 @@ class DWTaskGroupAllPurpose(BaseTaskGroup):
             and extraction_type == "full"
         ):
             dim_default_row_task = QuintoAndarDatabricksSubmitRunOperator(
-                databricks_conn_id="databricks_job_cluster",
+                databricks_conn_id=self.databricks_conn_id,
                 dag=self.dag,
                 task_id=self.generate_default_task_id(
                     task_prefix=self.ADD_DEFAULT_ROW_TASK_PREFIX,

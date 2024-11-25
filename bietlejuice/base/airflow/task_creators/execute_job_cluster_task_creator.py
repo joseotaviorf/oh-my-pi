@@ -104,7 +104,7 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
             task_id = self._TASK_ID
 
         return QuintoAndarDatabricksExecuteJobClusterOperator(
-            databricks_conn_id="databricks_job_cluster",
+            databricks_conn_id=self.dag_execution_context.databricks_conn_id,
             dag=self.dag_execution_context.dag,
             task_id=task_id,
             cluster_configuration=cluster_configuration,

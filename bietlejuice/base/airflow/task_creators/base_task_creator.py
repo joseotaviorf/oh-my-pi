@@ -58,7 +58,7 @@ class BaseTaskCreator(ABC):
         spark_job_path = path.join(spark_job_directory, f"{spark_job_name}.py")
 
         return QuintoAndarDatabricksCheckJobTaskOperator(
-            databricks_conn_id="databricks_job_cluster",
+            databricks_conn_id=self.dag_execution_context.databricks_conn_id,
             dag=self.dag_execution_context.dag,
             task_id=task_id,
             json={

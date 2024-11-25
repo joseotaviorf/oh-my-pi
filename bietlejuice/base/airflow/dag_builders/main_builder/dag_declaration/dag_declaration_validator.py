@@ -163,6 +163,7 @@ class DAGDeclarationValidator(Validator):
                         },
                     },
                 },
+                "databricks_conn_id": {"type": "string", "empty": False},
             },
         },
     }

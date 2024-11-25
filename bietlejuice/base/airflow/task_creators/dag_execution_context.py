@@ -16,6 +16,7 @@ class DagExecutionContext:
     load_end_date: str = "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
     execution_date: str = "{{ ds }}"
     incoming_bucket: str = None
+    databricks_conn_id: str = "databricks_job_cluster"
 
     def __post_init__(self):
         assert self.dag is not None, "DAG is required"
@@ -26,3 +27,6 @@ class DagExecutionContext:
         assert self.dag_args is not None, "DAG Args is required"
         assert self.workflow_args is not None, "Workflow Args is required"
         assert self.cluster_args is not None, "Cluster Args is required"
+
+        if "databricks_conn_id" in self.cluster_args:
+            self.databricks_conn_id = self.cluster_args["databricks_conn_id"]

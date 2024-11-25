@@ -30,6 +30,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         spark_jobs_path,
         athena_query_result_location=None,
         execution_timeout_hours=BaseTaskGroup.DEFAULT_EXECUTION_TIMEOUT_HOURS,
+        databricks_conn_id="databricks_default",
     ):
         """
         :param dag: main dag instance
@@ -53,6 +54,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         config_service = ConfigurationService()
         self.inmetro_bucket = config_service.get_config("inmetro_bucket")
+        self.databricks_conn_id = databricks_conn_id
 
     def _build_load_task(
         self,
@@ -75,6 +77,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             },
             do_output_xcom_push=do_output_xcom_push,
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
+            databricks_conn_id=self.databricks_conn_id,
         )
 
         return load_table_task
@@ -136,6 +139,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 }
             },
             execution_timeout=timedelta(minutes=30),
+            databricks_conn_id=self.databricks_conn_id,
         )
 
         return sync_metadata_task
@@ -195,6 +199,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
                     }
                 },
                 execution_timeout=timedelta(hours=self.execution_timeout_hours),
+                databricks_conn_id=self.databricks_conn_id,
             )
 
             data_quality_tasks.append(data_quality_task)
