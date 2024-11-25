@@ -7,7 +7,6 @@ dag:
 workflow:
     type: query_delta
     layer: enrich
-    default_partitions: [country_code, business_context]
 cluster:
     type: databricks_12_2_med_general_photon_cluster
     access_control_list:
