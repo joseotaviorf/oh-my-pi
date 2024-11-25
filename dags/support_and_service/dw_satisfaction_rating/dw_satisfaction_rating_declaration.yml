@@ -12,6 +12,13 @@ workflow:
   custom_schema: satisfaction_rating
   default_extraction_type: incremental
   default_partitions: [year, month, day]
+  tables_customization:
+    dim_answer:
+      z_order_by: [sk_answer, respondent_type]
+    fact_analyst_answers:
+      z_order_by: [sk_analyst, sk_survey]
+    fact_answer:
+      z_order_by: [sk_answer, sk_user]
 
 cluster:
   type: custom_cluster
