@@ -88,7 +88,7 @@ if __name__ == "__main__":
     datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table_to_send}/year={execution_date.year}/bimester={bimester}"
 
     try:
-        df = s3_consumer.get_data_from_file(path=datalake_path, format="parquet")
+        df = s3_consumer.get_data_from_file(path=datalake_path, format="delta")
 
         destination_path = f"v1/{table_to_send}/"
         file_name = (
