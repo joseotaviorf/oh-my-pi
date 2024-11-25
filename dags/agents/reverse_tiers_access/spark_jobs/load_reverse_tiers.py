@@ -49,6 +49,7 @@ if __name__ == "__main__":
 
     parser.add_argument("environment", help="forno/prod values ")
     parser.add_argument("source", help="source name")
+    parser.add_argument("schema", help="schema name")
     parser.add_argument("datalake_bucket", help="bucket for forno/prod datalake")
     parser.add_argument("table_to_send")
     parser.add_argument("execution_date")
@@ -59,6 +60,7 @@ if __name__ == "__main__":
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
+    schema = args.schema
     external_bucket = args.external_bucket
     table_to_send = args.table_to_send
     execution_date = args.execution_date
@@ -66,7 +68,7 @@ if __name__ == "__main__":
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
     bimester = int((execution_date.month / 2) + 0.5)
 
-    datalake_path_prefix = f"reverse/{source}"
+    datalake_path_prefix = f"reverse/{schema}"
 
     config_service = ConfigurationService(source)
     webhook_key = config_service.get_config("notification_webhooks_keys")[
@@ -74,7 +76,7 @@ if __name__ == "__main__":
     ]
 
     logger.info(
-        f"""m=__main__, environment={environment}, source={source},
+        f"""m=__main__, environment={environment}, source={source}, schema={schema},
         datalake_bucket={datalake_bucket}, external_bucket={external_bucket}
         """
     )

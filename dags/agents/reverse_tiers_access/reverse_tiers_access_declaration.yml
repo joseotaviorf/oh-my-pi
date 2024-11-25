@@ -8,12 +8,14 @@ dag:
 workflow:
   type: access
   layer: reverse
+  custom_schema: tiers
   load_spark_job: load_reverse_tiers
   default_extraction_type: incremental
   default_partitions: ['year', 'bimester']
   spark_job_arguments:
     - "{environment}"
     - "{dag_name}"
+    - "{schema}"
     - "{bucket}"
     - "{table_name}"
     - "{{ ds }}"
