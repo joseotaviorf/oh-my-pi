@@ -1,0 +1,47 @@
+---
+database_name: datalake_availability_check
+table_name: availability_check_events
+owner: ae-rede@quintoandar.com.br
+domain: Rede
+description: 'Table containing events related to availability checks'
+columns:
+  id_house:
+    description: 'Unique identifier for the house'
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  publication_availability_check_hsm_group:
+    description: 'Group identifier for availability check HSM'
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  requested_action_consolidated:
+    description: 'Consolidated requested action for the event'
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  requested_action_with_reason:
+    description: 'Requested action along with the reason for the event'
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  button_clicked_raw_text:
+    description: 'Raw text of the button clicked during the event'
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  ts_hsm_sent:
+    description: 'Timestamp when the HSM was sent'
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  ts_hsm_answered:
+    description: 'Timestamp when the HSM was answered'
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  year:
+    description: 'Year when the event occurred'
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    description: 'Month when the event occurred'
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    description: 'Day when the event occurred'
+    lineage:
+      - datalake_amplitude_clean.events.day
