@@ -19,4 +19,4 @@ workflow:
       clean_table_name: call_in_app_eligibility
 
 cluster:
-  type: databricks_12_2_min_general_cluster
+  type: databricks_12_2_med_general_cluster
