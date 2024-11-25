@@ -23,3 +23,5 @@ workflow:
 
 cluster:
   type: databricks_12_2_med_general_cluster
+  custom_libraries:
+    - whl: "{artifacts_default_bucket}/reclameaqui-api-client-python/quintoandar_reclameaqui_api_client-0.1.0-py2.py3-none-any.whl"
