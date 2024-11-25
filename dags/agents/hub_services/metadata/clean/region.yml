@@ -2,8 +2,8 @@
 database_name: datalake_hub_services_clean
 table_name: region
 description: Table that maps the operating regions of the hubs we have. Since this is an incremental table, it must be filtered with a row_number to avoid duplicates.
-domain: For Sale
-owner: gabriel.firmino@quintoandar.com.br
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id:
     description: unique identifier of regions.

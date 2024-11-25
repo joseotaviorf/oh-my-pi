@@ -2,8 +2,8 @@
 database_name: datalake_hub_services
 table_name: member_profile_relation
 description: Table that identifies the each relation between Agent, EN and the actual EA and the duration of relationship.
-domain: For Sale
-owner: matheus.sampaio@quintoandar.com.br
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent:
     lineage:

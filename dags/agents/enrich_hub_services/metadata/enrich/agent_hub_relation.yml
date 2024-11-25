@@ -2,8 +2,8 @@
 database_name: datalake_hub_services
 table_name: agent_hub_relation
 description: Table that identifies the relation between Agent and Hub per day.
-domain: For Sale
-owner: matheus.sampaio@quintoandar.com.br
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_snapshot:
     lineage:

@@ -2,8 +2,8 @@
 database_name: datalake_hub_services_clean
 table_name: business_unit_aud
 description: Audit table, used to keep changes to business unit records as historical data.
-domain: For Sale
-owner: gabriel.firmino@quintoandar.com.br
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id:
     lineage:

@@ -1,8 +1,8 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: reminder_aud
-owner: gustavo.miller@quintoandar.com.br
-domain: For Sale
+owner: data-ae-agents@quintoandar.com.br
+domain: Agents
 description: 'Audit of reminders for agents in Hub Services'
 columns:
   id:

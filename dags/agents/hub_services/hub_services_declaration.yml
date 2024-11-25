@@ -1,0 +1,101 @@
+---
+dag:
+  name: hub_services
+  schedule_start_date: 2021, 8, 10
+  schedule_interval: 0 0 * * *
+  owner: Data Agents
+  documentation: 
+    dag_purpose: This DAG imports the tables from [HubServices](https://github.com/quintoandar/hubs), a service that centralizes hub data.
+workflow:
+  type: database_pull_delta
+  layer: raw
+  database_type: postgres
+  dbutils_secret_key: HUB_SERVICES_DB
+  lineage_product_database_name: hubservices
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    business_unit:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+    business_unit_aud:
+      date_filter_column: updated_at
+    business_unit_region:
+      date_filter_column: updated_at
+      raw_extraction_type: full
+      clean_extraction_type: full
+    business_unit_region_aud:
+      date_filter_column: updated_at
+    lead:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+    lead_aud:
+      date_filter_column: updated_at
+    member_profile:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+    member_profile_aud:
+      date_filter_column: updated_at
+    observation:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+    observation_aud:
+      date_filter_column: updated_at
+    region:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+    region_aud:
+      date_filter_column: updated_at
+    reminder:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+    reminder_aud:
+      date_filter_column: updated_at
+    reminder_type:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+    reminder_type_aud:
+      date_filter_column: updated_at
+    responsible:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+    responsible_aud:
+      date_filter_column: updated_at
+    revinfo:
+      clean_table_name: rev_info
+      date_filter_column: timestamp
+      unixtime_measure: milliseconds
+    users:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+    users_aud:
+      date_filter_column: updated_at
+    visitor:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental 
+      clean_extraction_type: full
+    visitor_aud:
+      date_filter_column: updated_at
+    visitor_event:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+    visitor_event_aud:
+      date_filter_column: updated_at
+    visitor_prospection:
+      date_filter_column: updated_at
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+    visitor_prospection_aud:
+      date_filter_column: updated_at
+cluster:
+  type: databricks_12_2_med_general_cluster

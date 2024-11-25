@@ -10,6 +10,13 @@ SELECT
     business_unit_id_mod AS mod_id_business_unit,
     region_id_mod AS mod_id_region,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
 FROM
     datalake_hub_services_raw.business_unit_region_aud
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

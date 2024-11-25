@@ -2,8 +2,8 @@
 database_name: datalake_hub_services_clean
 table_name: business_unit_region
 description: This table has the objective of making a "middle field" between the regions table and the business unit table, with it we can see which id_region's have the hub's performance.
-domain: For Sale
-owner: gabriel.firmino@quintoandar.com.br
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id:
     description: unique id that identifies the record of the table itself.
