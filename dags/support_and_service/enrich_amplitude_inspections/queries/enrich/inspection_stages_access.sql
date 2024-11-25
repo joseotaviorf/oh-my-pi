@@ -132,4 +132,4 @@ FROM
     review_events AS re
 JOIN
     budget_approval_events AS ba
-        ON review.id_inspection = ba.id_inspection
+        ON re.id_inspection = ba.id_inspection
