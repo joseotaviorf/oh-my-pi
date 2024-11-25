@@ -14,6 +14,7 @@ workflow:
   default_clean_extraction_type: full
   default_raw_partitions: [year, month, day]
   default_clean_partitions: []
+  execution_timeout_hours: 3
   tables_customization:
     image_inspection:
       date_filter_column: updated_at
@@ -30,9 +31,6 @@ workflow:
     photo:
       raw_extraction_type: full
       raw_partitions: []
-    photo_aud:
-      raw_extraction_type: full
-      raw_partitions: []
     photo_invalid_source:
       date_filter_column: created_at
       clean_extraction_type: incremental
@@ -41,18 +39,11 @@ workflow:
       raw_extraction_type: full
       raw_partitions: []
       clean_table_name: photo_sphere
-    photosphere_aud:
-      raw_extraction_type: full
-      raw_partitions: []
-      clean_table_name: photo_sphere_aud
     userrevisionentity:
       raw_extraction_type: full
       raw_partitions: []
       clean_table_name: user_revision_entity
     video:
-      raw_extraction_type: full
-      raw_partitions: []
-    video_aud:
       raw_extraction_type: full
       raw_partitions: []
     watermark_removal:
