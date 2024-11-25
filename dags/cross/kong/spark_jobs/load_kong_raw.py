@@ -18,6 +18,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 from pyspark.sql.functions import lit
 
 JOB_NAME = "load_kong_raw"
+SOURCE = "kong"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -26,7 +27,6 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
-    parser.add_argument("source")
     parser.add_argument("table_name")
     parser.add_argument("partition_cols")
     parser.add_argument("execution_date")
@@ -34,7 +34,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
     environment = args.env
     datalake_bucket = args.datalake_bucket
-    source = args.source
     table_name = args.table_name
     partition_cols = json.loads(args.partition_cols)
     execution_date = args.execution_date
@@ -56,7 +55,7 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    db_info = DatalakeMetastoreService.get_db_info(environment, SOURCE, datalake_bucket)
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     database_name = db_info["db_raw_databricks"]

@@ -1,0 +1,26 @@
+dag:
+  name: kong
+  schedule_start_date: 2023, 4, 3
+  schedule_interval: 0 1 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: Retrieves kong logs data from all 5A applications.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_kong_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{table_name}"
+    - "{partitions}"
+    - "{{ ds }}"
+
+  default_extraction_type: incremental
+  default_partitions: [year, month, day, hour]
+  tables_customization:
+    kong_logs: {}
+
+cluster:
+  type: databricks_12_2_max_io-memory_cluster
