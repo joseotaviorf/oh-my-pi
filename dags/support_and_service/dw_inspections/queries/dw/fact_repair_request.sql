@@ -31,6 +31,7 @@ SELECT DISTINCT
     rr.is_cost_absorbed_by_tenant,
     rr.is_cost_absorbed_by_owner,
     rr.is_exempted,
+    rr.is_exempted_by_owner_from_budget,
     rr.is_exempted_by_owner,
     rr.is_requested_by_owner,
     rr.is_finished,

@@ -74,6 +74,10 @@ columns:
     description:
       Indicates whether the repair suggested by the AN1 team was exempted
       by the owner or a analyst
+  is_exempted_by_owner_from_budget:
+    lineage:
+      - datalake_inspections.repair_request.is_exempted_by_owner_from_budget
+    description: Indicates whether the repair was exempted by the owner at the budget approval stage.
   is_exempted_by_owner:
     description: The repair request was exempted by the owner
   is_requested_by_owner:
