@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
 
-    proxy_path = "s3://auditlogs.s3.sre.quintoandar.com.br/proxy/k8s.core-prd-*/{}/{}/{}/{}/kong*/*/*.gz"
+    proxy_path = "s3://auditlogs.s3.sre.quintoandar.com.br/proxy/k8s.core-prd-*/{}/{}/{}/{}/*kong*/*/*.gz"
 
     max_cores = int(multiprocessing.cpu_count() * 0.6)
 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
             format="json",
         )
 
-        df = df.where("container_name = 'kong-proxy' AND NOT RLIKE(message, 'error')")
+        df = df.where("NOT RLIKE(message, 'error')")
 
         df = (
             df.withColumn("year", lit(execution_date.year))
