@@ -51,6 +51,22 @@ WITH repair_metrics AS (
         AND responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
     GROUP BY
           ALL
+),
+contract_repair_metrics AS (
+    SELECT
+        id_contract,
+        id_inspection,
+        total_tentant_repair_ar,
+        repairs_added_by_owner_review,
+        repairs_exempted_by_owner_review,
+        total_tentant_repair_review,
+        repairs_exempted_ac,
+        repairs_absorbed_ac,
+        total_tentant_repair_ac
+    FROM
+        repair_metrics
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY id_inspection DESC) = 1
 )
 SELECT
     t.id_termination AS sk_termination,
@@ -68,13 +84,13 @@ SELECT
     t.fee_discount_value,
     t.fee_final_amount,
     t.fee_number_of_installments,
-    rm.total_tentant_repair_ar,
-    rm.repairs_added_by_owner_review,
-    rm.repairs_exempted_by_owner_review,
-    rm.total_tentant_repair_review,
-    rm.repairs_exempted_ac,
-    rm.repairs_absorbed_ac,
-    rm.total_tentant_repair_ac,
+    crm.total_tentant_repair_ar,
+    crm.repairs_added_by_owner_review,
+    crm.repairs_exempted_by_owner_review,
+    crm.total_tentant_repair_review,
+    crm.repairs_exempted_ac,
+    crm.repairs_absorbed_ac,
+    crm.total_tentant_repair_ac,
     t.is_relisting,
     t.has_automatically_closed_task,
     t.is_contract_b2b,
@@ -95,7 +111,7 @@ SELECT
 FROM
     datalake_terminator.termination AS t
 LEFT JOIN
-    repair_metrics AS rm
-      ON t.id_contract = rm.id_contract
+    contract_repair_metrics AS crm
+      ON t.id_contract = crm.id_contract
 WHERE
     DATE(t.ts_termination_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
