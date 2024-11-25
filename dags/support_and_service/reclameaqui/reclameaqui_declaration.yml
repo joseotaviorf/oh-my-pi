@@ -1,0 +1,25 @@
+dag:
+  name: reclameaqui
+  schedule_start_date: 2022, 4, 26
+  schedule_interval: 0 1 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: Extracts the reclameaqui information using [hugme api](https://developer.hugme.com.br/)
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_reclameaqui_tickets
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{{ ds }}"
+
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    tickets:
+      z_order_by: [id]
+
+cluster:
+  type: databricks_12_2_med_general_cluster

@@ -23,7 +23,8 @@ from bietlejuice.base.spark import (
 from bietlejuice.services import ConfigurationService
 
 DATABRICKS_SCOPE = "quintoandar"
-JOB_NAME = "load_incremental_tickets_data_into_datalake_raw"
+JOB_NAME = "load_reclameaqui_tickets"
+SOURCE = "reclameaqui"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -36,16 +37,14 @@ if __name__ == "__main__":
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("execution_date")
-    parser.add_argument("source")
 
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     execution_date = args.execution_date
-    source = args.source
 
-    config_service = ConfigurationService(source)
+    config_service = ConfigurationService(SOURCE)
     tickets_endpoint_config = config_service.get_config("tickets")
 
     schema = tickets_endpoint_config.get("schema")
@@ -79,7 +78,7 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
 
     datalake_info = DatalakeMetastoreService.get_db_info(
-        environment, source, datalake_bucket
+        environment, SOURCE, datalake_bucket
     )
     database_name = datalake_info["db_raw_databricks"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
