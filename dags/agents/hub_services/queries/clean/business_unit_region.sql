@@ -8,3 +8,5 @@ SELECT
     updated_at AS ts_updated
 FROM    
     datalake_hub_services_raw.business_unit_region
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1

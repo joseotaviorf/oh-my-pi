@@ -23,7 +23,7 @@ workflow:
       date_filter_column: updated_at
     business_unit_region:
       date_filter_column: updated_at
-      raw_extraction_type: full
+      raw_extraction_type: incremental
       clean_extraction_type: full
     business_unit_region_aud:
       date_filter_column: updated_at

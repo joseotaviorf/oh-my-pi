@@ -22,7 +22,7 @@ SELECT
     ap.hub_name,
     t.total_operation_points,
     t.tier_name,
-    t.brokerage_value,
+    CAST(t.brokerage_value AS DOUBLE) AS brokerage_value,
     t.year,
     t.bimester
 FROM
