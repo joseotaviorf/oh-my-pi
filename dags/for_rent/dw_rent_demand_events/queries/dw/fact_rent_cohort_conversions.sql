@@ -37,10 +37,10 @@ SELECT DISTINCT
   COALESCE(fde2.sk_event, 0) AS sk_conversion_event,
   COALESCE(fde2.sk_event_type, 0) AS sk_conversion_event_type,
   fde1.sk_event_date AS sk_base_event_date,
-  IF(fde2.sk_event_date IS NOT NULL AND fde2.sk_event_date >= fde1.sk_event_date, fde2.sk_event_date, -1) AS sk_conversion_date,
+  COALESCE(fde2.sk_event_date, -1) AS sk_conversion_date,
   fde1.country_code,
-  IF(fde2.sk_event_date IS NOT NULL AND fde2.sk_event_date >= fde1.sk_event_date, DATEDIFF(dd2.date, dd1.date), -1) AS days_to_conversion,
-  IF(fde2.sk_event_date IS NOT NULL AND fde2.sk_event_date >= fde1.sk_event_date, DATEDIFF(dd2.week_start, dd1.week_start)/7, -1) AS weeks_to_conversion,
+  IF(fde2.sk_event_date >= fde1.sk_event_date, DATEDIFF(dd2.date, dd1.date), 0) AS days_to_conversion,
+  IF(fde2.sk_event_date >= fde1.sk_event_date, DATEDIFF(dd2.week_start, dd1.week_start)/7, 0) AS weeks_to_conversion,
   NOW() AS ts_load
 FROM
   event_type_adjustment AS fde1
