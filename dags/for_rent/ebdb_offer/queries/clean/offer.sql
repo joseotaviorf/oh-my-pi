@@ -20,6 +20,7 @@ SELECT
   type,
   godfatherUpdatedAt AS ts_updated_godfather,
   residentName AS resident_name,
-  firestoreId_unique AS is_id_firestore_unique
+  firestoreId_unique AS is_id_firestore_unique,
+  COALESCE(docs_created_sync, FALSE) AS is_docs_created_sync
 FROM
   datalake_ebdb_raw.offer

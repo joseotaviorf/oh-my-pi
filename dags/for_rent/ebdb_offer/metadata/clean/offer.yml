@@ -67,3 +67,6 @@ columns:
   is_id_firestore_unique:
     lineage:
       - datalake_ebdb_raw.offer.firestoreid_unique
+  is_docs_created_sync:
+    lineage:
+      - datalake_ebdb_raw.offer.docs_created_sync
