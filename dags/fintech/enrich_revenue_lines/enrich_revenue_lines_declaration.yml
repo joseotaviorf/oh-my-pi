@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       This DAG creates the enriched tables for Revenue Lines model.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_13_3_med_general_cluster

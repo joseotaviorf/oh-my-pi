@@ -3,7 +3,7 @@ dag:
   schedule_start_date: 2023,03,02
   owner: Data Fintech
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: rental_payments
   has_load_to_redshift_task: false

@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       This DAG creates the tables from [Ownerfees](https://github.com/quintoandar/owner-fees), a service that deals with fees related to the contract, listing and bills that are charged to the owner.
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   dbutils_secret_key: OWNER_FEES_DB

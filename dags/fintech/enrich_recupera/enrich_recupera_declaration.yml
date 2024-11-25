@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       Enrich pipe for Recupera data.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     changes_debts_distribution:

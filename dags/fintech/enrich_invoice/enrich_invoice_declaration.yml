@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       This DAG creates the full table for credit invoice enrichment, with information about payments.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     invoice_all:

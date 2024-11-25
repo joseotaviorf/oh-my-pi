@@ -8,7 +8,7 @@ dag:
       Enrich pipe for Debt Recovery data from TratoFeito, the service that handles debts
       and redirects to and receive feedback from `Recupera` third party service.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     negotiation:

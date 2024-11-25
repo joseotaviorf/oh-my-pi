@@ -8,7 +8,7 @@ dag:
       This DAG creates a snapshot of several tables in order to provide "time travel" for Finance Team.
       This DAG is triggered when execution_date is the first business day, monthly, via Mediator.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: incremental
   default_partitions: [year, month, day]

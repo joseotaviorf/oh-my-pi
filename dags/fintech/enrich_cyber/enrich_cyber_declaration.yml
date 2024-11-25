@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       Enrich pipe for Cyber
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     negotiation:
