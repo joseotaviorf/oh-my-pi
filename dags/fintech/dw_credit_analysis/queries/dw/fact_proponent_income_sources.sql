@@ -35,6 +35,8 @@ LEFT JOIN
     ON cec.id_proposal = ce.id_proposal
 -- Get the latest credit evaluation
 WHERE ce.ts_created = cec.ts_max_created
+-- Remove records with null proponent_type (legacy data)
+AND cep.proponent_type IS NOT NULL
 ),
 
 get_proponent_income_data AS (
