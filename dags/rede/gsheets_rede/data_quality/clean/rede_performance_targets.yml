@@ -9,12 +9,12 @@ column_level_validations:
   month:
     is_complete:
       severity_level: Error
-  cluster:
+  cohort:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
   context:
     is_complete:
-      severity_level: Error
+      severity_level: Warning
     is_contained_in:
       values:
         - demand
