@@ -116,12 +116,13 @@ def main():
                 result = metadata_file_service.validate_file(file, status)
                 results["passed"].append(result[0])
             except YamaleError as error:
-                for yaml_err in error.results:
-                    if "domain: " in yaml_err.errors:
-                        yaml_err.errors = (
-                            yaml_err.errors + " Check in DataHub if the domain is valid"
-                        )
-                    results["failed"].append(yaml_err)
+                for yaml_result in error.results:
+                    for yaml_err in yaml_result.errors:
+                        if "domain: " in yaml_err:
+                            yaml_err = (
+                                yaml_err + " Check in DataHub if the domain is valid"
+                            )
+                        results["failed"].append(yaml_err)
             except ReverseMetadataFileException as error:
                 results["failed"].append(error)
             except MetricValidateLayerException as error:
