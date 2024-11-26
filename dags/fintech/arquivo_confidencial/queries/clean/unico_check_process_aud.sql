@@ -17,7 +17,3 @@ SELECT
     day
 FROM
     datalake_arquivo_confidencial_raw.unico_check_process_aud
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

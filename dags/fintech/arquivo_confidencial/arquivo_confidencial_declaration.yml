@@ -1,0 +1,33 @@
+dag:
+  name: arquivo_confidencial
+  schedule_interval: 0 3 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG extracts data from Arquivo Confidencial, a service responsible to track user personal info using SaaS platforms.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_schema: arquivoconfidencial
+  dbutils_secret_key: ARQUIVOCONFIDENCIAL_DB
+  lineage_product_database_name: arquivoconfidencial
+  tables_customization:
+    documentation_report: {}
+    documentation_report_aud: {}
+    documents: {}
+    emailage_result: {}
+    emailage_result_aud: {}
+    integration_report: {}
+    integration_report_aud: {}
+    presumed_income_report: {}
+    presumed_income_report_aud: {}
+    request_tracker: {}
+    revinfo:
+      clean_table_name: rev_info
+    unico_check_document: {}
+    unico_check_document_aud: {}
+    unico_check_process: {}
+    unico_check_process_aud: {}
+cluster:
+  type: databricks_12_2_med_general_cluster
