@@ -1,7 +1,13 @@
 sheets_info:
+  forbrokers_3p_partner_conditions:
+    sheet_id: 1b8dFqydGYZFy-m6K7hWpbThTS1SlFiWNli5qBF08HfE
+    sheet_name: forbrokers_3p_partner_conditions
+    clean_table_name: forbrokers_3p_partner_conditions
+    sheet_context: rede
+
   rede_performance_targets:
     sheet_id: 1ql7GdvSV1jjPbnPZyRBLoSbOk4rvZAUhpqaRY0bGbyU
-    sheet_name: DB Target
+    sheet_name: New Daily Targets
     clean_table_name: rede_performance_targets
     sheet_context: rede
 

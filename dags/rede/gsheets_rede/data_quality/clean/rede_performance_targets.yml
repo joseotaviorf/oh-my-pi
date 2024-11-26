@@ -12,17 +12,11 @@ column_level_validations:
   cluster:
     is_complete:
       severity_level: Error
-  flow:
+  context:
     is_complete:
       severity_level: Error
     is_contained_in:
       values:
         - demand
         - supply
-        - lead-gen
-  metric_type:
-    is_complete:
-      severity_level: Error
-  metric_target:
-    is_complete:
-      severity_level: Error
+        - lead_gen

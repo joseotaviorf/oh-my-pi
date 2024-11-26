@@ -5,18 +5,52 @@ columns:
   month:
     lineage:
       - datalake_gsheets_raw.rede_performance_targets.mes
-  cluster:
+    description: 'Target reference month'
+  day:
     lineage:
-      - datalake_gsheets_raw.rede_performance_targets.cluster
-  flow:
+      - datalake_gsheets_raw.rede_performance_targets.dia
+    description: 'Target reference day'
+  cohort:
     lineage:
-      - datalake_gsheets_raw.rede_performance_targets.flow
-  metric_type:
-    lineage:
-      - datalake_gsheets_raw.rede_performance_targets.type
+      - datalake_gsheets_raw.rede_performance_targets.cohort
+    description: 'Rede company cluster'
   account_manager:
     lineage:
-      - datalake_gsheets_raw.rede_performance_targets.account_manager
-  metric_target:
+      - datalake_gsheets_raw.rede_performance_targets.am
+    description: 'Account manager responsible for the broker'
+  context:
     lineage:
-      - datalake_gsheets_raw.rede_performance_targets.target
+      - datalake_gsheets_raw.rede_performance_targets.context
+    description: 'Supply, Demand or Lead Gen'
+  city:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.cidade
+    description: 'Broker city'
+  visit_booked:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.vb
+    description: 'Visit booked metric target'
+  visit_confirmed:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.vc
+    description: 'Visit confirmed metric target'
+  offer_signed:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.os
+    description: 'Offer signed metric target'
+  offer_accepted:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.oa
+    description: 'Offer accepted metric target'
+  signed_contract:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.vvc
+    description: 'Signed contract metric target'
+  first_listing:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.fl
+    description: 'First listing metric target'
+  ongoing_listing:
+    lineage:
+      - datalake_gsheets_raw.rede_performance_targets.ol
+    description: 'Ongoing listing metric target'
