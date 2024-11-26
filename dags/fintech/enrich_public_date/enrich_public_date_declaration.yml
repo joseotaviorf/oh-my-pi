@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: Creates enriched tables for the dw_public.dim_date using dynamical holidays from other sources
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: quintoandar
 cluster:

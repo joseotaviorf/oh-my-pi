@@ -1,42 +1,42 @@
 dag:
-    name: checkout
-    owner: Data Fintech
-    schedule_interval: 0 3 * * *
+  name: checkout
+  owner: Data Fintech
+  schedule_interval: 0 3 * * *
 workflow:
-    type: database_pull
-    layer: raw
-    database_type: postgres
-    tables_customization:
-      bank_account:
-        clean_table_name: bank_account
-      bolecode:
-        clean_table_name: bolecode
-      boleto:
-        clean_table_name: boleto
-      boleto_webhook:
-        clean_table_name: boleto_webhook
-      charge_status_log:
-        clean_table_name: charge_status_log
-      charge:
-        clean_table_name: charge
-      credit_card:
-        clean_table_name: credit_card
-      order:
-        clean_table_name: order
-      payment_config:
-        clean_table_name: payment_config
-      payment_gateway_error:
-        clean_table_name: payment_gateway_error
-      pix_refund:
-        clean_table_name: pix_refund
-      pix:
-        clean_table_name: pix
-      requester:
-        clean_table_name: requester
-      webhook:
-        clean_table_name: webhook
+  type: database_pull_delta
+  layer: raw
+  database_type: postgres
+  tables_customization:
+    bank_account:
+      clean_table_name: bank_account
+    bolecode:
+      clean_table_name: bolecode
+    boleto:
+      clean_table_name: boleto
+    boleto_webhook:
+      clean_table_name: boleto_webhook
+    charge_status_log:
+      clean_table_name: charge_status_log
+    charge:
+      clean_table_name: charge
+    credit_card:
+      clean_table_name: credit_card
+    order:
+      clean_table_name: order
+    payment_config:
+      clean_table_name: payment_config
+    payment_gateway_error:
+      clean_table_name: payment_gateway_error
+    pix_refund:
+      clean_table_name: pix_refund
+    pix:
+      clean_table_name: pix
+    requester:
+      clean_table_name: requester
+    webhook:
+      clean_table_name: webhook
 cluster:
-    type: databricks_12_2_med_general_photon_cluster
-    access_control_list:
-        group_name: analytics-engineers
-        permission_level: CAN_MANAGE
+  type: databricks_12_2_med_general_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

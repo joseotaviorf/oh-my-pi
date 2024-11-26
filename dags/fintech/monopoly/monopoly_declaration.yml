@@ -1,42 +1,42 @@
-dag: 
-    name: monopoly
-    owner: Data Fintech
-    schedule_interval: 0 0 * * *
+dag:
+  name: monopoly
+  owner: Data Fintech
+  schedule_interval: 0 0 * * *
 workflow:
-    type: database_pull
-    layer: raw
-    database_type: postgres
-    tables_customization:
-      accounting_entry:
-        clean_table_name: accounting_entry
-      income_reference:
-        clean_table_name: income_reference
-      income_status_log:
-        clean_table_name: income_status_log
-      income:
-        clean_table_name: income
-      nota_fiscal_emission_error:
-        clean_table_name: nota_fiscal_emission_error
-      outcome_reference:
-        clean_table_name: outcome_reference
-      outcome_status_log:
-        clean_table_name: outcome_status_log
-      outcome:
-        clean_table_name: outcome
-      person_sale:
-        clean_table_name: person_sale
-      person:
-        clean_table_name: person
-      revenue_share:
-        clean_table_name: revenue_share
-      sale_revision:
-        clean_table_name: sale_revision
-      sale_transaction:
-        clean_table_name: sale_transaction
-      sale:
-        clean_table_name: sale
+  type: database_pull_delta
+  layer: raw
+  database_type: postgres
+  tables_customization:
+    accounting_entry:
+      clean_table_name: accounting_entry
+    income_reference:
+      clean_table_name: income_reference
+    income_status_log:
+      clean_table_name: income_status_log
+    income:
+      clean_table_name: income
+    nota_fiscal_emission_error:
+      clean_table_name: nota_fiscal_emission_error
+    outcome_reference:
+      clean_table_name: outcome_reference
+    outcome_status_log:
+      clean_table_name: outcome_status_log
+    outcome:
+      clean_table_name: outcome
+    person_sale:
+      clean_table_name: person_sale
+    person:
+      clean_table_name: person
+    revenue_share:
+      clean_table_name: revenue_share
+    sale_revision:
+      clean_table_name: sale_revision
+    sale_transaction:
+      clean_table_name: sale_transaction
+    sale:
+      clean_table_name: sale
 cluster:
-    type: databricks_12_2_med_general_cluster
-    access_control_list:
-        group_name: analytics-engineers
-        permission_level: CAN_MANAGE
+  type: databricks_12_2_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
