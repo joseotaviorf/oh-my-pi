@@ -29,6 +29,7 @@ SELECT
   bc.sk_business_context,
   et.sk_entrance_type,
   bm.sk_business_model,
+  db.sk_behavior_type,
   dvs.sk_visit_status,
   v.id_cancellation_detail AS sk_cancellation_detail,
   COALESCE(CAST(REPLACE(SUBSTRING(v.ts_visit_requested,1, 10),'-','') AS BIGINT), -1) AS sk_visit_request_date,
@@ -62,15 +63,18 @@ FROM
 INNER JOIN
   visit_status_events AS vse
     ON v.id_visit = vse.id_visit
+INNER JOIN
+    dw_visit.dim_behavior_type AS db
+    ON v.behavior = db.behavior_type
 LEFT JOIN
-  dim_visit_status AS dvs
+  dw_visit.dim_visit_status AS dvs
     ON v.computed_status = dvs.status_name
 LEFT JOIN
-  dim_business_context AS bc
+  dw_visit.dim_business_context AS bc
     ON v.business_context = bc.business_context
 LEFT JOIN
-    dim_entrance_type AS et
+    dw_visit.dim_entrance_type AS et
         ON v.method = et.entrance_type
 LEFT JOIN
-    dim_business_model AS bm
+    dw_visit.dim_business_model AS bm
         ON v.business_model = bm.business_model

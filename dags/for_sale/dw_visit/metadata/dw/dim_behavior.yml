@@ -1,0 +1,12 @@
+database_name: dw_visit
+table_name: dim_behavior_type
+description: This dimension table has the behavior types of the visits.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_behavior_type:
+    description: Id of the behavior type.
+  behavior_type:
+    description: Name of the behavior type.
+  ts_load:
+    description: Timestamp of the ingestion data.
