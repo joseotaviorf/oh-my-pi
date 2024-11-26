@@ -45,7 +45,7 @@ workflow:
       - month
       - day
       - interaction_type
-    user_global_metrics:
+    global_metrics:
       partitions:
         - year
         - month
