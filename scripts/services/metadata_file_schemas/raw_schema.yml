@@ -2,7 +2,7 @@
 database_name: str(min=1, max=280)
 table_name: str(min=1, max=280)
 owner: regex('(?:[\.-]?\w+)*@\w+(?:[\.-]?\w+)*', required=False)
-domain: str(min=1, max=280, required=False)
+domain: regex('Agents|Brand|Cross|Data Ops & Governance|Fintech|For Brokers|For Rent|For Sale|Growth|International|MLOps|People|Primitives|Rede|Support and Services')
 description: str(required=False)
 columns: map(include("column"), key=str(min=1, max=280), required=False)
 ---
