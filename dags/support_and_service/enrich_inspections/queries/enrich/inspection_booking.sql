@@ -191,7 +191,7 @@ LEFT JOIN
         AND ic.inspection_type = i.inspection_type
 LEFT JOIN
     datalake_ebdb_clean.country c
-        ON c.id = COALESCE(b.id_country, ic.id_country)
+        ON c.id = ic.id_country
 LEFT JOIN
     appointment_data AS ad
       ON ad.id_inspection = i.id_inspection
