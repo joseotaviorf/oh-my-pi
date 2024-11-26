@@ -17,7 +17,7 @@ SELECT
   COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_unsuccessful,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_unsuccessful,
   NOW() AS ts_load
 FROM
-  datalake_visits.visit_schedules AS schedule_events
+  datalake_visit.visit_schedules AS schedule_events
 INNER JOIN
    dw_visit.dim_origin_type AS dot
     ON schedule_events.schedule_origin = dot.origin_name

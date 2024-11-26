@@ -64,7 +64,7 @@ INNER JOIN
   visit_status_events AS vse
     ON v.id_visit = vse.id_visit
 INNER JOIN
-    dw_visit.dim_behavior_type AS db
+    dw_visit.dim_behavior AS db
     ON v.behavior = db.behavior_type
 LEFT JOIN
   dw_visit.dim_visit_status AS dvs
