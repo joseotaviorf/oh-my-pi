@@ -138,6 +138,7 @@ class GsheetsService:
 
             if sheet.get("sheet_context") == "static" or sheet["dag_name"] in (
                 "gsheets_people",
+                "gsheets_people_pin",
                 "gsheets_people_static",
             ):
                 continue

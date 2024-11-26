@@ -3522,8 +3522,8 @@ bietlejuice.reverse_nazare:
   - bietlejuice.gsheets_fintech:done-clean-campaign-bonus
   - bietlejuice.gsheets_fintech:done-clean-hub-bonus
   - bietlejuice.gsheets_fintech:done-clean-negotiation-executive-bonus
-  - bietlejuice.gsheets_rede:done-clean-forbrokers-3p-partner-conditions
   - bietlejuice.gsheets_for_sale:done-clean-sale-payments-tiers
+  - bietlejuice.gsheets_rede:done-clean-forbrokers-3p-partner-conditions
 bietlejuice.reverse_nexxera:
   - bietlejuice.enrich_nexxera:load-enrich-dtw-filter
 bietlejuice.reverse_robbyson_access:
