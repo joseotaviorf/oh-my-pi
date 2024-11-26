@@ -66,8 +66,10 @@ appointment_union AS (
         b.slots_duration AS duration_in_slots,
         b.is_agent_fixed AS is_fixed_agent,
         b.is_confirmed,
-        b.dt_booking AS ts_appointment_inspected_utc,
-        b.dt_booking - INTERVAL 3 HOUR AS ts_appointment_inspected_local_tz,
+        CAST(b.dt_booking AS TIMESTAMP)
+          + FLOOR((b.slot_day * 15 / 60)+8) * INTERVAL 1 HOURS
+          + ABS(b.slot_day * 15 % 60) * INTERVAL 1 MINUTES
+        AS ts_appointment_inspected_local_tz,
         b.ts_created AS ts_appointment_created_utc,
         b.ts_updated AS ts_appointment_updated_utc,
         b.ts_created - INTERVAL 3 HOUR AS ts_appointment_created_local_tz,
@@ -116,8 +118,10 @@ appointment_union AS (
         s.duration_in_slots,
         a.is_fixed_agent,
         s.is_confirmed,
-        a.dt_scheduled AS ts_appointment_inspected_utc,
-        a.dt_scheduled - INTERVAL 3 HOURS AS ts_appointment_inspected_local_tz,
+        CAST(a.dt_scheduled AS TIMESTAMP)
+          + FLOOR((s.slot_of_day * 15 / 60)+8) * INTERVAL 1 HOURS
+          + ABS(s.slot_of_day * 15 % 60) * INTERVAL 1 MINUTES
+        AS ts_appointment_inspected_local_tz,
         a.ts_created AS ts_appointment_created_utc,
         a.ts_updated AS ts_appointment_updated_utc,
         a.ts_created - INTERVAL 3 HOURS AS ts_appointment_created_local_tz,
@@ -174,11 +178,11 @@ SELECT
         ELSE FALSE
     END AS is_first_schedule,
     CASE
-        WHEN DATE(ts_first_appointment_cancelled_utc) = DATE(ts_appointment_inspected_utc) THEN TRUE
+        WHEN DATE(ts_first_appointment_cancelled_utc) = DATE(TO_UTC_TIMESTAMP(a.ts_appointment_inspected_local_tz, 'UTC')) THEN TRUE
         ELSE FALSE
     END AS is_d0_canceled,
     CASE
-        WHEN DATE(ts_first_appointment_cancelled_utc) = DATE_SUB(DATE(ts_appointment_inspected_utc), 1) THEN TRUE
+        WHEN DATE(ts_first_appointment_cancelled_utc) = DATE_SUB(DATE(TO_UTC_TIMESTAMP(a.ts_appointment_inspected_local_tz, 'UTC')), 1) THEN TRUE
         ELSE FALSE
     END AS is_d1_canceled,
     CASE
@@ -192,7 +196,7 @@ SELECT
         WHEN a.cancellation_reason IS NULL THEN NULL
         ELSE FALSE
     END AS is_not_canceled_by_inspector,
-    a.ts_appointment_inspected_utc,
+    TO_UTC_TIMESTAMP(a.ts_appointment_inspected_local_tz, 'UTC') AS ts_appointment_inspected_utc,
     a.ts_appointment_inspected_local_tz,
     a.ts_appointment_created_utc,
     a.ts_appointment_updated_utc,
@@ -209,4 +213,4 @@ LEFT JOIN
     inspection_data AS i
       ON a.id_inspection = i.id_inspection
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY a.id_appointment, a.id_main_appointment ORDER BY a.ts_appointment_updated_utc DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY a.id_appointment ORDER BY a.ts_appointment_updated_utc DESC) = 1

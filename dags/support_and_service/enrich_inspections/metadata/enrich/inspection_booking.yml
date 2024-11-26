@@ -67,7 +67,6 @@ columns:
   id_country:
     description: Unique identifier of country.
     lineage:
-      - datalake_booking.booking.id_country
       - datalake_region.region.id_country
   id_city:
     description: Unique identifier of city.
@@ -83,7 +82,6 @@ columns:
     description: Identification code of the country where the property is located.
     lineage:
       - datalake_inspections_clean.inspection_aud.house
-      - datalake_booking.booking.country_code
       - datalake_region.region.country_code
   country_default_timezone:
     description: The country's default timezone.
@@ -101,7 +99,7 @@ columns:
   booking_type:
     description: What type of booking is Inspection or Quarterly Inspection
     lineage:
-      - datalake_booking.booking.type
+      - datalake_inspections.appointment_inspection.type
   source:
     description: Since the table merges two data sources, this column indicates where the inspection is coming from.
     categories:
@@ -170,33 +168,27 @@ columns:
   ts_booking_inspected_utc:
     description: Scheduled date and time (UTC).
     lineage:
-      - datalake_booking.booking.ts_booking_utc
-      - datalake_inspections_clean.appointment.dt_scheduled
+      - datalake_inspections.appointment_inspection.ts_appointment_inspected_utc
   ts_booking_inspected_local_tz:
     description: Scheduled date and time in your region's local time.
     lineage:
-      - datalake_booking.booking.ts_booking_local_tz
-      - datalake_inspections_clean.appointment.dt_scheduled
+      - datalake_inspections.appointment_inspection.ts_appointment_inspected_utc
   ts_booking_created_utc:
     description: Datetime of the booking creation (UTC).
     lineage:
-      - datalake_booking.booking.ts_created
-      - datalake_inspections_clean.appointment.ts_created
+      - datalake_inspections.appointment_inspection.ts_appointment_created_utc
   ts_booking_created_local_tz:
     description: Datetime of the booking creation in your region's local time.
     lineage:
-      - datalake_booking.booking.ts_created_local_tz
-      - datalake_inspections_clean.appointment.ts_created
+      - datalake_inspections.appointment_inspection.ts_appointment_created_local_tz
   ts_booking_cancelled_utc:
     description: Schedule cancellation date and time (UTC).
     lineage:
-      - datalake_booking.booking.ts_first_canceled_unevaluated
-      - datalake_inspections_clean.appointment.ts_updated
+      - datalake_inspections.appointment_inspection.ts_first_appointment_cancelled_utc
   ts_booking_cancelled_local_tz:
     description: Schedule cancellation date and time in local time for the region.
     lineage:
-      - datalake_booking.booking.ts_first_canceled_unevaluated_local_tz
-      - datalake_inspections_clean.appointment.ts_updated
+      - datalake_inspections.appointment_inspection.ts_first_appointment_cancelled_local_tz
   ts_termination_canceled:
     description: Date and time when the termination of the contract was canceled.
     lineage:

@@ -1944,7 +1944,6 @@ bietlejuice.enrich_inspections:
   - bietlejuice.ebdb_visit:load-clean-booking
   - bietlejuice.ebdb_visit:load-clean-booking-aud
   - bietlejuice.ebdb_visit:load-clean-booking-status-change
-  - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.inspections:load-clean-appointment

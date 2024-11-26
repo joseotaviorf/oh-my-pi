@@ -63,17 +63,11 @@ WITH union_inspection_history AS (
 ),
 appointment_data AS (
     SELECT
-        *,
-        dt_scheduled AS ts_booking_inspected_utc,
-        dt_scheduled - INTERVAL 3 HOURS AS ts_booking_inspected_local_tz,
-        ts_created AS ts_booking_created_utc,
-        ts_created - INTERVAL 3 HOURS AS ts_booking_created_local_tz,
-        IF(status = "CANCELLED", FIRST(ts_updated) OVER (PARTITION BY id_inspection ORDER BY ts_updated), NULL) AS ts_booking_cancelled_utc,
-        IF(status = "CANCELLED", FIRST(ts_updated - INTERVAL 3 HOURS) OVER (PARTITION BY id_inspection ORDER BY ts_updated), NULL) AS ts_booking_cancelled_local_tz
+        *
     FROM
-        datalake_inspections_clean.appointment
+        datalake_inspections.appointment_inspection
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
+        ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_appointment_updated_utc DESC) = 1
 ),
 inspection_contract AS (
     SELECT
@@ -118,13 +112,13 @@ SELECT DISTINCT
     i.id_client_side,
     i.id_house,
     i.id_inspector,
-    COALESCE(b.id_country, ic.id_country) AS id_country,
+    ic.id_country,
     ic.id_city,
     ic.city_name,
-    COALESCE(i.country_code, b.country_code, ic.country_code) AS country_code,
+    COALESCE(i.country_code, ic.country_code) AS country_code,
     c.default_timezone AS country_default_timezone,
     i.inspection_type,
-    b.type AS booking_type,
+    ad.type AS booking_type,
     i.source,
     a.source AS assessment_source,
     i.status,
@@ -143,33 +137,33 @@ SELECT DISTINCT
         ELSE FALSE
     END AS is_executed_in_first_schedule,
     CASE
-        WHEN DATE(COALESCE(b.ts_first_canceled_unevaluated, ad.ts_booking_cancelled_utc)) = DATE(COALESCE(b.ts_booking_utc, ad.ts_booking_inspected_utc)) THEN True
+        WHEN DATE(ad.ts_first_appointment_cancelled_utc) = DATE(ad.ts_appointment_inspected_utc) THEN True
         ELSE False
     END AS is_d0_canceled,
     CASE
-        WHEN DATE(COALESCE(b.ts_first_canceled_unevaluated, ad.ts_booking_cancelled_utc)) = DATE_SUB(DATE(COALESCE(b.ts_booking_utc, ad.ts_booking_inspected_utc)), 1) THEN True
+        WHEN DATE(ad.ts_first_appointment_cancelled_utc) = DATE_SUB(DATE(ad.ts_appointment_inspected_utc), 1) THEN True
         ELSE False
     END AS is_d1_canceled,
     CASE
-        WHEN COALESCE(b.cancellation_reason, ad.cancellation_reason) NOT IN (
+        WHEN ad.cancellation_reason NOT IN (
                 'INSPECTOR_BLOCKED_SCHEDULE',
                 'CANCELED_PROBLEM_INSPECTOR',
                 'CANCELED_INSPECTOR_NOT_ATTEND',
                 'CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION'
             )
             THEN TRUE
-        WHEN COALESCE(b.cancellation_reason, ad.cancellation_reason) IS NULL THEN NULL
+        WHEN ad.cancellation_reason IS NULL THEN NULL
         ELSE FALSE
     END AS is_not_canceled_by_inspector,
     ic.dt_contract_entrance,
     ic.dt_contract_termination,
     ic.dt_execution_limit,
-    COALESCE(b.ts_booking_utc, ad.ts_booking_inspected_utc) AS ts_booking_inspected_utc,
-    COALESCE(b.ts_booking_local_tz, ad.ts_booking_inspected_local_tz) AS ts_booking_inspected_local_tz,
-    COALESCE(b.ts_created, ad.ts_booking_created_utc) AS ts_booking_created_utc,
-    COALESCE(b.ts_created_local_tz, ad.ts_booking_created_local_tz) AS ts_booking_created_local_tz,
-    COALESCE(b.ts_first_canceled_unevaluated, ad.ts_booking_cancelled_utc) AS ts_booking_cancelled_utc,
-    COALESCE(b.ts_first_canceled_unevaluated_local_tz, ad.ts_booking_cancelled_local_tz) AS ts_booking_cancelled_local_tz,
+    ad.ts_appointment_inspected_utc AS ts_booking_inspected_utc,
+    ad.ts_appointment_inspected_utc AS ts_booking_inspected_local_tz,
+    ad.ts_appointment_created_utc AS ts_booking_created_utc,
+    ad.ts_appointment_created_local_tz AS ts_booking_created_local_tz,
+    ad.ts_first_appointment_cancelled_utc AS ts_booking_cancelled_utc,
+    ad.ts_first_appointment_cancelled_local_tz AS ts_booking_cancelled_local_tz,
     ic.ts_termination_canceled,
     a.ts_started AS ts_execution_started_local_tz,
     a.ts_finished AS ts_execution_finished_local_tz,
@@ -191,9 +185,6 @@ FROM
 LEFT JOIN
     datalake_inspections_clean.assessment AS a
         ON a.id_inspection = i.id_inspection
-LEFT JOIN
-    datalake_booking.booking AS b
-        ON i.id_booking = b.id
 LEFT JOIN
     inspection_contract AS ic
         ON ic.id_contract = i.id_contract

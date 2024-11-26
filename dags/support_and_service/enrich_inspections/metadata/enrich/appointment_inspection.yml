@@ -32,12 +32,12 @@ columns:
   type:
     lineage:
       - datalake_schedules_clean.appointment.type
-      - datalake_booking.booking.type
+      - datalake_ebdb_clean.booking.type
     description: Descriptive information indicating the status of the inspection schedule.
   status:
     lineage:
       - datalake_inspections_clean.appointment.status
-      - datalake_booking.booking.status
+      - datalake_ebdb_clean.booking.status
     description: Descriptive information indicating the status of the inspection schedule.
   status_made_by:
     lineage:
@@ -52,7 +52,7 @@ columns:
   cancellation_reason:
     lineage:
       - datalake_inspections_clean.appointment.cancellation_reason
-      - datalake_booking.booking.cancellation_reason
+      - datalake_ebdb_clean.booking.cancellation_reason
     description: Descriptive information indicating the reason for canceling the inspection appointment.
   observation:
     lineage:
@@ -87,42 +87,44 @@ columns:
   ts_appointment_inspected_utc:
     lineage:
       - datalake_inspections_clean.appointment.dt_scheduled
-      - datalake_booking.booking.ts_booking_utc
+      - datalake_ebdb_clean.booking.ts_booking_utc
+      - datalake_schedules_clean.appointment.slot_of_day
+      - datalake_ebdb_clean.booking.slot_day
     description: Timestamp (UTC) information indicating the date and time the inspection was carried out.
   ts_appointment_inspected_local_tz:
     lineage:
       - datalake_inspections_clean.appointment.dt_scheduled
-      - datalake_booking.booking.ts_booking_utc
+      - datalake_ebdb_clean.booking.ts_booking_utc
     description: Timestamp (Local Timezone) information indicating the date and time the inspection was carried out.
   ts_appointment_created_utc:
     lineage:
       - datalake_inspections_clean.appointment.ts_created
-      - datalake_booking.booking.ts_created
+      - datalake_ebdb_clean.booking.ts_created
     description: Timestamp(UTC) information indicating when the inspection schedule was created.
   ts_appointment_updated_utc:
     lineage:
       - datalake_inspections_clean.appointment.ts_updated
-      - datalake_booking.booking.ts_updated
+      - datalake_ebdb_clean.booking.ts_updated
     description: Timestamp (UTC) information indicating when the inspection schedule was updated.
   ts_appointment_created_local_tz:
     lineage:
       - datalake_inspections_clean.appointment.ts_created
-      - datalake_booking.booking.ts_created_local_tz
+      - datalake_ebdb_clean.booking.ts_created_local_tz
     description: Timestamp (Local Timezone) information indicating when the inspection schedule was created.
   ts_appointment_updated_local_tz:
     lineage:
       - datalake_inspections_clean.appointment.ts_updated
-      - datalake_booking.booking.ts_updated
+      - datalake_ebdb_clean.booking.ts_updated
     description: Timestamp (Local Timezone) information indicating when the inspection schedule was updated.
   ts_first_appointment_cancelled_utc:
     lineage:
       - datalake_inspections_clean.appointment.ts_updated
-      - datalake_booking.booking.ts_first_canceled_unevaluated
+      - datalake_ebdb_clean.booking.ts_first_canceled_unevaluated
     description: Timestamp (UTC) information indicating when the inspection schedule was cancelled.
   ts_first_appointment_cancelled_local_tz:
     lineage:
       - datalake_inspections_clean.appointment.ts_updated
-      - datalake_booking.booking.ts_first_canceled_unevaluated_local_tz
+      - datalake_ebdb_clean.booking.ts_first_canceled_unevaluated_local_tz
     description: Timestamp (Local Timezone) information indicating when the inspection schedule was cancelled.
   year:
     lineage:

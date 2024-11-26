@@ -12,6 +12,7 @@ workflow:
   layer: enrich
   inner_dependencies:
     inspection_booking:
+      - appointment_inspection
       - main_inspection_booking
     item:
       - item_group
