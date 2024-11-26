@@ -1,0 +1,245 @@
+---
+database_name: datalake_gsheets_people_pin_clean
+table_name: hra_evaluations
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "Table capturing details about performance evaluations, including participants, templates, and timelines."
+columns:
+  id_evaluation:
+    description: "Unique identifier for the evaluation record."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.evaluation_id
+  id_business_group:
+    description: "Business group associated with the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.business_group_id
+  id_template_definition:
+    description: "Template definition ID used for the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.template_defn_id
+  id_template_period:
+    description: "Template period ID associated with the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.tmpl_period_id
+  id_worker:
+    description: "Worker's ID being evaluated."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.worker_id
+  id_manager:
+    description: "Manager's ID overseeing the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.manager_id
+  id_assignment:
+    description: "Assignment ID related to the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.assignment_id
+  id_locked_by_user:
+    description: "User ID locking the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.locked_by_user_id
+  id_default_matrix_participant_role:
+    description: "Default role ID for matrix participants."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.default_matrix_pcpn_role_id
+  id_manager_assignment:
+    description: "Assignment ID of the manager involved."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.manager_assignment_id
+  id_review_period:
+    description: "Review period ID linked to the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.review_period_id
+  id_compensation_plan:
+    description: "Compensation plan ID associated with the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.cmp_plan_id
+  id_compensation_plan_period:
+    description: "Compensation plan period ID."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.cmp_plan_period_id
+  template_type_code:
+    description: "Code defining the type of template used."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.template_type_code
+  evaluation_name:
+    description: "Name of the evaluation process."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.name
+  language_code:
+    description: "Language code applied in the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.language_code
+  status_code:
+    description: "Current status code of the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.status_code
+  previous_status:
+    description: "Code of the previous evaluation status."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.prev_status_code
+  mapping_method:
+    description: "Mapping method for the evaluation data."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.mapping_method_code
+  comments_manager:
+    description: "Comments added by the manager."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.manager_comments
+  comments_worker:
+    description: "Comments provided by the worker."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.worker_comments
+  created_by:
+    description: "User who created the evaluation record."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.created_by
+  last_updated_by:
+    description: "User who last updated the evaluation record."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.last_updated_by
+  action_type:
+    description: "Action type performed in the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.action_code
+  reason_for_action:
+    description: "Reason for the specific action in the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.action_reason
+  performed_by_action:
+    description: "User who performed the action."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.action_performed_by
+  calibration_status:
+    description: "Status of the calibration process."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.calibration_status
+  calibration_performed_by:
+    description: "User who performed the calibration."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.calibration_performed_by
+  is_calculated_ratings_used:
+    description: "Indicates usage of calculated ratings."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.use_calc_ratings_flag
+  is_select_manager_allowed:
+    description: "Indicates if managers can be selected for the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.select_manager_allowed_flag
+  is_calculation_ratings_enabled:
+    description: "Indicates if calculation of ratings is enabled."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.calculation_ratings_flag
+  is_star_rating_enabled:
+    description: "Indicates if star rating is active."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.star_rating_enabled_flag
+  is_kudos_region_enabled:
+    description: "Indicates the Kudos region visibility."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.kudos_region_flag
+  is_digital_signature_enabled:
+    description: "Indicates if digital signature is active."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.digital_signature_flag
+  is_role_minimums_set:
+    description: "If minimum roles are set for the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.set_role_minimums_flag
+  is_role_maximums_set:
+    description: "If maximum roles are set for the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.set_role_maximums_flag
+  min_total_participants:
+    description: "Minimum number of participants allowed."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.total_min_participants
+  max_total_participants:
+    description: "Maximum number of participants allowed."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.total_max_participants
+  is_min_participants_enforced:
+    description: "Enforces the minimum number of participants."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.enforce_min_pcpns_flag
+  is_worker_allowed_see_manager_participants:
+    description: "If workers can view manager participants."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.wrk_see_mgr_pcpn_flag
+  is_worker_connections_used:
+    description: "Usage of worker connections."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.use_wrk_connections_flag
+  is_feedback_required_for_participants:
+    description: "If feedback is mandatory for participants."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.pcpn_feedback_req_flag
+  is_decline_option_available:
+    description: "Option for participants to decline involvement."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.pcpn_decline_option_flag
+  is_auto_populate_mm_enabled:
+    description: "Enables auto-population for matrix management."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.auto_populate_mm_flag
+  is_request_to_mm_sent:
+    description: "Requests sent to matrix management."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.send_request_to_mm_flag
+  object_version_number:
+    description: "Versioning for optimistic locking."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.object_version_number
+  is_worker_calculated_rating_shown:
+    description: "Visibility of worker's calculated ratings."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.show_wkr_calc_rating_flag
+  is_manager_calculated_rating_shown:
+    description: "Visibility of manager's calculated ratings."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.show_mgr_calc_rating_flag
+  is_mm_calculated_rating_shown:
+    description: "Matrix management calculated ratings visibility."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.show_mm_calc_rating_flag
+  is_participant_calculated_rating_shown:
+    description: "Visibility of participant ratings."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.show_pcpn_calc_rating_flag
+  is_sync_enabled:
+    description: "Sync feature activation status."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.enable_sync_flag
+  dt_started:
+    description: "Evaluation process start date."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.start_date
+  dt_ended:
+    description: "Evaluation process end date."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.end_date
+  dt_evaluated:
+    description: "Date of evaluation completion."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.evaluation_date
+  dt_meeting_held:
+    description: "Meeting date associated with evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.meeting_held_date
+  dt_created:
+    description: "Timestamp of record creation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.creation_date
+  dt_updated:
+    description: "Timestamp of last record update."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.last_update_date
+  dt_action_performed:
+    description: "Timestamp for performed action."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.action_performed_date
+  dt_calibration_performed:
+    description: "Timestamp for calibration action."
+    lineage:
+      - datalake_gsheets_people_raw.hra_evaluations.calibration_performed_date
+  ts_load:
+    description: "Timestamp when the record was loaded into the datalake."

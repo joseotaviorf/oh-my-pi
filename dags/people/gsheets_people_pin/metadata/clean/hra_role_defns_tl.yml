@@ -1,0 +1,53 @@
+---
+database_name: datalake_gsheets_people_pin_clean
+table_name: hra_role_defns_tl
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "Performance role definitions (Translates)."
+columns:
+  id_role:
+    description: "Unique identifier for the role."
+    lineage:
+      - datalake_gsheets_people_raw.hra_role_defns_tl.role_id
+  id_business_group:
+    description: "Identifier for the business group associated with the role."
+    lineage:
+      - datalake_gsheets_people_raw.hra_role_defns_tl.business_group_id
+  language_code:
+    description: "Code representing the language of the role definition."
+    lineage:
+      - datalake_gsheets_people_raw.hra_role_defns_tl.language
+  source_language:
+    description: "Source language for the role definition translation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_role_defns_tl.source_lang
+  role_name:
+    description: "Translated name of the role."
+    lineage:
+      - datalake_gsheets_people_raw.hra_role_defns_tl.name
+  role_description:
+    description: "Translated description of the role."
+    lineage:
+      - datalake_gsheets_people_raw.hra_role_defns_tl.description
+  created_by:
+    description: "User who created the role definition record."
+    lineage:
+      - datalake_gsheets_people_raw.hra_role_defns_tl.created_by
+  updated_by:
+    description: "User who last updated the role definition record."
+    lineage:
+      - datalake_gsheets_people_raw.hra_role_defns_tl.last_updated_by
+  version_number:
+    description: "Version number for optimistic locking."
+    lineage:
+      - datalake_gsheets_people_raw.hra_role_defns_tl.object_version_number
+  dt_created:
+    description: "Timestamp when the role definition record was created."
+    lineage:
+      - datalake_gsheets_people_raw.hra_role_defns_tl.creation_date
+  dt_updated:
+    description: "Timestamp when the role definition record was last updated."
+    lineage:
+      - datalake_gsheets_people_raw.hra_role_defns_tl.last_update_date
+  ts_load:
+    description: "Timestamp when the record was loaded into the datalake."

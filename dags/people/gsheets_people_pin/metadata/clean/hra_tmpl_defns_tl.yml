@@ -1,0 +1,53 @@
+---
+database_name: datalake_gsheets_people_pin_clean
+table_name: hra_tmpl_defns_tl
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "Performance Template definitions (Translates)."
+columns:
+  id_template_definition:
+    description: "Unique identifier for the template definition."
+    lineage:
+      - datalake_gsheets_people_raw.hra_tmpl_defns_tl.template_defn_id
+  id_business_group:
+    description: "Identifier for the business group associated with the template."
+    lineage:
+      - datalake_gsheets_people_raw.hra_tmpl_defns_tl.business_group_id
+  language_code:
+    description: "Code representing the language of the template translation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_tmpl_defns_tl.language
+  source_language:
+    description: "Source language for the template translation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_tmpl_defns_tl.source_lang
+  template_name:
+    description: "Translated name of the template."
+    lineage:
+      - datalake_gsheets_people_raw.hra_tmpl_defns_tl.name
+  template_comments:
+    description: "Translated comments or description for the template."
+    lineage:
+      - datalake_gsheets_people_raw.hra_tmpl_defns_tl.comments
+  created_by:
+    description: "User who created the translation record for the template."
+    lineage:
+      - datalake_gsheets_people_raw.hra_tmpl_defns_tl.created_by
+  updated_by:
+    description: "User who last updated the translation record for the template."
+    lineage:
+      - datalake_gsheets_people_raw.hra_tmpl_defns_tl.last_updated_by
+  object_version_number:
+    description: "Version number for optimistic locking."
+    lineage:
+      - datalake_gsheets_people_raw.hra_tmpl_defns_tl.object_version_number
+  dt_created:
+    description: "Timestamp when the translation record was created."
+    lineage:
+      - datalake_gsheets_people_raw.hra_tmpl_defns_tl.creation_date
+  dt_updated:
+    description: "Timestamp when the translation record was last updated."
+    lineage:
+      - datalake_gsheets_people_raw.hra_tmpl_defns_tl.last_update_date
+  ts_load:
+    description: "Timestamp when the record was loaded into the datalake."

@@ -1,0 +1,53 @@
+---
+database_name: datalake_gsheets_people_pin_clean
+table_name: hra_pf_task_roles_b
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "This table stores the task roles involved in the process flow definition."
+columns:
+  id_process_task_role:
+    description: "Unique identifier for the process task role."
+    lineage:
+      - datalake_gsheets_people_raw.hra_pf_task_roles_b.process_task_role_id
+  id_business_group:
+    description: "Identifier for the business group associated with the task role."
+    lineage:
+      - datalake_gsheets_people_raw.hra_pf_task_roles_b.business_group_id
+  id_process_flow:
+    description: "Identifier for the process flow associated with the task role."
+    lineage:
+      - datalake_gsheets_people_raw.hra_pf_task_roles_b.process_flow_id
+  id_module:
+    description: "Identifier for the module associated with the task role."
+    lineage:
+      - datalake_gsheets_people_raw.hra_pf_task_roles_b.module_id
+  task_code:
+    description: "Code representing the task."
+    lineage:
+      - datalake_gsheets_people_raw.hra_pf_task_roles_b.task_code
+  created_by:
+    description: "User who created the task role."
+    lineage:
+      - datalake_gsheets_people_raw.hra_pf_task_roles_b.created_by
+  updated_by:
+    description: "User who last updated the task role."
+    lineage:
+      - datalake_gsheets_people_raw.hra_pf_task_roles_b.last_updated_by
+  sequence_num:
+    description: "Order of the task role in the process flow."
+    lineage:
+      - datalake_gsheets_people_raw.hra_pf_task_roles_b.sequence_number
+  version_number:
+    description: "Version number for optimistic locking."
+    lineage:
+      - datalake_gsheets_people_raw.hra_pf_task_roles_b.object_version_number
+  dt_created:
+    description: "Timestamp when the task role was created."
+    lineage:
+      - datalake_gsheets_people_raw.hra_pf_task_roles_b.creation_date
+  dt_updated:
+    description: "Timestamp when the task role was last updated."
+    lineage:
+      - datalake_gsheets_people_raw.hra_pf_task_roles_b.last_update_date
+  ts_load:
+    description: "Timestamp when the record was loaded into the datalake."

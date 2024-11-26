@@ -1,0 +1,25 @@
+---
+database_name: datalake_gsheets_people_pin_clean
+table_name: fnd_lookup_values
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "Stores lookup values used to categorize and define value sets across various system areas. These lookups ensure consistency in dropdown lists, input fields, and other interface elements."
+columns:
+  lookup_code:
+    description: "Code representing the lookup value."
+    lineage:
+      - datalake_gsheets_people_raw.fnd_lookup_values.lookup_code
+  lookup_type:
+    description: "Type or category of the lookup value."
+    lineage:
+      - datalake_gsheets_people_raw.fnd_lookup_values.lookup_type
+  language:
+    description: "Language in which the lookup value is defined."
+    lineage:
+      - datalake_gsheets_people_raw.fnd_lookup_values.language
+  meaning:
+    description: "Human-readable meaning of the lookup value."
+    lineage:
+      - datalake_gsheets_people_raw.fnd_lookup_values.meaning
+  ts_load:
+    description: "Timestamp when the record was loaded into the datalake."

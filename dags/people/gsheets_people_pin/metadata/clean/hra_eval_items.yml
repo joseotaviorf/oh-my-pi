@@ -1,0 +1,121 @@
+---
+database_name: datalake_gsheets_people_pin_clean
+table_name: hra_eval_items
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "This tables stores evaluation item details."
+columns:
+  eval_item_id:
+    description: "Unique identifier for the evaluation item."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.eval_item_id
+  eval_section_id:
+    description: "Identifier for the section to which the evaluation item belongs."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.eval_section_id
+  reference_item_id:
+    description: "Reference identifier for linking related items."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.reference_item_id
+  parent_item_id:
+    description: "Identifier for the parent evaluation item."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.parent_item_id
+  business_group_id:
+    description: "Identifier for the associated business group."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.business_group_id
+  evaluation_id:
+    description: "Identifier for the related evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.evaluation_id
+  target_prof_rev_rating_id:
+    description: "Target rating for professional reviews."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.target_prof_rev_rating_id
+  target_perf_rev_rating_id:
+    description: "Target rating for performance reviews."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.target_perf_rev_rating_id
+  perf_rating_model_id:
+    description: "Identifier for the performance rating model."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.perf_rating_model_id
+  prof_rating_model_id:
+    description: "Identifier for the professional rating model."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.prof_rating_model_id
+  item_name:
+    description: "Name of the evaluation item."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.item_name
+  item_description:
+    description: "Description of the evaluation item."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.description
+  owned_by:
+    description: "Identifier for the owner of the evaluation item."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.owned_by
+  not_rated_updated_by:
+    description: "Identifier for the person who updated the 'not rated' flag."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.not_rated_flag_updated_by
+  created_by:
+    description: "Identifier for the creator of the evaluation item."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.created_by
+  updated_by:
+    description: "Identifier for the person who last updated the evaluation item."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.last_updated_by
+  measurement_metric:
+    description: "Metric used for measurement in the evaluation item."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.measurement
+  minimum_weight:
+    description: "Minimum weight assigned to the evaluation item."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.min_weight
+  weight_percentage:
+    description: "Weight percentage for the evaluation item."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.weight
+  percent_completed:
+    description: "Percentage of completion for the evaluation item."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.percent_completed
+  is_rating_overridden:
+    description: "Indicates if the rating was overridden."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.rating_override_flag
+  is_mandatory:
+    description: "Indicates if the evaluation item is mandatory."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.mandatory_flag
+  is_critical:
+    description: "Indicates if the evaluation item is critical."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.critical_flag
+  is_not_rated:
+    description: "Indicates if the evaluation item was not rated."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.not_rated_flag
+  is_added_in_task:
+    description: "Indicates if the evaluation item was added in a task."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.added_in_task
+  version_number:
+    description: "Version number of the evaluation item record."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.object_version_number
+  ts_created:
+    description: "Timestamp of when the evaluation item was created."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.creation_date
+  ts_updated:
+    description: "Timestamp of when the evaluation item was last updated."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_items.last_update_date
+  ts_load:
+    description: "Timestamp when the record was loaded into the datalake."

@@ -1,0 +1,213 @@
+---
+database_name: datalake_gsheets_people_pin_clean
+table_name: hra_eval_sections
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "This table stores the evaluation sections."
+columns:
+  id_eval_section:
+    description: "Unique identifier for the evaluation section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.eval_section_id
+  id_business_group:
+    description: "Identifier for the associated business group."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.business_group_id
+  id_template_section:
+    description: "Identifier for the section template."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.tmpl_section_id
+  id_content_type:
+    description: "Identifier for the content type of the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.content_type_id
+  id_evaluation:
+    description: "Identifier for the evaluation associated with the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.evaluation_id
+  id_fast_formula:
+    description: "Identifier for the fast formula used in the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.fast_formula_id
+  id_section_rating_model:
+    description: "Identifier for the section rating model."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.section_rating_model_id
+  id_perf_rating_model:
+    description: "Identifier for the performance rating model."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.perf_rating_model_id
+  id_profile_type:
+    description: "Identifier for the profile type used in the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.profile_type_id
+  id_profile:
+    description: "Identifier for the profile associated with the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.profile_id
+  id_reference_section:
+    description: "Identifier for the reference section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.reference_section_id
+  id_goal_plan_assignment:
+    description: "Identifier for the goal plan assignment."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.goal_plan_assignment_id
+  section_type:
+    description: "Code representing the type of the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.section_type_code
+  calculation_rule_code:
+    description: "Code representing the calculation rules applied."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.calculation_rule_code
+  rating_type:
+    description: "Code representing the type of rating used in the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.rating_type_code
+  item_calculation_code:
+    description: "Code representing the item calculation method."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.item_calculation_code
+  comments:
+    description: "Comments associated with the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.comments
+  created_by:
+    description: "User who created the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.created_by
+  last_updated_by:
+    description: "User who last updated the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.last_updated_by
+  comments_text:
+    description: "Detailed comments text for the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.comment_text
+  rounding_rule:
+    description: "Code representing the rounding rules applied."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.rounding_rule_code
+  mapping_method:
+    description: "Code for the mapping method used."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.mapping_method_code
+  calc_mapping:
+    description: "Code representing the calculation mapping."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.calc_mapping_code
+  evaluation_type_code:
+    description: "Code indicating the type of evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.evaluation_type_code
+  is_section_comments_enabled:
+    description: "Indicates if comments are enabled for the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.enable_section_comments_flag
+  sequence_num:
+    description: "Order of the section within the evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.sequence_number
+  weight_section:
+    description: "Weight assigned to the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.section_weight
+  min_weight_section:
+    description: "Minimum weight assigned to the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.section_min_weight
+  is_enabled_items:
+    description: "Indicates if items are enabled for the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.enable_items
+  is_free_form_allowed:
+    description: "Indicates if free-form entries are allowed."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.free_form_allowed_flag
+  is_item_rated:
+    description: "Indicates if items within the section are rated."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.rate_item_flag
+  is_section_weighted:
+    description: "Indicates if the section is weighted."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.weight_section_flag
+  is_section_rated:
+    description: "Indicates if the section is rated."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.rate_section_flag
+  is_sec_rating_for_perf_rating_used:
+    description: "Indicates if section ratings are used for performance ratings."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.use_secrtg_for_perfrtg_flag
+  is_target_perf_rating_shown:
+    description: "Indicates if target performance ratings are shown."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.show_target_perf_rtg
+  is_target_prof_level_shown:
+    description: "Indicates if target proficiency levels are shown."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.show_target_prof_level
+  is_items_confirm_crit_required:
+    description: "Indicates if confirmation criteria for adding items are required."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.add_items_confirm_crit_flag
+  is_section_weight_flagged:
+    description: "Indicates if section weight is flagged."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.section_weight_flag
+  is_section_min_weight_flagged:
+    description: "Indicates if section minimum weight is flagged."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.section_min_weight_flag
+  is_mandatory_shown:
+    description: "Indicates if mandatory fields are shown."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.show_mandatory
+  is_critical_shown:
+    description: "Indicates if critical fields are shown."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.show_critical
+  is_description_shown:
+    description: "Indicates if descriptions are shown."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.show_description
+  is_measurement_shown:
+    description: "Indicates if measurements are shown."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.show_measurement
+  is_due_date_shown:
+    description: "Indicates if due dates are shown."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.show_due_date
+  is_reminder_date_shown:
+    description: "Indicates if reminder dates are shown."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.show_reminder_date
+  is_owned_by_shown:
+    description: "Indicates if ownership is shown."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.show_owned_by
+  is_status_shown:
+    description: "Indicates if status is shown."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.show_status
+  is_percent_complete_shown:
+    description: "Indicates if percent completion is shown."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.show_percent_complete
+  is_rating_overridden:
+    description: "Indicates if ratings can be overridden."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.rating_overide_flag
+  is_profile_used:
+    description: "Indicates if profiles are used in the section."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.use_profile_flag
+  is_specific_profile_used:
+    description: "Indicates if specific profiles are used."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_sections.use_spec_profile
+  ts_load:
+    description: "Timestamp when the record was loaded into the datalake."

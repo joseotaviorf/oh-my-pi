@@ -1,0 +1,117 @@
+---
+database_name: datalake_gsheets_people_pin_clean
+table_name: hra_eval_steps
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "This table stores evaluation steps."
+columns:
+  id_eval_step:
+    description: "Unique identifier for the evaluation step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.eval_step_id
+  id_business_group:
+    description: "Identifier for the associated business group."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.business_group_id
+  id_evaluation:
+    description: "Identifier for the evaluation associated with the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.evaluation_id
+  id_eval_participant:
+    description: "Identifier for the participant involved in the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.eval_participant_id
+  id_parent_step:
+    description: "Identifier for the parent step, if applicable."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.parent_step_id
+  completed_by:
+    description: "Identifier of the person who completed the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.step_completed_by
+  step_code:
+    description: "Code representing the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.step_code
+  status_step:
+    description: "Status of the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.step_status
+  created_by:
+    description: "User who created the step record."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.created_by
+  updated_by:
+    description: "User who last updated the step record."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.last_updated_by
+  step_sub_status:
+    description: "Sub-status of the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.step_sub_status
+  action_reason:
+    description: "Reason for the action performed on the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.action_reason
+  action_performed_by:
+    description: "Identifier for the user who performed the action."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.action_performed_by
+  update_action_code:
+    description: "Code for the update action performed on the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.step_upd_action_code
+  update_action_reason:
+    description: "Reason for the update action performed on the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.step_upd_action_reason
+  update_action_performed_by:
+    description: "User who performed the update action on the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.step_upd_action_performed_by
+  sequence_number:
+    description: "Order of the step in the evaluation process."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.sequence_number
+  critical_alert_days:
+    description: "Number of days before a critical alert is triggered for the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.critical_alert_days
+  standard_alert_days:
+    description: "Number of days before a standard alert is triggered for the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.standard_alert_days
+  object_version_number:
+    description: "Version number for optimistic locking."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.object_version_number
+  dt_notified:
+    description: "Date the participant was notified about the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.notified_date
+  dt_step_completed:
+    description: "Date the step was completed."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.step_completion_date
+  dt_due:
+    description: "Due date for the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.due_date
+  dt_created:
+    description: "Timestamp when the step record was created."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.creation_date
+  dt_updated:
+    description: "Timestamp when the step record was last updated."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.last_update_date
+  dt_action_performed:
+    description: "Date the action was performed on the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.action_performed_date
+  dt_update_action_performed:
+    description: "Date the update action was performed on the step."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_steps.step_upd_action_performed_date
+  ts_load:
+    description: "Timestamp when the record was loaded into the datalake."

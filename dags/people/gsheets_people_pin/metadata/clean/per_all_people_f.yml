@@ -1,0 +1,77 @@
+---
+database_name: datalake_gsheets_people_pin_clean
+table_name: per_all_people_f
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "This table will store core personal data that is not expected to vary by Legislation Code, or has need of a global value that is independent of the Legislation Code context. Data is stored with date effectivity, but need not functionally change over time. Values that are static over time will be duplicated to each new date effective instance of a row with the same person_id."
+columns:
+  id_person:
+    description: "Unique identifier for the person."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.person_id
+  id_business_group:
+    description: "Identifier for the business group associated with the person."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.business_group_id
+  id_primary_email:
+    description: "Identifier for the person's primary email."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.primary_email_id
+  id_primary_phone:
+    description: "Identifier for the person's primary phone."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.primary_phone_id
+  id_mailing_address:
+    description: "Identifier for the person's mailing address."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.mailing_address_id
+  id_primary_nid:
+    description: "Identifier for the person's primary national ID."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.primary_nid_id
+  person_number:
+    description: "Unique number assigned to the person."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.person_number
+  applicant_number:
+    description: "Unique number assigned to the applicant."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.applicant_number
+  created_by:
+    description: "User who created the person record."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.created_by
+  updated_by:
+    description: "User who last updated the person record."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.last_updated_by
+  object_version_number:
+    description: "Version number for optimistic locking."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.object_version_number
+  is_data_protection_waived:
+    description: "Indicates if data protection is waived for the person."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.waive_data_protect
+  dt_created:
+    description: "Timestamp when the person record was created."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.creation_date
+  dt_last_updated:
+    description: "Timestamp when the person record was last updated."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.last_update_date
+  dt_started:
+    description: "Start date for the person's record."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.start_date
+  dt_effective_start:
+    description: "Effective start date for the person's record."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.effective_start_date
+  dt_effective_end:
+    description: "Effective end date for the person's record."
+    lineage:
+      - datalake_gsheets_people_raw.per_all_people_f.effective_end_date
+  ts_load:
+    description: "Timestamp when the record was loaded into the datalake."

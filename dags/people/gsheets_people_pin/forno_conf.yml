@@ -1,0 +1,150 @@
+sheets_info:
+  fnd_lookup_values:
+    clean_table_name: fnd_lookup_values
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: fnd_lookup_values
+
+  hra_eval_items:
+    clean_table_name: hra_eval_items
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_eval_items
+
+  hra_eval_participants:
+    clean_table_name: hra_eval_participants
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_eval_participants
+
+  hra_eval_ratings:
+    clean_table_name: hra_eval_ratings
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_eval_ratings
+
+  hra_eval_roles:
+    clean_table_name: hra_eval_roles
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_eval_roles
+
+  hra_eval_sections:
+    clean_table_name: hra_eval_sections
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_eval_sections
+
+  hra_eval_steps:
+    clean_table_name: hra_eval_steps
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_eval_steps
+
+  hra_evaluations:
+    clean_table_name: hra_evaluations
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_evaluations
+
+  hra_pf_task_roles_b:
+    clean_table_name: hra_pf_task_roles_b
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_pf_task_roles_b
+
+  hra_pf_task_roles_tl:
+    clean_table_name: hra_pf_task_roles_tl
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_pf_task_roles_tl
+
+  hra_role_defns_tl:
+    clean_table_name: hra_role_defns_tl
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_role_defns_tl
+
+  hra_tmpl_defns_b:
+    clean_table_name: hra_tmpl_defns_b
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_tmpl_defns_b
+
+  hra_tmpl_defns_tl:
+    clean_table_name: hra_tmpl_defns_tl
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_tmpl_defns_tl
+
+  hra_tmpl_periods_tl:
+    clean_table_name: hra_tmpl_periods_tl
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_tmpl_periods_tl
+
+  hra_tmpl_roles:
+    clean_table_name: hra_tmpl_roles
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_tmpl_roles
+
+  hra_tmpl_sections:
+    clean_table_name: hra_tmpl_sections
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hra_tmpl_sections
+
+  hrt_rating_levels_b:
+    clean_table_name: hrt_rating_levels_b
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hrt_rating_levels_b
+
+  hrt_rating_levels_tl:
+    clean_table_name: hrt_rating_levels_tl
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hrt_rating_levels_tl
+
+  hrt_rating_models_b:
+    clean_table_name: hrt_rating_models_b
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hrt_rating_models_b
+
+  hrt_rating_models_tl:
+    clean_table_name: hrt_rating_models_tl
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hrt_rating_models_tl
+
+  hrt_review_periods_b:
+    clean_table_name: hrt_review_periods_b
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hrt_review_periods_b
+
+  hrt_review_periods_tl:
+    clean_table_name: hrt_review_periods_tl
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: hrt_review_periods_tl
+
+  per_all_people_f:
+    clean_table_name: per_all_people_f
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: per_all_people_f
+
+  per_assignment_supervisors_f:
+    clean_table_name: per_assignment_supervisors_f
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: per_assignment_supervisors_f
+
+  per_person_names_f:
+    clean_table_name: per_person_names_f
+    sheet_context: people
+    sheet_id: 18xa4eLDAumQFVWjLrEg8nuqGT18n3ZS5VH1T6wNBC30
+    sheet_name: per_person_names_f

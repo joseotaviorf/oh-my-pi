@@ -1,0 +1,137 @@
+---
+database_name: datalake_gsheets_people_pin_clean
+table_name: hra_eval_participants
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "This table stores the participants that are taking part Performance Document review."
+columns:
+  eval_participant_id:
+    description: "Unique identifier for the evaluation participant."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.eval_participant_id
+  business_group_id:
+    description: "Identifier for the associated business group."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.business_group_id
+  evaluation_id:
+    description: "Identifier for the related evaluation."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.evaluation_id
+  person_id:
+    description: "Identifier for the participant."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.person_id
+  eval_role_id:
+    description: "Identifier for the participant's evaluation role."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.eval_role_id
+  questionnaire_id:
+    description: "Identifier for the assigned questionnaire."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.questionnaire_id
+  id_added_by_person:
+    description: "Identifier for the person who added the participant."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.added_by_person_id
+  id_notified_by_person:
+    description: "Identifier for the person who notified the participant."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.notified_by_person_id
+  role_type_code:
+    description: "Code representing the type of role the participant has."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.role_type_code
+  participation_status_code:
+    description: "Code representing the participant's status."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.participation_status_code
+  added_by_role:
+    description: "Role of the person who added the participant."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.added_by_role
+  notified_by_role:
+    description: "Role of the person who notified the participant."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.notified_by_role
+  work_comments:
+    description: "Comments provided by the participant related to the work."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.pcpn_comments_for_wrk
+  created_by:
+    description: "Identifier for the person who created the record."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.created_by
+  updated_by:
+    description: "Identifier for the person who last updated the record."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.last_updated_by
+  work_comment_text:
+    description: "Detailed comment text provided by the participant."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.pcpn_comment_text_for_wrk
+  action_type:
+    description: "Type of action performed by the participant."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.action_code
+  reason_for_action:
+    description: "Reason for the action performed by the participant."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.action_reason
+  performed_by:
+    description: "Identifier for the person who performed the action."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.action_performed_by
+  is_notified:
+    description: "Indicates if the participant has been notified."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.notified_flag
+  is_feedback_started:
+    description: "Indicates if the feedback process has started."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.fdback_started_flag
+  is_feedback_sent_back:
+    description: "Indicates if the feedback was sent back."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.fdback_sent_back_flag
+  is_locked_out:
+    description: "Indicates if the participant is locked out."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.locked_out_flag
+  is_matrix_participant:
+    description: "Indicates if the participant is part of a matrix structure."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.matrix_participant_flag
+  version_number:
+    description: "Version number of the record."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.object_version_number
+  dt_status_updated:
+    description: "Date when the status was last updated."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.status_update_date
+  dt_due:
+    description: "Due date for the participant's task."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.due_date
+  dt_locked_out:
+    description: "Date when the participant was locked out."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.locked_out_date
+  dt_feedback_completion:
+    description: "Date when feedback was completed."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.fdback_completion_date
+  dt_created:
+    description: "Date when the record was created."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.creation_date
+  dt_updated:
+    description: "Date when the record was last updated."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.last_update_date
+  dt_performed:
+    description: "Date when the action was performed."
+    lineage:
+      - datalake_gsheets_people_raw.hra_eval_participants.action_performed_date
+  ts_load:
+    description: "Timestamp when the record was loaded into the datalake."

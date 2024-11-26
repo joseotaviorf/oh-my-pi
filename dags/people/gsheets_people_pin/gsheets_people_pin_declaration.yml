@@ -1,0 +1,23 @@
+dag:
+  name: gsheets_people_pin
+  description:
+  schedule_interval: 0 2 * * *
+  owner: Data People
+cluster:
+  type: databricks_13_3_med_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  custom_libraries:
+    - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
+    - pypi:
+        package: "google-auth==2.13.0"
+    - pypi:
+        package: "google-api-python-client==2.55.0"
+workflow:
+  type: gsheets
+  layer: raw
+  has_hive_sync: False
+  credentials_scope: people
+  bucket_config_name: people_bucket
+  custom_schema: gsheets_people
