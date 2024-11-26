@@ -5,12 +5,8 @@ domain: primitives
 description: |
   Table with ids, dimensions, metrics and timestamps related to search.
 columns:
-  id_search:
-    description: id_search
-  id_house:
-    description: id_house
   ids:
-    description: A json with all relevant ids for search analysis. Ex. id_user, id_amplitude, ...
+    description: A json with all relevant ids for search analysis. Ex. id_user, id_house, id_search, id_amplitude, ...
   dimensions:
     description: A json with all relevant dimensions for search analysis. Ex. business_context, city, ...
   variants:

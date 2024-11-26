@@ -4,7 +4,7 @@
 
 1. This pipeline calculates the metrics for search analysis and monitoring.
 2. This pipeline calculates the metrics for search experimentation (AB Tests).
-3This pipeline calculates the target used to monitor online search.
+3. This pipeline calculates the target used to monitor online search.
 
 <details>
   <summary><strong> > DAG details (click to expand)</strong></summary>
@@ -21,7 +21,7 @@ This pipeline produces the following output table on enrich layer:
 - `item_interaction`
 - `item_interaction_sale`
 - `search_impressions`
-- `houses_published`
+- `global_metrics`
 
 ### Responsible Data Team
 ​

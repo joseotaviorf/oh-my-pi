@@ -9,18 +9,19 @@ workflow:
   extra_query_template_params:
         "days_past": 14
         "days_past_21": 21
+        "days_past_30": 30
         "start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
         "end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   inner_dependencies:
     search_impressions:
       - experiment_config
-    houses_published:
-      - experiment_config
-      - search_impressions
     item_interaction:
       - amplitude_user_device
     item_interaction_sale:
       - amplitude_user_device
+    global_metrics:
+      - experiment_config
+      - search_impressions
   tables_customization:
     search_impressions:
       partitions:
@@ -44,6 +45,11 @@ workflow:
       - month
       - day
       - interaction_type
+    user_global_metrics:
+      partitions:
+        - year
+        - month
+        - day
 
 cluster:
   type: custom_cluster

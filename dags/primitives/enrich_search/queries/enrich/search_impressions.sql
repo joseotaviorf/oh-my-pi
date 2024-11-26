@@ -21,7 +21,7 @@ WITH experiments AS (
             FROM
                 datalake_search.experiment_config
             WHERE
-                (DATE_SUB(DATE('{start_date}'), {days_past_21}) <= config.end_date OR config.end_date IS NULL)
+                (DATE_SUB(DATE('{start_date}'), {days_past_30}) <= config.end_date OR config.end_date IS NULL)
                 AND DATE('{end_date}') >= config.begin_date
         )
 ),
@@ -43,7 +43,7 @@ union_spvs AS (
         datalake_amplitude_clean_staging.170698_search_page_viewed_events
     WHERE
         -- include one more day to make sure we don't repeat id_search that start before midnight and end after.
-        MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_21} + 1) AND DATE('{end_date}')
+        MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30} + 1) AND DATE('{end_date}')
         AND get_json_object(event_properties, '$.search_id') IS NOT NULL
         AND get_json_object(event_properties, '$.search_results_list') IS NOT NULL
         AND get_json_object(event_properties, '$.search_results_list') <> '[]'
@@ -65,7 +65,7 @@ union_spvs AS (
         datalake_amplitude_clean_staging.170698_search_results_page_viewed_events
     WHERE
         -- include one more day to make sure we don't repeat id_search that start before midnight and end after.
-        MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_21} + 1) AND DATE('{end_date}')
+        MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30} + 1) AND DATE('{end_date}')
         AND get_json_object(event_properties, '$.search_id') IS NOT NULL
         AND get_json_object(event_properties, '$.search_results_list') IS NOT NULL
         AND get_json_object(event_properties, '$.search_results_list') <> '[]'
@@ -189,7 +189,7 @@ clicks AS (
         1 AS click
     FROM datalake_amplitude_clean.170698_listing_page_viewed_events
     WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_21}) AND DATE('{end_date}')
+        MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
         AND get_json_object(event_properties, '$.from_route') = "search_results"
         AND get_json_object(event_properties, '$.search_id') IS NOT NULL
 ),
@@ -207,7 +207,7 @@ rent_flow AS (
     FROM
         datalake_rent_flows.rent_flows
     WHERE
-        ts_rent_flow_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_21}) AND DATE('{end_date}')
+        ts_rent_flow_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
         AND id_tenant_prospect IS NOT NULL
         AND id_house IS NOT NULL
     GROUP BY
@@ -227,7 +227,7 @@ sale_flow AS (
         MIN(dt_sale_agreement_signed) AS ts_contract_signed
     FROM datalake_sale_flows.sale_flow
     WHERE
-        ts_first_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_21}) AND DATE('{end_date}')
+        ts_first_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
         AND id_buyer IS NOT NULL
         AND id_house IS NOT NULL
     GROUP BY
@@ -422,13 +422,11 @@ exploded_houses AS (
 -- Final Query
 
 SELECT
-    searches.id_search,
-    exploded_houses.id_house,
-
     --ids
-
     to_json(
         named_struct(
+            'id_search', searches.id_search,
+            'id_house', exploded_houses.id_house,
             'id_user', searches.id_user,
             'id_session', searches.id_session,
             'id_amplitude', searches.id_amplitude,
@@ -438,7 +436,6 @@ SELECT
     ) AS ids,
 
     -- dimensions
-
     to_json(
         named_struct(
             'business_context', searches.business_context,
@@ -457,11 +454,9 @@ SELECT
     ) AS dimensions,
 
     --experimentation
-
     COALESCE(variants, '{{}}') AS variants,
 
     --metrics
-
     to_json(
         named_struct(
             'search', 1,
@@ -515,4 +510,4 @@ LEFT JOIN sale_flow
     ON exploded_houses.id_house = sale_flow.id_house
     AND searches.id_user = sale_flow.id_user
     AND searches.business_context = 'sale'
-WHERE searches.ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_21}) AND DATE('{end_date}')
+WHERE searches.ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
