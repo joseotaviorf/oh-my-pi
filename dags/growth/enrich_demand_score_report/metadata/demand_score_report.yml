@@ -13,6 +13,18 @@ columns:
     description: The age of the listing related in month in For Rent.
     lineage:
       - reverse_demand_score.listing_demand_score.listing_age
+  city_group:
+    description: The city group of the listing.
+    lineage:
+      - reverse_demand_score.listing_demand_score.city_group 
+  city_name:
+    description: The city name of the listing.
+    lineage:
+      - reverse_demand_score.listing_demand_score.city_name
+  region_code:
+    description: The region code of the listing.
+    lineage:
+      - reverse_demand_score.listing_demand_score.region_code   
   quality_score:
     description: The quality score of the listing in For Rent.
     lineage:

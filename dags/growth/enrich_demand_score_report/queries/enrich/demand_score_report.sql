@@ -1,6 +1,9 @@
 SELECT
     id_house,
     id_house_listing,
+    city_group,
+    city_name,
+    region_code,
     listing_age,
     quality_score,
     liquidity_score,

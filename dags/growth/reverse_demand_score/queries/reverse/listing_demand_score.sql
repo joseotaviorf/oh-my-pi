@@ -36,7 +36,21 @@ days_published AS (
         WHEN hldi.status_history in ('publicado', 'PUBLISHED') AND hldi.dt_day >= date_add (DAY, -7, CURRENT_DATE) THEN hldi.dt_day
         ELSE NULL
       END
-    ) AS days_pub 
+    ) AS days_pub_7, 
+    COUNT(
+      DISTINCT 
+      CASE
+        WHEN hldi.status_history in ('publicado', 'PUBLISHED') AND hldi.dt_day >= date_add (DAY, -3, CURRENT_DATE) THEN hldi.dt_day
+        ELSE NULL
+      END
+    ) AS days_pub_3,
+    COUNT(
+      DISTINCT 
+      CASE
+        WHEN hldi.status_history in ('publicado', 'PUBLISHED') AND hldi.dt_day >= date_add (DAY, -1, CURRENT_DATE) THEN hldi.dt_day
+        ELSE NULL
+      END
+    ) AS days_pub_1
   FROM 
     dw_public.dim_house_listing AS dhl
   LEFT JOIN 
@@ -67,13 +81,15 @@ lpv AS (
   SELECT 
     dhl.ts_publication::DATE AS dt_publication,
     dhl.sk_house_listing,
-    p.days_pub,
+    p.days_pub_7,
+    p.days_pub_3,
+    p.days_pub_1,
     SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -7, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END) AS lpv_7d,
-    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -7, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub = 0 THEN 1 ELSE p.days_pub END)::DOUBLE AS avg_lpv_days_pub_7d,
+    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -7, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub_7 = 0 THEN 1 ELSE p.days_pub_7 END)::DOUBLE AS avg_lpv_days_pub_7d,
     SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -3, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END) AS lpv_3d,
-    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -3, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub = 0 THEN 1 ELSE p.days_pub END)::DOUBLE AS avg_lpv_days_pub_3d,
+    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -3, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub_3 = 0 THEN 1 ELSE p.days_pub_3 END)::DOUBLE AS avg_lpv_days_pub_3d,
     SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -1, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END) AS lpv_1d,
-    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -1, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub = 0 THEN 1 ELSE p.days_pub END)::DOUBLE AS avg_lpv_days_pub_1d
+    SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -1, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub_1 = 0 THEN 1 ELSE p.days_pub_1 END)::DOUBLE AS avg_lpv_days_pub_1d
   FROM 
     dw_public.dim_house_listing AS dhl
   LEFT JOIN 
@@ -86,7 +102,7 @@ lpv AS (
   WHERE 
     (dhl.version > 0)
     AND (dhl.ts_listing_version_start::DATE >= '2023-10-01'::DATE)
-  GROUP BY 1, 2, 3
+  GROUP BY 1, 2, 3, 4, 5
 ),
 booking_availability_hours AS (
   SELECT 
@@ -188,6 +204,7 @@ final_db AS (
     END AS listing_age,
     bd.listing_category_start,
     bd.city_group,
+    bd.city_name,
     bd.region_code,
     bd.sk_house_listing,
     bd.id_house AS id_house,
@@ -221,6 +238,9 @@ for_rent_score AS (
     id_house,
     listing_age,
     sk_house_listing,
+    city_group,
+    city_name,
+    region_code,
     avg_lpv_days_pub_1d AS qt_lpv_1d_for_rent,
     avg_lpv_days_pub_3d AS qt_lpv_3d_for_rent,
     avg_lpv_days_pub_7d AS qt_lpv_7d_for_rent,
@@ -236,6 +256,9 @@ for_sale_score AS (
   SELECT 
     ol.sk_house AS id_house,
     ls.liquidity_score,
+    dr.city_group,
+    dr.city_name,
+    dr.region_code,
     if(date(dhl.ts_last_publication) is null,date(dhl.ts_first_publication),date(dhl.ts_first_publication)) as dt_publication,
     ROUND(AVG(CASE WHEN d.date >= DATE_ADD(DAY,-1,CURRENT_DATE) THEN ol.qt_listing_page_viewed END),1) AS qt_lpv_1d_for_sale,
     ROUND(AVG(CASE WHEN d.date >= DATE_ADD(DAY,-3,CURRENT_DATE) THEN ol.qt_listing_page_viewed END),1) AS qt_lpv_3d_for_sale,
@@ -249,16 +272,25 @@ for_sale_score AS (
     dw_sale.dim_listing AS dhl
       ON dhl.sk_house = ol.sk_house
   LEFT JOIN 
+    dw_sale.fact_listings AS fl 
+      ON fl.sk_house = dhl.sk_house
+  LEFT JOIN
+    dw_public.dim_region AS dr 
+      ON dr.sk_region = fl.sk_region
+  LEFT JOIN 
     sales_liquidity_score.predicted_scores ls
       ON ls.sk_house = ol.sk_house
   WHERE 
     d.date >= DATE_ADD(DAY,-7,CURRENT_DATE)
-  GROUP BY 1,2,3
+  GROUP BY 1,2,3,4,5,6
 ),
 results AS (
   SELECT 
     COALESCE(fr.id_house, fs.id_house) AS id_house,
     fr.sk_house_listing AS id_house_listing,
+    COALESCE(fr.city_group, fs.city_group) AS city_group,
+    COALESCE(fr.city_name, fs.city_name) AS city_name,
+    COALESCE(fr.region_code, fs.region_code) AS region_code,
     fr.listing_age,
     fr.quality_score,
     fs.liquidity_score,
