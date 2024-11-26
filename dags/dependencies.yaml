@@ -3657,6 +3657,8 @@ quintoml.recs.house_user_embeddings_quintoml.inference:
   - wonka.user_listing_page_viewed_cross_devices:load-user_listing_page_viewed_cross_devices
   - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
   - wonka.user_sale_listing_page_viewed_cross_devices:load-user_sale_listing_page_viewed_cross_devices
+wonka.house_agg_rent_flows:
+  - wonka.house_user_rent_flows:load-house_user_rent_flows
 wonka.house_demand_balancer_predictions:
   - bietlejuice.demand_balancer_service:load-clean-demand-balancer
 wonka.house_embeddings_main:
@@ -3675,6 +3677,10 @@ wonka.house_rent_search_page_viewed:
   - wonka.searched_house_main:load-searched_house_main
 wonka.house_sale_search_page_viewed:
   - wonka.searched_house_main:load-searched_house_main
+wonka.house_user_rent_flows:
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
+  - wonka.house_listing_business_context:load-house_listing_business_context
 wonka.user_embeddings_main:
   - quintoml.recs.house_user_embeddings_quintoml.inference:batch-predict
 wonka.user_most_viewed_city:

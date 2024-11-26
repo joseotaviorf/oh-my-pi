@@ -955,3 +955,12 @@ bietlejuice.looker_temps:
     - bietlejuice.dw_datamarts_for_sale_cross:load-dw-datamarts-sale-cohort-conversions
     - bietlejuice.dw_datamarts_for_sale_cross:load-dw-datamarts-sale-events-funnel
     - bietlejuice.dw_datamarts_for_sale:load-dw-datamarts-repressed-demand-sale-booking-fit-in
+
+wonka.house_user_rent_flows:
+  add:
+    - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+    - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
+    - wonka.house_listing_business_context:load-house_listing_business_context
+wonka.house_agg_rent_flows:
+ add:
+    - wonka.house_user_rent_flows:load-house_user_rent_flows
