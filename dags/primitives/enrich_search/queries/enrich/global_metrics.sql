@@ -139,6 +139,7 @@ global_user_metrics AS (
             -- timestamps
            to_json(
               named_struct(
+                  'ts_search', all_users.date,
                   'ts_global_offer', COALESCE(rent_flow.ts_offer, sale_flow.ts_offer),
                   'ts_global_visit_completed', COALESCE(rent_flow.ts_visit_completed, sale_flow.ts_visit_completed),
                   'ts_global_contract_signed', COALESCE(rent_flow.ts_contract_signed, sale_flow.ts_contract_signed)
