@@ -34,7 +34,10 @@ SELECT
     is_before_started,
     is_international,
     is_writtendown_in_dead_time,
+    is_write_off,
+    is_contract_write_off,
     has_repair_offboarding_bill_item,
+    dt_write_off,
     dt_closing,
     NOW() AS ts_load
 FROM

@@ -89,6 +89,8 @@ WITH provision AS(
     m.is_invoice_deal,
     m.is_international,
     m.is_writtendown_in_dead_time,
+    m.is_write_off,
+    m.is_contract_write_off,
     m.has_repair_offboarding_bill_item,
     m.dt_closing,
     m.dt_created_deal,
@@ -96,6 +98,7 @@ WITH provision AS(
     m.dt_due_deal_anchor,
     m.dt_due_general_accrual,
     m.dt_paid_adjs,
+    m.dt_write_off,
     m.dt_snapshot
   FROM datalake_losses.delay AS m
     LEFT JOIN datalake_losses.provision_factor AS p1D
@@ -300,6 +303,8 @@ SELECT
   is_invoice_deal,
   is_international,
   is_writtendown_in_dead_time,
+  is_write_off,
+  is_contract_write_off,
   has_repair_offboarding_bill_item,
   dt_closing,
   dt_created_deal,
@@ -307,5 +312,6 @@ SELECT
   dt_due_deal_anchor,
   dt_due_general_accrual,
   dt_paid_adjs,
+  dt_write_off,
   dt_snapshot
 FROM provision

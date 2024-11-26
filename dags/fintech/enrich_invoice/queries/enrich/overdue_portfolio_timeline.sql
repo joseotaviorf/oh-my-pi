@@ -1,4 +1,10 @@
 WITH
+contract_write_off AS (
+    SELECT DISTINCT
+        id_contract_external
+    FROM datalake_retsuko.invoice
+    WHERE is_write_off IS TRUE
+),
 target_invoices AS (
     SELECT DISTINCT
         i.id_contract_external AS id_contract,
@@ -11,13 +17,16 @@ target_invoices AS (
         i.substatus,
         i.reason,
         i.paid_via,
+        IFNULL(i.is_write_off, FALSE) AS is_write_off,
+        IF(cwo.id_contract_external IS NOT NULL, TRUE, FALSE) AS is_contract_write_off,
         i.due_amount,
         i.paid_amount,
         c.status AS contract_status,
         DATE(i.ts_due) AS dt_due,
         i.dt_due_adjusted,
         DATE(i.ts_paid) AS dt_paid,
-        c.dt_termination AS dt_contract_annulled
+        c.dt_termination AS dt_contract_annulled,
+        DATE(i.ts_write_off) AS dt_write_off
     FROM
         datalake_retsuko.invoice AS i
     LEFT JOIN
@@ -29,6 +38,8 @@ target_invoices AS (
         ON c.id_house = eh.id
     LEFT JOIN datalake_proposal.proposal AS p
         ON p.id = c.id_proposal
+    LEFT JOIN contract_write_off AS cwo
+        ON cwo.id_contract_external = i.id_contract_external
     WHERE
         LOWER(i.status) != "canceled"
         AND LOWER(c.status) != "cancelado" -- only active or finalized
@@ -62,6 +73,8 @@ invoices_timeline AS (
         i.substatus,
         i.reason,
         i.paid_via,
+        i.is_write_off,
+        i.is_contract_write_off,
         CASE
             WHEN dd.date < i.dt_contract_annulled THEN "Active"
             WHEN dd.date >= i.dt_contract_annulled THEN "Finished"
@@ -74,7 +87,8 @@ invoices_timeline AS (
         i.dt_due,
         i.dt_due_adjusted,
         i.dt_paid,
-        i.dt_contract_annulled
+        i.dt_contract_annulled,
+        i.dt_write_off
     FROM
         datalake_quintoandar.aux_date AS dd
     LEFT JOIN
@@ -178,7 +192,6 @@ tainted_dataset_range AS (
     WHERE
         delay_contamined_at_closure > 0
 )
-
 SELECT
     id_contract,
     id_proposal,
@@ -191,6 +204,8 @@ SELECT
     substatus,
     reason,
     paid_via,
+    is_write_off,
+    is_contract_write_off,
     debtor_type,
     due_amount,
     CASE
@@ -211,7 +226,7 @@ SELECT
     delay_contamined_range,
     delay_contract_range,
     business_day,
-    IF(reference_date=max_date_between_business_days, TRUE, FALSE) AS is_last_business_days,
+    IF(reference_date = max_date_between_business_days, TRUE, FALSE) AS is_last_business_days,
     dt_contract_annulled,
     contract_due_date_min AS dt_contract_due_date_min,
     CASE
@@ -221,7 +236,9 @@ SELECT
     END AS dt_invoice_paid,
     dt_due AS dt_invoice_due,
     dt_due_adjusted AS dt_invoice_due_adjust,
+    dt_write_off,
     month_start AS dt_month_start,
     month_end AS dt_month_end,
     reference_date AS dt_reference
-FROM tainted_dataset_range
+FROM
+    tainted_dataset_range

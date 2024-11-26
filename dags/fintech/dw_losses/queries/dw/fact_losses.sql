@@ -11,6 +11,7 @@ base_of_calculation AS (
         fp.is_before_started,
         fp.is_international,
         fp.is_writtendown_in_dead_time,
+        fp.is_contract_write_off,
         fp.has_repair_offboarding_bill_item,
         fc.city,
         CASE
@@ -42,7 +43,7 @@ base_of_calculation AS (
     FROM
         dw_losses.fact_provision AS fp
     LEFT JOIN
-        dw_losses.fact_closing AS fc
+       dw_losses.fact_closing AS fc
             ON fp.sk_invoice = fc.sk_invoice
                 AND fp.sk_contract = fc.sk_contract
                 AND fp.dt_closing = fc.dt_closing
@@ -50,6 +51,7 @@ base_of_calculation AS (
         fp.is_international IS FALSE
         AND fp.is_before_started IS FALSE
         AND fp.payment_status <> 'written down'
+        AND fp.is_write_off IS NOT TRUE
         AND NOT(fp.dt_closing >= DATE('2024-02-01') AND fp.has_repair_offboarding_bill_item)
 ),
 monthly_aggregation AS (
@@ -80,6 +82,7 @@ calculate_previous_pdd AS (
         f.is_before_started,
         f.is_international,
         f.is_writtendown_in_dead_time,
+        f.is_contract_write_off,
         f.has_repair_offboarding_bill_item,
         f.city,
         f.risk_group,
@@ -115,6 +118,7 @@ SELECT
     is_before_started,
     is_international,
     is_writtendown_in_dead_time,
+    is_contract_write_off,
     has_repair_offboarding_bill_item,
     city,
     risk_group,

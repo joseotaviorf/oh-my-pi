@@ -1,7 +1,41 @@
-WITH BASE_INVOICES_SNAPSHOT_CLEAN AS (
+WITH
+contract_write_off AS (
+      SELECT DISTINCT
+            sk_contract AS id
+      FROM
+            dw_payment_snapshot.dim_invoice_snapshot  AS m
+      LEFT JOIN
+            datalake_retsuko.invoice AS i
+                  ON i.id_external = m.sk_invoice
+      LEFT JOIN
+            dw_public_snapshot.dim_contract_snapshot AS c
+                  ON c.sk_contract = i.id_contract_external
+                  AND c.year = m.year
+                  AND c.month = m.month
+                  AND c.day = m.day
+      WHERE m.is_write_off IS TRUE
+),
+BASE_INVOICES_SNAPSHOT_CLEAN AS (
       WITH BASE_INVOICES_SNAPSHOT_RAW AS (
             SELECT
-                  ps.*,
+                  ps.sk_invoice,
+                  ps.frequency,
+                  ps.payment_status,
+                  ps.user,
+                  IFNULL(ps.is_write_off, FALSE) AS is_write_off,
+                  ps.due_amount,
+                  ps.paid_amount,
+                  ps.accrual_year_month,
+                  ps.ts_created,
+                  ps.ts_canceled,
+                  ps.dt_sent,
+                  ps.dt_due,
+                  ps.dt_paid,
+                  ps.dt_write_off,
+                  ps.year,
+                  ps.month,
+                  ps.day,
+                  ps.ts_snapshot,
                   dt.month_end AS closing_day,
                   CAST(ps.ts_snapshot AS DATE) AS dt_snapshot
             FROM
@@ -87,17 +121,18 @@ BASE_CLOSING_DRAFT AS (
       SELECT
             m.*,
             CASE
-                  WHEN (m.ts_canceled IS NOT NULL) AND (m.ts_canceled > closing_day) AND (m.ts_canceled <= ts_snapshot) THEN TRUE
+                  WHEN (m.ts_canceled IS NOT NULL) AND (m.ts_canceled > m.closing_day) AND (m.ts_canceled <= m.ts_snapshot) THEN TRUE
                   ELSE FALSE
             END AS flag_canceled_in_dead_time,
             CASE
-                  WHEN (m.payment_status = 'written down') AND (m.dt_paid > closing_day) AND (m.dt_paid <= ts_snapshot ) THEN TRUE
+                  WHEN (m.payment_status = 'written down') AND (m.dt_paid > m.closing_day) AND (m.dt_paid <= m.ts_snapshot) THEN TRUE
                   ELSE FALSE
             END AS flag_writtendown_in_dead_time,
             CASE
-                  WHEN m.dt_paid = closing_day THEN TRUE
+                  WHEN m.dt_paid = m.closing_day THEN TRUE
                   ELSE FALSE
             END AS flag_paid_in_closing_day,
+            IF(cwo.id IS NOT NULL, TRUE, FALSE) AS is_contract_write_off,
             coalesce(c.flag_is_before_started_raw, c_backup.flag_is_before_started_raw) as flag_is_before_started,
             coalesce(c.id, c_backup.id) as id,
             coalesce(c.dt_started, c_backup.dt_started) as dt_started,
@@ -129,11 +164,14 @@ BASE_CLOSING_DRAFT AS (
                   AND c.month = m.month
                   AND c.day = m.day
       LEFT JOIN
-            CONTRACT_AUX as c_backup
+            CONTRACT_AUX AS c_backup
                   ON c_backup.id = cr.id_external
       LEFT JOIN
             repair_offboarding AS b
                   ON b.id_invoice = m.sk_invoice and b.dt_closing = m.closing_day
+      LEFT JOIN
+            contract_write_off AS cwo
+                  ON cwo.id = coalesce(c.id, c_backup.id)
 )
 SELECT
       sk_invoice AS id_invoice,
@@ -159,6 +197,8 @@ SELECT
       flag_is_international AS is_international,
       flag_paid_in_closing_day AS is_paid_in_closing_day,
       flag_writtendown_in_dead_time AS is_writtendown_in_dead_time,
+      is_write_off,
+      is_contract_write_off,
       has_repair_offboarding_bill_item,
       paid_amount,
       payment_status,
@@ -170,6 +210,7 @@ SELECT
       dt_due,
       dt_paid,
       dt_sent,
+      dt_write_off,
       dt_snapshot
 FROM
       BASE_CLOSING_DRAFT

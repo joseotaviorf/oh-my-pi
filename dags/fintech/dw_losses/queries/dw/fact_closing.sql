@@ -16,6 +16,8 @@ WITH closing_union AS(
     is_international,
     is_paid_in_closing_day,
     is_writtendown_in_dead_time,
+    is_write_off,
+    is_contract_write_off,
     has_repair_offboarding_bill_item,
     paid_amount,
     payment_status,
@@ -27,6 +29,7 @@ WITH closing_union AS(
     dt_due,
     dt_paid,
     dt_sent,
+    dt_write_off,
     dt_snapshot
   FROM
     datalake_losses.closing
@@ -50,6 +53,8 @@ WITH closing_union AS(
     is_international,
     is_paid_in_closing_day,
     is_writtendown_in_dead_time,
+    NULL AS is_write_off,
+    NULL AS is_contract_write_off,
     NULL AS has_repair_offboarding_bill_item,
     paid_amount,
     payment_status,
@@ -61,6 +66,7 @@ WITH closing_union AS(
     dt_due,
     dt_paid,
     dt_sent,
+    NULL AS dt_write_off,
     dt_snapshot
   FROM
     datalake_losses.historical_closing
@@ -82,6 +88,8 @@ SELECT
     is_international,
     is_paid_in_closing_day,
     is_writtendown_in_dead_time,
+    is_write_off,
+    is_contract_write_off,
     has_repair_offboarding_bill_item,
     payment_status,
     origin_factor,
@@ -91,6 +99,7 @@ SELECT
     dt_due,
     dt_paid,
     dt_sent,
+    dt_write_off,
     dt_snapshot,
     NOW() AS ts_load
 FROM

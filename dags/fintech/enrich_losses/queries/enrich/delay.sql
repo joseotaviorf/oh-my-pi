@@ -152,6 +152,8 @@ closing_union AS(
     is_international,
     is_paid_in_closing_day,
     is_writtendown_in_dead_time,
+    is_write_off,
+    is_contract_write_off,
     has_repair_offboarding_bill_item,
     paid_amount,
     payment_status,
@@ -163,6 +165,7 @@ closing_union AS(
     dt_due,
     dt_paid,
     dt_sent,
+    dt_write_off,
     dt_snapshot
   FROM
     datalake_losses.closing
@@ -185,6 +188,8 @@ closing_union AS(
     is_international,
     is_paid_in_closing_day,
     is_writtendown_in_dead_time,
+    NULL AS is_write_off,
+    NULL AS is_contract_write_off,
     NULL AS has_repair_offboarding_bill_item,
     paid_amount,
     payment_status,
@@ -196,6 +201,7 @@ closing_union AS(
     dt_due,
     dt_paid,
     dt_sent,
+    NULL AS dt_write_off,
     dt_snapshot
   FROM
     datalake_losses.historical_closing
@@ -208,10 +214,7 @@ base_step0_delay AS(
     d.dt_created_deal,
     d.deal_detection_method,
     d.dt_min_due_date_at_deal AS deal_anchor_due_date,
-    v.dt_due as dt_due_general_accrual,
-    is_international,
-    is_before_started,
-    has_repair_offboarding_bill_item
+    v.dt_due as dt_due_general_accrual
   FROM
     closing_union fc
   LEFT JOIN
@@ -222,8 +225,6 @@ base_step0_delay AS(
       ON v.accrual_year_month = fc.accrual_year_month
   WHERE
     TRUE
-    --AND is_international is FALSE
-    --AND is_before_started is FALSE
   -- There`s an exception of deals on january balance due to the accounting window on the moment of the emission of this closing, there`s an alignment between MIS and controlling regarding this.
     AND (is_paid_in_closing_day is FALSE or dt_closing = '2023-01-31')
     AND (payment_status <> 'canceled' and (is_canceled_in_dead_time is FALSE or is_canceled_in_dead_time IS TRUE))
@@ -236,11 +237,7 @@ base_step1_delay AS(
     CASE WHEN (deal_anchor_due_date IS NOT NULL AND ((deal_detection_method='bill-item') AND (dt_closing=date('2023-1-31')))) OR (deal_anchor_due_date IS NOT NULL AND NOT(dt_closing=date('2023-1-31'))) THEN 1 ELSE 0 END AS flag_is_invoice_deal,
     datediff(dt_due_adjs, dt_closing) AS delta_days,
     datediff(deal_anchor_due_date, dt_created_deal) AS delay_at_deal_creation,
-    datediff(deal_anchor_due_date, dt_closing) AS full_delay_at_deal,
-    is_international,
-    is_before_started,
-    is_writtendown_in_dead_time,
-    has_repair_offboarding_bill_item
+    datediff(deal_anchor_due_date, dt_closing) AS full_delay_at_deal
   FROM
     base_step0_delay
 ),
@@ -332,11 +329,7 @@ base_step2_delay_mid AS(
          WHEN flag_is_invoice_deal = 0 AND flas_contract_has_deal = 1 AND delta_days < 0 THEN delta_days + coalesce(f.bigger_anchor_deal_at_contract,0)
          WHEN flag_is_invoice_deal = 0 AND  flas_contract_has_deal = 1 AND delta_days >=0 THEN delta_days
          WHEN flag_is_invoice_deal = 0 AND  flas_contract_has_deal = 0 THEN delta_days
-        END AS deal_delay_rule_e,
-    is_international,
-    is_before_started,
-    is_writtendown_in_dead_time,
-    has_repair_offboarding_bill_item
+        END AS deal_delay_rule_e
   FROM
     base_step2_delay m
   LEFT JOIN
@@ -387,11 +380,7 @@ base_step3_delay AS(
     aux.delay_contaminated_range_rule_c,
     aux.delay_contaminated_range_rule_d,
     aux.delay_contaminated_range_rule_e,
-    aux_hr.flag_is_HR,
-    is_international,
-    is_before_started,
-    is_writtendown_in_dead_time,
-    has_repair_offboarding_bill_item
+    aux_hr.flag_is_HR
   FROM base_step2_delay_mid m
   LEFT JOIN
     base_aux_ref_contract_delays AS aux
@@ -450,11 +439,7 @@ base_step4_delay AS(
     END AS pd_range_rule_e,
     CASE WHEN flag_is_HR IS TRUE THEN 'HR'
          ELSE 'LR'
-    END AS flag_risk,
-    is_international,
-    is_before_started,
-    is_writtendown_in_dead_time,
-    has_repair_offboarding_bill_item
+    END AS flag_risk
   FROM
     base_step3_delay
 ),
@@ -575,6 +560,11 @@ SELECT
   flas_contract_has_deal as is_contract_with_deal,
   COALESCE(flag_is_HR,FALSE) as is_hr,
   IF(flag_is_invoice_deal = 1, TRUE, FALSE) AS is_invoice_deal,
+  is_international,
+  is_writtendown_in_dead_time,
+  has_repair_offboarding_bill_item,
+  is_write_off,
+  is_contract_write_off,
   dt_closing,
   dt_created_deal,
   dt_due_adjs,
@@ -582,10 +572,7 @@ SELECT
   dt_due_general_accrual,
   dt_paid_adjs,
   dt_snapshot,
-  is_international,
-  is_before_started,
-  is_writtendown_in_dead_time,
-  has_repair_offboarding_bill_item
+  dt_write_off
 FROM
   base_step4_delay
 )
@@ -648,12 +635,15 @@ SELECT
   is_international,
   is_writtendown_in_dead_time,
   has_repair_offboarding_bill_item,
+  is_write_off,
+  is_contract_write_off,
   dt_closing,
   dt_created_deal,
   dt_due_adjs,
   dt_due_deal_anchor,
   dt_due_general_accrual,
   dt_paid_adjs,
+  dt_write_off,
   dt_snapshot
 FROM
   base_step5_delay
