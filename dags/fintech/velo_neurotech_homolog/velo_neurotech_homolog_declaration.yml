@@ -1,0 +1,39 @@
+---
+dag:
+  name: velo_neurotech_homolog
+  schedule_interval: 0 3 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: homolog_dag
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_incremental_data_into_datalake_raw
+  default_partitions: [year, month, day]
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{{ ds }}"
+    - "{table_name}"
+    - "{partitions}"
+
+  tables_customization:
+    logs_credit_granting_pj:
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - DadosConcessaoCreditoPJAPI
+    logs_scoping_policy_pj:
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - DadosAlcadaPJAPI
+    logs_scoping_policy_homolog:
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - DadosAlcadaAPI
+
+cluster:
+  type: databricks_13_3_med_general_cluster
+  custom_libraries:
+    - whl: "{artifacts_bucket}/velo-neurotech-api-client-python/quintoandar_velo_neurotech_api_client-0.3.2-py2.py3-none-any.whl"

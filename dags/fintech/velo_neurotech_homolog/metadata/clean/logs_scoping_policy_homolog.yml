@@ -1,0 +1,19 @@
+---
+database_name: datalake_velo_neurotech_homolog_clean
+table_name: logs_scoping_policy_homolog
+columns:
+  id_proposal:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy_homolog.codigo_proposta
+  id_operation:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy_homolog.codigo_operacao
+  year:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy_homolog.year
+  month:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy_homolog.month
+  day:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy_homolog.day
