@@ -137,6 +137,8 @@ tables:
     extraction_type: full
   sales_flow_users_aud:
     extraction_type: incremental
+  screening_buyer:
+    extraction_type: incremental
   screening_seller:
     extraction_type: incremental
   seller_data:
