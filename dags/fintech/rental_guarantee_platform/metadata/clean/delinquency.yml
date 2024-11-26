@@ -14,12 +14,12 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.status
     categories:
-      '0': "REGISTERED - First status, when the delinquency is created"
-      '1': 'RECOVERING - The delinquency was sent to Recupera'
-      '2': 'PROGRESS - Legacy status from 2.0, not used anymore'
-      '3': 'FINISHED - The delinquency was paid (with gain or loss)'
-      '4': 'UNDER_AGREEMENT - A confirmed agreement between QuintoCred and the defaulter'
-      '5': 'REQUESTED_AGREEMENT - Agreement requested but not confirmed yet'
+      "0": "REGISTERED - First status, when the delinquency is created"
+      "1": "RECOVERING - The delinquency was sent to Recupera"
+      "2": "PROGRESS - Legacy status from 2.0, not used anymore"
+      "3": "FINISHED - The delinquency was paid (with gain or loss)"
+      "4": "UNDER_AGREEMENT - A confirmed agreement between QuintoCred and the defaulter"
+      "5": "REQUESTED_AGREEMENT - Agreement requested but not confirmed yet"
   id_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.type
@@ -32,6 +32,9 @@ columns:
   subcategory:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.subcategory
+  source:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.source
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.value

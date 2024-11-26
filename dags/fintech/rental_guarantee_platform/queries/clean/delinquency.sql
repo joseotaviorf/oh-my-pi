@@ -6,6 +6,7 @@ SELECT
     userinsert AS id_user_insert,
     userupdate AS id_user_update,
     subcategory,
+    source,
     value,
     original_value,
     amount_paid,

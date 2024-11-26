@@ -46,6 +46,12 @@ columns:
   mod_subcategory:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.subcategory_mod
+  source:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.source
+  mod_source:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency_aud.source_mod
   value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency_aud.value

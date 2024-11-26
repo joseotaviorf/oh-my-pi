@@ -13,6 +13,8 @@ SELECT
     revtype AS rev_type,
     subcategory,
     subcategory_mod AS mod_subcategory,
+    source,
+    source_mod AS mod_source,
     value,
     value_mod AS mod_value,
     original_value,
