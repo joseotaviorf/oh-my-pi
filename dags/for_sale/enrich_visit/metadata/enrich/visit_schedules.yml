@@ -1,0 +1,57 @@
+database_name: datalake_visit
+table_name: visit.schedules
+description: Information about Rent and Sale schedules (booking).
+  Each row is an unique schedule with the most important information's.
+domain: Data ForSale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  id_schedule:
+    lineage:
+      - datalake_visit.visit_status_events.id_schedule
+    description:
+  id_author_creator:
+    lineage:
+      - datalake_visit.visit_status_events.id_author_user
+    description:
+      Creator of the schedule.
+  id_succeed_schedule:
+    description:
+      The next schedule case when this schedule have a reschedule.
+  business_context:
+    lineage:
+      - datalake_visit.visit_status_events.business_context
+    description:
+      Business context of the schedule.
+  schedule_origin:
+    description:
+      If the start of this schedule is from a Request or a Reschedule.
+  ts_schedule_requested:
+    lineage:
+      - datalake_visit.visit_status_events.ts_event_created
+    description:
+      Timestamp of the request event.
+  ts_schedule_rescheduled:
+    lineage:
+      - datalake_visit.visit_status_events.ts_event_created
+    description:
+      Timestamp of the reschedule event.
+  ts_schedule_confirmed:
+    lineage:
+      - datalake_visit.visit_status_events.ts_event_created
+    description:
+      Timestamp of the confirmation event.
+  ts_schedule_completed:
+    lineage:
+      - datalake_visit.visit_status_events.ts_event_created
+    description:
+      Timestamp of the completed event.
+  ts_schedule_unsuccessful:
+    lineage:
+      - datalake_visit.visit_status_events.ts_event_created
+    description:
+      Timestamp with the  event.
+  ts_schedule_canceled:
+    lineage:
+      - datalake_visit.visit_status_events.ts_event_created
+    description:
+      Timestamp of the canceled event.
