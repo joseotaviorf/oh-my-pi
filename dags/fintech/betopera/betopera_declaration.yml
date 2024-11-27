@@ -38,8 +38,12 @@ workflow:
       date_filter_column: updated_at
     payment:
       date_filter_column: updated_at
+    reminder:
+      date_filter_column: updated_at
+    reminder_aud:
+      date_filter_column: updated_at
     revinfo:
       extraction_type: full
       clean_table_name: rev_info
 cluster:
-  type: databricks_13_3_min_general_cluster
+  type: databricks_13_3_med_general_cluster
