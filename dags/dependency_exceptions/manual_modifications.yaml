@@ -47,6 +47,9 @@ bietlejuice.dw_crm:
     - bietlejuice.enrich_crm_tasks_history_flows:load-enrich-tasks-history-users-flow
     - bietlejuice.enrich_heimdall:load-enrich-activity
     - bietlejuice.enrich_inspections:load-enrich-inspection-booking
+bietlejuice.dw_customer_suport:
+  remove:
+    - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
 bietlejuice.dw_datamarts_spark.cross:
   add:
     - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
@@ -962,5 +965,5 @@ wonka.house_user_rent_flows:
     - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
     - wonka.house_listing_business_context:load-house_listing_business_context
 wonka.house_agg_rent_flows:
- add:
+  add:
     - wonka.house_user_rent_flows:load-house_user_rent_flows
