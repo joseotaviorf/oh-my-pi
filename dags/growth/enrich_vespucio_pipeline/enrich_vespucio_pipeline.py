@@ -39,6 +39,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+output_location = config_service.get_config("vespucio_output_path")
 
 VESPUCIO_PACKAGE_VERSION = config_service.get_config("vespucio_pipeline_version")
 VESPUCIO_WHEEL_FILE = (
@@ -49,6 +50,7 @@ CLUSTER_DESCRIPTION = config_service.get_config("custom_cluster")
 CLUSTER_DESCRIPTION["spark_conf"].update(
     {"spark.metrics.namespace": "data_products.enrich_vespucio_pipeline"}
 )
+CLUSTER_DESCRIPTION["spark_env_vars"]["OUTPUT_LOCATION"] = output_location
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
