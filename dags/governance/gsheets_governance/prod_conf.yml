@@ -16,3 +16,21 @@ sheets_info:
     sheet_name: looker
     clean_table_name: looker_users_history
     sheet_context: governance
+
+  scan_clean_evaluation:
+    sheet_id: 1Z-Bry2V17FRSFsrLWkhWAyvnYL53lKmBx_ItLLYCKjU
+    sheet_name: Scan_CLEAN
+    clean_table_name: scan_clean_evaluation
+    sheet_context: governance
+
+  scan_enrich_evaluation:
+    sheet_id: 1Z-Bry2V17FRSFsrLWkhWAyvnYL53lKmBx_ItLLYCKjU
+    sheet_name: Scan_ENRICH
+    clean_table_name: scan_enrich_evaluation
+    sheet_context: governance
+
+  scan_dw_evaluation:
+    sheet_id: 1Z-Bry2V17FRSFsrLWkhWAyvnYL53lKmBx_ItLLYCKjU
+    sheet_name: Scan_DW
+    clean_table_name: scan_dw_evaluation
+    sheet_context: governance
