@@ -60,8 +60,10 @@ SELECT
     qdto.queue_name AS olos_dialer_label_description,
     dm.campaign_label,
     qdtc.queue_name AS campaign_label_description,
-    dm.pre_legal_label,
-    qdtpj.queue_name AS pre_legal_label_description,
+    dm.evictions_label,
+    qdtle.queue_name AS evictions_label_description,
+    dm.serasa_limpa_nome_label,
+    qdtlsln.queue_name AS serasa_limpa_nome_label_description,
     dm.id_agency AS agency,
     dm.agency_automatically_assigned,
     dm.times_account_assigned_agency,
@@ -123,5 +125,7 @@ LEFT JOIN deduplicate_queues AS qdto
     ON dm.olos_dialer_label = qdto.queue AND qdto.queue_type = 'Discador Olos'
 LEFT JOIN deduplicate_queues AS qdtc
     ON dm.campaign_label = qdtc.queue AND qdtc.queue_type = 'Campaign'
-LEFT JOIN deduplicate_queues AS qdtpj
-    ON dm.pre_legal_label = qdtpj.queue AND qdtpj.queue_type = 'Pré Jurídico'
+LEFT JOIN deduplicate_queues AS qdtle
+    ON dm.evictions_label = qdtle.queue AND qdtle.queue_type = 'Label Evictions'
+LEFT JOIN deduplicate_queues AS qdtlsln
+    ON dm.serasa_limpa_nome_label = qdtlsln.queue AND qdtlsln.queue_type = 'Label Serasa Limpa Nome'

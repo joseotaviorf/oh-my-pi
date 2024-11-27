@@ -116,7 +116,13 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
     lbl_dectbl5:
-      clean_table_name: pre_legal_label_decision_tree
+      clean_table_name: evictions_label_decision_tree
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+    lbl_dectbl4:
+      clean_table_name: serasa_limpa_nome_label_decision_tree
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:

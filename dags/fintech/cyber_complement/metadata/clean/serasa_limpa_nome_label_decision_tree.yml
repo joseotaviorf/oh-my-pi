@@ -1,0 +1,71 @@
+---
+database_name: datalake_cyber_complement_clean
+table_name: serasa_limpa_nome_label_decision_tree
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  group:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.acct_grp
+  level:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.level1
+  test:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.test
+  sequence:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.sequence
+  comment:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.comment1
+  field_1:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.field_1
+  operator:
+    description: ""
+  field_2:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.field_2
+  field_2_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.field_2_flag
+  field_3:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.field_3
+  field_3_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.field_3_flag
+  or_flag:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.or_flag
+  num_return:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.num_return
+  next_level:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.next_level
+  nxt_return:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.nxt_return
+  queue:
+    description: ""
+    lineage:
+      - datalake_cyber_raw.lbl_dectbl4.queue
+  ts_load:
+    description: ""

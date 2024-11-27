@@ -159,9 +159,10 @@ SELECT
     a.id_campaign,
     COALESCE(c.creditor, a.creditor) AS creditor,
     CASE
-      WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name)) LIKE "PASCH%" THEN "PASCHOALOTTO"
-      WHEN a.id_user LIKE "PSC%" THEN "PASCHOALOTTO"
       WHEN a.id_user = "MIGRACAO" THEN "MIGRACAO"
+      WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name)) LIKE "PASCH%" THEN "PASCHOALOTTO"
+      WHEN UPPER(a.id_user) LIKE "PSC%" THEN "PASCHOALOTTO"
+      WHEN UPPER(a.id_user) LIKE "%SERASA%" THEN "SERASA DIGITAL"
       ELSE UPPER(COALESCE(agg.agency_name, ag.agency_name))
     END AS advisory,
     a.frequency,
@@ -178,6 +179,7 @@ SELECT
       WHEN ag.agency_type = "Portal" THEN "Portal Auto Negociação"
       WHEN ag.agency_type = "Cyber Credit" THEN "Operador Interno"
       WHEN a.id_user = "MIGRACAO" THEN "Migração"
+      WHEN ag.agency_type = "SE" THEN "Serasa Digital"
       ELSE ag.agency_type
     END AS origin_agreement,
     a.status AS original_negotiation_status,

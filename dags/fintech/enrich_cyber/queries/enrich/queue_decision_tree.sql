@@ -59,9 +59,17 @@ union_sources AS (
 
     SELECT
         *,
+        'Label 4' AS label_number,
+        'Label Serasa Limpa Nome' AS queue_type
+    FROM datalake_cyber_clean.serasa_limpa_nome_label_decision_tree
+
+    UNION ALL
+
+    SELECT
+        *,
         'Label 5' AS label_number,
-        'Pré Jurídico' AS queue_type
-    FROM datalake_cyber_clean.pre_legal_label_decision_tree
+        'Label Evictions' AS queue_type
+    FROM datalake_cyber_clean.evictions_label_decision_tree
 ),
 translate_field AS (
   SELECT
@@ -93,6 +101,7 @@ translate_field AS (
       WHEN UPPER(field_1) = 'DMQUE6' THEN 'Fila Negativação'
       WHEN UPPER(field_1) = 'DMLABEL3' THEN 'Label Campanhas'
       WHEN UPPER(field_1) = 'DMLABEL5' THEN 'Label Evictions'
+      WHEN UPPER(field_1) = 'DMLABEL4' THEN 'Label Serasa Limpa Nome'
       ELSE UPPER(field_1)
     END AS field,
     CONCAT("'",
