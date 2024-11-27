@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       Creates enriched tables for Arquivo Confidencial data.
 workflow:
-  type: query_delta
+  type: query
   layer: enrich
   inner_dependencies:
     scr_pivot:
