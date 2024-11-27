@@ -1,0 +1,21 @@
+dag:
+  name: reverse_sale_unavailable_listings_access
+  schedule_start_date: 2022,7,12
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      This DAG aims to provide the product team with a list of platform listings suspected to be unavailable. An HSM will then be sent to these sellers to verify their listings' availability.
+workflow:
+  type: access
+  layer: reverse
+  custom_schema: sale_unavailable_listings
+  load_spark_job: load_into_s3
+  spark_job_arguments:
+    - "{environment}"
+    - "{schema}"
+    - "{table_name}"
+    - "{{ ds }}"
+  tables_customization:
+    suspected_unavailable_listings: {}
+cluster:
+  type: databricks_12_2_xmin_memory_cluster

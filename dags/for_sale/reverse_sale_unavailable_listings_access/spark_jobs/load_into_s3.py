@@ -20,11 +20,16 @@ logger = QuintoAndarLogger(JOB_NAME)
 s3_service = S3Service(boto3.resource("s3"))
 spark_client = SparkClient()
 
+buckets = {
+    "prod": "sale-unavailable-listings-s3-data-quintoandar-com-br",
+    "forno": "5a-sale-unavailable-listings-forno",
+}
+
 def main():
-    bucket, database_name, table_name, execution_date = (
+    env, database_name, table_name, execution_date = (
         parse_arguments()
     )
-
+    bucket = buckets[env]
     logger.info(
         f"""m=__main__, bucket= {bucket}, database_name={database_name}, 
         table_name={table_name}, execution_date={execution_date}"""
@@ -39,7 +44,7 @@ def parse_arguments() -> Tuple[str, str, str, datetime]:
     
     parser = ArgumentParser(description=JOB_NAME)
 
-    parser.add_argument("bucket", help="URL of the Reverse ETL destination bucket")
+    parser.add_argument("env", help="Environment where the job is running")
     parser.add_argument("database_name", help="Name of the reverse etl schema")
     parser.add_argument("table_name", help="Name of the table to be loaded")
     parser.add_argument(
@@ -48,12 +53,12 @@ def parse_arguments() -> Tuple[str, str, str, datetime]:
 
     args = parser.parse_args()
 
-    bucket = args.bucket
+    env = args.env
     database_name = args.database_name
     table_name = args.table_name
     execution_date = datetime.fromisoformat(args.execution_date)
 
-    return bucket, database_name, table_name, execution_date
+    return env, database_name, table_name, execution_date
 
 def prepare_table(database_name: str, table_name: str, execution_date: datetime):
     """

@@ -1,4 +1,0 @@
----
-bucket: sale-unavailable-listings-s3-data-quintoandar-com-br
-database_name: reverse_sale_unavailable_listings
-table_name: suspected_unavailable_listings
