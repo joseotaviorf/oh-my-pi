@@ -321,7 +321,54 @@ global_house_metrics AS (
                                   AND houses_published.business_context = get_json_object(global_user_metrics.dimensions, '$.business_context')
 
     WHERE houses_published.date BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+),
+
+-- This is used to have a the correct denominator is the metrics calculation.
+house_published_all AS (
+    SELECT
+    --ids
+    to_json(
+       named_struct(
+         'id_house', houses_published.id_house
+       )
+     ) AS ids,
+
+    -- dimensions
+    to_json(
+            named_struct(
+                'business_context', houses_published.business_context,
+                'city', house_cities.city
+            )
+    ) AS dimensions,
+
+    -- variants
+    houses_published.variants as variants,
+
+    --metrics
+    to_json(
+            named_struct(
+                'house_published', 1
+            )
+    ) AS metrics,
+
+    -- timestamps
+    to_json(
+            named_struct(
+                'ts_house_published', houses_published.ts_house_published
+            )
+    ) AS timestamps,
+
+    houses_published.date,
+    houses_published.year,
+    houses_published.month,
+    houses_published.day,
+    houses_published.week
+
+    FROM parsed_houses_published as houses_published
+    LEFT JOIN house_cities ON houses_published.id_house = house_cities.id_house
+    WHERE houses_published.date BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
+
 
 ------------------------------------------------------------------------------------
 --------------------------- 3 - User House Global Metrics --------------------------
@@ -331,3 +378,5 @@ global_house_metrics AS (
 SELECT * FROM global_user_metrics
 UNION
 SELECT * FROM global_house_metrics
+UNION
+SELECT * FROM house_published_all
