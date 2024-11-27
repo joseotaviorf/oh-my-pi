@@ -1,0 +1,72 @@
+database_name: datalake_betopera_clean
+table_name: reminder_aud
+columns:
+  id:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.id
+  rev:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.rev
+  rev_end:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.revend
+  rev_type:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.revtype
+  id_certificate:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.certificate_id
+  id_idempotency:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.idempotency_id
+  hash:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.hash
+  status:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.status
+  event_type:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.event_type
+  mod_id_certificate:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.certificate_id_mod
+  mod_id_idempotency:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.idempotency_id_mod
+  mod_hash:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.hash_mod
+  mod_status:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.status_mod
+  mod_dt_event:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.event_date_mod
+  mod_event_type:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.event_type_mod
+  mod_created_at:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.created_at_mod
+  mod_updated_at:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.updated_at_mod
+  dt_event:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.event_date
+  ts_created:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.updated_at
+  year:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.year
+  month:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.month
+  day:
+    lineage:
+      - datalake_betopera_raw.reminder_aud.day

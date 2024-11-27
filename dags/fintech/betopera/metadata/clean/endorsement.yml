@@ -1,0 +1,33 @@
+database_name: datalake_betopera_clean
+table_name: endorsement
+columns:
+    id:
+        lineage:
+            - datalake_betopera_raw.endorsement.id
+    id_certificate:
+        lineage:
+            - datalake_betopera_raw.endorsement.certificate_id
+    process_info:
+        lineage:
+            - datalake_betopera_raw.endorsement.process_info
+    type:
+        lineage:
+            - datalake_betopera_raw.endorsement.type
+    status:
+        lineage:
+            - datalake_betopera_raw.endorsement.status
+    ts_created:
+        lineage:
+            - datalake_betopera_raw.endorsement.created_at
+    ts_updated:
+        lineage:
+            - datalake_betopera_raw.endorsement.updated_at
+    year:
+        lineage:
+            - datalake_betopera_raw.endorsement.year
+    month:
+        lineage:
+            - datalake_betopera_raw.endorsement.month
+    day:
+        lineage:
+            - datalake_betopera_raw.endorsement.day

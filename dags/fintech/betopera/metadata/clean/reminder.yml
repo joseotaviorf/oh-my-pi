@@ -1,0 +1,39 @@
+database_name: datalake_betopera_clean
+table_name: reminder
+columns:
+  id:
+    lineage:
+      - datalake_betopera_raw.reminder.id
+  id_certificate:
+    lineage:
+      - datalake_betopera_raw.reminder.certificate_id
+  id_idempotency:
+    lineage:
+      - datalake_betopera_raw.reminder.idempotency_id
+  hash:
+    lineage:
+      - datalake_betopera_raw.reminder.hash
+  status:
+    lineage:
+      - datalake_betopera_raw.reminder.status
+  event_type:
+    lineage:
+      - datalake_betopera_raw.reminder.event_type
+  dt_event:
+    lineage:
+      - datalake_betopera_raw.reminder.event_date
+  ts_created:
+    lineage:
+      - datalake_betopera_raw.reminder.created_at
+  ts_updated:
+    lineage:
+      - datalake_betopera_raw.reminder.updated_at
+  year:
+    lineage:
+      - datalake_betopera_raw.reminder.year
+  month:
+    lineage:
+      - datalake_betopera_raw.reminder.month
+  day:
+    lineage:
+      - datalake_betopera_raw.reminder.day

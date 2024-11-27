@@ -1,0 +1,51 @@
+database_name: datalake_betopera_clean
+table_name: insurance_aud
+columns:
+    id:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.id
+    id_idempotency:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.idempotency_id
+    rev:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.rev
+    rev_end:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.revend
+    rev_type:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.revtype
+    source_type_code:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.source_type_code
+    status:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.status
+    version:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.version
+    mod_status:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.status_mod
+    mod_source_type_code:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.source_type_code_mod
+    mod_id_idempotency:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.idempotency_id_mod
+    ts_created:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.created_at
+    ts_updated:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.updated_at
+    year:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.year
+    month:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.month
+    day:
+        lineage:
+            - datalake_betopera_raw.insurance_aud.day

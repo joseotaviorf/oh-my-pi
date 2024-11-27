@@ -1,0 +1,99 @@
+database_name: datalake_betopera_clean
+table_name: certificate_aud
+columns:
+    id:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.id
+    id_insurance:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.insurance_id
+    id_certificate_request:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.certificate_request_id
+    rev:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.rev
+    rev_end:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.revend
+    rev_type:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.revtype
+    version:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.version
+    response_payload:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.response_payload
+    file_url:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.file_url
+    status:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.status
+    source_input_type:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.source_input_type
+    person_email:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.person_email
+    cancellation_reason:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.cancellation_reason
+    mod_response_payload:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.response_payload_mod
+    mod_file_url:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.file_url_mod
+    mod_status:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.status_mod
+    mod_source_input_type:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.source_input_type_mod
+    mod_person_email:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.person_email_mod
+    mod_cancellation_reason:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.cancellation_reason_mod
+    mod_id_insurance:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.insurance_id_mod
+    mod_id_certificate_request:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.certificate_request_id_mod
+    mod_dt_start:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.start_date_mod
+    mod_dt_end:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.end_date_mod
+    mod_dt_cancel:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.cancel_date_mod
+    dt_start:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.start_date
+    dt_end:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.end_date
+    dt_cancel:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.cancel_date
+    ts_created:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.created_at
+    ts_updated:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.updated_at
+    year:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.year
+    month:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.month
+    day:
+        lineage:
+            - datalake_betopera_raw.certificate_aud.day

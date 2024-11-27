@@ -1,0 +1,57 @@
+database_name: datalake_betopera_clean
+table_name: certificate_request_aud
+columns:
+    id:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.id
+    id_insurance:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.insurance_id
+    rev:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.rev
+    rev_end:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.revend
+    rev_type:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.revtype
+    version:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.version
+    payload:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.payload
+    status:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.status
+    mod_id_insurance:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.insurance_id_mod
+    mod_payload:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.payload_mod
+    mod_status:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.status_mod
+    mod_synced_at:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.synced_at_mod
+    ts_synced:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.synced_at
+    ts_created:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.created_at
+    ts_updated:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.updated_at
+    year:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.year
+    month:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.month
+    day:
+        lineage:
+            - datalake_betopera_raw.certificate_request_aud.day

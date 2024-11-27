@@ -1,0 +1,18 @@
+database_name: datalake_betopera_clean
+table_name: rev_info
+columns:
+    rev:
+        lineage:
+            - datalake_betopera_raw.revinfo.rev
+    ts_created:
+        lineage:
+            - datalake_betopera_raw.revinfo.revtstmp
+    year:
+        lineage:
+            - datalake_betopera_raw.revinfo.year
+    month:
+        lineage:
+            - datalake_betopera_raw.revinfo.month
+    day:
+        lineage:
+            - datalake_betopera_raw.revinfo.day

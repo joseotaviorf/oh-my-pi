@@ -18,14 +18,28 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   tables_customization:
+    certificate_aud:
+      date_filter_column: updated_at
+    certificate_request_aud:
+      date_filter_column: updated_at
     certificate_request:
       date_filter_column: updated_at
     certificate:
       date_filter_column: updated_at
+    endorsement_aud:
+      date_filter_column: updated_at
+    endorsement:
+      date_filter_column: updated_at
+    insurance_aud:
+      date_filter_column: updated_at
     insurance:
       date_filter_column: updated_at
+    payment_aud:
+      date_filter_column: updated_at
+    payment:
+      date_filter_column: updated_at
+    revinfo:
+      extraction_type: full
+      clean_table_name: rev_info
 cluster:
   type: databricks_13_3_min_general_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE

@@ -1,0 +1,39 @@
+database_name: datalake_betopera_clean
+table_name: payment
+columns:
+    id:
+        lineage:
+            - datalake_betopera_raw.payment.id
+    id_certificate:
+        lineage:
+            - datalake_betopera_raw.payment.certificate_id
+    process_info:
+        lineage:
+            - datalake_betopera_raw.payment.process_info
+    amount:
+        lineage:
+            - datalake_betopera_raw.payment.amount
+    status:
+        lineage:
+            - datalake_betopera_raw.payment.status
+    dt_start_installment:
+        lineage:
+            - datalake_betopera_raw.payment.installment_start_date
+    dt_end_installment:
+        lineage:
+            - datalake_betopera_raw.payment.installment_end_date
+    ts_created:
+        lineage:
+            - datalake_betopera_raw.payment.created_at
+    ts_updated:
+        lineage:
+            - datalake_betopera_raw.payment.updated_at
+    year:
+        lineage:
+            - datalake_betopera_raw.payment.year
+    month:
+        lineage:
+            - datalake_betopera_raw.payment.month
+    day:
+        lineage:
+            - datalake_betopera_raw.payment.day

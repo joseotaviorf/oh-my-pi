@@ -1,15 +1,17 @@
 SELECT
     id,
-    idempotency_id AS id_idempotency,
-    source_type_code,
+    certificate_id AS id_certificate,
+    process_info,
+    amount,
     status,
-    version,
+    DATE(installment_start_date) AS dt_start_installment,
+    DATE(installment_end_date) AS dt_end_installment,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated,
     year,
     month,
     day
 FROM
-    datalake_betopera_raw.insurance
+    datalake_betopera_raw.payment
 WHERE
     MAKE_DATE(year,month,day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

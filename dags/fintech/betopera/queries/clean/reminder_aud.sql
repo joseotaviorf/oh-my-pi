@@ -1,0 +1,28 @@
+SELECT
+    id,
+    rev,
+    revend AS rev_end,
+    revtype AS rev_type,
+    certificate_id AS id_certificate,
+    idempotency_id AS id_idempotency,
+    hash,
+    status,
+    event_type,
+    certificate_id_mod AS mod_id_certificate,
+    idempotency_id_mod AS mod_id_idempotency,
+    hash_mod AS mod_hash,
+    status_mod AS mod_status,
+    event_date_mod AS mod_dt_event,
+    event_type_mod AS mod_event_type,
+    created_at_mod AS mod_created_at,
+    updated_at_mod AS mod_updated_at,
+    DATE(event_date) AS dt_event,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_betopera_raw.reminder_aud
+WHERE
+    MAKE_DATE(year,month,day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

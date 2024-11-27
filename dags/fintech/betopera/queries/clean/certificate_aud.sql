@@ -1,0 +1,37 @@
+SELECT
+    id,
+    insurance_id AS id_insurance,
+    certificate_request_id AS id_certificate_request,
+    rev,
+    revend AS rev_end,
+    revtype AS rev_type,
+    version,
+    response_payload,
+    file_url,
+    status,
+    source_input_type,
+    person_email,
+    cancellation_reason,
+    response_payload_mod AS mod_response_payload,
+    file_url_mod AS mod_file_url,
+    status_mod AS mod_status,
+    source_input_type_mod AS mod_source_input_type,
+    person_email_mod AS mod_person_email,
+    cancellation_reason_mod AS mod_cancellation_reason,
+    insurance_id_mod AS mod_id_insurance,
+    certificate_request_id_mod AS mod_id_certificate_request,
+    start_date_mod AS mod_dt_start,
+    end_date_mod AS mod_dt_end,
+    cancel_date_mod AS mod_dt_cancel,
+    DATE(start_date) AS dt_start,
+    DATE(end_date) AS dt_end,
+    DATE(cancel_date) AS dt_cancel,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_betopera_raw.certificate_aud
+WHERE
+    MAKE_DATE(year,month,day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
