@@ -26,4 +26,6 @@ SELECT
 FROM
     datalake_growth_lab_raw.supply_recurrence
 WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+    year = {year}
+    AND month = {month}
+    AND day = {day}

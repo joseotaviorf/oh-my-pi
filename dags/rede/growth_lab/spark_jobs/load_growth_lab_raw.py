@@ -77,15 +77,10 @@ def parse_args() -> Namespace:
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("table_name")
-    parser.add_argument("load_start_date", type=str, help="Start of date range to be used in filtering the files")
-    parser.add_argument("load_end_date", type=str, help="End of date range to be used in filtering the files")
+    parser.add_argument("execution_date", type=str, help="DAG execution date")
     parser.add_argument("gcp_bucket_name", type=str, help="Name of the bucket in GCP")
     parser.add_argument("prefix_template", type=str, help="Template of the file name to find the blob")
     args = parser.parse_args()
-
-
-    parser.add_argument("load_start_date", help="Start of date range to be used in filtering the files. Format: '%Y-%m-%d'")
-    parser.add_argument("load_end_date", help="End of date range to be used in filtering the files. Format: '%Y-%m-%d'")
 
     logger.info(
         f"""

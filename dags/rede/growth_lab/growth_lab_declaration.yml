@@ -11,21 +11,17 @@ workflow:
   load_spark_job: load_growth_lab_raw
   default_extraction_type: incremental
   default_partitions: [year, month, day]
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
     - "{dag_name}"
     - "{table_name}"
-    - "{load_start_date}"
-    - "{load_end_date}"
+    - "{{ ds }}"
   tables_customization:
     supply_recurrence:
       extra_spark_job_arguments:
         - "growthlab-factory"
-        - "supply_recurrence/{{ macros.ds_add(load_start_date, 1) | replace('-', '_') }}/supply_recurrence.csv"
+        - "supply_recurrence/{{ macros.ds_add(ds, 1) | replace('-', '_') }}/supply_recurrence.csv"
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:
