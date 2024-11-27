@@ -35,6 +35,7 @@ cte_bp_type AS (
   SELECT 
     pdr.id_prospect,
     pdr.event_name,
+    pdr.id_region,
     CASE 
       WHEN pdr.event_name = 'USER RECOVERY' AND pdr.flow_order = 1 THEN 'RBP'
       WHEN pdr.event_name = 'USER FIRST ACTIVATION' AND pdr.flow_order = 1 THEN 'NBP'
