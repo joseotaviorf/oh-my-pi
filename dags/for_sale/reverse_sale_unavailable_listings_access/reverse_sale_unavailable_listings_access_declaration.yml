@@ -8,7 +8,7 @@ dag:
 workflow:
   type: access
   layer: reverse
-  custom_schema: sale_unavailable_listings
+  custom_schema: reverse_sale_unavailable_listings
   load_spark_job: load_into_s3
   spark_job_arguments:
     - "{environment}"
