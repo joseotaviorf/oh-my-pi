@@ -9,7 +9,9 @@ workflow:
   layer: dw
   custom_schema: public
 cluster:
-  type: databricks_12_2_med_general_photon_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
