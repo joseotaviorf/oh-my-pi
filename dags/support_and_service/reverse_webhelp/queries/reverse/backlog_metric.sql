@@ -1,4 +1,4 @@
-SELECT DISTINCT
+SELECT
   bmt.sk_task AS sk_ticket,
   bmt.sk_agent,
   bmt.origin AS channel,
@@ -10,7 +10,7 @@ SELECT DISTINCT
   dt.motivation AS contact_motivation_tag,
   dt.theme_detail AS contact_theme_detail_tag,
   dt.customer_type_tag AS customer_type_tag,
-  dtt.tags AS tag,
+  dit.tags AS tag,
   dt.step_tag AS step_tag,
   dd.team,
   dd.journey_step,
@@ -36,14 +36,14 @@ LEFT JOIN
   dw_customer_support.dim_taxonomy AS dt
     ON bmt.sk_taxonomy = dt.sk_taxonomy
 LEFT JOIN
-  dw_customer_support.dim_ticket_tags AS dtt
-    ON bmt.sk_tags = dtt.sk_tags
-LEFT JOIN
   dw_customer_support.dim_department AS dd
     ON bmt.sk_main_department = dd.sk_department
 LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON bmt.sk_agent = da.sk_agent
+LEFT JOIN 
+  dw_customer_support.dim_ticket dit
+    ON dit.sk_ticket = bmt.sk_task
 LEFT JOIN 
   dw_customer_support.fact_ticket AS tf
     ON tf.sk_ticket = bmt.sk_task
@@ -51,4 +51,6 @@ WHERE
   DATE(bmt.dt_metric_reference) >= CURRENT_DATE - INTERVAL '1' YEAR
   AND dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'
-  AND da.agent_organization IN ('webhelp', 'webhelpbr')
+  AND da.agent_organization IN ('webhelp', 'webhelpbr', 'contractors')
+QUALIFY
+  ROW_NUMBER() OVER(PARTITION BY bmt.sk_task, bmt.dt_metric_reference ORDER BY bmt.sla_target DESC) = 1
