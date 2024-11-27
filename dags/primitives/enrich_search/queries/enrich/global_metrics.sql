@@ -168,7 +168,7 @@ global_user_metrics AS (
                           OR sale_flow.ts_contract_signed >= all_users.date
                         )
     LEFT JOIN house_cities ON COALESCE(rent_flow.id_house, sale_flow.id_house) = house_cities.id_house
-)
+),
 
 ------------------------------------------------------------------------------------
 ------------------------------ 2 - House Global Metrics ----------------------------
@@ -177,7 +177,7 @@ global_user_metrics AS (
 -----------------
 --House publication
 
-WITH houses_catalog AS (
+houses_catalog AS (
     SELECT DISTINCT
         CAST(
             SUBSTRING(
@@ -265,7 +265,7 @@ parsed_houses_published AS (
     LEFT JOIN house_cities
         ON houses_published.id_house = house_cities.id_house
     WHERE houses_published.ts_house_published BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-)
+),
 
 global_house_metrics AS (
     SELECT
