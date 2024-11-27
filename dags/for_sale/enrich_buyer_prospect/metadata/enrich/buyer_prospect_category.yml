@@ -1,0 +1,56 @@
+---
+database_name: datalake_buyer_prospect
+table_name: buyer_prospect_category
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: Table with categorization of buyer prospects of High Ticket and if is new prospect or recovery.
+  prospect
+columns:
+  id_prospect:
+    description: 'Id of the prospect, or buyer.'
+    lineage:
+    - datalake_demand_flows.prospect_daily_results.id_prospect
+  id_region:
+    description: 'Id of the region of the prospect'
+    lineage:
+    - datalake_demand_flows.prospect_daily_results.id_region
+  id_first_booking:
+    description: 'Id of the first booking of the prospect.'
+    lineage:
+    - datalake_demand_flows.prospect_daily_results.id_booking
+  id_house_first_booking:
+    description: 'Id of the house of the first booking of the prospect.'
+    lineage:
+    - datalake_demand_flows.prospect_daily_results.id_house
+  bp_type:
+    description: 'Buyer prospect type, if is new prospect or recovery prospect.'
+    categories:
+      "NBP": "New Buyer Prospect."
+      "RBP": "Recovery Buyer Prospect."
+    lineage:
+    - datalake_demand_flows.prospect_daily_results.event_name
+  city_group:
+    description: 'City group of the prospect.'
+    lineage:
+    - datalake_region.region.city_group
+  ticket_segmentation:
+    description: 'Segmentation of the ticket of the first visit of the prospect.'
+    categories:
+      "High Ticket": "High Ticket"
+      "Low Ticket": "Low Ticket"
+    lineage:
+    - datalake_sale_listings.sale_listing_price_changes.ticket_segmentation
+  activation_date:
+    description: 'Date of activation of the prospect.'
+    lineage:
+    - datalake_demand_flows.prospect_daily_results.ts_event
+  activation_end_date:
+    description: 'Date of end of activation of the prospect.'
+    lineage:
+    - datalake_demand_flows.prospect_daily_results.ts_event
+  ts_first_booking:
+    description: 'Timestamp of the first booking of the prospect.'
+    lineage:
+    - datalake_demand_flows.prospect_daily_results.ts_event
+  ts_load:
+    description: 'Timestamp of the load of the data.'

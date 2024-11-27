@@ -1327,8 +1327,11 @@ bietlejuice.enrich_bureaus:
 bietlejuice.enrich_buyer_prospect:
   - bietlejuice.ebdb_contract:load-clean-contract-person
   - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
   - bietlejuice.enrich_offer:load-enrich-offer
+  - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
 bietlejuice.enrich_ciq:
   - bietlejuice.gsheets_agents:done-clean-ciq-portfolio
 bietlejuice.enrich_ciq_comissioning:
