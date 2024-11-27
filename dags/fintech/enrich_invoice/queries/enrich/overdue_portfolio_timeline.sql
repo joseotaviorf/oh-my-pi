@@ -203,8 +203,14 @@ SELECT
     payment_status,
     substatus,
     reason,
-    paid_via,
-    is_write_off,
+    CASE
+        WHEN dt_paid BETWEEN month_start AND reference_date
+            AND dt_paid > dt_due_adjusted
+        THEN paid_via
+    END AS paid_via,
+    CASE
+        WHEN reference_date >= dt_write_off THEN is_write_off
+    END AS is_write_off,
     is_contract_write_off,
     debtor_type,
     due_amount,
@@ -236,7 +242,9 @@ SELECT
     END AS dt_invoice_paid,
     dt_due AS dt_invoice_due,
     dt_due_adjusted AS dt_invoice_due_adjust,
-    dt_write_off,
+    CASE
+        WHEN reference_date >= dt_write_off THEN dt_write_off
+    END AS dt_write_off,
     month_start AS dt_month_start,
     month_end AS dt_month_end,
     reference_date AS dt_reference
