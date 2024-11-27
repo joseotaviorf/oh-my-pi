@@ -198,13 +198,6 @@ sheets_info:
     sheet_context: for_sale
     preload_time_in_seconds: 30
 
-  tqc_leads_bh:
-    sheet_id: 134aaiWWqIE4P9nEOONk7dSesdRZrTZf1otcxwZGjT-g
-    sheet_name: tqc_leads_bh
-    clean_table_name: tqc_leads_bh
-    sheet_context: for_sale
-    preload_time_in_seconds: 30
-
   vespucio_condo_golden_set:
     sheet_id: 1m_PJ_47dOvWnfuyz3aR3d018NPWc4cZCL_l5GbaMy7g
     sheet_name: TreatedFormToBeImported
