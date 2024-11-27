@@ -1,0 +1,172 @@
+---
+database_name: datalake_mission_control_test_clean
+table_name: contract
+owner: "kleber.inoue@quintoandar.com.br"
+domain: For Rent
+description: Table that contains the contracts of Mission Control source.
+  Due to incremental load, this table contains duplicated IDs.
+columns:
+  id_contract:
+    description: ID of the contract and it's the same of EBDB. It's the primary key of the table.
+    lineage:
+      - datalake_mission_control_test_raw.contract.id
+  id_house:
+    description: ID of the house. It can be joined with the id_house from EBDB.
+    lineage:
+      - datalake_mission_control_test_raw.contract.imovel_id
+  id_google_drive:
+    description: ID of the Google Drive.
+    lineage:
+      - datalake_mission_control_test_raw.contract.google_drive_id
+  id_property_address:
+    description: ID of the property's address.
+    lineage:
+      - datalake_mission_control_test_raw.contract.property_address_id
+  id_mailing_address:
+    description: ID of the mailing address.
+    lineage:
+      - datalake_mission_control_test_raw.contract.mailing_address_id
+  id_landlord_account:
+    description: ID of the landlord's account.
+    lineage:
+      - datalake_mission_control_test_raw.contract.landlord_account_id
+  id_tenant_account:
+    description: ID of the tenant's account.
+    lineage:
+      - datalake_mission_control_test_raw.contract.tenant_account_id
+  id_landlord_user:
+    description: ID user of the landlord. It can be joined with user table from EBDB.
+    lineage:
+      - datalake_mission_control_test_raw.contract.landlord_user_id
+  id_tenant_user:
+    description: ID user of the tenant. It can be joined with user table from EBDB.
+    lineage:
+      - datalake_mission_control_test_raw.contract.tenant_user_id
+  id_condo_manager:
+    description: ID of the condo manager.
+    lineage:
+      - datalake_mission_control_test_raw.contract.condo_manager_id
+  id_payment_info:
+    description: ID of the info payment.
+    lineage:
+      - datalake_mission_control_test_raw.contract.info_payment_id
+  id_partner:
+    description: ID of the partner.
+    lineage:
+      - datalake_mission_control_test_raw.contract.partner_id
+  id_external:
+    description: ID of the EBDB contract. It has the same ID of id_contract column.
+    lineage:
+      - datalake_mission_control_test_raw.contract.external_id
+  status:
+    description: Status of the contract.
+    lineage:
+      - datalake_mission_control_test_raw.contract.status
+  guarantee:
+    description: Guarantee type.
+    lineage:
+      - datalake_mission_control_test_raw.contract.guarantee
+  condominium_from_account_type:
+    description: Account type responsible to pay the condominium.
+    lineage:
+      - datalake_mission_control_test_raw.contract.condominium_from_account_type
+  iptu_from_account_type:
+    description: Account type responsible to pay the IPTU (property tax).
+    lineage:
+      - datalake_mission_control_test_raw.contract.iptu_from_account_type
+  iptu_to_account_type:
+    description: Account type responsible to receive the IPTU (property tax).
+    lineage:
+      - datalake_mission_control_test_raw.contract.iptu_to_account_type
+  condominium_payer:
+    description: Account type responsible to pay the condominium.
+    lineage:
+      - datalake_mission_control_test_raw.contract.condominium_payer
+  cover_image_url:
+    description: URL of the cover image.
+    lineage:
+      - datalake_mission_control_test_raw.contract.cover_image_url
+  version:
+    description: Contract version.
+    lineage:
+      - datalake_mission_control_test_raw.contract.version
+  contract_rent_model:
+    description: Type of the rental administrator.
+    lineage:
+      - datalake_mission_control_test_raw.contract.contract_rent_model
+  landlord_transfer_funds_day:
+    description: Day of the month when landlord receives the funds.
+    lineage:
+      - datalake_mission_control_test_raw.contract.landlord_transfer_funds_day
+  tenant_charge_day:
+    description: Day of the month when tenant is charged.
+    lineage:
+      - datalake_mission_control_test_raw.contract.tenant_charge_day
+  condominium_amount:
+    description: Condominium value.
+    lineage:
+      - datalake_mission_control_test_raw.contract.condominium_amount
+  brokerage_fee:
+    description: Brokerage fee value.
+    lineage:
+      - datalake_mission_control_test_raw.contract.brokerage_fee
+  iptu_installments:
+    description: Number of IPTU (property tax) installments.
+    lineage:
+      - datalake_mission_control_test_raw.contract.iptu_installments
+  iptu_amount:
+    description: IPTU (property tax) value.
+    lineage:
+      - datalake_mission_control_test_raw.contract.iptu_amount
+  rental_amount:
+    description: Rent value.
+    lineage:
+      - datalake_mission_control_test_raw.contract.rental_amount
+  administration_fee:
+    description: Administration fee value (percentage).
+    lineage:
+      - datalake_mission_control_test_raw.contract.administration_fee
+  monthly_discount:
+    description: Monthly discount value.
+    lineage:
+      - datalake_mission_control_test_raw.contract.monthly_discount
+  home_insurance_amount:
+    description: Home insurance value.
+    lineage:
+      - datalake_mission_control_test_raw.contract.home_insurance_amount
+  can_chat:
+    description: Boolean value to check if the landlord/tenant is open to chat.
+    lineage:
+      - datalake_mission_control_test_raw.contract.can_chat
+  is_auto_igpm:
+    description: Boolean value to check if the contract has auto IGPM active.
+    lineage:
+      - datalake_mission_control_test_raw.contract.auto_igpm
+  is_deleted:
+    description: Boolean value to check if the record is deleted.
+    lineage:
+      - datalake_mission_control_test_raw.contract.deleted
+  ts_created:
+    description: Timestamp of the contract creation.
+    lineage:
+      - datalake_mission_control_test_raw.contract.created_on
+  ts_updated:
+    description: Timestamp when the register was updated.
+    lineage:
+      - datalake_mission_control_test_raw.contract.updated_on
+  ts_last_synced:
+    description: Timestamp of the contract's last sync.
+    lineage:
+      - datalake_mission_control_test_raw.contract.last_sync
+  ts_charge_started:
+    description: Timestamp of when the charged started.
+    lineage:
+      - datalake_mission_control_test_raw.contract.start_charge
+  ts_period_started:
+    description: Timestamp of when the period started.
+    lineage:
+      - datalake_mission_control_test_raw.contract.start_period
+  ts_period_ended:
+    description: Timestamp of when the period ended.
+    lineage:
+      - datalake_mission_control_test_raw.contract.end_period

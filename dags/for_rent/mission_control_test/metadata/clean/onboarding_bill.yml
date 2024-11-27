@@ -1,0 +1,92 @@
+---
+database_name: datalake_mission_control_test_clean
+table_name: onboarding_bill
+owner: "kleber.inoue@quintoandar.com.br"
+domain: For Rent
+description: Table that contains the bills (energy, water, etc)
+  Due to incremental load, this table contains duplicated IDs.
+columns:
+  id:
+    description: ID of the bill.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.id
+  id_address:
+    description: ID address.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.address_id
+  id_onboarding:
+    description: ID of the onboarding.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.onboarding_id
+  id_supplier:
+    description: ID of the supplier, it can be NULL.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.supplier_id
+  id_supplier_city:
+    description: ID of the supplier city.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.supplier_city_id
+  id_google_drive:
+    description: ID of the Google Drive.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.google_drive_id
+  id_google_drive_file:
+    description: ID of the Google's Drive file.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.google_drive_file_id
+  status:
+    description: Status of the bill.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.status
+  type:
+    description: Type of the bill.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.type
+  ownership:
+    description: The owner's name which is related to the bill.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.ownership
+  ownership_cpf:
+    description: Owner's CPF (Brazilian Individual Taxpayer Registry) related to the bill.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.ownership_cpf
+  installation_code:
+    description: Installation's code.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.installation_code
+  total_debit:
+    description: Debit value left from the bill.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.total_debit
+  is_on:
+    description: Boolean value if the bill is on.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.is_on
+  is_active:
+    description: Boolean value if the bill is active.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.is_active
+  is_deleted:
+    description: Boolean value if the bill is deleted.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.deleted
+  ts_created:
+    description: Timestamp of the bill's creation.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.created_on
+  ts_updated:
+    description: Timestamp when the bill was updated.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.updated_on
+  year:
+    description: Year integer value of the record's update. Also it's a partition.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.year
+  month:
+    description: Month integer value of the record's update. Also it's a partition.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.month
+  day:
+    description: Day integer value of the record's update. Also it's a partition.
+    lineage:
+      - datalake_mission_control_test_raw.onboardingbill.day

@@ -1,0 +1,35 @@
+dag:
+  name: mission_control_test
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 10 21 * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: Extraction and load database mission_control (MySQL) responsible for the onboarding and ongoing journey of our tenants and landlords.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: mission_control_test
+  database_type: mysql
+  source_database: mission_control
+  source_schema: mission_control
+  lineage_product_database_name: missioncontrol
+  dbutils_secret_key: MISSION_CONTROL_DB
+  tables_customization:
+    Contract:
+      clean_table_name: contract
+    ContractPerson:
+      clean_table_name: contract_person
+    Onboarding:
+      clean_table_name: onboarding
+    OnboardingAction:
+      clean_table_name: onboarding_action
+    OnboardingBill:
+      clean_table_name: onboarding_bill
+    OnboardingTask:
+      clean_table_name: onboarding_task
+    OnboardingTaskTypes:
+      clean_table_name: onboarding_task_types
+    User:
+      clean_table_name: user
+cluster:
+  type: databricks_12_2_med_general_cluster
