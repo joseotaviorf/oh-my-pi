@@ -219,7 +219,16 @@ tickets_per_task AS (
     COALESCE(ca1.is_call_answered, ca2.is_call_answered) AS is_call_answered,
     t.ts_budget,
     t.ts_created,
-    COALESCE(ca1.ts_reservation_created, ca2.ts_reservation_created, ch.ts_created) AS ts_created_twilio,
+    COALESCE(
+      ca1.ts_task_created,
+      ca2.ts_task_created,
+      ch.ts_created
+    ) AS ts_created_twilio,
+    COALESCE(
+      ca1.ts_reservation_created,
+      ca2.ts_reservation_created,
+      ch.ts_created
+    ) AS ts_twilio_task_created,
     t.ts_solved,
     t.ts_closed,
     t.ts_updated,
@@ -248,10 +257,10 @@ ticket_twilio_data AS (
   WITH twilio_attr AS (
     SELECT DISTINCT
       id_ticket,
-      FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_created_twilio) AS first_queue,
-      FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_created_twilio DESC) AS last_queue,
-      FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_created_twilio) AS first_analyst_email,
-      FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_created_twilio DESC) AS last_analyst_email,
+      FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created) AS first_queue,
+      FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created DESC) AS last_queue,
+      FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created) AS first_analyst_email,
+      FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created DESC) AS last_analyst_email,
       MAX(ts_created_twilio) OVER(PARTITION BY id_ticket) AS ts_created_twilio
     FROM
       tickets_per_task
