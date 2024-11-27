@@ -12,7 +12,7 @@ columns:
     description: "Unique identifier for each campaign across different media platforms."
     lineage:
       - datalake_facebook_insights_clean.facebook_insights.id_campaign
-      - datalake_criteo_campaigns_clean.criteo_campaigns.id_campaign
+      - datalake_criteo.criteo_campaigns.id_campaign
       - datalake_lifull_campaigns_clean.mitula_campaigns.id_campaign
       - datalake_rtb_campaigns_clean.rtb_campaigns.id_sub_campaign
       - datalake_lifull_campaigns_clean.trovit_campaigns.id_campaign
@@ -27,7 +27,7 @@ columns:
     description: "Name of the campaign provided by each media platform."
     lineage:
       - datalake_facebook_insights_clean.facebook_insights.campaign_name
-      - datalake_criteo_campaigns_clean.criteo_campaigns.campaign_name
+      - datalake_criteo.criteo_campaigns.campaign_name
       - datalake_lifull_campaigns_clean.mitula_campaigns.campaign_name
       - datalake_rtb_campaigns_clean.rtb_campaigns.sub_campaign_name
       - datalake_lifull_campaigns_clean.trovit_campaigns.campaign_name
@@ -41,7 +41,7 @@ columns:
     description: "Earliest start date of the campaign as per platform data."
     lineage:
       - datalake_facebook_insights_clean.facebook_insights.dt_start
-      - datalake_criteo_campaigns_clean.criteo_campaigns.dt_attribution
+      - datalake_criteo.criteo_campaigns.dt_report
       - datalake_lifull_campaigns_clean.mitula_campaigns.dt_attribution
       - datalake_rtb_campaigns_clean.rtb_campaigns.dt_attribution
       - datalake_lifull_campaigns_clean.trovit_campaigns.dt_attribution

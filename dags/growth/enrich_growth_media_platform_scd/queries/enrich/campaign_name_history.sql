@@ -15,11 +15,11 @@ criteo AS (
     'criteo' AS origin,
     id_campaign,
     campaign_name,
-    MIN(dt_attribution) AS dt_start
+    MIN(dt_report) AS dt_start
   FROM 
-    datalake_criteo_campaigns_clean.criteo_campaigns
+    datalake_criteo.criteo_campaigns
   WHERE 
-    DATE(dt_attribution) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    DATE(dt_report) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   GROUP BY ALL
 ),
 mitula AS (

@@ -1852,7 +1852,7 @@ bietlejuice.enrich_growth_media_platform_metrics:
   - bietlejuice.gsheets_growth:done-clean-cost-taxonomy-translation-dictionary
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
 bietlejuice.enrich_growth_media_platform_scd:
-  - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
+  - bietlejuice.enrich_criteo:load-enrich-criteo-campaigns
   - bietlejuice.facebook_insights:load-clean-facebook-insights
   - bietlejuice.google_ads:load-clean-ads-performance
   - bietlejuice.google_ads:load-clean-campaigns-performance
