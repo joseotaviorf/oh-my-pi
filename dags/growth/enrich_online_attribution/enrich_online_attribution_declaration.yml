@@ -44,7 +44,7 @@ workflow:
       - events_exploded
   tables_customization:
     online_attribution:
-      zorder_by: [event_type_sanitized, ts_event]
+      z_order_by: [ts_event, event_type_sanitized]
 cluster:
   type: custom_cluster
   custom_configurations:

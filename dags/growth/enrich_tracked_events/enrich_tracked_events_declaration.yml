@@ -35,7 +35,7 @@ workflow:
   default_partitions: [year, month, day]
   tables_customization:
     offline_attribution:
-      zorder_by: [ts_event]
+      z_order_by: [ts_event]
 cluster:
   type: custom_cluster
   custom_configurations:
