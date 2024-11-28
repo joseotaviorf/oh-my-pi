@@ -1104,6 +1104,7 @@ bietlejuice.enrich_agreement_hourly:
   - bietlejuice.trato_feito_hourly:load-clean-installment
   - bietlejuice.trato_feito_hourly:load-clean-negotiation
   - bietlejuice.trato_feito_hourly:load-clean-payment
+  - bietlejuice.trato_feito:load-clean-debtor
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated
   - bietlejuice.airtable:load-clean-cr-occurrences

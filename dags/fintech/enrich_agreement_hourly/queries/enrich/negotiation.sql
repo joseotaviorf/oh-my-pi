@@ -26,25 +26,35 @@ installments AS (
 ),
 deduplicate_negotiation AS (
   SELECT
-    id AS id_negotiation,
-    id_collector_external AS id_negotiation_external,
-    id_debtor_external AS id_contract,
-    consultancy AS agency,
-    ts_created AS ts_negotiation_creation,
-    year,
-    month,
-    day
-  FROM datalake_trato_feito_hourly_clean.negotiation
+    n.id AS id_negotiation,
+    n.id_collector_external AS id_negotiation_external,
+    n.id_debtor_external AS id_contract,
+    CASE
+      WHEN LOWER(d.origin) = "velo_delinquency" THEN  "QuintoCred"
+      WHEN LOWER(d.origin) = "rental_contract" THEN  "QuintoAndar"
+    END AS creditor,
+    n.status AS negotiation_status,
+    n.consultancy AS agency,
+    n.ts_created AS ts_negotiation_creation,
+    n.year,
+    n.month,
+    n.day
+  FROM datalake_trato_feito_hourly_clean.negotiation AS n
+  LEFT JOIN
+    datalake_trato_feito_clean.debtor AS d
+        ON n.id_debtor = d.id
   WHERE
     MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_negotiation ORDER BY ts_created DESC) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY n.id ORDER BY n.ts_created DESC) = 1
 ),
 installment_group_by_negotiation AS (
   SELECT
     n.id_negotiation,
     n.id_negotiation_external,
     n.id_contract,
+    n.creditor,
     n.agency AS id_agency,
+    n.negotiation_status,
     n.ts_negotiation_creation,
     n.year,
     n.month,
@@ -57,13 +67,15 @@ installment_group_by_negotiation AS (
   FROM deduplicate_negotiation AS n
   INNER JOIN installments AS i
     ON i.id_negotiation = n.id_negotiation
-  GROUP BY 1,2,3,4,5,6,7,8
+  GROUP BY 1,2,3,4,5,6,7,8,9,10
 )
 SELECT
   id_negotiation,
   id_negotiation_external,
   id_contract,
   id_agency,
+  creditor,
+  negotiation_status,
   down_payment_amount,
   down_payment_paid_amount,
   total_negotiated_amount,
