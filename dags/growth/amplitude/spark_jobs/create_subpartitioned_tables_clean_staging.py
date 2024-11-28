@@ -101,7 +101,7 @@ if __name__ == "__main__":
         subpartitioned_table_name = StringFormatter.set_alphanumeric_snake_case(
             unquote(suffixed_table_name.replace("-", "_"))
         )
-        if subpartitioned_table_name not in existing_tables:
+        if len(subpartitioned_table_name) < 128 and subpartitioned_table_name not in existing_tables:
             create_subpartitioned_table(subpartitioned_table_name, row)
         else:
             logger.info(
