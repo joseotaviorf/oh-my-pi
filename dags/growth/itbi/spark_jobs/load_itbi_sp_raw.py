@@ -2,6 +2,7 @@ import logging
 import pandas as pd
 import re
 import requests
+import time
 
 from argparse import ArgumentParser
 from datetime import date, datetime
@@ -58,7 +59,7 @@ def extract_urls(
     pattern = r'<a\s+(?:[^>]*?\s+)?href="([^"]*itbi.*?[\.|\-]{source_format})"'.format(source_format=source_format)
     urls = re.findall(pattern, request_response.text, re.IGNORECASE)
     full_urls = [urljoin(base_url, url) if url.startswith('/') else url for url in urls]
-    filtered_urls = [url for url in full_urls if any(year in url for year in year_interval) and url not in blocklist_urls]
+    filtered_urls = list(set([url for url in full_urls if any(year in url for year in year_interval) and url not in blocklist_urls]))
     logger.info(f"m=extract_urls, msg=Extracted {len(filtered_urls)} URLs for {source_download_page_url}.")
     return filtered_urls
   except Exception as e:
@@ -169,6 +170,36 @@ def transform_month_to_portuguese_relative(
   return months[str(month)]
 
 
+def extract_sheets(
+  url: str,
+) -> Dict[str, pd.DataFrame]:
+  """
+  Extracts sheets from an Excel file at the provided URL.
+  Args:
+    url (str): The URL of the Excel file.
+  Returns:
+    Dict[str, DataFrame]: A dictionary of sheet names and their corresponding Spark DataFrames.
+  """
+
+  max_retries = 3
+  retry_delay = 5
+
+  for i in range(max_retries):
+    try:
+      response = requests.get(url)
+      response.raise_for_status()
+      sheets = pd.read_excel(response.content, sheet_name=None)
+      break
+    except requests.exceptions.RequestException as e:
+      logger.error(f"Error: {e}")
+      logger.error(f"Retrying in {retry_delay} seconds...")
+      time.sleep(retry_delay)
+  else:
+      logger.info("Max retries exceeded. Unable to fetch data.")
+
+  return sheets
+
+
 def process_url(
   columns_rename_mapped: Dict[str,str],
   problematic_columns_rename_mapped: Dict[str, Dict[str, str]],
@@ -192,8 +223,9 @@ def process_url(
         transform_month_to_portuguese_relative, StringType()
   )
 
+  sheets = extract_sheets(url)
+
   try:
-    sheets = pd.read_excel(url, sheet_name=None)
     sheet_name_pattern = re.compile(r"[a-zA-Z]+-[0-9]+")
     sheets = {k: sheets[k] for k in sheets if sheet_name_pattern.match(k)}
   except Exception as e:
