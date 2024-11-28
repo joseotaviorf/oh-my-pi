@@ -19,6 +19,9 @@ workflow:
       z_order_by: [sk_analyst, sk_survey]
     fact_answer:
       z_order_by: [sk_answer, sk_user]
+    fact_ticket_csat:
+      merge_on: [sk_ticket]
+      z_order_by: [sk_ticket]
 
 cluster:
   type: custom_cluster

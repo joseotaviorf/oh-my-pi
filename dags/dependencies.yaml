@@ -905,6 +905,7 @@ bietlejuice.dw_sale_visits:
   - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation
   - bietlejuice.enrich_sale_visit:load-enrich-sale-visit
 bietlejuice.dw_satisfaction_rating:
+  - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers
   - bietlejuice.enrich_survicate:load-enrich-single-station-surveys
 bietlejuice.dw_search_session_event:
