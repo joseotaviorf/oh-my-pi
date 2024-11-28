@@ -16,9 +16,6 @@ columns:
   medium:
     lineage:
       - datalake_gsheets_raw.demand_taxonomy_management_aggregation.medium
-  source:
-    lineage:
-      - datalake_gsheets_raw.demand_taxonomy_management_aggregation.source
   taxonomy_aggregation_level_1:
     lineage:
       - datalake_gsheets_raw.demand_taxonomy_management_aggregation.taxonomy_aggregation_level_1

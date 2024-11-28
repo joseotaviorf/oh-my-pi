@@ -4,7 +4,6 @@ SELECT
     campaign_strategy_intent,
     behavior_type,
     medium, 
-    source,
     taxonomy_aggregation_level_1, 
     taxonomy_aggregation_level_2
 FROM
