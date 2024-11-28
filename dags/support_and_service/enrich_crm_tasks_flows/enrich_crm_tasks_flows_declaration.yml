@@ -2,7 +2,7 @@ dag:
     name: enrich_crm_tasks_flows
     schedule_start_date: 2015, 10, 29
     owner: Data SS
-    documentation: 
+    documentation:
         dag_purpose: |
             Creates CRM (Customer Relationship Management) base tasks flows tables. These tables will be used to generate models in Tasks context.
 workflow:
@@ -11,4 +11,9 @@ workflow:
     default_extraction_type: incremental
     default_partitions: ["year", "month", "day"]
 cluster:
-    type: databricks_12_2_med_general_photon_cluster
+    type: custom_cluster
+    custom_configurations:
+        driver_node_type_id: m5d.2xlarge
+        node_type_id: m5d.4xlarge
+        num_workers: 3
+        spark_version: 12.2.x-scala2.12
