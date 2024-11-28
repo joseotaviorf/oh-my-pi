@@ -4,7 +4,8 @@ dag:
   schedule_start_date: 2019, 1, 1
   owner: Data Growth
   documentation:
-    dag_purpose: 'As a derivation of Amplitude enrich layer, this DAG generates an
+    dag_purpose:
+      "As a derivation of Amplitude enrich layer, this DAG generates an
       aggregated online attribution from conversion events. The query selects amplitude
       conversion events day to day and lookups all past events. The stakeholders will
       use this to improve attribution and reduce lost tracking metrics.
@@ -15,7 +16,7 @@ dag:
       is a part of a project to reduce lost tracking metrics.
 
 
-      The query isn''t 100% accurate, because we are fetching events that occur at
+      The query isn't 100% accurate, because we are fetching events that occur at
       most four months ago. For precise attribution, we need to collect all past events
       from a user.
 
@@ -26,9 +27,9 @@ dag:
       data from all events and attributions from users who converted in `2022/01/01`.
 
       When doing a historical reprocess, it may be necessary to use a cluster with more nodes and more cores/CPUs.
-      Also, make sure to use these settings: 
+      Also, make sure to use these settings:
       `spark.sql.execution.arrow.maxRecordsPerBatch 10000``
-      `spark.sql.shuffle.partitions 200`'
+      `spark.sql.shuffle.partitions 200`"
 workflow:
   type: query_delta
   layer: enrich
@@ -42,9 +43,6 @@ workflow:
   inner_dependencies:
     online_attribution:
       - events_exploded
-  tables_customization:
-    online_attribution:
-      z_order_by: [ts_event, event_type_sanitized]
 cluster:
   type: custom_cluster
   custom_configurations:
