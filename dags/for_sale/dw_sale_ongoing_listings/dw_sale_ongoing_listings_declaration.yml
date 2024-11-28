@@ -9,7 +9,7 @@ workflow:
   default_partitions: ['year', 'month', 'day']
   has_load_to_redshift_task: false
 cluster:
-  type: databricks_12_2_min_2xlarge_memory_cluster
+  type: databricks_13_3_med_memory_2_workers_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
