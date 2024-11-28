@@ -47,7 +47,7 @@ bietlejuice.dw_crm:
     - bietlejuice.enrich_crm_tasks_history_flows:load-enrich-tasks-history-users-flow
     - bietlejuice.enrich_heimdall:load-enrich-activity
     - bietlejuice.enrich_inspections:load-enrich-inspection-booking
-bietlejuice.dw_customer_suport:
+bietlejuice.dw_customer_support:
   remove:
     - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics
 bietlejuice.dw_datamarts_spark.cross:
