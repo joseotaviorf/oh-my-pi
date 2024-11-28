@@ -3,8 +3,10 @@ SELECT
   id_visit AS sk_visit,
   id_author_creator AS sk_author_creator,
   bc.sk_business_context,
+  vm.sk_visit_model,
   schedule_events.id_succeed_schedule AS sk_succeed_schedule,
   sk_origin_type,
+  1 AS is_booking,
   CASE WHEN ts_schedule_rescheduled IS NOT NULL THEN 1 ELSE 0 END AS is_reschedule,
   CASE WHEN ts_schedule_confirmed IS NOT NULL THEN 1 ELSE 0 END AS is_confirmed,
   CASE WHEN ts_schedule_completed IS NOT NULL THEN 1 ELSE 0 END AS is_completed,
@@ -21,6 +23,9 @@ FROM
 INNER JOIN
    dw_visit.dim_origin_type AS dot
     ON schedule_events.schedule_origin = dot.origin_name
-LEFT JOIN
+INNER JOIN
    dw_visit.dim_business_context AS bc
     ON schedule_events.business_context = bc.business_context
+INNER JOIN
+    dw_visit.dim_visit_model AS vm
+     ON  schedule_events.visit_model = vm.visit_model

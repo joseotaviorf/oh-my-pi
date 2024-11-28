@@ -22,6 +22,11 @@ columns:
       - datalake_visit.visit_status_events.business_context
     description:
       Business context of the schedule.
+  visit_model:
+    lineage:
+      - datalake_visit.visit_status_events.event_type
+    description:
+      Visit model of the visit.
   schedule_origin:
     description:
       If the start of this schedule is from a Request or a Reschedule.

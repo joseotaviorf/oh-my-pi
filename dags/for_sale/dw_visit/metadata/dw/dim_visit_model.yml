@@ -1,0 +1,16 @@
+database_name: dw_visit
+table_name: dim_visit_model
+description: This dimension table has the visit model of the visits.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_visit_model:
+    description: Id of the visit model.
+  visit_model:
+    description: Identifies the visit model of the visit.
+    categories:
+      STANDARD : If is a common visit.
+      REGISTERED : If the agent registered the visit after it occurred.
+      FITTED : If there ia a fitted schedule for the visit.
+  ts_load:
+    description: Timestamp of the ingestion data.

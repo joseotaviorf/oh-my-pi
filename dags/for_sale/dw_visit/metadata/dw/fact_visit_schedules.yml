@@ -6,17 +6,17 @@ owner: matheus.sampaio@quintoandar.com.br
 columns:
   sk_schedule:
     lineage:
-      - datalake_visits.visit_status_events.id_schedule
+      - datalake_visits.visit_schedules.id_schedule
     description:
       Is the booking key. Joins with booking table.
   sk_visit:
     lineage:
-      - datalake_visits.visit_status_events.id_visit
+      - datalake_visits.visit_schedules.id_visit
     description:
       Is the visit unique key. Joins with visit table.
   sk_author_creator:
     lineage:
-      - datalake_visits.visit_status_events.id_author_user
+      - datalake_visits.visit_schedules.id_author_user
     description:
       Is the key of the responsible for the event.
   sk_business_context:
@@ -24,6 +24,11 @@ columns:
       - dw_visit.dim_business_context.sk_business_context
     description:
       Is the key of business context of the schedule.
+  sk_visit_model:
+    lineage:
+      - dw_visit.dim_business_context.sk_business_context
+    description:
+      Is the key of the visit model.
   sk_succeed_schedule:
     description:
       The next schedule case when this schedule have a reschedule.
@@ -32,6 +37,9 @@ columns:
       - dw_visit.dim_origin_type
     description:
       Is the key of origin of the event.
+  is_booking:
+    description:
+      If is a booking.
   is_reschedule:
     description:
       If is a reschedule.
@@ -52,22 +60,22 @@ columns:
       Sk with the creation date.
   sk_schedule_confirmed:
     lineage:
-      - datalake_visit.visit_schedules
+      - datalake_visit.visit_schedules.ts_schedule_confirmed
     description:
       Sk with the confirmed date.
   sk_schedule_completed:
     lineage:
-      - datalake_visit.visit_schedules
+      - datalake_visit.visit_schedules.ts_schedule_completed
     description:
       Sk with the completed date.
   sk_schedule_canceled:
     lineage:
-      - datalake_visit.visit_schedules
+      - datalake_visit.visit_schedules.ts_schedule_canceled
     description:
       Sk with the canceled date.
   sk_schedule_unsuccessful:
     lineage:
-      - datalake_visit.visit_schedules
+      - datalake_visit.visit_schedules.ts_schedule_unsuccessful
     description:
       Sk with the unsuccessful date.
   ts_load:
