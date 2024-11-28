@@ -22,6 +22,7 @@ workflow:
     fact_ticket_csat:
       merge_on: [sk_ticket]
       z_order_by: [sk_ticket]
+      partitions: []
 
 cluster:
   type: custom_cluster
