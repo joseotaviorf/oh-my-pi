@@ -281,3 +281,17 @@ class GsheetsService:
             dag_name, spark_client, clean_table_name, raw_table_name
         )
         self.release_memory(spark_client, df, clean_table_name)
+
+    def clean_unsupported_column_names(self, df: DataFrame) -> DataFrame:
+        """
+        Cleans unsupported column names from a DataFrame
+        Unity catalog does not support column names with 0 length or greater than 255 characters
+        :param df: Spark Dataframe with Google sheets data
+        :return: Spark Dataframe with cleaned column names
+        """
+        for column in df.columns:
+            if column == "":
+                df = df.withColumnRenamed(column, "unnamed_column")
+            if len(column) > 255:
+                df = df.withColumnRenamed(column, column[:255])
+        return df

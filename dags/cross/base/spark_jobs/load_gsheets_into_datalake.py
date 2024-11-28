@@ -127,8 +127,9 @@ if __name__ == "__main__":
             sheet_details.get("partitioned"),
             sheet_details.get("preload_time_in_seconds"),
         )
-        # validate data before loading
         service = GsheetsService(schema=schema)
+        df = service.clean_unsupported_column_names(df)
+        # validate data before loading
         service.validate_clean_query_against_raw(
             dag_name,
             spark_client,

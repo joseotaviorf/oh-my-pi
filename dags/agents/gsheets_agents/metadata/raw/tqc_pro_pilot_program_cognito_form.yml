@@ -29,7 +29,7 @@ columns:
     tags:
       - PII
       - Confidential
-  dadosdoassociado_dadosdocomprador_preferenciapeloatendimentodedeterminadocorretorassociadonamodalidadecompraevenda_opcionalvocegostariadeindicarumcorretorassociadodoquintoandarnamodalidadecompraevendaparaatenderaocompradorcadastradoporvocesesimpreenchacomonomecompletodocorretor:
+  dadosdoassociado_dadosdocomprador_preferenciapeloatendimentodedeterminadocorretorassociadonamodalidadecompraevenda_opcionalvocegostariadeindicarumcorretorassociadodoquintoandarnamodalidadecompraevendaparaatenderaocompradorcadastradoporvocesesimpreenchacom:
     tags:
       - PII
       - Confidential
