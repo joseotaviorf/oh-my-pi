@@ -1,5 +1,6 @@
 SELECT
     MD5(a.email) AS sk_analyst,
+    a.id_agent_twilio AS sk_agent_twilio,
     a.name AS full_name,
     a.email,
     a.phone,
