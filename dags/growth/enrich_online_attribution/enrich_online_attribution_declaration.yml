@@ -42,6 +42,9 @@ workflow:
   inner_dependencies:
     online_attribution:
       - events_exploded
+  tables_customization:
+    online_attribution:
+      zorder_by: [event_type_sanitized, ts_event]
 cluster:
   type: custom_cluster
   custom_configurations:
