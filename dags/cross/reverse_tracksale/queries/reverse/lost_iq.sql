@@ -103,17 +103,25 @@ sale_flows AS (
 -- Avoid users that are experience ongoing crisis, which means that there's crisis tickets not closed yet
 crisis_users AS (
     SELECT DISTINCT
-    ft.sk_user AS id_user
-    FROM dw_customer_support.dim_ticket dt
-    INNER JOIN dw_tickets.fact_tickets ft
-        ON dt.sk_ticket  = ft.sk_ticket
-    INNER JOIN dw_customer_support.dim_department dc
-        ON dt.group_name = dc.department
+        ft.sk_user AS id_user
+    FROM
+        dw_customer_support.fact_tickets AS ft
+    INNER JOIN
+        dw_customer_support.dim_ticket AS dt
+            ON dt.sk_ticket = ft.sk_ticket
+    INNER JOIN
+        dw_customer_support.dim_department AS dd
+            ON dd.department = dt.group_name
     WHERE
-        (dc.department IN ('Notificação Extrajudicial [CE] [POS] [BACK]', 'Dados Bancários [CE] [POS] [BACK]', 'CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
-            OR dc.team IN ('Casos Especiais', 'Ouvidoria', 'ReclameAqui', 'Evictions'))
-        AND ft.sk_solved_date_local = -1
-        AND ft.sk_user > 0
+        (
+            dt.group_name IN (
+                'Notificação Extrajudicial [CE] [POS] [BACK]',
+                'Dados Bancários [CE] [POS] [BACK]',
+                'CX ReclameAqui Adquiridas [CE] [POS] [BACK]'
+            ) OR dd.team IN ('Casos Especiais', 'Ouvidoria', 'ReclameAqui', 'Evictions')
+        )
+        AND ft.sk_user <> -1
+        AND ft.ts_solved IS NULL
 ),
 users_to_exclude AS (
     SELECT

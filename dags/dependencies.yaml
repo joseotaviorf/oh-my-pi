@@ -3593,6 +3593,7 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
@@ -3604,7 +3605,6 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
-  - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.ebdb_contract:load-clean-contract-person
   - bietlejuice.ebdb_house:load-clean-house
@@ -3615,7 +3615,6 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
   - bietlejuice.enrich_tracksale_dispatches:load-enrich-true-offboarding-iq-dispatches
   - bietlejuice.enrich_tracksale_dispatches:load-enrich-true-offboarding-pp-dispatches
-  - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.reverse_webhelp:
   - bietlejuice.bigfone:load-clean-call
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
