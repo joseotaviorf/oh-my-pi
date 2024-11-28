@@ -23,7 +23,7 @@ UNION ALL
 -- Target de Recovered Prospects de Rent
 SELECT
   'prospects' AS metric_name, 
-  'Recovered' AS submetric_name, 
+  'recovered' AS submetric_name, 
   'Rent' AS business_context,
   t.funnel_side, 
   'Rent' AS campaign_business_context, 
@@ -45,7 +45,7 @@ UNION ALL
 -- Target de New Prospects de Sale
 SELECT
   'prospects' AS metric_name, 
-  'New' AS submetric_name, 
+  'new' AS submetric_name, 
   'Sale' AS business_context,
   t.funnel_side, 
   'Sale' AS campaign_business_context, 
@@ -67,7 +67,7 @@ UNION ALL
 -- Target de Recovered Prospects de Sale
 SELECT
   'prospects' AS metric_name, 
-  'Recovered' AS submetric_name, 
+  'recovered' AS submetric_name, 
   'Sale' AS business_context,
   t.funnel_side, 
   'Sale' AS campaign_business_context, 
