@@ -43,7 +43,8 @@ workflow:
     reminder_aud:
       date_filter_column: updated_at
     revinfo:
-      extraction_type: full
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
       clean_table_name: rev_info
 cluster:
   type: databricks_13_3_med_general_cluster
