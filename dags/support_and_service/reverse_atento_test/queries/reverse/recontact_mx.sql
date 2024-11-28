@@ -54,7 +54,7 @@ WITH base_tickets AS (
       dw_customer_support.dim_zendesk_user AS dzu
         ON dzu.sk_zendesk_user = fts.sk_zendesk_requester_user
   WHERE
-      ft.ts_startedBETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
+      ft.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
       AND dzu.phone IS NOT NULL
       AND ((dc.channel = 'chat' AND dc.direction = 'inbound')
         OR (ft.ticket_origin IN ('call inbound', 'call inapp')))
