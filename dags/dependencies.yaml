@@ -1098,10 +1098,10 @@ bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.robin_hood:load-clean-accounting-entry-source
   - bietlejuice.robin_hood:load-clean-payee
 bietlejuice.enrich_agreement_hourly:
+  - bietlejuice.trato_feito:load-clean-debtor
   - bietlejuice.trato_feito_hourly:load-clean-installment
   - bietlejuice.trato_feito_hourly:load-clean-negotiation
   - bietlejuice.trato_feito_hourly:load-clean-payment
-  - bietlejuice.trato_feito:load-clean-debtor
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated
   - bietlejuice.airtable:load-clean-cr-occurrences
@@ -1512,11 +1512,11 @@ bietlejuice.enrich_cyber:
   - bietlejuice.cyber:load-clean-historical-agreements
   - bietlejuice.cyber:load-clean-history-contract-distribution
   - bietlejuice.cyber:load-clean-logs
+  - bietlejuice.cyber:load-clean-logs-code-description
   - bietlejuice.cyber:load-clean-payments
   - bietlejuice.cyber:load-clean-users
   - bietlejuice.cyber_complement:load-clean-agency-group
   - bietlejuice.cyber_complement:load-clean-campaign
-  - bietlejuice.cyber:load-clean-logs-code-description
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-house-dim-house
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
