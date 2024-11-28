@@ -1,7 +1,7 @@
 dag:
   name: mission_control
   schedule_start_date: 2021, 2, 20
-  schedule_interval: 10 21 * * *
+  schedule_interval: 30 0 * * *
   owner: Data ForRent
   documentation:
     dag_purpose: Extraction and load database mission_control (MySQL) responsible for the onboarding and ongoing journey of our tenants and landlords.
