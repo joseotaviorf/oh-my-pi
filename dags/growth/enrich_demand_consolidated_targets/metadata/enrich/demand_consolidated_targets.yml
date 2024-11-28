@@ -1,0 +1,123 @@
+---
+database_name: datalake_demand_consolidated_targets
+table_name: demand_consolidated_targets
+owner: uilson.bonfim@quintoandar.com.br
+domain: growth
+description: This Table aims to consolidate Targets for Growth@Demand. It includes ToF (Daily, Weekly and Monthly), Prospects and Marketing Cost. It is composed by the union of all of these metrics.
+columns:
+  behavior_type:
+    description: 'Growth Taxonomy Level that indicates whener the prospect looked for QA.'
+    lineage: 
+      - datalake_gsheets_clean.rental_prospect_target.behavior_type
+      - datalake_gsheets_clean.sale_prospect_target.behavior_type
+      - datalake_gsheets_clean.mkt_cost_target.behavior_type
+      - datalake_gsheets_clean.rental_tof_daily_target.behavior_type
+      - datalake_gsheets_clean.sale_tof_daily_target.behavior_type
+      - datalake_gsheets_clean.rental_tof_weekly_target.behavior_type
+      - datalake_gsheets_clean.sale_tof_weekly_target.behavior_type
+      - datalake_gsheets_clean.rental_tof_monthly_target.behavior_type
+      - datalake_gsheets_clean.sale_tof_monthly_target.behavior_type
+  business_context:
+    description: 'States which business_context the target is applied for'
+    lineage:
+      - datalake_gsheets_clean.mkt_cost_target.behavior_type
+  campaign_business_context:
+    description: 'Growth Taxonomy Level that indicates which business_context that campaign is focused on.'
+    lineage:
+      - datalake_gsheets_clean.rental_prospect_target.campaign_business_context
+      - datalake_gsheets_clean.sale_prospect_target.campaign_business_context
+      - datalake_gsheets_clean.mkt_cost_target.campaign_business_context
+      - datalake_gsheets_clean.rental_tof_daily_target.campaign_business_context
+      - datalake_gsheets_clean.sale_tof_daily_target.campaign_business_context
+      - datalake_gsheets_clean.rental_tof_weekly_target.campaign_business_context
+      - datalake_gsheets_clean.sale_tof_weekly_target.campaign_business_context
+      - datalake_gsheets_clean.rental_tof_monthly_target.campaign_business_context
+      - datalake_gsheets_clean.sale_tof_monthly_target.campaign_business_context
+  campaign_strategy_intent:
+    description: 'Growth Taxonomy Level that indicates which Growth strategy is been applied.'
+    lineage:
+      - datalake_gsheets_clean.rental_prospect_target.campaign_strategy_intent
+      - datalake_gsheets_clean.sale_prospect_target.campaign_strategy_intent
+      - datalake_gsheets_clean.mkt_cost_target.campaign_strategy_intent
+      - datalake_gsheets_clean.rental_tof_daily_target.campaign_strategy_intent
+      - datalake_gsheets_clean.sale_tof_daily_target.campaign_strategy_intent
+      - datalake_gsheets_clean.rental_tof_weekly_target.campaign_strategy_intent
+      - datalake_gsheets_clean.sale_tof_weekly_target.campaign_strategy_intent
+      - datalake_gsheets_clean.rental_tof_monthly_target.campaign_strategy_intent
+      - datalake_gsheets_clean.sale_tof_monthly_target.campaign_strategy_intent
+  city_group:
+    description: 'City group of the house related to row event.'
+    lineage: 
+      - datalake_gsheets_clean.rental_prospect_target.city_group
+      - datalake_gsheets_clean.sale_prospect_target.city_group
+      - datalake_gsheets_clean.mkt_cost_target.city_group
+      - datalake_gsheets_clean.rental_tof_daily_target.city_group
+      - datalake_gsheets_clean.sale_tof_daily_target.city_group
+      - datalake_gsheets_clean.rental_tof_weekly_target.city_group
+      - datalake_gsheets_clean.sale_tof_weekly_target.city_group
+      - datalake_gsheets_clean.rental_tof_monthly_target.city_group
+      - datalake_gsheets_clean.sale_tof_monthly_target.city_group
+  country_code:
+    description: 'Country of the house related to row event.'
+  dt_target:
+    description: 'Evaluated date.'
+    lineage:
+      - datalake_gsheets_clean.rental_prospect_target.date
+      - datalake_gsheets_clean.sale_prospect_target.date
+      - datalake_gsheets_clean.mkt_cost_target.date
+      - datalake_gsheets_clean.rental_tof_daily_target.date
+      - datalake_gsheets_clean.sale_tof_daily_target.date
+      - datalake_gsheets_clean.rental_tof_weekly_target.week_start
+      - datalake_gsheets_clean.sale_tof_weekly_target.week_start
+      - datalake_gsheets_clean.rental_tof_monthly_target.month_start
+      - datalake_gsheets_clean.sale_tof_monthly_target.month_start
+  funnel_side:
+    description: 'Growth Taxonomy Level that indicates which funnel side that target is applied for.'
+    lineage: 
+      - datalake_gsheets_clean.rental_prospect_target.funnel_side
+      - datalake_gsheets_clean.sale_prospect_target.funnel_side
+      - datalake_gsheets_clean.mkt_cost_target.funnel_side
+      - datalake_gsheets_clean.rental_tof_daily_target.funnel_side
+      - datalake_gsheets_clean.sale_tof_daily_target.funnel_side
+      - datalake_gsheets_clean.rental_tof_weekly_target.funnel_side
+      - datalake_gsheets_clean.sale_tof_weekly_target.funnel_side
+      - datalake_gsheets_clean.rental_tof_monthly_target.funnel_side
+      - datalake_gsheets_clean.sale_tof_monthly_target.funnel_side
+  medium:
+    description: 'Growth Taxonomy Level that indicates the medium of that Target.'
+    lineage: 
+      - datalake_gsheets_clean.rental_prospect_target.medium
+      - datalake_gsheets_clean.sale_prospect_target.medium
+      - datalake_gsheets_clean.mkt_cost_target.medium
+      - datalake_gsheets_clean.rental_tof_daily_target.medium
+      - datalake_gsheets_clean.sale_tof_daily_target.medium
+      - datalake_gsheets_clean.rental_tof_weekly_target.medium
+      - datalake_gsheets_clean.sale_tof_weekly_target.medium
+      - datalake_gsheets_clean.rental_tof_monthly_target.medium
+      - datalake_gsheets_clean.sale_tof_monthly_target.medium
+  metric_name:
+    description: 'Indicates which metric is been evalutaed on target column'
+  operation_channel:
+    description: 'Growth Taxonomy Level that indicates the operation_channel of that Target.'
+    lineage: 
+      - datalake_gsheets_clean.rental_prospect_target.operation_channel
+      - datalake_gsheets_clean.sale_prospect_target.operation_channel
+  referral_type:
+    description: 'Growth Taxonomy Level that indicates the referral_type of that Target.'
+    lineage: 
+      - datalake_gsheets_clean.rental_prospect_target.operation_channel
+      - datalake_gsheets_clean.sale_prospect_target.operation_channel
+  source:
+    description: 'Growth Taxonomy Level that indicates the source of that Target.'
+  target:
+    description: 'Agregated Target metric'
+    lineage:
+      - datalake_gsheets_clean.rental_prospect_target.target
+      - datalake_gsheets_clean.sale_prospect_target.target
+      - datalake_gsheets_clean.mkt_cost_target.target
+      - datalake_gsheets_clean.rental_tof_daily_target.target
+      - datalake_gsheets_clean.sale_tof_daily_target.target
+      - datalake_gsheets_clean.rental_tof_weekly_target.target
+      - datalake_gsheets_clean.sale_tof_weekly_target.target
+      - datalake_gsheets_clean.rental_tof_monthly_target.target
+      - datalake_gsheets_clean.sale_tof_monthly_target.target

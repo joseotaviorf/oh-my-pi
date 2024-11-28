@@ -1561,6 +1561,16 @@ bietlejuice.enrich_debt_recovery:
   - bietlejuice.trato_feito:load-clean-installment-charges
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
+bietlejuice.enrich_demand_consolidated_targets:
+  - bietlejuice.gsheets_growth_targets:done-clean-mkt-cost-target
+  - bietlejuice.gsheets_growth_targets:done-clean-rental-prospect-target
+  - bietlejuice.gsheets_growth_targets:done-clean-rental-tof-daily-target
+  - bietlejuice.gsheets_growth_targets:done-clean-rental-tof-monthly-target
+  - bietlejuice.gsheets_growth_targets:done-clean-rental-tof-weekly-target
+  - bietlejuice.gsheets_growth_targets:done-clean-sale-prospect-target
+  - bietlejuice.gsheets_growth_targets:done-clean-sale-tof-daily-target
+  - bietlejuice.gsheets_growth_targets:done-clean-sale-tof-monthly-target
+  - bietlejuice.gsheets_growth_targets:done-clean-sale-tof-weekly-target
 bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events
