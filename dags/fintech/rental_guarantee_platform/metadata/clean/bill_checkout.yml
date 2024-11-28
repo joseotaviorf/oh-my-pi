@@ -38,12 +38,3 @@ columns:
   ts_updated:
     lineage:
       - datalake_rental_guarantee_platform_raw.bill.updated_at
-  year:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.bill.year
-  month:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.bill.month
-  day:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.bill.day
