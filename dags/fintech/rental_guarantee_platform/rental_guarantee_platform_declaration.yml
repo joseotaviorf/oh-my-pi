@@ -252,7 +252,8 @@ workflow:
       date_filter_column: updated_at
     bill:
       clean_table_name: bill_checkout
-      date_filter_column: updated_at
+      raw_extraction_type: full
+      raw_partitions: []
     ticket_activation:
       date_filter_column: updated_at
     charge:
