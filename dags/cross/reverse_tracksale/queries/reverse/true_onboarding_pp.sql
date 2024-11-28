@@ -25,7 +25,7 @@ WITH new_contracts AS (
 ),
 crisis_users AS (
 	SELECT DISTINCT
-        ft.sk_user AS id_user
+        ft.sk_contract
     FROM
         dw_customer_support.fact_tickets AS ft
     INNER JOIN
