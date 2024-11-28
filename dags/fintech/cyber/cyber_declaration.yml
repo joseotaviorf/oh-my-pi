@@ -44,6 +44,14 @@ workflow:
       partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['ACACTDTE']"
+    actvertb:
+      clean_table_name: logs_code_description
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
+      merge_on: ["code", "code_type", "group"]
+      extra_spark_job_arguments:
+        - "[]"
     tb_parcela:
       clean_table_name: bill
       extraction_type: incremental

@@ -27,14 +27,6 @@ workflow:
     - "{extraction_type}"
     - "{partitions}"
   tables_customization:
-    actvertb:
-      clean_table_name: logs_code_description
-      raw_extraction_type: incremental
-      raw_partitions: [year, month, day]
-      clean_extraction_type: full
-      merge_on: ["code", "code_type", "group"]
-      extra_spark_job_arguments:
-        - "[]"
     agrtype:
       clean_table_name: agreement_type
       raw_extraction_type: incremental

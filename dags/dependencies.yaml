@@ -1520,7 +1520,7 @@ bietlejuice.enrich_cyber:
   - bietlejuice.cyber:load-clean-users
   - bietlejuice.cyber_complement:load-clean-agency-group
   - bietlejuice.cyber_complement:load-clean-campaign
-  - bietlejuice.cyber_complement:load-clean-logs-code-description
+  - bietlejuice.cyber:load-clean-logs-code-description
 bietlejuice.enrich_dai_report:
   - bietlejuice.dw_house:load-dw-house-dim-house
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
