@@ -17,6 +17,7 @@ workflow:
     tables_customization:
         tickets_curent:
             extraction_type: full
+            z_order_by: [id_ticket]
         tickets_metric:
             z_order_by: [id_ticket]
         tickets:
