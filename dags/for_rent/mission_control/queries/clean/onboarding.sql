@@ -1,4 +1,4 @@
-SELECT 
+SELECT
 	id,
 	contract_id AS id_contract,
 	google_drive_id AS id_google_drive,
@@ -16,7 +16,3 @@ SELECT
 	day
 FROM
 	datalake_mission_control_raw.onboarding
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}

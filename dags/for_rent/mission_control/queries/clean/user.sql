@@ -10,7 +10,3 @@ SELECT
 	day
 FROM
 	datalake_mission_control_raw.user
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}

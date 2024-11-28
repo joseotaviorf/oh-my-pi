@@ -1,5 +1,5 @@
 dag:
-  name: mission_control_test
+  name: mission_control
   schedule_start_date: 2021, 2, 20
   schedule_interval: 10 21 * * *
   owner: Data ForRent
@@ -8,7 +8,7 @@ dag:
 workflow:
   type: cdc
   layer: raw
-  custom_schema: mission_control_test
+  custom_schema: mission_control
   database_type: mysql
   source_database: mission_control
   source_schema: mission_control

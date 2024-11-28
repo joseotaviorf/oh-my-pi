@@ -17,7 +17,3 @@ SELECT
 	day
 FROM
 	datalake_mission_control_raw.onboardingtask
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}

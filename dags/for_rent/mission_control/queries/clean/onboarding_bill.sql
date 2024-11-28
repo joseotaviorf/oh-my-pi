@@ -1,4 +1,4 @@
-SELECT 
+SELECT
 	id,
 	onboarding_id AS id_onboarding,
 	address_id AS id_address,
@@ -22,7 +22,3 @@ SELECT
 	day
 FROM
 	datalake_mission_control_raw.onboardingbill
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}

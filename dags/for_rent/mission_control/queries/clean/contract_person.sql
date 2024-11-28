@@ -14,9 +14,5 @@ SELECT
     year,
 	month,
 	day
-FROM 
+FROM
 	datalake_mission_control_raw.contractperson
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}

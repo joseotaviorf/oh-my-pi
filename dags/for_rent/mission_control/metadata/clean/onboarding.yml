@@ -1,68 +1,69 @@
 ---
 database_name: datalake_mission_control_clean
 table_name: onboarding
-owner: 'kleber.inoue@quintoandar.com.br'
+owner: "kleber.inoue@quintoandar.com.br"
 domain: For Rent
-description: Once a contract is signed, an entity Onboarding is created and we can related to the contract from EBDB (Main).
+description:
+  Once a contract is signed, an entity Onboarding is created and we can related to the contract from EBDB (Main).
   Due to incremental load, this table contains duplicated IDs.
 columns:
   id:
     description: ID of the onboarding. It's the primary key of the table.
     lineage:
-    - datalake_mission_control_raw.onboarding.id
+      - datalake_mission_control_raw.onboarding.id
   id_contract:
     description: ID of the EBDB's contract (Main).
     lineage:
-    - datalake_mission_control_raw.onboarding.contract_id
+      - datalake_mission_control_raw.onboarding.contract_id
   id_google_drive:
     description: ID of the Google Drive.
     lineage:
-    - datalake_mission_control_raw.onboarding.google_drive_id
+      - datalake_mission_control_raw.onboarding.google_drive_id
   status:
     description: Status of the onboarding.
     lineage:
-    - datalake_mission_control_raw.onboarding.status
+      - datalake_mission_control_raw.onboarding.status
   property_type:
     description: Type of the property.
     lineage:
-    - datalake_mission_control_raw.onboarding.property_type
+      - datalake_mission_control_raw.onboarding.property_type
   key_location:
     description: Key location of the property.
     lineage:
-    - datalake_mission_control_raw.onboarding.key_location
+      - datalake_mission_control_raw.onboarding.key_location
   key_location_details:
     description: Details of the key location.
     lineage:
-    - datalake_mission_control_raw.onboarding.key_location_details
+      - datalake_mission_control_raw.onboarding.key_location_details
   version:
     description: Version of the onboarding.
     lineage:
-    - datalake_mission_control_raw.onboarding.version
+      - datalake_mission_control_raw.onboarding.version
   is_deleted:
     description: Boolean flag to check if the onboarding is deleted.
     lineage:
-    - datalake_mission_control_raw.onboarding.deleted
+      - datalake_mission_control_raw.onboarding.deleted
   ts_created:
     description: Timestamp of the onboarding's creation.
     lineage:
-    - datalake_mission_control_raw.onboarding.created_on
+      - datalake_mission_control_raw.onboarding.created_on
   ts_updated:
     description: Timestmap of the last onboarding's update.
     lineage:
-    - datalake_mission_control_raw.onboarding.updated_on
+      - datalake_mission_control_raw.onboarding.updated_on
   ts_last_synced:
     description: Timestamp of the last sync.
     lineage:
-    - datalake_mission_control_raw.onboarding.last_sync
+      - datalake_mission_control_raw.onboarding.last_sync
   year:
     description: Year integer value of the record's update. Also it's a partition.
     lineage:
-    - datalake_mission_control_raw.onboarding.year
+      - datalake_mission_control_raw.onboarding.year
   month:
     description: Month integer value of the record's update. Also it's a partition.
     lineage:
-    - datalake_mission_control_raw.onboarding.month
+      - datalake_mission_control_raw.onboarding.month
   day:
     description: Day integer value of the record's update. Also it's a partition.
     lineage:
-    - datalake_mission_control_raw.onboarding.day
+      - datalake_mission_control_raw.onboarding.day

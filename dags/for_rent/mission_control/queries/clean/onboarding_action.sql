@@ -1,4 +1,4 @@
-SELECT 
+SELECT
 	id,
 	onboarding_id AS id_onboarding,
 	type_identifier,
@@ -11,7 +11,3 @@ SELECT
 	day
 FROM
 	datalake_mission_control_raw.onboardingaction
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}

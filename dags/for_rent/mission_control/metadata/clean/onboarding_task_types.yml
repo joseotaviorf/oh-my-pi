@@ -1,7 +1,7 @@
 ---
 database_name: datalake_mission_control_clean
 table_name: onboarding_task_types
-owner: 'kleber.inoue@quintoandar.com.br'
+owner: "kleber.inoue@quintoandar.com.br"
 domain: For Rent
 description: Table that stores the types of the onboarding tasks.
   Due to incremental load, this table contains duplicated IDs.
@@ -9,39 +9,39 @@ columns:
   id:
     description: ID of the task's type. It's the primary key of the table.
     lineage:
-    - datalake_mission_control_raw.onboardingtasktypes.id
+      - datalake_mission_control_raw.onboardingtasktypes.id
   user_type:
     description: Type of the user which the task is attributed to.
     categories:
       LANDLORD: Landlord
       TENANT: Tenant
     lineage:
-    - datalake_mission_control_raw.onboardingtasktypes.user_type
+      - datalake_mission_control_raw.onboardingtasktypes.user_type
   type:
     description: Type of the task.
     lineage:
-    - datalake_mission_control_raw.onboardingtasktypes.type
+      - datalake_mission_control_raw.onboardingtasktypes.type
   is_active:
     description: Boolean flag to check if the task is active.
     lineage:
-    - datalake_mission_control_raw.onboardingtasktypes.active
+      - datalake_mission_control_raw.onboardingtasktypes.active
   ts_created:
     description: Timestamp of the task's creation.
     lineage:
-    - datalake_mission_control_raw.onboardingtasktypes.created_on
+      - datalake_mission_control_raw.onboardingtasktypes.created_on
   ts_updated:
     description: Timestamp of the task's update.
     lineage:
-    - datalake_mission_control_raw.onboardingtasktypes.updated_on
+      - datalake_mission_control_raw.onboardingtasktypes.updated_on
   year:
     description: Year integer value of the record's update. Also it's a partition.
     lineage:
-    - datalake_mission_control_raw.onboardingtasktypes.year
+      - datalake_mission_control_raw.onboardingtasktypes.year
   month:
     description: Month integer value of the record's update. Also it's a partition.
     lineage:
-    - datalake_mission_control_raw.onboardingtasktypes.month
+      - datalake_mission_control_raw.onboardingtasktypes.month
   day:
     description: Day integer value of the record's update. Also it's a partition.
     lineage:
-    - datalake_mission_control_raw.onboardingtasktypes.day
+      - datalake_mission_control_raw.onboardingtasktypes.day

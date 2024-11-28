@@ -1,7 +1,7 @@
 ---
 database_name: datalake_mission_control_clean
 table_name: onboarding_action
-owner: 'kleber.inoue@quintoandar.com.br'
+owner: "kleber.inoue@quintoandar.com.br"
 domain: For Rent
 description: Table that contains the action for each onboarding.
   Due to incremental load, this table contains duplicated IDs.
@@ -9,40 +9,40 @@ columns:
   id:
     description: ID of the onboarding's action. It's the primary key of the table.
     lineage:
-    - datalake_mission_control_raw.onboardingaction.id
+      - datalake_mission_control_raw.onboardingaction.id
   id_onboarding:
     description: Onboarding ID.
     lineage:
-    - datalake_mission_control_raw.onboardingaction.onboarding_id
+      - datalake_mission_control_raw.onboardingaction.onboarding_id
   type_identifier:
     description: Type of the onboarding action.
     lineage:
-    - datalake_mission_control_raw.onboardingaction.type_identifier
+      - datalake_mission_control_raw.onboardingaction.type_identifier
   user_role_target_type:
     description: User's type related to the action.
     lineage:
-    - datalake_mission_control_raw.onboardingaction.user_role_type_target
+      - datalake_mission_control_raw.onboardingaction.user_role_type_target
   is_deleted:
     description: Boolean flag value if the record was deleted.
     lineage:
-    - datalake_mission_control_raw.onboardingaction.deleted
+      - datalake_mission_control_raw.onboardingaction.deleted
   ts_created:
-    description: Timestamp of the onboarding's action creation. 
+    description: Timestamp of the onboarding's action creation.
     lineage:
-    - datalake_mission_control_raw.onboardingaction.created_on
+      - datalake_mission_control_raw.onboardingaction.created_on
   ts_updated:
     description: Timestamp when the register was updated.
     lineage:
-    - datalake_mission_control_raw.onboardingaction.updated_on
+      - datalake_mission_control_raw.onboardingaction.updated_on
   year:
     description: Year integer value of the record's update. Also it's a partition.
     lineage:
-    - datalake_mission_control_raw.onboardingaction.year
+      - datalake_mission_control_raw.onboardingaction.year
   month:
     description: Month integer value of the record's update. Also it's a partition.
     lineage:
-    - datalake_mission_control_raw.onboardingaction.month
+      - datalake_mission_control_raw.onboardingaction.month
   day:
     description: Day integer value of the record's update. Also it's a partition.
     lineage:
-    - datalake_mission_control_raw.onboardingaction.day
+      - datalake_mission_control_raw.onboardingaction.day
