@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_nexxera.cnab_charges_recupera.our_number
       - datalake_checkout_clean.boleto.our_number
-      - datalake_pas.ledger.id_external_payment
+      - datalake_accounting_funnel.ledger.id_external_payment
     description: "Unique code to identify bank payments"
   bank_amount:
     lineage:
@@ -21,7 +21,7 @@ columns:
     description: "Paid amount from Vans and Checkout"
   sap_amount:
     lineage:
-      - datalake_pas.ledger.debit_credit
+      - datalake_accounting_funnel.ledger.debit_credit
     description: "Paid amount from SAP - Ledger"
   status_bank:
     description: "If TRUE, Bank is recorded"

@@ -1,0 +1,143 @@
+---
+database_name: datalake_pas
+table_name: ledger_new_template
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table ledger from SAP B1 with the 4HANA template"
+columns:
+  id_transaction:
+    description: "Identification number of the transaction"
+    lineage:
+      - datalake_pas.ledger.id_transaction
+  id_business_entity:
+    description: "Identification number of the business entity"
+    lineage:
+      - datalake_pas.ledger.id_business_entity
+  id_finance_entity:
+    description: "Identification number of the finance entity"
+    lineage:
+      - datalake_pas.ledger.id_finance_entity
+  id_finance_entity_entry:
+    description: "Identification number of the finance entitiy of entry"
+    lineage:
+      - datalake_pas.ledger.id_finance_entity_entry
+  id_external_payment:
+    description: "External ID of the payment"
+    lineage:
+      - datalake_pas.ledger.id_external_payment
+  id_document:
+    description: "Identification number of the document"
+    lineage:
+      - datalake_pas.ledger.id_document
+  id_branch:
+    description: "ID that indicates which company from 5A group"
+    lineage:
+      - datalake_pas.ledger.id_branch
+  4hana_id_company:
+    description: "ID that indicates which company from 5A group updated to 4HANA format"
+    lineage:
+      - datalake_pas.ledger.id_branch
+  account_type:
+    description: "Account type description"
+    lineage:
+      - datalake_pas.ledger.account_type
+  account_number:
+    description: "Account number"
+    lineage:
+      - datalake_pas.ledger.account_number
+  4hana_account_number:
+    description: "Account number in 4HANA Format"
+    lineage:
+      - datalake_pas.ledger.account_number
+  account_name:
+    description: "Description of the account"
+    lineage:
+      - datalake_pas.ledger.account_name
+  series:
+    description: "Series description"
+    lineage:
+      - datalake_pas.ledger.series
+  document_number:
+    description: "Transaction type and document number"
+    lineage:
+      - datalake_pas.ledger.document_number
+  accounting_rule:
+    description: "Accounting rule applied"
+    lineage:
+      - datalake_pas.ledger.accounting_rule
+  accounting_type:
+    description: "Accounting type: bill or transfer"
+    lineage:
+      - datalake_pas.ledger.accounting_type
+  4hana_transaction_type:
+    description: "Transaction Type in 4HANA format"
+    lineage:
+      - datalake_pas.ledger.document_number
+  user_type:
+    description: "Type of user involved in the referred transactions"
+    lineage:
+      - datalake_pas.ledger.user_type
+  source_client:
+    description: "Product that was the transaction source"
+    lineage:
+      - datalake_pas.ledger.source_client
+  comments:
+    description: "Comments and observations"
+    lineage:
+      - datalake_pas.ledger.comments
+  debit_credit:
+    description: "Debit - Credit value"
+    lineage:
+      - datalake_pas.ledger.debit_credit
+  debit:
+    description: "Debit value"
+    lineage:
+      - datalake_pas.ledger.debit
+  credit:
+    description: "Credit value"
+    lineage:
+      - datalake_pas.ledger.credit
+  created_by:
+    description: "Name of the user who created the register"
+    lineage:
+      - datalake_pas.ledger.created_by
+  location_profit_code:
+    description: "Location profit code"
+    lineage:
+      - datalake_pas.ledger.location_profit_code
+  cost_center_code:
+    description: "Identification number of the cost center"
+    lineage:
+      - datalake_pas.ledger.cost_center_code
+  4hana_cost_center_code:
+    description: "Identification number of the cost center on 4HANA format"
+    lineage:
+      - datalake_pas.ledger.cost_center_code
+  uuid:
+    description: "Unic ID"
+    lineage:
+      - datalake_pas.ledger.uuid
+  dt_reference:
+    description: "Reference date"
+    lineage:
+      - datalake_pas.ledger.dt_reference
+  dt_due:
+    description: "Due date"
+    lineage:
+      - datalake_pas.ledger.dt_due
+  dt_tax:
+    description: "Tax date"
+    lineage:
+      - datalake_pas.ledger.dt_tax
+  dt_created:
+    description: "Created date"
+    lineage:
+      - datalake_pas.ledger.dt_created
+  dt_updated:
+    description: "Updated date"
+    lineage:
+      - datalake_pas.ledger.dt_updated
+  accrual_year_month:
+    description: "Accrual date"
+    lineage:
+      - datalake_pas.ledger.accrual_year_month

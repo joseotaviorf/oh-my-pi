@@ -9,6 +9,11 @@ workflow:
   custom_schema: pas
   inner_dependencies:
     ledger:
+      - ledger_new_template
+      - 4hana_journal_entries_bank_account
+    4hana_journal_entries_bank_account:
+      - 4hana_journal_entries
+    ledger_new_template:
       - incoming_payments_lines
       - incoming_payments
       - invoice_lines

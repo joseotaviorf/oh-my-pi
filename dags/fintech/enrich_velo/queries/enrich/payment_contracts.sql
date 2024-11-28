@@ -71,7 +71,7 @@ payments_assinaturas_billing_direto AS (
         FROM
             datalake_accounting_funnel.ledger
         WHERE
-            account_name IN ('Duplicatas a Receber VELO')
+            (account_number = '113009' OR account_name IN ('Duplicatas a Receber VELO'))
             AND debit = 0
         ),
         cobranca_billing AS (

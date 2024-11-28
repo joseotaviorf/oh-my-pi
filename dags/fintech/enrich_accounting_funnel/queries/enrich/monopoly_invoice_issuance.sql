@@ -28,22 +28,22 @@ sap_gateway AS (
         f.id_finance_entity,
         f.id_feature,
         s.hash,
-        f.sync_sap_status, 
+        f.sync_sap_status,
         MIN(IF(s.status = 'done', 'success', 'failed')) AS sync_sap_job_status
     FROM
         datalake_sap_gateway.feature f
     LEFT JOIN
         datalake_sap_gateway.sync_sap_job s
-            ON f.id_feature = s.id_feature 
-    WHERE 
+            ON f.id_feature = s.id_feature
+    WHERE
         erp_solution = 'B1'
         AND type = 'NF'
-    GROUP BY 
+    GROUP BY
         1, 2, 3, 4
 ),
 
 sap AS (
-    SELECT 
+    SELECT
         id_business_entity,
         id_finance_entity,
         hash,
@@ -51,13 +51,13 @@ sap AS (
         MAX(DATE(dt_created)) AS dt_sap_created,
         MAX(DATE(dt_reference)) AS dt_sap_reference,
         CAST(SUM(debit_credit) AS DECIMAL(12,2)) AS sap_amount
-    FROM 
+    FROM
         datalake_accounting_funnel.ledger
-    WHERE 
-        account_number IN ('31101.04.01', '31101.04.09')
-        AND document_number LIKE 'IN %'
+    WHERE
+        account_number IN ('420007')
+        AND transaction_type = 'DR'
         AND dt_reference >= DATE('2024-01-01')
-    GROUP BY 
+    GROUP BY
         1, 2, 3, 4
 ),
 
@@ -74,15 +74,15 @@ SELECT
     m.dt_trigger,
     s.dt_sap_created,
     s.dt_sap_reference
-FROM 
-    monopoly m 
-LEFT JOIN 
-    sap_gateway sg 
+FROM
+    monopoly m
+LEFT JOIN
+    sap_gateway sg
         ON sg.id_feature = m.id_external_sync
-LEFT JOIN 
-    sap s 
+LEFT JOIN
+    sap s
         ON s.hash = sg.hash
-WHERE 
+WHERE
     dt_trigger >= DATE('2023-01-01')
 GROUP BY 1,2,3,4,5,6,7,9,10,11
 )
@@ -97,5 +97,5 @@ SELECT
     dt_trigger AS dt_source_trigger,
     dt_sap_created,
     dt_sap_reference
-FROM 
-    df 
+FROM
+    df

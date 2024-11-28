@@ -179,8 +179,19 @@ sap AS (
     FROM
         datalake_accounting_funnel.ledger
     WHERE
-        account_number IN ('41102.01.06', '41103.02.01', '41102.01.16', '41102.01.05', '31102.01.01', '41102.01.15', '21104.01.07', '61101.01.70', '61101.01.77')
-        AND document_number like 'JE %'
+
+    WHERE
+        (
+            dt_reference >= DATE('2024-01-01')
+            AND account_number IN ('420019', '420003', '420025', '420020', '420003', '611012', '211415')
+            AND transaction_type = 'SA'
+        )
+        OR
+        (
+            dt_reference < DATE('2024-01-01')
+            AND account_number IN ('41102.01.06', '41103.02.01', '41102.01.16', '41102.01.05', '31102.01.01', '41102.01.15', '21104.01.07', '61101.01.70', '61101.01.77')
+            AND document_number like 'JE %'
+        )
     GROUP BY 1, 2, 3, 5, 6
 ),
 

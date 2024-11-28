@@ -24,7 +24,17 @@ sap AS (
     FROM
         datalake_pas.ledger
     WHERE
-        account_number = '11102.01.11'
+        (
+            (
+                dt_reference >= DATE('2024-01-01')
+                AND account_number = '110044'
+            )
+            OR
+            (
+                dt_reference < DATE('2024-01-01')
+                AND account_number = '11102.01.11'
+            )
+        )
         AND id_finance_entity <> ''
         AND id_finance_entity IS NOT NULL
         AND id_external_payment IS NOT NULL

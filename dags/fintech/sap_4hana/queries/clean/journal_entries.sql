@@ -11,7 +11,7 @@ SELECT
     NULLIF(zzref_per, '') AS accrual_year_month,
     NULLIF(dmbtr, '') AS document_amount,
     COALESCE(NULLIF(kunnr,''), NULLIF(lifnr,'')) AS account_shortname,
-    NULLIF(hkont, '') AS account_number,
+    BIGINT(NULLIF(hkont, '')) AS account_number,
     NULLIF(zzbp_type, '') AS user_type,
     NULLIF(zzacc_rule, '') AS accounting_rule,
     CASE
@@ -27,6 +27,7 @@ SELECT
     NULLIF(monat, '') AS posting_period,
     NULLIF(blart, '') AS accounting_type,
     COALESCE(NULLIF(ZZMEMOITEM, ''),NULLIF(bktxt, '')) AS memo,
+    NULLIF(matnr, '') AS material,
     NULLIF(usnam, '') AS created_by,
     NULLIF(xblnr, '') AS xblnr,
     NULLIF(waers, '') AS currency_code,
@@ -35,6 +36,7 @@ SELECT
     TO_DATE(bldat, 'yyyyMMdd') AS dt_tax,
     TO_DATE(budat, 'yyyyMMdd') AS dt_accrual,
     TO_DATE(cpudt, 'yyyyMMdd') AS dt_created,
+    TO_DATE(COALESCE(NULLIF(aedat, '00000000'), cpudt), 'yyyyMMdd') AS dt_updated,
     year,
     month,
     day

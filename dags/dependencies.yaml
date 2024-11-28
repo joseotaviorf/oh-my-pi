@@ -1055,11 +1055,8 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry
-  - bietlejuice.enrich_sap:load-enrich-invoice-lines
-  - bietlejuice.enrich_sap:load-enrich-invoices
-  - bietlejuice.enrich_sap:load-enrich-journal-entries
-  - bietlejuice.enrich_sap:load-enrich-journal-entry-lines
   - bietlejuice.enrich_sap:load-enrich-ledger
+  - bietlejuice.enrich_sap:load-enrich-ledger-new-template
   - bietlejuice.enrich_sap_gateway:load-enrich-feature
   - bietlejuice.enrich_sap_gateway:load-enrich-sync-sap-job
   - bietlejuice.gsheets_fintech:done-clean-cod-locale
@@ -2753,6 +2750,8 @@ bietlejuice.enrich_sap:
   - bietlejuice.sap:load-clean-invoices
   - bietlejuice.sap:load-clean-journal-entries
   - bietlejuice.sap:load-clean-journal-entry-lines
+  - bietlejuice.sap_4hana:load-clean-journal-entries
+
 bietlejuice.enrich_sap_gateway:
   - bietlejuice.sap_gateway:load-clean-feature
   - bietlejuice.sap_gateway:load-clean-operation

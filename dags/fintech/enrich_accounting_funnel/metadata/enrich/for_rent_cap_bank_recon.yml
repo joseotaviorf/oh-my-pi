@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_nexxera.cnab_payments.company_use
       - datalake_accounting_funnel.payment_platforms.reference_1
-      - datalake_pas.ledger.id_external_payment
+      - datalake_accounting_funnel.ledger.id_external_payment
     description: "Unique code to identify bank payments"
   bank_account_number:
     lineage:
@@ -17,7 +17,7 @@ columns:
     description: "Bank account where de payments was made"
   sap_account_number:
     lineage:
-      - datalake_pas.ledger.account_number
+      - datalake_accounting_funnel.ledger.account_number
     description: "SAP account number where de transaction was register"
   latest_occurrence_code:
     lineage:
@@ -33,7 +33,7 @@ columns:
     description: "Paid amount from Vans/Checkout"
   sap_paid_amount:
     lineage:
-      - datalake_pas.ledger.debit_credit
+      - datalake_accounting_funnel.ledger.debit_credit
     description: "Paid amount from SAP - Ledger"
   is_vans_compliance:
     description: "If TRUE, Bank and Vans are matching in company_use, paid_amount and dt_paid"
@@ -49,15 +49,15 @@ columns:
     description: "Paid date from Vans/Checkout"
   dt_sap_paid:
     lineage:
-      - datalake_pas.ledger.dt_reference
+      - datalake_accounting_funnel.ledger.dt_reference
     description: "Paid date from SAP/Ledger - RefDate"
   dt_sap_tax:
     lineage:
-      - datalake_pas.ledger.dt_tax
+      - datalake_accounting_funnel.ledger.dt_tax
     description: "Document date - TaxDate - from SAP/Ledger"
   dt_paid:
     lineage:
       - datalake_nexxera.cnab_payments.dt_paid
       - datalake_accounting_funnel.payment_platforms.dt_paid
-      - datalake_pas.ledger.dt_reference
+      - datalake_accounting_funnel.ledger.dt_reference
     description: "Dates combine from all systems to filter in recon process"

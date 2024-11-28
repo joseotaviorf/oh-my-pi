@@ -8,159 +8,151 @@ columns:
   id_transaction:
     description: "Identification number of the transaction"
     lineage:
-      - datalake_pas.journal_entries.id_transaction
-      - datalake_pas.invoices.id_transaction
+      - datalake_accounting_funnel.ledger_new_template.id_transaction
+      - datalake_sap_4hana_clean.journal_entries.id_transaction
   id_business_entity:
     description: "Identification number of the business entity"
     lineage:
-      - datalake_pas.journal_entries.id_business_entity
-      - datalake_pas.invoices.id_business_entity
+      - datalake_accounting_funnel.ledger_new_template.id_business_entity
+      - datalake_sap_4hana_clean.journal_entries.id_business_entity
   id_finance_entity:
     description: "Identification number of the finance entity"
     lineage:
-      - datalake_pas.journal_entry_lines.id_finance_entity
-      - datalake_pas.invoice_lines.id_finance_entity
+      - datalake_accounting_funnel.ledger_new_template.id_finance_entity
+      - datalake_sap_4hana_clean.journal_entries.id_finance_entity
   id_finance_entity_entry:
     description: "Identification number of the finance entitiy of entry"
     lineage:
-      - datalake_pas.journal_entry_lines.id_finance_entity_entry
-      - datalake_pas.invoice_lines.id_finance_entity_entry
+      - datalake_accounting_funnel.ledger_new_template.id_finance_entity_entry
+      - datalake_sap_4hana_clean.journal_entries.id_finance_entity_entry
   id_external_payment:
     description: "External ID of the payment"
     lineage:
-      - datalake_pas.journal_entries.id_external_payment
-      - datalake_pas.invoices.id_external_payment
+      - datalake_accounting_funnel.ledger_new_template.id_external_payment
+      - datalake_sap_4hana_clean.journal_entries.id_external_payment
   id_document:
     description: "Identification number of the document"
     lineage:
-      - datalake_pas.invoice_lines.id_document
+      - datalake_accounting_funnel.ledger_new_template.id_document
   id_branch:
     description: "ID that indicates which company from 5A group"
     lineage:
-      - datalake_pas.invoice_lines.id_branch
-      - datalake_pas.journal_entry_lines.id_branch
+      - datalake_accounting_funnel.ledger_new_template.4hana_id_company
+      - datalake_sap_4hana_clean.journal_entries.id_company
   account_type:
     description: "Account type description"
+    lineage:
+      - datalake_accounting_funnel.ledger_new_template.account_type
   account_number:
     description: "Account number"
     lineage:
-      - datalake_pas.journal_entry_lines.account
-      - datalake_pas.invoice_lines.account
+      - datalake_accounting_funnel.ledger_new_template.4hana_account_number
+      - datalake_sap_4hana_clean.journal_entries.account_number
   account_name:
     description: "Description of the account"
     lineage:
-      - datalake_pas_clean.chart_of_accounts
+      - datalake_accounting_funnel.ledger_new_template.account_name
+      - datalake_sap_4hana_clean.journal_entries.account_shortname
   series:
     description: "Series description"
     lineage:
-      - datalake_pas.journal_entries.series
-      - datalake_pas.invoices.series
+      - datalake_accounting_funnel.ledger_new_template.series
   contra_act:
     description: "Indicates the opposite entry account number. If a debit, indicates the credit account number and vice versa"
     lineage:
-      - datalake_pas.invoice_lines.contra_act
-      - datalake_pas.journal_entry_lines.contra_act
+      - datalake_accounting_funnel.ledger_new_template.contra_act
   sap_document_number:
     description: "References the input or output sap document table"
     lineage:
-      - datalake_pas.invoice_lines.sap_document_number
-      - datalake_pas.journal_entry_lines.sap_document_number
+      - datalake_accounting_funnel.ledger_new_template.sap_document_number
   document_number:
     description: "Transaction type and document number"
     lineage:
-      - datalake_pas.journal_entries.transaction_type
-      - datalake_pas.invoices.transaction_type
-      - datalake_pas.journal_entries.source_document_number
-      - datalake_pas.invoices.source_document_number
+      - datalake_accounting_funnel.ledger_new_template.document_number
   accounting_rule:
     description: "Accounting rule applied"
     lineage:
-      - datalake_pas.journal_entry_lines.accounting_rule
-      - datalake_pas.invoice_lines.accounting_rule
+      - datalake_accounting_funnel.ledger_new_template.accounting_rule
+      - datalake_sap_4hana_clean.journal_entries.accounting_rule
   accounting_type:
     description: "Accounting type: bill or transfer"
     lineage:
-      - datalake_pas.journal_entry_lines.accounting_type
-      - datalake_pas.invoice_lines.accounting_type
+      - datalake_accounting_funnel.ledger_new_template.accounting_type
+      - datalake_sap_4hana_clean.journal_entries.accounting_type
   user_type:
     description: "Type of user involved in the referred transactions"
     lineage:
-      - datalake_pas.journal_entry_lines.user_type
-      - datalake_pas.invoice_lines.user_type
+      - datalake_accounting_funnel.ledger_new_template.user_type
+      - datalake_sap_4hana_clean.journal_entries.user_type
   source_client:
     description: "Product that was the transaction source"
     lineage:
-      - datalake_pas.journal_entries.source_client
-      - datalake_pas.invoices.source_client
+      - datalake_accounting_funnel.ledger_new_template.source_client
+      - datalake_sap_4hana_clean.journal_entries.source_client
   comments:
     description: "Comments and observations"
     lineage:
-      - datalake_pas.journal_entry_lines.memo_line
-      - datalake_pas.invoice_lines.memo_line
-      - datalake_pas.journal_entries.memo
-      - datalake_pas.invoice.memo
+      - datalake_accounting_funnel.ledger_new_template.comments
+      - datalake_sap_4hana_clean.journal_entries.memo
+      - datalake_sap_4hana_clean.journal_entries.memo_line
+      - datalake_sap_4hana_clean.journal_entries.comments
   debit_credit:
-    description: "Debit - Credit value"
+    description: "Debit - Credit"
     lineage:
-      - datalake_pas.journal_entry_lines.debit
-      - datalake_pas.invoice_lines.debit
-      - datalake_pas.journal_entry_lines.credit
-      - datalake_pas.invoice_lines.credit
+      - datalake_accounting_funnel.ledger_new_template.debit_credit
+      - datalake_sap_4hana_clean.journal_entries.debit
+      - datalake_sap_4hana_clean.journal_entries.credit
   debit:
     description: "Debit value"
     lineage:
-      - datalake_pas.journal_entry_lines.debit
-      - datalake_pas.invoice_lines.debit
-      - datalake_pas.journal_entry_lines.credit
-      - datalake_pas.invoice_lines.credit
+      - datalake_accounting_funnel.ledger_new_template.debit
+      - datalake_sap_4hana_clean.journal_entries.debit
   credit:
     description: "Credit value"
     lineage:
-      - datalake_pas.journal_entry_lines.debit
-      - datalake_pas.invoice_lines.debit
-      - datalake_pas.journal_entry_lines.credit
-      - datalake_pas.invoice_lines.credit
+      - datalake_accounting_funnel.ledger_new_template.credit
+      - datalake_sap_4hana_clean.journal_entries.credit
   created_by:
     description: "Name of the user who created the register"
     lineage:
-      - datalake_pas_clean.users
+      - datalake_accounting_funnel.ledger_new_template.created_by
+      - datalake_sap_4hana_clean.journal_entries.created_by
   location_profit_code:
     description: "Location profit code"
     lineage:
-      - datalake_pas.journal_entry_lines.location_profit_code
-      - datalake_pas.invoice_lines.location_profit_code
+      - datalake_accounting_funnel.ledger_new_template.location_profit_code
+      - datalake_sap_4hana_clean.journal_entries.location_profit_code
   cost_center_code:
     description: "Identification number of the cost center"
     lineage:
-      - datalake_pas.journal_entry_lines.cost_center_code
-      - datalake_pas.invoice_lines.cost_center_code
+      - datalake_accounting_funnel.ledger_new_template.4hana_cost_center_code
+      - datalake_sap_4hana_clean.journal_entries.cost_center_code
   hash:
     description: "Unic ID"
     lineage:
-      - datalake_pas.journal_entries.uuid
-      - datalake_pas.invoices.uuid
+      - datalake_accounting_funnel.ledger_new_template.uuid
+      - datalake_sap_4hana_clean.journal_entries.hash
   dt_created:
     description: "Created date"
     lineage:
-      - datalake_pas.journal_entries.dt_created
-      - datalake_pas.invoices.dt_created
+      - datalake_accounting_funnel.ledger_new_template.dt_created
+      - datalake_sap_4hana_clean.journal_entries.dt_created
   dt_reference:
     description: "Reference date"
     lineage:
-      - datalake_pas.journal_entries.dt_reference
-      - datalake_pas.invoices.dt_reference
+      - datalake_accounting_funnel.ledger_new_template.dt_reference
+      - datalake_sap_4hana_clean.journal_entries.dt_accrual
   dt_due:
     description: "Due date"
     lineage:
-      - datalake_pas.journal_entries.dt_due
-      - datalake_pas.invoices.dt_due
+      - datalake_accounting_funnel.ledger_new_template.dt_due
   dt_tax:
     description: "Tax date"
     lineage:
-      - datalake_pas.journal_entries.dt_tax
-      - datalake_pas.invoices.dt_tax
+      - datalake_accounting_funnel.ledger_new_template.dt_tax
+      - datalake_sap_4hana_clean.journal_entries.dt_tax
   accrual_year_month:
     description: "Accrual date"
     lineage:
-      - datalake_pas.journal_entries.accrual_year_month
-      - datalake_pas.invoices.accrual_year_month
+      - datalake_accounting_funnel.ledger_new_template.accrual_year_month
+      - datalake_sap_4hana_clean.journal_entries.accrual_year_month

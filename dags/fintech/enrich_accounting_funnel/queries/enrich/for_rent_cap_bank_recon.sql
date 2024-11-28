@@ -45,9 +45,18 @@ sap AS (
         dt_tax,
         ROUND(SUM(debit_credit), 2) AS paid_amount
     FROM
-        datalake_pas.ledger
+        datalake_accounting_funnel.ledger
     WHERE
-        account_number IN ('11102.01.04', '11102.02.01', '11102.01.08', '11102.01.07')
+        (
+            dt_reference >= DATE('2024-01-01')
+            AND account_number IN ('110104', '111180', '110350', '110164')
+        )
+        OR
+        (
+            dt_reference < DATE('2024-01-01')
+            AND account_number IN ('11102.01.04', '11102.02.01', '11102.01.08', '11102.01.07')
+        )
+
     GROUP BY
         1, 2, 3, 4
 ),
