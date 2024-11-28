@@ -1,5 +1,5 @@
 SELECT
-  CAST(id_ticket AS sk_ticket,
+  CAST(id_ticket AS BIGINT) sk_ticket,
   first_csat_score,
   last_csat_score,
   first_csat_comment,
