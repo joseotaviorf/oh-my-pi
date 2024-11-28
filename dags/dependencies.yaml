@@ -630,7 +630,6 @@ bietlejuice.dw_offer:
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal-aud
   - bietlejuice.enrich_offer:load-enrich-offer
-  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
 bietlejuice.dw_offer_temp:
   - bietlejuice.dw_offer:load-dw-rent-dim-offer
@@ -850,7 +849,6 @@ bietlejuice.dw_sale_flows:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
-  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
 bietlejuice.dw_sale_listing_flow:
   - bietlejuice.dw_region:load-dw-public-dim-region
@@ -888,7 +886,6 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events
   - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation
   - bietlejuice.enrich_offer:load-enrich-sale-offer
-  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
 bietlejuice.dw_sale_ongoing_listings:
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type
@@ -1266,7 +1263,6 @@ bietlejuice.enrich_booking:
   - bietlejuice.enrich_hub_services:load-enrich-buyer-secretariat-changes
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
   - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review
   - bietlejuice.insider:load-clean-review-feature

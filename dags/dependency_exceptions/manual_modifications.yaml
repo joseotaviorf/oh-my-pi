@@ -137,17 +137,20 @@ bietlejuice.dw_datamarts_spark.static:
 bietlejuice.dw_date:
   add:
     - bietlejuice.enrich_public_date:load-enrich-aux-date
+bietlejuice.dw_losses:
+  remove:
+    - bietlejuice.enrich_losses:load-enrich-provision-factor
 bietlejuice.dw_offboarding:
   add:
     - bietlejuice.enrich_inspections:load-enrich-repair-request
+bietlejuice.dw_offer:
+  remove:
+    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
 bietlejuice.dw_photo_jobs:
   remove:
     - bietlejuice.ebdb_visit:load-clean-booking
     - bietlejuice.ebdb:load-clean-inspection
     - bietlejuice.ebdb_house:load-clean-house
-bietlejuice.dw_losses:
-  remove:
-    - bietlejuice.enrich_losses:load-enrich-provision-factor
 bietlejuice.dw_revenue_lines:
   remove:
     - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
@@ -158,6 +161,9 @@ bietlejuice.dw_revenue_lines:
 bietlejuice.dw_sale_events:
   add:
     - bietlejuice.dw_rede_company:load-dw-rede-dim-company
+bietlejuice.dw_sale_flows:
+  remove:
+    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
 bietlejuice.dw_sale_listings:
   add:
     - bietlejuice.ebdb_house:load-clean-house
@@ -169,6 +175,7 @@ bietlejuice.dw_sale_offer_users:
 bietlejuice.dw_sale_offers:
   remove:
     - bietlejuice.ebdb_house:load-clean-house
+    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
 bietlejuice.dw_sale_visits:
   remove:
     - bietlejuice.ebdb_user:load-clean-user
@@ -221,6 +228,9 @@ bietlejuice.enrich_app_installed:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
+bietlejuice.enrich_booking:
+  remove:
+      - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
 bietlejuice.enrich_braze_events:
   remove:
     - bietlejuice.braze_events:load-clean-events-indica-ai
