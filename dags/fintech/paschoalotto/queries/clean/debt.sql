@@ -109,6 +109,4 @@ SELECT
     day
 FROM datalake_paschoalotto_raw.cbparcela
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    MAKE_DATE(year,month,day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

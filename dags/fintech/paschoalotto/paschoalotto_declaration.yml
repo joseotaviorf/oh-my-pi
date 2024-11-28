@@ -1,0 +1,89 @@
+---
+dag:
+  name: paschoalotto
+  schedule_start_date: 2024, 2, 7
+  schedule_interval: 0 3 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Ingestion of Paschoalotto tables.
+      The data will be used in the Collection Recovery analysis.
+      Tribe: Portfolio Management.
+      In case we don't find any files, an alert will be sent to the Google Chat channel: Fintech Data Quality Alerts with the missing tables.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: paschoalotto
+  load_spark_job: load_paschoalotto_raw
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - 5a-paschoalotto
+    - parquet
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{extraction_type}"
+    - "{partitions}"
+  tables_customization:
+    cbfollowup:
+      clean_table_name: followup
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
+    cbbordero:
+      clean_table_name: negotiation
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
+    cbparcela:
+      clean_table_name: debt
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
+    cbcontrato:
+      clean_table_name: contract
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
+    cbpagamento:
+      clean_table_name: agreement_payment
+      extraction_type: full
+    cbitembordero:
+      clean_table_name: agreement_detail
+      extraction_type: full
+    cbtiponegocio:
+      clean_table_name: product
+      extraction_type: full
+    cbparcelapagamento:
+      clean_table_name: debt_payment
+      extraction_type: full
+    cbsituacaocontrato:
+      clean_table_name: customer_history
+      extraction_type: full
+    cbsitcontato:
+      clean_table_name: collection_history
+      extraction_type: full
+    cbetapa:
+      clean_table_name: collection_step
+      extraction_type: full
+    geqlcontato:
+      clean_table_name: contact
+      extraction_type: full
+    geqlemail:
+      clean_table_name: email
+      extraction_type: full
+    geqlendereco:
+      clean_table_name: address
+      extraction_type: full
+    geqlcontrato:
+      clean_table_name: customer_map_keys
+      extraction_type: full
+    cbparcelaitembordero:
+      clean_table_name: debt_negotiation_details
+      extraction_type: full
+    geusuario:
+      clean_table_name: user
+      extraction_type: full
+cluster:
+  type: databricks_13_3_med_general_cluster
