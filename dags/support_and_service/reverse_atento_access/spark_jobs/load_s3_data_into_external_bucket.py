@@ -27,9 +27,10 @@ def __get_first_layer_folders_s3(bucket, prefix):
     datalakebucket = s3_resource.Bucket(bucket)
     tables = set()
     for object_summary in datalakebucket.objects.filter(Prefix=prefix):
-        first_level = object_summary.key.split(prefix + "/")[1]
-        first_level = first_level.split("/")[0]
-        tables.add(first_level)
+        if "_test" not in object_summary.key:
+            first_level = object_summary.key.split(prefix + "/")[1]
+            first_level = first_level[1].split("/")[0]
+            tables.add(first_level)
     return tables
 
 

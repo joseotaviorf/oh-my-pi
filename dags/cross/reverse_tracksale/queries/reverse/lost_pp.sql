@@ -59,7 +59,7 @@ listing_aux2 as (
 ),
 crisis_users AS (
 	SELECT DISTINCT
-        ft.sk_user AS id_user
+        ft.sk_user
     FROM
         dw_customer_support.fact_tickets AS ft
     INNER JOIN
