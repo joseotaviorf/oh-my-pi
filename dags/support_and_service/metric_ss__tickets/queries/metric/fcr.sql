@@ -18,13 +18,13 @@ WITH ticket_perspective AS (
     dt.journey,
     dd.journey_step,
     CASE
-      WHEN ft.ticket_origin = 'call inapp' THEN UPPER(ft.direction)
+      WHEN ft.ticket_origin = 'call inapp' THEN null
       WHEN dit.ticket_via = 'whatsapp' THEN 'OUTBOUND'
       WHEN ft.ticket_origin = 'call inbound' THEN 'INBOUND'
       WHEN ft.ticket_origin = 'chat5a' THEN 'INBOUND'
       WHEN ft.ticket_origin = 'call outbound' THEN 'OUTBOUND'
-      WHEN dit.ticket_via = 'whatsapp' then UPPER(ft.direction)
-      ELSE UPPER(ft.direction)
+      WHEN dit.ticket_via = 'whatsapp' then null
+      ELSE null
     END AS refined_direction,
     CASE
       WHEN dd.team IN (
@@ -97,7 +97,7 @@ WITH ticket_perspective AS (
     AND ft.ts_started >= CAST('2023-01-01' AS DATE)
     AND dd.area NOT LIKE ('%MX%')
     AND (
-      (ft.channel = 'call' AND ft.is_call_answered IS TRUE)
+      ft.channel = 'call' 
       OR ft.channel != 'call'
     )
 )
