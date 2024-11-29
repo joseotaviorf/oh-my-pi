@@ -29,7 +29,7 @@ def __get_first_layer_folders_s3(bucket, prefix):
     for object_summary in datalakebucket.objects.filter(Prefix=prefix):
         if "_test" not in object_summary.key:
             first_level = object_summary.key.split(prefix + "/")[1]
-            first_level = first_level[1].split("/")[0]
+            first_level = first_level.split("/")[0]
             tables.add(first_level)
     return tables
 
