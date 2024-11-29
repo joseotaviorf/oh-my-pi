@@ -290,9 +290,9 @@ global_house_metrics AS (
     to_json(
             named_struct(
                 'house_published', 1,
-                'global_offer', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_offer') >= houses_published.date THEN 1 ELSE 0 END,
-                'global_visit_completed', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_visit_completed') >= houses_published.date THEN 1 ELSE 0 END,
-                'global_contract_signed', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_contract_signed') >= houses_published.date THEN 1 ELSE 0 END
+                'global_offer', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_global_offer') >= houses_published.date THEN 1 ELSE 0 END,
+                'global_visit_completed', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_global_visit_completed') >= houses_published.date THEN 1 ELSE 0 END,
+                'global_contract_signed', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_global_contract_signed') >= houses_published.date THEN 1 ELSE 0 END
             )
     ) AS metrics,
 
@@ -300,9 +300,9 @@ global_house_metrics AS (
     to_json(
             named_struct(
                 'ts_house_published', houses_published.ts_house_published,
-                'ts_global_offer', get_json_object(global_user_metrics.timestamps, '$.ts_offer') ,
-                'ts_global_visit_completed', get_json_object(global_user_metrics.timestamps, '$.ts_visit_completed'),
-                'ts_global_contract_signed', get_json_object(global_user_metrics.timestamps, '$.ts_contract_signed')
+                'ts_global_offer', get_json_object(global_user_metrics.timestamps, '$.ts_global_offer') ,
+                'ts_global_visit_completed', get_json_object(global_user_metrics.timestamps, '$.ts_global_visit_completed'),
+                'ts_global_contract_signed', get_json_object(global_user_metrics.timestamps, '$.ts_global_contract_signed')
             )
     ) AS timestamps,
 
