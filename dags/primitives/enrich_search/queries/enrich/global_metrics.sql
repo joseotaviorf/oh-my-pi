@@ -53,14 +53,13 @@ sale_flow AS (
         MIN(dt_sale_agreement_signed) AS ts_contract_signed
     FROM datalake_sale_flows.sale_flow
     WHERE
-        date_format(ts_first_event, 'yyyy-MM-dd') BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-        AND id_buyer IS NOT NULL
+        id_buyer IS NOT NULL
         AND id_house IS NOT NULL
         AND
             (
-             ts_first_visit_completed IS NOT NULL
-             OR ts_first_offer_submitted IS NOT NULL
-             OR dt_sale_agreement_signed IS NOT NULL
+             ts_first_visit_completed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+             OR ts_first_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+             OR dt_sale_agreement_signed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
             )
     GROUP BY
         id_buyer,
@@ -80,15 +79,14 @@ rent_flow AS (
     FROM
         datalake_rent_flows.rent_flows
     WHERE
-        date_format(ts_rent_flow_event, 'yyyy-MM-dd') BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-        AND id_tenant_prospect IS NOT NULL
+        id_tenant_prospect IS NOT NULL
         AND id_house IS NOT NULL
         AND
             (
-             ts_visit_completed IS NOT NULL
-             OR ts_direct_offer_submitted IS NOT NULL
-             OR ts_offer_submitted IS NOT NULL
-             OR ts_contract_signed IS NOT NULL
+             ts_visit_completed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+             OR ts_direct_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+             OR ts_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+             OR ts_contract_signed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
             )
     GROUP BY
         id_tenant_prospect,
