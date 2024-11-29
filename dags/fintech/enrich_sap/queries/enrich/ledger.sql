@@ -66,7 +66,7 @@ WITH sap_b1 AS (
         NULL AS document_number,
         accounting_rule,
         accounting_type,
-        transaction_type,
+        NULL AS transaction_type,
         user_type,
         source_client,
         COALESCE(memo, memo_line, comments) AS comments,
