@@ -9491,7 +9491,7 @@ SELECT
         WHEN SPLIT(document_number, ' ')[0] = 'JR' THEN 'SA'
         WHEN SPLIT(document_number, ' ')[0] = 'PS' THEN 'KZ'
         ELSE SPLIT(document_number, ' ')[0]
-    END AS 4hana_transaction_type,
+    END AS transaction_type,
     *
 FROM
     cte_b1_ledger
