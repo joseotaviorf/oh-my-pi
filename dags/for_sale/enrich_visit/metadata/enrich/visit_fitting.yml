@@ -1,3 +1,4 @@
+---
 database_name: datalake_visit
 table_name: visit_fitting
 description: Information about Rent and Sale visit fitting.
@@ -29,6 +30,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house_listing
     description: House Listing's ID.
+  id_next_visit_fitting_after_discard:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.id_next_visit_fitting_after_discard
+    description: ID of the new visit request responsible for discarding the current visit request
   country_code:
     lineage:
       - datalake_ebdb_listing.house_listing.country_code
@@ -53,6 +58,18 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_fitting.request_context
     description: The context about the request.
+  has_fitted_visit_after_expired:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.has_fitted_visit_after_expired
+    description: Indicates whether there was a scheduled visit for the Visitor after the visit request expired.
+  has_fitted_visit_after_expired_in_same_house:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.has_fitted_visit_after_expired_in_same_house
+    description: Indicates whether a visit was scheduled for the Visitor after the visit request expired, however, the house with the scheduled visit is the same as the one in the expired request.
+  has_fitted_visit_all_5a_journey:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.has_fitted_visit_all_5a_journey
+    description: Indicates whether there was a scheduled visit (originating from a visit request) throughout the user's 5A journey
   dt_visit_desired:
     lineage:
       - datalake_ebdb_clean.visit_fitting.dt_visit
@@ -76,4 +93,20 @@ columns:
   ts_created:
     lineage:
       - datalake_ebdb_clean.visit_fitting.ts_created
-    description: When was done the solicitation.
+    description: When was created the solicitation.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.ts_updated
+    description: When was updated the solicitation.
+  year:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.ts_updated
+    description: Year of updated date.
+  month:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.ts_updated
+    description: Month of updated date.
+  day:
+    lineage:
+      - datalake_ebdb_clean.visit_fitting.ts_updated
+    description: Day of updated date.

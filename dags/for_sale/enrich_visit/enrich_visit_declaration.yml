@@ -7,6 +7,12 @@ dag:
 workflow:
     type: query_delta
     layer: enrich
+    tables_customization:
+        visit_fitting:
+            extraction_type: incremental
+            partitions: [year, month, day]
+            z_order_by: [id, status]
+            merge_on: [id]
 cluster:
     type: databricks_12_2_med_general_photon_cluster
     access_control_list:
