@@ -50,13 +50,15 @@ responsible_for_contract AS (
 ssn_original_payment AS (
     -- Service Self Negotiation where customer paid the original invoice
     SELECT DISTINCT
-        event_properties:contract_id AS id_contract,
-        event_properties:invoice_id AS id_invoice
+        COALESCE(pi.event_properties:contract_id, rip.event_properties:contract_id) AS id_contract,
+        COALESCE(pi.event_properties:invoice_id, rip.event_properties:invoice_id) AS id_invoice
     FROM
-        datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events
+        datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events AS pi
+    FULL OUTER JOIN
+        datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events AS rip
     WHERE
-        event_properties:contract_id IS NOT NULL
-        AND event_properties:invoice_id IS NOT NULL
+        COALESCE(pi.event_properties:contract_id, rip.event_properties:contract_id) IS NOT NULL
+        AND COALESCE(pi.event_properties:invoice_id, rip.event_properties:invoice_id) IS NOT NULL
 ),
 ssn_boletao AS (
     SELECT DISTINCT
