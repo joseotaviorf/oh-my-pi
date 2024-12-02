@@ -5,9 +5,10 @@ dag:
   owner: Data Growth
   documentation:
     dag_purpose: |
-      This DAG creates the enriched tables for [Bob (bob-o-construtor)](https://github.com/quintoandar/bob-o-construtor), a house registry service and now it has been used by AA (Autonomous Agents).
+      This DAG creates the enriched tables for [Bob (bob-o-construtor)](https://github.com/quintoandar/bob-o-construtor),
+      a house registry service and now it has been used by AA (Autonomous Agents).
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   tables_customization:
     house_draft_aud:
