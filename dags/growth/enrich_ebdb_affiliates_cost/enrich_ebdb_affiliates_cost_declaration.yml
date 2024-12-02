@@ -6,12 +6,12 @@ dag:
   documentation:
     dag_purpose: EBDB Affiliates Cost DAG retrieves QuintoAndar's EBDB affiliate commission values classified according to each account transaction type
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: incremental
   default_partitions:
-  - year
-  - month
-  - day
+    - year
+    - month
+    - day
 cluster:
   type: databricks_12_2_med_general_photon_cluster
