@@ -25,8 +25,6 @@ workflow:
       clean_table_name: closing_file
     commission_revenue_share_params:
       clean_table_name: commission_revenue_share_params
-    commission_revenue_share_periods:
-      clean_table_name: commission_revenue_share_periods
     consulta_score:
       clean_table_name: pre_analysis
     consulta_score_bradesco:
