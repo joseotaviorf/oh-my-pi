@@ -85,22 +85,22 @@ ivr_events AS (
     from_phone_number AS from_number,
     to_phone_number AS to_number,
     MIN(id_task) AS id_task,
-    MIN(ts_created - INTERVAL 3 HOUR) AS ts_first_event
+    MIN(ts_ivr_started - INTERVAL 3 HOUR) AS ts_first_event
   FROM
-    datalake_bigfone.ivr_tasks
+    datalake_customer_support.ivr_interactions
   WHERE
-    -- CX's exclusive phone number to plaquinhas contacts
     (
       to_phone_number IN (
         "+5511933058701",
         "+5531933007908",
         "+5540202507"
-      ) AND ts_created  - INTERVAL 3 HOUR < "2022-10-17"
-    ) OR (
+      ) AND ts_ivr_started  - INTERVAL 3 HOUR < "2022-10-17"
+    ) OR
+    (
       to_phone_number LIKE "%40202507%"
-      AND ts_created  - INTERVAL 3 HOUR >= "2022-10-17"
+      AND ts_ivr_started  - INTERVAL 3 HOUR >= "2022-10-17"
     )
-  GROUP BY 1, 2, 3
+  GROUP BY ALL
 ),
 
 flex_events AS (

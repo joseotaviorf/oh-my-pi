@@ -2751,7 +2751,6 @@ bietlejuice.enrich_sap:
   - bietlejuice.sap:load-clean-journal-entries
   - bietlejuice.sap:load-clean-journal-entry-lines
   - bietlejuice.sap_4hana:load-clean-journal-entries
-
 bietlejuice.enrich_sap_gateway:
   - bietlejuice.sap_gateway:load-clean-feature
   - bietlejuice.sap_gateway:load-clean-operation
@@ -3018,7 +3017,7 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.casa_mineira_crm:load-clean-origin-contact
   - bietlejuice.demand_contact_submission:load-clean-contact-submissions
   - bietlejuice.ebdb_user:load-clean-user
-  - bietlejuice.enrich_bigfone:load-enrich-ivr-tasks
+  - bietlejuice.enrich_customer_support:load-enrich-ivr-interactions
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
   - bietlejuice.enrich_quinto_messenger:load-enrich-tasks
