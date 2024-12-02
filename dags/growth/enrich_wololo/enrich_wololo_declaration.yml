@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: Creates enriched tables for the supply context based on Wololo data.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   tables_customization:
     lead_sales_company:
