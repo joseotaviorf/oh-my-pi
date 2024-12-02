@@ -199,7 +199,7 @@ tickets_per_task AS (
       ELSE 'inbound'
     END AS direction,
     CASE
-      WHEN COALESCE(ca1.origin, ca2.origin) IS NOT NULL THEN CONCAT('call  ', COALESCE(ca1.origin, ca2.origin))
+      WHEN COALESCE(ca1.origin, ca2.origin) IS NOT NULL THEN CONCAT('call ', COALESCE(ca1.origin, ca2.origin))
       WHEN ch.origin = 'in app' THEN 'chat in app'
       WHEN ch.origin = 'whatsapp' THEN ch.origin
       ELSE "n/a"
@@ -608,7 +608,7 @@ ticket_metrics AS (
           'Rescisão - Despejo [OFF][POS][BACK]',
           'Rescisão 1 [OFF] [POS] [BACK]'
         )
-        AND t.ticket_origin != "call outbound" THEN TRUE
+        AND t.ticket_origin != 'call outbound' THEN TRUE
       WHEN t.channel IN ('cs email', 'whatsapp')
         AND t.front_or_back IN ('front', 'back')
         AND DATE(t.ts_solved) >= DATE('2022-01-01')
