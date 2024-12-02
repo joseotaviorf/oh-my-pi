@@ -35,45 +35,48 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_api_response(token, endpoint_name, params):
+def get_api_response(token, table_name, params):
 
     tracksale_client = TracksaleClient(api_token=token)
-    consumer_instance = CONSUMERS[endpoint_name](tracksale_client)
+    consumer_instance = CONSUMERS[table_name](tracksale_client)
     api_response = consumer_instance.sync(**params)
 
     return api_response
 
+def get_parameters(table_name):
+    campaign_string = "[{'answer': 'campaign_code','campaign': 'code','dispatch': 'campaign.code'}]"
+    campaign_column = eval(campaign_string)[0][table_name]
+    campaigns_to_block = "['248', '326', '327', '356']"
+    return campaign_column, campaigns_to_block 
 
 if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
-    parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
-    parser.add_argument("source", help="name of the API")
-    parser.add_argument("endpoint_name", help="endpoint to call the API")
-    parser.add_argument("campaign_column", help="campaign ID column name")
-    parser.add_argument("campaigns_to_block", help="campaigns to be blocked")
+    parser.add_argument("bucket", help="bucket value in forno/prod")
+    parser.add_argument("dag_name", help="name of the API")
+    parser.add_argument("table_name", help="endpoint to call the API")
     parser.add_argument("execution_date", help="execution date in str format")
 
     args = parser.parse_args()
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={args.environment}, source={args.source}, execution_date={args.execution_date},
-            datalake_bucket={args.datalake_bucket}, endpoint_name={args.endpoint_name}, msg=print spark jobs args"
+            m={JOB_NAME}, environment={args.environment}, dag_name={args.dag_name}, execution_date={args.execution_date},
+            bucket={args.bucket}, table_name={args.table_name}, msg=print spark jobs args"
         """
     )
 
     environment = args.environment
-    source = args.source
+    dag_name = args.dag_name
     execution_date = args.execution_date
-    datalake_bucket = args.datalake_bucket
-    endpoint_name = args.endpoint_name
-    campaign_column = args.campaign_column
+    bucket = args.bucket
+    table_name = args.table_name
+    
+    campaign_column, campaigns_to_block = get_parameters(table_name)
     campaign_column = campaign_column.split(".")
-    campaigns_to_block = args.campaigns_to_block
-    campaigns_to_block = list(map(int, campaigns_to_block.split(",")))
+    campaigns_to_block = list(map(int, eval(campaigns_to_block)))
     partition_cols = ["year", "month", "day"]
 
     api_params = {"start_time": execution_date, "end_time": execution_date}
@@ -87,9 +90,9 @@ if __name__ == "__main__":
     )
     credentials = json.loads(json_credentials)
     spark_client = SparkClient()
-    api_response = get_api_response(credentials["token"], endpoint_name, api_params)
+    api_response = get_api_response(credentials["token"], table_name, api_params)
 
-    if endpoint_name == "dispatch":  # TODO: Create a more beautiful way to pass schema
+    if table_name == "dispatch":  # TODO: Create a more beautiful way to pass schema
         schema = StructType(
             [
                 StructField("campaign", MapType(StringType(), StringType(), True)),
@@ -133,7 +136,7 @@ if __name__ == "__main__":
         )
 
         datalake_info = DatalakeMetastoreService.get_db_info(
-            environment, source, datalake_bucket
+            environment, dag_name, bucket
         )
         spark_metastore_service = SparkMetastoreService(spark_client)
         database_name = datalake_info["db_raw_databricks"]
@@ -141,7 +144,6 @@ if __name__ == "__main__":
 
         database_location = datalake_info["db_raw_path"]
         format_options = SparkTableStorageFormat.DEFAULT_RAW
-        table_name = endpoint_name  # the table will have the same name as the endpoint
 
         # loaders
         s3_loader = S3Loader()
