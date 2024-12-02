@@ -169,7 +169,7 @@ get_elected_income AS (
 income_sources AS (
   SELECT DISTINCT
     pis.id_credit_evaluation_proponent AS sk_credit_evaluation_proponent,
-    pis.id_user AS sk_user,
+    pis.id_user AS sk_client,
     pis.id_credit_evaluation AS sk_credit_evaluation,
     pis.id_proposal AS sk_proposal,
     pis.proponent_cpf,
@@ -192,7 +192,7 @@ income_sources AS (
 )
 SELECT
   sk_credit_evaluation_proponent,
-  sk_user,
+  sk_client,
   sk_credit_evaluation,
   sk_proposal,
   proponent_cpf,

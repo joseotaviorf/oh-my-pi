@@ -8,7 +8,7 @@ columns:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.id
     description: Unique identifier of the proponent credit evaluation.
-  sk_user:
+  sk_client:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_user
     description: ID of the main user of the proposal.

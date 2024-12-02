@@ -123,7 +123,7 @@ columns:
     description: "Limite até 360 dias que é informado quando o banco não reporta o produto específico"
   overdraft_check_limit_expiration_up_to_360_days:
     description: "Limite de cheque especial disponível no período de até 360 dias"
-  credit_card_limit_expiration_over_up_to_360_days:
+  credit_card_limit_expiration_up_to_360_days:
     description: "Limite para uso de cartão de crédito disponível no período de até 360 dias"
   personal_credit_limit_expiration_up_to_360_days:
     description: "Limite de crédito pessoal disponível no período de até 360 dias"
