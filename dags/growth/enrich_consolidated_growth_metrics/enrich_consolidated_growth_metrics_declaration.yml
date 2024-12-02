@@ -3,26 +3,26 @@ dag:
   name: enrich_consolidated_growth_metrics
   schedule_start_date: 2024, 3, 1
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: |
       This DAG consolidates costs information above groups marketing metrics for QuintoAndar's media channels.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     consolidated_media_metrics:
-    - braze_consolidated_metrics
-    - criteo_consolidated_metrics
-    - facebook_consolidated_metrics
-    - google_consolidated_metrics
-    - mitula_consolidated_metrics
-    - rtb_consolidated_metrics
-    - trovit_consolidated_metrics
+      - braze_consolidated_metrics
+      - criteo_consolidated_metrics
+      - facebook_consolidated_metrics
+      - google_consolidated_metrics
+      - mitula_consolidated_metrics
+      - rtb_consolidated_metrics
+      - trovit_consolidated_metrics
   default_extraction_type: incremental
   default_partitions: ["id_date"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"  
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: custom_cluster
   custom_configurations:
