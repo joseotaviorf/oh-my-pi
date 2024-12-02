@@ -998,10 +998,7 @@ repasse_direto AS (
         FROM
             datalake_accounting_funnel.ledger
         WHERE
-            (
-                account_number = '113009'
-                OR account_name IN ('Títulos recebidos via cartão de crédito', 'Itaú Ag. 8792 Conta 49458-8')
-            )
+            account_name IN ('Duplicatas a Receber VELO')
             AND debit = 0
     )
     ,cpf_cnpj_person AS (
