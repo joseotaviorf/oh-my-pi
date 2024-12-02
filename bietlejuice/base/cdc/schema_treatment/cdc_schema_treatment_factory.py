@@ -13,10 +13,14 @@ from bietlejuice.base.cdc.schema_treatment.postgres_cdc_schema_treatment import 
 
 class CdcSchemaTreatmentFactory:
     def __init__(
-        self, schema_finder: CdcSchemaFinder, datalake_table_schema: str
+        self,
+        schema_finder: CdcSchemaFinder,
+        datalake_table_schema: str,
+        transactional_datatype_overrides: dict,
     ) -> None:
         self.schema_finder = schema_finder
         self.datalake_table_schema = datalake_table_schema
+        self.transactional_datatype_overrides = transactional_datatype_overrides
 
     def get_cdc_schema_treatment(
         self, database_type: DatabaseTypeEnum
@@ -29,8 +33,14 @@ class CdcSchemaTreatmentFactory:
 
     def get_postgres_cdc_schema_treatment(self) -> CdcSchemaTreatment:
         return PostgresCdcSchemaTreatment(
-            self.schema_finder, self.datalake_table_schema
+            self.schema_finder,
+            self.datalake_table_schema,
+            self.transactional_datatype_overrides,
         )
 
     def get_mysql_cdc_schema_treatment(self) -> CdcSchemaTreatment:
-        return MySqlCdcSchemaTreatment(self.schema_finder, self.datalake_table_schema)
+        return MySqlCdcSchemaTreatment(
+            self.schema_finder,
+            self.datalake_table_schema,
+            self.transactional_datatype_overrides,
+        )

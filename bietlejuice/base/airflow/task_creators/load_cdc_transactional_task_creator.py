@@ -2,6 +2,7 @@ from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCre
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
+import json
 
 
 class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
@@ -39,6 +40,9 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
         dbutils_secret_key = self.dag_execution_context.workflow_args.get(
             "dbutils_secret_key", f"{table_attributes.schema.upper()}_DB"
         )
+        transactional_datatype_overrides = table_attributes.table_customization.get(
+            "transactional_datatype_overrides", {}
+        )
 
         parameters = [
             self.dag_execution_context.environment,
@@ -54,6 +58,7 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
             str(partitions),
             primary_keys,
             dbutils_secret_key,
+            json.dumps(transactional_datatype_overrides),
         ]
         return parameters
 

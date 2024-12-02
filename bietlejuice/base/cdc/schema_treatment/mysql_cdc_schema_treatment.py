@@ -26,10 +26,14 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
     }
 
     def __init__(
-        self, schema_finder: MySqlCdcSchemaFinder, datalake_table_schema: str
+        self,
+        schema_finder: MySqlCdcSchemaFinder,
+        datalake_table_schema: str,
+        transactional_datatype_overrides: dict,
     ) -> None:
         self.schema_finder = schema_finder
         self.datalake_table_schema = datalake_table_schema
+        self.transactional_datatype_overrides = transactional_datatype_overrides
 
     def treat_dataframe(
         self, table_name: str, transactional_dataframe: DataFrame
@@ -37,7 +41,9 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
         latest_table_change = self._try_find_latest_table_definition(table_name)
         if latest_table_change:
             transactional_dataframe = self._treat_columns_from_latest_table_change(
-                latest_table_change, transactional_dataframe
+                latest_table_change,
+                transactional_dataframe,
+                self.transactional_datatype_overrides,
             )
 
         datalake_dataframe = self._try_find_existing_datalake_table(
@@ -61,6 +67,8 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
         self, latest_table_change: dict, transactional_dataframe: DataFrame
     ) -> DataFrame:
         """Forces the columns of the transactional dataframe to match the latest table DDL change in the source database."""
+
+        transactional_dataframe = self._apply_declared_types(transactional_dataframe)
 
         transactional_dataframe = self._treat_timestamp_columns(
             transactional_dataframe, latest_table_change
@@ -103,7 +111,10 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
         string_columns = []
 
         for column in latest_table_change["columns"]:
-            if column["name"] not in transactional_dataframe.columns:
+            if (
+                column["name"] not in transactional_dataframe.columns
+                or column["name"] in self.transactional_datatype_overrides.keys()
+            ):
                 continue
             if column["typeName"] == "DATE":
                 days_unix_columns.append(column["name"])
@@ -185,7 +196,10 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
         self, transactional_dataframe: DataFrame, latest_table_change: dict
     ) -> DataFrame:
         for column in latest_table_change["columns"]:
-            if column["name"] not in transactional_dataframe.columns:
+            if (
+                column["name"] not in transactional_dataframe.columns
+                or column["name"] in self.transactional_datatype_overrides.keys()
+            ):
                 continue
             if column["typeName"] not in ("BIT", "TINYINT"):
                 continue

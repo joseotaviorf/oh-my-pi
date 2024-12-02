@@ -34,6 +34,7 @@ class TestCdcSchemaTreatmentFactory:
         factory = CdcSchemaTreatmentFactory(
             schema_finder=postgres_cdc_schema_finder,
             datalake_table_schema="datalake_layer_test.table_name",
+            transactional_datatype_overrides={},
         )
 
         cdc_schema_treatment = factory.get_cdc_schema_treatment(
@@ -49,6 +50,7 @@ class TestCdcSchemaTreatmentFactory:
         factory = CdcSchemaTreatmentFactory(
             schema_finder=mysql_cdc_schema_finder,
             datalake_table_schema="datalake_layer_test.table_name",
+            transactional_datatype_overrides={},
         )
 
         cdc_schema_treatment = factory.get_cdc_schema_treatment(DatabaseTypeEnum.MYSQL)
@@ -60,6 +62,7 @@ class TestCdcSchemaTreatmentFactory:
         factory = CdcSchemaTreatmentFactory(
             schema_finder=mysql_cdc_schema_finder,
             datalake_table_schema="datalake_layer_test.table_name",
+            transactional_datatype_overrides={},
         )
 
         with pytest.raises(ValueError):

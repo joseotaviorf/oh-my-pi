@@ -13,10 +13,14 @@ class PostgresCdcSchemaTreatment(CdcSchemaTreatment):
     TYPE_MAPPING = {"smallint": "int", "integer": "int"}
 
     def __init__(
-        self, schema_finder: PostgresCdcSchemaFinder, datalake_table_schema: str
+        self,
+        schema_finder: PostgresCdcSchemaFinder,
+        datalake_table_schema: str,
+        transactional_datatype_overrides: dict,
     ) -> None:
         self.schema_finder = schema_finder
         self.datalake_table_schema = datalake_table_schema
+        self.transactional_datatype_overrides = transactional_datatype_overrides
 
     def treat_dataframe(
         self, table_name: str, transactional_dataframe: DataFrame
@@ -45,6 +49,8 @@ class PostgresCdcSchemaTreatment(CdcSchemaTreatment):
         self, latest_table_change: dict, transactional_dataframe: DataFrame
     ) -> DataFrame:
         """Forces the columns of the transactional dataframe to match the latest table DDL change in the source database, which is found in the Postgres database."""
+        transactional_dataframe = self._apply_declared_types(transactional_dataframe)
+
         transactional_dataframe = self._treat_timestamp_columns(
             transactional_dataframe, latest_table_change
         )
@@ -65,7 +71,10 @@ class PostgresCdcSchemaTreatment(CdcSchemaTreatment):
         as a string. This method converts those columns into timestamp by applying the necessary transformations.
         """
         for column in latest_table_change["columns"]:
-            if column["name"] not in transactional_dataframe.columns:
+            if (
+                column["name"] not in transactional_dataframe.columns
+                or column["name"] in self.transactional_datatype_overrides.keys()
+            ):
                 continue
             if column["typeName"] == "timestamp without time zone":
                 transactional_dataframe = transactional_dataframe.withColumn(

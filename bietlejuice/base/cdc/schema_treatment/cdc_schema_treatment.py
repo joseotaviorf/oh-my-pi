@@ -45,7 +45,10 @@ class CdcSchemaTreatment(ABC):
         self, transactional_dataframe: DataFrame, latest_table_change: dict
     ) -> DataFrame:
         for column in latest_table_change["columns"]:
-            if column["name"] not in transactional_dataframe.columns:
+            if (
+                column["name"] not in transactional_dataframe.columns
+                or column["name"] in self.transactional_datatype_overrides.keys()
+            ):
                 continue
             if column["typeName"] in self.TYPE_MAPPING:
                 transactional_dataframe = transactional_dataframe.withColumn(
@@ -61,7 +64,10 @@ class CdcSchemaTreatment(ABC):
         CDC saves decimal and numeric data types as a float64. This method converts to decimal again.
         """
         for column in latest_table_change["columns"]:
-            if column["name"] not in transactional_dataframe.columns:
+            if (
+                column["name"] not in transactional_dataframe.columns
+                or column["name"] in self.transactional_datatype_overrides.keys()
+            ):
                 continue
             if column["typeName"].upper() in ("DECIMAL", "NUMERIC"):
                 type = f"decimal({column['length']}, {column['scale']})"
@@ -71,4 +77,14 @@ class CdcSchemaTreatment(ABC):
                     column["name"], col(column["name"]).cast(type)
                 )
 
+        return transactional_dataframe
+
+    def _apply_declared_types(self, transactional_dataframe: DataFrame) -> DataFrame:
+        """Applies the declared types to the transactional dataframe, if they exist."""
+        for column, datatype in self.transactional_datatype_overrides.items():
+            if column not in transactional_dataframe.columns:
+                continue
+            transactional_dataframe = transactional_dataframe.withColumn(
+                column, col(column).cast(datatype)
+            )
         return transactional_dataframe

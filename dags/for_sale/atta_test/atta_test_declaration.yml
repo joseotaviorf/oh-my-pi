@@ -57,6 +57,9 @@ workflow:
       clean_table_name: providers_info
     franquia:
       clean_table_name: franchise_info
+      transactional_datatype_overrides:
+        Latitude: decimal(38,30)
+        Longitude: decimal(38,30)
     log_proposta_esteira:
       clean_table_name: log_isolve_v1
     max_usuarios:
@@ -71,6 +74,15 @@ workflow:
       clean_table_name: track_step_detail
     proposta:
       clean_table_name: proposal
+      transactional_datatype_overrides:
+        Commission_PaymentBoosterRate: decimal(38,30)
+        Commission_PaymentBoosterValue: decimal(38,30)
+        Commission_PaymentPenaltyRate: decimal(38,30)
+        Commission_PaymentPenaltyValue: decimal(38,30)
+        Commission_PaymentQuintoAndarRate: decimal(38,30)
+        Commission_PaymentQuintoAndarValue: decimal(38,30)
+        Commission_PaymentRate: decimal(38,30)
+        Commission_PaymentValue: decimal(38,30)
     proposta_credimob_confval:
       clean_table_name: financing_proposal_check
     proposta_itau:
@@ -79,6 +91,8 @@ workflow:
       clean_table_name: proposal_notes
     reconciliation_item:
       clean_table_name: reconciliation_item
+      transactional_datatype_overrides:
+        financial_value: decimal(38,30)
     storagedocumentos:
       clean_table_name: storage_documents
     inspections:

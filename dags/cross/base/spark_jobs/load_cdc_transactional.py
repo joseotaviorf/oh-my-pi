@@ -44,7 +44,8 @@ def parse_arguments():
     parser.add_argument("partitions")
     parser.add_argument("primary_keys", help="Comma separated list of primary keys")
     parser.add_argument("dbutils_secret_key")
-
+    parser.add_argument("transactional_datatype_overrides")
+    
     return parser.parse_args()
 
 
@@ -63,6 +64,7 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
     )
 
     loader = DeltaLoader()
+
     loader.load_table(
         f"datalake_{schema}_transactional.{table_name}",
         path=f"s3://{datalake_bucket}/transactional/{schema}/{table_name}/",
@@ -187,6 +189,7 @@ def main():
     end_date = args.end_date
     partitions = json.loads(args.partitions.replace("'", '"'))
     dbutils_secret_key = args.dbutils_secret_key
+    transactional_datatype_overrides = json.loads(args.transactional_datatype_overrides)
     full_table_name = f"datalake_{schema}_transactional.{table_name}"
     schema_finder = CdcSchemaFinderFactory(
         dbutils_secret_key=dbutils_secret_key
@@ -256,7 +259,9 @@ def main():
     pre_treatment = CdcSchemaTreatmentFactory(
         schema_finder=schema_finder,
         datalake_table_schema=f"datalake_{schema}_transactional",
+        transactional_datatype_overrides=transactional_datatype_overrides,
     ).get_cdc_schema_treatment(DatabaseTypeEnum(database_type))
+
     transactional_df = pre_treatment.treat_dataframe(table_name, transactional_df)
 
     SchemaChangesNotifier.alert_schema_changes(
