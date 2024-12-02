@@ -1,4 +1,4 @@
-WITH rent_status_version_order AS (
+WITH rent_status_versions AS (
     SELECT DISTINCT
         hl.id_house,
         hl.id_house_listing,
@@ -15,32 +15,40 @@ WITH rent_status_version_order AS (
         bch.business_context = 'RENT'
         AND hl.id_house_listing IS NOT NULL
 ),
+rent_status_version_order AS (
+    SELECT
+        *,
+        ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_listing_version_start ASC) = 1 AS is_first_version
+    FROM
+        rent_status_versions
+),
 sale_timestamp_version AS (
-  SELECT
-    id_house,
-    id_sale_listing,
-    ts_status_started,
-    ts_status_ended,
-    ROW_NUMBER() OVER(PARTITION BY id_sale_listing ORDER BY ts_status_started ASC) AS rn_start,
-    ROW_NUMBER() OVER(PARTITION BY id_sale_listing ORDER BY COALESCE(ts_status_ended, CURRENT_TIMESTAMP) DESC) AS rn_end
-  FROM
-    datalake_sale_listings.sale_listing_status
+    SELECT
+        id_house,
+        id_sale_listing,
+        ts_status_started,
+        ts_status_ended,
+        ROW_NUMBER() OVER(PARTITION BY id_sale_listing ORDER BY ts_status_started ASC) AS rn_start,
+        ROW_NUMBER() OVER(PARTITION BY id_sale_listing ORDER BY COALESCE(ts_status_ended, CURRENT_TIMESTAMP) DESC) AS rn_end
+    FROM
+        datalake_sale_listings.sale_listing_status
 ),
 sale_status_version_order AS (
-  SELECT
-    stv1.id_house,
-    stv1.id_sale_listing AS id_house_listing,
-    stv1.ts_status_started AS ts_listing_version_start,
-    stv2.ts_status_ended AS ts_listing_version_end
-  FROM
-    sale_timestamp_version AS stv1
-  INNER JOIN
-    sale_timestamp_version AS stv2
-      ON stv1.id_sale_listing = stv2.id_sale_listing
-      AND stv1.rn_start = stv2.rn_end
-  WHERE
-    stv1.rn_start = 1
-    AND stv1.id_sale_listing IS NOT NULL
+    SELECT
+        stv1.id_house,
+        stv1.id_sale_listing AS id_house_listing,
+        ROW_NUMBER() OVER(PARTITION BY stv1.id_house ORDER BY stv1.ts_status_started ASC) = 1 AS is_first_version,
+        stv1.ts_status_started AS ts_listing_version_start,
+        stv2.ts_status_ended AS ts_listing_version_end
+    FROM
+        sale_timestamp_version AS stv1
+    INNER JOIN
+        sale_timestamp_version AS stv2
+            ON stv1.id_sale_listing = stv2.id_sale_listing
+            AND stv1.rn_start = stv2.rn_end
+    WHERE
+        stv1.rn_start = 1
+        AND stv1.id_sale_listing IS NOT NULL
 ),
 calculator_changes AS (
     SELECT
@@ -62,7 +70,7 @@ calculator_changes AS (
         datalake_ebdb_user.user_revision_entity AS r
             ON hpp_aud.rev = r.id
 )
-SELECT DISTINCT
+SELECT
     cc.id_house,
     rsvo.id_house_listing,
     cc.id_revision,
@@ -74,20 +82,24 @@ SELECT DISTINCT
     cc.p_90 AS calculator_max_price,
     cc.certainty AS calculator_certainty,
     cc.is_last_prediction_of_day,
-    cc.ts_calculator_result_started,
+    IF(cc.ts_calculator_result_started < rsvo.ts_listing_version_start, rsvo.ts_listing_version_start, cc.ts_calculator_result_started) AS ts_calculator_result_started,
     cc.ts_calculator_result_ended
 FROM
     calculator_changes AS cc
-LEFT JOIN
+INNER JOIN
     rent_status_version_order AS rsvo
-        ON rsvo.id_house = cc.id_house
-        AND cc.ts_calculator_result_started BETWEEN rsvo.ts_listing_version_start AND COALESCE(rsvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
+    ON rsvo.id_house = cc.id_house
+    AND IF(
+        rsvo.is_first_version AND cc.ts_calculator_result_started < rsvo.ts_listing_version_start,
+        rsvo.ts_listing_version_start BETWEEN cc.ts_calculator_result_started AND COALESCE(cc.ts_calculator_result_ended, TO_TIMESTAMP(CURRENT_DATE)),
+        cc.ts_calculator_result_started BETWEEN rsvo.ts_listing_version_start AND COALESCE(rsvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
+    )
 WHERE
-  cc.business_context = 'RENT'
+    cc.business_context = 'RENT'
 
 UNION ALL
 
-SELECT DISTINCT
+SELECT
     cc.id_house,
     ssvo.id_house_listing,
     cc.id_revision,
@@ -99,13 +111,17 @@ SELECT DISTINCT
     cc.p_90 AS calculator_max_price,
     cc.certainty AS calculator_certainty,
     cc.is_last_prediction_of_day,
-    cc.ts_calculator_result_started,
+    IF(cc.ts_calculator_result_started < ssvo.ts_listing_version_start, ssvo.ts_listing_version_start, cc.ts_calculator_result_started) AS ts_calculator_result_started,
     cc.ts_calculator_result_ended
 FROM
     calculator_changes AS cc
-LEFT JOIN
+INNER JOIN
     sale_status_version_order AS ssvo
         ON ssvo.id_house = cc.id_house
-        AND cc.ts_calculator_result_started BETWEEN ssvo.ts_listing_version_start AND COALESCE(ssvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
+        AND IF(
+            ssvo.is_first_version AND cc.ts_calculator_result_started < ssvo.ts_listing_version_start,
+            ssvo.ts_listing_version_start BETWEEN cc.ts_calculator_result_started AND COALESCE(cc.ts_calculator_result_ended, TO_TIMESTAMP(CURRENT_DATE)),
+            cc.ts_calculator_result_started BETWEEN ssvo.ts_listing_version_start AND COALESCE(ssvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
+        )
 WHERE
-  cc.business_context = 'SALE'
+    cc.business_context = 'SALE'

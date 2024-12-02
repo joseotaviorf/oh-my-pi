@@ -1,7 +1,7 @@
 ---
 database_name: datalake_ebdb_pricing
 table_name: listing_price_change
-description: Enrich table that handles sale and rental price change information and enriches it with some comparison columns and pricing scheme information.
+description: Enrich table that handles sale and rental listing price change information and enriches it with some comparison columns and pricing scheme information.
   Each row represents a price exchange for the listing, since 2020.
 domain: For Rent
 owner: bruna.prates@quintoandar.com.br
@@ -63,6 +63,8 @@ columns:
   ts_price_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_sale_listings.sale_listing_status.ts_status_started
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
     description: Timestamp of the beginning of the price scheme observed in that row.
   ts_price_ended:
     lineage:

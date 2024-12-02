@@ -1,7 +1,7 @@
 ---
 database_name: datalake_ebdb_pricing
 table_name: listing_prediction_changes
-description: Enrich table that handles sale and rental calculator predicted price change information.
+description: Enrich table that handles sale and rental calculator listing predicted price change information.
   Each row represents a price exchange for the listing.
 domain: Cross
 owner: bruna.prates@quintoandar.com.br
@@ -60,6 +60,8 @@ columns:
   ts_calculator_result_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_sale_listings.sale_listing_status.ts_status_started
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
     description: Timestamp of the beginning of the calculator price result observed in that row.
   ts_calculator_result_ended:
     lineage:

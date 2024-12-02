@@ -16,7 +16,6 @@ CREATE TABLE datalake_ebdb_pricing.listing_price_change (
     days_with_pricing_scheme INT,
     is_first_price BOOLEAN,
     is_last_price_of_day BOOLEAN,
-    is_smart_price_change BOOLEAN,
     ts_price_started TIMESTAMP,
     ts_price_ended TIMESTAMP
 ) USING DELTA LOCATION 's3://5a-datalake-prod/enrich/ebdb_pricing/listing_price_change'
