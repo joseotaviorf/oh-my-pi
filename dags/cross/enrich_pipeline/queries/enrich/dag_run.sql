@@ -56,7 +56,7 @@ table_task_success AS (
     ts_success_event,
     CASE
       WHEN layer = 'reverse' THEN COALESCE(DATE(ts_success_event), DATE_ADD(dt_run, 1)) + INTERVAL 15 HOUR
-      WHEN l.id_dag LIKE '%datamart%' THEN COALESCE(DATE(ts_success_event), DATE_ADD(dt_run, 1)) + INTERVAL 13 HOUR
+      WHEN l.id_dag LIKE '%datamart%' OR layer = 'metric' THEN COALESCE(DATE(ts_success_event), DATE_ADD(dt_run, 1)) + INTERVAL 13 HOUR
       ELSE COALESCE(DATE(ts_success_event), DATE_ADD(dt_run, 1)) + INTERVAL 11 HOUR
     END AS ts_expected_sla
   FROM
@@ -111,7 +111,7 @@ success_run AS (
     l.ts_event AS ts_success_event,
     CASE
         WHEN layer = 'reverse' THEN COALESCE(DATE(l.ts_event), DATE_ADD(l.ts_executed, 1)) + INTERVAL 15 HOUR
-        WHEN di.id_dag LIKE '%datamart%' THEN COALESCE(DATE(l.ts_event), DATE_ADD(l.ts_executed, 1)) + INTERVAL 13 HOUR
+        WHEN di.id_dag LIKE '%datamart%' OR layer = 'metric' THEN COALESCE(DATE(l.ts_event), DATE_ADD(l.ts_executed, 1)) + INTERVAL 13 HOUR
         ELSE COALESCE(DATE(l.ts_event), DATE_ADD(l.ts_executed, 1)) + INTERVAL 11 HOUR
       END AS ts_expected_sla
   FROM
