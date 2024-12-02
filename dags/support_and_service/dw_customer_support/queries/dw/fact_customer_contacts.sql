@@ -163,14 +163,19 @@ contacts AS (
       AND art.agent_email = d.worker_email
       AND d.channel = 'chat'
   LEFT JOIN
-    datalake_customer_support.tickets AS t1
-      ON t1.id_twilio = d.id_call
-      AND STARTSWITH(t1.id_twilio, "CA")
-  LEFT JOIN
-    datalake_customer_support.tickets AS t2
-      ON t2.id_twilio = d.id_task
-      AND STARTSWITH(t2.id_twilio, "WT")
-      AND d.channel = 'call'
+      datalake_customer_support.tickets AS t1
+        ON t1.id_twilio = d.id_call
+        AND STARTSWITH(t1.id_twilio, "CA")
+        AND d.channel = 'call'
+    LEFT JOIN
+      datalake_customer_support.tickets AS t2
+        ON t2.id_twilio = d.id_task
+        AND STARTSWITH(t2.id_twilio, "WT")
+        AND d.channel = 'call'
+    LEFT JOIN
+      datalake_customer_support.tickets AS t3
+        ON t3.id_session = d.id_session
+        AND d.channel = 'chat'
 )
 SELECT
   sk_contact,
