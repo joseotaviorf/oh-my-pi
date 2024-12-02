@@ -2,8 +2,13 @@ dag:
   name: dw_supply_outbound_contacts
   schedule_start_date: 2022,10,1
   owner: Data Growth
+  documentation:
+    dag_purpose: |
+      Creates DW dimensional model tables for the Outbound flow of Supply, Inside Sales,
+      connecting the databases of the micro-services that are part of the Omnichannel - Braze, Jaiminho and Wololo
+      - to map the contacts made to a prospect throughout the Prospect-2-Oportunity stage.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: supply_outbound_contacts
   default_extraction_type: full

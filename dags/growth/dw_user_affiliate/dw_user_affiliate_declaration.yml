@@ -2,8 +2,13 @@ dag:
   name: dw_user_affiliate
   schedule_start_date: 2020,02,20
   owner: Data Growth
+  documentation:
+    dag_purpose: |
+      Creates incremental DW dimension table of the context of `User Affiliate` model, relating enriched data of Amplitude,
+      users and regions, and data of taxonomy sheets. This dimension is stored at the Janus schema to audit its content to
+      the older ODS table content.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: public
 cluster:

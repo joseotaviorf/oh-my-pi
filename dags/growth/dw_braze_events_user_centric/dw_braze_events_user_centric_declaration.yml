@@ -2,8 +2,15 @@ dag:
   name: dw_braze_events_user_centric
   schedule_start_date: 2020,8,29
   owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG creates the incremental models for Braze Events of user centered data.
+      It's a periodic snapshot fact that joins snapshots of 5 different time windows (`same week`, `1 week before`,
+      `2 weeks before`, `3 weeks before` and `all time before`) each one stored in a distinct table. Their data is joined
+      by their execution date, which takes the role as a snapshot date. The information is summarized in one single fact
+      for easy comparison.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: braze
   default_extraction_type: incremental

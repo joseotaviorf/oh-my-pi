@@ -6,7 +6,7 @@ dag:
     dag_purpose: |
       This DAG dw tables related to the process of taxonomy in Growth context.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: growth
 cluster:

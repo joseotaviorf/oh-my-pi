@@ -2,8 +2,11 @@ dag:
   name: dw_lead
   schedule_start_date: 2021,8,2
   owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG loads to DW our models related to Lead context.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: public
   default_extraction_type: full

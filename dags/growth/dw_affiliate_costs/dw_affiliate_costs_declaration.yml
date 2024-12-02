@@ -1,8 +1,12 @@
 dag:
   name: dw_affiliate_costs
   owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG creates the dim and fact that the Marketing Analysts will use to analyze the commission costs that
+      occur in our Indica AI Program.
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: quintoandar
 cluster:
