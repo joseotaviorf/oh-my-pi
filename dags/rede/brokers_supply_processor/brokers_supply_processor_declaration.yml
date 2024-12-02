@@ -18,15 +18,18 @@ workflow:
       date_filter_column: updated_at
     business_context_detail:
       date_filter_column: updated_at
+      z_order_by: [id_partner]
     business_context_detail_aud:
       date_filter_column: created_at
     file:
       date_filter_column: updated_at
+      z_order_by: [id]
     file_aud:
       date_filter_column: created_at
     lead3p:
       clean_table_name: lead_3p
       date_filter_column: updated_at
+      z_order_by: [id, id_company_hubspot, uuid_lead]
     lead3p_aud:
       clean_table_name: lead_3p_aud
       date_filter_column: created_at
