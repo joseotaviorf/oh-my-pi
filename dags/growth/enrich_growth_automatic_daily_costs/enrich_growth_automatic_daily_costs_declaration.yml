@@ -3,17 +3,17 @@ dag:
   name: enrich_growth_automatic_daily_costs
   schedule_start_date: 2021, 1, 17
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: |
       This DAG generates the automatic costs (i.e. gathered from medias API/Crawlers) combined with the taxonomy tables.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: growth_costs
   default_extraction_type: incremental
   default_partitions:
-  - id_date
-  - flow_type
+    - id_date
+    - flow_type
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
