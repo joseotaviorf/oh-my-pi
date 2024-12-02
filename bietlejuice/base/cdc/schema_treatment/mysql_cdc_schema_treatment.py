@@ -41,9 +41,7 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
         latest_table_change = self._try_find_latest_table_definition(table_name)
         if latest_table_change:
             transactional_dataframe = self._treat_columns_from_latest_table_change(
-                latest_table_change,
-                transactional_dataframe,
-                self.transactional_datatype_overrides,
+                latest_table_change, transactional_dataframe
             )
 
         datalake_dataframe = self._try_find_existing_datalake_table(
