@@ -15,17 +15,9 @@ workflow:
     fact_campaign_user_dispatch:
       extraction_type: incremental
       partitions: [year, month, day]
-      extra_query_template_params:
-        year: "{year}"
-        month: "{month}"
-        day: "{day}"
     fact_canvas_user_dispatch:
       extraction_type: incremental
       partitions: [year, month, day]
-      extra_query_template_params:
-        year: "{year}"
-        month: "{month}"
-        day: "{day}"
 cluster:
   type: databricks_12_2_min_general_photon_cluster
   access_control_list:

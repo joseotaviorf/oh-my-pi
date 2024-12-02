@@ -16,10 +16,6 @@ workflow:
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   has_load_to_redshift_task: False
-  extra_query_template_params:
-    year: "{year}"
-    month: "{month}"
-    day: "{day}"
 cluster:
   type: databricks_12_2_min_memory_photon_cluster
   access_control_list:
