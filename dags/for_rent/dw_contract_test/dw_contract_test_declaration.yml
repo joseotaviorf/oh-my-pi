@@ -15,7 +15,7 @@ workflow:
     fact_contrat_people:
       z_order_by: [sk_contract_person]
 cluster:
-  type: databricks_12_2_min_memory_cluster
+  type: databricks_13_3_med_memory_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
