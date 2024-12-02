@@ -8,7 +8,7 @@ dag:
       Creates enriched tables for the lead tracking context.
       This context is responsible for tracking the leads and prospects data.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   tables_customization:
     rene_acquisition_data:
