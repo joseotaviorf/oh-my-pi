@@ -2805,11 +2805,6 @@ bietlejuice.enrich_seo_funnel:
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
-bietlejuice.enrich_sirena:
-  - bietlejuice.sirena:load-clean-agents
-  - bietlejuice.sirena:load-clean-groups
-  - bietlejuice.sirena:load-clean-interactions
-  - bietlejuice.sirena:load-clean-prospects
 bietlejuice.enrich_sorting_hat:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis
