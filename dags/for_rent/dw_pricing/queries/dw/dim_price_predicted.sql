@@ -6,6 +6,7 @@ SELECT
     calculator_p70_price AS p70_price,
     calculator_max_price AS max_price,
     calculator_certainty AS certainty,
+    business_context,
     NOW() AS ts_load
 FROM
     datalake_ebdb_pricing.listing_prediction_changes

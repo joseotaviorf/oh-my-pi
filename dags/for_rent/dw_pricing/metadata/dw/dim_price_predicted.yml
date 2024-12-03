@@ -37,5 +37,12 @@ columns:
       MEDIUM: If the prediction has a medium confidence interval, having a medium certainty in the prediction.
       LOW: If the prediction has a high confidence interval, having a low certainty in the prediction.
       NONE: If the prediction has no certainty at all.
+  business_context:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.business_context
+    description: Listing business context.
+    categories:
+      RENT: For rent.
+      SALE: For sale.
   ts_load:
     description: Timestamp of when the table was loaded.

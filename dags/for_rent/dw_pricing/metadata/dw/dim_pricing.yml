@@ -24,6 +24,10 @@ columns:
     description: Percent difference between the published price for the row and the first published price.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.first_price_variation
+  change_number:
+    description: The listing price modification number.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.change_number
   change_type:
     description: Describes the type of price change.
     categories:
@@ -32,9 +36,12 @@ columns:
       Price decrease: Price of the listing went down.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.change_type
-  change_number:
-    description: The listing price modification number.
+  business_context:
     lineage:
-      - datalake_ebdb_pricing.listing_price_change.change_number
+      - datalake_ebdb_pricing.listing_price_change.business_context
+    description: Listing business context.
+    categories:
+      RENT: For rent.
+      SALE: For sale.
   ts_load:
     description: Timestamp of when the table was loaded.

@@ -30,7 +30,6 @@ WITH house_aud AS (
     WHERE
         (rent > 1
         OR sale_price > 1)
-        AND YEAR(r.ts_revision) >= 2020
 ),
 rent_price_threshold AS (
     SELECT

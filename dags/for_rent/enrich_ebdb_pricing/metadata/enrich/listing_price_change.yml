@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_pricing
 table_name: listing_price_change
 description: Enrich table that handles sale and rental listing price change information and enriches it with some comparison columns and pricing scheme information.
-  Each row represents a price exchange for the listing, since 2020.
+  Each row represents a price exchange for the listing.
 domain: For Rent
 owner: bruna.prates@quintoandar.com.br
 columns:
