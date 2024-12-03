@@ -29,9 +29,9 @@ workflow:
       extra_spark_job_arguments:
         - DadosAlcadaAPI
     logs_credit_granting_pj:
-          partitions: [year, month, day]
-          extra_spark_job_arguments:
-            - DadosConcessaoCreditoPJAPI
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - DadosConcessaoCreditoPJAPI
     logs_scoping_policy_pj:
       partitions: [year, month, day]
       extra_spark_job_arguments:
