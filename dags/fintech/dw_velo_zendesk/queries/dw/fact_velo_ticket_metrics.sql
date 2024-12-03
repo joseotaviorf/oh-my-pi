@@ -27,6 +27,7 @@ SELECT
     reopens,
     replies,
     overdue_amount,
+    exception_value,
     leadtime_calendar_days,
     leadtime_business_days,
     interval_first_response,

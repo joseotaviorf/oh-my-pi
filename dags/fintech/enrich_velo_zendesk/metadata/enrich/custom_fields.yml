@@ -56,6 +56,10 @@ columns:
         description: "Overdue amount (paid to the broker)"
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
+    exception_value:
+        description: "Value of the commercial exception"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.exception_value
     has_payment_forwarded:
         description: "Flag indicating if the ticket has payment forwarded. Filled in the moment when the ticket is closed"
         lineage:

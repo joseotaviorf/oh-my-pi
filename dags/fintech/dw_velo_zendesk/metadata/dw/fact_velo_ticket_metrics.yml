@@ -124,6 +124,10 @@ columns:
     description: "Overdue amount (paid to the broker)"
     lineage:
       - datalake_velo_zendesk.ticket_metrics.overdue_amount
+  exception_value:
+    description: "Value of the commercial exception"
+    lineage:
+      - datalake_velo_zendesk.ticket_metrics.exception_value
   leadtime_calendar_days:
     description: "Ticket lead time in calendar days"
     lineage:

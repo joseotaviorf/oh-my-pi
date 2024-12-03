@@ -45,6 +45,7 @@ GROUP BY 1
         base.custom_fields['Solicitação do Cliente'] AS client_request,
         COALESCE(base.custom_fields['Valor inadimplente (pago à imob)'],base.custom_fields['Valor inadimplente (pago à imob) 1'],base.custom_fields['Valor inadimplente (pago à imob) 2'], base.custom_fields['Overdue amount']) AS overdue_amount,
         base.custom_fields['Acionamento de garantia'] AS guarantee_activation,
+        base.custom_fields['Valor exceção'] AS exception_value,
         base.custom_fields['Encaminhado para Pagamento'] AS has_payment_forwarded,
         CAST(base.custom_fields['Realizada 1ª ligação - Data'] AS DATE) AS dt_first_call,
         CAST(base.custom_fields['Realizada 2ª ligação - Data'] AS DATE) AS dt_second_call,
