@@ -45,6 +45,7 @@ SELECT
   os_version,
   version_name,
   ts_event,
+  NOW() AS ts_load,
   year,
   month,
   day

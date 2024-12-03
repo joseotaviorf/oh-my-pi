@@ -27,6 +27,7 @@ SELECT
     ts_complaint_response,
     ts_rating,
     ts_last_modification,
+    NOW() AS ts_load,
     year,
     month,
     day

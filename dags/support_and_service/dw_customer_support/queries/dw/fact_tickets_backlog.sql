@@ -28,7 +28,8 @@ SELECT
   DATE("{load_start_date}") AS dt_snapshot,
   ts_created,
   ts_sla_started,
-  ts_budget
+  ts_budget,
+  NOW() AS ts_load
 FROM
   datalake_customer_support.tickets
 WHERE

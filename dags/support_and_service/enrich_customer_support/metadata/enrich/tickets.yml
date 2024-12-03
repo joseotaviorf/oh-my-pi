@@ -15,6 +15,8 @@ columns:
   id_user_main:
     lineage:
       - datalake_zendesk.tickets_current.id_user_main
+      - datalake_customer_support.chats.id_user
+      - datalake_customer_support.calls.id_user
     description: Identifier for the main user associated with the ticket.
   id_contract:
     lineage:

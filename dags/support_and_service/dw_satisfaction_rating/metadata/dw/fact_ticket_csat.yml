@@ -42,3 +42,5 @@ columns:
     lineage:
       - datalake_customer_support.csat.ts_last_response
     description: Timestamp of the most recent response recorded for the ticket.
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_customer_support.

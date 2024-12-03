@@ -62,6 +62,8 @@ columns:
       - datalake_bigfone_clean.ivr_closed_history.ts_requested
       - datalake_greenseer.sessions.ts_started
     description: Timestamp of when the user was blocked
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_customer_support.
   year:
     description: Partition column
   month:

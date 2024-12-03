@@ -54,6 +54,7 @@ SELECT
   bic.has_app_installed,
   bic.ts_last_app_installed AS ts_last_app_opened,
   b.ts_blocked,
+  NOW() AS ts_load,
   YEAR(b.ts_blocked) AS year,
   MONTH(b.ts_blocked) AS month,
   DAY(b.ts_blocked) AS day

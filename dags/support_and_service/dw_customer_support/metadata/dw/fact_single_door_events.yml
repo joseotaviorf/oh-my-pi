@@ -64,6 +64,8 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.ts_event
     description: Timestamp of the event
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_customer_support.
   year:
     description: Partition column
   month:

@@ -108,6 +108,8 @@ columns:
     lineage:
       - datalake_reclameaqui_clean.tickets.ts_last_modification
     description: Timestamp of the last modification.
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_customer_support.
   year:
     lineage:
       - datalake_reclameaqui_clean.tickets.year

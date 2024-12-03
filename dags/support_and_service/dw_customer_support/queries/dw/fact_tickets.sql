@@ -151,7 +151,8 @@ SELECT
   t.ts_closed,
   t.ts_updated,
   tcm.ts_latest_customer_comment,
-  tcm.ts_latest_analyst_comment
+  tcm.ts_latest_analyst_comment,
+  NOW() AS ts_load
 FROM
   datalake_customer_support.tickets AS t
 LEFT JOIN

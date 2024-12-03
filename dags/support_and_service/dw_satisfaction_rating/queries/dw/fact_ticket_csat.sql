@@ -7,7 +7,8 @@ SELECT
   is_answered,
   is_solved,
   ts_first_response,
-  ts_last_response
+  ts_last_response,
+  NOW() AS ts_load
 FROM
   datalake_customer_support.csat
 WHERE
