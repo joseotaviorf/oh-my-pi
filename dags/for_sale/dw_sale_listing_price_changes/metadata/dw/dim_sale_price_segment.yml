@@ -1,0 +1,25 @@
+---
+database_name: dw_sale_listing_price_changes
+table_name: dim_sale_price_segment
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: Dimension table for ticket segmentation
+columns:
+  sk_sale_price_segment:
+    description: 'Surrogate key for ticket segmentation'
+    lineage:
+    - datalake_sale_listings.sale_listing_price_changes.ticket_segmentation
+  price_segment:
+    description: 'Ticket segmentation'
+    lineage:
+    - datalake_sale_listings.sale_listing_price_changes.ticket_segmentation
+    categories:
+      High Ticket: If the listing is equal or greater than 1 Million BRL
+      Low Ticket: If the listing is less than 1 Million BRL
+  price_segment_short:
+    description: 'Short ticket segmentation'
+    lineage:
+    - datalake_sale_listings.sale_listing_price_changes.ticket_segmentation
+    categories:
+      HT: High Ticket
+      LT: Low Ticket
