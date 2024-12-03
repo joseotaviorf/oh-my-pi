@@ -558,7 +558,7 @@ SELECT DISTINCT
   m.sk_transaction,
   m.sk_delinquency,
   m.sk_array_delinquency,
-  m.sk_propose_nf,
+  CAST(m.sk_propose_nf AS BIGINT) AS sk_propose_nf,
   m.sk_propose_delinquency,
   m.id_document,
   m.id_array_document_canceled,
