@@ -1,0 +1,126 @@
+---
+database_name: datalake_clustering_image_model_clean
+table_name: clustering_image
+owner: andre.melo@quintoandar.com.br
+domain: Data Growth
+description: |
+  Table with information on the data science image clustering model results for houses similarity by images.
+  This model use Atlas DB database to generate the results of the clustering algorithm.
+columns:
+  id_condo:
+    description: |
+      "Condo dejavuID provided by the Atlas DB datasources."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.condo
+  id_sourcename_anchor:
+    description: |
+      "The house external_id with the pattern <source_name>:<source_id>.
+      The anchor is the house with the smallest number of photos comparing with the pair."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.sourcenameid_anchor
+  id_sourcename_pair:
+    description: |
+      "The house external_id with the pattern <source_name>:<source_id>.
+      The pair is the house with the greatest number of photos comparing with the anchor."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.sourcenameid_pair
+  region_name:
+    description: |
+      "The houses region name."
+    categories:
+      sp_bh: "Houses from São Paulo and Belo Horizonte cities."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.region_name
+  unit_anchor:
+    description: |
+      "The anchor unit provided on its complement data.
+      It can assume null value."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.unit_anchor
+  unit_pair:
+    description: |
+      "The pair unit provided on its complement data.
+      It can assume null value."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.unit_pair
+  building_anchor:
+    description: |
+      "The anchor building provided on its complement data.
+      It can assume null value."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.building_anchor
+  building_pair:
+    description: |
+      "The pair building provided on its complement data.
+      It can assume null value."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.building_pair
+  photos_anchor:
+    description: |
+      "The total number of photos of the anchor house."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.photos_anchor
+  photos_pair:
+    description: |
+      "The total number of photos of the pair house."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.photos_pair
+  similarity:
+    description: |
+      "The similarity between the anchor and pair houses.
+      The similarity is calculated by the clustering algorithm, and it is a
+      float number between 0 and 1."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.similarity
+  ypred:
+    description: |
+      "The prediction of the clustering algorithm.
+      The prediction is a boolean value that indicates if the pair house is similar to the anchor house,
+      based on the similarity value and a threshold."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.ypred
+  check_metadata:
+    description: |
+      "The metadata of the clustering algorithm check.
+      The metadata is a boolean value that indicates if the clustering algorithm was checked or not."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.check_metadata
+  ypred_using_metadata:
+    description: |
+      "The prediction of the clustering algorithm using the metadata.
+      The prediction is a boolean value that indicates if the pair house is similar to the anchor house,
+      based on the similarity value and a threshold."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.ypred_using_metadata
+  db_to_filter:
+    description: |
+      "Either or not the row should be filtered out from the Atlas DB."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.db_to_filter
+  model_metadata:
+    description: |
+      "The metadata of the clustering algorithm model.
+      It keeps important information about the model, like the threshold used to predict the similarity."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.model_metadata
+  dt_model:
+    description: |
+      "The date of the clustering algorithm model.
+      It is the date when the model result was saved in the S3 Bucket by the Data Science Team."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.dt_model
+  day:
+    description: |
+      "Day Partition Column based on the dt_model value."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.day
+  month:
+    description: |
+      "Month Partition Column based on the dt_model value."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.month
+  year:
+    description: |
+      "Year Partition Column based on the dt_model value."
+    lineage:
+      - datalake_clustering_image_model_raw.clustering_image.year

@@ -1,0 +1,36 @@
+dag:
+  name: clustering_image_model
+  owner: Data Growth
+  schedule_start_date: 2024, 11, 28
+  schedule_interval: "0 4 * * *"
+  documentation:
+    dag_purpose: |
+      The clustering image model DAG incrementally ingests data from a Data Science S3 bucket with
+      the results of an image clustering algorithm to detect houses by its images, increasing the
+      coverage and completeness of the missing complement in the Atlas DB project.
+      If there is no result for the previous day, no data will be ingested.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_clustering_image_model_raw
+  default_extraction_type: incremental
+  default_partitions: [region_name, year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+    - "{table_name}" # table_name
+    - "{partitions}" # partition_cols
+    - "s3://data-science.s3.data.quintoandar.com.br/atlas/datasets/output/" # base_path
+    - "dedup_output" # path_key
+    - "['sp_bh']" # region_list
+    - "{load_start_date}" # load_start_date
+    - "{load_end_date}" # load_end_date
+  tables_customization:
+    clustering_image: {}
+
+cluster:
+  type: databricks_13_3_med_memory_cluster

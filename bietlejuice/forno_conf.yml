@@ -292,6 +292,16 @@ databricks_13_3_med_memory_2_workers_cluster:
         availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
 
+databricks_13_3_med_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: m5a.large
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 databricks_12_2_med_compute_cluster:
     <<: *cluster_anchor
     driver_node_type_id: c5a.large
