@@ -1,6 +1,6 @@
 SELECT DISTINCT
   DENSE_RANK() over (ORDER BY ticket_segmentation) AS sk_sale_price_segment,
-  price_segment,
+  ticket_segmentation AS price_segment,
   CASE
     WHEN ticket_segmentation = 'High Ticket' 
       THEN 'HT'
