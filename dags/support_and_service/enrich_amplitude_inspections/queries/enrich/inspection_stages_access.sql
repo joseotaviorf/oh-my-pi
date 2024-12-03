@@ -54,7 +54,7 @@ review_events AS (
     FROM
         inspections AS ia
     LEFT JOIN
-        datalake_amplitude_inspections.inspection_review_page_viewed_events AS insp
+        datalake_amplitude_clean.170698_inspection_review_home_page_viewed_events AS insp
             ON insp.id_client_side = ia.id_client_side
     GROUP BY
         ALL

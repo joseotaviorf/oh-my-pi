@@ -15,11 +15,11 @@ columns:
     description: Inspection unique identifier (uuid)
   id_contract:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_page_viewed_events.id_contract
+      - datalake_inspections_clean.inspection_aud.id_contract
     description: Unique identifier of the contract related to the property to be inspected.
   inspection_type:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_page_viewed_events.inspection_type
+      - datalake_inspections_clean.inspection_aud.inspection_type
     description: The type of inspection.
   total_owner_access_review:
     description: Number of times the owner accessed the inspection report review home page
@@ -39,19 +39,19 @@ columns:
     description: Indicates whether the tenant accessed the budget approval event home page.
   ts_first_owner_access_review:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_inspection_review_home_page_viewed_events.ts_event
     description: Timestamp of the first time the owner accessed the inspection report review home page
   ts_last_owner_access_review:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_inspection_review_home_page_viewed_events.ts_event
     description: Timestamp of the last time the owner accessed the inspection report review home page
   ts_first_tenant_access_review:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_inspection_review_home_page_viewed_events.ts_event
     description: Timestamp of the first time the tenant accessed the inspection report review home page
   ts_last_tenant_access_review:
     lineage:
-      - datalake_amplitude_inspections.inspection_review_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_inspection_review_home_page_viewed_events.ts_event
     description: Timestamp of the last time the tenant accessed the inspection report review home page
   ts_first_owner_access_budget_approval:
     lineage:

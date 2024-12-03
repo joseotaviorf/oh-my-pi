@@ -11,9 +11,24 @@ columns:
   adid:
     lineage:
       - datalake_amplitude_clean_staging.170698_inspection_review_home_page_viewed_events.adid
+  id_client_side:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_inspection_review_home_page_viewed_events.event_properties
+  id_contract:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_inspection_review_home_page_viewed_events.event_properties
   amplitude_event_type:
     lineage:
       - datalake_amplitude_clean_staging.170698_inspection_review_home_page_viewed_events.amplitude_event_type
+  inspection_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_inspection_review_home_page_viewed_events.event_properties
+  user_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_inspection_review_home_page_viewed_events.event_properties
+  uri:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_inspection_review_home_page_viewed_events.event_properties
   id_app:
     lineage:
       - datalake_amplitude_clean_staging.170698_inspection_review_home_page_viewed_events.id_app

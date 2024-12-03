@@ -9,18 +9,15 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  inner_dependencies:
-    inspection_stages_access:
-      - inspection_review_page_viewed_events
   tables_customization:
     inspection_stages_access:
       partitions: [year, month, day]
       extraction_type: incremental
       z_order_by: [id_inspection]
       merge_on: [id_inspection]
-    inspection_review_page_viewed_events:
-      partitions: [year, month, day]
-      extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 
 cluster:
   type: databricks_13_3_min_io-memory_cluster
