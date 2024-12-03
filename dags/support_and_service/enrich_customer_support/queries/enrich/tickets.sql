@@ -166,7 +166,11 @@ tickets_per_task AS (
   SELECT
     ut.id_ticket,
     t.id_problem_ticket,
-    t.id_user_main,
+    CASE
+      WHEN ut.channel = 'chat' THEN COALESCE(ch.id_user, t.id_user_main)
+      WHEN ut.channel = 'call' THEN COALESCE(ca1.id_user, ca2.id_user, t.id_user_main)
+      ELSE t.id_user_main
+    END AS id_user_main,
     t.id_contract,
     t.id_call,
     t.id_session,
