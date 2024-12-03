@@ -13,6 +13,9 @@ columns:
   id_visit:
     lineage:
       - datalake_ebdb_raw.Visitor.visit_id
+  uuid_company:
+    lineage:
+      - datalake_ebdb_raw.Visitor.company_uuid
   absence_reason:
     lineage:
       - datalake_ebdb_raw.Visitor.absenceReason

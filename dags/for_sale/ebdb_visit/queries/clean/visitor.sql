@@ -3,6 +3,7 @@ SELECT
     agendamento_id AS id_booking,
     usuario_id AS id_user,
     visit_id AS id_visit,
+    company_uuid AS uuid_company,
     absenceReason AS absence_reason,
     attended AS has_attended,
     type,
