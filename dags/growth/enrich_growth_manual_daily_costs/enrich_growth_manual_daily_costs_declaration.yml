@@ -3,17 +3,17 @@ dag:
   name: enrich_growth_manual_daily_costs
   schedule_start_date: 2019, 1, 1
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: |
-      This DAG generates the manual costs (i.e. gathered from gsheets tables) and saves its part in the final Fact Marketing Daily Costs aside Enrich Marketing Automatic Daily Costs. 
+      This DAG generates the manual costs (i.e. gathered from gsheets tables) and saves its part in the final Fact Marketing Daily Costs aside Enrich Marketing Automatic Daily Costs.
       At the day 2024-10-04, we copy gsheets to the table `datalake_growth_costs.historical_marketing_manual_costs_name_convention` and `datalake_growth_costs.historical_marketing_manual_costs`
       We added this as historical data.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: growth_costs
   default_partitions:
-  - id_date
-  - flow_type
+    - id_date
+    - flow_type
 cluster:
   type: databricks_12_2_min_general_photon_cluster
