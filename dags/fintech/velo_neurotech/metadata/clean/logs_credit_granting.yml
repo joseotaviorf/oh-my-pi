@@ -530,6 +530,18 @@ columns:
   predictus_status_message_fourth_proponent:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_predictus_status_message_4
+  smartgtwrf_base_first_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_smartgtwrf_base_consultada_1
+  smartgtwrf_base_second_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_smartgtwrf_base_consultada_2
+  smartgtwrf_base_third_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_smartgtwrf_base_consultada_3
+  smartgtwrf_base_fourth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_smartgtwrf_base_consultada_4
   proposal_document_type:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.prop_tipo_documento
