@@ -16,4 +16,12 @@ workflow:
       - delinquency_timeline
       - major_type_distribution
 cluster:
-  type: databricks_13_3_med_memory_cluster
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5d.4xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    spark_version: 13.3.x-scala2.12
+    autoscale:
+      min_workers: 3
+      max_workers: 8
