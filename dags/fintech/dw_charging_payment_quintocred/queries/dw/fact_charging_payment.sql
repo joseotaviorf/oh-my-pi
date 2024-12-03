@@ -213,9 +213,9 @@ base_payment_ajustada AS (
       date_trunc( 'MONTH', b.dt_due ) 
       AND add_months( date_trunc( 'MONTH', b.dt_due ), 11 )
     AND b.value BETWEEN  
-      pv.annual_guarantee *0.8 
-      AND pv.annual_guarantee*1.12
-    AND b.gateway = 'ASAAS'
+      ( pv.annual_guarantee + pv.activator_amount ) * 0.8  
+      AND ( pv.annual_guarantee + pv.activator_amount ) * 1.12
+    AND ( b.gateway = 'ASAAS' OR b.gateway = 'ASAAS RAW' )
     AND b.status IN ( 'SUCCESS','RECEIVED','RECEIVED_IN_CASH' )
 )
 SELECT 
@@ -230,13 +230,13 @@ SELECT
       THEN 2
     WHEN status = 'PROCESSING' 
       THEN 3
-    WHEN status = 'REVERSED' 
+    WHEN status IN ('REVERSED','SCHEDULED_REVERSAL')  
       THEN 4
-    WHEN status = 'REFUNDED' 
+    WHEN status IN ('REFUNDED','REFUND_PROCESSING')  
       THEN 5
     WHEN status = 'CHARGEBACK' 
       THEN 6
-    WHEN status = 'REFUSED' 
+    WHEN status IN ('REFUSED','EXPIRED')
       THEN 7
     WHEN status = 'PENDING' 
       THEN 8
