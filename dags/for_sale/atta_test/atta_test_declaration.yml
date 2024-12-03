@@ -47,8 +47,6 @@ workflow:
       clean_table_name: pre_analysis_santander
     consulta_score_santander_matriz_decisao:
       clean_table_name: pre_analysis_santander_matrix
-    consulta_score_santander_ratings:
-      clean_table_name: pre_analysis_santander_ratings
     entidade_log:
       clean_table_name: log_isolve_v2
     fornecedores:
