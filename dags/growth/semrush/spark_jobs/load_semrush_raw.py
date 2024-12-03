@@ -6,6 +6,8 @@ import boto3
 import json
 import urllib
 
+import re
+
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import *
 from functools import reduce
@@ -27,7 +29,14 @@ from bietlejuice.services import S3Service
 
 def _create_dataframe_with_standard_columns(response_data: dict, display_date: str) -> DataFrame:
 
-    data = response_data['text']
+    data_raw = response_data['text']
+    """
+    The code below addresses an issue with the ZapImoveis domain. Some target URLs include 
+    filters containing special characters that are invalid for CSV parsing. This code 
+    resolves the problem by removing the filter string.
+    """
+    data = re.sub(r"/%23%7B.*%7D/", "/", data_raw) # removing everything between { and }
+
     try:
         rdd_data = sc.parallelize(data.split('\r\n'))
     except:
