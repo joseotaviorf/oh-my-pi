@@ -23,4 +23,4 @@ LEFT JOIN
     ON c.agent_email = a.email
 WHERE
   a.organization IN ('atento', 'atn')
-  AND DATE(bc.ts_started) = CURRENT_DATE() - 1
+  AND DATE(bc.ts_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

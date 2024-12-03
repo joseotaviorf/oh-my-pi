@@ -1,14 +1,14 @@
 dag:
-  name: reverse_atento_test
-  schedule_start_date: 2022,7,12
+  name: reverse_webhelp
+  schedule_start_date: 2023,8,23
   owner: Data SS
   documentation:
     dag_purpose: |
-      This dag aims to load a copy of the databases that will be sent to Atento to our datalake, before actually sending them.
+      This dag has the purpose of processing and storing the operation follow-up data, related to webhelp services.
 workflow:
   type: load
   layer: reverse
-  custom_schema: atento_test
+  custom_schema: webhelp
   default_extraction_type: incremental
   default_partitions: ["year", "month", "day"]
   extra_query_template_params:

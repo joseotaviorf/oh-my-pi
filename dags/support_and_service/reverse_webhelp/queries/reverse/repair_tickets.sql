@@ -61,9 +61,9 @@ SELECT
   rt.ts_initially_assigned_local,
   rt.ts_last_assigned_local,
   te.ts_reflux,
-  rt.year,
-  rt.month,
-  rt.day,
+  YEAR(CURRENT_DATE - 1) AS year,
+  MONTH(CURRENT_DATE - 1) AS month,
+  DAY(CURRENT_DATE - 1) AS day,
   NOW() AS ts_load
 FROM
   datalake_repairs.repair_tickets AS rt
@@ -71,6 +71,6 @@ LEFT JOIN
   ticket_events AS te
     ON te.sk_ticket = rt.id_ticket
 WHERE
-  MAKE_DATE(year, month, day) >= CURRENT_DATE - INTERVAL '1' YEAR
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY rt.id_ticket ORDER BY MAKE_DATE(rt.year,rt.month,rt.day) DESC) = 1

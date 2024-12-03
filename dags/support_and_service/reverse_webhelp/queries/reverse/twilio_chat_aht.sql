@@ -19,5 +19,5 @@ FROM
       ON ca.department_name = dc.department
       AND dc.channel = 'Twillio'
 WHERE
-  ca.dt_task_created_local = CURRENT_DATE - 1
+  ca.dt_task_created_local BETWEEN DATE('{load_start_date}') - 1 AND DATE('{load_end_date}')
   AND ca.agent_organization IN ('webhelp', 'webhelpbr')

@@ -51,7 +51,7 @@ WITH message_summary AS (
       'ProOwners [FRONT] [PRE] [POS]'
       )
     AND a.organization IN ('webhelp', 'webhelpbr')
-    AND DATE(cht.ts_segment_closed) = CURRENT_DATE() - 1
+    AND DATE(cht.ts_segment_closed) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
   id_ticket,

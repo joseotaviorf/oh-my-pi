@@ -131,7 +131,7 @@ FROM chat_messenger AS cm
       AND event.ts_created >= cm.ts_segment_created
       AND event.ts_created < cm.ts_segment_closed
 WHERE
-  CAST(cm.chat_ts_created AS DATE) >= DATE_SUB(CURRENT_DATE(), 90)
+  CAST(cm.chat_ts_created AS DATE) BETWEEN DATE('{load_start_date}') - INTERVAL '90' DAY AND DATE('{load_end_date}')
   AND REGEXP_LIKE(event.message_to, '((@quintoandar\.com\.br)|(@atento\.com\.br))') = true
   AND REGEXP_LIKE(event.message_from, '((@quintoandar\.com\.br)|(@atento\.com\.br))') = false
 GROUP BY ALL

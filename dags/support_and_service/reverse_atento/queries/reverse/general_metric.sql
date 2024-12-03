@@ -48,7 +48,7 @@ SELECT DISTINCT
   t.minutes_full_resolution_time_business
 FROM
   dw_customer_support.fact_ticket AS ft
-LEFT JOIN 
+LEFT JOIN
   dw_tickets.fact_tickets AS t
     ON ft.sk_ticket = t.sk_ticket
 LEFT JOIN
@@ -68,7 +68,7 @@ LEFT JOIN
     ON ft.sk_last_agent = da.sk_agent
     OR ft.sk_last_agent = da.sk_agent_twilio
 WHERE
-  DATE(ft.ts_started) >= CURRENT_DATE - INTERVAL '1' YEAR
+  DATE(ft.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
 AND
   dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'

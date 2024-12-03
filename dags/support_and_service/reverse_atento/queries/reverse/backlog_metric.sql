@@ -28,7 +28,7 @@ SELECT
   YEAR(CURRENT_DATE) AS year,
   MONTH(CURRENT_DATE) AS month,
   DAY(CURRENT_DATE) AS day,
-  NOW() AS ts_load 
+  NOW() AS ts_load
 FROM
   dw_customer_support.fact_backlog_metrics_tasks AS bmt
 LEFT JOIN
@@ -40,11 +40,11 @@ LEFT JOIN
 LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON bmt.sk_agent = da.sk_agent
-LEFT JOIN 
+LEFT JOIN
   dw_customer_support.dim_ticket dit
     ON dit.sk_ticket = bmt.sk_task
 WHERE
-  DATE(bmt.dt_metric_reference) >= CURRENT_DATE - INTERVAL '1' YEAR
+  DATE(bmt.dt_metric_reference) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
 AND
   dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'

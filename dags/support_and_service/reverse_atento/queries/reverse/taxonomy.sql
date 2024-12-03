@@ -57,4 +57,4 @@ FROM
 WHERE
   agent_organization IN ('atento')
   AND front_or_back = 'front'
-  AND DATE_TRUNC('month', ts_created) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTH
+  AND DATE_TRUNC('month', ts_created) BETWEEN DATE_TRUNC('month', DATE('{load_start_date}')) - INTERVAL '6' MONTH AND DATE('{load_end_date}')

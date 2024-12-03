@@ -65,7 +65,7 @@ WITH front_tickets_list AS (
       DAY,
       LAG(DATE(rc.ts_started)) OVER(PARTITION BY rc.sk_user, rc.team ORDER BY rc.ts_started),
       DATE(rc.ts_started)
-    ) AS days_since_last_contact,    
+    ) AS days_since_last_contact,
     rc.theme,
     rc.theme_detail,
     CASE
@@ -106,9 +106,8 @@ WITH front_tickets_list AS (
     ROW_NUMBER() OVER(PARTITION BY rc.sk_ticket, rc.sk_user, rc.team ORDER BY rc.ts_started DESC) AS rn
   FROM
     front_tickets_list AS rc
-
   WHERE
-    ts_started >= DATE('2024-06-01')
+    ts_started BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH AND DATE('{load_end_date}')
     AND refined_direction = 'INBOUND'
 ),
 demand_back_FRC AS (

@@ -61,13 +61,13 @@ WITH segments AS (
   LEFT JOIN
     dw_customer_support.dim_agent da
       ON frc.agent_email = da.email
-  LEFT JOIN 
+  LEFT JOIN
     dw_customer_support.fact_ticket AS ft
       ON frc.sk_ticket = ft.sk_ticket
-  LEFT JOIN 
+  LEFT JOIN
       dw_customer_support.dim_department AS fd
         ON fd.sk_department = ft.sk_first_department
-  LEFT JOIN 
+  LEFT JOIN
       dw_customer_support.dim_department AS ld
         ON ld.sk_department = ft.sk_main_department
   LEFT JOIN
@@ -95,7 +95,7 @@ WITH segments AS (
       'CX Visitas [FRONT] [PRE]',
       'Consultores imobiliários 5A',
       'CX Parceiros Compra e Venda [FRONT]')
-    AND DATE_TRUNC('month', ts_started) >= CURRENT_DATE - INTERVAL '2' MONTH
+    AND DATE_TRUNC('month', ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '2' MONTH AND DATE('{load_end_date}')
     AND (agent_organization = 'atento' OR agent_organization = 'atn')
 )
 SELECT

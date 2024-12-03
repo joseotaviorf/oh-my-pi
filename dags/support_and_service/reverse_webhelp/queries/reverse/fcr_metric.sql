@@ -39,7 +39,7 @@ LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON ft.sk_last_agent = da.sk_agent
 WHERE
-  DATE(ft.ts_started) >= CURRENT_DATE - INTERVAL '1' YEAR
+  DATE(ft.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
   AND da.agent_organization IN ('webhelp', 'webhelpbr')
   AND (ft.front_or_back IS NULL OR ft.front_or_back <> 'back')
   AND dd.area = 'CX'

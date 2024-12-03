@@ -48,8 +48,7 @@ LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON dmt.sk_agent = da.sk_agent
 WHERE
-  DATE(dmt.ts_started) >= CURRENT_DATE - INTERVAL '1' YEAR
-AND
-  dd.is_partner IS TRUE
+  DATE(dmt.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
+  AND dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'
   AND (da.agent_organization = "atento" OR da.agent_organization = "atn")

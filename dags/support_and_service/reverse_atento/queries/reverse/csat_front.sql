@@ -31,7 +31,7 @@ LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON ft.sk_last_agent = da.sk_agent
 WHERE
-  ft.ts_csat_response >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '3' months)
+  ft.ts_csat_response BETWEEN DATE_TRUNC('month',DATE('{load_start_date}') - INTERVAL '3' MONTH) AND DATE('{load_end_date}')
   AND dd.is_partner IS TRUE
   AND dd.front_or_back = 'front'
   AND (da.agent_organization = "atento" OR da.agent_organization = "atn")
