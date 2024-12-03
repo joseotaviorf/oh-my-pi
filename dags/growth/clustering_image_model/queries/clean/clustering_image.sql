@@ -15,7 +15,7 @@ SELECT
   ypred_using_metadata,
   db_to_filter,
   model_metadata,
-  ts_model,
+  dt_model,
   year,
   month,
   day
