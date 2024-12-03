@@ -84,7 +84,7 @@ if __name__ == "__main__":
     for table in tables:
         datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
         try:
-            df = s3_consumer.get_data_from_file(path=datalake_path, format="parquet")
+            df = s3_consumer.get_data_from_file(path=datalake_path, format="delta")
         except AnalysisException:
             tables_to_send_warning.append(table)
             df = None
