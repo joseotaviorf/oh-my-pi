@@ -13,7 +13,7 @@ WITH daily_base AS (
     WHERE
     -- If a status ends in the current day, but the listing still existing and there's a new status
     -- we are not consuming the ended status in this day. In order to update the ts_status_ended
-    -- for this status, we need to go back 1 day and rewrite its partition. 
+    -- for this status, we need to go back 1 day and rewrite its partition.
         date BETWEEN DATE('{year}-{month}-{day}') - INTERVAL 1 DAY AND DATE('{year}-{month}-{day}')
 ),
 lbc AS (
@@ -21,7 +21,7 @@ lbc AS (
         id_house,
         CAST(MAX(CAST((business_context = 'SALE') AS INTEGER)) AS BOOLEAN) AS is_for_sale,
         CAST(MAX(CAST((business_context = 'RENT') AS INTEGER)) AS BOOLEAN) AS is_for_rent
-    FROM 
+    FROM
         datalake_ebdb_listing.listing_business_context
     GROUP BY 1
 ),
@@ -31,12 +31,12 @@ last_ciq_of_day AS (
     one status per day. To do so, we are assuming that only the last status/agency
     of this house in a day will be considered. We aligned with SWE
     and the rule is programs are excludent, so there is only
-    one program:house per time. 
+    one program:house per time.
     For the SELECT program, we are not sure yet, but for CIQ/ASP this is valid.
-    
+
     In addition, there are periods around June - 2021 (In our auds) when two programs exists at
     the same time. It's an error, and we are treating it in this CTE.
-    
+
     */
     SELECT /*+ RANGE_JOIN(hch, 340) */
         id_house,
@@ -109,10 +109,10 @@ listings_states_per_day AS (
         heh.doorman_type,
         awk.first_key_location,
         heh.key_location,
-        rlpc.price AS rent,
-        rppc.p_10,
-        rppc.p_90,
-        rppc.certainty,
+        lpc.price AS rent,
+        pred.calculator_min_price AS p_10,
+        pred.calculator_max_price AS p_90,
+        pred.calculator_certainty AS certainty,
         hls.status_history,
         hls.status_change_reason,
         hl.listing_category,
@@ -142,7 +142,7 @@ listings_states_per_day AS (
     FROM
         datalake_ebdb_listing.house_listing AS hl -- id_house_listing is PK
     JOIN
-        datalake_ebdb_listing.house_listing_status AS hls -- 1:M => 1 listing has M statuses 
+        datalake_ebdb_listing.house_listing_status AS hls -- 1:M => 1 listing has M statuses
             ON hl.id_house_listing = hls.id_house_listing
             AND hls.is_last_status_of_day = True
     LEFT JOIN
@@ -153,9 +153,9 @@ listings_states_per_day AS (
             ON pled.id_contract = c.id
     JOIN
         daily_base AS dbase
-            ON (dbase.dt_day >= DATE(hls.ts_status_started) 
+            ON (dbase.dt_day >= DATE(hls.ts_status_started)
                 AND dbase.dt_day < COALESCE(DATE(hls.ts_status_ended), '2100-01-01'))
-            OR (dbase.dt_day >= c.ts_created 
+            OR (dbase.dt_day >= c.ts_created
                 AND dbase.dt_day < COALESCE(c.dt_termination, CURRENT_DATE()))
     LEFT JOIN
         lbc
@@ -175,10 +175,12 @@ listings_states_per_day AS (
             AND dbase.dt_day < COALESCE(DATE(heh.ts_entrance_ended), '2100-01-01')
             AND heh.is_last_status_of_day = True
     LEFT JOIN
-        datalake_ebdb_pricing.rent_listing_price_changes AS rlpc
-            ON COALESCE(pled.id_house, hl.id_house) = rlpc.id_house
-            AND dbase.dt_day >= DATE(rlpc.ts_price_started)
-            AND dbase.dt_day < COALESCE(DATE(rlpc.ts_price_ended), '2100-01-01')
+        datalake_ebdb_pricing.listing_price_change AS lpc
+            ON COALESCE(pled.id_house, hl.id_house) = lpc.id_house
+            AND dbase.dt_day >= DATE(lpc.ts_price_started)
+            AND dbase.dt_day < COALESCE(DATE(lpc.ts_price_ended), '2100-01-01')
+            AND lpc.is_last_price_of_day
+            AND lpc.business_context = 'RENT'
     LEFT JOIN
         datalake_pro_owners.house_b2b_history AS hbh
             ON COALESCE(pled.id_house, hl.id_house) = hbh.id_house
@@ -199,12 +201,13 @@ listings_states_per_day AS (
             ON hls.status_history <=> hs.house_status
             AND hls.status_change_reason <=> hs.status_reason
     LEFT JOIN
-        datalake_ebdb_pricing.rent_percentile_price_changes AS rppc
-            ON COALESCE(pled.id_house, hl.id_house) = rppc.id_house
-            AND dbase.dt_day >= DATE(rppc.ts_price_started)
-            AND dbase.dt_day < COALESCE(DATE(rppc.ts_price_ended), '2100-01-01')
-            AND rppc.is_last_status_of_day = True
-    /* 
+        datalake_ebdb_pricing.listing_prediction_changes AS pred
+            ON COALESCE(pled.id_house, hl.id_house) = pred.id_house
+            AND dbase.dt_day >= DATE(pred.ts_calculator_result_started)
+            AND dbase.dt_day < COALESCE(DATE(pred.ts_calculator_result_ended), '2100-01-01')
+            AND pred.is_last_prediction_of_day
+            AND pred.business_context = 'RENT'
+    /*
     This table is used for For_Rent and
     should be similar to fact_house_listing_status, so
     we are removing houses that are pure Sales from here.

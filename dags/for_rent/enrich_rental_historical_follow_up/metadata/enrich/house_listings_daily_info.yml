@@ -100,19 +100,19 @@ columns:
     description: Which is this listing category.
   rent:
     lineage:
-    - datalake_ebdb_pricing.rent_listing_price_changes.price
+    - datalake_ebdb_pricing.listing_price_change.price
     description: Rent value of the house.
   p_10:
     lineage:
-    - datalake_ebdb_pricing.rent_percentile_price_changes.p_10
+    - datalake_ebdb_pricing.listing_prediction_changes.calculator_min_price
     description: Calculator column. Tells the minimum price estimated by the calculator output.
   p_90:
     lineage:
-    - datalake_ebdb_smart_price.rental_price_history.p_90
+    - datalake_ebdb_pricing.listing_prediction_changes.calculator_max_price
     description: alculator column. Tells the estimated price related to the 90% percentile of the calculator's output.
   certainty:
     lineage:
-    - datalake_ebdb_smart_price.rental_price_history.certainty
+    - datalake_ebdb_pricing.listing_prediction_changes.calculator_certainty
     description: Calculator column. Tells the certainty level of the prediction calculated by the calculator. It is strongly related to the intensity of the QuintoAndar performance with the listing region.
   status_change_reason:
     lineage:
