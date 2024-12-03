@@ -227,8 +227,8 @@ bietlejuice.dw_contract_test:
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
 bietlejuice.dw_credit_analysis:
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report
-  - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
-  - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation-proponent
+  - bietlejuice.docx:load-clean-credit-evaluation
+  - bietlejuice.docx:load-clean-credit-evaluation-proponent
   - bietlejuice.dw_crm:load-dw-crm-fact-credit-tasks
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
@@ -937,7 +937,7 @@ bietlejuice.dw_table_snapshot:
 bietlejuice.dw_taxonomy:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
 bietlejuice.dw_tenant_documentation:
-  - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
+  - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.ebdb_proposal:load-clean-proponent-info-resend-request
   - bietlejuice.ebdb_proposal:load-clean-proponent-proposal
   - bietlejuice.ebdb_proposal:load-clean-proposal
@@ -1596,8 +1596,8 @@ bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-dag-metadata
   - bietlejuice.documentation_metrics:load-clean-lineage-and-tags
 bietlejuice.enrich_docx:
-  - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
-  - bietlejuice.docx_user_documents:load-clean-document
+  - bietlejuice.docx:load-clean-credit-evaluation
+  - bietlejuice.docx:load-clean-document
 bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb:load-clean-account-transaction
   - bietlejuice.ebdb:load-clean-lead
@@ -2675,8 +2675,8 @@ bietlejuice.enrich_sale_offer:
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
   - bietlejuice.hub_services:load-clean-business-unit
 bietlejuice.enrich_sale_offer_flows:
-  - bietlejuice.docx_user_documents:load-clean-folder
-  - bietlejuice.docx_user_documents:load-clean-folder-reference
+  - bietlejuice.docx:load-clean-folder
+  - bietlejuice.docx:load-clean-folder-reference
   - bietlejuice.monopoly:load-clean-sale-revision
   - bietlejuice.sales_flow:load-clean-buyer-data
   - bietlejuice.sales_flow:load-clean-cash-payment
@@ -3580,7 +3580,7 @@ bietlejuice.reverse_tiers:
 bietlejuice.reverse_tiers_access:
   - bietlejuice.reverse_tiers:load-reverse-tiers
 bietlejuice.reverse_tracksale:
-  - bietlejuice.docx_credit_evaluation:load-clean-credit-evaluation
+  - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department

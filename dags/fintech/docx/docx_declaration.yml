@@ -1,27 +1,42 @@
 dag:
-  name: docx_credit_evaluation
+  name: docx
   owner: Data Fintech
   documentation:
     dag_purpose: |
       Extraction of Docx tables into data lake, in which the data is related to the credit evaluation process. Docx is the backend application for documents and credit simulation.
   schedule_interval: 0 0 * * *
 workflow:
-  type: database_pull
+  type: cdc
   layer: raw
   database_type: postgres
   custom_schema: docx
   dbutils_secret_key: DOCX_DB
   tables_customization:
-    credit_evaluation_aud: {}
-    credit_evaluation_proponent_aud: {}
-    credit_evaluation_proponent:
-      get_table_metrics:
-        count: id
     credit_evaluation:
       get_table_metrics:
         count: id
+    credit_evaluation_aud: {}
+    credit_evaluation_proponent:
+      get_table_metrics:
+        count: id
+    credit_evaluation_proponent_aud: {}
+    document: {}
+    document_aud: {}
+    document_context: {}
+    document_type: {}
+    folder: {}
+    folder_aud: {}
+    folder_reference: {}
+    folder_reference_aud: {}
+    folder_reference_type: {}
+    folder_type: {}
+    machine_state: {}
     message: {}
     processed_message: {}
-    machine_state: {}
+    revinfo:
+      clean_table_name: rev_info
+    simulation: {}
+    simulation_user: {}
+    user_tenant_flow: {}
 cluster:
   type: databricks_13_3_med_general_cluster
