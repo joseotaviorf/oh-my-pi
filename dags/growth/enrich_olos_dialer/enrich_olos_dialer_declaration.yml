@@ -4,7 +4,7 @@ dag:
   schedule_start_date: 2020, 8, 29
   owner: Data Growth
   documentation:
-    dag_purpose: | 
+    dag_purpose: |
       Creates a table that enriches datalake_olos_dialer_clean.attempts_raw_data table information with another data sent by Olos, such as users and campaigns infos.
       The goal of this table is to deliver the same structure of data that is delivered by the datalake_wololo_clean.contacts table, because we want to have all the information about the contacts attempts (succeeded or not) that Inside Sales realizes with our prospects.
 
@@ -13,7 +13,7 @@ dag:
       Our outbound contacts with customers are carried out by an internal team and also by third-party companies, and these contacts need a dialer so that they can happen.
       QuintoAndar hired the Olos company dialer for that, so we need to ingest the data from these dialings to integrate with our internal data because only with the data coming from Olos we can determine which company acted in a specific dialing and other details.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: incremental
   default_partitions: [year, month, day]
