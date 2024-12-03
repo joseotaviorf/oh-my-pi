@@ -178,7 +178,7 @@ SELECT
     calc_predictus_status_message_4 AS predictus_status_message_fourth_proponent,
     calc_smartgtwrf_base_consultada_1 AS smartgtwrf_base_first_proponent,
     calc_smartgtwrf_base_consultada_2 AS smartgtwrf_base_second_proponent,
-    alc_smartgtwrf_base_consultada_3 AS smartgtwrf_base_third_proponent,
+    calc_smartgtwrf_base_consultada_3 AS smartgtwrf_base_third_proponent,
     calc_smartgtwrf_base_consultada_4 AS smartgtwrf_base_fourth_proponent,
     prop_tipo_documento AS proposal_document_type,
     rgr_backgroundcheck_cad_localizado AS located_registration_bigid,
