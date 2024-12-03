@@ -10,10 +10,13 @@ workflow:
   tables_customization:
     dim_contract:
       z_order_by: [sk_contract]
+      merge_on: [sk_contract]
     dim_contract_person:
       z_order_by: [sk_contract_person]
+      merge_on: [sk_contract_person]
     fact_contrat_people:
       z_order_by: [sk_contract_person]
+      merge_on: [sk_contract_person]
 cluster:
   type: databricks_13_3_med_memory_general_cluster
   access_control_list:
