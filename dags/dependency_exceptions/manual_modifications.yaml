@@ -318,9 +318,6 @@ bietlejuice.enrich_customer_support:
     - bietlejuice.quinto_messenger:load-clean-task
     - bietlejuice.quinto_messenger:load-clean-task-event
     - bietlejuice.sauron:load-clean-bot-outgoing-messages
-bietlejuice.enrich_ebdb_affiliates_cost:
-  remove:
-    - bietlejuice.ebdb:load-clean-conversion-lead
 bietlejuice.enrich_ebdb_photo_jobs:
   add:
     - bietlejuice.ebdb:load-clean-map-region

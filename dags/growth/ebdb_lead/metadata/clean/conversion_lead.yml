@@ -1,38 +1,38 @@
-database_name: datalake_ebdb_test_clean
+database_name: datalake_ebdb_clean
 table_name: conversion_lead
 domain: Growth
 description: This table has information related to QuintoAndar's lead conversions.
 columns:
   id:
     lineage:
-      - datalake_ebdb_test_raw.conversaolead.id
+      - datalake_ebdb_raw.conversaolead.id
   id_house:
     lineage:
-      - datalake_ebdb_test_raw.conversaolead.imovel_id
+      - datalake_ebdb_raw.conversaolead.imovel_id
   id_converted_lead:
     lineage:
-      - datalake_ebdb_test_raw.conversaolead.leadconvertido_id
+      - datalake_ebdb_raw.conversaolead.leadconvertido_id
   id_sales_rep:
     lineage:
-      - datalake_ebdb_test_raw.conversaolead.vendedor_id
+      - datalake_ebdb_raw.conversaolead.vendedor_id
   id_account_manager:
     lineage:
-      - datalake_ebdb_test_raw.conversaolead.gerentecontas_id
+      - datalake_ebdb_raw.conversaolead.gerentecontas_id
   is_validated:
     lineage:
-      - datalake_ebdb_test_raw.conversaolead.validado
+      - datalake_ebdb_raw.conversaolead.validado
   status:
     lineage:
-      - datalake_ebdb_test_raw.conversaolead.status
+      - datalake_ebdb_raw.conversaolead.status
   type:
     lineage:
-      - datalake_ebdb_test_raw.conversaolead.tipo
+      - datalake_ebdb_raw.conversaolead.tipo
   ts_conversion:
     lineage:
-      - datalake_ebdb_test_raw.conversaolead.dataconversao
+      - datalake_ebdb_raw.conversaolead.dataconversao
   ts_created:
     lineage:
-      - datalake_ebdb_test_raw.conversaolead.criadoem
+      - datalake_ebdb_raw.conversaolead.criadoem
   ts_updated:
     lineage:
-      - datalake_ebdb_test_raw.conversaolead.atualizadoem
+      - datalake_ebdb_raw.conversaolead.atualizadoem

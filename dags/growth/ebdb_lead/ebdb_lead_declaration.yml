@@ -1,7 +1,7 @@
 dag:
   name: ebdb_lead
   schedule_start_date: 2021, 2, 20
-  schedule_interval: 0 0 * * *
+  schedule_interval: 0 22 * * *
   owner: Data Growth
   documentation:
     dag_purpose: Extraction of EBDB tables related to Lead into data lake. EBDB is the main database of QuintoAndar.
@@ -11,7 +11,7 @@ workflow:
   database_type: mysql
   source_database: ebdb
   source_schema: ebdb
-  custom_schema: ebdb_test
+  custom_schema: ebdb
   dbutils_secret_key: EBDB_DB
   tables_customization:
     ConversaoLead:

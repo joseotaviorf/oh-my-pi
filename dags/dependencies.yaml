@@ -566,7 +566,7 @@ bietlejuice.dw_keys_tracking:
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.enrich_ebdb_listing:load-enrich-agents-with-keys
 bietlejuice.dw_lead:
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_partner:load-clean-partner
   - bietlejuice.ebdb_partner:load-clean-partner-agent
@@ -1179,8 +1179,8 @@ bietlejuice.enrich_atta:
 bietlejuice.enrich_availability_check_events:
   - bietlejuice.amplitude:load-clean-events
 bietlejuice.enrich_b2b:
-  - bietlejuice.ebdb:load-clean-conversion-lead
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-conversion-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.ebdb:load-clean-photographer-job
   - bietlejuice.ebdb_contract:load-clean-portability
   - bietlejuice.ebdb_house:load-clean-house
@@ -1225,10 +1225,10 @@ bietlejuice.enrich_bob:
   - bietlejuice.ebdb_house:load-clean-house
 bietlejuice.enrich_booking:
   - bietlejuice.ebdb:load-clean-appointment-change-reason-category
-  - bietlejuice.ebdb:load-clean-conversion-lead
+  - bietlejuice.ebdb_lead:load-clean-conversion-lead
   - bietlejuice.ebdb:load-clean-house-weekly-schedule
   - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.ebdb:load-clean-preferred-fixed-agent
   - bietlejuice.ebdb:load-clean-preferred-fixed-agent-aud
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud
@@ -1599,7 +1599,8 @@ bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-document
 bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb:load-clean-account-transaction
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-conversion-lead
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_partner:load-clean-affiliate-data
   - bietlejuice.ebdb_partner:load-clean-affiliate-data-aud
@@ -1652,8 +1653,8 @@ bietlejuice.enrich_ebdb_condo:
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_contract:
-  - bietlejuice.ebdb:load-clean-conversion-lead
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-conversion-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.ebdb:load-clean-photographer-job
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_contract:load-clean-contract-aud
@@ -1987,8 +1988,8 @@ bietlejuice.enrich_internal_chat:
   - bietlejuice.enrich_hub_services_agents:load-enrich-users
   - bietlejuice.internal_chat:load-clean-internal-chat-messages
 bietlejuice.enrich_invoice:
-  - bietlejuice.ebdb:load-clean-conversion-lead
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-conversion-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_partner:load-clean-affiliate-data
@@ -2042,8 +2043,8 @@ bietlejuice.enrich_landlord_journey:
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-aud
 bietlejuice.enrich_lead:
-  - bietlejuice.ebdb:load-clean-conversion-lead
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-conversion-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.ebdb:load-clean-lead-reason
   - bietlejuice.ebdb_partner:load-clean-affiliate-data
   - bietlejuice.ebdb_user:load-clean-user
@@ -2052,7 +2053,7 @@ bietlejuice.enrich_lead:
   - bietlejuice.rene_descartes:load-clean-address
   - bietlejuice.rene_descartes:load-clean-house-lead
 bietlejuice.enrich_lead_tracking:
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
   - bietlejuice.rene_descartes:load-clean-house-lead
@@ -2073,7 +2074,7 @@ bietlejuice.enrich_listing_contracts:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.terminator:load-clean-termination
 bietlejuice.enrich_listing_flow:
-  - bietlejuice.ebdb:load-clean-lead-aud
+  - bietlejuice.ebdb_lead:load-clean-lead-aud
   - bietlejuice.ebdb:load-clean-lead-reason
   - bietlejuice.ebdb:load-clean-photographer-job
   - bietlejuice.ebdb_partner:load-clean-affiliate-data
@@ -2098,8 +2099,8 @@ bietlejuice.enrich_listing_jobs:
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.kodak:load-clean-video
 bietlejuice.enrich_listing_temp:
-  - bietlejuice.ebdb:load-clean-conversion-lead
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-conversion-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.ebdb:load-clean-photographer-job
   - bietlejuice.ebdb_condo:load-clean-condo
   - bietlejuice.ebdb_contract:load-clean-contract
@@ -2313,8 +2314,8 @@ bietlejuice.enrich_pixar:
   - bietlejuice.pixar:load-clean-charge
   - bietlejuice.pixar:load-clean-refund
 bietlejuice.enrich_pro_owners:
-  - bietlejuice.ebdb:load-clean-conversion-lead-aud
-  - bietlejuice.ebdb:load-clean-lead-aud
+  - bietlejuice.ebdb_lead:load-clean-conversion-lead-aud
+  - bietlejuice.ebdb_lead:load-clean-lead-aud
   - bietlejuice.ebdb_administration:load-clean-pro-owner-fee-aud
   - bietlejuice.ebdb_contract:load-clean-portability
   - bietlejuice.ebdb_house:load-clean-house
@@ -2835,8 +2836,8 @@ bietlejuice.enrich_superset:
 bietlejuice.enrich_supply_acquisition:
   - bietlejuice.bob:load-clean-location
   - bietlejuice.bob:load-clean-submission-progress
-  - bietlejuice.ebdb:load-clean-conversion-lead
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-conversion-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
@@ -2884,7 +2885,7 @@ bietlejuice.enrich_supply_leads:
   - bietlejuice.bob:load-clean-house-draft
   - bietlejuice.bob:load-clean-submission-progress
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
@@ -2900,7 +2901,7 @@ bietlejuice.enrich_supply_outbound_flows:
 bietlejuice.enrich_supply_taxonomy:
   - bietlejuice.bob:load-clean-registrar
   - bietlejuice.bob:load-clean-submission-progress
-  - bietlejuice.ebdb:load-clean-lead
+  - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_bob:load-enrich-house-draft
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context

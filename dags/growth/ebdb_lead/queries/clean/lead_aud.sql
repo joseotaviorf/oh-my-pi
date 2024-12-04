@@ -81,4 +81,4 @@ SELECT
     captadoEm AS dt_picked_up,
     lastUpdateStatusDate AS ts_last_status_updated
 FROM
-    datalake_ebdb_test_raw.lead_aud
+    datalake_ebdb_raw.lead_aud

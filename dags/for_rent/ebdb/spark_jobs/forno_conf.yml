@@ -4,6 +4,10 @@ nb_threads: 15
 
 table_block_list:
   - AgrupamentoLeadsPorTelefone
+  - ConversaoLead
+  - ConversaoLead_AUD
+  - Lead
+  - Lead_AUD
   - date_range
   - ENT_REVTYPE
   - REVCHANGES

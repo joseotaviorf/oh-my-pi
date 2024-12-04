@@ -12,4 +12,4 @@ SELECT
     validado_MOD AS mod_is_validated,
     dataConversao AS ts_conversion
 FROM 
-    datalake_ebdb_test_raw.ConversaoLead_aud
+    datalake_ebdb_raw.ConversaoLead_aud
