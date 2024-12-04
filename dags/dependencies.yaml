@@ -325,7 +325,6 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.ebdb_visit:load-clean-visit-fitting
-  - bietlejuice.enrich_booking:load-enrich-house-available-hours
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.dw_datamarts_for_rent_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
