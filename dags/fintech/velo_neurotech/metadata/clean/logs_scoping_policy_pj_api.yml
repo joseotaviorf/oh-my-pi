@@ -1,0 +1,19 @@
+---
+database_name: datalake_velo_neurotech_clean
+table_name: logs_scoping_policy_pj_api
+columns:
+  id_proposal:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy_pj_api.codigo_proposta
+  id_operation:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy_pj_api.codigo_operacao
+  year:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy_pj_api.year
+  month:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy_pj_api.month
+  day:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy_pj_api.day

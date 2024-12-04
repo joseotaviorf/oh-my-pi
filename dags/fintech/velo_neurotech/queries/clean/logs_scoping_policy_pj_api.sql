@@ -5,4 +5,4 @@ SELECT
     month AS month,
     day AS day
 FROM
-    datalake_velo_neurotech_raw.logs_scoping_policy_pj
+    datalake_velo_neurotech_raw.logs_scoping_policy_pj_api
