@@ -2,6 +2,17 @@ SELECT
   CAST(id_ticket AS BIGINT) AS sk_ticket,
   CAST(COALESCE(id_problem_ticket, -1) AS BIGINT) AS sk_problem_ticket,
   COALESCE(CAST(id_contract AS BIGINT), -1) AS sk_contract,
+  MD5(
+    CONCAT(
+      COALESCE(step_tag, ''),
+      COALESCE(customer_type_tag, ''),
+      COALESCE(client_type, ''),
+      COALESCE(request_type, ''),
+      COALESCE(contact_motivation_tag, ''),
+      COALESCE(contact_theme_tag, ''),
+      COALESCE(contact_theme_detail_tag, '')
+    )
+  ) AS sk_taxonomy,
   status,
   type,
   tags,

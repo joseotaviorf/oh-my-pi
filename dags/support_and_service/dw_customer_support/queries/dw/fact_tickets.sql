@@ -48,6 +48,7 @@ abandoned_calls AS (
     dc.front_or_back = 'front'
     AND dc.area = 'CX'
     AND c.is_call_answered IS FALSE
+    AND c.direction != 'outbound'
   GROUP BY 1, 2, 4
 ),
 ticket_rate_proportion AS (
@@ -98,6 +99,9 @@ ticket_comment_metrics AS (
 SELECT
   CAST(t.id_ticket AS BIGINT) AS sk_ticket,
   COALESCE(t.id_user_main, -1) AS sk_user,
+  COALESCE(CAST(tc.id_submitter AS BIGINT), -1) AS sk_zendesk_submitter_user,
+  COALESCE(CAST(tc.id_requester AS BIGINT), -1) AS sk_zendesk_requester_user,
+  COALESCE(CAST(tc.id_assignee AS BIGINT), -1) AS sk_zendesk_assignee_user,
   COALESCE(CAST(t.id_session AS BIGINT), -1) AS sk_session,
   COALESCE(t.id_contract, -1) AS sk_contract,
   MD5(COALESCE(t.last_queue, "NULL")) AS sk_department,
