@@ -408,10 +408,10 @@ ticket_sla_target AS (
   FROM
     tickets AS t
   LEFT JOIN
-    datalake_gsheets_clean.tag_sla_target AS tst
-      ON t.journey_step = tst.journey
-      AND t.tags LIKE CONCAT('%', tst.tag, '%')
-      AND t.ts_created BETWEEN tst.dt_start AND COALESCE(tst.dt_end, TIMESTAMP("{load_end_date}"))
+    datalake_gsheets_clean.tag_sla_target AS tgs
+      ON t.journey_step = tgs.journey
+      AND t.tags LIKE CONCAT('%', tgs.tag, '%')
+      AND t.ts_created BETWEEN tgs.dt_start AND COALESCE(tgs.dt_end, TIMESTAMP("{load_end_date}"))
   LEFT JOIN
     datalake_customer_support.sla_theme_detail AS tds
       ON t.journey_step = tds.journey_step
