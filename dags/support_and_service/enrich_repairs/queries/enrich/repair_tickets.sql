@@ -79,7 +79,8 @@ WITH ticket_history_base AS (
       'Prestadores Parceiros [SO]',
       'Reparos [BACK]',
       'Triagem Reparos [Back]',
-      'FullService [BACK]')
+      'FullService [BACK]',
+      'ReparAção (Piloto Urgente)')
     AND (
         DATE(tc.ts_solved - INTERVAL 3 HOUR) >= CURRENT_DATE - INTERVAL 1 YEAR
         OR tc.ts_solved - INTERVAL 3 HOUR IS NULL)
@@ -310,7 +311,8 @@ WHERE
     'Reparos [BACK]',
     'Triagem Reparos [Back]',
     'FullService [BACK]',
-    'Autosserviço Reparos [BACK]')
+    'Autosserviço Reparos [BACK]',
+    'ReparAção (Piloto Urgente)')
   AND (
     tc.ts_created >= CURRENT_DATE - INTERVAL 6 MONTH
     OR tc.ts_solved >= CURRENT_DATE - INTERVAL 2 YEAR
