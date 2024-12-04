@@ -1,8 +1,8 @@
 ---
 database_name: dw_datamarts
 table_name: buyer_prospect_status
-domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+domain: Growth
+owner: data-growth@quintoandar.com.br
 description: A buyer prospect is a user who has scheduled at least one visit to a property for sale. This table contains information about the status of the prospect,
   and each row is a change in the status.
 columns:

@@ -1,7 +1,7 @@
 ---
 database_name: dw_datamarts
 table_name: affiliates_clusters
-domain: Cross
+domain: Growth
 owner: '@data-growth'
 description: This dataset contains information about the affiliates clusters.
 columns:

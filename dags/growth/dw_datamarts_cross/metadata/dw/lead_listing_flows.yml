@@ -1,7 +1,7 @@
 ---
 database_name: dw_datamarts
 table_name: lead_listing_flows
-domain: Cross
+domain: Growth
 owner: "@data-growth"
 description: This dataset contains information about the lead flow.
 columns:
