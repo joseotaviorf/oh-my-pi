@@ -1024,6 +1024,7 @@ bietlejuice.dw_visit:
   - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
+  - bietlejuice.enrich_visit:load-enrich-visit-schedules
   - bietlejuice.enrich_visit:load-enrich-visit-status-events
   - bietlejuice.enrich_visit:load-enrich-visits
 bietlejuice.enrich_3p:
@@ -3120,16 +3121,34 @@ bietlejuice.enrich_vespucio_pipeline:
   - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
   - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
 bietlejuice.enrich_visit:
+  - bietlejuice.ebdb:load-clean-preferred-fixed-agent
+  - bietlejuice.ebdb:load-clean-preferred-fixed-agent-aud
+  - bietlejuice.ebdb:load-clean-real-estate-agent-rating
+  - bietlejuice.ebdb_agent:load-clean-agent-data-aud
+  - bietlejuice.ebdb_contract:load-clean-work-contract
+  - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_location:load-clean-country
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
+  - bietlejuice.ebdb_visit:load-clean-user-visit-preferences
   - bietlejuice.ebdb_visit:load-clean-visit
   - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
+  - bietlejuice.ebdb_visit:load-clean-visit-checkin
   - bietlejuice.ebdb_visit:load-clean-visit-fitting
   - bietlejuice.ebdb_visit:load-clean-visit-status-log
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
+  - bietlejuice.enrich_hub_services:load-enrich-buyer-secretariat-changes
+  - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
+  - bietlejuice.enrich_offer:load-enrich-sale-offer
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
+  - bietlejuice.insider:load-clean-review
 bietlejuice.enrich_webhelp_reports:
   - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
   - bietlejuice.reverse_webhelp:load-reverse-csat-front

@@ -201,6 +201,7 @@ LEFT JOIN
 LEFT JOIN
     entrance_method_treatment AS emt
         ON visit.id_house = emt.id_house
-        AND visit.dt_visit BETWEEN emt.start_date AND emt.end_date
+        AND visit.dt_visit >= emt.start_date
+        AND visit.dt_visit < emt.end_date
 WHERE
     DATE(visit.ts_created) >= '2024-11-01'
