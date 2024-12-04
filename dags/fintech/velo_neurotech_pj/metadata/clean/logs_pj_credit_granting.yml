@@ -1,0 +1,10 @@
+---
+database_name: datalake_velo_neurotech_pj_clean
+table_name: logs_pj_credit_granting
+columns:
+  id_proposal:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.codigo_proposta
+  id_operation:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.codigo_operacao
