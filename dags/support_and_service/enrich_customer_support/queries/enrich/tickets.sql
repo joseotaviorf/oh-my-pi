@@ -22,8 +22,6 @@ departments AS (
     front_or_back
   FROM
     datalake_gsheets_clean.department_control
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY department ORDER BY journey_step DESC) = 1
 ),
 incoming_tickets AS (
   SELECT
@@ -247,15 +245,17 @@ tickets_per_task AS (
   LEFT JOIN
     datalake_customer_support.chats AS ch
       ON ch.id_session = t.id_session
-      AND ch.task_status <> 'canceled'
+      AND ch.task_status NOT IN ('pending', 'canceled')
   LEFT JOIN
     datalake_customer_support.calls AS ca1
       ON ca1.id_task = t.id_call
       AND STARTSWITH(t.id_call, "WT")
+      AND ca1.is_reservation_answered IS TRUE
   LEFT JOIN
     datalake_customer_support.calls AS ca2
       ON ca2.id_call = t.id_call
       AND STARTSWITH(t.id_call, "CA")
+      AND ca2.is_reservation_answered IS TRUE
 ),
 ticket_twilio_data AS (
   WITH twilio_attr AS (
@@ -387,69 +387,13 @@ back_ticket_timestamps AS (
     back_tickets
   GROUP BY 1
 ),
-/*
-TODO: the following 'sla' CTEs are a replica of the ones in datalake_customer_demand.base_tasks and should be
-revisited, ideally performing array operations on the date columns instead of JOINing on the result of
-EXPLODE(SEQUENCE())
-*/
-unique_theme_detail_sla_target AS (
-  SELECT DISTINCT
-    journey_step,
-    contact_theme_detail_tag AS taxonomy_tag,
-    sla_in_days,
-    EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE("{load_end_date}")))) AS dt_reference
-  FROM
-    datalake_gsheets_clean.taxonomy_sla
-  WHERE
-    dt_target_invalidated IS NULL
-),
-unique_theme_sla_target AS (
-  WITH exploded_theme_sla AS (
-    SELECT
-      journey_step,
-      contact_theme_tag AS taxonomy_tag,
-      sla_in_days,
-      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE("{load_end_date}")))) AS dt_reference
-    FROM
-      datalake_gsheets_clean.taxonomy_sla
-    WHERE
-      dt_target_invalidated IS NULL
-  )
-  SELECT
-    journey_step,
-    taxonomy_tag,
-    MIN(sla_in_days) AS sla_in_days,
-    dt_reference
-  FROM
-    exploded_theme_sla
-  GROUP BY 1,2,4
-),
-unique_journey_sla_target AS (
-  WITH exploded_journey_taxonomy AS (
-    SELECT
-      journey_step,
-      sla_in_days,
-      EXPLODE(SEQUENCE(dt_start, COALESCE(dt_end, DATE("{load_end_date}")))) AS dt_reference
-    FROM
-      datalake_gsheets_clean.taxonomy_sla
-    WHERE
-      dt_target_invalidated IS NULL
-  )
-  SELECT
-    journey_step,
-    MIN(sla_in_days) AS sla_in_days,
-    dt_reference
-  FROM
-    exploded_journey_taxonomy
-  GROUP BY 1,3
-),
 ticket_sla_target AS (
   SELECT
     t.id_ticket,
     MAX(
       CASE
         WHEN t.last_queue IN ('Proteção QuintoAndar [OFF] [POS] [BACK]', 'Rescisão - Despejo [OFF][POS][BACK]') THEN 21
-        ELSE COALESCE(tst.sla, tds.sla_in_days, ts.sla_in_days, ujst.sla_in_days)
+        ELSE COALESCE(tgs.sla, tds.sla, ths.sla, jrs.sla)
       END
     ) AS sla_target,
     MAX(
@@ -469,19 +413,19 @@ ticket_sla_target AS (
       AND t.tags LIKE CONCAT('%', tst.tag, '%')
       AND t.ts_created BETWEEN tst.dt_start AND COALESCE(tst.dt_end, TIMESTAMP("{load_end_date}"))
   LEFT JOIN
-    unique_theme_detail_sla_target AS tds
+    datalake_customer_support.sla_theme_detail AS tds
       ON t.journey_step = tds.journey_step
-      AND t.contact_theme_detail_tag = tds.taxonomy_tag
-      AND DATE(t.ts_created) = tds.dt_reference
+      AND t.contact_theme_detail_tag = tds.theme_detail
+      AND DATE(t.ts_created) BETWEEN tds.dt_start AND COALESCE(tds.dt_end, TIMESTAMP("{load_end_date}"))
   LEFT JOIN
-    unique_theme_sla_target AS ts
-      ON t.journey_step = ts.journey_step
-      AND t.contact_theme_tag = ts.taxonomy_tag
-      AND DATE(t.ts_created) = ts.dt_reference
+    datalake_customer_support.sla_theme AS ths
+      ON t.journey_step = ths.journey_step
+      AND t.contact_theme_tag = ths.theme
+      AND DATE(t.ts_created) BETWEEN ths.dt_start AND COALESCE(ths.dt_end, TIMESTAMP("{load_end_date}"))
   LEFT JOIN
-    unique_journey_sla_target AS ujst
-      ON t.journey_step = ujst.journey_step
-      AND DATE(t.ts_created) = ujst.dt_reference
+    datalake_customer_support.sla_journey AS jrs
+      ON t.journey_step = jrs.journey_step
+      AND DATE(t.ts_created) BETWEEN jrs.dt_start AND COALESCE(jrs.dt_end, TIMESTAMP("{load_end_date}"))
   WHERE
     t.tags NOT LIKE '%robotserviceaccount02%'
     AND (

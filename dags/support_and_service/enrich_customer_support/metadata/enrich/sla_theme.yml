@@ -1,0 +1,28 @@
+database_name: datalake_customer_support
+table_name: sla_theme
+description: Table containing the SLA for every theme, in days
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  journey_step:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_sla.journey_step
+    description: The journey step of the department
+  theme:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_sla.contact_theme_tag
+    description: Theme field on ticket taxonomy
+  sla:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
+    description: Service Level Agreement duration in days.
+  dt_start:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_sla.dt_start
+      - datalake_gsheets_clean.taxonomy_sla.dt_end
+    description: The start date of the SLA period.
+  dt_end:
+    lineage:
+      - datalake_gsheets_clean.taxonomy_sla.dt_start
+      - datalake_gsheets_clean.taxonomy_sla.dt_end
+    description: The end date of the SLA period.

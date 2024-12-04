@@ -27,6 +27,9 @@ workflow:
         tickets:
             - chats
             - calls
+            - sla_journey
+            - sla_theme
+            - sla_theme_detail
     tables_customization:
         calls:
             z_order_by: [id_task, id_reservation]
@@ -42,6 +45,12 @@ workflow:
             z_order_by: [id_ticket, id_call, id_session]
         csat:
             merge_on: [id_ticket]
+        sla_journey:
+            merge_on: [journey_step]
+        sla_theme:
+            merge_on: [journey_step, theme]
+        sla_theme_detail:
+            merge_on: [journey_step, theme_detail]
 cluster:
     type: custom_cluster
     custom_configurations:
@@ -50,7 +59,7 @@ cluster:
         node_type_id: r5d.8xlarge
         runtime_engine: PHOTON
         spark_version: 12.2.x-scala2.12
-        num_workers: 4
+        num_workers: 5
         aws_attributes:
             first_on_demand: 1
             spot_bid_price_percent: 100
