@@ -213,10 +213,6 @@ bietlejuice.dw_contract:
   - bietlejuice.enrich_ebdb_contract:load-enrich-ongoing-contracts
   - bietlejuice.enrich_offboarding:load-enrich-contract-anomaly
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
-bietlejuice.dw_contract_temp:
-  - bietlejuice.dw_contract:load-dw-rent-dim-contract
-  - bietlejuice.dw_contract:load-dw-rent-dim-contract-person
-  - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
 bietlejuice.dw_contract_test:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
