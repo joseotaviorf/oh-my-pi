@@ -41,7 +41,8 @@ base_payment AS (
     status_pay.desc_lvl_1 AS status,
     gateway.desc_lvl_1 AS gateway,
     billing.desc_lvl_1 AS billing_type,
-    category.desc_lvl_1 AS category
+    category.desc_lvl_1 AS category,
+    NULL AS description
   FROM 
     dw_velo.fact_velo_payment p
   LEFT JOIN dw_velo.dim_velo_junk status_pay
@@ -89,7 +90,8 @@ base_payment AS (
     status_pay.desc_lvl_1 AS status,
     gateway.desc_lvl_1 AS gateway,
     billing.desc_lvl_1 AS billing_type,
-    category.desc_lvl_1 AS category
+    category.desc_lvl_1 AS category,
+    NULL AS description
   FROM 
     dw_velo.fact_velo_payment p
   LEFT JOIN 
@@ -129,7 +131,8 @@ base_payment AS (
     status_pay.desc_lvl_1 AS status,
     gateway.desc_lvl_1 AS gateway,
     billing.desc_lvl_1 AS billing_type,
-    category.desc_lvl_1 AS category
+    category.desc_lvl_1 AS category,
+    NULL AS description
   FROM
     dw_velo.fact_velo_payment_legacy pl
   LEFT JOIN dw_velo.dim_velo_junk status_pay
@@ -160,7 +163,8 @@ base_payment AS (
     status,
     "ASAAS RAW" AS gateway,
     billint_type AS billing_type,
-    category
+    category,
+    description
   FROM 
     base_payment_asaas
 ),
@@ -215,7 +219,7 @@ base_payment_ajustada AS (
     AND b.value BETWEEN  
       ( pv.annual_guarantee + pv.activator_amount ) * 0.8  
       AND ( pv.annual_guarantee + pv.activator_amount ) * 1.12
-    AND ( b.gateway = 'ASAAS' OR b.gateway = 'ASAAS RAW' )
+    AND ( b.gateway = 'ASAAS' OR ( b.gateway = 'ASAAS RAW' AND UPPER( b.description ) LIKE '%ASSINATURA%' ) ) 
     AND b.status IN ( 'SUCCESS','RECEIVED','RECEIVED_IN_CASH' )
 )
 SELECT 
