@@ -25,40 +25,44 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_api_response(token, endpoint_name):
+def get_api_response(token, table_name):
 
     tracksale_client = TracksaleClient(api_token=token)
-    consumer_instance = CONSUMERS[endpoint_name](tracksale_client)
+    consumer_instance = CONSUMERS[table_name](tracksale_client)
     api_response = consumer_instance.sync()
 
     return api_response
 
+def get_parameters(table_name):
+    campaign_string = "[{'answer': 'campaign_code','campaign': 'code','dispatch': 'campaign.code'}]"
+    campaign_column = eval(campaign_string)[0][table_name]
+    campaigns_to_block = "['248', '326', '327', '356']"
+    return campaign_column, campaigns_to_block 
 
 if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
-    parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
-    parser.add_argument("source", help="name of the API")
-    parser.add_argument("endpoint_name", help="endpoint to call the API")
-    parser.add_argument("campaign_column", help="campaign ID column name")
-    parser.add_argument("campaigns_to_block", help="campaigns to be blocked")
-
+    parser.add_argument("bucket", help="bucket value in forno/prod")
+    parser.add_argument("dag_name", help="name of the API")
+    parser.add_argument("table_name", help="endpoint to call the API")
+    parser.add_argument("execution_date", help="execution date in str format")
+    
     args = parser.parse_args()
 
     environment = args.environment
-    source = args.source
-    datalake_bucket = args.datalake_bucket
-    endpoint_name = args.endpoint_name
-    campaign_column = args.campaign_column
+    bucket = args.bucket
+    dag_name = args.dag_name
+    table_name = args.table_name
+
+    campaign_column, campaigns_to_block = get_parameters(table_name)
     campaign_column = campaign_column.split(".")
-    campaigns_to_block = args.campaigns_to_block
-    campaigns_to_block = list(map(int, campaigns_to_block.split(",")))
+    campaigns_to_block = list(map(int, eval(campaigns_to_block)))
 
     logger.info(
-        f"m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, "
-        f"endpoint_name={endpoint_name}, msg=Starting spark job..."
+        f"m=__main__, environment={environment}, dag_name={dag_name}, bucket={bucket}, "
+        f"table_name={table_name}, msg=Starting spark job..."
     )
 
     base_dbutils = BaseDBUtils()
@@ -69,7 +73,7 @@ if __name__ == "__main__":
         scope=DATABRICKS_SCOPE, key=APIEnum.TRACKSALE
     )
     credentials = json.loads(json_credentials)
-    api_response = get_api_response(credentials["token"], endpoint_name)
+    api_response = get_api_response(credentials["token"], table_name)
 
     if api_response:
 
@@ -93,7 +97,7 @@ if __name__ == "__main__":
         df = SparkDataFrameService().input(df).convert_array_type_to_json().output()
 
         db_info = DatalakeMetastoreService.get_db_info(
-            environment, source, datalake_bucket
+            environment, dag_name, bucket
         )
         metastore_service = SparkMetastoreService(spark_client)
         spark_metastore_loader = SparkMetastoreLoader(metastore_service)
@@ -111,11 +115,11 @@ if __name__ == "__main__":
         s3_loader.load_full_table(
             df=df,
             database_name=database_name,
-            table_name=endpoint_name,
+            table_name=table_name,
             format_options=format_options,
             database_location=database_location,
         )
 
         spark_metastore_loader.update_metastore(
-            df, database_name, endpoint_name, format_options, database_location
+            df, database_name, table_name, format_options, database_location
         )
