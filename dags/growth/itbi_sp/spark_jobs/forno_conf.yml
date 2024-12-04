@@ -1,0 +1,49 @@
+base_url: "https://capital.sp.gov.br"
+site_download_page_url: "/web/fazenda/w/acesso_a_informacao/31501"
+source_format: "xlsx"
+blocklist_urls:
+  [
+    "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2006.xlsx",
+    "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2007.xlsx",
+    "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2008.xlsx",
+    "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2009.xlsx",
+    "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2010.xlsx",
+    "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2011.xlsx",
+    "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2012.xlsx",
+    "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2013.xlsx",
+    "https://www.prefeitura.sp.gov.br/cidade/secretarias/upload/fazenda/arquivos/itbi/guias_de_itbi_pagas_2014.xlsx",
+  ]
+columns_to_rename:
+  N° do Cadastro (SQL): "n_cadastro_sql"
+  Nome do Logradouro: "nome_logradouro"
+  Número: "numero"
+  Complemento: "complemento"
+  Bairro: "bairro"
+  Referência: "referencia"
+  CEP: "cep"
+  Natureza de Transação: "natureza_transacao"
+  Valor de Transação (declarado pelo contribuinte): "valor_transacao_declarado"
+  Data de Transação: "data_transacao"
+  Valor Venal de Referência: "valor_venal_referencia"
+  Proporção Transmitida (%): "proporcao_transmitida"
+  Valor Venal de Referência (proporcional): "valor_venal_referencia_proporcional"
+  Base de Cálculo adotada: "base_calculo_adotada"
+  Tipo de Financiamento: "tipo_financiamento"
+  Valor Financiado: "valor_financiado"
+  Cartório de Registro: "cartorio_registro"
+  Matrícula do Imóvel: "matricula_imovel"
+  Situação do SQL: "situacao_sql"
+  Área do Terreno (m2): "area_terreno_m2"
+  Testada (m): "testada_m"
+  Fração Ideal: "fracao_ideal"
+  Área Construída (m2): "area_construida_m2"
+  Uso (IPTU): "uso_iptu"
+  Descrição do uso (IPTU): "descricao_uso_iptu"
+  Padrão (IPTU): "padrao_iptu"
+  Descrição do padrão (IPTU): "descricao_padrao_iptu"
+  ACC (IPTU): "acc_iptu"
+problematic_columns_to_rename:
+  ACC (IPTU).1:
+    ACC (IPTU): "descricao_padrao_iptu"
+    ACC (IPTU).1: "acc_iptu"
+diff_year: 1

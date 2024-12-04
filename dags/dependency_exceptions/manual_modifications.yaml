@@ -230,7 +230,7 @@ bietlejuice.enrich_app_installed:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
 bietlejuice.enrich_booking:
   remove:
-      - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
+    - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
 bietlejuice.enrich_braze_events:
   remove:
     - bietlejuice.braze_events:load-clean-events-indica-ai
@@ -452,8 +452,8 @@ bietlejuice.enrich_open_external_data_addresses:
   # Therefore, if we keep these dependencies, this DAG would not update with the data from the other tables used.
   remove:
     - bietlejuice.iptu:load-clean-iptu-sp
-    - bietlejuice.itbi:load-clean-itbi-bh
-    - bietlejuice.itbi:load-clean-itbi-sp
+    - bietlejuice.itbi_sp:load-clean-itbi-sp
+    - bietlejuice.itbi_bh:load-clean-itbi-bh
 bietlejuice.enrich_pipeline:
   # We need to remove these dependencies because the Composer DAG runs several times during the day, and it's not
   # our intention to run this DAG the same amount of times.

@@ -1,0 +1,35 @@
+dag:
+  name: itbi_bh
+  owner: Data Growth
+  schedule_start_date: 2024, 11, 28
+  schedule_interval: 0 11 15,30 * *
+  documentation:
+    dag_purpose: |
+      This DAG imports "Imposto de Transmissão de Bens Imóveis (ITBI)" information
+      from the public website (https://ckan.pbh.gov.br/dataset/itbi-relatorios)
+      of Belo Horizonte city.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: itbi
+  load_spark_job: load_itbi_bh_raw
+  default_extraction_type: incremental
+  default_partitions: [year, month]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{schema}" # "schema"
+    - "{table_name}" # "table_name"
+    - "{partitions}" # partition_cols
+    - "{{ ds }}" # execution_date
+  tables_customization:
+    itbi_bh: {}
+
+cluster:
+  type: databricks_13_3_med_memory_cluster
+  custom_libraries:
+    - pypi:
+        package: "openpyxl"

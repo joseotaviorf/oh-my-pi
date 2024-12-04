@@ -1,3 +1,4 @@
+import ast
 import logging
 import pandas as pd
 import re
@@ -25,8 +26,8 @@ from pyspark.sql.types import IntegerType, StringType
 from quintoandar_logger import QuintoAndarLogger
 
 
-ITBI_REGION = "itbi_sp"
-JOB_NAME = f"load_{ITBI_REGION}_raw"
+SOURCE = "itbi_sp"
+JOB_NAME = f"load_{SOURCE}_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -330,7 +331,7 @@ def load_dataframe_into_datalake(
   environment:str,
   partition_cols:List[str],
   raw_table_name:str,
-  source:str,
+  schema:str,
   ) -> None:
   """
   Loads a DataFrame into the Data Lake.
@@ -341,7 +342,7 @@ def load_dataframe_into_datalake(
       environment (str): The environment to load the data into.
       partition_cols (list): List of partition columns.
       raw_table_name (str): The name of the raw table.
-      source (str): The source of the data.
+      schema (str): The source of the data.
 
   Returns:
       None: None
@@ -349,7 +350,7 @@ def load_dataframe_into_datalake(
 
   spark_client = SparkClient()
 
-  db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+  db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
   database_name = db_info["db_raw_databricks"]
   database_location = db_info["db_raw_path"]
   format_options = SparkTableStorageFormat.DEFAULT_RAW
@@ -390,39 +391,38 @@ def main():
   (
       environment,
       datalake_bucket,
-      source,
+      schema,
+      raw_table_name,
+      partition_cols,
       execution_date,
   ) = parse_arguments()
 
   logger.info(
       f"""
-      m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source},
+      m=main, environment={environment}, datalake_bucket={datalake_bucket}, schema={schema},
         execution_date={execution_date}
         msg=Starting Spark job...
       """
   )
 
-  config_service = ConfigurationService(source)
-  itbi_configs = config_service.get_config("tables")[ITBI_REGION]
+  config_service = ConfigurationService(SOURCE)
 
-  table_name = ITBI_REGION
-  base_url = itbi_configs["source"]["base_url"]
-  site_download_page_url = itbi_configs["source"]["site_download_page_url"]
+  base_url = config_service.get_config("base_url")
+  site_download_page_url = config_service.get_config("site_download_page_url")
   source_download_page_url = f"{base_url}{site_download_page_url}"
-  source_format = itbi_configs["source"]["format"]
-  partition_cols = itbi_configs["partition_cols"]
-  blocklist_urls = itbi_configs["source"]["blocklist_urls"]
-  columns_rename_mapped = itbi_configs["columns_to_rename"]
-  problematic_columns_rename_mapped = itbi_configs["problematic_columns_to_rename"]
-  diff_year = int(itbi_configs["source"]["diff_year"])
+  source_format = config_service.get_config("source_format")
+  blocklist_urls = config_service.get_config("blocklist_urls")
+  columns_rename_mapped = config_service.get_config("columns_to_rename")
+  problematic_columns_rename_mapped = config_service.get_config("problematic_columns_to_rename")
+  diff_year = int(config_service.get_config("diff_year"))
   dt_execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
   year_interval = [str(year) for year in range(dt_execution_date.year - diff_year, dt_execution_date.year + 1)]
 
 
   logger.info(
       f"""
-      m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date}
-      msg=Configuration table, table_name={table_name}, source_format={source_format}
+      m=main, environment={environment}, datalake_bucket={datalake_bucket}, schema={schema}, execution_date={execution_date}
+      msg=Configuration table, table_name={raw_table_name}, source_format={source_format}
       """
   )
 
@@ -439,7 +439,7 @@ def main():
   if df_itbi_sp_source:
     logger.info(
         f"""
-        m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date}
+        m=main, environment={environment}, datalake_bucket={datalake_bucket}, schema={schema}, execution_date={execution_date}
         msg=Dataframe imported with sucess.
         """
     )
@@ -447,9 +447,9 @@ def main():
     load_dataframe_into_datalake(
         df=df_itbi_sp_source,
         environment=environment,
-        source=source,
+        schema=schema,
         datalake_bucket=datalake_bucket,
-        raw_table_name=table_name,
+        raw_table_name=raw_table_name,
         partition_cols=partition_cols,
     )
   else:
@@ -457,18 +457,29 @@ def main():
 
 def parse_arguments():
   parser = ArgumentParser(description=JOB_NAME)
-  parser.add_argument("env")
-  parser.add_argument("datalake_bucket")
-  parser.add_argument("source")
-  parser.add_argument("execution_date")
+  parser.add_argument("env", help="Forno/Prod values")
+  parser.add_argument("datalake_bucket", help="Bucket value in forno/prod")
+  parser.add_argument("schema", help="Custom Schema to save table"),
+  parser.add_argument("table_name", help="Name of the table to store data into")
+  parser.add_argument("partitions", help="Partition columns name")
+  parser.add_argument("execution_date", help="DAG execution_date")
 
   args = parser.parse_args()
 
+  env: str = args.env
+  datalake_bucket: str = args.datalake_bucket
+  schema: str = args.schema
+  raw_table_name: str = args.table_name
+  partition_cols: List[str] = ast.literal_eval(args.partitions)
+  execution_date: str = args.execution_date
+
   return (
-      args.env,
-      args.datalake_bucket,
-      args.source,
-      args.execution_date,
+      env,
+      datalake_bucket,
+      schema,
+      raw_table_name,
+      partition_cols,
+      execution_date,
   )
 
 if __name__ == "__main__":

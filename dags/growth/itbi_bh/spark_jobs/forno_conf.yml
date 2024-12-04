@@ -1,0 +1,52 @@
+site_download_page_url: "https://ckan.pbh.gov.br/dataset/itbi-relatorios"
+headers: "{'user-agent': 'Chrome/131.0.0.0'}"
+format: ".csv"
+blacklist_urls:
+  [
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/c98e75c0-fe00-4b0c-98c9-a30e45ee76dd/download/relatorioitbi2009_julho2021.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/e4c455ea-86ae-40ea-932c-fbf914a0e286/download/relatorioitbi.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/254efdec-4c82-4164-96b5-b38b79c6b1bc/download/relatorioitbi2009_julho2021.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/1536ccbe-7d65-43dd-9628-bdb96f14f731/download/relatorioitbiagosto2021.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/9a04f4c0-9ca0-434b-b405-fcae8154e6d5/download/relatorioitbisetembro2021.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/d1712a0b-6dec-48e3-8f01-a14599b86942/download/relatorioitbioutubro2021.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/d3aeb4fb-f0a0-4cbe-81ee-5596609e4367/download/relatorioitbinovembro2021.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/933ca26b-5497-4b3e-8567-135105ac8c11/download/relatorioitbidezembro2021.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/8f791565-7bdc-44dd-90ee-3fa31672f911/download/relatorioitbijaneiroabril2022.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/00f54f96-ca6b-4675-b8de-6532700ce0e6/download/relatorioitbimaiojunho2022.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/618470ba-315c-45d3-a171-eaf0a60def80/download/relatorio_itbi_julho_agosto_2022.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/0be6d32f-ef23-4549-9893-af72a3c8dbd8/download/itbi_2022_setembro_relatorio-itbi.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/a95749eb-b76c-460a-b9de-eadd6918aeca/download/itbi_2022_outubro_relatorio-itbi.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/f25c7c28-247c-4f40-8304-f2d343652037/download/itbi_2022_novembro_relatorio-itbi.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/611340d0-fddd-4422-a8fb-e8de14152f07/download/itbi_2022_dezembro.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/06130c26-0028-4291-8c5f-66aeb0e4b550/download/itbi_2023_janeiro.csv",
+    "https://ckan.pbh.gov.br/dataset/fdb1a8b6-1ef5-4084-bda5-e9503d00d5c5/resource/34e4dc51-6190-42a5-8132-2796e7e7f6a7/download/itbi_2023_fevereiro.csv",
+  ]
+columns_to_rename:
+  Endereco Completo: endereco_completo
+  Endereco: endereco_completo
+  Bairro: bairro
+  Ano de Construcao (Unidade): ano_construcao_unidade
+  Ano Construcao (Unidade): ano_construcao_unidade
+  Ano de Construcao Unidade: ano_construcao_unidade
+  Area Terreno Total: area_terreno_total
+  Area Construida Adquirida: area_construida_adquirida
+  Area Adquirida (Unidades Somadas): area_adquirida_unidades_somadas
+  Area Adquirida Unidades Somadas: area_adquirida_unidades_somadas
+  Padrao Acabamento (Unidade): padrao_acabamento_unidade
+  Padrao Acabamento Unidade: padrao_acabamento_unidade
+  Fracao Ideal Adquirida: fracao_ideal_adquirida
+  Tipo Construtivo Preponderante: tipo_construtivo_preponderante
+  Descrição Tipo Ocupacao (Unidade): descricao_tipo_ocupacao_unidade
+  Descricao Tipo Ocupacao (Unidade): descricao_tipo_ocupacao_unidade
+  Descricao Tipo Ocupacao Unidade: descricao_tipo_ocupacao_unidade
+  Valor Base Calculo: valor_base_calculo
+  Valor Declarado: valor_declarado
+  Zona Uso ITBI: zona_uso_itbi
+  Data Inclusao Transacao: data_inclusao_transacao
+  Data Quitação Transacao: data_inclusao_transacao
+  Data Quitacao Transacao: data_inclusao_transacao
+  Data_quitacao: data_inclusao_transacao
+  Data quitacao: data_inclusao_transacao
+  Data quitação Transação: data_inclusao_transacao
+  Data Quitacao: data_inclusao_transacao
+  Valor Imposto Cobrado (sumarizado): valor_imposto_cobrado_sumarizado

@@ -20,3 +20,5 @@ SELECT
   year
 FROM
   datalake_itbi_raw.itbi_bh
+WHERE
+  year BETWEEN YEAR(DATE('{load_start_date}')) - 1 AND YEAR(DATE('{load_end_date}'))
