@@ -290,13 +290,6 @@ chain(
 
 polygon_region_raw_task >> task_list_first_task(clean_task_list["polygon_region"])
 
-contract_model_dependencies = []
-
-contract_model_dependencies.extend(
-    task_list_last_tasks(clean_task_list.pop("conversion_lead"))
-)
-contract_model_dependencies.extend(task_list_last_tasks(clean_task_list.pop("lead")))
-
 # Data Quality tests for raw
 tb_names = DAGPackagesPathService.list_data_quality_tests_files_in_composer(
     dag_name=SOURCE, layer=LayerEnum.RAW.value

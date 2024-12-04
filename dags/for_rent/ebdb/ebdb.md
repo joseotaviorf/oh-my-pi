@@ -66,8 +66,6 @@ Produces the following output tables:
     `conservation_item`
     `conservation_room`
     `consumption_bill`
-    `conversion_lead`
-    `conversion_lead_aud`
     `country`
     `device`
     `doorman_affiliate_data`
@@ -119,8 +117,6 @@ Produces the following output tables:
     `instant_offer`
     `instant_offer_aud`
     `key_type`
-    `lead`
-    `lead_aud`
     `lead_reason`
     `listing_business_context`
     `listing_business_context_aud`
