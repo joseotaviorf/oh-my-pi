@@ -46,6 +46,9 @@ workflow:
     video:
       raw_extraction_type: full
       raw_partitions: []
+    video_aud:
+       raw_extraction_type: full
+       raw_partitions: []
     watermark_removal:
       date_filter_column: updated_at
 cluster:
