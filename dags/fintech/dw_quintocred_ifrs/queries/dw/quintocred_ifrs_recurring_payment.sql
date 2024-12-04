@@ -513,7 +513,11 @@ base_sap_ifrs AS (
         WHERE
             dt_reference between DATE('2023-09-01') AND DATE('2023-09-30')
             AND credit = 0
-            AND account_name IN ('Títulos recebidos via cartão de crédito', 'Itaú Ag. 8792 Conta 49458-8')
+            AND
+                (
+                    account_name IN ('Títulos recebidos via cartão de crédito', 'Itaú Ag. 8792 Conta 49458-8')
+                    OR account_number IN ('113070', '110354')
+                )
 
         GROUP BY 1,2,3,4,5,6,7,8,9
     )
@@ -998,7 +1002,10 @@ repasse_direto AS (
         FROM
             datalake_accounting_funnel.ledger
         WHERE
-            account_name IN ('Duplicatas a Receber VELO')
+            (
+                account_number = '113009'
+                OR account_name IN ('Duplicatas a Receber VELO')
+            )
             AND debit = 0
     )
     ,cpf_cnpj_person AS (
