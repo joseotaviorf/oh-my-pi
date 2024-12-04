@@ -1,0 +1,91 @@
+---
+database_name: datalake_survicate_test_clean
+table_name: survey_responses
+description: Responses to a specific survey identified by their unique ID.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  response_uuid:
+    description: A unique, unchangeable identifier for the response.
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.uuid
+  id_survey:
+    description:
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.survey_id
+  url:
+    description: The URL where the survey was displayed to the respondent.
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.url
+  device_type:
+    description: The type of device used by the respondent to submit the response.
+    categories:
+      Desktop: ""
+      Mobile: ""
+      Tablet: ""
+      Tv: ""
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.device_type
+  operating_system:
+    description: The operating system of the device used by the respondent.
+    categories:
+      Android: ""
+      OS: ""
+      iOS: ""
+      Linux: ""
+      Desktop: ""
+      macOS: ""
+      Windows: ""
+      Other: ""
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.operating_system
+  language:
+    description: If present, the language of the survey translation presented to the respondent.
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.language
+  answers:
+    description: |
+      An array of answers provided by the respondent for each specific question in the survey.
+        - "question_id": The question's unique unchangeable identifier.
+        - "question_type": The question's type (single, multiple, dropdown_list, rating, ranking, smiley_scale, numerical_scale, csat)
+        - "answer.id": An abstract entity to build other classes. The answer's unique unchangeable identifier.
+        - "answer.content": The respondent's selected answer content.
+        - "answer.comment": Optional text input provided by the respondent as an additional comment to the selected response.
+        - "answer.rating": Numerical value representing the respondent's rating.
+        - "fields.type": The type of field in the contact form, as chosen by the user through the Survicate interface.
+        - "fields.content": The respondent's input for a specific field.
+        - "answer.tag": This represents the NPS group associated with the score selected by the respondent.
+          The options include: * Detractor (0-6) * Passive (7-8) * Promoter (9-10).
+        - "answer.score": Label of the selected option in a matrix choice question.
+        - "answer.rank": The selected position of the respondent's choice in the ranking question.
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.answers
+  respondent:
+    description: |
+      - "respondent_uuid": A unique, unchangeable identifier for the respondent who submitted the response.
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.respondent
+  workspace_name:
+    description: Workspace where the response is from.
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.workspace_name
+  ts_collected:
+    description: This timestamp marks the moment a survey response was received.
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.collected_at
+  dt_load:
+    description: Date and time when the data was loaded.
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.dt_load
+  year:
+    description: Year when the data was loaded.
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.year
+  month:
+    description: Month when the data was loaded.
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.month
+  day:
+    description: Day when the data was loaded.
+    lineage:
+      - datalake_survicate_test_raw.survey_responses.day
