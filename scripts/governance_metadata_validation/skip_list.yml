@@ -22,18 +22,9 @@ metadata_files_out_of_pattern:
   - support_and_service/enrich_offboarding/metadata/enrich/ongoing.yml
   - support_and_service/enrich_offboarding/metadata/enrich/tickets.yml
   # The following files are being added only temporarily to skip list, with permission from the Data Governance team
-  - cross/dw_datamarts_spark/metadata/dw/for_rent/datamart_kpi_weekly.yml
-  - cross/dw_datamarts_spark/metadata/dw/for_sale/liquidity_by_sk_region.yml
-  - cross/dw_datamarts_spark/metadata/dw/for_sale_cross/sale_cohort_conversions.yml
-  - cross/dw_datamarts_spark/metadata/dw/for_sale_cross/sale_events_funnel.yml
-  - cross/dw_datamarts_spark/metadata/dw/for_sale_cross/temp_supply_flows.yml
   - growth/dw_datamarts_growth_cross/metadata/dw/tenant_prospects_activations.yml
   - support_and_service/enrich_offboarding/metadata/enrich/budgeting_window.yml
   # TODO: Migrated datamarts pending documentation
-  - cross/dw_datamarts_spark/metadata/dw/cross/buyer_prospect_status.yml
-  - cross/dw_datamarts_spark/metadata/dw/growth/casa_mineira_top_of_funnel_volumes_daily.yml
-  - cross/dw_datamarts_spark/metadata/dw/growth/casa_mineira_top_of_funnel_volumes_monthly.yml
-  - cross/dw_datamarts_spark/metadata/dw/growth/performance_marketing_metrics_imobiliaria_casa_mineira.yml
   - growth/dw_datamarts_growth_cross/metadata/dw/inbound_attendance_leads_flows.yml
   - growth/dw_datamarts_growth_cross/metadata/dw/marketing_campaigns_costs_and_volumes.yml
   - growth/dw_datamarts_growth_cross/metadata/dw/marketing_demand_supply_branding_costs.yml

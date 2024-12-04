@@ -1,0 +1,15 @@
+dag:
+  name: dw_datamarts_cross
+  owner: Data Growth
+  documentation: 
+    dag_purpose: |
+      Creates/updates the datamart tables that have cross squad dependencies.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: datamarts
+  inner_dependencies:
+    affiliates_clusters:
+      - lead_listing_flows
+cluster:
+  type: databricks_12_2_med_memory_cluster

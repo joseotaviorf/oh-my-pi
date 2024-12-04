@@ -330,7 +330,7 @@ bietlejuice.dw_datamarts_for_rent_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-performance-marketing-metrics-demand
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
+  - bietlejuice.dw_datamarts_cross:load-dw-datamarts-lead-listing-flows
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_offer:load-dw-rent-dim-offer
@@ -372,8 +372,8 @@ bietlejuice.dw_datamarts_for_sale:
 bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-affiliates-clusters
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
+  - bietlejuice.dw_datamarts_cross:load-dw-datamarts-affiliates-clusters
+  - bietlejuice.dw_datamarts_cross:load-dw-datamarts-lead-listing-flows
   - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_sale_flows:load-dw-sale-fact-sale-flows
@@ -393,9 +393,9 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-affiliates-clusters
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-buyer-prospect-status
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
+  - bietlejuice.dw_datamarts_cross:load-dw-datamarts-affiliates-clusters
+  - bietlejuice.dw_datamarts_cross:load-dw-datamarts-buyer-prospect-status
+  - bietlejuice.dw_datamarts_cross:load-dw-datamarts-lead-listing-flows
   - bietlejuice.dw_lead:load-dw-public-dim-lead
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_offer:load-dw-rent-dim-offer
@@ -441,7 +441,7 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.robin_hood:load-clean-accounting-entry-source
   - bietlejuice.robin_hood:load-clean-tax
   - bietlejuice.robin_hood:load-clean-tax-ratio
-bietlejuice.dw_datamarts_spark.cross:
+bietlejuice.dw_datamarts_cross:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
@@ -1152,7 +1152,7 @@ bietlejuice.enrich_atento_reports:
 bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
-  - bietlejuice.dw_datamarts_spark.cross:load-dw-datamarts-lead-listing-flows
+  - bietlejuice.dw_datamarts_cross:load-dw-datamarts-lead-listing-flows
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
