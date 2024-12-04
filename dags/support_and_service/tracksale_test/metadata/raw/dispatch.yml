@@ -1,7 +1,0 @@
-database_name: datalake_tracksale_test_raw
-table_name: dispatch
-columns:
-  customers:
-    tags:
-    - PII
-    - Confidential
