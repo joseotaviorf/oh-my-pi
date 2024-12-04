@@ -250,6 +250,7 @@ SELECT
       THEN 10
     WHEN status = 'ERROR' 
       THEN 11
+    ELSE 99
   END AS order_status,
   CASE 
     WHEN gateway = 'WALLSTREET' 
