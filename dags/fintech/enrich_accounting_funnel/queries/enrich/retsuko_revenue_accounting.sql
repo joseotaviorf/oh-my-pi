@@ -23,12 +23,12 @@ retsuko AS (
         se.id_sap_gateway_feature,
         'seu barriga' AS source_name,
         CASE
-            WHEN e.bill_item IN ('entry.bill-item/rental-anticipation-fee') THEN '41102.01.06'
-            WHEN e.bill_item IN ('entry.bill-item/property-damage-fine') THEN '41103.02.01'
-            WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment') THEN '21104.01.07'
+            WHEN e.bill_item IN ('entry.bill-item/rental-anticipation-fee') THEN '420019'
+            WHEN e.bill_item IN ('entry.bill-item/property-damage-fine') THEN '420003'
+            WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment') THEN '211415'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-partner-select',
-            'entry.bill-item/brokerage-estate-agent', 'entry.bill-item/brokerage-third-party-real-estate') THEN '61101.01.70'
-            WHEN e.bill_item IN ('entry.bill-item/adm-fee-adm-partner') THEN '61101.01.77'
+            'entry.bill-item/brokerage-estate-agent', 'entry.bill-item/brokerage-third-party-real-estate') THEN '700005'
+            WHEN e.bill_item IN ('entry.bill-item/adm-fee-adm-partner') THEN '700009'
         END AS revenue_account,
         CASE
             WHEN e.bill_item IN ('entry.bill-item/rental-anticipation-fee') THEN 'rental anticipation fee'
@@ -88,11 +88,11 @@ retsuko_fine AS (
         se.id_sap_gateway_feature,
         'seu barriga' AS source_name,
         CASE
-            WHEN e.bill_item IN ('entry.bill-item/fine-and-interest') THEN '31102.01.01'
-            WHEN e.bill_item IN ('entry.bill-item/negotiation-fine-and-interest') THEN '41102.01.16'
-            WHEN e.bill_item IN ('entry.bill-item/credit-card-revenue') THEN '41102.01.05'
-            WHEN e.bill_item IN ('entry.bill-item/fine') THEN '31102.01.01'
-            WHEN e.bill_item IN ('entry.bill-item/interest') THEN '41102.01.15'
+            WHEN e.bill_item IN ('entry.bill-item/fine-and-interest') THEN '420003'
+            WHEN e.bill_item IN ('entry.bill-item/negotiation-fine-and-interest') THEN '420025'
+            WHEN e.bill_item IN ('entry.bill-item/credit-card-revenue') THEN '420020'
+            WHEN e.bill_item IN ('entry.bill-item/fine') THEN '420003'
+            WHEN e.bill_item IN ('entry.bill-item/interest') THEN '611012'
         END AS revenue_account,
         CASE
             WHEN e.bill_item IN ('entry.bill-item/fine-and-interest') THEN 'fine and interest'
@@ -181,17 +181,9 @@ sap AS (
     WHERE
 
     WHERE
-        (
-            dt_reference >= DATE('2024-01-01')
-            AND account_number IN ('420019', '420003', '420025', '420020', '420003', '611012', '211415')
-            AND transaction_type = 'SA'
-        )
-        OR
-        (
-            dt_reference < DATE('2024-01-01')
-            AND account_number IN ('41102.01.06', '41103.02.01', '41102.01.16', '41102.01.05', '31102.01.01', '41102.01.15', '21104.01.07', '61101.01.70', '61101.01.77')
-            AND document_number like 'JE %'
-        )
+        dt_reference >= DATE('2024-01-01')
+        AND account_number IN ('420019', '420003', '420025', '420020', '420003', '611012', '211415')
+        AND transaction_type = 'SA'
     GROUP BY 1, 2, 3, 5, 6
 ),
 

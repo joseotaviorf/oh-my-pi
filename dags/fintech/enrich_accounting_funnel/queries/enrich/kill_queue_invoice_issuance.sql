@@ -1,5 +1,5 @@
 WITH sap_gateway AS (
-    SELECT    
+    SELECT
         f.id_source,
         f.sync_sap_status,
         s.status,
@@ -7,9 +7,9 @@ WITH sap_gateway AS (
     FROM
         datalake_sap_gateway.feature f
     LEFT JOIN
-        datalake_sap_gateway.sync_sap_job s 
+        datalake_sap_gateway.sync_sap_job s
             ON f.id_feature = s.id_feature
-    WHERE 
+    WHERE
         f.source = 'kill-queue/reservation'
         AND s.type = 'NF'
     QUALIFY RANK() OVER (PARTITION BY f.id_source ORDER BY s.ts_updated DESC) = 1
@@ -20,7 +20,7 @@ WITH sap_gateway AS (
         id_finance_entity,
         accrual_year_month,
         CASE
-            WHEN account_number = '31101.01.11' THEN 'reservation fee'
+            WHEN account_number = '420006' THEN 'reservation fee'
         END AS revenue_account,
         account_number,
         MAX(DATE(dt_created)) AS dt_sap_created,
@@ -29,8 +29,7 @@ WITH sap_gateway AS (
     FROM
         datalake_accounting_funnel.ledger
     WHERE
-        account_number = '31101.01.11'
-        AND document_number LIKE 'IN %'
+        account_number = '420006'
         AND dt_reference >= '2024-01-01'
     GROUP BY
         1, 2, 3, 4
@@ -41,7 +40,7 @@ WITH sap_gateway AS (
         r.id_tenant AS id_business_entity,
         r.id AS id_finance_entity,
         'kill_queue' AS source_name,
-        '31101.01.11' AS account_number,
+        '420006' AS account_number,
         'reservation_fee' AS revenue_name,
         r.value AS source_amount,
         r.status,
@@ -76,12 +75,12 @@ WITH sap_gateway AS (
       MAX(dt_source_trigger) AS dt_source_trigger,
       MAX(dt_sap_created) AS dt_sap_created,
       MAX(dt_sap_reference) AS dt_sap_reference
-    FROM 
+    FROM
         kill_queue k
-    LEFT JOIN 
-        sap s 
+    LEFT JOIN
+        sap s
             ON k.id_finance_entity = s.id_finance_entity
-    LEFT JOIN 
+    LEFT JOIN
         sap_gateway sg
             ON k.id_finance_entity = sg.id_source
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 10, 11
@@ -101,14 +100,14 @@ WITH sap_gateway AS (
         df.status,
         df.source_amount,
         df.sap_amount,
-        df.account_number,    
+        df.account_number,
         df.is_completeness_compliance,
         IF((ABS(df.source_amount) - ABS(df.sap_amount)) >= 0.05 OR (ABS(df.source_amount) - ABS(df.sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness_compliance,
         IF(df.dt_sap_reference BETWEEN df.dt_source_trigger AND DATE_ADD(df.dt_source_trigger, 30), TRUE, FALSE) AS is_temporality_compliance,
         df.dt_source_trigger,
         df.dt_sap_created,
         df.dt_sap_reference
-    FROM 
+    FROM
         df
 )
 

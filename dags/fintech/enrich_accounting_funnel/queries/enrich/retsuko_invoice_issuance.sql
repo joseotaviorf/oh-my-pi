@@ -57,9 +57,9 @@ retsuko_pre AS (
         nf.id_invoice AS id_original,
         'seu barriga' AS source_name,
         CASE
-            WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN '31101.02.01'
-            WHEN e.bill_item = 'entry.bill-item/brokerage-quinto-andar' THEN '31101.01.01'
-            WHEN e.bill_item = 'entry.bill-item/brokerage-installment-fee' THEN '31101.01.16'
+            WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN '420002'
+            WHEN e.bill_item = 'entry.bill-item/brokerage-quinto-andar' THEN '420001'
+            WHEN e.bill_item = 'entry.bill-item/brokerage-installment-fee' THEN '420004'
         END AS revenue_account,
         CASE
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN 'adm fee'
@@ -124,8 +124,8 @@ retsuko_pos AS (
         CAST(NULL AS INT) AS id_original,
         'seu barriga' AS source_name,
         CASE
-            WHEN e.bill_item = 'entry.bill-item/service-fee' THEN '31101.05.01'
-            WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN '31101.02.01'
+            WHEN e.bill_item = 'entry.bill-item/service-fee' THEN '420005'
+            WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN '420002'
         END AS revenue_account,
         CASE
             WHEN e.bill_item = 'entry.bill-item/service-fee' THEN 'service fee'
@@ -274,10 +274,10 @@ sap AS (
     SELECT
         id_finance_entity,
         CASE
-            WHEN account_number = '31101.05.01' THEN 'service fee'
-            WHEN account_number = '31101.02.01' THEN 'adm fee'
-            WHEN account_number = '31101.01.01' THEN 'brokerage quinto andar'
-            WHEN account_number = '31101.01.16' THEN 'brokerage installment fee'
+            WHEN account_number = '420005' THEN 'service fee'
+            WHEN account_number = '420002' THEN 'adm fee'
+            WHEN account_number = '420001' THEN 'brokerage quinto andar'
+            WHEN account_number = '420004' THEN 'brokerage installment fee'
         END AS revenue_account,
         account_number,
         MAX(DATE(dt_created)) AS dt_sap_created,
