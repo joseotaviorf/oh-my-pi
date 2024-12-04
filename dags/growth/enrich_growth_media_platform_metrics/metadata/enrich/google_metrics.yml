@@ -8,10 +8,12 @@ columns:
   id_account:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.id_external_customer
+      - datalake_google_ads_clean.campaigns_geo_performance.id_external_customer
     description: The account id of the Google Ads platform.
   id_campaign:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.id_campaign
+      - datalake_google_ads_clean.campaigns_geo_performance.id_campaign
     description: The id of the campaign in Google Ads.
   id_adset:
     lineage:
@@ -22,6 +24,7 @@ columns:
   account_name:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.account_snake_case
+      - datalake_google_ads_clean.campaigns_geo_performance.account_snake_case
     description: The name of the account in Google Ads.
   origin:
     description: The origin of the data. For this table, it is always Google.
@@ -30,6 +33,7 @@ columns:
   utm_campaign:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.campaign_name
+      - datalake_google_ads_clean.campaigns_geo_performance.campaign_name
     description: The UTM campaign name of the ad.
   utm_term:
     lineage:
@@ -40,6 +44,7 @@ columns:
   country_code:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.country_code
+      - datalake_google_ads_clean.campaigns_geo_performance.country_code
     description: The country code of the report.
   state:
     lineage:
@@ -52,30 +57,37 @@ columns:
   clicks:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.clicks
+      - datalake_google_ads_clean.campaigns_geo_performance.clicks
     description: Number of clicks in Google Ads.
   conversions:
     description: Number of conversions in Google Ads. This information is not available for this table.
   impressions:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.impressions
+      - datalake_google_ads_clean.campaigns_geo_performance.impressions
     description: Number of impressions in Google Ads.
   total_cost:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.cost
+      - datalake_google_ads_clean.campaigns_geo_performance.cost
     description: Total cost of the ads in Google Ads, converted to standard currency units.
   dt_cost:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.dt_loaded
+      - datalake_google_ads_clean.campaigns_geo_performance.dt_loaded
     description: Date when the cost data was loaded.
   year:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.dt_loaded
+      - datalake_google_ads_clean.campaigns_geo_performance.dt_loaded
     description: Year of the report.
   month:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.dt_loaded
+      - datalake_google_ads_clean.campaigns_geo_performance.dt_loaded
     description: Month of the report.
   day:
     lineage:
       - datalake_google_ads_clean.ad_group_geo_performance.dt_loaded
+      - datalake_google_ads_clean.campaigns_geo_performance.dt_loaded
     description: Day of the report.
