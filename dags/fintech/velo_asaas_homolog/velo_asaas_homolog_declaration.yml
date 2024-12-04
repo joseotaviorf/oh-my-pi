@@ -1,0 +1,38 @@
+---
+dag:
+  name: velo_asaas_homolog
+  schedule_interval: 0 4 * * 1
+  owner: Data Fintech
+  documentation:
+    dag_purpose: Velo is one of QuintoAndar's acquisitions, and this DAG is responsible for data ingestion from Velo's legacy bank account, ASAAS.
+workflow:
+  type: custom_ingestion
+  custom_schema: velo_asaas_homolog
+  layer: raw
+  load_spark_job: load_velo_asaas_into_datalake
+  execution_timeout_hours: 3
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ ds }}"
+    - "{extraction_type}"
+
+  tables_customization:
+    customers:
+      extraction_type: full
+    payments:
+      extraction_type: full
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.4xlarge
+    node_type_id: m5a.4xlarge
+    num_workers: 1
+    spark_version: 13.3.x-scala2.12
+    autotermination_minutes: 200
+  custom_libraries:
+    - whl: "{artifacts_bucket}/asaas_api_client_python/quintoandar_asaas_api_client-0.1.0-py2.py3-none-any.whl"

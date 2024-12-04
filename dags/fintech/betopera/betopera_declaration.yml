@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       This DAG creates the incremental tables for betopera, the integration with Insurance providers.
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   dbutils_secret_key: BETOPERA_DB
