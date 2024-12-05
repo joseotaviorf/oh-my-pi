@@ -10,7 +10,7 @@ dag:
         - offline_manual_costs
         - offline-costs-and-budget
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     offline_costs_and_budget:
