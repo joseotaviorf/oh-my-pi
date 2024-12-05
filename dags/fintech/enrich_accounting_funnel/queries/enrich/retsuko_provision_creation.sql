@@ -44,18 +44,18 @@ retsuko_provisao AS (
                 'entry.bill-item/igpm-adm-fee',
                 'entry.bill-item/ipca-adm-fee',
                 'entry.bill-item/adjustment-agreement-adm-fee',
-                'entry.bill-item/lockin') THEN '31101.02.02'
+                'entry.bill-item/lockin') THEN '420021'
             WHEN e.bill_item IN (
                 'entry.bill-item/adm-fee-adm-partner',
                 'entry.bill-item/igpm-adm-partner-adm-fee',
-                'entry.bill-item/ipca-adm-partner-adm-fee') THEN '61101.01.73'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN '31101.01.04'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-partner-select') THEN '61101.01.82'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') AND LOWER(e.description) LIKE '%consultor imobiliário%' THEN '61101.01.78'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-third-party-real-estate') THEN '61101.01.72'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-estate-agent') THEN '61101.01.71'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN '31101.01.04'
-            WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN '31101.01.13'
+                'entry.bill-item/ipca-adm-partner-adm-fee') THEN '420021'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN '420022'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-partner-select') THEN '700010'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') AND LOWER(e.description) LIKE '%consultor imobiliário%' THEN '700007'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-third-party-real-estate') THEN '700011'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-estate-agent') THEN '700006'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v1' THEN '420022'
+            WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') AND ie.version = 'v2' THEN '420023'
         END AS account_number,
         i.accrual_year_month,
         IF(e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND e.producer = 'early-termination-v2' AND e.accrual_year_month < CAST(REPLACE(LEFT(DATE(e.ts_created) + INTERVAL '1' MONTH, 7), '-', '') AS INTEGER), DATE(e.ts_created) + INTERVAL '1' MONTH, DATE(e.ts_created)) AS dt_source_trigger,
@@ -158,14 +158,13 @@ sap_gateway AS (
         datalake_sap_gateway.sync_sap_job s
             ON f.id_feature = s.id_feature
     WHERE
-        erp_solution = 'B1'
+        erp_solution in ('B1', 'S4')
         AND type = 'LCM'
 ),
 
 sap AS (
     SELECT
         hash,
-        account_number,
         account_number,
         debit_credit,
         DATE(dt_created) AS dt_sap_created,
@@ -176,10 +175,10 @@ sap AS (
         (
             dt_reference >= DATE('2024-01-01')
             AND (
-                account_number IN ('420001', '420022', '420006', '420023', '420004', '420002', '420021', '420002', '420002', '420009', '420035', '420010', '420034', '420010', '420034', '420035', '420009', '420034', '420010', '420009', '420035', '420007', '430029', '420032', '420007', '420007', '420032', '420032', '420005', '420037', '420013', '420036', '420013', '420013', '420036', '420013', '420036', '430000', '413010', '410000', '430014', '413012', '410000', '420016', '413012', '430029', '430024', '430030', '430025', '430026', '420026', '420033', '430023', '430005', '430001', '430023', '413011', '420040')
-                OR account_number IN ('700004', '700004', '700004', '700004', '700004', '700004', '700004', '700004', '700004', '700004', '700004', '700004', '700012', '700007', '700005', '700006', '700011', '700008', '700006', '700013', '700009', '700007', '700004', '700006', '700004', '700010', '700014', '700016', '700016', '700015', '700004')
+                account_number IN ('420001', '420022', '420006', '420023', '420004', '420002', '420021', '420009', '420035', '420010', '420034', '420007', '430029', '420032', '420005', '420037', '420013', '420036', '430000', '413010', '410000', '430014', '413012', '420016', '430024', '430030', '430025', '430026', '420026', '420033', '430023', '430005', '413011', '420040')
+                OR account_number IN ('700004', '700012', '700007', '700005', '700006', '700011', '700008', '700013', '700009', '700010', '700014', '700016', '700015')
             )
-            AND  transaction_type = 'SA'
+            --AND  transaction_type = 'SA'
         )
         OR
         (
