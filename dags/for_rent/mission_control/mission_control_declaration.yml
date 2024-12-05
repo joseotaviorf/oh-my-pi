@@ -10,8 +10,8 @@ workflow:
   layer: raw
   custom_schema: mission_control
   database_type: mysql
-  source_database: mission_control
-  source_schema: mission_control
+  source_database: missioncontrol
+  source_schema: missioncontrol
   lineage_product_database_name: missioncontrol
   dbutils_secret_key: MISSION_CONTROL_DB
   tables_customization:
