@@ -70,7 +70,7 @@ tasks AS (
   FROM
     datalake_quinto_messenger_clean.task
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY AND "{load_end_date}"
     AND is_spoc_task IS FALSE
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
@@ -120,3 +120,5 @@ LEFT JOIN
   sauron_sessions AS ss
     ON ss.id_session = ias.id_session
     OR ss.id_session = ws.id_session
+WHERE
+  COALESCE(ias.id_session, ws.id_session) IS NOT NULL
