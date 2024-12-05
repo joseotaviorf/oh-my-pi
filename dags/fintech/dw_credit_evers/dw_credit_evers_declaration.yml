@@ -17,6 +17,9 @@ workflow:
   short_circuit_customization:
     function: CHECK_IS_LAST_BUSINESS_DAY_OF_MONTH
   custom_schema: credit_evers
+  inner_dependencies:
+    fact_credit_evers_original_due_date:
+      - fact_ever_invoices
   spark_session_configs:
     udfs: [FINTECHOPS_WORK_MIN_SLA]
 cluster:

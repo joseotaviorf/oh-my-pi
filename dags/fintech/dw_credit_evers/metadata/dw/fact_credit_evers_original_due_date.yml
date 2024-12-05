@@ -16,40 +16,28 @@ columns:
     lineage:
       - datalake_invoice.credit_invoice_original_due_date.id_proposal
     description: "Proposal ID of contract"
+  invoice_anchor:
+    description: "First invoice of the reference contract"
+  invoice_origin:
+    description: "Last invoice of the reference contract"  
   months_of_contract:
     description: "Age of contracts in month, if ended, the total age"
   contract_mob_number:
     description: "Auxiliary array for explode the contract by its monthly age classifications"
   contract_ever_number:
     description: "Auxiliary array for explode the contract by its delay classification"
-  invoice_anchor:
-    description: "First invoice of the reference contract"  
-  invoice_anchor_debt_forgiveness:
-    description: "First invoice of the reference contract for debt forgiveness"  
-  invoice_anchor_fraud:
-    description: "First invoice of the reference contract for fraud"  
-  is_ever:
-    description: "Operation that determines if the delay of invoice is higher than the auxiliary ever classification columns and takes the maximum"
-  is_ever_fraud:
-    description: "Same as is_ever, but only for fraud"
   num_overs_in_mob_window:
     description: "Operation that determines how many times the contract had an invoice positively over in delay by age evolution"
-  num_overs_in_mob_window_debt_forgiveness:
-    description: "Same as num_overs_in_mob_window, but only for debt_forgiveness"
-  num_overs_in_mob_window_fraud:
-    description: "Same as num_overs_in_mob_window, but only for fraud"
+  total_due_amount_in_mob_window:
+    description: "Operation that determines how much money the contract had over in delay by maximum age in mob view"
   num_total_overs:
     description: "Operation that determines how many times the contract had an invoice positively over in delay to maximum age"
-  num_total_overs_debt_forgiveness:
-    description: "Same as num_total_overs, but only for debt_forgiveness"
-  num_total_overs_fraud:
-    description: "Same as num_total_overs, but only for fraud"
   total_due_amount:
     description: "Operation that determines how much money the contract had over in delay by maximum age"
-  total_due_amount_debt_forgiveness:
-    description: "Same as total_due_amount, but only for debt_forgiveness"
-  total_due_amount_fraud:
-    description: "Same as total_due_amount, but only for fraud"
+  is_ever:
+    description: "Operation that determines if the delay of invoice is higher than the auxiliary ever classification columns and takes the maximum"
+  is_agreement:
+    description: "Operation that determines if the ever was an agreement"
   ts_signature:
     lineage:
       - datalake_invoice.credit_invoice_original_due_date.ts_signature
@@ -60,3 +48,5 @@ columns:
     lineage:
       - datalake_invoice.credit_invoice_original_due_date.dt_contract_updated
     description: "Last date that the contract had informations updated in main"
+  dt_cancellation:
+    description: "Date cancellation when the contract was an agreement"

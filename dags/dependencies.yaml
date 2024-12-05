@@ -253,7 +253,16 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat_credit_engine:load-clean-variant
 bietlejuice.dw_credit_evers:
+  - bietlejuice.dw_collection_recovery:load-dw-collection-recovery-fact-negotiation
+  - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
+  - bietlejuice.enrich_retsuko:load-enrich-bill-items
+  - bietlejuice.enrich_retsuko:load-enrich-debt-forgiveness
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.retsuko:load-clean-account
+  - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.trato_feito:load-clean-negotiation
 bietlejuice.dw_crm:
   - bietlejuice.ebdb_inspections:load-clean-inspection
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal
