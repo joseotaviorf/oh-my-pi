@@ -7,7 +7,7 @@ dag:
       More information about the Fact's architecture can be found at [this diagram] (https://app.diagrams.net/#G1aM-IGy6JcG1rxB0IyDxOJpyCU6GMoFzm) under the "New Arch" tab.
   owner: Data Growth
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: marketing_costs
   default_extraction_type: incremental
