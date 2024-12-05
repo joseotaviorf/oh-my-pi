@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_pricing
 table_name: listing_price_change
 description: Enrich table that handles sale and rental listing price change information and enriches it with some comparison columns and pricing scheme information.
-  Each row represents a price exchange for the listing.
+  If the price change occurred before versioning, it will be associated with the first version of the listing. Each row represents a price exchange for the listing.
 domain: For Rent
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -22,7 +22,7 @@ columns:
   id_revision:
     lineage:
       - datalake_ebdb_clean.house_aud.rev
-    description: Foreign key reffering to the revision entity of the price change.
+    description: Foreign key refering to the revision entity of the price change.
   business_context:
     description: Listing business context.
     categories:

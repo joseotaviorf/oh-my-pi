@@ -8,12 +8,6 @@ WITH house_aud AS (
         h_aud.rent AS rent_price,
         h_aud.sale_price AS sale_price,
         lbc.ts_first_publication,
-        CASE
-            WHEN lbc.ts_first_publication >= r.ts_revision OR lbc.ts_first_publication IS NULL THEN 'UNPUBLISHED'
-            ELSE 'PUBLISHED'
-        END AS status_threshold,
-        /* The purpose of creating this threshold is to take the last line before the listing is published, so that we have the first price. */
-        ROW_NUMBER() OVER (PARTITION BY h_aud.id_house, lbc.business_context, IF(lbc.ts_first_publication >= r.ts_revision OR lbc.ts_first_publication IS NULL, 'UNPUBLISHED', 'PUBLISHED') ORDER BY h_aud.rev DESC) AS threshold,
         /* We can't trust the mod_sale_price flag in 100% of cases, so we need to check if the price has changed manually. */
         LAG(h_aud.rent) OVER (PARTITION BY h_aud.id_house, lbc.business_context ORDER BY r.ts_revision, h_aud.rev) IS DISTINCT FROM h_aud.rent AS has_rent_price_changed,
         LAG(h_aud.sale_price) OVER (PARTITION BY h_aud.id_house, lbc.business_context ORDER BY r.ts_revision, h_aud.rev) IS DISTINCT FROM h_aud.sale_price AS has_sale_price_changed,
@@ -43,13 +37,8 @@ rent_price_threshold AS (
     FROM
         house_aud
     WHERE
-        /* Filter the last price before publication and all changes while published. (Avoids price changes before deciding on the price that will actually be published). */
         business_context = 'RENT'
-        AND
-        (
-            (status_threshold = 'UNPUBLISHED' AND threshold = 1)
-            OR (status_threshold = 'PUBLISHED' AND has_rent_price_changed)
-        )
+        AND has_rent_price_changed
 ),
 sale_price_threshold AS (
     SELECT
@@ -63,12 +52,8 @@ sale_price_threshold AS (
     FROM
         house_aud
     WHERE
-        /* Filter the last price before publication and all changes while published. (Avoids price changes before deciding on the price that will actually be published). */
         business_context = 'SALE'
-        AND (
-            (status_threshold = 'UNPUBLISHED' AND threshold = 1)
-            OR (status_threshold = 'PUBLISHED' AND has_sale_price_changed)
-        )
+        AND has_sale_price_changed
 ),
 rent_price_lag AS (
     SELECT
@@ -108,7 +93,6 @@ rent_price_interval AS (
         business_context,
         rent_price,
         lag_price,
-        IF(ROW_NUMBER() OVER (PARTITION BY id_house, dt_change ORDER BY ts_revision DESC) = 1, TRUE, FALSE) AS is_last_price_of_day,
         ts_revision AS ts_price_started,
         LEAD(ts_revision) OVER (PARTITION BY id_house ORDER BY ts_revision) AS ts_price_ended
     FROM
@@ -122,7 +106,6 @@ sale_price_interval AS (
         business_context,
         sale_price,
         lag_price,
-        IF(ROW_NUMBER() OVER (PARTITION BY id_house, dt_change ORDER BY ts_revision DESC) = 1, TRUE, FALSE) AS is_last_price_of_day,
         ts_revision AS ts_price_started,
         LEAD(ts_revision) OVER (PARTITION BY id_house ORDER BY ts_revision) AS ts_price_ended
     FROM
@@ -189,8 +172,7 @@ rent_price_changes_listing AS (
         pi.business_context,
         pi.rent_price AS price,
         LAG(pi.rent_price) OVER (PARTITION BY pi.id_house ORDER BY ts_price_started) AS lag_price,
-        pi.is_last_price_of_day,
-        IF(pi.ts_price_started < rsvo.ts_listing_version_start, rsvo.ts_listing_version_start, pi.ts_price_started) AS ts_price_started,
+        pi.ts_price_started,
         pi.ts_price_ended
     FROM
         rent_price_interval AS pi
@@ -200,7 +182,7 @@ rent_price_changes_listing AS (
             AND IF(
                 rsvo.is_first_version AND pi.ts_price_started < rsvo.ts_listing_version_start,
                 rsvo.ts_listing_version_start BETWEEN pi.ts_price_started AND COALESCE(pi.ts_price_ended, TO_TIMESTAMP(CURRENT_DATE)),
-                pi.ts_price_started BETWEEN rsvo.ts_listing_version_start AND COALESCE(rsvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
+                pi.ts_price_started >= rsvo.ts_listing_version_start AND pi.ts_price_started < COALESCE(rsvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
             )
 ),
 sale_price_changes_listing AS (
@@ -212,8 +194,7 @@ sale_price_changes_listing AS (
         pi.business_context,
         pi.sale_price AS price,
         LAG(pi.sale_price) OVER (PARTITION BY pi.id_house ORDER BY ts_price_started) AS lag_price,
-        pi.is_last_price_of_day,
-        IF(pi.ts_price_started < ssvo.ts_listing_version_start, ssvo.ts_listing_version_start, pi.ts_price_started) AS ts_price_started,
+        pi.ts_price_started,
         pi.ts_price_ended
     FROM
         sale_price_interval AS pi
@@ -223,7 +204,7 @@ sale_price_changes_listing AS (
             AND IF(
                 ssvo.is_first_version AND pi.ts_price_started < ssvo.ts_listing_version_start,
                 ssvo.ts_listing_version_start BETWEEN pi.ts_price_started AND COALESCE(pi.ts_price_ended, TO_TIMESTAMP(CURRENT_DATE)),
-                pi.ts_price_started BETWEEN ssvo.ts_listing_version_start AND COALESCE(ssvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
+                pi.ts_price_started >= ssvo.ts_listing_version_start AND pi.ts_price_started < COALESCE(ssvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
             )
 ),
 rent_price_changes_variation AS (
@@ -247,7 +228,7 @@ rent_price_changes_variation AS (
         ts_price_started,
         ts_price_ended
     FROM
-    rent_price_changes_listing
+        rent_price_changes_listing
 ),
 sale_price_changes_variation AS (
     SELECT
@@ -266,11 +247,11 @@ sale_price_changes_variation AS (
         (price - lag_price)/NULLIF(lag_price, 0) AS last_price_variation,
         (price - MIN(IF(lag_price IS NULL, price, NULL)) OVER (PARTITION BY id_house))/NULLIF(MIN(IF(lag_price IS NULL, price, NULL)) OVER (PARTITION BY id_house), 0) AS first_price_variation,
         IF(lag_price IS NULL, TRUE, FALSE) AS is_first_price,
-        is_last_price_of_day,
+        IF(ROW_NUMBER() OVER (PARTITION BY id_house, DATE(ts_price_started) ORDER BY ts_price_started DESC) = 1, TRUE, FALSE) AS is_last_price_of_day,
         ts_price_started,
         ts_price_ended
     FROM
-    sale_price_changes_listing
+        sale_price_changes_listing
 )
 SELECT
     id_house,
@@ -296,7 +277,7 @@ SELECT
     ts_price_started,
     ts_price_ended
 FROM
-rent_price_changes_variation
+    rent_price_changes_variation
 
 UNION ALL
 
