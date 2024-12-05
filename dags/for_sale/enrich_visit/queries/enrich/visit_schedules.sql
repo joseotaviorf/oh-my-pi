@@ -318,13 +318,13 @@ buyer_review AS (
 ),
 filtered_vsl AS(
   SELECT
+    DISTINCT
     id_schedule,
     id_visit
   FROM
     datalake_ebdb_clean.visit_status_log
   WHERE 
       ts_created >= '2024-11-01'
-  AND event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
 ),
 filtered_visit AS (
   SELECT
