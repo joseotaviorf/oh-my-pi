@@ -40,7 +40,7 @@ columns:
       SALE_COMPLETED: If the listing is already sold during the change
       SUSPENDED: If the listing is suspended during the change
       UNPUBLISHED: If the listing is unpublished during the change
-  ticket_segmentation:
+  price_segment:
     description: >
       'Ticket segmentation of the listing.'
     categories:

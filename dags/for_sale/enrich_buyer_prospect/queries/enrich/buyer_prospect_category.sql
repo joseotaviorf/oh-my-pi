@@ -84,7 +84,7 @@ SELECT DISTINCT
   FIRST(cb.id_house) OVER (PARTITION BY cbtf.id_prospect, cbtf.activation_date ORDER BY cb.ts_event ASC) AS id_house_first_booking,
   cbtf.bp_type,
   cbtf.city_group,
-  slpc.ticket_segmentation,
+  slpc.price_segment,
   cbtf.activation_date,
   cbtf.activation_end_date,
   FIRST(cb.ts_event) OVER (PARTITION BY cbtf.id_prospect ORDER BY cb.ts_event ASC) AS ts_first_booking,

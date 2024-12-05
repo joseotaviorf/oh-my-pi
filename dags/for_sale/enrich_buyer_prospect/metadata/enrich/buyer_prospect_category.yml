@@ -33,13 +33,13 @@ columns:
     description: 'City group of the prospect.'
     lineage:
     - datalake_region.region.city_group
-  ticket_segmentation:
+  price_segment:
     description: 'Segmentation of the ticket of the first visit of the prospect.'
     categories:
       "High Ticket": "High Ticket"
       "Low Ticket": "Low Ticket"
     lineage:
-    - datalake_sale_listings.sale_listing_price_changes.ticket_segmentation
+    - datalake_sale_listings.sale_listing_price_changes.price_segment
   activation_date:
     description: 'Date of activation of the prospect.'
     lineage:

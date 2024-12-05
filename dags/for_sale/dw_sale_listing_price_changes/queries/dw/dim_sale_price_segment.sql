@@ -1,10 +1,10 @@
 SELECT DISTINCT
-  DENSE_RANK() over (ORDER BY ticket_segmentation) AS sk_sale_price_segment,
-  ticket_segmentation AS price_segment,
+  DENSE_RANK() over (ORDER BY price_segment) AS sk_sale_price_segment,
+  price_segment,
   CASE
-    WHEN ticket_segmentation = 'High Ticket' 
+    WHEN price_segment = 'High Ticket' 
       THEN 'HT'
-    WHEN ticket_segmentation = 'Low Ticket'
+    WHEN price_segment = 'Low Ticket'
       THEN 'LT'
   END AS price_segment_short
 FROM 

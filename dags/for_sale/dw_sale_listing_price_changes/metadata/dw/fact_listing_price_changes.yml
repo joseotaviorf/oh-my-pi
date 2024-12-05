@@ -30,6 +30,11 @@ columns:
     - datalake_sale_listings.sale_listing_price_changes.id_region
     description: Foreign key of region where house listing is located in. Can be joined
       with dw_public.dim_region.
+  sk_sale_price_segment:
+    lineage:
+    - datalake_sale_listings.sale_listing_price_changes.sk_sale_price_segment
+    description: Foreign key referring to the ticket segmentation of the listing. Can
+      be joined with dw_sale_listing_price_changes.dim_sale_price_segment.
   sk_price_started_date:
     lineage:
     - datalake_sale_listings.sale_listing_price_changes.ts_price_started
