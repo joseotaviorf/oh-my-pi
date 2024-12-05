@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from argparse import ArgumentParser
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -150,6 +151,11 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
             )
 
             df = spark.sql(feedback_parameters_query)
+
+            while df.rdd.isEmpty():
+                logger.warning(f"m={job_name}, environment={environment}, dag_execution_date={args.execution_date}, table_name={table_name}, msg=DataFrame is empty for workspace {workspace}. Waiting 5 minutes.")
+                time.sleep(300)
+                df = spark.sql(feedback_parameters_query)
 
             feedback_parameters = list(map(lambda row: row.asDict(), df.collect()))
 
