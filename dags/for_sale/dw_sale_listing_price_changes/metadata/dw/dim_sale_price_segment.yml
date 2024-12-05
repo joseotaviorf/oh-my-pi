@@ -1,5 +1,5 @@
 ---
-database_name: dw_sale_listing_price_changes
+database_name: dw_sale
 table_name: dim_sale_price_segment
 owner: leonardo.soares@quintoandar.com.br
 domain: for_sale

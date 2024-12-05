@@ -5,6 +5,9 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: sale
+  inner_dependencies:
+    fact_listing_price_changes:
+      - dim_sale_price_segment
 cluster:
   type: databricks_12_2_med_general_cluster
   access_control_list:
