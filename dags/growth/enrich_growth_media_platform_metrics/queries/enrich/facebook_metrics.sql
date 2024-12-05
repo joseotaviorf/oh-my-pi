@@ -13,7 +13,13 @@ SELECT
     -- Regions
     country_code,
     regexp_replace(region, '\\(.*?\\)', '') AS state,
-    NULL::STRING AS city, -- not available in the table
+    CASE 
+        WHEN region = 'Minas Gerais' THEN 'Belo Horizonte'
+        WHEN region = 'Rio de Janeiro (state)' THEN 'Rio de Janeiro'
+        WHEN region = 'Rio Grande do Sul' THEN 'Porto Alegre'
+        WHEN region = 'São Paulo (state)' THEN 'São Paulo'
+      ELSE NULL::STRING 
+    END AS city, -- not available in the table
     -- Metrics
     clicks,
     NULL::BIGINT AS conversions,

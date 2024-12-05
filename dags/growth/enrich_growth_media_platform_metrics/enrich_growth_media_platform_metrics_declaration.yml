@@ -13,6 +13,8 @@ workflow:
   custom_schema: growth_media_platform
   default_extraction_type: incremental
   default_partitions: ["origin", "year", "month", "day"]
+  spark_session_configs:
+    udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"

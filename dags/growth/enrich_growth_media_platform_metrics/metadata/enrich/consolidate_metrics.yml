@@ -33,6 +33,10 @@ columns:
       - datalake_growth_media_platform.google_metrics.id_ad
       - datalake_growth_media_platform.trovit_metrics.id_ad
     description: The id of the ad in media platform.
+  id_region:
+    lineage:
+      - datalake_region.region
+    description: Id of the region. 
   account_name:
     lineage:
       - datalake_growth_media_platform.criteo_metrics.account_name
@@ -124,6 +128,18 @@ columns:
       - datalake_growth_media_platform.google_metrics.total_cost
       - datalake_growth_media_platform.trovit_metrics.total_cost
     description: Total cost of the media on ads.
+  current_campaign_name:
+    lineage:
+      - datalake_growth_media_platform.campaign_name_history
+    description: Current campaign name. 
+  last_campaign_name:
+    lineage:
+      - datalake_growth_media_platform.campaign_name_history
+    description: Last campaign name before current one. 
+  dt_campaign_name_last_change:
+    lineage:
+      - datalake_growth_media_platform.campaign_name_history
+    description: Date of last campaign name change. 
   dt_cost:
     lineage:
       - datalake_growth_media_platform.criteo_metrics.dt_cost
