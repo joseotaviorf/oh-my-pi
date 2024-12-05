@@ -1,0 +1,18 @@
+---
+database_name: datalake_gsheets_clean
+table_name: historical_lead_reason
+description: This gsheet contains all the entries from EBDB's vw_lead_reason view, which was previously loaded to our
+  data lake as datalake_ebdb_clean.lead_reason table. As we migrated EBDB load to CDC, it doesn't support views anymore 
+  and we also found out that the vw_lead_reason is legacy and shouldn't be accounted anymore.
+  So for historical reason as it's used in the dw_lead pipeline, we decided to create a static gsheet with its information.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  reason:
+    lineage:
+      - datalake_gsheets_raw.historical_lead_reason.reason
+    description: "Reason for lead discard"
+  reason_detail:
+    lineage:
+      - datalake_gsheets_raw.historical_lead_reason.reason_detail
+    description: "Detailed reason for lead discard"
