@@ -27,7 +27,7 @@ SELECT
   UUID() AS id,
   CAST(CONCAT(dl.sk_house, DATE_FORMAT(DATE('{load_end_date}'), 'yyyyMMdd')) AS STRING) AS business_id,
   dl.sk_house AS id_house,
-  COALESCE(dc.uuid_company, '1P') AS company_uuid,
+  COALESCE(dc.uuid_company, '44bab39d-39e5-44b9-88fe-0a1a800c0bb3') AS company_uuid,
   'SALE' AS business_context,
   CASE
     WHEN fl.days_as_published <= 30 AND ds.general_demand_score < 3 THEN 3
