@@ -768,6 +768,7 @@ bietlejuice.reverse_dsat_report_access:
     - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report
 bietlejuice.reverse_listings_report_access:
   add:
+    - bietlejuice.reverse_listings_report_load:load-reverse-demand-score
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-sent
     - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-published

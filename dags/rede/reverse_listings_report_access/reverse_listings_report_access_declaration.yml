@@ -9,34 +9,46 @@ workflow:
   load_spark_job: load_into_sns
   spark_job_arguments:
     - "{dag_name}"
-    - "reverse_listings_report" # Database name
+    - "reverse_listings_report"
     - "{table_name}"
     - "{{ ds }}"
   tables_customization:
+    demand_score:
+      extra_spark_job_arguments:
+        - DEMAND_SCORE
+        - sns_topic_arn_scores
     sale_listing_traffic:
       extra_spark_job_arguments:
         - NEW_LISTING_TRAFFIC
+        - sns_topic_arn_reports
     sale_listing_published:
       extra_spark_job_arguments:
         - NEW_LISTING_PUBLISHED
+        - sns_topic_arn_reports
     sale_ongoing_listings:
       extra_spark_job_arguments:
         - ONGOING_LISTINGS
+        - sns_topic_arn_reports
     sale_listing_visit_scheduled:
       extra_spark_job_arguments:
         - NEW_LISTING_VISIT_SCHEDULED
+        - sns_topic_arn_reports
     sale_listing_visit_confirmed:
       extra_spark_job_arguments:
         - NEW_LISTING_VISIT_CONFIRMED
+        - sns_topic_arn_reports
     sale_listing_offer_sent:
       extra_spark_job_arguments:
         - NEW_LISTING_OFFER_SENT
+        - sns_topic_arn_reports
     sale_listing_offer_accepted:
       extra_spark_job_arguments:
         - NEW_LISTING_OFFER_ACCEPTED
+        - sns_topic_arn_reports
     sale_listing_signed_contract:
       extra_spark_job_arguments:
         - NEW_LISTING_SIGNED_CONTRACT
+        - sns_topic_arn_reports
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
@@ -54,4 +66,4 @@ cluster:
         zone_id: us-east-1d
         availability: SPOT_WITH_FALLBACK
         ebs_volume_size: 200
-        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"
+        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}" 

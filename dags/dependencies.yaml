@@ -3508,6 +3508,7 @@ bietlejuice.reverse_dsat_report_load:
   - bietlejuice.enrich_survicate:load-enrich-survey-questions
   - bietlejuice.enrich_survicate:load-enrich-survey-responses
 bietlejuice.reverse_listings_report_access:
+  - bietlejuice.reverse_listings_report_load:load-reverse-demand-score
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-sent
   - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-published
@@ -3524,6 +3525,8 @@ bietlejuice.reverse_listings_report_load:
   - bietlejuice.dw_rede_supply:load-dw-rede-fact-lead-3p-status-reason
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type
   - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event
+  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_ongoing_listings:load-dw-sale-fact-daily-ongoing-listing

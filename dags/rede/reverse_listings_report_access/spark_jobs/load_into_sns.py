@@ -16,11 +16,11 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def main():
-    dag_name, database_name, table_name, event_type, execution_date = (
+    dag_name, database_name, table_name, event_type, execution_date, sns_topic_arn = (
         parse_arguments()
     )
     config_service = ConfigurationService(dag_name)
-    sns_topic_arn = config_service.get_config("sns_topic_arn")
+    sns_topic_arn = config_service.get_config(sns_topic_arn)
     logger.info(
         f"""m=__main__, database_name={database_name}, table_name={table_name},
         event_type={event_type}, sns_topic_arn={sns_topic_arn}, execution_date={execution_date}"""
@@ -45,6 +45,7 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
         "execution_date", help="Date of the execution in the format YYYY-MM-DD"
     )
     parser.add_argument("event_type", help="Type of event to be sent to SNS")
+    parser.add_argument("sns_topic_arn", help="ARN of the SNS topic to send the messages to")
 
     args = parser.parse_args()
 
@@ -53,8 +54,9 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     table_name = args.table_name
     event_type = args.event_type
     execution_date = datetime.fromisoformat(args.execution_date)
+    sns_topic_arn = args.sns_topic_arn
 
-    return dag_name, database_name, table_name, event_type, execution_date
+    return dag_name, database_name, table_name, event_type, execution_date, sns_topic_arn
 
 
 def load_table_into_sns(
