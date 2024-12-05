@@ -54,10 +54,12 @@ columns:
     lineage:
       - datalake_listing_contracts.listing_contracts.id_contract
     description: Key of the listing's previous contract.
+      This column links the contract of the previous listing, independently if the listing has a contract.
   sk_next_contract:
     lineage:
       - datalake_listing_contracts.listing_contracts.id_contract
     description: Key of the listing's next contract.
+      This column links the contract of the next listing that has a contract.
   sk_condo:
     lineage:
       - datalake_ebdb_clean.condo.id
