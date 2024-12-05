@@ -5,7 +5,7 @@ WITH facebook AS (
     campaign_name,
     MIN(dt_start) AS dt_start
   FROM 
-    datalake_facebook_insights_clean.facebook_insights
+    datalake_facebook_insights_clean.facebook_ads_insights_by_region
   WHERE 
     DATE(dt_start) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   GROUP BY ALL
@@ -20,30 +20,6 @@ criteo AS (
     datalake_criteo.criteo_campaigns
   WHERE 
     DATE(dt_report) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  GROUP BY ALL
-),
-mitula AS (
-  SELECT
-    'mitula' AS origin,
-    id_campaign,
-    campaign_name,
-    MIN(dt_attribution) AS dt_start
-  FROM 
-    datalake_lifull_campaigns_clean.mitula_campaigns
-  WHERE 
-    DATE(dt_attribution) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  GROUP BY ALL
-),
-rtb AS (
-  SELECT
-    'rtb' AS origin,
-    id_sub_campaign AS id_campaign,
-    sub_campaign_name AS campaign_name,
-    MIN(dt_attribution) AS dt_start
-  FROM 
-    datalake_rtb_campaigns_clean.rtb_campaigns
-  WHERE 
-    DATE(dt_attribution) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   GROUP BY ALL
 ),
 trovit AS (
@@ -65,7 +41,7 @@ google AS (
     campaign_name,
     MIN(dt_loaded) AS dt_start
   FROM 
-    datalake_google_ads_clean.ads_performance
+    datalake_google_ads_clean.ad_group_geo_performance
   WHERE 
     DATE(dt_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   GROUP BY ALL 
@@ -76,32 +52,10 @@ google AS (
     campaign_name,
     MIN(dt_loaded) AS dt_start
   FROM 
-    datalake_google_ads_clean.keywords_performance
+    datalake_google_ads_clean.campaigns_geo_performance
   WHERE 
     DATE(dt_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   GROUP BY ALL 
-  UNION ALL
-  SELECT 
-    'google' AS origin,
-    id_campaign,
-    campaign_name,
-    MIN(dt_loaded) AS dt_start
-  FROM 
-    datalake_google_ads_clean.campaigns_performance
-  WHERE 
-    DATE(dt_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  GROUP BY ALL 
-  UNION ALL
-  SELECT 
-      'google' AS origin,
-      id_campaign,
-      campaign_name,
-      MIN(dt_loaded) AS dt_start
-  FROM 
-    datalake_google_ads_clean.videos_performance
-  WHERE 
-    DATE(dt_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  GROUP BY ALL
 ),
 base AS (
   SELECT * FROM google
@@ -110,11 +64,7 @@ base AS (
   UNION ALL
   SELECT * FROM criteo
   UNION ALL
-  SELECT * FROM mitula
-  UNION ALL
   SELECT * FROM trovit
-  UNION ALL
-  SELECT * FROM rtb
 ),
 base_deduplicated AS (
   SELECT 

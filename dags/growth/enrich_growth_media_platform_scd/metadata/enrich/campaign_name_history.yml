@@ -11,44 +11,31 @@ columns:
   id_campaign:
     description: "Unique identifier for each campaign across different media platforms."
     lineage:
-      - datalake_facebook_insights_clean.facebook_insights.id_campaign
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.id_campaign
       - datalake_criteo.criteo_campaigns.id_campaign
-      - datalake_lifull_campaigns_clean.mitula_campaigns.id_campaign
-      - datalake_rtb_campaigns_clean.rtb_campaigns.id_sub_campaign
       - datalake_lifull_campaigns_clean.trovit_campaigns.id_campaign
-      - datalake_google_ads_clean.ads_performance.id_campaign
-      - datalake_google_ads_clean.keywords_performance.id_campaign
-      - datalake_google_ads_clean.campaigns_performance.id_campaign
-      - datalake_google_ads_clean.videos_performance.id_campaign
+      - datalake_google_ads_clean.ad_group_geo_performance.id_campaign
+      - datalake_google_ads_clean.campaigns_geo_performance.id_campaign
   origin:
     description: "Source platform of the campaign data."  
 
   campaign_name:
     description: "Name of the campaign provided by each media platform."
     lineage:
-      - datalake_facebook_insights_clean.facebook_insights.campaign_name
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.campaign_name
       - datalake_criteo.criteo_campaigns.campaign_name
-      - datalake_lifull_campaigns_clean.mitula_campaigns.campaign_name
-      - datalake_rtb_campaigns_clean.rtb_campaigns.sub_campaign_name
       - datalake_lifull_campaigns_clean.trovit_campaigns.campaign_name
-      - datalake_google_ads_clean.ads_performance.campaign_name
-      - datalake_google_ads_clean.keywords_performance.campaign_name
-      - datalake_google_ads_clean.campaigns_performance.campaign_name
-      - datalake_google_ads_clean.videos_performance.campaign_name
+      - datalake_google_ads_clean.ad_group_geo_performance.campaign_name
+      - datalake_google_ads_clean.campaigns_geo_performance.campaign_name
   is_current:
     description: "Indicates if the record represents the latest data for a campaign, marked as True for current records."
   dt_start:
     description: "Earliest start date of the campaign as per platform data."
     lineage:
-      - datalake_facebook_insights_clean.facebook_insights.dt_start
+      - datalake_facebook_insights_clean.facebook_ads_insights_by_region.dt_start
       - datalake_criteo.criteo_campaigns.dt_report
-      - datalake_lifull_campaigns_clean.mitula_campaigns.dt_attribution
-      - datalake_rtb_campaigns_clean.rtb_campaigns.dt_attribution
       - datalake_lifull_campaigns_clean.trovit_campaigns.dt_attribution
-      - datalake_google_ads_clean.ads_performance.dt_loaded
-      - datalake_google_ads_clean.keywords_performance.dt_loaded
-      - datalake_google_ads_clean.campaigns_performance.dt_loaded
-      - datalake_google_ads_clean.videos_performance.dt_loaded
-
+      - datalake_google_ads_clean.ad_group_geo_performance.dt_loaded
+      - datalake_google_ads_clean.campaigns_geo_performance.dt_loaded
   dt_end:
     description: "End date of the campaign, null if currently active."
