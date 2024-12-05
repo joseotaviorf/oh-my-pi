@@ -9,6 +9,7 @@ workflow:
   type: cdc
   layer: raw
   database_type: mysql
+  source_database: arquivoconfidencial
   source_schema: arquivoconfidencial
   dbutils_secret_key: ARQUIVOCONFIDENCIAL_DB
   lineage_product_database_name: arquivoconfidencial
