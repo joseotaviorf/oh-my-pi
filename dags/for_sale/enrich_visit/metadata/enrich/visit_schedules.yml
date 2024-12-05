@@ -55,7 +55,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.preferred_fixed_agent.id_agent_data
     description: ID of the fixed agent associated with the buyer when the schedule was created.
-      ID of the fixed agent associated with the buyer when the booking was created.
   id_user_sale_attendence_5a:
     lineage:
      - datalake_hub_services.secretariat_hierarchy.id_user_5a
@@ -102,9 +101,14 @@ columns:
       Code of the visit.
   business_context:
     lineage:
-      - datalake_visit.visit_status_events.business_context
+      - datalake_ebdb_clean.visit.business_context
     description:
       Business context of the schedule.
+  business_model:
+    lineage:
+      - datalake_ebdb_clean.visit.business_model
+    description:
+      Business model of the visit.
   method:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.key_location
@@ -128,7 +132,7 @@ columns:
       - datalake_ebdb_clean.work_contract.contract_name
     description: Name of the contract of the agent associated with the booking, if the contract is from a hub.
   is_hub_flow:
-    description: True if the visit is from an agent with HUB active workcontract
+    description: True if the visit is from an agent with HUB active workcontract.
   is_house_rented:
     lineage:
       datalake_ebdb_contract.contract.status

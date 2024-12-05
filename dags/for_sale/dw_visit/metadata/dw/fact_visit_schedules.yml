@@ -14,11 +14,11 @@ columns:
       - datalake_visits.visit_schedules.id_visit
     description:
       Is the visit unique key. Joins with visit table.
-  sk_author_creator:
+  sk_region:
     lineage:
-      - datalake_visits.visit_schedules.id_author_user
+      - datalake_visits.visit_schedules.id_region
     description:
-      Is the key of the responsible for the event.
+      Is the id of region.
   sk_business_context:
     lineage:
       - dw_visit.dim_business_context.sk_business_context
@@ -29,6 +29,76 @@ columns:
       - dw_visit.dim_business_context.sk_business_context
     description:
       Is the key of the visit model.
+  sk_behavior_type:
+    lineage:
+      - datalake_visit.visit_schedules.behavior
+    description:
+      What is the behavior of the visit.
+  sk_business_model:
+    lineage:
+      - datalake_visit.visit_schedules.business_model
+    description:
+      Business model of the visit.
+  sk_business_unit:
+    lineage:
+      - datalake_visit.visit_schedules.id_business_unit
+    description:
+      ID of the business unit associated with the booking. Can be joined with datalake_hub_services_clean.business_unit.
+  sk_company_supply:
+    lineage:
+      - datalake_visit.visit_schedules.id_company_supply
+    description:
+      Id of the company in Rede QuintoAndar associated with the house.
+  sk_company_demand:
+    lineage:
+      - datalake_visit.visit_schedules.id_company_demand
+    description:
+      Id of the company in Rede QuintoAndar associated with the agent.
+  sk_agent:
+    lineage:
+      - datalake_visit.visit_schedules.id_agent
+    description:
+      Is the id agent of the agent.
+  sk_user_agent:
+    lineage:
+      - datalake_visit.visit_schedules.id_user_agent
+    description:
+      Is the user Id of the agent.
+  sk_user_en:
+    lineage:
+      - datalake_visit.visit_schedules.id_user_en
+    description:
+      ID of the user of the trading executive.
+  sk_fixed_agent:
+    lineage:
+      - datalake_visit.visit_schedules.id_fixed_agent
+    description:
+      ID of the fixed agent associated with the buyer when the schedule was created.
+  sk_author_creator:
+    lineage:
+      - datalake_visit.visit_schedules.id_user_creation
+    description:
+      Creator of the schedule.
+  sk_author_cancelation:
+    lineage:
+      - datalake_visit.visit_schedules.id_user_cancelation
+    description:
+      Who canceled the schedule.
+  visit_code:
+    lineage:
+      - datalake_visit.visit_schedules.visit_code
+    description:
+      Code of the visit.
+  sk_offer:
+    lineage:
+      - datalake_visit.visit_schedules.id_offer
+    description:
+      If the house have a offer, we fill this field.
+  sk_entrance_type:
+    lineage:
+      - datalake_visit.visit_schedules.id_entrance_type
+    description:
+      How occurred the entry method.
   sk_succeed_schedule:
     description:
       The next schedule case when this schedule have a reschedule.
@@ -37,6 +107,45 @@ columns:
       - dw_visit.dim_origin_type
     description:
       Is the key of origin of the event.
+  days_visit_cancelled_to_visit:
+    lineage:
+      - datalake_visit.visit_schedules.days_visit_cancelled_to_visit
+    description:
+      Days between the visit cancelled and the visit.
+  days_visit_booked_to_visit:
+    lineage:
+      - datalake_visit.visit_schedules.days_visit_booked_to_visit
+    description:
+      Days between the visit booked and the visit.
+  days_visit_booked_to_cancelled:
+    lineage:
+      - datalake_visit.visit_schedules.days_visit_booked_to_cancelled
+    description:
+      Days between the booking creation and the visit cancelled date.
+  days_visit_booked_to_visit_completed:
+    lineage:
+      - datalake_visit.visit_schedules.days_visit_booked_to_visit_completed
+    description:
+      Days between the booking creation and the visit completed date.
+  hours_booking_to_offer:
+    lineage:
+      - datalake_visit.visit_schedules.hours_booking_to_offer
+    description:
+      Hours between the booking created and the first offer.
+  hours_visit_to_offer:
+    lineage:
+      - datalake_visit.visit_schedules.hours_visit_to_offer
+    description:
+      Hours between the visit completed and the first offer.
+  is_hub_flow:
+    lineage:
+      - datalake_visit.visit_schedules.is_hub_flow
+    description: True if the visit is from an agent with HUB active workcontract.
+  is_house_rented:
+    lineage:
+      - datalake_visit.visit_schedules.is_house_rented
+    description:
+      True if the house booked had an active rental contract at 5A at the booking date
   is_booking:
     description:
       If is a booking.

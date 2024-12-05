@@ -19,7 +19,6 @@ reschedules AS (
     ON ev1.id_visit = ev2.id_visit
     AND ev1.ranking = (ev2.ranking -1)
     AND ev2.event_type = 'VISIT_RESCHEDULED'
-  GROUP BY ALL
 ),
 visit_model AS (
   SELECT
@@ -32,7 +31,6 @@ visit_model AS (
     datalake_ebdb_clean.visit_status_log AS vse
   WHERE
     vse.event_type IN ('VISIT_FITTED', 'VISIT_REGISTERED')
-  GROUP BY ALL
 ),
 schedule_creator AS (
   SELECT
@@ -62,11 +60,10 @@ entrance_method AS (
   FROM
     datalake_ebdb_listing.house_entrance_history heh
   WHERE
-    heh.is_last_status_of_day
+    heh.is_last_status_of_day = TRUE
     AND heh.ts_entrance_started < NOW()
     AND COALESCE(heh.ts_entrance_ended, NOW()) >= DATE_SUB(NOW(), 400)
-  GROUP BY
-    ALL
+  GROUP BY 1,2,3
 ),
 entrance_method_treatment(
   SELECT
@@ -76,10 +73,11 @@ entrance_method_treatment(
     TRIM(LOWER(MAX(COALESCE(em.method, l.key_location)))) AS method
   FROM
     datalake_ebdb_listing.house AS l
-  LEFT JOIN entrance_method AS em
+  LEFT JOIN 
+      entrance_method AS em
     ON l.id = em.sk_house
   GROUP BY
-    ALL
+    1,2,3
 ),
 offer_after_booking AS (
   SELECT
@@ -157,10 +155,11 @@ booking_3p_demand_agent AS (
     ON b.ts_created BETWEEN ac.ts_work_contract_start
     AND COALESCE(ac.ts_work_contract_end, CURRENT_TIMESTAMP)
     AND ac.id_agent = b.id_agent
-  INNER JOIN datalake_ebdb_work_contract.work_contract AS wc
+  INNER JOIN 
+      datalake_ebdb_work_contract.work_contract AS wc
     ON wc.id = ac.id_work_contract
   WHERE
-    is_3p_contract
+    is_3p_contract = TRUE
 ),
 booking_hub_agent AS (
   SELECT
@@ -202,12 +201,9 @@ booking_in_rented_house AS (
     c.status in ('Ativo', 'Finalizado')
     AND b.dt_visit BETWEEN c.dt_started
     AND CASE
-      WHEN c.status = 'Ativo' THEN NOW()
-      WHEN c.status = 'Finalizado' THEN LEAST(
-        TO_DATE(c.ts_analyst_annulment_input),
-        c.dt_termination
-      )
-    END
+            WHEN c.status = 'Ativo' THEN NOW()
+            WHEN c.status = 'Finalizado' THEN LEAST(TO_DATE(c.ts_analyst_annulment_input), c.dt_termination)
+        END
     AND b.business_context = 'SALE'
   GROUP BY
     b.id_schedule
@@ -292,6 +288,10 @@ last_secretariat as (
 event_date AS (
   SELECT
     id_schedule,
+    CASE
+      WHEN MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') IS NOT NULL THEN 'RESCHEDULE'
+      ELSE 'REQUEST'
+    END AS schedule_origin,
     MIN(vse.ts_created) FILTER (WHERE event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')) AS ts_schedule_created,
     MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS ts_schedule_requested,
     MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_schedule_rescheduled,
@@ -315,8 +315,47 @@ buyer_review AS (
     type = 'tenant_visit'
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_reviewed, id_reviewer ORDER BY dt_creation ASC) = 1
+),
+filtered_vsl AS(
+  SELECT
+    id_schedule,
+    id_visit
+  FROM
+    datalake_ebdb_clean.visit_status_log
+  WHERE 
+      ts_created >= '2024-11-01'
+  AND event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
+),
+filtered_visit AS (
+  SELECT
+    v.id,
+    id_visitor,
+    v.id_house,
+    id_agent,
+    v.code,
+    business_context,
+    behavior,
+    business_model,
+    dt_visit,
+    id_real_estate_agent_rating,
+    TO_UTC_TIMESTAMP(
+      (CAST(dt_visit AS TIMESTAMP) + FLOOR((slot * 15 / 60) + 8) * INTERVAL 1 HOURS + ABS(slot * 15 % 60) * INTERVAL 1 MINUTES
+      ),
+    COALESCE(ct.default_timezone, 'UTC')
+  ) AS ts_visit,
+    v.ts_created
+  FROM
+    datalake_ebdb_clean.visit AS v
+  LEFT JOIN 
+      datalake_ebdb_listing.house_listing AS hll
+    ON v.id_house = hll.id_house
+    AND DATE(v.ts_created) >= DATE(hll.ts_listing_version_start)
+    AND (DATE(v.ts_created) <= DATE(hll.ts_listing_version_end) OR hll.ts_listing_version_end IS NULL)
+  LEFT JOIN 
+      datalake_ebdb_clean.country AS ct
+    ON ct.code = hll.country_code
 )
-SELECT
+SELECT DISTINCT
   vse.id_schedule,
   vse.id_visit,
   v.id_visitor,
@@ -341,6 +380,7 @@ SELECT
   svh.id_user_en,
   v.code AS visit_code,
   v.business_context,
+  v.business_model,
   CASE
     emt.method
     WHEN 'frontdoor' THEN 'Front Door'
@@ -355,10 +395,7 @@ SELECT
     ELSE vm.visit_model
   END AS visit_model,
   v.behavior,
-  CASE
-    WHEN MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') IS NOT NULL THEN 'RESCHEDULE'
-    ELSE 'REQUEST'
-  END AS schedule_origin,
+  evd.schedule_origin,
   bha.contract_name AS hub_agent_region,
   IF(bha.id_schedule IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
   brh.is_house_rented,
@@ -368,12 +405,7 @@ SELECT
   DATEDIFF(ts_schedule_completed, ts_schedule_created) AS days_visit_booked_to_visit_completed,
   so.hours_booking_to_offer,
   so.hours_visit_to_offer,
-  TO_UTC_TIMESTAMP(
-    (
-      CAST(v.dt_visit AS TIMESTAMP) + FLOOR((v.slot * 15 / 60) + 8) * INTERVAL 1 HOURS + ABS(v.slot * 15 % 60) * INTERVAL 1 MINUTES
-    ),
-    COALESCE(ct.default_timezone, 'UTC')
-  ) AS ts_visit,
+  v.ts_visit,
   evd.ts_schedule_created,
   evd.ts_schedule_requested,
   evd.ts_schedule_rescheduled,
@@ -386,12 +418,15 @@ SELECT
   br.dt_creation AS ts_buyer_review_rating,
   NOW() AS ts_load
 FROM
-  datalake_ebdb_clean.visit_status_log AS vse
-INNER JOIN event_date AS evd
+  filtered_vsl AS vse
+INNER JOIN 
+    event_date AS evd
   ON vse.id_schedule = evd.id_schedule
-INNER JOIN datalake_ebdb_clean.visit AS v
+INNER JOIN 
+    filtered_visit AS v
   ON vse.id_visit = v.id
-INNER JOIN datalake_ebdb_clean.house AS h
+INNER JOIN 
+    datalake_ebdb_clean.house AS h
   ON v.id_house = h.id
 LEFT JOIN datalake_ebdb_listing.house AS hl
   ON v.id_house = hl.id
@@ -427,17 +462,14 @@ LEFT JOIN offer_after_booking AS so
   ON vse.id_schedule = so.id_schedule
 LEFT JOIN booking_hub_agent AS bha
   ON bha.id_schedule = vse.id_schedule
-LEFT JOIN booking_in_rented_house AS brh
+LEFT JOIN 
+    booking_in_rented_house AS brh
   ON vse.id_schedule = brh.id_schedule
-LEFT JOIN datalake_ebdb_listing.house_listing AS hll
-  ON v.id_house = hll.id_house
-  AND DATE(v.ts_created) >= DATE(hll.ts_listing_version_start)
-  AND (DATE(v.ts_created) <= DATE(hll.ts_listing_version_end) OR hll.ts_listing_version_end IS NULL)
-LEFT JOIN datalake_ebdb_clean.country AS ct
-  ON ct.code = hll.country_code
-LEFT JOIN datalake_ebdb_clean.visit_checkin AS v_cin
+LEFT JOIN 
+    datalake_ebdb_clean.visit_checkin AS v_cin
   ON v_cin.id_visit = vse.id_visit
-LEFT JOIN buyer_review AS br
+LEFT JOIN 
+    buyer_review AS br
   ON v.code = br.id_reviewed
   AND v.id_visitor = br.id_reviewer
 LEFT JOIN datalake_rede_company.company_sks AS cs_demand
@@ -457,6 +489,3 @@ LEFT JOIN
           AND hl.id_company_hubspot IS NULL
           AND hl.partner_3p_supply = cs_supply.extracted_3p_tag
         )
-GROUP BY ALL
-HAVING
-  MIN(vse.ts_created) >= '2024-11-01'
