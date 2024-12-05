@@ -45,21 +45,15 @@ def sync_data(username, password, client_id, client_secret, end_date, report_nam
     :param end_date: end date for querying log data
     :return: Json list zof returned records
     """
-    #start_date = end_date - timedelta(days=1)
-    #start_date = datetime(
-    #    start_date.year, start_date.month, start_date.day, hour=23, minute=59
-    #)
-    #start_date = convert_datetime_to_neurotech_format(start_date)
-
-    #end_date = datetime(end_date.year, end_date.month, end_date.day, hour=23, minute=59)
-    # fix execution date given by Airflow which is delayed by 1 day
-    #end_date = end_date + timedelta(days=1)
-    #end_date = convert_datetime_to_neurotech_format(end_date)
-
-    start_date = datetime(2024, 7, 1, 23, 59)  # 01/07/2024 às 23:59
-    end_date = datetime(2024, 12, 3, 23, 59)  # 03/12/2024 às 23:59
-
+    start_date = end_date - timedelta(days=1)
+    start_date = datetime(
+        start_date.year, start_date.month, start_date.day, hour=23, minute=59
+    )
     start_date = convert_datetime_to_neurotech_format(start_date)
+
+    end_date = datetime(end_date.year, end_date.month, end_date.day, hour=23, minute=59)
+    # fix execution date given by Airflow which is delayed by 1 day
+    end_date = end_date + timedelta(days=1)
     end_date = convert_datetime_to_neurotech_format(end_date)
 
     client = VeloNeurotechClient(username, password, client_id, client_secret)
