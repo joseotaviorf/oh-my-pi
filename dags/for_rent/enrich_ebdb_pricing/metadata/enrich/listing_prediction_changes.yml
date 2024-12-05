@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_pricing
 table_name: listing_prediction_changes
 description: Enrich table that handles sale and rental calculator listing predicted price change information.
-  Each row represents a price exchange for the listing.
+  If the predicted price change occurred before versioning, it will be associated with the first version of the listing. Each row represents a price exchange for the listing.
 domain: Cross
 owner: bruna.prates@quintoandar.com.br
 columns:

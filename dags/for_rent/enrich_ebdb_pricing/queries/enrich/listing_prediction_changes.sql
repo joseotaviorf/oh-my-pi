@@ -82,7 +82,7 @@ SELECT
     cc.p_90 AS calculator_max_price,
     cc.certainty AS calculator_certainty,
     cc.is_last_prediction_of_day,
-    IF(cc.ts_calculator_result_started < rsvo.ts_listing_version_start, rsvo.ts_listing_version_start, cc.ts_calculator_result_started) AS ts_calculator_result_started,
+    cc.ts_calculator_result_started,
     cc.ts_calculator_result_ended
 FROM
     calculator_changes AS cc
@@ -92,7 +92,7 @@ INNER JOIN
     AND IF(
         rsvo.is_first_version AND cc.ts_calculator_result_started < rsvo.ts_listing_version_start,
         rsvo.ts_listing_version_start BETWEEN cc.ts_calculator_result_started AND COALESCE(cc.ts_calculator_result_ended, TO_TIMESTAMP(CURRENT_DATE)),
-        cc.ts_calculator_result_started BETWEEN rsvo.ts_listing_version_start AND COALESCE(rsvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
+        cc.ts_calculator_result_started >= rsvo.ts_listing_version_start AND cc.ts_calculator_result_started < COALESCE(rsvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
     )
 WHERE
     cc.business_context = 'RENT'
@@ -111,7 +111,7 @@ SELECT
     cc.p_90 AS calculator_max_price,
     cc.certainty AS calculator_certainty,
     cc.is_last_prediction_of_day,
-    IF(cc.ts_calculator_result_started < ssvo.ts_listing_version_start, ssvo.ts_listing_version_start, cc.ts_calculator_result_started) AS ts_calculator_result_started,
+    cc.ts_calculator_result_started,
     cc.ts_calculator_result_ended
 FROM
     calculator_changes AS cc
@@ -121,7 +121,7 @@ INNER JOIN
         AND IF(
             ssvo.is_first_version AND cc.ts_calculator_result_started < ssvo.ts_listing_version_start,
             ssvo.ts_listing_version_start BETWEEN cc.ts_calculator_result_started AND COALESCE(cc.ts_calculator_result_ended, TO_TIMESTAMP(CURRENT_DATE)),
-            cc.ts_calculator_result_started BETWEEN ssvo.ts_listing_version_start AND COALESCE(ssvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
+            cc.ts_calculator_result_started >= ssvo.ts_listing_version_start AND cc.ts_calculator_result_started < COALESCE(ssvo.ts_listing_version_end, TO_TIMESTAMP(CURRENT_DATE))
         )
 WHERE
     cc.business_context = 'SALE'
