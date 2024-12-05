@@ -46,11 +46,11 @@ workflow:
         csat:
             merge_on: [id_ticket]
         sla_journey:
-            merge_on: [journey_step]
+            z_order_by: [journey_step]
         sla_theme:
-            merge_on: [journey_step, theme]
+            z_order_by: [theme]
         sla_theme_detail:
-            merge_on: [journey_step, theme_detail]
+            z_order_by: [theme_detail]
 cluster:
     type: custom_cluster
     custom_configurations:
