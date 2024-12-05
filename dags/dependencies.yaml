@@ -3695,6 +3695,10 @@ bietlejuice.reverse_webhelp_test:
   - bietlejuice.quinto_messenger:load-clean-channel-event
 bietlejuice.search_metrics_service:
   - quintoml.search.search_monitoring.inference:batch-predict
+bietlejuice.survicate_respondent_attributes_test:
+  - bietlejuice.survicate_survey_attributes_test:load-raw-survey-responses
+bietlejuice.survicate_survey_attributes_test:
+  - bietlejuice.survicate_surveys_test:load-raw-surveys
 quintoml.growth.eltv.inference:
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
   - bietlejuice.ebdb_house:load-clean-house

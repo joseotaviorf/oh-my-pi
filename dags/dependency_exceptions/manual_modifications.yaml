@@ -824,6 +824,12 @@ bietlejuice.reverse_supply_access:
 bietlejuice.search_metrics_service:
   add:
     - quintoml.search.search_monitoring.inference:batch-predict
+bietlejuice.survicate_survey_attributes_test:
+  add:
+    - bietlejuice.survicate_surveys_test:load-raw-surveys
+bietlejuice.survicate_respondent_attributes_test:
+  add:
+    - bietlejuice.survicate_survey_attributes_test:load-raw-survey-responses
 bietlejuice.enrich_wordpress_baroes:
   remove:
     - bietlejuice.wordpress_baroes:load-clean-meulugar-data

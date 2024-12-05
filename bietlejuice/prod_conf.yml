@@ -40,6 +40,8 @@ dags_out_of_pattern:
         "reverse_tracksale",
         "reverse_webhelp",
         "reverse_webhelp_test",
+        "survicate_surveys_test",
+        "survicate_survey_attributes_test",
         "wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition",
         "wonka.group_house_rent_flow_house_relisting",
         "wonka.group_house_rent_listing_favorite_set_house_rent_listing_page_viewed",

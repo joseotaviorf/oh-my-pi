@@ -1,5 +1,5 @@
 dag:
-  name: survicate_test
+  name: survicate_surveys_test
   owner: Data SS
   schedule_start_date: 2020, 11, 1
   schedule_interval: 0 1 * * *
@@ -10,7 +10,7 @@ workflow:
   type: custom_ingestion
   layer: raw
   custom_schema: survicate_test
-  load_spark_job: load_survicate_raw
+  load_spark_job: load_survicate_surveys_raw
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
@@ -23,9 +23,6 @@ workflow:
   default_partitions: [year, month, day]
   tables_customization:
     surveys: {}
-    survey_responses: {}
-    respondent_attributes: {}
-    survey_questions: {}
 
 cluster:
   type: databricks_13_3_med_general_cluster
