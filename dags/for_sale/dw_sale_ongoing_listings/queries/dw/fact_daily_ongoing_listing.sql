@@ -103,6 +103,7 @@ SELECT
     dol.sk_house,
     COALESCE(dol.sk_region, -1) AS sk_region,
     COALESCE(cs_supply.sk_company, -1) AS sk_company,
+    COALESCE(dsps.sk_sale_price_segment, -1) AS sk_sale_price_segment,
     slpc.sale_price,
     COALESCE(ad.qt_search_result_page_viewed, 0) AS qt_search_result_page_viewed,
     COALESCE(ad.qt_listing_page_viewed, 0) AS qt_listing_page_viewed,
@@ -134,6 +135,9 @@ LEFT JOIN
     datalake_sale_listings.sale_listing_price_changes AS slpc
         ON dol.sk_house = slpc.id_house
         AND dol.dt_snapshot BETWEEN slpc.ts_price_started AND COALESCE(slpc.ts_price_ended, NOW())
+LEFT JOIN
+    dw_sale.dim_sale_price_segment AS dsps
+        ON slpc.price_segment = dsps.price_segment
 LEFT JOIN
     datalake_rede_house_history.rede_house_history AS rhh
         ON dol.sk_house = rhh.id_house
