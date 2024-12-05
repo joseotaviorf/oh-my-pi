@@ -163,7 +163,7 @@ sap_gateway AS (
         datalake_sap_gateway.sync_sap_job s
             ON f.id_feature = s.id_feature
     WHERE
-        erp_solution = 'B1'
+        erp_solution = 'S4'
         AND type = 'LCM'
         AND status = 'done'
 ),
@@ -182,8 +182,8 @@ sap AS (
 
     WHERE
         dt_reference >= DATE('2024-01-01')
-        AND account_number IN ('420019', '420003', '420025', '420020', '420003', '611012', '211415')
-        AND transaction_type = 'SA'
+        AND account_number IN ('420019', '420003', '420025', '420020', '420003', '611012', '211415', '700005', '700009')
+        --AND transaction_type = 'SA'
     GROUP BY 1, 2, 3, 5, 6
 ),
 
