@@ -885,6 +885,7 @@ bietlejuice.dw_sale_offers:
 bietlejuice.dw_sale_ongoing_listings:
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type
   - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event
+  - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-dim-sale-price-segment
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity

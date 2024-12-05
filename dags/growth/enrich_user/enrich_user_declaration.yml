@@ -9,7 +9,7 @@ dag:
       by Personas, the user type, which can be a property owner, tenant, broker,
       photographer, pp multi, prospect, among others. It provides a daily snapshot."
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     persona_type:
