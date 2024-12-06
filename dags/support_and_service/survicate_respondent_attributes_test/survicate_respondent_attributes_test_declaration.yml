@@ -2,7 +2,6 @@ dag:
   name: survicate_respondent_attributes_test
   owner: Data SS
   schedule_start_date: 2020, 11, 1
-  schedule_interval: None
   documentation:
     dag_purpose: |
       Get survey response collected from [Survicate](https://developers.survicate.com/data-export/#get-the-list-of-surveys).
