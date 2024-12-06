@@ -50,4 +50,4 @@ LEFT JOIN
     ON fl.sk_company = dc.sk_company
 WHERE
   dl.status = 'PUBLISHED'
-LIMIT 10
+  
