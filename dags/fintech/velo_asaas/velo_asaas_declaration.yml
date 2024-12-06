@@ -1,13 +1,13 @@
 ---
 dag:
-  name: velo_asaas_homolog
+  name: velo_asaas
   schedule_interval: 0 4 * * 1
   owner: Data Fintech
   documentation:
     dag_purpose: Velo is one of QuintoAndar's acquisitions, and this DAG is responsible for data ingestion from Velo's legacy bank account, ASAAS.
 workflow:
   type: custom_ingestion
-  custom_schema: velo_asaas_homolog
+  custom_schema: velo_asaas
   layer: raw
   load_spark_job: load_velo_asaas_into_datalake
   execution_timeout_hours: 3

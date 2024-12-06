@@ -57,17 +57,10 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
-    parser.add_argument("load_mode")
     parser.add_argument("table_name")
-    parser.add_argument(
-        "api_consumer_id", type=str, help="The consumer that will be used to load data"
-    )
-    parser.add_argument(
-        "consumer_args",
-        type=str,
-        help="Dict in string with arguments for the consumer function",
-    )
     parser.add_argument("execution_date")
+    parser.add_argument("load_mode")
+
 
     args = parser.parse_args()
 
@@ -76,18 +69,17 @@ if __name__ == "__main__":
     source = args.source
     load_mode = args.load_mode
     table_name = args.table_name
-    api_consumer_id = args.api_consumer_id
-    consumer_args = args.consumer_args
-    consumer_args = eval(consumer_args)
     execution_date = args.execution_date
     execution_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
     tomorrow_date = execution_datetime + timedelta(days=1)
     tomorrow_date = tomorrow_date.strftime("%Y-%m-%d")
+    api_consumer_id = "Parallel"
+    consumer_args = {}
 
     logger.info(
         f"""
                 m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
-                table_name={table_name}, api_consumer_id={api_consumer_id}, msg=Starting spark job...
+                table_name={table_name}, msg=Starting spark job...
         """
     )
 
