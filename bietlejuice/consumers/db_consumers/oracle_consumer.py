@@ -20,13 +20,12 @@ class OracleSparkConsumer(DBConsumer):
     :type spark_client: SparkClient
     """
 
-    def __init__(self, conn_config: dict, spark_client):
+    def __init__(self, conn_config: dict, spark_client, fetch_size=50000):
         dbtype = conn_config["dbtype"]
         driver_enum = DatabaseDriverEnum[dbtype.upper()]
         self.conn_config = conn_config
         self.schema = self.conn_config["schema"]
         self.spark_client = spark_client
-        self.fetch_size = 7500
         self.spark_common_options = {
             "driver": driver_enum.value,
             "url": "jdbc:oracle:thin:@{}:{}/{}".format(
@@ -36,7 +35,7 @@ class OracleSparkConsumer(DBConsumer):
             ),
             "user": self.conn_config["user"],
             "password": self.conn_config["pwd"],
-            "fetchsize": self.fetch_size,
+            "fetchsize": fetch_size,
         }
 
     @logger
