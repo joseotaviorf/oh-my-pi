@@ -1,6 +1,6 @@
 database_name: dw_customer_support
 table_name: dim_agent
-description: Dimension containing agents attributes. Values obtained from Zendesk base.
+description: DEPRECATED - - Dimension containing agents attributes. Values obtained from Zendesk base.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
@@ -9,34 +9,34 @@ columns:
   sk_agent_twilio:
     lineage:
       - datalake_support_users.analysts.id_agent_twilio
-    description: Temporary field for analyst identification in twilio.
+    description: DEPRECATED - Temporary field for analyst identification in twilio.
   full_name:
     lineage:
       - datalake_support_users.analysts.name
-    description: Agent name.
+    description: DEPRECATED - Agent name.
   email:
     lineage:
       - datalake_support_users.analysts.email
-    description: Agent email.
+    description: DEPRECATED - Agent email.
   phone:
     lineage:
       - datalake_support_users.analysts.phone
-    description: Agent phone.
+    description: DEPRECATED - Agent phone.
   agent_organization:
     lineage:
       - datalake_support_users.analysts.organization
-    description: Name of the company where the analyst works.
+    description: DEPRECATED - Name of the company where the analyst works.
   agent_company:
     lineage:
       - datalake_support_users.analysts.organization
-    description: Temporary field.
+    description: DEPRECATED - Temporary field.
   agent_manager:
     lineage:
       - datalake_gsheets_clean.agents_control.manager
-    description: Analyst Manager.
+    description: DEPRECATED - Analyst Manager.
   dt_agent_start:
     lineage:
       - datalake_support_users.analysts.ts_created
-    description: Date agent start working for QuintoAndar.
+    description: DEPRECATED - Date agent start working for QuintoAndar.
   ts_load:
-    description: This timestamp indicates when this data was loaded into dw_customer_support.
+    description: DEPRECATED - This timestamp indicates when this data was loaded into dw_customer_support.

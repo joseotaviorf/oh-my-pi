@@ -2,20 +2,20 @@
 database_name: dw_customer_support
 table_name: fact_backlog_metrics_tasks
 description:
-  This table contains all back-office tasks that are considered part of the backlog.
+  DEPRECATED - This table contains all back-office tasks that are considered part of the backlog.
   The table tracks the SLA compliance of each task day by day until it is solved.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_task:
-    description: The id task, which is the crm task or the zendesk e-mail ticket.
+    description: DEPRECATED - The id task, which is the crm task or the zendesk e-mail ticket.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.id_task
   sk_agent:
     description: SK generated to uniquely identify an agent based on teh agent's email
   sk_taxonomy:
     description:
-      The id taxonomy is used to represent the task taxonomy. For CRM tasks, the
+      DEPRECATED - The id taxonomy is used to represent the task taxonomy. For CRM tasks, the
       id_taxonomy is NULL. However, for zendesk e-mail tickets, it is a MD5 applied to
       some taxonomy fields, including "step_tag", "customer_type_tag", "client_type",
       "request_type", "contact_motivation_tag", "contact_theme_tag", and
@@ -26,28 +26,28 @@ columns:
       - datalake_customer_demand.backlog_metrics_tasks.id_taxonomy
   sk_tags:
     description:
-      The id tag is used to represent the task tag. For CRM tasks, the id_tag is NULL.
+      DEPRECATED - The id tag is used to represent the task tag. For CRM tasks, the id_tag is NULL.
       However, for Zendesk e-mail tickets, it is a MD5 applied to the ticket tag
       description field.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.id_tags
   sk_main_department:
     description:
-      The id_department associated with the task is the task type for CRM tasks,
+      DEPRECATED - The id_department associated with the task is the task type for CRM tasks,
       and a MD5 applied to the ticket department description field for
       Zendesk e-mail tickets.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.id_main_department
   sla_target:
     description:
-      Each task has a SLA target. For CRM tasks, the default SLA target is 5 days.
+      DEPRECATED - Each task has a SLA target. For CRM tasks, the default SLA target is 5 days.
       For Zendesk Tickets, it first considers the "tag sla target". If there is no
       return, it then considers the "unique_theme_detail_sla_target", followed by the
       "unique_theme_sla_target", and finally the "unique_journey_sla_target".
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.sla_target
   origin:
-    description: The task origin.
+    description: DEPRECATED - The task origin.
     categories:
       crm: For CRM tasks.
       email: For Zendesk E-mail Tickets.
@@ -56,7 +56,7 @@ columns:
       - datalake_customer_demand.backlog_metrics_tasks.origin
   status:
     description:
-      The task status differs for CRM tasks and Zendesk e-mail tickets. For CRM tasks,
+      DEPRECATED - The task status differs for CRM tasks and Zendesk e-mail tickets. For CRM tasks,
       it is null. However, for Zendesk e-mail tickets, it can take on other values.
     categories:
       new: If a ticket was created.
@@ -70,60 +70,60 @@ columns:
       - datalake_customer_demand.backlog_metrics_tasks.status
   days_worked:
     description:
-      It considers the difference between the dt_metric_reference and the task
+      DEPRECATED - It considers the difference between the dt_metric_reference and the task
       started_date. Then, it subtracts the days_off from the previous difference.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.days_worked
   days_worked_with_days_offs:
     description:
-      It considers the difference between the dt_metric_reference and the task
+      DEPRECATED - It considers the difference between the dt_metric_reference and the task
       started_date, but considering the days_off.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.days_worked_with_days_offs
   days_off:
     description:
-      Total days off in the interval between the dt_metric_reference and the
+      DEPRECATED - Total days off in the interval between the dt_metric_reference and the
       started_date. It considers as days off Brazil national holidays and weekends,
       such as saturday and sunday.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.days_off
   is_daily_backlog:
     description:
-      It is a boolean column, that assumes only TRUE value to indicate that the task
+      DEPRECATED - It is a boolean column, that assumes only TRUE value to indicate that the task
       in this table is a daily backlog task.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.is_daily_backlog
   is_backlog_within_sla:
     description:
-      If the total days_worked is minor or equal the task sla_target, then assumes
+      DEPRECATED - If the total days_worked is minor or equal the task sla_target, then assumes
       TRUE value, otherwise, it is FALSE.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.is_backlog_in_time
   is_backlog_with_exceed_sla:
     description:
-      If the total days_worked is greater than the task sla_target, then assumes
+      DEPRECATED - If the total days_worked is greater than the task sla_target, then assumes
       TRUE value, otherwise, it is FALSE.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.is_backlog_not_in_time
   dt_metric_reference:
     description:
-      Metric-Reference Date. The date interval between the task started_date and the
+      DEPRECATED - Metric-Reference Date. The date interval between the task started_date and the
       tasks completed_date or the current_date (if the task was not solved yet). It
       considers the days when task remained unsolved in the backlog.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.dt_metric_reference
   ts_started:
     description:
-      This timestamp indicates when the task started. For Zendesk E-mail tickets, if a
+      DEPRECATED - This timestamp indicates when the task started. For Zendesk E-mail tickets, if a
       ticket has a budget executed, it considers the budget date, otherwise, it
       considers the ticket creation date in America/Sao_Paulo timestamp.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.ts_started
   ts_solved:
     description:
-      The task solved date. For Zendesk E-mail ticket, it is the ticket solved date
+      DEPRECATED - The task solved date. For Zendesk E-mail ticket, it is the ticket solved date
       in America/Sao_Paulo timestamp.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.ts_completed
   ts_load:
-    description: This timestamp indicates when this data was loaded into dw_customer_support.
+    description: DEPRECATED - This timestamp indicates when this data was loaded into dw_customer_support.

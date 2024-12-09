@@ -1,16 +1,16 @@
 database_name: dw_customer_support
 table_name: dim_service_status
-description: Dimension containing front office service statuses
+description: DEPRECATED - Dimension containing front office service statuses
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_service_status:
     lineage:
       - datalake_customer_support.chat.service_status
-    description: Unique identifier for a status value
+    description: DEPRECATED - Unique identifier for a status value
   service_status:
     lineage:
       - datalake_customer_support.chat.service_status
-    description: Describes what was the final status of the front office service.
+    description: DEPRECATED - Describes what was the final status of the front office service.
   ts_load:
-    description: Timestamp indicating when data was loaded into dw_customer_support.
+    description: DEPRECATED - Timestamp indicating when data was loaded into dw_customer_support.

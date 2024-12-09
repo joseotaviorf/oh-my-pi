@@ -2,7 +2,7 @@
 database_name: dw_customer_support
 table_name: fact_demand_metrics_tasks
 description:
-  This table presents a summary of all back-office tasks and their latest status, which
+  DEPRECATED - This table presents a summary of all back-office tasks and their latest status, which
   includes received, solved, and closed demands, as well as whether the task was solved
   within its SLA or not. Unlike the backlog metrics task, this table does not track the
   number of days a task remained open, but instead provides the current status of
@@ -15,12 +15,12 @@ columns:
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.id_task
   sk_agent:
-    description: SK generated to uniquely identify an agent based on teh agent's email
-    lineage: 
+    description: DEPRECATED - SK generated to uniquely identify an agent based on teh agent's email
+    lineage:
       - datalake_customer_demand.demand_metrics_tasks.id_agent
   sk_taxonomy:
     description:
-      The id taxonomy is used to represent the task taxonomy. For CRM tasks, the
+      DEPRECATED - The id taxonomy is used to represent the task taxonomy. For CRM tasks, the
       id_taxonomy is NULL. However, for zendesk e-mail tickets, it is a MD5 applied to
       some taxonomy fields, including "step_tag", "customer_type_tag", "client_type",
       "request_type", "contact_motivation_tag", "contact_theme_tag", and
@@ -31,28 +31,28 @@ columns:
       - datalake_customer_demand.demand_metrics_tasks.id_taxonomy
   sk_tags:
     description:
-      The id tag is used to represent the task tag. For CRM tasks, the id_tag is NULL.
+      DEPRECATED - The id tag is used to represent the task tag. For CRM tasks, the id_tag is NULL.
       However, for Zendesk e-mail tickets, it is a MD5 applied to the ticket tag
       description field.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.id_tags
   sk_main_department:
     description:
-      The id_department associated with the task is the task type for CRM tasks,
+      DEPRECATED - The id_department associated with the task is the task type for CRM tasks,
       and a MD5 applied to the ticket department description field for
       Zendesk e-mail tickets.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.id_main_department
   sla_target:
     description:
-      Each task has a SLA target. For CRM tasks, the default SLA target is 5 days.
+      DEPRECATED - Each task has a SLA target. For CRM tasks, the default SLA target is 5 days.
       For Zendesk Tickets, it first considers the "tag sla target". If there is no
       return, it then considers the "unique_theme_detail_sla_target", followed by the
       "unique_theme_sla_target", and finally the "unique_journey_sla_target".
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.sla_target
   origin:
-    description: The task origin.
+    description: DEPRECATED - The task origin.
     categories:
       crm: For CRM tasks.
       email: For Zendesk E-mail Tickets.
@@ -61,7 +61,7 @@ columns:
       - datalake_customer_demand.demand_metrics_tasks.origin
   status:
     description:
-      The task status differs for CRM tasks and Zendesk e-mail tickets. For CRM tasks,
+      DEPRECATED - The task status differs for CRM tasks and Zendesk e-mail tickets. For CRM tasks,
       it is null. However, for Zendesk e-mail tickets, it can take on other values.
     categories:
       new: If a ticket was created.
@@ -75,7 +75,7 @@ columns:
       - datalake_customer_demand.demand_metrics_tasks.status
   time_spent_solved_within_sla:
     description:
-      The total days worked on a task is calculated as the difference between the
+      DEPRECATED - The total days worked on a task is calculated as the difference between the
       task's start and end dates, not considering days off. If the total days worked
       are less than or equal to the task's SLA target, the total days worked are
       returned. Otherwise, the function returns 0.
@@ -90,54 +90,54 @@ columns:
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.time_spent_not_solved_in_time
   days_worked:
-    description: The difference between the task's start and end dates, not considering days off.
+    description: DEPRECATED - The difference between the task's start and end dates, not considering days off.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.days_worked
   days_off:
     description:
-      Total days off between the task's start and end dates, considering holidays
+      DEPRECATED - Total days off between the task's start and end dates, considering holidays
       and weekend.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.days_off
   is_ticket_solved_within_sla:
     description:
-      If the total days worked are  less than or equal to the task's SLA target, it is
+      DEPRECATED - If the total days worked are  less than or equal to the task's SLA target, it is
       equal to TRUE, otherwise, it is FALSE.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.is_ticket_solved_in_time
   is_ticket_solved_with_exceed_sla:
     description:
-      If the total days_worked are greater than the task's SLA target, it is equal to
+      DEPRECATED - If the total days_worked are greater than the task's SLA target, it is equal to
       TRUE, otherwise, it is FALSE.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.is_ticket_not_solved_in_time
   is_received_demand:
-    description: If the task ts_started is not null, then it is TRUE, otherwise, it is FALSE.
+    description: DEPRECATED - If the task ts_started is not null, then it is TRUE, otherwise, it is FALSE.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.is_received_demand
   is_solved_demand:
-    description: If the task ts_completed is not null, then it is TRUE, otherwise, it is FALSE.
+    description: DEPRECATED - If the task ts_completed is not null, then it is TRUE, otherwise, it is FALSE.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.is_solved_demand
   is_closed_demand:
-    description: If the task ts_closed is not null, then it is TRUE, otherwise, it is FALSE.
+    description: DEPRECATED - If the task ts_closed is not null, then it is TRUE, otherwise, it is FALSE.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.is_closed_demand
   ts_started:
     description:
-      This timestamp indicates when the task started. For Zendesk email tickets, if a
+      DEPRECATED - This timestamp indicates when the task started. For Zendesk email tickets, if a
       ticket has a budget executed, it considers the budget date; otherwise, it
       considers the ticket creation date in the America/Sao_Paulo timezone.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.ts_started
   ts_solved:
     description:
-      The task's solved date. For Zendesk email tickets, it is the ticket solved date
+      DEPRECATED - The task's solved date. For Zendesk email tickets, it is the ticket solved date
       in the America/Sao_Paulo timezone.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.ts_completed
   ts_closed:
-    description: The task closed date.
+    description: DEPRECATED - The task closed date.
     lineage:
       - datalake_customer_demand.demand_metrics_tasks.ts_closed
   ts_load:
