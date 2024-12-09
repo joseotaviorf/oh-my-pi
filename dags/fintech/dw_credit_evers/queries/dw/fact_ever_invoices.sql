@@ -60,7 +60,7 @@ agreement AS (
         n.status in ('offset','broken','finished')
     AND i.purpose in ('monthly','onboarding')
     AND fn.creditor = 'IQ QuintoAndar'
-    AND fn.is_down_payment_paid = true
+    AND fn.dt_down_payment IS NOT NULL
     AND fn.negotiation_status = 'broken'
     AND fn.number_of_installments > 1
     AND fn.promisse_payment_method <> 'CARTÃO' 
