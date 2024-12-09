@@ -1,18 +1,43 @@
 WITH
+campaign_discount AS (
+  SELECT
+    id_offer AS id_agreement,
+    SUM(IF(field_name IN ("Juros Residuais", "Juros Acordo"), amount_without_discount, 0)) AS contract_interest_fees_amount,
+    SUM(IF(field_name IN ("Multa Residuais", "Multa Acordo"), amount_without_discount, 0)) AS fine_amount,
+    SUM(IF(field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), amount_without_discount, 0)) AS original_amount,
+    SUM(IF(field_name IN ("Custas Residuais", "Custas Acordo"), amount_without_discount, 0)) AS eviction_costs_amount,
+    SUM(IF(field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), discount, 0)) AS discount_to_original_amount,
+    SUM(IF(field_name IN ("Juros Residuais", "Juros Acordo", "Multa Residuais", "Multa Acordo", "Custas Residuais", "Custas Acordo"), discount, 0)) AS discount_to_fees_amount,
+    SUM(discount) AS discount_amount
+  FROM datalake_cyber_clean.campaign_discounts
+  GROUP BY 1
+),
+agreement_discount AS (
+  SELECT
+    id_agreement,
+    SUM(IF(field_name IN ("Juros Residuais", "Juros Acordo"), amount_without_discount, 0)) AS contract_interest_fees_amount,
+    SUM(IF(field_name IN ("Multa Residuais", "Multa Acordo"), amount_without_discount, 0)) AS fine_amount,
+    SUM(IF(field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), amount_without_discount, 0)) AS original_amount,
+    SUM(IF(field_name IN ("Custas Residuais", "Custas Acordo"), amount_without_discount, 0)) AS eviction_costs_amount,
+    SUM(IF(field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), discount, 0)) AS discount_to_original_amount,
+    SUM(IF(field_name IN ("Juros Residuais", "Juros Acordo", "Multa Residuais", "Multa Acordo", "Custas Residuais", "Custas Acordo"), discount, 0)) AS discount_to_fees_amount,
+    SUM(discount) AS discount_amount
+  FROM datalake_cyber_clean.agreement_discounts
+  GROUP BY 1
+),
 amount_details AS (
   SELECT
-    ad.id_agreement,
-    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Juros Residuais", "Juros Acordo"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS contract_interest_fees_amount,
-    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Multa Residuais", "Multa Acordo"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS fine_amount,
-    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Parcelas Vencidas", "Parcelas a Vencer"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS original_amount,
-    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Custas Residuais", "Custas Acordo"), COALESCE(ad.amount_without_discount, cd.amount_without_discount), 0)) AS eviction_costs_amount,
-    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Parcelas Vencidas", "Parcelas a Vencer"), COALESCE(ad.discount, cd.discount), 0)) AS discount_to_original_amount,
-    SUM(IF(COALESCE(ad.field_name, cd.field_name) IN ("Juros Residuais", "Juros Acordo", "Multa Residuais", "Multa Acordo", "Custas Residuais", "Custas Acordo"), COALESCE(ad.discount, cd.discount), 0)) AS discount_to_fees_amount,
-    SUM(COALESCE(ad.discount, cd.discount)) AS discount_amount
-  FROM datalake_cyber_clean.agreement_discounts AS ad
-  FULL OUTER JOIN datalake_cyber_clean.campaign_discounts AS cd
-    ON ad.id_agreement = cd.id_offer
-  GROUP BY 1
+    COALESCE(ad.id_agreement, cd.id_agreement) AS id_agreement,
+    COALESCE(ad.contract_interest_fees_amount, cd.contract_interest_fees_amount) AS contract_interest_fees_amount,
+    COALESCE(ad.fine_amount, cd.fine_amount) AS fine_amount,
+    COALESCE(ad.original_amount, cd.original_amount) AS original_amount,
+    COALESCE(ad.eviction_costs_amount, cd.eviction_costs_amount) AS eviction_costs_amount,
+    COALESCE(ad.discount_to_original_amount, cd.discount_to_original_amount) AS discount_to_original_amount,
+    COALESCE(ad.discount_to_fees_amount, cd.discount_to_fees_amount) AS discount_to_fees_amount,
+    COALESCE(ad.discount_amount, cd.discount_amount) AS discount_amount
+  FROM agreement_discount AS ad
+  FULL OUTER JOIN campaign_discount AS cd
+    ON ad.id_agreement = cd.id_agreement
 ),
 total_installments AS (
   SELECT
