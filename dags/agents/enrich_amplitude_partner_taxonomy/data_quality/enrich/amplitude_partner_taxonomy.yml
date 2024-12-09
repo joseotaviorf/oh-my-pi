@@ -1,0 +1,11 @@
+---
+table_name: datalake_amplitude_partner_taxonomy.amplitude_partner_taxonomy
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 22000
+    severity_level: Error
+column_level_validations:
+  id_device:
+    is_complete:
+      severity_level: Error
