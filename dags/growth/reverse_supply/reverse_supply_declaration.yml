@@ -1,0 +1,14 @@
+dag:
+  name: reverse_supply
+  schedule_start_date: 2023,08,23
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG has the purpose of processing and storing the operation follow-up data for affiliates in the datalake.
+workflow:
+  type: load
+  layer: reverse
+  custom_schema: supply
+  default_extraction_type: full
+cluster:
+  type: databricks_13_3_med_general_cluster
