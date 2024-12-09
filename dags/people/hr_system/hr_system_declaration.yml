@@ -117,6 +117,17 @@ workflow:
               - "phones.phonesDFF"
               - "religions"
               - "visasPermits"
+    job_families:
+      partitions: ["year", "month", "day"]
+      extra_spark_job_arguments:
+        - deduplication_key: "JobFamilyId"
+          column_to_partition: "CreationDate"
+          params:
+            onlyData: true
+            orderBy: "JobFamilyId:asc"
+            limit: 100
+            expand:
+              - "JobFamilyDFF"
     jobs:
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:

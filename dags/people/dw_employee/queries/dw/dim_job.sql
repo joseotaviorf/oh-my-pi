@@ -60,28 +60,14 @@ SELECT DISTINCT
         WHEN j.id_set = 300000004799077 THEN 'QuintoAndar SP'
         ELSE 'UNKNOWN'
     END AS comp_ladder_business_unit,
-    CASE
-        WHEN j.id_job_family = 300000004860261 THEN 'C-Level'
-        WHEN j.id_job_family = 300000004860279 THEN 'Gerentes'
-        WHEN j.id_job_family = 300000004860291 THEN 'Especialistas'
-        WHEN j.id_job_family = 300000004860273 THEN 'Diretores'
-        WHEN j.id_job_family = 300000004860297 THEN 'Supervisores'
-        WHEN j.id_job_family = 300000004860267 THEN 'Vice Presidentes'
-        WHEN j.id_job_family = 300000004860285 THEN 'Coordenadores'
-        WHEN j.id_job_family = 300000004860321 THEN 'Jovem Aprendiz'
-        WHEN j.id_job_family = 300000004860303 THEN 'Analistas'
-        WHEN j.id_job_family = 300000004860327 THEN 'Estagiario'
-        WHEN j.id_job_family = 300000004860309 THEN 'Assistentes'
-        WHEN j.id_job_family = 300000004860315 THEN 'Auxiliares'
-        ELSE 'UNKNOWN'
-    END AS job_category,
+    jf.name_job_family AS job_category,
     COALESCE(jcf.career_track, 'UNKNOWN') AS career_track,
     COALESCE(jcf.working_hours_regime, 'UNKNOWN') AS working_hours_regime,
     jcf.workload,
     -- metrics
     CASE
         WHEN j.active_status = 'A' THEN TRUE
-        WHEN j.active_status = 'I' THEN TRUE
+        WHEN j.active_status = 'I' THEN FALSE
     END AS is_active,
     CASE
         WHEN jcf.has_clock_in = 'Sim' THEN TRUE
@@ -93,9 +79,12 @@ SELECT DISTINCT
     NOW() AS ts_load
 FROM
     jobs AS j
-LEFT JOIN 
-    job_customer_flex AS jcf 
+LEFT JOIN
+    job_customer_flex AS jcf
         ON j.id_job = jcf.id_job
-LEFT JOIN 
-    band_ladder AS bl 
+LEFT JOIN
+    band_ladder AS bl
         ON j.id_grade_ladder = bl.id_band_ladder
+LEFT JOIN
+    datalake_hr_system_clean.job_families AS jf
+        ON jf.id_job_family = j.id_job_family
