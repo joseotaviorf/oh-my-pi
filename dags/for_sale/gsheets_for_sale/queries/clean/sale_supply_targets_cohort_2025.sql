@@ -1,5 +1,5 @@
 SELECT
-    NULLIF(city_group, '') AS city_group,
+    NULLIF(region, '') AS region,
     NULLIF(planning_conversion, '') AS planning_conversion,
     NULLIF(planning_operation, '') AS planning_operation,
     NULLIF(planning_cluster, '') AS planning_cluster,
