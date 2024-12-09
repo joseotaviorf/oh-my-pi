@@ -103,7 +103,7 @@ LEFT JOIN
     datalake_ebdb_clean.user AS user_affiliate
         ON ad.id = user_affiliate.id_affiliates
 LEFT JOIN
-    datalake_ebdb_clean.lead_reason AS lead_reason
+    datalake_gsheets_clean.historical_lead_reason AS lead_reason
  	    ON l.reason = lead_reason.reason_detail
 -- Rene Descartes is the new source of truth for leads. As we were facing problems to relate a lead to the Mexico country,
 -- the SWE International team added a new country column on Rene Descartes based on the latitude of the address.

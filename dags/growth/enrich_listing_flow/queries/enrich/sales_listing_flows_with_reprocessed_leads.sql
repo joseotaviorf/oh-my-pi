@@ -216,7 +216,7 @@ acquisition_channels AS (
     FROM datalake_listing_flow.listing_flow AS lf
     LEFT JOIN datalake_lead.lead AS l
         ON l.id = lf.id_lead
-    LEFT JOIN datalake_ebdb_clean.lead_reason AS lr
+    LEFT JOIN datalake_gsheets_clean.historical_lead_reason AS lr
         ON l.reason = lr.reason_detail
     LEFT JOIN reproc_leads AS rl
         ON rl.id = lf.id_lead

@@ -2050,7 +2050,6 @@ bietlejuice.enrich_landlord_journey:
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-aud
 bietlejuice.enrich_lead:
-  - bietlejuice.ebdb:load-clean-lead-reason
   - bietlejuice.ebdb_lead:load-clean-conversion-lead
   - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.ebdb_partner:load-clean-affiliate-data
@@ -2081,7 +2080,6 @@ bietlejuice.enrich_listing_contracts:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.terminator:load-clean-termination
 bietlejuice.enrich_listing_flow:
-  - bietlejuice.ebdb:load-clean-lead-reason
   - bietlejuice.ebdb:load-clean-photographer-job
   - bietlejuice.ebdb_lead:load-clean-lead-aud
   - bietlejuice.ebdb_partner:load-clean-affiliate-data

@@ -475,7 +475,6 @@ table_block_list:
 
 view_allow_list:
   - MapRegiao
-  - vw_lead_reason
 
 block_list:
   - PoligonoRegiao

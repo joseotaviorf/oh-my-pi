@@ -112,10 +112,10 @@ columns:
   reason:
     lineage:
       - datalake_ebdb_clean.lead.reason
-      - datalake_ebdb_clean.lead_reason.reason
+      - datalake_gsheets_clean.historical_lead_reason.reason
   reason_detail:
     lineage:
-      - datalake_ebdb_clean.lead_reason.reason_detail
+      - datalake_gsheets_clean.historical_lead_reason.reason_detail
   lead_owner_name:
     lineage:
       - datalake_ebdb_clean.ownerlead.name
