@@ -13,4 +13,4 @@ SELECT
     CAST(REPLACE(NULLIF(q2opp, ''), ',', '') AS FLOAT) AS q2opp,
     CAST(NULLIF(week_start, '') AS DATE) AS week_start
 FROM
-    datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025
+    datalake_gsheets_raw.sale_supply_targets_cohort_2025
