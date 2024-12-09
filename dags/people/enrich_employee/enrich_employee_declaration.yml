@@ -9,6 +9,12 @@ cluster:
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
 workflow:
   type: query_delta
   layer: enrich
@@ -19,3 +25,5 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]

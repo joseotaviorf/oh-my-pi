@@ -17,3 +17,9 @@ workflow:
     - sale_status_version_order
 cluster:
   type: databricks_12_2_med_4xlarge_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
