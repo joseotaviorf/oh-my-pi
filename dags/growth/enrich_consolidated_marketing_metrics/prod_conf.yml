@@ -1,9 +1,0 @@
----
-custom_cluster:
-    driver_node_type_id: m5d.xlarge
-    node_type_id: m5d.xlarge
-    runtime_engine: PHOTON
-    num_workers: 3
-    spark_version: 12.2.x-scala2.12
-partition_cols:
-  - id_date
