@@ -1,0 +1,20 @@
+---
+table_name: datalake_ebdb_agents.agents_weekly_schedule_history
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 1200000000
+    severity_level: Error
+column_level_validations:
+  id_agent:
+    is_complete:
+      severity_level: Error
+  agent_type:
+    is_complete:
+      severity_level: Error
+  day_of_week:
+    is_complete:
+      severity_level: Error
+  slot_number:
+    is_complete:
+      severity_level: Error

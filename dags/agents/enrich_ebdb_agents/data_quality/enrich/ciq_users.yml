@@ -1,0 +1,11 @@
+---
+table_name: datalake_ebdb_agents.ciq_users
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 27000
+    severity_level: Error
+column_level_validations:
+  id_partner:
+    is_complete:
+      severity_level: Error

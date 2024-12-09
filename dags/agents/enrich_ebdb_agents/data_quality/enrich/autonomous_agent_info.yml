@@ -1,0 +1,22 @@
+---
+table_name: datalake_ebdb_agents.autonomous_agent_info
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 280000
+    severity_level: Error
+column_level_validations:
+  id_house_listing:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  id_partner:
+    is_complete:
+      severity_level: Error
+  id_partner_agent:
+    is_complete:
+      severity_level: Error
