@@ -145,10 +145,10 @@ global_user_metrics AS (
            ) AS timestamps,
 
            all_users.date,
-           all_users.week,
            all_users.year,
            all_users.month,
-           all_users.day
+           all_users.day,
+           all_users.week
 
     FROM all_users
     LEFT JOIN rent_flow ON all_users.id_user = rent_flow.id_user
