@@ -6,7 +6,7 @@ dag:
     dag_purpose: |
       Sorting Hat is a microservice responsible for credit policy and analysis for tenants' rental process. This DAG brings the credit engine data from a postgreSQL database.
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   custom_schema: sorting_hat
