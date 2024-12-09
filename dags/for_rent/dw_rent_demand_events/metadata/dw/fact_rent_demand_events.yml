@@ -95,7 +95,7 @@ columns:
   country_code:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.country_code
-    description: Country code information.
+    description: Country code information. It's also a table partitions.
   is_during_termination:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.is_during_termination
@@ -107,5 +107,17 @@ columns:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: Timestamp of when the event happened.
+  year:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Year of when the event happened. It's also a table partitions.
+  month:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Month of when the event happened. It's also a table partitions.
+  day:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+    description: Day of when the event happened. It's also a table partitions.
   ts_load:
     description: Load date.

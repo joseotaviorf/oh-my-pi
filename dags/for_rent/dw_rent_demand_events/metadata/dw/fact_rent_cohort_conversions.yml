@@ -56,7 +56,7 @@ columns:
   country_code:
     lineage:
       - dw_rent.fact_rent_demand_events.country_code
-    description: "Country code related to the event."
+    description: "Country code related to the event. It's also a table partitions."
   days_to_conversion:
     description: "Days between the base event and the conversion event dates. If the event hasn't converted, it will be -1."
   weeks_to_conversion:

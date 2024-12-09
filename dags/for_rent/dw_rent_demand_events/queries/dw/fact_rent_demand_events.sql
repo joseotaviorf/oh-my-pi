@@ -43,6 +43,9 @@ SELECT
     rde.country_code,
     rde.is_during_termination,
     rde.ts_event,
+    YEAR(rde.ts_event) AS year,
+    MONTH(rde.ts_event) AS month,
+    DAY(rde.ts_event) AS day,
     NOW() AS ts_load
 FROM
     datalake_rent_demand_events.rent_demand_events AS rde
