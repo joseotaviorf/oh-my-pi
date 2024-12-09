@@ -119,6 +119,11 @@ columns:
       - datalake_visit.visit_status_events.event_type
     description:
       Visit model of the visit.
+  visit_fup:
+    lineage:
+      - datalake_ebdb_clean.booking.visit_fup
+    description:
+      The follow up of the visit.
   behavior:
     lineage:
       - datalake_ebdb_clean.visit.behavior

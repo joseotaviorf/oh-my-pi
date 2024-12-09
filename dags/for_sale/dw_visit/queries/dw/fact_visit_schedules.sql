@@ -5,6 +5,7 @@ SELECT
   bc.sk_business_context,
   vm.sk_visit_model,
   db.sk_behavior_type,
+  fup.sk_visit_fup,
   bm.sk_business_model,
   es.id_business_unit AS sk_business_unit,
   es.id_company_supply AS sk_company_supply,
@@ -28,6 +29,7 @@ SELECT
   es.hours_visit_to_offer,
   CASE WHEN es.is_hub_flow IS TRUE THEN 1 ELSE 0 END AS is_hub_flow,
   CASE WHEN es.is_house_rented IS TRUE THEN 1 ELSE 0 END AS is_house_rented,
+  CASE WHEN es.has_tenant_living IS TRUE THEN 1 ELSE 0 END AS has_tenant_living,
   1 AS is_booking,
   CASE WHEN es.ts_schedule_rescheduled IS NOT NULL THEN 1 ELSE 0 END AS is_reschedule,
   CASE WHEN es.ts_schedule_confirmed IS NOT NULL THEN 1 ELSE 0 END AS is_confirmed,
@@ -60,3 +62,6 @@ LEFT JOIN
 LEFT JOIN
     dw_visit.dim_business_model AS bm
         ON es.business_model = bm.business_model
+LEFT JOIN
+    dw_visit.dim_visit_fup AS fup
+        ON es.visit_fup = fup.visit_fup

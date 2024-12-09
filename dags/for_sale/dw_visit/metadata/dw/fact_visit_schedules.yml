@@ -107,6 +107,11 @@ columns:
       - dw_visit.dim_origin_type
     description:
       Is the key of origin of the event.
+  sk_visit_fup:
+    lineage:
+      - dw_visit.dim_visit_fup
+    description:
+      Is the key of the follow of of the visit.
   days_visit_cancelled_to_visit:
     lineage:
       - datalake_visit.visit_schedules.days_visit_cancelled_to_visit
@@ -145,7 +150,12 @@ columns:
     lineage:
       - datalake_visit.visit_schedules.is_house_rented
     description:
-      True if the house booked had an active rental contract at 5A at the booking date
+      True if the house booked had an active rental contract at 5A at the booking date.
+  has_tenant_living:
+    lineage:
+      - datalake_visit.visit_schedules.has_tenant_living
+    description:
+      True if the house has a tenant living in the moment of the visit.
   is_booking:
     description:
       If is a booking.

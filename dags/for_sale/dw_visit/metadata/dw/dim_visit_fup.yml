@@ -1,0 +1,12 @@
+database_name: dw_visit
+table_name: dim_visit_fup
+description: This dimension table has follow up of the visit.
+domain: For Sale
+owner: matheus.sampaio@quintoandar.com.br
+columns:
+  sk_visit_fup:
+    description: Id of the visit fup.
+  visit_fup:
+    description: Identifies the visit fup of the visit.
+  ts_load:
+    description: Timestamp of the ingestion data.

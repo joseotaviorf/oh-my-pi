@@ -73,7 +73,7 @@ entrance_method_treatment(
     TRIM(LOWER(MAX(COALESCE(em.method, l.key_location)))) AS method
   FROM
     datalake_ebdb_listing.house AS l
-  LEFT JOIN 
+  LEFT JOIN
       entrance_method AS em
     ON l.id = em.sk_house
   GROUP BY
@@ -155,7 +155,7 @@ booking_3p_demand_agent AS (
     ON b.ts_created BETWEEN ac.ts_work_contract_start
     AND COALESCE(ac.ts_work_contract_end, CURRENT_TIMESTAMP)
     AND ac.id_agent = b.id_agent
-  INNER JOIN 
+  INNER JOIN
       datalake_ebdb_work_contract.work_contract AS wc
     ON wc.id = ac.id_work_contract
   WHERE
@@ -292,6 +292,7 @@ event_date AS (
       WHEN MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') IS NOT NULL THEN 'RESCHEDULE'
       ELSE 'REQUEST'
     END AS schedule_origin,
+    MAX(vse.ts_created) FILTER (WHERE on_behalf_of = 'TENANT_LIVING') AS ts_event_tenant,
     MIN(vse.ts_created) FILTER (WHERE event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')) AS ts_schedule_created,
     MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS ts_schedule_requested,
     MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_schedule_rescheduled,
@@ -323,7 +324,7 @@ filtered_vsl AS(
     id_visit
   FROM
     datalake_ebdb_clean.visit_status_log
-  WHERE 
+  WHERE
       ts_created >= '2024-11-01'
 ),
 filtered_visit AS (
@@ -346,12 +347,12 @@ filtered_visit AS (
     v.ts_created
   FROM
     datalake_ebdb_clean.visit AS v
-  LEFT JOIN 
+  LEFT JOIN
       datalake_ebdb_listing.house_listing AS hll
     ON v.id_house = hll.id_house
     AND DATE(v.ts_created) >= DATE(hll.ts_listing_version_start)
     AND (DATE(v.ts_created) <= DATE(hll.ts_listing_version_end) OR hll.ts_listing_version_end IS NULL)
-  LEFT JOIN 
+  LEFT JOIN
       datalake_ebdb_clean.country AS ct
     ON ct.code = hll.country_code
 )
@@ -394,11 +395,13 @@ SELECT DISTINCT
     WHEN vm.visit_model IS NULL THEN 'STANDARD'
     ELSE vm.visit_model
   END AS visit_model,
+  bb.visit_fup,
   v.behavior,
   evd.schedule_origin,
   bha.contract_name AS hub_agent_region,
   IF(bha.id_schedule IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
   brh.is_house_rented,
+  IF(evd.ts_event_tenant IS NOT NULL, TRUE, FALSE) AS has_tenant_living,
   DATEDIFF(v.dt_visit, ts_schedule_canceled) AS days_visit_cancelled_to_visit,
   DATEDIFF(v.dt_visit, ts_schedule_created) AS days_visit_booked_to_visit,
   DATEDIFF(ts_schedule_canceled, ts_schedule_created) AS days_visit_booked_to_cancelled,
@@ -419,18 +422,22 @@ SELECT DISTINCT
   NOW() AS ts_load
 FROM
   filtered_vsl AS vse
-INNER JOIN 
+INNER JOIN
     event_date AS evd
   ON vse.id_schedule = evd.id_schedule
-INNER JOIN 
+INNER JOIN
     filtered_visit AS v
   ON vse.id_visit = v.id
-INNER JOIN 
+INNER JOIN
     datalake_ebdb_clean.house AS h
   ON v.id_house = h.id
+--Precisamos para as análises a fup da booking, sendo esse o único join, tendo que ser retirado assim que criarem uma nova referência no produto.
+INNER JOIN
+    datalake_ebdb_clean.booking AS bb
+        ON vse.id_schedule = bb.id
 LEFT JOIN datalake_ebdb_listing.house AS hl
   ON v.id_house = hl.id
-INNER JOIN datalake_ebdb_clean.user AS ua
+LEFT JOIN datalake_ebdb_clean.user AS ua
   ON v.id_agent = ua.id
 LEFT JOIN datalake_sale_visit_hubs.sale_visit_hubs AS svh
   ON svh.id_booking = vse.id_schedule
@@ -462,13 +469,13 @@ LEFT JOIN offer_after_booking AS so
   ON vse.id_schedule = so.id_schedule
 LEFT JOIN booking_hub_agent AS bha
   ON bha.id_schedule = vse.id_schedule
-LEFT JOIN 
+LEFT JOIN
     booking_in_rented_house AS brh
   ON vse.id_schedule = brh.id_schedule
-LEFT JOIN 
+LEFT JOIN
     datalake_ebdb_clean.visit_checkin AS v_cin
   ON v_cin.id_visit = vse.id_visit
-LEFT JOIN 
+LEFT JOIN
     buyer_review AS br
   ON v.code = br.id_reviewed
   AND v.id_visitor = br.id_reviewer

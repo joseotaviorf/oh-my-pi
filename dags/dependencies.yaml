@@ -3134,6 +3134,7 @@ bietlejuice.enrich_visit:
   - bietlejuice.ebdb_location:load-clean-country
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
+  - bietlejuice.ebdb_visit:load-clean-booking
   - bietlejuice.ebdb_visit:load-clean-user-visit-preferences
   - bietlejuice.ebdb_visit:load-clean-visit
   - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
