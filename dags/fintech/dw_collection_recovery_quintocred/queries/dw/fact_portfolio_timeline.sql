@@ -64,9 +64,9 @@ collection_recovery_team AS (
         ROUND(SUM(FNI.MAIN_AMOUNT),2) AS original_value,
         ROUND(SUM(FNI.paid_amount),2) AS paid_amount
     FROM
-        dw_collection_recovery.fact_negotiation_installment AS FNI
+        dw_collection_recovery_quintoandar.fact_negotiation_installment AS FNI
     LEFT JOIN
-        dw_collection_recovery.fact_negotiation AS FN
+        dw_collection_recovery_quintoandar.fact_negotiation AS FN
             ON FNI.sk_negotiation = FN.sk_negotiation
 WHERE
     FNI.dt_paid >= "2023-08-01"

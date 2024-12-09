@@ -54,7 +54,7 @@ agreement AS (
       datalake_trato_feito_clean.negotiation n
       ON n.id = d.id_negotiation
     LEFT JOIN
-      dw_collection_recovery.fact_negotiation fn
+      dw_collection_recovery_quintoandar.fact_negotiation fn
       ON fn.sk_negotiation = n.id_collector_external
     WHERE
         n.status in ('offset','broken','finished')

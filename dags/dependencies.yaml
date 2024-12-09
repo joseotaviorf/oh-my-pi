@@ -186,8 +186,8 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.trato_feito:load-clean-contract
   - bietlejuice.trato_feito:load-clean-debt
 bietlejuice.dw_collection_recovery_quintocred:
-  - bietlejuice.dw_collection_recovery:load-dw-collection-recovery-fact-negotiation
-  - bietlejuice.dw_collection_recovery:load-dw-collection-recovery-fact-negotiation-installment
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-house
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-person
@@ -253,7 +253,7 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat_credit_engine:load-clean-variant
 bietlejuice.dw_credit_evers:
-  - bietlejuice.dw_collection_recovery:load-dw-collection-recovery-fact-negotiation
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
   - bietlejuice.enrich_retsuko:load-enrich-bill-items
@@ -3533,8 +3533,8 @@ bietlejuice.reverse_listings_report_load:
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type
   - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event
   - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
-  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_ongoing_listings:load-dw-sale-fact-daily-ongoing-listing
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits

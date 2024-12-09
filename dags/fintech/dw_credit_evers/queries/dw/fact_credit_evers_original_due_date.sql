@@ -228,7 +228,7 @@ SELECT
   id_contract,
   dt_cancellation
 FROM 
-  dw_collection_recovery.fact_negotiation
+  dw_collection_recovery_quintoandar.fact_negotiation
 WHERE 
   creditor = 'IQ QuintoAndar'
   AND is_down_payment_paid = TRUE
