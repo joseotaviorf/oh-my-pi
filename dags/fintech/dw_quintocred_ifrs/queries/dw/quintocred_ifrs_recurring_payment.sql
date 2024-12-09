@@ -1034,7 +1034,7 @@ repasse_direto AS (
             i.total_amount AS fatura_valor,
             COALESCE(sap.id_contract,e.propose) AS sk_propose,
             COALESCE(sap.mensalidade_por_contrato,e.amount) AS mensalidade_por_contrato,
-            IF(b.status IN ('PAID','PAID_AFTER_DUE_DATE'), mensalidade_por_contrato, 0) AS paid_amount,
+            IF(b.status IN ('PAID','PAID_AFTER_DUE_DATE'), COALESCE(sap.mensalidade_por_contrato, e.amount), 0) AS paid_amount,
             DATE(b.ts_paid) AS boleto_compensando_em,
             DATE(b.ts_created) AS dt_boleto_created,
             b.status AS boleto_status,

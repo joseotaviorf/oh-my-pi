@@ -13,5 +13,7 @@ SELECT
     updated_at AS ts_updated
 FROM
     datalake_rental_guarantee_platform_raw.bill
+WHERE 
+    active = TRUE
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1
