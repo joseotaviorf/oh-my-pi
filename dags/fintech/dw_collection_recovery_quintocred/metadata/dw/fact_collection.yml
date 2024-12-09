@@ -1,0 +1,106 @@
+database_name: dw_collection_recovery_quintocred
+table_name: fact_collection
+description: It contain data about the collection action by customer.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  sk_collection:
+    lineage:
+      - datalake_recupera.collection.ts_occurrence
+      - datalake_recupera.collection.id_customer
+      - datalake_recupera.collection.id_contract
+      - datalake_recupera.collection.id_creditor
+      - datalake_recupera.collection.operator_name
+      - datalake_recupera.collection.occurrence
+    description: Surrogate key of table. It is a sequential number created based on the occurrence timestamp ordered in ascending order
+  sk_debtor:
+    lineage:
+      - datalake_recupera.collection.id_customer
+    description: Customer document (CPF). Foreign key of table dim_debtor.
+  sk_contract:
+    lineage:
+      - datalake_recupera.collection.id_contract
+    description: Contract ID
+  creditor:
+    lineage:
+      - datalake_recupera.collection.id_creditor
+    description: Creditor - IQ QuintoAndar, IQ QuintoCred or PP QuintoAndar
+  id_operator:
+    lineage:
+      - datalake_recupera.collection.operator_name
+    description: Operator ID that made de occurence
+  id_operator_registration:
+    lineage:
+      - datalake_recupera_clean.operators.id_operator_registration
+    description: Operator Registration Code, such as QUINTO, PASCHOAL, QUITEI, IAF ...
+  operator_type:
+    lineage:
+      - datalake_recupera_clean.operators.operator_type
+    description: Operator type
+    categories:
+      API: ""
+      API carga: ""
+      Administrativo: ""
+      Ativo Receptivo: ""
+      Lojista: ""
+      Receptivo: ""
+      Responsável: ""
+      Webservice: ""
+  id_occurrence:
+    lineage:
+      - datalake_recupera.collection.occurrence
+    description: Occurence ID. Examples - ACORDO, NEGOCIAC, ATUDIV, BAIXA, ALTCONTT, CARGA, EMISBOL..
+  occurrence:
+    lineage:
+      - datalake_recupera_clean.historical.historical_description
+    description: Occurence. Examples - ACORDO PARCELADO, EM NEGOCIACAO...
+  total_esforco:
+    lineage:
+      - datalake_recupera.collection.esforco
+    description: Total number of times that was a dialer attempt. It is used to calculate the spin.
+  total_alo:
+    lineage:
+      - datalake_recupera.collection.alo
+    description:
+      Total number of times that someone, whether the correct person or not, answered (call) made to the contact informed by the debtor.
+      Occurence IDs categorized as 'alo' - ACORDO, ALEGAPGT, ALFRAUDE, EM FINAL, ESTRECEB, NEGOCIAC, PROBLE5A, PROMESSA, SEMPREVI, QUITEI, PROEMAIL, PAGO,EMPROCES, PROWHATS, DISCORDA, PROLIGAC, RETCLIEN, CDESCONH, RECADO, NATENDE, OCUPADO,CAIXAPOS, ALTVIGENCIA, QUEBRAPRO,EM PROCESS,QBRACOR, TENTESGO, CDESCONH,QUEBRAPR,RETORTER,PASCHOAL,ALTVIGEN,EMISBOL,GERALINK,ENVIPROP,NCONFIR,PAGOCBX,PAGOSBX,ABANDONO
+  total_cpc:
+    lineage:
+      - datalake_recupera.collection.cpc
+    description:
+      Total number of time that the operator was able to contact the correct person.
+      Occurence IDs categorized as 'cpc' - ACORDO, ALEGAPGT, ALFRAUDE, EM FINAL, ESTRECEB, NEGOCIAC, PROBLE5A, PROMESSA, SEMPREVI, QUITEI, PAGO, EMPROCES, DISCORDA, RETCLIEN, PROEMAIL, PROWHATS, PROLIGAC, ALTVIGENCIA, QUEBRAPRO, EM PROCESS, QBRACOR, TENTESGO,QUEBRAPR,PASCHOAL,ALTVIGEN,EMISBOL,GERALINK,ENVIPROP,NCONFIR,PAGOCBX,PAGOSBX,ABANDONO
+  total_promisse:
+    lineage:
+      - datalake_recupera.collection.promisse
+    description:
+      Total number of time that the debtor made a promisse to pay the debt
+      Occurence IDs categorized as 'promessa' - PROMESSA,PROEMAIL,PROWHATS,PROLIGAC
+  total_agreement:
+    lineage:
+      - datalake_recupera.collection.agreement
+    description: Total number of time that a agreement/negotiation was created.
+      Occurence IDs categorized as 'acordo' - ACORDO,EMISBOL,GERALINK
+  total_failure:
+    lineage:
+      - datalake_recupera.collection.failure
+    description: Total number of times an error occurred
+      Occurence IDs categorized as 'insucesso' - CLNLOCAL,NATENDE,OCUPADO,FAX,LIGAMUDA,QUEDALIG
+  dt_occurrence:
+    lineage:
+      - datalake_recupera.collection.ts_occurrence
+    description: The date of the occurence
+  year:
+    lineage:
+      - datalake_recupera.collection.ts_occurrence
+    description: Year of the occurence
+  month:
+    lineage:
+      - datalake_recupera.collection.ts_occurrence
+    description: Month of the occurence
+  day:
+    lineage:
+      - datalake_recupera.collection.ts_occurrence
+    description: Day of the occurence
+  ts_load:
+    description: Timestamp of when the data was inserted into the table

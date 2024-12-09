@@ -15,6 +15,9 @@ workflow:
   inner_dependencies:
     fact_proposal_signature_payment_timeline:
       - fact_contract_payment_signature_timeline
+    fact_portfolio_timeline:
+      - fact_negotiation_installment
+      - fact_negotiation
 cluster:
   type: custom_cluster
   custom_configurations:

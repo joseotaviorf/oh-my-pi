@@ -1,0 +1,109 @@
+database_name: dw_collection_recovery_quintocred
+table_name: fact_debt
+description: |
+  It contains information about the debts negotiated, in granularity of invoice per contract, i.e, which invoices have been negotiated, even if the invoice has not yet expired.
+  An invoice can have 1 or more negotiations, in case of a broken negotiation (i.e a promisse not paid). 1 negotiation can include 1 or more invoices (from seu barriga).
+  If an extra invoice (installment of a negotiation) is overdue, it will also be registered in this table.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  sk_debt:
+    lineage:
+      - datalake_debt_recovery.negotiation.id_contract
+      - datalake_recupera_clean.creditor_pending.id_contract
+      - datalake_recupera_clean.complementary_records.id_contract
+      - datalake_recupera_clean.complementary_records_written_down.id_contract
+      - datalake_trato_feito_clean.debt.id_external
+      - datalake_recupera_clean.creditor_pending.id_installment
+      - datalake_recupera_clean.complementary_records.id_installment
+      - datalake_recupera_clean.complementary_records_written_down.id_installment
+    description: Surrogate key of table. It is a sequencial number based on the id_creditor and id_installment.
+  id_contract:
+    lineage:
+      - datalake_debt_recovery.negotiation.id_contract
+      - datalake_recupera_clean.creditor_pending.id_contract
+      - datalake_recupera_clean.complementary_records.id_contract
+      - datalake_recupera_clean.complementary_records_written_down.id_contract
+    description: Contract ID (Propose ID on QuintoCred)
+  id_invoice:
+    lineage:
+      - datalake_trato_feito_clean.debt.id_external
+      - datalake_recupera_clean.creditor_pending.id_installment
+      - datalake_recupera_clean.complementary_records.id_installment
+      - datalake_recupera_clean.complementary_records_written_down.id_installment
+    description: When on QuintoAndar, SeuBarriga original invoice ID. When on QuintoCred, Rental Guarantee Platform delinquency ID.
+  creditor:
+    lineage:
+      - datalake_debt_recovery.negotiation.debtor
+      - datalake_recupera_clean.creditor_pending.id_creditor
+      - datalake_recupera_clean.complementary_records.id_creditor
+      - datalake_recupera_clean.complementary_records_written_down.id_creditor
+    description: Creditor - IQ QuintoAndar, IQ QuintoCred or PP QuintoAndar
+  invoice_payment_status:
+    lineage:
+      - datalake_retsuko.invoice.status
+      - datalake_velo.junk.desc_lvl_1
+    description: When QuintoAndar, Retsuko's current invoice status; When QuintoCred, Rental Guarantee Platform current delinquency status; Read more about retsuko invoice status at https://docs.google.com/document/d/1EoWn1-aoJ_khoZNJUuMjp1uLQy32sH25JwjiRdbx8yk/edit#heading=h.70famyfdn89k
+    categories:
+      open: "QuintoAndar"
+      paid: "QuintoAndar"
+      written-down: "QuintoAndar"
+      canceled: "QuintoAndar"
+      not-payable: "QuintoAndar - zero value invoice (due-amount=0). It behaves as an open invoice but there is no charge or transfer that can be done. "
+      divergent-payment: "QuintoAndar - invoice that was paid but the amount paid is different than the value of the invoice."
+      registered: "QuintoCred - First status, when the delinquency is created"
+      under_agreement: "QuintoCred - The delinquency was sent to Recupera"
+      requested_agreement: "QuintoCred - Legacy status from 2.0, not used anymore"
+      progress: "QuintoCred - A confirmed agreement between QuintoCred and the defaulter"
+      finished: "QuintoCred - The delinquency was paid (with gain or loss)"
+      recovering: "QuintoCred - Agreement requested but not confirmed yet"
+  invoice_status:
+    lineage:
+      - datalake_retsuko.invoice.substatus
+    description: Retsuko's current invoice substatus. Non-existant for QuintoCred.
+    categories:
+      debt: ""
+      ongoing-negotiation: ""
+      none: ""
+  invoice_due_amount:
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+      - datalake_velo.occurrence.due_amount
+    description: Invoice due amount
+  invoice_paid_amount:
+    lineage:
+      - datalake_retsuko.invoice.paid_amount
+      - datalake_velo.occurrence.paid_amount
+    description: Invoice paid amount. This field will be filled int for rows where the original invoice is paid or the status is written down and there is a negotiation
+  interest_fee_amount:
+    lineage:
+      - datalake_trato_feito_clean.debt.interest_fee_amount
+    description: Interest fee amount (juros)
+  fine_fee_amount:
+    lineage:
+      - datalake_trato_feito_clean.debt.fine_fee_amount
+    description: Fine fee amount(multa)
+  discount_amount:
+    lineage:
+      - datalake_trato_feito_clean.debt.discount_amount
+    description: Discount amount
+  debt_amount:
+    lineage:
+      - datalake_trato_feito_clean.debt.original_amount
+      - datalake_trato_feito_clean.debt.interest_fee_amount
+      - datalake_trato_feito_clean.debt.fine_fee_amount
+      - datalake_trato_feito_clean.debt.discount_amount
+    description: Total debt amount. It is invoice_due_amount + interest_fee_amount + fine_fee_amount - discount_amount
+  dt_invoice_due:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+      - datalake_velo.occurrence.dt_due_legacy
+      - datalake_velo.occurrence.dt_due
+    description: Invoice due date
+  dt_invoice_paid:
+    lineage:
+      - datalake_retsuko.invoice.ts_paid
+      - datalake_velo.occurrence.ts_paid
+    description: Invoice paid date. This field will be filled int for rows where the original invoice is paid or the status is written down and there is a negotiation
+  ts_load:
+    description: Timestamp of when the data was inserted into the table
