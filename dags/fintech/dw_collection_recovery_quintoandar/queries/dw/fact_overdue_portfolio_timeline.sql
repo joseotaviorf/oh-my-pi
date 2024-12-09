@@ -1,18 +1,32 @@
 WITH
+invoice_payment_option_clicked_events AS (
+  SELECT DISTINCT
+    event_properties:invoice_id AS id_invoice,
+    event_properties:contract_id AS id_contract
+  FROM datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events
+  WHERE
+    event_properties:contract_id IS NOT NULL
+    AND event_properties:invoice_id IS NOT NULL
+),
+pending_invoices_invoice_pay_button_clicked_events AS (
+  SELECT DISTINCT
+    event_properties:invoice_id AS id_invoice,
+    event_properties:contract_id AS id_contract
+  FROM datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events
+  WHERE
+    event_properties:contract_id IS NOT NULL
+    AND event_properties:invoice_id IS NOT NULL
+)
 ssn_original_payment AS (
-    -- Service Self Negotiation where customer paid the original invoice
     SELECT DISTINCT
-        COALESCE(pi.event_properties:contract_id, rip.event_properties:contract_id) AS id_contract,
-        COALESCE(pi.event_properties:invoice_id, rip.event_properties:invoice_id) AS id_invoice
+        COALESCE(pi.id_contract, rip.id_contract) AS id_contract,
+        COALESCE(pi.id_invoice, rip.id_invoice) AS id_invoice
     FROM
-        datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events AS pi
+        pending_invoices_invoice_pay_button_clicked_events AS pi
     FULL OUTER JOIN
-        datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events AS rip
-      ON pi.event_properties:invoice_id = rip.event_properties:invoice_id
-        AND pi.event_properties:contract_id = rip.event_properties:contract_id
-    WHERE
-        COALESCE(pi.event_properties:contract_id, rip.event_properties:contract_id) IS NOT NULL
-        AND COALESCE(pi.event_properties:invoice_id, rip.event_properties:invoice_id) IS NOT NULL
+        invoice_payment_option_clicked_events AS rip
+      ON pi.id_invoice = rip.id_invoice
+        AND pi.id_contract = rip.id_contract
 ),
 negotiation_data AS (
   SELECT DISTINCT
