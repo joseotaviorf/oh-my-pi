@@ -1,0 +1,45 @@
+database_name: datalake_gsheets_clean
+table_name: rent_demand_budget_2025
+columns:
+  business_type:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.business_type
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.city_group
+  contracts_signed:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.contracts_signed
+  credit_approved:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.credit_approved
+  date:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.date
+  documentation_sent:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.documentation_sent
+  evaluation_positive:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.evaluation_positive
+  evaluation_started:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.evaluation_started
+  offers_accepted:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.offers_accepted
+  offers_submitted:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.offers_submitted
+  rent_flow_origin:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.rent_flow_origin
+  rental_administrator:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.rental_administrator
+  visits_booked:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.visits_booked
+  visits_completed:
+    lineage:
+      - datalake_gsheets_raw.rent_demand_budget_2025.visits_completed

@@ -1,0 +1,45 @@
+database_name: datalake_gsheets_clean
+table_name: ongoing_listings_targets_2025
+columns:
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.business_context
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.city_group
+  date:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.date
+  depublications:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.depublications
+  ended_rentals:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.ended_rentals
+  erc:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.erc
+  new_first_rental:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.new_first_rental
+  new_rental:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.new_rental
+  ongoing_listings:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.ongoing_listings
+  ongoing_rentals:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.ongoing_rentals
+  recovered:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.recovered
+  relisting:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.relisting
+  rental_administrator:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.rental_administrator
+  suspensions:
+    lineage:
+      - datalake_gsheets_raw.ongoing_listings_targets_2025.suspensions

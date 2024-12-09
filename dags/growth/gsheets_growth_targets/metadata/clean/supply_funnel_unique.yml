@@ -1,0 +1,90 @@
+database_name: datalake_gsheets_clean
+table_name: supply_funnel_unique
+columns:
+  available_qualifieds_fs:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.available_qualifieds_fs
+  available_qualifieds_fr:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.available_qualifieds_fr
+  company_report_origin:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.company_report_origin
+  date:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.date
+  fator_available_qualifieds:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.fator_available_qualifieds
+  fator_available_qualifieds_aux_2:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.fator_available_qualifieds_aux_2
+  fator_first_listings:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.fator_first_listings
+  fator_first_listings_aux_2:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.fator_first_listings_aux_2
+  fator_opportunities:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.fator_opportunities
+  fator_opportunities_aux_2:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.fator_opportunities_aux_2
+  fator_prospects:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.fator_prospects
+  fator_prospects_aux_2:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.fator_prospects_aux_2
+  first_listings_fs:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.first_listings_fs
+  first_listings_fr:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.first_listings_fr
+  planning_cluster:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.planning_cluster
+  planning_conversion:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.planning_conversion
+  planning_operation:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.planning_operation
+  prospects_fs:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.prospects_fs
+  prospects_fr:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.prospects_fr
+  qualifieds_fs:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.qualifieds_fs
+  qualifieds_fr:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.qualifieds_fr
+  opportunities_fs:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.opportunities_fs
+  opportunities_fr:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.opportunities_fr
+  volume_available_qualifieds_unique:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.volume_available_qualifieds_unique
+  volume_first_listings_unique:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.volume_first_listings_unique
+  volume_opportunities_unique:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.volume_opportunities_unique
+  volume_prospects_unique:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.volume_prospects_unique
+  volume_qualifieds_unique:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.volume_qualifieds_unique
+  year_month:
+    lineage:
+      - datalake_gsheets_raw.supply_funnel_unique.year_month

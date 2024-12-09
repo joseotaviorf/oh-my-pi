@@ -228,6 +228,12 @@ sheets_info:
     clean_table_name: rental_tenant_prospects_budget_2024
     sheet_context: growth
 
+  rental_tenant_prospects_budget_2025:
+    sheet_id: 1NOInKDMOZRFHlvAjDxXSr6TcJMxD25Mo1g58yAoNh_w
+    sheet_name: targets
+    clean_table_name: rental_tenant_prospects_budget_2025
+    sheet_context: growth
+
   rental_tof_daily_targets:
     sheet_id: 1rUa1jyrjcbkZP_33O-7vZH376O16zkGI7FcFVAZkDSo
     sheet_name: rental_tof_daily_targets

@@ -1,0 +1,36 @@
+database_name: datalake_gsheets_clean
+table_name: sale_supply_budget_2025
+columns:
+  available_qualifieds:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2025.available_qualifieds
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2025.city_group
+  company_report_origin:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2025.company_report_origin
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2025.date
+  first_listings:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2025.first_listings
+  opportunities:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2025.opportunities
+  planning_cluster:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2025.planning_cluster
+  planning_conversion:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2025.planning_conversion
+  planning_operation:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2025.planning_operation
+  prospects:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2025.prospects
+  qualifieds:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_budget_2025.qualifieds

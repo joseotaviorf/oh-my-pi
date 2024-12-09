@@ -1,0 +1,45 @@
+database_name: datalake_gsheets_clean
+table_name: rental_tenant_prospects_budget_2024
+columns:
+  behavior_type:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.behavior_type
+  campaign_strategy_intent:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.campaign_strategy_intent
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.city_group
+  date:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.date
+  funnel_side:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.funnel_side
+  mkt_channel:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_channel
+  mkt_medium:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_medium
+  mkt_origin:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_origin
+  mkt_source:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.mkt_source
+  ntp_target:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.ntp
+  operation_channel:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.operation_channel
+  referral_type:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.referral_type
+  rtp_target:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.rtp
+  tier:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2024.tier

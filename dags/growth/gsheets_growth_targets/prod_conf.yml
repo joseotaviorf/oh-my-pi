@@ -52,6 +52,12 @@ sheets_info:
     sheet_name: supply_targets_2024
     clean_table_name: supply_targets_2024
     sheet_context: for_rent_targets
+  
+  supply_targets_2025:
+    sheet_id: 1VjT9_onWiIVDcsCXgwz6AdvbS_7PadWT-kdd0ara2hY
+    sheet_name: rent_supply_targets_2025
+    clean_table_name: supply_targets_2025
+    sheet_context: for_rent_targets
 
   supply_targets_2024_cohort:
     sheet_id: 1V5HQxP9pI9pm7P4si59P40TJvGxGS1doVUTX-R3h0iY
@@ -59,10 +65,22 @@ sheets_info:
     clean_table_name: supply_targets_2024_cohort
     sheet_context: for_rent_targets
 
+  rent_supply_targets_cohort_2025:
+    sheet_id: 1UAal1Buce509lxAXRjs7206UB_hnYdl6F5Yk0Mu9gcA
+    sheet_name: rent_supply_targets_cohort_2025
+    clean_table_name: rent_supply_targets_cohort_2025
+    sheet_context: for_rent_targets
+
   rent_supply_budget_2024:
     sheet_id: 1KKsISTNvrwmP-XTZvBg06TRl4tdtFj2DuqtoK29tM_U
     sheet_name: supply_targets_2024
     clean_table_name: rent_supply_budget_2024
+    sheet_context: for_rent_targets
+
+  rent_supply_budget_2025:
+    sheet_id: 16O4qMihQqod70lnoJ3hDHzjUzt17mDmkipr9BOgBvBk
+    sheet_name: rent_supply_targets_2025
+    clean_table_name: rent_supply_budget_2025
     sheet_context: for_rent_targets
 
   sale_prospect_target:
@@ -88,3 +106,9 @@ sheets_info:
     sheet_name: targets
     clean_table_name: sale_tof_weekly_target
     sheet_context: growth
+
+  supply_funnel_unique:
+      sheet_id: 1WhUjDG1gYEZPlADVEloRw_1bbWsY96p1tTi8VQ4ndiA
+      sheet_name: supply_funil_unique
+      clean_table_name: supply_funnel_unique
+      sheet_context: growth

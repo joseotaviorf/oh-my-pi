@@ -10,6 +10,12 @@ sheets_info:
     sheet_name: demand_targets_2024
     clean_table_name: demand_targets_2024
     sheet_context: for_rent_targets
+  
+  demand_targets_2025:
+    sheet_id: 1H66U4LVfUuIzqXAnw4I0i9ziJ-umN6E6jUViAV0aYBU
+    sheet_name: demand_targets_2025
+    clean_table_name: demand_targets_2025
+    sheet_context: for_rent_targets
 
   demand_targets_2024_cohort:
     sheet_id: 1yNCA3Y6y4hkqIh-AgFDOdTFB4dsJhgS-VYRgsC8oEe4
@@ -17,12 +23,24 @@ sheets_info:
     clean_table_name: demand_targets_2024_cohort
     sheet_context: for_rent_targets
 
+  demand_targets_2025_cohort:
+    sheet_id: 1E77AuDjlI_uYr3yVKkoeik7QpapMd2pzBa-kGguKmbY
+    sheet_name: demand_targets_2025_cohort
+    clean_table_name: demand_targets_2025_cohort
+    sheet_context: for_rent_targets
+    
   rent_demand_budget_2024:
     sheet_id: 15kh4lhTAwUr3RQktAkInDo7hHLwlQIP3z6vvzNaNi0U
     sheet_name: demand_targets_2024
     clean_table_name: rent_demand_budget_2024
     sheet_context: for_rent_targets
 
+  rent_demand_budget_2025:
+    sheet_id: 1HZ4kkaBpysPbwAc2lpMGCdEyzpmR0YHm7EmzRsyfHKY
+    sheet_name: demand_targets_2025
+    clean_table_name: rent_demand_budget_2025
+    sheet_context: for_rent_targets
+    
   forecast_cohort_demanda:
     sheet_id: 1X8kklNtizTnKJ8zI4XMLaI3H31YU3Oq36VmFxmhwLD0
     sheet_name: forecast_cohort_demanda
@@ -39,6 +57,12 @@ sheets_info:
     sheet_id: 16BHKdlbn4stT8q4bdoGJ_0Fo9i4Z_ibOFevsBR4lD5s
     sheet_name: ongoing_listings_target
     clean_table_name: ongoing_listings_target
+    sheet_context: for_rent_targets
+
+  ongoing_listings_targets_2025:
+    sheet_id: 17cv7e3pXs5D_JxOCbY9YQ_VfoUE4n5tBBHYpkfEXoJ4
+    sheet_name: ongoing_listings_target
+    clean_table_name: ongoing_listings_targets_2025
     sheet_context: for_rent_targets
 
   rent_ongoing_listings_budget_2024:

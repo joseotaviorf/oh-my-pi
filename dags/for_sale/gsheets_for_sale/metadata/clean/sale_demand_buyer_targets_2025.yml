@@ -1,0 +1,48 @@
+database_name: datalake_gsheets_clean
+table_name: sale_demand_buyer_targets_2025
+columns:
+  bp:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.bp
+  bp_w_ccv:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.first_listings
+  bp_w_oa:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.opportunities
+  bp_w_os:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.bp_w_os
+  bp_w_vc:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.bp_w_vc
+  ccv:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.ccv
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.date
+  is_tqc:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.is_tqc
+  modelo:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.modelo
+  oa:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.oa
+  os:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.os
+  price_range:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.price_range
+  region:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.region
+  vb:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.vb
+  vc:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_2025.vc

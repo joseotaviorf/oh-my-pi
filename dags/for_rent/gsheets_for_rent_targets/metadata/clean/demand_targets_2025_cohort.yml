@@ -1,0 +1,42 @@
+database_name: datalake_gsheets_clean
+table_name: demand_targets_2025_cohort
+columns:
+  business_type:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.business_type
+  ca2cs:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.ca2cs
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.city_group
+  cs:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.cs
+  oa2ca:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.oa2ca
+  os2oa:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.os2oa
+  rent_flow_origin:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.rent_flow_origin
+  rental_administrator:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.rental_administrator
+  vb2os:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.vb2os
+  vb2vc:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.vb2vc
+  vc2os:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.vc2os
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.week_start
+  weeks_conversion:
+    lineage:
+      - datalake_gsheets_raw.demand_targets_2025_cohort.weeks_conversion

@@ -1,0 +1,42 @@
+database_name: datalake_gsheets_clean
+table_name: sale_demand_buyer_targets_cohort_2025
+columns:
+  avq2opp:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.avq2opp
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.city_group
+  company_report_origin:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.company_report_origin
+  fl:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.fl
+  op2q:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.op2q
+  opp2fl:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.opp2fl
+  planning_cluster:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.planning_cluster
+  planning_conversion:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.planning_conversion
+  planning_operation:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.planning_operation
+  q2avq:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.q2avq
+  q2opp:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.q2opp
+  week_start:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.week_start
+  weeks_conversion:
+    lineage:
+      - datalake_gsheets_raw.sale_demand_buyer_targets_cohort_2025.weeks_conversion

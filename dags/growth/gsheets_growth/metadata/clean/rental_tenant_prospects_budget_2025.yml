@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: rental_tenant_prospects_budget_2025
+columns:
+  behavior_type:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2025.behavior_type
+  campaign_strategy_intent:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2025.campaign_strategy_intent
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2025.city_group
+  date:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2025.date
+  funnel_side:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2025.funnel_side
+  medium:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2025.medium
+  ntp:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2025.ntp
+  operation_channel:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2025.operation_channel
+  referral_type:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2025.referral_type
+  rtp:
+    lineage:
+      - datalake_gsheets_raw.rental_tenant_prospects_budget_2025.rtp
