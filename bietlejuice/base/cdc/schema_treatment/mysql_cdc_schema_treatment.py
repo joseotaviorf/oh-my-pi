@@ -1,6 +1,6 @@
 from typing import Optional
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import col, to_timestamp, to_date
+from pyspark.sql.functions import col, to_timestamp, to_date, when
 from bietlejuice.base.cdc.schema_treatment.cdc_schema_treatment import (
     CdcSchemaTreatment,
 )
@@ -105,7 +105,7 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
         the columns that are timestamps by looking at the latest DDL change in the table schema, and treating them accordingly.
         """
         days_unix_columns = []
-        milliseconds_unix_columns = []
+        unix_columns = []
         string_columns = []
 
         for column in latest_table_change["columns"]:
@@ -117,15 +117,12 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
             if column["typeName"] == "DATE":
                 days_unix_columns.append(column["name"])
             elif column["typeName"] == "DATETIME":
-                milliseconds_unix_columns.append(column["name"])
+                unix_columns.append(column["name"])
             elif column["typeName"] == "TIMESTAMP":
                 string_columns.append(column["name"])
 
         return self._treat_timestamp_columns_from_column_lists(
-            transactional_dataframe,
-            days_unix_columns,
-            milliseconds_unix_columns,
-            string_columns,
+            transactional_dataframe, days_unix_columns, unix_columns, string_columns
         )
 
     def _treat_timestamp_columns_from_existing_datalake_table(
@@ -136,7 +133,7 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
         the columns that are timestamps by looking at the schema of the existing datalake table, and treating them accordingly.
         """
         days_unix_columns = []
-        milliseconds_unix_columns = []
+        unix_columns = []
         string_columns = []
 
         for column in datalake_dataframe.columns:
@@ -157,20 +154,17 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
             ):
                 string_columns.append(column)
             elif datalake_dataframe.schema[column].dataType.typeName() == "timestamp":
-                milliseconds_unix_columns.append(column)
+                unix_columns.append(column)
 
         return self._treat_timestamp_columns_from_column_lists(
-            transactional_dataframe,
-            days_unix_columns,
-            milliseconds_unix_columns,
-            string_columns,
+            transactional_dataframe, days_unix_columns, unix_columns, string_columns
         )
 
     def _treat_timestamp_columns_from_column_lists(
         self,
         transactional_dataframe: DataFrame,
         days_unix_columns: list,
-        milliseconds_unix_columns: list,
+        unix_columns: list,
         string_columns: list,
     ) -> DataFrame:
         """CDC saves date and datetime columns as unix timestamps. This method converts them back to datetime"""
@@ -179,10 +173,21 @@ class MySqlCdcSchemaTreatment(CdcSchemaTreatment):
             transactional_dataframe = transactional_dataframe.withColumn(
                 column, to_date(to_timestamp(col(column) * 24 * 60 * 60))
             )
-        for column in milliseconds_unix_columns:
+
+        for column in unix_columns:
+            """
+                If the unix timestamp is lower than 100000000000000, it is a unix timestamp with miliseconds
+                If not, it is a timestamp with microseconds.
+            """
             transactional_dataframe = transactional_dataframe.withColumn(
-                column, to_timestamp(col(column) / 1000)
+                column,
+                to_timestamp(
+                    when(col(column) < 100000000000000, col(column) / 1000).otherwise(
+                        col(column) / 1000000
+                    )
+                ),
             )
+
         for column in string_columns:
             transactional_dataframe = transactional_dataframe.withColumn(
                 column, to_timestamp(col(column))
