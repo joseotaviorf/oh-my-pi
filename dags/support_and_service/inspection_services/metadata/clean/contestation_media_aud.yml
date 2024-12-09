@@ -1,0 +1,93 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: contestation_media_aud
+description: When an tenant makes a contestation of a requested repair, it is possible to add photos as evidence.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_contestation_media:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.id
+    description: Auto-incrementing internal ID
+  id_contestation:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.contestation_id
+    description: ID of the contestation to which the media belongs
+  uuid:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.uuid
+    description: Auto-incrementing external ID
+  type:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.type
+    description: Media type
+    categories:
+      PHOTO: ""
+  name:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.name
+    description: Path of the photo in the bucket
+  rev:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.rev
+    description: Foreign key of the RevInfo table, which indicates when the record was changed
+  revtype:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.revtype
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+  revend:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.revend
+    description: Number of the next revision of this id.
+  mod_id_contestation:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.contestation_id_mod
+    description: Indicates if the id_contestation field has been changed
+  mod_uuid:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.uuid_mod
+    description: Indicates if the uuid field has been changed
+  mod_type:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.type_mod
+    description: Indicates if the type field has been changed
+  mod_name:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.name_mod
+    description: Indicates if the name field has been changed
+  mod_contestation:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.contestation_mod
+    description: Indicates if the contestation field has been changed
+  mod_ts_created:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.created_at_mod
+    description: Indicates if the ts_created field has been changed
+  mod_ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.updated_at_mod
+    description: Indicates if the ts_updated field has been changed
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.created_at
+    description: Record creation date
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.updated_at
+    description: Record update date
+  year:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.year
+    description: Year of update date
+  month:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.month
+    description: Month of update date
+  day:
+    lineage:
+      - datalake_inspection_services_raw.contestation_media_aud.day
+    description: Day of update date

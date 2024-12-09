@@ -1,0 +1,99 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: item_group_type_aud
+description: It brings the standard types of item group that we can have within the application.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_item_group_type:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.id
+    description: Item Group Type unique identifier
+  id_room_type:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.room_type_id
+    description: Room type identification key.
+  type:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.type
+    description: Name of the object evaluated in the inspection
+  rev:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.rev
+    description: Foreign key of the RevInfo table, which indicates when the record was changed
+  revtype:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.revtype
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+  revend:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.revend
+    description: Number of the next revision of this id.
+  review_instruction:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.review_instruction
+    description: Text that will be displayed on the report for owners and tenants
+  is_deletable:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.deletable
+    description: Identifies whether the record can be deleted via IS
+  is_deleted:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.deleted
+    description: Identifies whether the record is deleted
+  mod_review_instruction:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.review_instruction_mod
+    description: Indicates if the review_instruction field has been changed
+  mod_type:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.type_mod
+    description: Indicates if the type field has been changed
+  mod_item_types:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.item_types_mod
+    description: Indicates if the item_types field has been changed
+  mod_room_type:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.room_type_mod
+    description: Indicates if the room_type field has been changed
+  mod_deleted:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.deleted_mod
+    description: Indicates if the is_deleted field has been changed
+  mod_deletable:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.deletable_mod
+    description: Indicates if the is_deletable field has been changed
+  mod_ts_created:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.created_at_mod
+    description: Indicates if the ts_created field has been changed
+  mod_ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.updated_at_mod
+    description: Indicates if the ts_updated field has been changed
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.created_at
+    description: Creation date
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.updated_at
+    description: Update date
+  year:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspection_services_raw.item_group_type_aud.day
+    description: Day of update date.

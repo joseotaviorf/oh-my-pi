@@ -1,0 +1,26 @@
+SELECT
+    id AS id_item_media,
+    main_id AS id_main,
+    item_id AS id_item,
+    uuid,
+    type,
+    url,
+    rev,
+    revtype,
+    revend,
+    active AS is_active,
+    main_id_mod AS mod_id_main,
+    uuid_mod AS mod_uuid,
+    item_mod AS mod_item,
+    type_mod AS mod_type,
+    url_mod AS mod_url,
+    active_mod AS mod_is_active,
+    created_at_mod AS mod_ts_created,
+    updated_at_mod AS mod_ts_updated,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_inspection_services_raw.item_media_aud

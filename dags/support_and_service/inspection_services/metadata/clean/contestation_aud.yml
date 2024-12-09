@@ -1,0 +1,144 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: contestation_aud
+description:
+  When an repair of an object is requested and the tenant understand it
+  as improper, it is possible to contest the repair request.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_contestation:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.id
+    description: Auto-incrementing internal ID
+  id_repair_request:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.repair_request_id
+    description: ID of the repair the contestation is referring to
+  id_reviewer:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.reviewer_id
+    description: Creator of the contestation
+  uuid:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.uuid
+    description: Auto-incrementing external ID
+  comment:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.comment
+    description: Contestation description
+  reason:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.reason
+    description: "Reason/Justification for dispute"
+    categories:
+      DISAGREE: ""
+      SAME: ""
+      REPAIR_NEGOTIATED: ""
+      OTHER: ""
+  origin:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.origin
+    description: Descriptive information that indicates when the contestation occurred.
+    categories:
+      REVIEW: If the contestation occurred at the time of review.
+      BUDGET_APPROVAL: If the contestation occurred at the time of budget approval process.
+  type:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.type
+    description: Descriptive information indicating the type of contestation made.
+    categories:
+      RESPONSIBILITY: If it was a contestation of responsibility for the repair.
+      COST: If it was a contestation of cost for the repair.
+  cost:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.cost
+    description: Float type information indicating the disputed value.
+  rev:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.rev
+    description: Foreign key of the RevInfo table, which indicates when the record was changed
+  revtype:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.revtype
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+  revend:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.revend
+    description: Number of the next revision of this id.
+  mod_id_reviewer:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.reviewer_id_mod
+    description: Indicates if the id_reviewer field has been changed
+  mod_id_repair_request:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.repair_request_id_mod
+    description: Indicates if the id_repair_request field has been changed
+  mod_uuid:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.uuid_mod
+    description: Indicates if the uuid field has been changed
+  mod_comment:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.comment_mod
+    description: Indicates if the comment field has been changed
+  mod_reason:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.reason_mod
+    description: Indicates if the reason field has been changed
+  mod_origin:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.origin_mod
+    description: Indicates if the origin field has been changed
+  mod_type:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.type_mod
+    description: Indicates if the type field has been changed
+  mod_cost:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.cost_mod
+    description: Indicates if the cost field has been changed
+  mod_reviewer:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.reviewer_mod
+    description: Indicates if the reviewer field has been changed
+  mod_repair_request:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.repair_request_mod
+    description: Indicates if the repair_request field has been changed
+  mod_contestation_medias:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.contestation_medias_mod
+    description: Indicates if the contestation_medias field has been changed
+  mod_ts_created:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.created_at_mod
+    description: Indicates if the ts_created field has been changed
+  mod_ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.updated_at_mod
+    description: Indicates if the ts_updated field has been changed
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.created_at
+    description: Record creation date
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.updated_at
+    description: Record update date
+  year:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.year
+    description: Year of update date
+  month:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.month
+    description: Month of update date
+  day:
+    lineage:
+      - datalake_inspection_services_raw.contestation_aud.day
+    description: Day of update date

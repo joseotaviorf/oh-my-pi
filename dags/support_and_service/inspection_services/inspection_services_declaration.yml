@@ -1,0 +1,70 @@
+dag:
+  name: inspection_services
+  schedule_start_date: 2024, 11, 21
+  schedule_interval: 15 3 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Retrieves data from the Inspections database (PostgreSQL). [Inspections](https://github.com/quintoandar/inspections-service) is a micro service to inspections with this database we need to measure the lead time inspections, when inspector start and finish inspection, if he follow the planner's route
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  source_database: inspections
+  dbutils_secret_key: INSPECTIONS_DB
+  lineage_product_database_name: inspections
+  tables_customization:
+    assessment_aud:
+      clean_table_name: assessment_aud
+      raw_primary_keys: [id, rev]
+    contestation_media_aud:
+      clean_table_name: contestation_media_aud
+      raw_primary_keys: [id, rev]
+    contestation_aud:
+      clean_table_name: contestation_aud
+      raw_primary_keys: [id, rev]
+    issue_type_aud:
+      clean_table_name: issue_type_aud
+      raw_primary_keys: [id, rev]
+    item_group_type_aud:
+      clean_table_name: item_group_type_aud
+      raw_primary_keys: [id, rev]
+    item_group_aud:
+      clean_table_name: item_group_aud
+      raw_primary_keys: [id, rev]
+    item_issue_aud:
+      clean_table_name: item_issue_aud
+      raw_primary_keys: [id, rev]
+    item_media_aud:
+      clean_table_name: item_media_aud
+      raw_primary_keys: [id, rev]
+    item_type_aud:
+      clean_table_name: item_type_aud
+      raw_primary_keys: [id, rev]
+    item_aud:
+      clean_table_name: item_aud
+      raw_primary_keys: [id, rev]
+    repair_request_media_aud:
+      clean_table_name: repair_request_media_aud
+      raw_primary_keys: [id, rev]
+    repair_request_aud:
+      clean_table_name: repair_request_aud
+      raw_primary_keys: [id, rev]
+    review_media_aud:
+      clean_table_name: review_media_aud
+      raw_primary_keys: [id, rev]
+    review_aud:
+      clean_table_name: review_aud
+      raw_primary_keys: [id, rev]
+    room_aud:
+      clean_table_name: room_aud
+      raw_primary_keys: [id, rev]
+    room_type_aud:
+      clean_table_name: room_type_aud
+      raw_primary_keys: [id, rev]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_12_2_med_general_cluster

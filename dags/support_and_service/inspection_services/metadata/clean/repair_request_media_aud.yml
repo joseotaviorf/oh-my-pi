@@ -1,0 +1,99 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: repair_request_media_aud
+description: Media data regarding the repair request after inspection.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_repair_request_media:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.id
+    description: Repair Request Media unique identifier (number)
+  id_repair_request:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.repair_request_id
+    description: Indicates which repair request the media belongs to
+  id_main:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.main_id
+    description: Media id in Main monolith
+  uuid:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.uuid
+    description: Repair Request Media unique identifier (uuid)
+  type:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.type
+    description: Indicates whether the media is a photo or a video
+  name:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.name
+    description: Name of the photo in the inspection image bucket
+  rev:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.rev
+    description: Foreign key of the RevInfo table, which indicates when the record was changed
+  revtype:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.revtype
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+  revend:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.revend
+    description: Number of the next revision of this id.
+  mod_id_repair_request:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.repair_request_id_mod
+    description: Indicates if the id_repair_request field has been changed
+  mod_id_main:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.main_id_mod
+    description: Indicates if the id_main field has been changed
+  mod_uuid:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.uuid_mod
+    description: Indicates if the uuid field has been changed
+  mod_type:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.type_mod
+    description: Indicates if the type field has been changed
+  mod_name:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.name_mod
+    description: Indicates if the name field has been changed
+  mod_repair_request:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.repair_request_mod
+    description: Indicates if the repair_request field has been changed
+  mod_ts_created:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.created_at_mod
+    description: Indicates if the ts_created field has been changed
+  mod_ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.updated_at_mod
+    description: Indicates if the ts_updated field has been changed
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.created_at
+    description: Creation date
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.updated_at
+    description: Update date
+  year:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_media_aud.day
+    description: Day of update date.
