@@ -83,21 +83,21 @@ def table_configs(table_name: str):
         
     elif table_name == 'survey_questions':
         endpoint_enum = 'SURVEY_QUESTIONS'
-        feedback_parameters_query = "SELECT DISTINCT id AS survey_id FROM datalake_survicate_surveys_test_raw.surveys WHERE workspace_name = '{workspace}'"
+        feedback_parameters_query = "SELECT DISTINCT id AS survey_id FROM datalake_survicate_test_raw.surveys WHERE workspace_name = '{workspace}'"
         optional_parameters = {"items_per_page": 100,
                                "start": start,
                                "end": end}
   
     elif table_name == 'survey_responses':
         endpoint_enum = 'SURVEY_RESPONSES'
-        feedback_parameters_query = "SELECT DISTINCT id AS survey_id FROM datalake_survicate_surveys_test_raw.surveys WHERE workspace_name = '{workspace}'"
+        feedback_parameters_query = "SELECT DISTINCT id AS survey_id FROM datalake_survicate_test_raw.surveys WHERE workspace_name = '{workspace}'"
         optional_parameters = {"items_per_page": 100,
                                "start": start,
                                "end": end}
     
     elif table_name == "respondent_attributes":
         endpoint_enum = 'RESPONDENT_ATTRIBUTES'
-        feedback_parameters_query = "SELECT DISTINCT GET_JSON_OBJECT(respondent, '$.uuid') AS respondent_uuid FROM datalake_survicate_survey_attributes_test_raw.survey_responses WHERE DATE(dt_load) = DATE('{execution_date}') and workspace_name = '{workspace}'"
+        feedback_parameters_query = "SELECT DISTINCT GET_JSON_OBJECT(respondent, '$.uuid') AS respondent_uuid FROM datalake_survicate_test_raw.survey_responses WHERE DATE(dt_load) = DATE('{execution_date}') and workspace_name = '{workspace}'"
         optional_parameters = {"items_per_page": 100,
                                "start": start} 
            
