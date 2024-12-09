@@ -1,0 +1,32 @@
+---
+table_name: datalake_tiers_classification.operation_points
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 21000
+    severity_level: Error
+column_level_validations:
+  id_user:
+    is_complete:
+      severity_level: Error
+  id_business_unit:
+    is_complete:
+      severity_level: Error
+  id_points_rule:
+    is_complete:
+      severity_level: Error
+  id_business_unit:
+    is_complete:
+      severity_level: Error
+  bimester_name:
+    is_complete:
+      severity_level: Error
+  profile:
+    is_complete:
+      severity_level: Error
+  program_code:
+    is_complete:
+      severity_level: Error
+  operation:
+    is_complete:
+      severity_level: Error

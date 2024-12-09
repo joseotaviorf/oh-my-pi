@@ -1,0 +1,19 @@
+---
+table_name: datalake_hub_services.profile
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 12
+    severity_level: Error
+column_level_validations:
+  id_profile:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  profile:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+
