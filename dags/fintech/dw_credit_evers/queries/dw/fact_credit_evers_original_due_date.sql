@@ -225,18 +225,18 @@ base_ever AS (
 dt_cancellation AS (
 SELECT
   sk_negotiation,
-  id_contract,
+  sk_contract,
   dt_cancellation
 FROM 
   dw_collection_recovery_quintoandar.fact_negotiation
 WHERE 
   creditor = 'IQ QuintoAndar'
-  AND is_down_payment_paid = TRUE
+  AND dt_down_payment IS NOT NULL
   AND negotiation_status IN ('broken','finished','offset')
   AND number_of_installments > 1
   AND promisse_payment_method <> 'CARTÃO'
 QUALIFY row_number() 
-  OVER ( PARTITION BY id_contract  ORDER BY CASE WHEN negotiation_status = 'broken' THEN 1 ELSE 0 END DESC,sk_negotiation ) = 1
+  OVER ( PARTITION BY sk_contract  ORDER BY CASE WHEN negotiation_status = 'broken' THEN 1 ELSE 0 END DESC,sk_negotiation ) = 1
 )
 SELECT
   b.id_contract_ebdb,
@@ -261,5 +261,5 @@ FROM
   base_ever b
 LEFT JOIN 
   dt_cancellation c
-  ON b.id_contract_ebdb = c.id_contract
+  ON b.id_contract_ebdb = c.sk_contract
   AND b.is_agreement = TRUE
