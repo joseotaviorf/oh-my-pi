@@ -1,0 +1,19 @@
+database_name: datalake_gsheets_clean
+table_name: pp_multi_cluster
+description: 
+  Clean table with information about which cluster each PP Multi belongs to, identified by id_owner.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_owner:
+    lineage:
+      - datalake_gsheets_raw.pp_multi_cluster.id_owner
+    description: Id of the PP Multi
+  cluster:
+    lineage:
+      - datalake_gsheets_raw.pp_multi_cluster.cluster
+    description: Cluster of the PP Multi. (Short Stay, Corporate Or Investors)
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.pp_multi_cluster.ts_load
+    description: Timestamp at which the data was loaded.

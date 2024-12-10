@@ -29,6 +29,13 @@ sheets_info:
     clean_table_name: ciq_portfolio
     sheet_context: agents
     partitioned: true
+  
+  pp_multi_cluster:
+    sheet_id: 1LlbYqd6atdjrwpIxT_r1p_nrp2wnzrz69Lfa18Moi5M
+    sheet_name: pp_multi_cluster
+    clean_table_name: pp_multi_cluster
+    sheet_context: agents
+    partitioned: true
 
   rent_comission_for_strategic_region:
     sheet_id: 1ygsGwDlMQZXKUGkXB54ZPno_N2dANJrms1Qki42NGYE

@@ -29,6 +29,13 @@ sheets_info:
     clean_table_name: ciq_portfolio
     sheet_context: agents
     partitioned: true
+  
+  pp_multi_cluster:
+    sheet_id: 1LlbYqd6atdjrwpIxT_r1p_nrp2wnzrz69Lfa18Moi5M
+    sheet_name: pp_multi_cluster
+    clean_table_name: pp_multi_cluster
+    sheet_context: agents
+    partitioned: true
 
   rent_comission_for_strategic_region:
     sheet_id: 1ygsGwDlMQZXKUGkXB54ZPno_N2dANJrms1Qki42NGYE
@@ -56,16 +63,16 @@ sheets_info:
     clean_table_name: sale_ongoing_listings_date
     sheet_context: agents
 
-  secretariat_portfolio:
+  secretariat_sale_portfolio:
     sheet_id: 1OIxF-7w_1n3BB77aiJRkbnA9nHrMqTSrQ-piU5WSFOw
     sheet_name: sv_portfolio_history
-    clean_table_name: secretariat_portfolio
+    clean_table_name: secretariat_sale_portfolio
     sheet_context: agents
 
-  secretariat_portfolio_details:
+  secretariat_sale_portfolio_details:
     sheet_id: 1OIxF-7w_1n3BB77aiJRkbnA9nHrMqTSrQ-piU5WSFOw
     sheet_name: sv_portfolio_details_history
-    clean_table_name: secretariat_portfolio_details
+    clean_table_name: secretariat_sale_portfolio_details
     sheet_context: agents
 
   subhub_regions:
