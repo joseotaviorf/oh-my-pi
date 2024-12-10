@@ -35,8 +35,8 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("table_name")
-    parser.add_argument("calendar_region")
     parser.add_argument("partition_columns")
+    parser.add_argument("calendar_region")
 
     args = parser.parse_args()
     environment = args.env

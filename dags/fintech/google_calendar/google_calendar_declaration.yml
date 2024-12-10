@@ -1,0 +1,47 @@
+---
+dag:
+  name: google_calendar
+  schedule_start_date: 2024, 8, 1
+  schedule_interval: 0 12 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Retrieves Data from the Google Calendar API
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_google_calendar
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{partitions}"
+  short_circuit_customization:
+    function: CHECK_IS_SPECIFIC_DAY_OF_MONTH
+    execution_date: "{{ macros.ds_add(ds, 1) }}"
+    function_params:
+      day: 1
+  tables_customization:
+    brazillian_holidays:
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+      partitions: ["year", "month", "day"]
+      extra_spark_job_arguments:
+        - "en.brazilian"
+    mexican_holidays:
+      raw_extraction_type: incremental
+      clean_extraction_type: full
+      partitions: ["year", "month", "day"]
+      extra_spark_job_arguments:
+        - "en.mexican"
+cluster:
+  type: databricks_13_3_min_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  custom_libraries:
+    - pypi:
+        package: "google-api-python-client==2.48.0"
+    - pypi:
+        package: "oauth2client==4.1.3"
