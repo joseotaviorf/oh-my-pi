@@ -1,7 +1,11 @@
 SELECT
-    *,
-    DATE(updated_at) AS dt
+  *,
+  DATE(updated_at) AS dt,
+  CAST(EXTRACT(YEAR FROM DATE(updated_at)) AS INT) AS year,
+  CAST(EXTRACT(MONTH FROM DATE(updated_at)) AS INT) AS month,
+  CAST(EXTRACT(DAY FROM DATE(updated_at)) AS INT) AS day
 FROM
-    house_lead
+  house_lead
 WHERE
-    DATE(updated_at) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  DATE(updated_at) >= DATE(DATE('{execution_date}') - INTERVAL '6 day')
+  AND DATE(updated_at) < DATE(DATE('{execution_date}') + INTERVAL '1 day')

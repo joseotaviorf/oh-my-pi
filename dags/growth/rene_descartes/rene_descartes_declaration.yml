@@ -1,0 +1,83 @@
+---
+dag:
+  name: rene_descartes
+  schedule_start_date: 2020, 7, 27
+  schedule_interval: 0 0 * * *
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG handles the ingestion of our raw and clean data for our Rene Descartes Microservice,
+      which is a Microservice for Owner Lead discard rules. For more information about the Database please refer
+      to the [Rene Descartes Repository](https://github.com/quintoandar/rene-descartes).
+workflow:
+  type: database_pull_delta
+  layer: raw
+  database_type: postgres
+  dbutils_secret_key: RENE_DESCARTES_DB
+  lineage_product_database_name: renedescartes
+  default_raw_extraction_type: incremental
+  default_clean_extraction_type: full
+  default_partitions: ["year", "month", "day"]
+  default_clean_partitions: []
+  tables_customization:
+    acquisition_misc_data:
+      date_filter_column: updated_at
+      read_from_sql: True
+    address_aud:
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
+      read_from_sql: True
+    address:
+      date_filter_column: updated_at
+      read_from_sql: True
+    house_lead_aud:
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
+      read_from_sql: True
+    house_lead_conversion_aud:
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
+      read_from_sql: True
+    house_lead_conversion:
+      date_filter_column: updated_at
+      read_from_sql: True
+    house_lead:
+      date_filter_column: updated_at
+      read_from_sql: True
+    lead_rejection_aud:
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
+      read_from_sql: True
+    lead_rejection:
+      date_filter_column: updated_at
+      read_from_sql: True
+    owner_aud:
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
+      read_from_sql: True
+    owner:
+      date_filter_column: updated_at
+      read_from_sql: True
+    phone:
+      date_filter_column: updated_at
+      read_from_sql: True
+    rejection_history_collector_aud:
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
+      read_from_sql: True
+    rejection_history_collector:
+      date_filter_column: updated_at
+      read_from_sql: True
+    rejection_history_event_aud:
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
+      read_from_sql: True
+    rejection_history_event:
+      date_filter_column: updated_at
+      read_from_sql: True
+    revinfo:
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
+      read_from_sql: True
+cluster:
+  type: databricks_13_3_med_memory_cluster
