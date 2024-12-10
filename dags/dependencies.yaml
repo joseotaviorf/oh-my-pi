@@ -231,14 +231,6 @@ bietlejuice.dw_contract:
   - bietlejuice.enrich_ebdb_contract:load-enrich-ongoing-contracts
   - bietlejuice.enrich_offboarding:load-enrich-contract-anomaly
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
-bietlejuice.dw_contract_test:
-  - bietlejuice.enrich_b2b:load-enrich-house-listing
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
-  - bietlejuice.enrich_ebdb_contract:load-enrich-ongoing-contracts
-  - bietlejuice.enrich_offboarding:load-enrich-contract-anomaly
-  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
 bietlejuice.dw_credit_analysis:
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report
   - bietlejuice.docx:load-clean-credit-evaluation
