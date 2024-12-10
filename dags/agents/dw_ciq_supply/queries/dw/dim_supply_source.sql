@@ -1,5 +1,5 @@
 SELECT DISTINCT
-    sk_supply_source,
+    id_supply_source AS sk_supply_source,
     supply_source,
     NOW() AS ts_load
 FROM
