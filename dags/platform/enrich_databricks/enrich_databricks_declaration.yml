@@ -15,13 +15,14 @@ workflow:
     unique_clusters:
       merge_on: [ id_cluster ]
       when_matched_update_condition: "source.ts_updated > target.ts_updated"
-    daily_pool_idle_time:
-      partitions: [ dt_cluster_run ]
+    # Removing this temporarily while we're fixing the issue with aws_costs_new
+    # daily_pool_idle_time:
+    #   partitions: [ dt_cluster_run ]
   inner_dependencies:
     daily_clusters:
       - unique_clusters
-    daily_pool_idle_time:
-      - daily_clusters
+    # daily_pool_idle_time:
+    #   - daily_clusters
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, tomorrow_ds, 'load_end_date') }}"
