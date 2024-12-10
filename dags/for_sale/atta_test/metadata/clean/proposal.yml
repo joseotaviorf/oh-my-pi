@@ -62,6 +62,9 @@ columns:
   status_translation:
     lineage:
       - datalake_atta_test_raw.proposta.StatusTranslation
+  chosen_by:
+    lineage:
+      - datalake_atta_test_raw.proposta.ChosenBy
   ts_registration:
     lineage:
       - datalake_atta_test_raw.proposta.dtentrada
@@ -71,3 +74,6 @@ columns:
   ts_last_updated:
     lineage:
       - datalake_atta_test_raw.proposta.dtultatu
+  ts_chosen:
+    lineage:
+      - datalake_atta_test_raw.proposta.ChosenAt

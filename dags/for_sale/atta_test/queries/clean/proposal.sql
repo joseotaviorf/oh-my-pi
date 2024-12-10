@@ -18,9 +18,11 @@ SELECT
     CPF                         AS client_cpf,
     Nome                        AS client_name,
     StatusTranslation           AS status_translation,
+    ChosenBy                    AS chosen_by,
     Valor                       AS financing_value,
     TIMESTAMP(DtEntrada)        AS ts_registration,
     TIMESTAMP(DtFinalizacao)    AS ts_financing_ended,
-    TIMESTAMP(DtUltAtu)         AS ts_last_updated
+    TIMESTAMP(DtUltAtu)         AS ts_last_updated,
+    TIMESTAMP(ChosenAt)         AS ts_chosen
 FROM
     datalake_atta_test_raw.proposta
