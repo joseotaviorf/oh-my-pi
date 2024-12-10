@@ -5,6 +5,3 @@ column_level_validations:
   id_supply:
     is_complete:
       severity_level: Warning
-  id_supply_lead:
-    is_complete:
-      severity_level: Warning

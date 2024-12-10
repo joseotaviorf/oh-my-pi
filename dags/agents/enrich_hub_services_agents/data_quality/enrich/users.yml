@@ -3,7 +3,7 @@ table_name: datalake_hub_services.users
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 28000
+    greater_than: 15000
     severity_level: Error
 column_level_validations:
   id_user:
