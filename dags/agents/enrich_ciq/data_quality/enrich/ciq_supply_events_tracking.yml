@@ -1,0 +1,10 @@
+---
+table_name: datalake_ciq.ciq_supply_events_tracking
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_supply:
+    is_complete:
+      severity_level: Warning
+  id_supply_lead:
+    is_complete:
+      severity_level: Warning

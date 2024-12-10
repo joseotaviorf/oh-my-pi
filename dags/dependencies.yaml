@@ -1351,6 +1351,8 @@ bietlejuice.enrich_buyer_prospect:
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
 bietlejuice.enrich_ciq:
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking
   - bietlejuice.gsheets_agents:done-clean-ciq-portfolio
 bietlejuice.enrich_ciq_comissioning:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house

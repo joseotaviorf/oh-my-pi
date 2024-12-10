@@ -1,0 +1,99 @@
+---
+database_name: datalake_ciq
+table_name: ciq_supply_events_tracking
+description: Table contains records about supply events related to the CIQ context. 
+  Each record corresponds to a step within the supply funnel and its corresponding information.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_supply:
+    description: Primary key that identifies each supply flow events (Lead to FL).
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.sk_supply_lead
+      - datalake_supply_flows.supply_events_tracking.id_house
+  id_supply_lead:
+    description: The unique identifier for each supply lead.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.sk_supply_lead
+  id_supply_source: 
+    description: The unique identifier for each source of the supply.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.supply_source
+  id_owner:
+    description: Id of the user who owns the house.
+    lineage:
+      - datalake_ebdb_listing.house.id_user
+  id_house:
+    description: The identifier for each house.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.id_house
+  id_user_affiliate:
+    description: The identifier of the user that referred the current lead.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.id_user_affiliate
+  id_user_registrant:
+    description:  Identifier of the user that registered the conversion event.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.id_user_registrant
+  id_user_conversion:
+    description: Identifier of the user that converted the lead.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.id_user_conversion
+  id_funnel_step:
+    description: Id corresponding to the order of the steps in the supply funnel.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.funnel_step
+      - datalake_supply_flows.supply_events_tracking.business_event
+  ops_agent:
+    description: Agent that reprocessed the lead.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.ops_agent
+  funnel_step:
+    description: The funnel step of the taxonomy, referring to the funnel step in the supply funnel.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.funnel_step
+  funnel_event_type:
+    description: The origin of data, can be acquisition or conversion.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.aux_origin_table
+  business_event:
+    description: Type of business event. It could be an acquisition or conversion event, together with the suffix intra funnel.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.business_event
+  origin:
+    description: Origin of the supply event, having a different classification between acquisition and conversion.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.application
+      - datalake_supply_flows.supply_events_tracking.supply_source
+      - datalake_supply_flows.supply_events_tracking.id_user_affiliate
+      - datalake_supply_flows.supply_events_tracking.application
+  business_context:
+    description: Business context of the supply event.
+    categories:
+      RENT: 'For rent lead or house'
+      SALE: 'For sale lead or house'
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.business_context
+  supply_source:
+    description: Source of the supply. Can be 1P, 3P, or CIQ.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.supply_source
+  application:
+    description: Origin of conversion in the PWAs.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.application
+  platform:
+    description: The name of platform that register the lead, as IoS, Android or Web.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.platform
+  company_report_origin:
+    description: Indicates the origin within the company that the report targets.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.supply_source
+      - datalake_supply_flows.supply_events_tracking.application
+      - datalake_supply_flows.supply_events_tracking.id_user_affiliate
+      - datalake_supply_flows.supply_events_tracking.funnel_event_type
+  ts_event:
+    description: Timestamp of the event.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.ts_event
