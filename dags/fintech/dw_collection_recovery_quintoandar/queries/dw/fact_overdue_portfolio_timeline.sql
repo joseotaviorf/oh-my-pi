@@ -16,7 +16,7 @@ pending_invoices_invoice_pay_button_clicked_events AS (
   WHERE
     event_properties:contract_id IS NOT NULL
     AND event_properties:invoice_id IS NOT NULL
-)
+),
 ssn_original_payment AS (
     SELECT DISTINCT
         COALESCE(pi.id_contract, rip.id_contract) AS id_contract,
