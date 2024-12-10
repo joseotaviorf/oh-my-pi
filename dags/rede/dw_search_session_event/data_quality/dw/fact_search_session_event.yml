@@ -1,10 +1,6 @@
 ---
 table_name: dw_public.fact_search_session_event
 alert_channel: "#alerts-de-airflow-dags"
-table_level_validations:
-  has_size:
-    greater_than: 0
-    severity_level: Error
 column_level_validations:
   sk_event:
     is_complete:

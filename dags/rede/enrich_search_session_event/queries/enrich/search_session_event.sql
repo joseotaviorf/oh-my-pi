@@ -134,7 +134,7 @@ SELECT
     id_house,
     event_type,
     search_rendering_type,
-    COALESCE(LOWER(business_context), 'unknown') AS business_context,
+    LOWER(business_context) AS business_context,
     utm_source,
     utm_medium,
     platform,

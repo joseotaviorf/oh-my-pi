@@ -27,7 +27,7 @@ column_level_validations:
       values:
         - sale
         - rent
-        - unknown
+        - n/a
   utm_source:
     is_complete:
       severity_level: Error
