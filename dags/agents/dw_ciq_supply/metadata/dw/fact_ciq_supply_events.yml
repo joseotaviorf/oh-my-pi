@@ -1,0 +1,69 @@
+database_name: dw_ciq_supply
+table_name: fact_ciq_supply_events
+description: Fact table that contains records about supply events related to the CIQ context. 
+  Each record corresponds to a step within the supply funnel and its corresponding information.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  sk_ciq_supply_event:
+    description: Unique primary key that identifies each supply event.
+  sk_supply_lead:
+    description: Unique identifier for each supply lead. Key from the dw_growth.dim_lead dimension associated with the supply.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.id_supply_lead
+  sk_supply_source:
+    description: Unique identifier for each supply source. Key from dw_ciq_supply.dim_supply_source
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.id_supply_source
+  sk_owner:
+    description: Id of the user who owns the house. Key from dw_public.dim_user.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.id_owner
+  sk_house:
+    description: The identifier for each house.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.id_house
+  sk_user_affiliate:
+    description: The identifier of the user that referred the current lead. 
+      Used to identify the CIQ id_user when it makes the referral. Key from dw_public.dim_user
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.id_user_affiliate
+  sk_user_registrant:
+    description: Identifier of the user that registered the conversion event. 
+      In this case, it could be the owner, the CIQ or the ops agent. Key from dw_public.dim_user
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.id_user_registrant
+  sk_user_conversion:
+    description: Identifier of the user that converted the lead. 
+      For this scenario, it could be the CIQ or ops agent. Key from dw_public.dim_user
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.id_user_conversion
+  sk_funnel_step:
+    description: Id corresponding to the order of the steps in the supply funnel. Key from dw_ciq_supply.dim_funnel_step.
+      Key from dw_ciq_supply.dim_funnel_step.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.id_funnel_step
+  is_for_rent:
+    description: Informs whether the funnel event belongs to the rent context.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.business_context
+  is_for_sale:
+    description: Informs whether the funnel event belongs to the sale context.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.business_context
+  is_ciq:
+    description: Reports whether that supply funnel event was converted by a CIQ.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.origin
+  is_ciq_operations:
+    description: Reports whether that supply funnel event was converted by CIQ Operations.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.origin
+      - datalake_ciq.ciq_supply_events_tracking.application
+      - datalake_ciq.ciq_supply_events_tracking.ops_agent
+  ts_event:
+    description: Timestamp of the event.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.ts_event
+  ts_load:
+    description: Timestamp of when the table was last processed.

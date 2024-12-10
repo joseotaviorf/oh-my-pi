@@ -114,6 +114,8 @@ bietlejuice.dw_charging_payment_quintocred:
   - bietlejuice.rental_guarantee_platform:load-clean-rev-info
   - bietlejuice.sap_gateway:load-clean-feature
   - bietlejuice.sap_gateway:load-clean-sync-sap-job
+bietlejuice.dw_ciq_supply:
+  - bietlejuice.enrich_ciq:load-enrich-ciq-supply-events-tracking
 bietlejuice.dw_collection_recovery:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-house

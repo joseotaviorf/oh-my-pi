@@ -1,0 +1,18 @@
+database_name: dw_ciq_supply
+table_name: dim_supply_source
+description: Dimension table that provides information about the supply funnel sources.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  sk_supply_source:
+    description: Unique primary key that identifies each supply source.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.id_supply_source
+  supply_source:
+    description: Source of the supply. Can be 1P, 3P, or CIQ.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.supply_source
+  ts_load:
+    description: Timestamp of when the table was last processed.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking

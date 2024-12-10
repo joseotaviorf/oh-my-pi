@@ -1,0 +1,13 @@
+---
+table_name: dw_ciq_supply.fact_ciq_supply_events
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 76000000
+    severity_level: Error
+column_level_validations:
+  sk_ciq_supply_event:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error

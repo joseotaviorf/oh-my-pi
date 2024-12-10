@@ -1,0 +1,11 @@
+dag:
+  name: dw_ciq_supply
+  owner: Data Agents
+  documentation:
+    dag_purpose: Dimensional modeling of supply funnel event data, associated with the CIQ context.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: ciq_supply
+cluster:
+  type: databricks_12_2_xmin_memory_cluster

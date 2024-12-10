@@ -1,0 +1,26 @@
+database_name: dw_ciq_supply
+table_name: dim_funnel_step
+description: Dimension table that provides information about the funnel stages, in relation to their order and nomenclature.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  sk_funnel_step:
+    description: Unique primary key that corresponding to the order of the steps in the supply funnel. 
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.id_funnel_step
+  funnel_step:
+    description: The funnel step of the taxonomy, referring to the funnel step in the supply funnel.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.funnel_step
+  business_event:
+    description: Type of business event. It could be an acquisition or conversion event, together with the suffix intra funnel.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.business_event
+  funnel_inter_step:
+    description: Code for the intermediate step within the funnel.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking.business_event
+  ts_load:
+    description: Timestamp of when the table was last processed.
+    lineage:
+      - datalake_ciq.ciq_supply_events_tracking
