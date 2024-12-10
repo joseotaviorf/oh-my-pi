@@ -30,6 +30,8 @@ workflow:
             - sla_journey
             - sla_theme
             - sla_theme_detail
+        csat:
+            - tickets
     tables_customization:
         calls:
             z_order_by: [id_task, id_reservation]
