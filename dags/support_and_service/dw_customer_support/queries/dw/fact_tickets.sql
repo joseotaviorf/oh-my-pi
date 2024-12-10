@@ -104,8 +104,10 @@ SELECT
   COALESCE(CAST(tc.id_assignee AS BIGINT), -1) AS sk_zendesk_assignee_user,
   COALESCE(CAST(t.id_session AS BIGINT), -1) AS sk_session,
   COALESCE(t.id_contract, -1) AS sk_contract,
-  MD5(COALESCE(t.last_queue, "NULL")) AS sk_department,
-  MD5(COALESCE(t.last_analyst_email, "NULL")) AS sk_analyst,
+  MD5(COALESCE(t.first_queue, "NULL")) AS sk_first_department,
+  MD5(COALESCE(t.last_queue, "NULL")) AS sk_main_department,
+  MD5(COALESCE(t.first_analyst_email, "NULL")) AS sk_first_analyst,
+  MD5(COALESCE(t.last_analyst_email, "NULL")) AS sk_last_analyst,
   MD5(
     CONCAT(
       COALESCE(t.step_tag, ''),
@@ -123,6 +125,8 @@ SELECT
   t.front_or_back,
   t.ticket_rate_weight,
   tr.total_tickets_proportional,
+  tc.group_stations AS total_group_stations,
+  tc.assignee_stations AS total_assignee_stations,
   tc.reply_time_min_calendar,
   tc.first_resolution_time_min_calendar,
   tc.full_resolution_time_min_calendar,

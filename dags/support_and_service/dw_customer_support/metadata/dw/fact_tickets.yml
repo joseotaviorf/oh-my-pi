@@ -18,19 +18,38 @@ columns:
       - datalake_customer_support.tickets.contact_theme_tag
       - datalake_customer_support.tickets.contact_theme_detail_tag
     description: Key generated as a MD5 from all taxonomies fields.
-  sk_analyst:
+  sk_first_analyst:
     lineage:
       - datalake_customer_support.tickets.id_analyst
-    description: Id of the last agent that answered this ticket.
-  sk_department:
+    description: MD5 generated from the first analyst assigned to the ticket
+  sk_last_analyst:
+    lineage:
+      - datalake_customer_support.tickets.id_analyst
+    description: MD5 generated from the last analyst assigned to the ticket
+  sk_first_department:
     lineage:
       - datalake_customer_support.tickets.id_queue
-    description: Key generated as a MD5 from the last department from Twilio
-      it if is a chat/call support, otherwise we consider the zendesk department.
+    description: MD5 generated from the first department the ticket was assigne to
+  sk_main_department:
+    lineage:
+      - datalake_customer_support.tickets.id_queue
+    description: MD5 generated from the last department the ticket was assigne to
   sk_user:
     lineage:
       - datalake_customer_support.tickets.id_user
     description: Unique user identifier.
+  sk_zendesk_submitter_user:
+    lineage:
+      - datalake_zendesk.tickets_current.id_submitter
+    description: SK of the user who submitted the ticket.
+  sk_zendesk_requester_user:
+    lineage:
+      - datalake_zendesk.tickets_current.id_requester
+    description: SK of the user who requested the ticket.
+  sk_zendesk_assignee_user:
+    lineage:
+      - datalake_zendesk.tickets_current.id_assignee
+    description: SK of the user who the ticket was assigned to.
   sk_contract:
     lineage:
       - datalake_customer_support.tickets.id_contract
@@ -95,6 +114,14 @@ columns:
       The total tickets proportional calculation related to the ticket, considering the ticket's weight,
       abandoned calls and tickets without theme.
       This column is exclusive for tickets that are part of the Ticket Rate metric.
+  total_group_stations:
+    lineage:
+      - datalake_zendesk.tickets_current.group_stations
+    description: Number of groups the ticket passed through
+  total_assignee_stations:
+    lineage:
+      - datalake_zendesk.tickets_current.assignee_stations
+    description: Number of agents assigned to the ticket
   first_resolution_time_min_business:
     lineage:
       - datalake_zendesk.tickets_current.first_resolution_time_min_business
