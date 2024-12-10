@@ -10,7 +10,7 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
@@ -119,7 +119,7 @@ def save_df(df: DataFrame, args: Namespace) -> None:
     """Saves dataframe to enrich layer"""
 
     spark_client = SparkClient()
-    s3_loader = S3Loader()
+    loader = DeltaLoader()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
@@ -127,11 +127,13 @@ def save_df(df: DataFrame, args: Namespace) -> None:
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
     spark_metastore_service.create_database(database_name)
+    s3_path = database_location + args.table_name
+    full_table_name = f"{database_name}.{args.table_name}"
 
-    s3_loader.load_df(
-        df=df,
-        format_options=SparkTableStorageFormat.DEFAULT_ENRICH,
-        s3_path=f"{database_location}{args.table_name}",
+    loader.load_table(
+        table_name=full_table_name,
+        path=s3_path,
+        source_df=df
     )
 
     spark_metastore_loader.update_metastore(
