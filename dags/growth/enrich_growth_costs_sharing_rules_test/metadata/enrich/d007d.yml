@@ -1,0 +1,28 @@
+---
+database_name: datalake_growth_costs_sharing_rules_test
+table_name: d007d
+owner: uilson.bonfim@quintoandar.com.br
+domain: Growth
+description: Allocation of classified ad campaign costs - divides the costs resulting from these campaigns according to the number of rental ongoing listings (properties that are currently published) among the cities Brasília, Campinas, Curitiba, Florianópolis, Porto Alegre, RMSP, Rio de Janeiro
+columns:
+  business_context:
+    description: Business context of the rule. 
+  city_group:
+    description: city_group segmentation
+    lineage:
+      - datalake_region.region.city_group
+  funnel_side: 
+    description: Marketplace side of business
+    categories: 
+      demand: ''
+      supply: ''
+  id_date:
+    description: Date of applied share
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  id_rule: 
+    description: Id rule
+    categories: 
+      d000d: ''
+  share: 
+    description: Percentage of cost that will be applied to specific city_group

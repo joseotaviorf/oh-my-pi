@@ -1,0 +1,23 @@
+---
+database_name: datalake_growth_costs_sharing_rules_test
+table_name: p014p
+owner: monica.faria@quintoandar.com.br
+domain: Growth
+description: Allocation of classified ad campaign costs - divides the costs resulting from these campaigns according to the number of sale ongoing listings (properties that are currently published) among all cities in Brasil.
+columns:
+  business_context:
+    description: Business context of the rule.
+  city_group:
+    description: city_group segmentation
+    lineage:
+      - datalake_region.region.city_group
+  funnel_side:
+    description: Marketplace side of business   
+  id_date:
+    description: Date of applied share  
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  id_rule:
+    description: Id rule
+  share:
+    description: Percentage of cost that will be applied to specific city_group   

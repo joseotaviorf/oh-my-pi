@@ -1,0 +1,225 @@
+---
+database_name: datalake_growth_costs_sharing_rules_test
+table_name: sharing_rules
+domain: Growth
+owner: uilson.bonfim@quintoandar.com.br
+description: This table concat all share rules by date
+columns:
+  business_context:
+    description: Business context of the rule.
+    lineage:
+      - datalake_growth_costs_sharing_rules_test.a002a.business_context
+      - datalake_growth_costs_sharing_rules_test.a003a.business_context
+      - datalake_growth_costs_sharing_rules_test.a004a.business_context
+      - datalake_growth_costs_sharing_rules_test.a009a.business_context
+      - datalake_growth_costs_sharing_rules_test.b016b.business_context
+      - datalake_growth_costs_sharing_rules_test.b017b.business_context
+      - datalake_growth_costs_sharing_rules_test.b018b.business_context
+      - datalake_growth_costs_sharing_rules_test.b035b.business_context
+      - datalake_growth_costs_sharing_rules_test.d000d.business_context
+      - datalake_growth_costs_sharing_rules_test.d001d.business_context
+      - datalake_growth_costs_sharing_rules_test.d005d.business_context
+      - datalake_growth_costs_sharing_rules_test.d006d.business_context
+      - datalake_growth_costs_sharing_rules_test.d007d.business_context
+      - datalake_growth_costs_sharing_rules_test.d008d.business_context
+      - datalake_growth_costs_sharing_rules_test.d010d.business_context
+      - datalake_growth_costs_sharing_rules_test.d011d.business_context
+      - datalake_growth_costs_sharing_rules_test.d020d.business_context
+      - datalake_growth_costs_sharing_rules_test.d021d.business_context
+      - datalake_growth_costs_sharing_rules_test.d023d.business_context
+      - datalake_growth_costs_sharing_rules_test.d046d.business_context
+      - datalake_growth_costs_sharing_rules_test.d047d.business_context
+      - datalake_growth_costs_sharing_rules_test.p014p.business_context
+      - datalake_growth_costs_sharing_rules_test.s012s.business_context
+      - datalake_growth_costs_sharing_rules_test.s019s.business_context
+      - datalake_growth_costs_sharing_rules_test.s024s.business_context
+      - datalake_growth_costs_sharing_rules_test.s025s.business_context
+      - datalake_growth_costs_sharing_rules_test.s026s.business_context
+      - datalake_growth_costs_sharing_rules_test.s027s.business_context
+      - datalake_growth_costs_sharing_rules_test.s029s.business_context
+      - datalake_growth_costs_sharing_rules_test.s030s.business_context
+      - datalake_growth_costs_sharing_rules_test.s031s.business_context
+      - datalake_growth_costs_sharing_rules_test.s032s.business_context
+  city_group:
+    description: city_group segmentation
+    lineage:
+      - datalake_growth_costs_sharing_rules_test.a002a.city_group
+      - datalake_growth_costs_sharing_rules_test.a003a.city_group
+      - datalake_growth_costs_sharing_rules_test.a004a.city_group
+      - datalake_growth_costs_sharing_rules_test.a009a.city_group
+      - datalake_growth_costs_sharing_rules_test.b016b.city_group
+      - datalake_growth_costs_sharing_rules_test.b017b.city_group
+      - datalake_growth_costs_sharing_rules_test.b018b.city_group
+      - datalake_growth_costs_sharing_rules_test.b035b.city_group
+      - datalake_growth_costs_sharing_rules_test.d000d.city_group
+      - datalake_growth_costs_sharing_rules_test.d001d.city_group
+      - datalake_growth_costs_sharing_rules_test.d005d.city_group
+      - datalake_growth_costs_sharing_rules_test.d006d.city_group
+      - datalake_growth_costs_sharing_rules_test.d007d.city_group
+      - datalake_growth_costs_sharing_rules_test.d008d.city_group
+      - datalake_growth_costs_sharing_rules_test.d010d.city_group
+      - datalake_growth_costs_sharing_rules_test.d011d.city_group
+      - datalake_growth_costs_sharing_rules_test.d020d.city_group
+      - datalake_growth_costs_sharing_rules_test.d021d.city_group
+      - datalake_growth_costs_sharing_rules_test.d023d.city_group
+      - datalake_growth_costs_sharing_rules_test.d046d.city_group
+      - datalake_growth_costs_sharing_rules_test.d047d.city_group
+      - datalake_growth_costs_sharing_rules_test.p014p.city_group
+      - datalake_growth_costs_sharing_rules_test.s012s.city_group
+      - datalake_growth_costs_sharing_rules_test.s019s.city_group
+      - datalake_growth_costs_sharing_rules_test.s024s.city_group
+      - datalake_growth_costs_sharing_rules_test.s025s.city_group
+      - datalake_growth_costs_sharing_rules_test.s026s.city_group
+      - datalake_growth_costs_sharing_rules_test.s027s.city_group
+      - datalake_growth_costs_sharing_rules_test.s029s.city_group
+      - datalake_growth_costs_sharing_rules_test.s030s.city_group
+      - datalake_growth_costs_sharing_rules_test.s031s.city_group
+      - datalake_growth_costs_sharing_rules_test.s032s.city_group
+  country_code:
+    description: country_code segmentation
+    lineage: 
+  funnel_side:
+    description: Marketplace side of business
+    lineage:
+      - datalake_growth_costs_sharing_rules_test.a002a.funnel_side
+      - datalake_growth_costs_sharing_rules_test.a003a.funnel_side
+      - datalake_growth_costs_sharing_rules_test.a004a.funnel_side
+      - datalake_growth_costs_sharing_rules_test.a009a.funnel_side
+      - datalake_growth_costs_sharing_rules_test.b016b.funnel_side
+      - datalake_growth_costs_sharing_rules_test.b017b.funnel_side
+      - datalake_growth_costs_sharing_rules_test.b018b.funnel_side
+      - datalake_growth_costs_sharing_rules_test.b035b.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d000d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d001d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d005d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d006d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d007d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d008d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d010d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d011d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d020d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d021d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d023d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d046d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.d047d.funnel_side
+      - datalake_growth_costs_sharing_rules_test.p014p.funnel_side
+      - datalake_growth_costs_sharing_rules_test.s012s.funnel_side
+      - datalake_growth_costs_sharing_rules_test.s019s.funnel_side
+      - datalake_growth_costs_sharing_rules_test.s024s.funnel_side
+      - datalake_growth_costs_sharing_rules_test.s025s.funnel_side
+      - datalake_growth_costs_sharing_rules_test.s026s.funnel_side
+      - datalake_growth_costs_sharing_rules_test.s027s.funnel_side
+      - datalake_growth_costs_sharing_rules_test.s029s.funnel_side
+      - datalake_growth_costs_sharing_rules_test.s030s.funnel_side
+      - datalake_growth_costs_sharing_rules_test.s031s.funnel_side
+      - datalake_growth_costs_sharing_rules_test.s032s.funnel_side
+  id_date:
+    description: Date segmentation
+    lineage:
+      - datalake_growth_costs_sharing_rules_test.a002a.id_date
+      - datalake_growth_costs_sharing_rules_test.a003a.id_date
+      - datalake_growth_costs_sharing_rules_test.a004a.id_date
+      - datalake_growth_costs_sharing_rules_test.a009a.id_date
+      - datalake_growth_costs_sharing_rules_test.b016b.id_date
+      - datalake_growth_costs_sharing_rules_test.b017b.id_date
+      - datalake_growth_costs_sharing_rules_test.b018b.id_date
+      - datalake_growth_costs_sharing_rules_test.b035b.id_date
+      - datalake_growth_costs_sharing_rules_test.d000d.id_date
+      - datalake_growth_costs_sharing_rules_test.d001d.id_date
+      - datalake_growth_costs_sharing_rules_test.d005d.id_date
+      - datalake_growth_costs_sharing_rules_test.d006d.id_date
+      - datalake_growth_costs_sharing_rules_test.d007d.id_date
+      - datalake_growth_costs_sharing_rules_test.d008d.id_date
+      - datalake_growth_costs_sharing_rules_test.d010d.id_date
+      - datalake_growth_costs_sharing_rules_test.d011d.id_date
+      - datalake_growth_costs_sharing_rules_test.d020d.id_date
+      - datalake_growth_costs_sharing_rules_test.d021d.id_date
+      - datalake_growth_costs_sharing_rules_test.d023d.id_date
+      - datalake_growth_costs_sharing_rules_test.d046d.id_date
+      - datalake_growth_costs_sharing_rules_test.d047d.id_date
+      - datalake_growth_costs_sharing_rules_test.p014p.id_date
+      - datalake_growth_costs_sharing_rules_test.s012s.id_date
+      - datalake_growth_costs_sharing_rules_test.s019s.id_date
+      - datalake_growth_costs_sharing_rules_test.s024s.id_date
+      - datalake_growth_costs_sharing_rules_test.s025s.id_date
+      - datalake_growth_costs_sharing_rules_test.s026s.id_date
+      - datalake_growth_costs_sharing_rules_test.s027s.id_date
+      - datalake_growth_costs_sharing_rules_test.s029s.id_date
+      - datalake_growth_costs_sharing_rules_test.s030s.id_date
+      - datalake_growth_costs_sharing_rules_test.s031s.id_date
+      - datalake_growth_costs_sharing_rules_test.s032s.id_date
+  id_rule:
+    description: Id rule
+    lineage:
+      - datalake_growth_costs_sharing_rules_test.a002a.id_rule
+      - datalake_growth_costs_sharing_rules_test.a003a.id_rule
+      - datalake_growth_costs_sharing_rules_test.a004a.id_rule
+      - datalake_growth_costs_sharing_rules_test.a009a.id_rule
+      - datalake_growth_costs_sharing_rules_test.b016b.id_rule
+      - datalake_growth_costs_sharing_rules_test.b017b.id_rule
+      - datalake_growth_costs_sharing_rules_test.b018b.id_rule
+      - datalake_growth_costs_sharing_rules_test.b035b.id_rule
+      - datalake_growth_costs_sharing_rules_test.d000d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d001d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d005d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d006d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d007d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d008d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d010d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d011d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d020d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d021d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d023d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d046d.id_rule
+      - datalake_growth_costs_sharing_rules_test.d047d.id_rule
+      - datalake_growth_costs_sharing_rules_test.p014p.id_rule
+      - datalake_growth_costs_sharing_rules_test.s012s.id_rule
+      - datalake_growth_costs_sharing_rules_test.s019s.id_rule
+      - datalake_growth_costs_sharing_rules_test.s024s.id_rule
+      - datalake_growth_costs_sharing_rules_test.s025s.id_rule
+      - datalake_growth_costs_sharing_rules_test.s026s.id_rule
+      - datalake_growth_costs_sharing_rules_test.s027s.id_rule
+      - datalake_growth_costs_sharing_rules_test.s029s.id_rule
+      - datalake_growth_costs_sharing_rules_test.s030s.id_rule
+      - datalake_growth_costs_sharing_rules_test.s031s.id_rule
+      - datalake_growth_costs_sharing_rules_test.s032s.id_rule
+  share:
+    description: Percentage of cost that will be applied to specific city_group
+    lineage:
+      - datalake_growth_costs_sharing_rules_test.a002a.share
+      - datalake_growth_costs_sharing_rules_test.a003a.share
+      - datalake_growth_costs_sharing_rules_test.a004a.share
+      - datalake_growth_costs_sharing_rules_test.a009a.share
+      - datalake_growth_costs_sharing_rules_test.b016b.share
+      - datalake_growth_costs_sharing_rules_test.b017b.share
+      - datalake_growth_costs_sharing_rules_test.b018b.share
+      - datalake_growth_costs_sharing_rules_test.b035b.share
+      - datalake_growth_costs_sharing_rules_test.d000d.share
+      - datalake_growth_costs_sharing_rules_test.d001d.share
+      - datalake_growth_costs_sharing_rules_test.d005d.share
+      - datalake_growth_costs_sharing_rules_test.d006d.share
+      - datalake_growth_costs_sharing_rules_test.d007d.share
+      - datalake_growth_costs_sharing_rules_test.d008d.share
+      - datalake_growth_costs_sharing_rules_test.d010d.share
+      - datalake_growth_costs_sharing_rules_test.d011d.share
+      - datalake_growth_costs_sharing_rules_test.d020d.share
+      - datalake_growth_costs_sharing_rules_test.d021d.share
+      - datalake_growth_costs_sharing_rules_test.d023d.share
+      - datalake_growth_costs_sharing_rules_test.d046d.share
+      - datalake_growth_costs_sharing_rules_test.d047d.share
+      - datalake_growth_costs_sharing_rules_test.p014p.share
+      - datalake_growth_costs_sharing_rules_test.s012s.share
+      - datalake_growth_costs_sharing_rules_test.s019s.share
+      - datalake_growth_costs_sharing_rules_test.s024s.share
+      - datalake_growth_costs_sharing_rules_test.s025s.share
+      - datalake_growth_costs_sharing_rules_test.s026s.share
+      - datalake_growth_costs_sharing_rules_test.s027s.share
+      - datalake_growth_costs_sharing_rules_test.s029s.share
+      - datalake_growth_costs_sharing_rules_test.s030s.share
+      - datalake_growth_costs_sharing_rules_test.s031s.share
+      - datalake_growth_costs_sharing_rules_test.s032s.share
+  utm_campaign:
+    description: utm_campaign segmentation
+    lineage: 
+      - datalake_growth_costs_sharing_rules_test.d046d.utm_campaign
+      - datalake_growth_costs_sharing_rules_test.d047d.utm_campaign

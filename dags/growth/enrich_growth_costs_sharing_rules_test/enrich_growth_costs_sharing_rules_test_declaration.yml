@@ -1,0 +1,191 @@
+---
+dag:
+  name: enrich_growth_costs_sharing_rules_test
+  schedule_start_date: 2019, 1, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG loads sharing rules defined by Marketing DAs to split costs into regions using processed data.
+      Concatenates all rules defined in `$COMPOSER_QUERIES_PATH/enrich_marketing_costs_sharing_rules/online/enrich`
+      for online costs and `$COMPOSER_QUERIES_PATH/enrich_marketing_costs_sharing_rules/offline/enrich` using SQL.
+      All queries must have these columns as output: id_date (analogue to sk_date, this column can't be called as sk
+      inside enrich databases), city_group, funnel_side/center_cost (online/offline), share, utm_campaign.
+      The rule id is defined by the .sql file name.
+workflow:
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    sharing_rules:
+      - a002a
+      - a003a
+      - a004a
+      - a009a
+      - a028a
+      - a033a
+      - a034a
+      - a036a
+      - b016b
+      - b017b
+      - b018b
+      - b035b
+      - d000d
+      - d001d
+      - d005d
+      - d006d
+      - d007d
+      - d008d
+      - d010d
+      - d011d
+      - d020d
+      - d021d
+      - d023d
+      - d046d
+      - d047d
+      - d048d
+      - d049d
+      - p014p
+      - s012s
+      - s019s
+      - s024s
+      - s025s
+      - s026s
+      - s027s
+      - s029s
+      - s030s
+      - s031s
+      - s032s
+      - s048s
+      - s049s
+      - s050s
+  tables_customization:
+    a002a:
+      extra_spark_job_arguments:
+        - a002a
+    a003a:
+      extra_spark_job_arguments:
+        - a003a
+    a004a:
+      extra_spark_job_arguments:
+        - a004a
+    a009a:
+      extra_spark_job_arguments:
+        - a009a
+    a028a:
+      extra_spark_job_arguments:
+        - a028a
+    a033a:
+      extra_spark_job_arguments:
+        - a033a
+    a034a:
+      extra_spark_job_arguments:
+        - a034a
+    a036a:
+      extra_spark_job_arguments:
+        - a036a
+    b016b:
+      extra_spark_job_arguments:
+        - b016b
+    b017b:
+      extra_spark_job_arguments:
+        - b017b
+    b018b:
+      extra_spark_job_arguments:
+        - b018b
+    b035b:
+      extra_spark_job_arguments:
+        - b035b
+    d000d:
+      extra_spark_job_arguments:
+        - d000d
+    d001d:
+      extra_spark_job_arguments:
+        - d001d
+    d005d: 
+      extra_spark_job_arguments:
+        - d005d
+    d006d: 
+      extra_spark_job_arguments:
+        - d006d
+    d007d: 
+      extra_spark_job_arguments:
+        - d007d
+    d008d: 
+      extra_spark_job_arguments:
+        - d008d
+    d010d:
+      extra_spark_job_arguments:
+        - d010d
+    d011d:
+      extra_spark_job_arguments:
+        - d011d
+    d020d:
+      extra_spark_job_arguments:
+        - d020d
+    d021d:
+      extra_spark_job_arguments:
+        - d021d
+    d023d:
+      extra_spark_job_arguments:
+        - d023d
+    d046d:
+      extra_spark_job_arguments:
+        - d046d
+    d047d:
+      extra_spark_job_arguments:
+        - d047d
+    d048d:
+      extra_spark_job_arguments:
+        - d048d
+    d049d:
+      extra_spark_job_arguments:
+        - d049d
+    p014p:
+      extra_spark_job_arguments:
+        - p014p
+    s012s:
+      extra_spark_job_arguments:
+        - s012s
+    s019s:
+      extra_spark_job_arguments:
+        - s019s
+    s024s:
+      extra_spark_job_arguments:
+        - s024s
+    s025s:
+      extra_spark_job_arguments:
+        - s025s
+    s026s:
+      extra_spark_job_arguments:
+        - s026s
+    s027s:
+      extra_spark_job_arguments:
+        - s027s
+    s029s:
+      extra_spark_job_arguments:
+        - s029s
+    s030s:
+      extra_spark_job_arguments:
+        - s030s
+    s031s:
+      extra_spark_job_arguments:
+        - s031s
+    s032s:
+      extra_spark_job_arguments:
+        - s032s
+    s048s:
+      extra_spark_job_arguments:
+        - s048s
+    s049s:
+      extra_spark_job_arguments:
+        - s049s
+    s050s:
+      extra_spark_job_arguments:
+        - s050s
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5d.4xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 4
+    spark_version: 12.2.x-scala2.12

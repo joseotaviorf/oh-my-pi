@@ -1,0 +1,23 @@
+---
+database_name: datalake_growth_costs_sharing_rules_test
+table_name: a009a
+owner: monica.faria@quintoandar.com.br
+domain: Growth
+description: Allocation based on prospects from the last week, coming from new affiliate users who joined in the prospect's month, with tracking sources Facebook or Google, and non-branded campaigns.
+columns:
+  business_context:
+    description: Business context of the rule.
+  city_group:
+    description: city_group segmentation
+    lineage:
+      - datalake_region.region.city_group
+  funnel_side:
+    description: Marketplace side of business      
+  id_date:
+    description: Date of applied share
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  id_rule:
+    description: Id rule
+  share:
+    description: Percentage of cost that will be applied to specific city_group
