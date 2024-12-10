@@ -1,5 +1,5 @@
 ---
-table_name: dw_rent_staging.dim_offer
+table_name: dw_rent.dim_offer
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
