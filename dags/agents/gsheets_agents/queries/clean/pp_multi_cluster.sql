@@ -1,5 +1,5 @@
 SELECT
-    CAST(id_owner AS BIGINT) AS id_owner
+    CAST(id_owner AS BIGINT) AS id_owner,
     cluster,
     ts_load
 FROM
