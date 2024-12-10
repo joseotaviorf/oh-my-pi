@@ -1,0 +1,24 @@
+dag:
+  name: reverse_supply_access
+  schedule_start_date: 2022,7,12
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG retrieves data stored in the `reverse_supply` schema,
+      which was previously processed by the DAG `reverse_supply`, and transmits
+      it through S3. This dataset serves as the foundation for generating segmentation in Wololo
+      to QuintoAndar Inside Sales Operations.
+workflow:
+  type: access
+  layer: reverse
+  custom_schema: supply_access
+  load_spark_job: load_into_s3
+  spark_job_arguments:
+    - "reverse_supply" # datalake_bucket
+    - "{table_name}"
+  tables_customization:
+    supply_affiliates_volumetry:
+      extra_spark_job_arguments:
+        - s3://5a-wololo-prod/csv/prospect/update-cluster/volumetry-categories.csv
+cluster:
+  type: databricks_13_3_min_general_2_workers_cluster
