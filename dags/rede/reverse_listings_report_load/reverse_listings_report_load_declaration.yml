@@ -12,18 +12,6 @@ workflow:
     demand_score:
       merge_on: ['id_house', 'demand_score']
       z_order_by: ["id_house"]
-      when_not_matched_insert_condition: "source.id_house IS NULL OR source.demand_score <> target.demand_score"
-      when_not_matched_operation: {
-        "id": "source.id",
-        "business_id": "source.business_id",
-        "id_house": "source.id_house",
-        "company_uuid": "source.company_uuid",
-        "business_context": "source.business_context",
-        "demand_score": "source.demand_score",
-        "year": "source.year",
-        "month": "source.month",
-        "day": "source.day"
-      }
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
