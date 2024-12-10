@@ -22,6 +22,8 @@ columns:
     description: 'Id of the house of the first booking of the prospect.'
     lineage:
     - datalake_demand_flows.prospect_daily_results.id_house
+  sk_buyer_prospect_type:
+    description: 'Surrogate key of the buyer prospect.'
   bp_type:
     description: 'Buyer prospect type, if is new prospect or recovery prospect.'
     categories:

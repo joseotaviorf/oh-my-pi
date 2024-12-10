@@ -82,6 +82,10 @@ SELECT DISTINCT
   cbtf.id_region,
   FIRST(cb.id_booking) OVER (PARTITION BY cbtf.id_prospect, cbtf.activation_date ORDER BY cb.ts_event ASC) AS id_first_booking,
   FIRST(cb.id_house) OVER (PARTITION BY cbtf.id_prospect, cbtf.activation_date ORDER BY cb.ts_event ASC) AS id_house_first_booking,
+  CASE 
+    WHEN bp_type = 'NBP' THEN 1
+    WHEN bp_type = 'RBP' THEN 2
+  END AS sk_buyer_prospect_type,
   cbtf.bp_type,
   cbtf.city_group,
   slpc.price_segment,
