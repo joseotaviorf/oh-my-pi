@@ -45,3 +45,8 @@ cluster:
       zone_id: us-east-1d
       availability: SPOT_WITH_FALLBACK
       ebs_volume_size: 200
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new
