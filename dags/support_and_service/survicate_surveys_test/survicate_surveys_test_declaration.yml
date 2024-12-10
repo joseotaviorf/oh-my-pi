@@ -18,6 +18,7 @@ workflow:
     - "{dag_name}"
     - "{table_name}"
     - "{partitions}"
+    - "{schema}"
 
   default_extraction_type: incremental
   default_partitions: [year, month, day]

@@ -116,8 +116,19 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
     execution_date = args.execution_date
     dag_name = args.dag_name
     table_name = args.table_name
+    schema = args.schema
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
+    
+    spark_client = SparkClient()
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    db_info = DatalakeMetastoreService.get_db_info(environment, schema, bucket)
+    database_name = db_info["db_raw_databricks"]
+    database_location = db_info["db_raw_path"]
+    spark_metastore_service = SparkMetastoreService(spark_client)
+
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+    spark_metastore_service.create_database(database_name) 
     
     partitions = ["year", "month", "day"]
     workspace_list = ["Production", "P&T | Prod"]
@@ -154,18 +165,6 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
             feedback_parameters = list(map(lambda row: row.asDict(), df.collect()))
 
         api_token = get_api_token(workspace_api_token)
-        spark_client = SparkClient()
-
-        format_options = SparkTableStorageFormat.DEFAULT_RAW
-
-        db_info = DatalakeMetastoreService.get_db_info(environment, dag_name, bucket)
-        database_name = db_info["db_raw_databricks"]
-        database_location = db_info["db_raw_path"]
-
-        spark_metastore_service = SparkMetastoreService(spark_client)
-
-        logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-        spark_metastore_service.create_database(database_name)
 
         survicate_client = SurvicateClient(api_token=api_token)
         survicate_consumer = SurvicateConsumer(survicate_client)
@@ -245,6 +244,7 @@ if __name__ == "__main__":
     parser.add_argument("dag_name")
     parser.add_argument("table_name")
     parser.add_argument("partitions")
+    parser.add_argument("schema")
 
     args = parser.parse_args()
 
