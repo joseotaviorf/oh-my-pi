@@ -8,10 +8,10 @@ dag:
       Creates enriched tables for the context `Contract` of ebdb.
       This DAG is triggered by Mediator and loads the table via full load.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_partitions:
-  - country_code
+    - country_code
 cluster:
   type: custom_cluster
   custom_configurations:
