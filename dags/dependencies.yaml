@@ -310,15 +310,18 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-calls
   - bietlejuice.enrich_customer_support:load-enrich-chat
+  - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_customer_support:load-enrich-ivr-interactions
   - bietlejuice.enrich_customer_support:load-enrich-received-demand
   - bietlejuice.enrich_customer_support:load-enrich-unified-tickets
   - bietlejuice.enrich_greenseer:load-enrich-sessions
+  - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_quinto_messenger:load-enrich-message
   - bietlejuice.enrich_satisfaction_rating:load-enrich-chat-fup-surveys
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
+  - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys
   - bietlejuice.enrich_zendesk:load-enrich-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
