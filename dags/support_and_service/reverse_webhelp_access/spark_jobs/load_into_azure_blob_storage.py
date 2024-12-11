@@ -4,6 +4,7 @@ from datetime import datetime
 from argparse import ArgumentParser
 from typing import Tuple
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.services.configuration_service import ConfigurationService
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -48,7 +49,6 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
         "execution_date", help="Date of the execution in the format YYYY-MM-DD"
     )
     parser.add_argument("table_context")
-    parser.add_argument("azure_container_name")
 
     args = parser.parse_args()
 
@@ -57,8 +57,10 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     database_name = args.database_name
     table_name = args.table_name
     execution_date = datetime.fromisoformat(args.execution_date)
-    azure_container_name = args.azure_container_name
     table_context = args.table_context
+    
+    config_service = ConfigurationService(source)
+    azure_container_name = config_service.get_config("azure_container_name")
 
     return environment, source, database_name, table_name, azure_container_name, table_context, execution_date
 
