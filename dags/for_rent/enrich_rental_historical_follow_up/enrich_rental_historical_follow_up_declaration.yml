@@ -3,12 +3,12 @@ dag:
   name: enrich_rental_historical_follow_up
   schedule_start_date: 2020, 7, 16
   owner: Data ForRent
-  documentation: 
+  documentation:
       dag_purpose: |
         Creates enriched tables that has a historical follow up of the data.
-        Usually the date values drives the tables of this DAG. 
+        Usually the date values drives the tables of this DAG.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   tables_customization:
     house_listings_daily_info:
