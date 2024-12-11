@@ -28,7 +28,7 @@ workflow:
   load_spark_job: load_into_azure_blob_storage
   spark_job_arguments:
     - "{environment}"
-    - "webhelp" #source
+    - "{dag_name}"
     - "reverse_webhelp" #database_name
     - "{table_name}" #table_name
     - "{{ ds }}"

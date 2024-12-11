@@ -15,11 +15,11 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 def main():
-    environment, source, database_name, table_name, azure_container_name, table_context, execution_date = (
+    environment, dag_name, database_name, table_name, azure_container_name, table_context, execution_date = (
         parse_arguments()
     )
     logger.info(
-        f"""m=__main__, environment={environment}, source={source}, database_name={database_name},
+        f"""m=__main__, environment={environment}, dag_name={dag_name}, database_name={database_name},
         table_name={table_name}, azure_container_name={azure_container_name}, execution_date={execution_date}
         table_context={table_context}"""
     )
@@ -29,7 +29,7 @@ def main():
     blob_storage_path = f"wasbs://{azure_container_name}@{storage_account_name}.blob.core.windows.net/"
 
     load_table_in_azure_blob_storage(
-        source, database_name, table_name, blob_storage_path, table_context, execution_date
+        dag_name, database_name, table_name, blob_storage_path, table_context, execution_date
     )
 
 
@@ -42,7 +42,7 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("env")
-    parser.add_argument("source")
+    parser.add_argument("dag_name")
     parser.add_argument("database_name")
     parser.add_argument("table_name")
     parser.add_argument(
@@ -53,16 +53,16 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     args = parser.parse_args()
 
     environment = args.env
-    source = args.source
+    dag_name = args.dag_name
     database_name = args.database_name
     table_name = args.table_name
     execution_date = datetime.fromisoformat(args.execution_date)
     table_context = args.table_context
     
-    config_service = ConfigurationService(source)
+    config_service = ConfigurationService(dag_name)
     azure_container_name = config_service.get_config("azure_container_name")
 
-    return environment, source, database_name, table_name, azure_container_name, table_context, execution_date
+    return environment, dag_name, database_name, table_name, azure_container_name, table_context, execution_date
 
 def get_azure_credentials():
     DATABRICKS_SCOPE = "quintoandar"
@@ -79,7 +79,7 @@ def get_azure_credentials():
     return credentials['storage_account_name'], credentials['storage_account_access_key']
 
 def load_table_in_azure_blob_storage(
-    source: str,
+    dag_name: str,
     database_name: str,
     table_name: str,
     blob_storage_path: str,
