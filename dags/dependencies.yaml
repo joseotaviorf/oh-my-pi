@@ -3617,6 +3617,7 @@ bietlejuice.reverse_nexxera:
   - bietlejuice.enrich_nexxera:load-enrich-dtw-filter
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance
+  - bietlejuice.dw_operator_performance:load-dw-operator-performance-fact-operator-performance
 bietlejuice.reverse_sale_unavailable_listings_access:
   - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings
 bietlejuice.reverse_sale_unavailable_listings_load:
