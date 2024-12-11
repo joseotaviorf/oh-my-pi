@@ -1,0 +1,128 @@
+---
+database_name: datalake_inspections
+table_name: report_approvals
+description:
+  Table that follows the inspection granularity, this table aims to gather information related to the approval flow through which the inspection went.
+  Here we have a link between the approvals through the review flow and the budget approval flow
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_inspection:
+    lineage:
+      - datalake_inspections_clean.assessment.id_inspection
+      - datalake_inspections_clean.budget.id_inspection
+    description: Unique inspection identification key.
+  id_assessment:
+    lineage:
+      - datalake_inspections_clean.reviewer.id_assessment
+      - datalake_inspections_clean.assessment.id_assessment
+    description: Assessment identification key.
+  id_previous_assessment:
+    lineage:
+      - datalake_inspections_clean.assessment.id_assessment
+    description: Identification key of the previous assessment.
+  id_budget:
+    lineage:
+      - datalake_inspections_clean.budget.id_budget
+    description: Budget approval identification key.
+  total_cost:
+    lineage:
+      - datalake_inspections_clean.budget.total_cost
+    description: Total cost linked to budget approval.
+  owner_amount_payment:
+    lineage:
+      - datalake_inspections_clean.budget.owner_amount_payment
+    description: Owner payment amount.
+  tenant_amount_payment:
+    lineage:
+      - datalake_inspections_clean.budget.tenant_amount_payment
+    description: Tenant payment amount.
+  owner_approved_by:
+    lineage:
+      - datalake_inspections_clean.reviewer.id_reviewer
+      - datalake_inspections_clean.budget.owner_approved_by
+    description: Approving owner identification key.
+  tenant_approved_by:
+    lineage:
+      - datalake_inspections_clean.reviewer.id_reviewer
+      - datalake_inspections_clean.budget.tenant_approved_by
+    description: Tenant owner identification key.
+  owner_approval_comment:
+    lineage:
+      - datalake_inspections_clean.reviewer.approval_comment
+      - datalake_inspections_clean.budget.owner_approval_comment
+    description: Owner approval comment.
+  tenant_approval_comment:
+    lineage:
+      - datalake_inspections_clean.reviewer.approval_comment
+      - datalake_inspections_clean.budget.tenant_approval_comment
+    description: Tenant approval comment.
+  owner_approval_reason:
+    lineage:
+      - datalake_inspections_clean.reviewer.approval_reason
+      - datalake_inspections_clean.budget.owner_approval_reason
+    description: Reason for owner approval.
+  tenant_approval_reason:
+    lineage:
+      - datalake_inspections_clean.reviewer.approval_reason
+      - datalake_inspections_clean.budget.tenant_approval_reason
+    description: Reason for tenant approval.
+  approval_type:
+    lineage:
+      - datalake_inspections_clean.reviewer.approval_type
+    description: Type of approval
+  owner_approved:
+    lineage:
+      - datalake_inspections_clean.reviewer.is_approved
+      - datalake_inspections_clean.budget.owner_approved
+    description: Boolean information indicating whether the owner approved.
+  tenant_approved:
+    lineage:
+      - datalake_inspections_clean.reviewer.is_approved
+      - datalake_inspections_clean.budget.owner_approved
+    description: Boolean information indicating whether the tenant approved.
+  ts_owner_approved:
+    lineage:
+      - datalake_inspections_clean.reviewer.ts_approved
+      - datalake_inspections_clean.budget.dt_owner_approved
+    description: Date in timestamp format indicating when the owner's approval was made.
+  ts_tenant_approved:
+    lineage:
+      - datalake_inspections_clean.reviewer.ts_approved
+      - datalake_inspections_clean.budget.dt_tenant_approved
+    description: Date in timestamp format indicating when the tenant's approval was made.
+  dt_owner_limit_revision:
+    lineage:
+      - datalake_inspections_clean.assessment.dt_owner_limit_revision
+      - datalake_inspections_clean.budget.dt_owner_dead_line
+    description: Deadline for owner review.
+  dt_tenant_limit_revision:
+    lineage:
+      - datalake_inspections_clean.assessment.dt_tenant_limit_revision
+      - datalake_inspections_clean.budget.dt_tenant_dead_line
+    description: Deadline for tenant review.
+  ts_created:
+    lineage:
+      - datalake_inspections_clean.reviewer.ts_created
+      - datalake_inspections_clean.budget.ts_created
+    description: Date in timestamp format indicating when the approval was created.
+  ts_updated:
+    lineage:
+      - datalake_inspections_clean.reviewer.ts_updated
+      - datalake_inspections_clean.budget.ts_updated
+    description: Date in timestamp format indicating when the approval was updated.
+  year:
+    lineage:
+      - datalake_inspections_clean.reviewer.year
+      - datalake_inspections_clean.budget.year
+    description: Year when the approval was updated.
+  month:
+    lineage:
+      - datalake_inspections_clean.reviewer.month
+      - datalake_inspections_clean.budget.month
+    description: Month when the approval was updated.
+  day:
+    lineage:
+      - datalake_inspections_clean.reviewer.day
+      - datalake_inspections_clean.budget.day
+    description: Day when the approval was updated.

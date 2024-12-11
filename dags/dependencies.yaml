@@ -1991,6 +1991,7 @@ bietlejuice.enrich_inspections:
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.inspections:load-clean-appointment
   - bietlejuice.inspections:load-clean-assessment
+  - bietlejuice.inspections:load-clean-budget
   - bietlejuice.inspections:load-clean-contestation
   - bietlejuice.inspections:load-clean-contestation-media
   - bietlejuice.inspections:load-clean-inspection
