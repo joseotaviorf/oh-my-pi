@@ -7,6 +7,16 @@ WITH pro_owner_history as (
   FROM
     datalake_pro_owners.pro_owner_history AS poh
 ),
+pp_multi_cluster AS (
+  SELECT
+    id_owner,
+    cluster,
+    ts_load
+  FROM
+    datalake_gsheets_clean.pp_multi_cluster
+  QUALIFY
+      ROW_NUMBER() OVER (PARTITION BY id_owner ORDER BY ts_load DESC) = 1
+),
 owner_house_category AS(
   SELECT
     ohqh.id_owner,
@@ -19,19 +29,7 @@ owner_house_category AS(
       ELSE FALSE
     END AS is_pp_multi,
     CASE
-      WHEN ohqh.id_owner in (2982090,10178048,794908,10302982) THEN 'Short Stay'
-      WHEN ohqh.id_owner in (4166683,870527,2501405,1673646,416663,680499,5895459,566993,10681722,1258354,
-                              1607543,495270,8546763,1418953,128015,1907990,446644,145322,11931906,5672476,
-                              1018547,3004808,213199,3690546,10880132,5522362,3682560,4851217,10891501,
-                              4111581,3029358,2115307,3607490,4475497,9112892,3005548,187379,337361,3743587,
-                              355892,706163,608080,173549,6106973,6355304,207669,7997849,10830112,3934646,
-                              1895145,967277,9192266,6238600,3718061,4619117,4101249,4233211,3886301,965214,
-                              3758881,3813441,1855833,315421,1495238,3694583,9893680,290153,1200835,7109194,
-                              1904923,5159117,1198668,9005414,992655,3272403,10670756,665660,3216531,214962,
-                              522568,75535,2247864,577129,1073746,7989117,3935725,1191711,2635622,1528470,
-                              1537297,4962986,4061144,7472979,3015692,10148490,3406816,11115489,1936163,8411116,
-                              928341,4967868,915917,2499588,9836052,501482) THEN 'Corporate'
-      WHEN ohqh.id_owner in (3930579,184489,66475) THEN 'Investor'
+      WHEN ohqh.id_owner = pmc.id_owner THEN pmc.cluster
       WHEN ohqh.ongoing_houses > 15 THEN 'Investors (15+)'
       WHEN ohqh.ongoing_houses >= 10 THEN 'Investors (10-15)'
       WHEN ohqh.ongoing_houses >= 5 THEN 'Long-tail (5-10)'
@@ -48,6 +46,9 @@ owner_house_category AS(
       ON ohqh.id_owner = poh.id_owner
       AND MAKE_DATE(ohqh.year, ohqh.month, ohqh.day) >= DATE(poh.ts_pro_owner_started)
       AND MAKE_DATE(ohqh.year, ohqh.month, ohqh.day) < COALESCE(DATE(poh.ts_pro_owner_ended), CURRENT_DATE())
+  LEFT JOIN
+    pp_multi_cluster AS pmc
+      ON ohqh.id_owner = pmc.id_owner
   WHERE
     ohqh.year = {year}
     AND ohqh.month = {month}

@@ -1879,11 +1879,11 @@ bietlejuice.enrich_growth_costs_sharing_rules_test:
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
   - bietlejuice.ebdb_partner:load-clean-partner
+  - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
-  - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
 bietlejuice.enrich_growth_manual_daily_costs:
   - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules
   - bietlejuice.gsheets_growth_intraday:done-clean-marketing-manual-costs
@@ -2371,6 +2371,7 @@ bietlejuice.enrich_pro_owners:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
+  - bietlejuice.gsheets_agents:done-clean-pp-multi-cluster
 bietlejuice.enrich_product_tech:
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
 bietlejuice.enrich_property_tax:
