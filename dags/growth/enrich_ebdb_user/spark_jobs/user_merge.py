@@ -1,19 +1,18 @@
 import logging
-from argparse import ArgumentParser
-from bietlejuice.base.spark import SparkTableStorageFormat
 
-from quintoandar_logger import QuintoAndarLogger
+from argparse import ArgumentParser
+# Link to graphframes lib: https://spark-packages.org/package/graphframes/graphframes
+from graphframes import *
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 from pyspark.sql.functions import col, collect_set
 
-# Link to graphframes lib: https://spark-packages.org/package/graphframes/graphframes
-from graphframes import *
+from quintoandar_logger import QuintoAndarLogger
+
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "user_merge_predecessor_list"
@@ -21,7 +20,11 @@ JOB_NAME = "user_merge_predecessor_list"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+
 def get_df_user_merge():
+  """
+  This function creates a graph using the user_merge table and returns a dataframe with the predecessor users for each user.
+  """
   # Creating df from user_merge table and selecting id_loser_account and id_winner_account
   user_merge_df = spark.table("datalake_ebdb_clean.user_merge")
   user_merge_df = user_merge_df.filter(col("status") == 'MERGED')
@@ -65,6 +68,7 @@ def get_df_user_merge():
 
   return df
 
+
 if __name__ == "__main__":
   parser = ArgumentParser(description=JOB_NAME)
 
@@ -73,7 +77,7 @@ if __name__ == "__main__":
   parser.add_argument("dag_name", help="dag_name")
   parser.add_argument("table_name", help="table_name")
   parser.add_argument("context", help="context")
-  
+
   args = parser.parse_args()
 
   environment = args.environment
@@ -84,7 +88,7 @@ if __name__ == "__main__":
 
   logger.info(
         f"""m=__main__, environment={environment},
-        datalake_bucket={datalake_bucket}, dag_name={dag_name}, 
+        datalake_bucket={datalake_bucket}, dag_name={dag_name},
         table_name={table_name}, context={context}
         msg=User Merge spark job running.
         """
@@ -92,9 +96,8 @@ if __name__ == "__main__":
 
   spark_client = SparkClient()
 
-  s3_loader = S3Loader()
+  loader = DeltaLoader()
   spark_metastore_service = SparkMetastoreService(spark_client)
-  spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
   db_info = DatalakeMetastoreService.get_db_info(environment, context, datalake_bucket)
   database_name = db_info["db_enrich_databricks"]
@@ -103,19 +106,17 @@ if __name__ == "__main__":
 
   df = get_df_user_merge()
 
-  if df:
-    s3_loader.load_df(
-      df=df,
-      format_options=SparkTableStorageFormat.DEFAULT_ENRICH,
-      s3_path=f"{database_location}{table_name}",
-    )
+  s3_path=f"{database_location}{table_name}"
+  full_table_name = f"{database_name}.{table_name}"
 
-    spark_metastore_loader.update_metastore(
-      df=df,
-      database_name=database_name,
-      table_name=table_name,
-      format_options=SparkTableStorageFormat.DEFAULT_ENRICH,
-      database_location=database_location,
+  if df:
+    loader.load_table(
+      table_name=full_table_name,
+      path=s3_path,
+      source_df=df,
+    )
+    spark_metastore_service.refresh_table(
+            database_name, table_name
     )
   else:
     logger.error(

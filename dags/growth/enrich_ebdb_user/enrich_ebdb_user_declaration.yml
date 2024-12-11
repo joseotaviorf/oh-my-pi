@@ -1,0 +1,44 @@
+---
+dag:
+  name: enrich_ebdb_user
+  schedule_start_date: 2020, 7, 1
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      'Creates enriched tables for the context `User` from ebdb.
+      It will track detailed information about the QuintoAndar users, such as the
+      affiliate, agents, end-user, doorman, and sales rep.'
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [country_code]
+  tables_customization:
+    affiliate_date: {}
+    agent_date: {}
+    user_doorman: {}
+    user_merge:
+      extraction_type: full
+      load_spark_job: user_merge
+      spark_job_arguments:
+        - "{environment}" # environment
+        - "{bucket}" # datalake_bucket
+        - "{dag_name}" # dag_name
+        - "{table_name}" # table_name
+        - "ebdb_user" # context
+    user_revision_entity: {}
+    user_sales_rep: {}
+    user: {}
+  inner_dependencies:
+    agent_data:
+      - user
+    user:
+      - user_revision_entity
+cluster:
+  type: databricks_13_3_med_general_cluster
+  custom_configurations:
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static
+  custom_libraries:
+    - maven:
+        coordinates: "graphframes:graphframes:0.8.1-spark3.0-s_2.12"
