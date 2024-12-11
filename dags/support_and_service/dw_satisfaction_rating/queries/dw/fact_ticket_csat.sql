@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
   CAST(id_ticket AS BIGINT) sk_ticket,
   first_csat_score,
   last_csat_score,
@@ -12,4 +12,4 @@ SELECT
 FROM
   datalake_customer_support.csat
 WHERE
-  ts_first_response BETWEEN '{load_start_date}' AND '{load_end_date}'
+  ts_first_response BETWEEN '{load_start_date}' - INTERVAL 30 DAY AND '{load_end_date}'
