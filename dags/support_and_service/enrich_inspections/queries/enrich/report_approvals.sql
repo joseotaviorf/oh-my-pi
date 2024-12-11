@@ -64,7 +64,7 @@ union_reviewer_approvals AS (
           ON a.id_assessment = ra_owner.id_assessment
           OR a.id_inspection = ra_tenant.id_assessment
     WHERE
-        MAKE_DATE(ra.year, ra.month, ra.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        DATE(COALESCE(ra_owner.ts_updated, ra_tenant.ts_updated)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY a.id_inspection ORDER BY COALESCE(ra_owner.ts_updated, ra_tenant.ts_updated) DESC) = 1
     UNION ALL
