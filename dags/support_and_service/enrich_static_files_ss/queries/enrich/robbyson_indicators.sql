@@ -65,7 +65,7 @@ WITH union_line_indicators AS (
   SELECT
     EXPLODE(MAP(
       "Recovery", MAP(
-        "Valor total de recuperação realizado por operador no período.",
+        "Valor total de recuperação realizado por operador no período (QuintoCred).",
         ARRAY("recovered_value")
       )
     )) AS (name, attributes),
