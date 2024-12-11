@@ -29,7 +29,7 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_user.user_doorman.country_code
-    description: Country code of the doorman.
+    description: Country code of the doorman. It's also a table partition.
     categories:
       BR: Brazil's country code.
       MX: Mexico's country code.

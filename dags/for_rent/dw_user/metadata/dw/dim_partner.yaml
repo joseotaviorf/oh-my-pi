@@ -19,7 +19,7 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_country.user.country_code
-    description: 'Country code of the partner.'
+    description: 'Country code of the partner. Its also a table partition.'
     categories:
       BR: 'Brazil country code.'
       MX: 'Mexico country code.'

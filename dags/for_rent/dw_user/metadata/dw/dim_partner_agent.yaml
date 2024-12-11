@@ -23,7 +23,7 @@ columns:
   country_code:
     lineage:
     - datalake_ebdb_country.user.country_code
-    description: Country code of the partner agent.
+    description: Country code of the partner agent. It's also a table partition.
     categories:
       BR: Brazil's country code.
       MX: Mexico's country code.

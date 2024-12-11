@@ -11,7 +11,7 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_user.user_sales_rep.country_code
-    description: "Country code related to the user."
+    description: "Country code related to the user. It's also a table partition."
   name:
     lineage:
     - datalake_ebdb_user.user_sales_rep.name

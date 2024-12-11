@@ -22,7 +22,7 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_country.user.country_code
-    description: Country code of the landlord/owner.
+    description: Country code of the landlord/owner. It's also a table partition.
     categories:
       BR: Brazil country code.
       MX: Mexico country code.
