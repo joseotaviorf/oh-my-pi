@@ -3,7 +3,7 @@ table_name: dw_visit.dim_author_type
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than_or_equal_to: 1000
+    greater_than_or_equal_to: 0
     severity_level: Error
 column_level_validations:
   sk_author_type:

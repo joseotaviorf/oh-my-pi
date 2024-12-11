@@ -66,7 +66,7 @@ visit AS(
     datalake_ebdb_listing.house_listing AS hl
       ON v.id_house = hl.id_house
       AND DATE(v.ts_created) >= DATE(hl.ts_listing_version_start)
-      AND (DATE(v.ts_created) <= DATE(hl.ts_listing_version_end) OR hl.ts_listing_version_end IS NULL)
+      AND (DATE(v.ts_created) < DATE(hl.ts_listing_version_end) OR hl.ts_listing_version_end IS NULL)
 ),
 booking_3p_demand_agent AS (
     SELECT

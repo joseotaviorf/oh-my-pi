@@ -188,7 +188,7 @@ LEFT JOIN
     datalake_ebdb_listing.house_listing AS hl
       ON visit.id_house = hl.id_house
       AND DATE(visit.ts_created) >= DATE(hl.ts_listing_version_start)
-      AND (DATE(visit.ts_created) <= DATE(hl.ts_listing_version_end) OR hl.ts_listing_version_end IS NULL)
+      AND (DATE(visit.ts_created) < DATE(hl.ts_listing_version_end) OR hl.ts_listing_version_end IS NULL)
 LEFT JOIN
     visit_3p_demand_agent AS visit_demand
         ON visit.id = visit_demand.id_visit

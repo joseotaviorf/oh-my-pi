@@ -13,12 +13,15 @@ workflow:
       dim_visit:
         custom_schema: public
 cluster:
-    type: databricks_12_2_med_general_photon_cluster
+    type: custom_cluster
     access_control_list:
         group_name: analytics-engineers
         permission_level: CAN_MANAGE
     databricks_conn_id: databricks_new
     custom_configurations:
+      driver_node_type_id: r5.4xlarge
+      node_type_id: r5.2xlarge
+      num_workers: 3
       single_user_name: '{{ var.value.databricks_single_user_name }}'
       data_security_mode: SINGLE_USER
       spark_conf:
