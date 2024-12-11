@@ -19,9 +19,10 @@ cluster:
         permission_level: CAN_MANAGE
     databricks_conn_id: databricks_new
     custom_configurations:
-      driver_node_type_id: r5.4xlarge
-      node_type_id: r5.2xlarge
+      driver_node_type_id: r5a.xlarge
+      node_type_id: r5a.xlarge
       num_workers: 3
+      spark_version: 13.3.x-scala2.12
       single_user_name: '{{ var.value.databricks_single_user_name }}'
       data_security_mode: SINGLE_USER
       spark_conf:
