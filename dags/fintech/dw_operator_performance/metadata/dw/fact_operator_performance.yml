@@ -18,3 +18,9 @@ columns:
     lineage:
       - dw_collection_recovery_quintocred.fact_negotiation_installment.recovered_value
     description: "Total recovery value realized by operator in the period"
+  year:
+    description: Year of reference date.
+  month:
+    description: Month of reference date.
+  day:
+    description: Day of reference date.

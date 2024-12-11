@@ -7,7 +7,7 @@ union_advisories AS (
         LOWER(email) AS email,
         NULL AS is_active,
         "PASCHOALOTTO" AS company,
-        NULL AS ts_updated
+        ts_load AS ts_updated
     FROM
         datalake_paschoalotto_clean.user
     QUALIFY ROW_NUMBER() OVER(PARTITION BY login_name ORDER BY IF(email IN ("_","-","","N"), NULL, email) DESC) = 1
@@ -57,7 +57,7 @@ union_advisories AS (
         LOWER(email) AS email,
         NULL AS is_active,
         "WEBHELP" AS company,
-        NULL AS ts_updated
+        ts_load AS ts_updated
     FROM
         datalake_webhelp_clean.login
     WHERE

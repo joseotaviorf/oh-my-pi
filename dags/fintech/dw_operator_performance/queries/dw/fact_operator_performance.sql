@@ -30,10 +30,13 @@ operators AS (
 )
 
 SELECT
-    o.date,
-    o.login AS operator,
     o.sk_operator,
-    MAX(r.recovered_value) AS recovered_value
+    o.login AS operator,
+    MAX(r.recovered_value) AS recovered_value,
+    o.date AS dt_reference,
+    YEAR(o.date) AS year,
+    MONTH(o.date) AS month,
+    DAY(o.date) AS day
 FROM
     datalake_quintoandar.aux_date d
 LEFT JOIN
@@ -71,5 +74,5 @@ WHERE
                 'RAYLENE')
     AND DATE(d.date) >= DATE('2024-04-01')
     AND DATE(d.date) <= DATE(DATE_ADD(CURRENT_DATE,-1))
-GROUP BY 1, 2, 3
-ORDER BY 1, 2, 3
+GROUP BY 1, 2, 4, 5, 6
+ORDER BY 1, 2
