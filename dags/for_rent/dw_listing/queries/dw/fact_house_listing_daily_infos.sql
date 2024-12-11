@@ -44,7 +44,7 @@ LEFT JOIN
     AND MAKE_DATE(hldi.year, hldi.month, hldi.day) < COALESCE(am.dt_account_manager_started, CURRENT_DATE())
 LEFT JOIN
   datalake_rede_company.company_sks AS cs
-    ON hldi.is_rent_3p_supply 
+    ON hldi.is_rent_3p_supply
     AND ((
       hldi.uuid_company IS NOT NULL
       AND hldi.uuid_company = cs.uuid_company
@@ -58,7 +58,5 @@ LEFT JOIN
       AND hldi.partner_3p_supply = cs.extracted_3p_tag
     ))
 WHERE
-  hldi.year = {year}
-  AND hldi.month = {month}
-  AND hldi.day = {day}
+  MAKE_DATE(hldi.year, hldi.month, hldi.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
   AND hldi.is_for_rent = TRUE

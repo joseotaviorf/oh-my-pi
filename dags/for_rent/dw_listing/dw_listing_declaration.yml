@@ -7,6 +7,9 @@ workflow:
   layer: dw
   custom_schema: rent
   default_partitions: [country_code]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   tables_customization:
     dim_condo:
       partitions: []
@@ -14,18 +17,10 @@ workflow:
     fact_house_listing_daily_infos:
       partitions: ["country_code", "year", "month", "day"]
       extraction_type: incremental
-      extra_query_template_params:
-        year: "{year}"
-        month: "{month}"
-        day: "{day}"
     fact_house_listing_daily_available_hours:
       partitions: [ "year", "month", "day" ]
       extraction_type: incremental
       custom_schema: listing
-      extra_query_template_params:
-        year: "{year}"
-        month: "{month}"
-        day: "{day}"
 cluster:
   type: databricks_12_2_med_general_photon_cluster
   access_control_list:

@@ -16,9 +16,7 @@ WITH house_listings AS (
         datalake_quintoandar.aux_date AS d
             ON d.date BETWEEN DATE(hls.ts_status_started) AND COALESCE(DATE(hls.ts_status_ended), CURRENT_DATE) - 1
     WHERE
-        d.year = {year}
-        AND d.month = {month}
-        AND d.day = {day}
+        MAKE_DATE(d.year, d.month, d.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
         AND hls.status_history IN ('publicado', 'PUBLISHED')
         AND hls.version <> 0
     QUALIFY
