@@ -18,7 +18,8 @@ SELECT
     is_compliance,
     dt_source_trigger,
     dt_sap_created,
-    dt_sap_reference
+    dt_sap_reference,
+    NOW() AS ts_load
 FROM 
     datalake_accounting_funnel.retsuko_provision_creation
 
@@ -44,7 +45,8 @@ SELECT
     is_compliance,
     dt_source_trigger,
     dt_sap_created,
-    dt_sap_reference
+    dt_sap_reference,
+    NOW() AS ts_load
 FROM 
     datalake_accounting_funnel.retsuko_reversion_creation
 
@@ -70,7 +72,8 @@ SELECT
     is_compliance,
     dt_source_trigger,
     dt_sap_created,
-    dt_sap_reference
+    dt_sap_reference,
+    NOW() AS ts_load
 FROM 
     datalake_accounting_funnel.retsuko_revenue_accounting
 
@@ -96,7 +99,8 @@ SELECT
     is_compliance,
     dt_source_trigger,
     dt_sap_created,
-    dt_sap_reference
+    dt_sap_reference,
+    NOW() AS ts_load
 FROM 
     datalake_accounting_funnel.retsuko_invoice_issuance
 
@@ -122,6 +126,7 @@ SELECT
     is_compliance,
     dt_source_trigger,
     dt_sap_created,
-    dt_sap_reference
+    dt_sap_reference,
+    NOW() AS ts_load
 FROM 
     datalake_accounting_funnel.kill_queue_invoice_issuance

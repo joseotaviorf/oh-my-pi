@@ -130,3 +130,5 @@ columns:
       - datalake_accounting_funnel.retsuko_revenue_accounting.dt_sap_reference
       - datalake_accounting_funnel.retsuko_invoice_issuance.dt_sap_reference
     description: "Indicates date that was referenced in SAP"
+  ts_load:
+    description: "Timestamp of when the data was inserted into the table"
