@@ -21,8 +21,8 @@ workflow:
     - "{extraction_type}"
 
   tables_customization:
-    customers:
-      extraction_type: full
+    # customers:
+    #   extraction_type: full
     payments:
       extraction_type: full
 
