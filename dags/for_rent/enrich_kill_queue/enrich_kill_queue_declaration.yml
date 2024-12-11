@@ -11,7 +11,7 @@ dag:
             In addition, in order to guarantee unicity for tables that have an incremental mode at the clean layer,
             tables house, documentation and user are recreated with a deduplication process.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_general_photon_cluster

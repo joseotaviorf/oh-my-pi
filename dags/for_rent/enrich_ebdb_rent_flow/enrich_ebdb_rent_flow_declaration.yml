@@ -8,7 +8,7 @@ dag:
       Creates enriched tables for the context `Rent Flow` of ebdb.
       This DAG is triggered by Mediator and loads the table via full load.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: custom_cluster

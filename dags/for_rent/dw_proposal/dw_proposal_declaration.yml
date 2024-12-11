@@ -2,7 +2,7 @@ dag:
   name: dw_proposal
   owner: Data ForRent
 workflow:
-  type: query
+  type: query_delta
   layer: dw
   custom_schema: rent
 cluster:
