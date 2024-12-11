@@ -17,7 +17,10 @@ workflow:
       - major_type_distribution
 cluster:
   type: custom_cluster
+  databricks_conn_id: databricks_new
   custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
     driver_node_type_id: m5d.4xlarge
     node_type_id: m5d.4xlarge
     runtime_engine: PHOTON
@@ -25,3 +28,5 @@ cluster:
     autoscale:
       min_workers: 3
       max_workers: 8
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
