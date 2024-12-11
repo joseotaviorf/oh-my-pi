@@ -38,7 +38,7 @@ BASE_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/base/"
 RAW_SPARK_JOB_PATH = f"{S3_PREFIX}/spark_jobs/{CONTEXT}"
 RAW_LOAD_SPARK_JOB_PATH = f"{RAW_SPARK_JOB_PATH}/load_sales_flow_into_datalake.py"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_2xlarge_general_cluster")
 
 TABLES = config_service.get_config("tables")
 PARTITION_COLS = config_service.get_config("partition_cols")
