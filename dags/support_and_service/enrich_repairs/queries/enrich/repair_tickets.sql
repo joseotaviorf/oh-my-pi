@@ -210,12 +210,12 @@ SELECT
   END AS agent_organization,
   th.contestation_task_origin,
   rr.service_provider,
-  COALESCE(chat.contact_theme_tag, call.contact_theme_tag, email.contact_theme_tag) AS theme,
-  COALESCE(chat.contact_theme_detail_tag, call.contact_theme_detail_tag, email.contact_theme_detail_tag) AS theme_detail,
-  COALESCE(chat.request_type, call.request_type, email.request_type) AS request_type,
-  COALESCE(chat.customer_type_tag, call.customer_type_tag, email.customer_type_tag) AS customer_type_tag,
-  COALESCE(chat.contact_motivation_tag, call.contact_motivation_tag, email.contact_motivation_tag) AS motivation,
-  COALESCE(chat.front_or_back, call.front_or_back, email.front_or_back) AS front_or_back,
+  t.contact_theme_tag AS theme,
+  t.contact_theme_detail_tag AS theme_detail,
+  t.request_type AS request_type,
+  t.customer_type_tag AS customer_type_tag,
+  t.contact_motivation_tag AS motivation,
+  t.front_or_back AS front_or_back,
   csat.respondent_comments AS comment_csat,
   csat.improvement_tags AS csat_tags,
   csat.satisfaction_score AS csat_score,
@@ -261,14 +261,7 @@ SELECT
 FROM
   datalake_zendesk.tickets_current AS tc
 LEFT JOIN
-  datalake_customer_support.chat AS chat
-    ON tc.id_ticket = chat.id_ticket
-LEFT JOIN
-  datalake_customer_support.call AS call
-    ON tc.id_ticket = call.id_ticket
-LEFT JOIN
-  datalake_customer_support.email AS email
-    ON tc.id_ticket = email.id_ticket
+  datalake_customer_support.tickets AS t
 LEFT JOIN
   datalake_ebdb_contract.contract AS c
     ON tc.id_contract = c.id

@@ -2254,7 +2254,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-users-resolutions-flow
-  - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
@@ -2555,9 +2555,6 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_pro_owners:load-enrich-house-b2b-history
 bietlejuice.enrich_repairs:
-  - bietlejuice.enrich_customer_support:load-enrich-call
-  - bietlejuice.enrich_customer_support:load-enrich-chat
-  - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_date:load-enrich-workday-window
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -2795,7 +2792,6 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.chat_fup:load-clean-rating
   - bietlejuice.chat_fup:load-clean-surveys-answer
   - bietlejuice.chat_fup:load-clean-surveys-survey
-  - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.enrich_survicate:load-enrich-inspections-surveys
   - bietlejuice.enrich_survicate:load-enrich-keys-surveys
@@ -2847,8 +2843,7 @@ bietlejuice.enrich_ss_logic_model:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.chat_fup:load-clean-rating
   - bietlejuice.enrich_app_installed:load-enrich-events
-  - bietlejuice.enrich_customer_support:load-enrich-call
-  - bietlejuice.enrich_customer_support:load-enrich-chat
+  - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_user:load-enrich-persona-type
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.enrich_superset:

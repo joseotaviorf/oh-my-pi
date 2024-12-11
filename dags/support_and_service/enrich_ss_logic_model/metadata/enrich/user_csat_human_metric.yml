@@ -11,9 +11,7 @@ columns:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd".
   id_user:
     lineage:
-      - datalake_customer_support.email.id_user
-      - datalake_customer_support.chat.id_user
-      - datalake_customer_support.call.id_user
+      - datalake_customer_support.tickets.id_user_main
     description:
       The user ID that has answered the satisfaction survey. It does not consider null
       id users or satisfaction surveys with null answers.
@@ -51,9 +49,7 @@ columns:
     description: If the user has answered any human csat created within the last 3 months.
   ts_last_human_csat_created:
     lineage:
-      - datalake_customer_support.email.ts_csat_first_response
-      - datalake_customer_support.chat.ts_csat_response
-      - datalake_customer_support.call.ts_csat_answered
+      - datalake_customer_support.tickets.ts_csat_first_response
     description: Timestamp that represents the last csat answered by the user.
   year:
     description: It is the snapshot year, also a partition column.

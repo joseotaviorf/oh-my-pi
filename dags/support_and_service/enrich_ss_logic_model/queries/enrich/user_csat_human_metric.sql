@@ -1,39 +1,18 @@
 WITH base_tickets AS (
   SELECT
-    em.id_user,
-    em.id_ticket,
-    em.csat_score,
-    em.ts_csat_first_response AS ts_csat_response
-  FROM
-    datalake_customer_support.email AS em
-  WHERE
-    em.id_user IS NOT NULL
-      AND em.csat_score IS NOT NULL
-      AND DATE(em.ts_csat_first_response) <= DATE('{year}-{month}-{day}')
-  UNION ALL
-  SELECT
-    ch.id_user,
-    ch.id_ticket,
-    ch.csat_score,
-    ch.ts_csat_response
-  FROM
-    datalake_customer_support.chat AS ch
-  WHERE
-    ch.id_user IS NOT NULL
-      AND ch.csat_score IS NOT NULL
-      AND DATE(ch.ts_csat_response) <= DATE('{year}-{month}-{day}')
-  UNION ALL
-  SELECT
-    cl.id_user,
-    cl.id_ticket,
-    cl.csat_rating AS csat_score,
-    cl.ts_csat_answered AS ts_csat_response
-  FROM
-    datalake_customer_support.call AS cl
-  WHERE
-    cl.id_user IS NOT NULL
-      AND cl.csat_rating IS NOT NULL
-      AND DATE(cl.ts_csat_answered) <= DATE('{year}-{month}-{day}')
+  t.id_user_main AS id_user,
+  t.id_ticket,
+  cs.last_csat_score AS csat_score,
+  cs.ts_first_response AS ts_csat_response
+FROM
+  datalake_customer_support.tickets AS t
+LEFT JOIN
+  datalake_customer_support.csat AS cs
+    ON cs.id_ticket = t.id_ticket
+WHERE
+  t.id_user_main IS NOT NULL
+  AND cs.last_csat_score IS NOT NULL
+  AND DATE(cs.ts_first_response) <= DATE('{year}-{month}-{day}')
 ),
 csat_score AS (
   SELECT

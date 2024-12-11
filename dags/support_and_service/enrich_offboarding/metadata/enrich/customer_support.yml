@@ -1,35 +1,37 @@
 ---
 database_name: datalake_offboarding
 table_name: customer_support
-description: Enrichment table that aims to gather satisfaction information from the 
+description:
+  Enrichment table that aims to gather satisfaction information from the
   customer support context. The granularity of this table is the contract.
 domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_contract:
-    description: Contract identification key.
     lineage:
       - datalake_offboarding.ongoing.id_contract
+      - datalake_ebdb_contract.contract_person.id_contract
+    description: Contract identifier associated with the ongoing record and linked contracts.
   department:
-    description: Descriptive information indicating the department related to the contract.
     lineage:
-      - datalake_customer_support.email.department
+      - datalake_customer_support.tickets.last_queue
+    description: Department or queue where the ticket was last handled.
   front_or_back:
-    description: Descriptive information that indicates whether the contract is for front or back office.
     lineage:
-      - datalake_customer_support.email.front_or_back
+      - datalake_customer_support.tickets.front_or_back
+    description: Indicates whether the support interaction was front-end or back-end.
   num_ticket_satisfied:
-    description: Grouping of tickets classified as satisfied by contract.
     lineage:
-      - datalake_customer_support.email.id_ticket
-      - datalake_customer_support.email.csat_score
+      - datalake_customer_support.csat.csat
+      - datalake_customer_support.tickets.id_ticket
+    description: Number of tickets with a customer satisfaction score of 4 or higher.
   num_ticket_neutral:
-    description: Grouping of tickets classified as neutral by contract.
     lineage:
-      - datalake_customer_support.email.id_ticket
-      - datalake_customer_support.email.csat_score
+      - datalake_customer_support.csat.csat
+      - datalake_customer_support.tickets.id_ticket
+    description: Number of tickets with a customer satisfaction score of exactly 3.
   num_ticket_dissatisfied:
-    description: Grouping of tickets classified as dissatisfied by contract.
     lineage:
-      - datalake_customer_support.email.id_ticket
-      - datalake_customer_support.email.csat_score
+      - datalake_customer_support.csat.csat
+      - datalake_customer_support.tickets.id_ticket
+    description: Number of tickets with a customer satisfaction score of 2 or lower.

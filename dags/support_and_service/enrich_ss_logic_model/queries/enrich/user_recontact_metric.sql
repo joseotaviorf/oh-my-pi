@@ -1,38 +1,21 @@
 WITH base_recontact AS (
   SELECT
-    ch.id_ticket,
-    MAX(ch.id_user) AS id_user,
-    MD5(ch.last_department) AS id_main_department,
-    ch.last_department AS main_department,
-    ch.contact_theme_tag AS theme,
-    ch.contact_theme_detail_tag AS theme_detail,
-    'chat' AS channel,
-    ch.ts_ticket_started
-  FROM
-    datalake_customer_support.chat AS ch
-  WHERE
-    ch.front_or_back = 'front'
-    AND ch.id_user IS NOT NULL
-    AND DATE(ch.ts_ticket_started) <= DATE('{year}-{month}-{day}')
-  GROUP BY 1, 3, 4, 5, 6, 7, 8
-  UNION ALL
-  SELECT
-    cl.id_ticket,
-    MAX(cl.id_user) AS id_user,
-    MD5(cl.last_department) AS id_main_department,
-    cl.last_department AS main_department,
-    cl.contact_theme_tag AS theme,
-    cl.contact_theme_detail_tag AS theme_detail,
-    'call' AS channel,
-    cl.ts_ticket_started
-  FROM
-    datalake_customer_support.call AS cl
-  WHERE
-    cl.front_or_back = 'front'
-    AND cl.id_user IS NOT NULL
-    AND cl.direction = 'inbound'
-    AND DATE(cl.ts_ticket_started) <= DATE('{year}-{month}-{day}')
-  GROUP BY 1, 3, 4, 5, 6, 7, 8
+  id_ticket,
+  MAX(id_user_main) AS id_user,
+  MD5(last_queue) AS id_main_department,
+  last_queue AS main_department,
+  contact_theme_tag AS theme,
+  contact_theme_detail_tag AS theme_detail,
+  channel,
+  ts_created AS ts_ticket_started
+FROM
+  datalake_customer_support.tickets
+WHERE
+  front_or_back = 'front'
+  AND id_user_main IS NOT NULL
+  AND channel IN ('call', 'chat')
+  AND DATE(ts_created) <= DATE('{year}-{month}-{day}')
+GROUP BY ALL
 ),
 base_tickets AS (
   SELECT DISTINCT

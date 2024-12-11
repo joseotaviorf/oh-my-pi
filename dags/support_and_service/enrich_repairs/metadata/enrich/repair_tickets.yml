@@ -7,216 +7,216 @@ domain: Support and Service
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_ticket:
-    description: Unique identification key for the service ticket.
     lineage:
       - datalake_zendesk.tickets_current.id_ticket
-  id_request:
-    description: Repair request identification key.
+    description: Unique identifier for the current ticket.
+  id_contact_ticket:
     lineage:
-      - datalake_repairs_clean.repair_request.id
+      - datalake_zendesk.tickets_current.custom_fields
+    description: Identifier for the contact ticket, extracted and cleaned from custom fields.
+  id_request:
+    lineage:
+      - datalake_repairs_clean.service_request.id_repair_request
+    description: Identifier for the repair request associated with the ticket.
   id_contract:
-    description: Identification key of the contract related to the service.
     lineage:
       - datalake_zendesk.tickets_current.id_contract
+      - datalake_ebdb_contract.contract.id
+    description: Identifier for the contract associated with the ticket.
   group_name:
-    description: Discursive data that indicates the department to which the service ticket is linked.
     lineage:
       - datalake_zendesk.tickets_current.group_name
+    description: Name of the group handling the ticket.
   client_type:
-    description: Type of customer who requested service.
     lineage:
       - datalake_zendesk.tickets_current.client_type
+    description: Type of client associated with the ticket.
   status:
-    description: Descriptive data that indicates the stage in which the service is at.
     lineage:
       - datalake_zendesk.tickets_current.status
+    description: Current status of the ticket.
   custom_fields:
-    description: Given in json format that brings together additional information for the service.
     lineage:
       - datalake_zendesk.tickets_current.custom_fields
+    description: JSON object containing custom fields related to the ticket.
   tags:
-    description: Descriptive data that indicates the process tags used during the service.
     lineage:
       - datalake_zendesk.tickets_current.tags
+    description: Tags associated with the ticket for categorization and tracking.
   ticket_via:
-    description: Descriptive data that indicates which platform the ticket was brought through.
     lineage:
-      - datalake_zendesk.tickets_current.ticket_via
+      - datalake_zendesk.tickets_current.via_channel
+    description: Channel through which the ticket was received.
   channel:
-    description: Descriptive data that indicates which service channel was used.
     lineage:
       - datalake_zendesk.tickets_current.channel
+    description: Communication channel of the ticket.
   agent_name:
-    description: Descriptive data that indicates the analyst's name linked to the ticket.
     lineage:
       - datalake_zendesk.tickets_current.analyst_name
+    description: Name of the analyst assigned to the ticket.
   agent_email:
-    description: Descriptive data that indicates the analyst's email linked to the ticket.
     lineage:
       - datalake_zendesk.tickets_current.analyst_email
+    description: Email of the analyst assigned to the ticket.
   email_assigned:
-    description: Descriptive data that indicates the email of the analyst who answered the ticket.
     lineage:
       - datalake_support_users.zendesk_users.email
+    description: Email address assigned to handle the ticket.
   email_requester:
-    description: Descriptive data that indicates the email of the requester who opened the ticket.
     lineage:
       - datalake_support_users.zendesk_users.email
+    description: Email address of the ticket requester.
   agent_organization:
-    description: Descriptive data that indicates the company in which the analyst linked to the ticket works.
     lineage:
       - datalake_zendesk.tickets_current.analyst_organization
+    description: Organization of the analyst handling the ticket.
   contestation_task_origin:
-    description: Descriptive data that indicates where the contestation request came from.
+    lineage:
+      - repair_tickets.contestation_task_origin
+    description: Origin of the contestation task associated with the ticket.
   service_provider:
-    description: Data in json format that indicates which company was the provider and the date on which the information was made available.
     lineage:
-      - datalake_repairs_clean.repair_request.service_provider
+      - service_provider.service_provider
+    description: Service provider involved in the repair request.
   theme:
-    description: Descriptive data that indicates a tag related to taxonomies.
     lineage:
-      - datalake_customer_support.chat.contact_theme_tag
-      - datalake_customer_support.call.contact_theme_tag
-      - datalake_customer_support.email.contact_theme_tag
+      - datalake_survicate.repairs_surveys.contact_theme_tag
+    description: Theme tag associated with the contact in the survey.
   theme_detail:
-    description: Descriptive data that indicates the detail of a tag related to taxonomies.
     lineage:
-      - datalake_customer_support.chat.contact_theme_detail_tag
-      - datalake_customer_support.call.contact_theme_detail_tag
-      - datalake_customer_support.email.contact_theme_detail_tag
+      - datalake_survicate.repairs_surveys.contact_theme_detail_tag
+    description: Detailed theme tag associated with the contact in the survey.
   request_type:
-    description: Descriptive information indicating the repair responsibility tag.
     lineage:
-      - datalake_customer_support.chat.request_type
-      - datalake_customer_support.call.request_type
-      - datalake_customer_support.email.request_type
+      - datalake_survicate.repairs_surveys.request_type
+    description: Type of request submitted by the customer.
   customer_type_tag:
-    description: Type of user identified in the tags.
     lineage:
-      - datalake_customer_support.chat.customer_type_tag
-      - datalake_customer_support.call.customer_type_tag
-      - datalake_customer_support.email.customer_type_tag
+      - datalake_survicate.repairs_surveys.customer_type_tag
+    description: Tag indicating the type of customer.
   motivation:
-    description: More taxonomy information to identify motivation.
     lineage:
-      - datalake_customer_support.chat.contact_motivation_tag
-      - datalake_customer_support.call.contact_motivation_tag
-      - datalake_customer_support.email.contact_motivation_tag
+      - datalake_survicate.repairs_surveys.contact_motivation_tag
+    description: Motivation behind the customer's contact.
   front_or_back:
-    description: Descriptive information that indicates whether the ticket is a back or front ticket.
     lineage:
-      - datalake_customer_support.chat.front_or_back
-      - datalake_customer_support.call.front_or_back
-      - datalake_customer_support.email.front_or_back
+      - datalake_survicate.repairs_surveys.front_or_back
+    description: Indicates if the interaction was front-end or back-end.
   comment_csat:
-    description: Descriptive information that contains the customer's comment on the satisfaction survey.
     lineage:
       - datalake_survicate.repairs_surveys.respondent_comments
+    description: Comments provided by the respondent in the CSAT survey.
   csat_tags:
-    description: Descriptive information that indicates which tags were added to the service.
     lineage:
       - datalake_survicate.repairs_surveys.improvement_tags
+    description: Tags indicating areas for improvement from the CSAT survey.
   csat_score:
-    description: Notation that the customer gave to the customer service.
     lineage:
       - datalake_survicate.repairs_surveys.satisfaction_score
+    description: Customer satisfaction score from the CSAT survey.
   csat_partes:
-    description: Secondary Notation that the customer gave to the service.
     lineage:
       - datalake_survicate.repairs_surveys.secondary_satisfaction_score
+    description: Secondary satisfaction score related to involved parties.
   is_closed_by_merge:
-    description: Boolean type information that indicates whether the ticket was closed with a merge from another service.
     lineage:
-      - datalake_zendesk.tickets_current.tags
+      - repair_tickets.is_closed_by_merge
+    description: Indicates if the ticket was closed by a merge operation.
   is_contestation_backlog:
-    description: Boolean information that indicates whether the contestation ticket is still in the backlog for the analyst to act on.
     lineage:
-      - datalake_zendesk.tickets_current.tags
+      - repair_tickets.is_contestation_backlog
+    description: Indicates if the contestation is in the backlog.
   is_ticket_followup:
-    description: Boolean type information that indicates whether the ticket is a follow-up ticket.
     lineage:
-      - datalake_zendesk.tickets_current.tags
+      - repair_tickets.is_ticket_followup
+    description: Indicates if the ticket is a follow-up.
   has_chat_negociation:
-    description: Boolean data that indicates whether the repair was negotiated via chat.
+    lineage:
+      - first_interaction.has_chat_negociation
+    description: Indicates if there was a chat negotiation for the ticket.
   reopens:
-    description: Integer type data that indicates the number of times the ticket was reopened.
     lineage:
       - datalake_zendesk.tickets_current.reopens
+    description: Number of times the ticket was reopened.
   replies:
-    description: Integer type data that indicates the number of times the ticket was replied.
     lineage:
       - datalake_zendesk.tickets_current.replies
+    description: Number of replies to the ticket.
   relisting:
-    description: Integer type data that indicates the number of times the listing was updated.
+    lineage:
+      - relisting_distinct.relisting
+    description: Count of relistings associated with the contract.
   minutes_first_reply_time_calendar:
-    description: Integer type data that indicates the time in minutes until the first service response.
     lineage:
       - datalake_zendesk.tickets_current.reply_time_min_calendar
+    description: Minutes taken for the first reply based on the calendar.
   dt_definition:
-    description: Date in timestamp format indicating when the ticket suplier was set
     lineage:
       - datalake_zendesk.tickets_current.custom_fields
+    description: Date when the service provider was defined.
   dt_chat:
-    description: Date in timestamp format indicating when the chat was started.
     lineage:
-      - datalake_repairs_clean.repair_request_chat.ts_started
+      - first_interaction.dt_chat
+    description: Date of the chat interaction.
   entrance_date:
-    description: Date on which the contract came into effect.
     lineage:
       - datalake_ebdb_contract.contract.dt_entered
+    description: Date when the contract was entered.
   ts_contestation:
-    description: Information such as date that indicates when the contestation was requested.
     lineage:
-      - datalake_zendesk.tickets.ts_updated
+      - repair_tickets.ts_contestation
+    description: Timestamp when the contestation occurred.
   ts_resolution_contestation:
-    description: Boolean type data that indicates when the contestation demand was resolved.
     lineage:
-      - datalake_zendesk.tickets.ts_updated
+      - repair_tickets.ts_resolution_contestation
+    description: Timestamp when the contestation was resolved.
   ts_first_interaction:
-    description: Date in timestamp format of the first iteration of the repair request.
     lineage:
-      - datalake_zendesk.tickets.ts_updated
+      - first_interaction.ts_first_interaction
+      - repairs_interaction_pp.ts_updated
+    description: Timestamp of the first interaction related to the ticket.
   ts_created_local:
-    description: Date in timestamp format that indicates when the ticket was created.
     lineage:
       - datalake_zendesk.tickets_current.ts_created
+    description: Local timestamp when the ticket was created.
   ts_updated_local:
-    description: Date in timestamp format that indicates when the ticket was updated.
     lineage:
       - datalake_zendesk.tickets_current.ts_updated
+    description: Local timestamp when the ticket was last updated.
   ts_closed_local:
-    description: Date in timestamp format that indicates when the ticket was closed.
     lineage:
       - datalake_zendesk.tickets_current.ts_updated
+    description: Local timestamp when the ticket was closed, if applicable.
   ts_solved_local:
-    description: Date in timestamp format that indicates when the ticket was solved.
     lineage:
       - datalake_zendesk.tickets_current.ts_solved
+    description: Local timestamp when the ticket was marked as solved.
   ts_request_created:
-    description: Date in timestamp format that indicates when the repair request was created.
     lineage:
-      - datalake_repairs_clean.repair_request.ts_created
+      - service_provider.ts_created
+    description: Local timestamp when the repair request was created.
   ts_csat_response_submitted:
-    description: Date in timestamp format that indicates when the satisfaction survey was completed.
     lineage:
       - datalake_survicate.repairs_surveys.ts_submitted
+    description: Date when the CSAT response was submitted.
   ts_initially_assigned_local:
-    description: Date in timestamp format that indicates when the first analyst to answer the ticket signed it.
     lineage:
       - datalake_zendesk.tickets_current.ts_initially_assigned
+    description: Local timestamp when the ticket was initially assigned.
   ts_last_assigned_local:
-    description: Date in timestamp format that indicates when the last analyst to answer the ticket signed it.
     lineage:
       - datalake_zendesk.tickets_current.ts_assigned
+    description: Local timestamp when the ticket was last assigned.
   year:
-    description: Partition data, referring to the year of the ticket update date.
     lineage:
       - datalake_zendesk.tickets_current.ts_updated
+    description: Year extracted from the local updated timestamp.
   month:
-    description: Partition data, referring to the month of the ticket update date.
     lineage:
       - datalake_zendesk.tickets_current.ts_updated
+    description: Month extracted from the local updated timestamp.
   day:
-    description: Partition data, referring to the day of the ticket update date.
     lineage:
       - datalake_zendesk.tickets_current.ts_updated
+    description: Day extracted from the local updated timestamp.

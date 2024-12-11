@@ -7,7 +7,7 @@ description:
   a 4-day period (starting from the day of the current contact). If a previous contact
   exists, the current contact is classified as a recontact; otherwise, it is not
   considered a recontact. The analysis includes FrontOffice tickets in CX with inbound
-  direction, as well as call and chat channels. It is important to note that this
+  direction, as well as call and tickets channels. It is important to note that this
   analysis is conducted only for identified users. Only tickets created until the
   snapshot date are being considered.
 domain: Support and Service
@@ -17,28 +17,23 @@ columns:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd".
   id_user:
     lineage:
-      - datalake_customer_support.chat.id_user
-      - datalake_customer_support.call.id_user
+      - datalake_customer_support.tickets.id_user_main
     description: The user ID related to the FrontOffice ticket.
   id_last_created_ticket:
     lineage:
-      - datalake_customer_support.chat.id_ticket
-      - datalake_customer_support.call.id_ticket
+      - datalake_customer_support.tickets.id_ticket
     description: It considers the last FrontOffice ticket created per user.
   last_ticket_department:
     lineage:
-      - datalake_customer_support.chat.last_department
-      - datalake_customer_support.call.last_department
+      - datalake_customer_support.tickets.last_queue
     description: Considering the last FrontOffice ticket created, it returns the ticket department.
   last_ticket_theme:
     lineage:
-      - datalake_customer_support.chat.contact_theme_tag
-      - datalake_customer_support.call.contact_theme_tag
+      - datalake_customer_support.tickets.contact_theme_tag
     description: Considering the last FrontOffice ticket created, it returns the ticket theme.
   last_ticket_theme_detail:
     lineage:
-      - datalake_customer_support.chat.contact_theme_detail_tag
-      - datalake_customer_support.call.contact_theme_detail_tag
+      - datalake_customer_support.tickets.contact_theme_detail_tag
     description: Considering the last FrontOffice ticket created, it returns the ticket theme detail.
   last_ticket_channel:
     description: Considering the last FrontOffice ticket created, it returns the ticket channel.
@@ -53,8 +48,7 @@ columns:
       Only subsequent tickets are classified as recontacts.
   ts_last_created_ticket:
     lineage:
-      - datalake_customer_support.call.ts_ticket_started
-      - datalake_customer_support.chat.ts_ticket_started
+      - datalake_customer_support.tickets.ts_created
     description: Timestamp that represents when the last FrontOffice ticket was created.
   year:
     description: It is the snapshot year, also a partition column.

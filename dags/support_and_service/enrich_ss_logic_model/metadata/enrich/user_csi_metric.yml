@@ -11,11 +11,11 @@ columns:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd".
   id_user:
     lineage:
-      - datalake_customer_support.email.id_user
+      - datalake_customer_support.tickets.id_user_main
     description: The user ID related to the csi ticket. It does not consider null values.
   id_last_csi_ticket:
     lineage:
-      - datalake_customer_support.email.id_ticket
+      - datalake_customer_support.tickets.id_ticket
     description:
       It considers the last csi ticket created per user. By csi ticket, these are tickets
       from the departments of "Midias Ops [POS] [BACK]" or "[CE]" related.
@@ -23,11 +23,11 @@ columns:
     description: The volume of csi tickets created per user until the snapshot date.
   ts_most_recent_csi_ticket_creation_date:
     lineage:
-      - datalake_customer_support.email.ts_ticket_started
+      - datalake_customer_support.tickets.ts_created
     description: Creation date of the most recent csi ticket per user until the snapshot date.
   ts_most_recent_csi_ticket_solved_date:
     lineage:
-      - datalake_customer_support.email.ts_ticket_solved
+      - datalake_customer_support.tickets.ts_solved
     description:
       Considering the most recent csi ticket per user, returns its solved date. If the
       ticket is not solved yet, it assumes null value.

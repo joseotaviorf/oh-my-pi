@@ -1,20 +1,21 @@
 WITH base_tickets AS (
   SELECT
-    em.id_ticket,
-    em.id_user,
-    MD5(department) AS id_main_department,
+    id_ticket,
+    id_user_main AS id_user,
+    MD5(last_queue) AS id_main_department,
     'email' AS channel,
-    em.ts_ticket_started AS ts_started,
-    em.ts_ticket_solved AS ts_solved
+    ts_created AS ts_started,
+    ts_solved AS ts_solved
   FROM
-    datalake_customer_support.email AS em
+    datalake_customer_support.tickets
   WHERE
-    em.id_user IS NOT NULL
-    AND DATE(em.ts_ticket_started) <= DATE('{year}-{month}-{day}')
+    id_user_main IS NOT NULL
+    AND DATE(ts_created) <= DATE('{year}-{month}-{day}')
     AND (
-      DATE(em.ts_ticket_solved) <= DATE('{year}-{month}-{day}')
-      OR DATE(em.ts_ticket_solved) IS NULL
+      DATE(ts_solved) <= DATE('{year}-{month}-{day}')
+      OR DATE(ts_solved) IS NULL
     )
+    AND channel = 'cs email'
 ),
 csi_tickets AS (
   SELECT

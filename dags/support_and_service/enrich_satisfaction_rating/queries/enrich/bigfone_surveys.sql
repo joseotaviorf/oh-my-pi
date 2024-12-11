@@ -28,7 +28,7 @@ WITH csat_events AS (
       ce.id_call,
       CAST(cs.id_contract AS BIGINT) AS id_contract,
       cs.id_ticket,
-      cs.id_user,
+      cs.id_user_main AS id_user,
       ce.csat_1,
       ce.csat_2,
       ce.csat_3,
@@ -43,8 +43,9 @@ WITH csat_events AS (
     FROM
       csat_events AS ce
     LEFT JOIN
-      datalake_customer_support.call AS cs
+      datalake_customer_support.tickets AS cs
         ON ce.id_call = cs.id_call
+        AND cs.channel = 'call'
   )
   SELECT
       MD5(CONCAT(id_call, "csat1", ts_created_local)) AS id_answer,
