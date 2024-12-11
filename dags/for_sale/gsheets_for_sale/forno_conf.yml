@@ -245,3 +245,15 @@ sheets_info:
     sheet_name: base_historica_5a
     clean_table_name: closed_deals
     sheet_context: for_sale
+
+  magellan_roadmap:
+    sheet_id: 1YqjKLgf17qRNVdoJbI_-KGMIY7uHGF4cbmYLKaBhn14/edit?gid=1917617193
+    sheet_name: magellan_roadmap
+    clean_table_name: magellan_roadmap
+    sheet_context: for_sale
+
+  ipo_roadmap:
+    sheet_id: 1YqjKLgf17qRNVdoJbI_-KGMIY7uHGF4cbmYLKaBhn14/edit?gid=1917617193
+    sheet_name: ipo_roadmap
+    clean_table_name: ipo_roadmap
+    sheet_context: for_sale

@@ -1,0 +1,23 @@
+---
+database_name: datalake_gsheets_for_sale_clean
+table_name: ipo_roadmap
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: Roadmap of the ipo team
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.ipo_roadmap.id
+  task:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.ipo_roadmap.task
+  status:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.ipo_roadmap.status
+  category:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.ipo_roadmap.category

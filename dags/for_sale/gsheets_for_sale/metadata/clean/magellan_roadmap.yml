@@ -1,0 +1,43 @@
+---
+database_name: datalake_gsheets_for_sale_clean
+table_name: magellan_roadmap
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: Table with the roadmap of the magellan project
+columns:
+  task:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.magellan_roadmap.task
+  owner:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.magellan_roadmap.owner
+  status:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.magellan_roadmap.status
+  type:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.magellan_roadmap.type
+  duration:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.magellan_roadmap.INT(duration)
+  affected_service:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.magellan_roadmap.affected_service
+  dt_start:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.magellan_roadmap.DATE(start_date)
+  dt_end:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.magellan_roadmap.DATE(end_date)
+  notes:
+    description: ''
+    lineage:
+    - datalake_gsheets_raw.magellan_roadmap.notes
