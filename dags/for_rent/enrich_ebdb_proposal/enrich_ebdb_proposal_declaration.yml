@@ -9,7 +9,7 @@ dag:
       This DAG is triggered by Mediator and loads the table via full load.
       All the output tables are partitioned by `country_code`.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_partitions:
     - country_code

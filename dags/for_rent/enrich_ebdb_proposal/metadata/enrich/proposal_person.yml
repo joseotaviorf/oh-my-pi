@@ -21,7 +21,7 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_country.user.country_code
-    description: Country code.
+    description: Country code. It's also a table partition.
   email:
     lineage:
       - datalake_ebdb_clean.proponent_proposal.email

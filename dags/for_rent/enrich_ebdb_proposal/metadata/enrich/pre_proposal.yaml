@@ -30,7 +30,7 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
-    description: Country code related to the offer's country of origin
+    description: Country code related to the offer's country of origin. It's also a table partition.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
