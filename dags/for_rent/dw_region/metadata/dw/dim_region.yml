@@ -27,7 +27,7 @@ columns:
   country_code:
     lineage:
     - datalake_region.region.country_code
-    description: Code related to the country of the region.
+    description: Code related to the country of the region. It's also a table partition.
     categories:
       BR: Brazil's country code.
       MX: Mexico's country code.
