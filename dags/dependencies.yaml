@@ -317,6 +317,7 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_customer_support:load-enrich-ivr-interactions
   - bietlejuice.enrich_customer_support:load-enrich-received-demand
   - bietlejuice.enrich_customer_support:load-enrich-unified-tickets
+  - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
   - bietlejuice.enrich_greenseer:load-enrich-sessions
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_quinto_messenger:load-enrich-message

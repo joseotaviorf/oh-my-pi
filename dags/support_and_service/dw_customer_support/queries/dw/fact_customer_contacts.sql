@@ -11,10 +11,9 @@ WITH time_metrics AS (
     dt_created
   FROM
     datalake_twilio_flex_insights_clean.conversation_time_metrics
-  QUALIFY -- TODO: this is probably avoidable if dt_created is filtered
+  QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_segment ORDER BY dt_created DESC) = 1
 ),
--- TODO: This CTE could be filtered by date/partition
 average_reply_time AS (
   SELECT
     id_task,
@@ -24,9 +23,21 @@ average_reply_time AS (
     datalake_quinto_messenger.message
   WHERE
     msg_sender LIKE "%@%.com%"
+    AND ts_created >= '{load_start_date}' - INTERVAL 30 DAY
   GROUP BY 1, 2
 ),
-demand AS (
+customer_email AS (
+  SELECT DISTINCT
+    customer_contact AS email,
+    id_user
+  FROM
+    datalake_ebdb_customer_contact_identification.customer_contact_identification
+  WHERE
+      channel = 'email'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY email ORDER BY id_user DESC) = 1
+),
+twilio_demand AS (
   SELECT DISTINCT
     id_session,
     id_call,
@@ -38,8 +49,10 @@ demand AS (
     'call' AS channel,
     origin,
     CASE
-      WHEN id_reservation IS NULL THEN 'abandoned'
-      WHEN ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_task_created DESC) = 1 THEN 'completed'
+      WHEN ends_in_abandon IS TRUE
+        AND ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_reservation_created DESC) = 1 THEN 'abandoned'
+      WHEN ends_in_abandon IS FALSE
+        AND ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_reservation_created DESC) = 1 THEN 'completed'
       ELSE 'transferred'
     END AS status,
     worker_email,
@@ -66,7 +79,7 @@ demand AS (
   FROM
     datalake_customer_support.calls
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}'- INTERVAL 30 DAY AND '{load_end_date}'
   UNION ALL
   SELECT DISTINCT
     id_session,
@@ -108,10 +121,10 @@ demand AS (
   FROM
     datalake_customer_support.chats
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}'- INTERVAL 30 DAY AND '{load_end_date}'
 ),
-contacts AS (
-  SELECT
+twilio_contacts AS (
+  SELECT DISTINCT
     CASE
       WHEN d.channel = 'call' THEN MD5(COALESCE(d.id_call, d.id_task))
       WHEN d.channel = 'chat' THEN MD5(d.id_session)
@@ -121,6 +134,7 @@ contacts AS (
       WHEN d.channel = 'chat' THEN MD5(d.id_task)
     END AS sk_interaction,
     MD5(d.queue_name) AS sk_department,
+    MD5(d.worker_email) AS sk_analyst,
     d.id_session AS sk_session,
     d.id_task AS sk_task,
     CAST(COALESCE(t1.id_ticket, t2.id_ticket) AS BIGINT) AS sk_ticket,
@@ -130,7 +144,6 @@ contacts AS (
     d.direction,
     d.origin,
     d.status,
-    d.worker_email,
     d.quinto_andar_phone_number,
     d.customer_phone_number,
     d.customer_email,
@@ -152,7 +165,7 @@ contacts AS (
     d.ts_reservation_ended,
     NOW() AS ts_load
   FROM
-    demand AS d
+    twilio_demand AS d
   LEFT JOIN
     time_metrics AS tm
       ON tm.id_task = d.id_task
@@ -176,6 +189,102 @@ contacts AS (
       datalake_customer_support.tickets AS t3
         ON t3.id_session = d.id_session
         AND d.channel = 'chat'
+),
+front_contacts AS (
+  SELECT
+    sk_contact,
+    sk_interaction,
+    sk_session,
+    sk_task,
+    COALESCE(sk_ticket, -1) AS sk_ticket,
+    COALESCE(sk_user, -1) AS sk_user,
+    sk_department,
+    sk_analyst,
+    direction,
+    channel,
+    origin,
+    status,
+    quinto_andar_phone_number,
+    customer_phone_number,
+    customer_email,
+    average_reply_time,
+    total_talk_time,
+    total_queue_time,
+    total_wrap_up_time,
+    total_waiting_time,
+    first_reply_time,
+    total_handling_time,
+    CASE
+      WHEN ROW_NUMBER() OVER(PARTITION BY sk_contact ORDER BY ts_reservation_created) = 1 THEN TRUE
+      ELSE FALSE
+    END AS is_first_interaction,
+    CASE
+      WHEN ROW_NUMBER() OVER(PARTITION BY sk_contact ORDER BY ts_reservation_created DESC) = 1 THEN TRUE
+      ELSE FALSE
+    END AS is_last_interaction,
+    CASE
+      WHEN ROW_NUMBER() OVER(PARTITION BY sk_contact, sk_department ORDER BY ts_reservation_created) = 1 THEN TRUE
+      ELSE FALSE
+    END AS is_first_department_interaction,
+    is_per_team_task,
+    is_contact_answered,
+    is_interaction_answered,
+    ts_task_created,
+    ts_reservation_created,
+    ts_reservation_ended
+  FROM
+    twilio_contacts
+  UNION ALL
+  SELECT DISTINCT
+    MD5(t.id_ticket) AS sk_contact,
+    MD5(CONCAT(t.id_ticket, 'email')) AS sk_interaction,
+    NULL AS sk_session,
+    NULL AS sk_task,
+    CAST(t.id_ticket AS BIGINT) AS sk_ticket,
+    COALESCE(t.id_user_main, -1) AS sk_user,
+    MD5(COALESCE(t.last_queue, "NULL")) AS sk_department,
+    MD5(COALESCE(t.last_analyst_email, "NULL")) AS sk_analyst,
+    'inbound' AS direction,
+    'email' AS channel,
+    NULL AS origin,
+    CASE
+      WHEN t.ts_closed IS NOT NULL THEN 'completed'
+      ELSE 'in progress'
+    END AS status,
+    NULL AS quinto_andar_phone_number,
+    NULL AS customer_phone_number,
+    ce.email AS customer_email,
+    NULL AS average_reply_time,
+    NULL AS total_talk_time,
+    NULL AS total_queue_time,
+    NULL AS total_wrap_up_time,
+    NULL AS total_waiting_time,
+    NULL AS first_reply_time,
+    NULL AS total_handling_time,
+    TRUE AS is_first_interaction,
+    TRUE AS is_last_interaction,
+    TRUE AS is_first_department_interaction,
+    NULL AS is_per_team_task,
+    TRUE AS is_contact_answered,
+    TRUE AS is_interaction_answered,
+    t.ts_created AS ts_task_created,
+    NULL AS ts_reservation_created,
+    NULL AS ts_reservation_ended
+  FROM
+    datalake_customer_support.tickets AS t
+  LEFT JOIN
+    datalake_zendesk.tickets_current AS tc
+      ON tc.id_ticket = t.id_ticket
+  LEFT JOIN
+    datalake_support_users.zendesk_users AS usr
+      ON usr.id_user_zendesk = tc.id_requester
+  LEFT JOIN
+    customer_email AS ce
+      ON ce.email = usr.email
+  WHERE
+    MAKE_DATE(t.year, t.month, t.day) BETWEEN '{load_start_date}'- INTERVAL 30 DAY AND '{load_end_date}'
+    AND t.channel = 'cs email'
+    AND front_or_back = 'front'
 )
 SELECT
   sk_contact,
@@ -186,6 +295,7 @@ SELECT
   COALESCE(sk_user, -1) AS sk_user,
   LAG(sk_department) OVER(PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_prev_department,
   sk_department,
+  sk_analyst,
   LEAD(sk_department) OVER(PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_next_department,
   FIRST(sk_department) OVER (PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_first_department,
   FIRST(sk_department) OVER (PARTITION BY sk_contact ORDER BY ts_task_created DESC) AS sk_last_department,
@@ -193,7 +303,6 @@ SELECT
   channel,
   origin,
   status,
-  worker_email,
   quinto_andar_phone_number,
   customer_phone_number,
   customer_email,
@@ -204,18 +313,9 @@ SELECT
   total_waiting_time,
   first_reply_time,
   total_handling_time,
-  CASE
-    WHEN ROW_NUMBER() OVER(PARTITION BY sk_contact ORDER BY ts_reservation_created) = 1 THEN TRUE
-    ELSE FALSE
-  END AS is_first_interaction,
-  CASE
-    WHEN ROW_NUMBER() OVER(PARTITION BY sk_contact ORDER BY ts_reservation_created DESC) = 1 THEN TRUE
-    ELSE FALSE
-  END AS is_last_interaction,
-  CASE
-    WHEN ROW_NUMBER() OVER(PARTITION BY sk_contact, sk_department ORDER BY ts_reservation_created) = 1 THEN TRUE
-    ELSE FALSE
-  END AS is_first_department_interaction,
+  is_first_interaction,
+  is_last_interaction,
+  is_first_department_interaction,
   is_per_team_task,
   is_contact_answered,
   is_interaction_answered,
@@ -224,4 +324,4 @@ SELECT
   ts_reservation_ended,
   NOW() AS ts_load
 FROM
-  contacts
+  front_contacts

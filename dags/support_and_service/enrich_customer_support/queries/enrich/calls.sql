@@ -39,7 +39,8 @@ call_events AS (
     MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
 ),
 reservation_queues AS (
-  SELECT
+  SELECT DISTINCT
+    id_task,
     id_reservation,
     id_queue,
     queue_name
@@ -47,6 +48,17 @@ reservation_queues AS (
     call_events
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_reservation ORDER BY ts_task_created) = 1
+),
+queues_per_reservation AS (
+  SELECT
+    id_task,
+    id_reservation,
+    COUNT(DISTINCT(queue_name)) AS total_queues
+  FROM
+    call_events
+  WHERE
+    id_reservation is not null
+  GROUP BY 1, 2
 ),
 task_queues AS (
   SELECT
@@ -151,6 +163,45 @@ unanswered_calls AS (
   GROUP BY ALL
   HAVING COUNT(DISTINCT(ce.id_reservation)) < 1
 ),
+reservation_metrics AS (
+  SELECT
+    r.id_call,
+    r.id_task,
+    r.id_reservation,
+    qpr.total_queues,
+    r.id_worker,
+    r.direction,
+    r.channel_type,
+    r.bpo_name,
+    r.worker_email,
+    r.from_phone_number,
+    r.to_phone_number,
+    r.waiting_time_sec,
+    r.is_reservation_answered,
+    COALESCE(
+      CAST(
+        SUM(CAST(is_reservation_answered AS INTEGER)) OVER(
+          PARTITION BY r.id_task ORDER BY r.ts_reservation_created ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING
+        )
+        AS BOOLEAN
+      ), FALSE
+    ) AS has_following_answered_reservation,
+    r.is_reservation_timeout,
+    r.is_reservation_rejected,
+    r.is_reservation_canceled,
+    r.ts_reservation_created,
+    r.ts_reservation_accepted,
+    r.ts_reservation_ended,
+    r.ts_task_created
+  FROM
+    reservations AS r
+  LEFT JOIN
+    queues_per_reservation AS qpr
+      ON qpr.id_reservation = r.id_reservation
+  LEFT JOIN
+    call_answered_flag AS caf
+      ON caf.id_task = r.id_task
+),
 calls AS (
   SELECT
     r.id_call,
@@ -165,6 +216,18 @@ calls AS (
     r.to_phone_number,
     r.waiting_time_sec,
     caf.is_call_answered,
+    CAST(
+      SUM(
+        CAST(
+          CASE
+            WHEN r.has_following_answered_reservation IS FALSE
+              AND r.total_queues > 1 THEN TRUE
+            ELSE FALSE
+          END AS INTEGER
+        )
+      ) OVER(PARTITION BY r.id_task ORDER BY r.ts_reservation_created ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+      AS BOOLEAN
+    ) AS ends_in_abandon,
     r.is_reservation_answered,
     r.is_reservation_timeout,
     r.is_reservation_rejected,
@@ -174,7 +237,7 @@ calls AS (
     r.ts_reservation_ended,
     r.ts_task_created
   FROM
-    reservations AS r
+    reservation_metrics AS r
   LEFT JOIN
     call_answered_flag AS caf
       ON caf.id_task = r.id_task
@@ -192,6 +255,7 @@ calls AS (
     to_phone_number,
     waiting_time_sec,
     is_call_answered,
+    NULL AS ends_in_abandon,
     is_reservation_answered,
     is_reservation_timeout,
     is_reservation_rejected,
@@ -224,6 +288,7 @@ SELECT DISTINCT
   c.to_phone_number,
   c.waiting_time_sec,
   c.is_call_answered,
+  c.ends_in_abandon,
   c.is_reservation_answered,
   c.is_reservation_timeout,
   c.is_reservation_rejected,

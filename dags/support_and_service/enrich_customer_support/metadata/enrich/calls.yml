@@ -82,6 +82,8 @@ columns:
     description: Time elapsed between the start of the call and the first reservation, in seconds
   is_call_answered:
     description: Boolean that indicates if the call was answered
+  ends_in_abandon:
+    description: Boolean describing if the call ends in an abandoned reservation
   is_reservation_answered:
     description: Boolean that indicates if the reservation was answered
   is_reservation_timeout:

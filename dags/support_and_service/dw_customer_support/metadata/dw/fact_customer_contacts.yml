@@ -53,6 +53,11 @@ columns:
       - datalake_customer_support.calls.queue_name
       - datalake_customer_support.chats.queue_name
     description: Current department associated with the contact.
+  sk_analyst:
+    lineage:
+      - datalake_customer_support.calls.worker_email
+      - datalake_customer_support.chats.worker_email
+    description: SK of the analyst associated with the contact.
   sk_next_department:
     lineage:
       - datalake_customer_support.calls.queue_name
@@ -79,6 +84,11 @@ columns:
     description: Communication channel of the contact (call or chat).
   status:
     description: Status of the interaction - represents how that interaction ended
+    categories:
+      tranferred: Not a terminal status, means the contact has a transfer generating a new interaction
+      in progress: Means the contact is still in progress, valid for email channel only.
+      completed: Terminal status, means the contact is finished.
+      abandoned: Is a terminal status, valid for calls
   worker_email:
     lineage:
       - datalake_customer_support.calls.worker_email
