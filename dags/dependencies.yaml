@@ -2969,10 +2969,10 @@ bietlejuice.enrich_support_users:
 bietlejuice.enrich_survicate:
   - bietlejuice.gsheets_support_and_service:done-clean-owner-offboarding-keys-csat
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-onboarding-keys-csat
-  - bietlejuice.survicate:load-clean-respondent-attributes
-  - bietlejuice.survicate:load-clean-survey-questions
-  - bietlejuice.survicate:load-clean-survey-responses
-  - bietlejuice.survicate:load-clean-surveys
+  - bietlejuice.survicate_respondent_attributes:load-clean-respondent-attributes
+  - bietlejuice.survicate_survey_attributes:load-clean-survey-questions
+  - bietlejuice.survicate_survey_attributes:load-clean-survey-responses
+  - bietlejuice.survicate_surveys:load-clean-surveys
 bietlejuice.enrich_table_dependency_tree:
   - bietlejuice.dag_inventory:load-clean-table
   - bietlejuice.table_usage_in_queries:load-clean-table-usage-in-queries
@@ -3735,10 +3735,10 @@ bietlejuice.reverse_webhelp_test:
   - bietlejuice.quinto_messenger:load-clean-channel-event
 bietlejuice.search_metrics_service:
   - quintoml.search.search_monitoring.inference:batch-predict
-bietlejuice.survicate_respondent_attributes_test:
-  - bietlejuice.survicate_survey_attributes_test:load-raw-survey-responses
-bietlejuice.survicate_survey_attributes_test:
-  - bietlejuice.survicate_surveys_test:load-raw-surveys
+bietlejuice.survicate_respondent_attributes:
+  - bietlejuice.survicate_survey_attributes:load-raw-survey-responses
+bietlejuice.survicate_survey_attributes:
+  - bietlejuice.survicate_surveys:load-raw-surveys
 quintoml.growth.eltv.inference:
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
   - bietlejuice.ebdb_house:load-clean-house
