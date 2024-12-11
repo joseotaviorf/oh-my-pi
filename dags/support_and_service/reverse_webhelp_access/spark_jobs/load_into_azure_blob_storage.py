@@ -44,11 +44,11 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     parser.add_argument("source")
     parser.add_argument("database_name")
     parser.add_argument("table_name")
-    parser.add_argument("azure_container_name")
-    parser.add_argument("table_context")
     parser.add_argument(
         "execution_date", help="Date of the execution in the format YYYY-MM-DD"
     )
+    parser.add_argument("table_context")
+    parser.add_argument("azure_container_name")
 
     args = parser.parse_args()
 
@@ -56,9 +56,9 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     source = args.source
     database_name = args.database_name
     table_name = args.table_name
+    execution_date = datetime.fromisoformat(args.execution_date)
     azure_container_name = args.azure_container_name
     table_context = args.table_context
-    execution_date = datetime.fromisoformat(args.execution_date)
 
     return environment, source, database_name, table_name, azure_container_name, table_context, execution_date
 
