@@ -1,0 +1,47 @@
+dag:
+  name: reverse_atlas_pricing_report_access
+  schedule_start_date: 2022,7,12
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      "This DAG is responsible for loading the reverse atlas pricing report access data"
+workflow:
+  type: access
+  layer: reverse
+  load_spark_job: load_into_sns
+  custom_schema: datalake_atlas_pricing_report
+  spark_job_arguments:
+    - "{dag_name}" # dag_name
+    - "datalake_atlas_pricing_report" # database_name
+    - "{table_name}" # table_name
+  tables_customization:
+    new_pricing_report_engagement:
+      extra_spark_job_arguments:
+        - NEW_PRICING_REPORT_ENGAGEMENT # event_type
+        - sns_topic_arn_business # sns_topic_arn
+        - 150 # chunk_size
+    new_pricing_report_listing_price_history:
+      extra_spark_job_arguments:
+        - NEW_PRICING_REPORT_LISTING_PRICE_HISTORY
+        - sns_topic_arn_listing
+        - 1000 # chunk_size
+    new_pricing_report_region:
+      extra_spark_job_arguments:
+        - NEW_PRICING_REPORT_REGION
+        - sns_topic_arn_business
+        - 1000 # chunk_size
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    autotermination_minutes: 20
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: c5a.2xlarge
+    num_workers: 6
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+      first_on_demand: 1
+      spot_bid_price_percent: 100
+      zone_id: us-east-1d
+      availability: SPOT_WITH_FALLBACK
+      ebs_volume_size: 200
+      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"

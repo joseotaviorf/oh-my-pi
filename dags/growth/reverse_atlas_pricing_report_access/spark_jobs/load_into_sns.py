@@ -7,8 +7,10 @@ from datetime import datetime, date, timezone
 from uuid import uuid4
 
 from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.services import ConfigurationService
 
 from quintoandar_logger import QuintoAndarLogger
+
 
 JOB_NAME = "load_into_sns"
 
@@ -25,6 +27,7 @@ def parse_arguments() -> dict:
 
     parser = ArgumentParser(description=JOB_NAME)
 
+    parser.add_argument("dag_name", help="Name of the DAG")
     parser.add_argument("database_name", help="Name of the database where the table is")
     parser.add_argument("table_name", help="Name of the table to be loaded")
     parser.add_argument("event_type", help="Type of event to be sent to SNS")
@@ -33,6 +36,7 @@ def parse_arguments() -> dict:
 
     args = parser.parse_args()
 
+    dag_name = args.dag_name
     database_name = args.database_name
     table_name = args.table_name
     event_type = args.event_type
@@ -40,6 +44,7 @@ def parse_arguments() -> dict:
     chunk_size = args.chunk_size
 
     return {
+        "dag_name": dag_name,
         "database_name": database_name,
         "table_name": table_name,
         "event_type": event_type,
@@ -123,17 +128,19 @@ def main():
     Start the pipeline.
     """
     job_args_dict = parse_arguments()
+    config_service = ConfigurationService(job_args_dict["dag_name"])
+    sns_topic_arn = config_service.get_config(job_args_dict["sns_topic_arn"])
 
     logger.info(
         f"""m=__main__, database_name={job_args_dict["database_name"]}, table_name={job_args_dict["table_name"]},
-        event_type={job_args_dict["event_type"]}, sns_topic_arn={job_args_dict["sns_topic_arn"]}"""
+        event_type={job_args_dict["event_type"]}, sns_topic_arn={sns_topic_arn}"""
     )
 
     load_table_into_sns(
         database_name=job_args_dict["database_name"],
         table_name=job_args_dict["table_name"],
         event_type=job_args_dict["event_type"],
-        sns_topic_arn=job_args_dict["sns_topic_arn"],
+        sns_topic_arn=sns_topic_arn,
         chunk_size=job_args_dict["chunk_size"]
     )
 

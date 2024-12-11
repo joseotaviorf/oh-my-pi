@@ -1,0 +1,2 @@
+sns_topic_arn_business: arn:aws:sns:us-east-1:632540934959:prod-reports-business-events
+sns_topic_arn_listing: arn:aws:sns:us-east-1:632540934959:prod-reports-listing-events
