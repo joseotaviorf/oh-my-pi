@@ -59,8 +59,12 @@ columns:
     description: Key of house's status and status_reason.
   sk_company_supply:
     lineage:
-    - datalake_rede_company.company_sks.sk_company
-    description: Key of the Rede company that owns the house. Can be joined with dw_rede.dim_company.
+      - datalake_rede_company.company_sks.sk_company
+    description: Key of the Rede company that owns the house. It can be joined with dw_rede.dim_company.
+  sk_pricing:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_price_change
+    description: Key of the price change. It can be joined with dw_listing.dim_pricing.
   sk_status_started_date:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.ts_status_started
@@ -73,6 +77,38 @@ columns:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.dt_day
     description: Key of reference date.
+  available_hours:
+    lineage:
+      - dw_listing.fact_house_listing_daily_available_hours.day_available_hours
+    description: Number of available hours of the house listing in the referenced date.
+  page_views:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+    description: Number of page views of the house listing in the referenced date.
+  visits_booked:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+    description: Number of visits booked, coming from the old booking modeling, of the house listing in the referenced date.
+  visits_completed:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.visits_completed
+    description: Number of visits completed, coming from the old booking modeling, of the house listing in the referenced date.
+  visits_requested:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.visits_requested
+    description: Number of visits requested, coming from the new visit modeling, of the house listing in the referenced date.
+  visits_rescheduled:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.visits_rescheduled
+    description: Number of visits rescheduled, coming from the new visit modeling, of the house listing in the referenced date.
+  visits_confirmed:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.visits_confirmed
+    description: Number of visits confirmed, coming from the new visit modeling, of the house listing in the referenced date.
+  visits_done:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.visits_done
+    description: Number of visits done, coming from the new visit modeling, of the house listing in the referenced date.
   country_code:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.country_code

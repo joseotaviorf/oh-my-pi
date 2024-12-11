@@ -54,6 +54,10 @@ columns:
     lineage:
     - datalake_ebdb_listing.house_status.id_house_status
     description: The Id of the status and status_reason related to the house.
+  id_price_change:
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.id_price_change
+    description: The Id of the price change related to the house.
   uuid_company:
     lineage:
       - datalake_ebdb_listing.house.uuid_company
@@ -114,6 +118,38 @@ columns:
     lineage:
     - datalake_ebdb_pricing.listing_prediction_changes.calculator_certainty
     description: Calculator column. Tells the certainty level of the prediction calculated by the calculator. It is strongly related to the intensity of the QuintoAndar performance with the listing region.
+  listing_page_views:
+    description: Number of page views of the house listing.
+  visits_booked:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_event
+      - datalake_rent_demand_events.rent_demand_events.id_event_type
+    description: Number of visits booked of the house listing, coming from the old booking modeling.
+  visits_completed:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_event
+      - datalake_rent_demand_events.rent_demand_events.id_event_type
+    description: Number of visits completed of the house listing, coming from the old booking modeling.
+  visits_requested:
+    lineage:
+      - datalake_visit.visit_status_events.id_schedule
+      - datalake_visit.visit_status_events.event_type
+    description: Number of visits requested of the house listing, coming from the new visit modeling.
+  visits_rescheduled:
+    lineage:
+      - datalake_visit.visit_status_events.id_schedule
+      - datalake_visit.visit_status_events.event_type
+    description: Number of visits rescheduled of the house listing, coming from the new visit modeling.
+  visits_confirmed:
+    lineage:
+      - datalake_visit.visit_status_events.id_schedule
+      - datalake_visit.visit_status_events.event_type
+    description: Number of visits confirmed of the house listing, coming from the new visit modeling.
+  visits_done:
+    lineage:
+      - datalake_visit.visit_status_events.id_schedule
+      - datalake_visit.visit_status_events.event_type
+    description: Number of visits done of the house listing, coming from the new visit modeling.
   status_change_reason:
     lineage:
     - datalake_ebdb_listing.house_listing_status.status_change_reason

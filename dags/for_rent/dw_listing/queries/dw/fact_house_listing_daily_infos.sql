@@ -21,9 +21,18 @@ SELECT
   COALESCE(hldi.id_region, -1) AS sk_region,
   COALESCE(hldi.id_house_status, -1) AS sk_house_status,
   COALESCE(cs.sk_company, -1) AS sk_company_supply,
+  COALESCE(hldi.id_price_change, -1) AS sk_pricing,
   BIGINT(DATE_FORMAT(DATE(ts_status_started), 'yyyyMMdd')) AS sk_status_started_date,
   BIGINT(COALESCE(DATE_FORMAT(DATE(ts_status_ended), 'yyyyMMdd'), -1)) AS sk_status_ended_date,
   BIGINT(DATE_FORMAT(dt_day, 'yyyyMMdd')) AS sk_date,
+  COALESCE(avh.day_available_hours, 0) AS available_hours,
+  COALESCE(hldi.listing_page_views, 0) AS page_views,
+  COALESCE(hldi.visits_booked, 0) AS visits_booked,
+  COALESCE(hldi.visits_completed, 0) AS visits_completed,
+  COALESCE(hldi.visits_requested, 0) AS visits_requested,
+  COALESCE(hldi.visits_rescheduled, 0) AS visits_rescheduled,
+  COALESCE(hldi.visits_confirmed, 0) AS visits_confirmed,
+  COALESCE(hldi.visits_done, 0) AS visits_done,
   hldi.country_code,
   hldi.year,
   hldi.month,
@@ -57,6 +66,12 @@ LEFT JOIN
       AND hldi.id_company_hubspot IS NULL
       AND hldi.partner_3p_supply = cs.extracted_3p_tag
     ))
+LEFT JOIN
+  dw_listing.fact_house_listing_daily_available_hours AS avh
+    ON avh.sk_house_listing = hldi.id_house_listing
+    AND avh.year = hldi.year
+    AND avh.month = hldi.month
+    AND avh.day = hldi.day
 WHERE
   MAKE_DATE(hldi.year, hldi.month, hldi.day) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
   AND hldi.is_for_rent = TRUE

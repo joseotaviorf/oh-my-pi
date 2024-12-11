@@ -87,6 +87,67 @@ previous_listing_early_demand AS (
       ON hl.id_house = ed.id_house
       AND hl.version = ed.version - 1
 ),
+lpv AS (
+    SELECT
+        COUNT(*) AS listing_page_viewed,
+        hl.id_house_listing,
+        dbase.dt_day
+    FROM
+        datalake_amplitude_page_viewed_events.schedule_search_listing_events AS le
+    JOIN
+        daily_base AS dbase
+            ON dbase.dt_day = DATE(le.ts_event)
+    JOIN
+        datalake_ebdb_listing.house_listing AS hl
+            ON hl.id_house = le.ep_house_id
+            AND le.ts_event >= hl.ts_listing_version_start
+            AND le.ts_event < COALESCE(hl.ts_listing_version_end, '2100-01-01')
+    WHERE
+        UPPER(le.business_context) = 'RENT'
+        AND le.tof_event_type = 'listing_page_viewed'
+    GROUP BY
+        2, 3
+),
+visits_old_modeling AS (
+    SELECT
+        COUNT(DISTINCT rde.id_event) FILTER (WHERE rde.id_event_type = 1) AS visits_booked,
+        COUNT(DISTINCT rde.id_event) FILTER (WHERE rde.id_event_type = 2) AS visits_completed,
+        rde.id_house_listing,
+        dbase.dt_day
+    FROM
+        datalake_rent_demand_events.rent_demand_events AS rde
+    JOIN
+        daily_base AS dbase
+            ON dbase.dt_day = DATE(rde.ts_event)
+    WHERE
+        country_code = 'BR'
+    GROUP BY
+        3, 4
+),
+visits_new_modeling AS (
+    SELECT
+        COUNT(DISTINCT vse.id_schedule) FILTER (WHERE vse.event_type = 'VISIT_REQUESTED') AS visits_requested,
+        COUNT(DISTINCT vse.id_schedule) FILTER (WHERE vse.event_type = 'VISIT_RESCHEDULED') AS visits_rescheduled,
+        COUNT(DISTINCT vse.id_schedule) FILTER (WHERE vse.event_type = 'VISIT_CONFIRMED') AS visits_confirmed,
+        COUNT(DISTINCT vse.id_schedule) FILTER (WHERE vse.event_type = 'VISIT_DONE') AS visits_done,
+        hl.id_house_listing,
+        dbase.dt_day
+    FROM
+        datalake_visit.visit_status_events AS vse
+    JOIN
+        datalake_ebdb_listing.house_listing AS hl
+            ON hl.id_house = vse.id_house
+            AND vse.ts_event_created >= hl.ts_listing_version_start
+            AND vse.ts_event_created < COALESCE(hl.ts_listing_version_end, '2100-01-01')
+    JOIN
+        daily_base AS dbase
+            ON dbase.dt_day = DATE(vse.ts_event_created)
+    WHERE
+        vse.country_code = 'BR'
+        AND vse.business_context = 'RENT'
+    GROUP BY
+        5, 6
+),
 listings_states_per_day AS (
     SELECT /*+ RANGE_JOIN(heh, 1180) */
         CONCAT(COALESCE(pled.id_house_listing, hl.id_house_listing), DATE_FORMAT(dbase.dt_day, 'yMMdd')) AS id_house_listing_day,
@@ -100,6 +161,7 @@ listings_states_per_day AS (
         lcod.id_partner AS id_partner_big_agent,
         h.id_region,
         hs.id_house_status,
+        lpc.id_price_change,
         IF(h.is_rent_3p_supply, h.uuid_company, NULL) AS uuid_company,
         IF(h.is_rent_3p_supply, h.id_company_hubspot, NULL) AS id_company_hubspot,
         IF(h.is_rent_3p_supply, h.partner_3p_supply, NULL) AS partner_3p_supply,
@@ -113,6 +175,13 @@ listings_states_per_day AS (
         pred.calculator_min_price AS p_10,
         pred.calculator_max_price AS p_90,
         pred.calculator_certainty AS certainty,
+        lpv.listing_page_viewed AS listing_page_views,
+        vom.visits_booked,
+        vom.visits_completed,
+        vnm.visits_requested,
+        vnm.visits_rescheduled,
+        vnm.visits_confirmed,
+        vnm.visits_done,
         hls.status_history,
         hls.status_change_reason,
         hl.listing_category,
@@ -207,6 +276,18 @@ listings_states_per_day AS (
             AND dbase.dt_day < COALESCE(DATE(pred.ts_calculator_result_ended), '2100-01-01')
             AND pred.is_last_prediction_of_day
             AND pred.business_context = 'RENT'
+    LEFT JOIN
+        lpv
+            ON COALESCE(pled.id_house_listing, hl.id_house_listing) = lpv.id_house_listing
+            AND dbase.dt_day = lpv.dt_day
+    LEFT JOIN
+        visits_old_modeling AS vom
+            ON COALESCE(pled.id_house_listing, hl.id_house_listing) = vom.id_house_listing
+            AND dbase.dt_day = vom.dt_day
+    LEFT JOIN
+        visits_new_modeling AS vnm
+            ON COALESCE(pled.id_house_listing, hl.id_house_listing) = vnm.id_house_listing
+            AND dbase.dt_day = vnm.dt_day
     /*
     This table is used for For_Rent and
     should be similar to fact_house_listing_status, so
@@ -228,6 +309,7 @@ SELECT
     id_partner_big_agent,
     id_region,
     id_house_status,
+    id_price_change,
     uuid_company,
     id_company_hubspot,
     partner_3p_supply,
@@ -241,6 +323,13 @@ SELECT
     p_10,
     p_90,
     certainty,
+    listing_page_views,
+    visits_booked,
+    visits_completed,
+    visits_requested,
+    visits_rescheduled,
+    visits_confirmed,
+    visits_done,
     status_history,
     status_change_reason,
     listing_category,
