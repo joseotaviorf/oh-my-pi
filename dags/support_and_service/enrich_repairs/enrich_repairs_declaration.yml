@@ -11,10 +11,7 @@ workflow:
     repair_tickets:
       partition_cols: ["year", "month", "day"]
       extraction_type: full
-      z_order_by: [
-        id_ticket,
-        id_request,
-        id_contract]
+      z_order_by: [id_ticket, id_request, id_contract]
       merge_on: [id_ticket]
 cluster:
   type: custom_cluster
@@ -22,4 +19,4 @@ cluster:
     spark_version: 13.3.x-scala2.12
     driver_node_type_id: r6gd.4xlarge
     node_type_id: r6gd.4xlarge
-    num_workers: 2
+    num_workers: 3

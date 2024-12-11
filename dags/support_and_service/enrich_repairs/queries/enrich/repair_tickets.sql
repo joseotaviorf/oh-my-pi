@@ -311,6 +311,7 @@ WHERE
     OR tc.ts_solved >= CURRENT_DATE - INTERVAL 2 YEAR
     OR tc.ts_solved IS NULL
   )
+  AND tc.year >= YEAR(CURRENT_DATE - INTERVAL 1 YEAR)
   AND tc.channel NOT IN ('call')
   AND tc.status NOT IN ('deleted')
   AND tc.tags NOT LIKE '%caso_ticket_agregador%'
