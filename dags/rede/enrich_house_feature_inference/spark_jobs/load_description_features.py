@@ -135,13 +135,8 @@ def save_df(df: DataFrame, args: Namespace) -> None:
         path=s3_path,
         source_df=df
     )
-
-    spark_metastore_loader.update_metastore(
-        df=df,
-        database_name=database_name,
-        table_name=args.table_name,
-        format_options=SparkTableStorageFormat.DEFAULT_ENRICH,
-        database_location=database_location,
+    spark_metastore_service.refresh_table(
+            database_name, args.table_name
     )
 
 if __name__ == '__main__':
