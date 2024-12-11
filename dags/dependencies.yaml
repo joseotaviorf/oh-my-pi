@@ -653,6 +653,8 @@ bietlejuice.dw_offer:
 bietlejuice.dw_offer_temp:
   - bietlejuice.dw_offer:load-dw-rent-dim-offer
 bietlejuice.dw_operator_performance:
+  - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-negotiation
+  - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-negotiation-installment
   - bietlejuice.iaf:load-clean-employee
   - bietlejuice.paschoalotto:load-clean-user
   - bietlejuice.recupera:load-clean-operators
