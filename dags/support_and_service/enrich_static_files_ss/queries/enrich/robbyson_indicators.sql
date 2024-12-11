@@ -4,7 +4,7 @@ WITH union_line_indicators AS (
       "CSAT", MAP(
         "O CSAT é a porcentagem de clientes satisfeitos nas pesquisas de satisfação (CSAT) que enviamos após o atendimento.//
         Este indicador reflete a qualidade do atendimento prestado, baseando-se nas respostas dos clientes.//
-        A fórmula de calculo basea-se nos fatores: (tickets_csat_satisfied / tickets_with_csat_score).", 
+        A fórmula de calculo basea-se nos fatores: (tickets_csat_satisfied / tickets_with_csat_score).",
         ARRAY("tickets_with_csat_score", "tickets_csat_satisfied")
       ),
       "DSAT", MAP(
@@ -59,6 +59,17 @@ WITH union_line_indicators AS (
       )
     )) AS (name, attributes),
     "support_and_services" AS context
+
+  UNION ALL
+
+  SELECT
+    EXPLODE(MAP(
+      "Recovery", MAP(
+        "Valor total de recuperação realizado por operador no período.",
+        ARRAY("recovered_value")
+      )
+    )) AS (name, attributes),
+    "fintech" AS context
 )
 SELECT
   STRING(crc32(name)) AS id_indicator,

@@ -1,0 +1,12 @@
+dag:
+  name: dw_operator_performance
+  owner: Data Fintech
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: bank
+cluster:
+  type: databricks_12_2_min_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

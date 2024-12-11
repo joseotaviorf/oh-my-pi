@@ -1,0 +1,20 @@
+database_name: dw_operator_performance
+table_name: fact_operator_performance
+description: Fact table that aims to gather data on metrics related to operators performance.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  sk_operator:
+    lineage:
+      - dw_operator_performance.dim_operator.sk_operator
+    description: "Operators unique identification number"
+  operator:
+    lineage:
+      - dw_operator_performance.dim_operator.login
+    description: "Operators login"
+  date:
+    description: "Reference date"
+  recovered_value:
+    lineage:
+      - dw_collection_recovery_quintocred.fact_negotiation_installment.recovered_value
+    description: "Total recovery value realized by operator in the period"

@@ -652,6 +652,11 @@ bietlejuice.dw_offer:
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
 bietlejuice.dw_offer_temp:
   - bietlejuice.dw_offer:load-dw-rent-dim-offer
+bietlejuice.dw_operator_performance:
+  - bietlejuice.iaf:load-clean-employee
+  - bietlejuice.paschoalotto:load-clean-user
+  - bietlejuice.recupera:load-clean-operators
+  - bietlejuice.webhelp:load-clean-login
 bietlejuice.dw_performance:
   - bietlejuice.hr_system:load-clean-performance-goals
 bietlejuice.dw_photo_jobs:

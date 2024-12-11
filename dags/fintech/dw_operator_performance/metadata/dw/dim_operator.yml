@@ -1,0 +1,46 @@
+database_name: dw_operator_performance
+table_name: dim_operator
+description: Dimension containing operator data
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  sk_operator:
+    description: "Hash for the corresponding operator"
+  id_operator:
+    lineage:
+      - datalake_paschoalotto_clean.user.id_user
+      - datalake_iaf_clean.employee.id
+      - datalake_webhelp_clean.login.id_person
+    description: "Operator identification number"
+  company:
+    description: "Operator identification number"
+  login:
+    lineage:
+      - datalake_paschoalotto_clean.user.login_name
+      - datalake_recupera_clean.operators.id_operator
+      - datalake_iaf_clean.employee.login
+      - datalake_webhelp_clean.login.id_login
+    description: "Operator login user"
+  full_name:
+    lineage:
+      - datalake_paschoalotto_clean.user.full_name
+      - datalake_iaf_clean.employee.name
+      - datalake_webhelp_clean.login.person_name
+    description: "Operator full name"
+  email:
+    lineage:
+      - datalake_paschoalotto_clean.user.email
+      - datalake_recupera_clean.operators.operator_login_code
+      - datalake_iaf_clean.employee.first_email
+      - datalake_webhelp_clean.login.email
+    description: "Operator email"
+  is_active:
+    lineage:
+      - datalake_recupera_clean.operators.is_active
+      - datalake_iaf_clean.employee.status
+    description: "Flag indicating if the user is currently active"
+  ts_updated:
+    lineage:
+      - datalake_recupera_clean.operators.ts_operator_registration_update
+      - datalake_iaf_clean.employee.ts_updated
+    description: "Timestamp when the user data was updated"
