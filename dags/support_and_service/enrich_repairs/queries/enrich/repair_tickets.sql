@@ -75,7 +75,7 @@ WITH ticket_history_base AS (
       ON ww.dt_Ref = DATE(th.ts_contestation) AND id_city = 39
   WHERE
     tc.year >= YEAR(CURRENT_DATE - INTERVAL 1 YEAR)
-    tc.group_name IN (
+    AND tc.group_name IN (
       'FullService [Back]',
       'Prestadores Parceiros [SO]',
       'Reparos [BACK]',
