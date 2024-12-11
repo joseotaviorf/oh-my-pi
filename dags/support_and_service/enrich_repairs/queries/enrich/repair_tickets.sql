@@ -74,6 +74,7 @@ WITH ticket_history_base AS (
     datalake_date.workday_window AS ww
       ON ww.dt_Ref = DATE(th.ts_contestation) AND id_city = 39
   WHERE
+    tc.year >= YEAR(CURRENT_DATE - INTERVAL 1 YEAR)
     tc.group_name IN (
       'FullService [Back]',
       'Prestadores Parceiros [SO]',
@@ -81,9 +82,6 @@ WITH ticket_history_base AS (
       'Triagem Reparos [Back]',
       'FullService [BACK]',
       'ReparAção (Piloto Urgente)')
-    AND (
-        DATE(tc.ts_solved - INTERVAL 3 HOUR) >= CURRENT_DATE - INTERVAL 1 YEAR
-        OR tc.ts_solved - INTERVAL 3 HOUR IS NULL)
     AND tc.channel NOT IN ('call')
     AND tc.status NOT IN ('deleted')
     AND tc.tags NOT LIKE '%caso_ticket_agregador%'
@@ -181,7 +179,6 @@ WITH ticket_history_base AS (
   GROUP BY
     ALL
 )
-
 SELECT
   tc.id_ticket,
   REPLACE(CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Ticket do contato"]') AS STRING),'#','') AS id_contact_ticket,
@@ -262,6 +259,7 @@ FROM
   datalake_zendesk.tickets_current AS tc
 LEFT JOIN
   datalake_customer_support.tickets AS t
+    ON t.id_ticket = tc.id_ticket
 LEFT JOIN
   datalake_ebdb_contract.contract AS c
     ON tc.id_contract = c.id
@@ -311,7 +309,6 @@ WHERE
     OR tc.ts_solved >= CURRENT_DATE - INTERVAL 2 YEAR
     OR tc.ts_solved IS NULL
   )
-  AND tc.year >= YEAR(CURRENT_DATE - INTERVAL 1 YEAR)
   AND tc.channel NOT IN ('call')
   AND tc.status NOT IN ('deleted')
   AND tc.tags NOT LIKE '%caso_ticket_agregador%'
