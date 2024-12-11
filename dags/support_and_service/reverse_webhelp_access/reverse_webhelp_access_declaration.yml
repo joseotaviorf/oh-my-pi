@@ -36,58 +36,44 @@ workflow:
     backlog_metric:
       extra_spark_job_arguments:
         - cx
-        - azure_container_name
     csat_front:
       extra_spark_job_arguments:
         - cx
-        - azure_container_name
     demand_metric:
       extra_spark_job_arguments:
         - cx
-        - azure_container_name
     fcr_metric:
       extra_spark_job_arguments:
         - cx
-        - azure_container_name
     general_metric:
       extra_spark_job_arguments:
         - cx
-        - azure_container_name
     listing_quality_tasks:
       extra_spark_job_arguments:
         - services
-        - azure_container_name
     listing_quality_sla:
       extra_spark_job_arguments:
         - services
-        - azure_container_name
     repair_tickets:
       extra_spark_job_arguments:
         - services
-        - azure_container_name
     speech_call:
       extra_spark_job_arguments:
         - speech_analytics
-        - azure_container_name
     speech_chat:
       extra_spark_job_arguments:
         - speech_analytics
-        - azure_container_name
     taxonomy:
       extra_spark_job_arguments:
         - cx
-        - azure_container_name
     recontact:
       extra_spark_job_arguments:
         - cx
-        - azure_container_name
     tickets_transferred:
       extra_spark_job_arguments:
         - cx
-        - azure_container_name
     twilio_chat_aht:
       extra_spark_job_arguments:
         - cx
-        - azure_container_name
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
