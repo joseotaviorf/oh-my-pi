@@ -400,7 +400,7 @@ SELECT DISTINCT
   bha.contract_name AS hub_agent_region,
   IF(bha.id_schedule IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
   brh.is_house_rented,
-  IF(sk_behavior_type IN (2,6,7), TRUE, FALSE) AS has_tenant_living,
+  IF(v.behavior IN ('CONFIRMATION_TENANT_LIVING','CONFIRMATION_TENANT_LIVING_ASSURED','CONFIRMATION_TENANT_LIVING_REQUIRED'), TRUE, FALSE) AS has_tenant_living,
   DATEDIFF(v.dt_visit, ts_schedule_canceled) AS days_visit_cancelled_to_visit,
   DATEDIFF(v.dt_visit, ts_schedule_created) AS days_visit_booked_to_visit,
   DATEDIFF(ts_schedule_canceled, ts_schedule_created) AS days_visit_booked_to_cancelled,
