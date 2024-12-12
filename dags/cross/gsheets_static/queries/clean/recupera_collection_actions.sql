@@ -11,4 +11,4 @@ SELECT
     promessa,
     NOW() AS ts_load
 FROM
-    datalake_gsheets_raw.cyber_collection_actions
+    datalake_gsheets_raw.recupera_collection_actions

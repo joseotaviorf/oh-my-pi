@@ -19,8 +19,8 @@ union_collection AS (
         SUM(IFNULL(esforco,0)) AS total_esforco,
         SUM(IFNULL(alo,0)) AS total_alo,
         SUM(IFNULL(cpc,0)) AS total_cpc,
-        0 AS total_promisse,
-        SUM(IFNULL(acordo,0)) AS total_agreement,
+        SUM(IFNULL(promessa,0)) AS total_promisse,
+        SUM(IFNULL(promessa,0)) AS total_agreement,
         0 AS total_failure,
         'Cyber' AS source,
         1 AS priority

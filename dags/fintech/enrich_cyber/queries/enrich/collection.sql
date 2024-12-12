@@ -14,7 +14,7 @@ map_type_occurrence AS (
     esforco,
     alo,
     cpc,
-    acordo
+    promessa
   FROM datalake_gsheets_clean.cyber_collection_actions
   QUALIFY ROW_NUMBER() OVER(PARTITION BY action_code, result_code, complement_code ORDER BY ts_load) = 1
 ),
@@ -72,8 +72,8 @@ SELECT
   END AS cpc,
   CASE
     WHEN UPPER(l.id_user) IN ("SISTEMA", "HOST", "RCVRY") THEN 0
-    ELSE mto.acordo
-  END AS acordo,
+    ELSE mto.promessa
+  END AS promessa,
   l.ts_activity AS ts_occurrence,
   NOW() AS ts_load
 FROM datalake_cyber_clean.logs AS l
