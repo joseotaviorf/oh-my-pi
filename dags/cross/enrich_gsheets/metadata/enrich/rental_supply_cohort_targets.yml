@@ -6,7 +6,8 @@ domain: For Rent
 owner: gustavo.alencar@quintoandar.com.br
 columns:
   city_group:
-    lineage:
+    lineage:  
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.city_group
       - datalake_gsheets_clean.supply_targets_2024_cohort.city_group
       - datalake_gsheets_clean.supply_targets_retro_cohort.city_group
     description: City group related to the target.
@@ -32,62 +33,74 @@ columns:
     description: Rental administrator related to the target.
   planning_conversion:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.planning_conversion
       - datalake_gsheets_clean.supply_targets_2024_cohort.planning_conversion
       - datalake_gsheets_clean.supply_targets_retro_cohort.planning_conversion
     description: Detailed conversion operation type.
       Distinguishes the Inside Sales operations in Inbound, Outbound and IS Expert.
   planning_operation:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.planning_operation
       - datalake_gsheets_clean.supply_targets_2024_cohort.planning_operation
       - datalake_gsheets_clean.supply_targets_retro_cohort.planning_operation
     description: Identifies the conversion operation type.
   planning_cluster:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.planning_cluster
       - datalake_gsheets_clean.supply_targets_2024_cohort.planning_cluster
       - datalake_gsheets_clean.supply_targets_retro_cohort.planning_cluster
     description: Channel segmented by Cluster (for affiliates) and Medium (for Owner PWA, Price Calculator FR/FS).
   company_report_origin:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.company_report_origin
       - datalake_gsheets_clean.supply_targets_2024_cohort.company_report_origin
       - datalake_gsheets_clean.supply_targets_retro_cohort.company_report_origin
     description: Acquisition channel for IS and FSS operations and conversion source for the others (CIQ, Rede, PP Multi, Captaí).
   weeks_conversion:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.weeks_conversion
       - datalake_gsheets_clean.supply_targets_2024_cohort.weeks_conversion
       - datalake_gsheets_clean.supply_targets_retro_cohort.weeks_conversion
     description: Amount of weeks of the event conversion related to the target.
   op2q:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.op2q
       - datalake_gsheets_clean.supply_targets_2024_cohort.op2q
       - datalake_gsheets_clean.supply_targets_retro_cohort.op2q
     description: Owner prospect to qualified conversion related to the target.
   q2opp:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.q2opp
       - datalake_gsheets_clean.supply_targets_2024_cohort.q2opp
       - datalake_gsheets_clean.supply_targets_retro_cohort.q2opp
     description: Qualified to opportunity conversion related to the target.
   opp2fl:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.opp2fl
       - datalake_gsheets_clean.supply_targets_2024_cohort.opp2fl
       - datalake_gsheets_clean.supply_targets_retro_cohort.opp2fl
     description: Opportunity to first listing conversion related to the target.
   fl:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.fl
       - datalake_gsheets_clean.supply_targets_2024_cohort.fl
       - datalake_gsheets_clean.supply_targets_retro_cohort.fl
     description: First listings coincident volume related to the target.
   q2avq:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.q2avq
       - datalake_gsheets_clean.supply_targets_2024_cohort.q2avq
       - datalake_gsheets_clean.supply_targets_retro_cohort.q2avq
     description: Qualified to available qualified conversion related to the target.
   avq2opp:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.avq2opp
       - datalake_gsheets_clean.supply_targets_2024_cohort.avq2opp
       - datalake_gsheets_clean.supply_targets_retro_cohort.avq2opp
     description: Available qualified to opportunity conversion related to the target.
   dt_week_started:
     lineage:
+      - datalake_gsheets_clean.rent_supply_targets_cohort_2025.week_start
       - datalake_gsheets_clean.supply_targets_2024_cohort.dt_week_started
       - datalake_gsheets_clean.supply_targets_retro_cohort.dt_week_started
     description: Week start of the date related to the target.

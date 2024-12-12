@@ -10,6 +10,7 @@ columns:
       - datalake_gsheets_clean.supply_targets_retro_1.city_group
       - datalake_gsheets_clean.supply_targets_retro_2.city_group
       - datalake_gsheets_clean.supply_targets_2024.city_group
+      - datalake_gsheets_clean.supply_targets_2025.city_group
     description: City group related to the target.
   planning_taxonomy:
     lineage:
@@ -40,6 +41,7 @@ columns:
       - datalake_gsheets_clean.supply_targets_retro_1.planning_conversion
       - datalake_gsheets_clean.supply_targets_retro_2.planning_conversion
       - datalake_gsheets_clean.supply_targets_2024.planning_conversion
+      - datalake_gsheets_clean.supply_targets_2025.planning_conversion
     description: Detailed conversion operation type.
       Distinguishes the Inside Sales operations in Inbound, Outbound and IS Expert.
   planning_operation:
@@ -47,52 +49,61 @@ columns:
       - datalake_gsheets_clean.supply_targets_retro_1.planning_operation
       - datalake_gsheets_clean.supply_targets_retro_2.planning_operation
       - datalake_gsheets_clean.supply_targets_2024.planning_operation
+      - datalake_gsheets_clean.supply_targets_2025.planning_operation
     description: Identifies the conversion operation type.
   planning_cluster:
     lineage:
       - datalake_gsheets_clean.supply_targets_retro_1.planning_cluster
       - datalake_gsheets_clean.supply_targets_retro_2.planning_cluster
       - datalake_gsheets_clean.supply_targets_2024.planning_cluster
+      - datalake_gsheets_clean.supply_targets_2025.planning_cluster
     description: Channel segmented by Cluster (for affiliates) and Medium (for Owner PWA, Price Calculator FR/FS).
   company_report_origin:
     lineage:
       - datalake_gsheets_clean.supply_targets_retro_1.company_report_origin
       - datalake_gsheets_clean.supply_targets_retro_2.company_report_origin
       - datalake_gsheets_clean.supply_targets_2024.company_report_origin
+      - datalake_gsheets_clean.supply_targets_2025.company_report_origin
     description: Acquisition channel for IS and FSS operations and conversion source for the others (CIQ, Rede, PP Multi, Captaí).
   prospects:
     lineage:
       - datalake_gsheets_clean.supply_targets_retro_1.prospects
       - datalake_gsheets_clean.supply_targets_retro_2.prospects
       - datalake_gsheets_clean.supply_targets_2024.prospects
+      - datalake_gsheets_clean.supply_targets_2025.prospects
     description: Volume of prospects related to the target.
   qualifieds:
     lineage:
       - datalake_gsheets_clean.supply_targets_retro_1.qualifieds
       - datalake_gsheets_clean.supply_targets_retro_2.qualifieds
       - datalake_gsheets_clean.supply_targets_2024.qualifieds
+      - datalake_gsheets_clean.supply_targets_2025.qualifieds
     description: Volume of qualifieds related to the target.
   opportunities:
     lineage:
       - datalake_gsheets_clean.supply_targets_retro_1.opportunities
       - datalake_gsheets_clean.supply_targets_retro_2.opportunities
       - datalake_gsheets_clean.supply_targets_2024.opportunities
+      - datalake_gsheets_clean.supply_targets_2025.opportunities
     description: Volume of opportunities related to the target.
   available_qualifieds:
     lineage:
       - datalake_gsheets_clean.supply_targets_retro_1.available_qualifieds
       - datalake_gsheets_clean.supply_targets_retro_2.available_qualifieds
       - datalake_gsheets_clean.supply_targets_2024.available_qualifieds
+      - datalake_gsheets_clean.supply_targets_2025.available_qualifieds
     description: Volume of available qualifieds related to the target.
   first_listings:
     lineage:
       - datalake_gsheets_clean.supply_targets_retro_1.first_listings
       - datalake_gsheets_clean.supply_targets_retro_2.first_listings
       - datalake_gsheets_clean.supply_targets_2024.first_listings
+      - datalake_gsheets_clean.supply_targets_2025.first_listings
     description: Volume of first listings related to the target.
   dt_target:
     lineage:
       - datalake_gsheets_clean.supply_targets_retro_1.dt_target
       - datalake_gsheets_clean.supply_targets_retro_2.dt_target
       - datalake_gsheets_clean.supply_targets_2024.dt_target
+      - datalake_gsheets_clean.supply_targets_2025.date
     description: Date related to the target.

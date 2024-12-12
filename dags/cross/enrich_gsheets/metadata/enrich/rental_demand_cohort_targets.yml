@@ -7,66 +7,79 @@ owner: gustavo.alencar@quintoandar.com.br
 columns:
   city_group:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.city_group
       - datalake_gsheets_clean.demand_targets_2024_cohort.city_group
       - datalake_gsheets_clean.demand_targets_retro_cohort.city_group
     description: City group related to the target.
   rental_administrator:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.rental_administrator
       - datalake_gsheets_clean.demand_targets_2024_cohort.rental_administrator
       - datalake_gsheets_clean.demand_targets_retro_cohort.rental_administrator
     description: Rental administrator related to the target.
   business_type:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.business_type
       - datalake_gsheets_clean.demand_targets_2024_cohort.business_type
       - datalake_gsheets_clean.demand_targets_retro_cohort.business_type
     description: Business type related to the target.
   rent_flow_origin:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.rent_flow_origin
       - datalake_gsheets_clean.demand_targets_2024_cohort.rent_flow_origin
       - datalake_gsheets_clean.demand_targets_retro_cohort.rent_flow_origin
     description: Rent flow origin (funnel touchpoint) related to the target.
   weeks_conversion:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.weeks_conversion
       - datalake_gsheets_clean.demand_targets_2024_cohort.weeks_conversion
       - datalake_gsheets_clean.demand_targets_retro_cohort.weeks_conversion
     description: Amount of weeks of the event conversion related to the target.
   vb2vc:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.vb2vc
       - datalake_gsheets_clean.demand_targets_2024_cohort.vb2vc
       - datalake_gsheets_clean.demand_targets_retro_cohort.vb2vc
     description: Visit booked to visit completed conversion related to the target.
   vc2os:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.vc2os
       - datalake_gsheets_clean.demand_targets_2024_cohort.vc2os
       - datalake_gsheets_clean.demand_targets_retro_cohort.vc2os
     description: Visit completed to offer submitted conversion related to the target.
   os2oa:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.os2oa
       - datalake_gsheets_clean.demand_targets_2024_cohort.os2oa
       - datalake_gsheets_clean.demand_targets_retro_cohort.os2oa
     description: Offer submitted to offer approved conversion related to the target.
   oa2ca:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.oa2ca
       - datalake_gsheets_clean.demand_targets_2024_cohort.oa2ca
       - datalake_gsheets_clean.demand_targets_retro_cohort.oa2ca
     description: Offer approved to credit approved conversion related to the target.
   ca2cs:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.ca2cs
       - datalake_gsheets_clean.demand_targets_2024_cohort.ca2cs
       - datalake_gsheets_clean.demand_targets_retro_cohort.ca2cs
     description: Credit approved to contract signed conversion related to the target.
   cs:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.cs
       - datalake_gsheets_clean.demand_targets_2024_cohort.cs
       - datalake_gsheets_clean.demand_targets_retro_cohort.cs
     description: Contract signed coincident volume related to the target.
   vb2os:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.vb2os
       - datalake_gsheets_clean.demand_targets_2024_cohort.vb2os
       - datalake_gsheets_clean.demand_targets_retro_cohort.vb2os
     description: Visit booked to offer submitted conversion related to the target.
   dt_week_started:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025_cohort.week_start
       - datalake_gsheets_clean.demand_targets_2024_cohort.dt_week_started
       - datalake_gsheets_clean.demand_targets_retro_cohort.dt_week_started
     description: Week start of the date related to the target.

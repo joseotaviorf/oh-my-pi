@@ -1926,6 +1926,10 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2022
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024-cohort
+  - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025
+  - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025-cohort
+  - bietlejuice.gsheets_growth_targets:done-clean-rent-supply-targets-cohort-2025
+  - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2025
 bietlejuice.enrich_heimdall:
   - bietlejuice.heimdall:load-clean-activity
 bietlejuice.enrich_house_feature_inference:

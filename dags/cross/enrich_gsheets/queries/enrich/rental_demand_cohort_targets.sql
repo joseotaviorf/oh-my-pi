@@ -31,3 +31,20 @@ SELECT
     dt_week_started
 FROM
     datalake_gsheets_clean.demand_targets_2024_cohort
+UNION ALL
+SELECT
+    city_group,
+    rental_administrator,
+    business_type,
+    rent_flow_origin,
+    weeks_conversion,
+    vb2vc,
+    vc2os,
+    os2oa,
+    oa2ca,
+    ca2cs,
+    cs,
+    vb2os,
+    week_start AS dt_week_started
+FROM
+    datalake_gsheets_clean.demand_targets_2025_cohort

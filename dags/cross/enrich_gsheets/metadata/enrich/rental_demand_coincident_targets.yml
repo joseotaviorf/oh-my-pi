@@ -7,71 +7,85 @@ owner: gustavo.alencar@quintoandar.com.br
 columns:
   city_group:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.city_group
       - datalake_gsheets_clean.demand_targets_2024.city_group
       - datalake_gsheets_clean.demand_targets_retro.city_group
     description: City group related to the target.
   rental_administrator:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.rental_administrator
       - datalake_gsheets_clean.demand_targets_2024.rental_administrator
       - datalake_gsheets_clean.demand_targets_retro.rental_administrator
     description: Rental administrator related to the target.
   business_type:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.business_type
       - datalake_gsheets_clean.demand_targets_2024.business_type
       - datalake_gsheets_clean.demand_targets_retro.business_type
     description: Business type related to the target.
   rent_flow_origin:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.rent_flow_origin
       - datalake_gsheets_clean.demand_targets_2024.rent_flow_origin
       - datalake_gsheets_clean.demand_targets_retro.rent_flow_origin
     description: Rent flow origin (funnel touchpoint) related to the target.
   visits_booked:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.visits_booked
       - datalake_gsheets_clean.demand_targets_2024.visits_booked
       - datalake_gsheets_clean.demand_targets_retro.visits_booked
     description: Visits booked volume related to the target.
   visits_completed:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.visits_completed
       - datalake_gsheets_clean.demand_targets_2024.visits_completed
       - datalake_gsheets_clean.demand_targets_retro.visits_completed
     description: Visits completed volume related to the target.
   offers_submitted:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.offers_submitted
       - datalake_gsheets_clean.demand_targets_2024.offers_submitted
       - datalake_gsheets_clean.demand_targets_retro.offers_submitted
     description: Offers submitted volume related to the target.
   offers_accepted:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.offers_accepted
       - datalake_gsheets_clean.demand_targets_2024.offers_accepted
       - datalake_gsheets_clean.demand_targets_retro.offers_accepted
     description: Offers accepted volume related to the target.
   evaluation_started:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.evaluation_started
       - datalake_gsheets_clean.demand_targets_2024.evaluation_started
       - datalake_gsheets_clean.demand_targets_retro.evaluation_started
     description: Evaluations started volume related to the target.
   evaluation_positive:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.evaluation_positive
       - datalake_gsheets_clean.demand_targets_2024.evaluation_positive
       - datalake_gsheets_clean.demand_targets_retro.evaluation_positive
     description: Evaluations positive volume related to the target.
   documentation_sent:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.documentation_sent
       - datalake_gsheets_clean.demand_targets_2024.documentation_sent
       - datalake_gsheets_clean.demand_targets_retro.documentation_sent
     description: Documentation sent volume related to the target.
   credit_approved:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.credit_approved
       - datalake_gsheets_clean.demand_targets_2024.credit_approved
       - datalake_gsheets_clean.demand_targets_retro.credit_approved
     description: Credits approved volume related to the target.
   contracts_signed:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.contracts_signed
       - datalake_gsheets_clean.demand_targets_2024.contracts_signed
       - datalake_gsheets_clean.demand_targets_retro.contracts_signed
     description: Contracts signed volume related to the target.
   dt_target:
     lineage:
+      - datalake_gsheets_clean.demand_targets_2025.date
       - datalake_gsheets_clean.demand_targets_2024.dt_target
       - datalake_gsheets_clean.demand_targets_retro.dt_target
     description: Date related to the target.
