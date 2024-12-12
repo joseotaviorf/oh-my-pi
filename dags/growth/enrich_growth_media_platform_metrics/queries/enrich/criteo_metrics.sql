@@ -14,7 +14,8 @@ SELECT
     id_campaign,
     id_ad_set AS id_adset,
     NULL::STRING AS id_ad,
-    advertiser_name AS account_name,
+    CASE WHEN advertiser_name = 'Quinto Andar Demand RetenÃ§Ã£o - ForSale BR' THEN 'Quinto Andar Demand Retenção - ForSale BR'
+        ELSE advertiser_name END AS account_name,
     'criteo' AS origin,
     'campaigns' AS report_type,
     campaign_name AS utm_campaign,
