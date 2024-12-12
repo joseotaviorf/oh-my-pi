@@ -6,7 +6,7 @@ dag:
         dag_purpose: |
             Transform survey response collected from [Survicate](https://developers.survicate.com/data-export/#get-the-list-of-surveys).
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     default_extraction_type: incremental
     default_partitions: ["year", "month", "day"]
