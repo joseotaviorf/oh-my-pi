@@ -21,6 +21,9 @@ workflow:
     dim_inspector:
       extraction_type: full
       partitions: []
+    dim_report_approval:
+      z_order_by: [sk_inspection]
+      merge_on: [sk_inspection]
     fact_appointments:
       z_order_by: [sk_appointment]
       merge_on: [sk_appointment]
@@ -28,8 +31,14 @@ workflow:
       extraction_type: full
     fact_repair_request:
       extraction_type: full
+    fact_report_inspections:
+      z_order_by: [sk_inspection]
+      merge_on: [sk_inspection]
     fact_report_review:
       extraction_type: full
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 
 cluster:
   type: databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster

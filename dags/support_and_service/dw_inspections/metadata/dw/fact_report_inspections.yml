@@ -1,0 +1,209 @@
+---
+database_name: dw_inspections
+table_name: fact_report_inspections
+description: |
+  Transactional fact table that aims to gather information from the inspection stages.
+  Each line of this table represents an inspection report with approval dates and summarized metrics.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_inspection:
+    lineage:
+      - datalake_inspections.report_approvals.id_inspection
+    description: Inspection unique identifier (number)
+  sk_assessment:
+    lineage:
+      - datalake_inspections.report_approvals.id_assessment
+    description: Identification key of the assessment related to the inspection.
+  sk_previous_assessment:
+    lineage:
+      - datalake_inspections.report_approvals.id_previous_assessment
+    description: Identification key of the previous assessment.
+  total_cost:
+    lineage:
+      - datalake_inspections.report_approvals.total_cost
+    description: Total cost linked to budget approval.
+  owner_amount_payment:
+    lineage:
+      - datalake_inspections.report_approvals.owner_amount_payment
+    description: Owner payment amount.
+  tenant_amount_payment:
+    lineage:
+      - datalake_inspections.report_approvals.tenant_amount_payment
+    description: Tenant payment amount
+  total_tenant_contestation:
+    description: Total number of objections made by the tenant.
+  total_owner_budget_approval_contestation:
+    description: Total number of objections made by the tenant at the budget approval stage.
+  total_tenant_budget_approval_contestation:
+    description: Total number of objections made by the owner at the budget approval stage.
+  total_exemptions:
+    description: Total exemptions in inspection.
+  total_exemptions_by_owner:
+    description: Total exemptions made by the owner during the inspection.
+  total_exemptions_by_owner_from_budget:
+    description: Total exemptions made by the owner at the budget approval stage.
+  total_repairs_requested_by_owner:
+    description: Total repairs requested by owner.
+  has_owner_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.has_owner_access_review
+    description: Boolean information indicating whether the owner had access to the report review.
+  has_tenant_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.has_tenant_access_review
+    description: Boolean information indicating whether the tenant had access to the report review.
+  has_owner_access_budget_approval:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.has_owner_access_budget_approval
+    description: Boolean information indicating whether the owner had access to the budget approval review.
+  has_tenant_access_budget_approval:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.has_tenant_access_budget_approval
+    description: Boolean information indicating whether the tenant had access to the budget approval review.
+  has_owner_approved_budget_approval:
+    lineage:
+      - datalake_inspections.report_approvals.owner_approved
+    description: Boolean information indicating whether there was an iteration of the owner in the budget approval review.
+  has_tenant_approved_budget_approval:
+    lineage:
+      - datalake_inspections.report_approvals.tenant_approved
+    description: Boolean information indicating whether there was an iteration of the tenant in the budget approval review.
+  ts_scheduled:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_scheduled
+    description: Date in timestamp format related to the inspection schedule.
+  ts_received:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_received
+    description: Timestamp. Inspection sent by the inspector, waiting for synchronization with the Main.
+  ts_processing:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_processing
+    description: Date in timestamp format indicating when the report was processed.
+  ts_cancelled:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_cancelled
+    description: Date in timestamp format indicating when the inspection was cancelled.
+  ts_sent_to_inspection_editing:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_sent_to_inspection_editing
+    description: Date in timestamp format indicating when the report was sent to the editing team.
+  ts_automatic_repair_processing:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_automatic_repair_processing
+    description: Timestamp. Inspection at the automatic repair identification stage [offboarding].
+  ts_sent_to_review:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_sent_to_review
+    description: Date in timestamp format indicating when the report was sent for review.
+  ts_review_started:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_review_started
+    description: Date in timestamp format indicating when the report review was initiated.
+  ts_sent_to_repair_analysis:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_sent_to_repair_analysis
+    description: Date in timestamp format indicating when the report was sent for repair analysis.
+  ts_sent_to_owner_review:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_sent_to_owner_review
+    description: Date in timestamp format indicating when the report was sent for analysis by the owner.
+  ts_first_owner_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.ts_first_owner_access_review
+    description: Date in timestamp format indicating the owner's first access to the report review.
+  ts_last_owner_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.ts_last_owner_access_review
+    description: Date in timestamp format indicating the owner's last access to the report review.
+  ts_review_started_by_owner:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_review_started_by_owner
+    description: Date in timestamp format indicating when the owner initiated the review.
+  ts_sent_to_tenant_review:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_sent_to_tenant_review
+    description: Date in timestamp format indicating when the report was sent for analysis by the tenant.
+  ts_first_tenant_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.ts_first_tenant_access_review
+    description: Date in timestamp format indicating the tenant's first access to the report review.
+  ts_last_tenant_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.ts_last_tenant_access_review
+    description: Date in timestamp format indicating the tenant's last access to the report review.
+  ts_review_started_by_tenant:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_review_started_by_tenant
+    description: Date in timestamp format indicating when the tenant initiated the review.
+  ts_sent_to_contestation_analysis:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_sent_to_contestation_analysis
+    description: Date in timestamp format indicating when the report was sent for contestation analysis.
+  ts_contestation_analysis_finished:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_contestation_analysis_finished
+    description: Date in timestamp format indicating when the contestation analysis finished.
+  ts_budget_approval:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_budget_approval
+    description: Date in timestamp format indicating when budget approval was initiated.
+  ts_budget_approval_sent_to_owner:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_budget_approval_sent_to_owner
+    description: Date in timestamp format indicating when the budget approval was sent for the owner's review.
+  ts_budget_approval_started_by_owner:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_budget_approval_started_by_owner
+    description: Date in timestamp format indicating when the budget approval review was initiated by the owner.
+  ts_budget_approval_sent_to_tenant:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_budget_approval_sent_to_tenant
+    description: Date in timestamp format indicating when the budget approval was sent for the tenant's review.
+  ts_budget_approval_started_by_tenant:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_budget_approval_started_by_tenant
+    description: Date in timestamp format indicating when the budget approval review was initiated by the tenant.
+  ts_reviewed:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_reviewed
+    description: Date in timestamp format indicating when the review was completed.
+  ts_owner_approved_budget_approval:
+    lineage:
+      - datalake_inspections.report_approvals.ts_owner_approved
+    description: Date in timestamp format indicating when the owner approved the budget approval.
+  ts_tenant_approved_budget_approval:
+    lineage:
+      - datalake_inspections.report_approvals.ts_tenant_approved
+    description: Date in timestamp format indicating when the tenant approved the budget approval.
+  ts_owner_limit_revision:
+    lineage:
+      - datalake_inspections.report_approvals.dt_owner_limit_revision
+    description: Date in timestamp format indicating the deadline for review by the owner.
+  ts_tenant_limit_revision:
+    lineage:
+      - datalake_inspections.report_approvals.dt_tenant_limit_revision
+    description: Date in timestamp format indicating the deadline for review by the tenant.
+  ts_owner_limit_revision_budget_approval:
+    lineage:
+      - datalake_inspections.report_approvals.dt_owner_limit_revision
+    description: Date in timestamp format indicating the deadline for budget approval review by the owner.
+  ts_tenant_limit_revision_budget_approval:
+    lineage:
+      - datalake_inspections.report_approvals.dt_tenant_limit_revision
+    description: Date in timestamp format indicating the deadline for budget approval review by the tenant.
+  ts_load:
+    description: Date and time when the data was loaded.
+  year:
+    lineage:
+      - datalake_inspections.report_approvals.day
+    description: Year of update date
+  month:
+    lineage:
+      - datalake_inspections.report_approvals.day
+    description: Month of update date
+  day:
+    lineage:
+      - datalake_inspections.report_approvals.day
+    description: Day of update date
