@@ -67,7 +67,7 @@ if __name__ == "__main__":
     )
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
-        dag_name=source, table_name=source, layer=S3_PATH_LAYER
+        dag_name=source, table_name=source, layer=LayerEnum.REVERSE.value
     )
 
     databricks_consumer = DatabricksConsumer({"db": database_name}, spark_client)
