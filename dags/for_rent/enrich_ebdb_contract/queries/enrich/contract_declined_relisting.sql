@@ -6,7 +6,6 @@ listing_rent_model AS (
     h.id_user AS id_owner,
     MIN_BY(ure.id_user, ure.ts_revision) FILTER (WHERE NOT aud.is_early_relisting) AS id_user_modifier,
     c.is_relisting_enabled,
-    aud.is_early_relisting,
     MIN(aud.is_early_relisting) AS is_early_relisting,
     MIN(ure.ts_revision) FILTER (WHERE NOT aud.is_early_relisting) AS ts_revision
   FROM
@@ -101,7 +100,7 @@ unificated AS (
 SELECT
   u.id_contract,
   u.id_house,
-  u.id_user_modifier
+  u.id_user_modifier,
   u.decline_person,
   ch.country_code,
   u.is_relisting_enabled,
