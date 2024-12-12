@@ -15,6 +15,7 @@ dags_out_of_pattern:
         "dw_quintocred_ifrs",
         "dw_rent_demand_events_snapshot",
         "dw_velo",
+        "dw_satisfaction_rating",
         "enrich_house_feature_inference",
         "enrich_hr_system_custom",
         "enrich_lost_listings",

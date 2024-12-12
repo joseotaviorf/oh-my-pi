@@ -1,80 +1,82 @@
-
 WITH segments AS (
   SELECT DISTINCT
-    frc.sk_ticket,
-    frc.sk_contact,
-    frc.sk_task AS sk_segment,
-    frc.sk_interaction,
-    frc.agent_email,
+    fcc.sk_ticket,
+    fcc.sk_contact,
+    fcc.sk_task AS sk_segment,
+    fcc.sk_interaction,
+    da.email AS agent_email,
     dt.theme,
     dt.theme_detail,
-    frc.customer_phone,
-    frc.transferred_from,
+    fcc.customer_phone_number AS customer_phone,
+    dd_prev.department AS transferred_from,
     dd.department,
-    LEAD(dd.team) OVER(PARTITION BY frc.sk_contact ORDER BY frc.ts_created) AS transferred_to_team,
-    frc.transferred_to,
+    LEAD(dd.team) OVER(PARTITION BY fcc.sk_contact ORDER BY fcc.ts_reservation_created) AS transferred_to_team,
+    dd2.department AS transferred_to,
     CASE
-      WHEN frc.channel = 'chat' THEN frc.status
-      WHEN frc.channel = 'call' AND frc.sk_task IS NULL THEN 'ABANDONED'
-      WHEN frc.channel = 'call'AND frc.is_last_interaction = True THEN 'COMPLETED'
-      WHEN frc.channel = 'call' THEN 'TRANSFERRED'
+      WHEN fcc.channel = 'chat' THEN fcc.status
+      WHEN fcc.channel = 'call' AND fcc.sk_task IS NULL THEN 'abandoned'
+      WHEN fcc.channel = 'call'AND fcc.is_last_interaction = True THEN 'completed'
+      WHEN fcc.channel = 'call' THEN 'transferred'
     END AS outcome,
     da.agent_organization,
     dd.team,
-    frc.channel,
+    fcc.channel,
     dd.area,
     dd.front_or_back,
-    frc.status,
+    fcc.status,
     fd.department AS first_department,
     ld.department AS last_department,
     CASE
-      WHEN frc.status = 'TRANSFERRED'
+      WHEN fcc.status = 'transferred'
         AND dd2.team <> 'Inside Sales'
-        AND frc.is_first_department_interaction = TRUE
+        AND fcc.is_first_department_interaction = TRUE
       THEN True
       ELSE False
     END AS task_transferred,
     CASE
-      WHEN frc.status = 'TRANSFERRED'
-        AND frc.is_first_department_interaction = TRUE
+      WHEN fcc.status = 'transferred'
+        AND fcc.is_first_department_interaction = TRUE
         AND dd2.team <> 'Inside Sales'
-        AND frc.transferred_to IS NOT NULL
-        AND transferred_from IS NULL
+        AND dd2.department IS NOT NULL
+        AND dd_prev.department IS NULL
       THEN True
       ELSE False
     END AS first_transfer,
-    frc.is_last_interaction,
-    frc.ts_created AS ts_started,
-    frc.is_first_department_interaction,
+    fcc.is_last_interaction,
+    fcc.ts_reservation_created AS ts_started,
+    fcc.is_first_department_interaction,
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS month,
     DAY(CURRENT_DATE) AS day,
     NOW() AS ts_load
   FROM
-    dw_customer_support.fact_received_contact frc
+    dw_customer_support.fact_customer_contacts AS fcc
   LEFT JOIN
-    dw_customer_support.dim_department dd
-      ON dd.sk_department = frc.sk_department
+    dw_customer_support.dim_department AS dd
+      ON dd.sk_department = fcc.sk_department
   LEFT JOIN
-    dw_customer_support.dim_department dd2
-      ON dd2.department = frc.transferred_to
+    dw_customer_support.dim_department AS dd_prev
+      ON dd.sk_department = fcc.sk_prev_department
   LEFT JOIN
-    dw_customer_support.dim_agent da
-      ON frc.agent_email = da.email
-  LEFT JOIN
-    dw_customer_support.fact_ticket AS ft
-      ON frc.sk_ticket = ft.sk_ticket
+    dw_customer_support.dim_department AS dd2
+      ON dd2.sk_department = fcc.sk_next_department
   LEFT JOIN
       dw_customer_support.dim_department AS fd
-        ON fd.sk_department = ft.sk_first_department
+        ON fd.sk_department = fcc.sk_first_department
   LEFT JOIN
       dw_customer_support.dim_department AS ld
-        ON ld.sk_department = ft.sk_main_department
+        ON ld.sk_department = fcc.sk_last_department
+  LEFT JOIN
+    dw_customer_support.dim_analyst AS da
+      ON fcc.sk_analyst = da.sk_analyst
+  LEFT JOIN
+    dw_customer_support.dim_ticket AS dit
+      ON fcc.sk_ticket = dit.sk_ticket
   LEFT JOIN
     dw_customer_support.dim_taxonomy AS dt
-      ON frc.sk_taxonomy = dt.sk_taxonomy
+      ON dt.sk_taxonomy = dit.sk_taxonomy
   WHERE
-    frc.channel = 'chat'
+    fcc.channel = 'chat'
 )
 ,segments_final AS (
   SELECT
@@ -104,7 +106,7 @@ SELECT
     WHEN
       (first_department = last_department
       OR (transferred_to != last_department))
-      AND outcome = 'TRANSFERRED' THEN 'human_error'
+      AND outcome = 'transferred' THEN 'human_error'
     ELSE 'bot_error'
   END AS transfer_reason,
   CASE
@@ -114,10 +116,11 @@ SELECT
     WHEN
       is_last_interaction = false
       AND transferred_to != last_department
-      AND outcome = 'TRANSFERRED' THEN 'human_error'
+      AND outcome = 'transferred' THEN 'human_error'
     WHEN
       is_last_interaction = false
       AND transferred_to = last_department
-      AND outcome = 'TRANSFERRED' THEN 'department_correction'
+      AND outcome = 'transferred' THEN 'department_correction'
   END AS transfer_reason_detailed
-FROM segments_final
+FROM
+  segments_final

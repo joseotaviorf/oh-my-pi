@@ -14,6 +14,7 @@ dags_out_of_pattern:
         "dw_datamarts_spark.for_sale_cross",
         "dw_quintocred_ifrs",
         "dw_rent_demand_events_snapshot",
+        "dw_satisfaction_rating",
         "dw_velo",
         "enrich_house_feature_inference",
         "enrich_hr_system_custom",
