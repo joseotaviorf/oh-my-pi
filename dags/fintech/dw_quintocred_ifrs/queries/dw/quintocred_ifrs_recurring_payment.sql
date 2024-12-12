@@ -1081,8 +1081,8 @@ repasse_direto AS (
     SELECT
         'invoice' AS origin_table,
         sk_propose,
-        id_bill,
         CAST(NULL AS INT) AS sk_propose_20,
+        id_bill,
         CONCAT(sk_propose,REPLACE(dt_ref_boleto,'-','')) AS sk_transaction,
         CONCAT(sk_propose,fatura_id) AS sk_key,
         client_cpf_cnpj,
