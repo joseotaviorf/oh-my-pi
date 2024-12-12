@@ -6,69 +6,35 @@ WITH locale_ids AS (
     datalake_gsheets_clean.cod_locale
   GROUP BY 1
 ),
-pre_remove_reversed AS (
-SELECT
-    e.sk_invoice_reversed_entry
-FROM
-    dw_payment.dim_invoice_entry e
-GROUP BY
-    1
-HAVING
-    count(e.sk_invoice_reversed_entry) > 1
-),
-pre_remove_reversed_2 AS (
-  SELECT
-    die.sk_invoice_entry AS id_entry,
-    DATE(fie1.ts_created) AS dt_reversal
-  FROM
-    dw_payment.dim_invoice_entry die
-  INNER JOIN
-    dw_payment.dim_invoice_entry die1
-      ON die.sk_invoice_entry = die1.sk_invoice_reversed_entry
-  INNER JOIN
-    dw_payment.fact_invoice_entries fie1
-      ON fie1.sk_invoice_entry = die1.sk_invoice_entry
-  INNER JOIN
-    dw_payment.fact_invoice_entries fie2
-      ON fie2.sk_invoice_entry = die.sk_invoice_entry
-  LEFT JOIN
-    pre_remove_reversed prr
-      ON prr.sk_invoice_reversed_entry = die.sk_invoice_entry
-  WHERE
-    fie1.sk_invoice = fie2.sk_invoice
-  AND
-    prr.sk_invoice_reversed_entry IS NULL
-
-  UNION ALL
-
-  SELECT
-    die.sk_invoice_entry AS id_entry,
-    DATE(fie.ts_created) AS dt_reversal
-  FROM
-    dw_payment.fact_invoice_entries fie
-  INNER JOIN
-    dw_payment.dim_invoice_entry die
-      ON fie.sk_invoice_entry = die.sk_invoice_entry
-  INNER JOIN
-    dw_payment.fact_invoice_entries fie1
-      ON fie1.sk_invoice_entry = die.sk_invoice_reversed_entry
-  LEFT JOIN
-    pre_remove_reversed prr
-      ON prr.sk_invoice_reversed_entry = die.sk_invoice_reversed_entry
-  WHERE
-    die.sk_invoice_reversed_entry IS NOT NULL
-  AND
-    prr.sk_invoice_reversed_entry IS NULL
-  AND
-    fie1.sk_invoice = fie.sk_invoice
-),
 remove_reversed AS (
-  SELECT
-    id_entry,
-    MIN(dt_reversal) as dt_reversal
-  FROM
-    pre_remove_reversed_2
-  GROUP BY 1
+
+    SELECT
+        e.id_external AS id_entry,
+        CASE
+            WHEN SUM(e.amount)
+                OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
+            THEN TRUE
+            WHEN LEAD(e.id_external)
+                OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created) IS NOT NULL
+            THEN TRUE
+            ELSE FALSE
+        END AS is_reversed,
+         CASE
+           WHEN
+             SUM(e.amount)
+               OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
+             AND
+               LEAD(e.ts_created)
+                 OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created) IS NULL
+           THEN e.ts_created
+           ELSE LEAD(e.ts_created) OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created)
+         END AS ts_entry_reversed
+    FROM
+      datalake_retsuko.entry AS e
+    QUALIFY
+      ROW_NUMBER()
+        OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created DESC) = 1
+
 ),
 next_business_day AS (
   SELECT
@@ -83,6 +49,57 @@ next_business_day AS (
       AND dd_next.working_days_in_month > 0
   GROUP BY
     1
+),
+not_invoiceable AS (
+
+    SELECT
+      e.id_external AS id_entry,
+      i.id_external AS id_invoice,
+      e.bill_item,
+      ii.payment_status,
+      e.status AS entry_status,
+      CASE
+        WHEN
+          (e.id_invoice IS NULL OR e.id_invoice IS NOT NULL AND ii.payment_status = 'canceled')
+          AND (e.producer = 'payment-adjustment-correction' OR e.producer = 'postponement' OR e.producer = 'manual'   OR e.producer = 'monthly-routine')
+          AND e.status = 'pending'
+        THEN FALSE -- Not-invoiceable habilitado
+        WHEN
+          e.id_invoice IS NULL
+          AND IFNULL(e.status,'vazio') != 'pending'
+        THEN TRUE --Not-invoiceable não habilitado
+      END AS is_not_invoiceable_inconsiderable,
+      e.amount,
+      e.accrual_year_month,
+      e.due_year_month
+    FROM
+      datalake_retsuko.entry AS e
+    LEFT JOIN
+      datalake_retsuko.invoice AS i
+      ON i.id = e.id_invoice
+    LEFT JOIN
+      datalake_retsuko.invoice_info AS ii
+      ON ii.id_invoice = i.id_external
+    WHERE
+      (
+        (
+          e.id_invoice IS NULL
+          OR (e.id_invoice IS NOT NULL AND ii.payment_status = 'canceled')
+        )
+        AND
+          (
+            e.producer = 'payment-adjustment-correction'
+            OR e.producer = 'postponement'
+            OR e.producer = 'manual'
+            OR e.producer = 'monthly-routine'
+          )
+        AND e.status = 'pending'
+      )
+      OR
+      (
+        e.id_invoice IS NULL
+        AND IFNULL(e.status,'vazio') != 'pending'
+      )
 )
 SELECT DISTINCT
   fie.sk_invoice_entry AS id_entry,
@@ -103,9 +120,10 @@ SELECT DISTINCT
   c.rental_administrator,
   c.status AS contract_status,
   ie.is_rental_paid_in_advance,
-  IF(rr.id_entry IS NULL, False, True) AS is_reversed,
-  FALSE as is_not_invoiceable_inconsiderable,
+  rr.is_reversed,
+  COALESCE(ni.is_not_invoiceable_inconsiderable, TRUE) AS is_not_invoiceable_inconsiderable,
   ie.entry_type AS bill_item,
+  i.is_write_off,
   ie.description,
   CASE
     WHEN UPPER(ie.description) LIKE '%ACORDO%' THEN 1
@@ -133,7 +151,7 @@ SELECT DISTINCT
     WHEN (ROUND(-1.0*i.due_amount,2) > 0 OR (ROUND(-1.0*i.due_amount,2) = 0 AND NOT(from_account_type = 'landlord' OR to_account_type= 'landlord') )) THEN 'receivable'
     ELSE 'payable'
   END AS account_classification,
-  COALESCE(i.payment_status, 'not-invoiceable') AS status,
+  IF(ni.id_entry IS NOT NULL, 'not-invoiceable', i.payment_status) AS status,
   i.closing_mode,
   i.paid_via,
   ROUND(fie.brl_entry_due_amount,2) AS due_amount,
@@ -149,53 +167,58 @@ SELECT DISTINCT
   END AS accrual_year_month,
   i.accrual_year_month AS invoice_accrual_year_month,
   ie.accrual_year_month AS entry_accrual_year_month,
+  ie.due_year_month AS entry_due_year_month,
   CAST(DATE_FORMAT(DATEADD(month, 1, dd_entry_created.date), 'yyyyMM') AS INT) AS entry_creation_accrual_year_month,
   DATE_FORMAT(dd_entry_created.date, 'yyyy-MM-dd') AS entry_created_date,
   DATE_FORMAT(DATE(i.ts_created), 'yyyy-MM-dd') AS invoice_created_date,
   DATE_FORMAT(i.dt_due, 'yyyy-MM-dd') AS invoice_due_date,
   DATE_FORMAT(i.dt_sent, 'yyyy-MM-dd') AS invoice_sent_date,
   DATE_FORMAT(i.dt_paid, 'yyyy-MM-dd') AS invoice_paid_date,
+  DATE_FORMAT(i.dt_write_off, 'yyyy-MM-dd') AS invoice_write_off_date,
   DATE_FORMAT(i.ts_canceled, 'yyyy-MM-dd') AS invoice_canceled_date,
-  DATE_FORMAT(rr.dt_reversal, 'yyyy-MM-dd') AS invoice_reversal_date,
+  DATE_FORMAT(rr.ts_entry_reversed, 'yyyy-MM-dd') AS invoice_reversal_date,
   DATE_FORMAT(nbd.date_next_bd, 'yyyy-MM-dd') AS invoice_paid_date_next_business_day,
   c.dt_start AS contract_start,
   c1.dt_termination AS contract_annulment,
-  NOW()       AS ts_load
+  NOW() AS ts_load
 FROM
-  dw_payment.fact_invoice_entries AS fie
+    dw_payment.fact_invoice_entries AS fie
 LEFT JOIN
-  dw_rent.dim_contract AS c
+    dw_rent.dim_contract AS c
     ON c.sk_contract = fie.sk_contract
 LEFT JOIN
-  datalake_ebdb_clean.contract AS c1
+    datalake_ebdb_clean.contract AS c1
     ON c1.id = fie.sk_contract
 LEFT JOIN
-  dw_public.dim_region AS r
+    dw_public.dim_region AS r
     ON fie.sk_region = r.sk_region
 LEFT JOIN
-  locale_ids AS cl
+    locale_ids AS cl
     ON  r.city_name = cl.city
 LEFT JOIN
-  dw_payment.dim_invoice_entry AS ie
+    dw_payment.dim_invoice_entry AS ie
     ON ie.sk_invoice_entry = fie.sk_invoice_entry
 LEFT JOIN
-  dw_payment.dim_invoice AS i
+    dw_payment.dim_invoice AS i
     ON fie.sk_invoice = i.sk_invoice
 LEFT JOIN
-  dw_public.dim_date AS dd_entry_created
+    dw_public.dim_date AS dd_entry_created
     ON dd_entry_created.sk_date = fie.sk_created_date
 LEFT JOIN
-  dw_public.dim_date AS dd_invoice_paid
+    dw_public.dim_date AS dd_invoice_paid
     ON dd_invoice_paid.date = i.dt_paid
 LEFT JOIN
-  next_business_day AS nbd
+    next_business_day AS nbd
     ON nbd.date = i.dt_paid
 LEFT JOIN
-  datalake_retsuko.entry AS e
+    datalake_retsuko.entry AS e
     ON e.id_external = fie.sk_invoice_entry
 LEFT JOIN
-    remove_reversed rr
+    remove_reversed AS rr
     ON rr.id_entry = fie.sk_invoice_entry
+LEFT JOIN
+    not_invoiceable AS ni
+    ON ni.id_entry = fie.sk_invoice_entry
 WHERE
     c.country_code = 'BR'
     AND c.status IN ('Ativo','Finalizado')

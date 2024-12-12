@@ -53,7 +53,8 @@ SELECT
     c.is_rental_paid_in_advance,
     e.producer,
     e.description,
-    e.accrual_year_month
+    e.accrual_year_month,
+    e.due_year_month
 FROM
     datalake_retsuko.entry AS e
 INNER JOIN

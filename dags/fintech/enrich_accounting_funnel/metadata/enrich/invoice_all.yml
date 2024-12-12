@@ -67,11 +67,13 @@ columns:
       - dw_payment.dim_invoice_entry.is_rental_paid_in_advance
     description: "Some versions of contracts have variation in the payment method (aka mora/paga, paga/mora)"
   is_reversed:
-    lineage:
-      - dw_payment.fact_invoice_entries.sk_invoice_entry
     description: "Flag that indicates if a entry was create to reverse (cancel) another entry or if that entry was reversed by another entry"
   is_not_invoiceable_inconsiderable:
     description: "Flag that indicates, if true, that a entry is a not-invoiceable/reversed insconsiderable"
+  is_write_off:
+    lineage:
+      - dw_payment.dim_invoice_entry.is_write_off
+    description: "Flag that indicates if an invoice was written off"
   bill_item:
     lineage:
       - dw_payment.dim_invoice_entry.entry_type
@@ -117,8 +119,6 @@ columns:
       - dw_payment.dim_invoice_entry.account_classification
     description: "Indicates the account classification based on bill item:  receivable or payable."
   status:
-    lineage:
-      - dw_payment.dim_invoice.payment_status
     description: "Description of payment status"
   closing_mode:
     lineage:
@@ -152,6 +152,10 @@ columns:
     lineage:
       - dw_payment.dim_invoice_entry.accrual_year_month
     description: "Entry expense reference month"
+  entry_due_year_month:
+    lineage:
+      - dw_payment.dim_invoice_entry.due_year_month
+    description: "Entry expense due month"
   entry_creation_accrual_year_month:
     lineage:
       - dw_payment.dim_invoice_entry.accrual_year_month
@@ -176,6 +180,10 @@ columns:
     lineage:
       - dw_payment.dim_invoice.dt_paid
     description: "Date when the invoice was paid"
+  invoice_write_off_date:
+    lineage:
+      - dw_payment.dim_invoice.dt_write_off
+    description: "Date when the invoice was written off"
   invoice_canceled_date:
     lineage:
       - dw_payment.dim_invoice.ts_canceled

@@ -268,5 +268,9 @@ columns:
     lineage:
     - datalake_retsuko.invoice_entry.accrual_year_month
     description: Expense reference month
+  due_year_month:
+    lineage:
+    - datalake_retsuko.invoice_entry.due_year_month
+    description: Expense due month
   ts_load:
     description: Timestamp which the data was loaded

@@ -105,3 +105,7 @@ columns:
     description: "Expense reference month"
     lineage:
       - datalake_retsuko.entry.accrual_year_month
+  due_year_month:
+    description: "Expense due month"
+    lineage:
+      - datalake_retsuko.entry.due_year_month
