@@ -2,7 +2,6 @@ WITH total_contestations AS (
     SELECT
         id_repair_request,
         COUNT(CASE WHEN reviewer_type = 'TENANT' AND (origin = 'REVIEW' OR origin IS NULL) THEN 1 END) AS total_tenant_contestation,
-        COUNT(CASE WHEN reviewer_type = 'OWNER' AND (origin = 'REVIEW' OR origin IS NULL) THEN 1 END) AS total_owner_contestation,
         COUNT(CASE WHEN reviewer_type = 'TENANT' AND origin = 'BUDGET_APPROVAL' THEN 1 END) AS total_tenant_budget_approval_contestation,
         COUNT(CASE WHEN reviewer_type = 'OWNER' AND origin = 'BUDGET_APPROVAL' THEN 1 END) AS total_owner_budget_approval_contestation
     FROM
@@ -43,7 +42,6 @@ SELECT
     rr.comment,
     rrm.total_media,
     tc.total_tenant_contestation,
-    tc.total_owner_contestation,
     tc.total_tenant_budget_approval_contestation,
     tc.total_owner_budget_approval_contestation,
     rr.has_automatically_identified,

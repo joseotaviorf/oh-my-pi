@@ -87,8 +87,6 @@ columns:
     description: Indicates whether media was generated for the repair request
   has_tenant_contestation:
     description: Indicates that there are objections from the tenant to the repair request during the review.
-  has_owner_contestation:
-    description: ""
   has_tenant_budget_approval_contestation:
     description: Boolean information indicating whether the tenant contested the repair in question at the budget approval stage.
   has_owner_budget_approval_contestation:

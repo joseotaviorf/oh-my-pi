@@ -24,7 +24,6 @@ SELECT DISTINCT
     rr.total_owner_budget_approval_contestation,
     COALESCE(rrm.total_media, 0) <> 0 AS has_media,
     COALESCE(rr.total_tenant_contestation, 0) <> 0 AS has_tenant_contestation,
-    COALESCE(rr.total_owner_contestation, 0) <> 0 AS has_owner_contestation,
     COALESCE(rr.total_tenant_budget_approval_contestation, 0) <> 0 AS has_tenant_budget_approval_contestation,
     COALESCE(rr.total_owner_budget_approval_contestation, 0) <> 0 AS has_owner_budget_approval_contestation,
     rr.is_cost_absorbed_by_company,
