@@ -4,7 +4,7 @@ SELECT
     id_campaign,
     id_adset,
     id_ad,
-    account_name,
+    LOWER(REGEXP_REPLACE(account_name, '[^a-zA-Z0-9]+', '_')) AS account_name,
     'facebook' AS origin,
     'ads_insights_by_region' AS report_type,
     campaign_name AS utm_campaign,
