@@ -1,0 +1,33 @@
+---
+database_name: datalake_gsheets_static_clean
+table_name: recupera_collection_actions
+owner: bianca.martins@quintoandar.com.br
+domain: cross
+description: Table to map the collections/occurrence as cpc, alo, esforco and promisse
+columns:
+  occurrence:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.occurrence
+  id_occurrence:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.id_occurrence
+  esforco:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.esforco
+  alo:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.alo
+  cpc:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.cpc
+  promessa:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.promessa
+  ts_load:
+    description: ""

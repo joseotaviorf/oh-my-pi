@@ -89,6 +89,12 @@ sheets_info:
     clean_table_name: cyber_collection_actions
     sheet_context: static
 
+  recupera_collection_actions:
+    sheet_id: 1uoOvLGQUTk2i8td_RlK6cNSktttrDrdLwhxhPtaTV-I
+    sheet_name: ocorrencias
+    clean_table_name: recupera_collection_actions
+    sheet_context: static
+
   dados_docato:
     sheet_id: 1wValHoubCG72NQZkOAGMJyBQM26Dkd4QwzKW1IXhSTw
     sheet_name: dados_docato

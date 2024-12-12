@@ -1,0 +1,49 @@
+---
+database_name: datalake_gsheets_static_clean
+table_name: cyber_collection_actions
+owner: bianca.martins@quintoandar.com.br
+domain: cross
+description: Table to map the actions, result and complement as cpc, alo, esforco and promisse
+columns:
+  action_code:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.action_code
+  action:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.action
+  result_code:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.result_code
+  result:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.result
+  complement_code:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.complement_code
+  complement:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.complement
+  esforco:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.esforco
+  alo:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.alo
+  cpc:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.cpc
+  promessa:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.cyber_collection_actions.promessa
+  ts_load:
+    description: ""
