@@ -21,7 +21,7 @@ SELECT
     ie.is_rental_paid_in_advance,
     ir.invoice_entry_revenue,
     ie.accrual_year_month,
-    ie.due_year_month
+    ie.due_year_month,
     NOW() AS ts_load
 FROM
     datalake_retsuko.invoice_entry AS ie
