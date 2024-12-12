@@ -1,0 +1,35 @@
+dag:
+  name: reverse_robbyson_access
+  schedule_start_date: 2024, 3, 26
+  owner: Data SS
+  documentation:
+    dag_purpose:
+      This dag aims to send analyst productivity data to the Robbyson tool. The dag proposes to send data from more than one line.
+workflow:
+  layer: reverse
+  type: access
+  load_spark_job: load_into_robbyson_api
+  spark_job_arguments:
+    - "{dag_name}" # dag_name
+    - "{environment}"
+    - "robbyson" #source
+    - "{{ ds }}"
+  tables_customization:
+    support_and_service: #dummy_task
+      extra_spark_job_arguments:
+        - "support_and_services" #context
+        - "results" #endpoint
+        - "dw_customer_support.fact_analysts_performance" #results_table_path
+        - "dw_customer_support.dim_agent" #agent_table_path
+        - "sk_agent" #key_join_tables
+        - "email" #analyst_key_column
+    fintech: #dummy_task
+      extra_spark_job_arguments:
+        - "fintech" #context
+        - "results" #endpoint
+        - "dw_operator_performance.fact_operator_performance" #results_table_path
+        - "dw_operator_performance.dim_operator" #agent_table_path
+        - "sk_operator" #key_join_tables
+        - "email" #analyst_key_column
+cluster:
+  type: databricks_12_2_med_2xlarge_general_cluster

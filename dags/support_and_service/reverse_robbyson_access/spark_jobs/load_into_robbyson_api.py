@@ -5,7 +5,7 @@ import json
 import logging
 import requests
 from quintoandar_logger import QuintoAndarLogger
-
+from bietlejuice.services import ConfigurationService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_into_robbyson_api"
@@ -13,20 +13,19 @@ JOB_NAME = "load_into_robbyson_api"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-
-def create_results_payload(configurations: dict, execution_date: str, context: str) -> list:
+def create_results_payload(results_table_path: str, agent_table_path: str, key_join_tables: str, analyst_key_column, execution_date: str, context: str) -> list:
     indicators_df = spark.sql(f"SELECT * FROM datalake_static_files_ss.robbyson_indicators WHERE context = '{context}'")
     indicators_content = {row['id_indicator']: row['attributes'] for row in indicators_df.collect()}
 
     results_df = spark.sql(f"""
-        SELECT 
-            *, 
-            STRING(MAKE_DATE(year, month, day)) AS date 
-        FROM 
-            {configurations["results_table_path"]}
-            LEFT JOIN {configurations["agent_table_path"]}
-                USING({configurations["key_join_tables"]})
-        WHERE 
+        SELECT
+            *,
+            STRING(MAKE_DATE(year, month, day)) AS date
+        FROM
+            {"results_table_path"}
+            LEFT JOIN {"agent_table_path"}
+                USING({"key_join_tables"})
+        WHERE
             MAKE_DATE(year, month, day) = DATE("{execution_date}")
     """)
     results_list = []
@@ -36,7 +35,7 @@ def create_results_payload(configurations: dict, execution_date: str, context: s
 
         for row in results_df.collect():
             results_json = {
-                "collaboratorIdentification": row[configurations["analyst_key_column"]],
+                "collaboratorIdentification": row["analyst_key_column"],
                 "indicadorId": int(key),
                 "resultado": 0,
                 "date": row['date'],
@@ -53,34 +52,43 @@ def parse_arguments() -> dict:
 
     parser = ArgumentParser(description=JOB_NAME)
 
+    parser.add_argument("dag_name", help="Name of the DAG")
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("source", help="Name of the source")
-    parser.add_argument("context", help="Line responsible for processing")
-    parser.add_argument("api_url", help="Robbyson tool api link")
-    parser.add_argument("endpoint", help="Api endpoint, where we will send the data")
     parser.add_argument(
         "execution_date", help="Date of the execution in the format YYYY-MM-DD"
     )
-    parser.add_argument("configurations", help="Settings required for payload creation")
+    parser.add_argument("context", help="Line responsible for processing")
+    parser.add_argument("endpoint", help="Api endpoint, where we will send the data")
+    parser.add_argument("results_table_path")
+    parser.add_argument("agent_table_path")
+    parser.add_argument("key_join_tables")
+    parser.add_argument("analyst_key_column")
 
     args = parser.parse_args()
 
+    dag_name = args.dag_name
     environment = args.environment
     source = args.source
     context = args.context
-    api_url = args.api_url
     execution_date = args.execution_date
     endpoint = args.endpoint
-    configurations = json.loads(args.configurations)
+    results_table_path =  args.results_table_path
+    agent_table_path =  args.agent_table_path
+    key_join_tables =  args.key_join_tables
+    analyst_key_column =  args.analyst_key_column
 
     return {
+        "dag_name": dag_name,
         "environment": environment,
         "source": source,
         "context": context,
-        "api_url": api_url, 
         "execution_date": execution_date,
         "endpoint": endpoint,
-        "configurations": configurations
+        "results_table_path": results_table_path,
+        "agent_table_path": agent_table_path,
+        "key_join_tables": key_join_tables,
+        "analyst_key_column": analyst_key_column
     }
 
 def main():
@@ -93,8 +101,17 @@ def main():
 
     token = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.ROBBYSON)
 
-    api_url = job_arguments_dict["api_url"]
-    configurations = job_arguments_dict["configurations"]
+    config_service = ConfigurationService(job_arguments_dict["dag_name"])
+    api_url = config_service.get_config("api_url")
+
+    configurations = {
+        job_arguments_dict["context"]: {
+            "results_table_path": job_arguments_dict["results_table_path"],
+            "agent_table_path": job_arguments_dict["agent_table_path"],
+            "key_join_tables": job_arguments_dict["key_join_tables"],
+            "analyst_key_column": job_arguments_dict["analyst_key_column"]
+        }
+    }
 
     headers = {
         "token": token,
