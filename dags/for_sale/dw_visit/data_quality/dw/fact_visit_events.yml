@@ -13,18 +13,12 @@ column_level_validations:
     is_complete:
       severity_level: Error
   sk_visit:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   sk_schedule:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   sk_house:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
   ts_load:

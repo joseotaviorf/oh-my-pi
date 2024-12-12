@@ -106,3 +106,15 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created
     description: When the event was created
+  year:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.ts_created
+    description: Year of created date.
+  month:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.ts_created
+    description: Month of created date.
+  day:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.ts_created
+    description: Day of created date.

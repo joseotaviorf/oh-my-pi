@@ -204,7 +204,6 @@ booking_in_rented_house AS (
             WHEN c.status = 'Ativo' THEN NOW()
             WHEN c.status = 'Finalizado' THEN LEAST(TO_DATE(c.ts_analyst_annulment_input), c.dt_termination)
         END
-    AND b.business_context = 'SALE'
   GROUP BY
     b.id_schedule
 ),
@@ -401,7 +400,7 @@ SELECT DISTINCT
   bha.contract_name AS hub_agent_region,
   IF(bha.id_schedule IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
   brh.is_house_rented,
-  IF(evd.ts_event_tenant IS NOT NULL, TRUE, FALSE) AS has_tenant_living,
+  IF(sk_behavior_type IN (2,6,7), TRUE, FALSE) AS has_tenant_living,
   DATEDIFF(v.dt_visit, ts_schedule_canceled) AS days_visit_cancelled_to_visit,
   DATEDIFF(v.dt_visit, ts_schedule_created) AS days_visit_booked_to_visit,
   DATEDIFF(ts_schedule_canceled, ts_schedule_created) AS days_visit_booked_to_cancelled,

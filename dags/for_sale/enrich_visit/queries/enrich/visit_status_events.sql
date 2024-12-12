@@ -115,7 +115,10 @@ SELECT
   v.channel,
   v.country_code,
   v.is_visit_last_event,
-  v.ts_event_created
+  v.ts_event_created,
+  YEAR(v.ts_event_created) AS year,
+  MONTH(v.ts_event_created) AS month,
+  DAY(v.ts_event_created) AS day
 FROM
    visit AS v
 LEFT JOIN

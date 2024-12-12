@@ -50,12 +50,12 @@ SELECT
   v.is_canceled,
   v.is_unsuccessful,
   v.journey_days,
-  IF(vse.ts_event_tenant IS NOT NULL, 1, 0) AS has_tenant_living,
-  DATEDIFF(HOUR, v.ts_created, v.ts_visit_local_tz) AS hours_between_created_and_visit_day,
+  IF(sk_behavior_type IN (2,6,7), 1, 0) AS has_tenant_living,
+  DATEDIFF(HOUR, v.ts_created, (v.ts_visit_local_tz + INTERVAL 3 HOUR)) AS hours_between_created_and_visit_day,
   DATEDIFF(HOUR, v.ts_created, v.ts_visit_canceled) AS hours_between_request_and_cancellation,
   DATEDIFF(HOUR, vse.ts_first_booked, v.ts_visit_canceled) AS hours_between_first_booked_and_visit_day,
   DATEDIFF(HOUR, vse.ts_last_booked, v.ts_visit_canceled) AS hours_between_last_booked_and_visit_day,
-  DATEDIFF(HOUR, v.ts_visit_canceled, v.ts_visit_local_tz) AS hours_between_cancellation_and_visit_date,
+  DATEDIFF(HOUR, v.ts_visit_canceled, (v.ts_visit_local_tz + INTERVAL 3 HOUR)) AS hours_between_cancellation_and_visit_date,
   v.hours_waiting_for_answers,
   NOW() AS ts_load
 FROM

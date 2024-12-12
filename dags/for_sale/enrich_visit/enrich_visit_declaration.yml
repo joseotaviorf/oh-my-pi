@@ -13,6 +13,11 @@ workflow:
             partitions: [year, month, day]
             z_order_by: [id, status]
             merge_on: [id]
+        visit_status_events:
+          extraction_type: incremental
+          partitions: [ year, month, day ]
+          z_order_by: [ id_visit_status_events, ranking ]
+          merge_on: [ id_visit_status_events ]
 cluster:
     type: custom_cluster
     custom_configurations:
