@@ -22,11 +22,11 @@ def create_results_payload(results_table_path: str, agent_table_path: str, key_j
             *,
             STRING(MAKE_DATE(year, month, day)) AS date
         FROM
-            {"results_table_path"}
-            LEFT JOIN {"agent_table_path"}
-                USING({"key_join_tables"})
+            {results_table_path}
+            LEFT JOIN {agent_table_path}
+                USING({key_join_tables})
         WHERE
-            MAKE_DATE(year, month, day) = DATE("{execution_date}")
+            MAKE_DATE(year, month, day) = DATE('{execution_date}')
     """)
     results_list = []
 
@@ -104,15 +104,6 @@ def main():
     config_service = ConfigurationService(job_arguments_dict["dag_name"])
     api_url = config_service.get_config("api_url")
 
-    configurations = {
-        job_arguments_dict["context"]: {
-            "results_table_path": job_arguments_dict["results_table_path"],
-            "agent_table_path": job_arguments_dict["agent_table_path"],
-            "key_join_tables": job_arguments_dict["key_join_tables"],
-            "analyst_key_column": job_arguments_dict["analyst_key_column"]
-        }
-    }
-
     headers = {
         "token": token,
         "accept": "application/json",
@@ -125,7 +116,13 @@ def main():
         f"m=Success in getting the credentials., transaction_id={transaction_id}"
     )
 
-    results_payload = create_results_payload(configurations, job_arguments_dict["execution_date"], job_arguments_dict["context"])
+    results_payload = create_results_payload(
+        job_arguments_dict["results_table_path"],
+        job_arguments_dict["agent_table_path"],
+        job_arguments_dict["key_join_tables"],
+        job_arguments_dict["analyst_key_column"],
+        job_arguments_dict["execution_date"],
+        job_arguments_dict["context"])
 
     requests.post(f'{api_url}/{job_arguments_dict["endpoint"]}/?transaction_id={transaction_id}', headers=headers, json=results_payload)
     requests.post(f'{api_url}/transactions/{transaction_id}', headers=headers)
