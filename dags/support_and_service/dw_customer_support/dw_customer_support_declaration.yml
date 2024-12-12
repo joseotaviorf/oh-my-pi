@@ -11,6 +11,9 @@ workflow:
   layer: dw
   custom_schema: customer_support
   default_extraction_type: full
+  inner_dependencies:
+    fact_tickets:
+      - fact_customer_contacts
   tables_customization:
     fact_user_blocks:
       partitions: [year, month, day]
@@ -29,12 +32,7 @@ workflow:
     fact_analysts_performance:
       partitions: [year, month, day]
       extraction_type: incremental
-      z_order_by:
-        [
-          sk_snapshot,
-          sk_agent,
-          sk_last_ticket_updated_date
-        ]
+      z_order_by: [sk_snapshot, sk_agent, sk_last_ticket_updated_date]
     fact_sessions_chatbot:
       partitions: [year, month, day]
       extraction_type: incremental
@@ -49,7 +47,7 @@ workflow:
           sk_survey,
           sk_answer,
           sk_started_chat,
-          sk_ended_chat
+          sk_ended_chat,
         ]
       extra_query_template_params:
         load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"

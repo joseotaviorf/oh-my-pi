@@ -33,22 +33,52 @@ WITH missing_theme_tickets AS (
     )
   GROUP BY 1, 2, 4
 ),
+abandoned_tasks AS (
+  SELECT DISTINCT
+    fcc.sk_task AS id_task,
+    dd.front_or_back AS ticket_type,
+    dd.department,
+    DATE(fcc.ts_task_created) AS dt_started
+  FROM
+    dw_customer_support.fact_customer_contacts AS fcc
+  LEFT JOIN
+    dw_customer_support.dim_department AS dd
+      ON fcc.sk_department = dd.sk_department
+  WHERE
+    fcc.channel = 'call'
+    AND dd.front_or_back = 'front'
+    AND dd.area = 'CX'
+    AND fcc.is_contact_answered IS FALSE
+    AND fcc.direction != 'outbound'
+    AND fcc.ts_task_created >= '2023-01-01'
+  UNION ALL
+  SELECT DISTINCT
+    fcc.sk_task AS id_task,
+    dd.front_or_back AS ticket_type,
+    dd.department,
+    DATE(fcc.ts_task_created) AS dt_started
+  FROM
+    dw_customer_support.fact_customer_contacts AS fcc
+  LEFT JOIN
+    dw_customer_support.dim_department AS dd
+      ON fcc.sk_department = dd.sk_department
+  WHERE
+    fcc.channel = 'call'
+    AND dd.front_or_back = 'front'
+    AND dd.area = 'CX'
+    AND fcc.is_contact_answered IS TRUE
+    AND fcc.direction != 'outbound'
+    AND fcc.ts_task_created >= '2023-01-01'
+    AND status = 'abandoned'
+),
 abandoned_calls AS (
   SELECT
-    dc.front_or_back AS ticket_type,
-    c.queue_name AS department,
+    ticket_type,
+    department,
     COUNT(DISTINCT(id_task)) AS contacts,
-    DATE(ts_task_created) AS dt_started
+    dt_started
   FROM
-    datalake_customer_support.calls AS c
-  LEFT JOIN
-    datalake_gsheets_clean.department_control AS dc
-      ON dc.department = c.queue_name
-  WHERE
-    dc.front_or_back = 'front'
-    AND dc.area = 'CX'
-    AND c.is_call_answered IS FALSE
-    AND c.direction != 'outbound'
+    abandoned_tasks
   GROUP BY 1, 2, 4
 ),
 ticket_rate_proportion AS (
