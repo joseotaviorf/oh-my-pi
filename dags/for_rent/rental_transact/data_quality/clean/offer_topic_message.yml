@@ -1,5 +1,5 @@
 ---
-table_name: datalake_rental_transact_clean.offer_aud
+table_name: datalake_rental_transact_clean.offer_topic_message
 alert_channel: "#alerts-de-airflow-dags"
 #table_level_validations:
 #  has_size:
@@ -7,15 +7,17 @@ alert_channel: "#alerts-de-airflow-dags"
 #    severity_level: Error
 column_level_validations:
   id:
+    is_unique:
+      severity_level: Error
     is_complete:
       severity_level: Error
-  rev:
+  uuid_offer_topic_message:
     is_complete:
       severity_level: Error
-  rev_type:
+  id_offer_topic:
     is_complete:
       severity_level: Error
-  rev_end:
+  actor_role:
     is_complete:
       severity_level: Error
   ts_created:

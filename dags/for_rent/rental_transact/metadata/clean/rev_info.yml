@@ -3,7 +3,7 @@ table_name: rev_info
 description: This table consolidates revision information related to audit tables.
   Each line should be unique audition identified by the rev column.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   rev:
     lineage:

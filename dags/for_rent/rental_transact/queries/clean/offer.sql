@@ -11,6 +11,7 @@ SELECT
     iteration,
     turn,
     rejection_reason,
+    original_rent_value,
     created_at AS ts_created,
     updated_at AS ts_updated,
     expires_at AS ts_expiration

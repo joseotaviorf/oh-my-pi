@@ -3,7 +3,7 @@ table_name: offer
 description: This table consolidates offer information related to the ForRent operation.
   Each line should be unique and identified by the id column.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -53,6 +53,10 @@ columns:
     lineage:
     - datalake_rental_transact_raw.offer.rejection_reason
     description: Rejection reason of the offer, if it has any.
+  original_rent_value:
+    lineage:
+    - datalake_rental_transact_raw.offer.original_rent_value
+    description: Original rent value asked by the owner.
   ts_created:
     lineage:
     - datalake_rental_transact_raw.offer.created_at

@@ -3,7 +3,7 @@ table_name: offer_aud
 description: This table consolidates the audition of offer information related to the ForRent operation.
   Each line should be unique audition identified by the rev column.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -70,6 +70,10 @@ columns:
     lineage:
     - datalake_rental_transact_raw.offer_aud.rejection_reason
     description: Rejection reason of the offer, if it has any.
+  original_rent_value:
+    lineage:
+    - datalake_rental_transact_raw.offer_aud.original_rent_value
+    description: Original rent value asked by the owner.
   mod_id_tenant_external:
     lineage:
     - datalake_rental_transact_raw.offer_aud.tenant_external_id_mod

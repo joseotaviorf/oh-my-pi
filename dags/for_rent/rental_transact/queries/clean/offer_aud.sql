@@ -14,6 +14,7 @@ SELECT
     iteration,
     turn,
     rejection_reason,
+    original_rent_value,
     tenant_external_id_mod AS mod_id_tenant_external,
     owner_external_id_mod AS mod_id_owner_external,
     status_mod AS mod_status,

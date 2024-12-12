@@ -3,7 +3,7 @@ table_name: resident_info_aud
 description: This table consolidates the audition of the resident information related to an offer.
   Each line should be unique and identified by the rev column.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id:
     lineage:

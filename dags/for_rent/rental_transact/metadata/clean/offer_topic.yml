@@ -1,0 +1,39 @@
+database_name: datalake_rental_transact_clean
+table_name: offer_topic
+description: This table consolidates offer topic information related to the ForRent operation.
+  Each line should be unique and identified by the id column.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_rental_transact_raw.offer_topic.id
+    description: Offer topic id.
+  uuid_offer_topic:
+    lineage:
+      - datalake_rental_transact_raw.offer_topic.offer_topic_uuid
+    description: Offer topic uuid.
+  id_offer:
+    lineage:
+      - datalake_rental_transact_raw.offer_topic.offer_id
+    description: Offer id.
+  id_firestore:
+    lineage:
+      - datalake_rental_transact_raw.offer_topic.firestore_id
+    description: Firestore id.
+  status:
+    lineage:
+      - datalake_rental_transact_raw.offer_topic.status
+    description: Offer topic status.
+  type:
+    lineage:
+      - datalake_rental_transact_raw.offer_topic.type
+    description: Offer topic type.
+  ts_created:
+    lineage:
+      - datalake_rental_transact_raw.offer_topic.created_at
+    description: Timestamp of the offer topic creation.
+  ts_updated:
+    lineage:
+      - datalake_rental_transact_raw.offer_topic.updated_at
+    description: Timestamp of the offer topic update.

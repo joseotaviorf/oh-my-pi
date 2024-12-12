@@ -3,7 +3,7 @@ table_name: resident_info
 description: This table consolidates the resident information related to an offer.
   Each line should be unique and identified by the id column.
 domain: For Rent
-owner: data-for-rent@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
   id:
     lineage:
