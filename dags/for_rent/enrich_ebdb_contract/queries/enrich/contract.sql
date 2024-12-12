@@ -200,6 +200,7 @@ SELECT
   cm.is_ended,
   cm.is_full_service,
   cm.is_deal_only,
+  COALESCE(c.is_relisting_enabled, FALSE) AS is_relisting_enabled,
   fc.monthly_administration_fee,
   ccr.cancellation_reason,
   ccr.ts_canceled,

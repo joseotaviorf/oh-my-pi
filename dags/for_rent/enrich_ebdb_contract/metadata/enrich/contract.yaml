@@ -6,28 +6,29 @@ owner: kleber.inoue@quintoandar.com.br
 columns:
   id:
     lineage:
-    - datalake_ebdb_clean.contract.id
+      - datalake_ebdb_clean.contract.id
     description: Id of the contract, which must be unique.
   id_country:
     lineage:
-    - datalake_ebdb_country.house.id_country
+      - datalake_ebdb_country.house.id_country
     description: Id of the contract's country.
   id_proposal:
     lineage:
-    - datalake_ebdb_clean.contract.id_proposal
+      - datalake_ebdb_clean.contract.id_proposal
     description: Id of the proposal that belongs to the contract, which must be unique.
   id_house:
     lineage:
-    - datalake_ebdb_clean.contract.id_house
-    description: Id of the house that belongs to the contract, which may not be unique
+      - datalake_ebdb_clean.contract.id_house
+    description:
+      Id of the house that belongs to the contract, which may not be unique
       (a house can be related to different contracts).
   country_code:
     lineage:
-    - datalake_ebdb_country.house.country_code
+      - datalake_ebdb_country.house.country_code
     description: Country code of the contract.
   rent:
     lineage:
-    - datalake_ebdb_clean.contract.rent
+      - datalake_ebdb_clean.contract.rent
     description: Rent value (the currency type is related to the country of the contract).
   value_segment:
     description: Rent categorization based on value.
@@ -38,26 +39,26 @@ columns:
       UNDEFINED: Undefined.
   first_rent_charged:
     lineage:
-    - datalake_ebdb_clean.contract_aud.rent
+      - datalake_ebdb_clean.contract_aud.rent
     description: The first rent charged (the currency type is related to the country of the contract).
   billing_day_of_month:
     lineage:
-    - datalake_ebdb_clean.contract.billing_day_of_month
+      - datalake_ebdb_clean.contract.billing_day_of_month
     description: Day of the month in which the charge of the rental happens.
   guarantee_type:
     lineage:
-    - datalake_ebdb_clean.contract.guarantee_type
+      - datalake_ebdb_clean.contract.guarantee_type
     description: Guarantee type of the contract.
   type:
     lineage:
-    - datalake_ebdb_clean.contract.type
+      - datalake_ebdb_clean.contract.type
     description: Type of the contract.
     categories:
       DealOnly: Contract without QuintoAndar administration and services (old product).
       FullService: Standard contract with QuintoAndar administration and services.
   status:
     lineage:
-    - datalake_ebdb_clean.contract.status
+      - datalake_ebdb_clean.contract.status
     description: Status of the contract, directly from the Main.
     categories:
       Ativo: The contract is active.
@@ -67,14 +68,14 @@ columns:
       PreAssinaturas: The contract is in pre signature, which means it was sent and is waiting for signatures.
   rental_administrator:
     lineage:
-    - datalake_ebdb_clean.contract.contract_rent_model
+      - datalake_ebdb_clean.contract.contract_rent_model
     description: The rental administrator type of the contract.
     categories:
       OWNER: Owner is the rental administrator, which means that the contract is brokerage-only.
       QUINTOANDAR: Default rental administrator, which is QuintoAndar.
   paying_condo:
     lineage:
-    - datalake_ebdb_clean.contract.paying_condo
+      - datalake_ebdb_clean.contract.paying_condo
     description: Who is responsible to make the payment of the condo.
     categories:
       Inquilino: The tenant is responsible for making the payment of the condo.
@@ -83,7 +84,7 @@ columns:
       "null": If the responsible for making the payment of the condo is null.
   responsible_for_condo:
     lineage:
-    - datalake_ebdb_clean.contract.responsible_for_condo
+      - datalake_ebdb_clean.contract.responsible_for_condo
     description: Who is responsible to pay the amount of the condo.
     categories:
       Inquilino: The tenant is responsible for paying the condo.
@@ -92,7 +93,7 @@ columns:
       "null": If the responsible of paying the condo is null.
   paying_iptu:
     lineage:
-    - datalake_ebdb_clean.contract.paying_iptu
+      - datalake_ebdb_clean.contract.paying_iptu
     description: Who is responsible to make the payment of the IPTU (if the country of origin has it).
     categories:
       Inquilino: The tenant is responsible for making the payment of the IPTU.
@@ -101,7 +102,7 @@ columns:
       "null": If the responsible for making the payment of the IPTU is null.
   responsible_for_iptu:
     lineage:
-    - datalake_ebdb_clean.contract.responsible_for_iptu
+      - datalake_ebdb_clean.contract.responsible_for_iptu
     description: Who is responsible to pay the amount of the IPTU (if the country of origin has it).
     categories:
       Inquilino: The tenant is responsible for paying the IPTU.
@@ -110,62 +111,62 @@ columns:
       "null": If the responsible of paying the IPTU is null.
   rental_guarantee_installment:
     lineage:
-    - datalake_ebdb_clean.contract.rental_guarantee_installment
+      - datalake_ebdb_clean.contract.rental_guarantee_installment
     description: Rental guarantee installment number of the contract.
   rental_guarantee_value:
     lineage:
-    - datalake_ebdb_clean.contract.rental_guarantee_value
+      - datalake_ebdb_clean.contract.rental_guarantee_value
     description: The value of the rental guarantee (the currency type is related to the country of the contract).
   home_insurance_installment:
     lineage:
-    - datalake_ebdb_clean.contract.home_insurance_installment
+      - datalake_ebdb_clean.contract.home_insurance_installment
     description: Installment number for paying the home insurance in the contract.
   home_insurance_value:
     lineage:
-    - datalake_ebdb_clean.contract.home_insurance_value
+      - datalake_ebdb_clean.contract.home_insurance_value
     description: Value of the home insurance (the currency type is related to the country of the contract).
   fist_rent_comission_fee:
     lineage:
-    - datalake_ebdb_clean.contract.fist_rent_comission_fee
+      - datalake_ebdb_clean.contract.fist_rent_comission_fee
     description: The first rent comission fee (the currency type is related to the country of the contract).
   condo_price:
     lineage:
-    - datalake_ebdb_clean.contract.condo_price
+      - datalake_ebdb_clean.contract.condo_price
     description: Price of the condo (the currency type is related to the country of the contract).
   iptu:
     lineage:
-    - datalake_ebdb_clean.contract.iptu
+      - datalake_ebdb_clean.contract.iptu
     description: Iptu price, if the country of origin has it (the currency type is also related to the country).
   tenant_service_fee:
     lineage:
-    - datalake_ebdb_clean.contract.tenant_service_fee
+      - datalake_ebdb_clean.contract.tenant_service_fee
     description: Rent percentage paid monthly by the tenant as a Service Fee.
   agent_brokerage_share:
     lineage:
-    - datalake_ebdb_clean.contract.agent_brokerage_share
+      - datalake_ebdb_clean.contract.agent_brokerage_share
     description: The monthly value splitted between QuintoAndar/Brokerage Partners (CIQ and Partner), in decimals.
   is_tenant_service_fee_opt_out:
     lineage:
-    - datalake_ebdb_clean.contract_aud.id_contract
+      - datalake_ebdb_clean.contract_aud.id_contract
     description: Boolean indicating if the contract's tenant service fee has been opted out.
   ts_tenant_service_fee_opt_out:
     lineage:
-    - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Timestamp of when tenant service fee opt out was created.
   is_exit_inspection_opted_out:
     lineage:
-    - datalake_ebdb_clean.contract.is_exit_inspection_opted_out
+      - datalake_ebdb_clean.contract.is_exit_inspection_opted_out
     description: Boolean indicating if the exit inspection is opted out.
   signature_type:
     lineage:
-    - datalake_ebdb_clean.contract.signature_type
+      - datalake_ebdb_clean.contract.signature_type
     description: Type of contract signature.
     categories:
       Eletronica: If the signature is eletronic (e.g. Docusign).
       "null": If the signature type is null.
   status_closing:
     lineage:
-    - datalake_ebdb_clean.contract.status_closing
+      - datalake_ebdb_clean.contract.status_closing
     description: Closing status of the contract.
     categories:
       ApoliceEmitida: Policy was issued.
@@ -178,92 +179,96 @@ columns:
       RedacaoContrato: Contract is being written.
   contract_version:
     lineage:
-    - datalake_ebdb_clean.contract_version.version_display_contract
+      - datalake_ebdb_clean.contract_version.version_display_contract
     description: Version of the contract.
   is_ongoing_contract:
     lineage:
-    - datalake_ebdb_clean.contract.ts_signed
-    - datalake_ebdb_clean.contract.dt_started
-    - datalake_ebdb_clean.contract.dt_entered
-    - datalake_ebdb_clean.contract.dt_termination
-    - datalake_ebdb_clean.contract.status
-    - datalake_ebdb_clean.contract.type
+      - datalake_ebdb_clean.contract.ts_signed
+      - datalake_ebdb_clean.contract.dt_started
+      - datalake_ebdb_clean.contract.dt_entered
+      - datalake_ebdb_clean.contract.dt_termination
+      - datalake_ebdb_clean.contract.status
+      - datalake_ebdb_clean.contract.type
     description: Boolean indicating if the contract is still ongoing (active).
   is_waiting_to_be_signed:
     lineage:
-    - datalake_ebdb_clean.contract.status
+      - datalake_ebdb_clean.contract.status
     description: Boolean indicating if the contract is waiting to be signed.
   is_active_or_ended:
     lineage:
-    - datalake_ebdb_clean.contract.status
+      - datalake_ebdb_clean.contract.status
     description: Boolean indicating if the contract is still active or if it has already ended.
   is_canceled:
     lineage:
-    - datalake_ebdb_clean.contract.status
+      - datalake_ebdb_clean.contract.status
     description: Boolean indicating if the contract has been canceled.
   is_ended:
     lineage:
-    - datalake_ebdb_clean.contract.status
+      - datalake_ebdb_clean.contract.status
     description: Boolean indicating if the contract has already ended.
   is_full_service:
     lineage:
-    - datalake_ebdb_clean.contract.type
+      - datalake_ebdb_clean.contract.type
     description: Boolean indicating if the contract is FullService type.
   is_deal_only:
     lineage:
-    - datalake_ebdb_clean.contract.type
+      - datalake_ebdb_clean.contract.type
     description: Boolean indicating if the contract is DealOnly type.
+  is_relisting_enabled:
+    lineage:
+      - datalake_ebdb_clean.contract.is_relisting_enabled
+    description: Boolean indicating if the listing is enabled to relist during the early relisting.
   monthly_administration_fee:
     lineage:
-    - datalake_ebdb_clean.full_contract.monthly_administration_fee
+      - datalake_ebdb_clean.full_contract.monthly_administration_fee
     description: Monthly administration fee, in decimals.
   cancellation_reason:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.reason
+      - datalake_ebdb_clean.user_revision_entity.reason
     description: Reason of the contract's cancellation.
   ts_canceled:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
     description: Timestamp of when the contract was canceled.
   ts_analyst_annulment_input:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.ts_revision
-    - datalake_ebdb_clean.contract_aud.dt_termination
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.contract_aud.dt_termination
     description: Timestamp of the analyst's annulment input.
   dt_started:
     lineage:
-    - datalake_ebdb_clean.contract.dt_started
+      - datalake_ebdb_clean.contract.dt_started
     description: Date of when the contract started.
   dt_entered:
     lineage:
-    - datalake_ebdb_clean.contract.dt_entered
+      - datalake_ebdb_clean.contract.dt_entered
     description: Date defined in the contract of when the tenant will enter in the property.
   dt_termination:
     lineage:
-    - datalake_ebdb_clean.contract.dt_termination
-    - datalake_terminator_clean.termination.dt_vacancy
+      - datalake_ebdb_clean.contract.dt_termination
+      - datalake_terminator_clean.termination.dt_vacancy
     description: Date of the contract's termination.
   ts_signed:
     lineage:
-    - datalake_ebdb_clean.contract.ts_signed
+      - datalake_ebdb_clean.contract.ts_signed
     description: Timestamp of when the contract was signed.
   ts_expected_termination:
     lineage:
-    - datalake_ebdb_clean.contract.ts_expected_termination
+      - datalake_ebdb_clean.contract.ts_expected_termination
     description: Timestamp of when the contract termination is expected.
   dt_contract_expected_end:
     lineage:
-    - datalake_ebdb_clean.contract.ts_contract_expected_end
+      - datalake_ebdb_clean.contract.ts_contract_expected_end
     description: Date of when the contract is expected to end.
   ts_minuta_approved:
     lineage:
-    - datalake_ebdb_clean.contract.ts_minuta_approved
+      - datalake_ebdb_clean.contract.ts_minuta_approved
     description: Timestamp of when the minuta (draft) was approved.
   ts_created:
     lineage:
-    - datalake_ebdb_clean.contract.ts_created
+      - datalake_ebdb_clean.contract.ts_created
     description: Timestamp of when the contract was created.
   ts_updated:
     lineage:
-    - datalake_ebdb_clean.contract.ts_updated
+      - datalake_ebdb_clean.contract.ts_updated
     description: Timestamp of when the contract was updated.
