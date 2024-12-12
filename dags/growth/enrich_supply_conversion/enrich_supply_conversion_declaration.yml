@@ -1,9 +1,8 @@
----
 dag:
   name: enrich_supply_conversion
   schedule_start_date: 2019, 1, 1
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: |
       This DAG is responsible for create tables with enriched data from supply conversion steps. The context is tracking conversion of supply and transform data from qualified to first_listing steps.
 workflow:
@@ -28,18 +27,18 @@ workflow:
       z_order_by: ["id_user"]
   inner_dependencies:
     conversion_staging:
-      - prospects_events
+    - prospects_events
     last_pj_attribution:
-      - conversion_staging
-      - operations_agents
+    - conversion_staging
+    - operations_agents
     conversion_attributed_events:
-      - conversion_staging
-      - conversion_events_3p
+    - conversion_staging
+    - conversion_events_3p
     conversion_events:
-      - conversion_attributed_events
+    - conversion_attributed_events
     manual_reprocessing_events:
-      - conversion_events
-      - conversion_staging
+    - conversion_events
+    - conversion_staging
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:
@@ -47,3 +46,9 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_12_2_med_4xlarge_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -7,13 +7,19 @@ workflow:
   custom_schema: rede
   inner_dependencies:
     fact_lead_3p_flows:
-      - dim_lead_3p_context
+    - dim_lead_3p_context
     fact_lead_3p_status:
-      - dim_lead_3p_context
+    - dim_lead_3p_context
     fact_lead_3p_status_reason:
-      - dim_lead_3p_context
+    - dim_lead_3p_context
 cluster:
   type: databricks_12_2_min_memory_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

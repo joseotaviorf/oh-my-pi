@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_tracked_events
   schedule_start_date: 2019, 1, 1
@@ -26,12 +25,12 @@ workflow:
   layer: enrich
   inner_dependencies:
     offline_attribution:
-      - plaquinhas_offline_touchpoints
-      - secretaria_offline_touchpoints
+    - plaquinhas_offline_touchpoints
+    - secretaria_offline_touchpoints
     cross_channel_full:
-      - offline_attribution
+    - offline_attribution
     attribution_cross_channel:
-      - cross_channel_full
+    - cross_channel_full
   default_partitions: [year, month, day]
 cluster:
   type: custom_cluster
@@ -43,5 +42,9 @@ cluster:
     spark_version: 13.3.x-scala2.12
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: static
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       availability: ON_DEMAND
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new

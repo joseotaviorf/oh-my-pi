@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_growth_manual_daily_costs
   schedule_start_date: 2019, 1, 1
@@ -13,7 +12,13 @@ workflow:
   layer: enrich
   custom_schema: growth_costs
   default_partitions:
-    - id_date
-    - flow_type
+  - id_date
+  - flow_type
 cluster:
   type: databricks_12_2_min_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,9 +1,8 @@
----
 dag:
   name: enrich_supply_taxonomy
   schedule_start_date: 2019, 1, 1
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: |
       This DAG is responsible for enriching the supply flows data with the taxonomy data.
 workflow:
@@ -16,8 +15,14 @@ workflow:
       z_order_by: ['id_lead', 'id_house', 'business_context']
   inner_dependencies:
     conversion_taxonomy:
-      - fallback_taxonomy
+    - fallback_taxonomy
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
 cluster:
   type: databricks_12_2_min_io-memory_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

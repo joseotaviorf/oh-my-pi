@@ -1,17 +1,9 @@
----
 dag:
   name: enrich_amplitude_page_viewed_events
   schedule_start_date: 2019, 1, 1
   owner: Data Growth
   documentation:
-    dag_purpose: Amplitude is a product analytics tool that we use at Quinto Andar
-      to help track visitor behaviour. We use the events in conjunction with our major
-      Facts and Dims; focused mostly on enriching them (such as enriching user information
-      onto leads.) More information about how the tool works can be found on [their
-      site](https://amplitude.com/) This Enrich layer is used for a few datamarts
-      due to timeout issues we have using Athena. As a result we take certain events
-      and materialize them so that the processing time is easier and Athena can handle
-      the load.
+    dag_purpose: Amplitude is a product analytics tool that we use at Quinto Andar to help track visitor behaviour. We use the events in conjunction with our major Facts and Dims; focused mostly on enriching them (such as enriching user information onto leads.) More information about how the tool works can be found on [their site](https://amplitude.com/) This Enrich layer is used for a few datamarts due to timeout issues we have using Athena. As a result we take certain events and materialize them so that the processing time is easier and Athena can handle the load.
 workflow:
   type: query_delta
   layer: enrich
@@ -23,3 +15,8 @@ cluster:
     runtime_engine: PHOTON
     num_workers: 4
     spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_open_external_data
   owner: Data Rede
@@ -13,8 +12,14 @@ workflow:
   layer: enrich
   inner_dependencies:
     itbi_all_residential_transactions:
-      - itbi_sp_residential_transactions
-      - itbi_bh_residential_transactions
+    - itbi_sp_residential_transactions
+    - itbi_bh_residential_transactions
   default_extraction_type: full
 cluster:
   type: databricks_12_2_med_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

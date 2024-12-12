@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_supply_leads
   schedule_start_date: 2019, 1, 1
@@ -27,3 +26,9 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_12_2_min_io-memory_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,35 +1,9 @@
----
 dag:
   name: enrich_online_attribution
   schedule_start_date: 2019, 1, 1
   owner: Data Growth
   documentation:
-    dag_purpose:
-      "As a derivation of Amplitude enrich layer, this DAG generates an
-      aggregated online attribution from conversion events. The query selects amplitude
-      conversion events day to day and lookups all past events. The stakeholders will
-      use this to improve attribution and reduce lost tracking metrics.
-
-
-      [Here](https://www.notion.so/productquintoandar/Growth-DE-Prioritization-c5796ec19067490ebe5b0e5c7132a600?p=39a5e8ff13504a3490c9ce640dd3ffcd)
-      you can find more context about the Data Analyst objectives with the data. This
-      is a part of a project to reduce lost tracking metrics.
-
-
-      The query isn't 100% accurate, because we are fetching events that occur at
-      most four months ago. For precise attribution, we need to collect all past events
-      from a user.
-
-
-      The enrich `online attribute` table is partitioned by year, month, and day from
-      the date of conversion, not the date of the event. So, if you query the table
-      using where clause `WHERE year = 2022 AND month = 1 AND day = 1` you will retrive
-      data from all events and attributions from users who converted in `2022/01/01`.
-
-      When doing a historical reprocess, it may be necessary to use a cluster with more nodes and more cores/CPUs.
-      Also, make sure to use these settings:
-      `spark.sql.execution.arrow.maxRecordsPerBatch 10000``
-      `spark.sql.shuffle.partitions 200`"
+    dag_purpose: "As a derivation of Amplitude enrich layer, this DAG generates an aggregated online attribution from conversion events. The query selects amplitude conversion events day to day and lookups all past events. The stakeholders will use this to improve attribution and reduce lost tracking metrics.\n\n[Here](https://www.notion.so/productquintoandar/Growth-DE-Prioritization-c5796ec19067490ebe5b0e5c7132a600?p=39a5e8ff13504a3490c9ce640dd3ffcd) you can find more context about the Data Analyst objectives with the data. This is a part of a project to reduce lost tracking metrics.\n\nThe query isn't 100% accurate, because we are fetching events that occur at most four months ago. For precise attribution, we need to collect all past events from a user.\n\nThe enrich `online attribute` table is partitioned by year, month, and day from the date of conversion, not the date of the event. So, if you query the table using where clause `WHERE year = 2022 AND month = 1 AND day = 1` you will retrive data from all events and attributions from users who converted in `2022/01/01`.\nWhen doing a historical reprocess, it may be necessary to use a cluster with more nodes and more cores/CPUs. Also, make sure to use these settings: `spark.sql.execution.arrow.maxRecordsPerBatch 10000`` `spark.sql.shuffle.partitions 200`"
 workflow:
   type: query_delta
   layer: enrich
@@ -42,7 +16,7 @@ workflow:
     udfs: [SF_ALPHANUMERIC_SNAKE_CASE]
   inner_dependencies:
     online_attribution:
-      - events_exploded
+    - events_exploded
   tables_customization:
     online_attribution:
       z_order_by: [ts_event, event_type_sanitized]
@@ -54,3 +28,8 @@ cluster:
     runtime_engine: PHOTON
     num_workers: 3
     spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

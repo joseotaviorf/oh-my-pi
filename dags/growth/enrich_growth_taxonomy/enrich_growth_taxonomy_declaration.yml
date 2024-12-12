@@ -1,9 +1,8 @@
----
 dag:
   name: enrich_growth_taxonomy
   schedule_start_date: 2023, 9, 27
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: |
       This DAG enrich manual inputs to generate Growth Taxonomy related tables that will be used to share Media results and costs between marketing and operation channels.
       More info about Growth Taxonomy and media setup params in [this doc](https://docs.google.com/presentation/d/1BylJwYp9-yoqEqNvzcIvzHLVhZbOOomAjDH5XmIaXtY/edit?usp=sharing).
@@ -27,3 +26,9 @@ workflow:
       has_hive_sync: true
 cluster:
   type: databricks_12_2_med_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

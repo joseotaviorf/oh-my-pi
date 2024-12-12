@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_listing_flow
   schedule_start_date: 2019, 1, 1
@@ -10,10 +9,16 @@ workflow:
   layer: enrich
   inner_dependencies:
     listing_flows_with_reprocessed_leads:
-      - listing_flow
-      - discards_reason_by_context
+    - listing_flow
+    - discards_reason_by_context
     sales_listing_flows_with_reprocessed_leads:
-      - listing_flow
-      - discards_reason_by_context
+    - listing_flow
+    - discards_reason_by_context
 cluster:
   type: databricks_12_2_med_2xlarge_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

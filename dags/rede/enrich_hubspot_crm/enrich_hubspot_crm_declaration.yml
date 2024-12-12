@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_hubspot_crm
   schedule_start_date: 2021, 8, 24
@@ -9,53 +8,59 @@ workflow:
   custom_schema: hubspot
   inner_dependencies:
     company:
-      - company_contact
-      - company_history
+    - company_contact
+    - company_history
     company_contact:
-      - contact
+    - contact
     company_status:
-      - company
+    - company
     contact:
-      - contact_history
+    - contact_history
     contact_status:
-      - contact
+    - contact
     deal:
-      - deal_history
+    - deal_history
     deal_stage:
-      - deal
-      - stage
+    - deal
+    - stage
     pipeline:
-      - pipeline_history
+    - pipeline_history
     stage:
-      - stage_history
+    - stage_history
     ticket:
-      - ticket_history
+    - ticket_history
     ticket_stage:
-      - ticket
+    - ticket
   tables_customization:
     company_history:
       extraction_type: incremental
       partitions:
-        - year
-        - month
-        - day
+      - year
+      - month
+      - day
     contact_history:
       extraction_type: incremental
       partitions:
-        - year
-        - month
-        - day
+      - year
+      - month
+      - day
     deal_history:
       extraction_type: incremental
       partitions:
-        - year
-        - month
-        - day
+      - year
+      - month
+      - day
     ticket_history:
       extraction_type: incremental
       partitions:
-        - year
-        - month
-        - day
+      - year
+      - month
+      - day
 cluster:
   type: databricks_12_2_min_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
