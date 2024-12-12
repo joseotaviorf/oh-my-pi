@@ -13,7 +13,7 @@ JOB_NAME = "load_into_robbyson_api"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-def create_results_payload(results_table_path: str, agent_table_path: str, key_join_tables: str, analyst_key_column, execution_date: str, context: str) -> list:
+def create_results_payload(results_table_path: str, agent_table_path: str, key_join_tables: str, analyst_key_column: str, execution_date: str, context: str) -> list:
     indicators_df = spark.sql(f"SELECT * FROM datalake_static_files_ss.robbyson_indicators WHERE context = '{context}'")
     indicators_content = {row['id_indicator']: row['attributes'] for row in indicators_df.collect()}
 
@@ -35,7 +35,7 @@ def create_results_payload(results_table_path: str, agent_table_path: str, key_j
 
         for row in results_df.collect():
             results_json = {
-                "collaboratorIdentification": row["analyst_key_column"],
+                "collaboratorIdentification": row[analyst_key_column],
                 "indicadorId": int(key),
                 "resultado": 0,
                 "date": row['date'],
