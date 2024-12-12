@@ -7,6 +7,7 @@ SELECT
     paid_via,
     user,
     is_write_off,
+    reason,
     due_amount,
     paid_amount,
     accrual_year_month,

@@ -14,6 +14,7 @@ contract_write_off AS (
                   AND c.month = m.month
                   AND c.day = m.day
       WHERE m.is_write_off IS TRUE
+            OR m.reason IN ('write-off-negotiation-cyber',  'write-off-negotiation-5a')
 ),
 BASE_INVOICES_SNAPSHOT_CLEAN AS (
       WITH BASE_INVOICES_SNAPSHOT_RAW AS (
@@ -22,7 +23,10 @@ BASE_INVOICES_SNAPSHOT_CLEAN AS (
                   ps.frequency,
                   ps.payment_status,
                   ps.user,
-                  IFNULL(ps.is_write_off, FALSE) AS is_write_off,
+                  CASE
+                        WHEN ps.reason IN ('write-off-negotiation-cyber',  'write-off-negotiation-5a') THEN TRUE
+                        ELSE IFNULL(ps.is_write_off, FALSE)
+                  END AS is_write_off,
                   ps.due_amount,
                   ps.paid_amount,
                   ps.accrual_year_month,
@@ -31,7 +35,10 @@ BASE_INVOICES_SNAPSHOT_CLEAN AS (
                   ps.dt_sent,
                   ps.dt_due,
                   ps.dt_paid,
-                  ps.dt_write_off,
+                  CASE
+                        WHEN ps.dt_write_off IS NULL AND ps.reason IN ('write-off-negotiation-cyber',  'write-off-negotiation-5a') THEN DATE(ps.ts_created)
+                        ELSE ps.dt_write_off
+                  END AS dt_write_off,
                   ps.year,
                   ps.month,
                   ps.day,

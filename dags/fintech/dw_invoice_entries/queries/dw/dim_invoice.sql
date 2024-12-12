@@ -8,6 +8,7 @@ SELECT
     il.paid_via,
     il.invoice_user AS user,
     i.is_write_off,
+    i.reason,
     CAST(i.due_amount AS DECIMAL(13,2)) AS due_amount,
     CAST(i.paid_amount AS DECIMAL(13,2)) AS paid_amount,
     i.accrual_year_month AS accrual_year_month,

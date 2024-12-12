@@ -805,7 +805,7 @@ SELECT
         'FREE' AS risk_type,
         0.0140 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -815,7 +815,7 @@ SELECT
         'FREE' AS risk_type,
         0.3764 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -825,7 +825,7 @@ SELECT
         'FREE' AS risk_type,
         0.6805 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -835,7 +835,7 @@ SELECT
         'FREE' AS risk_type,
         1.0000 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -845,7 +845,7 @@ SELECT
         'FREE' AS risk_type,
         1.0000 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -855,7 +855,7 @@ SELECT
         'FREE' AS risk_type,
         1.0000 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -865,7 +865,7 @@ SELECT
         'FREE' AS risk_type,
         1.0000 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -875,7 +875,7 @@ SELECT
         'FREE' AS risk_type,
         1.0000 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -885,7 +885,7 @@ SELECT
         'PAID' AS risk_type,
         0.0750 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -895,7 +895,7 @@ SELECT
         'PAID' AS risk_type,
         0.5822 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -905,7 +905,7 @@ SELECT
         'PAID' AS risk_type,
         0.8393 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -915,7 +915,7 @@ SELECT
         'PAID' AS risk_type,
         1.0000 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -925,7 +925,7 @@ SELECT
         'PAID' AS risk_type,
         1.0000 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -935,7 +935,7 @@ SELECT
         'PAID' AS risk_type,
         1.0000 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -945,7 +945,7 @@ SELECT
         'PAID' AS risk_type,
         1.0000 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
         'guarantee'	AS provision_name
     UNION ALL
     SELECT
@@ -955,5 +955,165 @@ SELECT
         'PAID' AS risk_type,
         1.0000 AS provision_factor,
         '2024-07-01' AS begin_date_application,
-        '2024-12-01' AS end_date_application,
+        '2024-11-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        97 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalCurrent' AS pd_range,
+        'FREE' AS risk_type,
+        0.0137 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        98 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +0 (1-30 days)' AS pd_range,
+        'FREE' AS risk_type,
+        0.3783 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        99 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +1 (31-60 days)' AS pd_range,
+        'FREE' AS risk_type,
+        0.6876 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        100 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +2 (61-90 days)' AS pd_range,
+        'FREE' AS risk_type,
+        1.0000 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        101 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +3 (91-120 days)' AS pd_range,
+        'FREE' AS risk_type,
+        1.0000 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        102 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +4 (121-150 days)' AS pd_range,
+        'FREE' AS risk_type,
+        1.0000 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        103 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +5 (151-180 days)' AS pd_range,
+        'FREE' AS risk_type,
+        1.0000 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        104 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +6 (>181 days)' AS pd_range,
+        'FREE' AS risk_type,
+        1.0000 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        105 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalCurrent' AS pd_range,
+        'PAID' AS risk_type,
+        0.0721 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        106 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +0 (1-30 days)' AS pd_range,
+        'PAID' AS risk_type,
+        0.5610 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        107 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +1 (31-60 days)' AS pd_range,
+        'PAID' AS risk_type,
+        0.8514 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        108 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +2 (61-90 days)' AS pd_range,
+        'PAID' AS risk_type,
+        1.0000 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        109 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +3 (91-120 days)' AS pd_range,
+        'PAID' AS risk_type,
+        1.0000 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        110 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +4 (121-150 days)' AS pd_range,
+        'PAID' AS risk_type,
+        1.0000 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        111 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +5 (151-180 days)' AS pd_range,
+        'PAID' AS risk_type,
+        1.0000 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
+        'guarantee'	AS provision_name
+    UNION ALL
+    SELECT
+        112 AS sk_factor_risk,
+        7 AS sk_provision_rule,
+        'TotalM +6 (>181 days)' AS pd_range,
+        'PAID' AS risk_type,
+        1.0000 AS provision_factor,
+        '2024-12-01' AS begin_date_application,
+        '2025-12-01' AS end_date_application,
         'guarantee'	AS provision_name
