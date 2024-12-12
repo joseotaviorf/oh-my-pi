@@ -78,12 +78,19 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
         self.data_quality_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.DATA_QUALITY_TESTS, self.config_service
         )
+        self.skip_run_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.SKIP_RUN
+        )
 
     def _create_all_tasks(self) -> None:
         """
         Creates all the tasks for the workflow, and sets their internal dependencies
         """
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
+
+        if self._check_include_skip_run_task():
+            skip_run_task = self.skip_run_task_creator.create_task()
+            skip_run_task >> execute_job_cluster_task
 
         dummy_terminate_job_cluster_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
