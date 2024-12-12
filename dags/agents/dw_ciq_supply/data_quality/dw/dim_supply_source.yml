@@ -11,6 +11,3 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  supply_source:
-    is_complete:
-      severity_level: Error
