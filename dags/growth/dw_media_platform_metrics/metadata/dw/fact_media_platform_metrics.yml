@@ -1,0 +1,85 @@
+---
+database_name: dw_growth
+table_name: fact_media_platform_metrics
+owner: isabela.matsumoto@quintoandar.com.br
+domain: growth
+description: This fact table consolidates media platform metrics, including campaign performance, costs, and regional data, enriched with campaign historical information and business rules. Note that this table does not have a unique identifier per row, as multiple rows may represent overlapping or aggregated data depending on the metrics and dimensions involved.
+columns:
+  sk_campaign:
+    description: The key for the campaign, representing the unique identifier for each media campaign.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.id_campaign
+  sk_adset:
+    description: The key for the adset, representing the unique identifier for each ad set.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.id_adset
+  sk_ad:
+    description: The key for the ad, representing the unique identifier for each advertisement.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.id_ad
+  sk_region:
+    description: The key for the region, representing the geographic segmentation of the campaign.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.id_region
+  sk_cost_date:
+    description: The key of Date when the cost was recorded.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.dt_cost
+  origin:
+    description: The source of the data (e.g., media platform such as Facebook, Google).
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.origin
+  utm_campaign:
+    description: Campaign UTM parameter for tracking.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.utm_campaign
+  utm_term:
+    description: Term UTM parameter for tracking, typically representing ad group-level granularity.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.utm_term
+  utm_content:
+    description: Content UTM parameter for tracking, representing ad-level granularity.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.utm_content
+  country_code:
+    description: Country code associated with the user's click on the campaign.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.country_code
+  clicks:
+    description: Number of clicks recorded for the campaign.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.clicks
+  conversions:
+    description: Number of conversions recorded for the campaign.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.conversions
+  impressions:
+    description: Number of impressions recorded for the campaign.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.impressions
+  total_cost:
+    description: Total cost associated with the campaign.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.total_cost
+  name_convention_suffix:
+    description: Suffix used for naming conventions in the media platform.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.name_convention_suffix
+  dt_cost:
+    description: Date when the cost was recorded.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.dt_cost
+  year:
+    description: Year of the cost record.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.year
+  month:
+    description: Month of the cost record.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.month
+  day:
+    description: Day of the cost record.
+    lineage:
+      - datalake_growth_media_platform.consolidated_metrics.day
+  ts_load:
+    description: Timestamp when the record was loaded into the fact table.
