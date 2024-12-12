@@ -16,20 +16,12 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from bietlejuice.services.configuration_service import ConfigurationService
-
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_reverse"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-
-def get_parameters(campaigns, table_name):
-    for campaign in campaigns["campaigns"]:
-        if campaign["query"] == table_name:
-            campaign_query = campaign["query"]
-            return campaign_query
 
 if __name__ == "__main__":
 
@@ -38,8 +30,7 @@ if __name__ == "__main__":
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="source name")
-    parser.add_argument("dag_name", help="dag_name")
-    parser.add_argument("table_name", help="Table name")
+    parser.add_argument("campaign_query", help="query ")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
@@ -47,15 +38,9 @@ if __name__ == "__main__":
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
-    dag_name = args.dag_name
-    parser.add_argument("table_name", help="Table name")
+    campaign_query = args.campaign_query
     execution_date = args.execution_date
     partition_cols = ["year", "month", "day"]
-
-    config_service = ConfigurationService(dag_name)
-    campaigns = config_service.get_config("campaigns")
-
-    campaign_query = get_parameters(campaigns, table_name)
 
     logger.info(
         f"""m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket}, source={source},

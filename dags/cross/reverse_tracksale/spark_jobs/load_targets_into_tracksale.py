@@ -13,8 +13,6 @@ from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
 
-from bietlejuice.services.configuration_service import ConfigurationService
-
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_targets_into_tracksale"
 
@@ -36,14 +34,6 @@ def send_targets_to_tracksale(token, campaign_code, payload):
     send_data = requester_instance.sync(campaign_code, payload)
     return send_data
 
-def get_parameters(campaigns, table_name):
-    for campaign in campaigns["campaigns"]:
-        if campaign["query"] == table_name:
-            campaign_code = campaign["campaign_code"]
-            tags = campaign["tags"]
-            trigger_at_hour = campaign["trigger_at_hour"]
-            trigger_at_minute = campaign["trigger_at_minute"]
-            return campaign_code, tags, trigger_at_hour, trigger_at_minute
 
 if __name__ == "__main__":
 
@@ -52,25 +42,27 @@ if __name__ == "__main__":
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="source name")
-    parser.add_argument("dag_name", help="dag_name")
-    parser.add_argument("table_name", help="Table name")
+    parser.add_argument("campaign_code", help="source name")
+    parser.add_argument("campaign_query", help="campaign query")
+    parser.add_argument("tags", help="campaign tags")
+    parser.add_argument("trigger_at_hour", help="hour that the campaign should be triggered")
+    parser.add_argument("trigger_at_minute", help="minute that the campaign should be triggered")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
-    dag_name = args.dag_name
-    table_name = args.table_name
-
-    config_service = ConfigurationService(dag_name)
-    campaigns = config_service.get_config("campaigns")
-
-    campaign_code, tags, trigger_at_hour, trigger_at_minute = get_parameters(campaigns, table_name)
+    source = args.source
+    campaign_code = args.campaign_code
+    campaign_query = args.campaign_query
+    tags = args.tags
+    trigger_at_hour = args.trigger_at_hour
+    trigger_at_minute = args.trigger_at_minute
     execution_date = args.execution_date
 
     logger.info(
-        f"""m={JOB_NAME}, environment={environment}, dag_name={dag_name}, datalake_bucket={datalake_bucket},
+        f"""m={JOB_NAME}, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
         campaign_code={campaign_code}, campaign_query={campaign_query}, tags={tags},
         trigger_at_hour={trigger_at_hour}, trigger_at_minute={trigger_at_minute}, execution_date={execution_date},
         msg=Starting Spark Job..."""
