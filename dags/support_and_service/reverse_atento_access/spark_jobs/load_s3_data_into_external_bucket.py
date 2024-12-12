@@ -15,6 +15,8 @@ from bietlejuice.services.messaging_services.message import Message
 import boto3
 from pyspark.sql.utils import AnalysisException
 
+from bietlejuice.services import ConfigurationService
+
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_s3_data_into_external_bucket"
 
@@ -53,17 +55,21 @@ if __name__ == "__main__":
 
     parser = ArgumentParser(description=JOB_NAME)
 
+    parser.add_argument("dag_name", help="Name of the DAG")
     parser.add_argument("environment", help="forno/prod values ")
     parser.add_argument("datalake_bucket", help="bucket for forno/prod datalake")
     parser.add_argument("source", help="source name")
-    parser.add_argument("external_bucket", help="bucket destination for files")
 
     args = parser.parse_args()
 
+    dag_name = args.dag_name
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
-    external_bucket = args.external_bucket
+
+    config_service = ConfigurationService(dag_name)
+    external_bucket = config_service.get_config("external_s3_bucket")
+
 
     logger.info(
         f"""m=__main__, environment={environment}, source={source},
