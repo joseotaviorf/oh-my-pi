@@ -1,0 +1,44 @@
+database_name: datalake_ebdb_contract
+table_name: contract_declined_relisting
+description:
+  Enriched table containing information about the contract and relisting related to the opt-out.
+  This tables informs the contract if the owner opted-out the house from the early relisting.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id_contract:
+    lineage:
+      - datalake_ebdb_contract.contract.id
+      - datalake_ebdb_clean.contract_aud.id_contract
+    description: ID of the contract.
+  id_house:
+    lineage:
+      - datalake_ebdb_contract.contract.id_house
+      - datalake_ebdb_clean.contract_aud.id_house
+    description: ID of the house.
+  id_user_modifier:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.id_user
+    description: ID of the user who modified the register.
+  country_code:
+    lineage:
+      - datalake_ebdb_country.house.country_code
+    description: Country code of the house.
+  is_relisting_enabled:
+    lineage:
+      - datalake_ebdb_clean.contract_aud.is_relisting_enabled
+    description: Boolean flag indicating if the house can be relisted.
+  is_early_relisting_enabled:
+    lineage:
+      - datalake_ebdb_clean.listing_rent_model_aud.is_early_relisting
+    description: Boolean flag indicating if the house's owner opted-in/out of the early relisting.
+  decline_person:
+    description: Column indicating who opted-out/declined the relisting.
+    categories:
+      "DECLINED_BY_PP": The person who declined the relisting was the owner.
+      "DECLINED_BY_CX/ENG": The person who declined the relisting and opted-out wasn't the owner.
+      "AUTO_DECLINED": If the is_early_relisting flag is False and we don't have any information who did the opt-out, the value will be Auto-declined.
+  ts_declined:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of when the register was updated.

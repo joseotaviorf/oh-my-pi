@@ -1698,6 +1698,8 @@ bietlejuice.enrich_ebdb_contract:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_lead:load-clean-conversion-lead
   - bietlejuice.ebdb_lead:load-clean-lead
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context
+  - bietlejuice.ebdb_listing:load-clean-listing-rent-model-aud
   - bietlejuice.ebdb_partner:load-clean-partner
   - bietlejuice.ebdb_partner:load-clean-partner-agent
   - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
@@ -1922,16 +1924,16 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2022
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024-cohort
+  - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025
+  - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025-cohort
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
   - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets-2024
   - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets-bps-2024
   - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets-2024
+  - bietlejuice.gsheets_growth_targets:done-clean-rent-supply-targets-cohort-2025
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2022
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024-cohort
-  - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025
-  - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025-cohort
-  - bietlejuice.gsheets_growth_targets:done-clean-rent-supply-targets-cohort-2025
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2025
 bietlejuice.enrich_heimdall:
   - bietlejuice.heimdall:load-clean-activity
