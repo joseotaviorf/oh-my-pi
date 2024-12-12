@@ -13,6 +13,6 @@ FROM
     datalake_bigfone_clean.event
 WHERE
     workflow_name = 'IVR Events'
-    AND MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+    AND year >= 2023
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_created) = 1

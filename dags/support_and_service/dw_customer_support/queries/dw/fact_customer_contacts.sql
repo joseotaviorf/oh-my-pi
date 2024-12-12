@@ -55,6 +55,7 @@ twilio_demand AS (
         AND ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_reservation_created DESC) = 1 THEN 'completed'
       ELSE 'transferred'
     END AS status,
+    NULL AS completion_reason,
     worker_email,
     CASE
       WHEN direction = 'inbound' THEN to_phone_number
@@ -79,7 +80,7 @@ twilio_demand AS (
   FROM
     datalake_customer_support.calls
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}'- INTERVAL 30 DAY AND '{load_end_date}'
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 30 DAY AND '{load_end_date}'
   UNION ALL
   SELECT DISTINCT
     id_session,
@@ -99,6 +100,7 @@ twilio_demand AS (
       WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_created DESC) = 1 THEN 'completed'
       ELSE 'transferred'
     END AS status,
+    task_completion_reason AS completion_reason,
     worker_email,
     twilio_phone_number AS quinto_andar_phone_number,
     customer_phone_number,
@@ -137,13 +139,14 @@ twilio_contacts AS (
     MD5(d.worker_email) AS sk_analyst,
     d.id_session AS sk_session,
     d.id_task AS sk_task,
-    CAST(COALESCE(t1.id_ticket, t2.id_ticket) AS BIGINT) AS sk_ticket,
+    MAX(CAST(COALESCE(t1.id_ticket, t2.id_ticket, t3.id_ticket) AS BIGINT)) OVER (PARTITION BY d.id_task) AS sk_ticket,
     CAST(d.id_user AS BIGINT) AS sk_user,
     d.queue_name,
     d.channel,
     d.direction,
     d.origin,
     d.status,
+    d.completion_reason,
     d.quinto_andar_phone_number,
     d.customer_phone_number,
     d.customer_email,
@@ -204,6 +207,7 @@ front_contacts AS (
     channel,
     origin,
     status,
+    completion_reason,
     quinto_andar_phone_number,
     customer_phone_number,
     customer_email,
@@ -251,6 +255,7 @@ front_contacts AS (
       WHEN t.ts_closed IS NOT NULL THEN 'completed'
       ELSE 'in progress'
     END AS status,
+    NULL AS completion_reason,
     NULL AS quinto_andar_phone_number,
     NULL AS customer_phone_number,
     ce.email AS customer_email,
@@ -286,7 +291,7 @@ front_contacts AS (
     AND t.channel = 'cs email'
     AND front_or_back = 'front'
 )
-SELECT
+SELECT DISTINCT
   sk_contact,
   sk_interaction,
   sk_session,
@@ -303,6 +308,7 @@ SELECT
   channel,
   origin,
   status,
+  completion_reason,
   quinto_andar_phone_number,
   customer_phone_number,
   customer_email,

@@ -6,7 +6,7 @@ WITH call_sessions AS (
   FROM
     datalake_sauron_clean.session
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY AND "{load_end_date}"
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY source_identity ORDER BY ts_updated DESC) = 1
 ),
@@ -36,7 +36,7 @@ call_events AS (
   FROM
     datalake_bigfone_clean.event
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY  AND "{load_end_date}"
 ),
 reservation_queues AS (
   SELECT DISTINCT
