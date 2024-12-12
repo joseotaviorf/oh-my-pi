@@ -77,4 +77,3 @@ columns:
   ts_chosen:
     lineage:
       - datalake_atta_raw.proposta.ChosenAt
-

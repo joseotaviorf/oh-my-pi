@@ -1,5 +1,5 @@
 dag:
-  name: atta_test
+  name: atta
   schedule_start_date: 2022, 9, 20
   schedule_interval: 0 21 * * *
   owner: Data ForSale
@@ -12,7 +12,7 @@ workflow:
   database_type: mysql
   source_database: atta
   source_schema: atta
-  custom_schema: atta_test
+  custom_schema: atta
   dbutils_secret_key: ATTA_DB
   tables_customization:
     banktracking:
