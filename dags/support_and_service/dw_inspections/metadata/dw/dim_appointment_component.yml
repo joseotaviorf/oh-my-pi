@@ -42,3 +42,5 @@ columns:
     description: Descriptive information indicating in which system the appointment was made.
     lineage:
       - datalake_inspections.appointment_inspection.source
+  ts_load:
+    description: Date and time when the data was loaded.

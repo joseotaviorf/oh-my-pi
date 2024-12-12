@@ -12,6 +12,7 @@ SELECT DISTINCT
     status_made_by,
     status_description,
     cancellation_reason,
-    source
+    source,
+    NOW() AS ts_load
 FROM
     datalake_inspections.appointment_inspection

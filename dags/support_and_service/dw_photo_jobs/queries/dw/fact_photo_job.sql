@@ -55,7 +55,8 @@ SELECT
     -- Applying FLOOR function to match ODS
 	CAST(FLOOR(j.creation_to_scheduling_diff_minutes) AS DECIMAL(10,1)) AS creation_to_scheduling_diff_minutes,
     CAST(ROUND(FLOOR(j.creation_to_scheduling_diff_minutes) / 60, 1) AS DECIMAL(10,1)) AS creation_to_scheduling_diff_hours,
-    CAST(ROUND(FLOOR(j.creation_to_scheduling_diff_minutes) / 1440, 1) AS DECIMAL(10,1)) AS creation_to_scheduling_diff_days
+    CAST(ROUND(FLOOR(j.creation_to_scheduling_diff_minutes) / 1440, 1) AS DECIMAL(10,1)) AS creation_to_scheduling_diff_days,
+    NOW() AS ts_load
 FROM
 	base_jobs j
 LEFT JOIN

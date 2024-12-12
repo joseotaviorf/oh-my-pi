@@ -249,3 +249,5 @@ columns:
     lineage:
       - datalake_ebdb_photo_jobs.photo_job.creation_to_scheduling_diff_minutes
     description: Days between date job creation and date it was scheduled to happen
+  ts_load:
+    description: Date and time when the data was loaded.
