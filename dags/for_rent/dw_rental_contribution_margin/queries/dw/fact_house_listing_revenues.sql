@@ -5,6 +5,7 @@ WITH invoices AS (
     ie.entry_type,
     brl_entry_due_amount,
     ii.invoice_user,
+    ii.payment_status,
     invoice.accrual_year_month
   FROM
     datalake_invoice.invoice_entries AS ies
@@ -28,6 +29,7 @@ invoices_values AS (
     invoices
   WHERE
     invoice_user = 'tenant'
+    AND payment_status != 'canceled'
   GROUP BY 1, 3
 ),
 
