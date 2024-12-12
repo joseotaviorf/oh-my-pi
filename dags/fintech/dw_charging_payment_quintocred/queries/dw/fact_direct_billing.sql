@@ -40,6 +40,8 @@ cobranca_billing AS (
     LEFT JOIN sap
         ON sap.id_fatura = cast(i.id AS varchar(10))
         and sap.id_contract = cast(p.id AS varchar(10))
+    WHERE
+        CONCAT( b.status , i.status ) NOT IN ('WRITTEN_DOWNCANCELED')
     QUALIFY
         ROW_NUMBER() OVER(
             PARTITION BY COALESCE( sap.id_contract, e.propose ), dt_ref_boleto

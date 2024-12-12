@@ -967,6 +967,7 @@ base_assinatura_ifrs_sem_repasse AS (
         origin_table,
         sk_propose,
         sk_propose_20,
+        NULL AS id_bill,
         sk_transaction,
         sk_key,
         client_cpf_cnpj,
@@ -1025,6 +1026,7 @@ repasse_direto AS (
         SELECT DISTINCT
             c.uuid_company AS imob_uuid,
             imob.broker_name,
+            b.id AS id_bill,
             c.id AS imob_id,
             i.id AS fatura_id,
             i.status AS fatura_status,
@@ -1071,13 +1073,15 @@ repasse_direto AS (
         LEFT JOIN
             cpf_cnpj_person doc
                 ON doc.sk_propose = fp.sk_propose AND rn = 1
-        -- WHERE
+        WHERE
+            CONCAT( b.status , i.status ) NOT IN ('WRITTEN_DOWNCANCELED')
         --     b.status NOT IN ('WRITTEN_DOWN')
         --     AND CONCAT(b.status,i.status) NOT IN ('OVERDUECANCELED')
     )
     SELECT
         'invoice' AS origin_table,
         sk_propose,
+        id_bill,
         CAST(NULL AS INT) AS sk_propose_20,
         CONCAT(sk_propose,REPLACE(dt_ref_boleto,'-','')) AS sk_transaction,
         CONCAT(sk_propose,fatura_id) AS sk_key,
@@ -1127,6 +1131,7 @@ base_final_unificada AS (
         sk_propose_20,
         sk_transaction,
         sk_key,
+        id_bill,
         client_cpf_cnpj,
         dt_register,
         dt_due,
@@ -1156,6 +1161,7 @@ SELECT
     sk_propose_20,
     sk_transaction,
     sk_key,
+    id_bill,
     client_cpf_cnpj,
     dt_register,
     dt_due,
