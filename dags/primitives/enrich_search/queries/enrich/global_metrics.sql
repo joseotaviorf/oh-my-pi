@@ -17,11 +17,13 @@ SELECT id_user,
        week,
        year,
        month,
-       day
+       day,
+       MIN(ts_search) AS min_ts_search
 FROM
   (
   SELECT get_json_object(ids, '$.id_user') AS id_user,
          get_json_object(dimensions, '$.business_context') AS business_context,
+         get_json_object(timestamps, '$.ts_search') AS ts_search,
          variants,
          date,
          week,
@@ -137,7 +139,7 @@ global_user_metrics AS (
             -- timestamps
            to_json(
               named_struct(
-                  'ts_search', all_users.date,
+                  'ts_search', all_users.min_ts_search,
                   'ts_global_offer', COALESCE(rent_flow.ts_offer, sale_flow.ts_offer),
                   'ts_global_visit_completed', COALESCE(rent_flow.ts_visit_completed, sale_flow.ts_visit_completed),
                   'ts_global_contract_signed', COALESCE(rent_flow.ts_contract_signed, sale_flow.ts_contract_signed)
