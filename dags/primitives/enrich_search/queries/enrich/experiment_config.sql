@@ -74,6 +74,51 @@ FROM VALUES
             ),
             'filters', "business_context = 'sale'"
         )
+    ),
+    -- ab_beakman_search_services_demand_concentration_rent_experiment
+    (
+        "ab_beakman_search_services_demand_concentration_rent_experiment",
+        named_struct(
+            'begin_date', DATE('2024-12-09'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'rent'"
+        )
+    ),
+    -- AB_TEST_RECS_HUE_INDEXED_RENT
+    (
+        "AB_TEST_RECS_HUE_INDEXED_RENT",
+        named_struct(
+            'begin_date', DATE('2024-12-09'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'rent'"
+        )
+    ),
+    -- AB_TEST_RECS_HUE_INDEXED_SALE
+    (
+        "AB_TEST_RECS_HUE_INDEXED_SALE",
+        named_struct(
+            'begin_date', DATE('2024-12-09'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'sale'"
+        )
     )
     -- Add new experiment here
 
