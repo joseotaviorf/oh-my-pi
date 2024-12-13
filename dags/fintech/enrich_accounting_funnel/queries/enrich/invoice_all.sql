@@ -121,7 +121,7 @@ SELECT DISTINCT
   c.status AS contract_status,
   ie.is_rental_paid_in_advance,
   rr.is_reversed,
-  COALESCE(ni.is_not_invoiceable_inconsiderable, TRUE) AS is_not_invoiceable_inconsiderable,
+  COALESCE(ni.is_not_invoiceable_inconsiderable, FALSE) AS is_not_invoiceable_inconsiderable,
   ie.entry_type AS bill_item,
   i.is_write_off,
   ie.description,
