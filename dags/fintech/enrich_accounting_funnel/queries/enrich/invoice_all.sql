@@ -6,34 +6,52 @@ WITH locale_ids AS (
     datalake_gsheets_clean.cod_locale
   GROUP BY 1
 ),
+entry_duplicates_removal AS (
+
+    SELECT
+        id_invoice,
+        id_contract,
+        id_external AS id_entry,
+        id_external_reversed_entry,
+        bill_item,
+        amount,
+        accrual_year_month,
+        due_year_month,
+        ts_created
+    FROM
+        datalake_retsuko.entry
+    QUALIFY
+        ROW_NUMBER()
+            OVER(PARTITION BY id_contract, id_external_reversed_entry, COALESCE(id_invoice, accrual_year_month), bill_item ORDER BY ts_created DESC) = 1
+
+),
 remove_reversed AS (
 
     SELECT
-        e.id_external AS id_entry,
-        CASE
-            WHEN SUM(e.amount)
+    e.id_entry,
+    CASE
+        WHEN
+            SUM(e.amount)
                 OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
-            THEN TRUE
-            WHEN LEAD(e.id_external)
+        THEN TRUE
+        WHEN
+            LEAD(e.id_entry)
                 OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created) IS NOT NULL
-            THEN TRUE
-            ELSE FALSE
-        END AS is_reversed,
-         CASE
-           WHEN
-             SUM(e.amount)
-               OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
-             AND
-               LEAD(e.ts_created)
-                 OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created) IS NULL
-           THEN e.ts_created
-           ELSE LEAD(e.ts_created) OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created)
-         END AS ts_entry_reversed
+        THEN TRUE
+        ELSE FALSE
+    END AS is_reversed,
+    CASE
+        WHEN
+            SUM(e.amount)
+                OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
+            AND
+                LEAD(e.ts_created)
+                    OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created) IS NULL
+        THEN e.ts_created
+        ELSE LEAD(e.ts_created) OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created)
+        END AS ts_entry_reversed
     FROM
-      datalake_retsuko.entry AS e
-    QUALIFY
-      ROW_NUMBER()
-        OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created DESC) = 1
+        entry_duplicates_removal AS e
 
 ),
 next_business_day AS (
@@ -63,43 +81,24 @@ not_invoiceable AS (
           (e.id_invoice IS NULL OR e.id_invoice IS NOT NULL AND ii.payment_status = 'canceled')
           AND (e.producer = 'payment-adjustment-correction' OR e.producer = 'postponement' OR e.producer = 'manual'   OR e.producer = 'monthly-routine')
           AND e.status = 'pending'
-        THEN FALSE -- Not-invoiceable habilitado
-        WHEN
-          e.id_invoice IS NULL
-          AND IFNULL(e.status,'vazio') != 'pending'
-        THEN TRUE --Not-invoiceable não habilitado
+          AND e.due_year_month >= 202401
+        THEN FALSE -- not-invoiceable válido
+        ELSE TRUE -- not-invoiceable não válido
       END AS is_not_invoiceable_inconsiderable,
       e.amount,
       e.accrual_year_month,
       e.due_year_month
     FROM
-      datalake_retsuko.entry AS e
+        datalake_retsuko.entry AS e
     LEFT JOIN
-      datalake_retsuko.invoice AS i
-      ON i.id = e.id_invoice
+        datalake_retsuko.invoice AS i
+        ON i.id = e.id_invoice
     LEFT JOIN
-      datalake_retsuko.invoice_info AS ii
-      ON ii.id_invoice = i.id_external
+        datalake_retsuko.invoice_info AS ii
+        ON ii.id_invoice = i.id_external
     WHERE
-      (
-        (
-          e.id_invoice IS NULL
-          OR (e.id_invoice IS NOT NULL AND ii.payment_status = 'canceled')
-        )
-        AND
-          (
-            e.producer = 'payment-adjustment-correction'
-            OR e.producer = 'postponement'
-            OR e.producer = 'manual'
-            OR e.producer = 'monthly-routine'
-          )
-        AND e.status = 'pending'
-      )
-      OR
-      (
         e.id_invoice IS NULL
-        AND IFNULL(e.status,'vazio') != 'pending'
-      )
+        OR (e.id_invoice IS NOT NULL AND ii.payment_status = 'canceled' AND e.status = 'pending')
 )
 SELECT DISTINCT
   fie.sk_invoice_entry AS id_entry,
@@ -120,7 +119,7 @@ SELECT DISTINCT
   c.rental_administrator,
   c.status AS contract_status,
   ie.is_rental_paid_in_advance,
-  rr.is_reversed,
+  COALESCE(rr.is_reversed, FALSE) AS is_reversed,
   COALESCE(ni.is_not_invoiceable_inconsiderable, FALSE) AS is_not_invoiceable_inconsiderable,
   ie.entry_type AS bill_item,
   i.is_write_off,
