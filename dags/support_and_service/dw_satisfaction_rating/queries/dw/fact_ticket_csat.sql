@@ -12,4 +12,4 @@ SELECT DISTINCT
 FROM
   datalake_customer_support.csat
 WHERE
-  ts_first_response BETWEEN '{load_start_date}' - INTERVAL 30 DAY AND '{load_end_date}'
+  ts_first_response >= '{load_start_date}' - INTERVAL 30 DAY

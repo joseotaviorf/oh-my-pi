@@ -115,7 +115,7 @@ non_twilio_tickets AS (
         AND it.tags NOT LIKE '%call_contato_ativo%'
         AND it.tags NOT LIKE '%redirecionado_adm_v1%'
         AND it.id_call IS NULL
-        AND it.id_session IS NULL THEN 'cs email'
+        AND it.id_session IS NULL THEN 'email'
       ELSE it.channel
     END AS channel
   FROM
