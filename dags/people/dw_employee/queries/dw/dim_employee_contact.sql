@@ -135,10 +135,3 @@ LEFT JOIN
 LEFT JOIN
   phones
     ON workers.id_person = phones.id_person
-WHERE
-  GREATEST (
-    addresses.dt_effective_start,
-    DATE(ew.ts_last_update),
-    DATE(eh.ts_last_update),
-    DATE(phones.ts_last_update)
-  ) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
