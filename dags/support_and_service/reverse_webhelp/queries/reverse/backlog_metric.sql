@@ -1,8 +1,8 @@
 SELECT
-  bmt.sk_task AS sk_ticket,
-  bmt.sk_agent,
-  bmt.origin AS channel,
-  bmt.status,
+  CAST(ftb.sk_ticket AS STRING) AS sk_ticket,
+  ftb.sk_analyst AS sk_agent,
+  'email' AS channel,
+  dit.status,
   da.agent_organization,
   da.email AS agent_email,
   dd.department,
@@ -15,42 +15,42 @@ SELECT
   dd.team,
   dd.journey_step,
   dd.area,
-  bmt.sla_target,
-  bmt.days_worked,
-  bmt.days_worked_with_days_offs,
-  bmt.days_off,
-  bmt.is_daily_backlog,
-  bmt.is_backlog_within_sla AS is_backlog_in_time,
-  bmt.is_backlog_with_exceed_sla AS is_backlog_not_in_time,
-  bmt.dt_metric_reference,
-  bmt.ts_started,
-  bmt.ts_solved,
+  ftb.sla_target,
+  CAST(ftb.days_elapsed_business AS BIGINT) AS days_worked,
+  CAST(ftb.days_elapsed_calendar AS INTEGER) AS days_worked_with_days_offs,
+  CAST(ftb.days_off AS BIGINT) AS days_off,
+  TRUE AS is_daily_backlog,
+  ftb.is_backlog_within_sla AS is_backlog_in_time,
+  ftb.is_backlog_outside_sla AS is_backlog_not_in_time,
+  ftb.dt_snapshot AS dt_metric_reference,
+  ftb.ts_created AS ts_started,
+  NULL AS ts_solved,
   tf.replies,
   YEAR(CURRENT_DATE - 1) AS year,
   MONTH(CURRENT_DATE - 1) AS month,
   DAY(CURRENT_DATE - 1) AS day,
   NOW() AS ts_load
 FROM
-  dw_customer_support.fact_backlog_metrics_tasks AS bmt
+  dw_customer_support.fact_tickets_backlog AS ftb
 LEFT JOIN
   dw_customer_support.dim_taxonomy AS dt
-    ON bmt.sk_taxonomy = dt.sk_taxonomy
+    ON ftb.sk_taxonomy = dt.sk_taxonomy
 LEFT JOIN
   dw_customer_support.dim_department AS dd
-    ON bmt.sk_main_department = dd.sk_department
+    ON ftb.sk_department = dd.sk_department
 LEFT JOIN
-  dw_customer_support.dim_agent AS da
-    ON bmt.sk_agent = da.sk_agent
+  dw_customer_support.dim_analyst AS da
+    ON ftb.sk_analyst = da.sk_analyst
 LEFT JOIN
   dw_customer_support.dim_ticket dit
-    ON dit.sk_ticket = bmt.sk_task
+    ON dit.sk_ticket = ftb.sk_ticket
 LEFT JOIN
   dw_customer_support.fact_ticket AS tf
-    ON tf.sk_ticket = bmt.sk_task
+    ON tf.sk_ticket = ftb.sk_ticket
 WHERE
-  DATE(bmt.dt_metric_reference) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
+  DATE(ftb.dt_snapshot) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
   AND dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'
   AND da.agent_organization IN ('webhelp', 'webhelpbr', 'contractors')
 QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY bmt.sk_task, bmt.dt_metric_reference ORDER BY bmt.sla_target DESC) = 1
+  ROW_NUMBER() OVER(PARTITION BY ftb.sk_ticket, ftb.dt_snapshot ORDER BY ftb.sla_target DESC) = 1

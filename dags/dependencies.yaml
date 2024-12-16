@@ -3680,19 +3680,20 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.enrich_tracksale_dispatches:load-enrich-true-offboarding-pp-dispatches
 bietlejuice.reverse_webhelp:
   - bietlejuice.bigfone:load-clean-call
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events
-  - bietlejuice.enrich_customer_support:load-enrich-call
-  - bietlejuice.enrich_customer_support:load-enrich-chat
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets-backlog
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
+  - bietlejuice.enrich_customer_support:load-enrich-calls
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks
-  - bietlejuice.enrich_quinto_messenger:load-enrich-chat
   - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
   - bietlejuice.enrich_repairs:load-enrich-repair-tickets
   - bietlejuice.enrich_support_users:load-enrich-analysts
@@ -3714,28 +3715,6 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-taxonomy
   - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
-bietlejuice.reverse_webhelp_test:
-  - bietlejuice.bigfone:load-clean-call
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets-backlog
-  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
-  - bietlejuice.enrich_customer_support:load-enrich-calls
-  - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla
-  - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks
-  - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
-  - bietlejuice.enrich_repairs:load-enrich-repair-tickets
-  - bietlejuice.enrich_support_users:load-enrich-analysts
-  - bietlejuice.gsheets_support_and_service:done-clean-department-control
-  - bietlejuice.quinto_messenger:load-clean-channel
-  - bietlejuice.quinto_messenger:load-clean-channel-event
 bietlejuice.search_metrics_service:
   - quintoml.search.search_monitoring.inference:batch-predict
 bietlejuice.survicate_respondent_attributes:

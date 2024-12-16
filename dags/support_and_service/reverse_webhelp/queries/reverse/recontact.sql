@@ -1,8 +1,20 @@
-WITH front_tickets_list AS (
+WITH time_metrics AS (
+  SELECT DISTINCT
+    sk_ticket,
+    total_handling_time / 60 AS total_minutes_handling_time,
+    total_waiting_time / 60 AS total_minutes_queue_time,
+    total_talk_time / 60 AS total_minutes_talk_time
+  FROM
+    dw_customer_support.fact_customer_contacts
+  WHERE
+    DATE(ts_task_created) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH
+      AND DATE('{load_end_date}')
+),
+front_tickets_list AS (
   SELECT DISTINCT
     ft.sk_ticket,
-    LAG(ft.sk_ticket) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS sk_ticket_previous_contact,
-    LEAD(ft.sk_ticket) OVER(PARTITION BY ft.sk_user ORDER BY ft.ts_started) AS sk_ticket_contact_later,
+    LAG(ft.sk_ticket) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_created) AS sk_ticket_previous_contact,
+    LEAD(ft.sk_ticket) OVER(PARTITION BY ft.sk_user ORDER BY ft.ts_created) AS sk_ticket_contact_later,
     ft.sk_user,
     ft.sk_main_department,
     ft.sk_taxonomy,
@@ -11,47 +23,50 @@ WITH front_tickets_list AS (
     dd.team,
     dd.department,
     dd.journey_step,
-    dc.channel,
+    ft.channel,
     ft.ticket_origin,
     dt.theme,
     dt.theme_detail,
-    ft.csat_score,
-    ft.total_minutes_handling_time,
-    ft.total_minutes_queue_time,
-    ft.total_minutes_talk_time,
+    ftc.last_csat_score AS csat_score,
+    tm.total_minutes_handling_time,
+    tm.total_minutes_queue_time,
+    tm.total_minutes_talk_time,
     CASE
-      WHEN LAG(ft.sk_ticket) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) IS NOT NULL THEN 1
+      WHEN LAG(ft.sk_ticket) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_created) IS NOT NULL THEN 1
       ELSE 0
     END AS recontact_flag,
-    LAG(dc.channel) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_channel,
-    LAG(dt.theme) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_taxonomy,
-    LAG(da.email) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_email,
-    LAG(ft.csat_score) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS previous_contact_csat,
-    DATE_DIFF(DATE(ft.ts_started), LAG(DATE(ft.ts_started)) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started)) AS days_since_last_contact,
-    LAG(ft.ts_started) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_started) AS ts_started_previous_contact,
-    DATE_SUB(ft.ts_started, 3) AS search_window_from,
-    ft.ts_started
+    LAG(ft.channel) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_created) AS previous_contact_channel,
+    LAG(dt.theme) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_created) AS previous_contact_taxonomy,
+    LAG(da.email) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_created) AS previous_contact_email,
+    LAG(ftc.last_csat_score) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_created) AS previous_contact_csat,
+    DATE_DIFF(DATE(ft.ts_created), LAG(DATE(ft.ts_created)) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_created)) AS days_since_last_contact,
+    LAG(ft.ts_created) OVER(PARTITION BY ft.sk_user, dd.team ORDER BY ft.ts_created) AS ts_started_previous_contact,
+    DATE_SUB(ft.ts_created, 3) AS search_window_from,
+    ft.ts_created AS ts_started
   FROM
-    dw_customer_support.fact_ticket AS ft
+    dw_customer_support.fact_tickets AS ft
+  LEFT JOIN
+    dw_satisfaction_rating.fact_ticket_csat AS ftc
+      ON ftc.sk_ticket = ft.sk_ticket
+  LEFT JOIN
+    time_metrics AS tm
+      ON tm.sk_ticket = ft.sk_ticket
   LEFT JOIN
     dw_customer_support.dim_department AS dd
       ON ft.sk_main_department = dd.sk_department
   LEFT JOIN
-    dw_customer_support.dim_channel AS dc
-      ON ft.sk_channel = dc.sk_channel
-  LEFT JOIN
     dw_customer_support.dim_taxonomy AS dt
       ON ft.sk_taxonomy = dt.sk_taxonomy
   LEFT JOIN
-    dw_customer_support.dim_agent as da
-      ON ft.sk_last_agent = da.sk_agent
-      OR ft.sk_last_agent = da.sk_agent_twilio
+    dw_customer_support.dim_analyst AS da
+      ON ft.sk_last_analyst = da.sk_analyst
+      OR ft.sk_last_analyst = da.sk_agent_twilio
   WHERE
     ft.sk_user IS NOT NULL
     AND dd.area = 'CX'
     AND ft.front_or_back = 'front'
-    AND ( (dc.channel = 'chat' AND dc.direction = 'inbound')
-        OR (ft.ticket_origin IN ('call inbound', 'call inapp')) )
+    AND ( (ft.channel = 'chat' AND ft.direction = 'inbound')
+        OR (ft.ticket_origin IN ('call inbound', 'call in app')) )
 ),
 tbl_completion_reason AS (
   SELECT
