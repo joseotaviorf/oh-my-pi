@@ -42,3 +42,5 @@ LEFT JOIN
         ON i.id_item = ii.id_item
 WHERE
     MAKE_DATE(ii.year, ii.month, ii.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY ii.id_item_issue ORDER BY ii.ts_updated DESC) = 1

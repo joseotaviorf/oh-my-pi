@@ -16,21 +16,60 @@ workflow:
     dim_appointment_component:
       extraction_type: full
       partitions: []
+    dim_assessment:
+      z_order_by: [sk_assessment]
+      merge_on: [sk_assessment]
+    dim_contestation:
+      z_order_by: [sk_contestation]
+      merge_on: [sk_contestation]
     dim_inspection:
       extraction_type: full
+      z_order_by: [sk_inspection]
+      merge_on: [sk_inspection]
     dim_inspector:
       extraction_type: full
       partitions: []
-    dim_report_approval:
-      z_order_by: [sk_inspection]
-      merge_on: [sk_inspection]
+    dim_item_group:
+      z_order_by: [sk_item_group]
+      merge_on: [sk_item_group]
+    dim_item_issue:
+      z_order_by: [sk_item_issue]
+      merge_on: [sk_item_issue]
+    dim_item_review:
+      z_order_by: [sk_item_review]
+      merge_on: [sk_item_review]
+    dim_item:
+      z_order_by: [sk_item]
+      merge_on: [sk_item]
+    dim_repair_exempted:
+      z_order_by: [sk_repair_request]
+      merge_on: [sk_repair_request]
+    dim_repair_request:
+      z_order_by: [id_repair_request]
+      merge_on: [id_repair_request]
+    dim_reviewer:
+      z_order_by: [sk_reviewer]
+      merge_on: [sk_reviewer]
+    dim_room:
+      z_order_by: [sk_room]
+      merge_on: [sk_room]
     fact_appointments:
       z_order_by: [sk_appointment]
       merge_on: [sk_appointment]
+    fact_contestation:
+      z_order_by: [sk_contestation]
+      merge_on: [sk_contestation]
+    fact_item_issue:
+      z_order_by: [sk_item_issue]
+      merge_on: [sk_item_issue]
     fact_inspection:
       extraction_type: full
+      z_order_by: [sk_inspection]
+      merge_on: [sk_inspection]
     fact_repair_request:
       extraction_type: full
+      z_order_by: [sk_repair_request]
+      merge_on: [sk_repair_request]
     fact_report_inspections:
       z_order_by: [sk_inspection]
       merge_on: [sk_inspection]
@@ -44,7 +83,7 @@ cluster:
   type: databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -12,18 +12,18 @@ workflow:
   layer: enrich
   inner_dependencies:
     inspection_booking:
-    - appointment_inspection
-    - main_inspection_booking
+      - appointment_inspection
+      - main_inspection_booking
     item:
-    - item_group
+      - item_group
     item_issue:
-    - item
+      - item
     item_media:
-    - item
+      - item
     item_review:
-    - item
+      - item
     report_approval:
-    - reviewer
+      - reviewer
   tables_customization:
     appointment_inspection:
       partitions: [year, month, day]
@@ -36,9 +36,13 @@ workflow:
     item_group:
       partitions: [year, month, day]
       extraction_type: incremental
+      z_order_by: [id_item_group]
+      merge_on: [id_item_group]
     item_issue:
       partitions: [year, month, day]
       extraction_type: incremental
+      z_order_by: [id_item_issue]
+      merge_on: [id_item_issue]
     item_media:
       partitions: [year, month, day]
       extraction_type: incremental
@@ -79,7 +83,7 @@ cluster:
     node_type_id: m5a.4xlarge
     num_workers: 3
     spark_version: 12.2.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
