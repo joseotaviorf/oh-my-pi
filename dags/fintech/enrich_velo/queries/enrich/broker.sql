@@ -65,6 +65,7 @@ LEFT JOIN
     datalake_company_clean.document AS d
         ON c.uuid_company = d.uuid_company
         AND d.document_type = 'CRECI'
+        AND d.status = 'ACTIVE'
 LEFT JOIN
     datalake_company_clean.document AS d2
         ON c.uuid_company = d2.uuid_company
