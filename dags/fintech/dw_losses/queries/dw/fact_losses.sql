@@ -127,7 +127,6 @@ SELECT
     delay_contaminated_range,
     provision_factor,
     CAST(provision_balance AS DECIMAL(32,10)) AS provision_balance,
-    CAST(previous_month_provision_balance AS DECIMAL(32,10)) AS previous_month_provision_balance,
     CAST(provision_balance - previous_month_provision_balance AS DECIMAL(32,10)) AS losses,
     CAST(due_amount AS DECIMAL(32,10)) AS due_amount,
     dt_cohort,

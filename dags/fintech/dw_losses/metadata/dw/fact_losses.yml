@@ -78,10 +78,6 @@ columns:
     description: "Provision balance being applied to the invoice"
     lineage:
       - dw_losses.fact_provision.provision_balance
-  previous_month_provision_balance:
-    description: "Provision balance being applied to the invoice in the previous month"
-    lineage:
-      - dw_losses.fact_provision.provision_balance
   losses:
     description: "Losses by invoice: previous provision balance (PDD) - current provision balance (PDD)"
     lineage:
