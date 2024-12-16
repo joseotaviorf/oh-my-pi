@@ -130,16 +130,16 @@ class HubSpotSchemaEnum(Enum):
 
 
 def main():
-    environment, datalake_bucket, source, execution_date = parse_arguments()
+    environment, datalake_bucket, source, execution_date, table = parse_arguments()
     logger.info(
         f"""
-        m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date}
+        m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date},table={table}
          msg=Starting Spark job...
         """
     )
 
     config_service = ConfigurationService(source)
-    tables = get_tables(config_service, execution_date)
+    tables = get_tables(config_service, execution_date, table)
     transform_tables_into_dataframes(tables)
     load_table_dataframes_into_datalake(
         tables, environment, source, datalake_bucket, execution_date
@@ -152,10 +152,11 @@ def parse_arguments():
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("execution_date")
+    parser.add_argument("table")
 
     args = parser.parse_args()
 
-    return args.env, args.datalake_bucket, args.source, args.execution_date
+    return args.env, args.datalake_bucket, args.source, args.execution_date, args.table
 
 
 def get_token():
@@ -169,13 +170,17 @@ def get_token():
     return json.loads(json_credentials)["token"]
 
 
-def get_tables(config_service, execution_date):
+def get_tables(config_service, execution_date, table):
     """Returns all the tables from the API in the form of a dictionary"""
 
     hubspot_client = HubspotClient(get_token())
     factory = EndpointFactory(hubspot_client)
     
-    tables = config_service.get_config("tables")
+    tables = config_service.get_config(table)
+    
+    if "params" in tables:
+        tables = {table: tables}
+
     table_results = {}
     for table_name, table_configs in tables.items():
         kwargs = table_configs.get("params", {})

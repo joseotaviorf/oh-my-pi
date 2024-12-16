@@ -1,0 +1,110 @@
+dag:
+  name: hubspot
+  schedule_start_date: 2020, 12, 21
+  schedule_interval: 0 21 * * *
+  owner: Data Rede
+  documentation:
+    dag_purpose: This DAG imports objects and pipeline information from HubSpot, a CRM service widely used in Rede.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_hubspot_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{{ ds }}"
+  default_partitions: [year, month, day]
+  tables_customization:
+    company:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - company
+    contact:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - contact
+    deal:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - deal
+    ticket:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - ticket
+    deal_pipeline:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - deal_pipeline
+    ticket_pipeline:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - ticket_pipeline
+    team:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - team
+    owner:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - owner
+    email:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - email
+    marketing_email:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - marketing_email
+    marketing_email_event:
+      extraction_type: incremental
+      date_filter_column: created_at
+      extra_spark_job_arguments:
+        - marketing_email_event
+    marketing_campaign:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - marketing_campaign
+    call:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - call
+    communication:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - communication
+    meeting:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - meeting
+    note:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - note
+    task:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - task
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.8xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+  custom_libraries:
+    - whl: "{artifacts_bucket}/hubspot-api-client-python/quintoandar_hubspot_api_client-0.2.0-py2.py3-none-any.whl"
