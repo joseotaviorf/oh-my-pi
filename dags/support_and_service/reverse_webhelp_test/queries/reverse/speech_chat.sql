@@ -26,7 +26,6 @@ WITH message_summary AS (
   LEFT JOIN
     datalake_support_users.analysts AS a
       ON cht.worker_email = a.email
-    datalake_customer_support.chats AS cht
   LEFT JOIN
     datalake_customer_support.tickets AS t
       ON t.id_session = cht.id_session

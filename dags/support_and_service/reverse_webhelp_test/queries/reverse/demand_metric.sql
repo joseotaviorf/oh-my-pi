@@ -1,5 +1,5 @@
 SELECT DISTINCT
-  ft.sk_ticket AS sk_task,
+  CAST(ft.sk_ticket AS STRING) AS sk_task,
   ft.sk_last_analyst AS sk_agent,
   ft.sla_target,
   'email' AS channel,
