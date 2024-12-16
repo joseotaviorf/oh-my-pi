@@ -1,21 +1,21 @@
-*                                                                       @quintoandar/bi-etl-ejuice-code-owners
-.woodpecker/**                                                          @quintoandar/data-ingestion-code-owners
-.drone.yml                                                              @quintoandar/data-ingestion-code-owners
-Makefile                                                                @quintoandar/data-ingestion-code-owners
-bietlejuice/base/airflow/**                                             @quintoandar/data-ingestion-code-owners
-bietlejuice/base/athena/**                                              @quintoandar/data-ingestion-code-owners
-bietlejuice/base/hive/**                                                @quintoandar/data-ingestion-code-owners
-bietlejuice/base/service/**                                             @quintoandar/data-ingestion-code-owners
-bietlejuice/base/spark/**                                               @quintoandar/data-ingestion-code-owners
-bietlejuice/loaders/**                                                  @quintoandar/data-ingestion-code-owners
-bietlejuice/metastore_pipeline/**                                       @quintoandar/data-ingestion-code-owners
-bietlejuice/pipeline/**                                                 @quintoandar/data-ingestion-code-owners
-dags/**/metric_*                                                        @quintoandar/bi-etl-ejuice-metric-layer-code-owners
-dags/platform/**                                                        @quintoandar/data-ingestion-code-owners
-scripts/ci_cd/**                                                        @quintoandar/data-ingestion-code-owners
-CODEOWNERS                                                              @quintoandar/data-ingestion-code-owners
-dags/primitives/                                                        @quintoandar/personalization @quintoandar/copilot-ds
-dags/mlops/                                                             @quintoandar/mlcops
-dags/governance/looker_temp*/                                           @quintoandar/data-ops-governance
-dags/growth/enrich_vespucio_pipeline/**                                 @quintoandar/atlas-db-code-owners
-dags/growth/zordominium_vespucio_plugin/**                              @quintoandar/atlas-db-code-owners
+*                                                                         @quintoandar/data-platform-engineering
+# .woodpecker/**                                                          @quintoandar/data-ingestion-code-owners
+# .drone.yml                                                              @quintoandar/data-ingestion-code-owners
+# Makefile                                                                @quintoandar/data-ingestion-code-owners
+# bietlejuice/base/airflow/**                                             @quintoandar/data-ingestion-code-owners
+# bietlejuice/base/athena/**                                              @quintoandar/data-ingestion-code-owners
+# bietlejuice/base/hive/**                                                @quintoandar/data-ingestion-code-owners
+# bietlejuice/base/service/**                                             @quintoandar/data-ingestion-code-owners
+# bietlejuice/base/spark/**                                               @quintoandar/data-ingestion-code-owners
+# bietlejuice/loaders/**                                                  @quintoandar/data-ingestion-code-owners
+# bietlejuice/metastore_pipeline/**                                       @quintoandar/data-ingestion-code-owners
+# bietlejuice/pipeline/**                                                 @quintoandar/data-ingestion-code-owners
+# dags/**/metric_*                                                        @quintoandar/bi-etl-ejuice-metric-layer-code-owners
+# dags/platform/**                                                        @quintoandar/data-ingestion-code-owners
+# scripts/ci_cd/**                                                        @quintoandar/data-ingestion-code-owners
+# CODEOWNERS                                                              @quintoandar/data-ingestion-code-owners
+# dags/primitives/                                                        @quintoandar/personalization @quintoandar/copilot-ds
+# dags/mlops/                                                             @quintoandar/mlcops
+# dags/governance/looker_temp*/                                           @quintoandar/data-ops-governance
+# dags/growth/enrich_vespucio_pipeline/**                                 @quintoandar/atlas-db-code-owners
+# dags/growth/zordominium_vespucio_plugin/**                              @quintoandar/atlas-db-code-owners
