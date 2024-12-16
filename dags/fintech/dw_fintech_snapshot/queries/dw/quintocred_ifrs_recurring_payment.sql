@@ -4,6 +4,7 @@ SELECT
     sk_propose_20,
     sk_transaction,
     sk_key,
+    id_bill,
     client_cpf_cnpj,
     dt_register,
     dt_due,
