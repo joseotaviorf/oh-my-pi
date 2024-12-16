@@ -1,10 +1,9 @@
 dag:
-    name: enrich_support_and_service_kpis_targets
-    schedule_start_date: 2022, 1, 16
-    owner: Data SS
-    documentation:
-      dag_purpose:
-        Transform the KPIs target gsheets to a readable and mergeable format to insert on LookML.
+  name: enrich_support_and_service_kpis_targets
+  schedule_start_date: 2022, 1, 16
+  owner: Data SS
+  documentation:
+    dag_purpose: Transform the KPIs target gsheets to a readable and mergeable format to insert on LookML.
 workflow:
   type: query
   layer: enrich
@@ -12,4 +11,4 @@ workflow:
     kpis_target:
       extraction_type: full
 cluster:
-  type: databricks_13_3_min_general_cluster
+  type: databricks_13_3_med_general_cluster

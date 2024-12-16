@@ -21,4 +21,4 @@ workflow:
     attendee:
       date_filter_column: updated_at
 cluster:
-  type: databricks_12_2_min_general_cluster
+  type: databricks_12_2_med_general_cluster
