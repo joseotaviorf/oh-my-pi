@@ -48,6 +48,7 @@ workflow:
         - ticket_pipeline
     team:
       extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - team
     owner:
@@ -72,6 +73,7 @@ workflow:
         - marketing_email_event
     marketing_campaign:
       extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
         - marketing_campaign
     call:
