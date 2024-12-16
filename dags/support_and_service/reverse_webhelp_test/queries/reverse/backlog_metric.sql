@@ -1,5 +1,5 @@
 SELECT
-  ftb.sk_ticket,
+  CAST(ftb.sk_ticket AS STRING) AS sk_ticket,
   ftb.sk_analyst AS sk_agent,
   'email' AS channel,
   dit.status,

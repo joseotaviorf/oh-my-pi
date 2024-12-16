@@ -71,7 +71,7 @@ LEFT JOIN
     ON ft.sk_last_analyst = da.sk_analyst
     OR ft.sk_last_analyst = da.sk_agent_twilio
 WHERE
-  DATE(ft.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
+  DATE(ft.ts_created) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
   AND dd.is_partner IS TRUE
   AND dd.front_or_back <> 'front'
   AND da.agent_organization IN ('webhelp', 'webhelpbr')

@@ -6,6 +6,9 @@ WITH time_metrics AS (
     total_talk_time / 60 AS total_minutes_talk_time
   FROM
     dw_customer_support.fact_customer_contacts
+  WHERE
+    DATE(ts_task_created) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH
+      AND DATE('{load_end_date}')
 ),
 front_tickets_list AS (
   SELECT DISTINCT
@@ -15,10 +18,7 @@ front_tickets_list AS (
     ft.sk_taxonomy,
     da.agent_organization,
     COALESCE(da.email, da2.email) AS email,
-    CASE
-      WHEN ft.channel = 'email' THEN 'email'
-      ELSE ft.channel
-    END AS channel,
+    ft.channel,
     CASE
       WHEN ft.ticket_origin = 'call inapp' THEN UPPER(ft.direction)
       WHEN ft.ticket_origin IN ('call inbound', 'chat5a') THEN 'INBOUND'

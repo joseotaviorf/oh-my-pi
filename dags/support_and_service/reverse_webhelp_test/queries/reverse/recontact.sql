@@ -6,6 +6,9 @@ WITH time_metrics AS (
     total_talk_time / 60 AS total_minutes_talk_time
   FROM
     dw_customer_support.fact_customer_contacts
+  WHERE
+    DATE(ts_task_created) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH
+      AND DATE('{load_end_date}')
 ),
 front_tickets_list AS (
   SELECT DISTINCT
