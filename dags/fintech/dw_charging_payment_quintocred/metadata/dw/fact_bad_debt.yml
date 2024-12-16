@@ -1,0 +1,94 @@
+database_name: dw_charging_payment_quintocred
+table_name: fact_bad_debt
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  origin_table:
+    description: "Source table of payment information for each line. Possible tables : Omie, Payment, Invoice (direct billing information), Delinquency and Sap"
+  origin_platform:
+    description: "IF the sk_propose is less than 5000000 then PLATAFORM_2.0 else PLATAFORM_3.0"
+  sk_propose:
+    description: "Proposal ID related to payment information"
+  sk_propose_20:
+    description: "Proposal ID related to payment information"
+  sk_transaction:
+    description: "Delinquency ID from the delinquency table"
+  sk_key:
+    description: "ID created according to the source sk_transaction (omie, sap, asaas), sk_delinquency (delinquency), sk_propose + id billing_report (direct billing)"
+  id_type:
+     description: ""
+  id_type_class:
+     description: ""
+  client_cpf_cnpj:
+    description: "For 3.0 cases, it will be the delinquency entry id, for 2.0 cases, it will be the delinquency id."
+  bill_item:
+    description: "discrimination of delinquency entry (condominium, energy bill, contractual termination fine, fire insurance, garbage fee, gas bill, IPTU, others, damage to property, rent, water bill)"
+  provisional_group:
+    description: "column that identifies whether the delinquency refers to Guarantee or Termination"
+  type_delinquency:
+    description: "identifies if the delinquency is RENEWAL or SIGNATURE"
+  type_delinquency_zoom:
+    description: "add the DIRECT BILLING to the type_delinquency classification"
+  payment_classification:
+    description: "Indicates whether the delinquency is still 'PENDING' or if the payment was made in the reference month 'PAID IN THE REFENRENCE MONTH', 'OTHER' for other cases"
+  due_amount:
+    description: "Amount of the original unpaid charge."
+  paid_amount:
+    description: "Delinquency amount paid"
+  open_amount:
+    description: "Difference between the amount paid and the original invoice amount"
+  discount_value:
+    description: "value of the discount given when paying the delinquency"
+  valor_pacote:
+    description: "total value of the package (rent + condo + water+IPTU+etc)"
+  perc_considered_base:
+    description: "The amount that must be paid proportionally from the issuance of the delinquency until the present time"
+  perc_considered: 
+    description: "Adjustment for when the contract is active and the renewal has already passed 12 months. The full delinquency is considered, but it is not considered a new bad debt for the month"
+  due_amount_new_bad_debt:
+    description: "calculates the new delinquency amount based on the contract status, valid renewal, and due date, considering proportional division or total amount as applicable"
+  open_amount_proportional:
+    description: "calculates the open amount proportionally"
+  open_amount_new_bad_debt:
+    description: "calculates the open amount proportionally for the bad debt cases"
+  is_renewal_to_add_new_bad_debt:
+    description: ""
+  is_emitted_at_reference_month:
+    description : ""
+  is_danos_imovel:
+    description: "column that identifies whether the delinquency refers to a charge for damage to the property"
+  is_contract_active:
+    description: "column that identifies whether the contract is active"
+  is_delinquency_renovacao:
+    description: "column that signals whether it is a Renewal delinquency"
+  is_perdao_divida:
+    description: "column that indicates whether it is a delinquency whose debt was forgiven"
+  dias_atraso:
+    description: ""
+  days_late_bad_debt:
+    description: ""
+  mobs_valid_renewal_base:
+    description: ""
+  mobs_valid_renewal: 
+    description: ""
+  mob_bad_debt:
+    description: ""
+  mob_bad_debt_payment:
+    description: ""
+  dt_reference_month:
+    description: ""
+  dt_closing:
+    description: ""
+  dt_register:
+    description: "Delinquency creation date"
+  dt_due:
+    description: "Due date of the original invoice that became delinquent"
+  dt_paid:
+    description: "Date of the most recent payment of the default."
+  dt_contract_started:
+    description: "contract start date"
+  dt_contract_ended:
+    description: "Contract cancellation date"
+  ts_load:
+    description: "Timestamp when the data was loaded"

@@ -13,6 +13,8 @@ workflow:
       - quintocred_ifrs_recurring_payment
     quintocred_aging_recurring_payment_renewal:
       - quintocred_ifrs_recurring_payment
+    quintocred_bad_debt:
+      - quintocred_ifrs_recurring_payment
   default_partitions: ["year", "month", "day"]
   default_extraction_type: incremental
   has_load_to_redshift_task: false
@@ -39,6 +41,9 @@ workflow:
       custom_schema: fintech_auditing
     quintocred_payment_full:
       custom_schema: fintech_auditing
+    quintocred_bad_debt:
+      custom_schema: fintech_auditing
+      extraction_type: full
 cluster:
   type: databricks_12_2_med_general_photon_cluster
   access_control_list:

@@ -95,6 +95,7 @@ bietlejuice.dw_business_unit_region:
 bietlejuice.dw_buyer_prospect:
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect
 bietlejuice.dw_charging_payment_quintocred:
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-omie-client
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
@@ -520,6 +521,7 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-recurring-payment-renewal
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-occurrence
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency
 bietlejuice.dw_hiring:
   - bietlejuice.enrich_workable:load-enrich-cost-center
   - bietlejuice.enrich_workable:load-enrich-custom-fields
