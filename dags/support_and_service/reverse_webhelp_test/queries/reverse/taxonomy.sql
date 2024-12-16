@@ -1,8 +1,8 @@
 WITH base AS (
   SELECT
-    NULLIF(frc.sk_ticket, -1) AS sk_ticket,
-    frc.channel,
-    frc.ts_created,
+    NULLIF(fcc.sk_ticket, -1) AS sk_ticket,
+    fcc.channel,
+    fcc.ts_task_created AS ts_created,
     dd.department,
     dd.front_or_back,
     dt.customer_type_tag AS customer_type,
@@ -11,30 +11,24 @@ WITH base AS (
     dt.theme_detail,
     dt.journey,
     dt.sub_journey,
-    CASE
-      WHEN da.agent_organization = 'atn' THEN 'atento'
-      WHEN da.agent_organization = 'atento' THEN 'atento'
-      WHEN da.agent_organization = 'webhelp' THEN 'webhelp'
-      WHEN da.agent_organization = 'webhelpbr' THEN 'webhelp'
-      WHEN da.agent_organization = 'quintoandar.com' THEN 'quintoandar'
-      WHEN da.agent_organization = 'quintoandar' THEN 'quintoandar'
-      WHEN da.agent_organization = 'contractors' THEN 'webhelp'
-      ELSE da.agent_organization
-    END AS agent_organization,
+    da.agent_organization,
     da.email
   FROM
-    dw_customer_support.fact_received_contact AS frc
+    dw_customer_support.fact_customer_contacts AS fcc
+  LEFT JOIN
+    dw_customer_support.dim_ticket AS dit
+      ON dit.sk_ticket = fcc.sk_ticket
   LEFT JOIN
     dw_customer_support.dim_department AS dd
-      ON dd.sk_department = frc.sk_department
+      ON dd.sk_department = fcc.sk_department
   LEFT JOIN
     dw_customer_support.dim_taxonomy AS dt
-      ON dt.sk_taxonomy = frc.sk_taxonomy
+      ON dit.sk_taxonomy = dt.sk_taxonomy
   LEFT JOIN
-    dw_customer_support.dim_agent AS da
-      ON da.email = frc.agent_email
+    dw_customer_support.dim_analyst AS da
+      ON da.sk_analyst = fcc.sk_analyst
   WHERE
-    frc.channel IN ('chat', 'call', 'email')
+    fcc.channel IN ('chat', 'call', 'email')
 )
 SELECT DISTINCT
   sk_ticket,

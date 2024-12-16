@@ -5,7 +5,7 @@ SELECT DISTINCT
   dmt.origin AS channel,
   dmt.status,
   da.email AS agent_email,
-  da.agent_organization,
+  da.agent_organization AS agent_company,
   dd.department,
   dd.journey_step,
   dd.front_or_back,
@@ -29,10 +29,9 @@ SELECT DISTINCT
   dmt.ts_started,
   dmt.ts_solved,
   dmt.ts_closed,
-  dti.ticket_via,
   YEAR(CURRENT_DATE - 1) AS year,
   MONTH(CURRENT_DATE - 1) AS month,
-  DAY(CURRENT_DATE - 1) AS day,
+  DAY(CURRENT_DATE1 - 1) AS day,
   NOW() AS ts_load
 FROM
   dw_customer_support.fact_demand_metrics_tasks AS dmt
@@ -48,9 +47,6 @@ LEFT JOIN
 LEFT JOIN
   dw_customer_support.dim_agent AS da
     ON dmt.sk_agent = da.sk_agent
-LEFT JOIN
-  dw_customer_support.dim_ticket AS dti
-    ON dti.sk_ticket = dmt.sk_task
 WHERE
   DATE(dmt.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
   AND dd.is_partner IS TRUE

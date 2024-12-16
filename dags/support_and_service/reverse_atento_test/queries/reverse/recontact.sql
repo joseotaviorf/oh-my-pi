@@ -52,10 +52,10 @@ front_tickets_list AS (
     dw_customer_support.dim_taxonomy AS dt
       ON ft.sk_taxonomy = dt.sk_taxonomy
   LEFT JOIN
-    dw_customer_support.dim_agent as da
-      ON ft.sk_last_analyst = da.sk_agent
+    dw_customer_support.dim_analyst as da
+      ON ft.sk_last_analyst = da.sk_analyst
   LEFT JOIN
-    dw_customer_support.dim_agent as da2
+    dw_customer_support.dim_analyst as da2
       ON ft.sk_last_analyst = da2.sk_agent_twilio
   WHERE
     ft.sk_user IS NOT NULL
