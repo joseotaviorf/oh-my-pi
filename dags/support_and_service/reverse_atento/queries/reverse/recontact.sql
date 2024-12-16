@@ -1,4 +1,16 @@
-WITH front_tickets_list AS (
+WITH time_metrics AS (
+  SELECT DISTINCT
+    sk_ticket,
+    total_handling_time / 60 AS total_minutes_handling_time,
+    total_waiting_time / 60 AS total_minutes_queue_time,
+    total_talk_time / 60 AS total_minutes_talk_time
+  FROM
+    dw_customer_support.fact_customer_contacts
+  WHERE
+    DATE(ts_task_created) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH
+      AND DATE('{load_end_date}')
+),
+front_tickets_list AS (
   SELECT DISTINCT
     ft.sk_ticket,
     ft.sk_user,
@@ -8,10 +20,10 @@ WITH front_tickets_list AS (
     COALESCE(da.email, da2.email) AS email,
     ft.channel,
     CASE
-      WHEN ft.ticket_origin = 'call inapp' THEN UPPER(dc.direction)
+      WHEN ft.ticket_origin = 'call inapp' THEN UPPER(ft.direction)
       WHEN ft.ticket_origin IN ('call inbound', 'chat5a') THEN 'INBOUND'
       WHEN ft.ticket_origin = 'call outbound' THEN 'OUTBOUND'
-      ELSE UPPER(dc.direction)
+      ELSE UPPER(ft.direction)
     END AS refined_direction,
     dd.team,
     dd.department,
@@ -19,29 +31,32 @@ WITH front_tickets_list AS (
     ft.ticket_origin,
     dt.theme,
     dt.theme_detail,
-    ft.csat_score,
-    ft.total_minutes_handling_time,
-    ft.total_minutes_queue_time,
-    ft.total_minutes_talk_time,
-    DATE_ADD(DAY, -3, ft.ts_started) AS search_window_from,
-    ft.ts_started
+    ftc.last_csat_score AS csat_score,
+    tm.total_minutes_handling_time,
+    tm.total_minutes_queue_time,
+    tm.total_minutes_talk_time,
+    DATE_ADD(DAY, -3, ft.ts_created) AS search_window_from,
+    ft.ts_created AS ts_started
   FROM
-    dw_customer_support.fact_ticket AS ft
+    dw_customer_support.fact_tickets AS ft
+  LEFT JOIN
+    dw_satisfaction_rating.fact_ticket_csat AS ftc
+      ON ftc.sk_ticket = ft.sk_ticket
+  LEFT JOIN
+    time_metrics AS tm
+      ON tm.sk_ticket = ft.sk_ticket
   LEFT JOIN
     dw_customer_support.dim_department AS dd
       ON ft.sk_main_department = dd.sk_department
   LEFT JOIN
-    dw_customer_support.dim_channel AS dc
-      ON ft.sk_channel = dc.sk_channel
-  LEFT JOIN
     dw_customer_support.dim_taxonomy AS dt
       ON ft.sk_taxonomy = dt.sk_taxonomy
   LEFT JOIN
-    dw_customer_support.dim_agent as da
-      ON ft.sk_last_agent = da.sk_agent
+    dw_customer_support.dim_analyst as da
+      ON ft.sk_last_analyst = da.sk_analyst
   LEFT JOIN
-    dw_customer_support.dim_agent as da2
-      ON ft.sk_last_agent = da2.sk_agent_twilio
+    dw_customer_support.dim_analyst as da2
+      ON ft.sk_last_analyst = da2.sk_agent_twilio
   WHERE
     ft.sk_user IS NOT NULL
     AND dd.area = 'CX'
@@ -112,13 +127,16 @@ WITH front_tickets_list AS (
 ),
 demand_back_FRC AS (
   SELECT DISTINCT
-    ft.ts_started,
+    ft.ts_created AS ts_started,
     ft.ts_solved,
     ft.sk_ticket,
     ft.sk_user,
     dd.department AS department_back,
     dd.team AS team_back,
-    dc.channel,
+    CASE
+      WHEN ft.channel = 'email' THEN 'email'
+      ELSE ft.channel
+    END AS channel,
     CAST(ft.sk_user AS STRING) || '-' ||
     CASE
       WHEN dd.department IN(
@@ -131,13 +149,10 @@ demand_back_FRC AS (
       THEN 'front'
     END AS unificador_back
   FROM
-    dw_customer_support.fact_ticket AS ft
+    dw_customer_support.fact_tickets AS ft
   INNER JOIN
     dw_customer_support.dim_department AS dd
       ON ft.sk_main_department = dd.sk_department
-  INNER JOIN
-    dw_customer_support.dim_channel AS dc
-      ON ft.sk_channel = dc.sk_channel
   WHERE
     ft.sk_user IS NOT NULL
     AND dd.area = 'CX'
@@ -149,7 +164,7 @@ demand_back_FRC AS (
       'CX Pagamentos Ativo [POS] [BACK] [PAY]',
       'Alteração de dados bancários [BACK]')
     AND dd.front_or_back = 'back'
-    AND ft.ts_started >= CURRENT_DATE - INTERVAL '6' month
+    AND ft.ts_created >= CURRENT_DATE - INTERVAL '6' month
 )
 SELECT
   rc.sk_ticket,

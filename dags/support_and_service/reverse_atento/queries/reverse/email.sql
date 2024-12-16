@@ -1,24 +1,27 @@
 WITH email_base AS (
   SELECT DISTINCT
     ft.sk_ticket,
-    cs.channel,
-    da.agent_organization,
     CASE
-      WHEN ft.ts_solved_local is not null then 1
+      WHEN ft.channel = 'email' THEN 'email'
+      ELSE NULL
+    END AS channel,
+    da.agent_organization AS agent_organization,
+    CASE
+      WHEN ft.ts_solved is not null then 1
       ELSE 0
     END AS is_solved,
     CASE
       WHEN dzu.role = 'agent' then 1
         ELSE 0
     END AS is_created_by_agent,
-    ac.email AS agent_email,
-    ac.agent_company AS cost_center,
-    gdc.team AS team,
+    da.email AS agent_email,
+    da.agent_organization AS cost_center,
+    dc.team AS team,
     ft.replies,
-    ft.minutes_first_reply_time_business,
-    ft.minutes_requester_wait_time_business,
-    ft.minutes_full_resolution_time_business,
-    CASE WHEN ft.minutes_first_reply_time_business <= 1440 then 1
+    ft.reply_time_min_business AS minutes_first_reply_time_business,
+    ft.requester_wait_time_min_business AS minutes_requester_wait_time_business,
+    ft.full_resolution_time_min_business AS minutes_full_resolution_time_business,
+    CASE WHEN ft.first_resolution_time_min_business <= 1440 then 1
       ELSE 0
     END AS sla_achieved_6biz_hr,
     CASE
@@ -58,36 +61,34 @@ WITH email_base AS (
       WHEN dt.tags NOT LIKE '%closed_by_merge%' then 1
       ELSE 0
     END AS has_merged_tags,
-    cs.front_or_back AS front_or_back,
-    cs.main_department AS main_department,
-    HOUR(cs.ts_started) AS hour_started,
-    HOUR(ft.ts_solved_local) AS hour_solved,
-    ft.ts_solved_local,
-    cs.ts_started
-  FROM dw_tickets.fact_tickets AS ft
-    LEFT JOIN
-      dw_customer_support.dim_ticket AS dt
-        ON dt.sk_ticket = ft.sk_ticket
-    LEFT JOIN
-      dw_customer_support.dim_zendesk_user AS dzu
-        ON ft.sk_zendesk_submitter_user = dzu.sk_zendesk_user
-    LEFT JOIN
-      dw_customer_support.dim_department gdc
-        ON dt.group_name = gdc.department
-    LEFT JOIN
-        dw_customer_support.dim_agent ac
-          ON ft.sk_agent = ac.sk_agent
-    LEFT JOIN
-      dw_customer_support.fact_ticket AS cs
-        ON ft.sk_ticket = cs.sk_ticket
-    LEFT JOIN
-      dw_customer_support.dim_agent AS da
-        ON da.sk_agent = ft.sk_agent
+    t.front_or_back AS front_or_back,
+    t.last_queue AS main_department,
+    HOUR(ft.ts_created) AS hour_started,
+    HOUR(ft.ts_solved) AS hour_solved,
+    ft.ts_solved AS ts_solved_local,
+    ft.ts_created AS ts_started
+  FROM
+    dw_customer_support.fact_tickets AS ft
+  LEFT JOIN
+    datalake_customer_support.tickets AS t
+      ON CAST(t.id_ticket AS BIGINT) = ft.sk_ticket
+  LEFT JOIN
+    dw_customer_support.dim_ticket AS dt
+      ON dt.sk_ticket = ft.sk_ticket
+  LEFT JOIN
+    dw_customer_support.dim_zendesk_user AS dzu
+      ON ft.sk_zendesk_submitter_user = dzu.sk_zendesk_user
+  LEFT JOIN
+    dw_customer_support.dim_department AS dc
+      ON dt.group_name = dc.department
+  LEFT JOIN
+    dw_customer_support.dim_analyst AS da
+      ON da.sk_analyst = ft.sk_last_analyst
   WHERE
-    cs.channel IN ('email', 'form_faq', 'web', 'other')
-    AND (DATE(ft.ts_solved_local) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH AND DATE('{load_end_date}')
-      OR DATE(cs.ts_started) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH AND DATE('{load_end_date}'))
-    AND team IS NOT NULL
+    t.channel IN ('email', 'email', 'form_faq', 'web', 'other', 'whatsapp')
+    AND (DATE(ft.ts_solved) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH AND DATE('{load_end_date}')
+      OR DATE(ft.ts_created) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH AND DATE('{load_end_date}'))
+    AND dc.team IS NOT NULL
 )
 SELECT
   sk_ticket,
@@ -145,5 +146,6 @@ WHERE
     'CX Rescisão e Vistoria [OFF] [POS] [FRONT]',
     '[MX] CX Front [front] [pre] [pos]',
     '[MX] CX Back [back] [pre] [pos]' ,
-    'PARTNERS/CIQ [FRONT] [PRE]')
+    'PARTNERS/CIQ [FRONT] [PRE]'
+  )
 GROUP BY ALL

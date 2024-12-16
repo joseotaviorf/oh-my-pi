@@ -3480,16 +3480,18 @@ bietlejuice.metric_ss__tickets:
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-zendesk-user
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
-  - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
-  - bietlejuice.enrich_customer_support:load-enrich-call
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
+  - bietlejuice.enrich_customer_support:load-enrich-calls
   - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
   - bietlejuice.enrich_support_users:load-enrich-analysts
@@ -3511,20 +3513,6 @@ bietlejuice.reverse_atento_access:
   - bietlejuice.reverse_atento:load-reverse-tickets-transferred
   - bietlejuice.reverse_atento:load-reverse-tmr
   - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
-bietlejuice.reverse_atento_test:
-  - bietlejuice.bigfone:load-clean-call
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-zendesk-user
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
-  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
-  - bietlejuice.enrich_customer_support:load-enrich-calls
-  - bietlejuice.enrich_support_users:load-enrich-analysts
-  - bietlejuice.quinto_messenger:load-clean-channel
-  - bietlejuice.quinto_messenger:load-clean-channel-event
 bietlejuice.reverse_atlas_pricing_report_access:
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-engagement
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-listing-price-history
