@@ -6,52 +6,29 @@ WITH locale_ids AS (
     datalake_gsheets_clean.cod_locale
   GROUP BY 1
 ),
-entry_duplicates_removal AS (
-
-    SELECT
-        id_invoice,
-        id_contract,
-        id_external AS id_entry,
-        id_external_reversed_entry,
-        bill_item,
-        amount,
-        accrual_year_month,
-        due_year_month,
-        ts_created
-    FROM
-        datalake_retsuko.entry
-    QUALIFY
-        ROW_NUMBER()
-            OVER(PARTITION BY id_contract, id_external_reversed_entry, COALESCE(id_invoice, accrual_year_month), bill_item ORDER BY ts_created DESC) = 1
-
-),
 remove_reversed AS (
 
     SELECT
-    e.id_entry,
-    CASE
-        WHEN
-            SUM(e.amount)
-                OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
+      e.id_external AS id_entry,
+      CASE
+        WHEN SUM(e.amount) OVER(PARTITION BY e.id_contract, e.accrual_year_month,e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
         THEN TRUE
-        WHEN
-            LEAD(e.id_entry)
-                OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created) IS NOT NULL
+        WHEN LEAD(e.id_external) OVER(PARTITION BY e.id_contract, e.accrual_year_month,e.bill_item ORDER BY e.ts_created) IS NOT NULL
         THEN TRUE
         ELSE FALSE
-    END AS is_reversed,
-    CASE
+      END AS is_reversed,
+      CASE
         WHEN
-            SUM(e.amount)
-                OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
-            AND
-                LEAD(e.ts_created)
-                    OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created) IS NULL
+          SUM(e.amount)
+            OVER(PARTITION BY e.id_contract, e.accrual_year_month, e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
+          AND
+            LEAD(e.ts_created)
+              OVER(PARTITION BY e.id_contract, e.accrual_year_month, e.bill_item ORDER BY e.ts_created) IS NULL
         THEN e.ts_created
-        ELSE LEAD(e.ts_created) OVER(PARTITION BY e.id_contract, COALESCE(e.id_invoice,e.accrual_year_month),e.bill_item ORDER BY e.ts_created)
-        END AS ts_entry_reversed
+        ELSE LEAD(e.ts_created) OVER(PARTITION BY e.id_contract, e.accrual_year_month, e.bill_item ORDER BY e.ts_created)
+      END AS ts_entry_reversed
     FROM
-        entry_duplicates_removal AS e
+      datalake_retsuko.entry AS e
 
 ),
 next_business_day AS (
