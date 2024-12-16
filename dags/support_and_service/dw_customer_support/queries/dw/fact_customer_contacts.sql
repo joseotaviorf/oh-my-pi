@@ -51,6 +51,7 @@ twilio_demand AS (
     CASE
       WHEN ends_in_abandon IS TRUE
         AND ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_reservation_created DESC) = 1 THEN 'abandoned'
+      WHEN is_call_answered IS FALSE THEN 'abandoned'
       WHEN ends_in_abandon IS FALSE
         AND ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_reservation_created DESC) = 1 THEN 'completed'
       ELSE 'transferred'
@@ -123,7 +124,7 @@ twilio_demand AS (
   FROM
     datalake_customer_support.chats
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}'- INTERVAL 30 DAY AND '{load_end_date}'
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 30 DAY AND '{load_end_date}'
 ),
 twilio_contacts AS (
   SELECT DISTINCT
@@ -139,8 +140,10 @@ twilio_contacts AS (
     MD5(d.worker_email) AS sk_analyst,
     d.id_session AS sk_session,
     d.id_task AS sk_task,
+    d.id_reservation AS sk_reservation,
     MAX(CAST(COALESCE(t1.id_ticket, t2.id_ticket, t3.id_ticket) AS BIGINT)) OVER (PARTITION BY d.id_task) AS sk_ticket,
     CAST(d.id_user AS BIGINT) AS sk_user,
+    d.worker_email,
     d.queue_name,
     d.channel,
     d.direction,
@@ -199,10 +202,12 @@ front_contacts AS (
     sk_interaction,
     sk_session,
     sk_task,
+    sk_reservation,
     COALESCE(sk_ticket, -1) AS sk_ticket,
     COALESCE(sk_user, -1) AS sk_user,
     sk_department,
     sk_analyst,
+    worker_email,
     direction,
     channel,
     origin,
@@ -244,10 +249,12 @@ front_contacts AS (
     MD5(CONCAT(t.id_ticket, 'email')) AS sk_interaction,
     NULL AS sk_session,
     NULL AS sk_task,
+    NULL AS sk_reservation,
     CAST(t.id_ticket AS BIGINT) AS sk_ticket,
     COALESCE(t.id_user_main, -1) AS sk_user,
     MD5(COALESCE(t.last_queue, "NULL")) AS sk_department,
     MD5(COALESCE(t.last_analyst_email, "NULL")) AS sk_analyst,
+    analyst_email AS worker_email,
     'inbound' AS direction,
     'email' AS channel,
     NULL AS origin,
@@ -296,6 +303,7 @@ SELECT DISTINCT
   sk_interaction,
   sk_session,
   sk_task,
+  sk_reservation,
   COALESCE(sk_ticket, -1) AS sk_ticket,
   COALESCE(sk_user, -1) AS sk_user,
   LAG(sk_department) OVER(PARTITION BY sk_contact ORDER BY ts_task_created) AS sk_prev_department,
@@ -308,6 +316,7 @@ SELECT DISTINCT
   channel,
   origin,
   status,
+  worker_email,
   completion_reason,
   quinto_andar_phone_number,
   customer_phone_number,
