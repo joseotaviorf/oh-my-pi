@@ -9,7 +9,6 @@ workflow:
   type: custom_ingestion
   layer: raw
   load_spark_job: load_{extraction_type}_data_into_datalake_raw
-  default_partitions: ["year", "month", "day"]
   default_extraction_type: incremental
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
@@ -25,6 +24,7 @@ workflow:
       extraction_type: full
     issues:
       extraction_type: incremental
+      partitions: [ "year", "month", "day" ]
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:
