@@ -1,7 +1,7 @@
 database_name: datalake_jira_clean
 table_name: issues
-description: 
-domain: governance
+description:
+domain: Data Governance
 owner: giuseppe.giovanelli@quintoandar.com.br
 columns:
   change_log:
