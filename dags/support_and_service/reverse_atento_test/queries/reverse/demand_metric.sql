@@ -16,14 +16,14 @@ SELECT DISTINCT
   dt.customer_type_tag,
   dt.step_tag,
   dit.tags AS tag,
-  ft.days_elapsed_business AS time_spent_solved_within_sla,
+  CAST(ft.days_elapsed_business AS BIGINT) AS time_spent_solved_within_sla,
   CASE
-    WHEN ft.days_elapsed_business >= ft.sla_target THEN ft.days_elapsed_business - ft.sla_target
+    WHEN ft.days_elapsed_business >= ft.sla_target THEN CAST(ft.days_elapsed_business - ft.sla_target AS BIGINT)
     ELSE 0
   END AS time_spent_solved_with_exceed_sla,
-  ft.days_elapsed_business AS days_worked,
-  ft.days_off,
-  ft.days_elapsed_business AS leadtime_day,
+  CAST(ft.days_elapsed_business AS BIGINT) AS days_worked,
+  CAST(ft.days_off AS BIGINT) AS days_off,
+  CAST(ft.days_elapsed_business AS BIGINT) AS leadtime_day,
   CASE
     WHEN ft.days_elapsed_business <= ft.sla_target THEN TRUE
     ELSE FALSE
