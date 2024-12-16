@@ -1,16 +1,22 @@
 dag:
-    name: enrich_bigfone_events
-    schedule_start_date: 2020, 8, 29
-    owner: Data SS
-    documentation:
-        dag_purpose: |
-            Prepares [Bigfone](github.com/quintoandar/big-fone) data for business utilization. [Bigfone](https://github.com/quintoandar/big-fone)
-            is a system responsible for interacting with Twilio (an external service) to manage calls, peers and store data used to generate
-            some reports. Also, it acts as a central place to identify a person, adding info from Skynet, Akinator, Timeline (from Stalker) and Akinator.
+  name: enrich_bigfone_events
+  schedule_start_date: 2020, 8, 29
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Prepares [Bigfone](github.com/quintoandar/big-fone) data for business utilization. [Bigfone](https://github.com/quintoandar/big-fone)
+      is a system responsible for interacting with Twilio (an external service) to manage calls, peers and store data used to generate
+      some reports. Also, it acts as a central place to identify a person, adding info from Skynet, Akinator, Timeline (from Stalker) and Akinator.
 workflow:
-    type: query_delta
-    layer: enrich
-    default_extraction_type: incremental
-    default_partitions: ["year", "month", "day"]
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
 cluster:
-    type: databricks_12_2_med_general_photon_cluster
+  type: databricks_12_2_med_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

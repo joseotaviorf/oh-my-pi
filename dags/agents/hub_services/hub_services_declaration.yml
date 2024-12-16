@@ -1,10 +1,9 @@
----
 dag:
   name: hub_services
   schedule_start_date: 2021, 8, 10
   schedule_interval: 0 0 * * *
   owner: Data Agents
-  documentation: 
+  documentation:
     dag_purpose: This DAG imports the tables from [HubServices](https://github.com/quintoandar/hubs), a service that centralizes hub data.
 workflow:
   type: database_pull_delta
@@ -81,7 +80,7 @@ workflow:
       date_filter_column: updated_at
     visitor:
       date_filter_column: updated_at
-      raw_extraction_type: incremental 
+      raw_extraction_type: incremental
       clean_extraction_type: full
     visitor_aud:
       date_filter_column: updated_at
@@ -99,3 +98,9 @@ workflow:
       date_filter_column: updated_at
 cluster:
   type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

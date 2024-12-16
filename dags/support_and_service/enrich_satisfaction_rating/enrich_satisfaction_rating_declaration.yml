@@ -14,22 +14,14 @@ workflow:
   default_partitions: [year, month, day]
   inner_dependencies:
     satisfaction_answers:
-      - bigfone_surveys
-      - chat_fup_surveys
-      - gsheets_surveys
-      - survicate_surveys
-      - zendesk_surveys
+    - bigfone_surveys
+    - chat_fup_surveys
+    - gsheets_surveys
+    - survicate_surveys
+    - zendesk_surveys
     tables_customization:
       satisfaction_answers:
-        z_order_by:
-          [
-            id_ticket,
-            id_contract,
-            id_survey,
-            id_answer,
-            id_respondent,
-            id_origin,
-          ]
+        z_order_by: [id_ticket, id_contract, id_survey, id_answer, id_respondent, id_origin]
       bigfone_surveys:
         z_order_by: [id_ticket, id_answer, id_contract, id_user]
       chat_fup_surveys:
@@ -37,15 +29,7 @@ workflow:
       gsheets_surveys:
         z_order_by: [id_answer, id_contract, id_survey]
       survicate_surveys:
-        z_order_by:
-          [
-            id_ticket,
-            id_contract,
-            id_survey,
-            id_answer,
-            id_respondent,
-            id_origin,
-          ]
+        z_order_by: [id_ticket, id_contract, id_survey, id_answer, id_respondent, id_origin]
       zendesk_surveys:
         z_order_by: [id_ticket, id_answer, id_contract, id_respondent]
 
@@ -58,3 +42,8 @@ cluster:
     num_workers: 2
     aws_attributes:
       availability: ON_DEMAND
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

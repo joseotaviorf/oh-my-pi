@@ -11,7 +11,7 @@ workflow:
   layer: enrich
   default_extraction_type: incremental
   default_partitions: [year, month, day]
-  extra_query_template_params:  
+  extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
   tables_customization:
     access_logs:
@@ -25,6 +25,10 @@ cluster:
     spark_version: 12.2.x-scala2.12
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
   access_control_list:
     group_name: software-engineers
     permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new

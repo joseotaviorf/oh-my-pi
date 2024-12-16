@@ -1,34 +1,38 @@
 dag:
-    name: enrich_zendesk
-    owner: Data SS
-    documentation:
-        dag_purpose: |
-            This DAG comprises all the logic on ticket and ticket metrics from Zendesk.
+  name: enrich_zendesk
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG comprises all the logic on ticket and ticket metrics from Zendesk.
 
 workflow:
-    type: query_delta
-    layer: enrich
-    inner_dependencies:
-        tickets_current:
-            - ticket_metrics
-            - tickets
-    default_extraction_type: incremental
-    default_partitions: ["year", "month", "day"]
-    tables_customization:
-        tickets_curent:
-            extraction_type: full
-            z_order_by: [id_ticket]
-        tickets_metric:
-            z_order_by: [id_ticket]
-        tickets:
-            z_order_by: [id_ticket]
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    tickets_current:
+    - ticket_metrics
+    - tickets
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  tables_customization:
+    tickets_curent:
+      extraction_type: full
+      z_order_by: [id_ticket]
+    tickets_metric:
+      z_order_by: [id_ticket]
+    tickets:
+      z_order_by: [id_ticket]
 
 cluster:
-    type: custom_cluster
-    custom_configurations:
-        driver_node_type_id: r5a.2xlarge
-        node_type_id: r5a.8xlarge
-        spark_version: 13.3.x-scala2.12
-        num_workers: 6
-        spark_conf:
-            spark.sql.mapKeyDedupPolicy: "LAST_WIN"
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.8xlarge
+    spark_version: 13.3.x-scala2.12
+    num_workers: 6
+    spark_conf:
+      spark.sql.mapKeyDedupPolicy: "LAST_WIN"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new

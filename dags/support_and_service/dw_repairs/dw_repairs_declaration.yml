@@ -15,13 +15,7 @@ workflow:
       z_order_by: [sk_ticket]
       merge_on: [sk_ticket]
     fact_repair_ongoing:
-      z_order_by: [
-        sk_ticket,
-        sk_request,
-        sk_contract,
-        sk_user,
-        sk_agent,
-        sk_budget_sender]
+      z_order_by: [sk_ticket, sk_request, sk_contract, sk_user, sk_agent, sk_budget_sender]
       merge_on: [sk_ticket]
 cluster:
   type: custom_cluster
@@ -30,3 +24,8 @@ cluster:
     driver_node_type_id: r6gd.4xlarge
     node_type_id: r6gd.4xlarge
     num_workers: 2
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

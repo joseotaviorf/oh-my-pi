@@ -1,12 +1,18 @@
 dag:
-    name: enrich_webhelp_reports
-    schedule_start_date: 2023, 9, 22
-    owner: Data SS
-    documentation: 
-        dag_purpose: |
-            Reverse webhelp context enrichment table. The objective of this table is to be able to maintain daily monitoring of the execution of the bases.
+  name: enrich_webhelp_reports
+  schedule_start_date: 2023, 9, 22
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Reverse webhelp context enrichment table. The objective of this table is to be able to maintain daily monitoring of the execution of the bases.
 workflow:
-    type: query_delta
-    layer: enrich
+  type: query_delta
+  layer: enrich
 cluster:
-    type: databricks_13_3_med_general_cluster
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

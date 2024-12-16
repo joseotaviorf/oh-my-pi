@@ -1,18 +1,23 @@
 dag:
-    name: enrich_listing_jobs
-    schedule_start_date: 2021, 8, 24
-    owner: Data SS
-    documentation:
-        dag_purpose: |
-            Creates enriched tables for the context `Listing Jobs` of multiple sources.
+  name: enrich_listing_jobs
+  schedule_start_date: 2021, 8, 24
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Creates enriched tables for the context `Listing Jobs` of multiple sources.
 workflow:
-    type: query_delta
-    layer: enrich
+  type: query_delta
+  layer: enrich
 
 cluster:
-    type: custom_cluster
-    custom_configurations:
-        driver_node_type_id: r5a.2xlarge
-        node_type_id: r5a.xlarge
-        spark_version: 13.3.x-scala2.12
-        num_workers: 2
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.xlarge
+    spark_version: 13.3.x-scala2.12
+    num_workers: 2
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

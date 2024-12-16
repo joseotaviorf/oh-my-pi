@@ -1,61 +1,66 @@
 dag:
-    name: enrich_ss_logic_model
-    schedule_start_date: 2023, 7, 12
-    owner: Data SS
-    documentation:
-        dag_purpose: |
-            "This DAG main responsibility is to provide the most important S&S Metrics by Persona, \n
-            where persona is the user type, that can be a property owner, tenant, broker, \n
-            photographer, pp multi, prospect, among others. It provides a daily snapshot."
+  name: enrich_ss_logic_model
+  schedule_start_date: 2023, 7, 12
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      "This DAG main responsibility is to provide the most important S&S Metrics by Persona, \n
+      where persona is the user type, that can be a property owner, tenant, broker, \n
+      photographer, pp multi, prospect, among others. It provides a daily snapshot."
 
 workflow:
-    type: query_delta
-    layer: enrich
-    inner_dependencies:
-        user_ss_metrics:
-            - user_app_installed_metric
-            - user_csat_bot_metric
-            - user_csat_human_metric
-            - user_csi_metric
-            - user_recontact_metric
-    tables_customization:
-        user_app_installed_metric:
-            partitions: [year, month, day]
-            extraction_type: incremental
-            z_order_by: [id_user, id_snapshot]
-        user_csat_bot_metric:
-            partitions: [year, month, day]
-            extraction_type: incremental
-            z_order_by: [id_user, id_snapshot]
-        user_csat_human_metric:
-            partitions: [year, month, day]
-            extraction_type: incremental
-            z_order_by: [id_user, id_snapshot]
-        user_csi_metric:
-            partitions: [year, month, day]
-            extraction_type: incremental
-            z_order_by: [id_user, id_snapshot]
-        user_recontact_metric:
-            partitions: [year, month, day]
-            extraction_type: incremental
-            z_order_by: [id_user, id_snapshot]
-        user_ss_metrics:
-            partitions: [year, month, day]
-            extraction_type: incremental
-            z_order_by: [id_user, id_snapshot]
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    user_ss_metrics:
+    - user_app_installed_metric
+    - user_csat_bot_metric
+    - user_csat_human_metric
+    - user_csi_metric
+    - user_recontact_metric
+  tables_customization:
+    user_app_installed_metric:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      z_order_by: [id_user, id_snapshot]
+    user_csat_bot_metric:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      z_order_by: [id_user, id_snapshot]
+    user_csat_human_metric:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      z_order_by: [id_user, id_snapshot]
+    user_csi_metric:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      z_order_by: [id_user, id_snapshot]
+    user_recontact_metric:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      z_order_by: [id_user, id_snapshot]
+    user_ss_metrics:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      z_order_by: [id_user, id_snapshot]
 
 cluster:
-    type: custom_cluster
-    custom_configurations:
-        autotermination_minutes: 20
-        driver_node_type_id: m5d.4xlarge
-        node_type_id: m5d.4xlarge
-        runtime_engine: PHOTON
-        spark_version: 13.3.x-scala2.12
-        num_workers: 5
-        aws_attributes:
-            first_on_demand: 1
-            spot_bid_price_percent: 100
-            zone_id: us-east-1d
-            availability: SPOT_WITH_FALLBACK
-            ebs_volume_size: 200
+  type: custom_cluster
+  custom_configurations:
+    autotermination_minutes: 20
+    driver_node_type_id: m5d.4xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    spark_version: 13.3.x-scala2.12
+    num_workers: 5
+    aws_attributes:
+      first_on_demand: 1
+      spot_bid_price_percent: 100
+      zone_id: us-east-1d
+      availability: SPOT_WITH_FALLBACK
+      ebs_volume_size: 200
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

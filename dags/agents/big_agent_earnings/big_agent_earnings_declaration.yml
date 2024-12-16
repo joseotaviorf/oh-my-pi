@@ -1,10 +1,9 @@
----
 dag:
   name: big_agent_earnings
   schedule_start_date: 2020, 12, 21
   schedule_interval: 0 0 * * *
   owner: Data Agents
-  documentation: 
+  documentation:
     dag_purpose: |
       This DAG imports data from [Big Agent](https://github.com/quintoandar/big-agent), which is an internal microservice responsible for handling the agent and house relationship.
       This DAG is triggered by Airflow and all the output tables are ingested via Incremental load and they are partitioned by year, month and day columns.
@@ -48,3 +47,8 @@ cluster:
     node_type_id: r5a.xlarge
     num_workers: 2
     spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

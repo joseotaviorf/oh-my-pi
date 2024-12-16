@@ -1,39 +1,44 @@
 dag:
-    name: enrich_landlord_journey
-    schedule_start_date: 2023, 7, 2
-    owner: Data SS
-    documentation:
-        dag_purpose: |
-            This DAG creates an enriched table containing the Tenant Journey Step.
-            The respective table is a comprehensive record of customer journey steps, which is
-            designed to categorize the progress of customers as they engage with the rental
-            context.
-            Each row in the table represents a specific customer and their journey
-            through various stages or actions.
-            The primary purpose of this table is to capture and organize important milestones
-            and interactions that customers go through during their experience with the rental
-            context. It provides a snapshot view of the different steps involved in the
-            customer journey.
+  name: enrich_landlord_journey
+  schedule_start_date: 2023, 7, 2
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG creates an enriched table containing the Tenant Journey Step.
+      The respective table is a comprehensive record of customer journey steps, which is
+      designed to categorize the progress of customers as they engage with the rental
+      context.
+      Each row in the table represents a specific customer and their journey
+      through various stages or actions.
+      The primary purpose of this table is to capture and organize important milestones
+      and interactions that customers go through during their experience with the rental
+      context. It provides a snapshot view of the different steps involved in the
+      customer journey.
 workflow:
-    type: query_delta
-    layer: enrich
-    default_extraction_type: incremental
-    default_partitions: ["year", "month", "day"]
-    tables_customization:
-        landlord_journey_step:
-            z_order_by: [id_owner, id_snapshot]
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  tables_customization:
+    landlord_journey_step:
+      z_order_by: [id_owner, id_snapshot]
 cluster:
-    type: custom_cluster
-    custom_configurations:
-        autotermination_minutes: 20
-        driver_node_type_id: m5d.4xlarge
-        node_type_id: m5d.4xlarge
-        runtime_engine: PHOTON
-        spark_version: 13.3.x-scala2.12
-        num_workers: 4
-        aws_attributes:
-            first_on_demand: 1
-            spot_bid_price_percent: 100
-            zone_id: us-east-1d
-            availability: SPOT_WITH_FALLBACK
-            ebs_volume_size: 200
+  type: custom_cluster
+  custom_configurations:
+    autotermination_minutes: 20
+    driver_node_type_id: m5d.4xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    spark_version: 13.3.x-scala2.12
+    num_workers: 4
+    aws_attributes:
+      first_on_demand: 1
+      spot_bid_price_percent: 100
+      zone_id: us-east-1d
+      availability: SPOT_WITH_FALLBACK
+      ebs_volume_size: 200
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new
