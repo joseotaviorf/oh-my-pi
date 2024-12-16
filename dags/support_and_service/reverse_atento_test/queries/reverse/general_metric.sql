@@ -2,7 +2,7 @@ SELECT DISTINCT
   ft.sk_ticket,
   ft.sk_last_analyst AS sk_agent,
   CASE
-    WHEN ft.channel = 'cs email' THEN  'email'
+    WHEN ft.channel = 'email' THEN  'email'
     ELSE ft.channel
   END AS channel,
   ftc.first_csat_score AS csat_score,

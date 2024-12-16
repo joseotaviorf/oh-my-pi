@@ -115,9 +115,8 @@ non_twilio_tickets AS (
         AND it.tags NOT LIKE '%call_contato_ativo%'
         AND it.tags NOT LIKE '%redirecionado_adm_v1%'
         AND it.id_call IS NULL
-        AND it.id_session IS NULL THEN 'cs email'
-      ELSE it.channel
-    END AS channel
+        AND it.id_session IS NULL THEN 'email'
+      WHEN it.channel = 'email' THEN 'zendesk email'
   FROM
     incoming_tickets AS it
   LEFT JOIN
@@ -557,7 +556,7 @@ ticket_metrics AS (
           'Rescisão 1 [OFF] [POS] [BACK]'
         )
         AND t.ticket_origin != 'call outbound' THEN TRUE
-      WHEN t.channel IN ('cs email', 'whatsapp')
+      WHEN t.channel IN ('email', 'whatsapp')
         AND t.front_or_back IN ('front', 'back')
         AND DATE(t.ts_solved) >= DATE('2022-01-01')
         AND t.contact_theme_detail_tag IS NOT NULL

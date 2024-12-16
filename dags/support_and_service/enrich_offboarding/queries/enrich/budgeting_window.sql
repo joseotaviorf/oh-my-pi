@@ -52,7 +52,7 @@ WITH tickets AS (
             'Rescisão Prime [Casa Mineira]',
              'B2B Prime [OFF] [POS] [BACK]'
         )
-        AND t.channel = 'cs email'
+        AND t.channel = 'email'
 ),
 last_ticket_in_contract AS (
     SELECT

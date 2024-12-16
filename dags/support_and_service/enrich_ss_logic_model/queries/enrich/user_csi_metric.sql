@@ -15,7 +15,7 @@ WITH base_tickets AS (
       DATE(ts_solved) <= DATE('{year}-{month}-{day}')
       OR DATE(ts_solved) IS NULL
     )
-    AND channel = 'cs email'
+    AND channel = 'email'
 ),
 csi_tickets AS (
   SELECT

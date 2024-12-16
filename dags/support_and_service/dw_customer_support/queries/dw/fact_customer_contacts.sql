@@ -295,7 +295,7 @@ front_contacts AS (
       ON ce.email = usr.email
   WHERE
     MAKE_DATE(t.year, t.month, t.day) BETWEEN '{load_start_date}'- INTERVAL 30 DAY AND '{load_end_date}'
-    AND t.channel = 'cs email'
+    AND t.channel = 'email'
     AND front_or_back = 'front'
 )
 SELECT DISTINCT

@@ -3,7 +3,7 @@ SELECT DISTINCT
   da.email,
   dd.team,
   CASE
-    WHEN ft.channel = 'cs email' THEN  'email'
+    WHEN ft.channel = 'email' THEN  'email'
     ELSE ft.channel
   END AS channel,
   dd.department AS main_department,

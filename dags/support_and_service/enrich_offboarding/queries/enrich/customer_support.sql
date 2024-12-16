@@ -37,7 +37,7 @@ customer_support_cte AS (
         t.id_user_main > 0
         AND dc.journey_step = 'Offboarding'
         AND t.ts_created >= '2021-01-01'
-        AND t.channel = 'cs email'
+        AND t.channel = 'email'
     GROUP BY ALL
 )
 SELECT

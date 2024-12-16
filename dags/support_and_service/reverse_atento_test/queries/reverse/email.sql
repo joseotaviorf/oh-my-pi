@@ -2,7 +2,7 @@ WITH email_base AS (
   SELECT DISTINCT
     ft.sk_ticket,
     CASE
-      WHEN ft.channel = 'cs email' THEN 'email'
+      WHEN ft.channel = 'email' THEN 'email'
       ELSE NULL
     END AS channel,
     da.agent_organization AS agent_organization,
@@ -85,7 +85,7 @@ WITH email_base AS (
     dw_customer_support.dim_analyst AS da
       ON da.sk_analyst = ft.sk_last_analyst
   WHERE
-    t.channel IN ('cs email', 'email', 'form_faq', 'web', 'other', 'whatsapp')
+    t.channel IN ('email', 'email', 'form_faq', 'web', 'other', 'whatsapp')
     AND (DATE(ft.ts_solved) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH AND DATE('{load_end_date}')
       OR DATE(ft.ts_created) BETWEEN DATE_TRUNC('MONTH', DATE('{load_start_date}')) - INTERVAL '6' MONTH AND DATE('{load_end_date}'))
     AND dc.team IS NOT NULL

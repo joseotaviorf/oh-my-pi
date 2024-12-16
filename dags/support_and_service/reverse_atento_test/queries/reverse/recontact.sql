@@ -16,7 +16,7 @@ front_tickets_list AS (
     da.agent_organization,
     COALESCE(da.email, da2.email) AS email,
     CASE
-      WHEN ft.channel = 'cs email' THEN 'email'
+      WHEN ft.channel = 'email' THEN 'email'
       ELSE ft.channel
     END AS channel,
     CASE
@@ -134,7 +134,7 @@ demand_back_FRC AS (
     dd.department AS department_back,
     dd.team AS team_back,
     CASE
-      WHEN ft.channel = 'cs email' THEN 'email'
+      WHEN ft.channel = 'email' THEN 'email'
       ELSE ft.channel
     END AS channel,
     CAST(ft.sk_user AS STRING) || '-' ||
