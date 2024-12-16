@@ -1,0 +1,74 @@
+---
+database_name: datalake_gsheets
+table_name: rental_supply_budget
+description: Table that consolidates rental supply budget from gsheets.
+domain: For Rent
+owner: uilson.bonfim@quintoandar.com.br
+columns:
+  available_qualifieds:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.available_qualifieds
+      - datalake_gsheets_clean.rent_supply_budget_2025.available_qualifieds
+    description: "Count of available qualified prospects"
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.city_group
+      - datalake_gsheets_clean.rent_supply_budget_2025.city_group
+    description: "City group"
+  company_report_origin:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.company_report_origin
+      - datalake_gsheets_clean.rent_supply_budget_2025.company_report_origin
+    description: "Company report origin"
+  dt_budget:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.dt_budget
+      - datalake_gsheets_clean.rent_supply_budget_2025.date
+    description: "Budget date"
+  first_listings:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.first_listings
+      - datalake_gsheets_clean.rent_supply_budget_2025.first_listings
+    description: "Count of first listings"
+  lead_processing_operation:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.lead_processing_operation
+    description: "Lead processing operation"
+  opportunities:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.opportunities
+      - datalake_gsheets_clean.rent_supply_budget_2025.opportunities
+    description: "Count of opportunities"
+  planning_cluster:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.planning_cluster
+      - datalake_gsheets_clean.rent_supply_budget_2025.planning_cluster
+    description: "Planning cluster"
+  planning_conversion:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.planning_conversion
+      - datalake_gsheets_clean.rent_supply_budget_2025.planning_conversion
+    description: "Planning conversion"
+  planning_operation:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.planning_operation
+      - datalake_gsheets_clean.rent_supply_budget_2025.planning_operation
+    description: "Planning operation"
+  planning_taxonomy:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.planning_taxonomy
+    description: "Planning taxonomy"
+  prospects:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.prospects
+      - datalake_gsheets_clean.rent_supply_budget_2025.prospects
+    description: "Count of prospects"
+  qualifieds:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.qualifieds
+      - datalake_gsheets_clean.rent_supply_budget_2025.qualifieds
+    description: "Count of qualified prospects"
+  supply_mkt_origin_detailed:
+    lineage:
+      - datalake_gsheets_clean.rent_supply_budget_2024.supply_mkt_origin_detailed
+    description: "Supply market origin detailed"

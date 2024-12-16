@@ -1926,12 +1926,22 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2022
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024-cohort
+  - bietlejuice.gsheets_for_rent_targets:done-clean-ongoing-listings-targets-2025
+  - bietlejuice.gsheets_for_rent_targets:done-clean-rent-demand-budget-2024
+  - bietlejuice.gsheets_for_rent_targets:done-clean-rent-demand-budget-2025
+  - bietlejuice.gsheets_for_rent_targets:done-clean-rent-ongoing-listings-budget-2024
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025-cohort
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
   - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets-2024
   - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets-bps-2024
+  - bietlejuice.gsheets_for_sale:done-clean-sale-supply-budget-2024
+  - bietlejuice.gsheets_for_sale:done-clean-sale-supply-budget-2025
   - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets-2024
+  - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets-2025
+  - bietlejuice.gsheets_for_sale:done-clean-sale-supply-targets-cohort-2024
+  - bietlejuice.gsheets_growth_targets:done-clean-rent-supply-budget-2024
+  - bietlejuice.gsheets_growth_targets:done-clean-rent-supply-budget-2025
   - bietlejuice.gsheets_growth_targets:done-clean-rent-supply-targets-cohort-2025
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2022
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024

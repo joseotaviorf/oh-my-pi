@@ -1,0 +1,73 @@
+database_name: datalake_gsheets
+table_name: ongoing_listings_target
+description: Table consolidating rent ongoing listings metrics.
+domain: For Rent
+owner: uilson.bonfim@quintoandar.com.br
+columns:
+  business_context:
+    lineage:
+      - datalake_gsheets_clean.rent_ongoing_listings_budget_2024.business_context
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.business_context
+    description: "Business context of the listing"
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.rent_ongoing_listings_budget_2024.city_group
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.city_group
+    description: "City group"
+  dt_budget:
+    lineage:
+      - datalake_gsheets_clean.rent_ongoing_listings_budget_2024.dt_budget
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.date
+    description: "Date of the target or budget entry"
+  depublications:
+    lineage:
+      - datalake_gsheets_clean.rent_ongoing_listings_budget_2024.depublications
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.depublications
+    description: "Number of listings depublished"
+  ended_rentals:
+    lineage:
+      - datalake_gsheets_clean.rent_ongoing_listings_budget_2024.ended_rentals
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.ended_rentals
+    description: "Number of rentals that ended"
+  erc:
+    lineage:
+      - datalake_gsheets_clean.rent_ongoing_listings_budget_2024.erc
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.erc
+    description: "Estimated rental capacity"
+  new_first_rental:
+    lineage:
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.new_first_rental
+    description: "Number of new first rentals (null for 2024 budget)"
+  new_rental:
+    lineage:
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.new_rental
+    description: "Number of new rentals (null for 2024 budget)"
+  ongoing_listings:
+    lineage:
+      - datalake_gsheets_clean.rent_ongoing_listings_budget_2024.ongoing_listings
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.ongoing_listings
+    description: "Number of ongoing listings"
+  ongoing_rentals:
+    lineage:
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.ongoing_rentals
+    description: "Number of ongoing rentals (null for 2024 budget)"
+  recovered:
+    lineage:
+      - datalake_gsheets_clean.rent_ongoing_listings_budget_2024.recovered
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.recovered
+    description: "Number of recovered listings"
+  relisting:
+    lineage:
+      - datalake_gsheets_clean.rent_ongoing_listings_budget_2024.relisting
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.relisting
+    description: "Number of relistings"
+  rental_administrator:
+    lineage:
+      - datalake_gsheets_clean.rent_ongoing_listings_budget_2024.rental_administrator
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.rental_administrator
+    description: "Rental administrator responsible for the listing"
+  suspensions:
+    lineage:
+      - datalake_gsheets_clean.rent_ongoing_listings_budget_2024.suspensions
+      - datalake_gsheets_clean.ongoing_listings_targets_2025.suspensions
+    description: "Number of listings suspended"

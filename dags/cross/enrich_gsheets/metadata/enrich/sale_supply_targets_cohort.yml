@@ -1,0 +1,84 @@
+---
+database_name: datalake_gsheets
+table_name: sale_supply_targets_cohort
+description: Table that consolidates sale supply cohort targets from gsheets.
+domain: For Sale
+owner: uilson.bonfim@quintoandar.com.br
+columns:
+  avq2opp:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.avq2opp
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.avq2opp
+    description: "Available qualified to opportunity conversion rate"
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.city_group
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.region
+    description: "City group or region"
+  company_report_origin:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.company_report_origin
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.company_report_origin
+    description: "Company report origin"
+  dt_week_started:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.dt_week_started
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.week_start
+    description: "Week start date"
+  fl:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.fl
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.fl
+    description: "First listings count"
+  lead_processing_operation:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.lead_processing_operation
+    description: "Lead processing operation"
+  opp2fl:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.opp2fl
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.opp2fl
+    description: "Opportunities to first listings conversion rate"
+  op2q:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.op2q
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.op2q
+    description: "Opportunities to qualified conversion rate"
+  planning_cluster:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.planning_cluster
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.planning_cluster
+    description: "Planning cluster"
+  planning_conversion:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.planning_conversion
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.planning_conversion
+    description: "Planning conversion"
+  planning_operation:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.planning_operation
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.planning_operation
+    description: "Planning operation"
+  planning_taxonomy:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.planning_taxonomy
+    description: "Planning taxonomy"
+  q2avq:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.q2avq
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.q2avq
+    description: "Qualified to available qualified conversion rate"
+  q2opp:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.q2opp
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.q2opp
+    description: "Qualified to opportunity conversion rate"
+  supply_mkt_origin_detailed:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.supply_mkt_origin_detailed
+    description: "Supply market origin detailed"
+  weeks_conversion:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2024.weeks_conversion
+      - datalake_gsheets_clean.sale_supply_targets_cohort_2025.weeks_conversion
+    description: "Weeks conversion data"

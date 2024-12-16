@@ -1,0 +1,81 @@
+database_name: datalake_gsheets
+table_name: rent_demand_budget
+description: Table consolidating rent demand budget metrics.
+domain: For Rent
+owner: uilson.bonfim@quintoandar.com.br
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.city_group
+      - datalake_gsheets_clean.rent_demand_budget_2025.city_group
+    description: "City group"
+  contracts_signed:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.contracts_signed
+      - datalake_gsheets_clean.rent_demand_budget_2025.contracts_signed
+    description: "Contracts signed"
+  credit_approved:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.credit_approved
+      - datalake_gsheets_clean.rent_demand_budget_2025.credit_approved
+    description: "Credit approved"
+  date:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.date
+      - datalake_gsheets_clean.rent_demand_budget_2025.date
+    description: "Raw date column"
+  dt_budget:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.date
+      - datalake_gsheets_clean.rent_demand_budget_2025.date
+    description: "Budget date"
+  documentation_sent:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.documentation_sent
+      - datalake_gsheets_clean.rent_demand_budget_2025.documentation_sent
+    description: "Documentation sent"
+  evaluation_positive:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.evaluation_positive
+      - datalake_gsheets_clean.rent_demand_budget_2025.evaluation_positive
+    description: "Positive evaluation"
+  evaluation_started:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.evaluation_started
+      - datalake_gsheets_clean.rent_demand_budget_2025.evaluation_started
+    description: "Evaluation started"
+  offers_accepted:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.offers_accepted
+      - datalake_gsheets_clean.rent_demand_budget_2025.offers_accepted
+    description: "Offers accepted"
+  offers_submitted:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.offers_submitted
+      - datalake_gsheets_clean.rent_demand_budget_2025.offers_submitted
+    description: "Offers submitted"
+  rent_flow_origin:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.rent_flow_origin
+      - datalake_gsheets_clean.rent_demand_budget_2025.rent_flow_origin
+    description: "Rent flow origin"
+  rental_administrator:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.rental_administrator
+      - datalake_gsheets_clean.rent_demand_budget_2025.rental_administrator
+    description: "Rental administrator"
+  visits_booked:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.visits_booked
+      - datalake_gsheets_clean.rent_demand_budget_2025.visits_booked
+    description: "Visits booked"
+  visits_completed:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.visits_completed
+      - datalake_gsheets_clean.rent_demand_budget_2025.visits_completed
+    description: "Visits completed"
+  business_type:
+    lineage:
+      - datalake_gsheets_clean.rent_demand_budget_2024.business_type
+      - datalake_gsheets_clean.rent_demand_budget_2025.business_type
+    description: "Business type"

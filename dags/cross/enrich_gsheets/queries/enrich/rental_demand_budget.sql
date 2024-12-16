@@ -1,0 +1,35 @@
+SELECT
+  city_group,
+  business_type,
+  rent_flow_origin,
+  rental_administrator,
+  visits_booked,
+  visits_completed,
+  offers_submitted,
+  offers_accepted,
+  evaluation_started,
+  evaluation_positive,
+  documentation_sent,
+  credit_approved,
+  contracts_signed,
+  dt_budget
+FROM
+  datalake_gsheets_clean.rent_demand_budget_2024
+UNION ALL
+SELECT
+  city_group,
+  business_type,
+  rent_flow_origin,
+  rental_administrator,
+  visits_booked,
+  visits_completed,
+  offers_submitted,
+  offers_accepted,
+  evaluation_started,
+  evaluation_positive,
+  documentation_sent,
+  credit_approved,
+  contracts_signed,
+  date AS dt_budget
+FROM
+  datalake_gsheets_clean.rent_demand_budget_2025

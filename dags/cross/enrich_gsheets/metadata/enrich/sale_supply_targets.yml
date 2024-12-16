@@ -1,0 +1,74 @@
+---
+database_name: datalake_gsheets
+table_name: sale_supply_targets
+description: Table that consolidates sale supply targets from gsheets.
+domain: For Sale
+owner: uilson.bonfim@quintoandar.com.br
+columns:
+  available_qualifieds:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.available_qualifieds
+      - datalake_gsheets_clean.sale_supply_targets_2025.available_qualifieds
+    description: "Available qualifieds count"
+  city_group:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.city_group
+      - datalake_gsheets_clean.sale_supply_targets_2025.city_group
+    description: "City group"
+  company_report_origin:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.company_report_origin
+      - datalake_gsheets_clean.sale_supply_targets_2025.company_report_origin
+    description: "Company report origin"
+  dt_target:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.dt_target
+      - datalake_gsheets_clean.sale_supply_targets_2025.date
+    description: "Target date"
+  first_listings:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.first_listings
+      - datalake_gsheets_clean.sale_supply_targets_2025.first_listings
+    description: "First listings count"
+  lead_processing_operation:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.lead_processing_operation
+    description: "Lead processing operation"
+  opportunities:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.opportunities
+      - datalake_gsheets_clean.sale_supply_targets_2025.opportunities
+    description: "Opportunities count"
+  planning_cluster:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.planning_cluster
+      - datalake_gsheets_clean.sale_supply_targets_2025.planning_cluster
+    description: "Planning cluster"
+  planning_conversion:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.planning_conversion
+      - datalake_gsheets_clean.sale_supply_targets_2025.planning_conversion
+    description: "Planning conversion"
+  planning_operation:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.planning_operation
+      - datalake_gsheets_clean.sale_supply_targets_2025.planning_operation
+    description: "Planning operation"
+  planning_taxonomy:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.planning_taxonomy
+    description: "Planning taxonomy"
+  prospects:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.prospects
+      - datalake_gsheets_clean.sale_supply_targets_2025.prospects
+    description: "Prospects count"
+  qualifieds:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.qualifieds
+      - datalake_gsheets_clean.sale_supply_targets_2025.qualifieds
+    description: "Qualified leads count"
+  supply_mkt_origin_detailed:
+    lineage:
+      - datalake_gsheets_clean.sale_supply_targets_2024.supply_mkt_origin_detailed
+    description: "Supply market origin detailed"
