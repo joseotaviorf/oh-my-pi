@@ -126,10 +126,12 @@ retsuko_pos AS (
         CASE
             WHEN e.bill_item = 'entry.bill-item/service-fee' THEN '420005'
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN '420002'
+            WHEN e.bill_item = 'entry.bill-item/pro-guarantor-5A-installment' THEN '420010'
         END AS revenue_account,
         CASE
             WHEN e.bill_item = 'entry.bill-item/service-fee' THEN 'service fee'
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN 'adm fee'
+            WHEN e.bill_item = 'entry.bill-item/pro-guarantor-5A-installment' THEN 'pro guarantor 5A installment'
         END AS revenue_name,
         e.accrual_year_month,
         MIN(CASE
@@ -167,7 +169,8 @@ retsuko_pos AS (
                   'adjustment-agreement-adm-fee',
                   'igpm-adm-fee',
                   'ipca-adm-fee',
-                  'service-fee'
+                  'service-fee',
+                  'pro-guarantor-5A-installment'
                   )
                 )
             )
@@ -206,6 +209,7 @@ retsuko_sum AS (
             WHEN e.bill_item = 'entry.bill-item/brokerage-quinto-andar' THEN 'brokerage quinto andar'
             WHEN e.bill_item = 'entry.bill-item/brokerage-installment-fee' THEN 'brokerage installment fee'
             WHEN e.bill_item = 'entry.bill-item/service-fee' THEN 'service fee'
+            WHEN e.bill_item = 'entry.bill-item/pro-guarantor-5A-installment' THEN 'pro guarantor 5A installment'
         END AS revenue_name,
         i.accrual_year_month,
         CAST(SUM(e.amount) AS DECIMAL(12,2)) AS source_amount
@@ -226,7 +230,8 @@ retsuko_sum AS (
                   'adjustment-agreement-adm-fee',
                   'igpm-adm-fee',
                   'ipca-adm-fee',
-                  'service-fee'
+                  'service-fee',
+                  'pro-guarantor-5A-installment'
                   )
                 )
             )
@@ -256,6 +261,7 @@ sap_gateway AS (
     SELECT DISTINCT
         f.id_finance_entity,
         f.id_feature,
+        hash,
         f.sync_sap_status,
         MIN(IF(s.status IN ('done', 'waiting-unified-invoice'), 'success', 'failed')) as sync_sap_job_status
     FROM
@@ -264,20 +270,22 @@ sap_gateway AS (
         datalake_sap_gateway.sync_sap_job s
             ON f.id_feature = s.id_feature
     WHERE
-        erp_solution = 'S4'
+        erp_solution IN ('S4', 'B1')
         AND type = 'NF'
     GROUP BY
-        1, 2, 3
+        1, 2, 3, 4
 ),
 
 sap AS (
     SELECT
         id_finance_entity,
+        hash,
         CASE
             WHEN account_number = '420005' THEN 'service fee'
             WHEN account_number = '420002' THEN 'adm fee'
             WHEN account_number = '420001' THEN 'brokerage quinto andar'
             WHEN account_number = '420004' THEN 'brokerage installment fee'
+            WHEN account_number = '420010' THEN 'pro guarantor 5A installment'
         END AS revenue_account,
         account_number,
         MAX(DATE(dt_created)) AS dt_sap_created,
@@ -290,7 +298,7 @@ sap AS (
         --AND transaction_type = 'DR'
         AND dt_reference >= '2024-01-01'
     GROUP BY
-        1, 2, 3
+        1, 2, 3, 4
 ),
 pre_df AS (
     SELECT
@@ -300,6 +308,7 @@ pre_df AS (
             WHEN r.revenue_name = 'brokerage quinto andar' THEN '2'
             WHEN r.revenue_name = 'service fee' THEN '3'
             WHEN r.revenue_name = 'brokerage installment fee' THEN '4'
+            WHEN r.revenue_name = 'pro guarantor 5A installment' THEN '5'
         END AS id_retsuko_invoice_issuance,
         r.id_business_entity,
         contract_type,
@@ -337,6 +346,7 @@ pre_df AS (
     LEFT JOIN
         sap s
             ON r.id_entity = s.id_finance_entity
+            OR sg.hash = s.hash
             AND r.revenue_name = s.revenue_account
 ),
 df AS (

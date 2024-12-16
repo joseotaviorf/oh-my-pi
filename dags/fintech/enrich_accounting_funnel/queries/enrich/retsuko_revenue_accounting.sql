@@ -25,7 +25,7 @@ retsuko AS (
         CASE
             WHEN e.bill_item IN ('entry.bill-item/rental-anticipation-fee') THEN '420019'
             WHEN e.bill_item IN ('entry.bill-item/property-damage-fine') THEN '420003'
-            WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment') THEN '211415'
+            --WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment') THEN '211415'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-partner-select',
             'entry.bill-item/brokerage-estate-agent', 'entry.bill-item/brokerage-third-party-real-estate') THEN '700005'
             WHEN e.bill_item IN ('entry.bill-item/adm-fee-adm-partner') THEN '700009'
@@ -33,7 +33,7 @@ retsuko AS (
         CASE
             WHEN e.bill_item IN ('entry.bill-item/rental-anticipation-fee') THEN 'rental anticipation fee'
             WHEN e.bill_item IN ('entry.bill-item/property-damage-fine') THEN 'property damage fine'
-            WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment') THEN 'pro guarantor 5A installment'
+            --WHEN e.bill_item IN ('entry.bill-item/pro-guarantor-5A-installment') THEN 'pro guarantor 5A installment'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-partner-select',
             'entry.bill-item/brokerage-estate-agent', 'entry.bill-item/brokerage-third-party-real-estate') THEN 'brokerage partners'
             WHEN e.bill_item IN ('entry.bill-item/adm-fee-adm-partner') THEN 'adm fee partner'
@@ -163,7 +163,7 @@ sap_gateway AS (
         datalake_sap_gateway.sync_sap_job s
             ON f.id_feature = s.id_feature
     WHERE
-        erp_solution = 'S4'
+        erp_solution IN ('S4', 'B1')
         AND type = 'LCM'
         AND status = 'done'
 ),
