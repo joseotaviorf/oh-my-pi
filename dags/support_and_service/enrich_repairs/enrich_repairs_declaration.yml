@@ -3,14 +3,13 @@ dag:
   schedule_start_date: 2023, 11, 24
   owner: Data SS
   documentation:
-    dag_purpose: This dag aims to execute the bases related to the repair flow.
+    dag_purpose: This dag aims to execute the bases related to the repair ongoing flow.
 workflow:
   type: query_delta
   layer: enrich
+  default_extraction_type: full
   tables_customization:
     repair_tickets:
-      partition_cols: ["year", "month", "day"]
-      extraction_type: full
       z_order_by: [id_ticket, id_request, id_contract]
       merge_on: [id_ticket]
 cluster:
