@@ -81,55 +81,59 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    credentials, scope = __get_auth(dbutils, credentials_scope, credentials_key)
-    gsheets_client = GoogleSheetsClient(credentials, scope)
-
-    scoped_credentials = build_scoped_credentials(credentials)
-    drive_service = build_drive_api_service(scoped_credentials)
-
-    gsheets_service = GsheetsService()
-
-    sheet_details_dict = {}
-    sheets_to_be_ingested = []
-
-    for raw_table_name, sheet_info in sheet_details.items():
-        sheet_details_dict[raw_table_name] = sheet_info
-        sheet_details_dict[raw_table_name]['dag_name'] = dag_name
-
-    success_run = True
-
-    try:
-        logger.info("m=__main__, msg=Checking which gsheet has to be ingested...")
-        recently_modified_gsheets_ids = gsheets_service.get_recently_modified_gsheet(
-            drive_service
-        )
-        import_range_gsheets_ids = gsheets_service.get_gsheets_with_import_range(
-            gsheets_client=gsheets_client, all_sheets_dict=sheet_details_dict
-        )
-
-        recently_modified_gsheets_ids_list = [
-            sheet_id for sheet_id in recently_modified_gsheets_ids
-        ]
-        ids_to_be_ingested_list = (
-            recently_modified_gsheets_ids_list + import_range_gsheets_ids
-        )
-
-        for raw_table_name, sheet_info in sheet_details.items():
-            sheet_id = sheet_info["sheet_id"]
-            if sheet_id in ids_to_be_ingested_list:
-                sheets_to_be_ingested.append(
-                    sheet_info["clean_table_name"]
-                )  # The DAG Builder actually uses the clean table name to attach raw and clean tasks together
-
-        logger.debug(
-            f"m=__main__, msg=Found {len(sheets_to_be_ingested)} gsheets to be ingested"
-        )
-    except Exception as e:
-        success_run = False
-        logger.error(f"m=__main__, msg=An exception occurred: {repr(e)}")
-    finally:
-        output_json = {
-            "success_run": success_run,
-            "sheets_to_be_ingested": sheets_to_be_ingested,
-        }
-        dbutils.notebook.exit(json.dumps(output_json))
+    output_json = {
+        "success_run": True,
+        "sheets_to_be_ingested": [],
+    }
+    # credentials, scope = __get_auth(dbutils, credentials_scope, credentials_key)
+    # gsheets_client = GoogleSheetsClient(credentials, scope)
+    #
+    # scoped_credentials = build_scoped_credentials(credentials)
+    # drive_service = build_drive_api_service(scoped_credentials)
+    #
+    # gsheets_service = GsheetsService()
+    #
+    # sheet_details_dict = {}
+    # sheets_to_be_ingested = []
+    #
+    # for raw_table_name, sheet_info in sheet_details.items():
+    #     sheet_details_dict[raw_table_name] = sheet_info
+    #     sheet_details_dict[raw_table_name]['dag_name'] = dag_name
+    #
+    # success_run = True
+    #
+    # try:
+    #     logger.info("m=__main__, msg=Checking which gsheet has to be ingested...")
+    #     recently_modified_gsheets_ids = gsheets_service.get_recently_modified_gsheet(
+    #         drive_service
+    #     )
+    #     import_range_gsheets_ids = gsheets_service.get_gsheets_with_import_range(
+    #         gsheets_client=gsheets_client, all_sheets_dict=sheet_details_dict
+    #     )
+    #
+    #     recently_modified_gsheets_ids_list = [
+    #         sheet_id for sheet_id in recently_modified_gsheets_ids
+    #     ]
+    #     ids_to_be_ingested_list = (
+    #         recently_modified_gsheets_ids_list + import_range_gsheets_ids
+    #     )
+    #
+    #     for raw_table_name, sheet_info in sheet_details.items():
+    #         sheet_id = sheet_info["sheet_id"]
+    #         if sheet_id in ids_to_be_ingested_list:
+    #             sheets_to_be_ingested.append(
+    #                 sheet_info["clean_table_name"]
+    #             )  # The DAG Builder actually uses the clean table name to attach raw and clean tasks together
+    #
+    #     logger.debug(
+    #         f"m=__main__, msg=Found {len(sheets_to_be_ingested)} gsheets to be ingested"
+    #     )
+    # except Exception as e:
+    #     success_run = False
+    #     logger.error(f"m=__main__, msg=An exception occurred: {repr(e)}")
+    # finally:
+    #     output_json = {
+    #         "success_run": success_run,
+    #         "sheets_to_be_ingested": sheets_to_be_ingested,
+    #     }
+    dbutils.notebook.exit(json.dumps(output_json))
