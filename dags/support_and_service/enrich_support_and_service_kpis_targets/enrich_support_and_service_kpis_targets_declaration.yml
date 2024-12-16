@@ -5,7 +5,7 @@ dag:
   documentation:
     dag_purpose: Transform the KPIs target gsheets to a readable and mergeable format to insert on LookML.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   tables_customization:
     kpis_target:

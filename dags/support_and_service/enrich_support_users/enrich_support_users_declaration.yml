@@ -6,11 +6,14 @@ dag:
         dag_purpose: |
             This DAG loads tables related to users in the Support context, this includes analysts, customers, and Zendesk general users.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     inner_dependencies:
         analysts:
             - zendesk_users
+    tables_customization:
+        zendesk_users:
+            z_order_by: [id_user_main]
 cluster:
     type: custom_cluster
     custom_configurations:
