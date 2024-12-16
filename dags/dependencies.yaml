@@ -305,10 +305,7 @@ bietlejuice.dw_crm_inspections:
 bietlejuice.dw_customer_support:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.bigfone:load-clean-ivr-closed-history
-  - bietlejuice.enrich_customer_demand:load-enrich-backlog-metrics
   - bietlejuice.enrich_customer_demand:load-enrich-backlog-metrics-tasks
-  - bietlejuice.enrich_customer_demand:load-enrich-demand-metrics
-  - bietlejuice.enrich_customer_demand:load-enrich-demand-metrics-tasks
   - bietlejuice.enrich_customer_resolution:load-enrich-customer-resolution-static
   - bietlejuice.enrich_customer_support:load-enrich-call
   - bietlejuice.enrich_customer_support:load-enrich-calls
@@ -3483,17 +3480,13 @@ bietlejuice.metric_ss__tickets:
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket-tags
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-zendesk-user
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-segment
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_tickets:load-dw-tickets-fact-tickets
   - bietlejuice.enrich_customer_support:load-enrich-call
@@ -3520,7 +3513,6 @@ bietlejuice.reverse_atento_access:
   - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.reverse_atento_test:
   - bietlejuice.bigfone:load-clean-call
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
@@ -3594,7 +3586,6 @@ bietlejuice.reverse_listings_report_load:
 bietlejuice.reverse_minority_report_ss:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
@@ -3689,16 +3680,12 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.enrich_tracksale_dispatches:load-enrich-true-offboarding-pp-dispatches
 bietlejuice.reverse_webhelp:
   - bietlejuice.bigfone:load-clean-call
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket-tags
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-segment
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events
   - bietlejuice.enrich_customer_support:load-enrich-call
@@ -3729,14 +3716,12 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
 bietlejuice.reverse_webhelp_test:
   - bietlejuice.bigfone:load-clean-call
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-segment
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets

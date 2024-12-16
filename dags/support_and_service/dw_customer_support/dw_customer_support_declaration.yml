@@ -13,7 +13,7 @@ workflow:
   default_extraction_type: full
   inner_dependencies:
     fact_tickets:
-    - fact_customer_contacts
+      - fact_customer_contacts
   tables_customization:
     fact_user_blocks:
       partitions: [year, month, day]
@@ -23,12 +23,6 @@ workflow:
       partitions: [year, month, day]
       extraction_type: incremental
       z_order_by: [sk_user, event_from, event_type, app]
-    fact_agent_ranking:
-      partitions: [year, month, day]
-      extraction_type: incremental
-    fact_agent_daily_productivity:
-      partitions: [year, month, day]
-      extraction_type: incremental
     fact_analysts_performance:
       partitions: [year, month, day]
       extraction_type: incremental
@@ -36,7 +30,19 @@ workflow:
     fact_sessions_chatbot:
       partitions: [year, month, day]
       extraction_type: incremental
-      z_order_by: [sk_session, sk_ticket, sk_user, sk_pipeline, sk_content, sk_contract, sk_survey, sk_answer, sk_started_chat, sk_ended_chat]
+      z_order_by:
+        [
+          sk_session,
+          sk_ticket,
+          sk_user,
+          sk_pipeline,
+          sk_content,
+          sk_contract,
+          sk_survey,
+          sk_answer,
+          sk_started_chat,
+          sk_ended_chat,
+        ]
       extra_query_template_params:
         load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"
         load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
@@ -77,6 +83,6 @@ cluster:
     spark_conf:
       spark.sql.broadcastTimeout: "600"
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
   databricks_conn_id: databricks_new
