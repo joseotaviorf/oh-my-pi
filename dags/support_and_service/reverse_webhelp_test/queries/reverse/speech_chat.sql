@@ -2,7 +2,11 @@ WITH message_summary AS (
   SELECT DISTINCT
     t.id_ticket,
     'BR' AS country_code,
+    t.id_ticket,
+    'BR' AS country_code,
     CAST(GET_JSON_OBJECT(evt.event_payload, '$.DateCreated') AS TIMESTAMP) AS ts_created_message,
+    cht.ts_created AS ts_ticket_started,
+    cht.ts_ended AS ts_ticket_ended,
     cht.ts_created AS ts_ticket_started,
     cht.ts_ended AS ts_ticket_ended,
     REPLACE(GET_JSON_OBJECT(evt.event_payload, '$.Body'), ';', ',') AS message,
@@ -22,7 +26,22 @@ WITH message_summary AS (
   LEFT JOIN
     datalake_support_users.analysts AS a
       ON cht.worker_email = a.email
+    datalake_customer_support.chats AS cht
+  LEFT JOIN
+    datalake_customer_support.tickets AS t
+      ON t.id_session = cht.id_session
+      AND t.channel = 'chat'
+  INNER JOIN
+    datalake_quinto_messenger_clean.channel AS ch
+      ON cht.id_session = ch.id_session
+  INNER JOIN
+    datalake_quinto_messenger_clean.channel_event AS evt
+      ON evt.id_channel = ch.id_channel
+  LEFT JOIN
+    datalake_support_users.analysts AS a
+      ON cht.worker_email = a.email
   WHERE
+    cht.queue_name IN (
     cht.queue_name IN (
       'CX Visitas [FRONT] [PRE]',
       'CX Propostas [FRONT] [PRE]',
@@ -55,7 +74,7 @@ WITH message_summary AS (
       'ProOwners [FRONT] [PRE] [POS]'
       )
     AND a.organization IN ('webhelp', 'webhelpbr')
-    AND DATE(cht.ts_ended) BETWEEN DATE('{load_start-date}') AND DATE('{load_end_date}')
+    AND DATE(cht.ts_ended) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
   id_ticket,
