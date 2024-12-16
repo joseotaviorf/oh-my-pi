@@ -33,9 +33,11 @@ def get_events_from_app_group(app_group_path, dbutils):
     )
     events = []
     for folder in data_export_folders:
-        events_in_folder = base_dbutils.discover_partition_values_in_path(
-            f"{app_group_path}/{folder}", dbutils
-        )
+        events_in_folder = [
+            partition_value[0] for partition_value in base_dbutils.discover_partition_values_in_path(
+                f"{app_group_path}/{folder}", dbutils, max_recursive_depth=1
+            )
+        ]
         events = list(set(events) | set(events_in_folder))
     return events
 

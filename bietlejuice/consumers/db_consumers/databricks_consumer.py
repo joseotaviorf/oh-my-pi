@@ -1,7 +1,10 @@
 from pyspark.sql.functions import col, lit
+from pyspark.sql.types import StructType, StructField, StringType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.consumers.db_consumers.db_consumer import DBConsumer
+from bietlejuice.services.metastore_services import SparkMetastoreService
+from pyspark.sql.utils import AnalysisException
 
 logger = QuintoAndarLogger("DatabricksConsumer")
 
@@ -100,6 +103,56 @@ class DatabricksConsumer(DBConsumer):
         :return: A Spark DataFrame with default col partition
         """
         query = f"SHOW PARTITIONS {self.conn_config['db']}.{table_name}"
-        df = self.spark_client.get_records(query)
+        try:
+            df = self.spark_client.get_records(query)
+        except AnalysisException as e:
+            if "UC_COMMAND_NOT_SUPPORTED" not in e.getErrorClass():
+                raise e
+            # Unity catalog doesn't support SHOW PARTITIONS, so we have to list them
+            # by searching the objects in the table path
+            df = self._get_partition_values_from_table_by_listing_objects(table_name)
 
         return df
+
+    def _get_partition_values_from_table_by_listing_objects(self, table_name):
+        """
+        Equivalent to running SHOW PARTITIONS, but for Unity Catalog. It recursively lists directories
+        and identifies partitions based on the directory structure.
+        """
+
+        # Import needs to be internal, otherwise this class is not serializable
+        # it must be serializable, since it is implicitly imported by a Spark job that uses parallelize
+        # (sync_metadata.py)
+        from bietlejuice.base.spark.base_spark import BaseDBUtils
+
+        base_dbutils = BaseDBUtils()
+        dbutils = base_dbutils.get_dbutils()
+        spark_metastore_service = SparkMetastoreService(self.spark_client)
+        location = spark_metastore_service.get_table_path(
+            self.conn_config["db"], table_name
+        )
+        partition_keys = [
+            key_tuple[0]
+            for key_tuple in spark_metastore_service.get_table_partition_keys(
+                self.conn_config["db"], table_name
+            )
+        ]
+        partition_values = base_dbutils.discover_partition_values_in_path(
+            location, dbutils, max_recursive_depth=len(partition_keys)
+        )
+        partition_values_formatted = []
+        for partition_value_list in partition_values:
+            partition_values_formatted.append(
+                [
+                    "/".join(
+                        [
+                            f"{key}={value}"
+                            for key, value in zip(partition_keys, partition_value_list)
+                        ]
+                    )
+                ]
+            )
+        return self.spark_client.create_dataframe(
+            partition_values_formatted,
+            StructType([StructField("partition", StringType())]),
+        )
