@@ -13,7 +13,11 @@ from pyspark.sql import DataFrame
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.api import APIEnum
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, SparkDataFrameService
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkTableStorageFormat,
+    SparkDataFrameService,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
@@ -33,10 +37,9 @@ JOB_NAME = "load_raw_sap_4hana"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+
 def _get_conn_config(dbutils, dbutils_secret_key):
-    conn_config_json = dbutils.secrets.get(
-        scope="quintoandar", key=dbutils_secret_key
-    )
+    conn_config_json = dbutils.secrets.get(scope="quintoandar", key=dbutils_secret_key)
 
     return json.loads(conn_config_json)
 
@@ -64,8 +67,6 @@ if __name__ == "__main__":
     extra_args = json.loads(args.extra_args)
     table_api_path = extra_args["table_api_path"]
 
-
-
     logger.info(
         f"""
                 m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
@@ -75,7 +76,7 @@ if __name__ == "__main__":
     )
 
     config_service = ConfigurationService(source)
-    table_schema = config_service.get_config("tables")[table_name]['table_schema']
+    table_schema = config_service.get_config("tables")[table_name]["table_schema"]
     table_schema = StructType.fromJson(json.loads(table_schema))
 
     spark_client = SparkClient()
@@ -94,15 +95,21 @@ if __name__ == "__main__":
     load_start_dt = datetime.strptime(load_start_date, "%Y-%m-%d")
     load_end_dt = datetime.strptime(load_end_date, "%Y-%m-%d")
 
-    date_range = pd.date_range(start=load_start_dt,end=load_end_date).to_pydatetime().tolist()
+    date_range = (
+        pd.date_range(start=load_start_dt, end=load_end_date).to_pydatetime().tolist()
+    )
 
     dfs = []
     for load_dt in date_range:
         try:
             data = consumer.sync(ingest_date=load_dt)
             df = spark_client.create_dataframe(data, table_schema, verify_schema=False)
-
-            df = df.withColumn("cpudt_dt", F.to_date(F.col("cpudt"), "yyyyMMdd"))
+            df = df.withColumn(
+                "cpudt_dt",
+                F.to_date(
+                    F.expr("COALESCE(NULLIF(aedat, '00000000'), cpudt)"), "yyyyMMdd"
+                ),
+            )
             df = (
                 SparkDataFrameService()
                 .input(df)
@@ -115,7 +122,9 @@ if __name__ == "__main__":
             logger.info(f"{e}, m=Error loading data for {load_dt}")
     if dfs:
         df = reduce(DataFrame.unionAll, dfs)
-        db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+        db_info = DatalakeMetastoreService.get_db_info(
+            environment, source, datalake_bucket
+        )
         spark_metastore_service = SparkMetastoreService(SparkClient())
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
@@ -131,7 +140,7 @@ if __name__ == "__main__":
                 database_location=database_location,
                 layer=LayerEnum.RAW,
                 query=None,
-                partitions=partitions
+                partitions=partitions,
             ).load_and_register(df, format_options)
         else:
             logger.info(f"m=No data to load for this period!")
