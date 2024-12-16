@@ -1,7 +1,7 @@
 dag:
   name: dw_data_quality
   schedule_start_date: 2022, 1, 1
-  owner: Data Engineering
+  owner: Data Governance
   documentation:
     dag_purpose: "This DAG loads to DW the data quality validations applied to bietlejuice DAGs by Inmetro."
 workflow:

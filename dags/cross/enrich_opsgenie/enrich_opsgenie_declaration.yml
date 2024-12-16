@@ -2,7 +2,7 @@
 dag:
   name: enrich_opsgenie
   schedule_start_date: 2020, 1, 1
-  owner: Data Engineering
+  owner: Data Governance
   documentation:
     dag_purpose: 'Get data from OpsGenie alerts and "acordamentos" to monitor Data Engineering Incidents.'
 workflow:
@@ -11,7 +11,7 @@ workflow:
   tables_customization:
     alerts:
       extraction_type: incremental
-      partitions:   
+      partitions:
         - year
         - month
         - day

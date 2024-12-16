@@ -3,7 +3,7 @@ dag:
   name: enrich_data_quality
   schedule_start_date: 2022, 1, 1
   schedule_interval: 0 6 * * *
-  owner: Data Engineering
+  owner: Data Governance
   documentation:
     dag_purpose: |
       This DAG consolidates the data quality validations from Inmetro applied to bietlejuice DAGs.

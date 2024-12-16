@@ -1,7 +1,7 @@
 dag:
   name: gsheets_cross
   schedule_interval: 50 22 * * *
-  owner: Data Engineering
+  owner: Data Governance
 cluster:
   type: databricks_12_2_med_general_cluster
   access_control_list:
