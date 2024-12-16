@@ -1926,12 +1926,12 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2022
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024-cohort
+  - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025
+  - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025-cohort
   - bietlejuice.gsheets_for_rent_targets:done-clean-ongoing-listings-targets-2025
   - bietlejuice.gsheets_for_rent_targets:done-clean-rent-demand-budget-2024
   - bietlejuice.gsheets_for_rent_targets:done-clean-rent-demand-budget-2025
   - bietlejuice.gsheets_for_rent_targets:done-clean-rent-ongoing-listings-budget-2024
-  - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025
-  - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2025-cohort
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
   - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets-2024
   - bietlejuice.gsheets_for_sale:done-clean-sale-demand-targets-bps-2024
@@ -3473,14 +3473,14 @@ bietlejuice.metric_rent__tickets:
 bietlejuice.metric_ss__segments:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-received-contact
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts
 bietlejuice.metric_ss__tickets:
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-demand-metrics-tasks
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-agent

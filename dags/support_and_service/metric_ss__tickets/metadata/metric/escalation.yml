@@ -8,8 +8,7 @@ columns:
     description: Identify the channel for this ticket (call, chat, email).
     dimension: True
     lineage:
-      - dw_customer_support.fact_ticket.channel
-      - dw_customer_support.fact_ticket.ticket_via
+      - dw_customer_support.fact_tickets.channel
   journey:
     description: Journey of the ticket.
     dimension: True
@@ -49,15 +48,15 @@ columns:
     metric:
       name: Amount escalation tickets
       description: Number of tickets that were escalated to the departments
-          '[MX] Media OPS'
-          'CX Conta Comigo [POS] [BACK]'
-          'CX ReclameAqui Adquiridas [CE] [POS] [BACK]'
-          'Midias Ops [POS] [BACK]'
-          'Notificação Extrajudicial [CE] [POS] [BACK]'
-          'Ouvidoria [CE] [POS] [BACK]'
-          'Ouvidoria For Sale [CE] [SALE] [BACK]'
-          'PROCON [CE] [POS] [BACK]'
-          'ReclameAqui [CE] [POS] [BACK]'
+        '[MX] Media OPS'
+        'CX Conta Comigo [POS] [BACK]'
+        'CX ReclameAqui Adquiridas [CE] [POS] [BACK]'
+        'Midias Ops [POS] [BACK]'
+        'Notificação Extrajudicial [CE] [POS] [BACK]'
+        'Ouvidoria [CE] [POS] [BACK]'
+        'Ouvidoria For Sale [CE] [SALE] [BACK]'
+        'PROCON [CE] [POS] [BACK]'
+        'ReclameAqui [CE] [POS] [BACK]'
         And that do not have the api_reclame_aqui TAG
         And that were not originated on WhatsApp
       acronym: Amount Escalation
@@ -70,20 +69,20 @@ columns:
     metric:
       name: Amount Escalation Tickets
       description: Number of tickets that were escalated to departments
-          'CX Partners Tasks [PRE] [BACK]'
-          'CX Proposals Tasks [PRE] [BACK]'
-          'Addendums [REP] [POS] [BACK]'
-          'Property Entry [ONB] [POS] [BACK]'
-          'CX Payments Active [POS] [BACK] [PAY]'
-          'Change of Bank Details [BACK]'
-          'Repairs Triage [Back]'
-          'Termination Due to Default [OFF][POS][BACK]'
-          'Scheduled Service [OFF] [POS] [BACK]'
-          'Common Repairs [Back]'
-          'Offboarding Repairs [OFF] [POS] [BACK]'
-          'QuintoAndar Protection [OFF] [POS] [BACK]'
-          'Repairs [BACK]'
-          'Self-Service Repairs [BACK]'
+        'CX Partners Tasks [PRE] [BACK]'
+        'CX Proposals Tasks [PRE] [BACK]'
+        'Addendums [REP] [POS] [BACK]'
+        'Property Entry [ONB] [POS] [BACK]'
+        'CX Payments Active [POS] [BACK] [PAY]'
+        'Change of Bank Details [BACK]'
+        'Repairs Triage [Back]'
+        'Termination Due to Default [OFF][POS][BACK]'
+        'Scheduled Service [OFF] [POS] [BACK]'
+        'Common Repairs [Back]'
+        'Offboarding Repairs [OFF] [POS] [BACK]'
+        'QuintoAndar Protection [OFF] [POS] [BACK]'
+        'Repairs [BACK]'
+        'Self-Service Repairs [BACK]'
         And they were not originated on WhatsApp
       acronym: Amoun Escalation Responses
       is_additive: True
@@ -94,7 +93,8 @@ columns:
   escalation_rate:
     metric:
       name: Escalation Rate
-      description: Semi-additive metric representing the sum of tickets that are escalation tickets for
+      description:
+        Semi-additive metric representing the sum of tickets that are escalation tickets for
         given departments divided by the overall sum of the number of escalation tickets
       acronym: DSAT Rate
       is_additive: False
@@ -106,4 +106,4 @@ columns:
     description: The created date of ticket.
     dimension: True
     lineage:
-      - dw_customer_support.fact_ticket.ts_started
+      - dw_customer_support.fact_tickets.ts_created

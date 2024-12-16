@@ -8,8 +8,7 @@ columns:
     description: Identify the channel for this ticket (call, chat, email).
     dimension: True
     lineage:
-      - dw_customer_support.fact_ticket.channel
-      - dw_customer_support.fact_ticket.ticket_via
+      - dw_customer_support.fact_tickets.channel
   journey:
     description: Journey of the ticket.
     dimension: True
@@ -79,4 +78,4 @@ columns:
     description: The created date of ticket.
     dimension: True
     lineage:
-      - dw_customer_support.fact_ticket.ts_started
+      - dw_customer_support.fact_tickets.ts_created

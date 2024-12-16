@@ -1,16 +1,16 @@
 WITH segments_perspective AS (
   SELECT DISTINCT
-    frc.sk_interaction,
-    frc.sk_contact,
+    fcc.sk_interaction,
+    fcc.sk_contact,
     CASE
-      WHEN frc.channel = 'chat' THEN frc.status
-      WHEN frc.channel = 'call' AND frc.sk_task  IS NULL THEN 'ABANDONED'
-      WHEN frc.channel = 'call' AND frc.is_last_interaction = True THEN 'COMPLETED'
-      WHEN frc.channel = 'call' THEN 'TRANSFERRED'
+      WHEN fcc.channel = 'chat' THEN fcc.status
+      WHEN fcc.channel = 'call' AND fcc.sk_task  IS NULL THEN 'ABANDONED'
+      WHEN fcc.channel = 'call' AND fcc.is_last_interaction = True THEN 'COMPLETED'
+      WHEN fcc.channel = 'call' THEN 'TRANSFERRED'
     END AS status,
-    frc.is_first_department_interaction,
-    LEAD(dd.team) OVER(PARTITION BY frc.sk_contact ORDER BY frc.ts_created) AS transferred_to_team,
-    frc.channel,
+    fcc.is_first_department_interaction,
+    LEAD(dd.team) OVER(PARTITION BY fcc.sk_contact ORDER BY fcc.ts_reservation_created) AS transferred_to_team,
+    fcc.channel,
     dd.department,
     dd.board,
     dd.team,
@@ -19,15 +19,18 @@ WITH segments_perspective AS (
     dt.journey,
     dd.journey_step,
     dt.customer_type_tag AS customer_type,
-    frc.ts_created
+    fcc.ts_reservation_created AS ts_created
   FROM
-    dw_customer_support.fact_received_contact AS frc
+    dw_customer_support.fact_customer_contacts AS fcc
+  LEFT JOIN
+    dw_customer_support.dim_ticket AS dit
+      ON dit.sk_ticket = fcc.sk_ticket
   LEFT JOIN
     dw_customer_support.dim_department AS dd
-      ON dd.sk_department = frc.sk_department
+      ON dd.sk_department = fcc.sk_department
   LEFT JOIN
     dw_customer_support.dim_taxonomy AS dt
-      ON dt.sk_taxonomy = frc.sk_taxonomy
+      ON dt.sk_taxonomy = dit.sk_taxonomy
 )
 SELECT DISTINCT
   channel,
@@ -76,5 +79,4 @@ SELECT DISTINCT
   DATE(ts_created) AS dt_segment_created
 FROM
   segments_perspective
-GROUP BY
-  ALL
+GROUP BY ALL

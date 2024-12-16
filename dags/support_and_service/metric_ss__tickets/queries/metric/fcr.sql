@@ -3,12 +3,7 @@ WITH ticket_perspective AS (
     ft.sk_ticket,
     ft.sk_user,
     COALESCE(ft.sk_user,ft.sk_contract) AS sk_user_contract,
-    CASE
-      WHEN ft.channel IN ('chat','call') THEN ft.channel
-      WHEN dit.ticket_via = 'whatsapp'
-      THEN 'whatsapp'
-      ELSE ft.channel
-    END AS channel,
+    ft.channel,
     ft.front_or_back,
     dd.department AS department,
     dd.board,
@@ -80,9 +75,9 @@ WITH ticket_perspective AS (
       ELSE dd.team
     END AS team_adjusted,
     ft.replies,
-    ft.ts_started
+    ft.ts_created AS ts_started
   FROM
-    dw_customer_support.fact_ticket AS ft
+    dw_customer_support.fact_tickets AS ft
   LEFT JOIN
     dw_customer_support.dim_department AS dd
       ON dd.sk_department = ft.sk_main_department
@@ -94,10 +89,10 @@ WITH ticket_perspective AS (
       ON CAST(dit.sk_ticket AS STRING) = ft.sk_ticket
   WHERE
     ft.sk_ticket IS NOT NULL
-    AND ft.ts_started >= CAST('2023-01-01' AS DATE)
+    AND ft.ts_created >= CAST('2023-01-01' AS DATE)
     AND dd.area NOT LIKE ('%MX%')
     AND (
-      ft.channel = 'call' 
+      ft.channel = 'call'
       OR ft.channel != 'call'
     )
 )

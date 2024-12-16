@@ -2,11 +2,7 @@ WITH tickets_perspective AS (
   SELECT DISTINCT
     ft.sk_ticket,
     ft.sk_user,
-    CASE
-      WHEN ft.channel IN ('chat','call') THEN ft.channel
-      WHEN dit.ticket_via = 'whatsapp' THEN 'whatsapp'
-      ELSE ft.channel
-    END AS channel,
+    ft.channel,
     dt.journey,
     dd_last.journey_step,
     dd_last.board,
@@ -15,16 +11,16 @@ WITH tickets_perspective AS (
     dd_last.area,
     dt.customer_type_tag AS customer_type,
     CASE
-      WHEN ft.ticket_origin = 'call inapp' THEN UPPER(dc.direction)
+      WHEN ft.ticket_origin = 'call in app' THEN UPPER(ft.direction)
       WHEN ft.ticket_origin = 'call inbound' THEN 'INBOUND'
-      WHEN ft.ticket_origin = 'chat5a' THEN 'INBOUND'
+      WHEN ft.ticket_origin = 'chat in app' THEN 'INBOUND'
       WHEN ft.ticket_origin = 'call outbound' THEN 'OUTBOUND'
-      ELSE UPPER(dc.direction)
+      ELSE UPPER(ft.direction)
     END AS refined_direction,
     ft.front_or_back,
-    ft.ts_started
+    ft.ts_created AS ts_started
   FROM
-    dw_customer_support.fact_ticket AS ft
+    dw_customer_support.fact_tickets AS ft
   LEFT JOIN
     dw_customer_support.dim_department AS dd_last
       ON dd_last.sk_department = ft.sk_main_department
@@ -34,11 +30,8 @@ WITH tickets_perspective AS (
   LEFT JOIN
     dw_customer_support.dim_ticket AS dit
       ON dit.sk_ticket = ft.sk_ticket
-  LEFT JOIN
-    dw_customer_support.dim_channel AS dc
-      ON dc.sk_channel = ft.sk_channel
   WHERE
-    ft.ts_started >= CAST('2021-01-01' AS DATE)
+    ft.ts_created >= CAST('2021-01-01' AS DATE)
 )
 , recontact_d4 AS (
   SELECT
@@ -90,5 +83,4 @@ FROM
     tickets_perspective AS tp
   LEFT JOIN recontact_d4 AS rc
     ON tp.sk_ticket = rc.sk_ticket
-GROUP BY
-  ALL
+GROUP BY ALL

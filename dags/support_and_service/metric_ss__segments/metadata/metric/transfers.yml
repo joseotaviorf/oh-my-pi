@@ -8,8 +8,7 @@ columns:
     description: Identify the channel for this ticket (call, chat, email).
     dimension: True
     lineage:
-      - dw_customer_support.fact_ticket.channel
-      - dw_customer_support.fact_ticket.ticket_via
+      - dw_customer_support.fact_tickets.channel
   journey:
     description: Journey of the ticket.
     dimension: True
@@ -48,7 +47,8 @@ columns:
   amount_interaction:
     metric:
       name: DSAT Amount interaction
-      description: Sum of interaction responses, considering the following business rules
+      description:
+        Sum of interaction responses, considering the following business rules
         WHEN status = 'TRANSFERRED'
         AND is_first_department_interaction = True
         AND transferred_to_team <> 'Inside Sales'
@@ -77,7 +77,8 @@ columns:
   dsat_rate:
     metric:
       name: Transfer Rate
-      description: Semi-additive metrics representing the Transfer rate. Calculated by the formula
+      description:
+        Semi-additive metrics representing the Transfer rate. Calculated by the formula
         (Amount interaction / Amount Contacts) * 100
       acronym: Transfer Rate
       is_additive: False
@@ -89,5 +90,4 @@ columns:
     description: The responsed transfer date.
     dimension: True
     lineage:
-      - dw_customer_support.fact_received_contact.ts_created
-      
+      - dw_customer_support.fact_customer_contacts.ts_created
