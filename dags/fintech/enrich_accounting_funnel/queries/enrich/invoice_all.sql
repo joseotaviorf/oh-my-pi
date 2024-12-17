@@ -55,12 +55,18 @@ not_invoiceable AS (
       e.status AS entry_status,
       CASE
         WHEN
+          e.id_invoice IS NULL
+          AND e.producer LIKE '%onboarding-routine%'
+          AND DATE(c.ts_period_started) >= DATE(e.ts_created)
+          AND e.due_year_month >= 202401
+        THEN FALSE -- valid not-invoiceable entry
+        WHEN
           (e.id_invoice IS NULL OR e.id_invoice IS NOT NULL AND ii.payment_status = 'canceled')
           AND (e.producer = 'payment-adjustment-correction' OR e.producer = 'postponement' OR e.producer = 'manual'   OR e.producer = 'monthly-routine')
           AND e.status = 'pending'
           AND e.due_year_month >= 202401
-        THEN FALSE -- not-invoiceable válido
-        ELSE TRUE -- not-invoiceable não válido
+        THEN FALSE -- valid not-invoiceable entry
+        ELSE TRUE -- non-valid not-invoiceable entry
       END AS is_not_invoiceable_inconsiderable,
       e.amount,
       e.accrual_year_month,
@@ -73,6 +79,9 @@ not_invoiceable AS (
     LEFT JOIN
         datalake_retsuko.invoice_info AS ii
         ON ii.id_invoice = i.id_external
+    LEFT JOIN
+        datalake_retsuko_clean.contract AS c
+        ON c.id = e.id_contract
     WHERE
         e.id_invoice IS NULL
         OR (e.id_invoice IS NOT NULL AND ii.payment_status = 'canceled' AND e.status = 'pending')
