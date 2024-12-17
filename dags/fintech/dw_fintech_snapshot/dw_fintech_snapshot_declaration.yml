@@ -44,6 +44,7 @@ workflow:
     quintocred_bad_debt:
       custom_schema: fintech_auditing
       extraction_type: full
+      partitions: []
 cluster:
   type: databricks_12_2_med_general_photon_cluster
   access_control_list:
