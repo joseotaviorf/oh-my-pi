@@ -1,6 +1,5 @@
 SELECT
     id,
-    business_unit_id AS id_business_unit,
     version,
     name AS region_name,
     created_at AS ts_created,

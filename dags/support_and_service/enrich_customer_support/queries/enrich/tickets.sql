@@ -117,6 +117,8 @@ non_twilio_tickets AS (
         AND it.id_call IS NULL
         AND it.id_session IS NULL THEN 'email'
       WHEN it.channel = 'email' THEN 'zendesk email'
+      ELSE it.channel
+    END AS channel
   FROM
     incoming_tickets AS it
   LEFT JOIN

@@ -3,7 +3,6 @@ SELECT
     agency_id AS id_agency,
     agent_id AS id_agent,
     program_id AS id_program,
-    house_external_id AS id_house_external,
     status,
     type,
     failure_count,

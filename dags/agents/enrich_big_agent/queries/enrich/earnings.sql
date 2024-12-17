@@ -11,7 +11,6 @@ SELECT
     id_agency,
     id_agent,
     id_program,
-    id_house_external,
     status,
     type,
     failure_count,
