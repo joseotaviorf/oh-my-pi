@@ -26,7 +26,7 @@ sap AS (
         (
             (
                 dt_reference >= DATE('2024-01-01')
-                AND account_number = '110044'
+                AND account_number = '11004X'
             )
             OR
             (
@@ -89,7 +89,7 @@ pre_vans_checkout AS (
     LEFT JOIN
         dw_public.dim_date dd
             ON vc.ts_paid = dd.date
-    WHERE 
+    WHERE
         UPPER(vc.company_use) NOT LIKE 'BY%'
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY our_number, paid_amount ORDER BY CASE WHEN id_invoice IS NOT NULL THEN company_use ELSE our_number END DESC) = 1

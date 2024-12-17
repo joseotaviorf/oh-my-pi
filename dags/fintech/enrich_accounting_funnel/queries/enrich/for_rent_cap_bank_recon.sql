@@ -49,7 +49,7 @@ sap AS (
     WHERE
         (
             dt_reference >= DATE('2024-01-01')
-            AND account_number IN ('110104', '111180', '110350', '110164')
+            AND account_number IN ('11010X', '11118X', '110350X', '11016X')
         )
         OR
         (

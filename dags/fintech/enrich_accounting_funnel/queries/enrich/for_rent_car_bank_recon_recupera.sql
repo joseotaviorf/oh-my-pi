@@ -27,7 +27,7 @@ sap AS (
         (
             (
                 dt_reference >= DATE('2024-01-01')
-                AND account_number = '110044'
+                AND account_number = '11004X'
             )
             OR
             (
