@@ -10,7 +10,7 @@ WITH segments AS (
     fcc.customer_phone_number AS customer_phone,
     dd_prev.department AS transferred_from,
     dd.department,
-    LEAD(dd.team) OVER(PARTITION BY fcc.sk_contact ORDER BY fcc.ts_reservation_created) AS transferred_to_team,
+    dd2.team AS transferred_to_team,
     dd2.department AS transferred_to,
     CASE
       WHEN fcc.channel = 'chat' THEN fcc.status
@@ -43,7 +43,7 @@ WITH segments AS (
       ELSE False
     END AS first_transfer,
     fcc.is_last_interaction,
-    fcc.ts_reservation_created AS ts_started,
+    fcc.ts_task_created AS ts_started,
     fcc.is_first_department_interaction,
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS month,
@@ -56,16 +56,16 @@ WITH segments AS (
       ON dd.sk_department = fcc.sk_department
   LEFT JOIN
     dw_customer_support.dim_department AS dd_prev
-      ON dd.sk_department = fcc.sk_prev_department
+      ON dd_prev.sk_department = fcc.sk_prev_department
   LEFT JOIN
     dw_customer_support.dim_department AS dd2
       ON dd2.sk_department = fcc.sk_next_department
   LEFT JOIN
-      dw_customer_support.dim_department AS fd
-        ON fd.sk_department = fcc.sk_first_department
+    dw_customer_support.dim_department AS fd
+      ON fd.sk_department = fcc.sk_first_department
   LEFT JOIN
-      dw_customer_support.dim_department AS ld
-        ON ld.sk_department = fcc.sk_last_department
+    dw_customer_support.dim_department AS ld
+      ON ld.sk_department = fcc.sk_last_department
   LEFT JOIN
     dw_customer_support.dim_analyst AS da
       ON fcc.sk_analyst = da.sk_analyst
@@ -77,28 +77,21 @@ WITH segments AS (
       ON dt.sk_taxonomy = dit.sk_taxonomy
   WHERE
     fcc.channel = 'chat'
-)
-,segments_final AS (
-  SELECT
-    *
-  FROM
-    segments
-  WHERE
-    front_or_back = 'front'
-    AND area = 'CX'
-    AND department IN (
-      'CX Mudança [FRONT] [POS]',
-      'CX Pagamentos [FRONT] [POS]',
-      'CX Parceiros [FRONT] [PRE]',
-      'CX Parceiros da Portaria [FRONT] [PRE]',
-      'CX Propostas [FRONT] [PRE]',
-      'CX Reparos [FRONT] [POS]',
-      'CX Rescisão [FRONT] [POS]',
-      'CX Visitas [FRONT] [PRE]',
-      'Consultores imobiliários 5A',
-      'CX Parceiros Compra e Venda [FRONT]')
-    AND DATE_TRUNC('month', ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '2' MONTH AND DATE('{load_end_date}')
-    AND (agent_organization = 'atento' OR agent_organization = 'atn')
+    AND dd.front_or_back = 'front'
+    AND dd.area = 'CX'
+    AND dd.department IN (
+    'CX Mudança [FRONT] [POS]',
+    'CX Pagamentos [FRONT] [POS]',
+    'CX Parceiros [FRONT] [PRE]',
+    'CX Parceiros da Portaria [FRONT] [PRE]',
+    'CX Propostas [FRONT] [PRE]',
+    'CX Reparos [FRONT] [POS]',
+    'CX Rescisão [FRONT] [POS]',
+    'CX Visitas [FRONT] [PRE]',
+    'Consultores imobiliários 5A',
+    'CX Parceiros Compra e Venda [FRONT]')
+    AND DATE_TRUNC('month', fcc.ts_task_created) BETWEEN DATE('{load_start_date}') - INTERVAL '2' MONTH AND DATE('{load_end_date}')
+    AND da.agent_organization IN ('atento','atn')
 )
 SELECT
   *,
@@ -123,4 +116,4 @@ SELECT
       AND outcome = 'transferred' THEN 'department_correction'
   END AS transfer_reason_detailed
 FROM
-  segments_final
+  segments

@@ -11,6 +11,7 @@ workflow:
   custom_schema: atento
   default_extraction_type: incremental
   default_partitions: ["year", "month", "day"]
+  execution_timeout_hours: 4
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_start_date') }}"
