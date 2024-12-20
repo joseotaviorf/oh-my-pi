@@ -6,31 +6,17 @@ WITH locale_ids AS (
     datalake_gsheets_clean.cod_locale
   GROUP BY 1
 ),
-
-remove_reversed AS (
-
+pre_reversed_entries AS (
   SELECT 
     e.id_contract,
+    e.id_invoice,
     e.id_external AS id_entry,
     e.id_external_reversed_entry,
+    e.amount,
+    e.accrual_year_month,
+    e.bill_item,
     e.ts_created,
-    CASE 
-      WHEN SUM(e.amount) OVER(PARTITION BY e.id_contract, e.accrual_year_month, e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
-      THEN TRUE
-      WHEN LEAD(e.id_external) OVER(PARTITION BY e.id_contract, e.accrual_year_month, e.bill_item ORDER BY e.ts_created) IS NOT NULL 
-      THEN TRUE
-      ELSE FALSE
-    END AS is_reversed,
-    CASE
-      WHEN 
-        SUM(e.amount) 
-          OVER(PARTITION BY e.id_contract, e.accrual_year_month, e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
-        AND 
-          LEAD(e.ts_created) 
-            OVER(PARTITION BY e.id_contract, e.accrual_year_month, e.bill_item ORDER BY e.ts_created) IS NULL
-      THEN e.ts_created
-      ELSE LEAD(e.ts_created) OVER(PARTITION BY e.id_contract, e.accrual_year_month, e.bill_item ORDER BY e.ts_created)
-    END AS ts_entry_reversed
+    LEAD(e.ts_created) OVER(PARTITION BY e.id_contract, e.id_invoice, e.accrual_year_month, e.bill_item ORDER BY e.ts_created) ts_entry_reversed
   FROM 
     datalake_retsuko.entry AS e
   LEFT JOIN 
@@ -43,7 +29,33 @@ remove_reversed AS (
     )
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_entry ORDER BY ts_entry_reversed DESC) = 1
+),
 
+remove_reversed AS (
+SELECT 
+  e.id_contract,
+  e.id_entry,
+  e.id_external_reversed_entry,
+  e.ts_created,
+  CASE 
+    WHEN SUM(e.amount) OVER(PARTITION BY e.id_contract, e.id_invoice, e.accrual_year_month, e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
+    THEN TRUE
+    WHEN LEAD(e.id_entry) OVER(PARTITION BY e.id_contract, e.id_invoice, e.accrual_year_month, e.bill_item ORDER BY e.ts_created) IS NOT NULL 
+    THEN TRUE
+    ELSE FALSE
+  END AS is_reversed,
+  CASE
+    WHEN 
+      SUM(e.amount) 
+        OVER(PARTITION BY e.id_contract, e.id_invoice, e.accrual_year_month, e.bill_item ORDER BY e.ts_created ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) = 0
+      AND 
+        LEAD(e.ts_created) 
+          OVER(PARTITION BY e.id_contract, e.id_invoice, e.accrual_year_month, e.bill_item ORDER BY e.ts_created) IS NULL
+    THEN e.ts_created
+    ELSE LEAD(e.ts_created) OVER(PARTITION BY e.id_contract, e.id_invoice, e.accrual_year_month, e.bill_item ORDER BY e.ts_created)
+  END AS ts_entry_reversed
+FROM 
+  pre_reversed_entries AS e
 ),
 next_business_day AS (
   SELECT
@@ -122,7 +134,7 @@ SELECT DISTINCT
   COALESCE(rr.is_reversed, FALSE) AS is_reversed,
   COALESCE(ni.is_not_invoiceable_inconsiderable, FALSE) AS is_not_invoiceable_inconsiderable,
   ie.entry_type AS bill_item,
-  COALESCE(i.is_write_off, FALSE) AS is_write_off,
+  i.is_write_off,
   ie.description,
   CASE
     WHEN UPPER(ie.description) LIKE '%ACORDO%' THEN 1
