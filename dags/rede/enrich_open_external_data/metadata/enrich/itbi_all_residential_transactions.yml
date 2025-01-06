@@ -127,9 +127,9 @@ columns:
   declared_transaction_value:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.declared_transaction_value
+      - datalake_open_external_data.itbi_bh_residential_transactions.declared_transaction_value
     description: |
       Value declared by the taxpayer.
-      It assumes value only for SP source.
   reference_appraisal_value:
     lineage:
       - datalake_open_external_data.itbi_sp_residential_transactions.reference_appraisal_value

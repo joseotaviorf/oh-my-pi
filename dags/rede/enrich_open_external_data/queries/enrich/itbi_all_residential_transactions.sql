@@ -46,7 +46,7 @@ itbi_bh AS (
     MAX(land_area_m2) AS land_area_m2,
     MAX(built_area_m2) AS built_area_m2,
     MAX(ideal_fraction) AS ideal_fraction,
-    NULL AS declared_transaction_value,
+    MAX(declared_transaction_value) AS declared_transaction_value,
     NULL AS reference_appraisal_value,
     NULL AS transmitted_proportion,
     NULL AS proportional_reference_appraisal_value,

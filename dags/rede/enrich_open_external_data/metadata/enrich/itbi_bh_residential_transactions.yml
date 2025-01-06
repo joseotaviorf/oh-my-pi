@@ -135,6 +135,11 @@ columns:
     description: |
       Value determined by the tax administration through an appraisal based on the elements contained
       in the Cadastro Imobiliário or the value declared by the taxpayer, if the latter is higher.
+  declared_transaction_value:
+    lineage:
+      - datalake_itbi_clean.itbi_bh.declared_transaction_value
+    description: |
+      Value declared by the taxpayer.
   amount_tax_paid_summarized:
     lineage:
       - datalake_itbi_clean.itbi_bh.amount_tax_paid_summarized
