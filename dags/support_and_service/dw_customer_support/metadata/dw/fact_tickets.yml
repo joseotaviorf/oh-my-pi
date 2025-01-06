@@ -54,6 +54,10 @@ columns:
     lineage:
       - datalake_customer_support.tickets.id_contract
     description: Unique contract identifier.
+  sk_house:
+    lineage:
+      - datalake_customer_support.tickets.id_house
+    description: Unique house identifier.
   sk_session:
     lineage:
       - datalake_customer_support.tickets.id_session

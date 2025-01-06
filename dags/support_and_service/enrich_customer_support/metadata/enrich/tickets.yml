@@ -18,6 +18,10 @@ columns:
       - datalake_customer_support.chats.id_user
       - datalake_customer_support.calls.id_user
     description: Identifier for the main user associated with the ticket.
+  id_house:
+    lineage:
+      - datalake_zendesk.tickets_current.id_house
+    description: ID of the house associated with the ticket
   id_contract:
     lineage:
       - datalake_zendesk.tickets_current.id_contract

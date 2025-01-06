@@ -134,6 +134,7 @@ SELECT
   COALESCE(CAST(tc.id_assignee AS BIGINT), -1) AS sk_zendesk_assignee_user,
   COALESCE(CAST(t.id_session AS BIGINT), -1) AS sk_session,
   COALESCE(t.id_contract, -1) AS sk_contract,
+  COALESCE(CAST(t.id_house AS BIGINT), -1) AS sk_house,
   MD5(COALESCE(t.first_queue, "NULL")) AS sk_first_department,
   MD5(COALESCE(t.last_queue, "NULL")) AS sk_main_department,
   MD5(COALESCE(t.first_analyst_email, "NULL")) AS sk_first_analyst,
