@@ -1,18 +1,19 @@
 WITH time_metrics AS (
-  SELECT
+  SELECT DISTINCT
     id_segment AS id_task,
     id_reservation,
     total_queue_time,
     total_talk_time,
     total_wrap_up_time,
     total_handling_time,
-    total_waiting_time,
-    first_reply_time,
-    dt_created
+    total_waiting_time
   FROM
     datalake_twilio_flex_insights_clean.conversation_time_metrics
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_segment ORDER BY dt_created DESC) = 1
+  WHERE
+    total_talk_time IS NOT NULL
+    AND total_queue_time IS NOT NULL
+    AND total_wrap_up_time IS NOT NULL
+    AND total_handling_time IS NOT NULL
 ),
 average_reply_time AS (
   SELECT
@@ -154,15 +155,15 @@ twilio_contacts AS (
     d.customer_phone_number,
     d.customer_email,
     art.average_reply_time,
-    tm.total_talk_time,
-    tm.total_queue_time,
-    tm.total_wrap_up_time,
-    tm.total_waiting_time,
+    COALESCE(tmcall.total_talk_time, tmchat.total_talk_time) AS total_talk_time,
+    COALESCE(tmcall.total_queue_time, tmchat.total_queue_time) AS total_queue_time,
+    COALESCE(tmcall.total_wrap_up_time, tmchat.total_wrap_up_time) AS total_wrap_up_time,
+    COALESCE(tmcall.total_waiting_time, tmchat.total_waiting_time) AS total_waiting_time,
     CASE
       WHEN d.channel = 'chat' THEN d.seconds_to_first_response
       WHEN d.channel = 'call' THEN d.waiting_time_sec
     END AS first_reply_time,
-    tm.total_handling_time,
+    COALESCE(tmcall.total_handling_time, tmchat.total_handling_time) AS total_handling_time,
     d.is_per_team_task,
     d.is_contact_answered,
     d.is_interaction_answered,
@@ -173,9 +174,13 @@ twilio_contacts AS (
   FROM
     twilio_demand AS d
   LEFT JOIN
-    time_metrics AS tm
-      ON tm.id_task = d.id_task
-      OR tm.id_reservation = d.id_reservation
+    time_metrics AS tmcall
+      ON tmcall.id_reservation = d.id_reservation
+      AND d.channel = 'call'
+  LEFT JOIN
+    time_metrics AS tmchat
+      ON tmchat.id_reservation = d.id_reservation
+      AND d.channel = 'chat'
   LEFT JOIN
     average_reply_time AS art
       ON art.id_task = d.id_task
@@ -197,7 +202,7 @@ twilio_contacts AS (
         AND d.channel = 'chat'
 ),
 front_contacts AS (
-  SELECT
+  SELECT DISTINCT
     sk_contact,
     sk_interaction,
     sk_session,
