@@ -3671,11 +3671,11 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-backlog-metrics-tasks
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
-  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets-backlog
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
   - bietlejuice.enrich_customer_support:load-enrich-calls
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla
