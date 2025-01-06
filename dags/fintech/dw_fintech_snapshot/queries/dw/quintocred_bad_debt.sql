@@ -47,7 +47,7 @@ SELECT *,
   CASE 
     WHEN open_amount = 0 
       AND date_trunc('month', dt_paid) <> date_trunc('month', dt_closing)
-      THEN 'OTHER'
+      THEN 'PAID IN THE PAST'
     WHEN open_amount = 0 
       AND date_trunc('month', dt_paid) = date_trunc('month', dt_closing) 
       THEN 'PAID ATE REFERENCE MONTH'
@@ -172,7 +172,7 @@ LEFT JOIN
 )
 SELECT 
   origin_table,
-  origin_platform
+  origin_platform,
   sk_propose,
   sk_propose_20,
   sk_transaction,
