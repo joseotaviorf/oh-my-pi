@@ -132,6 +132,8 @@ columns:
   provision_balance_p5_delay_a:
     description: Provision balance for the rule A from dez/2023 to jun/2024.
   provision_balance_p6_delay_a:
+    description: Provision balance for the rule A from jul/2024 to nov/2024.
+  provision_balance_p7_delay_a:
     description: Current provision balance for the rule A.
   provision_balance_p1_delay_b:
     description: Provision balance for the rule B during 2022.
@@ -144,6 +146,8 @@ columns:
   provision_balance_p5_delay_b:
     description: Provision balance for the rule B from dez/2023 to jun/2024.
   provision_balance_p6_delay_b:
+    description: Provision balance for the rule B from jul/2024 to nov/2024.
+  provision_balance_p7_delay_b:
     description: Current provision balance for the rule B.
   provision_balance_p1_delay_c:
     description: Provision balance for the rule C during 2022.
@@ -156,6 +160,8 @@ columns:
   provision_balance_p5_delay_c:
     description: Provision balance for the rule C from dez/2023 to jun/2024.
   provision_balance_p6_delay_c:
+    description: Provision balance for the rule C from jul/2024 to nov/2024.
+  provision_balance_p7_delay_c:
     description: Current provision balance for the rule C.
   provision_balance_p1_delay_d:
     description: Provision balance for the rule D during 2022.
@@ -168,6 +174,8 @@ columns:
   provision_balance_p5_delay_d:
     description: Provision balance for the rule D from dez/2023 to jun/2024.
   provision_balance_p6_delay_d:
+    description: Provision balance for the rule D from jul/2024 to nov/2024.
+  provision_balance_p7_delay_d:
     description: Current provision balance for the rule D.
   provision_balance_p1_delay_e:
     description: Provision balance for the rule E during 2022.
@@ -180,6 +188,8 @@ columns:
   provision_balance_p5_delay_e:
     description: Provision balance for the rule E from dez/2023 to jun/2024.
   provision_balance_p6_delay_e:
+    description: Provision balance for the rule E from jul/2024 to nov/2024.
+  provision_balance_p7_delay_e:
     description: Current provision balance for the rule E.
   provision_balance:
     description: Provision balance being applied to the invoice.
