@@ -92,5 +92,7 @@ columns:
     description: "contract start date"
   dt_contract_ended:
     description: "Contract cancellation date"
+  ts_snapshot:
+    description: "Timestamp of the source snapshot was loaded"
   ts_load:
     description: "Timestamp when the data was loaded"

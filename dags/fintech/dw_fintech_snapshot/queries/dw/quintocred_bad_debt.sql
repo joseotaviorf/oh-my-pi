@@ -215,6 +215,7 @@ SELECT
   dt_paid,
   dt_contract_started,
   dt_contract_ended,
+  ts_snapshot,
   NOW() as ts_load
 FROM 
   step_6
