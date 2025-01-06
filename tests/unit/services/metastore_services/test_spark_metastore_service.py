@@ -241,13 +241,17 @@ class TestSparkMetastoreService:
         "bietlejuice.services.metastore_services.metastore_service.MetastoreService.create_new_partitions_from_df"
     )
     def test_create_new_partitions_from_df_should_call_metastore_service(
-        self, mocked_create_new_partitions_from_df, spark_metastore_service
+        self,
+        mocked_create_new_partitions_from_df,
+        spark_metastore_service,
+        unity_catalog_helper,
     ):
         # arrange
         database_name = "database_name"
         table_name = "table_name"
         partition_cols = ["year", "month", "day"]
         df = Mock()
+        unity_catalog_helper.is_default_catalog_using_unity.return_value = False
 
         # act
         spark_metastore_service.create_new_partitions_from_df(
@@ -258,6 +262,30 @@ class TestSparkMetastoreService:
         mocked_create_new_partitions_from_df.assert_called_once_with(
             database_name, table_name, df, partition_cols, 1
         )
+
+    @mock.patch(
+        "bietlejuice.services.metastore_services.metastore_service.MetastoreService.create_new_partitions_from_df"
+    )
+    def test_create_new_partitions_from_df_should_not_call_metastore_service_if_uc_enabled(
+        self,
+        mocked_create_new_partitions_from_df,
+        spark_metastore_service,
+        unity_catalog_helper,
+    ):
+        # arrange
+        database_name = "database_name"
+        table_name = "table_name"
+        partition_cols = ["year", "month", "day"]
+        df = Mock()
+        unity_catalog_helper.is_default_catalog_using_unity.return_value = True
+
+        # act
+        spark_metastore_service.create_new_partitions_from_df(
+            database_name, table_name, df, partition_cols, 1
+        )
+
+        # assert
+        mocked_create_new_partitions_from_df.assert_not_called()
 
     @mock.patch(
         "bietlejuice.services.metastore_services.metastore_service.MetastoreService.create_new_partitions_from_df"

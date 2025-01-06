@@ -316,19 +316,26 @@ class SparkMetastoreService(MetastoreService):
     def create_new_partitions_from_df(
         self, database_name, table_name, df, partition_cols, parallelism=1
     ):
-        super().create_new_partitions_from_df(
-            database_name, table_name, df, partition_cols, parallelism
-        )
-
         # Import needs to be internal, otherwise this class is not serializable
         # it must be sereializable, since it is implicitly imported by a Spark job that uses parallelize
         # (sync_metadata.py)
         unity_catalog_helper = importlib.import_module(
             "bietlejuice.base.spark.unity_catalog_helper"
         ).UnityCatalogHelper
+
+        is_saving_to_unity_catalog = (
+            unity_catalog_helper.is_default_catalog_using_unity()
+        )
+
+        # Unity Catalog does not require (nor support) the ADD PARTITIONS command
+        if not is_saving_to_unity_catalog:
+            super().create_new_partitions_from_df(
+                database_name, table_name, df, partition_cols, parallelism
+            )
+
         if (
             unity_catalog_helper.is_cluster_unity_catalog_enabled()
-            and not unity_catalog_helper.is_default_catalog_using_unity()
+            and not is_saving_to_unity_catalog
             and bool(partition_cols)
         ):
             unity_catalog_helper.sync_table_to_unity_catalog(

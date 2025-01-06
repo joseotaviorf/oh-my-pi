@@ -17,12 +17,16 @@ class IncrementalTableLoaderPipeline(TableLoaderPipeline):
         s3_loader = S3Loader()
 
         save_to_unity_catalog = UnityCatalogHelper.is_default_catalog_using_unity()
-        if save_to_unity_catalog:
+        save_as_table = save_to_unity_catalog and format_options == "PARQUET"
+        if save_as_table:
             # With unity Catalog, we're supposed to save directly as table, not save the files and update
-            # the metastore separately
+            # the metastore separately.
+            # The exception is for non-parquet tables, because they don't support the mergeSchema option
             load_options[
                 "full_table_name"
             ] = f"{self.target_database_name}.{self.table_name}"
+            load_options["mergeSchema"] = not force_recreate
+            load_options["overwriteSchema"] = force_recreate
 
         s3_loader.load_df(
             df=df,
@@ -32,7 +36,7 @@ class IncrementalTableLoaderPipeline(TableLoaderPipeline):
             **load_options,
         )
 
-        if not save_to_unity_catalog:
+        if not save_as_table:
             # Again, if we're using Unity Catalog, the metastore will already have been updated when saving the table
             spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
             spark_metastore_loader.update_metastore(
