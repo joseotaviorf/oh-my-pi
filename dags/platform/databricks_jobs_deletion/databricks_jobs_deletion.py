@@ -19,10 +19,10 @@ PROJECT_TO_JOB_NAME_REGEX_MAPPING = {"bietlejuice": "^bietlejuice-", "wonka": "^
 JOBS_REMOVAL_TIMEDELTA = timedelta(days=7)
 
 
-def delete_databricks_jobs(remove_before_timedelta: timedelta, job_name_regex: str):
-    databricks_hook = QuintoAndarDatabricksHook(
-        databricks_conn_id="databricks_job_cluster"
-    )
+def delete_databricks_jobs(
+    remove_before_timedelta: timedelta, job_name_regex: str, databricks_conn_id: str
+):
+    databricks_hook = QuintoAndarDatabricksHook(databricks_conn_id=databricks_conn_id)
     current_timestamp = datetime.now()
     jobs_list = databricks_hook.list_jobs()
     jobs_id_list = {
@@ -54,19 +54,39 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME),
 )
 
+# We must remove this code whenever the UnityCatalog migration ends, since this environment will be deprecated.
 previous_task = None
 for project, job_name_regex in PROJECT_TO_JOB_NAME_REGEX_MAPPING.items():
-    delete_jobs_task = PythonOperator(
-        task_id=f"delete-{project}-databricks-jobs",
+    delete_jobs_task_old_env = PythonOperator(
+        task_id=f"delete-{project}-databricks-jobs-old-prod",
         dag=dag,
         retries=5,
         python_callable=delete_databricks_jobs,
         op_kwargs={
             "remove_before_timedelta": JOBS_REMOVAL_TIMEDELTA,
             "job_name_regex": job_name_regex,
+            "databricks_conn_id": "databricks_job_cluster",
         },
     )
     # We're making them all sequential instead of parallel due to the Databricks API rate limit
     if previous_task:
-        previous_task >> delete_jobs_task
-    previous_task = delete_jobs_task
+        previous_task >> delete_jobs_task_old_env
+    previous_task = delete_jobs_task_old_env
+
+previous_task = None
+for project, job_name_regex in PROJECT_TO_JOB_NAME_REGEX_MAPPING.items():
+    delete_jobs_task_new_env = PythonOperator(
+        task_id=f"delete-{project}-databricks-jobs-uc-prod",
+        dag=dag,
+        retries=5,
+        python_callable=delete_databricks_jobs,
+        op_kwargs={
+            "remove_before_timedelta": JOBS_REMOVAL_TIMEDELTA,
+            "job_name_regex": job_name_regex,
+            "databricks_conn_id": "databricks_new",
+        },
+    )
+    # We're making them all sequential instead of parallel due to the Databricks API rate limit
+    if previous_task:
+        previous_task >> delete_jobs_task_new_env
+    previous_task = delete_jobs_task_new_env
