@@ -3,6 +3,7 @@ from unittest import mock
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from py4j.protocol import Py4JJavaError
 from pyspark.sql.utils import AnalysisException
+from pyspark.sql.types import StructField, StructType, StringType
 
 
 class TestDeltaLoader:
@@ -26,7 +27,9 @@ class TestDeltaLoader:
     @pytest.fixture
     def mock_target_df(self, merge_builder_mock):
         target_df = mock.MagicMock()
-        target_df.schema = ["column1", "column2"]
+        target_df.schema = StructType(
+            [StructField("column1", StringType()), StructField("column2", StringType())]
+        )
         target_df.alias.return_value = target_df
         target_df.merge.return_value = merge_builder_mock
         return target_df
@@ -44,7 +47,9 @@ class TestDeltaLoader:
     @pytest.fixture
     def mock_source_df(self):
         source_df = mock.MagicMock()
-        source_df.schema = ["column1", "column2"]
+        source_df.schema = StructType(
+            [StructField("column1", StringType()), StructField("column2", StringType())]
+        )
         source_df.alias = source_df
         dataframe_writer = mock.MagicMock()
         dataframe_writer.format.return_value = dataframe_writer
@@ -89,6 +94,36 @@ class TestDeltaLoader:
         delta_table_builder_mock.location.assert_called_once_with(path)
         delta_table_builder_mock.partitionedBy.assert_called_once_with(*partition_by)
         delta_table_builder_mock.execute.assert_called_once()
+
+    def test_create_empty_table_converts_not_nullable_to_nullable(
+        self,
+        mock_spark_context,
+        mock_delta_table,
+        delta_table_builder_mock,
+        mock_source_df,
+    ):
+        table_name = "test_database.test_table"
+        path = "test_path"
+        partition_by = ["column1", "column2"]
+        mock_spark_context.spark.catalog.tableExists.return_value = False
+        mock_source_df.schema = StructType(
+            [
+                StructField("column1", StringType(), nullable=True),
+                StructField("column2", StringType(), nullable=False),
+            ]
+        )
+
+        delta_loader = DeltaLoader()
+        delta_loader.load_table(table_name, path, mock_source_df, partition_by)
+
+        delta_table_builder_mock.addColumns.assert_called_once_with(
+            StructType(
+                [
+                    StructField("column1", StringType(), nullable=True),
+                    StructField("column2", StringType(), nullable=True),
+                ]
+            )
+        )
 
     def test_convert_to_delta_when_it_exists_but_is_not_delta(
         self, mock_spark_context, mock_delta_table, mock_source_df

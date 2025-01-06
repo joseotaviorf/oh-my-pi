@@ -2,6 +2,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.spark.base_spark import BaseSparkContext
 from pyspark.sql import DataFrame
 from pyspark.sql.utils import AnalysisException
+from pyspark.sql.types import StructField, StructType
 from py4j.protocol import Py4JJavaError
 from delta.tables import DeltaTable
 
@@ -94,11 +95,18 @@ class DeltaLoader:
         else:
             builder = DeltaTable.createIfNotExists(BaseSparkContext.spark)
         builder = builder.tableName(table_name)
-        builder = builder.addColumns(source_df.schema)
+        schema = self.convert_schema_to_nullable(source_df.schema)
+        builder = builder.addColumns(schema)
         if partition_by:
             builder = builder.partitionedBy(*partition_by)
         builder = builder.location(path)
         return builder.execute()
+
+    @staticmethod
+    def convert_schema_to_nullable(schema: StructField) -> StructField:
+        return StructType(
+            [StructField(field.name, field.dataType, True) for field in schema.fields]
+        )
 
     def _convert_to_delta_table(self, table_name: str) -> None:
         """Convert a table to a Delta table"""
