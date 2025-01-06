@@ -467,7 +467,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
   - bietlejuice.gsheets_for_sale:done-clean-sale-tof-daily-targets
   - bietlejuice.gsheets_for_sale:done-clean-sale-tof-monthly-targets
-  - bietlejuice.gsheets_for_sale:done-clean-sale-tof-weekly-targets
   - bietlejuice.gsheets_growth:done-clean-affiliates-extra-user-bonus
   - bietlejuice.gsheets_growth:done-clean-branding-where-is-plaquinha
   - bietlejuice.gsheets_growth:done-clean-ciq-costs
@@ -480,7 +479,6 @@ bietlejuice.dw_datamarts_growth_cross:
   - bietlejuice.gsheets_growth:done-clean-rental-flows-targets
   - bietlejuice.gsheets_growth:done-clean-rental-ntp-source-targets
   - bietlejuice.gsheets_growth:done-clean-rental-tof-daily-targets
-  - bietlejuice.gsheets_growth:done-clean-rental-tof-weekly-targets
   - bietlejuice.gsheets_growth:done-clean-sale-flows-targets
   - bietlejuice.robin_hood:load-clean-accounting-entry-source
   - bietlejuice.robin_hood:load-clean-tax
