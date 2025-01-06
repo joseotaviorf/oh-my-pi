@@ -323,7 +323,8 @@ SELECT
     WHEN date_trunc('month', dt_snapshot) - interval '1' month BETWEEN DATE('2023-03-01') AND DATE('2023-05-01') THEN provision_balance_p4_delay_b
     WHEN date_trunc('month', dt_snapshot) - interval '1' month BETWEEN DATE('2023-06-01') AND DATE('2023-11-01') THEN provision_balance_p4_delay_e
     WHEN date_trunc('month', dt_snapshot) - interval '1' month BETWEEN DATE('2023-12-01') AND DATE('2024-06-01') THEN provision_balance_p5_delay_e
-    WHEN date_trunc('month', dt_snapshot) - interval '1' month >= DATE('2024-07-01') THEN provision_balance_p6_delay_e
+    WHEN date_trunc('month', dt_snapshot) - interval '1' month BETWEEN DATE('2024-07-01') AND DATE('2024-11-01') THEN provision_balance_p6_delay_e
+    WHEN date_trunc('month', dt_snapshot) - interval '1' month >= DATE('2024-12-01') THEN provision_balance_p7_delay_e
   END AS provision_balance,
   provision_factor,
   risk_type,
