@@ -1,7 +1,7 @@
 ---
 dag:
   name: criteo_temp
-  schedule_interval: 00 08 * * *
+  schedule_interval: 00 05 * * *
   owner: Data Growth
 cluster:
   type: databricks_13_3_med_general_cluster

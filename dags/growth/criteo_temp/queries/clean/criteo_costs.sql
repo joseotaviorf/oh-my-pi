@@ -8,21 +8,9 @@ SELECT
   region,
   zip_code,
   cost::DOUBLE,
-  sales::DOUBLE,
-  audience::DOUBLE,
   clicks::DOUBLE,
-  cpc::DOUBLE,
-  ctr::DOUBLE,
   displays::DOUBLE,
-  exposed_users::DOUBLE,
-  reach::DOUBLE,
-  visits::DOUBLE,
-  win_rate::DOUBLE,
-  bounce_rate::DOUBLE,
-  cost_per_visit::DOUBLE,
-  cpo::DOUBLE,
-  cvr::DOUBLE,
-  TO_DATE(day, 'MM/dd/yyyy') AS dt_report,
+  TO_DATE(day, 'yyyy-MM-dd') AS dt_report,
   ts_load
 FROM 
   datalake_gsheets_raw.criteo_costs
