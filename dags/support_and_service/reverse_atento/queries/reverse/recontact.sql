@@ -58,7 +58,7 @@ front_tickets_list AS (
     dw_customer_support.dim_analyst as da2
       ON ft.sk_last_analyst = da2.sk_agent_twilio
   WHERE
-    ft.sk_user IS NOT NULL
+    ft.sk_user  <> -1
     AND dd.area = 'CX'
     AND ft.front_or_back = 'front'
     AND ft.channel IN ('call', 'chat')
@@ -154,7 +154,7 @@ demand_back_FRC AS (
     dw_customer_support.dim_department AS dd
       ON ft.sk_main_department = dd.sk_department
   WHERE
-    ft.sk_user IS NOT NULL
+    ft.sk_user  <> -1
     AND dd.area = 'CX'
     AND dd.department IN(
       'CX Partners Tarefas [PRE] [BACK]',

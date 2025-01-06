@@ -62,7 +62,7 @@ front_tickets_list AS (
       ON ft.sk_last_analyst = da.sk_analyst
       OR ft.sk_last_analyst = da.sk_agent_twilio
   WHERE
-    ft.sk_user IS NOT NULL
+    ft.sk_user <> -1
     AND dd.area = 'CX'
     AND ft.front_or_back = 'front'
     AND ( (ft.channel = 'chat' AND ft.direction = 'inbound')
