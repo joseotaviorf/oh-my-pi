@@ -331,7 +331,7 @@ pre_df AS (
         END AS status,
         source_amount,
         sap_amount,
-        IF(s.id_finance_entity IS NULL OR sg.id_feature IS NULL, FALSE, TRUE) AS is_completeness_compliance,
+        IF(s.id_finance_entity IS NULL AND sg.id_feature IS NULL, FALSE, TRUE) AS is_completeness_compliance,
         dt_source_trigger,
         dt_sap_created,
         dt_sap_reference
