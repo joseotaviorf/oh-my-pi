@@ -8,8 +8,8 @@ workflow:
   layer: reverse
   type: access
   inner_dependencies:
-    fintech:
-      - support_and_service
+    export_reverse_fintech:
+      - export_reverse_support_and_service
   load_spark_job: load_into_robbyson_api
   spark_job_arguments:
     - "{dag_name}" # dag_name
