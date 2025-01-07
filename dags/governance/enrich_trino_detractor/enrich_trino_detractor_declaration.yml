@@ -7,7 +7,7 @@ dag:
     dag_purpose: |
       Exports Trino usage data from data_platform_metrics table in Databricks
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_extraction_type: full
   extra_query_template_params:
