@@ -32,6 +32,6 @@ workflow:
   tables_customization:
     clustering_image:
       merge_on: ["id_condo", "id_sourcename_anchor", "id_sourcename_pair"]
-      when_matched_updated_condition: "source.dt_model >= target.dt_model"
+      when_matched_update_condition: "source.dt_model >= target.dt_model"
 cluster:
   type: databricks_13_3_med_memory_cluster
