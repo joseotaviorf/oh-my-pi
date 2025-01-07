@@ -32,25 +32,25 @@ SELECT
     'survicate' AS source_name,
     MAX(CAST(
         CASE 
-            WHEN rc.id_question IN (2714051, 2718067, 2720689, 2720694) 
+            WHEN rc.id_question IN (2714051, 2718067, 2720689, 2720694, 2881950) 
             THEN rc.answer_content
         END AS INT
     )) AS facility_satisfaction,
     MAX(CAST(
         CASE 
-            WHEN rc.id_question IN (2714054, 2718068, 2720690, 2720695) 
+            WHEN rc.id_question IN (2714054, 2718068, 2720690, 2720695, 2881951) 
             THEN rc.answer_content
         END AS INT
     )) AS time_satisfaction,
     MAX(CAST(
         CASE 
-            WHEN rc.id_question IN (2714057, 2718069, 2720691, 2720696) 
+            WHEN rc.id_question IN (2714057, 2718069, 2720691, 2720696, 2881952) 
             THEN rc.answer_content
         END AS INT
     )) AS support_satisfaction,
     MAX(
         CASE 
-            WHEN rc.id_question IN (2714059, 2718070, 2720692, 2720697) 
+            WHEN rc.id_question IN (2714059, 2718070, 2720692, 2720697, 2881953) 
             THEN rc.answer_content
         END
     ) AS improvements_suggestions,
@@ -68,7 +68,7 @@ LEFT JOIN emails AS e
   ON e.respondent_uuid = sr.id_respondent
 LEFT JOIN user_id as u
   ON u.respondent_uuid = sr.id_respondent
-WHERE sr.id_survey IN ('775741557ef98468','9fa10adff80551f6','74c8f0608123f05d','9efcef20c637ee47','739bb49c771b2806') 
+WHERE sr.id_survey IN ('775741557ef98468','9fa10adff80551f6','74c8f0608123f05d','9efcef20c637ee47','739bb49c771b2806', '8fdbeef40b501e84') 
 AND DATE(rc.dt_load) BETWEEN DATE('{load_start_date}') AND DATE('{load_start_date}')
 GROUP BY
     ALL
