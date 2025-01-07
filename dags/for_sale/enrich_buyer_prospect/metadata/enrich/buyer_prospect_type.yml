@@ -9,19 +9,19 @@ columns:
   id_prospect:
     description: 'Id of the prospect, or buyer.'
     lineage:
-    - datalake_demand_flows.prospect_daily_results.id_prospect
+    - datalake_demand_flows.buyer_prospect_status.id_buyer_prospect
   id_region:
     description: 'Id of the region of the prospect'
     lineage:
-    - datalake_demand_flows.prospect_daily_results.id_region
+    - datalake_ebdb_clean.house.id_region
   id_first_booking:
     description: 'Id of the first booking of the prospect.'
     lineage:
-    - datalake_demand_flows.prospect_daily_results.id_booking
+    - datalake_booking.booking.id_booking
   id_house_first_booking:
     description: 'Id of the house of the first booking of the prospect.'
     lineage:
-    - datalake_demand_flows.prospect_daily_results.id_house
+    - datalake_booking.booking.id_house
   sk_buyer_prospect_type:
     description: 'Surrogate key of the buyer prospect.'
   bp_type:
@@ -30,11 +30,11 @@ columns:
       "NBP": "New Buyer Prospect."
       "RBP": "Recovery Buyer Prospect."
     lineage:
-    - datalake_demand_flows.prospect_daily_results.event_name
+    - datalake_demand_flows.buyer_prospect_status.event_name
   city_group:
     description: 'City group of the prospect.'
     lineage:
-    - datalake_region.region.city_group
+    - datalake_demand_flows.buyer_prospect_status.city_group
   price_segment:
     description: 'Segmentation of the ticket of the first visit of the prospect.'
     categories:
@@ -42,17 +42,17 @@ columns:
       "Low Ticket": "Low Ticket"
     lineage:
     - datalake_sale_listings.sale_listing_price_changes.price_segment
-  activation_date:
+  ts_activation:
     description: 'Date of activation of the prospect.'
     lineage:
-    - datalake_demand_flows.prospect_daily_results.ts_event
-  activation_end_date:
+    - atalake_demand_flows.buyer_prospect_status.ts_status_started
+  ts_activation_end:
     description: 'Date of end of activation of the prospect.'
     lineage:
-    - datalake_demand_flows.prospect_daily_results.ts_event
+    - datalake_demand_flows.buyer_prospect_status.ts_activation_end
   ts_first_booking:
     description: 'Timestamp of the first booking of the prospect.'
     lineage:
-    - datalake_demand_flows.prospect_daily_results.ts_event
+    - datalake_booking.booking.ts_created
   ts_load:
     description: 'Timestamp of the load of the data.'

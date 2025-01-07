@@ -1,112 +1,75 @@
-WITH prospect_daily_results AS (
-  SELECT DISTINCT
-    pdr.id_prospect,
-    pdr.id_booking,
-    pdr.id_house,
-    pdr.ts_event,
-    pdr.event_type,
-    pdr.event_name,
-    pdr.business_context,
-    pdr.id_region,
-    ROW_NUMBER() OVER(PARTITION BY COALESCE(id_rent_flow, id_sale_flow), event_type, business_context ORDER BY ts_event ASC) AS flow_order
-  FROM 
-    datalake_demand_flows.prospect_daily_results AS pdr
-  WHERE
-    business_context = 'sale' 
-), 
-cte_booking AS (
-  SELECT 
-    pdr.id_prospect,
-    pdr.id_booking,
-    pdr.id_house,
-    pdr.ts_event,
-    pdr.event_type,
-    pdr.event_name,
-    pdr.business_context,
-    pdr.id_region
-  FROM 
-    prospect_daily_results AS pdr
-  WHERE 
-    event_type = 'FLOW'
-    AND event_name = 'VISIT BOOKED'
-    AND ts_event < CURRENT_DATE()
-), 
-cte_bp_type AS (
-  SELECT 
-    pdr.id_prospect,
-    pdr.event_name,
-    pdr.id_region,
-    CASE 
-      WHEN pdr.event_name = 'USER RECOVERY' AND pdr.flow_order = 1 THEN 'RBP'
-      WHEN pdr.event_name = 'USER FIRST ACTIVATION' AND pdr.flow_order = 1 THEN 'NBP'
+WITH bp_status AS (
+  SELECT
+    bps.id_buyer_prospect,
+    bps.prospect_event_name,
+    bps.status_trigger_event_name,
+    CASE
+      WHEN bps.prospect_event_name = 'USER RECOVERY' THEN 'RBP'
+      WHEN bps.prospect_event_name IN (
+        'USER FIRST ACTIVATION',
+        'USER FIRST ACTIVATION IN CITY GROUP'
+      ) THEN 'NBP'
     END AS bp_type,
-    dr.city_group,
-    pdr.event_type,
-    pdr.ts_event AS activation_date,
-    LEAD(pdr.ts_event) OVER(PARTITION BY pdr.id_prospect, dr.city_group ORDER BY pdr.ts_event ASC, pdr.event_type DESC) AS activation_end_date
-  FROM 
-    prospect_daily_results AS pdr
-  INNER JOIN 
-    datalake_region.region dr
-      ON pdr.id_region = dr.id
-  WHERE
-    event_type = 'CONVERSION'
-    AND ts_event < CURRENT_DATE()
+    bps.city_group,
+    bps.status_detail,
+    bps.status,
+    bps.ts_status_started AS ts_activation,
+    COALESCE(
+      bps.ts_status_ended,
+      LEAD(bps.ts_status_started) OVER (PARTITION BY bps.id_buyer_prospect ORDER BY bps.ts_status_started)
+     ) AS ts_activation_end
+  FROM
+    datalake_demand_flows.buyer_prospect_status AS bps
 ),
- cte_bp_type_final AS (
-  SELECT 
-    cbt.id_prospect,
-    cbt.id_region,
-    cbt.bp_type,
-    cbt.city_group,
-    cbt.activation_date,
-    cbt.activation_end_date,
-    LAG(cbt.activation_date) OVER (
-    PARTITION BY 
-      cbt.id_prospect
-    ORDER BY
-      cbt.activation_date
-    ) AS previous_activation_date,
-    LEAD(cbt.activation_date) OVER (
-      PARTITION BY cbt.id_prospect
-      ORDER BY
-        cbt.activation_date
-    ) AS next_activation_date
-  FROM 
-    cte_bp_type AS cbt
-  WHERE 
-    cbt.bp_type is not null 
+bookings AS (
+  SELECT
+    id_visitor,
+    id_visit,
+    id_house,
+    ts_created AS ts_booking_created
+  FROM
+    datalake_booking.booking
+  WHERE
+    visit_intent = 'SALE'
 )
-SELECT DISTINCT
-  cbtf.id_prospect,
-  cbtf.id_region,
-  FIRST(cb.id_booking) OVER (PARTITION BY cbtf.id_prospect, cbtf.activation_date ORDER BY cb.ts_event ASC) AS id_first_booking,
-  FIRST(cb.id_house) OVER (PARTITION BY cbtf.id_prospect, cbtf.activation_date ORDER BY cb.ts_event ASC) AS id_house_first_booking,
-  CASE 
+SELECT
+  bp_status.id_buyer_prospect AS id_prospect,
+  h.id_region,
+  bookings.id AS id_first_booking,
+  bookings.id_house AS id_house_first_booking,
+  CASE
     WHEN bp_type = 'NBP' THEN 1
     WHEN bp_type = 'RBP' THEN 2
   END AS sk_buyer_prospect_type,
-  cbtf.bp_type,
-  cbtf.city_group,
+  bp_status.bp_type,
+  bp_status.city_group,
   slpc.price_segment,
-  cbtf.activation_date,
-  cbtf.activation_end_date,
-  FIRST(cb.ts_event) OVER (PARTITION BY cbtf.id_prospect ORDER BY cb.ts_event ASC) AS ts_first_booking,
-  NOW() AS ts_load
-FROM 
-  cte_bp_type_final AS cbtf
-LEFT JOIN
-  cte_booking AS cb
-    ON cbtf.id_prospect = cb.id_prospect
-    AND cb.ts_event BETWEEN cbtf.activation_date AND cbtf.activation_end_date
-LEFT JOIN
-  datalake_sale_listings.sale_listing_price_changes AS slpc
-    ON cb.id_house = slpc.id_house
-    AND cb.ts_event BETWEEN slpc.ts_price_started AND COALESCE(slpc.ts_price_ended, NOW())
+  bp_status.ts_activation,
+  bp_status.ts_activation_end,
+  bookings.ts_created AS ts_first_booking
+FROM
+  bp_status
+  INNER JOIN 
+    datalake_booking.booking AS bookings 
+      ON bp_status.id_buyer_prospect = bookings.id_visitor
+      AND bookings.ts_created BETWEEN bp_status.ts_activation
+      AND COALESCE(bp_status.ts_activation_end, NOW())
+  LEFT JOIN
+    datalake_ebdb_clean.house AS h
+      ON bookings.id_house = h.id
+  LEFT JOIN 
+    datalake_sale_listings.sale_listing_price_changes AS slpc 
+      ON bookings.id_house = slpc.id_house
+      AND bookings.ts_created BETWEEN slpc.ts_price_started
+      AND COALESCE(slpc.ts_price_ended, NOW())
 WHERE
-  (
-    cbtf.previous_activation_date IS NULL 
-    OR cbtf.activation_date <> cbtf.previous_activation_date
-  )
-QUALIFY
-  FIRST(cb.id_booking) OVER (PARTITION BY cbtf.id_prospect, cbtf.activation_date ORDER BY cb.ts_event ASC) = cb.id_booking
+    bp_status.status = 'ACTIVE'
+QUALIFY ROW_NUMBER() OVER (
+    PARTITION BY bp_status.id_buyer_prospect,
+    bp_status.ts_activation_end,
+    bp_status.bp_type,
+    bp_status.city_group,
+    bp_status.status
+    ORDER BY
+      bookings.ts_created ASC
+  ) = 1
