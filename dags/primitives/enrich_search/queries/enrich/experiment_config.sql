@@ -79,7 +79,7 @@ FROM VALUES
     (
         "ab_beakman_search_services_demand_concentration_rent_experiment",
         named_struct(
-            'begin_date', DATE('2024-12-09'),
+            'begin_date', DATE('2024-12-19'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
@@ -118,6 +118,21 @@ FROM VALUES
                 )
             ),
             'filters', "business_context = 'sale'"
+        )
+    )
+    -- Copilot exp
+    (
+        "native_copilot_experiment",
+        named_struct(
+            'begin_date', DATE('2024-11-07'),
+            'end_date', DATE('2025-01-02'),
+            'variants', to_json(
+                named_struct(
+                    'baseline', 'baseline',
+                    'treatment', 'treatment'
+                )
+            ),
+            'filters', NULL
         )
     )
     -- Add new experiment here
