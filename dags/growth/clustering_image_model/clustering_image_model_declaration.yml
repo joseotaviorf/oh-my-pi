@@ -30,7 +30,8 @@ workflow:
     - "{load_start_date}" # load_start_date
     - "{load_end_date}" # load_end_date
   tables_customization:
-    clustering_image: {}
-
+    clustering_image:
+      merge_on: ["id_condo", "id_sourcename_anchor", "id_sourcename_pair"]
+      when_matched_updated_condition: "source.dt_model >= target.dt_model"
 cluster:
   type: databricks_13_3_med_memory_cluster
