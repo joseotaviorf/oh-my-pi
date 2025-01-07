@@ -1,5 +1,0 @@
----
-PARTITION_COLUMNS:
-  - year
-  - month
-  - day

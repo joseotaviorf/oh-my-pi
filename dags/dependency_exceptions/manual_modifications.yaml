@@ -957,12 +957,6 @@ bietlejuice.dw_agent:
     - bietlejuice.sirena:load-clean-agents
     - bietlejuice.sirena:load-clean-prospects
     - bietlejuice.enrich_sirena:load-enrich-messages
-bietlejuice.looker_temps:
-  remove:
-    - bietlejuice.dw_datamarts_for_sale_cross:load-dw-datamarts-temp-supply-flows
-    - bietlejuice.dw_datamarts_for_sale_cross:load-dw-datamarts-sale-cohort-conversions
-    - bietlejuice.dw_datamarts_for_sale_cross:load-dw-datamarts-sale-events-funnel
-    - bietlejuice.dw_datamarts_for_sale:load-dw-datamarts-repressed-demand-sale-booking-fit-in
 
 wonka.house_user_rent_flows:
   add:
