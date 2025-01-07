@@ -1,17 +1,17 @@
 ---
 dag:
-  name: enrich_viva_real_crawler_listings
+  name: enrich_zap_imoveis_crawler_listings
   schedule_start_date: 2021, 7, 20
-  owner: Data ForRent
-  schedule_interval: 0 6 * * 3
+  owner: Data Growth
+  schedule_interval: 0 6 * * 2
   documentation: 
     dag_purpose: |
-      Creates enriched table for the context `Crawlers Listings` from Viva Real.
+      Creates enriched table for the context `Crawlers Listings` from Zap Imoveis.
       The `datalake_crawlers_listings` schema has tables that extract data from OLX, VivaReal and Zap Imoveis  websites.
       The ingestion is incremental, partitioned on city, year, month and day columns.
-      This DAG runs once a week (Wednesday) and it's triggered by Airflow.
+      This DAG runs once a week (Tuesday) and it's triggered by Airflow.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: crawlers_listings
   default_extraction_type: incremental

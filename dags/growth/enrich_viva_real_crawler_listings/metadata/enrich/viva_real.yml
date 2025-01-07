@@ -1,97 +1,97 @@
 database_name: datalake_crawlers_listings
-table_name: zap_imoveis
-description: Table with information about the listings of ZAP Imoveis.
-domain: For Rent
-owner: gustavo.geiger@quintoandar.com.br
+table_name: viva_real
+description: Table with information about the listings of Viva Real.
+domain: Growth
+owner: andre.melo@quintoandar.com.br
 columns:
   id_house_platform:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.id
+    - datalake_crawlers_listings_clean.viva_real.id
     description: ID from platform
   id_house:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.id
+    - datalake_crawlers_listings_clean.viva_real.id
     description: ID with the competitor name together
   platform:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.origin
+    - datalake_crawlers_listings_clean.viva_real.origin
     description: Competitor name
   country:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.address
+    - datalake_crawlers_listings_clean.viva_real.address
     description: House listing country name
   state:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.address
+    - datalake_crawlers_listings_clean.viva_real.address
     description: House listing state name
   address_city:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.address
-    - datalake_crawlers_listings_clean.zap_imoveis.city
+    - datalake_crawlers_listings_clean.viva_real.address
+    - datalake_crawlers_listings_clean.viva_real.city
     description: House listing primary column name
   city:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.city
+    - datalake_crawlers_listings_clean.viva_real.city
     description: House listing secondary column for city name
   neighborhood:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.address
+    - datalake_crawlers_listings_clean.viva_real.address
     description: House listing neighborhood name
   street:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.address
+    - datalake_crawlers_listings_clean.viva_real.address
     description: House listing street name
   street_number:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.address
+    - datalake_crawlers_listings_clean.viva_real.address
     description: House listing number
   zip_code:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.address
+    - datalake_crawlers_listings_clean.viva_real.address
     description: House listing zip code
   latitude:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.geolocation
+    - datalake_crawlers_listings_clean.viva_real.geolocation
     description: House listing latitude
   longitude:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.geolocation
+    - datalake_crawlers_listings_clean.viva_real.geolocation
     description: House listing longitude
   listing_name:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.listing_name
+    - datalake_crawlers_listings_clean.viva_real.listing_name
     description: House listing description
   total_area:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.house_info
+    - datalake_crawlers_listings_clean.viva_real.house_info
     description: House listing total area
   amenities:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.house_info
+    - datalake_crawlers_listings_clean.viva_real.house_info
     description: All amenities in house listing
   bathrooms:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.house_info
+    - datalake_crawlers_listings_clean.viva_real.house_info
     description: Total listing bathrooms
   bedrooms:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.house_info
+    - datalake_crawlers_listings_clean.viva_real.house_info
     description: Total listing bedrooms
   floors:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.house_info
+    - datalake_crawlers_listings_clean.viva_real.house_info
     description: Building floors
   parking_spaces:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.house_info
+    - datalake_crawlers_listings_clean.viva_real.house_info
     description: Parking spaces available for the listing
   suites:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.house_info
+    - datalake_crawlers_listings_clean.viva_real.house_info
     description: Total listing suites
   unit_type:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.house_info
+    - datalake_crawlers_listings_clean.viva_real.house_info
     description: Listing unit type
     categories:
       CONDOMINIUM: ''
@@ -99,74 +99,75 @@ columns:
       PENTHOUSE: ''
       FLAT: ''
       ALLOTMENT_LAND: ''
+      COUNTRY_HOUSE: ''
       RESIDENTIAL_ALLOTMENT_LAND: ''
-      VILLAGE_HOUSE: ''
+      RESIDENTIAL_BUILDING: ''
       HOME: ''
       FARM: ''
+      TWO_STORY_HOUSE: ''
       APARTMENT: ''
-      LOFT: ''
   usage_type:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.house_info
+    - datalake_crawlers_listings_clean.viva_real.house_info
     description: Listing usage type
     categories:
       RESIDENTIAL: ''
       RESIDENTIAL, COMMERCIAL: ''
   advertiser_name:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.contact_information
+    - datalake_crawlers_listings_clean.viva_real.contact_information
     description: Who published the listing
   advertiser_phone:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.contact_information
+    - datalake_crawlers_listings_clean.viva_real.contact_information
     description: The phone number of the advertiser
   condo_fee:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.price
+    - datalake_crawlers_listings_clean.viva_real.price
     description: House listing condo price
   iptu:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.price
+    - datalake_crawlers_listings_clean.viva_real.price
     description: House listing iptu price
   price_rental:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.price
+    - datalake_crawlers_listings_clean.viva_real.price
     description: House listing rent price
   price_sale:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.price
+    - datalake_crawlers_listings_clean.viva_real.price
     description: House listing sale price
   is_for_rent:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.type
+    - datalake_crawlers_listings_clean.viva_real.type
     description: If this listings if for rent
   is_for_sale:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.type
+    - datalake_crawlers_listings_clean.viva_real.type
     description: If this listing is for sale
   ts_created:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.date_info
+    - datalake_crawlers_listings_clean.viva_real.date_info
     description: Timestamp when listing was created in platform
   ts_updated:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.date_info
+    - datalake_crawlers_listings_clean.viva_real.date_info
     description: Timestamp when listing was last updated in platform
   year:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.year
+    - datalake_crawlers_listings_clean.viva_real.year
     description: Year when listing was created on platform
   month:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.month
+    - datalake_crawlers_listings_clean.viva_real.month
     description: Month when listing was created on platform
   day:
     lineage:
-    - datalake_crawlers_listings_clean.zap_imoveis.day
+    - datalake_crawlers_listings_clean.viva_real.day
     description: Day when listing was created on platform
+  is_hybrid:
+    description: If this listing is both for rent and for sale
   price_m2_rental:
     description: House listing rent m² price
   price_m2_sale:
     description: House listing sale m² price
-  is_hybrid:
-    description: If this listing is both for rent and for sale
