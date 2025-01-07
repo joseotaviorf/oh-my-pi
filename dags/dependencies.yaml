@@ -972,11 +972,6 @@ bietlejuice.dw_tenant_documentation:
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud
   - bietlejuice.ebdb_proposal:load-clean-proposal-document
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
-bietlejuice.dw_tickets:
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-house
-  - bietlejuice.enrich_support_users:load-enrich-zendesk-users
-  - bietlejuice.enrich_zendesk:load-enrich-tickets-current
-  - bietlejuice.zendesk:load-clean-ticket-comments
 bietlejuice.dw_tracksale:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
