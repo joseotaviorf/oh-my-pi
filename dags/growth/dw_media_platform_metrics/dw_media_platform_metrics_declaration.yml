@@ -2,7 +2,7 @@ dag:
   name: dw_media_platform_metrics
   schedule_start_date: 2024,11,11
   owner: Data Growth
-  documentation: 
+  documentation:
     dag_purpose: |
       This DAG is responsible for consolidate metrics like clicks, impressions and cost from 
       Media Platforms like Google, Facebook, Criteo and Trovit.
@@ -14,6 +14,12 @@ workflow:
   default_partitions: ["year", "month", "day"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}" 
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,13 +1,9 @@
----
 dag:
   name: rental_guarantee_platform
   schedule_interval: 0 1 * * *
   owner: Data Fintech
   documentation:
-    dag_purpose:
-      This DAG imports the tables from **Rental Guarantee Platform**, a
-      For Brokers service that provides insurance against loss of rent for real estate
-      agencies.
+    dag_purpose: This DAG imports the tables from **Rental Guarantee Platform**, a For Brokers service that provides insurance against loss of rent for real estate agencies.
 workflow:
   type: database_pull_delta
   layer: raw
@@ -17,9 +13,9 @@ workflow:
   default_raw_extraction_type: incremental
   default_clean_extraction_type: full
   default_raw_partitions:
-    - year
-    - month
-    - day
+  - year
+  - month
+  - day
   lineage_product_database_name: rentalguaranteeplatform
   tables_customization:
     address:
@@ -266,3 +262,9 @@ workflow:
       raw_partitions: []
 cluster:
   type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

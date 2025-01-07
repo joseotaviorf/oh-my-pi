@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_ebdb_proposal
   schedule_start_date: 2020, 7, 1
@@ -12,9 +11,13 @@ workflow:
   type: query_delta
   layer: enrich
   default_partitions:
-    - country_code
+  - country_code
 cluster:
   type: databricks_12_2_min_xlarge_io-memory_photon_cluster
   custom_configurations:
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: static
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new

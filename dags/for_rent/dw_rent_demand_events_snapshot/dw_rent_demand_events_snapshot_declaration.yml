@@ -11,7 +11,7 @@ workflow:
   has_load_to_redshift_task: false
   inner_dependencies:
     coincident_events_volume_changes_snapshot:
-      - rent_demand_events_snapshot
+    - rent_demand_events_snapshot
   tables_customization:
     coincident_events_volume_changes_snapshot:
       extra_query_template_params:
@@ -30,9 +30,14 @@ cluster:
     node_type_id: r5d.4xlarge
     num_workers: 3
     aws_attributes:
-        first_on_demand: 1
-        spot_bid_price_percent: 100
-        zone_id: us-east-1d
-        ebs_volume_size: 200
-        availability: SPOT_WITH_FALLBACK
+      first_on_demand: 1
+      spot_bid_price_percent: 100
+      zone_id: us-east-1d
+      ebs_volume_size: 200
+      availability: SPOT_WITH_FALLBACK
     spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

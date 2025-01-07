@@ -13,51 +13,51 @@ workflow:
   custom_schema: ebdb
   source_schema: ebdb
   tables_customization:
-    HouseMaintenanceCondition: 
+    HouseMaintenanceCondition:
       clean_table_name: house_maintenance_condition
       get_table_metrics:
         count: '*'
-    HouseMaintenanceCondition_AUD: 
+    HouseMaintenanceCondition_AUD:
       clean_table_name: house_maintenance_condition_aud
       get_table_metrics:
         count: '*'
-    HouseMedia: 
+    HouseMedia:
       clean_table_name: house_media
       get_table_metrics:
         count: '*'
-    HousePredictedPrice: 
+    HousePredictedPrice:
       clean_table_name: house_predicted_price
       get_table_metrics:
         count: '*'
-    HousePredictedPrice_AUD: 
+    HousePredictedPrice_AUD:
       clean_table_name: house_predicted_price_aud
       get_table_metrics:
         count: '*'
-    HouseRating: 
+    HouseRating:
       clean_table_name: house_rating
       get_table_metrics:
         count: '*'
-    HouseRegistrationStatus: 
+    HouseRegistrationStatus:
       clean_table_name: house_registration_status
       get_table_metrics:
         count: '*'
-    HouseRegistrationStatus_AUD: 
+    HouseRegistrationStatus_AUD:
       clean_table_name: house_registration_status_aud
       get_table_metrics:
         count: '*'
-    HouseRentCosts_AUD: 
+    HouseRentCosts_AUD:
       clean_table_name: house_rent_costs_aud
       get_table_metrics:
         count: '*'
-    HouseSpecialCondition: 
+    HouseSpecialCondition:
       clean_table_name: house_special_condition
       get_table_metrics:
         count: '*'
-    Imovel: 
+    Imovel:
       clean_table_name: house
       get_table_metrics:
         count: '*'
-    Imovel_AUD: 
+    Imovel_AUD:
       clean_table_name: house_aud
       get_table_metrics:
         count: '*'
@@ -69,4 +69,9 @@ cluster:
     num_workers: 3
     spark_version: 13.3.x-scala2.12
     aws_attributes:
-        ebs_volume_size: 200
+      ebs_volume_size: 200
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

@@ -1,31 +1,36 @@
 dag:
-    name: enrich_support_users
-    schedule_start_date: 2023, 7, 24
-    owner: Data SS
-    documentation:
-        dag_purpose: |
-            This DAG loads tables related to users in the Support context, this includes analysts, customers, and Zendesk general users.
+  name: enrich_support_users
+  schedule_start_date: 2023, 7, 24
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG loads tables related to users in the Support context, this includes analysts, customers, and Zendesk general users.
 workflow:
-    type: query_delta
-    layer: enrich
-    inner_dependencies:
-        analysts:
-            - zendesk_users
-    tables_customization:
-        zendesk_users:
-            z_order_by: [id_user_main]
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    analysts:
+    - zendesk_users
+  tables_customization:
+    zendesk_users:
+      z_order_by: [id_user_main]
 cluster:
-    type: custom_cluster
-    custom_configurations:
-        autotermination_minutes: 20
-        driver_node_type_id: r5d.4xlarge
-        node_type_id: r5d.4xlarge
-        num_workers: 2
-        spark_version: 12.2.x-scala2.12
-        runtime_engine: PHOTON
-        aws_attributes:
-            first_on_demand: 1
-            spot_bid_price_percent: 100
-            zone_id: us-east-1d
-            availability: SPOT_WITH_FALLBACK
-            ebs_volume_size: 200
+  type: custom_cluster
+  custom_configurations:
+    autotermination_minutes: 20
+    driver_node_type_id: r5d.4xlarge
+    node_type_id: r5d.4xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    runtime_engine: PHOTON
+    aws_attributes:
+      first_on_demand: 1
+      spot_bid_price_percent: 100
+      zone_id: us-east-1d
+      availability: SPOT_WITH_FALLBACK
+      ebs_volume_size: 200
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

@@ -1,17 +1,22 @@
----
 dag:
   name: enrich_kill_queue
   schedule_start_date: 2020, 7, 1
   owner: Data ForRent
-  documentation: 
-      dag_purpose: |
-            Creates the enriched tables for the context `Reservation` using Kill Queue data.
-            It will track the user's reservation journey with all information, such as status, installments,
-            house, and tenant id.
-            In addition, in order to guarantee unicity for tables that have an incremental mode at the clean layer,
-            tables house, documentation and user are recreated with a deduplication process.
+  documentation:
+    dag_purpose: |
+      Creates the enriched tables for the context `Reservation` using Kill Queue data.
+      It will track the user's reservation journey with all information, such as status, installments,
+      house, and tenant id.
+      In addition, in order to guarantee unicity for tables that have an incremental mode at the clean layer,
+      tables house, documentation and user are recreated with a deduplication process.
 workflow:
   type: query_delta
   layer: enrich
 cluster:
   type: databricks_12_2_med_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

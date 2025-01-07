@@ -1,14 +1,20 @@
 dag:
-    name: enrich_kong
-    schedule_start_date: 2023, 4, 3
-    owner: Data SS
-    documentation:
-        dag_purpose: |
-            Extracts the access logs message in to columns
+  name: enrich_kong
+  schedule_start_date: 2023, 4, 3
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Extracts the access logs message in to columns
 workflow:
-    type: query_delta
-    layer: enrich
-    default_extraction_type: incremental
-    default_partitions: ["year", "month", "day", "hour"]
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day", "hour"]
 cluster:
-    type: databricks_12_2_max_io-memory_cluster
+  type: databricks_12_2_max_io-memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

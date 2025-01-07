@@ -1,95 +1,100 @@
 dag:
-    name: vans_homolog
-    schedule_start_date: 2019,10,1
-    schedule_interval: 0 8 * * *
-    owner: Data Fintech
-    documentation:
-        dag_purpose: |
-            This DAG creates the full tables for Vans, the integration with VAN service, responsible for the exchange with financial agent.
+  name: vans_homolog
+  schedule_start_date: 2019,10,1
+  schedule_interval: 0 8 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG creates the full tables for Vans, the integration with VAN service, responsible for the exchange with financial agent.
 workflow:
-    type: cdc
-    layer: raw
-    database_type: mysql
-    source_schema: vans
-    custom_schema: vans_homolog
-    source_database: vans
-    dbutils_secret_key: VANS_DB
-    tables_customization:
-        Bank:
-            clean_table_name: bank
-            raw_primary_keys: ["id"]
-            clean_primary_keys: ["id"]
-        BankBoleto:
-            clean_table_name: bank_boleto
-            raw_primary_keys: ["id"]
-            clean_primary_keys: ["id"]
-        BankBoletoRequestedBy:
-            clean_table_name: bank_boleto_requested_by
-            raw_primary_keys: ["bank_boleto_id"]
-            clean_primary_keys: ["id_bank_boleto"]
-        BankPayment:
-            clean_table_name: bank_payment
-            raw_primary_keys: ["id"]
-            clean_primary_keys: ["id"]
-        BankPaymentRequestedBy:
-            clean_table_name: bank_payment_requested_by
-            raw_primary_keys: ["bank_payment_id"]
-            clean_primary_keys: ["id_bank_payment"]
-        Boleto:
-            clean_table_name: boleto
-            raw_primary_keys: ["id"]
-            clean_primary_keys: ["id"]
-        BoletoOurNumberCounter:
-            clean_table_name: boleto_our_number_counter
-            raw_primary_keys: ["our_number"]
-            clean_primary_keys: ["our_number"]
-        Boleto_File:
-            clean_table_name: boleto_file
-            raw_primary_keys: ["file_id", "boleto_id"]
-            clean_primary_keys: ["id_file", "id_boleto"]
-        File:
-            clean_table_name: file
-            raw_primary_keys: ["id"]
-            clean_primary_keys: ["id"]
-        File_Payment:
-            clean_table_name: file_payment
-            raw_primary_keys: ["file_id", "payment_id"]
-            clean_primary_keys: ["id_file", "id_payment"]
-        File_PaymentBoleto:
-            clean_table_name: file_payment_boleto
-            raw_primary_keys: ["file_id", "payment_boleto_id"]
-            clean_primary_keys: ["id_file", "id_payment_boleto"]
-        Payment:
-            clean_table_name: payment
-            raw_primary_keys: ["id"]
-            clean_primary_keys: ["id"]
-        PaymentBoleto:
-            clean_table_name: payment_boleto
-            raw_primary_keys: ["id"]
-            clean_primary_keys: ["id"]
-        PaymentBoleto_Status_Log:
-            clean_table_name: payment_boleto_status_log
-            raw_primary_keys: ["id"]
-            clean_primary_keys: ["id"]
-        PaymentMethod:
-            clean_table_name: payment_method
-            raw_primary_keys: ["id"]
-            clean_primary_keys: ["id"]
-        Payment_Status_Log:
-            clean_table_name: payment_status_log
-            raw_primary_keys: ["id"]
-            clean_primary_keys: ["id"]
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_schema: vans
+  custom_schema: vans_homolog
+  source_database: vans
+  dbutils_secret_key: VANS_DB
+  tables_customization:
+    Bank:
+      clean_table_name: bank
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    BankBoleto:
+      clean_table_name: bank_boleto
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    BankBoletoRequestedBy:
+      clean_table_name: bank_boleto_requested_by
+      raw_primary_keys: ["bank_boleto_id"]
+      clean_primary_keys: ["id_bank_boleto"]
+    BankPayment:
+      clean_table_name: bank_payment
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    BankPaymentRequestedBy:
+      clean_table_name: bank_payment_requested_by
+      raw_primary_keys: ["bank_payment_id"]
+      clean_primary_keys: ["id_bank_payment"]
+    Boleto:
+      clean_table_name: boleto
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    BoletoOurNumberCounter:
+      clean_table_name: boleto_our_number_counter
+      raw_primary_keys: ["our_number"]
+      clean_primary_keys: ["our_number"]
+    Boleto_File:
+      clean_table_name: boleto_file
+      raw_primary_keys: ["file_id", "boleto_id"]
+      clean_primary_keys: ["id_file", "id_boleto"]
+    File:
+      clean_table_name: file
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    File_Payment:
+      clean_table_name: file_payment
+      raw_primary_keys: ["file_id", "payment_id"]
+      clean_primary_keys: ["id_file", "id_payment"]
+    File_PaymentBoleto:
+      clean_table_name: file_payment_boleto
+      raw_primary_keys: ["file_id", "payment_boleto_id"]
+      clean_primary_keys: ["id_file", "id_payment_boleto"]
+    Payment:
+      clean_table_name: payment
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    PaymentBoleto:
+      clean_table_name: payment_boleto
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    PaymentBoleto_Status_Log:
+      clean_table_name: payment_boleto_status_log
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    PaymentMethod:
+      clean_table_name: payment_method
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    Payment_Status_Log:
+      clean_table_name: payment_status_log
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
 cluster:
-    type: custom_cluster
-    custom_configurations:
-        autotermination_minutes: 20
-        driver_node_type_id: r5.xlarge
-        node_type_id: r5.xlarge
-        num_workers: 3
-        spark_version: 12.2.x-scala2.12
-        aws_attributes:
-            first_on_demand: 1
-            spot_bid_price_percent: 100
-            zone_id: us-east-1d
-            ebs_volume_size: 200
-            availability: SPOT_WITH_FALLBACK
+  type: custom_cluster
+  custom_configurations:
+    autotermination_minutes: 20
+    driver_node_type_id: r5.xlarge
+    node_type_id: r5.xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+      first_on_demand: 1
+      spot_bid_price_percent: 100
+      zone_id: us-east-1d
+      ebs_volume_size: 200
+      availability: SPOT_WITH_FALLBACK
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

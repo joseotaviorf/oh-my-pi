@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_ebdb_contract
   schedule_start_date: 2020, 7, 1
@@ -11,10 +10,10 @@ workflow:
   type: query_delta
   layer: enrich
   default_partitions:
-    - country_code
+  - country_code
   inner_dependencies:
     contract_declined_relisting:
-      - contract
+    - contract
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -24,3 +23,7 @@ cluster:
     spark_version: 12.2.x-scala2.12
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: static
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new

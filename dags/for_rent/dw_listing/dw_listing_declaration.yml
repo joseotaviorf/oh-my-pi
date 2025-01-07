@@ -12,7 +12,7 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   inner_dependencies:
     fact_house_listing_daily_infos:
-      - fact_house_listing_daily_available_hours
+    - fact_house_listing_daily_available_hours
   tables_customization:
     dim_condo:
       partitions: []
@@ -21,7 +21,7 @@ workflow:
       partitions: ["country_code", "year", "month", "day"]
       extraction_type: incremental
     fact_house_listing_daily_available_hours:
-      partitions: [ "year", "month", "day" ]
+      partitions: ["year", "month", "day"]
       extraction_type: incremental
       custom_schema: listing
 cluster:
@@ -29,3 +29,9 @@ cluster:
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

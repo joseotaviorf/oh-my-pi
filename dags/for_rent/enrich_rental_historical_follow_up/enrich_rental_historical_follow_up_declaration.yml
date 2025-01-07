@@ -1,12 +1,11 @@
----
 dag:
   name: enrich_rental_historical_follow_up
   schedule_start_date: 2020, 7, 16
   owner: Data ForRent
   documentation:
-      dag_purpose: |
-        Creates enriched tables that has a historical follow up of the data.
-        Usually the date values drives the tables of this DAG.
+    dag_purpose: |
+      Creates enriched tables that has a historical follow up of the data.
+      Usually the date values drives the tables of this DAG.
 workflow:
   type: query_delta
   layer: enrich
@@ -14,8 +13,14 @@ workflow:
     house_listings_daily_info:
       extraction_type: incremental
       partitions:
-        - year
-        - month
-        - day
+      - year
+      - month
+      - day
 cluster:
   type: databricks_12_2_min_io-memory_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

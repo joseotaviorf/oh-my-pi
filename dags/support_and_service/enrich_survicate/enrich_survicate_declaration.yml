@@ -1,44 +1,49 @@
 dag:
-    name: enrich_survicate
-    schedule_start_date: 2020, 7, 1
-    owner: Data SS
-    documentation: 
-        dag_purpose: |
-            Transform survey response collected from [Survicate](https://developers.survicate.com/data-export/#get-the-list-of-surveys).
+  name: enrich_survicate
+  schedule_start_date: 2020, 7, 1
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Transform survey response collected from [Survicate](https://developers.survicate.com/data-export/#get-the-list-of-surveys).
 workflow:
-    type: query_delta
-    layer: enrich
-    default_extraction_type: incremental
-    default_partitions: ["year", "month", "day"]
-    inner_dependencies:
-        inspections_surveys:
-            - response_content
-            - survey_responses
-        keys_surveys:
-            - response_content
-            - survey_responses
-        lockbox_surveys:
-            - response_content
-            - survey_responses
-        photo_surveys:
-            - response_content
-            - survey_responses
-        repairs_surveys:
-            - response_content
-            - survey_responses
-        scheduling_surveys:
-            - response_content
-            - survey_responses
-        zendesk_email_surveys:
-            - response_content
-            - survey_responses
-        single_station_surveys:
-            - response_content
-            - survey_responses
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  inner_dependencies:
+    inspections_surveys:
+    - response_content
+    - survey_responses
+    keys_surveys:
+    - response_content
+    - survey_responses
+    lockbox_surveys:
+    - response_content
+    - survey_responses
+    photo_surveys:
+    - response_content
+    - survey_responses
+    repairs_surveys:
+    - response_content
+    - survey_responses
+    scheduling_surveys:
+    - response_content
+    - survey_responses
+    zendesk_email_surveys:
+    - response_content
+    - survey_responses
+    single_station_surveys:
+    - response_content
+    - survey_responses
 cluster:
-    type: custom_cluster
-    custom_configurations:
-        driver_node_type_id: m5a.2xlarge
-        node_type_id: m5a.xlarge
-        num_workers: 3
-        spark_version: 13.3.x-scala2.12
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new
