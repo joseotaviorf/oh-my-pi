@@ -422,10 +422,10 @@ results AS (
       COALESCE(listing_age, 'X'),
       COALESCE(quality_score_result, 'X'),
       COALESCE(liquidity_score_result, 'X'),
-      -- COALESCE(lpv_7d_for_rent, 'X'), -- Removed at the request of SH on 2024-11-05
-      -- COALESCE(lpv_7d_for_sale, 'X'), -- Removed at the request of SH on 2024-11-05
       COALESCE(lpv_3d_for_rent, 'X'),
-      COALESCE(lpv_3d_for_sale, 'X')
+      COALESCE(lpv_3d_for_sale, 'X'),
+      COALESCE(lpv_7d_for_rent, 'X'), -- Adding at the request of SH on 2025-01-06
+      COALESCE(lpv_7d_for_sale, 'X') -- Adding at the request of SH on 2025-01-06
       -- COALESCE(lpv_1d_for_rent, 'X'), -- Removed at the request of SH on 2024-11-05
       -- COALESCE(lpv_1d_for_sale, 'X') -- Removed at the request of SH on 2024-11-05
     ) AS demand_score,
