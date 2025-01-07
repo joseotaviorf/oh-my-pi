@@ -4,7 +4,7 @@ dag:
   schedule_interval: 0 0 * * *
   owner: Data Governance
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   custom_schema: superset
   database_type: postgres

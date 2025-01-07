@@ -4,7 +4,7 @@ dag:
   schedule_interval: 0 0 * * *
   owner: Data Governance
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   custom_schema: superset
   has_hive_sync: true
@@ -13,7 +13,7 @@ workflow:
   default_partitions: ["year", "month", "day"]
   dbutils_secret_key: SUPERSET_DB
   tables_customization:
-    dashboard_slices: 
+    dashboard_slices:
       extraction_type: full
       partitions: []
     dashboard_user:
