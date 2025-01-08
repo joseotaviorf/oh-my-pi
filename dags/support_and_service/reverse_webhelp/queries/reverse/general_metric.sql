@@ -22,6 +22,7 @@ SELECT DISTINCT
   ft.front_or_back,
   dd.team,
   dt.motivation AS contact_motivation_tag,
+  dt.theme AS contact_theme_tag,
   dt.theme_detail AS contact_theme_detail_tag,
   dt.customer_type_tag,
   dit.tags AS tag,
@@ -72,6 +73,4 @@ LEFT JOIN
     OR ft.sk_last_analyst = da.sk_agent_twilio
 WHERE
   DATE(ft.ts_created) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
-  AND dd.is_partner IS TRUE
-  AND dd.front_or_back <> 'front'
   AND da.agent_organization IN ('webhelp', 'webhelpbr')
