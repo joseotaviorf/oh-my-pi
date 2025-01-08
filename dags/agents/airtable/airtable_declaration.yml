@@ -16,49 +16,49 @@ workflow:
   type: custom_ingestion
   load_spark_job: load_airtable_raw
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "{dag_name}"
-    - "{{ ds }}"
-    - "{table_name}"
-    - "{partitions}"
+  - "{environment}"
+  - "{bucket}"
+  - "{dag_name}"
+  - "{{ ds }}"
+  - "{table_name}"
+  - "{partitions}"
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   tables_customization:
     activated:
       extra_spark_job_arguments:
-        - base_id: app1Xchm7V2ypMlBQ
-          table_id: tblXIVyaK8QFpjLdy
-        - view: viwWbSdPz8p3TEow6
+      - base_id: app1Xchm7V2ypMlBQ
+        table_id: tblXIVyaK8QFpjLdy
+      - view: viwWbSdPz8p3TEow6
     brokers_accreditation:
       extra_spark_job_arguments:
-        - base_id: appgKZQCSVwzoloYh
-          table_id: tble5DCCppB5WQzeJ
-        - view: viwNAUHGZlrBma6A7
+      - base_id: appgKZQCSVwzoloYh
+        table_id: tble5DCCppB5WQzeJ
+      - view: viwNAUHGZlrBma6A7
     brokers_indication:
       extra_spark_job_arguments:
-        - base_id: appgKZQCSVwzoloYh
-          table_id: tbl5vup4GEab4jEj4
-        - view: viw1PecGNTWXvJGuZ
+      - base_id: appgKZQCSVwzoloYh
+        table_id: tbl5vup4GEab4jEj4
+      - view: viw1PecGNTWXvJGuZ
     cr_occurrences:
       extra_spark_job_arguments:
-        - base_id: app1Xchm7V2ypMlBQ
-          table_id: tblswVeTPw5LtSXwl
-        - view: viwOosdLmusE800Or
+      - base_id: app1Xchm7V2ypMlBQ
+        table_id: tblswVeTPw5LtSXwl
+      - view: viwOosdLmusE800Or
     historical:
       extra_spark_job_arguments:
-        - base_id: app1Xchm7V2ypMlBQ
-          table_id: tblrDwceCJcDMJhBP
-        - view: viwiq3dffbK6z2bog
+      - base_id: app1Xchm7V2ypMlBQ
+        table_id: tblrDwceCJcDMJhBP
+      - view: viwiq3dffbK6z2bog
     jira_tickets:
       extra_spark_job_arguments:
-        - base_id: app1Xchm7V2ypMlBQ
-          table_id: tblZl2bbgWIJpvhA3
-        - view: viwcC4sQQzVUDa099
+      - base_id: app1Xchm7V2ypMlBQ
+        table_id: tblZl2bbgWIJpvhA3
+      - view: viwcC4sQQzVUDa099
 cluster:
   type: custom_cluster
   custom_libraries:
-    - whl: "{artifacts_bucket}/airtable-api-client-python/quintoandar_airtable_api_client-0.1.0-py2.py3-none-any.whl"
+  - whl: "{artifacts_bucket}/airtable-api-client-python/quintoandar_airtable_api_client-0.1.0-py2.py3-none-any.whl"
   custom_configurations:
     driver_node_type_id: m5a.xlarge
     node_type_id: m5a.large
@@ -66,3 +66,7 @@ cluster:
     spark_version: 12.2.x-scala2.12
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new

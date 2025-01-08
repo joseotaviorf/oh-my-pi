@@ -4,9 +4,7 @@ dag:
   schedule_interval: 0 0 * * *
   owner: Data SS
   documentation:
-  dag_purpose: Retrieve data from the Bigfone database (PostgreSQL).
-    [Bigfone](https://github.com/quintoandar/big-fone) is a system which is responsible for interacting with Twilio (an external service) to manage calls, peers and store data used to generate some reports.
-    It also acts as a central place to identify a person, adding info from Skynet, Akinator, Timeline (from Stalker) and Akinator.
+  dag_purpose: Retrieve data from the Bigfone database (PostgreSQL). [Bigfone](https://github.com/quintoandar/big-fone) is a system which is responsible for interacting with Twilio (an external service) to manage calls, peers and store data used to generate some reports. It also acts as a central place to identify a person, adding info from Skynet, Akinator, Timeline (from Stalker) and Akinator.
 
 workflow:
   type: database_pull_delta
@@ -38,3 +36,8 @@ cluster:
     node_type_id: r5a.2xlarge
     num_workers: 3
     spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

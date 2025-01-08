@@ -1,4 +1,3 @@
-
 dag:
   name: ebdb_condo
   schedule_start_date: 2021, 2, 20
@@ -20,11 +19,11 @@ workflow:
       clean_table_name: access_type
     AccessType_AUD:
       clean_table_name: access_type_aud
-    Amenidades: 
+    Amenidades:
       clean_table_name: amenities
-    AmenidadesInfo: 
+    AmenidadesInfo:
       clean_table_name: info_amenities
-    AmenidadesInfo_AUD: 
+    AmenidadesInfo_AUD:
       clean_table_name: info_amenities_aud
     CondicoesEntrada:
       clean_table_name: entrance_conditions
@@ -34,11 +33,17 @@ workflow:
       clean_table_name: condo
     ContatoCondominio:
       clean_table_name: condo_contact
-    Instalacao: 
+    Instalacao:
       clean_table_name: condo_amenities
-    InstalacaoInfo: 
+    InstalacaoInfo:
       clean_table_name: info_condo_amenities
-    InstalacaoInfo_AUD: 
+    InstalacaoInfo_AUD:
       clean_table_name: info_condo_amenities_aud
 cluster:
   type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

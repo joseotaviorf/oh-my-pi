@@ -1,4 +1,3 @@
----
 dag:
   name: cyber
   schedule_start_date: 2024, 8, 1
@@ -17,33 +16,33 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
   default_extraction_type: full
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "{dag_name}"
-    - "{table_name}"
-    - "{load_start_date}"
-    - "{load_end_date}"
-    - "{extraction_type}"
-    - "{partitions}"
+  - "{environment}"
+  - "{bucket}"
+  - "{dag_name}"
+  - "{table_name}"
+  - "{load_start_date}"
+  - "{load_end_date}"
+  - "{extraction_type}"
+  - "{partitions}"
   tables_customization:
     delqmst:
       clean_table_name: delinquent_master
       extraction_type: incremental
       partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "['DMHOSTUP']"
+      - "['DMHOSTUP']"
     tb_historico_disponibilizacao:
       clean_table_name: history_contract_distribution
       extraction_type: incremental
       partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "['HD_DT_DISPONIBILIZACAO']"
+      - "['HD_DT_DISPONIBILIZACAO']"
     actfil:
       clean_table_name: logs
       extraction_type: incremental
       partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "['ACACTDTE']"
+      - "['ACACTDTE']"
     actvertb:
       clean_table_name: logs_code_description
       raw_extraction_type: incremental
@@ -51,91 +50,91 @@ workflow:
       clean_extraction_type: full
       merge_on: ["code", "code_type", "group"]
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     tb_parcela:
       clean_table_name: bill
       extraction_type: incremental
       partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "['PADTUPDATE', 'PADTINSERT', 'PABIDTUPDATE', 'PABIDTINSERT']"
+      - "['PADTUPDATE', 'PADTINSERT', 'PABIDTUPDATE', 'PABIDTINSERT']"
     tb_boleto:
       clean_table_name: agreement_invoices
       extraction_type: incremental
       partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "['BLRESV3','BLDTDOC']"
+      - "['BLRESV3','BLDTDOC']"
     relations:
       clean_table_name: debtor
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     uda1:
       clean_table_name: contracts
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     phone:
       clean_table_name: phone
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     address:
       clean_table_name: address
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     pmtfil:
       clean_table_name: payments
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     agrdm:
       clean_table_name: contracts_agreements
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     agrhdr:
       clean_table_name: agreements
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     agdscdet:
       clean_table_name: agreement_discounts
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     agpmtdet:
       clean_table_name: agreement_installments
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     collid:
       clean_table_name: users
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     agency:
       clean_table_name: agency
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
     agr_hist:
       clean_table_name: historical_agreements
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - "[]"
+      - "[]"
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -143,5 +142,10 @@ cluster:
     node_type_id: r5a.large
     num_workers: 3
     spark_version: 13.3.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   custom_libraries:
-    - jar: "{artifacts_bucket}/jars/ojdbc8.jar"
+  - jar: "{artifacts_bucket}/jars/ojdbc8.jar"
+  databricks_conn_id: databricks_new

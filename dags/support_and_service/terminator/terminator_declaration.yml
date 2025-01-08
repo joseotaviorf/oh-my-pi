@@ -4,9 +4,7 @@ dag:
   schedule_interval: 30 0 * * *
   owner: Data SS
   documentation:
-    dag_purpose:
-      This DAG imports the tables from [Terminator](https://github.com/quintoandar/terminator),
-      our service to orchestrate the offboard contract process.
+    dag_purpose: This DAG imports the tables from [Terminator](https://github.com/quintoandar/terminator), our service to orchestrate the offboard contract process.
 
 workflow:
   type: database_pull_delta
@@ -86,3 +84,8 @@ cluster:
     node_type_id: r5d.xlarge
     num_workers: 3
     spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

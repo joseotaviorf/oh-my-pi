@@ -1,4 +1,3 @@
----
 dag:
   name: invoice_preview
   schedule_start_date: 2020, 11, 1
@@ -15,21 +14,27 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "{dag_name}"
-    - s3://5a-seubarriga/prod/report
-    - "{load_start_date}"
-    - "{load_end_date}"
-    - "{table_name}"
+  - "{environment}"
+  - "{bucket}"
+  - "{dag_name}"
+  - s3://5a-seubarriga/prod/report
+  - "{load_start_date}"
+  - "{load_end_date}"
+  - "{table_name}"
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   tables_customization:
     invoice_preview:
       extra_spark_job_arguments:
-        - csv
-        - header: "true"
-          escape: '"'
-          multiLine: "true"
+      - csv
+      - header: "true"
+        escape: '"'
+        multiLine: "true"
 cluster:
   type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
