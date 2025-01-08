@@ -65,7 +65,7 @@ FROM VALUES
         "ab_beakman_ranking_sale_pclick_v1",
         named_struct(
             'begin_date', DATE('2024-10-19'),
-            'end_date', NULL,
+            'end_date', DATE('2025-01-08'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -119,7 +119,7 @@ FROM VALUES
             ),
             'filters', "business_context = 'sale'"
         )
-    )
+    ),
     -- Copilot exp
     (
         "native_copilot_experiment",
