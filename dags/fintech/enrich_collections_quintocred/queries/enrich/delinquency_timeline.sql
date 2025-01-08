@@ -121,11 +121,12 @@ timeline_base AS (
     SELECT
         t.*,
         COALESCE(t.dt_paid, t.dt_updated) AS dt_updated_paid,
+        DATE(t.dt_created) AS dt_fatura,
         CASE
-            WHEN t.id_type IN (0,4,5) AND DATE(t.dt_created) >= DATE("2024-02-01") THEN t.dt_due
-            WHEN t.id_delinquency < 15 OR t.id_delinquency >= 5000000 THEN DATE(t.dt_created)
-            ELSE t.dt_due
-        END AS dt_fatura,
+            WHEN t.id_delinquency < 5000000 THEN DATE(t.dt_due)
+            WHEN t.id_type IN (1, 2) THEN DATE(t.dt_due)
+            ELSE DATE(t.dt_created)
+        END AS dt_aging,
         de.dt_updated AS dt_delinquency_last_register
     FROM
         base_timeline AS t
