@@ -22,7 +22,7 @@ zendesk_tickets AS (
       CASE 
         WHEN SPLIT(parse, '=')[0] LIKE "%ticket_id%" OR SPLIT(parse, '=')[0] IN ("t_id", "id_ticket") 
         THEN SPLIT(parse, '=')[1] 
-      END AS BIGINT
+      END AS STRING
     ) AS id_ticket,
     CASE 
       WHEN SPLIT(parse, '=')[0] LIKE "%email%" THEN SPLIT(parse, '=')[1] 
