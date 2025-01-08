@@ -101,9 +101,4 @@ cluster:
     num_workers: 3
     spark_version: 13.3.x-scala2.12
     aws_attributes:
-      ebs_volume_size: 200
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new
+        ebs_volume_size: 200
