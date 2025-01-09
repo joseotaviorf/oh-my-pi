@@ -9,9 +9,7 @@ WITH explode_parse_url AS (
     datalake_survicate.survey_responses AS sr
   WHERE
     sr.id_survey IN ('a514a5d6fe646931', '01176589bb5ad239')
-    AND sr.year = {year}
-    AND sr.month = {month}
-    AND sr.day = {day}
+    AND sr.dt_load BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ), 
 zendesk_tickets AS (
   SELECT DISTINCT
@@ -30,7 +28,7 @@ zendesk_tickets AS (
     survey_name
   FROM
     explode_parse_url
-)
+), final_df as (
 SELECT
     rc.id_response AS id_answer,
     sr.id_survey,
@@ -53,14 +51,14 @@ SELECT
         END
       ) AS STRING
     ) AS improvement_tags,
-    LAST(
+    MAX(
       CASE 
         WHEN rc.id_question IN (1852449, 1852463) 
         THEN rc.answer_content 
       END
     ) AS respondent_comments,
     CAST(
-      LAST(
+      MAX(
         CASE 
           WHEN rc.id_question IN (1852451, 1852461) 
           THEN rc.answer_content 
@@ -69,7 +67,7 @@ SELECT
     ) AS satisfaction_score,
     "satisfaction evaluation" AS score_description,
     CAST(
-      LAST(
+      MAX(
         CASE 
           WHEN rc.id_question IN (1852447, 1852460) 
           THEN rc.answer_content 
@@ -88,7 +86,10 @@ JOIN
     zendesk_tickets AS sr
         ON sr.id_response = rc.id_response
 WHERE
-    rc.year = {year}
-    AND rc.month = {month}
-    AND rc.day = {day}
-GROUP BY 1, 2, 3, 6, 7, 8, 9, 10, 14, 16, 17, 18, 19, 20, 21
+  rc.dt_load BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+GROUP BY 1, 2, 3, 6, 7, 8, 9, 10, 14, 16, 17, 18, 19, 20, 21)
+SELECT
+  * 
+FROM
+  final_df
+QUALIFY ROW_NUMBER() OVER (PARTITION BY id_answer order by dt_load DESC) = 1
