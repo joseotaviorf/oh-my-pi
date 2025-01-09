@@ -110,7 +110,9 @@ def create_task(entry_point: str, parameters: List[str], task_id: str = None):
 
 
 class Tables:
-    source_clustering_image_model = "vespucio_sources_delta.source_clustering_image_model"
+    source_clustering_image_model = (
+        "vespucio_sources_delta.source_clustering_image_model"
+    )
     source_ebdb_condo = "vespucio_sources_delta.source_ebdb_condo"
     source_kodak_metadata_condo = "vespucio_sources_delta.source_kodak_metadata_condo"
     source_navent_condo = "vespucio_sources_delta.source_navent_condo"
@@ -138,6 +140,12 @@ class Tables:
     geocode_step_cache = "vespucio_pipeline_delta.geocode_step_cache"
     geocode_step_condos = "vespucio_pipeline_delta.geocode_step_condos"
     geocode_step_houses = "vespucio_pipeline_delta.geocode_step_houses"
+    address_adjusted_step_condos = (
+        "vespucio_pipeline_delta.address_adjusted_step_condos"
+    )
+    address_adjusted_step_houses = (
+        "vespucio_pipeline_delta.address_adjusted_step_houses"
+    )
     cluster_step_condos = "vespucio_pipeline_delta.cluster_step_condos"
     cluster_step_houses = "vespucio_pipeline_delta.cluster_step_houses"
     source_predict_step_houses = "vespucio_pipeline_delta.source_predict_step_houses"
@@ -145,7 +153,10 @@ class Tables:
     merge_step_houses = "vespucio_pipeline_delta.merge_step_houses"
     images_step_houses = "vespucio_pipeline_delta.images_step_houses"
     link_step_condos = "vespucio_pipeline_delta.link_step_condos"
-
+    link_step_houses = "vespucio_pipeline_delta.link_step_houses"
+    compound_predict_step_houses = (
+        "vespucio_pipeline_delta.compound_predict_step_houses"
+    )
     condo_compounds = "vespucio_prod_delta.condo_compounds"
     house_compounds = "vespucio_prod_delta.house_compounds"
     listings = "vespucio_prod_delta.listings"
@@ -332,10 +343,21 @@ core_tasks = [
         ],
     ),
     create_task(
-        entry_point="core_cluster_step",
+        entry_point="core_address_adjustments_step",
         parameters=[
             f"--input_geocoded_condos={Tables.geocode_step_condos}",
             f"--input_geocoded_houses={Tables.geocode_step_houses}",
+            f"--input_source_cnefe_houses={Tables.source_cnefe_houses}",
+            f"--overwrite_schema",
+            f"--output_address_adjusted_condos={Tables.address_adjusted_step_condos}",
+            f"--output_address_adjusted_houses={Tables.address_adjusted_step_houses}",
+        ],
+    ),
+    create_task(
+        entry_point="core_cluster_step",
+        parameters=[
+            f"--input_address_adjusted_condos={Tables.address_adjusted_step_condos}",
+            f"--input_address_adjusted_houses={Tables.address_adjusted_step_houses}",
             f"--overwrite_schema",
             f"--output_clustered_condos={Tables.cluster_step_condos}",
             f"--output_clustered_houses={Tables.cluster_step_houses}",
@@ -363,6 +385,9 @@ core_tasks = [
             f"--output_merged_houses={Tables.merge_step_houses}",
         ],
     ),
+]
+
+images_and_relations_tasks = [
     create_task(
         entry_point="core_images_step",
         parameters=[
@@ -381,15 +406,37 @@ core_tasks = [
         entry_point="core_link_step",
         parameters=[
             f"--input_merged_condos={Tables.merge_step_condos}",
-            f"--input_images_houses={Tables.images_step_houses}",
+            f"--input_merged_houses={Tables.merge_step_houses}",
             f"--overwrite_schema",
             f"--output_linked_condos={Tables.link_step_condos}",
+            f"--output_linked_houses={Tables.link_step_houses}",
+        ],
+    ),
+]
+
+predict_and_join_task = [
+    create_task(
+        entry_point="core_compound_predict_step",
+        parameters=[
+            f"--input_linked_condos={Tables.link_step_condos}",
+            f"--input_linked_houses={Tables.link_step_houses}",
+            f"--overwrite_schema",
+            f"--output_compound_predicted_houses={Tables.compound_predict_step_houses}",
+        ],
+    ),
+    create_task(
+        entry_point="core_join_compound_step",
+        parameters=[
+            f"--input_images_houses={Tables.images_step_houses}",
+            f"--input_linked_houses={Tables.link_step_houses}",
+            f"--input_compound_predicted_houses={Tables.compound_predict_step_houses}",
+            f"--overwrite_schema",
             f"--output_house_compounds={Tables.house_compounds}",
         ],
     ),
 ]
 
-after_link_tasks = [
+after_join_tasks = [
     create_task(
         entry_point="core_listing_step",
         parameters=[
@@ -553,8 +600,11 @@ join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 execute_job_cluster_task >> source_tasks
 source_tasks >> core_tasks[0]
 chain(*core_tasks)
-core_tasks[-1] >> after_link_tasks
-after_link_tasks >> join_plugins
+core_tasks[-1] >> images_and_relations_tasks
+images_and_relations_tasks >> predict_and_join_task[0]
+chain(*predict_and_join_task)
+predict_and_join_task[-1] >> after_join_tasks
+after_join_tasks >> join_plugins
 join_plugins >> plugin_tasks
 join_plugins >> classifieds_tasks[0]
 chain(*classifieds_tasks)
