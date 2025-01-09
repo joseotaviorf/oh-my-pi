@@ -108,18 +108,18 @@ timeline_final AS (
         datalake_collections_quintocred.major_type_distribution AS ta
         ON ta.document = t.document
         AND ta.id_propose = t.id_propose
-        AND t.`date` = ta.`date`
+        AND t.dt_base = ta.`date`
     LEFT JOIN
         document_major_type AS mt
         ON mt.document = t.document
-        AND t.`date` = mt.`date`
+        AND t.dt_base = mt.`date`
     LEFT JOIN
         min_dates AS md
         ON t.document = md.document
     LEFT JOIN
         min_propose_date AS mpd
         ON t.id_propose = mpd.id_propose
-    GROUP BY 1,2,3,5,6,7,17,18,21
+    GROUP BY 1,2,3,5,6,7,17,18,20
 ),
 evictions_day AS (
     SELECT
