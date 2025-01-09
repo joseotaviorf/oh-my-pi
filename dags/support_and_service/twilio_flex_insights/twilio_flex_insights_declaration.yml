@@ -13,20 +13,20 @@ workflow:
   type: custom_ingestion
   load_spark_job: load_twilio_flex_insights_raw
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "{table_name}"
-    - "{partitions}"
+  - "{environment}"
+  - "{bucket}"
+  - "{table_name}"
+  - "{partitions}"
 
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   tables_customization:
     conversation_time_metrics:
       extra_spark_job_arguments:
-        - table_details:
-            workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
-            object_id: "801119"
-            column_create_date: "date"
+      - table_details:
+          workspace_id: "vz8klwkjsszukriuuqllc3dz4d8sl6yx"
+          object_id: "801119"
+          column_create_date: "date"
 
 cluster:
   type: custom_cluster
@@ -35,5 +35,10 @@ cluster:
     node_type_id: m5a.xlarge
     num_workers: 3
     spark_version: 13.3.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   custom_libraries:
-    - whl: "{artifacts_bucket}/twilio-flex-insights-api-client-python/quintoandar_twilio_flex_insights_api_client-0.1.0-py2.py3-none-any.whl"
+  - whl: "{artifacts_bucket}/twilio-flex-insights-api-client-python/quintoandar_twilio_flex_insights_api_client-0.1.0-py2.py3-none-any.whl"
+  databricks_conn_id: databricks_new

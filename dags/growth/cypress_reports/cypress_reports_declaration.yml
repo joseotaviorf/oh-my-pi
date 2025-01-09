@@ -3,8 +3,8 @@ dag:
   owner: Tech Platform Cyber Security
   schedule_start_date: 2023, 1, 1
   schedule_interval: "0 3 * * *"
-  documentation: 
-    dag_purpose: |    
+  documentation:
+    dag_purpose: |
       Cypress is an End to End testing framework used by the product team here at Quinto Andar.
       This DAG retrieves JSON data from Cypress' reports in S3 source bucket and make it available for
       the QAs to analyse.
@@ -18,11 +18,11 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   spark_job_arguments:
-    - "{environment}" # env
-    - "{bucket}" # datalake_bucket
-    - "{dag_name}" # source
-    - "{load_start_date}"
-    - "{load_end_date}"
+  - "{environment}"   # env
+  - "{bucket}"   # datalake_bucket
+  - "{dag_name}"   # source
+  - "{load_start_date}"
+  - "{load_end_date}"
   tables_customization:
     cypress_reports:
       clean_extraction_type: full
@@ -41,3 +41,9 @@ workflow:
       partitions: []
 cluster:
   type: databricks_12_2_min_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

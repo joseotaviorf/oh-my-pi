@@ -13,12 +13,12 @@ workflow:
   type: custom_ingestion
   load_spark_job: load_internal_chat_raw
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "{schema}"
-    - "{{ ds }}"
-    - "{table_name}"
-    - "{partitions}"
+  - "{environment}"
+  - "{bucket}"
+  - "{schema}"
+  - "{{ ds }}"
+  - "{table_name}"
+  - "{partitions}"
 
   default_extraction_type: incremental
   default_partitions: [year, month, day, hour]
@@ -36,3 +36,7 @@ cluster:
     spark_version: 12.2.x-scala2.12
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new

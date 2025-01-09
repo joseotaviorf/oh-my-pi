@@ -1,44 +1,38 @@
----
 dag:
   name: enrich_lost_listings
   schedule_start_date: 2019, 1, 1
   owner: Data Growth
   documentation:
-    dag_purpose: 'Enrich Lost listings DAG runs a Spark job that uses a Scikit-learn
-      model over a set of house listings characteristics to apply a segmentation group
-      to each listing, enabling more homogeneous grouped views for a better understanding
-      of the reasons that hinder the renting flow, allowing analysts to select levers
-      to enchance the share o transactions.
-      The model used for this segmentation is stored in Databricks File System, in
-      the path:
-      `/dbfs/FileStore/models/marketing/lost_listings_model.joblib`
-      More infromation is available in [this Lost Listings presentation](https://docs.google.com/presentation/d/1HdV_cJ3uIgcg4ksG8EhJS9GahD6tgyZMS7Tx4_I_75E/).
+    dag_purpose: 'Enrich Lost listings DAG runs a Spark job that uses a Scikit-learn model over a set of house listings characteristics to apply a segmentation group to each listing, enabling more homogeneous grouped views for a better understanding of the reasons that hinder the renting flow, allowing analysts to select levers to enchance the share o transactions. The model used for this segmentation is stored in Databricks File System, in the path: `/dbfs/FileStore/models/marketing/lost_listings_model.joblib` More infromation is available in [this Lost Listings presentation](https://docs.google.com/presentation/d/1HdV_cJ3uIgcg4ksG8EhJS9GahD6tgyZMS7Tx4_I_75E/).
 
-      ### Disclamer
-      The resulting table of this enrich DAG is different than other enrich DAGs as
-      its not a direct result of a query execution, but a result of a Scikit-learn
-      model applied on a query result set.'
+      ### Disclamer The resulting table of this enrich DAG is different than other enrich DAGs as its not a direct result of a query execution, but a result of a Scikit-learn model applied on a query result set.'
 workflow:
   type: query_delta
   layer: enrich
   load_spark_job: load_lost_listings_enrich
   custom_schema: marketing_segmentations
   spark_job_arguments:
-    - '{environment}'
-    - '{bucket}'
-    - 'lost_listings' # its equal source
-    - 'marketing_segmentations' #its equal context
-    - '{{ ds }}' # execution date
+  - '{environment}'
+  - '{bucket}'
+  - 'lost_listings'   # its equal source
+  - 'marketing_segmentations'   #its equal context
+  - '{{ ds }}'   # execution date
   tables_customization:
     lost_listings: {}
   default_partitions:
-    - year
-    - month
-    - day
+  - year
+  - month
+  - day
 cluster:
   type: databricks_12_2_med_general_photon_cluster
   custom_libraries:
-    - pypi:
-        package: lightgbm>=3.3.1
-    - pypi:
-        package: scikit-learn>=0.24.0
+  - pypi:
+      package: lightgbm>=3.3.1
+  - pypi:
+      package: scikit-learn>=0.24.0
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

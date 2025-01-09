@@ -3,8 +3,8 @@ dag:
   owner: Data Growth
   schedule_start_date: 2020, 11, 1
   schedule_interval: "20 0 * * *"
-  documentation: 
-    dag_purpose: |    
+  documentation:
+    dag_purpose: |
       Retrieves Details data from [Campaigns](https://www.braze.com/docs/api/endpoints/export/campaigns/get_campaign_details/)
       and [Canvases](https://www.braze.com/docs/api/endpoints/export/canvas/get_canvas_details/) identifier endpoints,
       according to each identifier ID retrieved from [Campaigns List](https://www.braze.com/docs/api/endpoints/export/campaigns/get_campaigns/)
@@ -22,35 +22,41 @@ workflow:
   load_spark_job: load_braze_details_raw
   default_extraction_type: full
   spark_job_arguments:
-    - "{environment}" # env
-    - "{bucket}" # datalake_bucket
-    - "{dag_name}" # source
+  - "{environment}"   # env
+  - "{bucket}"   # datalake_bucket
+  - "{dag_name}"   # source
   tables_customization:
     campaign_details_indica_ai:
-      extra_spark_job_arguments: 
-        - indica_ai # app group
-        - campaign # identifier
-    campaign_details_owners:
-      extra_spark_job_arguments: 
-        - owners # app group
-        - campaign # identifier
-    campaign_details_tenants:
-      extra_spark_job_arguments: 
-        - tenants # app group
-        - campaign # identifier
-    canvas_details_indica_ai:
-      extra_spark_job_arguments: 
-        - indica_ai # app group
-        - canvas # identifier
-    canvas_details_owners: 
       extra_spark_job_arguments:
-        - owners # app group
-        - canvas # identifier
+      - indica_ai   # app group
+      - campaign   # identifier
+    campaign_details_owners:
+      extra_spark_job_arguments:
+      - owners   # app group
+      - campaign   # identifier
+    campaign_details_tenants:
+      extra_spark_job_arguments:
+      - tenants   # app group
+      - campaign   # identifier
+    canvas_details_indica_ai:
+      extra_spark_job_arguments:
+      - indica_ai   # app group
+      - canvas   # identifier
+    canvas_details_owners:
+      extra_spark_job_arguments:
+      - owners   # app group
+      - canvas   # identifier
     canvas_details_tenants:
-      extra_spark_job_arguments: 
-        - tenants # app group
-        - canvas # identifier
+      extra_spark_job_arguments:
+      - tenants   # app group
+      - canvas   # identifier
 cluster:
   type: databricks_13_3_med_memory_2_workers_general_cluster
   custom_libraries:
-    - whl: "{artifacts_bucket}/braze-api-client-python/quintoandar_braze_api_client-0.1.0-py2.py3-none-any.whl"
+  - whl: "{artifacts_bucket}/braze-api-client-python/quintoandar_braze_api_client-0.1.0-py2.py3-none-any.whl"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

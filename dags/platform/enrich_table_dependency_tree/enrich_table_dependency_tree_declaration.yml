@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_table_dependency_tree
   owner: Data Ingestion
@@ -12,19 +11,25 @@ workflow:
     bietlejuice_table_dependencies_with_indirection:
       load_spark_job: load_table_dependency_tree
       spark_job_arguments:
-        - '{environment}'
-        - '{bucket}'
-        - '{schema}'
-        - '{table_name}'
-        - '{partitions}'
-        - '{{ ds }}' # execution date
-        - 'datalake_databricks.bietlejuice_table_dependencies'
+      - '{environment}'
+      - '{bucket}'
+      - '{schema}'
+      - '{table_name}'
+      - '{partitions}'
+      - '{{ ds }}'   # execution date
+      - 'datalake_databricks.bietlejuice_table_dependencies'
   default_partitions:
-    - year
-    - month
-    - day
+  - year
+  - month
+  - day
   inner_dependencies:
     bietlejuice_table_dependencies_with_indirection:
-      - bietlejuice_table_dependencies
+    - bietlejuice_table_dependencies
 cluster:
   type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

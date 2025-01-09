@@ -10,6 +10,12 @@ cluster:
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
 workflow:
   layer: raw
   type: custom_ingestion
@@ -17,10 +23,13 @@ workflow:
   has_hive_sync: false
   load_spark_job: load_hr_system_custom_raw
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "{dag_name}"
-    - "{table_name}"
+  - "{environment}"
+  - "{bucket}"
+  - "{dag_name}"
+  - "{table_name}"
   tables_customization:
     workers_registration:
       merge_on: ["assignment_number"]
+  default_table_privileges:
+    people-team:
+    - ALL PRIVILEGES

@@ -3,8 +3,8 @@ dag:
   owner: Data Growth
   schedule_start_date: 2019, 1, 1
   schedule_interval: "0 10 * * *"
-  documentation: 
-    dag_purpose: |    
+  documentation:
+    dag_purpose: |
       Google Search Console DAG retrieves QuintoAndar's Google Web Search data metrics from Google Search Console platform.
       - [Documentation](https://developers.google.com/webmaster-tools/v1/searchanalytics)
       - [Aggregation types](https://support.google.com/webmasters/answer/7576553?visit_id=638090418915582448-722979880&rd=1#urlorsite)
@@ -18,32 +18,38 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}"
   spark_job_arguments:
-    - "{environment}" # env
-    - "{bucket}" # datalake_bucket
-    - "{dag_name}" # source
-    - "{load_start_date}" # load_start_date
-    - "{load_end_date}" # load_end_date
-  tables_customization:  
+  - "{environment}"   # env
+  - "{bucket}"   # datalake_bucket
+  - "{dag_name}"   # source
+  - "{load_start_date}"   # load_start_date
+  - "{load_end_date}"   # load_end_date
+  tables_customization:
     report_by_discover:
-      extra_spark_job_arguments: 
-        - by_discover # report_type
+      extra_spark_job_arguments:
+      - by_discover   # report_type
     report_by_google_news:
-      extra_spark_job_arguments: 
-        - by_google_news # report_type
+      extra_spark_job_arguments:
+      - by_google_news   # report_type
     report_by_page_and_query:
-      extra_spark_job_arguments: 
-        - by_page_and_query # report_type
+      extra_spark_job_arguments:
+      - by_page_and_query   # report_type
     report_by_page:
-      extra_spark_job_arguments: 
-        - by_page # report_type  
+      extra_spark_job_arguments:
+      - by_page   # report_type  
     report_by_query_summarized:
-      extra_spark_job_arguments: 
-        - by_query_summarized # report_type
+      extra_spark_job_arguments:
+      - by_query_summarized   # report_type
     report_by_query:
-      extra_spark_job_arguments: 
-        - by_query # report_type                      
+      extra_spark_job_arguments:
+      - by_query   # report_type                      
 cluster:
   type: databricks_13_3_med_general_cluster
   custom_libraries:
-    - pypi:
-        package: "google-api-python-client"
+  - pypi:
+      package: "google-api-python-client"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

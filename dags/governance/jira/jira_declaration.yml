@@ -14,18 +14,24 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   spark_job_arguments:
-    - "{environment}" # env
-    - "{bucket}" # datalake_bucket
-    - "{dag_name}" # source
-    - "{load_start_date}" # load_start_date
-    - "{table_name}"
+  - "{environment}"   # env
+  - "{bucket}"   # datalake_bucket
+  - "{dag_name}"   # source
+  - "{load_start_date}"   # load_start_date
+  - "{table_name}"
   tables_customization:
     projects:
       extraction_type: full
     issues:
       extraction_type: incremental
-      partitions: [ "year", "month", "day" ]
+      partitions: ["year", "month", "day"]
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:
-    - whl: "{artifacts_bucket}/jira-api-client-python/quintoandar_jira_api_client-0.2.1-py2.py3-none-any.whl"
+  - whl: "{artifacts_bucket}/jira-api-client-python/quintoandar_jira_api_client-0.2.1-py2.py3-none-any.whl"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

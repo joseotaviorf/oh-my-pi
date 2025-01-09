@@ -12,19 +12,24 @@ workflow:
   default_extraction_type: incremental
   default_partitions: [year, month, day]
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "{dag_name}"
-    - "{table_name}"
-    - "{{ ds }}"
+  - "{environment}"
+  - "{bucket}"
+  - "{dag_name}"
+  - "{table_name}"
+  - "{{ ds }}"
   tables_customization:
     supply_recurrence:
       extra_spark_job_arguments:
-        - "growthlab-factory"
-        - "supply_recurrence/{{ macros.ds_add(ds, 1) | replace('-', '_') }}/supply_recurrence.csv"
+      - "growthlab-factory"
+      - "supply_recurrence/{{ macros.ds_add(ds, 1) | replace('-', '_') }}/supply_recurrence.csv"
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:
-    - pypi:
-        package: "google-cloud-storage==2.11.0"
-        
+  - pypi:
+      package: "google-cloud-storage==2.11.0"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

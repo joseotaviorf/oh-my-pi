@@ -19,19 +19,25 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   spark_job_arguments:
-    - "{environment}" # env
-    - "{bucket}" # datalake_bucket
-    - "{dag_name}" # source
-    - "{table_name}" # table_name
-    - "{partitions}" # partition_cols
-    - "s3://data-science.s3.data.quintoandar.com.br/atlas/datasets/output/" # base_path
-    - "dedup_output" # path_key
-    - "['sp_bh']" # region_list
-    - "{load_start_date}" # load_start_date
-    - "{load_end_date}" # load_end_date
+  - "{environment}"   # env
+  - "{bucket}"   # datalake_bucket
+  - "{dag_name}"   # source
+  - "{table_name}"   # table_name
+  - "{partitions}"   # partition_cols
+  - "s3://data-science.s3.data.quintoandar.com.br/atlas/datasets/output/"   # base_path
+  - "dedup_output"   # path_key
+  - "['sp_bh']"   # region_list
+  - "{load_start_date}"   # load_start_date
+  - "{load_end_date}"   # load_end_date
   tables_customization:
     clustering_image:
       merge_on: ["id_condo", "id_sourcename_anchor", "id_sourcename_pair"]
       when_matched_update_condition: "source.dt_model >= target.dt_model"
 cluster:
   type: databricks_13_3_med_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

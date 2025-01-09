@@ -2,7 +2,7 @@ dag:
   name: table_usage_in_queries
   owner: Data Ingestion
   schedule_interval: 0 0 * * *
-  documentation: 
+  documentation:
     dag_purpose: |
       Generate metrics about table usage in bietlejuice queries
 workflow:
@@ -13,14 +13,20 @@ workflow:
   custom_schema: databricks
   load_spark_job: load_table_usage_in_queries
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "{schema}"
-    - "{table_name}"
-    - "{{ ds }}"
-    - "{partitions}"
+  - "{environment}"
+  - "{bucket}"
+  - "{schema}"
+  - "{table_name}"
+  - "{{ ds }}"
+  - "{partitions}"
   tables_customization:
     table_usage_in_queries: {}
 cluster:
   type: databricks_13_3_med_general_cluster
 
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

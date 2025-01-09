@@ -1,28 +1,29 @@
----
 dag:
   name: enrich_house_feature_inference
   schedule_start_date: 2021, 8, 24
   owner: Data Rede
   documentation:
-    dag_purpose: "This DAG infers which features each EBDB house has, that are not\
-      \ necessarily declared in the register. For example, if the description mentions\
-      \ \"tem elevador\", we can infer that the house has an elevator. This is useful\
-      \ for the Vespúcio project, which aims to collect data from several sources\
-      \ to create a source of truth.\n\nDocumentations about Vespúcio project [here](https://docs.google.com/spreadsheets/d/1v-6sGlfHUVeNyqMh28SXlLW7mUwDYuQNg0lul0Q28ck/edit#gid=396558073)."
+    dag_purpose: "This DAG infers which features each EBDB house has, that are not necessarily declared in the register. For example, if the description mentions \"tem elevador\", we can infer that the house has an elevator. This is useful for the Vespúcio project, which aims to collect data from several sources to create a source of truth.\n\nDocumentations about Vespúcio project [here](https://docs.google.com/spreadsheets/d/1v-6sGlfHUVeNyqMh28SXlLW7mUwDYuQNg0lul0Q28ck/edit#gid=396558073)."
 workflow:
   type: query_delta
   layer: enrich
   load_spark_job: load_description_features
   spark_job_arguments:
-    - '{environment}'
-    - '{bucket}'
-    - '{schema}'
-    - '{dag_name}'
-    - '{table_name}'
+  - '{environment}'
+  - '{bucket}'
+  - '{schema}'
+  - '{dag_name}'
+  - '{table_name}'
   tables_customization:
     description_features: {}
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:
-    - pypi:
-        package: ftfy
+  - pypi:
+      package: ftfy
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -3,8 +3,8 @@ dag:
   owner: Data Growth
   schedule_start_date: 2020, 11, 1
   schedule_interval: "15 0 * * *"
-  documentation: 
-    dag_purpose: |    
+  documentation:
+    dag_purpose: |
       Retrieves data from events streamed by [Braze's Currents tool](https://www.braze.com/docs/user_guide/data_and_analytics/braze_currents/).
       Braze is a multichannel communication platform, and its tool Currents is responsible for streaming event data into our infrastructure.
       This DAG gets all the Braze integrations declared in the DAG file constant `APP_GROUPS` and generates a respective output table.
@@ -18,21 +18,27 @@ workflow:
   #  load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
   #  load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   spark_job_arguments:
-    - "{environment}" # env
-    - "{bucket}" # datalake_bucket
-    - "{dag_name}" # source
-    - "{{ ds }}" # execution_date
+  - "{environment}"   # env
+  - "{bucket}"   # datalake_bucket
+  - "{dag_name}"   # source
+  - "{{ ds }}"   # execution_date
     #- "{load_start_date}"
     #- "{load_end_date}"
   tables_customization:
     events_indica_ai:
-      extra_spark_job_arguments: 
-        - indica_ai # app group
-    events_owners: 
-      extra_spark_job_arguments: 
-        - owners # app group
+      extra_spark_job_arguments:
+      - indica_ai   # app group
+    events_owners:
+      extra_spark_job_arguments:
+      - owners   # app group
     events_tenants:
-      extra_spark_job_arguments: 
-        - tenants # app group
+      extra_spark_job_arguments:
+      - tenants   # app group
 cluster:
   type: databricks_13_3_med_memory_2_workers_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

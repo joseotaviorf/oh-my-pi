@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_ebdb_user
   schedule_start_date: 2020, 7, 1
@@ -21,24 +20,28 @@ workflow:
       extraction_type: full
       load_spark_job: user_merge
       spark_job_arguments:
-        - "{environment}" # environment
-        - "{bucket}" # datalake_bucket
-        - "{dag_name}" # dag_name
-        - "{table_name}" # table_name
-        - "ebdb_user" # context
+      - "{environment}"   # environment
+      - "{bucket}"   # datalake_bucket
+      - "{dag_name}"   # dag_name
+      - "{table_name}"   # table_name
+      - "ebdb_user"   # context
     user_revision_entity: {}
     user_sales_rep: {}
     user: {}
   inner_dependencies:
     agent_data:
-      - user
+    - user
     user:
-      - user_revision_entity
+    - user_revision_entity
 cluster:
   type: databricks_13_3_med_general_cluster
   custom_configurations:
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: static
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
   custom_libraries:
-    - maven:
-        coordinates: "graphframes:graphframes:0.8.1-spark3.0-s_2.12"
+  - maven:
+      coordinates: "graphframes:graphframes:0.8.1-spark3.0-s_2.12"
+  databricks_conn_id: databricks_new

@@ -1,26 +1,32 @@
 dag:
-    name: enrich_jira
-    schedule_start_date: 2021, 2, 4
-    owner: Data Governance
-    documentation: 
-        dag_purpose: |
-            This DAG creates the full table for Jira issues status change.
+  name: enrich_jira
+  schedule_start_date: 2021, 2, 4
+  owner: Data Governance
+  documentation:
+    dag_purpose: |
+      This DAG creates the full table for Jira issues status change.
 workflow:
-    type: query_delta
-    layer: enrich
-    tables_customization:
-        deleted_issues:
-            load_spark_job: load_deleted_issues
-            spark_job_arguments:
-                - "{environment}"
-                - "{bucket}"
-                - "{schema}"
-                - "{table_name}"
-                - '["DIN", "DG", "DAC"]' # Projects to look for deleted issues. We don't include every project because this is not a very optimal process
-    inner_dependencies:
-        issues:
-            - deleted_issues
+  type: query_delta
+  layer: enrich
+  tables_customization:
+    deleted_issues:
+      load_spark_job: load_deleted_issues
+      spark_job_arguments:
+      - "{environment}"
+      - "{bucket}"
+      - "{schema}"
+      - "{table_name}"
+      - '["DIN", "DG", "DAC"]'           # Projects to look for deleted issues. We don't include every project because this is not a very optimal process
+  inner_dependencies:
+    issues:
+    - deleted_issues
 cluster:
-    type: databricks_12_2_med_io-memory_photon_cluster
-    custom_libraries:
-        - whl: "{artifacts_bucket}/jira-api-client-python/quintoandar_jira_api_client-0.2.1-py2.py3-none-any.whl"
+  type: databricks_12_2_med_io-memory_photon_cluster
+  custom_libraries:
+  - whl: "{artifacts_bucket}/jira-api-client-python/quintoandar_jira_api_client-0.2.1-py2.py3-none-any.whl"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

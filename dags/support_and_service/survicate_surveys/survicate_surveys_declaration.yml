@@ -12,13 +12,13 @@ workflow:
   custom_schema: survicate
   load_spark_job: load_survicate_surveys_raw
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "{{ ds }}"
-    - "{dag_name}"
-    - "{table_name}"
-    - "{partitions}"
-    - "{schema}"
+  - "{environment}"
+  - "{bucket}"
+  - "{{ ds }}"
+  - "{dag_name}"
+  - "{table_name}"
+  - "{partitions}"
+  - "{schema}"
 
   default_extraction_type: incremental
   default_partitions: [year, month, day]
@@ -28,4 +28,10 @@ workflow:
 cluster:
   type: databricks_13_3_med_general_cluster
   custom_libraries:
-    - whl: "{artifacts_bucket}/survicate-api-client-python/quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl"
+  - whl: "{artifacts_bucket}/survicate-api-client-python/quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

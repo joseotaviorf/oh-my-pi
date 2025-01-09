@@ -10,97 +10,97 @@ workflow:
   type: custom_ingestion
   load_spark_job: load_hubspot_raw
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "{dag_name}"
-    - "{{ ds }}"
+  - "{environment}"
+  - "{bucket}"
+  - "{dag_name}"
+  - "{{ ds }}"
   default_partitions: [year, month, day]
   tables_customization:
     company:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - company
+      - company
     contact:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - contact
+      - contact
     deal:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - deal
+      - deal
     ticket:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - ticket
+      - ticket
     deal_pipeline:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - deal_pipeline
+      - deal_pipeline
     ticket_pipeline:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - ticket_pipeline
+      - ticket_pipeline
     team:
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - team
+      - team
     owner:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - owner
+      - owner
     email:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - email
+      - email
     marketing_email:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - marketing_email
+      - marketing_email
     marketing_email_event:
       extraction_type: incremental
       date_filter_column: created_at
       extra_spark_job_arguments:
-        - marketing_email_event
+      - marketing_email_event
     marketing_campaign:
       extraction_type: full
       partitions: []
       extra_spark_job_arguments:
-        - marketing_campaign
+      - marketing_campaign
     call:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - call
+      - call
     communication:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - communication
+      - communication
     meeting:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - meeting
+      - meeting
     note:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - note
+      - note
     task:
       extraction_type: incremental
       date_filter_column: updated_at
       extra_spark_job_arguments:
-        - task
+      - task
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -108,5 +108,10 @@ cluster:
     node_type_id: r5a.2xlarge
     num_workers: 2
     spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   custom_libraries:
-    - whl: "{artifacts_bucket}/hubspot-api-client-python/quintoandar_hubspot_api_client-0.2.0-py2.py3-none-any.whl"
+  - whl: "{artifacts_bucket}/hubspot-api-client-python/quintoandar_hubspot_api_client-0.2.0-py2.py3-none-any.whl"
+  databricks_conn_id: databricks_new

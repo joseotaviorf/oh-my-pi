@@ -3,7 +3,7 @@ dag:
   owner: Data Ingestion
   schedule_start_date: 2024, 5, 26
   schedule_interval: 0 9 * * *
-  documentation: 
+  documentation:
     dag_purpose: |
       This dag aims to consolidade a table with cdc metrics based on the Transactional Layer.
 workflow:
@@ -13,22 +13,23 @@ workflow:
   custom_schema: dataplatform
   default_partitions: [year, month, day]
   spark_job_arguments:
-    - '{bucket}'
-    - '{partitions}'
-    - '{{ get_date_param(dag_run, ds, "load_start_date") }}'
-    - '{{ get_date_param(dag_run, tomorrow_ds, "load_end_date") }}'
-    - '{schema}'
+  - '{bucket}'
+  - '{partitions}'
+  - '{{ get_date_param(dag_run, ds, "load_start_date") }}'
+  - '{{ get_date_param(dag_run, tomorrow_ds, "load_end_date") }}'
+  - '{schema}'
   tables_customization:
-    cdc_replication_metrics: {
-      extra_spark_job_arguments: [
+    cdc_replication_metrics: {extra_spark_job_arguments: [
         # Here you can configure custom channels for the alerts
         # The key will be the schema (i.e., whatever is in the middle of datalake_<schema>_transactional)
         # The value will be the name of the Databricks Secret that contains the webhook URL
         # When this is specified, the alert will be sent to the custom channel IN ADDITION TO being sent to the default channel ([DIN] CDC Alerts)
-        {
-          "ebdb": "GCHAT_EBDB_ALERTS_WEBHOOK"
-        }
-      ]
-    }
+       "ebdb": "GCHAT_EBDB_ALERTS_WEBHOOK"]}
 cluster:
   type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

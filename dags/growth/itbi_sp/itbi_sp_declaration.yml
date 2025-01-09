@@ -19,17 +19,23 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   spark_job_arguments:
-    - "{environment}" # env
-    - "{bucket}" # datalake_bucket
-    - "{schema}" # "schema"
-    - "{table_name}" # "table_name"
-    - "{partitions}" # partition_cols
-    - "{{ ds }}" # execution_date
+  - "{environment}"   # env
+  - "{bucket}"   # datalake_bucket
+  - "{schema}"   # "schema"
+  - "{table_name}"   # "table_name"
+  - "{partitions}"   # partition_cols
+  - "{{ ds }}"   # execution_date
   tables_customization:
     itbi_sp: {}
 
 cluster:
   type: databricks_13_3_med_memory_cluster
   custom_libraries:
-    - pypi:
-        package: "openpyxl"
+  - pypi:
+      package: "openpyxl"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

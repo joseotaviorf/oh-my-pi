@@ -14,16 +14,22 @@ workflow:
   load_spark_job: load_crawlers_listings_into_datalake
   custom_schema: crawlers_listings
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "crawlers" # Source
-    - "listings" # Context
-    - "{table_name}"
-    - "olx" # Origin
-    - "{{ ds }}"
+  - "{environment}"
+  - "{bucket}"
+  - "crawlers"   # Source
+  - "listings"   # Context
+  - "{table_name}"
+  - "olx"   # Origin
+  - "{{ ds }}"
   default_extraction_type: incremental
   default_partitions: ["city", "year", "month", "day"]
   tables_customization:
     olx: {}
 cluster:
   type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
