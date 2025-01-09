@@ -63,10 +63,6 @@ cluster:
     spark_version: 13.3.x-scala2.12
     spark_conf:
       spark.driver.maxResultSize: "0"
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     autoscale:
       min_workers: 2
       max_workers: 6
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-  databricks_conn_id: databricks_new
