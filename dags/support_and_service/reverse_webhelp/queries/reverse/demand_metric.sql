@@ -60,8 +60,8 @@ LEFT JOIN
   dw_customer_support.dim_taxonomy AS dt
     ON ft.sk_taxonomy = dt.sk_taxonomy
 LEFT JOIN
-  dw_customer_support.dim_agent AS da
-    ON ft.sk_last_analyst = da.sk_agent
+  dw_customer_support.dim_analyst AS da
+    ON ft.sk_last_analyst = da.sk_analyst
 WHERE
   DATE(ft.ts_created) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
   AND dd.is_partner IS TRUE

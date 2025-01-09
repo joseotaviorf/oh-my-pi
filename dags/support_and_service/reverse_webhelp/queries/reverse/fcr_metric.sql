@@ -36,8 +36,8 @@ LEFT JOIN
   dw_customer_support.dim_department AS dd
     ON ft.sk_main_department = dd.sk_department
 LEFT JOIN
-  dw_customer_support.dim_agent AS da
-    ON ft.sk_last_agent = da.sk_agent
+  dw_customer_support.dim_analyst AS da
+    ON ft.sk_last_agent = da.sk_analyst
 WHERE
   DATE(ft.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
   AND da.agent_organization IN ('webhelp', 'webhelpbr')

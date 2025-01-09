@@ -38,8 +38,8 @@ LEFT JOIN
   dw_customer_support.dim_department AS dd
     ON bmt.sk_main_department = dd.sk_department
 LEFT JOIN
-  dw_customer_support.dim_agent AS da
-    ON bmt.sk_agent = da.sk_agent
+  dw_customer_support.dim_analyst AS da
+    ON bmt.sk_agent = da.sk_analyst
 LEFT JOIN
   dw_customer_support.dim_ticket dit
     ON dit.sk_ticket = bmt.sk_task

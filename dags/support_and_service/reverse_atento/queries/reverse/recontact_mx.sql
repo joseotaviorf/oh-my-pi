@@ -57,8 +57,8 @@ base_tickets AS (
     dw_customer_support.dim_taxonomy AS dt
       ON ft.sk_taxonomy = dt.sk_taxonomy
   LEFT JOIN
-    dw_customer_support.dim_agent AS da
-      ON ft.sk_last_analyst = COALESCE(da.sk_agent, da.sk_agent_twilio)
+    dw_customer_support.dim_analyst AS da
+      ON ft.sk_last_analyst = COALESCE(da.sk_analyst, da.sk_agent_twilio)
   LEFT JOIN
     dw_customer_support.dim_zendesk_user AS dzu
       ON dzu.sk_zendesk_user = ft.sk_zendesk_requester_user

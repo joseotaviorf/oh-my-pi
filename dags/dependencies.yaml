@@ -1613,8 +1613,8 @@ bietlejuice.enrich_demand_conversion_events:
 bietlejuice.enrich_demand_score_report:
   - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score
 bietlejuice.enrich_docpilot:
-  - bietlejuice.docx:load-clean-document
   - bietlejuice.docpilot:load-clean-income-extraction
+  - bietlejuice.docx:load-clean-document
   - bietlejuice.enrich_docx:load-enrich-personal-documentation
   - bietlejuice.enrich_ebdb_user:load-enrich-user
 bietlejuice.enrich_documentation_metrics:
@@ -1849,9 +1849,9 @@ bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.batch_inference:load-clean-batch-inference
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues
   - bietlejuice.ebdb_contract:load-clean-contract
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all
@@ -3465,6 +3465,7 @@ bietlejuice.reverse_listings_report_load:
 bietlejuice.reverse_minority_report_ss:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
