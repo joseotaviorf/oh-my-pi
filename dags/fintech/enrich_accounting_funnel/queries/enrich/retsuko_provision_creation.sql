@@ -158,7 +158,7 @@ sap_gateway AS (
         datalake_sap_gateway.sync_sap_job s
             ON f.id_feature = s.id_feature
     WHERE
-        erp_solution in ('B1', 'S4')
+        erp_solution IN ('S4')
         AND type = 'LCM'
 ),
 
