@@ -1613,7 +1613,10 @@ bietlejuice.enrich_demand_conversion_events:
 bietlejuice.enrich_demand_score_report:
   - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score
 bietlejuice.enrich_docpilot:
+  - bietlejuice.docx:load-clean-document
   - bietlejuice.docpilot:load-clean-income-extraction
+  - bietlejuice.enrich_docx:load-enrich-personal-documentation
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
 bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-categories-documentation
   - bietlejuice.documentation_metrics:load-clean-columns-documentation
