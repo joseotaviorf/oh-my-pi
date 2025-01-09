@@ -8,7 +8,7 @@ workflow:
   default_partitions: [year, month, day]
   default_extraction_type: incremental
   tables_customization:
-    enrich_search_session_event_declaration:
+    search_session_event:
       z_order_by: [id_house, event_type]
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
