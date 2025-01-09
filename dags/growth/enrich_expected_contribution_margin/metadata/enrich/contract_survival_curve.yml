@@ -1,0 +1,16 @@
+database_name: datalake_expected_contribution_margin
+table_name: contract_survival_curve
+description: This table contains the contract survival curve of all contracts signed since Jan 2016.
+columns:
+  quarter:
+    lineage:
+      - datalake_ebdb_contract.contract
+    description: Quarter identifier (it's in YYYY-MM-DD format).
+  days_since_start:
+    lineage:
+      - datalake_ebdb_contract.contract
+    description: Number of days since the contract started.
+  survival_probability:
+    lineage:
+      - datalake_ebdb_contract.contract
+    description: The survival probability (survival curve) for a given _quarter_ and _days_since_start_.

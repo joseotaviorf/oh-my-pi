@@ -29,6 +29,12 @@ workflow:
       extra_query_template_params:
         start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -30), 'start_date') }}"
         end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
+    contract_survival_curve:
+      schedule_interval: monthly
+      extraction_type: full
+    house_survival_curve:
+      schedule_interval: monthly
+      extraction_type: full
 
 cluster:
   type: databricks_12_2_med_general_photon_cluster

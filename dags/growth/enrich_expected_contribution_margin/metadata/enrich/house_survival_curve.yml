@@ -1,0 +1,16 @@
+database_name: datalake_expected_contribution_margin
+table_name: house_survival_curve
+description: This table contains the house survival curve of all houses listed since Jan 2016. It measures how many days a house, on average, generates money. To build the curve, we exclude all houses that never had a contract signed.
+columns:
+  quarter:
+    lineage:
+      - datalake_ebdb_contract.contract
+    description: Quarter identifier (it's in YYYY-MM-DD format).
+  days_since_start:
+    lineage:
+      - datalake_ebdb_contract.contract
+    description: Number of days since the first contract of the house started.
+  survival_probability:
+    lineage:
+      - datalake_ebdb_contract.contract
+    description: The survival probability (survival curve) for a given _quarter_ and _days_since_start_.
