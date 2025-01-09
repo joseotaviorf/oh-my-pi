@@ -1,0 +1,43 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: members
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table with members from QuintoAndar's in Workable.
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.members.id
+  id_api:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.members.api_id
+  role:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.members."role"
+  email:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.members.email
+  name:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.members."name"
+  headline:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.members.headline
+  is_active:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.members.active
+  ts_member_created:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.members.member_created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.members.updated_at

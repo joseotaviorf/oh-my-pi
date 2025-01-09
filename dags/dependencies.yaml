@@ -525,6 +525,9 @@ bietlejuice.dw_hiring:
   - bietlejuice.workable_redshift:load-clean-answers
   - bietlejuice.workable_redshift:load-clean-candidates
   - bietlejuice.workable_redshift:load-clean-requisitions
+  - bietlejuice.workable_redshift_full:load-clean-answers
+  - bietlejuice.workable_redshift_full:load-clean-candidates
+  - bietlejuice.workable_redshift_full:load-clean-requisitions
 bietlejuice.dw_house:
   - bietlejuice.ebdb_condo:load-clean-amenities
   - bietlejuice.ebdb_condo:load-clean-condo-amenities
@@ -3244,6 +3247,16 @@ bietlejuice.enrich_workable:
   - bietlejuice.workable_redshift:load-clean-jobs
   - bietlejuice.workable_redshift:load-clean-members
   - bietlejuice.workable_redshift:load-clean-requisitions
+  - bietlejuice.workable_redshift_full:load-clean-activities
+  - bietlejuice.workable_redshift_full:load-clean-answers
+  - bietlejuice.workable_redshift_full:load-clean-candidates
+  - bietlejuice.workable_redshift_full:load-clean-field-choices
+  - bietlejuice.workable_redshift_full:load-clean-field-value-choices
+  - bietlejuice.workable_redshift_full:load-clean-field-values
+  - bietlejuice.workable_redshift_full:load-clean-fields
+  - bietlejuice.workable_redshift_full:load-clean-jobs
+  - bietlejuice.workable_redshift_full:load-clean-members
+  - bietlejuice.workable_redshift_full:load-clean-requisitions
 bietlejuice.enrich_zendesk:
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users

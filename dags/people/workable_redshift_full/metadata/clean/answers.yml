@@ -1,0 +1,55 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: answers
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table with answers from candidates
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers.id
+  id_job:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers.job_id
+  id_question:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers.question_id
+  id_candidate:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers.candidate_id
+  job_title:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers.job_title
+  question:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers.question
+  type:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers."type"
+  answer:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers.answer
+  candidate_name:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers.candidate_name
+  ts_answer_created:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers.answer_created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers.updated_at
+  ts_load:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.answers.NOW()

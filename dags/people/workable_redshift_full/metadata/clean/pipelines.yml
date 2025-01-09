@@ -1,0 +1,39 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: pipelines
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table with recruiting pipelines from Workable
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.pipelines.id
+  name:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.pipelines."name"
+  is_default:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.pipelines."default"
+  is_base:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.pipelines.base
+  is_active:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.pipelines.active
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.pipelines.created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.pipelines.updated_at
+  ts_load:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.pipelines.NOW()

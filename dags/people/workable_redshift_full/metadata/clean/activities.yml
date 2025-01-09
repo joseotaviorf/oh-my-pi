@@ -1,0 +1,81 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: activities
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: The activities of candidates and jobs
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.id
+  id_stage:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.stage_id
+  id_job:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.job_id
+  id_candidate:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.candidate_id
+  id_member:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.member_id
+  id_trackable:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.trackable_id
+  id_target_stage:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.target_stage_id
+  action:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities."action"
+  action_type:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.action_type
+  stage_kind:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.stage_kind
+  job_title:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.job_title
+  job_department:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.job_department
+  candidate_name:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.candidate_name
+  member_name:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.member_name
+  trackable_type:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.trackable_type
+  is_member_recruiter:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.member_is_recruiter
+  ts_activity_created:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.activity_created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.activities.updated_at
+  ts_load:
+    description: ''

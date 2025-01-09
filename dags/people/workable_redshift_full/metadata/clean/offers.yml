@@ -1,0 +1,57 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: offers
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: Table with information about offers.
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.id
+  id_candidate:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.candidate_id
+  id_job:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.job_id
+  id_member:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.member_id
+  id_signable_template:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.signable_template_id
+  decline_reason:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.decline_reason
+  state:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.state
+  locale:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.locale
+  visibility_mask:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.visibility_mask
+  ts_state_updated:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.state_updated_at
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_workable_redshift_raw.offers.updated_at
+  ts_load:
+    description: ''
