@@ -23,9 +23,9 @@ WITH timeline AS (
         t.is_currently_active,
         t.dt_due,
         t.dt_ended_propose,
-        t.dt_base,
         t.dt_paid,
-        t.dt_base AS `date`,
+        t.dt_base,
+        dt_aging,
         t.dt_created
     FROM
         datalake_collections_quintocred.delinquency_timeline AS t
@@ -39,9 +39,9 @@ WITH timeline AS (
 min_dates AS (
     SELECT
         document,
-        MIN(CASE WHEN type_description = 'GUARANTEE' THEN dt_base END) AS min_dt_guarantee,
-        MIN(CASE WHEN type_description IN ('RENEWAL', 'SIGNATURE') THEN dt_base END) AS min_dt_signature,
-        MIN(CASE WHEN type_description = 'RESCISAO' THEN dt_base END) AS min_dt_termination
+        MIN(CASE WHEN type_description = 'GUARANTEE' THEN dt_aging END) AS min_dt_guarantee,
+        MIN(CASE WHEN type_description IN ('RENEWAL', 'SIGNATURE') THEN dt_aging END) AS min_dt_signature,
+        MIN(CASE WHEN type_description = 'RESCISAO' THEN dt_aging END) AS min_dt_termination
     FROM
         datalake_collections_quintocred.mob_delinquency_timeline
     GROUP BY 1
@@ -49,7 +49,7 @@ min_dates AS (
 min_propose_date AS (
     SELECT
         id_propose,
-        MIN(dt_base) AS min_dt_propose
+        MIN(dt_aging) AS min_dt_propose
     FROM
         datalake_collections_quintocred.mob_delinquency_timeline
     GROUP BY 1
@@ -92,7 +92,8 @@ timeline_final AS (
         MAX(t.is_legacy_propose) AS is_legacy_propose,
         MAX(t.is_currently_active) AS is_currently_active,
         MAX(t.dt_ended_propose) AS dt_ended_propose,
-        t.`date` AS dt_base,
+        dt_base,
+        t.dt_aging,
         array_agg(t.dt_paid) AS dt_paid_array,
         CASE
             WHEN ta.major_type = 'RESCISAO' AND md.min_dt_termination IS NULL THEN md.min_dt_guarantee
@@ -118,7 +119,7 @@ timeline_final AS (
     LEFT JOIN
         min_propose_date AS mpd
         ON t.id_propose = mpd.id_propose
-    GROUP BY 1,2,3,5,6,7,17,19
+    GROUP BY 1,2,3,5,6,7,17,18,21
 ),
 evictions_day AS (
     SELECT

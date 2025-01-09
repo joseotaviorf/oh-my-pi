@@ -76,3 +76,5 @@ columns:
       - datalake_rental_guarantee_platform_clean.delinquency.ts_created
   dt_base:
     description: "Reference date for the timeline"
+  dt_aging:
+    description: "Reference date for the aging calculation"

@@ -99,3 +99,5 @@ columns:
     description: "Reference date for the timeline"
     lineage:
       - datalake_quintocred_collections.delinquency_timeline.dt_base
+  dt_aging:
+    description: "Reference date for the aging calculation"

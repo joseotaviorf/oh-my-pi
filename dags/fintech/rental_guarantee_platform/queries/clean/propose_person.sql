@@ -12,12 +12,6 @@ SELECT
     `sign` AS has_sign,
     active AS is_active,
     dateinsert AS ts_inserted,
-    dateupdate AS ts_updated,
-    year,
-    month,
-    day
+    dateupdate AS ts_updated
 FROM
     datalake_rental_guarantee_platform_raw.propose_person
-
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id ORDER BY dateupdate DESC) = 1

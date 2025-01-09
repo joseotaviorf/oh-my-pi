@@ -140,7 +140,8 @@ cte_timeline_daily AS (
         d.month_start,
         t.id_delinquency,
         t.dt_updated_arq,
-        MAX(t.dt_updated_paid) AS dt_updated
+        MAX(t.dt_updated_paid) AS dt_updated,
+        MIN(dt_aging) AS dt_aging
     FROM
         datalake_quintoandar.aux_date AS d
     LEFT JOIN
@@ -155,6 +156,7 @@ cte_timeline_daily AS (
 timeline AS (
     SELECT
         td.`date`,
+        td.dt_aging,
         t.*,
         IF(td.`date` <> COALESCE(t.dt_paid, t.dt_updated), 0.00, t.amount_paid_added) AS amount_paid_added_fixed
     FROM
@@ -233,6 +235,7 @@ SELECT
     MAX(t.dt_due) AS dt_due,
     MAX(t.dt_ended_propose) AS dt_ended_propose,
     t.`date` AS dt_base,
+    t.dt_aging,
     MAX(t.dt_paid) AS dt_paid,
     MIN(t.dt_created) AS dt_created
 FROM
@@ -244,4 +247,4 @@ LEFT JOIN
 WHERE
     s.id_status IS NOT NULL
     AND t.date >= ADD_MONTHS(CURRENT_DATE, -6)
-GROUP BY 1,2,3,17
+GROUP BY 1,2,3,17,18

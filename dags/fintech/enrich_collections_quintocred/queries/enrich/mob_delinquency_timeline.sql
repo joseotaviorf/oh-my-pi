@@ -25,6 +25,7 @@ SELECT
     t.dt_base,
     t.dt_paid,
     t.dt_base AS `date`,
+    t.dt_aging,
     t.dt_created
 FROM
     datalake_collections_quintocred.delinquency_timeline AS t

@@ -13,9 +13,9 @@ workflow:
   default_raw_extraction_type: incremental
   default_clean_extraction_type: full
   default_raw_partitions:
-  - year
-  - month
-  - day
+    - year
+    - month
+    - day
   lineage_product_database_name: rentalguaranteeplatform
   tables_customization:
     address:
@@ -102,7 +102,8 @@ workflow:
       date_filter_column: revtstmp
       unixtime_measure: milliseconds
     user_account:
-      date_filter_column: updated_at
+      raw_extraction_type: full
+      raw_partitions: []
     user_account_aud:
       raw_extraction_type: full
       raw_partitions: []
@@ -140,7 +141,8 @@ workflow:
     propose_item:
       date_filter_column: dateupdate
     propose_person:
-      date_filter_column: dateupdate
+      raw_extraction_type: full
+      raw_partitions: []
     propose_person_type:
       date_filter_column: dateupdate
     propose_status:
@@ -264,7 +266,7 @@ cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

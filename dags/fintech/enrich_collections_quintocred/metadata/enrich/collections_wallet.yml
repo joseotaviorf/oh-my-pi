@@ -75,3 +75,5 @@ columns:
     description: "The first date of the propose"
     lineage:
       - datalake_velo.delinquency_timeline.dt_base
+  dt_aging:
+    description: "Reference date for the aging calculation"
