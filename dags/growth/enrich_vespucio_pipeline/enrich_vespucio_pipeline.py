@@ -110,6 +110,7 @@ def create_task(entry_point: str, parameters: List[str], task_id: str = None):
 
 
 class Tables:
+    source_clustering_image_model = "vespucio_sources_delta.source_clustering_image_model"
     source_ebdb_condo = "vespucio_sources_delta.source_ebdb_condo"
     source_kodak_metadata_condo = "vespucio_sources_delta.source_kodak_metadata_condo"
     source_navent_condo = "vespucio_sources_delta.source_navent_condo"
@@ -169,6 +170,14 @@ class Tables:
 
 
 source_tasks = [
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=clustering_image_model.sql",
+            f"--output_table={Tables.source_clustering_image_model}",
+        ],
+        task_id="clustering_image_model",
+    ),
     create_task(
         entry_point="sources_sql_job",
         parameters=[
