@@ -919,5 +919,5 @@ databricks_12_2_med_mem_driver_high_mem_nodes:
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_PROD_WEBHOOK
 
-vespucio_pipeline_version: 0.35.0
+vespucio_pipeline_version: 0.35.1
 vespucio_output_path: "s3://5a-vespucio-prod"
