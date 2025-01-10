@@ -65,7 +65,7 @@ FROM VALUES
         "ab_beakman_ranking_sale_pclick_v1",
         named_struct(
             'begin_date', DATE('2024-10-19'),
-            'end_date', DATE('2025-01-08'),
+            'end_date', DATE('2025-01-01'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -95,7 +95,7 @@ FROM VALUES
         "AB_TEST_RECS_HUE_INDEXED_RENT",
         named_struct(
             'begin_date', DATE('2024-12-09'),
-            'end_date', NULL,
+            'end_date', DATE('2025-01-09'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -110,7 +110,7 @@ FROM VALUES
         "AB_TEST_RECS_HUE_INDEXED_SALE",
         named_struct(
             'begin_date', DATE('2024-12-09'),
-            'end_date', NULL,
+            'end_date', DATE('2025-01-09'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -125,7 +125,7 @@ FROM VALUES
         "native_copilot_experiment",
         named_struct(
             'begin_date', DATE('2024-11-07'),
-            'end_date', DATE('2025-01-02'),
+            'end_date', DATE('2025-01-01'),
             'variants', to_json(
                 named_struct(
                     'baseline', 'baseline',
