@@ -341,3 +341,53 @@ class SparkMetastoreService(MetastoreService):
             unity_catalog_helper.sync_table_to_unity_catalog(
                 f"{database_name}.{table_name}"
             )
+
+    @logger
+    def repair_table_partitions(self, database_name, table_name):
+        """
+        Updates partitions and data associated with partitions in a table. It can
+        take some time to add(update) all partitions.
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        """
+        unity_catalog_helper = importlib.import_module(
+            "bietlejuice.base.spark.unity_catalog_helper"
+        ).UnityCatalogHelper
+
+        is_using_unity_catalog = unity_catalog_helper.is_default_catalog_using_unity()
+
+        if not is_using_unity_catalog:
+            super().repair_table_partitions(database_name, table_name)
+        else:
+            logger.warning(
+                "m=repair_table_partitions, msg=Can't perform REPAIR TABLE command in UnityCatalog tables."
+            )
+
+    @logger
+    def add_partitions(self, database_name, table_name, partitions):
+        """
+        Creates one or more partitions for a table. Each partition consists of
+        one or more distinct column name/value combinations.
+        :param database_name: database name
+        :type database_name: str
+        :param table_name: table name
+        :type table_name: str
+        :param partitions: partitions to add (each one with a unique set of column
+        names and values)
+        :type partitions: a list of dict where each dict correspond to a single
+        partition
+        """
+        unity_catalog_helper = importlib.import_module(
+            "bietlejuice.base.spark.unity_catalog_helper"
+        ).UnityCatalogHelper
+
+        is_using_unity_catalog = unity_catalog_helper.is_default_catalog_using_unity()
+
+        if not is_using_unity_catalog:
+            super().add_partitions(database_name, table_name)
+        else:
+            logger.warning(
+                "m=repair_table_partitions, msg=Can't perform ALTER TABLE command in UnityCatalog tables."
+            )
