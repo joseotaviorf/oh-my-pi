@@ -407,7 +407,12 @@ class HiveMetastoreLoader:
         added_partitions = []
         for partition_values in spark_partition_values:
             if partition_values in metastore_partition_values:
-                removed_partitions.remove(partition_values)
+                try:
+                    removed_partitions.remove(partition_values)
+                except ValueError:
+                    logger.info(
+                        f"m=_map_partition_values_difference, partition={partition_values} msg=Tried to remove a key that has already been removed."
+                    )
             else:
                 added_partitions.append(
                     PartitionBuilder(
