@@ -13,24 +13,24 @@ workflow:
   source_schema: public
   dbutils_secret_key: RENTAL_TRANSACT_DB
   tables_customization:
-#    offer:
-#      clean_table_name: offer
-#      raw_primary_keys: [id]
-#      clean_primary_keys: [id]
-#    offer_aud:
-#      clean_table_name: offer_aud
-#    offer_topic:
-#      clean_table_name: offer_topic
-#      raw_primary_keys: [id]
-#      clean_primary_keys: [id]
-#    offer_topic_aud:
-#      clean_table_name: offer_topic_aud
-#    offer_topic_message:
-#      clean_table_name: offer_topic_message
-#      raw_primary_keys: [id]
-#      clean_primary_keys: [id]
-#    offer_topic_message_aud:
-#      clean_table_name: offer_topic_message_aud
+    offer:
+      clean_table_name: offer
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    offer_aud:
+      clean_table_name: offer_aud
+    offer_topic:
+      clean_table_name: offer_topic
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    offer_topic_aud:
+      clean_table_name: offer_topic_aud
+    offer_topic_message:
+      clean_table_name: offer_topic_message
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    offer_topic_message_aud:
+      clean_table_name: offer_topic_message_aud
     resident_info:
       clean_table_name: resident_info
       raw_primary_keys: [id]
