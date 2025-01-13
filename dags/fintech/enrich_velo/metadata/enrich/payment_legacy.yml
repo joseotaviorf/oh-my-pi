@@ -49,6 +49,20 @@ columns:
     description: Business ID for Subscription.
     lineage:
       - datalake_velo_clean.fiancavelo_payment.subscription
+  billing_type:
+    description: Billing type description.
+    lineage:
+      - datalake_velo_clean.fiancavelo_billingtype.name
+  payment_type:
+    description: Payment type description.
+  status:
+    description: Status description.
+  payment_gateway:
+    description: Payment gateway description.
+    lineage:
+      - datalake_velo_clean.fiancavelo_gateway.name
+  payment_category:
+    description: Payment category description.
   invoice_url:
     description: URL of charged invoice.
     lineage:

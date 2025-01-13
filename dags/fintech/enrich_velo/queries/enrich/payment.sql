@@ -61,6 +61,16 @@ SELECT DISTINCT
     p.customer AS id_customer,
     p.unicid AS id_unicid,
     p.id_subscription,
+    p.billing_type AS billing_type,
+    CASE
+        WHEN p.billing_type = 'PIX' AND p.gateway = 'PIXAR' THEN 'annual'
+        WHEN p.billing_type = 'ANNUAL_CREDIT_CARD' THEN 'annual'
+        WHEN p.billing_type = 'CREDIT_CARD' THEN 'monthly'
+        ELSE NULL
+    END AS payment_type,
+    p.status AS status,
+    p.gateway AS payment_gateway,
+    IF(p.product_type = 'GUARANTEE', 'RECURRING_SUBSCRIPTION', p.product_type) AS payment_category,
     p.invoice_url,
     p.description,
     p.value AS due_amount,
@@ -131,6 +141,11 @@ SELECT DISTINCT
     NULL AS id_customer,
     NULL AS id_unicid,
     NULL AS id_subscription,
+    ap.billing_type AS billing_type,
+    'collection/no info' AS payment_type,
+    ap.status AS status,
+    NULL AS payment_gateway,
+    'AGREEMENT' AS payment_category,
     NULL AS invoice_url,
     NULL AS description,
     ap.value AS due_amount,

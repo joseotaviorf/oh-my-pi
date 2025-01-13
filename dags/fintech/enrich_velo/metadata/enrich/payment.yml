@@ -58,6 +58,28 @@ columns:
     description: Business ID for Subscription.
     lineage:
       - datalake_rental_guarantee_platform_clean.payment.id_subscription
+  billing_type:
+    description: Billing type description.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.billing_type
+      - datalake_rental_guarantee_platform_clean.agreement_payment.billing_type
+  payment_type:
+    description: Payment type description.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.billing_type
+  status:
+    description: Status description.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.status
+      - datalake_rental_guarantee_platform_clean.agreement_payment.status
+  payment_gateway:
+    description: Payment gateway description.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.gateway
+  payment_category:
+    description: Payment category description.
+    lineage:
+      - datalake_rental_guarantee_platform_clean.payment.product_type
   invoice_url:
     description: URL of charged invoice.
     lineage:

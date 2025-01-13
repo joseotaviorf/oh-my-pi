@@ -73,6 +73,20 @@ WITH payment AS (
         p.id_customer,
         p.unicid AS id_unicid,
         p.subscription AS id_subscription,
+        bt.name AS billing_type,
+        CASE
+            WHEN (p.due_amount/COALESCE(pk.total_package_amount*pl.percent/100.00,0) BETWEEN 0.9 AND 1.1) OR (p.due_amount/(COALESCE(pk.total_package_amount*pl.percent/100.00,0) + COALESCE(a.value,0)) BETWEEN 0.9 AND 1.1) THEN 'monthly'
+            WHEN (p.due_amount/COALESCE(pk.total_package_amount*pl.percent*12.00/100.00,0) BETWEEN 0.9 AND 1.1) OR (p.due_amount/(COALESCE(pk.total_package_amount*pl.percent*12.00/100.00,0) + COALESCE(a.value,0)) BETWEEN 0.9 AND 1.1) THEN 'annual'
+            WHEN p.due_amount/COALESCE(a.value,0) BETWEEN 0.9 AND 1.1 THEN 'activation'
+        ELSE 'collection/no info'
+        END AS payment_type,
+        ps.new_status AS status,
+        pg.name AS payment_gateway,
+        CASE
+            WHEN p.subscription IS NOT NULL THEN 'RECURRING_SUBSCRIPTION'
+            WHEN ISNOTNULL(o.id_occurrence) THEN 'AGREEMENT'
+            ELSE 'NO INFO'
+        END AS payment_category,
         p.invoice_url,
         p.description,
         p.due_amount,
