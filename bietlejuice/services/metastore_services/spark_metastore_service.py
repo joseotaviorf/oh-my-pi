@@ -386,7 +386,7 @@ class SparkMetastoreService(MetastoreService):
         is_using_unity_catalog = unity_catalog_helper.is_default_catalog_using_unity()
 
         if not is_using_unity_catalog:
-            super().add_partitions(database_name, table_name)
+            super().add_partitions(database_name, table_name, partitions)
         else:
             logger.warning(
                 "m=repair_table_partitions, msg=Can't perform ALTER TABLE command in UnityCatalog tables."
