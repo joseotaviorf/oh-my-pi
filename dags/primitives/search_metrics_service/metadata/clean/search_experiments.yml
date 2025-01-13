@@ -14,9 +14,6 @@ columns:
   dimension_value:
     lineage:
       - datalake_search.search_experiments.dimension_value
-  agg_id:
-    lineage:
-      - datalake_search.search_experiments.agg_id
   metric_name:
     lineage:
       - datalake_search.search_experiments.metric_name

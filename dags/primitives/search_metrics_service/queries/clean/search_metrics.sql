@@ -2,7 +2,6 @@ select
     business_context,
     dimension_name,
     dimension_value,
-    agg_id,
     metric_name,
     metric_numerator,
     metric_denominator,
