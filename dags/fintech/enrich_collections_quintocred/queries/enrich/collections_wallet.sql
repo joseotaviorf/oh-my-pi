@@ -132,8 +132,8 @@ evictions_day AS (
         datalake_gsheets_clean.quintocred_process_evictions AS e
           ON d.`date` >= e.dt_register
           AND (
-              DATE_TRUNC('MONTH', d.`date`) <= e.dt_finalized
-              OR e.dt_finalized IS NULL
+              DATE_TRUNC('MONTH', d.`date`) <= e.dt_register
+              OR e.dt_register IS NULL
               )
 WHERE
     d.`date` < CURRENT_DATE()
@@ -172,8 +172,8 @@ LEFT JOIN
         ON REGEXP_REPLACE(e.cpf_cnpj, '[^0-9]', '') = t.document
         AND e.dt_distribution >= t.dt_base
         AND (
-            e.dt_finalized <= date_trunc('MONTH', t.dt_base)
-            OR e.dt_finalized IS NULL
+            e.dt_register <= date_trunc('MONTH', t.dt_base)
+            OR e.dt_register IS NULL
             )
         AND e.is_archived IS FALSE
 LEFT JOIN
