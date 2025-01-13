@@ -1,0 +1,175 @@
+---
+database_name: datalake_amplitude_clean
+table_name: 170698_copy_inspection_report_link_button_clicked_events
+columns:
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.id_amplitude
+  ids_amplitude_attributed:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.ids_amplitude_attributed
+  id_app:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.id_app
+  id_device:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.id_device
+  id_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.id_event
+  id_session:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.id_session
+  id_inserted:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.id_inserted
+  id_user:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.id_user
+  id_schema:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.id_schema
+  idfa:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.idfa
+  adid:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.adid
+  uuid:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.uuid
+  amplitude_event_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.amplitude_event_type
+  city:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.city
+  country:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.country
+  region:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.region
+  data:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.data
+  device_brand:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.device_brand
+  device_carrier:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.device_carrier
+  device_family:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.device_family
+  device_manufacturer:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.device_manufacturer
+  device_model:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.device_model
+  device_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.device_type
+  dma:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.dma
+  event_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.event_type
+  event_properties:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.event_properties
+  is_attribution_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.is_attribution_event
+  ip_address:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.ip_address
+  location_lat:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.location_lat
+  location_lng:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.location_lng
+  os_name:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.os_name
+  os_version:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.os_version
+  platform:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.platform
+  library:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.library
+  is_paying:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.is_paying
+  start_version:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.start_version
+  language:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.language
+  version_name:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.version_name
+  sample_rate:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.sample_rate
+  user_properties:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.user_properties
+  up_app_type:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.user_properties
+  up_utm_source:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.user_properties
+  up_utm_medium:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.user_properties
+  up_utm_campaign:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.user_properties
+  up_utm_content:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.user_properties
+  up_utm_term:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.user_properties
+  dt_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.ts_event
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.ts_event
+  ts_server_uploaded:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.ts_server_uploaded
+  ts_user_created:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.ts_user_created
+  ts_client_event:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.ts_client_event
+  ts_client_uploaded:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.ts_client_uploaded
+  ts_server_received:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.ts_server_received
+  ts_processed:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.ts_processed
+  year:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.year
+  month:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.month
+  day:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events.day
