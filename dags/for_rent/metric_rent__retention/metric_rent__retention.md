@@ -18,7 +18,9 @@ Currently, there is the following output tables in the metric layer:
 - `early_demand_ca2cs_weekly`
 - `er2rr_daily`
 - `er2rr_monthly`
+- `er2rr_monthly_by_city_group`
 - `er2rr_weekly`
+- `er2rr_weekly_by_city_group`
 - `er2unp_susp_monthly`
 - `er2unp_susp_weekly`
 - `generated_anomalies_monthly`
