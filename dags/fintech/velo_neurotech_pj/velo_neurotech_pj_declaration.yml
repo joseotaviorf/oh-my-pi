@@ -31,4 +31,10 @@ workflow:
 cluster:
   type: databricks_13_3_med_general_cluster
   custom_libraries:
-    - whl: "{artifacts_bucket}/velo-neurotech-api-client-python/quintoandar_velo_neurotech_api_client-0.3.2-py2.py3-none-any.whl"
+  - whl: "{artifacts_bucket}/velo-neurotech-api-client-python/quintoandar_velo_neurotech_api_client-0.3.2-py2.py3-none-any.whl"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

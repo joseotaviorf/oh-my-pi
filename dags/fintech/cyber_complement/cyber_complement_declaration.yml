@@ -149,5 +149,10 @@ cluster:
     node_type_id: r5a.large
     num_workers: 3
     spark_version: 13.3.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   custom_libraries:
-    - jar: "{artifacts_bucket}/jars/ojdbc8.jar"
+  - jar: "{artifacts_bucket}/jars/ojdbc8.jar"
+  databricks_conn_id: databricks_new

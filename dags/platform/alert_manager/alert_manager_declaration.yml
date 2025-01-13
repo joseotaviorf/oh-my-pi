@@ -27,3 +27,7 @@ cluster:
   custom_configurations:
     spark_conf:
       spark.sql.caseSensitive: "true"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new

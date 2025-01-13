@@ -32,8 +32,12 @@ workflow:
 cluster:
   type: databricks_12_2_med_memory_photon_cluster
   access_control_list:
-      group_name: data-products
-      permission_level: CAN_MANAGE
+    group_name: data-products
+    permission_level: CAN_MANAGE
   custom_configurations:
     spark_conf:
       spark.metrics.namespace: "data_products.search"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new
