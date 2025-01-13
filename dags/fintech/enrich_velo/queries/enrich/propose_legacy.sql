@@ -379,11 +379,11 @@ credit_analysis AS (
     WHERE 1=1
 ),
 rescission AS (
-    SELECT DISTINCT 
+    SELECT DISTINCT
         id_propose
-    FROM 
+    FROM
         datalake_rental_guarantee_platform_clean.delinquency
-    WHERE 
+    WHERE
         id_type = 2
         AND is_active
 )
@@ -401,6 +401,10 @@ SELECT DISTINCT
     jk2.id_junk AS id_propose_status,
     CAST(NULL AS INT) AS id_guarantee_status,
     jk4.id_junk AS id_propose_type,
+    IF(pc.id_propose IS NOT NULL, 'PJ/company', 'PF') AS origin,
+    CAST(NULL AS STRING) AS guarantee_status,
+    ps.name AS propose_status,
+    pbt.name AS propose_type,
     pm.count_persons_included,
     CAST(NULL AS DECIMAL(38,6)) AS percentage_income_from_primary_person,
     CAST(NULL AS DECIMAL(14,4)) AS avg_serasa_score,
@@ -451,7 +455,7 @@ SELECT DISTINCT
     IF(
         r.id_propose IS NULL,
         old.dt_ended,
-        old.dt_analyst_annulment_input 
+        old.dt_analyst_annulment_input
     ) AS dt_ended_official,
     COALESCE(p.ts_inserted, old.ts_propose_started) AS ts_propose_started,
     old.ts_waiting_new_docs AS ts_waiting_new_docs,
@@ -512,7 +516,7 @@ LEFT JOIN
     credit_analysis AS ca
         ON ca.id_propose = p.id
         AND ca.rn = 1
-LEFT JOIN 
+LEFT JOIN
     rescission as r
         ON p.id = r.id_propose
 WHERE

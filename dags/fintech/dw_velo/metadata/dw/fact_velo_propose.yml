@@ -59,6 +59,26 @@ columns:
       - datalake_velo.propose.id_propose_type
       - datalake_velo.propose_legacy.id_propose_type
     description: Propose type's identification number (ID). It indicates if the propose is residential or commercial this key connects to the table dw_velo.dim_velo_junk
+  origin:
+    lineage:
+      - datalake_velo.propose.origin
+      - datalake_velo.propose_legacy.origin
+    description: Origin's description. It indicates if the the propose was made by a person or by a business
+  propose_status:
+    lineage:
+      - datalake_velo.propose.propose_status
+      - datalake_velo.propose_legacy.propose_status
+    description: Propose status' description.
+  guarantee_status:
+    lineage:
+      - datalake_velo.propose.guarantee_status
+      - datalake_velo.propose_legacy.guarantee_status
+    description: Guarantee status' description.
+  propose_type:
+    lineage:
+      - datalake_velo.propose.propose_type
+      - datalake_velo.propose_legacy.propose_type
+    description: Propose type's description. It indicates if the propose is residential or commercial
   count_persons_included:
     lineage:
       - datalake_velo.propose.count_persons_included

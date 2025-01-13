@@ -50,6 +50,18 @@ columns:
     description: Propose type's identification number (ID). It indicates if the the propose was made by a person or by a business and this key connects to the table datalake_velo.junk
     lineage:
       - datalake_velo.junk.id_junk
+  origin:
+    description: Origin's description. It indicates if the the propose was made by a person or by a business
+  propose_status:
+    description: Propose status' description
+    lineage:
+      - datalake_rental_guarantee_platform_clean.propose_status.name
+  guarantee_status:
+    description: Guarantee status' description
+  propose_type:
+    description: Propose type's description. It indicates if the propose is residential or commercial
+    lineage:
+      - datalake_rental_guarantee_platform_clean.bussines_type.name
   count_persons_included:
     description: How many persons were included on the propose
   percentage_income_from_primary_person:
