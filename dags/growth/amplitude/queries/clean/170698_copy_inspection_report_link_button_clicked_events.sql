@@ -50,7 +50,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean_staging.170698_offboarding_keys_task_success_page_viewed_events
+    datalake_amplitude_clean_staging.170698_copy_inspection_report_link_button_clicked_events
 WHERE
     year = {}
     AND month = {}
