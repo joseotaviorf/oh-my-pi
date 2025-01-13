@@ -12,11 +12,11 @@ cluster:
     group_name: people-analytics
     permission_level: CAN_MANAGE
   custom_libraries:
-  - maven:
-      coordinates: "com.amazon.redshift:redshift-jdbc42:2.1.0.29"
+    - maven:
+        coordinates: "com.amazon.redshift:redshift-jdbc42:2.1.0.29"
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
@@ -102,13 +102,11 @@ workflow:
       extraction_type: incremental
       merge_on: ["id"]
     requisitions:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      merge_on: ["id"]
+      extraction_type: full
     stages:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
   default_table_privileges:
     people-team:
-    - ALL PRIVILEGES
+      - ALL PRIVILEGES
