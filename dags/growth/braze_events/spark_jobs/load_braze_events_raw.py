@@ -159,4 +159,4 @@ if __name__ == "__main__":
                 partition_cols=partition_cols,
             )
 
-            spark_metastore_service.refresh_table(database_name, table_name)
+    spark_metastore_service.refresh_table(database_name, table_name)
