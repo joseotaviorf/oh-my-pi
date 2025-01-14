@@ -18,6 +18,11 @@ SELECT
         WHEN region = 'Rio de Janeiro (state)' THEN 'Rio de Janeiro'
         WHEN region = 'Rio Grande do Sul' THEN 'Porto Alegre'
         WHEN region = 'São Paulo (state)' THEN 'São Paulo'
+        WHEN region = 'Bahia' THEN 'Salvador'
+        WHEN region = 'Santa Catarina' THEN 'Florianópolis'
+        WHEN region = 'Goiás' THEN 'Goiânia'
+        WHEN region = 'Paraná' THEN 'Curitiba'
+        WHEN region IN ('Distrito Federal', 'Federal District' ) THEN 'Brasília'
       ELSE NULL::STRING 
     END AS city, -- not available in the table
     -- Metrics
