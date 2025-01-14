@@ -6,6 +6,10 @@ description:
 domain: For Rent
 owner: kleber.inoue@quintoandar.com.br
 columns:
+  id_termination:
+    lineage:
+      - datalake_terminator_clean.termination.id
+    description: ID of the termination.
   id_contract:
     lineage:
       - datalake_ebdb_contract.contract.id

@@ -1,6 +1,7 @@
 WITH
 listing_rent_model AS (
   SELECT
+    t.id AS id_termination,
     c.id AS id_contract,
     c.id_house,
     h.id_user AS id_owner,
@@ -22,7 +23,7 @@ listing_rent_model AS (
   JOIN
     datalake_ebdb_user.user_revision_entity as ure
       ON aud.rev = ure.id
-      AND ure.ts_revision BETWEEN t.ts_created AND DATEADD(DAY, 1, DATE(COALESCE(c.ts_analyst_annulment_input,c.dt_termination)))
+      AND ure.ts_revision BETWEEN t.ts_created AND DATEADD(DAY, 3, DATE(t.ts_created))
   JOIN
     datalake_ebdb_clean.house AS h
       ON c.id_house = h.id
@@ -32,6 +33,7 @@ listing_rent_model AS (
 ),
 contract_aud AS (
   SELECT
+    t.id AS id_termination,
     aud.id_contract,
     aud.id_house,
     h.id_user AS id_owner,
@@ -51,7 +53,7 @@ contract_aud AS (
   JOIN
     datalake_ebdb_user.user_revision_entity AS ure
       ON ure.id = aud.rev
-      AND ure.ts_revision BETWEEN t.ts_created AND DATEADD(DAY, 1, DATE(COALESCE(c.ts_analyst_annulment_input, c.dt_termination)))
+      AND ure.ts_revision BETWEEN t.ts_created AND DATEADD(DAY, 3, DATE(t.ts_created))
   JOIN
     datalake_ebdb_clean.house AS h
       ON aud.id_house = h.id
@@ -62,6 +64,7 @@ contract_aud AS (
 ),
 unificated AS (
   SELECT
+    id_termination,
     id_contract,
     id_house,
     id_user_modifier,
@@ -78,6 +81,7 @@ unificated AS (
     contract_aud
   UNION ALL
   SELECT
+    id_termination,
     id_contract,
     id_house,
     id_user_modifier,
@@ -98,6 +102,7 @@ unificated AS (
     listing_rent_model
 )
 SELECT
+  u.id_termination,
   u.id_contract,
   u.id_house,
   u.id_user_modifier,
@@ -111,3 +116,5 @@ FROM
 JOIN
   datalake_ebdb_country.house AS ch
     ON u.id_house = ch.id_house
+WHERE
+  u.ts_revision IS NOT NULL
