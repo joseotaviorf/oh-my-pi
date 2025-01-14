@@ -13,15 +13,15 @@ SELECT
   o.status,
   o.dt_effective_start,
   o.dt_effective_end,
-  NOW() AS ts_load
+  NOW () AS ts_load
 FROM
   datalake_hr_system_clean.organizations AS o
-LEFT JOIN
-  datalake_hr_system_clean.areas_of_responsibility AS r
+LEFT JOIN 
+  datalake_hr_system_clean.areas_of_responsibility AS r 
     ON o.codigo_dff = r.template_code
-LEFT JOIN
-  datalake_hr_system.employee_ids AS e
+    AND r.active_status = 'A'
+LEFT JOIN 
+  datalake_hr_system.employee_ids AS e 
     ON e.id_assignment = r.id_assignment
 WHERE
   o.classification_code = 'DEPARTMENT'
-  AND r.active_status = 'A'
