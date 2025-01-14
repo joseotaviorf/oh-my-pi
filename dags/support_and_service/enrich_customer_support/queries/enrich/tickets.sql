@@ -68,7 +68,9 @@ incoming_tickets AS (
   FROM
     datalake_zendesk.tickets_current AS t
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 7 DAY AND '{load_end_date}'
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
 ),
 -- The following CTEs are needed because a single call/chat can create multiple tickets.
 chat_tickets AS (
