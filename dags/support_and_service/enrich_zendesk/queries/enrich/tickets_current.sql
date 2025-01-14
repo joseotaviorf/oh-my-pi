@@ -245,7 +245,7 @@ SELECT
   tm.ts_latest_comment_added,
   t.ts_analyst_started,
   t.ts_created,
-  t.ts_updated,
+  GREATEST(t.ts_updated, tm.ts_updated) AS ts_updated,
   CASE
     WHEN t.status = 'closed' THEN t.ts_updated
     ELSE NULL
