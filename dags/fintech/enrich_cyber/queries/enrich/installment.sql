@@ -113,7 +113,7 @@ split_fees_between_installments AS (
       ai.id_agreement_installment,
       ai.id_agreement AS id_negotiation,
       ai.id_contract,
-      c.id_contract_external,
+      COALESCE(c.id_contract_external, SPLIT(ai.id_contract, r'\.')[0]) AS id_contract_external,
       COALESCE(c.id_client, ai.id_client) AS id_debtor,
       p.id_payment AS id_receipt,
       ain.our_number,
@@ -169,7 +169,7 @@ split_fees_between_installments AS (
       COALESCE(DATE(ain.ts_processing), ai.dt_processing_boleto) AS dt_processing_boleto,
       ai.dt_cancelation
     FROM union_promisses_agreements_installments AS ai
-    INNER JOIN datalake_cyber_clean.contracts AS c
+    LEFT JOIN datalake_cyber_clean.contracts AS c
       ON ai.id_contract = c.id_contract
     LEFT JOIN datalake_cyber_clean.payments AS p
       ON ai.id_agreement_installment = p.id_agreement_installment

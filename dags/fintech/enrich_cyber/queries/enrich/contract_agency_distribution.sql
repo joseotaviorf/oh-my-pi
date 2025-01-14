@@ -17,24 +17,23 @@ get_agency_group_name AS (
 ),
 get_agency_name AS (
   SELECT
-    c.id_contract_external AS id_contract,
+    COALESCE(c.id_contract_external, SPLIT(hr.id_contract,r'\.')[0]) AS id_contract,
     hr.creditor,
     hr.agency AS agency_group,
     COALESCE(ag.id_agency, hr.agency) AS id_agency,
     COALESCE(agg.agency_name, ag.agency_name) AS agency_name,
     hr.new_debt_amount,
     hr.ts_distribution,
-    hr.ts_redistribution,
-    LAG(COALESCE(agg.agency_name, ag.agency_name)) OVER(PARTITION BY c.id_contract_external ORDER BY hr.ts_distribution) AS previous_agency,
-    LEAD(hr.ts_distribution) OVER(PARTITION BY c.id_contract_external ORDER BY hr.ts_distribution) AS ts_next_distribution
+    LAG(COALESCE(agg.agency_name, ag.agency_name)) OVER(PARTITION BY COALESCE(c.id_contract_external, SPLIT(hr.id_contract,r'\.')[0]) ORDER BY hr.ts_distribution) AS previous_agency,
+    LEAD(hr.ts_distribution) OVER(PARTITION BY COALESCE(c.id_contract_external, SPLIT(hr.id_contract,r'\.')[0]) ORDER BY hr.ts_distribution) AS ts_redistribution
   FROM datalake_cyber_clean.history_contract_distribution AS hr
-  INNER JOIN datalake_cyber_clean.contracts AS c
+  LEFT JOIN datalake_cyber_clean.contracts AS c
     ON hr.id_contract = c.id_contract
   LEFT JOIN datalake_cyber_clean.agency AS ag
     ON hr.agency = ag.id_agency
   LEFT JOIN get_agency_group_name AS agg
     ON ag.id_agency = agg.agency_group
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY c.id_contract_external, hr.ts_distribution ORDER BY ts_redistribution DESC) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY COALESCE(c.id_contract_external, SPLIT(hr.id_contract,r'\.')[0]), hr.ts_distribution ORDER BY hr.ts_redistribution DESC) = 1
 ),
 capture_changes AS (
   SELECT
@@ -44,7 +43,7 @@ capture_changes AS (
     id_agency,
     agency_name,
     ts_distribution,
-    IF(ts_next_distribution IS NULL, DATE(current_timestamp), DATE_SUB(ts_redistribution, 1)) AS ts_redistribution,
+    COALESCE(DATE_SUB(ts_redistribution, 1), CURRENT_DATE) AS ts_redistribution,
     IF(IFNULL(LAG(agency_name) OVER (PARTITION BY creditor, id_contract ORDER BY ts_distribution), "") != agency_name, 1, 0) AS has_changed
   FROM get_agency_name
 ),
@@ -72,5 +71,5 @@ FROM segregate_groups
 GROUP BY
   id_contract,
   creditor,
-  agency_name,
+  advisory,
   group

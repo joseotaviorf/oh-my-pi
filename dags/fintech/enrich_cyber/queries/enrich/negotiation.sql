@@ -186,7 +186,7 @@ union_promisses_agreements AS (
 SELECT
     CAST(a.id_agreement AS STRING) AS id_negotiation,
     a.id_contract AS id_contract_cyber,
-    c.id_contract_external AS id_contract,
+    COALESCE(c.id_contract_external, SPLIT(a.id_contract, r'\.')[0]) AS id_contract,
     COALESCE(c.id_client, a.id_client) AS id_customer,
     a.id_user AS id_operator,
     a.id_campaign,

@@ -37,7 +37,7 @@ get_agency_group_name AS (
 SELECT
   l.creditor,
   l.id_contract,
-  c.id_contract_external,
+  COALESCE(c.id_contract_external, SPLIT(l.id_contract,r'\.')[0]) AS id_contract_external,
   c.id_client AS id_customer,
   UPPER(l.id_user) AS id_operator,
   u.user_email AS operator_email,
@@ -77,7 +77,7 @@ SELECT
   l.ts_activity AS ts_occurrence,
   NOW() AS ts_load
 FROM datalake_cyber_clean.logs AS l
-INNER JOIN datalake_cyber_clean.contracts AS c
+LEFT JOIN datalake_cyber_clean.contracts AS c
   ON l.id_contract = c.id_contract
 LEFT JOIN datalake_cyber_clean.users AS u
   ON UPPER(l.id_user) = UPPER(u.id_user)

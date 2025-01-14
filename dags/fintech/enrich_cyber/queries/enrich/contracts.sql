@@ -7,8 +7,8 @@ WITH deduplicate_queues AS (
     QUALIFY ROW_NUMBER() OVER(PARTITION BY queue, queue_type ORDER BY level DESC) = 1
 )
 SELECT
-    c.id_contract,
-    c.id_contract_external,
+    COALESCE(c.id_contract, dm.id_contract) AS id_contract,
+    COALESCE(c.id_contract_external, SPLIT(dm.id_contract,r'\.')[0]) AS id_contract_external,
     c.id_client,
     c.id_contract_property,
     c.id_oldest_negative_invoice,
@@ -99,7 +99,7 @@ SELECT
     dm.ts_last_update_credit_denial_queue,
     NOW() AS ts_load
 FROM datalake_cyber_clean.contracts AS c
-LEFT JOIN datalake_cyber_clean.delinquent_master AS dm
+FULL OUTER JOIN datalake_cyber_clean.delinquent_master AS dm
  ON c.id_contract = dm.id_contract
 LEFT JOIN deduplicate_queues AS qdts
     ON dm.segmentation_queue = qdts.queue AND qdts.queue_type = 'Segmentação'
