@@ -1,0 +1,22 @@
+---
+database_name: datalake_gsheets_clean
+table_name: quintocred_iaf_occurences
+columns:
+  code_status:
+    lineage:
+      - datalake_gsheets_raw.quintocred_iaf_occurences.code_status
+  desc_status:
+    lineage:
+      - datalake_gsheets_raw.quintocred_iaf_occurences.desc_status
+  tab:
+    lineage:
+      - datalake_gsheets_raw.quintocred_iaf_occurences.tab
+  effort:
+    lineage:
+      - datalake_gsheets_raw.quintocred_iaf_occurences.effort
+  massive:
+    lineage:
+      - datalake_gsheets_raw.quintocred_iaf_occurences.massive
+  channel:
+    lineage:
+      - datalake_gsheets_raw.quintocred_iaf_occurences.channel
