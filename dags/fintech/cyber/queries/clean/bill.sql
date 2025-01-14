@@ -96,6 +96,7 @@ SELECT
     PADTINSERT AS ts_insert,
     PADTUPDATE AS ts_update,
     PABIDTEXCLUSAO AS ts_bill_item_deleted,
+    PADTUPDREG AS ts_record_updated,
     year,
     month,
     day,

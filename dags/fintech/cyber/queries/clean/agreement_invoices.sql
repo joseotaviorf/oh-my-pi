@@ -88,6 +88,7 @@ SELECT
     BLDTVENC AS ts_due,
     BLDTDOC AS ts_document,
     BLDTPROC AS ts_processing,
+    BLDTUPDATE AS ts_record_updated,
     year,
     month,
     day,

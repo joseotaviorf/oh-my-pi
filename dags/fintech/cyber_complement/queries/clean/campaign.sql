@@ -49,5 +49,6 @@ SELECT
     CADTPROC AS ts_boletagem_sent,
     CADTVAL AS ts_due_boletagem,
     CADTVCENTR AS ts_due_down_payment,
+    CADTUPDATE AS ts_record_updated,
     NOW() AS ts_load
 FROM datalake_cyber_raw.tb_campanha

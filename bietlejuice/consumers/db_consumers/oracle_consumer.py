@@ -254,16 +254,23 @@ class OracleSparkConsumer(DBConsumer):
             start_range_date = dt_start_filter
             end_range_date = dt_end_filter
 
-        date_filters = ", ".join(
-            f"COALESCE({date_filter}, TO_DATE('1970-01-01', 'YYYY-MM-DD'))"
-            for date_filter in date_filter_columns
-        )
+        if len(date_filter_columns) > 1:
+            date_filters = ", \n".join(
+                f"NVL({date_filter}, TO_DATE('1970-01-01', 'YYYY-MM-DD'))"
+                for date_filter in date_filter_columns
+            )
+            fields_filter = f"GREATEST({date_filters})"
+
+        else:
+            fields_filter = ", ".join(
+                date_filter for date_filter in date_filter_columns
+            )
 
         filters = f"""
-            GREATEST({date_filters})
-            BETWEEN TO_TIMESTAMP('{start_range_date}', 'YYYY-MM-DD HH24:MI:SS')
-            AND TO_TIMESTAMP('{end_range_date}', 'YYYY-MM-DD HH24:MI:SS')
-        """
+                {fields_filter}
+                BETWEEN TO_DATE('{start_range_date}', 'YYYY-MM-DD HH24:MI:SS')
+                AND TO_DATE('{end_range_date}', 'YYYY-MM-DD HH24:MI:SS')
+            """
 
         query = f"""
             SELECT *

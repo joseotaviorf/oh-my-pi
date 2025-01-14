@@ -32,5 +32,6 @@ SELECT
     CCVLRJUAG AS agreement_interest_amount,
     CCVLRTXCARAG AS credit_card_fee_amount,
     CCDLQDT AS ts_due_contract_due,
+    CCDTUPDATE AS ts_record_updated,
     NOW() AS ts_load
 FROM datalake_cyber_raw.tb_campanha_contrato

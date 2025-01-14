@@ -103,6 +103,7 @@ if __name__ == "__main__":
         df = oracle_consumer.get_incremental_data_from_table(oracle_table_name, date_filter_columns, load_start_date, load_end_date)
     else:
         df = oracle_consumer.get_data_from_table(oracle_table_name)
+
     if df.rdd.isEmpty():
         _send_warning(dbutils, environment, table_name)
     else:
