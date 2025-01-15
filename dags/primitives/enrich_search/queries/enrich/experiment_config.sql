@@ -95,7 +95,7 @@ FROM VALUES
         "AB_TEST_RECS_HUE_INDEXED_RENT",
         named_struct(
             'begin_date', DATE('2024-12-09'),
-            'end_date', DATE('2025-01-09'),
+            'end_date', NULL,
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -110,7 +110,7 @@ FROM VALUES
         "AB_TEST_RECS_HUE_INDEXED_SALE",
         named_struct(
             'begin_date', DATE('2024-12-09'),
-            'end_date', DATE('2025-01-09'),
+            'end_date', NULL,
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
