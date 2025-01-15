@@ -6,13 +6,22 @@ columns:
       - datalake_hefesto_raw.worker_portfolio_event.id
   id_portfolio:
     lineage:
-      - datalake_hefesto_raw.worker_portfolio_event.portfolio_id
+      - datalake_hefesto_raw.worker_portfolio_event.worker_portfolio_id
   id_portfolio_file:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.portfolio_file_id
   event_type:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.external_id
+  author:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_event.author
+  description:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_event.description
+  portfolio_unit_id:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_event.portfolio_unit_id
   ts_created:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.created_at

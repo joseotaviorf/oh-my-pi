@@ -9,13 +9,19 @@ columns:
       - datalake_hefesto_raw.worker_portfolio.worker_id
   id_user:
     lineage:
-      - datalake_hefesto_raw.worker_portfolio.user_id
+      - datalake_hefesto_raw.worker_portfolio.user_identifier
   id_contract:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.contract_id
   id_entity_origin:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.entity_origin_id
+  context_identifier:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio.context_identifier
+  user_identifier_type:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio.user_identifier_type
   id_chat:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.chat_uuid,
@@ -24,7 +30,7 @@ columns:
       - datalake_hefesto_raw.worker_portfolio.status
   entity_origin_name:
     lineage:
-      - datalake_hefesto_raw.worker_portfolio.entity_origin_name
+      - datalake_hefesto_raw.worker_portfolio.context_group
   entity_origin_persona:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.entity_origin_persona

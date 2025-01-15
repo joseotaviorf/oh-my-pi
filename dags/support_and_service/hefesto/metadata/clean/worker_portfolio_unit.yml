@@ -1,0 +1,27 @@
+database_name: datalake_hefesto_clean
+table_name: worker_portfolio_unit
+columns:
+  id_unit:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_unit.id
+  ts_created:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_unit.created_at
+  ts_updated:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_unit.updated_at
+  status:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_unit.status
+  worker_portfolio_id:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_unit.worker_portfolio_id
+  origin_identifier:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_unit.origin_identifier
+  user_persona: 
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_unit.user_persona
+  metadata:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_unit.metadata
