@@ -303,8 +303,3 @@ sheets_info:
     clean_table_name: quintocred_iaf_occurrences
     sheet_context: fintech
 
-  quintocred_iaf_qualifies_calls:
-    sheet_id: 1EI_0dhvKCbCsRvrWrLLh9IUbIfG1Q44W
-    sheet_name: iaf_qualifies_calls
-    clean_table_name: quintocred_iaf_qualifies_calls
-    sheet_context: fintech

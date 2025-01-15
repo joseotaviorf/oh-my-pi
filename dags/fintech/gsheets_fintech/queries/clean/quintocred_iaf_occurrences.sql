@@ -5,5 +5,6 @@ SELECT
     NULLIF(effort, '') AS effort,
     NULLIF(massive, '') AS massive,
     NULLIF(channel, '') AS channel
+    
 FROM
-    datalake_gsheets_raw.quintocred_iaf_occurences
+    datalake_gsheets_raw.quintocred_iaf_occurrences
