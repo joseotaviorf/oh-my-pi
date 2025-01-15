@@ -68,7 +68,7 @@ incoming_tickets AS (
   FROM
     datalake_zendesk.tickets_current AS t
   WHERE
-    t.ts_updated BETWEEN '{load_start_date}' - INTERVAL 7 DAY AND '{load_end_date}'
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 7 DAY AND '{load_end_date}'
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
 ),
