@@ -11,7 +11,7 @@ dag:
 workflow:
   layer: raw
   type: custom_ingestion
-  load_spark_job: add_data_from_stitch_to_raw
+  load_spark_job: add_data_from_airbyte_to_raw
   spark_job_arguments:
   - "{environment}"
   - "{bucket}"
@@ -39,10 +39,8 @@ workflow:
     ticket_fields:
       z_order_by: [id_ticket_field]
     ticket_comments:
-      load_spark_job: add_data_from_airbyte_to_raw
       z_order_by: [id_ticket]
     ticket_audits:
-      load_spark_job: add_data_from_airbyte_to_raw
       z_order_by: [id_ticket]
 
 cluster:
