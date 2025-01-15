@@ -1,6 +1,6 @@
 dag:
     name: enrich_offer
-    owner: Data Engineering
+    owner: Data ForRent
     schedule_start_date: 2020, 7, 1
     documentation: 
       dag_purpose: |
