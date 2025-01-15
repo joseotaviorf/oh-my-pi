@@ -3007,6 +3007,7 @@ bietlejuice.enrich_terminator:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-declined-relisting
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.terminator:load-clean-checklist-item

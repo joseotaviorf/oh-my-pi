@@ -80,6 +80,14 @@ columns:
     description: Descriptive information that indicates which checklist item the record is in the termination process.
     lineage:
       - datalake_terminator_clean.checklist_item.checklist_item
+  decline_person:
+    description: Column indicating who opted-out/declined the relisting.
+    lineage:
+      - datalake_ebdb_contract.contract_declined_relisting.decline_person
+    categories:
+      "DECLINED_BY_PP": The person who declined the relisting was the owner.
+      "DECLINED_BY_CX/ENG": The person who declined the relisting and opted-out wasn't the owner.
+      "AUTO_DECLINED": If the is_early_relisting flag is False and we don't have any information who did the opt-out, the value will be Auto-declined.
   is_relisting:
     description: Boolean information that indicates whether the house is already being relisting.
     lineage:
@@ -104,6 +112,14 @@ columns:
     description: Boolean information that indicates if de checklit is done.
     lineage:
       - datalake_terminator_clean.checklist_item.is_done
+  is_relisting_enabled:
+    lineage:
+      - datalake_ebdb_contract.contract_declined_relisting.is_relisting_enabled
+    description: Boolean flag indicating if the house can be relisted.
+  is_early_relisting_enabled:
+    lineage:
+      - datalake_ebdb_contract.contract_declined_relisting.is_early_relisting_enabled
+    description: Boolean flag indicating if the house's owner opted-in/out of the early relisting.
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:
@@ -157,6 +173,10 @@ columns:
     description: Date in timestamp format that indicates when the trade opening for the termination fee was updated.
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.ts_updated
+  ts_declined:
+    lineage:
+      - datalake_ebdb_contract.contract_declined_relisting.ts_declined
+    description: Timestamp of when the declined for relisting happened.
   year:
     description: Year when the data was loaded.
     lineage:

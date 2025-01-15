@@ -5,11 +5,12 @@ SELECT
     requested_by,
     status,
     feedback,
-    rescheduling_history
+    rescheduling_history,
     workflow_current_step,
     fee_negotiation_status,
     fee_payment_option,
     checklist_item,
+    decline_person,
     NOW() AS ts_load,
     year,
     month,

@@ -49,6 +49,14 @@ columns:
     description: Descriptive information that indicates which checklist item the record is in the termination process.
     lineage:
       - datalake_terminator.termination.checklist_item
+  decline_person:
+    description: Column indicating who opted-out/declined the relisting.
+    lineage:
+      - datalake_terminator.termination.decline_person
+    categories:
+      "DECLINED_BY_PP": The person who declined the relisting was the owner.
+      "DECLINED_BY_CX/ENG": The person who declined the relisting and opted-out wasn't the owner.
+      "AUTO_DECLINED": If the is_early_relisting flag is False and we don't have any information who did the opt-out, the value will be Auto-declined.
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_offboarding.
   year:

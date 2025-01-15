@@ -84,6 +84,7 @@ SELECT
     ln.fee_negotiation_status,
     ln.fee_payment_option,
     checklist.checklist_item,
+    cdr.decline_person,
     t.is_relisting,
     tw.has_automatically_closed_task,
     ci.is_contract_b2b,
@@ -91,6 +92,8 @@ SELECT
     (tm.id IS NOT NULL) AS has_been_rescheduled,
     checklist.is_active AS is_checklist_active,
     checklist.is_done AS is_checklist_done,
+    cdr.is_relisting_enabled,
+    cdr.is_early_relisting_enabled,
     DATEDIFF(t.dt_termination, t.ts_created) AS leadtime_request_to_vacancy,
     ln.fee_discount_percentage,
     ln.fee_discount_value,
@@ -104,6 +107,7 @@ SELECT
     IF(t.status = 'DONE', t.ts_updated, NULL) AS ts_termination_finished,
     ln.ts_fee_negotiation_created,
     ln.ts_fee_negotiation_updated,
+    cdr.ts_declined,
     YEAR(t.ts_updated) AS year,
     MONTH(t.ts_updated) AS month,
     DAY(t.ts_updated) AS day
@@ -120,16 +124,19 @@ LEFT JOIN
         ON t.id = tt.id_termination
 LEFT JOIN
     last_inspection_synch AS lis
-      ON t.id = lis.id
+        ON t.id = lis.id
 LEFT JOIN
     last_negociation AS ln
-      ON t.id = ln.id_termination
+        ON t.id = ln.id_termination
 LEFT JOIN
     contract_info AS ci
         ON t.id_contract = ci.id_contract
 LEFT JOIN
     terminations_modified AS tm
         ON t.id = tm.id
+LEFT JOIN
+    datalake_ebdb_contract.contract_declined_relisting AS cdr
+        ON t.id = cdr.id_termination
 WHERE
     DATE(t.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY

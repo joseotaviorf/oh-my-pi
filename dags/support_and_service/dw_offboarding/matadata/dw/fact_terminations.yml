@@ -109,6 +109,14 @@ columns:
     description: Boolean information that indicates if de checklit is done.
     lineage:
       - datalake_terminator.termination.is_checklist_done
+  is_relisting_enabled:
+    lineage:
+      - datalake_terminator.termination.is_relisting_enabled
+    description: Boolean flag indicating if the house can be relisted.
+  is_early_relisting_enabled:
+    lineage:
+      - datalake_terminator.termination.is_early_relisting_enabled
+    description: Boolean flag indicating if the house's owner opted-in/out of the early relisting.
   ts_termination_request:
     description: Date in timestamp format that indicates when the termination request occurred.
     lineage:
@@ -133,6 +141,10 @@ columns:
     description: Date in timestamp format that indicates when the trade opening for the termination fee was updated.
     lineage:
       - datalake_terminator.termination.ts_fee_negotiation_updated
+  ts_declined:
+    lineage:
+      - datalake_terminator.termination.ts_declined
+    description: Timestamp of when the declined for relisting happened.
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_offboarding.
   year:
