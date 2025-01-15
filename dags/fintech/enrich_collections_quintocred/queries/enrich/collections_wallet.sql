@@ -93,7 +93,6 @@ timeline_final AS (
         MAX(t.is_currently_active) AS is_currently_active,
         MAX(t.dt_ended_propose) AS dt_ended_propose,
         dt_base,
-        t.dt_aging,
         array_agg(t.dt_paid) AS dt_paid_array,
         CASE
             WHEN ta.major_type = 'RESCISAO' AND md.min_dt_termination IS NULL THEN md.min_dt_guarantee
@@ -119,7 +118,7 @@ timeline_final AS (
     LEFT JOIN
         min_propose_date AS mpd
         ON t.id_propose = mpd.id_propose
-    GROUP BY 1,2,3,5,6,7,17,18,20
+    GROUP BY 1,2,3,5,6,7,17,19
 ),
 evictions_day AS (
     SELECT
