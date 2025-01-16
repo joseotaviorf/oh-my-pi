@@ -1,0 +1,37 @@
+dag:
+  name: ebdb_sale_test
+  schedule_start_date: 2024,01,01
+  schedule_interval: 10 21 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      Dag containing all tables from Sale's context.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  custom_schema: ebdb_test
+  dbutils_secret_key: EBDB_DB
+  tables_customization:
+    AppointmentChangeReasonCategory:
+      clean_table_name: appointment_change_reason_category
+    HorarioSemanalImovel:
+      clean_table_name: house_weekly_schedule
+    HorarioSemanalImovel_AUD:
+      clean_table_name: house_weekly_schedule_aud
+    HouseVisitStatus_AUD:
+      clean_table_name: house_visit_status_aud
+    SaleOperationManagement:
+      clean_table_name: sale_operation_management
+    ShopWindow:
+      clean_table_name: shop_window
+    ShopWindow_AUD:
+      clean_table_name: shop_window_aud
+    ShopWindow_ListingBusinessContext:
+      clean_table_name: shop_window_listing_business_context
+    ShopWindow_ListingBusinessContext_AUD:
+      clean_table_name: shop_window_listing_business_context_aud
+cluster:
+  type: databricks_12_2_med_general_cluster

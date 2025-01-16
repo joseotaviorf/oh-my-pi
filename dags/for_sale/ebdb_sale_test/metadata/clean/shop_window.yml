@@ -1,0 +1,40 @@
+---
+database_name: datalake_ebdb_test_clean
+table_name: shop_window
+domain: Rede
+description: Shop window created by an agent from Rede QuintoAndar.
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  id_shop_window:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow.id
+  id_shop_window_creator:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow.shopwindowcreatorid
+  id_agents_prospect:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow.agentsProspect_id
+  id_external:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow.externalid
+  shop_window_name:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow.name
+  shop_window_creator_user_type:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow.shopwindowcreatorusertype
+  short_url:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow.shorturl
+  cover_image_uri:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow.coverimageuri
+  is_active:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow.isactive
+  ts_created:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow.criadoem
+  ts_updated:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow.atualizadoem

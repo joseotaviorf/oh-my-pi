@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_test_clean
+table_name: house_visit_status_aud
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_test_raw.housevisitstatus_aud.id
+  rev:
+    lineage:
+      - datalake_ebdb_test_raw.housevisitstatus_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_test_raw.housevisitstatus_aud.revtype
+  id_house:
+    lineage:
+      - datalake_ebdb_test_raw.housevisitstatus_aud.imovel_id
+  mod_house:
+    lineage:
+      - datalake_ebdb_test_raw.housevisitstatus_aud.imovel_mod
+  status:
+    lineage:
+      - datalake_ebdb_test_raw.housevisitstatus_aud.status
+  mod_status:
+    lineage:
+      - datalake_ebdb_test_raw.housevisitstatus_aud.status_mod
+  reason:
+    lineage:
+      - datalake_ebdb_test_raw.housevisitstatus_aud.reason
+  mod_reason:
+    lineage:
+      - datalake_ebdb_test_raw.housevisitstatus_aud.reason_mod

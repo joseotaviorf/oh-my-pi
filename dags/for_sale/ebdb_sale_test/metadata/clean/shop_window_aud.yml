@@ -1,0 +1,64 @@
+---
+database_name: datalake_ebdb_test_clean
+table_name: shop_window_aud
+domain: Rede
+description: Audit of shop window created by an agent from Rede QuintoAndar.
+owner: gustavo.miller@quintoandar.com.br
+columns:
+  id_shop_window:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.id
+  id_shop_window_creator:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.shopwindowcreatorid
+  id_agents_prospect:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.agentsProspect_id
+  id_external:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.externalid
+  shop_window_name:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.name
+  shop_window_creator_user_type:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.shopwindowcreatorusertype
+  short_url:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.shorturl
+  cover_image_uri:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.coverimageuri
+  rev:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.rev
+  rev_type:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.revtype
+  is_active:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.isactive
+  mod_id_shop_window_creator:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.shopwindowcreatorid_mod
+  mod_id_agents_prospect:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.agentsProspect_id_MOD
+  mod_id_external:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.externalid_mod
+  mod_shop_window_name:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.name_mod
+  mod_shop_window_creator_user_type:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.shopwindowcreatorusertype_mod
+  mod_short_url:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.shorturl_mod
+  mod_cover_image_uri:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.coverimageuri_mod
+  mod_is_active:
+    lineage:
+      - datalake_ebdb_test_raw.shopwindow_aud.isactive_mod
