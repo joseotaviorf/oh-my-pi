@@ -8,6 +8,9 @@ columns:
   desc_status:
     lineage:
       - datalake_gsheets_raw.quintocred_iaf_occurrences.desc_status
+  amount:
+    lineage:
+      - datalake_gsheets_raw.quintocred_iaf_occurrences.amount 
   tab:
     lineage:
       - datalake_gsheets_raw.quintocred_iaf_occurrences.tab

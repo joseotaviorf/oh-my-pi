@@ -298,8 +298,7 @@ sheets_info:
     sheet_context: fintech
 
   quintocred_iaf_occurrences:
-    sheet_id: 1EI_0dhvKCbCsRvrWrLLh9IUbIfG1Q44W
-    sheet_name: iaf_occurrences
+    sheet_id: 1gBO7nEtBL5lN4GSMKfNnQVHxAihYzbnCdpmuwWK2KJ0
+    sheet_name: Sheet1
     clean_table_name: quintocred_iaf_occurrences
     sheet_context: fintech
-
