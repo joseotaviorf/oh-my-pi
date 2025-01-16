@@ -32,6 +32,18 @@ columns:
   params:
     lineage:
       - datalake_search.search_experiments.params
+  begin_date:
+    lineage:
+      - datalake_search.search_experiments.begin_date
+  last_processed_date:
+    lineage:
+      - datalake_search.search_experiments.last_processed_date
+  is_last_date:
+    lineage:
+      - datalake_search.search_experiments.is_last_date
+  total_days:
+    lineage:
+      - datalake_search.search_experiments.total_days
   baseline_observations:
     lineage:
       - datalake_search.search_experiments.baseline_observations
@@ -59,51 +71,51 @@ columns:
   conversion_rate_diff_rel:
     lineage:
       - datalake_search.search_experiments.conversion_rate_diff_rel
-  ci_lower_bound_rel:
+  ci_lower_bound:
     lineage:
-      - datalake_search.search_experiments.ci_lower_bound_rel
-  ci_upper_bound_rel:
+      - datalake_search.search_experiments.ci_lower_bound
+  ci_upper_bound:
     lineage:
-      - datalake_search.search_experiments.ci_upper_bound_rel
-  mde_rel:
+      - datalake_search.search_experiments.ci_upper_bound
+  mde:
     lineage:
-      - datalake_search.search_experiments.mde_rel
+      - datalake_search.search_experiments.mde
   significance:
     lineage:
       - datalake_search.search_experiments.significance
   has_significance:
     lineage:
       - datalake_search.search_experiments.has_significance
-  p_treatment_win:
+  prob_treatment_win:
     lineage:
-      - datalake_search.search_experiments.p_treatment_win
+      - datalake_search.search_experiments.prob_treatment_win
   decision:
     lineage:
       - datalake_search.search_experiments.decision
-  baseline_observations_cumulative:
+  baseline_observations_marginal:
     lineage:
-      - datalake_search.search_experiments.baseline_observations_cumulative
-  baseline_conversions_cumulative:
+      - datalake_search.search_experiments.baseline_observations_marginal
+  baseline_conversions_marginal:
     lineage:
-      - datalake_search.search_experiments.baseline_conversions_cumulative
-  treatment_observations_cumulative:
+      - datalake_search.search_experiments.baseline_conversions_marginal
+  treatment_observations_marginal:
     lineage:
-      - datalake_search.search_experiments.treatment_observations_cumulative
-  treatment_conversions_cumulative:
+      - datalake_search.search_experiments.treatment_observations_marginal
+  treatment_conversions_marginal:
     lineage:
-      - datalake_search.search_experiments.treatment_conversions_cumulative
-  baseline_conversion_rate_cumulative:
+      - datalake_search.search_experiments.treatment_conversions_marginal
+  baseline_conversion_rate_marginal:
     lineage:
-      - datalake_search.search_experiments.baseline_conversion_rate_cumulative
-  treatment_conversion_rate_cumulative:
+      - datalake_search.search_experiments.baseline_conversion_rate_marginal
+  treatment_conversion_rate_marginal:
     lineage:
-      - datalake_search.search_experiments.treatment_conversion_rate_cumulative
-  conversion_rate_diff_abs_cumulative:
+      - datalake_search.search_experiments.treatment_conversion_rate_marginal
+  conversion_rate_diff_abs_marginal:
     lineage:
-      - datalake_search.search_experiments.conversion_rate_diff_abs_cumulative
-  conversion_rate_diff_rel_cumulative:
+      - datalake_search.search_experiments.conversion_rate_diff_abs_marginal
+  conversion_rate_diff_rel_marginal:
     lineage:
-      - datalake_search.search_experiments.conversion_rate_diff_rel_cumulative
+      - datalake_search.search_experiments.conversion_rate_diff_rel_marginal
   ci_lower_bound_rel_marginal:
     lineage:
       - datalake_search.search_experiments.ci_lower_bound_rel_marginal

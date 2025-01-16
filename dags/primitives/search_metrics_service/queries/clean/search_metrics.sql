@@ -6,6 +6,7 @@ select
     metric_numerator,
     metric_denominator,
     metric_value,
+    is_stable,
     date_granularity,
     date
 from

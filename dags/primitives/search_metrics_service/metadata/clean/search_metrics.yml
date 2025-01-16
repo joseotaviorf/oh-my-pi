@@ -26,6 +26,9 @@ columns:
   metric_value:
     lineage:
       - datalake_search.search_metrics.metric_value
+  is_stable:
+    lineage:
+      - datalake_search.search_metrics.is_stable
   date_granularity:
     lineage:
       - datalake_search.search_metrics.date_granularity
