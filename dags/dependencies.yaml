@@ -645,8 +645,6 @@ bietlejuice.dw_offer:
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal-aud
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
-bietlejuice.dw_offer_temp:
-  - bietlejuice.dw_offer:load-dw-rent-dim-offer
 bietlejuice.dw_operator_performance:
   - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-negotiation
   - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-negotiation-installment
@@ -672,10 +670,6 @@ bietlejuice.dw_proposal:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_proposal:load-enrich-proposal-person
   - bietlejuice.enrich_proposal:load-enrich-proposal
-bietlejuice.dw_proposal_temp:
-  - bietlejuice.dw_proposal:load-dw-rent-dim-proposal
-  - bietlejuice.dw_proposal:load-dw-rent-dim-proposal-person
-  - bietlejuice.dw_proposal:load-dw-rent-fact-proposal-people
 bietlejuice.dw_quintocred_ifrs:
   - bietlejuice.dw_velo:load-dw-velo-bridge-velo-propose-person
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker
@@ -767,8 +761,6 @@ bietlejuice.dw_rent_flow:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
-bietlejuice.dw_rent_flow_temp:
-  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
 bietlejuice.dw_rent_listing_flow:
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.ebdb_partner:load-clean-affiliate-data
@@ -817,8 +809,6 @@ bietlejuice.dw_repairs:
   - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
-bietlejuice.dw_reservation_temp:
-  - bietlejuice.dw_reservation:load-dw-rent-dim-reservation
 bietlejuice.dw_retention:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
