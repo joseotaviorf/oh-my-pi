@@ -10,6 +10,9 @@ columns:
   id_user:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.user_identifier
+  user:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio.user_id
   id_contract:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.contract_id
@@ -28,6 +31,9 @@ columns:
   status:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.status
+  entity_origin:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio.entity_origin_name
   entity_origin_name:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.context_group
