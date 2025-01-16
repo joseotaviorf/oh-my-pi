@@ -1,8 +1,8 @@
 database_name: datalake_crawlers_listings
 table_name: olx
 description: Table with information about the listings of OLX.
-domain: For Rent
-owner: gustavo.geiger@quintoandar.com.br
+domain: Growth
+owner: andre.melo@quintoandar.com.br
 columns:
   id_house_platform:
     lineage:

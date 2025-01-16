@@ -2,7 +2,7 @@
 dag:
   name: enrich_olx_crawler_listings
   schedule_start_date: 2021, 7, 20
-  owner: Data ForRent
+  owner: Data Growth
   schedule_interval: 0 6 * * 5
   documentation: 
     dag_purpose: |
@@ -11,7 +11,7 @@ dag:
       The ingestion is incremental, partitioned on city, year, month and day columns.
       This DAG runs once a week (Friday) and it's triggered by Airflow.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: crawlers_listings
   default_extraction_type: incremental
