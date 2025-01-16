@@ -25,3 +25,12 @@ columns:
   metadata:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_unit.metadata
+  year:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_unit.year
+  month:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_unit.month
+  day:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio_unit.day

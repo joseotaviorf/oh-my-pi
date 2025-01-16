@@ -6,7 +6,10 @@ SELECT
     worker_portfolio_id, 
     origin_identifier, 
     user_persona, 
-    metadata
+    metadata,
+    year,
+    month,
+    day
 FROM
     datalake_hefesto_raw.worker_portfolio_unit
 WHERE
