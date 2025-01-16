@@ -51,6 +51,9 @@ CLUSTER_DESCRIPTION["spark_conf"].update(
     {"spark.metrics.namespace": "data_products.enrich_vespucio_pipeline"}
 )
 CLUSTER_DESCRIPTION["spark_env_vars"]["OUTPUT_LOCATION"] = output_location
+CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
+CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -84,7 +87,7 @@ dag = DAG(
 )
 
 execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
-    databricks_conn_id="databricks_job_cluster",
+    databricks_conn_id="databricks_new",
     dag=dag,
     task_id="execute-job-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
@@ -95,7 +98,7 @@ execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
 
 def create_task(entry_point: str, parameters: List[str], task_id: str = None):
     return QuintoAndarDatabricksCheckJobTaskOperator(
-        databricks_conn_id="databricks_job_cluster",
+        databricks_conn_id="databricks_new",
         dag=dag,
         task_id=(task_id or entry_point).replace("-", "-"),
         json={

@@ -41,6 +41,9 @@ VESPUCIO_PACKAGE_VERSION = config_service.get_config("vespucio_pipeline_version"
 VESPUCIO_WHEEL_FILE = f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_13_3_med_general_cluster")
+CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
+CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -69,7 +72,7 @@ dag = DAG(
 )
 
 execute_job_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    databricks_conn_id="databricks_job_cluster",
+    databricks_conn_id="databricks_new",
     dag=dag,
     task_id="execute-job-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
@@ -79,7 +82,7 @@ execute_job_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
 
 def create_task(entry_point: str, parameters: str, task_id: str = None):
     return QuintoAndarDatabricksSubmitRunOperator(
-        databricks_conn_id="databricks_job_cluster",
+        databricks_conn_id="databricks_new",
         dag=dag,
         task_id=(task_id or entry_point).replace("_", "-"),
         json={
