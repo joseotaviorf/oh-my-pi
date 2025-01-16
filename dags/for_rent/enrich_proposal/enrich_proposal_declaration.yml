@@ -7,7 +7,7 @@ dag:
             This DAG creates the enriched table for the Proposal context.
             Data used in enrichment is from EBDB, Sorting Hat and Rental Guarantee extractions.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     default_extraction_type: full
     default_partitions: [country_code]

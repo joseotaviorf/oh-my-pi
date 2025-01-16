@@ -7,7 +7,7 @@ dag:
             This DAG creates the enriched tables about rent flows and its entities (property, tenant prospect,
             booking, offer, contract, etc.).
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     default_extraction_type: full
     default_partitions: [country_code]

@@ -8,7 +8,7 @@ dag:
           This DAG is triggered by Mediator and loads the table via full load.
   owner: Data ForRent
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
 cluster:
   type: custom_cluster

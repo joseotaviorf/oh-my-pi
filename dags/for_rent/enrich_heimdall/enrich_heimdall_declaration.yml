@@ -6,7 +6,7 @@ dag:
         dag_purpose: |
             Expanding columns from `heimdall` datalake table `activity` to facilitate the analysis.
 workflow:
-    type: query
+    type: query_delta
     layer: enrich
     inner_dependencies:
         ongoing_refund_requests:
