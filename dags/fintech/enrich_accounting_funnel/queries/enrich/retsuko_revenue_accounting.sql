@@ -215,7 +215,9 @@ df AS (
             ON r.id_sap_gateway_feature = sap_gateway.id_feature
     LEFT JOIN
         sap
-            ON sap.hash = sap_gateway.hash AND r.revenue_account = sap.account_number
+          ON r.id_invoice = sap.id_finance_entity
+          OR sap.hash = sap_gateway.hash 
+          AND r.revenue_account = sap.account_number
     GROUP BY 1, 2, 3, 4, 5 ,6 ,7 ,8 ,11
 ),
 

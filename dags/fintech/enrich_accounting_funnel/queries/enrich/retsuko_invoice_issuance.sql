@@ -261,7 +261,6 @@ sap_gateway AS (
     SELECT DISTINCT
         f.id_finance_entity,
         f.id_feature,
-        hash,
         f.sync_sap_status,
         MIN(IF(s.status IN ('done', 'waiting-unified-invoice'), 'success', 'failed')) as sync_sap_job_status
     FROM
@@ -273,13 +272,12 @@ sap_gateway AS (
         erp_solution IN ('S4')
         AND type = 'NF'
     GROUP BY
-        1, 2, 3, 4
+        1, 2, 3
 ),
 
 sap AS (
     SELECT
         id_finance_entity,
-        hash,
         CASE
             WHEN account_number = '420005' THEN 'service fee'
             WHEN account_number = '420002' THEN 'adm fee'
@@ -298,7 +296,7 @@ sap AS (
         --AND transaction_type = 'DR'
         AND dt_reference >= '2024-01-01'
     GROUP BY
-        1, 2, 3, 4
+        1, 2, 3
 ),
 pre_df AS (
     SELECT
@@ -331,7 +329,7 @@ pre_df AS (
         END AS status,
         source_amount,
         sap_amount,
-        IF(s.id_finance_entity IS NULL AND sg.id_feature IS NULL, FALSE, TRUE) AS is_completeness_compliance,
+        IF(s.id_finance_entity IS NULL OR sg.id_feature IS NULL, FALSE, TRUE) AS is_completeness_compliance,
         dt_source_trigger,
         dt_sap_created,
         dt_sap_reference
@@ -346,7 +344,6 @@ pre_df AS (
     LEFT JOIN
         sap s
             ON r.id_entity = s.id_finance_entity
-            OR sg.hash = s.hash
             AND r.revenue_name = s.revenue_account
 ),
 df AS (
