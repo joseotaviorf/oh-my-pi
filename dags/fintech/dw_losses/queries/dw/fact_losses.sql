@@ -11,6 +11,7 @@ base_of_calculation AS (
         fp.is_before_started,
         fp.is_international,
         fp.is_writtendown_in_dead_time,
+        fp.is_write_off,
         fp.is_contract_write_off,
         fp.has_repair_offboarding_bill_item,
         fc.city,
@@ -39,7 +40,8 @@ base_of_calculation AS (
         fc.dt_annulment AS dt_contract_annulment,
         fp.dt_closing,
         fp.dt_snapshot,
-        fp.dt_paid_adjs AS dt_paid_invoice_adjusted
+        fp.dt_paid_adjs AS dt_paid_invoice_adjusted,
+        fp.dt_write_off
     FROM
         dw_losses.fact_provision AS fp
     LEFT JOIN
@@ -51,7 +53,6 @@ base_of_calculation AS (
         fp.is_international IS FALSE
         AND fp.is_before_started IS FALSE
         AND fp.payment_status <> 'written down'
-        AND fp.is_write_off IS NOT TRUE
         AND NOT(fp.dt_closing >= DATE('2024-02-01') AND fp.has_repair_offboarding_bill_item)
 ),
 monthly_aggregation AS (
@@ -82,6 +83,7 @@ calculate_previous_pdd AS (
         f.is_before_started,
         f.is_international,
         f.is_writtendown_in_dead_time,
+        f.is_write_off,
         f.is_contract_write_off,
         f.has_repair_offboarding_bill_item,
         f.city,
@@ -99,7 +101,8 @@ calculate_previous_pdd AS (
         f.dt_due_invoice_adjusted,
         f.dt_paid_invoice_adjusted,
         f.dt_contract_signature,
-        f.dt_contract_annulment
+        f.dt_contract_annulment,
+        f.dt_write_off
     FROM
         base_of_calculation AS f
     LEFT JOIN
@@ -118,6 +121,7 @@ SELECT
     is_before_started,
     is_international,
     is_writtendown_in_dead_time,
+    is_write_off,
     is_contract_write_off,
     has_repair_offboarding_bill_item,
     city,
@@ -136,5 +140,6 @@ SELECT
     dt_paid_invoice_adjusted,
     dt_contract_signature,
     dt_contract_annulment,
+    dt_write_off,
     NOW() AS ts_load
 FROM calculate_previous_pdd
