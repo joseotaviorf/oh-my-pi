@@ -23,7 +23,7 @@ listing_rent_model AS (
   JOIN
     datalake_ebdb_user.user_revision_entity as ure
       ON aud.rev = ure.id
-      AND ure.ts_revision BETWEEN t.ts_created AND DATEADD(DAY, 3, DATE(t.ts_created))
+      AND ure.ts_revision BETWEEN t.ts_created AND DATEADD(DAY, 1, DATE(COALESCE(c.ts_analyst_annulment_input, c.dt_termination)))
   JOIN
     datalake_ebdb_clean.house AS h
       ON c.id_house = h.id
@@ -53,7 +53,7 @@ contract_aud AS (
   JOIN
     datalake_ebdb_user.user_revision_entity AS ure
       ON ure.id = aud.rev
-      AND ure.ts_revision BETWEEN t.ts_created AND DATEADD(DAY, 3, DATE(t.ts_created))
+      AND ure.ts_revision BETWEEN t.ts_created AND DATEADD(DAY, 1, DATE(COALESCE(c.ts_analyst_annulment_input,c.dt_termination)))
   JOIN
     datalake_ebdb_clean.house AS h
       ON aud.id_house = h.id
