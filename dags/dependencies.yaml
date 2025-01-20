@@ -11,6 +11,9 @@ bietlejuice.dw_accounting_funnel:
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-provision-creation
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-revenue-accounting
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-reversion-creation
+bietlejuice.dw_accounts_receivable:
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliate-costs
   - bietlejuice.robin_hood:load-clean-tax

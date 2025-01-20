@@ -8,6 +8,9 @@ bietlejuice.amplitude_supply:
 bietlejuice.dw_agent_contract:
   add:
     - bietlejuice.dw_rede_company:load-dw-rede-dim-company
+bietlejuice.dw_accounts_receivable:
+  remove:
+    - bietlejuice.dw_losses:load-dw-losses-fact-losses
 bietlejuice.dw_braze_events_user_dispatch:
   remove:
     - bietlejuice.braze_details:load-clean-canvas-details-indica-ai

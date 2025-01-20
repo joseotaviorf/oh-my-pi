@@ -1,0 +1,42 @@
+---
+database_name: dw_accounts_receivable
+table_name: fact_accounts_receivable
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Analytical used to create metric AR90 (accounts receivables).
+columns:
+  sk_invoice:
+    description: "ID Invoice from Retsuko"
+    lineage:
+      - dw_losses.fact_losses.sk_invoice
+  closing_month_status:
+    description: "Contract status of the closing month"
+    lineage:
+      - dw_losses.fact_losses.contract_closing_month_status
+  provisional_group:
+    description: "Provisional group based on risk type of the deal and type of guarantee (paid or free)"
+    lineage:
+      - dw_losses.fact_losses.provisional_group
+  delay_contaminated_range:
+    description: "Delay Contamined Range calculated based on dt_promisse and dt_due_invoice_anchor"
+    lineage:
+      - dw_losses.fact_losses.delay_contaminated_range
+  due_amount:
+    description: "Invoice Due amount from PDD"
+    lineage:
+      - dw_losses.fact_losses.due_amount
+  recovered_amount:
+    description: "Invoice recovered amount"
+    lineage:
+      - dw_losses.fact_losses.due_amount
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.net_recovered_amount
+  dt_invoice_paid:
+    description: "Invoice payment date"
+    lineage:
+      - dw_losses.datalake_retsuko.invoice.ts_paid
+      - dw_losses.datalake_retsuko.invoice.ts_canceled
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_paid
+  dt_month:
+    description: "First day of the closing month"
+    lineage:
+      - dw_losses.fact_losses.dt_closing
