@@ -21,12 +21,13 @@ def create_results_payload(results_table_path: str, agent_table_path: str, key_j
 
     results_df = spark.sql(f"""
         SELECT
-            *,
+            fact.*,
+            dim.{analyst_key_column},
             STRING(MAKE_DATE(year, month, day)) AS date
         FROM
-            {results_table_path}
-            LEFT JOIN {agent_table_path}
-                ON {key_join_tables_fact} = {key_join_tables_dim}
+            {results_table_path} AS fact
+            LEFT JOIN {agent_table_path} AS dim
+                ON fact.{key_join_tables_fact} = dim.{key_join_tables_dim}
         WHERE
             MAKE_DATE(year, month, day) BETWEEN DATE('{start_date}') - INTERVAL 30 DAY AND DATE('{end_date}')
     """)
@@ -119,7 +120,7 @@ def send_payload_in_batches(api_url: str, endpoint: str, transaction_id: str, he
         else:
             logger.info(f"m=Batch sent successfully. Batch_index={i // batch_size}, size={len(batch)}")
 
-def send_alert_message(error_message: str):
+def send_alert_message(error_message: str, dag_name: str, environment: str):
     """
     Envia uma mensagem de alerta no canal configurado com o erro ocorrido.
     """
@@ -127,14 +128,14 @@ def send_alert_message(error_message: str):
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    DAG_NAME = f"{dag_name}"
+    DAG_NAME = dag_name
     config_service = ConfigurationService(DAG_NAME)
     webhook_key = config_service.get_config("notification_webhooks_keys")["data_quality"]
     gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=webhook_key)
 
     message_content = (
         f"⚠️\n"
-        f"Validation: Payload sending on`{dag_name}`\n"
+        f"Validation: Payload sending on `{dag_name}`\n"
         f"Environment: *{environment}*\n"
         f"Status: *FAILED*\n"
         f"*Existence validation failed for `{datetime.now().strftime('%Y-%m-%d')}`\n"
@@ -151,7 +152,7 @@ def safe_post_request_with_alert(url: str, headers: dict, json_data=None):
     except requests.exceptions.RequestException as e:
         error_message = f"URL: {url}\nErro: {e}"
         logger.error(f"m=Error during POST request., {error_message}")
-        send_alert_message(error_message)
+        send_alert_message(error_message, job_arguments_dict["dag_name"], job_arguments_dict["environment"])
         return None
 
 def main():
