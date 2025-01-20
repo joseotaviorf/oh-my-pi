@@ -216,8 +216,8 @@ union_sources AS (
     rn.dt_due_promisse,
     COALESCE(tfn.dt_breach, rn.dt_cancellation) AS dt_cancellation,
     rn.dt_next_due,
-    COALESCE(tfn.dt_first_payment, rn.dt_down_payment) AS dt_down_payment,
-    COALESCE(tfn.dt_paid_all, rn.dt_paid_all) AS dt_paid_all_installments,
+    COALESCE(rn.dt_down_payment, tfn.dt_first_payment) AS dt_down_payment,
+    COALESCE(rn.dt_paid_all, tfn.dt_paid_all) AS dt_paid_all_installments,
     COALESCE(tfn.dt_expected_end, rn.dt_negotiation_expected_end) AS dt_expected_ending,
     COALESCE(tfn.dt_breach, rn.dt_cancellation, tfn.dt_paid_all, rn.dt_paid_all) AS dt_ending,
     NOW() AS ts_load
