@@ -2690,6 +2690,7 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history
+  - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.enrich_sale_listings_lenses:
   - bietlejuice.ebdb:load-clean-suspected-unavailability-listings
   - bietlejuice.ebdb:load-clean-suspected-unavailability-listings-aud

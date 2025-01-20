@@ -44,8 +44,15 @@ columns:
     description: >
       'Ticket segmentation of the listing.'
     categories:
-      High Ticket: If the listing is equal or greater than 1 Million BRL
-      Low Ticket: If the listing is less than 1 Million BRL
+      High Ticket: >
+        If the city group is RMSP, Belo Horizonte and Rio de Janeiro, 
+          and the listing is greater than 1 Million BRL.
+        If the city group is Porto Alegre and the listing is greater than 600 Thousand BRL.
+        If the city group is CuriCampinastiba and the listing is greater than 800 Thousand BRL.
+      Low Ticket: If the listing doesn't fit in the High Ticket category.
+    lineage:
+      - datalake_region.region.city_group
+      - datalake_ebdb_clean.house_aud.sale_price
   sale_price: 
     lineage:
       - datalake_ebdb_clean.house_aud.sale_price

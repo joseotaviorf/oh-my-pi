@@ -11,6 +11,7 @@ WITH house_aud AS (
           ELSE 'PUBLISHED'
         END AS status_threshold,
         r.reason,
+        rr.city_group,
         /* The purpose of creating this threshold is to take the last line before the listing is published, so that we have the first price. */
         ROW_NUMBER() OVER (PARTITION BY h_aud.id_house, IF(lbc.ts_first_publication >= FROM_UNIXTIME(r.ts_revision/1000), 'UNPUBLISHED', 'PUBLISHED') ORDER BY h_aud.rev DESC) AS threshold,
         -- We can't trust the mod_sale_price flag in 100% of cases, so we need to check if the price has changed manually.
@@ -26,6 +27,9 @@ WITH house_aud AS (
     INNER JOIN 
         datalake_ebdb_clean.listing_business_context AS lbc
             ON lbc.id_house = h_aud.id_house
+    LEFT JOIN
+        datalake_region.region AS rr
+          ON h_aud.id_region = rr.id
     WHERE 
         lbc.business_context = 'SALE'
         AND sale_price > 1 
@@ -38,6 +42,7 @@ price_changes_raw AS (
         id_region,
         sale_price,
         reason,
+        city_group,
         dt_change,
         ts_revision,
         ts_first_publication
@@ -59,6 +64,7 @@ price_changes_clean AS (
         sale_price,
         LAG(sale_price) OVER (PARTITION BY id_house ORDER BY ts_revision) AS lag_sale_price,
         reason,
+        city_group,
         dt_change,
         ts_revision AS ts_price_started,
         ts_first_publication
@@ -73,6 +79,7 @@ price_changes_enriched AS (
         id_user_revision,
         id_owner,
         id_region,
+        city_group,
         sale_price,
         lag_sale_price,
         CASE
@@ -104,6 +111,7 @@ sale_price_changes AS (
             WHEN is_first_price = TRUE THEN 'PUBLISHED' 
             ELSE NULL 
         END AS status,
+        city_group,
         sale_price,
         lag_sale_price,
         ROUND(last_price_variation, 4) AS last_price_variation,
@@ -189,8 +197,11 @@ SELECT
     pc.id_owner,
     pc.id_region,
     COALESCE(pc.status, sls.status_history, 'PUBLISHED') AS status_history, 
-    CASE 
-        WHEN sale_price >= 1000000 THEN 'High Ticket'
+    CASE
+        WHEN pc.city_group IN ('RMSP', 'Belo Horizonte', 'Rio de Janeiro') 
+            AND pc.sale_price >= 1000000 THEN 'High Ticket'
+        WHEN pc.city_group = 'Porto Alegre' AND pc.sale_price >= 600000 THEN 'High Ticket'
+        WHEN pc.city_group = 'Campinas' AND pc.sale_price >= 800000 THEN 'High Ticket'
         ELSE 'Low Ticket'
     END price_segment,
     pc.sale_price,
