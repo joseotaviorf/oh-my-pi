@@ -21,12 +21,13 @@ WITH log_union AS (
             CAST(GET_JSON_OBJECT(to, '$.Status') AS INTEGER) AS id_current_status,
             CAST(GET_JSON_OBJECT(from, '$.Situacao') AS INTEGER) AS id_previous_proposal_situation,
             CAST(GET_JSON_OBJECT(to, '$.Situacao') AS INTEGER) AS id_current_proposal_situation,
-            CAST(GET_JSON_OBJECT(from, '$.DtUltAtu') AS TIMESTAMP) AS ts_previous_log,
-            to_utc_timestamp(GET_JSON_OBJECT(to, '$.DtUltAtu') , 'UTC+3') AS ts_current_log
+            LAG(ts_created) over(partition by id_proposal order by ts_created) AS ts_previous_log,
+            ts_created AS ts_current_log
         FROM
             datalake_atta_clean.log_isolve_v2
         WHERE
             GET_JSON_OBJECT(to, '$.Status') IS NOT NULL
+            AND CAST(GET_JSON_OBJECT(from, '$.Situacao') AS INTEGER) IS NOT NULL
             AND type_operation = 'Proposta'
     )
     ),
@@ -51,6 +52,9 @@ SELECT
             WHEN 12 THEN 'Revisão'
             WHEN 13 THEN 'Não Processado Banco'
             WHEN 14 THEN 'Divergência de Cadastro'
+            WHEN 15 THEN 'Notas de Exigência'
+            WHEN 16 THEN 'Cartório Externo'
+            WHEN 17 THEN 'Aprovado Condicionado'
         END AS proposal_previous_situation,
         CASE log.id_current_proposal_situation
             WHEN 1 THEN 'Andamento'
@@ -67,6 +71,9 @@ SELECT
             WHEN 12 THEN 'Revisão'
             WHEN 13 THEN 'Não Processado Banco'
             WHEN 14 THEN 'Divergência de Cadastro'
+            WHEN 15 THEN 'Notas de Exigência'
+            WHEN 16 THEN 'Cartório Externo'
+            WHEN 17 THEN 'Aprovado Condicionado'
         END AS proposal_next_situation,
         pp.ts_registration AS ts_proposal_registration,
         log.ts_previous_log AS ts_start_situation,
@@ -74,7 +81,7 @@ SELECT
         -- datediff(hour,COALESCE(log.ts_previous_log,pp.ts_registration),log.ts_current_log) AS leadtime_situation_in_hour,
         MIN(log.ts_current_log) OVER (PARTITION BY log.id_proposal, pre.proposal_status ORDER BY log.id_proposal, pre.proposal_status) AS min_ts_step,
         MAX(log.ts_current_log) OVER (PARTITION BY log.id_proposal, pre.proposal_status ORDER BY log.id_proposal, pre.proposal_status) AS max_ts_step,
-        row_number() OVER(PARTITION BY log.id_proposal ORDER BY log.ts_previous_log) AS proposal_order
+        row_number() OVER(PARTITION BY log.id_proposal ORDER BY log.ts_current_log) AS proposal_order
     FROM
         log_union AS log
     LEFT JOIN
@@ -165,6 +172,3 @@ SELECT * FROM adj_last_situation
 SELECT
 *
 FROM union_all
-ORDER BY
-   id_proposal DESC,
-   proposal_order
