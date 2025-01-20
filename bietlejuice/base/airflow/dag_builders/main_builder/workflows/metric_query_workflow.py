@@ -23,6 +23,9 @@ class MetricQueryWorkflow(BaseWorkflow):
 
     def __init__(self, dag_args, workflow_args, cluster_args):
         super().__init__(dag_args, workflow_args, cluster_args)
+        self.databricks_conn_id = self.cluster_args.get(
+            "databricks_conn_id", "databricks_default"
+        )
 
     def build_dag(self):
         tables_customization = self.workflow_args.get("tables_customization", {})
@@ -50,6 +53,7 @@ class MetricQueryWorkflow(BaseWorkflow):
             datalake_bucket=metrics_bucket,
             relative_query_path=self.dag_name,
             spark_jobs_path=base_spark_jobs_path,
+            databricks_conn_id=self.databricks_conn_id,
         )
 
         metric_task_group = task_group.build_task_group_from_sql_files(
@@ -67,9 +71,12 @@ class MetricQueryWorkflow(BaseWorkflow):
             cluster_configuration=cluster_params["cluster_config"],
             libraries=cluster_params["default_libraries"],
             access_control_list=cluster_params["access_control_list"],
+            databricks_conn_id=self.databricks_conn_id,
         )
         terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-            dag=dag, task_id="terminate-cluster"
+            dag=dag,
+            task_id="terminate-cluster",
+            databricks_conn_id=self.databricks_conn_id,
         )
 
         self.set_dependencies(

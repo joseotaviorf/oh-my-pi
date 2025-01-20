@@ -65,6 +65,9 @@ class RawGsheetsWorkflow(BaseWorkflow):
             f"{self.databricks_bietlejuice_repo_path}/spark_jobs/base/"
         )
         self.has_hive_sync = workflow_args.get("has_hive_sync", True)
+        self.databricks_conn_id = self.cluster_args.get(
+            "databricks_conn_id", "databricks_default"
+        )
 
         CREDENTIALS_SCOPE = {
             "quintoandar": APIEnum.GSHEETS_CREDENTIALS,
@@ -91,14 +94,20 @@ class RawGsheetsWorkflow(BaseWorkflow):
             cluster_configuration=cluster_params["cluster_config"],
             libraries=cluster_params["libraries"],
             access_control_list=cluster_params["access_control_list"],
+            databricks_conn_id=self.databricks_conn_id,
         )
 
+        default_table_privileges = self.workflow_args.get(
+            "default_table_privileges", None
+        )
         task_group = DatalakeTaskGroup(
             dag=self.dag,
             env=self.env,
             datalake_bucket=self.datalake_bucket,
             relative_query_path=self.dag_name,
             spark_jobs_path=self.base_spark_jobs_path,
+            databricks_conn_id=self.databricks_conn_id,
+            default_table_privileges=default_table_privileges,
         )
 
         load_ids_to_be_ingested_task_group = self._set_load_ingestion_ids_info_task(
@@ -129,7 +138,10 @@ class RawGsheetsWorkflow(BaseWorkflow):
         done_tasks = self._set_done_tasks(tables_customization)
 
         terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-            dag=self.dag, task_id="terminate-cluster", trigger_rule="all_done"
+            dag=self.dag,
+            task_id="terminate-cluster",
+            trigger_rule="all_done",
+            databricks_conn_id=self.databricks_conn_id,
         )
 
         self.set_dependencies(

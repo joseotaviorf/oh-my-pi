@@ -31,6 +31,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         athena_query_result_location=None,
         execution_timeout_hours=BaseTaskGroup.DEFAULT_EXECUTION_TIMEOUT_HOURS,
         databricks_conn_id="databricks_default",
+        default_table_privileges=None,
     ):
         """
         :param dag: main dag instance
@@ -55,6 +56,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         config_service = ConfigurationService()
         self.inmetro_bucket = config_service.get_config("inmetro_bucket")
         self.databricks_conn_id = databricks_conn_id
+        self.default_table_privileges = default_table_privileges
 
     def _build_load_task(
         self,
@@ -358,6 +360,9 @@ class DatalakeTaskGroup(BaseTaskGroup):
         extraction_spark_job_file = table_customization.get(
             "extraction_spark_job_file"
         ) or path.join(self.spark_jobs_path, f"load_table_{table_extraction_type}.py")
+        table_privileges = (
+            table_customization.get("table_privileges") or self.default_table_privileges
+        )
 
         load_table_task = self._build_load_task(
             task_id=self.generate_default_task_id(
@@ -380,6 +385,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
                 str(extra_query_template_params),
                 schema,
                 tree_path,
+                "--table-privileges",
+                json.dumps(table_privileges),
             ],
         )
 
