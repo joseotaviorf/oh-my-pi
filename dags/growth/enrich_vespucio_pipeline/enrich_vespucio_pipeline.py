@@ -390,26 +390,21 @@ core_tasks = [
     ),
 ]
 
-"""
-Disabled image step until all navent images are updated to point to s3 bucket instead
-of to cdn. If the step is enabled we will suffer a desync between the images as part of
-images stored on kodak are already updated
-"""
 images_and_relations_tasks = [
-    #create_task(
-    #    entry_point="core_images_step",
-    #    parameters=[
-    #        f"--input_merged_houses={Tables.merge_step_houses}",
-    #        f"--input_kodak_photo_invalid_source={Tables.kodak_photo_invalid_source}",
-    #        f"--input_kodak_photo={Tables.kodak_photo}",
-    #        "--overwrite_schema",
-    #        f"--output_images_houses={Tables.images_step_houses}",
-    #        f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
-    #        f"--kodak_photo_sns_arn={config_service.get_config('kodak_photo_sns_arn')}",
-    #        "--kodak_photo_sns_region=us-east-1",
-    #        "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
-    #    ],
-    #),
+    create_task(
+        entry_point="core_images_step",
+        parameters=[
+            f"--input_merged_houses={Tables.merge_step_houses}",
+            f"--input_kodak_photo_invalid_source={Tables.kodak_photo_invalid_source}",
+            f"--input_kodak_photo={Tables.kodak_photo}",
+            "--overwrite_schema",
+            f"--output_images_houses={Tables.images_step_houses}",
+            f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
+            f"--kodak_photo_sns_arn={config_service.get_config('kodak_photo_sns_arn')}",
+            "--kodak_photo_sns_region=us-east-1",
+            "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
+        ],
+    ),
     create_task(
         entry_point="core_link_step",
         parameters=[
