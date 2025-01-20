@@ -1,14 +1,12 @@
 WITH time_metrics AS (
-  SELECT
+  SELECT DISTINCT
     id_segment AS id_task,
     id_reservation,
     total_queue_time,
     total_talk_time,
     total_wrap_up_time,
     total_handling_time,
-    total_waiting_time,
-    first_reply_time,
-    dt_created
+    total_waiting_time
   FROM
     datalake_twilio_flex_insights_clean.conversation_time_metrics
   QUALIFY
@@ -23,7 +21,7 @@ average_reply_time AS (
     datalake_quinto_messenger.message
   WHERE
     msg_sender LIKE "%@%.com%"
-    AND ts_created >= '{load_start_date}' - INTERVAL 30 DAY
+    AND ts_created >= '{load_start_date}' - INTERVAL 2 YEAR
   GROUP BY 1, 2
 ),
 customer_email AS (
@@ -81,7 +79,7 @@ twilio_demand AS (
   FROM
     datalake_customer_support.calls
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 30 DAY AND '{load_end_date}'
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 2 YEAR AND '{load_end_date}'
   UNION ALL
   SELECT DISTINCT
     id_session,
@@ -124,7 +122,7 @@ twilio_demand AS (
   FROM
     datalake_customer_support.chats
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 30 DAY AND '{load_end_date}'
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 2 YEAR AND '{load_end_date}'
 ),
 twilio_contacts AS (
   SELECT DISTINCT
@@ -197,7 +195,7 @@ twilio_contacts AS (
         AND d.channel = 'chat'
 ),
 front_contacts AS (
-  SELECT
+  SELECT DISTINCT
     sk_contact,
     sk_interaction,
     sk_session,
@@ -294,7 +292,7 @@ front_contacts AS (
     customer_email AS ce
       ON ce.email = usr.email
   WHERE
-    MAKE_DATE(t.year, t.month, t.day) BETWEEN '{load_start_date}'- INTERVAL 30 DAY AND '{load_end_date}'
+    MAKE_DATE(t.year, t.month, t.day) BETWEEN '{load_start_date}'- INTERVAL 2 YEAR AND '{load_end_date}'
     AND t.channel = 'email'
     AND front_or_back = 'front'
 )
@@ -340,3 +338,5 @@ SELECT DISTINCT
   NOW() AS ts_load
 FROM
   front_contacts
+QUALIFY
+  ROW_NUMBER() OVER(PARTITION BY sk_contact, sk_interaction, sk_user, sk_department ORDER BY ts_task_created DESC) = 1
