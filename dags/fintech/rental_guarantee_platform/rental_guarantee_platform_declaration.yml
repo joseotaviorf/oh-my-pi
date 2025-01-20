@@ -199,7 +199,8 @@ workflow:
       raw_extraction_type: full
       raw_partitions: []
     renewal:
-      date_filter_column: updated_at
+      raw_extraction_type: full
+      raw_partitions: []
     tenant_company:
       date_filter_column: updated_at
     omie_occurrence_legacy:

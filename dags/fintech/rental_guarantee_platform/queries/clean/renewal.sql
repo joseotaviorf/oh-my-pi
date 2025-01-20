@@ -12,10 +12,7 @@ SELECT
     due_date        AS dt_due,
     paid_date       AS dt_paid,
     created_at      AS ts_created,
-    updated_at      AS ts_updated,
-    year,
-    month,
-    day
+    updated_at      AS ts_updated
 FROM
     datalake_rental_guarantee_platform_raw.renewal
 QUALIFY
