@@ -66,9 +66,10 @@ if __name__ == "__main__":
     parser.add_argument("load_start_date", help="Start of date range: '%Y-%m-%d'")
     parser.add_argument("load_end_date", help="End of date range: '%Y-%m-%d'")
     parser.add_argument("extraction_type", help="extraction_type - full or incremental")
-    parser.add_argument("purge_table", help="purge_table - True or False")
     parser.add_argument("partitions", help="partition columns")
     parser.add_argument("date_filter_columns", help="partition columns")
+    parser.add_argument("purge_table", help="purge_table - True or False")
+
 
     args = parser.parse_args()
 

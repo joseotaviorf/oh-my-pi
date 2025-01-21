@@ -3,7 +3,7 @@ import json
 import logging
 from argparse import ArgumentParser
 
-from pyspark.sql.functions import col, current_timestamp, greatest, to_date
+from pyspark.sql.functions import col, current_timestamp, greatest, to_date, lit
 
 from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
@@ -68,6 +68,8 @@ if __name__ == "__main__":
     parser.add_argument("extraction_type", help="extraction_type - full or incremental")
     parser.add_argument("partitions", help="partition columns")
     parser.add_argument("date_filter_columns", help="partition columns")
+    parser.add_argument("purge_table", help="purge_table - True or False")
+
 
     args = parser.parse_args()
 
@@ -78,6 +80,7 @@ if __name__ == "__main__":
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
     extraction_type = args.extraction_type
+    purge_table = args.purge_table
     partitions = ast.literal_eval(args.partitions)
     date_filter_columns = ast.literal_eval(args.date_filter_columns)
 
@@ -85,7 +88,7 @@ if __name__ == "__main__":
         f"""
                 m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
                 table_name={table_name}, load_start_date={load_start_date}, load_end_date={load_end_date}
-                extraction_type={extraction_type}, partitions={partitions}, date_filter_columns={date_filter_columns}
+                extraction_type={extraction_type}, purge_table={purge_table}, partitions={partitions}, date_filter_columns={date_filter_columns}
                 msg=Starting spark job...
         """
     )
@@ -103,6 +106,30 @@ if __name__ == "__main__":
         df = oracle_consumer.get_incremental_data_from_table(oracle_table_name, date_filter_columns, load_start_date, load_end_date)
     else:
         df = oracle_consumer.get_data_from_table(oracle_table_name)
+
+        if purge_table:
+            df = df.withColumn("source", lit("Original Table"))
+            df_purge= oracle_consumer.get_data_from_table(f'{oracle_table_name}_ESP')
+            df_purge = df_purge.withColumn("source", lit("Purge Table"))
+
+            # Get the columns from both DataFrames
+            existing_columns = set(df.columns)
+            new_columns = set(df_purge.columns)
+
+            # Find missing columns in each DataFrame
+            missing_in_existing = new_columns - existing_columns
+            missing_in_new = existing_columns - new_columns
+
+            # Add missing columns to the DataFrames with null values
+            for col in missing_in_existing:
+                df = df.withColumn(col, lit(None))
+
+            for col in missing_in_new:
+                df_purge = df_purge.withColumn(col, lit(None))
+
+            df = df.unionByName(df_purge)
+
+
     if df.rdd.isEmpty():
         _send_warning(dbutils, environment, table_name)
     else:
@@ -117,7 +144,6 @@ if __name__ == "__main__":
                 partition = "table_partition"
             else:
                 partition = "ts_ingestion"
-
 
             df = (
                 SparkDataFrameService()
