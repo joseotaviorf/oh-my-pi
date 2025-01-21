@@ -39,7 +39,7 @@ class DefaultRowAdditionPipeline(AbstractPipeline):
         if save_to_unity_catalog:
             # With unity Catalog, we're supposed to save directly as table, not save the files and update
             # the metastore separately
-            full_table_name = f"{self.target_database_name}.{self.table_name}"
+            full_table_name = f"{self.database_name}.{self.table_name}"
         else:
             full_table_name = None
 
