@@ -49,9 +49,15 @@ columns:
   total_seconds:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.segundostotal
+  alo:
+    lineage:
+      - datalake_gsheets_clean.quintocred_iaf_qualifies_calls.alo
+  cpc:
+    lineage:
+      - datalake_gsheets_clean.quintocred_iaf_qualifies_calls.cpc
   hr_cad:
     lineage:
-      - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.hora_cad
+      - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.hora_cad     
   dt_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_qualifica_chamadas.data_cad

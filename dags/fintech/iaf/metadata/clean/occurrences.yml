@@ -52,6 +52,18 @@ columns:
   total_time:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.tempototal
+  tab:
+    lineage:
+      - datalake_gsheets_clean.quintocred_iaf_occurrences.tab
+  effort:
+    lineage:
+      - datalake_gsheets_clean.quintocred_iaf_occurrences.effort
+  massive:
+    lineage:
+      - datalake_gsheets_clean.quintocred_iaf_occurrences.massive
+  channel:
+    lineage:
+      - datalake_gsheets_clean.quintocred_iaf_occurrences.channel
   dt_cad:
     lineage:
       - datalake_iaf_raw.vi_319_tb_ocorrencias.datacad
