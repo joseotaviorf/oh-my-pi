@@ -3,7 +3,7 @@ import json
 import logging
 from argparse import ArgumentParser
 
-from pyspark.sql.functions import col, current_timestamp, greatest, to_date, lit
+from pyspark.sql.functions import col, current_timestamp, greatest, lit
 
 from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
     extraction_type = args.extraction_type
-    purge_table = args.purge_table
+    purge_table = ast.literal_eval(args.purge_table)
     partitions = ast.literal_eval(args.partitions)
     date_filter_columns = ast.literal_eval(args.date_filter_columns)
 
