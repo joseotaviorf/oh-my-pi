@@ -173,6 +173,18 @@ sheets_info:
     clean_table_name: fdic_liquidation_2022
     sheet_context: static
 
+  fdic_acquisition_2023:
+    sheet_id: 1Vu0vpRWjgzcr_e-R0WLmhyExZ4I05dk_jstdyagOaS4
+    sheet_name: acquisition
+    clean_table_name: fdic_acquisition_2023
+    sheet_context: fintech
+
+  fdic_liquidation_2023:
+    sheet_id: 1Vu0vpRWjgzcr_e-R0WLmhyExZ4I05dk_jstdyagOaS4
+    sheet_name: liquidation
+    clean_table_name: fdic_liquidation_2023
+    sheet_context: fintech
+
   for_sale_marketplace_region_clusters:
     sheet_id: 1kuE-ymre0dKQLH7hyEzIUGwdInfISHQnTO_hl9EVYb0
     sheet_name: Clusters

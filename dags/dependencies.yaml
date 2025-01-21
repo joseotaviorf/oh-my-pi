@@ -1904,8 +1904,6 @@ bietlejuice.enrich_growth_taxonomy:
   - bietlejuice.gsheets_growth:done-clean-dict-taxonomy-supply
   - bietlejuice.gsheets_growth:done-clean-taxonomy-levels-values
 bietlejuice.enrich_gsheets:
-  - bietlejuice.gsheets_fintech:done-clean-fdic-acquisition-2023
-  - bietlejuice.gsheets_fintech:done-clean-fdic-liquidation-2023
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2022
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024
   - bietlejuice.gsheets_for_rent_targets:done-clean-demand-targets-2024-cohort
