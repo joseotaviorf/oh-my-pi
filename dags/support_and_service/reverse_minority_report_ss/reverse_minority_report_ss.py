@@ -32,6 +32,10 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 reverse_spark_job_path = f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_{DAG_NAME}.py"
 
 cluster_description = config_service.get_config("custom_cluster")
+
+cluster_description["data_security_mode"] = "SINGLE_USER"
+cluster_description["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
+cluster_description["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 default_libraries = config_service.get_config("default_libraries")
 
 minority_report_endpoint = config_service.get_config("minority_report_endpoint")
@@ -63,22 +67,19 @@ dag = DAG(
     ),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
 load_tasks = []
 for table in tables.keys():
-    send_data_task = QuintoAndarDatabricksSubmitRunOperator(
-        task_id=f"load_{table}_data",
+    send_data_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=f"load_{table}_data",
         dag=dag,
         json={
             "spark_python_task": {

@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_trino
   schedule_start_date: 2022, 5, 5
@@ -17,14 +16,14 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   inner_dependencies:
     table_usage_information:
-      - query_information
+    - query_information
   tables_customization:
     trino_detractor_queries:
       extraction_type: incremental
       partitions:
-        - year
-        - month
-        - day
+      - year
+      - month
+      - day
       extra_query_template_params:
         load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
         load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
@@ -34,3 +33,9 @@ workflow:
         stages_threshold: 90
 cluster:
   type: databricks_12_2_med_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

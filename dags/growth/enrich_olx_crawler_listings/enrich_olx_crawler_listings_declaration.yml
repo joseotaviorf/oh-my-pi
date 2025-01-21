@@ -1,10 +1,9 @@
----
 dag:
   name: enrich_olx_crawler_listings
   schedule_start_date: 2021, 7, 20
   owner: Data Growth
   schedule_interval: 0 6 * * 5
-  documentation: 
+  documentation:
     dag_purpose: |
       Creates enriched table for the context `Crawlers Listings` from OLX.
       The `datalake_crawlers_listings` schema has tables that extract data from OLX, Viva Real and Zap Imoveis  websites.
@@ -16,10 +15,10 @@ workflow:
   custom_schema: crawlers_listings
   default_extraction_type: incremental
   default_partitions:
-    - address_city
-    - year
-    - month
-    - day
+  - address_city
+  - year
+  - month
+  - day
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -27,3 +26,8 @@ cluster:
     node_type_id: c5d.4xlarge
     num_workers: 2
     spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

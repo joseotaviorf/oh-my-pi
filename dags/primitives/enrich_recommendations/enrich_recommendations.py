@@ -41,6 +41,10 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 CLUSTER_DESCRIPTION = config_service.get_config("custom_cluster")
 
+
+CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
+CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.DATA_PRODUCTS,
@@ -90,20 +94,17 @@ dag = DAG(
     },
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=DEFAULT_LIBRARIES,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-datalake_task_group = DatalakeTaskGroup(
-    dag=dag,
+datalake_task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,

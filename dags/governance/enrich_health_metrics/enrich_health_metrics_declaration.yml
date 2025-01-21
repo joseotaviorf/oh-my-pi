@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_health_metrics
   schedule_start_date: 2019, 1, 1
@@ -11,17 +10,17 @@ workflow:
   layer: enrich
   inner_dependencies:
     daily_sla_metrics:
-      - dag_historical_executions
+    - dag_historical_executions
     top_reference_sla_days:
-      - daily_sla_metrics
+    - daily_sla_metrics
     dag_execution_metrics:
-      - dag_historical_executions
-      - top_reference_sla_days
+    - dag_historical_executions
+    - top_reference_sla_days
     table_historical_executions:
-      - dag_historical_executions
+    - dag_historical_executions
     table_execution_metrics:
-      - table_historical_executions
-      - top_reference_sla_days
+    - table_historical_executions
+    - top_reference_sla_days
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -31,3 +30,8 @@ cluster:
       min_workers: 1
       max_workers: 3
     spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

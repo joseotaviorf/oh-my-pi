@@ -14,13 +14,13 @@ workflow:
   layer: reverse
   load_spark_job: create_regions_polygon_topojson
   spark_job_arguments:
-    - "{environment}"
-    - "{bucket}"
-    - "{dag_name}" # dag_name
-    - "regions_polygon" #source
-    - "s3://5a-looker/subregion_polygons_new" # output_file_path
-    - "5a_subregion_polygons.topojson" # output_file_name
-    - "{{ ds }}" # execution_date
+  - "{environment}"
+  - "{bucket}"
+  - "{dag_name}"   # dag_name
+  - "regions_polygon"   #source
+  - "s3://5a-looker/subregion_polygons_new"   # output_file_path
+  - "5a_subregion_polygons.topojson"   # output_file_name
+  - "{{ ds }}"   # execution_date
   tables_customization:
     regions_polygon_topojson: {}
 cluster:
@@ -30,16 +30,21 @@ cluster:
     node_type_id: m5a.xlarge
     spark_version: 13.3.x-scala2.12
     num_workers: 2
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   custom_libraries:
-    - maven:
-        coordinates: "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating"
-    - maven:
-        coordinates: "org.apache.sedona:sedona-viz-3.0_2.12:1.2.1-incubating"
-    - maven:
-        coordinates: "org.apache.sedona:sedona-viz-3.0_2.12:1.2.1-incubating"
-    - maven:
-        coordinates: "org.datasyslab:geotools-wrapper:1.3.0-27.2"
-    - pypi:
-        package: "pytopojson==1.0.0"
-    - pypi:
-        package: "apache-sedona"
+  - maven:
+      coordinates: "org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating"
+  - maven:
+      coordinates: "org.apache.sedona:sedona-viz-3.0_2.12:1.2.1-incubating"
+  - maven:
+      coordinates: "org.apache.sedona:sedona-viz-3.0_2.12:1.2.1-incubating"
+  - maven:
+      coordinates: "org.datasyslab:geotools-wrapper:1.3.0-27.2"
+  - pypi:
+      package: "pytopojson==1.0.0"
+  - pypi:
+      package: "apache-sedona"
+  databricks_conn_id: databricks_new

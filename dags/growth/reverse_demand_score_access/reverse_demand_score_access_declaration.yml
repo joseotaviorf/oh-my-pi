@@ -8,10 +8,16 @@ workflow:
   custom_schema: reverse_demand_score
   load_spark_job: load_into_sqs
   spark_job_arguments:
-    - "{dag_name}"
-    - "reverse_demand_score" # Database name
-    - "{table_name}"
+  - "{dag_name}"
+  - "reverse_demand_score"   # Database name
+  - "{table_name}"
   tables_customization:
     listing_demand_score: {}
 cluster:
   type: databricks_13_3_min_general_2_workers_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

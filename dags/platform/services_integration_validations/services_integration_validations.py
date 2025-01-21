@@ -23,6 +23,10 @@ MAIN_SCHEDULE_INTERVAL = "0 13,16,18,20 * * *"
 
 config_service = ConfigurationService()
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_general_cluster")
+
+CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
+CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -64,20 +68,17 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries + custom_libraries,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-run_validations_suites = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=f"run-validations-suites",
+run_validations_suites = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=f"run-validations-suites",
     dag=dag,
     retries=0,
     json={

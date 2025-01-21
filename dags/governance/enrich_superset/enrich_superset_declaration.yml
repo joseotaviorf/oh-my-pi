@@ -4,52 +4,52 @@ dag:
   owner: Data Governance
   documentation:
     dag_purpose: |
-        This DAG creates the full tables for Superset entities, except for the lake_tables_usage table.
+      This DAG creates the full tables for Superset entities, except for the lake_tables_usage table.
 workflow:
-    type: query_delta
-    layer: enrich
-    inner_dependencies:
-      dashboards:
-      - ab_user
-      - tag
-      - tagged_object
-      slices:
-      - ab_user
-      - tables
-      - tag
-      - tagged_object
-      tables:
-      - ab_user
-      - table_columns
-      - sql_metrics
-    tables_customization:
-      ab_user:
-        extraction_type: full
-      dashboards:
-        extraction_type: full
-      lake_tables_usage:
-        extraction_type: incremental
-        partitions:
-        - year
-        - month
-        - day
-      slices:
-        extraction_type: full
-      sql_metrics:
-        extraction_type: full
-      table_columns:
-        extraction_type: full
-      table_schema:
-        extraction_type: full
-      tables:
-        extraction_type: full
-      tag:
-        extraction_type: full
-      tagged_object:
-        extraction_type: full
-    extra_query_template_params:
-      load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-      load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    dashboards:
+    - ab_user
+    - tag
+    - tagged_object
+    slices:
+    - ab_user
+    - tables
+    - tag
+    - tagged_object
+    tables:
+    - ab_user
+    - table_columns
+    - sql_metrics
+  tables_customization:
+    ab_user:
+      extraction_type: full
+    dashboards:
+      extraction_type: full
+    lake_tables_usage:
+      extraction_type: incremental
+      partitions:
+      - year
+      - month
+      - day
+    slices:
+      extraction_type: full
+    sql_metrics:
+      extraction_type: full
+    table_columns:
+      extraction_type: full
+    table_schema:
+      extraction_type: full
+    tables:
+      extraction_type: full
+    tag:
+      extraction_type: full
+    tagged_object:
+      extraction_type: full
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -58,3 +58,8 @@ cluster:
     runtime_engine: PHOTON
     num_workers: 2
     spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

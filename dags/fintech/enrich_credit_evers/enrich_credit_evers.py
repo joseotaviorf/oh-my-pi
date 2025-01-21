@@ -42,6 +42,10 @@ base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_description = config_service.get_config("databricks_13_3_med_general_cluster")
 
+
+cluster_description["data_security_mode"] = "SINGLE_USER"
+cluster_description["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
+cluster_description["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -56,15 +60,13 @@ dag = DAG(
     ),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag, 
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag, 
     task_id="create-cluster", 
     cluster_configuration=cluster_description,
     libraries=default_libraries
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
 skip_run_task = ShortCircuitOperator(
@@ -73,8 +75,7 @@ skip_run_task = ShortCircuitOperator(
     op_args=["{{ macros.ds_add(ds, 1) }}", 14],
 )
 
-datalake_task_group = DatalakeTaskGroup(
-    dag=dag,
+datalake_task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,

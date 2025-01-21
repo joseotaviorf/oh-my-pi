@@ -7,29 +7,29 @@ workflow:
   layer: enrich
   default_extraction_type: full
   extra_query_template_params:
-        "days_past": 14
-        "days_past_21": 21
-        "days_past_30": 30
-        "start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-        "end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    "days_past": 14
+    "days_past_21": 21
+    "days_past_30": 30
+    "start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    "end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   inner_dependencies:
     search_impressions:
-      - experiment_config
+    - experiment_config
     amplitude_user_device:
-      - global_metrics
+    - global_metrics
     item_interaction:
-      - amplitude_user_device
+    - amplitude_user_device
     item_interaction_sale:
-      - amplitude_user_device
+    - amplitude_user_device
     global_metrics:
-      - experiment_config
-      - search_impressions
+    - experiment_config
+    - search_impressions
   tables_customization:
     search_impressions:
       partitions:
-        - year
-        - month
-        - day
+      - year
+      - month
+      - day
     item_interaction:
       partitions:
       - year
@@ -44,9 +44,9 @@ workflow:
       - interaction_type
     global_metrics:
       partitions:
-        - year
-        - month
-        - day
+      - year
+      - month
+      - day
 
 cluster:
   type: custom_cluster
@@ -59,8 +59,12 @@ cluster:
     num_workers: 3
     spark_conf:
       spark.metrics.namespace: "data_products.enrich_search"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       ebs_volume_size: 200
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
   access_control_list:
     group_name: data-products
     permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new

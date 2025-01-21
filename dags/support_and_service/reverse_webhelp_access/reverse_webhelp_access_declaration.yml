@@ -3,77 +3,66 @@ dag:
   schedule_start_date: 2023, 8, 23
   owner: Data SS
   documentation:
-    dag_purpose:
-      This dag pulls in the data saved in the datalake loaded by reverse_webhelp, then uses that data to write a parquet dataframe in the webhelp's azure environment.
-      The data sent refers to the monitoring of the operation.
-    additional_information:
-      This pipeline exports the following tables from the reverse_webhelp schema to an azure environment
-        - `backlog_metric`
-        - `csat_front`
-        - `demand_metric`
-        - `fcr_metric`
-        - `general_metric`
-        - `listing_quality_tasks`
-        - `listing_quality_sla`
-        - `repair_tickets`
-        - `speech_call`
-        - `speech_chat`
-        - `taxonomy`
-        - `recontact`
-        - `tickets_transferred`
-        - `twilio_chat_aht`
+    dag_purpose: This dag pulls in the data saved in the datalake loaded by reverse_webhelp, then uses that data to write a parquet dataframe in the webhelp's azure environment. The data sent refers to the monitoring of the operation.
+    additional_information: This pipeline exports the following tables from the reverse_webhelp schema to an azure environment - `backlog_metric` - `csat_front` - `demand_metric` - `fcr_metric` - `general_metric` - `listing_quality_tasks` - `listing_quality_sla` - `repair_tickets` - `speech_call` - `speech_chat` - `taxonomy` - `recontact` - `tickets_transferred` - `twilio_chat_aht`
 workflow:
   layer: reverse
   type: access
   load_spark_job: load_into_azure_blob_storage
   spark_job_arguments:
-    - "{environment}"
-    - "{dag_name}"
-    - "reverse_webhelp" #database_name
-    - "{table_name}" #table_name
-    - "{{ ds }}"
+  - "{environment}"
+  - "{dag_name}"
+  - "reverse_webhelp"   #database_name
+  - "{table_name}"   #table_name
+  - "{{ ds }}"
   tables_customization:
     backlog_metric:
       extra_spark_job_arguments:
-        - cx
+      - cx
     csat_front:
       extra_spark_job_arguments:
-        - cx
+      - cx
     demand_metric:
       extra_spark_job_arguments:
-        - cx
+      - cx
     fcr_metric:
       extra_spark_job_arguments:
-        - cx
+      - cx
     general_metric:
       extra_spark_job_arguments:
-        - cx
+      - cx
     listing_quality_tasks:
       extra_spark_job_arguments:
-        - services
+      - services
     listing_quality_sla:
       extra_spark_job_arguments:
-        - services
+      - services
     repair_tickets:
       extra_spark_job_arguments:
-        - services
+      - services
     speech_call:
       extra_spark_job_arguments:
-        - speech_analytics
+      - speech_analytics
     speech_chat:
       extra_spark_job_arguments:
-        - speech_analytics
+      - speech_analytics
     taxonomy:
       extra_spark_job_arguments:
-        - cx
+      - cx
     recontact:
       extra_spark_job_arguments:
-        - cx
+      - cx
     tickets_transferred:
       extra_spark_job_arguments:
-        - cx
+      - cx
     twilio_chat_aht:
       extra_spark_job_arguments:
-        - cx
+      - cx
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

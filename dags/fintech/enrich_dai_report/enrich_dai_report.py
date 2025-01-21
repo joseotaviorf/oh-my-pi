@@ -44,6 +44,10 @@ DAI_CUSTOM_SPARK_JOB_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG
 
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_13_3_min_general_cluster")
 
+
+CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
+CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -65,16 +69,14 @@ dag = DAG(
     ),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries + custom_libraries,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
 skip_run_task = ShortCircuitOperator(
@@ -83,8 +85,7 @@ skip_run_task = ShortCircuitOperator(
     op_args=["{{ macros.ds_add(ds, 1) }}", 10],
 )
 
-datalake_task_group = DatalakeTaskGroup(
-    dag=dag,
+datalake_task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
@@ -101,8 +102,7 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
 query_export_xlsx = config_service.get_config("query_export_xlsx")
 format_options = config_service.get_config("format_options")
 out_path = config_service.get_config("out_path")
-load_data_into_s3 = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=f"load-{SOURCE}-in-s3",
+load_data_into_s3 = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=f"load-{SOURCE}-in-s3",
     dag=dag,
     json={
         "spark_python_task": {

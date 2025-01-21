@@ -11,25 +11,25 @@ workflow:
   load_spark_job: load_into_sns
   custom_schema: datalake_atlas_pricing_report
   spark_job_arguments:
-    - "{dag_name}" # dag_name
-    - "datalake_atlas_pricing_report" # database_name
-    - "{table_name}" # table_name
+  - "{dag_name}"   # dag_name
+  - "datalake_atlas_pricing_report"   # database_name
+  - "{table_name}"   # table_name
   tables_customization:
     new_pricing_report_engagement:
       extra_spark_job_arguments:
-        - NEW_PRICING_REPORT_ENGAGEMENT # event_type
-        - sns_topic_arn_business # sns_topic_arn
-        - 150 # chunk_size
+      - NEW_PRICING_REPORT_ENGAGEMENT   # event_type
+      - sns_topic_arn_business   # sns_topic_arn
+      - 150   # chunk_size
     new_pricing_report_listing_price_history:
       extra_spark_job_arguments:
-        - NEW_PRICING_REPORT_LISTING_PRICE_HISTORY
-        - sns_topic_arn_listing
-        - 1000 # chunk_size
+      - NEW_PRICING_REPORT_LISTING_PRICE_HISTORY
+      - sns_topic_arn_listing
+      - 1000   # chunk_size
     new_pricing_report_region:
       extra_spark_job_arguments:
-        - NEW_PRICING_REPORT_REGION
-        - sns_topic_arn_business
-        - 1000 # chunk_size
+      - NEW_PRICING_REPORT_REGION
+      - sns_topic_arn_business
+      - 1000   # chunk_size
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -45,3 +45,8 @@ cluster:
       availability: SPOT_WITH_FALLBACK
       ebs_volume_size: 200
       instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

@@ -9,31 +9,37 @@ workflow:
   type: access
   inner_dependencies:
     export_reverse_fintech:
-      - export_reverse_support_and_service
+    - export_reverse_support_and_service
   load_spark_job: load_into_robbyson_api
   spark_job_arguments:
-    - "{dag_name}" # dag_name
-    - "{environment}"
-    - "{{ get_date_param(dag_run, ds, 'load_start_date') }}" #start_date
-    - "{{ get_date_param(dag_run, ds, 'load_end_date') }}" #end_date
-    - 2000 #dispatch_limits
-    - "results" #endpoint
+  - "{dag_name}"   # dag_name
+  - "{environment}"
+  - "{{ get_date_param(dag_run, ds, 'load_start_date') }}"   #start_date
+  - "{{ get_date_param(dag_run, ds, 'load_end_date') }}"   #end_date
+  - 2000   #dispatch_limits
+  - "results"   #endpoint
   tables_customization:
     support_and_service: #dummy_task
       extra_spark_job_arguments:
-        - "support_and_services" #context
-        - "dw_customer_support.fact_analysts_performance" #results_table_path
-        - "dw_customer_support.dim_analyst" #agent_table_path
-        - "sk_agent" #key_join_tables_fact
-        - "sk_analyst" #key_join_tables_dim
-        - "email" #analyst_key_column
+      - "support_and_services"   #context
+      - "dw_customer_support.fact_analysts_performance"   #results_table_path
+      - "dw_customer_support.dim_analyst"   #agent_table_path
+      - "sk_agent"   #key_join_tables_fact
+      - "sk_analyst"   #key_join_tables_dim
+      - "email"   #analyst_key_column
     fintech: #dummy_task
       extra_spark_job_arguments:
-        - "fintech" #context
-        - "dw_operator_performance.fact_operator_performance" #results_table_path
-        - "dw_operator_performance.dim_operator" #agent_table_path
-        - "sk_operator" #key_join_tables_fact
-        - "sk_operator" #key_join_tables_dim
-        - "email" #analyst_key_column
+      - "fintech"   #context
+      - "dw_operator_performance.fact_operator_performance"   #results_table_path
+      - "dw_operator_performance.dim_operator"   #agent_table_path
+      - "sk_operator"   #key_join_tables_fact
+      - "sk_operator"   #key_join_tables_dim
+      - "email"   #analyst_key_column
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

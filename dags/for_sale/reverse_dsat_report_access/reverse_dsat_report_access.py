@@ -35,6 +35,10 @@ reverse_spark_job_path = f"{s3_prefix}/spark_jobs/{DAG_NAME}/load_into_sqs.py"
 
 cluster_description = config_service.get_config("databricks_12_2_med_general_cluster")
 
+
+cluster_description["data_security_mode"] = "SINGLE_USER"
+cluster_description["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
+cluster_description["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -61,23 +65,20 @@ dag = DAG(
     ),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
 load_to_sqs_tasks = []
 for table_name in tables:
     load_to_sqs_tasks.append(
-        QuintoAndarDatabricksSubmitRunOperator(
-            task_id=StringFormatter.slugify(f"load-{table_name}-into_sqs"),
+        QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=StringFormatter.slugify(f"load-{table_name}-into_sqs"),
             dag=dag,
             json={
                 "spark_python_task": {
