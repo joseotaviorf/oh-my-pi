@@ -229,6 +229,7 @@ bietlejuice.dw_collection_recovery_quintocred:
   - bietlejuice.rental_guarantee_platform:load-clean-rev-info
   - bietlejuice.trato_feito:load-clean-accounting-installment
   - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.trato_feito:load-clean-payment
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract

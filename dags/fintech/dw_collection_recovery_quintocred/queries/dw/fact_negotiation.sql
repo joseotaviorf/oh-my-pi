@@ -1,4 +1,14 @@
 WITH
+trato_feito_dt_paid AS (
+  SELECT
+    i.id_negotiation,
+    DATE(p.dt_paid)
+  FROM
+    datalake_trato_feito_clean.payment p
+  LEFT JOIN
+    datalake_debt_recovery.installment i
+    ON p.id_installment = i.id
+),
 trato_feito_negotiation AS (
   SELECT
     id_negotiation_external AS id_negotiation_recupera,
@@ -216,23 +226,28 @@ union_sources AS (
     rn.dt_due_promisse,
     COALESCE(tfn.dt_breach, rn.dt_cancellation) AS dt_cancellation,
     rn.dt_next_due,
-    COALESCE(rn.dt_down_payment, tfn.dt_first_payment) AS dt_down_payment,
+    COALESCE(rn.dt_down_payment, COALESCE(p.dt_paid, tfn.dt_first_payment)) AS dt_down_payment,
     COALESCE(rn.dt_paid_all, tfn.dt_paid_all) AS dt_paid_all_installments,
     COALESCE(tfn.dt_expected_end, rn.dt_negotiation_expected_end) AS dt_expected_ending,
     COALESCE(tfn.dt_breach, rn.dt_cancellation, tfn.dt_paid_all, rn.dt_paid_all) AS dt_ending,
     NOW() AS ts_load
   FROM
-    recupera_negotiation AS rn
+      recupera_negotiation AS rn
   FULL OUTER JOIN
       trato_feito_negotiation AS tfn
         ON rn.id_negotiation = tfn.id_negotiation_recupera
   LEFT JOIN
       renegotiation AS r
         ON tfn.id_negotiation = r.id_negotiation
-  LEFT JOIN original_invoices AS oi
-    ON tfn.id_negotiation = oi.id_negotiation
-  LEFT JOIN invalid_negotiations AS invn
-    ON invn.id_negotiation = rn.id_negotiation
+  LEFT JOIN
+      original_invoices AS oi
+        ON tfn.id_negotiation = oi.id_negotiation
+  LEFT JOIN
+      invalid_negotiations AS invn
+        ON invn.id_negotiation = rn.id_negotiation
+  LEFT JOIN
+      trato_feito_dt_paid p
+        ON tfn.id_negotiation = P.id_negotiation
 )
 SELECT
   u.sk_negotiation,

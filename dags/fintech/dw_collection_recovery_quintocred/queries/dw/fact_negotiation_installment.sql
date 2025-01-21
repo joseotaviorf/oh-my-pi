@@ -100,7 +100,7 @@ SELECT DISTINCT
     COALESCE(i.dt_due, tfi.dt_due) AS dt_due,
     CASE
           WHEN (tfi.installment_status IN ('pending', 'registered') OR i.installment_status = 'Em aberto') AND nx.paid_amount IS NOT NULL THEN nx.dt_paid -- Order of checks here matters!!!! Only use nexxera if others call it 'registered'
-          ELSE COALESCE(i.dt_paid, tfi.dt_paid)
+          ELSE COALESCE(i.dt_paid, COALESCE(DATE(p.dt_paid), tfi.dt_paid))
       END AS dt_paid,
     COALESCE(i.dt_canceled, tfi.dt_canceled) AS dt_canceled,
     NOW() AS ts_load
@@ -114,3 +114,6 @@ LEFT JOIN
     nexxera_confirmation AS nx
         ON nx.id_receipt = COALESCE(i.id_receipt, tfi.id_receipt)
         AND nx.dt_due = i.dt_due
+LEFT JOIN
+    datalake_trato_feito_clean.payment AS p
+        ON tfi.id_installment = p.id_installment
