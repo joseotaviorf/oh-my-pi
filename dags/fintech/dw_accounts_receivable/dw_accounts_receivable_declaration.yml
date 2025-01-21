@@ -1,6 +1,6 @@
 dag:
   name: dw_accounts_receivable
-  schedule_start_date: 2026,01,20
+  schedule_start_date: 2025,01,18
   owner: Data Fintech
 workflow:
   type: query_delta
