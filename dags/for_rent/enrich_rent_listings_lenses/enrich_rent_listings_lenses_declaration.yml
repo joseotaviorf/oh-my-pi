@@ -1,6 +1,6 @@
 dag:
   name: enrich_rent_listings_lenses
-  owner: Data ForRent
+  owner: Data ForSale
   schedule_start_date: 2020, 8, 29
 workflow:
   type: query

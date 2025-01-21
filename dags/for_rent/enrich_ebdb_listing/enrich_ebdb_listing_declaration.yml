@@ -2,7 +2,7 @@
 dag:
   name: enrich_ebdb_listing
   schedule_start_date: 2020, 7, 1
-  owner: Data ForRent
+  owner: Data ForSale
   documentation:
     dag_purpose: |
       Creates enriched tables for the context `Listing` of EBDB.

@@ -1,7 +1,7 @@
 dag:
   name: dw_smart_price
   schedule_start_date: 2020,07,20
-  owner: Data ForRent
+  owner: Data ForSale
 workflow:
   type: query_delta
   layer: dw

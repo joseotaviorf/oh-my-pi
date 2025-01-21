@@ -1,7 +1,7 @@
 dag:
   name: dw_listing_temp
   schedule_start_date: 2021,08,02
-  owner: Data ForRent
+  owner: Data ForSale
 workflow:
   type: query_delta
   layer: dw

@@ -2,8 +2,8 @@
 dag:
   name: enrich_ebdb_smart_price
   schedule_start_date: 2020, 7, 1
-  owner: Data ForRent
-  documentation: 
+  owner: Data ForSale
+  documentation:
     dag_purpose: |
       Creates enriched tables for the context `Smart Price` of ebdb adding dynamic pricing to listing information.
       In addition, tables that are base for price tracking for rental or sales are being allocated here too.

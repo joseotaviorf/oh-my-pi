@@ -2,7 +2,7 @@ dag:
   name: ebdb_house
   schedule_start_date: 2021, 2, 20
   schedule_interval: 10 21 * * *
-  owner: Data ForRent
+  owner: Data ForSale
   documentation:
     dag_purpose: Extraction of EBDB tables related to House into data lake. EBDB is the main database for QuintoAndar.
 workflow:

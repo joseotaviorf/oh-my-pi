@@ -2,7 +2,7 @@
 dag:
   name: enrich_ebdb_house
   schedule_start_date: 2023, 4, 26
-  owner: Data ForRent
+  owner: Data ForSale
   documentation:
     dag_purpose: Creates enriched tables for the context `House` from ebdb. This DAG is responsible for creating enriched tables about
       the house domain with a direct dependency on the EBDB. As a home domain, these would be characteristics,

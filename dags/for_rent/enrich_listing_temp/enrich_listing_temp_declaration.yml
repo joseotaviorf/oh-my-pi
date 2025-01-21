@@ -2,10 +2,10 @@
 dag:
   name: enrich_listing_temp
   schedule_start_date: 2022, 10, 18
-  owner: Data ForRent
-  documentation: 
+  owner: Data ForSale
+  documentation:
     dag_purpose: |
-      Creates enriched tables for the context `Listing` of EBDB. 
+      Creates enriched tables for the context `Listing` of EBDB.
       This is a temporary DAG to create tables similar to house_listing and dim_house_listing to be tested before replacing the original ones.
       This DAG is triggered by Mediator and loads the table via full load.
 workflow:
