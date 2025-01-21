@@ -5,7 +5,7 @@ dag:
   schedule_interval: 0 3 * * *
   owner: Data ForRent
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   dbutils_secret_key: PROPERTY_TAX_DB

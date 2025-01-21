@@ -7,7 +7,7 @@ dag:
     dag_purpose: Retrieve data from Condominium Payments database (postgresql) [Condominium Payments](https://github.com/quintoandar/infrastructure /blob/master/vault/database/postgres/prod/condominium-payments-api/main.tf) into data lake. This data comes from Condominium Payments API [Condominium Payments API](https://github.com/quintoandar/condominium-payments-api). Condominium Payments is an API that checks non-payment reports and keeps business rules related to the workflow of condominium-related payments.
 
 workflow:
-  type: database_pull
+  type: database_pull_delta
   layer: raw
   database_type: postgres
   lineage_product_database_name: condominium_payments
