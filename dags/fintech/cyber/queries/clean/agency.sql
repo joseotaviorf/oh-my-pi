@@ -2,7 +2,6 @@ SELECT
     AGAGENCY AS id_agency,
     AGFIRM AS agency_name,
     AGNICKNAME AS agency_commercial_name,
-    source,
     AGIRSNUM AS cnpj,
     CASE
         WHEN AGAGCYCD = "CC" THEN "Cyber Credit"

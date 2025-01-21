@@ -3,7 +3,6 @@ SELECT
     HAACCT AS id_contract,
     AHIDPARC AS id_invoice,
     AHSSNUM AS id_client,
-    source,
     HAACCTG AS contract_group,
     CASE
         WHEN HAACCTG = "1" THEN "QuintoAndar"
