@@ -209,6 +209,8 @@ status_rules AS (
     CASE
       WHEN activation_order = 1 AND ts_status_started = ts_became_new_buyer_prospect
           THEN 'USER FIRST ACTIVATION'
+      WHEN activation_order = 1 AND LAG(status) OVER(PARTITION BY id_buyer_prospect ORDER BY ts_status_started) IN ('CHURNED', 'RENTED')
+        THEN 'USER RECOVERY IN OTHER CITY GROUP'     
       WHEN activation_order = 1
           THEN 'USER FIRST ACTIVATION IN CITY GROUP'
       WHEN status = 'SIGNED CCV'

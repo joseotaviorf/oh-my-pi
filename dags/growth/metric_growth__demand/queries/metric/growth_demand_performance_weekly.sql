@@ -61,7 +61,7 @@ weekly_prospect_metrics AS (
     COUNT(DISTINCT 
           CASE WHEN fdpe.event_name = 'USER FIRST ACTIVATION' THEN sk_prospect END) AS new_prospects, 
     COUNT(DISTINCT 
-          CASE WHEN fdpe.event_name = 'USER RECOVERY' THEN sk_prospect END) AS recovered_prospects,    
+          CASE WHEN fdpe.event_name LIKE 'USER RECOVERY%' THEN sk_prospect END) AS recovered_prospects,    
     COUNT(DISTINCT 
           CASE WHEN fdpe.event_type = 'FLOW' AND flow_order = 1 THEN sk_flow END) AS flows 
   FROM 
