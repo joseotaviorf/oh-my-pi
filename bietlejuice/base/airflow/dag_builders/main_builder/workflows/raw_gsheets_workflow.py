@@ -322,6 +322,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
         """
         return QuintoAndarDatabricksSubmitRunOperator(
             task_id=self.IDS_TO_BE_INGESTED_TASK_ID,
+            databricks_conn_id=self.databricks_conn_id,
             dag=dag,
             pool=task_pool,
             json={
