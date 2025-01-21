@@ -1,5 +1,6 @@
 SELECT
     CAST(ADID AS STRING) AS id_agreement,
+    source,
     ACFIELD AS field,
     CASE
         WHEN UPPER(ADFIELD) = "U1VLRPRCAG" THEN "Parcelas Vencidas"

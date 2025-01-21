@@ -3,6 +3,7 @@ SELECT
     PMACCT AS id_contract,
     BIGINT(PMTDDESC) AS id_agreement_installment,
     PMSSNUM AS id_client,
+    source,
     PMACCTG AS contract_group,
     CASE
         WHEN PMACCTG = "1" THEN "QuintoAndar"

@@ -2,6 +2,7 @@ SELECT
     CAST(AHID AS STRING) AS id_agreement,
     AHACCT AS id_client,
     AHCOLLID AS id_user,
+    source,
     AHTYPE AS agreement_type,
     AHACCTG AS contract_group,
     CASE

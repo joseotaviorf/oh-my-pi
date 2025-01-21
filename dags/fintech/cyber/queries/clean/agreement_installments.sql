@@ -1,6 +1,7 @@
 SELECT
     CAST(APAHID AS STRING) AS id_agreement,
     CONCAT(APAHID ,LPAD(APDETID, 3, '0')) AS id_agreement_installment,
+    source,
     CASE
         WHEN APFLAG = "S" THEN "Programado"
         WHEN APFLAG = "C" THEN "Concluído"

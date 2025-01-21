@@ -3,6 +3,7 @@ SELECT
     ADRERID AS id_debtor,
     ADACCT AS id_contract,
     ADID AS id_address,
+    source,
     ADACCTG AS contract_group,
     CASE
         WHEN ADACCTG = "1" THEN "QuintoAndar"

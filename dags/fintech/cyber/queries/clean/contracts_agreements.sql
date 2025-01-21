@@ -1,6 +1,7 @@
 SELECT
     ADACCT AS id_contract,
     ADAHID AS id_agreement,
+    source,
     ADACCTG AS contract_group,
     CASE
         WHEN ADACCTG = "1" THEN "QuintoAndar"

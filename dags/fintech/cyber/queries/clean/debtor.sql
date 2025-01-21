@@ -3,6 +3,7 @@ SELECT
     RERACCT AS id_contract,
     RERNAME2 AS id_quintoandar,
     RERID AS id_phone,
+    source,
     RERACCTG AS contract_group,
     CASE
         WHEN RERACCTG = "1" THEN "QuintoAndar"

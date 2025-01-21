@@ -6,6 +6,7 @@ SELECT
     U1IDFMAN AS id_oldest_negative_invoice,
     U1IDPARCNEG AS id_last_negative_installment,
     U1UUIDCLIE AS id_client_legacy,
+    source,
     U1ACCTG AS contract_group,
     CASE
         WHEN U1ACCTG = "1" THEN "QuintoAndar"

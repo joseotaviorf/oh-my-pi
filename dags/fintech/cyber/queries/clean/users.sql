@@ -3,6 +3,7 @@ SELECT
     CLSSNUM AS id_unique_user,
     CLLDAPID AS id_ldap,
     CLAGENCY AS id_agency,
+    source,
     CLRTYPE AS record_type,
     CASE
         WHEN CLCTYPE = 1 THEN "Auxiliar"

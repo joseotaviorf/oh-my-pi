@@ -259,7 +259,7 @@ class OracleSparkConsumer(DBConsumer):
                 f"NVL({date_filter}, TO_DATE('1970-01-01', 'YYYY-MM-DD'))"
                 for date_filter in date_filter_columns
             )
-            fields_filter = f"GREATEST({date_filters})"
+            fields_filter = f"TRUNC(GREATEST({date_filters}))"
 
         else:
             fields_filter = ", ".join(

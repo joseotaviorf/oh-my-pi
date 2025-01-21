@@ -2,6 +2,7 @@ SELECT
     PHID AS id_phone,
     PHSSNUM AS id_client,
     PHACCT AS id_contract,
+    source,
     PHACCTG AS contract_group,
     CASE
         WHEN PHACCTG = "1" THEN "QuintoAndar"
