@@ -2,12 +2,13 @@ WITH
 trato_feito_dt_paid AS (
   SELECT
     i.id_negotiation,
-    DATE(p.dt_paid)
+    DATE(MIN(p.dt_paid)) AS dt_paid
   FROM
     datalake_trato_feito_clean.payment p
   LEFT JOIN
     datalake_debt_recovery.installment i
     ON p.id_installment = i.id
+  GROUP BY 1
 ),
 trato_feito_negotiation AS (
   SELECT
