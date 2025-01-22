@@ -1,0 +1,24 @@
+database_name: datalake_rental_guarantee_platform_clean
+table_name: renewal_inconsistencies_corrected
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected.id
+  id_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected.id_propose
+  previous_monthly_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected.previous_monthly_amount
+  updated_monthly_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected.updated_monthly_amount
+  dt_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected.dt_due
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected.ts_created
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected.ts_updated

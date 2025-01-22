@@ -1,0 +1,51 @@
+database_name: datalake_rental_guarantee_platform_clean
+table_name: renewal_inconsistencies_corrected_aud
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.id
+  id_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.id_propose
+  id_propose_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.id_propose_mod
+  previous_monthly_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.previous_monthly_amount
+  previous_monthly_amount_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.previous_monthly_amount_mod
+  updated_monthly_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.updated_monthly_amount
+  updated_monthly_amount_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.updated_monthly_amount_mod
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.rev
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.rev_type
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.rev_end
+  dt_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.dt_due
+  dt_due_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.dt_due_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.ts_created
+  ts_created_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.ts_created_mod
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.ts_updated
+  ts_updated_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected_aud.ts_updated_mod

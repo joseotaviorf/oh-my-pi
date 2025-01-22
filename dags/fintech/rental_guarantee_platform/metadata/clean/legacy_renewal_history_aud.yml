@@ -1,0 +1,78 @@
+database_name: datalake_rental_guarantee_platform_clean
+table_name: legacy_renewal_history_aud
+columns:
+  id_renewal:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.id_renewal
+  id_renewal_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.id_renewal_mod
+  id_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.id_propose
+  id_propose_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.id_propose_mod
+  previous_monthly_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.previous_monthly_amount
+  previous_monthly_amount_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.previous_monthly_amount_mod
+  updated_monthly_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.updated_monthly_amount
+  updated_monthly_amount_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.updated_monthly_amount_mod
+  rev:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.rev
+  rev_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.rev_type
+  rev_end:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.rev_end
+  price_index:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.price_index
+  price_index_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.price_index_mod
+  price_index_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.price_index_type
+  price_index_type_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.price_index_type_mod
+  dt_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.dt_due
+  dt_due_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.dt_due_mod
+  ts_created_renewal:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_created_renewal
+  ts_created_renewal_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_created_renewal_mod
+  ts_updated_renewal:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_updated_renewal
+  ts_updated_renewal_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_updated_renewal_mod
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_created
+  ts_created_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_created_mod
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_updated
+  ts_updated_mod:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud.ts_updated_mod

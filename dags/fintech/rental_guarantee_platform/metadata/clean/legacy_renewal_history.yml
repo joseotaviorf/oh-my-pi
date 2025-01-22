@@ -1,0 +1,36 @@
+database_name: datalake_rental_guarantee_platform_clean
+table_name: legacy_renewal_history
+columns:
+  id_renewal:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history.id_renewal
+  id_propose:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history.id_propose
+  previous_monthly_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history.previous_monthly_amount
+  updated_monthly_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history.updated_monthly_amount
+  price_index:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history.price_index
+  price_index_type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history.price_index_type
+  dt_due:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history.dt_due
+  ts_renewal_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history.ts_renewal_created
+  ts_renewal_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history.ts_renewal_updated
+  ts_created:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history.ts_created
+  ts_updated:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.legacy_renewal_history.ts_updated

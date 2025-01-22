@@ -263,6 +263,18 @@ workflow:
     delinquency_accounting:
       raw_extraction_type: full
       raw_partitions: []
+    renewal_inconsistencies_corrected:
+      raw_extraction_type: full
+      raw_partitions: []
+    renewal_inconsistencies_corrected_aud:
+      raw_extraction_type: full
+      raw_partitions: []
+    legacy_renewal_history:
+      raw_extraction_type: full
+      raw_partitions: []
+    legacy_renewal_history_aud:
+      raw_extraction_type: full
+      raw_partitions: []
 cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new

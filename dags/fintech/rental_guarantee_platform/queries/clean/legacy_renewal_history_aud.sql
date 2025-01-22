@@ -1,0 +1,28 @@
+SELECT
+    renewal_id                  AS id_renewal,
+    renewal_id_mod              AS id_renewal_mod,
+    propose_id                  AS id_propose,
+    propose_id_mod              AS id_propose_mod,
+    previous_monthly_amount,
+    previous_monthly_amount_mod,
+    updated_monthly_amount,
+    updated_monthly_amount_mod,
+    rev,
+    revtype                     AS rev_type,
+    revend                      AS rev_end,
+    price_index,
+    price_index_mod,
+    price_index_type,
+    price_index_type_mod,
+    due_date                    AS dt_due,
+    due_date_mod                AS dt_due_mod,
+    created_renewal_at          AS ts_created_renewal,
+    created_renewal_at_mod      AS ts_created_renewal_mod,
+    updated_renewal_at          AS ts_updated_renewal,
+    updated_renewal_at_mod      AS ts_updated_renewal_mod,
+    created_at                  AS ts_created,
+    created_at_mod              AS ts_created_mod,
+    updated_at                  AS ts_updated,
+    updated_at_mod              AS ts_updated_mod
+FROM 
+    datalake_rental_guarantee_platform_raw.legacy_renewal_history_aud
