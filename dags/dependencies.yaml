@@ -3528,6 +3528,7 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
+  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_demand_events:load-dw-rent-fact-rent-demand-events
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows

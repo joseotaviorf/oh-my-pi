@@ -1,132 +1,133 @@
-WITH buyers AS (
+WITH
+  last_visit AS (
     SELECT
-        vb.id_visitor,
-        MAX(
-            CASE
-                WHEN dt_created IS NOT NULL
-                AND vb.visit_follow_up = 'VaiNegociar' THEN 1
-                ELSE 0
-            END
-        ) AS has_visit_completed
+      id_visitor,
+      MAX(dt_scheduling) last_dt_scheduling
     FROM
-        dw_public.dim_booking vb
+      dw_public.dim_booking
     WHERE
-        vb.visit_intent = 'SALE'
-        AND vb.type = 'Visita'
-        AND vb.country_code = 'BR'
+      dt_scheduling >= CURRENT_DATE - INTERVAL '30' DAY
     GROUP BY
-        1
-),
-visits AS (
+      1
+  ),
+  first_ AS (
     SELECT
-        vb.sk_booking,
-        vb.id_visitor,
-        vb.id_property AS id_house,
-        vb.id_agent,
-        vb.id_attendant,
-        vb.dt_created AS dt_booking_created,
-        vb.dt_scheduling AS dt_visit,
-        is_rescheduled,
-        vb.status,
-        vb.responsible,
-        visit_follow_up,
-        ROW_NUMBER() OVER (PARTITION BY id_visitor ORDER BY dt_scheduling DESC ) AS rank_visitas
+      first_visit.id_visitor,
+      first_visit.sk_booking,
+      last_visit.last_dt_scheduling
     FROM
-        dw_public.dim_booking vb
+      dw_public.dim_booking first_visit
+    INNER JOIN 
+      last_visit 
+        ON last_visit.id_visitor = first_visit.id_visitor
+        AND last_visit.last_dt_scheduling = first_visit.dt_scheduling
+    LEFT JOIN 
+      dw_public.dim_booking second_visit 
+        ON first_visit.id_visitor = second_visit.id_visitor
+        AND second_visit.dt_scheduling > first_visit.dt_scheduling
     WHERE
-        vb.visit_intent = 'SALE'
-        AND vb.type = 'Visita'
-        AND vb.country_code = 'BR'
-),
-rent_visits AS (
+      first_visit.visit_intent = 'SALE'
+      AND first_visit.type = 'Visita'
+      AND first_visit.country_code = 'BR'
+      AND first_visit.status = 'Cancelado'
+      AND first_visit.rescheduled_from_id IS NULL
+      AND second_visit.dt_scheduling IS NULL
+      AND date_diff (CURRENT_DATE, DATE(first_visit.dt_scheduling)) = 7
+  ),
+  second_ AS (
     SELECT
-        id_visitor,
-        MAX(dt_scheduling) AS dt_visit_rent
+      first_visit.id_visitor,
+      first_visit.sk_booking,
+      last_visit.last_dt_scheduling
     FROM
-        dw_public.dim_booking
+      dw_public.dim_booking first_visit
+    INNER JOIN 
+      last_visit 
+        ON last_visit.id_visitor = first_visit.id_visitor
+        AND last_visit.last_dt_scheduling = first_visit.dt_scheduling
     WHERE
-        visit_intent = 'RENT'
-        AND type = 'Visita'
-        AND visit_follow_up = 'VaiNegociar'
-        AND country_code = 'BR'
-    GROUP BY
-        1
-),
-visits_ AS (
+      first_visit.visit_intent = 'SALE'
+      AND first_visit.type = 'Visita'
+      AND first_visit.country_code = 'BR'
+      AND first_visit.status NOT IN ('Cancelado', 'Realizado')
+      AND rescheduled_from_id IS NULL
+      AND date_diff (CURRENT_DATE, DATE(first_visit.dt_scheduling)) = 2
+  ),
+  third_ AS (
     SELECT
-        vb.sk_buyer,
-        MAX(sk_visit_date) AS dt_last_schedule_visit
+      first_visit.id_visitor,
+      first_visit.sk_booking,
+      last_visit.last_dt_scheduling
     FROM
-        dw_sale.fact_visits vb
-    GROUP BY
-        1
-),
-offers AS (
+      dw_public.dim_booking first_visit
+    INNER JOIN 
+      last_visit 
+        ON last_visit.id_visitor = first_visit.id_visitor
+        AND last_visit.last_dt_scheduling = first_visit.dt_scheduling
+    LEFT JOIN 
+      dw_sale.fact_offers o 
+        ON first_visit.id_visitor = o.sk_buyer
+        AND o.ts_offer_submitted > first_visit.dt_scheduling
+    WHERE
+      first_visit.visit_intent = 'SALE'
+      AND first_visit.type = 'Visita'
+      AND first_visit.country_code = 'BR'
+      AND first_visit.status IN ('Realizado')
+      AND rescheduled_from_id IS NULL
+      AND o.ts_offer_submitted IS NULL
+      AND date_diff (CURRENT_DATE, DATE(first_visit.dt_scheduling)) = 8
+  ),
+  rent_visits AS (
     SELECT
-        sk_buyer AS id_buyer,
-        COALESCE(MAX(sk_offer_submitted_date), -1) AS dt_last_offer_sent
+      id_visitor,
+      MAX(dt_scheduling) AS dt_visit_rent
     FROM
-        dw_sale.fact_offers
+      dw_public.dim_booking
+    WHERE
+      visit_intent = 'RENT'
+      AND TYPE = 'Visita'
+      AND visit_follow_up = 'VaiNegociar'
+      AND country_code = 'BR'
     GROUP BY
-        1
-),
-sale_flows_events AS (
+      1
+  ),
+  union_ AS (
     SELECT
-        sk_buyer,
-        MAX(sk_sale_agreement_signed_date) AS dt_last_sale_agreement_signed,
-        MAX(sk_house_registry_ended_date) AS dt_last_house_registry_ended
+      *
     FROM
-        dw_sale.fact_sale_flows
-    GROUP BY
-        1
-)
+      first_
+    UNION ALL
+    SELECT
+      *
+    FROM
+      second_
+    UNION ALL
+    SELECT
+      *
+    FROM
+      third_
+  )
 SELECT
-    nome AS customer_name,
-    email AS customer_email,
-    telefone_principal AS customer_phone,
-    'Visita' AS campaign_step,
-    'Buyer' AS customer_type,
-    cpf AS customer_cpf,
-    v.id_visitor AS id_user,
-    'lost' AS campaign_type,
-    'booking' AS driver_type,
-    v.sk_booking AS id_driver,
-    CASE
-        WHEN rv.id_visitor IS NULL THEN 'Sale'
-        ELSE 'Híbrido'
-    END AS business_context,
-    NOW() AS ts_load
+  du.nome AS customer_name,
+  du.email AS customer_email,
+  du.telefone_principal AS customer_phone,
+  'Visita' AS campaign_step,
+  'Buyer' AS customer_type,
+  du.cpf AS customer_cpf,
+  v.id_visitor AS id_user,
+  'lost' AS campaign_type,
+  'booking' AS driver_type,
+  v.sk_booking AS id_driver,
+  CASE
+    WHEN rv.id_visitor IS NULL THEN 'Sale'
+    ELSE 'Híbrido'
+  END AS business_context
 FROM
-    visits v
-    JOIN
-        buyers b
-            ON b.id_visitor = v.id_visitor
-    JOIN
-        dw_public.dim_user du
-            ON du.sk_user = v.id_visitor
-    LEFT JOIN
-        rent_visits rv
-            ON rv.id_visitor = v.id_visitor
-            AND rv.dt_visit_rent BETWEEN DATE_SUB(v.dt_visit, 30) AND DATE_ADD(v.dt_visit, 30)
-    LEFT JOIN
-        visits_ v_
-            ON v_.sk_buyer = v.id_visitor
-    LEFT JOIN
-        offers o
-            ON o.id_buyer = v_.sk_buyer
-    LEFT JOIN
-        sale_flows_events sf
-            ON sf.sk_buyer = v.id_visitor
-WHERE
-    v.rank_visitas = 1
-    AND v.is_rescheduled = 'False'
-    AND DATEDIFF(CURRENT_DATE, v.dt_visit) = 20
-    AND b.has_visit_completed = 0
-    AND (TO_DATE(STRING(NULLIF(v_.dt_last_schedule_visit, -1)),'yyyyMMdd') <= DATE(v.dt_visit)
-        OR NULLIF(v_.dt_last_schedule_visit, -1) IS NULL)
-    AND (TO_DATE(STRING(NULLIF(o.dt_last_offer_sent, -1)),'yyyyMMdd') <= DATE(v.dt_visit)
-        OR NULLIF(o.dt_last_offer_sent, -1) IS NULL)
-    AND (TO_DATE(STRING(NULLIF(sf.dt_last_sale_agreement_signed, -1)),'yyyyMMdd') <= DATE(v.dt_visit)
-        OR NULLIF(sf.dt_last_sale_agreement_signed, -1) IS NULL)
-    AND (TO_DATE(STRING(NULLIF(sf.dt_last_house_registry_ended, -1)),'yyyyMMdd') <= DATE(v.dt_visit)
-        OR NULLIF(sf.dt_last_house_registry_ended, -1) IS NULL)
+  union_ v
+JOIN 
+  dw_public.dim_user du 
+    ON du.sk_user = v.id_visitor
+LEFT JOIN 
+  rent_visits rv
+    ON rv.id_visitor = v.id_visitor
+    AND rv.dt_visit_rent BETWEEN (v.last_dt_scheduling - INTERVAL '30' DAY) AND (v.last_dt_scheduling + INTERVAL '30' DAY)

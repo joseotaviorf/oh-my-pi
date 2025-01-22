@@ -1,119 +1,120 @@
 WITH brazil_houses AS (
     SELECT
-        DISTINCT id_house
+      id_house
     FROM
-        dw_rent.dim_house_listing
+      dw_public.dim_house_listing
     WHERE
-        country_code = 'BR'
-),
-ev AS (
-    SELECT DISTINCT
-        TO_DATE(STRING(COALESCE(NULLIF(fo.sk_offer_dismissed_date,-1),NULLIF(fo.sk_offer_submitted_date,-1))), 'yyyyMMdd') AS dt_event,
-        dof.offer_status,
-        ROW_NUMBER() OVER (PARTITION BY sf.sk_buyer ORDER BY NULLIF(fo.sk_offer_dismissed_date,-1)) AS rn,
-        sf.sk_house,
-        fo.sk_offer,
-        sf.sk_seller,
-        sf.sk_buyer
-    FROM
-        dw_sale.fact_sale_flows sf
-    INNER JOIN
-        brazil_houses dh
-            ON sf.sk_house = dh.id_house
-    JOIN
-        dw_sale.fact_offers fo
-            ON sf.sk_sale_flow = fo.sk_sale_flow
-    JOIN
-        dw_sale.dim_offer dof
-            ON dof.sk_offer = fo.sk_offer
-            AND dof.offer_status IN ('Offer Rejected', 'OFFER_REJECTED')
-),
-rent_visits AS (
+      country_code = 'BR'
+    GROUP BY
+      1
+  ),
+  ccv AS (
     SELECT
-        id_visitor,
-        MAX(dt_scheduling) AS dt_visit_rent
+      sk_buyer,
+      TO_DATE(MAX(sk_sale_agreement_signed_date), 'yyyyMMdd') AS dt_last_sale_agreement_signed
     FROM
-        dw_public.dim_booking
+      dw_sale.fact_sale_flows fs
     WHERE
-        visit_intent = 'RENT'
-        AND type = 'Visita'
-        AND visit_follow_up = 'VaiNegociar'
-        AND country_code = 'BR'
-    GROUP BY 1
-),
-base AS (
+      sk_sale_agreement_signed_date <> -1
+    GROUP BY
+      1
+  ),
+  final AS (
     SELECT
-        ev.sk_buyer AS id_buyer,
-        ev.dt_event,
-        ev.sk_offer AS id_offer,
-        du.sk_user AS id_user,
-        du.cpf,
-        du.nome,
-        du.email,
-        du.telefone_principal,
-        du.cidade,
-        du.estado_nome
+      fo.ts_offer_submitted,
+      fo.ts_offer_accepted,
+      fo.ts_offer_dismissed,
+      fo.ts_offer_rescued,
+      dof.offer_status,
+      sf.sk_house,
+      fo.sk_offer,
+      sf.sk_seller,
+      sf.sk_buyer,
+      ccv.dt_last_sale_agreement_signed,
+      ROW_NUMBER() OVER (
+        PARTITION BY
+          sf.sk_buyer
+        ORDER BY
+          fo.ts_offer_submitted DESC
+      ) rn
     FROM
-        ev
-    JOIN
-        dw_public.dim_user du
-            ON ev.sk_buyer = du.sk_user
+      dw_sale.fact_sale_flows sf
+    INNER JOIN 
+      brazil_houses dh 
+        ON sf.sk_house = dh.id_house
+    LEFT JOIN 
+      dw_sale.fact_offers fo 
+        ON sf.sk_sale_flow = fo.sk_sale_flow
+    LEFT JOIN 
+      dw_sale.dim_offer dof 
+        ON dof.sk_offer = fo.sk_offer
+    LEFT JOIN 
+      ccv 
+        ON ccv.sk_buyer = sf.sk_buyer
+        AND dt_last_sale_agreement_signed >= fo.ts_offer_submitted
     WHERE
-        rn = 1
-),
-visits AS (
+      fo.ts_offer_submitted IS NOT NULL
+  ),
+  first_ AS (
     SELECT
-        vb.sk_buyer,
-        MAX(sk_visit_date) AS dt_last_schedule_visit
+      *
     FROM
-        dw_sale.fact_visits vb
-    GROUP BY 1
-),
-offers AS (
+      final
+    WHERE
+      rn = 1
+      AND offer_status = 'OFFER_REJECTED'
+      AND date_diff (CURRENT_DATE, DATE(ts_offer_dismissed)) = 17
+  ),
+  second_ AS (
     SELECT
-        sk_buyer AS id_buyer,
-        MAX(sk_offer_submitted_date) AS dt_last_offer_sent
+      *
     FROM
-        dw_sale.fact_offers
-    GROUP BY 1
-),
-sale_flows_events AS (
+      final
+    WHERE
+      rn = 1
+      AND offer_status = 'OFFER_ACCEPTED'
+      AND dt_last_sale_agreement_signed IS NULL
+      AND date_diff (CURRENT_DATE, DATE(ts_offer_accepted)) = 11
+  ),
+  third_ AS (
     SELECT
-        sk_buyer,
-        MAX(sk_sale_agreement_signed_date) AS dt_last_sale_agreement_signed,
-        MAX(sk_house_registry_ended_date) AS dt_last_house_registry_ended
+      *
     FROM
-        dw_sale.fact_sale_flows
-    GROUP BY 1
-)
+      final
+    WHERE
+      rn = 1
+      AND ts_offer_accepted IS NULL
+      AND ts_offer_dismissed IS NULL
+      AND dt_last_sale_agreement_signed IS NULL
+      AND date_diff (CURRENT_DATE, DATE(ts_offer_submitted)) = 18
+  ),
+  union_ AS (
+    SELECT
+      *
+    FROM
+      first_
+    UNION ALL
+    SELECT
+      *
+    FROM
+      second_
+    UNION ALL
+    SELECT
+      *
+    FROM
+      third_
+  )
 SELECT
-    nome AS customer_name,
-    email AS customer_email,
-    telefone_principal AS customer_phone,
-    'Oferta Recusada' AS campaign_step,
-    'Buyer' AS customer_type,
-    cpf AS customer_cpf,
-    b.id_buyer AS id_user,
-    'lost' AS campaign_type,
-    'offer' AS driver_type,
-    b.id_offer AS id_driver,
-    CASE WHEN rv.id_visitor IS NULL THEN 'Sale' ELSE 'Híbrido' END AS business_context,
-    NOW() AS ts_load
+  du.nome AS customer_name,
+  du.email AS customer_email,
+  du.telefone_principal AS customer_phone,
+  'Oferta' AS campaign_step,
+  'Buyer' AS customer_type,
+  du.cpf AS customer_cpf,
+  v.sk_buyer AS id_user,
+  'lost' AS campaign_type,
+  'offer' AS driver_type,
+  v.sk_offer AS id_driver
 FROM
-    base b
-LEFT JOIN
-    rent_visits rv
-        ON rv.id_visitor = b.id_buyer AND rv.dt_visit_rent BETWEEN DATE_SUB(b.dt_event, 30) AND DATE_ADD(b.dt_event, 30)
-JOIN
-    visits v
-        ON v.sk_buyer = b.id_buyer AND (TO_DATE(STRING(NULLIF(v.dt_last_schedule_visit,-1)), 'yyyyMMdd') <= b.dt_event OR NULLIF(v.dt_last_schedule_visit,-1) IS NULL)
-JOIN
-    offers o
-        ON o.id_buyer = b.id_buyer AND (TO_DATE(STRING(NULLIF(o.dt_last_offer_sent, -1)), 'yyyyMMdd') <= b.dt_event OR NULLIF(o.dt_last_offer_sent, -1) IS NULL)
-JOIN
-    sale_flows_events sf
-        ON sf.sk_buyer = b.id_buyer
-            AND (TO_DATE(STRING(NULLIF(sf.dt_last_sale_agreement_signed,-1)), 'yyyyMMdd') <= b.dt_event OR NULLIF(sf.dt_last_sale_agreement_signed,-1) IS NULL)
-            AND (TO_DATE(STRING(NULLIF(sf.dt_last_house_registry_ended,-1)), 'yyyyMMdd') <= b.dt_event OR NULLIF(sf.dt_last_house_registry_ended,-1) IS NULL)
-WHERE
-    DATEDIFF(current_date, b.dt_event) = 26
+  union_ v
+  JOIN dw_public.dim_user du ON du.sk_user = v.sk_buyer
