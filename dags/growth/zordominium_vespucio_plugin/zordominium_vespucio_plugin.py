@@ -4,10 +4,10 @@ from datetime import datetime, timedelta
 import pendulum
 from airflow.models import DAG
 from databricks_plugin import (
-    QuintoAndarDatabricksSubmitRunOperator,
+    QuintoAndarDatabricksCheckJobTaskOperator,
     QuintoAndarDatabricksExecuteJobClusterOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
 )
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
@@ -38,17 +38,25 @@ base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 
 VESPUCIO_PACKAGE_VERSION = config_service.get_config("vespucio_pipeline_version")
-VESPUCIO_WHEEL_FILE = f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
+VESPUCIO_WHEEL_FILE = (
+    f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
+)
 
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_13_3_med_general_cluster")
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+CLUSTER_DESCRIPTION["spark_conf"][
+    "spark.databricks.sql.initial.catalog.namespace"
+] = "quintoandar_{{ var.value.environment }}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
         "permission_level": ClusterPermissionEnum.MANAGE,
-    }
+    },
+    {
+        "group_name": DatabricksGroupNameEnum.SOFTWARE_ENGINEERS,
+        "permission_level": ClusterPermissionEnum.MANAGE,
+    },
 ]
 LIBRARIES = [{"whl": f"{artifacts_bucket}/vespucio/{VESPUCIO_WHEEL_FILE}"}]
 DAG_DOCUMENTATION = config_service.get_config("dag_documentation")
@@ -80,8 +88,9 @@ execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
     libraries=LIBRARIES,
 )
 
+
 def create_task(entry_point: str, parameters: str, task_id: str = None):
-    return QuintoAndarDatabricksSubmitRunOperator(
+    return QuintoAndarDatabricksCheckJobTaskOperator(
         databricks_conn_id="databricks_new",
         dag=dag,
         task_id=(task_id or entry_point).replace("_", "-"),
@@ -95,15 +104,12 @@ def create_task(entry_point: str, parameters: str, task_id: str = None):
         execution_timeout=timedelta(hours=EXECUTION_HOURS_TIMEOUT),
     )
 
-plugin_task = create_task(
-        entry_point="plugins_zordominium",
-        parameters='{"parameters":["--operation=both"]}',
-        task_id="zordominium"
-    )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
+plugin_task = create_task(
+    entry_point="plugins_zordominium",
+    parameters='{"parameters":["--operation=both"]}',
+    task_id="zordominium",
 )
 
 
-execute_job_cluster_task >> plugin_task >> terminate_cluster_task
+execute_job_cluster_task >> plugin_task
