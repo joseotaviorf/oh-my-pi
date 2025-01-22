@@ -4,7 +4,6 @@ SELECT
     CAAHID AS id_agreement,
     CAACCTCOB AS id_contract,
     CAAGENCY AS id_agency,
-    source,
     CAGRUPO AS contract_group,
     CASE
         WHEN CAGRUPO = "1" THEN "QuintoAndar"

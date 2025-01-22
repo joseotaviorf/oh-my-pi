@@ -5,7 +5,7 @@ deduplicate_invoices AS (
     id_invoice
   FROM datalake_cyber_clean.bill
   WHERE invoice_or_entry = "Invoice"
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_invoice, contract_group ORDER BY ts_insert DESC) = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_invoice, contract_group ORDER BY COALESCE(ts_update, MAKE_DATE(year,month,day)) DESC) = 1
 )
 SELECT DISTINCT
     COALESCE(ha.id_invoice, cc.id_invoice) AS id_invoice,

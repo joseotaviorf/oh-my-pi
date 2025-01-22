@@ -48,7 +48,7 @@ workflow:
       partitions: []
       extra_spark_job_arguments:
         - "[]"
-        - True
+        - False
     tb_grupo_agency:
       clean_table_name: agency_group
       extraction_type: full

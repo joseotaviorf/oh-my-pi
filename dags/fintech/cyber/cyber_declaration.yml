@@ -57,15 +57,26 @@ workflow:
         - False
     tb_parcela:
       clean_table_name: bill
-      extraction_type: incremental
-      partitions: [year, month, day]
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
+      merge_on:
+        [
+          "id_contract",
+          "contract_group",
+          "id_invoice",
+          "id_entry",
+          "invoice_or_entry",
+        ]
       extra_spark_job_arguments:
         - "['PADTUPDREG', 'PADTINSERT','PADTUPDATE']"
         - False
     tb_boleto:
       clean_table_name: agreement_invoices
-      extraction_type: incremental
-      partitions: [year, month, day]
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
+      merge_on: ["id_invoice", "id_contract", "contract_group", "id_agreement"]
       extra_spark_job_arguments:
         - "['BLDTUPDATE']"
         - False
