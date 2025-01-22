@@ -11,10 +11,10 @@ workflow:
   type: custom_ingestion
   load_spark_job: load_wall_street_into_datalake
   spark_job_arguments:
-  - "{environment}"
-  - "{bucket}"
-  - "{dag_name}"
-  - "{table_name}"
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
   default_extraction_type: full
   tables_customization:
     Charge_AUD:
@@ -31,13 +31,15 @@ workflow:
       clean_table_name: store
     Chargeback:
       clean_table_name: chargeback
+    ChargebackNotification:
+      clean_table_name: chargeback_notification
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:
-  - jar: "{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
+    - jar: "{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar"
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

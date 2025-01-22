@@ -1,0 +1,63 @@
+database_name: datalake_wall_street_clean
+table_name: chargeback_notification
+columns:
+  id:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.id
+  id_charge:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.chargeid
+  nsu:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.nsu
+  reference_number:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.referencenumber
+  protocol_number:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.protocolnumber
+  acquirer_store_code:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.acquirerstorecode
+  sales_summary_number:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.salessummarynumber
+  reason_code:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.reasoncode
+  authorization_code:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.authorizationcode
+  sheet_number:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.sheetnumber
+  terminal_code:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.terminalcode
+  card_first_six_digits:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.cardfirstsixdigits
+  card_last_four_digits:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.cardlastfourdigits
+  message:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.message
+  dt_transaction:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.transactiondate
+  dt_request:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.requestdate
+  dt_return:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.returndate
+  chargeback_amount:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.chargebackamount
+  transaction_amount:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.transactionamount
+  metadata:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.metadata
