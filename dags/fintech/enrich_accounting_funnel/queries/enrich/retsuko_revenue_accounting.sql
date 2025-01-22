@@ -196,6 +196,7 @@ df AS (
         source_name,
         revenue_name,
         accrual_year_month,
+        sap.hash,
         r.revenue_account AS account_number,
         MIN(CASE
           WHEN sap.hash IS NOT NULL THEN 'SUCCESS'
@@ -215,13 +216,11 @@ df AS (
             ON r.id_sap_gateway_feature = sap_gateway.id_feature
     LEFT JOIN
         sap
-          ON r.id_invoice = sap.id_finance_entity
-          OR sap.hash = sap_gateway.hash 
-          AND r.revenue_account = sap.account_number
-    GROUP BY 1, 2, 3, 4, 5 ,6 ,7 ,8 ,11
-),
-
-df_final AS (
+        ON sap.hash = sap_gateway.hash 
+        AND r.revenue_account = sap.account_number
+    GROUP BY 1, 2, 3, 4, 5 ,6 ,7 ,8, 9, 12
+)
+, df_final AS (
     SELECT
         'JE'||'-'||IF(id_entry IS NOT NULL, id_entry, id_invoice)||'-'||'1'||'-'||'4'||'-'||
         CASE
@@ -256,6 +255,7 @@ df_final AS (
     FROM
         df
 )
+
 SELECT
     id_retsuko_revenue_accounting,
     id_business_entity,

@@ -39,4 +39,4 @@ SELECT
 FROM
     datalake_sap_4hana_clean.journal_entries
 QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_company, id_transaction, id_line ORDER BY MAKE_DATE(year, month, day) DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY id_transaction, id_finance_entity, id_finance_entity_entry, id_business_entity ORDER BY MAKE_DATE(year, month, day) DESC) = 1

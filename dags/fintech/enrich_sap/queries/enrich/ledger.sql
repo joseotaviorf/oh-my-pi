@@ -69,7 +69,7 @@ WITH sap_b1 AS (
         CAST(NULL AS STRING) AS transaction_type,
         user_type,
         source_client,
-        COALESCE(memo, memo_line, comments) AS comments,
+        COALESCE(memo_line, memo, comments) AS comments,
         (IF(indicator = 'Debit', document_amount, 0) - IF(indicator = 'Credit', document_amount, 0)) AS debit_credit,
         IF(indicator = 'Debit', document_amount, 0) AS debit,
         IF(indicator = 'Credit', document_amount, 0) AS credit,
