@@ -1,4 +1,3 @@
----
 dag:
   name: criteo_temp
   schedule_interval: 00 05 * * *
@@ -9,11 +8,17 @@ cluster:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   custom_libraries:
-    - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
-    - pypi:
-        package: "google-auth==2.23.0"
-    - pypi:
-        package: "google-api-python-client==2.55.0"
+  - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
+  - pypi:
+      package: "google-auth==2.23.0"
+  - pypi:
+      package: "google-api-python-client==2.55.0"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
 workflow:
   type: gsheets
   layer: raw

@@ -1,22 +1,26 @@
 dag:
-    name: enrich_proposal
-    owner: Data ForRent
-    schedule_start_date: 2020, 7, 1
-    documentation:
-      dag_purpose: |
-            This DAG creates the enriched table for the Proposal context.
-            Data used in enrichment is from EBDB, Sorting Hat and Rental Guarantee extractions.
+  name: enrich_proposal
+  owner: Data ForRent
+  schedule_start_date: 2020, 7, 1
+  documentation:
+    dag_purpose: |
+      This DAG creates the enriched table for the Proposal context.
+      Data used in enrichment is from EBDB, Sorting Hat and Rental Guarantee extractions.
 workflow:
-    type: query_delta
-    layer: enrich
-    default_extraction_type: full
-    default_partitions: [country_code]
+  type: query_delta
+  layer: enrich
+  default_extraction_type: full
+  default_partitions: [country_code]
 cluster:
-    type: custom_cluster
-    custom_configurations:
-      driver_node_type_id: m5a.2xlarge
-      node_type_id: m5a.4xlarge
-      num_workers: 2
-      spark_version: 12.2.x-scala2.12
-      spark_conf:
-        spark.sql.sources.partitionOverwriteMode: static
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.4xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new

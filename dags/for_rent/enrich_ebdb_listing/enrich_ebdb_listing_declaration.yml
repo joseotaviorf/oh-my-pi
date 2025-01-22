@@ -1,4 +1,3 @@
----
 dag:
   name: enrich_ebdb_listing
   schedule_start_date: 2020, 7, 1
@@ -12,86 +11,86 @@ workflow:
   layer: enrich
   inner_dependencies:
     agents_with_keys:
-      - house_listing
+    - house_listing
     house_listing:
-      - house_status_version_order
-      - lbc_status_version_order
-      - house_listing_status
-      - listing_business_context_status_history
-      - business_context_history
-      - house_listing_category
-      - house_listing_special_conditions
+    - house_status_version_order
+    - lbc_status_version_order
+    - house_listing_status
+    - listing_business_context_status_history
+    - business_context_history
+    - house_listing_category
+    - house_listing_special_conditions
     house_listing_category:
-      - lbc_status_version_order
+    - lbc_status_version_order
     house_listing_early_demand:
-      - house_listing_category
+    - house_listing_category
     house_listing_fees:
-      - house_listing
+    - house_listing
     house_listing_special_conditions:
-      - house_listing_category
+    - house_listing_category
     house_listing_status:
-      - house_status_version_order
-      - lbc_status_version_order
+    - house_status_version_order
+    - lbc_status_version_order
     house_status:
-      - house_listing
+    - house_listing
     lbc_status_version_order:
-      - business_context_history
+    - business_context_history
   tables_customization:
     agents_with_keys:
       partitions:
-        - country_code
+      - country_code
     business_context_history:
       partitions:
-        - country_code
-        - business_context
+      - country_code
+      - business_context
     house:
       partitions:
-        - country_code
+      - country_code
     house_entrance_history:
       partitions:
-        - country_code
+      - country_code
     house_listing:
       partitions:
-        - country_code
+      - country_code
     house_listing_category:
       partitions:
-        - country_code
+      - country_code
     house_listing_early_demand:
       partitions:
-        - country_code
+      - country_code
     house_listing_fees:
       partitions:
-        - country_code
+      - country_code
     house_listing_special_conditions:
       partitions:
-        - country_code
+      - country_code
     house_listing_status:
       partitions:
-        - country_code
+      - country_code
     house_status_version_order:
       partitions:
-        - country_code
+      - country_code
     lbc_status_version_order:
       partitions:
-        - country_code
+      - country_code
     listing_business_context:
       partitions:
-        - country_code
-        - business_context
+      - country_code
+      - business_context
     listing_business_context_status_history:
       partitions:
-        - country_code
-        - business_context
+      - country_code
+      - business_context
     listing_business_context_suspension_history:
       partitions:
-        - country_code
-        - business_context
+      - country_code
+      - business_context
     portability:
       partitions:
-        - country_code
+      - country_code
     rent_listing:
       partitions:
-        - country_code
+      - country_code
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -102,6 +101,7 @@ cluster:
     spark_conf:
       spark.sql.broadcastTimeout: 1200
       spark.sql.sources.partitionOverwriteMode: static
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       first_on_demand: 1
       spot_bid_price_percent: 100
@@ -109,3 +109,6 @@ cluster:
       ebs_volume_size: 200
       availability: SPOT_WITH_FALLBACK
     spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new

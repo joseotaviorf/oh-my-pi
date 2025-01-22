@@ -1,12 +1,9 @@
----
 dag:
   name: enrich_ebdb_house
   schedule_start_date: 2023, 4, 26
   owner: Data ForSale
   documentation:
-    dag_purpose: Creates enriched tables for the context `House` from ebdb. This DAG is responsible for creating enriched tables about
-      the house domain with a direct dependency on the EBDB. As a home domain, these would be characteristics,
-      conditions and statuses that are independent of the listing (they don't change after a publication/depublication).
+    dag_purpose: Creates enriched tables for the context `House` from ebdb. This DAG is responsible for creating enriched tables about the house domain with a direct dependency on the EBDB. As a home domain, these would be characteristics, conditions and statuses that are independent of the listing (they don't change after a publication/depublication).
 workflow:
   type: query
   layer: enrich
@@ -21,3 +18,7 @@ cluster:
     spark_version: 13.3.x-scala2.12
     spark_conf:
       spark.sql.sources.partitionOverwriteMode: static
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  databricks_conn_id: databricks_new

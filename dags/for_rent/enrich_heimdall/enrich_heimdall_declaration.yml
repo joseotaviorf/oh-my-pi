@@ -1,17 +1,23 @@
 dag:
-    name: enrich_heimdall
-    schedule_start_date: 2022, 7, 1
-    owner: Data ForRent
-    documentation: 
-        dag_purpose: |
-            Expanding columns from `heimdall` datalake table `activity` to facilitate the analysis.
+  name: enrich_heimdall
+  schedule_start_date: 2022, 7, 1
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Expanding columns from `heimdall` datalake table `activity` to facilitate the analysis.
 workflow:
-    type: query_delta
-    layer: enrich
-    inner_dependencies:
-        ongoing_refund_requests:
-            - activity
-            - auditable_expenses
-            - expenses
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    ongoing_refund_requests:
+    - activity
+    - auditable_expenses
+    - expenses
 cluster:
-    type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -4,8 +4,7 @@ dag:
   schedule_interval: 0 3 * * *
   owner: Data ForSale
   documentation:
-    dag_purpose: ClassifiedsResponder is a Database we use to store our contract history we have when dealing with Classifieds Leads
-      (A lead which comes from one of our Classifieds like Criteo). This DAG ingests this database into our raw flow (until clean).
+    dag_purpose: ClassifiedsResponder is a Database we use to store our contract history we have when dealing with Classifieds Leads (A lead which comes from one of our Classifieds like Criteo). This DAG ingests this database into our raw flow (until clean).
 workflow:
   type: database_pull
   layer: raw
@@ -18,3 +17,9 @@ workflow:
     lead_reply: {}
 cluster:
   type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

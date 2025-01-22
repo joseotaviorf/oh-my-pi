@@ -1,20 +1,25 @@
 dag:
-    name: enrich_offer
-    owner: Data ForRent
-    schedule_start_date: 2020, 7, 1
-    documentation: 
-      dag_purpose: |
-            This DAG creates the enriched tables of the Offer context related to ForRent and ForSale operations.
+  name: enrich_offer
+  owner: Data ForRent
+  schedule_start_date: 2020, 7, 1
+  documentation:
+    dag_purpose: |
+      This DAG creates the enriched tables of the Offer context related to ForRent and ForSale operations.
 workflow:
-    type: query
-    layer: enrich
+  type: query
+  layer: enrich
 cluster:
-    type: custom_cluster
-    custom_configurations:
-      driver_node_type_id: r5d.xlarge
-      node_type_id: m5d.2xlarge
-      num_workers: 2
-      runtime_engine: PHOTON
-      aws_attributes:
-        availability: ON_DEMAND
-      spark_version: 12.2.x-scala2.12
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5d.xlarge
+    node_type_id: m5d.2xlarge
+    num_workers: 2
+    runtime_engine: PHOTON
+    aws_attributes:
+      availability: ON_DEMAND
+    spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

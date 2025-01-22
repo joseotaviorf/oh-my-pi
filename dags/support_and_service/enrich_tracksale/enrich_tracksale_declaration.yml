@@ -1,22 +1,28 @@
 dag:
-    name: enrich_tracksale
-    schedule_start_date: 2020, 7, 21
-    owner: Data SS
-    documentation: 
-        dag_purpose: |
-          Prepares [Tracksale](https://www.tracksale.co/) data for business utilization. Tracksale is an external service that manages NPS data.
+  name: enrich_tracksale
+  schedule_start_date: 2020, 7, 21
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Prepares [Tracksale](https://www.tracksale.co/) data for business utilization. Tracksale is an external service that manages NPS data.
 workflow:
-    type: query
-    layer: enrich
-    inner_dependencies:
-      answer_cities:
-        - answer_tags
-      answer_tags:
-        - answer
-      customer_conversions:
-        - answer
-        - dispatch
-      answer_justifications:
-        - answer
+  type: query
+  layer: enrich
+  inner_dependencies:
+    answer_cities:
+    - answer_tags
+    answer_tags:
+    - answer
+    customer_conversions:
+    - answer
+    - dispatch
+    answer_justifications:
+    - answer
 cluster:
-    type: databricks_12_2_med_compute_cluster
+  type: databricks_12_2_med_compute_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

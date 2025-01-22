@@ -44,6 +44,10 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 cluster_configuration["spark_conf"].update(EXTRA_SPARK_CONF)
+cluster_configuration["data_security_mode"] = "SINGLE_USER"
+cluster_configuration["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
+cluster_configuration["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+
 
 default_libraries = config_service.get_config("default_libraries")
 
@@ -74,20 +78,17 @@ dag = DAG(
     ),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
-    dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_configuration,
     libraries=default_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
-    dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="events-to-datalake-raw",
+events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id="events-to-datalake-raw",
     dag=dag,
     json={
         "spark_python_task": {
@@ -98,8 +99,7 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
 )
 
-propagate_table_metadata_raw_events_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
+propagate_table_metadata_raw_events_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
     task_id=f"propagate-table-metadata-raw-events",
     json={
         "spark_python_task": {
@@ -116,8 +116,7 @@ propagate_table_metadata_raw_events_task = QuintoAndarDatabricksSubmitRunOperato
     },
 )
 
-events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -141,8 +140,7 @@ events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
 )
 
-sync_metastore_clean_events_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+sync_metastore_clean_events_structure_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -163,8 +161,7 @@ sync_metastore_clean_events_structure_task = QuintoAndarDatabricksSubmitRunOpera
     },
 )
 
-sync_metastore_clean_events_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+sync_metastore_clean_events_partitions_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -185,8 +182,7 @@ sync_metastore_clean_events_partitions_task = QuintoAndarDatabricksSubmitRunOper
     },
 )
 
-propagate_table_metadata_clean_events_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
+propagate_table_metadata_clean_events_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
     task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=PROPAGATE_TABLE_METADATA_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
@@ -206,8 +202,7 @@ propagate_table_metadata_clean_events_task = QuintoAndarDatabricksSubmitRunOpera
     },
 )
 # 170698_user_merge
-user_merge_170698_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+user_merge_170698_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -230,8 +225,7 @@ user_merge_170698_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-sync_metastore_clean_170698_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+sync_metastore_clean_170698_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -252,8 +246,7 @@ sync_metastore_clean_170698_user_merge_structure_task = QuintoAndarDatabricksSub
     },
 )
 
-sync_metastore_clean_170698_user_merge_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+sync_metastore_clean_170698_user_merge_partitions_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -274,8 +267,7 @@ sync_metastore_clean_170698_user_merge_partitions_task = QuintoAndarDatabricksSu
     },
 )
 
-propagate_table_metadata_clean_170698_user_merge_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
+propagate_table_metadata_clean_170698_user_merge_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
     task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=PROPAGATE_TABLE_METADATA_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
@@ -296,8 +288,7 @@ propagate_table_metadata_clean_170698_user_merge_task = QuintoAndarDatabricksSub
 )
 
 # 183047_user_merge
-user_merge_183047_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+user_merge_183047_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -320,8 +311,7 @@ user_merge_183047_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-sync_metastore_clean_183047_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+sync_metastore_clean_183047_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -342,8 +332,7 @@ sync_metastore_clean_183047_user_merge_structure_task = QuintoAndarDatabricksSub
     },
 )
 
-sync_metastore_clean_183047_user_merge_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+sync_metastore_clean_183047_user_merge_partitions_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -364,8 +353,7 @@ sync_metastore_clean_183047_user_merge_partitions_task = QuintoAndarDatabricksSu
     },
 )
 
-propagate_table_metadata_clean_183047_user_merge_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
+propagate_table_metadata_clean_183047_user_merge_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
     task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=PROPAGATE_TABLE_METADATA_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
@@ -386,8 +374,7 @@ propagate_table_metadata_clean_183047_user_merge_task = QuintoAndarDatabricksSub
 )
 
 # 205027_user_merge
-user_merge_205027_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+user_merge_205027_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -410,8 +397,7 @@ user_merge_205027_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-sync_metastore_clean_205027_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+sync_metastore_clean_205027_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -432,8 +418,7 @@ sync_metastore_clean_205027_user_merge_structure_task = QuintoAndarDatabricksSub
     },
 )
 
-sync_metastore_clean_205027_user_merge_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id=DatalakeTaskGroup.generate_default_task_id(
+sync_metastore_clean_205027_user_merge_partitions_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
@@ -454,8 +439,7 @@ sync_metastore_clean_205027_user_merge_partitions_task = QuintoAndarDatabricksSu
     },
 )
 
-propagate_table_metadata_clean_205027_user_merge_task = QuintoAndarDatabricksSubmitRunOperator(
-    dag=dag,
+propagate_table_metadata_clean_205027_user_merge_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
     task_id=DatalakeTaskGroup.generate_default_task_id(
         task_prefix=PROPAGATE_TABLE_METADATA_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
@@ -475,8 +459,7 @@ propagate_table_metadata_clean_205027_user_merge_task = QuintoAndarDatabricksSub
     },
 )
 
-create_clean_staging_events_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="create-clean-staging-events",
+create_clean_staging_events_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id="create-clean-staging-events",
     dag=dag,
     json={
         "spark_python_task": {
@@ -495,8 +478,7 @@ create_clean_staging_events_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
-update_subpartitions_table_clean_staging_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="update-clean-staging-subpartitions-values",
+update_subpartitions_table_clean_staging_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id="update-clean-staging-subpartitions-values",
     dag=dag,
     json={
         "spark_python_task": {
@@ -515,8 +497,7 @@ update_subpartitions_table_clean_staging_task = QuintoAndarDatabricksSubmitRunOp
     },
 )
 
-create_subpartitioned_tables_clean_staging_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="create-clean-staging-subpartitioned-tables",
+create_subpartitioned_tables_clean_staging_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id="create-clean-staging-subpartitioned-tables",
     dag=dag,
     json={
         "spark_python_task": {
@@ -527,8 +508,7 @@ create_subpartitioned_tables_clean_staging_task = QuintoAndarDatabricksSubmitRun
     },
 )
 
-update_subpartitioned_events_clean_staging_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="update-clean-staging-subpartitioned-tables",
+update_subpartitioned_events_clean_staging_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id="update-clean-staging-subpartitioned-tables",
     dag=dag,
     json={
         "spark_python_task": {
@@ -547,8 +527,7 @@ subpartitioned_table_list = list(set(tables_list) - set(CLEAN_STAGING_BLOCK_TABL
 load_subpartitioned_clean_tables_tasks = []
 for table in subpartitioned_table_list:
 
-    load_subpartitioned_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
-            task_id=DatalakeTaskGroup.generate_default_task_id(
+    load_subpartitioned_clean_table_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=DatalakeTaskGroup.generate_default_task_id(
             task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
             layer=LayerEnum.CLEAN,
             schema=SOURCE,
@@ -579,8 +558,7 @@ load_subpartitioned_all_clean_tables_done_tasks = DummyOperator(
     task_id="load-subpartitioned-event-tables-to-clean",
 )
 
-sync_metastore_clean_subpartitioned_events_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-metastore-clean-subpartitioned-event-tables-structure",
+sync_metastore_clean_subpartitioned_events_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id="sync-metastore-clean-subpartitioned-event-tables-structure",
     dag=dag,
     json={
         "spark_python_task": {
@@ -595,8 +573,7 @@ sync_metastore_clean_subpartitioned_events_tables_structure_task = QuintoAndarDa
     },
 )
 
-sync_metastore_clean_subpartitioned_events_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="sync-hive-metastore-clean-subpartitioned-events-tables-partitions",
+sync_metastore_clean_subpartitioned_events_tables_partitions_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id="sync-hive-metastore-clean-subpartitioned-events-tables-partitions",
     dag=dag,
     json={
         "spark_python_task": {
@@ -611,8 +588,7 @@ sync_metastore_clean_subpartitioned_events_tables_partitions_task = QuintoAndarD
     },
 )
 
-propagate_tables_metadata_clean_task = QuintoAndarDatabricksSubmitRunOperator(
-    task_id="propagate-clean-tables-metadata-task",
+propagate_tables_metadata_clean_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id="propagate-clean-tables-metadata-task",
     dag=dag,
     json={
         "spark_python_task": {
