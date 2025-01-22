@@ -88,9 +88,14 @@ if __name__ == "__main__":
     tables_to_send_warning = []
 
     for table in tables:
-        datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
+        datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table}"
         try:
-            df = s3_consumer.get_data_from_file(path=datalake_path, format="delta")
+            data = s3_consumer.get_data_from_file(path=datalake_path, format="delta")
+            df = data.filter(
+                (data.year == execution_date.year) &
+                (data.month == execution_date.month) &
+                (data.day == execution_date.day)
+            )
         except AnalysisException:
             tables_to_send_warning.append(table)
             df = None
