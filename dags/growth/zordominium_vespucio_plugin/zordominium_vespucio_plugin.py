@@ -5,7 +5,7 @@ import pendulum
 from airflow.models import DAG
 from databricks_plugin import (
     QuintoAndarDatabricksSubmitRunOperator,
-    QuintoAndarDatabricksCreateClusterOperator,
+    QuintoAndarDatabricksExecuteJobClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
 from bietlejuice.base.airflow.base_dag import BaseDAG
@@ -71,7 +71,7 @@ dag = DAG(
     ),
 )
 
-execute_job_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
     databricks_conn_id="databricks_new",
     dag=dag,
     task_id="execute-job-cluster",
@@ -97,7 +97,7 @@ def create_task(entry_point: str, parameters: str, task_id: str = None):
 
 plugin_task = create_task(
         entry_point="plugins_zordominium",
-        parameters=None,
+        parameters='{"parameters":["--operation=both"]}',
         task_id="zordominium"
     )
 
