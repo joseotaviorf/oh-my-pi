@@ -43,10 +43,52 @@ appointment_history AS (
 ),
 appointment_union AS (
     SELECT
-        MD5(CONCAT(b.id, 'PWA')) AS id_appointment,
+        a.id_appointment AS id_is_appointment,
+        a.id_external_appointment AS id_main_appointment,
+        a.id_inspection,
+        a.id_inspector,
+        s.type,
+        a.status,
+        ah.category_name AS status_made_by,
+        ah.category_description AS status_description,
+        a.cancellation_reason,
+        a.observation,
+        'IS' AS source,
+        s.slot_of_day,
+        s.duration_in_slots,
+        a.is_fixed_agent,
+        s.is_confirmed,
+        CAST(a.dt_scheduled AS TIMESTAMP)
+          + FLOOR((s.slot_of_day * 15 / 60)+8) * INTERVAL 1 HOURS
+          + ABS(s.slot_of_day * 15 % 60) * INTERVAL 1 MINUTES
+        AS ts_appointment_inspected_local_tz,
+        a.ts_created AS ts_appointment_created_utc,
+        a.ts_updated AS ts_appointment_updated_utc,
+        a.ts_created - INTERVAL 3 HOURS AS ts_appointment_created_local_tz,
+        a.ts_updated - INTERVAL 3 HOURS AS ts_appointment_updated_local_tz,
+        IF(a.status = "CANCELLED", FIRST(a.ts_updated) OVER (PARTITION BY a.id_inspection ORDER BY a.ts_updated), NULL) AS ts_first_appointment_cancelled_utc,
+        IF(a.status = "CANCELLED", FIRST(a.ts_updated - INTERVAL 3 HOURS) OVER (PARTITION BY a.id_inspection ORDER BY a.ts_updated), NULL) AS ts_first_appointment_cancelled_local_tz,
+        a.year,
+        a.month,
+        a.day
+    FROM
+        datalake_inspections_clean.appointment AS a
+    LEFT JOIN
+        datalake_ebdb_clean.booking AS b
+          ON a.id_external_appointment = b.id
+    LEFT JOIN
+        datalake_schedules_clean.appointment AS s
+          ON b.id_schedule = s.id
+    LEFT JOIN
+        appointment_history AS ah
+          ON b.id_schedule = ah.id_appointment
+    WHERE
+        MAKE_DATE(a.year, a.month, a.day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+    UNION ALL
+    SELECT
         a.id_appointment AS id_is_appointment,
         b.id AS id_main_appointment,
-        is.id_inspection,
+        MD5(CONCAT(is.id_inspection, 'PWA')) AS id_inspection,
         b.id_agent AS id_inspector,
         CASE
             WHEN LOWER(b.type) IN ('vistoria', 'vistoriaquarteirizada') THEN 'INSPECTION'
@@ -100,50 +142,6 @@ appointment_union AS (
     WHERE
         LOWER(b.type) IN ('vistoria', 'vistoriaquarterizada')
         AND DATE(b.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
-    UNION ALL
-    SELECT
-        MD5(CONCAT(a.id_appointment, 'IS')) AS id_appointment,
-        a.id_appointment AS id_is_appointment,
-        a.id_external_appointment AS id_main_appointment,
-        a.id_inspection,
-        a.id_inspector,
-        s.type,
-        a.status,
-        ah.category_name AS status_made_by,
-        ah.category_description AS status_description,
-        a.cancellation_reason,
-        a.observation,
-        'IS' AS source,
-        s.slot_of_day,
-        s.duration_in_slots,
-        a.is_fixed_agent,
-        s.is_confirmed,
-        CAST(a.dt_scheduled AS TIMESTAMP)
-          + FLOOR((s.slot_of_day * 15 / 60)+8) * INTERVAL 1 HOURS
-          + ABS(s.slot_of_day * 15 % 60) * INTERVAL 1 MINUTES
-        AS ts_appointment_inspected_local_tz,
-        a.ts_created AS ts_appointment_created_utc,
-        a.ts_updated AS ts_appointment_updated_utc,
-        a.ts_created - INTERVAL 3 HOURS AS ts_appointment_created_local_tz,
-        a.ts_updated - INTERVAL 3 HOURS AS ts_appointment_updated_local_tz,
-        IF(a.status = "CANCELLED", FIRST(a.ts_updated) OVER (PARTITION BY a.id_inspection ORDER BY a.ts_updated), NULL) AS ts_first_appointment_cancelled_utc,
-        IF(a.status = "CANCELLED", FIRST(a.ts_updated - INTERVAL 3 HOURS) OVER (PARTITION BY a.id_inspection ORDER BY a.ts_updated), NULL) AS ts_first_appointment_cancelled_local_tz,
-        a.year,
-        a.month,
-        a.day
-    FROM
-        datalake_inspections_clean.appointment AS a
-    LEFT JOIN
-        datalake_ebdb_clean.booking AS b
-          ON a.id_external_appointment = b.id
-    LEFT JOIN
-        datalake_schedules_clean.appointment AS s
-          ON b.id_schedule = s.id
-    LEFT JOIN
-        appointment_history AS ah
-          ON b.id_schedule = ah.id_appointment
-    WHERE
-        MAKE_DATE(a.year, a.month, a.day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ),
 inspection_data AS (
     SELECT
@@ -157,7 +155,7 @@ inspection_data AS (
         ROW_NUMBER() OVER(PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
 )
 SELECT
-    a.id_appointment,
+    MD5(COALESCE(CONCAT(a.id_is_appointment, 'IS'), CONCAT(a.id_main_appointment, 'PWA'))) AS id_appointment,
     a.id_is_appointment,
     a.id_main_appointment,
     a.id_inspection,
@@ -213,4 +211,4 @@ LEFT JOIN
     inspection_data AS i
       ON a.id_inspection = i.id_inspection
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY a.id_appointment ORDER BY a.ts_appointment_updated_utc DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY MD5(COALESCE(CONCAT(a.id_is_appointment, 'IS'), CONCAT(a.id_main_appointment, 'PWA'))) ORDER BY a.ts_appointment_updated_utc DESC) = 1
