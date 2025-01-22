@@ -6,7 +6,7 @@ dag:
     dag_purpose: |
       Prepares [Tracksale](https://www.tracksale.co/) data for business utilization. Tracksale is an external service that manages NPS data.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     answer_cities:
