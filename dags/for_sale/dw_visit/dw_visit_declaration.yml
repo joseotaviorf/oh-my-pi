@@ -12,6 +12,8 @@ workflow:
     tables_customization:
       dim_visit:
         custom_schema: public
+      dim_event_type:
+        merge_on: event_type
 cluster:
     type: custom_cluster
     access_control_list:

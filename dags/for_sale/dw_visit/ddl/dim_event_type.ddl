@@ -1,0 +1,8 @@
+-- This DDL is not meant for Redshift, but for Spark itself.
+-- This is because the query for this table is self-referential in order to create the Surrogate Keys.
+-- Therefore, we need to have the empty table created manually before the query runs.
+CREATE TABLE dw_visit.dim_event_type (
+    sk_event_type BIGINT GENERATED ALWAYS AS IDENTITY,,
+    event_type STRING,
+    ts_load TIMESTAMP
+) USING DELTA LOCATION 's3://5a-dw-prod/visit/dim_event_type'
