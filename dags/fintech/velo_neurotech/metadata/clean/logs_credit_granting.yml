@@ -353,6 +353,9 @@ columns:
   score_bigid_forth_proponent:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_bigidbgc_score4
+  boavista_score_fifth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_api_boavista_score_p5
   package_range:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_faixa_pacote
