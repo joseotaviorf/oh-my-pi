@@ -36,9 +36,6 @@ base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 default_libraries = config_service.get_config("default_libraries")
 cluster_configuration = config_service.get_config("custom_cluster")
-cluster_configuration["data_security_mode"] = "SINGLE_USER"
-cluster_configuration["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-cluster_configuration["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 
 EBDB_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/"
 RAW_SPARK_JOB_FILE = EBDB_SPARK_JOBS_PATH + "load_ebdb_raw.py"
@@ -81,7 +78,8 @@ def clean_tasks(table_name):
     :rtype: List[str, List[str]]
     """
     slugged_table_name = table_name.replace("_", "-")
-    clean_table_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
+    clean_table_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
         task_id=DatalakeTaskGroup.generate_default_task_id(
             task_prefix=DatalakeTaskGroup.LOAD_TASK_PREFIX,
             layer=LayerEnum.CLEAN,
@@ -96,7 +94,8 @@ def clean_tasks(table_name):
         },
     )
 
-    sync_metastore_clean_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
+    sync_metastore_clean_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
         task_id=f"sync-hive-metastore-clean-{slugged_table_name}-structure",
         json={
             "spark_python_task": {
@@ -116,7 +115,8 @@ def clean_tasks(table_name):
     if DAGMetadataService.metadata_file_exists(
         SOURCE, LayerEnum.CLEAN.value, table_name
     ):
-        propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
+        propagate_table_metadata_task = QuintoAndarDatabricksSubmitRunOperator(
+            dag=dag,
             task_id=f"propagate-table-metadata-clean-{slugged_table_name}",
             json={
                 "spark_python_task": {
@@ -150,7 +150,8 @@ def build_raw_task_list():
 
     :rtype: List[str]
     """
-    load_tables_into_datalake_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id="load-tables-to-datalake-raw",
+    load_tables_into_datalake_task = QuintoAndarDatabricksSubmitRunOperator(
+        task_id="load-tables-to-datalake-raw",
         dag=dag,
         json={
             "spark_python_task": {
@@ -211,17 +212,20 @@ def task_list_last_tasks(task_list_tasks):
     return last_tasks
 
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_configuration,
     libraries=default_libraries + CUSTOM_LIBRARIES,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    dag=dag, task_id="terminate-cluster"
 )
 
-polygon_region_raw_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
+polygon_region_raw_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
     task_id="load-polygon-region-raw",
     json={
         "spark_python_task": {
@@ -231,7 +235,8 @@ polygon_region_raw_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn
     },
 )
 
-sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
+sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
     task_id=f"sync-hive-metastore-raw-structure",
     json={
         "spark_python_task": {
@@ -246,7 +251,8 @@ sync_metastore_table_structure_task = QuintoAndarDatabricksSubmitRunOperator(dat
     },
 )
 
-propagate_table_lineage_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
+propagate_table_lineage_task = QuintoAndarDatabricksSubmitRunOperator(
+    dag=dag,
     task_id=f"propagate-table-metadata-raw",
     json={
         "spark_python_task": {
@@ -294,7 +300,8 @@ for tb_name in tb_names:
     table_name_suffix = StringFormatter.slugify(f"-{tb_name}")
     intermediate_path = ""
 
-    data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", dag=dag,
+    data_quality_tests_task = QuintoAndarDatabricksSubmitRunOperator(
+        dag=dag,
         task_id=f"data-quality-tests-raw-{SOURCE}{table_name_suffix}",
         json={
             "spark_python_task": {
