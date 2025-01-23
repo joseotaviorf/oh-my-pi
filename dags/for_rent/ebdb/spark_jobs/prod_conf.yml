@@ -476,6 +476,7 @@ table_block_list:
   - HorarioSemanalImovel
   - HorarioSemanalImovel_AUD
   - HouseVisitStatus_AUD
+  - message
 
 view_allow_list:
   - MapRegiao
