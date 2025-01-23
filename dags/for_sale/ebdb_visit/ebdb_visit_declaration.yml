@@ -14,6 +14,14 @@ workflow:
   source_schema: ebdb
   custom_schema: ebdb
   tables_customization:
+    AppointmentChangeReasonCategory:
+      clean_table_name: appointment_change_reason_category
+    HorarioSemanalImovel:
+      clean_table_name: house_weekly_schedule
+    HorarioSemanalImovel_AUD:
+      clean_table_name: house_weekly_schedule_aud
+    HouseVisitStatus_AUD:
+      clean_table_name: house_visit_status_aud
     Agendamento:
       clean_table_name: booking
     Agendamento_AUD:

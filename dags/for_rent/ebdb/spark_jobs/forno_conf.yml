@@ -472,9 +472,13 @@ table_block_list:
   - VisitaOrigem
   - VisitStatusLog
   - Visitor
+  - AppointmentChangeReasonCategory
+  - HorarioSemanalImovel
+  - HorarioSemanalImovel_AUD
+  - HouseVisitStatus_AUD
 
 view_allow_list:
-  - vteste_utf8mb3
+  - MapRegiao
 
 block_list:
   - PoligonoRegiao

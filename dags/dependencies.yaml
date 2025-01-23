@@ -367,8 +367,8 @@ bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.ebdb:load-clean-house-visit-status-aud
-  - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
+  - bietlejuice.ebdb_visit:load-clean-house-visit-status-aud
+  - bietlejuice.ebdb_visit:load-clean-house-weekly-schedule-aud
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
@@ -396,8 +396,8 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-  - bietlejuice.ebdb:load-clean-house-visit-status-aud
-  - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
+  - bietlejuice.ebdb_visit:load-clean-house-visit-status-aud
+  - bietlejuice.ebdb_visit:load-clean-house-weekly-schedule-aud
   - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.ebdb_house:load-clean-house
@@ -1237,9 +1237,9 @@ bietlejuice.enrich_bob:
   - bietlejuice.bob:load-clean-submission-progress
   - bietlejuice.ebdb_house:load-clean-house
 bietlejuice.enrich_booking:
-  - bietlejuice.ebdb:load-clean-appointment-change-reason-category
-  - bietlejuice.ebdb:load-clean-house-weekly-schedule
-  - bietlejuice.ebdb:load-clean-house-weekly-schedule-aud
+  - bietlejuice.ebdb_visit:load-clean-appointment-change-reason-category
+  - bietlejuice.ebdb_visit:load-clean-house-weekly-schedule
+  - bietlejuice.ebdb_visit:load-clean-house-weekly-schedule-aud
   - bietlejuice.ebdb:load-clean-preferred-fixed-agent
   - bietlejuice.ebdb:load-clean-preferred-fixed-agent-aud
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud
