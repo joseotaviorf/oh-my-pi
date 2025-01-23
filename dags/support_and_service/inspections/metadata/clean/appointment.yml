@@ -13,6 +13,10 @@ columns:
     description: Unique external ID of the inspection schedule, this ID relates to the Planner (Main) schedule data.
     lineage:
       - datalake_inspections_raw.appointment.external_appointment_id
+  id_schedules:
+    description: Scheduling identification key in the schedules databases.
+    lineage:
+      - datalake_inspections_raw.appointment.schedules_appointment_id
   id_inspection:
     description: Inspection unique identifier.
     lineage:

@@ -2,6 +2,8 @@ SELECT
 	id AS id_appointment,
 	external_appointment_id AS id_external_appointment,
 	external_appointment_id_mod AS mod_id_external_appointment,
+	schedules_appointment_id AS id_schedules,
+	schedules_appointment_id_mod AS mod_id_schedules,
 	inspection_id AS id_inspection,
 	inspection_id_mod AS mod_id_inspection,
 	inspector_id AS id_inspector,

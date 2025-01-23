@@ -17,6 +17,14 @@ columns:
     description: Indicates if the id_external_appointment field has been changed
     lineage:
       - datalake_inspections_raw.appointment_aud.external_appointment_id_mod
+  id_schedules:
+    description: Scheduling identification key in the schedules databases.
+    lineage:
+      - datalake_inspections_raw.appointment.schedules_appointment_id
+  mod_id_schedules:
+    description: Indicates if the id_schedules field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment.schedules_appointment_id_mod
   id_inspection:
     description: Inspection unique identifier.
     lineage:
