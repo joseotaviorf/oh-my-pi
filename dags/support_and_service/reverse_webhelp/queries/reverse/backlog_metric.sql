@@ -45,7 +45,7 @@ LEFT JOIN
   dw_customer_support.dim_ticket dit
     ON dit.sk_ticket = bmt.sk_task
 LEFT JOIN
-  dw_customer_support.fact_ticket AS tf
+  dw_customer_support.fact_tickets AS tf
     ON tf.sk_ticket = bmt.sk_task
 WHERE
   DATE(bmt.dt_metric_reference) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')

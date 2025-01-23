@@ -3371,7 +3371,6 @@ bietlejuice.reverse_atento:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
   - bietlejuice.enrich_customer_support:load-enrich-calls
-  - bietlejuice.enrich_customer_support:load-enrich-chat
   - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
