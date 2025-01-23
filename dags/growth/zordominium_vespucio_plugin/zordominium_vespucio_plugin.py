@@ -107,7 +107,7 @@ def create_task(entry_point: str, parameters: str, task_id: str = None):
 
 plugin_task = create_task(
     entry_point="plugins_zordominium",
-    parameters='{"parameters":["--operation=both"]}',
+    parameters=["--operation=both"],
     task_id="zordominium",
 )
 
