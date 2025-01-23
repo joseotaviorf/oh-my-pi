@@ -88,7 +88,7 @@ task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
 )
 
 raw_task_group = task_group.build_raw_task_group_for_single_table(
-    has_hive_sync=False
+    has_hive_sync=False,
     source=SOURCE,
     table_name=TABLE_NAME,
     target_database_base_name=CONTEXT,
