@@ -68,7 +68,8 @@ if __name__ == "__main__":
     s3_client = boto3.client("s3")
 
     for table in tables:
-        table_config = [conf for conf in tables_config if conf['table_name'] == table][0]
+        if [conf for conf in tables_config if conf['table_name'] == table]:
+            table_config = [conf for conf in tables_config if conf['table_name'] == table][0]
         if table_config.get("is_monthly", False) and execution_date.day != 1:
             logger.info(
                     f"m=__main__, message={table} is monthly and should not run today, execution_date={execution_date}"
