@@ -1,0 +1,95 @@
+database_name: datalake_rental_transact
+table_name: offer
+description: Enrich table for the offers from Rental Transact database.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  id_offer:
+    lineage:
+      - datalake_rental_transact_clean.offer.id
+    description: Offer ID.
+  id_offer_topic:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.id_offer_topic
+    description: Offer topic ID.
+  id_firestore:
+    lineage:
+      - datalake_rental_transact_clean.offer.id_firestore_offer
+    description: Firestore ID
+  id_tenant:
+    lineage:
+      - datalake_rental_transact_clean.offer.id_tenant_external
+    description: House tenant user ID.
+  id_owner:
+    lineage:
+      - datalake_rental_transact_clean.offer.id_owner_external
+    description: House owner user ID.
+  id_house:
+    lineage:
+      - datalake_rental_transact_clean.offer.id_house_external
+    description: House ID.
+  original_condo:
+    lineage:
+      - datalake_ebdb_clean.house.condo
+    description: Original condominium value.
+  original_home_insurance:
+    lineage:
+      - datalake_ebdb_clean.house.insurance_value
+    description: Original house insurance value.
+  original_iptu:
+    lineage:
+      - datalake_ebdb_clean.house.iptu
+    description: Original IPTU value.
+  original_rent:
+    lineage:
+      - datalake_rental_transact_clean.offer.original_rent_value
+    description: Original rent value.
+  rent:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.proposed_rent_value
+    description: Proposed offer rent value.
+  status:
+    lineage:
+      - datalake_rental_transact_clean.offer.status
+    description: Offer status.
+  turn:
+    lineage:
+      - datalake_rental_transact_clean.offer.turn
+    description: Indicates whose turn it is.
+    categories:
+      SUPPLY: Owner's turn.
+      DEMAND: Tenant's turn.
+  iteration:
+    lineage:
+      - datalake_rental_transact_clean.offer.iteration
+    description: Negotiation iteration.
+  rejection_reason:
+    lineage:
+      - datalake_rental_transact_clean.offer.rejection_reason
+    description: Offer rejection reason.
+  type:
+    lineage:
+      - datalake_rental_transact_clean.offer.type
+    description: Offer type.
+  number_of_cohabitants:
+    lineage:
+      - datalake_rental_transact_clean.resident_info.number_of_cohabitants
+    description: Number of cohabitants including the tenant.
+  ts_created:
+    lineage:
+      - datalake_rental_transact_clean.offer.ts_created
+    description: Timestamp of the offer creation.
+  ts_updated:
+    lineage:
+      - datalake_rental_transact_clean.offer.ts_updated
+    description: Timestamp of the offer last update.
+  ts_expiration:
+    lineage:
+      - datalake_rental_transact_clean.offer.ts_expiration
+    description: Timestamp of when the offer expirates.
+  year:
+    description: Year of the offer creation. It's also a table partition.
+  month:
+    description: Month of the offer creation. It's also a table partition.
+  day:
+    description: Day of the offer creation. It's also a table partition.
