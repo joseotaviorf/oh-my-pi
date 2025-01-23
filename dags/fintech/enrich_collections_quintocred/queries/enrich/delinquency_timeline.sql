@@ -5,7 +5,7 @@ WITH
         del.id_propose,
         del.id_type,
         CASE
-            WHEN del.id_type = 0 THEN 'SIGNATURE'
+            WHEN del.id_type IN (0, 6) THEN 'SIGNATURE'
             WHEN del.id_type = 1 THEN 'GUARANTEE'
             WHEN del.id_type = 2 THEN 'TERMINATION'
             WHEN del.id_type = 3 THEN 'BILLING'
@@ -146,7 +146,7 @@ cte_timeline_daily AS (
         datalake_quintoandar.aux_date AS d
     LEFT JOIN
         timeline_base AS t
-            ON IF(t.is_finished, d.`date` >= t.dt_updated_paid AND d.`date` <= LAST_DAY(t.dt_updated_paid), IF(t.is_currently_active = true, d.`date` >= t.dt_fatura AND (d.`date` <= t.dt_delinquency_last_register OR t.dt_delinquency_last_register IS NULL), d.`date` >= t.dt_fatura AND d.`date` <= t.dt_delinquency_last_register))
+            ON IF(t.is_finished, d.`date` >= t.dt_updated_paid AND d.`date` <= LAST_DAY(t.dt_updated_paid), IF(t.is_currently_active = true, d.`date` >= t.dt_fatura AND (d.`date` <= t.dt_delinquency_last_register OR t.dt_delinquency_last_register IS NULL), d.`date` >= t.dt_fatura AND d.`date` <= LAST_DAY(t.dt_delinquency_last_register)))
     WHERE
         d.`date` > DATE('2020-01-01')
         AND d.`date` <= CURRENT_DATE()
@@ -157,8 +157,8 @@ timeline AS (
     SELECT
         td.`date`,
         td.dt_aging,
-        t.*,
-        IF(td.`date` <> COALESCE(t.dt_paid, t.dt_updated), 0.00, t.amount_paid_added) AS amount_paid_added_fixed
+        t.*
+        -- IF(td.`date` <= COALESCE(t.dt_paid, t.dt_updated), 0.00, t.amount_paid_added) AS amount_paid_added_fixed
     FROM
         cte_timeline_daily AS td
     LEFT JOIN
@@ -212,10 +212,22 @@ cte_timeline_status AS (
         datalake_quintoandar.aux_date AS d
     LEFT JOIN
         base_cte_status s
-        ON IF(s.ts_ended_fixed IS NOT NULL OR s.ts_ended_3 IS NOT NULL, d.`date` >= s.dt_fatura AND IF(s.ts_ended_fixed IS NOT NULL, d.`date` < DATE(s.ts_ended_fixed), d.`date` <= DATE(s.ts_ended_3)), d.`date` >= s.dt_fatura)
+        ON IF(s.ts_ended_fixed IS NOT NULL OR s.ts_ended_3 IS NOT NULL, d.`date` >= s.dt_fatura AND IF(s.ts_ended_fixed IS NOT NULL, d.`date` <= LAST_DAY(s.ts_ended_fixed), d.`date` <= DATE(s.ts_ended_3)), d.`date` >= s.dt_fatura)
     WHERE
         d.`date` > DATE('2020-01-01')
         AND d.`date` <= CURRENT_DATE()
+),
+payment_evol AS (
+    SELECT DISTINCT
+        t.`date`,
+        t.id_delinquency,
+        SUM(IF(t.dt_paid = t.`date`, t.amount_paid_added,0)) AS amount_paid_added,
+        SUM(IF(t.dt_paid <= t.`date` AND DATE_TRUNC('MONTH', t.dt_paid) = DATE_TRUNC('MONTH', t.`date`), t.amount_paid_added,0)) AS amount_paid_added_month,
+        SUM(IF(t.dt_paid <= t.`date`, t.amount_paid_added,0)) AS amount_paid_added_accrual
+    FROM
+        timeline AS t
+    GROUP BY
+        1, 2
 )
 SELECT
     t.id_delinquency,
@@ -225,13 +237,17 @@ SELECT
     MAX(t.delinquency_amount) AS delinquency_amount,
     MAX(t.original_value) AS original_value,
     MAX(t.amount_paid) AS amount_paid,
-    MAX(t.amount_paid_added_fixed) AS amount_paid_added,
+    MAX(p.amount_paid_added) AS amount_paid_added,
+    MAX(p.amount_paid_added_month) AS amount_paid_added_month,
+    MAX(p.amount_paid_added_accrual) AS amount_paid_added_accrual,
     MIN(t.open_amount) AS open_amount,
-    FIRST_VALUE(MIN(t.open_amount)) OVER (PARTITION BY t.id_delinquency, YEAR(t.`date`), MONTH(t.`date`) ORDER BY t.`date`) AS open_amount_first_day_of_month,
+    MIN(t.delinquency_amount - p.amount_paid_added_accrual) AS open_amount_deducted,
+    FIRST_VALUE(MIN(t.delinquency_amount - p.amount_paid_added_accrual)) OVER (PARTITION BY t.id_delinquency, YEAR(t.`date`), MONTH(t.`date`) ORDER BY t.`date`) AS open_amount_first_day_of_month,
     MAX(t.is_finished) As is_finished,
     MAX(t.is_legacy_agreement) AS is_legacy_agreement,
     MAX(t.is_legacy_propose) AS is_legacy_propose,
     MAX(t.is_currently_active) AS is_currently_active,
+    MAX(IF(t.dt_updated_arq > t.`date`, TRUE, FALSE)) AS is_active_timeline,
     MAX(t.dt_due) AS dt_due,
     MAX(t.dt_ended_propose) AS dt_ended_propose,
     t.`date` AS dt_base,
@@ -244,7 +260,11 @@ LEFT JOIN
     cte_timeline_status s
     ON t.id_delinquency = s.id
     AND DATE(t.`date`) = DATE(s.dt_status_updated)
+LEFT JOIN
+    payment_evol p
+    ON t.id_delinquency = p.id_delinquency
+    AND DATE(t.`date`) = DATE(p.`date`)
 WHERE
     s.id_status IS NOT NULL
     -- AND t.date >= ADD_MONTHS(CURRENT_DATE, -6)
-GROUP BY 1,2,3,17,18
+GROUP BY 1,2,3,20,21

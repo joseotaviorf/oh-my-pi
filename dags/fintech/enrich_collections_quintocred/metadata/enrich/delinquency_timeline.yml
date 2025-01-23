@@ -37,11 +37,17 @@ columns:
     lineage:
       - datalake_rental_guarantee_platform_clean.delinquency_aud.amount_paid
   amount_paid_added:
-    description: "Amount that was added on this update to the amount_paid column"
+    description: "Amount added on this specific day to the amount_paid column"
+  amount_paid_added_month:
+    description: "Amount added accumulated by month"
+  amount_paid_added_accrual:
+    description: "Amount added accumulated by delinquency"
   open_amount:
     description: "Open amount on the dt_updated window (delinquency_amount - open_amount)"
   open_amount_first_day_of_month:
-    description: "Open amount on the first day of the month according to the dt_updated window (delinquency_amount - open_amount)"
+    description: "Open amount on the first day of the month according to the dt_updated window (delinquency_amount - amount_paid_added_accrual)"
+  open_amount_deducted:
+    description: Open amount deducted on this specific day"
   is_finished:
     description: "If the amount_paid completed the delinquency_amount value"
   is_legacy_agreement:
@@ -51,9 +57,11 @@ columns:
   is_legacy_propose:
     description: "If this propose is legacy"
   is_currently_active:
-    description: "If this propose was active on the moment of the base date"
+    description: "If this propose is active on the current date"
     lineage:
       - datalake_rental_guarantee_platform_clean.delinquency_aud.is_active
+  is_active_timeline:
+    description: "If this propose was active on the moment of dt_base"
   dt_due:
     description: "Date Due for this debt"
     lineage:
