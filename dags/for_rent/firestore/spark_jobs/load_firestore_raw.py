@@ -34,16 +34,16 @@ logger = QuintoAndarLogger(JOB_NAME)
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
 
-    parser.add_argument("env")
-    parser.add_argument("datalake_bucket")
-    parser.add_argument("source")
+    parser.add_argument("environment")
+    parser.add_argument("bucket")
+    parser.add_argument("dag_name")
     parser.add_argument("subscription_id")
     parser.add_argument("table_name")
     args = parser.parse_args()
 
-    environment = args.env
-    datalake_bucket = args.datalake_bucket
-    source = args.source
+    environment = args.environment
+    datalake_bucket = args.bucket
+    source = args.dag_name
     subscription_id = args.subscription_id
     table_name = args.table_name
 
