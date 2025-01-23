@@ -3569,6 +3569,7 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-channel-event
+  - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up
 bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
   - bietlejuice.reverse_webhelp:load-reverse-csat-front

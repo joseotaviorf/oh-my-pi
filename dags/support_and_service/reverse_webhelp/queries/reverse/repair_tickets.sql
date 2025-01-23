@@ -1,19 +1,30 @@
 WITH ticket_events AS (
   SELECT
     te.sk_ticket,
-    CASE
-      WHEN REGEXP_LIKE(te.tags,
-        'macro_ro_acao_backlog_full_prestador_interno|
-        acao_backlog_full_prestador_interno|
-        macro_ro_refluxo_tarefa_acionar_parceiro')
-      THEN MIN(te.ts_event - INTERVAL 3 HOUR)
-    END AS ts_reflux
+    MIN(te.ts_event) FILTER (
+      WHERE
+        REGEXP_LIKE(te.tags, 'macro_ro_acao_backlog_full_prestador_interno')
+        OR REGEXP_LIKE(te.tags,'acao_backlog_full_prestador_interno')
+        OR REGEXP_LIKE(te.tags,'macro_ro_refluxo_tarefa_acionar_parceiro')
+    ) - INTERVAL 3 HOUR AS ts_reflux,
+    MIN(te.ts_event) FILTER (
+      WHERE sk_group IN ('11373011255565','10567436267277')
+    ) - INTERVAL 3 HOUR AS ts_first_open
   FROM
     dw_customer_support.fact_ticket_events AS te
   WHERE
     te.ts_ticket_created >= DATE('2024-01-01')
   GROUP BY
-    te.sk_ticket, te.tags, te.sk_group
+    te.sk_ticket
+),status_fup AS (
+SELECT
+    rrtnf.id_repair_request,
+    rrtnf.ts_updated AS ts_help_request
+  FROM
+    datalake_repairs_clean.repair_request_tenant_negotiation_follow_up AS rrtnf
+  WHERE status = 'HELP_NEEDED'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY rrtnf.id_repair_request ORDER BY rrtnf.ts_updated ASC) = 1
 )
 SELECT
   rt.id_ticket,
@@ -61,6 +72,8 @@ SELECT
   rt.ts_initially_assigned_local,
   rt.ts_last_assigned_local,
   te.ts_reflux,
+  te.ts_first_open,
+  sf.ts_help_request,
   YEAR(CURRENT_DATE - 1) AS year,
   MONTH(CURRENT_DATE - 1) AS month,
   DAY(CURRENT_DATE - 1) AS day,
@@ -70,6 +83,9 @@ FROM
 LEFT JOIN
   ticket_events AS te
     ON te.sk_ticket = rt.id_ticket
+LEFT JOIN
+  status_fup AS sf
+    ON sf.id_repair_request = rt.id_request
 WHERE
   MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE('{load_end_date}')
 QUALIFY

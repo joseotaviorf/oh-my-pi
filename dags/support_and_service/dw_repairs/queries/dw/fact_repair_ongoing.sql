@@ -19,56 +19,49 @@ repair_request_budget AS (
 ,ticket_events AS (
   SELECT
     te.sk_ticket,
-    CASE
-      WHEN REGEXP_LIKE(te.tags,
-        'macro_ro_acao_backlog_full_prestador_interno|
-        acao_backlog_full_prestador_interno|
-        macro_ro_refluxo_tarefa_acionar_parceiro')
-      THEN MIN(te.ts_event - INTERVAL 3 HOUR)
-    END AS ts_reflux,
-    CASE
-      WHEN
-        REGEXP_LIKE (te.tags,
-        'pp_autosserviço_contestou|
-        iq_pp_autosserviço_contestou|
-        alteração_de_responsabilidade_criticidade|
-        acompanhamento_alteracao_responsabilidade_criticidade|
-        check_responsabilidade_reparos|
-        pp_autosserviço_contestou')
-      THEN MIN(te.ts_event - INTERVAL 3 HOUR)
-    END AS ts_contestation,
-    CASE
-      WHEN
-        REGEXP_LIKE(te.tags,
-        'macro_ro_cont_benfeitoria_pp|
-        macro_ro_cont_benfeitoria_iq|
-        macro_ro_cont_terceiros_pp|
-        macro_ro_cont_terceiros_iq|
-        macro_ro_cont_aprovada_iq|
-        macro_ro_cont_aprovada_pp|
-        macro_ro_cont_reprovada_pp|
-        macro_ro_cont_reprovada_iq|
-        macro_ro_cont_reprovada_iq|
-        closed_by_merge|
-        reprovado_ro|
-        aprovado_ro|
-        opcional_ro|
-        ação_backlog_contestação|
-        alteração_reprovada|
-        alteração_aprovada|
-        alteração_benfeitoria')
-      THEN MIN(te.ts_event - INTERVAL 3 HOUR)
-    END AS ts_resolution_contestation,
-    CASE
-      WHEN sk_group IN ('11373011255565','10567436267277')
-        THEN MIN(te.ts_event - INTERVAL 3 HOUR)
-    END AS ts_first_open
+    MIN(te.ts_event) FILTER (
+      WHERE
+        REGEXP_LIKE(te.tags, 'macro_ro_acao_backlog_full_prestador_interno')
+        OR REGEXP_LIKE(te.tags,'acao_backlog_full_prestador_interno')
+        OR REGEXP_LIKE(te.tags,'macro_ro_refluxo_tarefa_acionar_parceiro')
+    ) - INTERVAL 3 HOUR AS ts_reflux,
+    MIN(te.ts_event) FILTER (
+      WHERE
+        REGEXP_LIKE (te.tags, 'pp_autosserviço_contestou')
+        OR REGEXP_LIKE (te.tags, 'iq_pp_autosserviço_contestou')
+        OR REGEXP_LIKE (te.tags, 'alteração_de_responsabilidade_criticidade')
+        OR REGEXP_LIKE (te.tags, 'acompanhamento_alteracao_responsabilidade_criticidade')
+        OR REGEXP_LIKE (te.tags, 'check_responsabilidade_reparos')
+        OR REGEXP_LIKE (te.tags, 'pp_autosserviço_contestou')
+    ) - INTERVAL 3 HOUR AS ts_contestation,
+    MIN(te.ts_event)  FILTER (
+      WHERE
+        REGEXP_LIKE(te.tags,'macro_ro_cont_benfeitoria_pp')
+        OR REGEXP_LIKE(te.tags,'macro_ro_cont_benfeitoria_iq')
+        OR REGEXP_LIKE(te.tags,'macro_ro_cont_terceiros_pp')
+        OR REGEXP_LIKE(te.tags,'macro_ro_cont_terceiros_iq')
+        OR REGEXP_LIKE(te.tags,'macro_ro_cont_aprovada_iq')
+        OR REGEXP_LIKE(te.tags,'macro_ro_cont_aprovada_pp')
+        OR REGEXP_LIKE(te.tags,'macro_ro_cont_reprovada_pp')
+        OR REGEXP_LIKE(te.tags,'macro_ro_cont_reprovada_iq')
+        OR REGEXP_LIKE(te.tags,'macro_ro_cont_reprovada_iq')
+        OR REGEXP_LIKE(te.tags,'closed_by_merge')
+        OR REGEXP_LIKE(te.tags,'reprovado_ro')
+        OR REGEXP_LIKE(te.tags,'aprovado_ro')
+        OR REGEXP_LIKE(te.tags,'opcional_ro')
+        OR REGEXP_LIKE(te.tags,'ação_backlog_contestação')
+        OR REGEXP_LIKE(te.tags,'alteração_reprovada')
+        OR REGEXP_LIKE(te.tags,'alteração_aprovada')
+        OR REGEXP_LIKE(te.tags,'alteração_benfeitoria')
+    ) - INTERVAL 3 HOUR AS ts_resolution_contestation,
+    MIN(te.ts_event) FILTER (
+      WHERE sk_group IN ('11373011255565','10567436267277')
+    ) - INTERVAL 3 HOUR AS ts_first_open
   FROM
     dw_customer_support.fact_ticket_events AS te
   WHERE
     te.ts_ticket_created >= DATE('2024-01-01')
-  GROUP BY
-    te.sk_ticket, te.tags, te.sk_group
+  GROUP BY te.sk_ticket
 )
 ,status_fup AS (
 SELECT
