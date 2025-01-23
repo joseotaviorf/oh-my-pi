@@ -2,11 +2,8 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime
 
-from pyspark.sql.functions import udf, lit
-from pyspark.sql.types import StructType, StructField, StringType
-from pyspark.sql.utils import AnalysisException
+from pyspark.sql.functions import udf, col
 from quintoandar_logger import QuintoAndarLogger
-from py4j.protocol import Py4JJavaError
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
@@ -18,95 +15,35 @@ from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_columns_metastore_to_raw"
+INFORMATION_SCHEMA_COLUMNS_TABLE_NAME =  "system.information_schema.columns"
 
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_columns_from_metastore(spark_client, schemas_skip_list):
-    final_df = get_empty_df(spark_client)
-    databases = list_metastore_databases(spark_client, schemas_skip_list)
-
-    for database in databases:
-        tables = list_metastore_tables(spark_client, database)
-        for table in tables:
-            logging.info(f"m={JOB_NAME}, msg=Getting columns from {database}.{table}")
-            try:
-                columns_df = (
-                    spark_client.get_records(f"SHOW COLUMNS IN {database}.{table}")
-                    .withColumn("database_name", lit(database))
-                    .withColumn("table_name", lit(table))
-                )
-            except Py4JJavaError as e:
-                if "AccessDeniedException" in str(e):
-                    logging.error(
-                        f"Permission error. Skiping table {database_name}.{table}"
-                    )
-                    continue
-
-                logging.error(
-                    f"m={JOB_NAME}, msg=Error getting columns from {database}.{table}. Error: {e}"
-                )
-                raise e
-            except AnalysisException as e:
-                if "TABLE_OR_VIEW_NOT_FOUND" in str(e):
-                    logging.error(
-                        f"Table not found, check if it is a temporary table. Skiping table {database}.{table}"
-                    )
-                    continue
-                raise e
-            final_df = final_df.union(columns_df)
+def get_columns_from_metastore():
+    df_columns = spark.table(INFORMATION_SCHEMA_COLUMNS_TABLE_NAME)
+    final_df = df_columns.filter(f"table_catalog = '{spark.catalog.currentCatalog()}'").select(
+       col("column_name"),
+       col("table_schema").alias("database_name"),
+       col("table_name")
+    ).where(
+        """database_name not like '%_staging%'
+        and database_name not like '%_temp%'
+        and (database_name like 'datalake_%'
+        or database_name like 'dw_%'
+        or database_name like 'metric_%'
+        or database_name like 'reverse_%'
+        or database_name = 'sandbox')
+        """
+    )
 
     final_df = final_df.coalesce(4)  # reducing number of partitions
     udf_extract_layer = udf(extract_layer_from_database_name)
     final_df = final_df.withColumn("layer", udf_extract_layer("database_name"))
 
     return final_df
-
-
-def get_empty_df(spark_client):
-    df_schema = StructType(
-        [
-            StructField("column_name", StringType(), True),
-            StructField("database_name", StringType(), True),
-            StructField("table_name", StringType(), True),
-        ]
-    )
-    return spark_client.create_dataframe([], df_schema)
-
-
-def list_metastore_databases(spark_client, schemas_skip_list):
-    databases_df = (
-        spark_client.get_records("SHOW DATABASES")
-        .where(
-            """databaseName not like '%_staging%'
-            and databaseName not like '%_temp%'
-            and (databaseName like 'datalake_%'
-            or databaseName like 'dw_%'
-            or databaseName like 'metric_%'
-            or databaseName like 'reverse_%'
-            or databaseName = 'sandbox')
-            """
-        )
-        .collect()
-    )
-    databases = [
-        db.databaseName
-        for db in databases_df
-        if db.databaseName not in schemas_skip_list
-    ]
-    return databases
-
-
-def list_metastore_tables(spark_client, database):
-    tables_df = (
-        spark_client.get_records(f"SHOW TABLES IN {database}")
-        .where("isTemporary = false")
-        .drop("isTemporary")
-        .collect()
-    )
-    return [tb.tableName for tb in tables_df]
 
 
 def extract_layer_from_database_name(database_name):
@@ -149,7 +86,6 @@ if __name__ == "__main__":
     config_service = ConfigurationService(source)
     documentation_bucket = config_service.get_config("DOCUMENTATION_BUCKET")
     documentation_prefix = config_service.get_config("DOCUMENTATION_PATH")
-    schemas_skip_list = config_service.get_config("DATABASE_SKIP_LIST")
     partition_cols = config_service.get_config("PARTITION_COLUMNS")
 
     s3_loader = S3Loader()
@@ -164,7 +100,7 @@ if __name__ == "__main__":
     spark_metastore_service.create_database(database_name)
 
     # Creating metrics dataframe
-    metastore_columns_df = get_columns_from_metastore(spark_client, schemas_skip_list)
+    metastore_columns_df = get_columns_from_metastore()
     metastore_columns_df = (
         SparkDataFrameService()
         .input(metastore_columns_df)
