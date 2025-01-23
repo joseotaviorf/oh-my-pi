@@ -366,7 +366,6 @@ notary AS (
         n.status,
         DATE(n.ts_started) AS dt_started,
         DATE(n.ts_ended) AS dt_ended,
-        DATE(n.ts_seller_paid) AS dt_seller_paid,
         DATE(n.ts_buyer_received_keys) AS dt_buyer_received_keys
     FROM
         last_update_notary AS n
@@ -856,7 +855,7 @@ SELECT
     NULLIF(cp.dt_crn_ended, '0001-01-1') AS dt_notes_registry_ended,
     NULLIF(n.dt_started, '0001-01-1') AS dt_house_registry_started,
     NULLIF(n.dt_ended, '0001-01-1') AS dt_house_registry_ended,
-    NULLIF(COALESCE(mg.dt_seller_paid, n.dt_seller_paid), '0001-01-1') AS dt_sale_transacton_paid,
+    NULLIF(mg.dt_seller_paid, '0001-01-1') AS dt_sale_transacton_paid,
     NULLIF(n.dt_buyer_received_keys, '0001-01-1') AS dt_sale_key_delivered,
     NULLIF(off.ts_created, '0001-01-1') AS ts_offer_created,
     NULLIF(off.ts_accepted, '0001-01-1') AS ts_accepted,
