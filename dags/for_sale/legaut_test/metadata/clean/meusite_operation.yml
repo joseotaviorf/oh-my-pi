@@ -1,0 +1,136 @@
+---
+database_name: datalake_legaut_test_clean
+table_name: meusite_operation
+columns:
+  id:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.id
+  id_project:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.project_id
+  id_google_docs_ccv:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.google_docs_ccv_id
+  id_notary:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.notary_id
+  id_place:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.place_id
+  id_created_by:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.created_by_id
+  id_house:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.house_id
+  id_offer:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.offer_id
+  id_sales_flow:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.salesflow_id
+  id_financing_type:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.financing_type
+  id_status:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.status
+  name:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.name
+  financing_bank:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.financing_bank
+  formatted_address:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.formatted_address
+  cep:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.cep
+  disposal_bank:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.banco_alienacao
+  payment_obs:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.payment_obs
+  geometry:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.geometry
+  address_components:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.address_components
+  fgts_amount:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.fgts_amount
+  signal_down_payment:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.signal_down_payment
+  down_payment:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.down_payment
+  financing_amount:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.financing_amount
+  total_amount:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.total_amount
+  disposal_amount:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.valor_alienacao
+  bathrooms:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.num_banheiros_sem_emp
+  bedrooms:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.num_quartos
+  parking_slots_deed:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.num_vagas_garagem_escritura
+  floor:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.pos_pavimento
+  complement:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.complement
+  is_disabled:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.disable
+  is_favorite:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.favorite
+  is_closing:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.is_closing
+  is_fgts:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.fgts
+  is_financed:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.financing
+  has_leasure_area:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.area_lazer
+  has_maid_bathroom:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.banheiro_emp
+  has_elevator:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.elevador
+  is_foreiro:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.imovel_foreiro
+  has_maid_bedroom:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.quarto_emp
+  has_balcony:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.varanda
+  has_fiduciary_alienation:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.alienacao_fiduciaria
+  is_credit_approved:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.credit_approved
+  ts_created:
+    lineage:
+      - datalake_legaut_test_raw.meusite_operation.created_at

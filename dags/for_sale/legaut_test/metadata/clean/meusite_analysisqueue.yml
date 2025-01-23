@@ -1,0 +1,31 @@
+---
+database_name: datalake_legaut_test_clean
+table_name: meusite_analysisqueue
+columns:
+  id:
+    lineage:
+      - datalake_legaut_test_raw.meusite_analysisqueue.id
+  id_unit:
+    lineage:
+      - datalake_legaut_test_raw.meusite_analysisqueue.unit_id
+  id_user:
+    lineage:
+      - datalake_legaut_test_raw.meusite_analysisqueue.user_id
+  active:
+    lineage:
+      - datalake_legaut_test_raw.meusite_analysisqueue.active
+  status:
+    lineage:
+      - datalake_legaut_test_raw.meusite_analysisqueue.status
+  tries:
+    lineage:
+      - datalake_legaut_test_raw.meusite_analysisqueue.tries
+  has_started:
+    lineage:
+      - datalake_legaut_test_raw.meusite_analysisqueue.started
+  ts_updated:
+    lineage:
+      - datalake_legaut_test_raw.meusite_analysisqueue.created_at
+  updated_at:
+    lineage:
+      - datalake_legaut_test_raw.meusite_analysisqueue.updated_at

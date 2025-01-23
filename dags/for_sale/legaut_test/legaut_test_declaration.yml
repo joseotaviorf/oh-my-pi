@@ -1,0 +1,48 @@
+dag:
+  name: legaut_test
+  schedule_start_date: 2022, 9, 20
+  schedule_interval: 0 21 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      This DAG imports the tables from Legaut database, a service used to track real state dillinges.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: legaut
+  source_schema: legaut
+  custom_schema: legaut_test
+  dbutils_secret_key: LEGAUT_DB
+  tables_customization:
+    crawlers_company:
+      clean_table_name: crawlers_company
+    crawlers_crawler:
+      clean_table_name: crawlers_crawler
+    crawlers_crawlergroup:
+      clean_table_name: crawlers_crawlergroup
+    crawlers_crawlertype:
+      clean_table_name: crawlers_crawlertype
+    crawlers_owner:
+      clean_table_name: crawlers_owner
+    meuSite_analysisqueue:
+      clean_table_name: meusite_analysisqueue
+    meuSite_city:
+      clean_table_name: meusite_city
+    meuSite_document:
+      clean_table_name: meusite_document
+    meuSite_notary:
+      clean_table_name: meusite_notary
+    meuSite_operation:
+      clean_table_name: meusite_operation
+    meuSite_project:
+      clean_table_name: meusite_project
+    meuSite_state:
+      clean_table_name: meusite_state
+    meuSite_unit:
+      clean_table_name: meusite_unit
+cluster:
+  type: databricks_13_3_med_memory_general_cluster
+  custom_configurations:
+    aws_attributes:
+        ebs_volume_size: 200

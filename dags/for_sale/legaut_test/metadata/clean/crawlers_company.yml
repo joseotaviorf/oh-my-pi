@@ -1,0 +1,15 @@
+database_name: datalake_legaut_test_clean
+table_name: crawlers_company
+columns:
+  id:
+    lineage:
+      - datalake_legaut_test_raw.crawlers_company.id
+  id_crawler_group:
+    lineage:
+      - datalake_legaut_test_raw.crawlers_company.crawlergroup_id
+  name:
+    lineage:
+      - datalake_legaut_test_raw.crawlers_company.name
+  cnpj:
+    lineage:
+      - datalake_legaut_test_raw.crawlers_company.cnpj

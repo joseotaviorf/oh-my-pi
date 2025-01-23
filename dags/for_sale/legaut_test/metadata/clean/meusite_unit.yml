@@ -1,0 +1,97 @@
+---
+database_name: datalake_legaut_test_clean
+table_name: meusite_unit
+columns:
+  id_project:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.id
+  project_id:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.project_id
+  id_notary:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.notary_id
+  id_matricula:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.matricula_id
+  id_place:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.place_id
+  id_operation:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.operation_id
+  id_google_docs:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.google_docs_id
+  id_google_drive_folder:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.google_drive_folder_id
+  id_google_spreedsheets:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.google_spreedsheets_id
+  id_google_docs_backup:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.google_docs_id_backup
+  id_google_docs_backup_partial:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.google_docs_id_backup_partial
+  id_google_docs_partial:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.google_docs_id_partial
+  favorite:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.favorite
+  disable:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.disable
+  report_status:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.report_status
+  type:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.type
+  approved:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.approved
+  queue:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.queue
+  report_google_docs_status:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.report_google_docs_status
+  complement:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.complement
+  formatted_address:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.formatted_address
+  geometry:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.geometry
+  name:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.name
+  obs:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.obs
+  address_components:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.address_components
+  notary_office:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.notary_office
+  folders:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.folders
+  slug:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.slug
+  contributor:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.contributor
+  ts_delivered:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.delivered_at
+  ts_created:
+    lineage:
+      - datalake_legaut_test_raw.meusite_unit.created_at

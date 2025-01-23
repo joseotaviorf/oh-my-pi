@@ -1,0 +1,13 @@
+---
+database_name: datalake_legaut_test_clean
+table_name: meusite_notary
+columns:
+  id:
+    lineage:
+      - datalake_legaut_test_raw.meusite_notary.id
+  id_city:
+    lineage:
+      - datalake_legaut_test_raw.meusite_notary.city_id
+  name:
+    lineage:
+      - datalake_legaut_test_raw.meusite_notary.name

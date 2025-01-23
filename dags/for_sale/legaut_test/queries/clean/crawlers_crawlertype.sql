@@ -1,0 +1,16 @@
+SELECT
+    id,
+    default,
+    value,
+    repeat,
+    monitor,
+    results,
+    classifier,
+    keys,
+    label,
+    link,
+    topic,
+    return_topic,
+    description
+FROM
+    datalake_legaut_test_raw.crawlers_crawlertype
