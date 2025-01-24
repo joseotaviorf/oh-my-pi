@@ -1,10 +1,25 @@
-WITH brazil_houses AS (
+WITH
+  brazil_houses AS (
     SELECT
       id_house
     FROM
       dw_public.dim_house_listing
     WHERE
       country_code = 'BR'
+    GROUP BY
+      1
+  ),
+  rent_visits AS (
+    SELECT
+      Id_visitor,
+      MAX(dt_scheduling) AS dt_visit_rent
+    FROM
+      dw_public.dim_booking
+    WHERE
+      visit_intent = 'RENT'
+      AND TYPE = 'Visita'
+      AND visit_follow_up = 'VaiNegociar'
+      AND country_code = 'BR'
     GROUP BY
       1
   ),
@@ -36,7 +51,11 @@ WITH brazil_houses AS (
           sf.sk_buyer
         ORDER BY
           fo.ts_offer_submitted DESC
-      ) rn
+      ) rn,
+      CASE
+        WHEN rv.id_visitor IS NULL THEN 'Sale'
+        ELSE 'Híbrido'
+      END AS business_context
     FROM
       dw_sale.fact_sale_flows sf
     INNER JOIN 
@@ -52,6 +71,10 @@ WITH brazil_houses AS (
       ccv 
         ON ccv.sk_buyer = sf.sk_buyer
         AND dt_last_sale_agreement_signed >= fo.ts_offer_submitted
+    LEFT JOIN 
+      rent_visits rv 
+        ON rv.id_visitor = sf.sk_buyer
+        AND rv.dt_visit_rent BETWEEN (fo.ts_offer_dismissed - INTERVAL '30' DAY) AND (fo.ts_offer_dismissed + INTERVAL '30' DAY)
     WHERE
       fo.ts_offer_submitted IS NOT NULL
   ),
@@ -114,7 +137,10 @@ SELECT
   v.sk_buyer AS id_user,
   'lost' AS campaign_type,
   'offer' AS driver_type,
-  v.sk_offer AS id_driver
+  v.sk_offer AS id_driver,
+  v.business_context
 FROM
   union_ v
-  JOIN dw_public.dim_user du ON du.sk_user = v.sk_buyer
+JOIN 
+  dw_public.dim_user du 
+    ON du.sk_user = v.sk_buyer
