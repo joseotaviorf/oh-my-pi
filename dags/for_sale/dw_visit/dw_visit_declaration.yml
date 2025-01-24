@@ -13,7 +13,7 @@ workflow:
       dim_visit:
         custom_schema: public
       dim_event_type:
-        merge_on: ["event_type"]
+        merge_on: ["event_name"]
 cluster:
     type: custom_cluster
     access_control_list:
