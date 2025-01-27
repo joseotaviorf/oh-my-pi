@@ -37,6 +37,7 @@ get_agency_group_name AS (
 SELECT
   l.creditor,
   l.id_contract,
+  l.contract_group,
   COALESCE(c.id_contract_external, SPLIT(l.id_contract,r'\.')[0]) AS id_contract_external,
   c.id_client AS id_customer,
   UPPER(l.id_user) AS id_operator,
@@ -58,6 +59,8 @@ SELECT
   COALESCE(cdc.code_description, cdcf.code_description) AS complement_description,
   l.comment AS occurrence_description,
   lvr.comment_pre_defined AS action_result_pre_defined_comment,
+  l.phone_number,
+  l.phone_extension,
   CASE
     WHEN UPPER(l.id_user) IN ("SISTEMA", "HOST", "RCVRY") THEN 0
     ELSE mto.esforco
@@ -103,4 +106,4 @@ LEFT JOIN map_type_occurrence AS mto
   ON mto.action_code = l.action
     AND mto.result_code = l.result
     AND mto.complement_code = l.complement
-QUALIFY ROW_NUMBER() OVER(PARTITION BY l.id_contract, UPPER(l.id_user), l.action, l.result, l.complement, l.comment, l.ts_activity ORDER BY l.ts_activity) = 1
+QUALIFY ROW_NUMBER() OVER(PARTITION BY l.id_contract, l.contract_group, UPPER(l.id_user), l.action, l.result, l.complement, l.comment, l.ts_activity ORDER BY l.ts_activity) = 1

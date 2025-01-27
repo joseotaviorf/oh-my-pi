@@ -37,6 +37,14 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_clean.logs.agency_name
+  phone_number:
+    description: "Phone triggered/contacted by the operator during the collection process"
+    lineage:
+      - datalake_cyber_clean.logs.phone_number
+  phone_extension:
+    description: "Phone extension of the phone number triggered/contacted by the operator during the collection process"
+    lineage:
+      - datalake_cyber_clean.logs.phone_extension
   action:
     description: ""
     lineage:

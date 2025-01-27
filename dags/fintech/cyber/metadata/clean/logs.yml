@@ -46,11 +46,11 @@ columns:
     lineage:
       - datalake_cyber_raw.actfil.ACCOMM
   phone_number:
-    description: ""
+    description: "Phone number triggered/contacted by the operator during the collection process"
     lineage:
       - datalake_cyber_raw.actfil.ACPHONE
   phone_extension:
-    description: ""
+    description: "Phone extension of the phone number triggered/contacted by the operator during the collection process"
     lineage:
       - datalake_cyber_raw.actfil.ACEXT
   latitude:
