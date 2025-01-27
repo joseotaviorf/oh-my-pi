@@ -63,7 +63,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_FOR_RENT,
+        "owner": DAGOwnerEnum.DATA_GROWTH,
         "wait_for_downstream": False,
         "depends_on_past": False,
     },
@@ -71,7 +71,7 @@ dag = DAG(
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(
         dag_name=ORIGIN,
-        template_path=f"{DAG_PACKAGES_ROOT}/for_rent/{SOURCE}/{CONTEXT}",
+        template_path=f"{DAG_PACKAGES_ROOT}/cross/{SOURCE}/{CONTEXT}",
     ).format(chart_url=doc_md_chart_url, dag_id=DAG_ID),
 )
 
