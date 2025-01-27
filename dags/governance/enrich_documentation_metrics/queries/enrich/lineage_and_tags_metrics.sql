@@ -6,9 +6,7 @@ WITH aggregated_dag_info AS (
     FROM
         datalake_documentation_metrics_clean.dag_metadata
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
     GROUP BY
         database_name
 ), dag_info AS (
@@ -32,9 +30,7 @@ WITH aggregated_dag_info AS (
     FROM
         datalake_documentation_metrics_clean.columns_metastore
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ), lineage_and_tags AS (
     SELECT
         database_name,
@@ -44,9 +40,7 @@ WITH aggregated_dag_info AS (
     FROM
         datalake_documentation_metrics_clean.lineage_and_tags
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 )
 SELECT
     ms.layer,

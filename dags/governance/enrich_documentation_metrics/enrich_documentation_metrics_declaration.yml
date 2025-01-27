@@ -1,0 +1,28 @@
+---
+dag:
+  name: enrich_documentation_metrics
+  schedule_start_date: 2022, 5, 5
+  owner: Data Governance
+  documentation:
+    dag_purpose:
+      This DAG uses data extracted from dags, our spark metastore and from
+      the documentation bucket to calculate metrics about our tables documentation,
+      lineage and tags.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions:
+    - year
+    - month
+    - day
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_12_2_med_general_photon_cluster
+  custom_configurations:
+    data_security_mode: SINGLE_USER
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

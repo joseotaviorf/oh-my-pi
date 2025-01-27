@@ -12,6 +12,4 @@ SELECT
 FROM
     datalake_documentation_metrics_clean.categories_documentation
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

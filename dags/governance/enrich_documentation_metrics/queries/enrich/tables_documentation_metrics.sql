@@ -9,9 +9,7 @@ WITH table_metastore AS (
     FROM
         datalake_documentation_metrics_clean.columns_metastore
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ), table_documentation AS (
     SELECT DISTINCT
         database_name,
@@ -21,9 +19,7 @@ WITH table_metastore AS (
     FROM
         datalake_documentation_metrics_clean.columns_documentation
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 )
 SELECT
     ms.layer,
