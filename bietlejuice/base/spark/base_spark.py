@@ -4,6 +4,7 @@ from urllib.parse import unquote
 from pyspark.sql import session, context
 from pyspark.conf import SparkConf
 from pyspark import SparkContext
+from py4j.protocol import Py4JError
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -97,8 +98,24 @@ class BaseDBUtils:
         return directories
 
 
+def _get_conf():
+    """
+    There are two types of clusters in Unity Catalog: SHARED and SINGLE-USER. The former does not allow
+    the use of SparkConf constructor, which is used to create a SparkConf object. This function tries to
+    create a SparkConf object and returns None if it fails.
+    """
+
+    try:
+        return SparkConf()
+    except Py4JError:
+        logger.warning(
+            f"SparkConf constructor cannot be used in SHARED clusters in Unity Catalog. Either find an alternative to it, or switch to a single-user cluster. Returning None instead."
+        )
+        return None
+
+
 class BaseSparkContext:
-    conf = SparkConf()
+    conf = _get_conf()
     sc = SparkContext.getOrCreate(conf=conf)
     spark = session.SparkSession(sc)
     sqlContext = context.HiveContext(sc)
