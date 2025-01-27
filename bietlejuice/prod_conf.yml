@@ -155,12 +155,15 @@ cluster_template:
             spark.sparkmeasure.printToStdout: "false"
             spark.databricks.delta.retentionDurationCheck.enabled: "false"
             spark.databricks.behaviorChange.SC102534CommandRedactProperties.enabled: "false"
+            spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
         spark_env_vars:
             PYSPARK_PYTHON: "/databricks/python3/bin/python3"
             ENVIRONMENT: "{{ var.value.environment }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
         ssh_public_keys: []
         spark_version: 10.4.x-scala2.12
+        data_security_mode: SINGLE_USER
+        single_user_name: '{{ var.value.databricks_single_user_name }}'
 
     # "cluster_anchor" is the one to use for clusters without instance pools
     cluster_template_no_pool: &cluster_anchor
