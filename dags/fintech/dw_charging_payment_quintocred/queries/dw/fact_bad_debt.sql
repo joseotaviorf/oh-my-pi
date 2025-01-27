@@ -168,7 +168,7 @@ SELECT
   sk_transaction,
   sk_key,
   id_type,
-  id_type_class
+  id_type_class,
   client_cpf_cnpj,
   bill_item,
   provisional_group,
