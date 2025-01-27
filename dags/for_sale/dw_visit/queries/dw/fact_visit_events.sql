@@ -28,14 +28,14 @@ FROM
   datalake_visit.visit_status_events AS vse
 INNER JOIN
   dw_visit.dim_event_type AS det
-    ON vse.event_type = det.event_type
+    ON vse.event_type = det.event_name
 LEFT JOIN
   datalake_visit.visit_status_events AS pe
     ON vse.id_visit = pe.id_visit
     AND vse.ranking = (pe.ranking)+1
 LEFT JOIN
   dw_visit.dim_event_type AS p_det
-    ON pe.event_type = p_det.event_type
+    ON pe.event_type = p_det.event_name
 INNER JOIN
   dw_visit.dim_author_type AS at
     ON (vse.author_user_role = at.author_user_role
