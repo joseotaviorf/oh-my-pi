@@ -223,14 +223,14 @@ union_sources AS (
     COALESCE(tfn.paid_amount, rn.total_amount_paid, 0) AS paid_amount,
     rn.total_next_due,
     oi.dt_due_invoice_anchor,
-    COALESCE(tfn.dt_promisse, rn.dt_promisse) AS dt_promisse,
+    COALESCE(rn.dt_promisse, tfn.dt_promisse) AS dt_promisse,
     rn.dt_due_promisse,
-    COALESCE(tfn.dt_breach, rn.dt_cancellation) AS dt_cancellation,
+    COALESCE(rn.dt_cancellation, tfn.dt_breach) AS dt_cancellation,
     rn.dt_next_due,
     COALESCE(rn.dt_down_payment, COALESCE(p.dt_paid, tfn.dt_first_payment)) AS dt_down_payment,
     COALESCE(rn.dt_paid_all, tfn.dt_paid_all) AS dt_paid_all_installments,
-    COALESCE(tfn.dt_expected_end, rn.dt_negotiation_expected_end) AS dt_expected_ending,
-    COALESCE(tfn.dt_breach, rn.dt_cancellation, tfn.dt_paid_all, rn.dt_paid_all) AS dt_ending,
+    COALESCE(rn.dt_negotiation_expected_end, tfn.dt_expected_end) AS dt_expected_ending,
+    COALESCE(rn.dt_cancellation, tfn.dt_breach, rn.dt_paid_all, tfn.dt_paid_all) AS dt_ending,
     NOW() AS ts_load
   FROM
       recupera_negotiation AS rn
