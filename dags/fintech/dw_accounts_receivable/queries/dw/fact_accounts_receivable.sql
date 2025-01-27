@@ -23,6 +23,7 @@ other_recovery AS (
 )
 SELECT
     l.sk_invoice,
+    l.sk_contract,
     l.contract_closing_month_status AS closing_month_status,
     l.provisional_group,
     l.delay_contaminated_range,
@@ -51,3 +52,4 @@ LEFT JOIN
 LEFT JOIN other_recovery od
     ON l.sk_invoice = od.id_invoice
         AND DATE_ADD(od.dt_month_start, -1) <= l.dt_closing
+WHERE NOT(l.payment_status = 'paid' AND l.due_amount = 0)

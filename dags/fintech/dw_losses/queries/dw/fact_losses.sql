@@ -74,6 +74,7 @@ SELECT
   COALESCE(la.city, la2.city) AS city,
   COALESCE(la.risk_group, la2.risk_group) AS risk_group,
   COALESCE(la.guarantee_group, la2.guarantee_group) AS guarantee_group,
+  COALESCE(la.provisional_group, la2.provisional_group) AS provisional_group,
   COALESCE(la.delay_contaminated_range, la2.delay_contaminated_range) AS delay_contaminated_range,
   COALESCE(la.provision_factor, la2.provision_factor) AS provision_factor,
   ABS(COALESCE(la.due_amount, 0)) AS due_amount,
