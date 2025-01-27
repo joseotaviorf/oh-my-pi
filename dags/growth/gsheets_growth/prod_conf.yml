@@ -132,6 +132,18 @@ sheets_info:
     clean_table_name: marketing_cost_taxonomy
     sheet_context: growth
 
+  marketing_manual_costs:
+    sheet_id: 14G3BRxBoIgutpNL7l_0xdeoJ0rnLWAc5A4ww4ZqfQvs
+    sheet_name: rateio_manual
+    clean_table_name: marketing_manual_costs
+    sheet_context: growth
+  
+  marketing_manual_costs_name_convetion:
+    sheet_id: 14G3BRxBoIgutpNL7l_0xdeoJ0rnLWAc5A4ww4ZqfQvs
+    sheet_name: rateio_name_convention
+    clean_table_name: marketing_manual_costs_name_convetion
+    sheet_context: growth
+
   marketing_offline_manual_costs:
     sheet_id: 1gneeE6l30lv4om6FBEUe23YGfbMCCNe8IwpbCRL6vXQ
     sheet_name: offline_manual_costs
