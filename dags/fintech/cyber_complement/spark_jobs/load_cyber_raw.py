@@ -69,6 +69,7 @@ if __name__ == "__main__":
     parser.add_argument("partitions", help="partition columns")
     parser.add_argument("date_filter_columns", help="partition columns")
     parser.add_argument("purge_table", help="purge_table - True or False")
+    parser.add_argument("excluded_fields", help="List of table fields that should not be ingested into the datalake")
 
 
     args = parser.parse_args()
@@ -83,12 +84,14 @@ if __name__ == "__main__":
     purge_table = ast.literal_eval(args.purge_table)
     partitions = ast.literal_eval(args.partitions)
     date_filter_columns = ast.literal_eval(args.date_filter_columns)
+    excluded_fields = ast.literal_eval(args.excluded_fields)
 
     logger.info(
         f"""
                 m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
                 table_name={table_name}, load_start_date={load_start_date}, load_end_date={load_end_date}
-                extraction_type={extraction_type}, purge_table={purge_table}, partitions={partitions}, date_filter_columns={date_filter_columns}
+                extraction_type={extraction_type}, purge_table={purge_table}, partitions={partitions},
+                date_filter_columns={date_filter_columns}, excluded_fields={excluded_fields}
                 msg=Starting spark job...
         """
     )
@@ -103,13 +106,13 @@ if __name__ == "__main__":
 
     oracle_table_name = table_name.upper()
     if extraction_type == "incremental" and date_filter_columns:
-        df = oracle_consumer.get_incremental_data_from_table(oracle_table_name, date_filter_columns, load_start_date, load_end_date)
+        df = oracle_consumer.get_incremental_data_from_table(oracle_table_name, date_filter_columns, load_start_date, load_end_date, excluded_fields)
     else:
-        df = oracle_consumer.get_data_from_table(oracle_table_name)
+        df = oracle_consumer.get_data_from_table(oracle_table_name, excluded_fields)
 
         if purge_table:
             df = df.withColumn("source", lit("Original Table"))
-            df_purge= oracle_consumer.get_data_from_table(f'{oracle_table_name}_ESP')
+            df_purge= oracle_consumer.get_data_from_table(f'{oracle_table_name}_ESP', excluded_fields)
             df_purge = df_purge.withColumn("source", lit("Purge Table"))
 
             # Get the columns from both DataFrames
@@ -121,11 +124,11 @@ if __name__ == "__main__":
             missing_in_new = existing_columns - new_columns
 
             # Add missing columns to the DataFrames with null values
-            for col in missing_in_existing:
-                df = df.withColumn(col, lit(None))
+            for columns_missing_existing in missing_in_existing:
+                df = df.withColumn(columns_missing_existing, lit(None))
 
-            for col in missing_in_new:
-                df_purge = df_purge.withColumn(col, lit(None))
+            for column_missing_new in missing_in_new:
+                df_purge = df_purge.withColumn(column_missing_new, lit(None))
 
             df = df.unionByName(df_purge)
 

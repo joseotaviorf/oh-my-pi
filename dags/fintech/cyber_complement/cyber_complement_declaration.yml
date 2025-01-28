@@ -35,6 +35,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     tb_campanha_contrato:
       clean_table_name: campaign_contracts
       extraction_type: full
@@ -42,6 +43,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     tb_campanha:
       clean_table_name: campaign
       extraction_type: full
@@ -49,6 +51,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     tb_grupo_agency:
       clean_table_name: agency_group
       extraction_type: full
@@ -56,6 +59,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     agtpdsc:
       clean_table_name: agreement_type_discount
       extraction_type: full
@@ -63,6 +67,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     que_dectbl:
       clean_table_name: segmentation_decision_tree
       extraction_type: full
@@ -70,6 +75,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     que_dectbl3:
       clean_table_name: agreement_decision_tree
       extraction_type: full
@@ -77,6 +83,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     que_dectbl4:
       clean_table_name: digital_channel_decision_tree
       extraction_type: full
@@ -84,6 +91,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     que_dectbl5:
       clean_table_name: eviction_decision_tree
       extraction_type: full
@@ -91,6 +99,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     que_dectbl6:
       clean_table_name: credit_denial_decision_tree
       extraction_type: full
@@ -98,6 +107,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     agn_dectbl:
       clean_table_name: agency_decision_tree
       extraction_type: full
@@ -105,6 +115,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     agrvalq:
       clean_table_name: queue_agreement_type
       extraction_type: full
@@ -112,6 +123,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     valcodes:
       clean_table_name: logs_valid_result_code
       extraction_type: full
@@ -119,6 +131,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     lbl_dectbl1:
       clean_table_name: olos_dialer_label_decision_tree
       extraction_type: full
@@ -126,6 +139,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     lbl_dectbl3:
       clean_table_name: campaign_label_decision_tree
       extraction_type: full
@@ -133,6 +147,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     lbl_dectbl5:
       clean_table_name: evictions_label_decision_tree
       extraction_type: full
@@ -140,6 +155,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     lbl_dectbl4:
       clean_table_name: serasa_limpa_nome_label_decision_tree
       extraction_type: full
@@ -147,6 +163,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     tb_campanha_ofer:
       clean_table_name: campaign_installments
       extraction_type: full
@@ -154,6 +171,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     tb_campanha_desc:
       clean_table_name: campaign_discounts
       extraction_type: full
@@ -161,6 +179,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
 cluster:
   type: custom_cluster
   custom_configurations:

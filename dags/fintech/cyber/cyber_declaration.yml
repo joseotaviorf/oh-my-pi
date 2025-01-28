@@ -32,6 +32,7 @@ workflow:
       extra_spark_job_arguments:
         - "['DMHOSTUP', 'DMQCHGDT', 'DMQCHGDT2', 'DMQCHGDT3', 'DMQCHGDT4', 'DMQCHGDT5', 'DMQCHGDT6']"
         - False
+        - "[]"
     tb_historico_disponibilizacao:
       clean_table_name: history_contract_distribution
       extraction_type: incremental
@@ -39,6 +40,7 @@ workflow:
       extra_spark_job_arguments:
         - "['HD_DT_DISPONIBILIZACAO']"
         - False
+        - "[]"
     actfil:
       clean_table_name: logs
       extraction_type: incremental
@@ -46,6 +48,7 @@ workflow:
       extra_spark_job_arguments:
         - "['ACACTDTE']"
         - False
+        - "[]"
     actvertb:
       clean_table_name: logs_code_description
       raw_extraction_type: incremental
@@ -55,6 +58,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     tb_parcela:
       clean_table_name: bill
       raw_extraction_type: incremental
@@ -71,6 +75,7 @@ workflow:
       extra_spark_job_arguments:
         - "['PADTUPDREG', 'PADTINSERT','PADTUPDATE']"
         - False
+        - "[]"
     tb_boleto:
       clean_table_name: agreement_invoices
       raw_extraction_type: incremental
@@ -80,6 +85,7 @@ workflow:
       extra_spark_job_arguments:
         - "['BLDTUPDATE']"
         - False
+        - "['BLBOLETO', 'BLIMGBOLETO', 'BLIMGPIX']"
     relations:
       clean_table_name: debtor
       extraction_type: full
@@ -87,6 +93,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - True
+        - "[]"
     uda1:
       clean_table_name: contracts
       extraction_type: full
@@ -94,6 +101,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - True
+        - "[]"
     phone:
       clean_table_name: phone
       extraction_type: full
@@ -101,6 +109,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - True
+        - "[]"
     address:
       clean_table_name: address
       extraction_type: full
@@ -108,6 +117,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - True
+        - "[]"
     pmtfil:
       clean_table_name: payments
       extraction_type: full
@@ -115,6 +125,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - True
+        - "[]"
     agrdm:
       clean_table_name: contracts_agreements
       extraction_type: full
@@ -122,6 +133,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - True
+        - "[]"
     agrhdr:
       clean_table_name: agreements
       extraction_type: full
@@ -129,6 +141,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - True
+        - "[]"
     agdscdet:
       clean_table_name: agreement_discounts
       extraction_type: full
@@ -136,6 +149,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - True
+        - "[]"
     agpmtdet:
       clean_table_name: agreement_installments
       extraction_type: full
@@ -143,6 +157,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - True
+        - "[]"
     collid:
       clean_table_name: users
       extraction_type: full
@@ -150,6 +165,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     agency:
       clean_table_name: agency
       extraction_type: full
@@ -157,6 +173,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
     agr_hist:
       clean_table_name: historical_agreements
       extraction_type: full
@@ -164,6 +181,7 @@ workflow:
       extra_spark_job_arguments:
         - "[]"
         - False
+        - "[]"
 cluster:
   type: custom_cluster
   custom_configurations:

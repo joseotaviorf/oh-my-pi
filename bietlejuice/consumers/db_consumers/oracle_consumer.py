@@ -56,17 +56,34 @@ class OracleSparkConsumer(DBConsumer):
         )
 
     @logger
-    def get_data_from_table(self, table_name: str):
+    def get_data_from_table(self, table_name: str, excluded_fields: list):
         """
         Fetches all data from a specified table.
 
         :param table_name: Name of the table.
         :type table_name: str
+        :param excluded_fields: List of column names to exclude from the query.
+        :type excluded_fields: list, optional
         :return: A Spark DataFrame with the table data.
         """
 
         extended_table_name = f"{self.schema}.{table_name}"
         logger.info(f"Fetching data from table: {extended_table_name}")
+
+        if len(excluded_fields) > 1:
+            schema_df = self.get_table_columns_name(table_name)
+            all_columns = [row["COLUMN_NAME"] for row in schema_df.collect()]
+            included_columns = [
+                col for col in all_columns if col not in excluded_fields
+            ]
+            columns_query = ", ".join(included_columns)
+
+            query = f"""
+                SELECT {columns_query}
+                FROM {self.schema}.{table_name}
+            """
+
+            return self.get_data_from_query(query)
 
         return self.spark_client.get_data_from_external_source(
             format="jdbc",
@@ -169,6 +186,27 @@ class OracleSparkConsumer(DBConsumer):
         return self.get_data_from_query(textwrap.dedent(query))
 
     @logger
+    def get_table_columns_name(self, table_name: str):
+        """
+        Retrieves the column names of a specified table from the Oracle database.
+
+        :param table_name: The name of the table whose column names are to be retrieved.
+        :type table_name: str
+        :return: A Spark DataFrame containing the column names of the specified table.
+        """
+
+        query = f"""
+            SELECT DISTINCT
+                COLUMN_NAME
+            FROM
+                USER_TAB_COLUMNS
+            WHERE
+                table_name = '{table_name}'
+        """
+
+        return self.get_data_from_query(textwrap.dedent(query))
+
+    @logger
     def get_table_primary_keys(self, table_name: str):
         """
         Retrieves the primary keys of a specified table.
@@ -225,6 +263,7 @@ class OracleSparkConsumer(DBConsumer):
         date_filter_columns: list,
         start_interval: str,
         end_interval: str,
+        excluded_fields: list,
         unixtime_measure: str = None,
     ):
         """
@@ -232,10 +271,14 @@ class OracleSparkConsumer(DBConsumer):
 
         :param table_name: Name of the table.
         :type table_name: str
-        :param date_filter_column: Column name to apply the date filter on.
-        :type date_filter_column: str
-        :param date_filter_value: Date value to filter records from (YYYY-MM-DD format).
-        :type date_filter_value: str
+        :param date_filter_columns: Columns names to apply the date filter on.
+        :type date_filter_columns: list
+        :param start_interval: The start of date interval.
+        :type start_interval: str
+        :param end_interval: The end of date interval.
+        :type end_interval: str
+        :param excluded_fields: List of column names to exclude from the query.
+        :type excluded_fields: list, optional
         :param unixtime_measure: Indicate whether the date filter is in 'seconds' or 'milliseconds'. Defaults to None.
         :type unixtime_measure: str, optional
         :return: A Spark DataFrame with the filtered table data.
@@ -272,8 +315,21 @@ class OracleSparkConsumer(DBConsumer):
                 AND TO_DATE('{end_range_date}', 'YYYY-MM-DD HH24:MI:SS')
             """
 
-        query = f"""
-            SELECT *
+        query = "SELECT "
+
+        if len(excluded_fields) > 1:
+            schema_df = self.get_table_columns_name(table_name)
+            all_columns = [row["COLUMN_NAME"] for row in schema_df.collect()]
+            included_columns = [
+                col for col in all_columns if col not in excluded_fields
+            ]
+            columns_query = ", ".join(included_columns)
+
+            query += f"{columns_query}"
+        else:
+            query += "*"
+
+        query += f"""
             FROM {self.schema}.{table_name}
             WHERE {filters}
         """
