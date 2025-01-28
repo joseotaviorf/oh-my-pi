@@ -50,13 +50,19 @@ all_renewal AS (
   SELECT DISTINCT 
     id,
     propose AS sk_propose, 
-    previous_monthly_amount, 
-    updated_monthly_amount, 
+    COALESCE( s.previous_monthly_amount, r.previous_monthly_amount ) AS previous_monthly_amount,
+    COALESCE( s.updated_monthly_amount, r.updated_monthly_amount) AS updated_monthly_amount,
     dt_due AS dt_renewal,
     step,
-    price_index_type,
+    COALESCE( s.price_index_type, r.price_index_type ) AS price_index_type,
     DATE( date_trunc( 'MONTH', dt_due )) AS previous_month_renewal, 
-    LEAD( DATE( date_trunc('MONTH', dt_due ))) OVER( PARTITION BY r.propose ORDER BY ts_created ASC ) AS next_month_renewal,
+    LEAD( DATE( date_trunc( 'MONTH', r.dt_due ))) OVER( 
+      PARTITION BY 
+        r.propose 
+      ORDER BY 
+      r.dt_due,
+      r.ts_created ASC
+    ) AS next_month_renewal,
     ts_created,
     ROW_NUMBER() OVER( 
       PARTITION BY propose 
@@ -64,6 +70,9 @@ all_renewal AS (
     ) AS rn  
   FROM 
     datalake_rental_guarantee_platform_clean.renewal r
+  LEFT JOIN 
+    datalake_rental_guarantee_platform_raw.legacy_renewal_history s
+    ON r.id = s.renewal_id
 ),
 renewal AS (
   SELECT 
@@ -99,6 +108,71 @@ first_renewal_value as (
     first_last_line_renewal fr
     ON  r.sk_propose = fr.sk_propose
     AND r.ts_created = fr.min_ts_created
+),
+all_renewal_corrected AS (
+    SELECT DISTINCT 
+      r.id,
+      r.propose_id AS sk_propose, 
+      r.previous_monthly_amount,
+      r.updated_monthly_amount,
+      r.due_date AS dt_renewal,
+      r.created_at AS ts_created,
+      DATE( date_trunc( 'MONTH', r.due_date )) AS previous_month_renewal, 
+      LEAD( DATE( date_trunc('MONTH', r.due_date ))) OVER(
+        PARTITION BY r.propose_id 
+        ORDER BY r.due_date ASC
+      ) AS next_month_renewal,
+      ROW_NUMBER() OVER(
+        PARTITION BY r.propose_id 
+        ORDER BY r.due_date DESC) AS rn,
+      CASE 
+        WHEN EXTRACT(YEAR FROM due_date) = 2024 
+          THEN add_months( date_trunc( 'MONTH', r.due_date ), 11) 
+      END AS dt_final_renewal
+  FROM datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected r
+),
+renewal_corrected AS (
+    SELECT 
+      id,
+      sk_propose, 
+      previous_monthly_amount, 
+      updated_monthly_amount, 
+      dt_renewal,
+      previous_month_renewal, 
+      add_months( next_month_renewal, -1 ) AS month_end_renewal,
+      dt_final_renewal,
+      ts_created,
+      rn  
+  from all_renewal_corrected
+),
+dt_renewal_final AS (
+  SELECT DISTINCT
+    sk_propose,
+    dt_final_renewal
+  FROM 
+    renewal_corrected 
+  WHERE 
+    dt_final_renewal IS NOT NULL
+),
+first_last_line_renewal_corrected AS (
+SELECT 
+  sk_propose,
+  min( ts_created ) AS min_ts_created
+FROM 
+  renewal_corrected
+GROUP BY 1
+),
+first_renewal_value_corrected AS (
+  SELECT DISTINCT
+    r.sk_propose,
+    r.previous_monthly_amount AS first_monthly_value_mod,
+    r.previous_monthly_amount * 12 AS first_annual_value_mod
+  FROM
+    renewal_corrected r
+  INNER JOIN
+    first_last_line_renewal_corrected fr
+  ON  r.sk_propose = fr.sk_propose
+  AND r.ts_created = fr.min_ts_created
 ),
 propose_aud AS (
   SELECT 
@@ -161,6 +235,12 @@ first_propose_value AS (
     ON  pm.id_propose = f.id_propose
     AND pm.ts_started_mod = f.ts_first_start_mod
 ),
+corrected_robot AS (
+  SELECT DISTINCT
+    propose_id as sk_propose
+  FROM 
+    datalake_rental_guarantee_platform_raw.renewal_inconsistencies_corrected
+),
 base_propose AS (
   SELECT
     p.sk_propose,
@@ -191,7 +271,12 @@ base_propose AS (
     ) AS annual_guarantee,
     pv.monthly_guarantee AS monthly_value_propose,
     pv.annual_guarantee AS annual_value_propose,
-    pv.total_package_amount
+    pv.total_package_amount,
+    IF(
+      ro.sk_propose IS NOT NULL,
+      TRUE,
+      FALSE
+    ) as is_corrected_robot
   FROM 
     dw_velo.fact_velo_propose p
   LEFT JOIN 
@@ -203,6 +288,8 @@ base_propose AS (
   LEFT JOIN 
     mensalidade_omie omie
     ON omie.sk_propose = p.sk_propose
+  LEFT JOIN corrected_robot ro
+    ON ro.sk_propose = p.sk_propose
   WHERE 
     p.is_contract
     AND djk.desc_lvl_1 <> 'Contrato Assinado mas não pago'
@@ -249,6 +336,25 @@ base_propose_timeline AS (
         ELSE coalesce(coalesce(r.updated_monthly_amount, f.first_monthly_value_mod), b.monthly_guarantee) 
       END,
       0 ) AS monthly_guarantee_renewal,
+    b.is_corrected_robot,
+    COALESCE(
+      CASE
+        WHEN b.is_corrected_robot = FALSE 
+          THEN NULL
+        WHEN dt_final.dt_final_renewal < dd.month_start 
+          THEN NULL
+        WHEN DATE_DIFF( b.dt_ended, b.dt_contract_started ) < 11 
+          THEN 0
+        WHEN dd.month_start = date_trunc( 'MONTH', dt_ended ) 
+        AND dt_ended <= dt_cancellation_limit 
+          THEN 0
+        WHEN DATE_TRUNC( 'MONTH', current_date ) = DATE_TRUNC( 'MONTH', rc.dt_renewal ) 
+        AND CURRENT_DATE <= rc.dt_renewal 
+          THEN rc.previous_monthly_amount 
+        ELSE COALESCE( COALESCE( rc.updated_monthly_amount, fc.first_monthly_value_mod ), b.monthly_guarantee ) 
+      END, 
+      0
+      ) AS monthly_guarantee_renewal_corrected,
     COALESCE(
       CASE
         WHEN DATE_DIFF( b.dt_ended, b.dt_contract_started ) < 11 
@@ -299,6 +405,16 @@ base_propose_timeline AS (
     BETWEEN 
       r.previous_month_renewal 
       AND COALESCE( COALESCE( r.month_end_renewal, b.dt_ended ), current_date )
+  LEFT JOIN first_renewal_value_corrected fc
+    ON b.sk_propose = fc.sk_propose
+  LEFT JOIN renewal_corrected rc
+    ON b.sk_propose = rc.sk_propose 
+    AND b.sk_propose = fc.sk_propose
+    AND dd.month_start BETWEEN 
+      rc.previous_month_renewal AND 
+      COALESCE( COALESCE( rc.month_end_renewal, b.dt_ended ), rc.dt_final_renewal )
+  LEFT JOIN dt_renewal_final dt_final
+    ON b.sk_propose = dt_final.sk_propose
   LEFT JOIN 
     propose_mod pm
     ON b.sk_propose = pm.id_propose
@@ -313,6 +429,7 @@ SELECT
   months_life_contract,
   month_chargeble,
   monthly_guarantee_renewal,
+  monthly_guarantee_renewal_corrected,
   monthly_guarantee_propose_aud,
   monthly_value_propose,
   first_monthly_value_mod,
@@ -324,6 +441,7 @@ SELECT
   mob_of_death,
   monthly_guarantee_renewal * 12 AS annual_guarantee_renewal,
   monthly_guarantee_propose_aud * 12 AS annual_guarantee_propose_aud,
+  is_corrected_robot,
   is_direct_billing,
   dt_contract_started,
   dt_ended,

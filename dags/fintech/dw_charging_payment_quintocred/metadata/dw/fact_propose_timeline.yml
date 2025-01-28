@@ -19,6 +19,8 @@ columns:
     description: ''
   monthly_guarantee_renewal:
     description: ''
+  monthly_guarantee_renewal_corrected:
+    description: ''
   monthly_guarantee_propose_aud:
     description: ''
   monthly_value_propose:
@@ -42,6 +44,8 @@ columns:
   annual_guarantee_renewal:
     description: ''
   annual_guarantee_propose_aud:
+    description: ''
+  is_corrected_robot:
     description: ''
   is_direct_billing:
     description: ''

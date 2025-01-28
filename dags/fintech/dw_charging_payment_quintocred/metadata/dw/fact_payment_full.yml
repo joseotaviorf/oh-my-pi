@@ -123,6 +123,10 @@ columns:
     description: "Propose monthly guarantee value for the month analyzed based on the Renewal table"
     lineage:
       - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.monthly_timeline_renewal
+  monthly_timeline_renewal_corrected:
+    description: "Propose monthly guarantee value for the month analyzed based on the Renewal table"
+    lineage:
+      - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.monthly_timeline_renewal_corrected
   monthly_timeline_propose_aud:
     description: "Propose monthly guarantee value for the month analyzed based on the Propose table"
     lineage:
@@ -203,6 +207,10 @@ columns:
     description: "Total value of canceled  and not canceled invoices"
     lineage:
       - dw_charging_payment_quintocred.fact_accounting_funnel.sap_amount
+  is_corrected_robot:
+    description: "Is corrected by robot"
+    lineage:
+      - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.is_corrected_robot
   is_nf_canceled:
     description: "Is invoice canceled, returning true or false"
     lineage:

@@ -166,7 +166,11 @@ columns:
   monthly_timeline_renewal:
     description: ''
     lineage:
-    - dw_charging_payment_quintocred.fact_propose_timeline.pl.monthly_guarantee_renewal
+    - dw_charging_payment_quintocred.fact_propose_timeline.monthly_guarantee_renewal
+  monthly_timeline_renewal_corrected:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.monthly_timeline_renewal_corrected
   monthly_timeline_propose_aud:
     description: ''
     lineage:
@@ -179,6 +183,10 @@ columns:
     description: ''
     lineage:
     - dw_charging_payment_quintocred.fact_propose_timeline.pl.month_start
+  is_corrected_robot:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_propose_timeline.is_corrected_robot
   month_due_original:
     description: ''
     lineage:
