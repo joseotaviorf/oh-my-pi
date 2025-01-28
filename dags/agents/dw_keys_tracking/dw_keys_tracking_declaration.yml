@@ -1,7 +1,7 @@
 dag:
   name: dw_keys_tracking
   schedule_start_date: 2020,02,20
-  owner: Data ForRent
+  owner: Data Agents
 workflow:
   type: query_delta
   layer: dw

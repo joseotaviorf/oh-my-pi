@@ -2,7 +2,7 @@
 database_name: dw_keys_tracking
 table_name: dim_agents_with_keys
 description: Information related to Agents. Dimension table about key location, agents and listings. Each line is an unique house listing with the related agent.
-domain: For Rent
+domain: Agents
 owner: gustavo.geiger@quintoandar.com.br
 columns:
   sk_house_listing:
