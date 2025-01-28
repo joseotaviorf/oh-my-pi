@@ -272,3 +272,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract.ts_updated
     description: Timestamp of when the contract was updated.
+  dt_ended_rental_confirmed:
+    lineage:
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.contract_aud.dt_termination
+      - datalake_ebdb_clean.contract.dt_termination
+      - datalake_terminator_clean.termination.dt_vacancy
+    description: Date when the ended rental was confirmed.

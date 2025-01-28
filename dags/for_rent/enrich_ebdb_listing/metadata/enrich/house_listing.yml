@@ -137,6 +137,11 @@ columns:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.ts_state_ended
     description: Timestamp when this listing version ended.
+  ts_publicated:
+    lineage:
+      - datalake_ebdb_listing.lbc_status_version_order.ts_state_started
+      - datalake_ebdb_listing.house_listing_category.ts_listing_version_start
+    description: House listing publication date of the version.
   ts_entrance_started:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.ts_entrance_started

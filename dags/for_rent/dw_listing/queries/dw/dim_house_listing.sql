@@ -56,7 +56,7 @@ house_listings AS (
         FROM
             datalake_ebdb_clean.rental_administrator_change_request AS rcr
         WHERE
-            rcr.old_rental_administrator = 'OWNER' 
+            rcr.old_rental_administrator = 'OWNER'
             AND rcr.status = 'SUCCESS'
     )
     SELECT DISTINCT
@@ -74,11 +74,7 @@ house_listings AS (
         hl.ts_listing_version_end,
         h.dt_first_publication AS ts_house_first_publication,
         h.ts_last_publication AS ts_house_last_publication,
-        CASE
-            WHEN hl.version = 1 THEN hl.ts_first_publication
-            WHEN hl.version > 0 THEN hl.ts_listing_version_start
-            ELSE NULL
-        END AS ts_publication,
+        hl.ts_publicated AS ts_publication,
         hl.ts_last_unpublished,
         hl.rent,
         FIRST(lrm.rental_administrator) OVER (PARTITION BY hl.id_house_listing ORDER BY lrm.ts_rental_administrator_start DESC) AS rental_administrator,
@@ -165,10 +161,10 @@ house_listings AS (
     JOIN
         datalake_ebdb_listing.house_listing AS hl
             ON hl.id_house = h.id
-    LEFT JOIN 
+    LEFT JOIN
         lbc
             ON lbc.id_house = h.id
-    LEFT JOIN 
+    LEFT JOIN
         lrm
             ON lrm.id_house = lbc.id_house
                 AND lrm.ts_rental_administrator_start <= COALESCE(hl.ts_listing_version_end, NOW())

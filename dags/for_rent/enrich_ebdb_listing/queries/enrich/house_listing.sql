@@ -482,6 +482,11 @@ SELECT
     CAST(hled.ts_early_demand_started AS TIMESTAMP) AS ts_early_demand_started,
     hl.ts_listing_version_start,
     hl.ts_listing_version_end,
+    CASE
+        WHEN hl.version = 1 THEN fp.ts_first_publication
+        WHEN hl.version > 0 THEN hl.ts_listing_version_start
+        ELSE NULL
+    END AS ts_publicated,
     fp.ts_first_publication,
     heh.ts_entrance_started,
     hl.ts_last_unpublished,

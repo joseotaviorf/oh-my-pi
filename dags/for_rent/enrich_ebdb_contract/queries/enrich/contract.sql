@@ -213,7 +213,8 @@ SELECT
   c.ts_contract_expected_end AS dt_contract_expected_end, -- TODO [ODS] rename col to dt_contract_expected_end in clean
   c.ts_minuta_approved,
   c.ts_created,
-  c.ts_updated
+  c.ts_updated,
+  DATE(COALESCE(aad.ts_analyst_annulment_input, IF(t.status = 'DONE' AND c.dt_termination > DATE('2020-01-07'), t.dt_vacancy, c.dt_termination))) AS dt_ended_rental_confirmed
 FROM
   datalake_ebdb_clean.contract AS c
 LEFT JOIN
