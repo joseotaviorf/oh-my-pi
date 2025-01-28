@@ -252,7 +252,7 @@ SELECT
     MAX(t.dt_ended_propose) AS dt_ended_propose,
     t.`date` AS dt_base,
     t.dt_aging,
-    MAX(t.dt_paid) AS dt_paid,
+    MAX(IF(t.dt_paid <= t.`date`, t.dt_paid, NULL)) AS dt_paid,
     MIN(t.dt_created) AS dt_created
 FROM
     timeline AS t
