@@ -1,7 +1,9 @@
 dag:
-  name: reverse_listings_report_load
+  name: reverse_sale_listings_report_load
   schedule_start_date: 2022,7,12
   owner: Data Rede
+  documentation:
+    dag_purpose: This DAG collects several events from listings (currently, only focused on Rede Sale Listings). These tables will be used in the DAG reverse_sale_listings_report_access to be sent via SNS to a service called "Member's Area", where they will be displayed as an analytical report for Rede Members.
 workflow:
   type: load
   layer: reverse

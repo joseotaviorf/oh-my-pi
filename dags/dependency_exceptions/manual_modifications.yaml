@@ -773,17 +773,17 @@ bietlejuice.reverse_demand_score_access:
 bietlejuice.reverse_dsat_report_access:
   add:
     - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report
-bietlejuice.reverse_listings_report_access:
+bietlejuice.reverse_sale_listings_report_access: 
   add:
-    - bietlejuice.reverse_listings_report_load:load-reverse-demand-score
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-accepted
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-offer-sent
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-published
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-signed-contract
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-traffic
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-confirmed
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-listing-visit-scheduled
-    - bietlejuice.reverse_listings_report_load:load-reverse-sale-ongoing-listings
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-demand-score
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-offer-accepted
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-offer-sent
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-published
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-signed-contract
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-traffic
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-visit-confirmed
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-visit-scheduled
+    - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-ongoing-listings
 bietlejuice.reverse_sale_unavailable_listings_access:
   add:
     - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings
