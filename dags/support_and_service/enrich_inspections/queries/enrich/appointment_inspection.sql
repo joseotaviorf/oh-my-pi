@@ -78,7 +78,7 @@ appointment_union AS (
           ON a.id_external_appointment = b.id
     LEFT JOIN
         datalake_schedules_clean.appointment AS s
-          ON b.id_schedule = s.id
+          ON COALESCE(a.id_schedules, b.id_schedule) = s.id
     LEFT JOIN
         appointment_history AS ah
           ON b.id_schedule = ah.id_appointment
