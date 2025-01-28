@@ -15,8 +15,8 @@ SELECT
     lf.sales_company,
     CASE WHEN dhl.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
     dhl.partner_3p_supply AS supply_3p_partner,
-    CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
-	rbh.partner AS supply_3pbh_partner,
+    CASE WHEN rbh.id IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
+	rbh.partner_3p_supply AS supply_3pbh_partner,
     CASE
         WHEN lf.mkt_origin = 'B2B' OR lf.mkt_origin = 'CIQ' THEN lf.mkt_origin
         WHEN lf.mkt_completion = 'Full Self-Service' THEN 'FSS'
@@ -388,8 +388,8 @@ SELECT
     NULLIF(sdc.demand_3p_partner, '') AS demand_3p_partner,
     CAST(sdc.is_3p_supply AS INT) AS is_3p_supply,
     NULLIF(sdc.supply_3p_partner, '') AS supply_3p_partner,
-    CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
-    rbh.partner AS supply_3pbh_partner,
+    CASE WHEN rbh.id IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
+    rbh.partner_3p_supply AS supply_3pbh_partner,
     CASE
         WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN 'Out of coverage area'
         WHEN COALESCE(sdr.city_group,sdc.city_group) IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas') THEN COALESCE(sdr.city_group,sdc.city_group)

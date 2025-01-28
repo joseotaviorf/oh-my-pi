@@ -13,8 +13,8 @@ WITH sale_listing_flows_adjust AS (
         lf.mkt_channel,
         lf.mkt_medium,
         lf.sales_company,
-        CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
-        rbh.partner AS supply_3pbh_partner,
+        CASE WHEN rbh.id IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
+        rbh.partner_3p_supply AS supply_3pbh_partner,
         CASE WHEN dhl.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
         dhl.partner_3p_supply AS supply_3p_partner,
         CASE
@@ -356,8 +356,8 @@ sale_demand_classification AS (
         NULLIF(sdc.demand_3p_partner, '') AS demand_3p_partner,
         CAST(sdc.is_3p_supply AS INT) AS is_3p_supply,
         NULLIF(sdc.supply_3p_partner, '') AS supply_3p_partner,
-        CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
-        rbh.partner AS supply_3pbh_partner,
+        CASE WHEN rbh.id IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
+        rbh.partner_3p_supply AS supply_3pbh_partner,
         CASE
             WHEN COALESCE(sdr.city_group,sdc.city_group) NOT IN ('RMSP', 'Rio de Janeiro','Belo Horizonte','Porto Alegre','Campinas')
                 THEN 'Out of coverage area'
@@ -403,7 +403,7 @@ sale_demand_classification AS (
             ON CAST(sdr.id_house AS STRING) = sdc.id_house
     LEFT JOIN
         datalake_ebdb_listing.house AS rbh
-            ON rbh.id_house = sdc.id_house
+            ON rbh.id = sdc.id_house
                 AND rbh.is_3p_supply_bh
 ),
 p2fc AS (
