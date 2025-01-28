@@ -80,42 +80,43 @@ if __name__ == "__main__":
     tables_to_send_warning = []
 
     for table in tables:
-        datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
-        try:
-            df = s3_consumer.get_data_from_file(path=datalake_path, format="parquet")
-        except AnalysisException:
-            tables_to_send_warning.append(table)
-            df = None
+        if table not in ['business_unit', 'offer_agent']:
+            datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
+            try:
+                df = s3_consumer.get_data_from_file(path=datalake_path, format="parquet")
+            except AnalysisException:
+                tables_to_send_warning.append(table)
+                df = None
 
-        if df is not None:
-            df = df.drop("year", "month", "day")
+            if df is not None:
+                df = df.drop("year", "month", "day")
 
-            destination_path = f"v1/{table}/"
-            file_name = (
-                f'{table}_{(execution_date.strftime("%Y_%m_%d_%H_%M_%S%z"))}.csv'
-            )
-            with io.StringIO() as csv_buffer:
-                df.toPandas().convert_dtypes().to_csv(
-                    csv_buffer, index=False, header=True
+                destination_path = f"v1/{table}/"
+                file_name = (
+                    f'{table}_{(execution_date.strftime("%Y_%m_%d_%H_%M_%S%z"))}.csv'
                 )
-
-                response = s3_client.put_object(
-                    Bucket=external_bucket,
-                    Key=destination_path + file_name,
-                    Body=csv_buffer.getvalue(),
-                    ACL="bucket-owner-full-control",
-                )
-
-                status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
-
-                if status == 200:
-                    logger.info(
-                        f"m=__main__, message=successful S3 put_object for table {table}, status={status}"
+                with io.StringIO() as csv_buffer:
+                    df.toPandas().convert_dtypes().to_csv(
+                        csv_buffer, index=False, header=True
                     )
-                else:
-                    raise HTTPException(
-                        f"m=__main__, message=UNSUCCESSFULL S3 put_object for table {table}, status={status}"
+
+                    response = s3_client.put_object(
+                        Bucket=external_bucket,
+                        Key=destination_path + file_name,
+                        Body=csv_buffer.getvalue(),
+                        ACL="bucket-owner-full-control",
                     )
+
+                    status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
+
+                    if status == 200:
+                        logger.info(
+                            f"m=__main__, message=successful S3 put_object for table {table}, status={status}"
+                        )
+                    else:
+                        raise HTTPException(
+                            f"m=__main__, message=UNSUCCESSFULL S3 put_object for table {table}, status={status}"
+                        )
 
     if tables_to_send_warning:
         base_dbutils = BaseDBUtils()

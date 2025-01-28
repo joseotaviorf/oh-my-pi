@@ -88,8 +88,8 @@ SELECT
     TO_DATE(STRING(fc.sk_payment_allowed_date), 'yyyyMMdd') AS payment_allowed_date,
     ds.ts_sale_agreement_signed AS signature_date,
     YEAR(CURRENT_DATE) AS year,
-    MONTH(CURRENT_DATE) AS MONTH,
-    DAY(CURRENT_DATE) AS DAY
+    MONTH(CURRENT_DATE) AS month,
+    DAY(CURRENT_DATE) AS day
 FROM
     dw_sale.dim_offer dof
 LEFT JOIN
