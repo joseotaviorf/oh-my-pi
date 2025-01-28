@@ -423,6 +423,7 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.hub_services:load-clean-business-unit
   - bietlejuice.rene_descartes:load-clean-lead-rejection
   - bietlejuice.wololo:load-clean-context-discard

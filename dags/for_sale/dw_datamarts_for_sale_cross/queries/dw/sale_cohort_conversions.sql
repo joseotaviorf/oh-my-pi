@@ -57,8 +57,9 @@ WITH sale_listing_flows_adjust AS (
         dw_rent.dim_house_listing AS dhl
             ON dhl.sk_house_listing = lf.sk_house_listing
     LEFT JOIN
-        datalake_3p.houses_3p_bh AS rbh
-            ON rbh.id_house = lf.sk_house_listing / 1000
+        datalake_ebdb_listing.house AS rbh
+            ON rbh.id = lf.sk_house_listing / 1000
+                AND rbh.is_3p_supply_bh
     WHERE
         lf.origin_table = 'Sale'
 ),
@@ -401,11 +402,9 @@ sale_demand_classification AS (
         sale_demand_region AS sdr
             ON CAST(sdr.id_house AS STRING) = sdc.id_house
     LEFT JOIN
-        datalake_3p.houses_3p AS hp
-            ON hp.id_house = sdc.id_house
-    LEFT JOIN
-        datalake_3p.houses_3p_bh AS rbh
+        datalake_ebdb_listing.house AS rbh
             ON rbh.id_house = sdc.id_house
+                AND rbh.is_3p_supply_bh
 ),
 p2fc AS (
     SELECT

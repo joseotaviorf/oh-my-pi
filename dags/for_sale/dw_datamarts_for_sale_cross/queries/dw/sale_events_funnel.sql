@@ -16,7 +16,7 @@ SELECT
     CASE WHEN dhl.is_3p_supply THEN 1 ELSE 0 END AS is_3p_supply,
     dhl.partner_3p_supply AS supply_3p_partner,
     CASE WHEN rbh.id_house IS NOT NULL THEN 1 ELSE 0 END AS is_3pbh_supply,
-    rbh.partner AS supply_3pbh_partner,
+	rbh.partner AS supply_3pbh_partner,
     CASE
         WHEN lf.mkt_origin = 'B2B' OR lf.mkt_origin = 'CIQ' THEN lf.mkt_origin
         WHEN lf.mkt_completion = 'Full Self-Service' THEN 'FSS'
@@ -54,8 +54,9 @@ LEFT JOIN
     dw_rent.dim_house_listing AS dhl
     	ON dhl.sk_house_listing = lf.sk_house_listing
 LEFT JOIN
-    datalake_3p.houses_3p_bh AS rbh
-    	ON rbh.id_house = lf.sk_house_listing / 1000
+    datalake_ebdb_listing.house AS rbh
+    	ON rbh.id = lf.sk_house_listing / 1000
+			AND rbh.is_3p_supply_bh
 WHERE lf.origin_table = 'Sale'
 ),
 data_deal_quali AS (
@@ -435,8 +436,9 @@ LEFT JOIN
     sale_demand_region sdr
         ON CAST(sdr.id_house AS STRING) = sdc.id_house
 LEFT JOIN
-    datalake_3p.houses_3p_bh AS rbh
-    	ON rbh.id_house = sdc.id_house
+    datalake_ebdb_listing.house AS rbh
+    	ON rbh.id = sdc.id_house
+			AND rbh.is_3p_supply_bh
 ),
 lead_ AS (
 SELECT
