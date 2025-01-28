@@ -12,13 +12,13 @@ columns:
     description: Key of house listing.
   sk_next_house_listing_rented:
     lineage:
-      - datalake_listing_contracts.listing_contracts.id_house_listing
+      - datalake_ebdb_listing.house_listing.id_next_house_listing_rented
     description:
       Key of the next house listing with a valid contract, that is, a contract with status 'Ativo' or 'Finalizado'.
       This column was created to help to identify the next sk house listing because the sk_house_listing + 1 won't work with all the cases.
   sk_next_house_listing:
     lineage:
-      - datalake_listing_contracts.listing_contracts.id_house_listing
+      - datalake_ebdb_listing.house_listing.id_next_house_listing
     description:
       Key of the next published house listing and the rental wasn't extended.
       This column was created to help to identify the next sk house listing because the sk_house_listing + 1 won't work with all the cases.
@@ -26,8 +26,7 @@ columns:
       and the contract will continue.
   sk_next_house_listing_consolidated:
     lineage:
-      - datalake_listing_contracts.listing_contracts.id_house_listing
-      - datalake_ebdb_listing.house_listing.id_house_listing
+      - datalake_ebdb_listing.house_listing.sk_next_house_listing_consolidated
     description: Key of the next published house listing.
       This column is the consolidated of the sk_next_house_listing and sk_next_house_listing_rented columns,
       prioritizing the sk_next_house_listing_rented, but if it's -1, then it will get the value of sk_next_house_listing column,
@@ -48,16 +47,16 @@ columns:
     description: Key of user who created the house listing.
   sk_contract:
     lineage:
-      - datalake_listing_contracts.listing_contracts.id_contract
+      - datalake_ebdb_listing.house_listing.id_contract
     description: Key of rental contract for house listing. In this table, we'll only have contracts that the status is active or finished.
   sk_previous_contract:
     lineage:
-      - datalake_listing_contracts.listing_contracts.id_contract
+      - datalake_ebdb_listing.house_listing.id_contract
     description: Key of the listing's previous contract.
       This column links the contract of the previous listing, independently if the listing has a contract.
   sk_next_contract:
     lineage:
-      - datalake_listing_contracts.listing_contracts.id_contract
+      - datalake_ebdb_listing.house_listing.id_next_contract
     description: Key of the listing's next contract.
       This column links the contract of the next listing that has a contract.
   sk_condo:

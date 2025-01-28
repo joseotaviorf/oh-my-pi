@@ -1,7 +1,8 @@
 ---
 database_name: datalake_ebdb_listing
 table_name: house_listing
-description: Information related to ForRent listings. Each line is an unique listing 
+description:
+  Information related to ForRent listings. Each line is an unique listing
   related to a house. The tuple [id_house_listing, id_house] must be unique.
 domain: For Rent
 owner: jonas.fiorini@quintoandar.com.br
@@ -19,6 +20,31 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract.id
     description: Id of the contract.
+  id_next_house_listing_rented:
+    lineage:
+      - datalake_ebdb_listing.house_listing_category.id_house_listing
+    description:
+      ID of the next house listing with a valid contract, that is, a contract with status 'Ativo' or 'Finalizado'.
+      This column was created to help to identify the next sk house listing because the id_house_listing + 1 won't work with all the cases.
+  id_next_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing_category.id_house_listing
+    description:
+      ID of the next published house listing and the rental wasn't extended.
+      This column was created to help to identify the next id_house_listing because the id_house_listing + 1 won't work with all the cases.
+      Due to the early demand, if a termination is canceled and the listing was published, a new version is created but it won't have a contract associated to it
+      and the contract will continue.
+  id_next_house_listing_consolidated:
+    lineage:
+      - datalake_ebdb_listing.house_listing_category.id_house_listing
+    description: ID of the next published house listing.
+      This column is the consolidated of the id_next_house_listing and id_next_house_listing_rented columns,
+      prioritizing id_next_house_listing_rented, but if it's NULL, then it will get the value of id_next_house_listing column.
+  id_next_contract:
+    lineage:
+      - datalake_ebdb_clean.contract.id
+    description: Key of the listing's next contract.
+      This column links the contract of the next listing that has a contract.
   country_code:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.country_code
@@ -36,7 +62,8 @@ columns:
       - datalake_ebdb_listing.lbc_status_version_order.status_reason
     description: Listing status reason.
   rent_type:
-    description: Indicates if a re-listing resulted in a re-rental or the termination 
+    description:
+      Indicates if a re-listing resulted in a re-rental or the termination
       was canceled and the listing was rented with the old contract or it wasn't rented at all.
   rent:
     lineage:
@@ -52,12 +79,15 @@ columns:
   last_iorent_type:
     lineage:
       - datalake_ebdb_clean.special_condition.special_condition_type
-    description: Column indicating last type related to I/ORent program (this program
+    description:
+      Column indicating last type related to I/ORent program (this program
       was deprecated in 2021 for new houses).
     categories:
-      IRent: Status related to I/ORent Program (this program was deprecated in 2021
+      IRent:
+        Status related to I/ORent Program (this program was deprecated in 2021
         for new houses)
-      ORent: Status related to I/ORent Program (this program was deprecated in 2021
+      ORent:
+        Status related to I/ORent Program (this program was deprecated in 2021
         for new houses)
   nr_renting:
     lineage:
@@ -74,23 +104,26 @@ columns:
   is_extended_rental:
     lineage:
       - datalake_ebdb_listing.house_listing_category.is_extended_rental
-    description: Boolean indicating if the contract termination was canceled after relisting as early demand
+    description:
+      Boolean indicating if the contract termination was canceled after relisting as early demand
       or the owner asked to unpublish the listing after relisting as early demand and the contract was active.
   has_termination_canceled:
-    lineage: 
-    - datalake_ebdb_listing.lbc_status_version_order.has_termination_canceled
+    lineage:
+      - datalake_ebdb_listing.lbc_status_version_order.has_termination_canceled
     description: Boolean indicating if the contract termination was canceled after relisting as early demand.
   is_originals_active:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_in
       - datalake_ebdb_clean.special_condition_aud.ts_opted_out
-    description: Once the listing has been flagged as Originals, it says whether it
+    description:
+      Once the listing has been flagged as Originals, it says whether it
       is current active.
   is_iorent_active:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_in
       - datalake_ebdb_clean.special_condition_aud.ts_opted_out
-    description: Once the listing has been flagged as IORent, it says whether it is
+    description:
+      Once the listing has been flagged as IORent, it says whether it is
       current active.
   is_for_rent:
     description: Boolean indicating if the listing is for rent.
@@ -119,7 +152,8 @@ columns:
   dt_last_exclusive_opted_out:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_out
-    description: Timestamp when was the last time this listing had opted out from
+    description:
+      Timestamp when was the last time this listing had opted out from
       Exclusive.
   dt_last_originals_opted_in:
     lineage:
@@ -128,17 +162,20 @@ columns:
   dt_last_originals_opted_out:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_out
-    description: Timestamp when was the last time this listing had opted out from
+    description:
+      Timestamp when was the last time this listing had opted out from
       Originals.
   dt_last_iorent_opted_in:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_in
-    description: Timestamp when was the last time this listing had opted in to I/ORent
+    description:
+      Timestamp when was the last time this listing had opted in to I/ORent
       program (this program was deprecated in 2021 for new houses).
   dt_last_iorent_opted_out:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_out
-    description: Timestamp when was the last time this listing had opted out from
+    description:
+      Timestamp when was the last time this listing had opted out from
       I/ORent program (this program was deprecated in 2021 for new houses).
   ts_contract_signed:
     lineage:
@@ -156,15 +193,18 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_listing_status.ts_status_started
       - datalake_ebdb_listing.lbc_status_version_order.ts_state_started
-    description: Date when this listing was stranded. A listing is considered stranded
+    description:
+      Date when this listing was stranded. A listing is considered stranded
       after at least 8 week published and no contract signed.
   is_early_demand:
     lineage:
       - datalake_ebdb_listing.house_listing_early_demand.is_early_demand
-    description: Flag indicating if the listing is available for early demand, that
+    description:
+      Flag indicating if the listing is available for early demand, that
       means it is available for visit/offer during contract termination.
   is_early_relisting:
-    description: Flag indicating if the listing has passed by any early relisting
+    description:
+      Flag indicating if the listing has passed by any early relisting
       phase.
   is_last_version:
     description: Flag indicating if this is the listing last version.
@@ -175,7 +215,8 @@ columns:
     categories:
       First Listing: Is the first time this listing is being published on the platform
       Re-listing: This house was listed before and is listed again after being rented
-      Recovered: This house was taken down from the platform and is being published
+      Recovered:
+        This house was taken down from the platform and is being published
         again
   order_renting:
     description: Is the position of this renting contract in this house's lifecycle.

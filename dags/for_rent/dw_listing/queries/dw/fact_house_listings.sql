@@ -1,57 +1,4 @@
-WITH house_listing_contracts AS (
-  WITH latest_contract AS (
-    SELECT
-      id_house_listing,
-      id_house,
-      MAX(id_contract) AS id_contract,
-      DENSE_RANK() OVER (PARTITION BY id_house ORDER BY id_house_listing) AS order_renting
-    FROM
-      datalake_listing_contracts.listing_contracts
-    WHERE
-      contract_status IN ('Ativo', 'Finalizado')
-    GROUP BY
-      id_house_listing,
-      id_house
-  ),
-  previous_next_contract AS (
-    SELECT
-      id_house_listing,
-      LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY id_house_listing) AS id_next_house_listing_rented,
-      LEAD(id_contract) OVER (PARTITION BY id_house ORDER BY id_house_listing) AS id_next_contract
-    FROM
-      latest_contract
-  )
-  SELECT
-    hl.id_house_listing,
-    pnc.id_next_house_listing_rented,
-    c.id AS id_contract,
-    pnc.id_next_contract,
-    lc.order_renting,
-    COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
-    c.ts_signed AS ts_contract_signed,
-    c.dt_termination AS dt_contract_annulment,
-    LEAD(c.ts_signed, 1) OVER (PARTITION BY hl.id_house ORDER BY hl.version) AS ts_next_contract_signed
-  FROM
-    datalake_ebdb_listing.house_listing AS hl
-  LEFT JOIN
-    latest_contract AS lc
-      ON hl.id_house_listing = lc.id_house_listing
-  LEFT JOIN
-    previous_next_contract AS pnc
-      ON hl.id_house_listing = pnc.id_house_listing
-  LEFT JOIN
-    datalake_ebdb_contract.contract AS c
-      ON c.id = lc.id_contract
-),
-house_listing_not_extended AS (
-  SELECT
-    id_house_listing,
-    LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY ts_listing_version_start) AS id_next_house_listing
-  FROM
-    datalake_ebdb_listing.house_listing
-  WHERE
-    has_termination_canceled = FALSE
-),
+WITH
 lbc AS (
   SELECT
     id_house,
@@ -85,15 +32,15 @@ autonomous_agent_info AS (
 )
 SELECT -- [ODS] This table was migrated from ODS flow and needs a future refactoring to remove castings and renamings
   hl.id_house_listing AS sk_house_listing,
-  COALESCE(hlc.id_next_house_listing_rented, -1) AS sk_next_house_listing_rented,
-  COALESCE(hlne.id_next_house_listing, -1) AS sk_next_house_listing,
-  COALESCE(hlc.id_next_house_listing_rented, hlne.id_next_house_listing, -1) AS sk_next_house_listing_consolidated,
+  COALESCE(hl.id_next_house_listing_rented, -1) AS sk_next_house_listing_rented,
+  COALESCE(hl.id_next_house_listing, -1) AS sk_next_house_listing,
+  COALESCE(hl.id_next_house_listing_rented, hl.id_next_house_listing, -1) AS sk_next_house_listing_consolidated,
   COALESCE(h.id_user, -1) AS sk_owner,
   COALESCE(h.id_region, -1) AS sk_region,
   COALESCE(h.id_user_registrant, -1) AS sk_user_registration,
-  COALESCE(hlc.id_contract, -1) AS sk_contract,
-  COALESCE(LAG(hlc.id_contract) OVER (PARTITION BY hl.id_house ORDER BY hl.id_house_listing), -1) AS sk_previous_contract,
-  COALESCE(hlc.id_next_contract, -1) AS sk_next_contract,
+  COALESCE(hl.id_contract, -1) AS sk_contract,
+  COALESCE(LAG(hl.id_contract) OVER (PARTITION BY hl.id_house ORDER BY hl.id_house_listing), -1) AS sk_previous_contract,
+  COALESCE(hl.id_next_contract, -1) AS sk_next_contract,
   COALESCE(cd.id, -1) AS sk_condo,
   COALESCE(pa_b2b_online.id_user, pa_b2b_prime.id_user, -1) AS sk_user_partner_agent,
   COALESCE(pa_b2b_online.id_partner, pa_b2b_prime.id_partner, -1) AS sk_partner,
@@ -104,13 +51,13 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   -- SparkSQL's datediff ignores the time part, so we get the seconds diff and convert it to integer days.
   -- 60s*60m*24h = 86400s
   h.country_code,
-  CAST((CAST(CAST(hlc.ts_contract_signed AS TIMESTAMP) AS LONG) - CAST(CAST(hl.ts_listing_version_start AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_listing_to_contract_signed,
+  CAST((CAST(CAST(hl.ts_contract_signed AS TIMESTAMP) AS LONG) - CAST(CAST(hl.ts_listing_version_start AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_listing_to_contract_signed,
   CAST((CAST(CAST(hl.ts_last_unpublished AS TIMESTAMP) AS LONG) - CAST(CAST(hl.ts_listing_version_start AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_listing_to_depublication,
-  CAST((CAST(CAST(hl.ts_listing_version_end AS TIMESTAMP) AS LONG) - CAST(CAST(hlc.dt_contract_annulment AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_ended_rental_to_relisting,
-  CAST((CAST(CAST(hlc.ts_next_contract_signed AS TIMESTAMP) AS LONG) - CAST(CAST(hl.ts_listing_version_end AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_relisting_to_re_rental,
-  CAST((CAST(CAST(hlc.ts_next_contract_signed AS TIMESTAMP) AS LONG) - CAST(CAST(hlc.dt_contract_annulment AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_ended_rental_to_re_rented,
-  CAST(COALESCE(hlc.nr_renting, 0) AS SMALLINT) AS nr_renting,
-  CAST(COALESCE(hlc.order_renting, 0) AS SMALLINT) AS order_renting,
+  CAST((CAST(CAST(hl.ts_listing_version_end AS TIMESTAMP) AS LONG) - CAST(CAST(hl.dt_contract_annulment AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_ended_rental_to_relisting,
+  CAST((CAST(CAST(hl.ts_next_contract_signed AS TIMESTAMP) AS LONG) - CAST(CAST(hl.ts_listing_version_end AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_relisting_to_re_rental,
+  CAST((CAST(CAST(hl.ts_next_contract_signed AS TIMESTAMP) AS LONG) - CAST(CAST(hl.dt_contract_annulment AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_ended_rental_to_re_rented,
+  CAST(COALESCE(hl.nr_renting, 0) AS SMALLINT) AS nr_renting,
+  CAST(COALESCE(hl.order_renting, 0) AS SMALLINT) AS order_renting,
   NOW() AS ts_load
 FROM
   datalake_ebdb_listing.house AS h
@@ -120,12 +67,6 @@ LEFT JOIN
 JOIN
   datalake_ebdb_listing.house_listing AS hl
     ON hl.id_house = h.id
-LEFT JOIN
-  house_listing_contracts AS hlc
-    ON hl.id_house_listing = hlc.id_house_listing
-LEFT JOIN
-  house_listing_not_extended AS hlne
-    ON hl.id_house_listing = hlne.id_house_listing
 LEFT JOIN
   datalake_ebdb_clean.condo AS cd
     ON h.id_condo_parent = cd.id

@@ -1,4 +1,4 @@
-WITH  
+WITH
 house_aud AS (
 --------------------------------------------------------------------------------------------------------
 -- Bring to IMOVEL_AUD datetime for each revision made                                                --
@@ -22,7 +22,7 @@ house_aud AS (
         rev.reason AS revision_reason
     FROM
       datalake_ebdb_clean.house_aud AS h
-    INNER JOIN 
+    INNER JOIN
       datalake_ebdb_clean.user_revision_entity AS rev
         ON rev.id = h.rev
 ),
@@ -67,7 +67,7 @@ listing_rent_last AS (
     SELECT
       id_house_listing,
       MAX(CASE WHEN max_order_status_version = order_rent_price THEN rent_price_history END) AS rent
-    FROM 
+    FROM
       house_rent_max
     GROUP BY 1
 ),
@@ -79,7 +79,7 @@ last_opt AS (
       special_condition_type,
       dt_opted_in,
       dt_opted_out
-    FROM 
+    FROM
       datalake_ebdb_listing.house_listing_special_conditions
     WHERE
       rn_last_special_condition = 1
@@ -106,9 +106,9 @@ listing_special_conditions_dates AS (
       fo.dt_opted_out AS dt_first_opted_out,
       lo.dt_opted_in AS dt_last_opted_in,
       lo.dt_opted_out AS dt_last_opted_out
-    FROM 
+    FROM
       last_opt AS lo
-    JOIN 
+    JOIN
       first_opt AS fo
         ON lo.id_house_listing = fo.id_house_listing
         AND (CASE
@@ -123,26 +123,26 @@ listing_special_conditions_dates AS (
             END)
 ),
 sale AS (
-  SELECT 
+  SELECT
     lbc.*,
     COALESCE(ch.country_code, 'Undefined') AS country_code
-  FROM 
+  FROM
     datalake_ebdb_clean.listing_business_context AS lbc
   LEFT JOIN
     datalake_ebdb_country.house AS ch
         ON ch.id_house = lbc.id_house
-  WHERE 
+  WHERE
     lbc.business_context = 'SALE'
-), 
+),
 sale_only AS (
-  SELECT 
+  SELECT
     sale.*
   FROM
     sale
-  LEFT JOIN 
+  LEFT JOIN
     datalake_ebdb_listing.lbc_status_version_order AS lbc_version
       ON lbc_version.id_house = sale.id_house
-  WHERE 
+  WHERE
     lbc_version.id_house IS NULL
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY sale.id_house ORDER BY sale.ts_updated DESC) = 1
@@ -249,6 +249,7 @@ house_listing_latest_contracts AS (
 ----------------------------------------------------------------------------------------------------------
     SELECT
       hl.id_house_listing,
+      hl.id_house,
       MAX(c.id) AS id_contract,
       DENSE_RANK() OVER (PARTITION BY hl.id_house ORDER BY hl.id_house_listing) AS order_renting
     FROM
@@ -256,9 +257,45 @@ house_listing_latest_contracts AS (
     JOIN
       datalake_ebdb_clean.contract AS c
         ON hl.id_house = c.id_house
-          AND c.ts_signed BETWEEN COALESCE(hl.ts_listing_version_start, '2000-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, CURRENT_DATE)
+          AND c.ts_created BETWEEN COALESCE(hl.ts_listing_version_start, '2000-01-01 00:00:00') AND COALESCE(hl.ts_listing_version_end, CURRENT_DATE)
           AND c.status IN ('Ativo', 'Finalizado')
     GROUP BY 1, hl.id_house
+),
+next_listing_contract AS (
+  SELECT
+    id_house_listing,
+    LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY order_renting) AS id_next_house_listing_rented,
+    LEAD(id_contract) OVER (PARTITION BY id_house ORDER BY order_renting) AS id_next_contract
+  FROM
+    house_listing_latest_contracts
+),
+house_listing_contracts AS (
+  SELECT
+    hl.id_house_listing,
+    nlc.id_next_house_listing_rented,
+    hllc.id_contract,
+    nlc.id_next_contract,
+    hllc.order_renting
+  FROM
+    house_listing AS hl
+  LEFT JOIN
+    house_listing_latest_contracts AS hllc
+      ON hl.id_house_listing = hllc.id_house_listing
+  LEFT JOIN
+    next_listing_contract AS nlc
+      ON hl.id_house_listing = nlc.id_house_listing
+  WHERE
+    hl.is_for_rent = TRUE
+),
+house_listing_not_cancelled AS (
+  SELECT
+    id_house_listing,
+    LEAD(id_house_listing) OVER (PARTITION BY id_house ORDER BY version) AS id_next_house_listing
+  FROM
+    house_listing
+  WHERE
+    has_termination_canceled = FALSE
+    AND is_for_rent
 ),
 house_listing_stranded_status_all AS (
     --select all status FROM each listing, calculate date_to_be_stranded using publication_date AND find IN which status was the stranded date
@@ -277,9 +314,9 @@ house_listing_stranded_status_all AS (
         END AS type_stranded,
         LAG(hls.status_history) OVER(PARTITION BY hls.id_house_listing ORDER BY hls.ts_status_started, COALESCE(hls.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_status_history,
         LAG(hls.status_change_reason) OVER(PARTITION BY hls.id_house_listing ORDER BY hls.ts_status_started, COALESCE(hls.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS previous_status_reason
-    FROM 
+    FROM
       datalake_ebdb_listing.house_listing_status AS hls
-    LEFT JOIN 
+    LEFT JOIN
       house_listing AS hl
         ON hls.id_house_listing = hl.id_house_listing
 ),
@@ -302,14 +339,14 @@ house_listing_stranded_rank_stranded AS (
         MIN(CASE WHEN type_stranded = 'stranded'
                       AND status_history IN ('publicado','suspenso','edicao','aguardando_publicacao', 'PUBLISHED', 'SUSPENDED', 'EDITING')
                                   AND (
-                                      (previous_status_history <> 'alugado' AND 
+                                      (previous_status_history <> 'alugado' AND
                                         (previous_status_history <> 'SUSPENDED' AND previous_status_reason <> 'RENTED')
                                       ) OR previous_status_history IS NULL)
                  THEN ts_status_started END) OVER (PARTITION BY id_house_listing) AS min_ts_valid_status,
         MIN(CASE WHEN type_stranded = 'stranded' THEN ts_to_be_stranded END) OVER (PARTITION BY id_house_listing) AS min_ts_to_be_stranded
-    FROM 
+    FROM
       house_listing_stranded_status_all
-    WHERE 
+    WHERE
       type_stranded IS NOT NULL
 ),
 house_listing_stranded_status AS (
@@ -351,7 +388,7 @@ house_listing_stranded_status AS (
             *  | 003    |   2019-03-07    |  2019-03-19     | despublicado |  2018-12-06    |  2019-01-31         | 2019-02-11    |
             *  --------------------------------------------------------------------------------------------------------------------
           */
-    FROM 
+    FROM
       house_listing_stranded_rank_stranded
 ),
 house_listing_stranded_date AS (
@@ -362,9 +399,9 @@ house_listing_stranded_date AS (
           THEN NULL
           ELSE GREATEST(CAST(COALESCE(min_ts_stranded,'3000-01-01') AS TIMESTAMP), CAST(min_ts_to_be_stranded AS TIMESTAMP))
       END AS dt_stranded
-    FROM 
+    FROM
       house_listing_stranded_status
-    WHERE 
+    WHERE
       rn = 1
 ),
 house_entrance_history AS (
@@ -374,12 +411,12 @@ house_entrance_history AS (
         hl.version,
         MAX(heh.rev) OVER(PARTITION BY hl.id_house_listing) = heh.rev AS is_last_status_in_listing,
         heh.ts_entrance_started
-  FROM 
+  FROM
     datalake_ebdb_listing.house_entrance_history AS heh
-  LEFT JOIN 
+  LEFT JOIN
     datalake_ebdb_clean.occupant_type AS ot
       ON ot.id = heh.id_occupant
-  JOIN 
+  JOIN
     house_listing AS hl
       ON heh.id_house = hl.id_house
         AND (heh.ts_entrance_started BETWEEN COALESCE(hl.ts_listing_version_start, DATE('1922-01-01')) AND COALESCE(hl.ts_listing_version_end, DATE('2100-01-01'))
@@ -401,20 +438,24 @@ SELECT
     hl.id_house_listing,
     hl.id_house,
     hl_c.id_contract,
+    hl_c.id_next_house_listing_rented,
+    hlnc.id_next_house_listing,
+    COALESCE(hl_c.id_next_house_listing_rented, hlnc.id_next_house_listing) AS id_next_house_listing_consolidated,
+    hl_c.id_next_contract,
     hl.country_code,
     hl.version,
     hl.status,
     hl.status_reason,
     CASE
       WHEN
-        hl.status = 'SUSPENDED' 
-        AND status_reason = 'RENTED' 
+        hl.status = 'SUSPENDED'
+        AND status_reason = 'RENTED'
         AND hl.revision_reason = 'TERMINATION_CANCELED'
       THEN 'OLD_CONTRACT_RESUMED'
       WHEN
         (
-          hl.status = 'SUSPENDED' 
-          AND status_reason = 'RENTED' 
+          hl.status = 'SUSPENDED'
+          AND status_reason = 'RENTED'
           AND (hl.revision_reason <> 'TERMINATION_CANCELED' OR hl.revision_reason IS NULL)
         )
         OR hl.status = 'alugado'
@@ -454,24 +495,27 @@ SELECT
     c.dt_termination AS dt_contract_annulment,
     c.ts_signed AS ts_contract_signed,
     LEAD(c.ts_signed, 1) OVER (PARTITION BY hl.id_house ORDER BY hl.version) AS ts_next_contract_signed
-FROM 
+FROM
   house_listing AS hl
-LEFT JOIN 
-  house_listing_latest_contracts AS hl_c
+LEFT JOIN
+  house_listing_contracts AS hl_c
     ON hl.id_house_listing = hl_c.id_house_listing
-LEFT JOIN 
+LEFT JOIN
+  house_listing_not_cancelled AS hlnc
+    ON hl.id_house_listing = hlnc.id_house_listing
+LEFT JOIN
   datalake_ebdb_clean.contract AS c
     ON hl_c.id_contract = c.id
-LEFT JOIN 
+LEFT JOIN
   house_listing_stranded_date AS hlsd
     ON hlsd.id_house_listing = hl.id_house_listing
-LEFT JOIN 
+LEFT JOIN
   house_entrance_history AS heh
     ON heh.id_house_listing = hl.id_house_listing
       AND heh.is_last_status_in_listing = True
-LEFT JOIN 
+LEFT JOIN
   datalake_ebdb_listing.house_listing_early_demand AS hled
     ON hled.id_house_listing = hl.id_house_listing
-LEFT JOIN 
+LEFT JOIN
   first_publication AS fp
     ON fp.id_house = hl.id_house

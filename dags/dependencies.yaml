@@ -606,7 +606,6 @@ bietlejuice.dw_listing:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
   - bietlejuice.enrich_booking:load-enrich-house-available-hours
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-agents-with-keys
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
@@ -615,7 +614,6 @@ bietlejuice.dw_listing:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
-  - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-category
   - bietlejuice.enrich_pro_owners:load-enrich-pro-owner-history
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
