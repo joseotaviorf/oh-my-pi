@@ -75,7 +75,6 @@ Produces the following output tables:
     `dynamic_pricing_parameters`
     `dynamic_pricing_parameters_aud`
     `entrance`
-    `feedback_tag`
     `financial_data`
     `follow_up_details`
     `follow_up_details_feedback_tag`
