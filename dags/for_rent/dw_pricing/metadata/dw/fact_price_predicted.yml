@@ -15,7 +15,7 @@ columns:
   sk_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing_status.id_house_status
-    description: Key referring to the house listing ID. The last 3 numbers indicate the version of the listing.
+    description: Key referring to the house listing ID (the last 3 numbers indicate the version of the listing) that was active when the referred prediction change occurred.
   ts_calculator_result_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision

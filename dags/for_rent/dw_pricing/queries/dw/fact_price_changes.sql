@@ -14,4 +14,6 @@ LEFT JOIN
     datalake_ebdb_pricing.listing_prediction_changes AS pre
         ON pre.id_house = pri.id_house
         AND pre.id_house_listing = pri.id_house_listing
-        AND pri.ts_price_started BETWEEN pre.ts_calculator_result_started AND COALESCE(pre.ts_calculator_result_ended, CURRENT_TIMESTAMP)
+        AND pre.ts_calculator_result_started BETWEEN pri.ts_price_started AND COALESCE(pri.ts_price_ended, CURRENT_TIMESTAMP)
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY sk_pricing ORDER BY pre.ts_calculator_result_started, COALESCE(pre.ts_calculator_result_ended, CURRENT_TIMESTAMP)) = 1

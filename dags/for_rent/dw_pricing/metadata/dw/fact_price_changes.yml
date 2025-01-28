@@ -1,7 +1,7 @@
 database_name: dw_listing
 table_name: fact_price_changes
-description: This fact table consolidates all the price changes of a house listing.
-  Each line is composed by a price change and a predicted price to the listing (sk_pricing + sk_price_predicted).
+description: This fact table consolidates all the price changes of a house listing and the respective prediction that
+  occurred right after. Each line is a price change (sk_pricing).
 domain: Cross
 owner: bruna.prates@quintoandar.com.br
 columns:
@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_ebdb_pricing.listing_price_change.id_house
   sk_house_listing:
-    description: Key referring to the house listing ID. The last 3 numbers indicate the version of the listing.
+    description: Key referring to the house listing ID (the last 3 numbers indicate the version of the listing) that was active when the referred price change occurred.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.id_house_listing
   sk_user:
