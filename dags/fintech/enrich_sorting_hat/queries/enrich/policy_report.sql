@@ -42,7 +42,7 @@ retenant_policy_report AS (
     GET_JSON_OBJECT(pr.result, '$.classification') AS retenant_classification,
     CAST(GET_JSON_OBJECT(pr.result, '$.avg_retenant_score') AS DECIMAL(10,2)) AS avg_retenant_score,
     CAST(GET_JSON_OBJECT(pr.result, '$.elected_contract_id') AS INTEGER) AS id_retenant_elected_contract,
-    CAST(proponents.retenant_contract_user_id AS INTEGER) AS id_retenant_contract_user,
+    MAX(CAST(proponents.retenant_contract_user_id AS INTEGER)) AS id_retenant_contract_user,
     COUNT(proponents.document_number) AS number_of_proponents,
     AVG(proponents.retenant_score) AS average_retenants_score_calculated,
     CASE
@@ -76,7 +76,6 @@ retenant_policy_report AS (
     9,
     10,
     11,
-    12,
     17,
     18
 )
