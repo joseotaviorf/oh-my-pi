@@ -1,5 +1,5 @@
 SELECT
-  MD5(CONCAT(CAST(id_date AS STRING), '_', id_rule)) AS bk_sharing_rules,
+  MD5(CONCAT(CAST(id_date AS STRING), '_', id_rule, funnel_side)) AS bk_sharing_rules,
   id_rule AS rule_code,
   country_code, 
   city_group,

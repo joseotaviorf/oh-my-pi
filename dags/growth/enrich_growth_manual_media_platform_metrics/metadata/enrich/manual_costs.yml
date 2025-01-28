@@ -1,0 +1,158 @@
+---
+database_name: datalake_growth_media_platform
+table_name: manual_costs
+owner: '@data-growth'
+domain: Growth
+description: Table that consolidates costs extract from manual growth marketing input
+columns:
+  bk_sharing_rules:
+    description: Business key for sharing rules
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.dt_cost
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.id_rule
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.funnel_side
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.dt_cost
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.id_rule
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.funnel_side
+  id_rule:
+    description: Identifier for cost sharing rules
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.id_rule
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.id_rule
+  id_region:
+    description: Unique identifier for region
+    lineage:
+      - datalake_region.region.id
+  naming_convention_sufix:
+    description: Generated naming convention suffix based on campaign context
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.campaign_business_context
+      - datalake_growth_costs.historical_marketing_manual_costs.campaign_strategy_intent
+      - datalake_growth_costs.historical_marketing_manual_costs.behavior_type
+      - datalake_growth_costs.historical_marketing_manual_costs.landing_page
+      - datalake_growth_costs.historical_marketing_manual_costs.funnel_side
+      - datalake_growth_costs.historical_marketing_manual_costs.medium
+      - datalake_growth_costs.historical_marketing_manual_costs.source
+      - datalake_gsheets_clean.marketing_manual_costs.campaign_business_context
+      - datalake_gsheets_clean.marketing_manual_costs.campaign_strategy_intent
+      - datalake_gsheets_clean.marketing_manual_costs.behavior_type
+      - datalake_gsheets_clean.marketing_manual_costs.landing_page
+      - datalake_gsheets_clean.marketing_manual_costs.funnel_side
+      - datalake_gsheets_clean.marketing_manual_costs.medium
+      - datalake_gsheets_clean.marketing_manual_costs.source
+  account_name:
+    description: Accont name at braze platform
+    lineage:
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.account_name
+      - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.account_name
+      - datalake_growth_manual_daily_costs_clean.marketing_name_convention_shared_costs.account_name
+  campaign_name:
+    description: Name of campaign segmentation
+    lineage:
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.campaign_name
+      - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.campaign_name
+      - datalake_growth_manual_daily_costs_clean.marketing_name_convention_shared_costs.campaign_name
+  utm_campaign:
+    description: utm_campaign applied on growth marketing platform
+    lineage:
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_campaign
+      - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.campaign_name
+      - datalake_growth_manual_daily_costs_clean.marketing_name_convention_shared_costs.campaign_name
+  utm_term:
+    description: utm_term applied on growth marketing platfor
+    lineage:
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_term
+      - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.utm_term
+      - datalake_growth_manual_daily_costs_clean.marketing_name_convention_shared_costs.utm_term
+  utm_content:
+    description: utm_content applied on growth marketing platform
+    lineage:
+      - datalake_consolidated_marketing_metrics.consolidated_media_metrics.utm_content
+      - datalake_growth_manual_daily_costs_clean.marketing_manual_shared_costs.utm_content
+      - datalake_growth_manual_daily_costs_clean.marketing_name_convention_shared_costs.utm_content
+  campaign_business_context:
+    description: Business context of the campaign
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.campaign_business_context
+      - datalake_gsheets_clean.marketing_manual_costs.campaign_business_context
+  campaign_strategy_intent:
+    description: Intention of the actions/campaigns adopted in relation to the growth strategy.
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.campaign_strategy_intent
+      - datalake_gsheets_clean.marketing_manual_costs.campaign_strategy_intent
+  campaign_landing_page:
+    description: Landing page/domain of QuintoAndar to which the campaign directs
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.landing_page
+      - datalake_gsheets_clean.marketing_manual_costs.landing_page
+  behavior_type:
+    description: Type of user behavior in relation to their search decision and entry into the QuintoAndar environment
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.behavior_type
+      - datalake_gsheets_clean.marketing_manual_costs.behavior_type
+  medium:
+    description: Combination of platform intent, media package, branded and recovery audience status dimensions. Where the average package size is mandatory and the others are applied when convenient. More information in the Doc indicated in the table description
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.medium
+      - datalake_gsheets_clean.marketing_manual_costs.medium
+  source:
+    description: QuintoAndar s external platform/operation responsible for generating the result
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.source
+      - datalake_gsheets_clean.marketing_manual_costs.source
+  funnel_side:
+    description: Side of the funnel to which that campaign was directed
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.funnel_side
+      - datalake_gsheets_clean.marketing_manual_costs.funnel_side
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.funnel_side
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.funnel_side
+  total_cost:
+    description: Total cost of the marketing campaign
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.cost
+      - datalake_gsheets_clean.marketing_manual_costs.cost
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.cost
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.cost
+  impressions:
+    description: Number of impressions generated by the campaign
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.impressions
+      - datalake_gsheets_clean.marketing_manual_costs.impressions
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.impressions
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.impressions
+  clicks:
+    description: Number of clicks generated by the campaign
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.clicks
+      - datalake_gsheets_clean.marketing_manual_costs.clicks
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.clicks
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.clicks
+  dt_cost:
+    description: Date associated with the campaign cost
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.dt_cost
+      - datalake_gsheets_clean.marketing_manual_costs.dt_cost
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.dt_cost
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.dt_cost
+  year:
+    description: Extracted year from the campaign cost date
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.dt_cost
+      - datalake_gsheets_clean.marketing_manual_costs.dt_cost
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.dt_cost
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.dt_cost
+  month:
+    description: Extracted month from the campaign cost date
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.dt_cost
+      - datalake_gsheets_clean.marketing_manual_costs.dt_cost
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.dt_cost
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.dt_cost
+  day:
+    description: Extracted day from the campaign cost date
+    lineage:
+      - datalake_growth_costs.historical_marketing_manual_costs.dt_cost
+      - datalake_gsheets_clean.marketing_manual_costs.dt_cost
+      - datalake_growth_costs.historical_marketing_manual_costs_name_convention.dt_cost
+      - datalake_gsheets_clean.marketing_manual_costs_name_convention.dt_cost  

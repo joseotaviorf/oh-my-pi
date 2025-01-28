@@ -1,0 +1,20 @@
+dag:
+  name: enrich_growth_manual_media_platform_metrics
+  schedule_start_date: 2025, 1, 28
+  owner: Data Growth
+  documentation:
+    dag_purpose: 
+      This DAG processes manual marketing costs (gathered from GSheets and other manual inputs) 
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: growth_media_platform
+  default_partitions: ["year", "month", "day"]
+cluster:
+  type: databricks_13_3_min_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

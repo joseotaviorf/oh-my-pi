@@ -1884,6 +1884,10 @@ bietlejuice.enrich_growth_manual_daily_costs:
   - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules
   - bietlejuice.gsheets_growth:done-clean-marketing-manual-costs
   - bietlejuice.gsheets_growth:done-clean-marketing-manual-costs-name-convetion
+bietlejuice.enrich_growth_manual_media_platform_metrics:
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.gsheets_growth:done-clean-marketing-manual-costs
+  - bietlejuice.gsheets_growth:done-clean-marketing-manual-costs-name-convetion
 bietlejuice.enrich_growth_media_platform_metrics:
   - bietlejuice.enrich_criteo:load-enrich-criteo-campaigns
   - bietlejuice.enrich_growth_media_platform_scd:load-enrich-campaign-name-history
