@@ -179,6 +179,18 @@ WITH ticket_history_base AS (
   GROUP BY
     ALL
 )
+,ticket_comment_metrics AS (
+  SELECT
+    tc.id_ticket,
+    MAX(CASE WHEN is_public AND zu.role = 'end-user' THEN tc.ts_created END) AS ts_latest_customer_comment,
+    MAX(CASE WHEN is_public AND zu.role = 'agent' THEN tc.ts_created END) AS ts_latest_analyst_comment
+  FROM
+    datalake_zendesk_clean.ticket_comments AS tc
+  LEFT JOIN
+    datalake_support_users.zendesk_users AS zu
+      ON zu.id_user_zendesk = tc.id_author
+  GROUP BY 1
+)
 SELECT
   tc.id_ticket,
   REPLACE(CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["Ticket do contato"]') AS STRING),'#','') AS id_contact_ticket,
@@ -252,6 +264,8 @@ SELECT
   CAST(csat.ts_submitted AS DATE) AS ts_csat_response_submitted,
   tc.ts_initially_assigned  - INTERVAL 3 HOUR AS ts_initially_assigned_local,
   tc.ts_assigned - INTERVAL 3 HOUR AS ts_last_assigned_local,
+  tcm.ts_latest_customer_comment,
+  tcm.ts_latest_analyst_comment,
   YEAR(tc.ts_updated - INTERVAL 3 HOUR ) AS year,
   MONTH(tc.ts_updated - INTERVAL 3 HOUR ) AS month,
   DAY(tc.ts_updated - INTERVAL 3 HOUR ) AS day
@@ -297,6 +311,9 @@ LEFT JOIN
 LEFT JOIN
   datalake_support_users.zendesk_users AS dzr
     ON dzr.id_user_zendesk = tc.id_requester
+LEFT JOIN
+  ticket_comment_metrics AS tcm
+    ON tcm.id_ticket = t.id_ticket
 WHERE
   tc.group_name IN (
     'Reparos [BACK]',

@@ -2565,6 +2565,7 @@ bietlejuice.enrich_repairs:
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.repairs:load-clean-repair-request-chat
   - bietlejuice.repairs:load-clean-service-request
+  - bietlejuice.zendesk:load-clean-ticket-comments
 bietlejuice.enrich_retsuko:
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-boleto

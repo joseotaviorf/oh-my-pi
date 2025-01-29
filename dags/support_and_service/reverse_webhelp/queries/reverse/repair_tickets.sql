@@ -74,6 +74,8 @@ SELECT
   te.ts_reflux,
   te.ts_first_open,
   sf.ts_help_request,
+  rt.ts_latest_customer_comment,
+  rt.ts_latest_analyst_comment,
   YEAR(CURRENT_DATE - 1) AS year,
   MONTH(CURRENT_DATE - 1) AS month,
   DAY(CURRENT_DATE - 1) AS day,
