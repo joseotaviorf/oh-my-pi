@@ -1,7 +1,0 @@
----
-table_name: metric_rede.offers_weekly
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  dt_week:
-    is_complete:
-      severity_level: Error

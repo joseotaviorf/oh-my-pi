@@ -7,7 +7,17 @@ workflow:
   layer: dw
   custom_schema: rede
   default_extraction_type: full
-  has_load_to_redshift_task: false
+  inner_dependencies:
+    fact_company_event:
+    - dim_company_event_type
+    - dim_company_lead
+    fact_company_journey:
+    - dim_company_lead
+  tables_customization:
+    fact_company_event:
+      partitions: [country_code, business_context]
+    fact_company_journey:
+      partitions: [country_code, business_context]
 cluster:
   type: databricks_12_2_min_general_cluster
   access_control_list:

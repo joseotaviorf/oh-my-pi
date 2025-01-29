@@ -533,9 +533,6 @@ bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
 bietlejuice.dw_house_amenities:
-  - bietlejuice.ebdb_house:load-clean-house-aud
-  - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
-  - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history
   - bietlejuice.enrich_ebdb_amenities:load-enrich-pivotted-amenities
@@ -701,19 +698,14 @@ bietlejuice.dw_quintocred_ifrs:
   - bietlejuice.rental_guarantee_platform:load-clean-renewal
   - bietlejuice.rental_guarantee_platform:load-clean-sap
 bietlejuice.dw_rede_company:
-  - bietlejuice.ebdb_location:load-clean-state
-  - bietlejuice.enrich_company:load-enrich-company
-  - bietlejuice.enrich_hubspot_crm:load-enrich-company
-  - bietlejuice.enrich_hubspot_crm:load-enrich-company-history
-  - bietlejuice.enrich_hubspot_management:load-enrich-owner
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
-bietlejuice.dw_rede_company_lead:
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company-history
+  - bietlejuice.enrich_hubspot_management:load-enrich-owner
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rede_company_event:load-enrich-company-event
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
@@ -1039,9 +1031,6 @@ bietlejuice.dw_visit:
   - bietlejuice.enrich_visit:load-enrich-visit-status-events
   - bietlejuice.enrich_visit:load-enrich-visits
 bietlejuice.enrich_3p:
-  - bietlejuice.ebdb_agent:load-clean-agent-data
-  - bietlejuice.ebdb_contract:load-clean-work-contract
-  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 bietlejuice.enrich_accounting_funnel:
   - bietlejuice.checkout:load-clean-boleto
@@ -3265,20 +3254,6 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-prospect-events
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-top-of-funnel-events
   - bietlejuice.dw_region:load-dw-public-dim-region
-bietlejuice.metric_rede__performance_score:
-  - bietlejuice.dw_booking:load-dw-public-dim-booking
-  - bietlejuice.dw_house_amenities:load-dw-house-dim-house-information
-  - bietlejuice.dw_house_amenities:load-dw-house-dim-house-price-calculator-revision
-  - bietlejuice.dw_house_amenities:load-dw-house-fact-house-information-filling
-  - bietlejuice.dw_rede_company:load-dw-rede-dim-company-cluster
-  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
-  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
-  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
-  - bietlejuice.dw_sale_ongoing_listings:load-dw-sale-fact-daily-ongoing-listing
-  - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-  - bietlejuice.dw_visit:load-dw-visit-dim-cancellation-type
-  - bietlejuice.dw_visit:load-dw-visit-fact-visit-events
-  - bietlejuice.dw_visit:load-dw-visit-fact-visits
 bietlejuice.metric_rent__bookings:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_region:load-dw-public-dim-region
