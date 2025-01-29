@@ -24,6 +24,9 @@ columns:
   return_value_interest:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation.return_value_interest
+  origin:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.origin
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation.active

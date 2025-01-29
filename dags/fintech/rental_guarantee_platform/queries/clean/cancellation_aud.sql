@@ -7,6 +7,7 @@ SELECT
     userinsert                  AS user_insert,
     userupdate                  AS user_update,
     propose,
+    origin,
     return_value,
     return_value_interest,
     type_mod                    AS mod_type,
@@ -15,6 +16,7 @@ SELECT
     propose_mod                 AS mod_propose,
     request_date_mod            AS mod_request_date,
     active_mod                  AS mod_active,
+    origin_mod                  AS mod_origin,
     active                      AS is_active,
     created_at                  AS ts_created,
     request_date                AS ts_requested

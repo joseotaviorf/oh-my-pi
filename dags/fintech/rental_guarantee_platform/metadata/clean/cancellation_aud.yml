@@ -27,6 +27,9 @@ columns:
   propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.propose
+  origin:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.origin
   return_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.return_value
@@ -51,6 +54,9 @@ columns:
   mod_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.active_mod
+  mod_origin:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation_aud.origin_mod
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation_aud.active

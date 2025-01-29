@@ -2,6 +2,7 @@ SELECT
     id,
     type                        AS cancellation_type,
     propose,
+    origin,
     userinsert                  AS user_insert,
     userupdate                  AS user_update,
     return_value,
