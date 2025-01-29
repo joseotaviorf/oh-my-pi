@@ -1146,21 +1146,6 @@ bietlejuice.enrich_app_installed:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_arquivo_confidencial:
   - bietlejuice.arquivo_confidencial:load-clean-integration-report
-bietlejuice.enrich_atento_reports:
-  - bietlejuice.reverse_atento:load-reverse-backlog-metric
-  - bietlejuice.reverse_atento:load-reverse-csat-front
-  - bietlejuice.reverse_atento:load-reverse-demand-metric
-  - bietlejuice.reverse_atento:load-reverse-email
-  - bietlejuice.reverse_atento:load-reverse-fcr-metric
-  - bietlejuice.reverse_atento:load-reverse-general-metric
-  - bietlejuice.reverse_atento:load-reverse-recontact
-  - bietlejuice.reverse_atento:load-reverse-recontact-mx
-  - bietlejuice.reverse_atento:load-reverse-speech-call
-  - bietlejuice.reverse_atento:load-reverse-speech-chat
-  - bietlejuice.reverse_atento:load-reverse-taxonomy
-  - bietlejuice.reverse_atento:load-reverse-tickets-transferred
-  - bietlejuice.reverse_atento:load-reverse-tmr
-  - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
 bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
@@ -2620,6 +2605,35 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.rental_guarantee:load-clean-guarantee-aud
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-credit-card-payment
+bietlejuice.enrich_reverses_monitoring:
+  - bietlejuice.reverse_atento:load-reverse-backlog-metric
+  - bietlejuice.reverse_atento:load-reverse-csat-front
+  - bietlejuice.reverse_atento:load-reverse-demand-metric
+  - bietlejuice.reverse_atento:load-reverse-email
+  - bietlejuice.reverse_atento:load-reverse-fcr-metric
+  - bietlejuice.reverse_atento:load-reverse-general-metric
+  - bietlejuice.reverse_atento:load-reverse-recontact
+  - bietlejuice.reverse_atento:load-reverse-recontact-mx
+  - bietlejuice.reverse_atento:load-reverse-speech-call
+  - bietlejuice.reverse_atento:load-reverse-speech-chat
+  - bietlejuice.reverse_atento:load-reverse-taxonomy
+  - bietlejuice.reverse_atento:load-reverse-tickets-transferred
+  - bietlejuice.reverse_atento:load-reverse-tmr
+  - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
+  - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
+  - bietlejuice.reverse_webhelp:load-reverse-csat-front
+  - bietlejuice.reverse_webhelp:load-reverse-demand-metric
+  - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
+  - bietlejuice.reverse_webhelp:load-reverse-general-metric
+  - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla
+  - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks
+  - bietlejuice.reverse_webhelp:load-reverse-recontact
+  - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
+  - bietlejuice.reverse_webhelp:load-reverse-speech-call
+  - bietlejuice.reverse_webhelp:load-reverse-speech-chat
+  - bietlejuice.reverse_webhelp:load-reverse-taxonomy
+  - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
+  - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-tax
@@ -3204,21 +3218,6 @@ bietlejuice.enrich_visit:
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
   - bietlejuice.insider:load-clean-review
-bietlejuice.enrich_webhelp_reports:
-  - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
-  - bietlejuice.reverse_webhelp:load-reverse-csat-front
-  - bietlejuice.reverse_webhelp:load-reverse-demand-metric
-  - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
-  - bietlejuice.reverse_webhelp:load-reverse-general-metric
-  - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla
-  - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks
-  - bietlejuice.reverse_webhelp:load-reverse-recontact
-  - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
-  - bietlejuice.reverse_webhelp:load-reverse-speech-call
-  - bietlejuice.reverse_webhelp:load-reverse-speech-chat
-  - bietlejuice.reverse_webhelp:load-reverse-taxonomy
-  - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
-  - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
 bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-contact
   - bietlejuice.wololo:load-clean-prospect

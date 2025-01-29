@@ -1,30 +1,35 @@
 ---
-database_name: datalake_atento_reports
+database_name: datalake_reverses_monitoring
 table_name: last_updated_atento
-owner: gabriel.firmino@quintoandar.com.br
+owner: rodrigo.kreuzberg@quintoandar.com.br
 domain: Data S&S
-description: Enrichment table with the aim of obtaining information about the execution of atento reverse dag, the granularity of this 
+description: Enrichment table with the aim of obtaining information about the execution of atento reverse dag, the granularity of this
   table follows the "table_name" column.
 columns:
   bpo:
     description: Partner company that receives the reverse data.
   table_name:
     description: Name of the table sent to the atento partner company.
-  ts_load:
+  max_ts_load:
     lineage:
       - reverse_atento.backlog_metric
       - reverse_atento.csat_front
       - reverse_atento.demand_metric
+      - reverse_atento.email
       - reverse_atento.fcr_metric
       - reverse_atento.general_metric
+      - reverse_atento.recontact_mx
+      - reverse_atento.recontact
       - reverse_atento.speech_call
       - reverse_atento.speech_chat
-      - reverse_atento.twilio_chat_aht
-      - reverse_atento.recontact_mx
       - reverse_atento.taxonomy
-      - reverse_atento.tickets_transferred_total
-      - reverse_atento.tmr
       - reverse_atento.tickets_transferred
-      - reverse_atento.email
-      - reverse_atento.recontact
+      - reverse_atento.tmr
+      - reverse_atento.twilio_chat_aht
     description: Timestamp date that indicates when our atento reverse process was executed.
+  year:
+    description: Year referring to date of update.
+  month:
+    description: Month referring to date of update.
+  day:
+    description: Day referring to date of update.

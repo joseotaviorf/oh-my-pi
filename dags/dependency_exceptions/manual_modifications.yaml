@@ -489,7 +489,7 @@ bietlejuice.enrich_repairs:
     - bietlejuice.repairs:load-clean-repair-expense-group
     - bietlejuice.repairs:load-clean-repair-request
     - bietlejuice.repairs:load-clean-repair-request-item
-bietlejuice.enrich_atento_reports:
+bietlejuice.enrich_reverses_monitoring:
   add:
     - bietlejuice.reverse_atento:load-reverse-backlog-metric
     - bietlejuice.reverse_atento:load-reverse-csat-front
@@ -505,6 +505,20 @@ bietlejuice.enrich_atento_reports:
     - bietlejuice.reverse_atento:load-reverse-tickets-transferred
     - bietlejuice.reverse_atento:load-reverse-tmr
     - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
+    - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
+    - bietlejuice.reverse_webhelp:load-reverse-csat-front
+    - bietlejuice.reverse_webhelp:load-reverse-demand-metric
+    - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
+    - bietlejuice.reverse_webhelp:load-reverse-general-metric
+    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks
+    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla
+    - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
+    - bietlejuice.reverse_webhelp:load-reverse-speech-call
+    - bietlejuice.reverse_webhelp:load-reverse-speech-chat
+    - bietlejuice.reverse_webhelp:load-reverse-taxonomy
+    - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
+    - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
+    - bietlejuice.reverse_webhelp:load-reverse-recontact
 bietlejuice.enrich_databricks_usage_costs:
   add:
     - bietlejuice.gsheets_platform:done-clean-databricks-contract-details
@@ -520,22 +534,6 @@ bietlejuice.enrich_demand_score_report:
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   add:
     - bietlejuice.gsheets_static:load-clean-ticket-rate-classification
-bietlejuice.enrich_webhelp_reports:
-  add:
-    - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
-    - bietlejuice.reverse_webhelp:load-reverse-csat-front
-    - bietlejuice.reverse_webhelp:load-reverse-demand-metric
-    - bietlejuice.reverse_webhelp:load-reverse-fcr-metric
-    - bietlejuice.reverse_webhelp:load-reverse-general-metric
-    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-tasks
-    - bietlejuice.reverse_webhelp:load-reverse-listing-quality-sla
-    - bietlejuice.reverse_webhelp:load-reverse-repair-tickets
-    - bietlejuice.reverse_webhelp:load-reverse-speech-call
-    - bietlejuice.reverse_webhelp:load-reverse-speech-chat
-    - bietlejuice.reverse_webhelp:load-reverse-taxonomy
-    - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
-    - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
-    - bietlejuice.reverse_webhelp:load-reverse-recontact
 bietlejuice.enrich_revenue_lines:
   add:
     - bietlejuice.owner_fees:load-clean-contract-brokerage-fee

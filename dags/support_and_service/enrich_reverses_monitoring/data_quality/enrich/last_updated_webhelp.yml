@@ -1,9 +1,9 @@
 ---
-table_name: datalake_atento_reports.last_updated_atento
+table_name: datalake_reverses_monitoring.last_updated_webhelp
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 0
+    greater_than: 13
     severity_level: Error
 column_level_validations:
   table_name:
