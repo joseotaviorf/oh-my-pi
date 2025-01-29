@@ -101,5 +101,9 @@ LEFT JOIN
     ON managers.id_person = ei.id_person
 WHERE
   ei.id_person IS NULL
-  AND DATE(managers['EffectiveStartDate']) BETWEEN DATE_SUB(DATE('{load_start_date}'), 35)
-    AND DATE('{load_end_date}')
+  AND (
+    DATE(managers['EffectiveStartDate'])
+      BETWEEN DATE_SUB(DATE('{load_start_date}'), 35) AND DATE('{load_end_date}')
+    OR DATE(managers['LastUpdateDate'])
+      BETWEEN DATE_SUB(DATE('{load_start_date}'), 35) AND DATE('{load_end_date}')
+  )
