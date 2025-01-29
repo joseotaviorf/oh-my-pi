@@ -1,0 +1,116 @@
+dag:
+  name: metabase
+  owner: Data Governance
+  schedule_start_date: 2020, 6, 1
+  schedule_interval: "0 5 * * *"
+  documentation:
+    dag_purpose: |
+      This DAG imports the tables from Metabase, our data visualization tool. We extract metadata from Metabase in order
+      to analyze user behavior and have a better control of what is being created there.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_{extraction_type}_data_into_datalake_raw
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  spark_job_arguments:
+  - "{environment}"   # env
+  - "{bucket}"   # datalake_bucket
+  - "{dag_name}"   # source
+  - "{table_name}"
+  tables_customization:
+    core_user:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - "{load_start_date}"   # load_start_date
+        - "updated_at"
+    metabase_database:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - "{load_start_date}"   # load_start_date
+        - "updated_at"
+    metabase_field:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - "{load_start_date}"   # load_start_date
+        - "updated_at"
+    metabase_table:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - "{load_start_date}"   # load_start_date
+        - "updated_at"
+    pulse:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - "{load_start_date}"   # load_start_date
+        - "updated_at"
+    pulse_channel:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - "{load_start_date}"   # load_start_date
+        - "updated_at"
+    report_card:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - "{load_start_date}"   # load_start_date
+        - "updated_at"
+    report_dashboard:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - "{load_start_date}"   # load_start_date
+        - "updated_at"
+    report_dashboardcard:
+      extraction_type: incremental
+      clean_table_name: report_dashboard_card
+      extra_spark_job_arguments:
+        - "{load_start_date}"   # load_start_date
+        - "updated_at"
+    permissions_group:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - "False"
+    permissions_group_membership:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - "False"
+    collection:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - "False"
+    pulse_card:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - "False"
+    pulse_channel_recipient:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - "False"
+    query:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - "False"
+    query_execution:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - "True"
+    revision:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - "False"
+    view_log:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - "False"
+cluster:
+  type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 2
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

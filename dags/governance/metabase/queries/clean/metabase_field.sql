@@ -16,7 +16,7 @@ SELECT
     database_type AS database_field_type,
     settings,
     active AS is_active,
-    preview_display AS has_preview_display, 
+    preview_display AS has_preview_display,
     last_analyzed AS ts_last_analyzed,
     created_at AS ts_created,
     updated_at AS ts_updated,
@@ -26,6 +26,4 @@ SELECT
 FROM
     datalake_metabase_raw.metabase_field
 WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
