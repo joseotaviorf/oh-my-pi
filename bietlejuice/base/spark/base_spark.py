@@ -114,8 +114,31 @@ def _get_conf():
         return None
 
 
+def _get_sql_context(spark, sc):
+    """
+    There are two types of clusters in Unity Catalog: SHARED and SINGLE-USER. The former does not allow
+    the use of HiveContext constructor, which is used to create a sqlContext object. This function tries to
+    create a HiveContext object and returns the spark session if it fails.
+    """
+
+    try:
+        return context.HiveContext(sc)
+    except Exception as e:
+        # Making sure that the exception is due to the usage in a SHARED UC cluster
+        if (
+            not hasattr(e, "getErrorClass")
+            or e.getErrorClass() != "JVM_ATTRIBUTE_NOT_SUPPORTED"
+        ):
+            raise e
+
+        logger.warning(
+            f"HiveContext constructor cannot be used in SHARED clusters in Unity Catalog. Either find an alternative to it, or switch to a single-user cluster. Returning the spark session instead."
+        )
+        return spark
+
+
 class BaseSparkContext:
     conf = _get_conf()
     sc = SparkContext.getOrCreate(conf=conf)
     spark = session.SparkSession(sc)
-    sqlContext = context.HiveContext(sc)
+    sqlContext = _get_sql_context(spark, sc)

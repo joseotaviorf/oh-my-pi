@@ -2,6 +2,7 @@ import os
 from bietlejuice.base.databricks.table_privilege_type_enum import TablePrivilegeTypeEnum
 from bietlejuice.base.spark import BaseSparkContext
 from quintoandar_logger import QuintoAndarLogger
+from py4j.protocol import Py4JError
 
 
 class UnityCatalogHelper:
@@ -9,11 +10,27 @@ class UnityCatalogHelper:
     logger = QuintoAndarLogger("UnityCatalogHelper")
 
     @staticmethod
+    def get_current_catalog() -> str:
+        """Returns the current catalog in use"""
+
+        try:
+            # This is the most reliable way to get the current catalog, but it doesn't work in Unity Catalog Shared Clusters,
+            # which is why we have the fallback below
+            return BaseSparkContext.spark.catalog.currentCatalog()
+        except Py4JError:
+            if UnityCatalogHelper.is_cluster_unity_catalog_enabled():
+                return BaseSparkContext.spark.conf.get(
+                    "spark.databricks.sql.initial.catalog.namespace"
+                )
+            else:
+                return "hive_metastore"
+
+    @staticmethod
     def is_default_catalog_using_unity() -> bool:
         """Returns true if the cluster is configured to use a catalog that supports Unity Catalog"""
 
         return (
-            BaseSparkContext.spark.catalog.currentCatalog()
+            UnityCatalogHelper.get_current_catalog()
             in UnityCatalogHelper.CATALOGS.values()
         )
 
