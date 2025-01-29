@@ -8,15 +8,16 @@ workflow:
   custom_schema: dashboard_governance
   load_spark_job: load_data_assets_into_mp
   spark_job_arguments:
-  - "{environment}"
-  - "--data_assets"
-  - "{table_name}"
+    - "{environment}"
+    - "--data_assets"
+    - "{table_name}"
+  execution_timeout_hours: 5
   tables_customization:
     dashboard_governance:
       load_spark_job: load_dashboard_governance_into_mp
       spark_job_arguments:
-      - "{environment}"
-      - "{{ ds }}"
+        - "{environment}"
+        - "{{ ds }}"
 cluster:
   type: databricks_12_2_min_general_photon_cluster
   access_control_list:
@@ -24,7 +25,7 @@ cluster:
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
