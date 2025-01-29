@@ -12,8 +12,26 @@ workflow:
     tables_customization:
       dim_visit:
         custom_schema: public
+      dim_author_type:
+        merge_on: [ "author_type", "author_user_role", "on_behalf_of", "channel" ]
+      dim_behavior:
+        merge_on: [ "behavior_type" ]
+      dim_business_context:
+        merge_on: [ "business_context" ]
+      dim_business_model:
+        merge_on: [ "business_model" ]
+      dim_entrance_type:
+        merge_on: [ "entrance_type" ]
       dim_event_type:
         merge_on: ["event_name"]
+      dim_origin_type:
+        merge_on: [ "origin_name" ]
+      dim_visit_fup:
+        merge_on: [ "visit_fup" ]
+      dim_visit_model:
+        merge_on: [ "visit_model" ]
+      dim_visit_status:
+        merge_on: [ "status_name" ]
 cluster:
     type: custom_cluster
     access_control_list:
