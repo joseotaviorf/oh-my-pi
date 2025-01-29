@@ -126,7 +126,7 @@ WITH atento_tables AS (
 SELECT
   'Atento' AS bpo,
   table_name,
-  ts_load AS max_ts_load,
+  ts_load,
   YEAR(CURRENT_DATE) AS year,
   MONTH(CURRENT_DATE) AS month,
   DAY(CURRENT_DATE) AS day

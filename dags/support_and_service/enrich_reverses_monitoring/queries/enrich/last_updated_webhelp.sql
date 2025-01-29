@@ -1,4 +1,3 @@
-CREATE OR REPLACE TEMPORARY VIEW vw_last_updated_webhelp AS
 WITH webhelp_tables AS (
   SELECT
     'backlog_metric' AS table_name,
