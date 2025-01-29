@@ -96,6 +96,7 @@ def send_payload_in_batches(api_url, endpoint, transaction_id, headers, payload,
         logger.error(f"m=Mismatch in batches sent. Expected={total_batches}, Sent={successful_batches}")
     else:
         logger.info(f"m=All batches sent successfully. Total_batches={total_batches}")
+        requests.post(f'{api_url}/transactions/{transaction_id}', headers=headers)
         result_request = requests.get(f'{api_url}/transactions/{transaction_id}', headers=headers).json()
         logger.info(f"m=Transaction completed successfully, transaction_status={result_request}")
 
