@@ -35,6 +35,9 @@ columns:
   listing_url:
     lineage:
     - datalake_growth_lab_raw.supply_recurrence.link_do_anuncio_do_imovel
+  city:
+    lineage:
+    - datalake_growth_lab_raw.supply_recurrence.Cidade
   neighborhood:
     lineage:
     - datalake_growth_lab_raw.supply_recurrence.bairro
@@ -50,6 +53,12 @@ columns:
   member_status:
     lineage:
     - datalake_growth_lab_raw.supply_recurrence.status_de_membros
+  supply_source:
+    lineage:
+    - datalake_growth_lab_raw.supply_recurrence.source
+  price:
+    lineage:
+    - datalake_growth_lab_raw.supply_recurrence.valor
   gc_leads:
     lineage:
     - datalake_growth_lab_raw.supply_recurrence.gc_leads
