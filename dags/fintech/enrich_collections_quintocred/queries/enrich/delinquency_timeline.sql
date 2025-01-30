@@ -1,5 +1,5 @@
 WITH
-  cte_base AS (
+cte_base AS (
     SELECT DISTINCT
         d.id AS id_delinquency,
         del.id_propose,
@@ -90,7 +90,6 @@ base_timeline AS (
         type_description,
         delinquency_amount,
         original_value,
-        amount_paid,
         MAX(amount_paid_added) AS amount_paid_added,
         open_amount,
         is_finished,
@@ -105,7 +104,7 @@ base_timeline AS (
         dt_created
     FROM
         cte_final
-    GROUP BY 1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,19
+    GROUP BY 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,18
 ),
 delinquency_end AS (
     SELECT DISTINCT
@@ -139,14 +138,14 @@ cte_timeline_daily AS (
         d.`date`,
         d.month_start,
         t.id_delinquency,
-        t.dt_updated_arq,
+        IF(t.dt_paid IS NULL, t.dt_updated_arq, t.dt_paid) AS dt_updated_arq,
         MAX(t.dt_updated_paid) AS dt_updated,
         MIN(dt_aging) AS dt_aging
     FROM
         datalake_quintoandar.aux_date AS d
     LEFT JOIN
         timeline_base AS t
-            ON IF(t.is_finished, d.`date` >= t.dt_updated_paid AND d.`date` <= LAST_DAY(t.dt_updated_paid), IF(t.is_currently_active = true, d.`date` >= t.dt_fatura AND (d.`date` <= t.dt_delinquency_last_register OR t.dt_delinquency_last_register IS NULL), d.`date` >= t.dt_fatura AND d.`date` <= LAST_DAY(t.dt_delinquency_last_register)))
+            ON IF(t.is_finished, d.`date` >= t.dt_updated_paid AND d.`date` <= LAST_DAY(t.dt_updated_paid), IF(t.is_currently_active = true, d.`date` >= t.dt_fatura AND (d.`date` <= LAST_DAY(t.dt_delinquency_last_register) OR t.dt_delinquency_last_register IS NULL), d.`date` >= t.dt_fatura AND d.`date` <= LAST_DAY(t.dt_delinquency_last_register)))
     WHERE
         d.`date` > DATE('2020-01-01')
         AND d.`date` <= CURRENT_DATE()
@@ -236,7 +235,6 @@ SELECT
     MIN(s.id_status) AS id_status,
     MAX(t.delinquency_amount) AS delinquency_amount,
     MAX(t.original_value) AS original_value,
-    MAX(t.amount_paid) AS amount_paid,
     MAX(p.amount_paid_added) AS amount_paid_added,
     MAX(p.amount_paid_added_month) AS amount_paid_added_month,
     MAX(p.amount_paid_added_accrual) AS amount_paid_added_accrual,
@@ -266,5 +264,4 @@ LEFT JOIN
     AND DATE(t.`date`) = DATE(p.`date`)
 WHERE
     s.id_status IS NOT NULL
-    -- AND t.date >= ADD_MONTHS(CURRENT_DATE, -6)
-GROUP BY 1,2,3,21,22
+GROUP BY 1,2,3,20,21

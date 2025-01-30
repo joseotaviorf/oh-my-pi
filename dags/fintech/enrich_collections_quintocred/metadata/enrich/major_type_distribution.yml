@@ -1,0 +1,35 @@
+---
+database_name: datalake_collections_quintocred
+table_name: major_type_distribution
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Intermediate table to create collections_wallet"
+columns:
+    name:
+        description: "Client name related to debts"
+        lineage:
+            - datalake_collections_quintocred.delinquency_timeline.name
+    document:
+        description: "Client document related to debts"
+        lineage:
+            - datalake_collections_quintocred.delinquency_timeline.document
+    id_propose:
+        description: "ID of related propose"
+        lineage:
+            - datalake_quintocred_collections.delinquency_timeline.id_propose
+    mob:
+        description: "MOB based on the oldest active delinquency"
+        lineage:
+            - datalake_quintocred_collections.delinquency_timeline.mob_delinquency
+    type_description:
+        description: "Array with all descriptions of this delinquency`s type"
+        lineage:
+            - datalake_quintocred_collections.delinquency_timeline.type_description
+    major_type:
+        description: "Type of the main propose of the client, aggregated by day"
+    monthly_major_type:
+        description: "Type of the main propose of the client, aggregated by month"
+    dt_base:
+        description: "Reference date for the timeline"
+        lineage:
+            - datalake_quintocred_collections.delinquency_timeline.dt_base

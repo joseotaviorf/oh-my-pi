@@ -47,14 +47,22 @@ columns:
     description: "Amount already paid on the dt_updated window"
     lineage:
       - datalake_quintocred_collections.delinquency_timeline.amount_paid
-  amount_paid_added:
-    description: "Amount that was added on this update to the amount_paid column"
+  amount_paid_added_month:
+    description: "Amount added accumulated by month"
     lineage:
-      - datalake_quintocred_collections.delinquency_timeline.amount_paid_added
+      - datalake_quintocred_collections.delinquency_timeline.amount_paid_added_month
+  amount_paid_added_accrual:
+    description: "Amount added accumulated by delinquency"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.amount_paid_added_accrual
   open_amount:
     description: "Open amount on the dt_updated window (delinquency_amount - open_amount)"
     lineage:
       - datalake_quintocred_collections.delinquency_timeline.open_amount
+  open_amount_deducted:
+    description: Open amount deducted on this specific day"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.open_amount_deducted
   open_amount_first_day_of_month:
     description: "Open amount on the first day of the month according to the dt_updated window (delinquency_amount - open_amount)"
     lineage:

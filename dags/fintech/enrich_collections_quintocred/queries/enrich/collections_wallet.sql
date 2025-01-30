@@ -13,9 +13,11 @@ WITH timeline AS (
         t.type_description,
         t.delinquency_amount,
         t.original_value,
-        t.amount_paid,
         t.amount_paid_added,
+        t.amount_paid_added_month,
+        t.amount_paid_added_accrual,
         t.open_amount,
+        t.open_amount_deducted,
         t.open_amount_first_day_of_month,
         t.is_finished,
         t.is_legacy_agreement,
@@ -39,12 +41,13 @@ WITH timeline AS (
 min_dates AS (
     SELECT
         document,
+        date,
         MIN(CASE WHEN type_description = 'GUARANTEE' THEN dt_aging END) AS min_dt_guarantee,
         MIN(CASE WHEN type_description IN ('RENEWAL', 'SIGNATURE') THEN dt_aging END) AS min_dt_signature,
         MIN(CASE WHEN type_description = 'RESCISAO' THEN dt_aging END) AS min_dt_termination
     FROM
         datalake_collections_quintocred.mob_delinquency_timeline
-    GROUP BY 1
+    GROUP BY 1,2
 ),
 min_propose_date AS (
     SELECT
@@ -85,7 +88,6 @@ timeline_final AS (
         mt.monthly_major_type,
         SUM(t.delinquency_amount) AS total_delinquency_amount,
         SUM(t.original_value) AS total_original_value,
-        SUM(t.amount_paid) AS total_amount_paid,
         SUM(t.amount_paid_added) AS amount_paid_added,
         SUM(t.open_amount) AS total_open_amount,
         array_agg(t.is_finished) As is_finished_array,
@@ -115,10 +117,11 @@ timeline_final AS (
     LEFT JOIN
         min_dates AS md
         ON t.document = md.document
+        AND t.dt_base = md.`date`
     LEFT JOIN
         min_propose_date AS mpd
         ON t.id_propose = mpd.id_propose
-    GROUP BY 1,2,3,5,6,7,17,19
+    GROUP BY 1,2,3,5,6,7,16,18
 ),
 evictions_day AS (
     SELECT
@@ -129,11 +132,11 @@ evictions_day AS (
         datalake_quintoandar.aux_date AS d
     LEFT JOIN
         datalake_gsheets_clean.quintocred_process_evictions AS e
-          ON d.`date` >= e.dt_register
-          AND (
-              DATE_TRUNC('MONTH', d.`date`) <= e.dt_register
-              OR e.dt_register IS NULL
-              )
+        ON d.`date` >= e.dt_register
+        AND (
+            DATE_TRUNC('MONTH', d.`date`) <= e.dt_register
+            OR e.dt_register IS NULL
+            )
 WHERE
     d.`date` < CURRENT_DATE()
     AND e.is_archived IS FALSE
@@ -148,7 +151,6 @@ SELECT
     t.monthly_major_type,
     t.total_delinquency_amount,
     t.total_original_value,
-    t.total_amount_paid,
     t.amount_paid_added,
     t.total_open_amount,
     DATE_DIFF(DATE_TRUNC('MONTH', t.dt_base), t.dt_min_major_type) AS lead_time_major_type,
@@ -184,4 +186,4 @@ LEFT JOIN
         ON t.document = em.document
         AND em.month = DATE_TRUNC('MONTH', t.dt_base)
 GROUP BY ALL
-ORDER BY 18,1
+ORDER BY 17,1
