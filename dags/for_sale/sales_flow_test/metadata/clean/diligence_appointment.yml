@@ -1,0 +1,31 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: diligence_appointment
+columns:
+  id_diligence_appointment:
+    lineage:
+      - datalake_sales_flow_test_raw.diligence_appointment.id
+  id_diligence:
+    lineage:
+      - datalake_sales_flow_test_raw.diligence_appointment.diligence_id
+  appointment:
+    lineage:
+      - datalake_sales_flow_test_raw.diligence_appointment.appointment
+  ts_deleted:
+    lineage:
+      - datalake_sales_flow_test_raw.diligence_appointment.deleted_at
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.diligence_appointment.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.diligence_appointment.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.diligence_appointment.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.diligence_appointment.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.diligence_appointment.day

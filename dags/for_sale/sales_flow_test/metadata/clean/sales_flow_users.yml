@@ -1,0 +1,35 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: sales_flow_users
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: Table that relates the users and the offers that they are participating.
+columns:
+  id:
+    description: Unique ID for this entry on this table.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users.id
+  id_sales_flow:
+    description: SalesFlow offer ID. Joins with datalake_sales_flow_test_clean.sales_flow.id
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users.sales_flow_id
+  id_user:
+    description: User ID on SalesFlow tables. Joins with table datalake_sales_flow_test_clean.users
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users.user_id
+  type:
+    description: User Type
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users.type
+  is_original_user:
+    description: Indicates if this user was the one that made the offer on the platform.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users.is_original_user
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users.updated_at

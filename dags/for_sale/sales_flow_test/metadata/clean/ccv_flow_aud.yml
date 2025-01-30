@@ -1,0 +1,61 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: ccv_flow_aud
+columns:
+  id_ccv_flow_aud:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.sales_flow_id
+  status:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.status
+  rev:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.revend
+  is_5a_model:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.is_5a_model
+  mod_id_sales_flow:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.sales_flow_id_mod
+  mod_status:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.status_mod
+  mod_is_5a_model:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.is_5a_model_mod
+  mod_ts_confection_started:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.started_confection_at_mod
+  mod_ts_signed:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.signed_at_mod
+  ts_confection_started:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.started_confection_at
+  ts_signed:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.signed_at
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_flow_aud.day

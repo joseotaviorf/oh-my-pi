@@ -1,0 +1,25 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: tag
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_test_raw.tag.id
+  label:
+    lineage:
+      - datalake_sales_flow_test_raw.tag.label
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.tag.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.tag.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.tag.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.tag.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.tag.day

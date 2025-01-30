@@ -1,0 +1,158 @@
+database_name: datalake_sales_flow_test_clean
+table_name: sales_flow_aud
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: Aud table for SalesFlow main table that contains general info about the offers.
+columns:
+  id:
+    description: SalesFlow offer ID.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.id
+  id_buyer:
+    description: Buyer ID on SalesFlow tables. Should not be used anymore, get this info from sales_flow_users.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.buyer_id
+  id_seller:
+    description: Seller ID on SalesFlow tables. Should not be used anymore, get this info from sales_flow_users.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.seller_id
+  id_house:
+    description: House ID on SalesFlow tables (house).
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.house_id
+  id_monday:
+    description: Deprecated. Do not use.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.monday_id
+  id_closing_type:
+    description: Closing type ID that indicates which process this offer is being done. This ID join with the ID on datalake_sales_flow_test_clean.closing_type.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.closing_type_id
+  flow_step:
+    description: Which step this offer is on the sale process.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.flow_step
+  flow_type:
+    description: Where this offer started.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.flow_type
+  status_closing:
+    description: Offer status, like canceled or credit_analysis.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.status_closing
+  status:
+    description: Which macro status this offer currently is.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.status
+  closing_canceled_reason:
+    description: Reason why this offer was canceled.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.closing_canceled_reason
+  buyer_canceled_reason:
+    description: Reason why the buyer canceled the offer.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.buyer_canceled_reason
+  buyer_canceled_comment:
+    description: Buyer comment on why the the offer was canceled.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.buyer_canceled_comment
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.revend
+  is_canceled:
+    description: Boolean indicating if the offer is canceled.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.is_canceled
+  mod_id_buyer:
+    description: Flag indicating if the id_buyer has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.buyer_id_mod
+  mod_id_seller:
+    description: Flag indicating if the id_seller has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.seller_id_mod
+  mod_id_house:
+    description: Flag indicating if the id_house has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.house_id_mod
+  mod_id_monday:
+    description: Flag indicating if the column id_monday has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.monday_id_mod
+  mod_id_closing_type:
+    description: Flag indicating if the column id_closing_type has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.closing_type_id_mod
+  mod_flow_step:
+    description: Flag indicating if the column flow_step has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.flow_step_mod
+  mod_flow_type:
+    description: Flag indicating if the column flow_type has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.flow_type_mod
+  mod_status_closing:
+    description: Flag indicating if the column status_closing has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.status_closing_mod
+  mod_status:
+    description: Flag indicating if the column status has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.status_mod
+  mod_closing_canceled_reason:
+    description: Flag indicating if the column closing_canceled_reason has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.closing_canceled_reason_mod
+  mod_buyer_canceled_reason:
+    description: Reason why the buyer canceled the offer.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.mod_buyer_canceled_reason
+  mod_buyer_canceled_comment:
+    description: Buyer comment on why the the offer was canceled.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.mod_buyer_canceled_comment
+  mod_is_canceled:
+    description: Flag indicating if the column is_canceled has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.is_canceled_mod
+  mod_ts_canceled:
+    description: Flag indicating if the column ts_canceled has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.canceled_at_mod
+  ts_canceled:
+    description: Timestamp that indicates when this offer was canceled.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.canceled_at
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_aud.day

@@ -1,0 +1,111 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: sales_flow_invite_aud
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: Aud table with the invites statuses.
+columns:
+  id:
+    description: Unique ID for the invite.
+    lineage:
+    - datalake_sales_flow_test_raw.sales_flow_invite_aud.id
+  id_sales_flow:
+    description: SalesFlow offer ID. Joins with datalake_sales_flow_test_clean.sales_flow.id
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.sales_flow_id
+  id_inviter:
+    description: Inviter User ID on Sales Flow databases.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.inviter_id
+  id_invitee:
+    description: User ID on Sales Flow databases after accepting the invite. This user id_external can be found on table sales_flow_test_clean.users
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.invitee_id
+  id_folder:
+    description: Buyer Docx Folder ID on Docx tables.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.folder_id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.revend
+  type:
+    description: User type. BUYER or SELLER
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.type
+  name:
+    description: User name.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.name
+  email:
+    description: User e-mail.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.email
+  status:
+    description: Invite status.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.status
+  mod_id_sales_flow:
+    description: Flag indicating if the column id_sales_flow has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.sales_flow_id_mod
+  mod_id_inviter:
+    description: Flag indicating if the column id_inviter has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.id_inviter_mod
+  mod_id_invitee:
+    description: Flag indicating if the column id_invitee has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.id_invitee_mod
+  mod_id_folder:
+    description: Flag indicating if the column id_folder has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.id_folder_mod
+  mod_type:
+    description: Flag indicating if the column type has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.type_mod
+  mod_name:
+    description: Flag indicating if the column name has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.name_mod
+  mod_email:
+    description: Flag indicating if the column email has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.email_mod
+  mod_status:
+    description: Flag indicating if the column status has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.status_mod
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_invite_aud.day

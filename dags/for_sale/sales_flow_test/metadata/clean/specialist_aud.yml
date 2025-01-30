@@ -1,0 +1,67 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: specialist_aud
+columns:
+  id_specialist_aud:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.sales_flow_id
+  id_main_user:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.main_user_id
+  id_user:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.user_id
+  rev:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.revend
+  kind:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.kind
+  email:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.email
+  specialist_name:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.name
+  mod_id_sales_flow:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.sales_flow_id_mod
+  mod_id_main_used:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.main_user_id_mod
+  mod_id_user:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.user_id_mod
+  mod_kind:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.kind_mod
+  mod_email:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.email_mod
+  mod_specialist_name:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.name_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.specialist_aud.day

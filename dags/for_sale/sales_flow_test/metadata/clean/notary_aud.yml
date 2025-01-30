@@ -1,0 +1,115 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: notary_aud
+columns:
+  id_notary_aud:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.sales_flow_id
+  id_specialist:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.specialist_id
+  rev:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.revend
+  label:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.label
+  status:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.status
+  protocol:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.protocol
+  password:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.password
+  available_costs:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.available_costs
+  paid_costs:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.paid_costs
+  seller_payment_status:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.seller_payment_status
+  mod_id_sales_flow:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.sales_flow_id_mod
+  mod_id_specialist:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.specialist_id_mod
+  mod_label:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.label_mod
+  mod_status:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.status_mod
+  mod_protocol:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.protocol_mod
+  mod_password:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.password_mod
+  mod_available_costs:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.available_costs_mod
+  mod_paid_costs:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.paid_costs_mod
+  mod_seller_payment_status:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.seller_payment_status_mod
+  mod_ts_started:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.started_at_mod
+  mod_ts_ended:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.ended_at_mod
+  mod_ts_prevision_ended:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.end_prevision_at_mod
+  mod_ts_buyer_received_keys:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.buyer_received_keys_at_mod
+  mod_ts_kit_sent:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.kit_sent_at_mod
+  ts_started:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.started_at
+  ts_ended:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.ended_at
+  ts_prevision_ended:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.end_prevision_at
+  ts_buyer_received_keys:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.buyer_received_keys_at
+  ts_kit_sent:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.kit_sent_at
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.notary_aud.day

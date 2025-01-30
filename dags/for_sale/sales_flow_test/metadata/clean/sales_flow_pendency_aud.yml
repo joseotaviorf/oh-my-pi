@@ -1,0 +1,40 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: sales_flow_pendency_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.id
+  id_sales_flow:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.sales_flow_id
+  rev:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.revend
+  pendency:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.pendency
+  type:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.type
+  mod_id_sales_flow:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.sales_flow_id_mod
+  mod_type:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.type_mod
+  mod_pendency:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.pendency_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_pendency_aud.updated_at

@@ -1,0 +1,86 @@
+database_name: datalake_sales_flow_test_clean
+table_name: sales_flow
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: SalesFlow main table that contains general info about the offers.
+columns:
+  id:
+    description: SalesFlow offer ID.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.id
+  id_buyer:
+    description: Buyer ID on SalesFlow tables. Should not be used anymore, get this info from sales_flow_users.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.buyer_id
+  id_seller:
+    description: Seller ID on SalesFlow tables. Should not be used anymore, get this info from sales_flow_users.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.seller_id
+  id_house:
+    description: House ID on SalesFlow tables (house).
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.house_id
+  id_monday:
+    description: Deprecated. Do not use.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.monday_id
+  id_closing_type:
+    description: Closing type ID that indicates which process this offer is being done. This ID join with the ID on datalake_sales_flow_test_clean.closing_type.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.closing_type_id
+  flow_step:
+    description: Which step this offer is on the sale process.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.flow_step
+  flow_type:
+    description: Where this offer started.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.flow_type
+  status_closing:
+    description: Offer status, like canceled or credit_analysis.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.status_closing
+  status:
+    description: Which macro status this offer currently is.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.status
+  buyer_canceled_reason:
+    description: Reason why the buyer canceled the offer.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.buyer_canceled_reason
+  buyer_canceled_comment:
+    description: Buyer comment on why the the offer was canceled.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.buyer_canceled_comment
+  closing_canceled_reason:
+    description: Reason why this offer was canceled.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.closing_canceled_reason
+  is_canceled:
+    description: Boolean indicating if the offer is canceled.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.is_canceled
+  ts_canceled:
+    description: Timestamp that indicates when this offer was canceled.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.canceled_at
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow.day

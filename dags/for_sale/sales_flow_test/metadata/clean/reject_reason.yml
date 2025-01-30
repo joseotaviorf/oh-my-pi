@@ -1,0 +1,33 @@
+database_name: datalake_sales_flow_test_clean
+table_name: reject_reason
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason.id
+  source:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason.source
+  category:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason.category
+  reason:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason.reason
+  is_active:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason.active
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason.day

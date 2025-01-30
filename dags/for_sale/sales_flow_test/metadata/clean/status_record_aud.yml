@@ -1,0 +1,79 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: status_record_aud
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: Status record type aud table.
+columns:
+  id:
+    description: Macrostatus ID on status Tables
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.id
+  id_sales_flow:
+    description: Offer ID on SalesFlow tables.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.sales_flow_id
+  id_status:
+    description: Status ID on status Tables.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.status_id
+  rev:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.revend
+  mod_id_sales_flow:
+    description: Flag indicating if the id_sales_flow phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.sales_flow_id_mod
+  mod_id_status:
+    description: Flag indicating if the id_status phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.status_id_mod
+  mod_ts_status_start:
+    description: Flag indicating if the ts_status_start phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.status_start_date_mod
+  mod_ts_status_end:
+    description: Flag indicating if the ts_status_end phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.status_end_date_mod
+  ts_status_start:
+    description: Date of registration of start of a status.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.status_start_date
+  ts_status_end:
+    description: Date of registration of finish of a status.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.status_end_date
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.status_record_aud.day

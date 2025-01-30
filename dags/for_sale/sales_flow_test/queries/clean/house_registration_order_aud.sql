@@ -1,0 +1,28 @@
+SELECT
+    id,
+    external_house_id AS id_house_external,
+    rev,
+    revtype as rev_type,
+    revend as rev_end,
+    house_registration_number,
+    city,
+    state,
+    registry_office,
+    status,
+    order_number,
+    error_status,
+    external_house_id_mod AS mod_id_house_external,
+    house_registration_number_mod AS mod_house_registration_number,
+    city_mod AS mod_city,
+    state_mod AS mod_state,
+    registry_office_mod AS mod_registry_office,
+    status_mod AS mod_status,
+    order_number_mod AS mod_order_number,
+    error_status_mod AS mod_error_status,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_sales_flow_test_raw.house_registration_order_aud

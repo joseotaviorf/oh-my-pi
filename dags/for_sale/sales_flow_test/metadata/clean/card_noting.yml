@@ -1,0 +1,30 @@
+database_name: datalake_sales_flow_test_clean
+table_name: card_noting
+columns:
+  id_card_noting:
+    lineage:
+      - datalake_sales_flow_test_raw.card_noting.id
+  buyer_and_seller:
+    lineage:
+      - datalake_sales_flow_test_raw.card_noting.buyer_and_seller
+  commitment_closing_transfer:
+    lineage:
+      - datalake_sales_flow_test_raw.card_noting.commitment_closing_transfer
+  negotiation_note:
+    lineage:
+      - datalake_sales_flow_test_raw.card_noting.negotiation_note
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.card_noting.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.card_noting.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.card_noting.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.card_noting.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.card_noting.day

@@ -1,0 +1,54 @@
+database_name: datalake_sales_flow_test_clean
+table_name: reject_reason_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.id
+  rev:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.revend
+  source:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.source
+  category:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.category
+  reason:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.reason
+  is_active:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.active
+  mod_source:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.source_mod
+  mod_category:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.category_mod
+  mod_reason:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.reason_mod
+  mod_is_active:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.active_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.reject_reason_aud.day

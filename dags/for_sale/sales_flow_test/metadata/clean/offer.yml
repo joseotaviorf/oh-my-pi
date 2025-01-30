@@ -1,0 +1,98 @@
+database_name: datalake_sales_flow_test_clean
+table_name: offer
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: Table that contains information about the offer made by the buyer.
+columns:
+  id:
+    description: Offer Unique ID on this table
+    lineage:
+      - datalake_sales_flow_test_raw.offer.id
+  id_sales_flow:
+    description: SalesFlow offer ID. Joins with datalake_sales_flow_test_clean.sales_flow.id
+    lineage:
+      - datalake_sales_flow_test_raw.offer.sales_flow_id
+  id_firestore:
+    description: Offer ID generated on Firestore.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.firestore_id
+  id_reject_reason:
+    description: ID to get more information about the reject reason on table sales_flow_test_clean.reject_reason.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.reject_reason_id
+  id_hub:
+    description: ID to get more information abou the HUB on HubServices tables.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.hub_id
+  offer_price:
+    description: Value sent by the buyer for this offer.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.offer_price
+  sale_price:
+    description: Value set by the seller on the listing.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.sale_price
+  final_price:
+    description: Sale price agreed between buyer and seller.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.final_price
+  itbi_price:
+    description: Value on registered on ITBI.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.itbi_price
+  registry_price:
+    description: Property registry price.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.registry_price
+  deed_price:
+    description: Property price in the deed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.deed_price
+  discard_reason:
+    description: Reason why this offer was discarded.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.discard_reason
+  status:
+    description: Offer status.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.status
+  has_used_offer_suggestion:
+    description: Flag that indicates if this user came from a carrousel showing properties with porperties like the one he is looking for.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.used_offer_suggestion
+  dt_proposed:
+    description: Offer proposal date.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.proposal_date
+  ts_accepted:
+    description: Timestamp which the seller accepted the buyer's offer.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.accepted_at
+  ts_validated:
+    description: Deprecated field. Do not use.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.validated_at
+  ts_discarded:
+    description: Timestamp which the seller discarded the buyer's offer.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.discarded_at
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.day

@@ -1,0 +1,111 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: house_registration_order_aud
+owner: herivelto.junior@quintoandar.com.br
+domain: ForSale
+description: null
+columns:
+  id:
+    description: House registration unique ID for this table.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.id
+  id_house_external:
+    description: House ID on main (EBDB) tables
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.external_house_id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.revend
+  house_registration_number:
+    description: House registration number on the notary office.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.house_registration_number
+  city:
+    description: City name
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.city
+  state:
+    description: State name
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.state
+  registry_office:
+    description: Registry office number where this house is registered
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.registry_office
+  status:
+    description: Request status.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.status
+  order_number:
+    description: Registration process number
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.order_number
+  error_status:
+    description: Error description
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.error_status
+  mod_id_house_external:
+    description: Flag indicating if the column id_house_external has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.external_house_id_mod
+  mod_house_registration_number:
+    description: Flag indicating if the column house_registration_number has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.house_registration_number_mod
+  mod_city:
+    description: Flag indicating if the column city has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.city_mod
+  mod_state:
+    description: Flag indicating if the column state has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.state_mode
+  mod_registry_office:
+    description: Flag indicating if the column registry_office has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.registry_office_mod
+  mod_status:
+    description: Flag indicating if the column status has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.status_mod
+  mod_order_number:
+    description: Flag indicating if the column order_number has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.order_number_mod
+  mod_error_status:
+    description: Flag indicating if the column error_status has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.error_status_mod
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order_aud.day

@@ -1,0 +1,47 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: ccv_edition_reason_aud
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: Aud table that stores the ccv edition reasons.
+columns:
+  id:
+    description: Unique ID for this entry.
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_edition_reason_aud.id
+  id_ccv:
+    description: Unique ID for this CCV. Joins with the ccv tables (ccv_flow, ccv, ccv_party and others).
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_edition_reason_aud.ccv_id
+  edition_reason:
+    description: Reason why this CCV was edited.
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_edition_reason_aud.edition_reason
+  mod_edition_reason:
+    description: Flag indicating if the edit_reason has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_edition_reason_aud.edition_reason_mod
+  mod_id_ccv:
+    description: Flag indicating if the id_ccv has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_edition_reason_aud.ccv_id_mod
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_edition_reason_aud.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_edition_reason_aud.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_edition_reason_aud.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_edition_reason_aud.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_edition_reason_aud.day

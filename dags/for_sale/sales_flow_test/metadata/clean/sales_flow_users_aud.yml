@@ -1,0 +1,79 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: sales_flow_users_aud
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: Aud table that relates the users and the offers that they are participating
+columns:
+  id:
+    description: Unique ID for this entry on this table.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.id
+  id_sales_flow:
+    description: SalesFlow offer ID. Joins with datalake_sales_flow_test_clean.sales_flow.id
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.sales_flow_id
+  id_user:
+    description: User ID on SalesFlow tables. Joins with table datalake_sales_flow_test_clean.users
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.user_id
+  type:
+    description: User Type
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.type
+  is_original_user:
+    description: Indicates if this user was the one that made the offer on the platform.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.is_original_user
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.rev
+  revtype:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.revtype
+  revend:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.revend
+  mod_id_sales_flow:
+    description: Flag indicating if the column id_sales_flow has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.sales_flow_id_mod
+  mod_id_user:
+    description: Flag indicating if the column id_user has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.user_id_mod
+  mod_type:
+    description: Flag indicating if the column type has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.type_mod
+  mod_is_original_user:
+    description: Flag indicating if the column is_original_user has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.is_original_user_mod
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.sales_flow_users_aud.day

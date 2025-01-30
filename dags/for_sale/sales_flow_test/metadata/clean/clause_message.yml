@@ -1,0 +1,46 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: clause_message
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.id
+  id_subject:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.subject_id
+  id_parent:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.parent_id
+  is_negotiation_clause:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.is_negotiation_clause
+  description:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.description
+  payment_method:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.payment_method
+  title:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.title
+  order_clause:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.order_clause
+  variables:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.variables
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.clause_message.day

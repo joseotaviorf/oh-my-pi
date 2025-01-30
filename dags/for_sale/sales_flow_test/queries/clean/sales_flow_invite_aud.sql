@@ -1,0 +1,28 @@
+SELECT
+    id,
+    sales_flow_id AS id_sales_flow,
+    inviter_id AS id_inviter,
+    invitee_id AS id_invitee,
+    folder_id AS id_folder,
+    rev,
+    revtype AS rev_type,
+    revend AS rev_end,
+    type,
+    name,
+    email,
+    status,
+    sales_flow_id_mod AS mod_id_sales_flow,
+    inviter_id_mod AS mod_id_inviter,
+    invitee_id_mod AS mod_id_invitee,
+    folder_id_mod AS mod_id_folder,
+    type_mod AS mod_type,
+    name_mod AS mod_name,
+    email_mod AS mod_email,
+    status_mod AS mod_status,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_sales_flow_test_raw.sales_flow_invite_aud

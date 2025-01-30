@@ -1,0 +1,84 @@
+database_name: datalake_sales_flow_test_clean
+table_name: ccv_party_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.id
+  id_ccv:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.ccv_id
+  id_address_data:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.address_data_id
+  type:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.type
+  name:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.name
+  email:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.email
+  document:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.document
+  nationality:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.nationality
+  profession:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.profession
+  marital_status:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.marital_status
+  rev:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.revend
+  mod_id_ccv:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.ccv_id_mod
+  mod_id_address_data:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.address_data_id_mod
+  mod_type:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.type_mod
+  mod_name:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.name_mod
+  mod_email:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.email_mod
+  mod_document:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.document_mod
+  mod_nationality:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.nationality_mod
+  mod_profession:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.profession_mod
+  mod_marital_status:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.marital_status_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_party_aud.day

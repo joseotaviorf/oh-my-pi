@@ -1,0 +1,61 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: ccv_rule_aud
+columns:
+  id_ccv_rule_aud:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.id
+  ccv_version:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.ccv_version
+  type:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.type
+  rev:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.revend
+  ccv_rule_name:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.name
+  storage_hash_token:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.storage_hash_token
+  checksum:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.checksum
+  mod_ccv_version:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.ccv_version_mod
+  mod_type:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.type_mod
+  mod_ccv_rule_name:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.name_mod
+  mod_storage_hash_token:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.storage_hash_token_mod 
+  mod_checksum:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.checksum_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.ccv_rule_aud.day

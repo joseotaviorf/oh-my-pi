@@ -1,0 +1,63 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: house_registration_order
+owner: herivelto.junior@quintoandar.com.br
+domain: ForSale
+description: null
+columns:
+  id:
+    description: House registration unique ID for this table.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.id
+  id_house_external:
+    description: House ID on main (EBDB) tables
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.external_house_id
+  house_registration_number:
+    description: House registration number on the notary office.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.house_registration_number
+  city:
+    description: City name
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.city
+  state:
+    description: State name
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.state
+  registry_office:
+    description: Registry office number where this house is registered
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.registry_office
+  status:
+    description: Request status.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.status
+  order_number:
+    description: Registration process number
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.order_number
+  error_status:
+    description: Error description
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.error_status
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.house_registration_order.day

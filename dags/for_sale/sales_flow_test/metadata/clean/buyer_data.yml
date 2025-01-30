@@ -1,0 +1,67 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: buyer_data
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: Table with the buyer information that will be used on the CCV. Since this is an incremental table, it must be filtered with a row_number to avoid duplicates.
+columns:
+  id_buyer:
+    description: Buyer user ID on SalesFlow tables.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.id
+  id_sales_flow:
+    description: SalesFlow offer ID. Joins with datalake_sales_flow_test_clean.sales_flow.id
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.sales_flow_id
+  id_docx_folder:
+    description: Buyer Docx Folder ID on Docx tables.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.docx_folder_id
+  name:
+    description: User name
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.name
+  email:
+    description: User email
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.email
+  holding_value:
+    description: Indicates how much this buyer is participating on the offer value.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.holding_value
+  ccv_role:
+    description: Indicates the user role on this CCV, on this case will be BUYER.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.ccv_role
+  signer_status:
+    description: Indicate if this user is a CCV signer.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.signer_status
+  triage_status:
+    description: This column is deprecated. Do not use.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.triage_status
+  is_investor:
+    description: Indicates if this user is an investor or not.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.investor
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.buyer_data.day

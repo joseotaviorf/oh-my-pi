@@ -1,0 +1,65 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: microstatus_order_aud
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: Micro status order type aud table.
+columns:
+  id:
+    description: MicroStatus of Closing Process ID
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.id
+  id_status_order:
+    description: Ordering of Status ID on status_order Tables
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.status_order_id
+  id_status:
+    description: Status ID on status Tables
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.status_id
+  rev:
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.revend
+  ordering:
+    description: Ordering of microstatus of Closing process.
+      For example, if the microstatus is Offer, the microstatus of the order will be created, sent and accepted. Each microstatus has its own microstatus order.
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.ordering
+  mod_id_status_order:
+    description:  Flag indicating if the id_status_order phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.status_order_id_mod
+  mod_id_status:
+    description:  Flag indicating if the id_status phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.status_id_mod
+  mod_ordering:
+    description:  Flag indicating if the ordering phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.ordering_mod
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.microstatus_order_aud.day

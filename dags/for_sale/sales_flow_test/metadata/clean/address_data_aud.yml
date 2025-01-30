@@ -1,0 +1,72 @@
+database_name: datalake_sales_flow_test_clean
+table_name: address_data_aud
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.id
+  street:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.street
+  number:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.number
+  complement:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.complement
+  neighborhood:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.neighborhood
+  city:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.city
+  state:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.state
+  zip_code:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.zip_code
+  rev:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.rev
+  rev_type:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.revend
+  mod_street:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.street_mod
+  mod_number:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.number_mod
+  mod_complement:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.complement_mod
+  mod_neighborhood:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.neighborhood_mod
+  mod_city:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.city_mod
+  mod_state:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.state_mod
+  mod_zip_code:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.zip_code_mod
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.updated_at
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.address_data_aud.day

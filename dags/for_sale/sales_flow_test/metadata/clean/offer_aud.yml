@@ -1,0 +1,182 @@
+database_name: datalake_sales_flow_test_clean
+table_name: offer_aud
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: Aud table that contains information about the offer made by the buyer.
+columns:
+  id:
+    description: Offer Unique ID on this table
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.id
+  id_sales_flow:
+    description: SalesFlow offer ID. Joins with datalake_sales_flow_test_clean.sales_flow.id
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.sales_flow_id
+  id_firestore:
+    description: Offer ID generated on Firestore.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.firestore_id
+  id_reject_reason:
+    description: ID to get more information about the reject reason on table sales_flow_test_clean.reject_reason.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.reject_reason_id
+  id_hub:
+    description: ID to get more information abou the HUB on HubServices tables.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.hub_id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.revend
+  offer_price:
+    description: Value sent by the buyer for this offer.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.offer_price
+  sale_price:
+    description: Value set by the seller on the listing.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.sale_price
+  final_price:
+    description: Sale price agreed between buyer and seller.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.final_price
+  itbi_price:
+    description: Value on registered on ITBI.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.itbi_price
+  registry_price:
+    description: Property registry price.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.registry_price
+  deed_price:
+    description: Property price in the deed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer.deed_price
+  discard_reason:
+    description: Reason why this offer was discarded.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.discard_reason
+  status:
+    description: Offer status.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.status
+  has_used_offer_suggestion:
+    description: Flag that indicates if this user came from a carrousel showing properties with porperties like the one he is looking for.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.used_offer_suggestion
+  mod_id_sales_flow:
+    description:  Flag indicating if the column id_sales_flow has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.sales_flow_id_mod
+  mod_id_firestore:
+    description: Flag indicating if the id_firestore phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.firestore_id_mod
+  mod_id_reject_reason:
+    description:  Flag indicating if the id_reject_reason phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.reject_reason_id_mod
+  mod_id_hub:
+    description: Flag indicating if the id_hub phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.hub_id_mod
+  mod_dt_proposed:
+    description: Flag indicating if the column dt_proposed has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.proposal_date_mod
+  mod_ts_accepted:
+    description: Flag indicating if the column ts_accepted has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.accepted_at_mod
+  mod_ts_validated:
+    description: Flag indicating if the column ts_validated has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.validated_at_mod
+  mod_ts_discarded:
+    description: Flag indicating if the column ts_discarded has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.discarded_at_mod
+  mod_offer_price:
+    description: Flag indicating if the offer_price phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.offer_price_mod
+  mod_sale_price:
+    description: Flag indicating if the sale_price phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.sale_price_mod
+  mod_final_price:
+    description: Flag indicating if the final_price phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.final_price_mod
+  mod_itbi_price:
+    description: Flag indicating if the itbi_price phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.itbi_price_mod
+  mod_registry_price:
+    description: Flag indicating if the registry_price phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.registry_price_mod
+  mod_deed_price:
+    description: Flag indicating if the itbi_price phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.deed_price_mod
+  mod_discard_reason:
+    description: Flag indicating if the discard_reason phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.discard_reason_mod
+  mod_status:
+    description: Flag indicating if the mod_discard_reason phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.status_mod
+  mod_has_used_offer_suggestion:
+    description: Flag indicating if the column has_used_offer_suggestion has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.used_offer_suggestion_mod
+  dt_proposed:
+    description: Offer proposal date.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.proposal_date
+  ts_accepted:
+    description: Timestamp which the seller accepted the buyer's offer.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.accepted_at
+  ts_validated:
+    description: Deprecated field. Do not use.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.validated_at
+  ts_discarded:
+    description: Timestamp which the seller discarded the buyer's offer.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.discarded_at
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.offer_aud.day

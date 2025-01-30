@@ -1,0 +1,201 @@
+dag:
+  name: sales_flow_test
+  schedule_start_date: 2021, 3, 2
+  schedule_interval: 0 21 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      This DAG imports the tables from [Sales Flow](https://github.com/quintoandar/sales-flow), a service responsible for the management of ForSale's operations after receiving an offer.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: salesflow
+  custom_schema: sales_flow_test
+  dbutils_secret_key: SALESFLOW_DB
+  tables_customization:
+    address_data:
+      clean_table_name: address_data
+    address_data_aud:
+      clean_table_name: address_data_aud
+    brokerage:
+      clean_table_name: brokerage
+    brokerage_aud:
+      clean_table_name: brokerage_aud
+    buyer_data:
+      clean_table_name: buyer_data
+    buyer_data_aud:
+      clean_table_name: buyer_data_aud
+    bypass:
+      clean_table_name: bypass
+    bypass_aud:
+      clean_table_name: bypass_aud
+    card_noting:
+      clean_table_name: card_noting
+    card_noting_aud:
+      clean_table_name: card_noting_aud
+    cash_payment:
+      clean_table_name: cash_payment
+    cash_payment_aud:
+      clean_table_name: cash_payment_aud
+    ccv:
+      clean_table_name: ccv
+    ccv_aud:
+      clean_table_name: ccv_aud
+    ccv_clause:
+      clean_table_name: ccv_clause
+    ccv_edition_reason:
+      clean_table_name: ccv_edition_reason
+    ccv_edition_reason_aud:
+      clean_table_name: ccv_edition_reason_aud
+    ccv_termination:
+      clean_table_name: ccv_termination
+    clause_message:
+      clean_table_name: clause_message
+    closing_type:
+      clean_table_name: closing_type
+    closing_type_aud:
+      clean_table_name: closing_type_aud
+    ccv_flow:
+      clean_table_name: ccv_flow
+    ccv_flow_aud:
+      clean_table_name: ccv_flow_aud
+    ccv_party:
+      clean_table_name: ccv_party
+    ccv_party_aud:
+      clean_table_name: ccv_party_aud
+    ccv_rule:
+      clean_table_name: ccv_rule
+    ccv_rule_aud:
+      clean_table_name: ccv_rule_aud
+    contact:
+      clean_table_name: contact
+    contact_aud:
+      clean_table_name: contact_aud
+    diligence:
+      clean_table_name: diligence
+    diligence_aud:
+      clean_table_name: diligence_aud
+    diligence_appointment:
+      clean_table_name: diligence_appointment
+    diligence_appointment_aud:
+      clean_table_name: diligence_appointment_aud
+    house:
+      clean_table_name: house
+    house_aud:
+      clean_table_name: house_aud
+    house_registration_order:
+      clean_table_name: house_registration_order
+    house_registration_order_aud:
+      clean_table_name: house_registration_order_aud
+    microstatus_order:
+      clean_table_name: microstatus_order
+    microstatus_order_aud:
+      clean_table_name: microstatus_order_aud
+    mortgage:
+      clean_table_name: mortgage
+    mortgage_aud:
+      clean_table_name: mortgage_aud
+    negotiation:
+      clean_table_name: negotiation
+    negotiation_aud:
+      clean_table_name: negotiation_aud
+    notary:
+      clean_table_name: notary
+    notary_aud:
+      clean_table_name: notary_aud
+    offer:
+      clean_table_name: offer
+    offer_aud:
+      clean_table_name: offer_aud
+    payment:
+      clean_table_name: payment
+    payment_aud:
+      clean_table_name: payment_aud
+    payment_rules:
+      clean_table_name: payment_rules
+    reject_reason:
+      clean_table_name: reject_reason
+    reject_reason_aud:
+      clean_table_name: reject_reason_aud
+    revinfo:
+      clean_table_name: rev_info
+    sales_flow:
+      clean_table_name: sales_flow
+    sales_flow_aud:
+      clean_table_name: sales_flow_aud
+    sales_flow_contact:
+      clean_table_name: sales_flow_contact
+    sales_flow_contact_aud:
+      clean_table_name: sales_flow_contact_aud
+    sales_flow_details:
+      clean_table_name: sales_flow_details
+    sales_flow_details_aud:
+      clean_table_name: sales_flow_details_aud
+    sales_flow_invite:
+      clean_table_name: sales_flow_invite
+    sales_flow_invite_aud:
+      clean_table_name: sales_flow_invite_aud
+    sales_flow_pendency:
+      clean_table_name: sales_flow_pendency
+    sales_flow_pendency_aud:
+      clean_table_name: sales_flow_pendency_aud
+    sales_flow_tag:
+      clean_table_name: sales_flow_tag
+    sales_flow_users:
+      clean_table_name: sales_flow_users
+    sales_flow_users_aud:
+      clean_table_name: sales_flow_users_aud
+    screening_buyer:
+      clean_table_name: screening_buyer
+    screening_seller:
+      clean_table_name: screening_seller
+    seller_data:
+      clean_table_name: seller_data
+    seller_data_aud:
+      clean_table_name: seller_data_aud
+    seller_documentation:
+      clean_table_name: seller_documentation
+    seller_documentation_aud:
+      clean_table_name: seller_documentation_aud
+    specialist:
+      clean_table_name: specialist
+    specialist_aud:
+      clean_table_name: specialist_aud
+    status:
+      clean_table_name: status
+    status_aud:
+      clean_table_name: status_aud
+    status_order:
+      clean_table_name: status_order
+    status_order_aud:
+      clean_table_name: status_order_aud
+    status_record:
+      clean_table_name: status_record
+    status_record_aud:
+      clean_table_name: status_record_aud
+    subtask:
+      clean_table_name: subtask
+    tag:
+      clean_table_name: tag
+    tag_aud:
+      clean_table_name: tag_aud
+    task:
+      clean_table_name: task
+    task_association:
+      clean_table_name: task_association
+    user_sample:
+      clean_table_name: user_sample
+    users:
+      clean_table_name: users
+    users_aud:
+      clean_table_name: users_aud
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        ebs_volume_size: 200

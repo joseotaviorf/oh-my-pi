@@ -1,0 +1,71 @@
+---
+database_name: datalake_sales_flow_test_clean
+table_name: seller_documentation_aud
+description: Aud table for seller_documentation table which contains the information about the seller documentation process.
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.id
+    description: Document unique ID.
+  id_house:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.house_id
+    description: House ID on SalesFlow tables (datalake_sales_flow_test_clean.house).
+  rev:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.rev
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+  rev_type:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.revtype
+    description: Modification type.
+    categories:
+      "0" : "Create"
+      "1" : "Update"
+      "2" : "Delete"
+  rev_end:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.revend
+    description: ID of the revision that replaced the current entry.
+  mod_id_house:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.house_id_mod
+    description: Flag indicating if the column id_house has changed.
+  mod_ts_started:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.started_at_mod
+    description: Flag indicating if the column ts_started has changed.
+  mod_ts_submitted:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.submitted_at_mod
+    description: Flag indicating if the column ts_submitted has changed.
+  ts_started:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.started_at
+    description: Timestamp related to the first document(s) sent by the seller.
+  ts_submitted:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.submitted_at
+    description: Timestamp related to the documentation process end, when the seller submitted the documents.
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.created_at
+    description: Timestamp when this event of this row happened.
+  ts_updated:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.updated_at
+    description: Timestamp when this event of this row was updated.
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.year
+    description: Year partition value.
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.month
+    description: Month partition value.
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.seller_documentation_aud.day
+    description: Day partition value.

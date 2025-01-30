@@ -1,0 +1,24 @@
+database_name: datalake_sales_flow_test_clean
+table_name: rev_info
+columns:
+  id:
+    lineage:
+      - datalake_sales_flow_test_raw.revinfo.id
+  id_user:
+    lineage:
+      - datalake_sales_flow_test_raw.revinfo.user_id
+  id_keycloak:
+    lineage:
+      - datalake_sales_flow_test_raw.revinfo.keycloak_id
+  ts_created:
+    lineage:
+      - datalake_sales_flow_test_raw.revinfo.timestamp
+  year:
+    lineage:
+      - datalake_sales_flow_test_raw.revinfo.year
+  month:
+    lineage:
+      - datalake_sales_flow_test_raw.revinfo.month
+  day:
+    lineage:
+      - datalake_sales_flow_test_raw.revinfo.day

@@ -1,0 +1,94 @@
+database_name: datalake_sales_flow_test_clean
+table_name: users_aud
+domain: ForSale
+owner: herivelto.junior@quintoandar.com.br
+description: Aud table with sales flow users infos.
+columns:
+  id:
+    description: User ID on SalesFlow tables.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.id
+  id_external:
+    description: User ID on 5A main table (EBDB) and it's the ID used on dw_public.dim_user.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.external_id
+  rev:
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.rev
+  rev_type:
+    description: Modification type.
+    categories:
+      "0" : Create
+      "1" : Update
+      "2" : Delete
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.revtype
+  rev_end:
+    description: ID of the revision that replaced the current entry.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.revend
+  name:
+    description: User name.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.name
+  email:
+    description: User e-mail.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.email
+  phone:
+    description: User phone.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.phone
+  type:
+    description: User type.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.type
+  cpf:
+    description: User personal document.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.cpf
+  mod_id_external:
+    description: Flag indicating if the column id_external has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.external_id_mod
+  mod_name:
+    description: Flag indicating if the column name has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.name_mod
+  mod_email:
+    description: Flag indicating if the column email has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.email_mod
+  mod_phone:
+    description: Flag indicating if the column phone has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.phone_mod
+  mod_type:
+    description: Flag indicating if the column type has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.type_mod
+  mod_cpf:
+    description: Flag indicating if the column cpf has changed.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.cpf_mod
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_test_raw.users_aud.day
