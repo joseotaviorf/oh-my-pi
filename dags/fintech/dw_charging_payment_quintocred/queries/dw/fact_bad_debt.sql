@@ -99,6 +99,8 @@ SELECT *,
     ELSE 'SIGNATURE' 
   END AS type_deliquency,
   CASE 
+    WHEN open_amount = 0 
+      THEN 0
     WHEN due_amount * perc_considered - paid_amount <= 0 
       THEN 0 
     ELSE due_amount * perc_considered - paid_amount 
