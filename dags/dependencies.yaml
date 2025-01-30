@@ -3168,6 +3168,7 @@ bietlejuice.enrich_velo_zendesk:
   - bietlejuice.velo_zendesk:load-clean-tickets
   - bietlejuice.velo_zendesk:load-clean-tickets-history
 bietlejuice.enrich_vespucio_pipeline:
+  - bietlejuice.clustering_image_model:load-clean-clustering-image
   - bietlejuice.ebdb_condo:load-clean-amenities
   - bietlejuice.ebdb_condo:load-clean-condo
   - bietlejuice.ebdb_condo:load-clean-condo-contact
