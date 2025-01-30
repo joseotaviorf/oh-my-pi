@@ -19,6 +19,9 @@ workflow:
     dim_termination:
       z_order_by: [sk_termination]
       merge_on: [sk_termination]
+    dim_house_listing_terminations:
+      z_order_by: [sk_termination]
+      merge_on: [sk_termination]
 
 cluster:
   type: custom_cluster
@@ -27,7 +30,7 @@ cluster:
     node_type_id: r5a.xlarge
     num_workers: 3
     spark_version: 13.3.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

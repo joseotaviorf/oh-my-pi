@@ -1,0 +1,81 @@
+---
+database_name: dw_offboarding
+table_name: fact_house_listing_terminations
+description: This table aims to facilitate the retention track of the listings that were/are in the termination step.
+domain: ForRent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  sk_termination:
+    lineage:
+      - datalake_terminator.termination.id_termination
+    description: Unique termination identification key.
+  sk_house_listing:
+    lineage:
+      - datalake_terminator.termination.id_house_listing
+    description: House listing identification key.
+  sk_next_house_listing_consolidated:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_next_house_listing_consolidated
+    description: Next valid house listing identification key.
+  sk_contract:
+    lineage:
+      - datalake_terminator.termination.id_contract
+    description: Contract identification key.
+  sk_next_contract:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_next_contract
+    description: Next contract identification key associated to the listing.
+  sk_region:
+    lineage:
+      - datalake_terminator.termination.id_region
+    description: Region identification key.
+  sk_termination_request_date:
+    lineage:
+      - datalake_terminator.termination.ts_termination_request
+    description: Key date when the termination was requested.
+  sk_termination_date:
+    lineage:
+      - datalake_terminator.termination.dt_termination
+    description: Key date when the property became or will become vacant in sk format.
+  sk_next_house_listing_publication_date:
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_publicated
+    description: Key date when the next house listing was publicated.
+  sk_contract_start_date:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_started
+    description: Key date when the contract related to the termination started.
+  sk_ended_rental_confirmed_date:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_ended_rental_confirmed
+    description: Key date when the contract's ended rental related to the termination was confirmed.
+  sk_next_contract_signature_date:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_signed
+    description: Key date when the next contract related to the house listing was signed.
+  sk_declined_date:
+    lineage:
+      - datalake_terminator.termination.ts_declined
+    description: Key date when the declined for relisting happened.
+  is_relisting_enabled:
+    lineage:
+      - datalake_terminator.termination.is_relisting_enabled
+    description: Boolean flag indicating if the house can be relisted.
+  is_early_relisting_enabled:
+    lineage:
+      - datalake_terminator.termination.is_early_relisting_enabled
+    description: Boolean flag indicating if the house's owner opted-in/out of the early relisting.
+  ts_load:
+    description: This timestamp indicates when this data was loaded into dw_offboarding.
+  year:
+    lineage:
+      - datalake_terminator.termination.year
+    description: Year when the data was loaded. Also, it's a partition of this table.
+  month:
+    lineage:
+      - datalake_terminator.termination.month
+    description: Month when the data was loaded. Also, it's a partition of this table.
+  day:
+    lineage:
+      - datalake_terminator.termination.day
+    description: Day when the data was loaded. Also, it's a partition of this table.
