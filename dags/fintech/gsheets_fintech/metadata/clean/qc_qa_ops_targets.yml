@@ -70,6 +70,24 @@ columns:
   dsat_credit_qc:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.dsat_credito_qc
+  credit_auditing_qc:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.auditoria_credito_qc
+  monitoring_docs_qc:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.monitoria_docs_qc
+  leadtime_docs_qc:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.leadtime_docs_qc
+  sla_docs_qc:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.sla_docs_qc
+  renewal_conversion_qc:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.conversao_renovacoes_qc
+  dsat_renewal_qc:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.dsat_renovacoes_qc
   reference_month_weekly_target:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.mes_de_referencia_tgt_semanal

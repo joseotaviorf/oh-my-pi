@@ -22,6 +22,12 @@ SELECT
     sla_ca2cs_qa,
     dsat_closing_qa,
     dsat_credito_qc AS dsat_credit_qc,
+    auditoria_credito_qc AS credit_auditing_qc,
+    monitoria_docs_qc AS monitoring_docs_qc,
+    leadtime_docs_qc AS leadtime_docs_qc,
+    sla_docs_qc AS sla_docs_qc,
+    conversao_renovacoes_qc AS renewal_conversion_qc,
+    dsat_renovacoes_qc AS dsat_renewal_qc,
     mes_de_referencia_tgt_semanal AS reference_month_weekly_target,
     dia AS dt_reference
 FROM
