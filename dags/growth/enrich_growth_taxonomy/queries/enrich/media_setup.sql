@@ -1,3 +1,5 @@
+WITH 
+base AS (
 SELECT
   id_media_setup,
   naming_convention_sufix,
@@ -41,3 +43,8 @@ SELECT
   ts_load
 FROM
   datalake_growth_taxonomy.ad_hoc_rules
+)
+SELECT
+  *
+FROM base 
+QUALIFY ROW_NUMBER() OVER (PARTITION BY naming_convention_sufix ORDER BY ts_load DESC) = 1
