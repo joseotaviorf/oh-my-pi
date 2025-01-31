@@ -13,24 +13,34 @@ workflow:
       dim_visit:
         custom_schema: public
       dim_author_type:
+        extraction_type: incremental
         merge_on: [ "author_type", "author_user_role", "on_behalf_of", "channel" ]
       dim_behavior:
+        extraction_type: incremental
         merge_on: [ "behavior_type" ]
       dim_business_context:
+        extraction_type: incremental
         merge_on: [ "business_context" ]
       dim_business_model:
+        extraction_type: incremental
         merge_on: [ "business_model" ]
       dim_entrance_type:
+        extraction_type: incremental
         merge_on: [ "entrance_type" ]
       dim_event_type:
-        merge_on: ["event_name"]
+        extraction_type: incremental
+        merge_on: [ "event_name" ]
       dim_origin_type:
+        extraction_type: incremental
         merge_on: [ "origin_name" ]
       dim_visit_fup:
+        extraction_type: incremental
         merge_on: [ "visit_fup" ]
       dim_visit_model:
+        extraction_type: incremental
         merge_on: [ "visit_model" ]
       dim_visit_status:
+        extraction_type: incremental
         merge_on: [ "status_name" ]
 cluster:
     type: custom_cluster
