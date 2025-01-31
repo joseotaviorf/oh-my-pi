@@ -12,9 +12,9 @@ spec:
   lifecycle: production
 
   ownership:
-    line: tech_platform
+    line: data_platform
     owner: mario.abreu@quintoandar.com.br
-    team: data_platform
+    team: data_platform_team
 
   libraries:
     - name: bi-etl-ejuice
