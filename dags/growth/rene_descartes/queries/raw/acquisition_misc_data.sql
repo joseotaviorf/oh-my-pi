@@ -7,5 +7,5 @@ SELECT
 FROM
   acquisition_misc_data
 WHERE
-  updated_at >= '{execution_date}' - INTERVAL '6 day'
-  AND updated_at < '{execution_date}' + INTERVAL '1 day'
+  updated_at >= DATE(DATE('{execution_date}') - INTERVAL '6 day')
+  AND updated_at < DATE(DATE('{execution_date}') + INTERVAL '1 day')

@@ -17,5 +17,5 @@ LEFT JOIN
 	revinfo AS r
 		ON t.rev = r.rev
 WHERE
-  TO_TIMESTAMP(revtstmp/1000) >= '{execution_date}' - INTERVAL '6 day'
-  AND TO_TIMESTAMP(revtstmp/1000) < '{execution_date}' + INTERVAL '1 day'
+  TO_TIMESTAMP(revtstmp/1000) >= DATE(DATE('{execution_date}') - INTERVAL '6 day')
+  AND TO_TIMESTAMP(revtstmp/1000) < DATE(DATE('{execution_date}') + INTERVAL '1 day')

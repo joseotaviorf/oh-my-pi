@@ -8,5 +8,5 @@ SELECT
 FROM
   revinfo
 WHERE
-  TO_TIMESTAMP(CAST(revtstmp/1000 AS BIGINT)) >= '{execution_date}' - INTERVAL '6 day'
-  AND TO_TIMESTAMP(CAST(revtstmp/1000 AS BIGINT)) < '{execution_date}' + INTERVAL '1 day'
+  TO_TIMESTAMP(CAST(revtstmp/1000 AS BIGINT)) >= DATE(DATE('{execution_date}') - INTERVAL '6 day')
+  AND TO_TIMESTAMP(CAST(revtstmp/1000 AS BIGINT)) < DATE(DATE('{execution_date}') + INTERVAL '1 day')
