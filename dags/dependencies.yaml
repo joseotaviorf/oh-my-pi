@@ -516,6 +516,8 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-occurrence
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
+bietlejuice.dw_fintech_snapshot_second_business_day:
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline
 bietlejuice.dw_hiring:
   - bietlejuice.enrich_workable:load-enrich-cost-center
   - bietlejuice.enrich_workable:load-enrich-custom-fields

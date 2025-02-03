@@ -38,6 +38,20 @@ class DAGRunDateValidators:
         return first_business_day_date.strftime("%Y-%m-%d") == reference_date
 
     @classmethod
+    def check_is_second_business_day_of_month(cls, reference_date):
+        """
+        Checks if the provided date is the second business day of month.
+        A business day is any day that is not a weekend day or a local
+        Brazil-SaoPaulo or international holiday.
+
+        :param reference_date: date used as reference for the evaluation
+        :type reference_date: str
+        :rtype: bool
+        """
+        second_business_day_date = cls.get_business_days_in_month(reference_date)[1]
+        return second_business_day_date.strftime("%Y-%m-%d") == reference_date
+
+    @classmethod
     def check_is_last_business_day_of_month(cls, reference_date):
         """
         Checks if the provided date is the last business day of month.

@@ -1,0 +1,145 @@
+---
+database_name: dw_payment_snapshot
+table_name: fact_overdue_portfolio_timeline_snapshot
+description: Monthly snapshot, taken on the second business day of month, of the table dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline. This table contains information about the portfolio of overdue invoices. The invoice is inserted into the table 1 day after its due date, and it's replicated every day until the day the debt is paid or written down.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  sk_overdue_portfolio_timeline:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.sk_overdue_portfolio_timeline
+    description: Surrogate key of table. It is the concat between id_invoice and dt_reference
+  sk_contract:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.sk_contract
+    description: Contract ID
+  id_invoice:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.id_invoice
+    description: Invoice ID
+  id_proposal:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.id_proposal
+    description: Proposal ID
+  contract_status:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.contract_status
+    description: Contract status
+  invoice_type:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.invoice_type
+    description: Invoice's type frequency - monthly, extra, pos rental, onboarding, early termination...
+  payment_status:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.payment_status
+    description: Payment status on the reference date
+  is_ssn:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.is_ssn
+    description: "Boolean to indicate if the invoice was paid by SSN - Self Service Negotiation."
+  type_ssn:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.type_ssn
+    description: Indicate the type of SSN.
+    categories:
+      "POSSN (payment of original)": "In this case, the customer paid the original invoice without a negotiation through the app's SSN screen."
+      "BOSSN (single debt negotiation)": "Boletão. In this case, the customer himself paid the debts through a negotiation that resulted in a single installment/invoice. This was carried out without the help of external advisors or a 5A employee"
+  recovery_method:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.recovery_method
+    description: "Recovery Method"
+    categories:
+      Self Service Negotiation - Payment of original debt: ""
+      Self Service Negotiation - Negotiation: ""
+      Original debt: ""
+      Negotiation: ""
+      Negotiation installments (extra): ""
+  debtor_type:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.debtor_type
+    description: "Debtor type: Flow or Stock"
+    categories:
+      Flow: customers that are new in the Portfolio. The day the flow contracts enters the portfolio is the first day of the overdue (i.e first business day after the due date).
+      Stock: customers that were already in the portfolio in the last month. Important to notice that the cut off date to this reference is the first day of the month.
+  delay_contamined_at_closure:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.delay_contamined_at_closure
+    description: Delay contamined at closure (Days that define delay_contract_range and delay_contamined_range)
+  delay_contamined_range:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.delay_contamined_range
+    description: Delay contamined range. We calculate it based on the contract and not the invoice
+  delay_contract_range:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.delay_contract_range
+    description: Same delay contamined range used for pdd. We calculate it based on the contract and not the invoice
+  contract_overdue_invoices:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.contract_overdue_invoices
+    description: Total number of overdue invoices in a contract on the reference date
+  due_amount:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.due_amount
+    description: Invoice due amount
+  paid_amount:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.paid_amount
+    description: Invoice paid amount
+  recovered_amount:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.recovered_amount
+    description: Amount recovered between reference month start and reference date
+  contract_debt:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.contract_debt
+    description: Debt of the contract
+  business_day:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.business_day
+    description: Working days accumulated up to the reference date
+  is_last_business_days:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.is_last_business_days
+    description: Boolean to inform whether it is the most recent date among days with the same business day, same invoice and month. It deduplicates the calculations per business day.
+  advisory:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.advisory
+    description: The advisory responsible for the contract on the reference date
+  distributor:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.distributor
+    description: The advisory responsible for the contract on the reference date
+  partner:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.partner
+    description: The partner responsible for the contract on the reference date. This field is created by the fallback (coalesce) between the advisory and the distributor
+  is_most_recent_record_month:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.is_most_recent_record_month
+    description: Boolean to indicate if the invoice record is the most recent in that month.
+  dt_invoice_paid:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_paid
+    description: Invoice paid date
+  dt_invoice_due:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_due
+    description: Invoice due date
+  dt_invoice_due_adjust:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_due_adjust
+    description: Invoice due date adjust for next business day
+  dt_month_start:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_month_start
+    description: The first day of the month of reference date
+  dt_month_end:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_month_end
+    description: The last day of the month of reference date
+  dt_reference:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_reference
+    description: Invoice timeline reference date
+  ts_load:
+    description: "Timestamp of when the data was inserted into the table"

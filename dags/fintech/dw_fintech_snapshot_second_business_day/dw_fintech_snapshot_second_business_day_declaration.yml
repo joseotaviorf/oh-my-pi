@@ -1,0 +1,24 @@
+dag:
+  name: dw_fintech_snapshot_second_business_day
+  schedule_start_date: 2025,01,01
+  owner: Data Fintech
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: payment_snapshot
+  default_partitions: ["year", "month", "day"]
+  default_extraction_type: incremental
+  has_load_to_redshift_task: false
+  short_circuit_customization:
+    function: CHECK_IS_SECOND_BUSINESS_DAY_OF_MONTH
+cluster:
+  type: databricks_12_2_med_general_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
