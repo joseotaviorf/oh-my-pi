@@ -30,8 +30,14 @@ workflow:
       clean_table_name: booking_status_change
     Entrance:
       clean_table_name: entrance
+    EntryAccessTracking:
+      clean_table_name: entry_access_tracking
+    EntryAccess:
+      clean_table_name: entry_access
     FollowUpDetails:
       clean_table_name: follow_up_details
+    KeyHolder:
+      clean_table_name: key_holder
     UserVisitPreferences:
       clean_table_name: user_visit_preferences
     UserVisitPreferences_AUD:

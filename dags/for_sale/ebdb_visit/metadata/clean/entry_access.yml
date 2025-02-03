@@ -1,0 +1,43 @@
+---
+database_name: datalake_ebdb_visit_clean
+table_name: entry_access
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccess.id
+  id_house:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccess.house_id
+  access_model:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccess.access_model
+  access_type:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccess.access_type
+  access_code:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccess.access_code
+  access_details:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccess.access_details
+  location:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccess.location
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccess.created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccess.updated_at

@@ -1,0 +1,87 @@
+---
+database_name: datalake_ebdb_visit_clean
+table_name: entry_access_tracking
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.id
+  id_house:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.house_id
+  id_actor_user:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.actor_user_id
+  id_entry_access:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.entry_access_id
+  channel:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.channel
+  actor_role:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.actor_role
+  event_type:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.event_type
+  entry_access_type:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.entry_access_type
+  entry_access_model:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.entry_access_model
+  entry_access_details:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.entry_access_details
+  key_holder_role:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.key_holder_role
+  key_holder_type:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.key_holder_type
+  key_holder_identifier:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.key_holder_identifier
+  key_holder_name:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.key_holder_name
+  key_holder_contact:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.key_holder_contact
+  key_holder_location:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.key_holder_location
+  actor_user_type:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.actor_user_type
+  key_holder_business_context:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.key_holder_business_context
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_ebdb_raw.EntryAccessTracking.updated_at
