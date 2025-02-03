@@ -1,9 +1,0 @@
-SELECT
-    id,
-    ibge,
-    pais,
-    name,
-    uf,
-    ddd
-FROM
-    datalake_legaut_test_raw.meuSite_state
