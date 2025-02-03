@@ -1,5 +1,0 @@
-database_name: datalake_rene_descartes_raw
-table_name: rejection_history_event
-owner: marcio.gomes@quintoandar.com.br
-domain: Data Growth
-description: WIP

@@ -1,5 +1,0 @@
-database_name: datalake_rene_descartes_raw
-table_name: house_lead_conversion_aud
-owner: arthur.gonzaga@quintoandar.com.br
-domain: Data Growth
-description: This table stores audit information about conversion of leads in houses.

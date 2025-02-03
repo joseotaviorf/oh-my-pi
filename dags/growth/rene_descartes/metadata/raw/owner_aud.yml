@@ -1,5 +1,0 @@
-database_name: datalake_rene_descartes_raw
-table_name: owner_aud
-owner: marcio.gomes@quintoandar.com.br
-domain: Data Growth
-description: The table contain audit trail data related to owners.

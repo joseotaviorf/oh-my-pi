@@ -22,18 +22,10 @@ workflow:
     acquisition_misc_data:
       date_filter_column: updated_at
       read_from_sql: true
-    address_aud:
-      date_filter_column: revtstmp
-      unixtime_measure: milliseconds
-      read_from_sql: true
     address:
       date_filter_column: updated_at
       read_from_sql: true
     house_lead_aud:
-      date_filter_column: revtstmp
-      unixtime_measure: milliseconds
-      read_from_sql: true
-    house_lead_conversion_aud:
       date_filter_column: revtstmp
       unixtime_measure: milliseconds
       read_from_sql: true
@@ -43,35 +35,10 @@ workflow:
     house_lead:
       date_filter_column: updated_at
       read_from_sql: true
-    lead_rejection_aud:
-      date_filter_column: revtstmp
-      unixtime_measure: milliseconds
-      read_from_sql: true
     lead_rejection:
       date_filter_column: updated_at
       read_from_sql: true
-    owner_aud:
-      date_filter_column: revtstmp
-      unixtime_measure: milliseconds
-      read_from_sql: true
-    owner:
-      date_filter_column: updated_at
-      read_from_sql: true
     phone:
-      date_filter_column: updated_at
-      read_from_sql: true
-    rejection_history_collector_aud:
-      date_filter_column: revtstmp
-      unixtime_measure: milliseconds
-      read_from_sql: true
-    rejection_history_collector:
-      date_filter_column: updated_at
-      read_from_sql: true
-    rejection_history_event_aud:
-      date_filter_column: revtstmp
-      unixtime_measure: milliseconds
-      read_from_sql: true
-    rejection_history_event:
       date_filter_column: updated_at
       read_from_sql: true
     revinfo:
@@ -82,7 +49,7 @@ cluster:
   type: databricks_13_3_med_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
