@@ -75,6 +75,26 @@ columns:
     lineage:
       - datalake_rental_transact_clean.resident_info.number_of_cohabitants
     description: Number of cohabitants including the tenant.
+  tenant_description:
+    lineage:
+      - datalake_rental_transact_clean.resident_info.introduction
+    description: Tenant description manually filled by the tenant.
+  first_rent_offered_by_tenant:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message_aud.proposed_rent_value
+    description: First rent value proposed by the tenant prospect.
+  first_rent_offered_by_owner:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message_aud.proposed_rent_value
+    description: First rent value proposed by the owner.
+  last_rent_offered_by_tenant:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message_aud.proposed_rent_value
+    description: Last rent value proposed by the tenant prospect.
+  last_rent_offered_by_owner:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message_aud.proposed_rent_value
+    description: Last rent value proposed by the owner.
   ts_created:
     lineage:
       - datalake_rental_transact_clean.offer.ts_created
@@ -87,6 +107,10 @@ columns:
     lineage:
       - datalake_rental_transact_clean.offer.ts_expiration
     description: Timestamp of when the offer expirates.
+  ts_analyzed:
+    lineage:
+      - datalake_rental_transact_clean.rev_info.ts_rev
+    description: Timestamp of the first time the offer was analyzed by the owner (REJECTED or ACCEPTED).
   year:
     description: Year of the offer creation. It's also a table partition.
   month:
