@@ -910,11 +910,9 @@ quintoml.growth.eltv.inference:
 
 quintoml.growth.sale_conversion_model.inference:
   add:
-    - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
     - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
-    - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
-    - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
-    - bietlejuice.ebdb_house:load-clean-house-aud
+    - bietlejuice.enrich_booking:load-enrich-booking
+    - wonka.house_main:load-house_main
 
 quintoml.growth.sale_discount_model.inference:
   add:
@@ -924,12 +922,15 @@ quintoml.growth.sale_discount_model.inference:
 
 quintoml.growth.rent_conversion_model.inference:
   add:
-    - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
     - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-    - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
-    - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
-    - bietlejuice.ebdb_house:load-clean-house-aud
     - bietlejuice.enrich_booking:load-enrich-booking
+    - wonka.house_main:load-house_main
+
+quintoml.growth.contract_duration_model.inference:
+  add:
+    - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+    - bietlejuice.enrich_booking:load-enrich-booking
+    - wonka.house_main:load-house_main
 
 quintoml.recs.house_user_embeddings_quintoml.inference:
   add:
