@@ -2,6 +2,12 @@
 database_name: datalake_gsheets_clean
 table_name: quintocred_executives_targets_commercial
 columns:
+  group:
+    lineage:
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.group
+  team:
+    lineage:
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.team
   executive:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.executive
@@ -20,6 +26,27 @@ columns:
   target_new_contract:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.target_credit_approved
+  effective_contacts:
+    lineage:
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.effective_contacts
+  registrations:
+    lineage:
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.registrations
+  activations:
+    lineage:
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.activations
+  calls:
+    lineage:
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.calls
+  online_time:
+    lineage:
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.online_time
+  appointments:
+    lineage:
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.appointments
+  opportunities:
+    lineage:
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.opportunities
   month_trunc:
     lineage:
       - datalake_gsheets_raw.quintocred_executives_targets_commercial.month_trunc
