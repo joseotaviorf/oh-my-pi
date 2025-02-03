@@ -296,3 +296,9 @@ sheets_info:
     sheet_name: Sheet2
     clean_table_name: quintocred_iaf_qualifies_calls
     sheet_context: fintech
+
+  quintocred_excluded_proposals:
+    sheet_id: 1nqLwYeDxdq5lP9C2UCrOPO12B_X-B9rKYdY5HtJg2Gc
+    sheet_name: quintocred_excluded_proposals
+    clean_table_name: quintocred_excluded_proposals
+    sheet_context: fintech

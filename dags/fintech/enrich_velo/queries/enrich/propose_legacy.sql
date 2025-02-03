@@ -521,3 +521,4 @@ LEFT JOIN
         ON p.id = r.id_propose
 WHERE
     p.id NOT IN (SELECT id FROM datalake_rental_guarantee_platform_clean.propose)
+    AND p.id NOT IN (SELECT id_propose FROM datalake_gsheets_clean.quintocred_excluded_proposals)

@@ -1,0 +1,7 @@
+---
+database_name: datalake_gsheets_clean
+table_name: quintocred_excluded_proposals
+columns:
+  id_propose:
+    lineage:
+      - datalake_gsheets_raw.quintocred_excluded_proposals.id_propose

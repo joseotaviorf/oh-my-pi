@@ -700,6 +700,7 @@ bietlejuice.enrich_velo:
     - bietlejuice.rental_guarantee_platform:load-clean-fiancavelo-proposeperson-legacy
     - bietlejuice.rental_guarantee_platform:load-clean-clientes-person-legacy
   remove:
+    - bietlejuice.gsheets_fintech:done-clean-quintocred-excluded-proposals
     - bietlejuice.velo_omie:load-clean-bank-account
     - bietlejuice.velo_omie:load-clean-categories
     - bietlejuice.velo_omie:load-clean-clients
