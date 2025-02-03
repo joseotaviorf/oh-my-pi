@@ -50,4 +50,6 @@ SELECT
     month,
     day
 FROM
-    {df}
+    datalake_amplitude_raw.events
+WHERE
+    year = {} and month = {} and day = {}

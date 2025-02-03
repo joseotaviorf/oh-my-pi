@@ -10,7 +10,7 @@ from bietlejuice.base.spark import (
     sqlContext,
 )
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_incremental_clean_staging"
@@ -59,13 +59,15 @@ if __name__ == "__main__":
 
     spark_client = SparkClient()
     metastore_service = SparkMetastoreService(spark_client)
-    delta_loader = DeltaLoader()
+    s3_loader = S3Loader()
+    format_options = SparkTableStorageFormat.DEFAULT_CLEAN
 
     metastore_service.create_database(db_clean_staging_name)
-    delta_loader.load_table(
-        table_name=f"{db_clean_staging_name}.{table_name}",
-        path=f"{db_clean_staging_path}{table_name}",
-        source_df=df_partitioned,
-        partition_by=partition_by,
+    s3_loader.load_df(
+        df=df_partitioned,
+        s3_path=f"{db_clean_staging_path}{table_name}",
+        format_options=format_options,
+        optimize_dataframe=False,
+        partitions=partition_by,
     )
     metastore_service.refresh_table(db_clean_staging_name, table_name)
