@@ -478,6 +478,9 @@ table_block_list:
   - HouseVisitStatus_AUD
   - message
   - feedbacktag
+  - EntryAccessTracking
+  - EntryAccess
+  - KeyHolder
 
 view_allow_list:
   - MapRegiao
