@@ -164,7 +164,7 @@ cluster_template:
         ssh_public_keys: []
         spark_version: 10.4.x-scala2.12
         data_security_mode: SINGLE_USER
-        single_user_name: '{{ var.value.databricks_single_user_name }}'
+        single_user_name: "{{ var.value.databricks_single_user_name }}"
 
     # "cluster_anchor" is the one to use for clusters without instance pools
     cluster_template_no_pool: &cluster_anchor
@@ -452,12 +452,12 @@ databricks_13_3_min_io-memory_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
-databricks_10_4_med_io-memory_cluster:
+databricks_13_3_med_io-general_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5a.2xlarge
-    node_type_id: r5a.4xlarge
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.4xlarge
     num_workers: 3
-    spark_version: 10.4.x-scala2.12
+    spark_version: 13.3.x-scala2.12
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200

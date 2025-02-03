@@ -6,13 +6,13 @@ workflow:
   type: query
   layer: metric
 cluster:
-  type: databricks_13_3_driver_med_mem_nodes_general_med_mem_photon_cluster
+  type: databricks_13_3_med_io-general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
