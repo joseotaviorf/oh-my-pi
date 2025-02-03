@@ -5,13 +5,13 @@ dag:
   documentation:
     dag_purpose: |
       This DAG is responsible for consolidate metrics like clicks, impressions and cost from 
-      Media Platforms like Google, Facebook, Criteo and Trovit.
+      Media Platforms like Google, Facebook, Criteo, Trovit and manual costs.
 workflow:
   type: query_delta
   layer: dw
   custom_schema: growth
   default_extraction_type: incremental
-  default_partitions: ["year", "month", "day"]
+  default_partitions: ["origin","year", "month", "day"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
