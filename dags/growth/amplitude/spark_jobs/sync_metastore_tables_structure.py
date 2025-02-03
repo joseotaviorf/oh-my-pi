@@ -18,6 +18,15 @@ from bietlejuice.services.metastore_services.hive_metastore_service import (
 
 JOB_NAME = "sync_metastore_tables_structure"
 
+# The first 3 tables are synced in their own task
+# The last table is Delta, so its sync mechanism is different (register table)
+SYNC_BLOCK_LIST = [
+    "170698_user_merge",
+    "183047_user_merge",
+    "205027_user_merge",
+    "events",
+]
+
 logging.getLogger("py4j").setLevel(logging.ERROR)
 driver_logger = QuintoAndarLogger(JOB_NAME)
 
@@ -124,6 +133,9 @@ if __name__ == "__main__":
     spark_ms.validate_table_arguments()
 
     tables_metadata = spark_ms.get_all_tables_metadata()
+    tables_metadata = {
+        k: v for k, v in tables_metadata.items() if k not in SYNC_BLOCK_LIST
+    }
 
     hive_ms_host = get_hive_metastore_host()
     hive_ms_client = HiveMetastoreClient(hive_ms_host)

@@ -1,4 +1,5 @@
 import os
+import json
 from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
@@ -62,6 +63,7 @@ PROPAGATE_TABLE_METADATA_TASK_PREFIX = "propagate-table-metadata"
 PROPAGATION_BYPASS_TASK_PREFIX = "propagation-bypass"
 SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX = "sync-hive-metastore-partitions"
 SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX = "sync-hive-metastore-structure"
+REGISTER_TABLE_TASK_PREFIX = "register-table"
 
 dag = DAG(
     dag_id=DAG_ID,
@@ -149,10 +151,10 @@ events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
 )
 
-sync_metastore_clean_events_structure_task = QuintoAndarDatabricksSubmitRunOperator(
+register_clean_events_task = QuintoAndarDatabricksSubmitRunOperator(
     databricks_conn_id="databricks_old",
     task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=SYNC_HIVE_METASTORE_STRUCTURE_TASK_PREFIX,
+        task_prefix=REGISTER_TABLE_TASK_PREFIX,
         layer=LayerEnum.CLEAN,
         schema=SOURCE,
         table_name="events",
@@ -160,35 +162,11 @@ sync_metastore_clean_events_structure_task = QuintoAndarDatabricksSubmitRunOpera
     dag=dag,
     json={
         "spark_python_task": {
-            "python_file": raw_spark_jobs_path + "sync_metastore_tables_structure.py",
+            "python_file": base_spark_jobs_path + "register_delta_table.py",
             "parameters": [
                 datalake_bucket,
                 LayerEnum.CLEAN.value,
                 SOURCE,
-                "--table-name",
-                "events",
-            ],
-        }
-    },
-)
-
-sync_metastore_clean_events_partitions_task = QuintoAndarDatabricksSubmitRunOperator(
-    databricks_conn_id="databricks_old",
-    task_id=DatalakeTaskGroup.generate_default_task_id(
-        task_prefix=SYNC_HIVE_METASTORE_PARTITIONS_TASK_PREFIX,
-        layer=LayerEnum.CLEAN,
-        schema=SOURCE,
-        table_name="events",
-    ),
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": raw_spark_jobs_path + "sync_metastore_tables_partitions.py",
-            "parameters": [
-                datalake_bucket,
-                LayerEnum.CLEAN.value,
-                SOURCE,
-                "--table-name",
                 "events",
             ],
         }
@@ -553,19 +531,6 @@ create_subpartitioned_tables_clean_staging_task = QuintoAndarDatabricksSubmitRun
     },
 )
 
-update_subpartitioned_events_clean_staging_task = QuintoAndarDatabricksSubmitRunOperator(
-    databricks_conn_id="databricks_old",
-    task_id="update-clean-staging-subpartitioned-tables",
-    dag=dag,
-    json={
-        "spark_python_task": {
-            "python_file": raw_spark_jobs_path
-            + "update_subpartitioned_events_clean_staging.py",
-            "parameters": ["{{ ds }}", ENV, datalake_bucket, "amplitude"],
-        }
-    },
-)
-
 tables_list = DAGPackagesPathService.list_queries_files_in_composer(
     dag_name=SOURCE, layer="clean"
 )
@@ -653,6 +618,48 @@ propagate_tables_metadata_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     },
 )
 
+table_parameter = json.dumps(
+    {
+        "events": {
+            "schema": SOURCE,
+            "vacuum_retention_hours": 48,
+            "run_optimize": True,
+        }
+    }
+)
+optimize_clean_staging_events = QuintoAndarDatabricksSubmitRunOperator(
+    databricks_conn_id="databricks_old",
+    task_id="optimize-clean-staging-events",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": base_spark_jobs_path + "optimize_delta_table.py",
+            "parameters": [
+                "clean_staging",
+                table_parameter,
+                16,
+            ],
+        }
+    },
+)
+optimize_clean_events = QuintoAndarDatabricksSubmitRunOperator(
+    databricks_conn_id="databricks_old",
+    task_id="optimize-clean-events",
+    dag=dag,
+    json={
+        "spark_python_task": {
+            "python_file": base_spark_jobs_path + "optimize_delta_table.py",
+            "parameters": [
+                "clean",
+                table_parameter,
+                16,
+            ],
+        }
+    },
+)
+create_clean_staging_events_task >> optimize_clean_staging_events >> terminate_cluster_task
+events_raw_to_clean_task >> optimize_clean_events >> terminate_cluster_task
+
 # raw tasks dependencies
 airflow_helpers.chain(
     create_cluster_task,
@@ -665,8 +672,7 @@ airflow_helpers.chain(
 airflow_helpers.chain(
     events_to_datalake_raw_task,
     events_raw_to_clean_task,
-    sync_metastore_clean_events_structure_task,
-    sync_metastore_clean_events_partitions_task,
+    register_clean_events_task,
     propagate_table_metadata_clean_events_task,
     terminate_cluster_task,
 )
@@ -705,7 +711,6 @@ airflow_helpers.chain(
     events_raw_to_clean_task,
     [create_clean_staging_events_task, update_subpartitions_table_clean_staging_task],
     create_subpartitioned_tables_clean_staging_task,
-    update_subpartitioned_events_clean_staging_task,
     load_subpartitioned_clean_tables_tasks,
     load_subpartitioned_all_clean_tables_done_tasks,
     sync_metastore_clean_subpartitioned_events_tables_structure_task,

@@ -25,12 +25,15 @@ parser.add_argument("source")
 parser.add_argument("source_table_name")
 
 ddl_template = """
-    CREATE TABLE IF NOT EXISTS
+    CREATE VIEW IF NOT EXISTS
         `{clean_staging_db}`.`{subpartitioned_table_name}`
-    LIKE
-        `{clean_db}`.`{source_table_name}`
-    LOCATION
-        '{clean_staging_source_path}{source_table_name}/{partition_values_path}'
+    AS
+    SELECT *
+    FROM
+        `{clean_staging_db}`.`{source_table_name}`
+    WHERE
+        id_app = {id_app}
+        AND event_type =  '{event_type}'
 """
 
 
@@ -38,26 +41,15 @@ def create_subpartitioned_table(subpartitioned_table_name, row):
     logger.info(
         f"m=__main__, msg=Creating and repairing table '{subpartitioned_table_name}'..."
     )
-    replace_map = ("/", "%2F"), ("[", "%5B"), ("]", "%5D")
     ddl = ddl_template.format(
         clean_staging_db=db_clean_staging,
         subpartitioned_table_name=subpartitioned_table_name,
         clean_db=db_info["db_clean_databricks"],
         source_table_name=source_table_name,
-        clean_staging_source_path=db_info["db_clean_staging_path"],
-        partition_values_path="/".join(
-            [
-                "{}={}".format(
-                    k, reduce(lambda a, t: str(a).replace(*t), replace_map, v)
-                )
-                for k, v in row.asDict().items()
-            ]
-        ),
+        id_app=row.id_app,
+        event_type=row.event_type,
     )
     spark.sql(ddl)
-    spark_metastore_service.repair_table_partitions(
-        db_clean_staging, subpartitioned_table_name
-    )
     logger.info(
         f"m=__main__, msg=Table '{subpartitioned_table_name}' created and repaired."
     )
