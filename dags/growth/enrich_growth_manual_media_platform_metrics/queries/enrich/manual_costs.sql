@@ -171,3 +171,4 @@ FROM
     base_manual_costs bmc 
 LEFT JOIN region r 
     ON bmc.city_group = r.city_group
+WHERE source not in ('Google', 'Facebook', 'Criteo')    

@@ -31,6 +31,8 @@ WITH all_metrics AS (
         datalake_growth_media_platform.trovit_metrics
     WHERE
         dt_cost::DATE BETWEEN '{load_start_date}'::DATE AND '{load_end_date}'::DATE
+        AND SPLIT(utm_campaign, '[.]')[0]  <> 'ZEBRA'
+        AND year >= 2023
 ),
 translation_dictionary AS (
     SELECT  
@@ -89,6 +91,7 @@ SELECT
     am.id_adset,
     am.id_ad,
     CASE 
+        WHEN am.origin = 'trovit' THEN TRY_CAST(REGEXP_EXTRACT(am.utm_campaign, '^(\\d+)[.]') AS INT)
         WHEN city_group IS NULL AND state = 'Bahia' THEN 2922
         WHEN city_group IS NULL AND state = 'Santa Catarina' THEN 2039
         WHEN city_group IS NULL AND state IN ( 'Distrito Federal', 'Federal District' ) THEN 1514
