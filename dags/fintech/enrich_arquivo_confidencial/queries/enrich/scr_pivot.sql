@@ -396,8 +396,9 @@ FROM (
 ),
 base AS (
 SELECT
+DISTINCT
   cpf,
-  `version`,
+  `rev_end`,
   mob,
   reference_date,
   financial_institution_count,
@@ -407,15 +408,17 @@ SELECT
   ts_next_updated,
   `value`,
   custom_categories
+
 FROM
-  datalake_arquivo_confidencial.scr
+    datalake_arquivo_confidencial.scr
 INNER JOIN
   dict
     ON dict.modality_submodality_domain = CAST(modality AS INT)||'-'||CAST(submodality AS INT)||'-'||CAST(domain AS INT)
 )
 SELECT
+DISTINCT
   cpf,
-  `version`,
+  `rev_end`,
   mob,
   financial_institution_count,
   start_relationship_date,

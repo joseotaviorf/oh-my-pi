@@ -2,7 +2,7 @@ WITH scr_data AS (
     SELECT
     id,
     cpf,
-    `version`,
+    `rev_end`,
     explode_outer(FROM_JSON(raw_data:analysis_output:scr.scr_data,
         'array<
         struct<
@@ -30,28 +30,30 @@ WITH scr_data AS (
         >')
     ) scr_data,
     ts_created,
-    ts_updated
-  FROM datalake_arquivo_confidencial_clean.integration_report
+    ts_database_transaction as ts_updated
+  FROM datalake_arquivo_confidencial_clean.integration_report_aud
   WHERE integration_provider = 'QI_TECH_SCR'
     AND ts_created >= DATE('2022-09-01')
+
 ),
 mobs AS (
   SELECT
+  distinct
     *,
-    ROW_NUMBER() OVER (PARTITION BY cpf, `version` ORDER BY scr_data.reference_date DESC) mob
+    ROW_NUMBER() OVER (PARTITION BY cpf, ts_created ORDER BY scr_data.reference_date DESC) mob
   FROM scr_data
 ),
 next_up AS (
-  SELECT 
+  SELECT
     *,
-    LEAD(ts_updated) OVER (PARTITION BY cpf, mob ORDER BY `version`) ts_next_updated
+    LEAD(ts_updated) OVER (PARTITION BY cpf, mob ORDER BY ts_created) ts_next_updated
   FROM mobs
 ),
 operation_items_exploded AS (
   SELECT
     id,
     cpf,
-    `version`,
+    `rev_end`,
     mob,
     scr_data.reference_date,
     scr_data.financial_institution_count,
@@ -64,9 +66,10 @@ FROM next_up
 )
 
 SELECT
+distinct
     id,
     cpf,
-    `version`,
+    `rev_end`,
     mob,
     reference_date,
     0.01*dat.value AS `value`,

@@ -1137,7 +1137,7 @@ bietlejuice.enrich_app_installed:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_arquivo_confidencial:
-  - bietlejuice.arquivo_confidencial:load-clean-integration-report
+  - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
 bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_contract:load-dw-rent-dim-contract

@@ -5,74 +5,74 @@ domain: fintech
 description: "Table with SCR data broken by Months on Booking (mob) and version."
 columns:
   id:
-    description: "Identification from integration report table."
+    description: "Identification from integration report aud table."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.id
+        - datalake_arquivo_confidencial_clean.integration_report_aud.id
   cpf:
     description: "Personal identification from main proponent."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.cpf
-  version:
-    description: "Numer of times certain cpf data were registered on the table for a particular provider."
+        - datalake_arquivo_confidencial_clean.integration_report_aud.cpf
+  rev_end:
+    description: "Represents the end of the validity period for a particular version of a row. If null, it represents the most current version, otherwise, it is filled with the timestamp of the latest revision when inserted."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.version
+        - datalake_arquivo_confidencial_clean.integration_report_aud.rev_end
   mob:
     description: "Months on Booking. Commom name for designating number of months before an event."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.mob
+        - datalake_arquivo_confidencial_clean.integration_report_aud.mob
   reference_date:
     description: "Year month of the credit limits data."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.reference_date
+        - datalake_arquivo_confidencial_clean.integration_report_aud.reference_date
   value:
     description: "SCR property value."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   domain:
     description: "SCR data identification regarding type and time."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   modality:
     description: "SCR data identification of balance operation group."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   submodality:
     description: "SCR data identification of balance operation detail."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   domain_group:
     description: "SCR domain grouping based on status."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   modality_description:
     description: "SCR data balance operation group."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   submodality_description:
     description: "SCR data balance operation detail."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   linked_to_foreign_currency:
     description: "If data is informed on foreign currency."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   financial_institution_count:
     description: "Count of financial institution."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   start_relationship_date:
     description: "Start date of the relationship"
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.raw_data
+        - datalake_arquivo_confidencial_clean.integration_report_aud.raw_data
   ts_created:
     description: "Date information was created"
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.ts_created
+        - datalake_arquivo_confidencial_clean.integration_report_aud.ts_created
   ts_updated:
     description: "Date information was last updated."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.ts_updated
+        - datalake_arquivo_confidencial_clean.integration_report_aud.ts_updated
   ts_next_updated:
     description: "Next date the cpf had its data updated"
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report.ts_updated
+        - datalake_arquivo_confidencial_clean.integration_report_aud.ts_updated
