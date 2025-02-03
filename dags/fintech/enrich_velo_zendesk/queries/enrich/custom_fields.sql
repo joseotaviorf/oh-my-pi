@@ -43,6 +43,10 @@ GROUP BY 1
         base.custom_fields['Motivo de Contato'] AS contact_reason,
         base.custom_fields['Nome do inquilino'] AS tenant_name,
         base.custom_fields['Solicitação do Cliente'] AS client_request,
+        base.custom_fields['Responsável pela Solicitação'] AS request_responsible,
+        base.custom_fields['Canal de solicitação'] AS request_channel,
+        base.custom_fields['Tipo de Exceção'] AS exception_type,
+        base.custom_fields['Período de pagamento'] AS payment_period,
         COALESCE(base.custom_fields['Valor inadimplente (pago à imob)'],base.custom_fields['Valor inadimplente (pago à imob) 1'],base.custom_fields['Valor inadimplente (pago à imob) 2'], base.custom_fields['Overdue amount']) AS overdue_amount,
         base.custom_fields['Acionamento de garantia'] AS guarantee_activation,
         base.custom_fields['Valor exceção'] AS exception_value,
@@ -55,6 +59,7 @@ GROUP BY 1
         CAST(base.custom_fields['Data de vencimento original'] AS DATE) AS dt_due_original,
         CAST(base.custom_fields['Data início da tratativa'] AS DATE) AS dt_started,
         CAST(base.custom_fields['Data em que o pagamento será realizado'] AS DATE) AS dt_payment_scheduled,
+        CAST(base.custom_fields['Data da solicitação'] AS DATE) AS dt_request,
         CAST(base.custom_fields['Data de encaminhamento pagamento'] AS DATE) AS dt_payment_forwarded
     FROM
         base

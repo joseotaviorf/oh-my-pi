@@ -174,3 +174,23 @@ columns:
     description: "Timestamp when the ticket was loaded"
     lineage:
       - datalake_velo_zendesk.ticket_details.ts_load
+  request_responsible:
+    description: "Name of the responsible for the request"
+    lineage:
+      - datalake_velo_zendesk.ticket_details.request_responsible
+  request_channel:
+    description: "Channel where the request was made"
+    lineage:
+      - datalake_velo_zendesk.ticket_details.request_channel
+  exception_type:
+    description: "Exception type"
+    lineage:
+      - datalake_velo_zendesk.ticket_details.exception_type
+  payment_period:
+    description: "Period the payment has to be made"
+    lineage:
+      - datalake_velo_zendesk.ticket_details.payment_period
+  dt_request:
+    description: "Date when the request was made"
+    lineage:
+      - datalake_velo_zendesk.ticket_details.dt_request

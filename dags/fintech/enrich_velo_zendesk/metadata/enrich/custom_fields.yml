@@ -100,3 +100,23 @@ columns:
         description: "Date when the third contact by phone from the claims team was made"
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
+    request_responsible:
+        description: "Name of the responsible for the request"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    request_channel:
+        description: "Channel where the request was made"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    exception_type:
+        description: "Exception type"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    payment_period:
+        description: "Period the payment has to be made"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    dt_request:
+        description: "Date when the request was made"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields

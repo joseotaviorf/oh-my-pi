@@ -81,6 +81,10 @@ base_survicate AS (
         cf.contact_reason,
         cf.tenant_name,
         cf.client_request,
+        cf.request_responsible,
+        cf.request_channel,
+        cf.exception_type,
+        cf.payment_period,
         th.recipient,
         CAST(GET_JSON_OBJECT(th.via, '$.channel') AS STRING) AS ticket_via,
         th.type AS ticket_type,
@@ -104,6 +108,7 @@ base_survicate AS (
             ELSE NULL
         END AS has_payment_forwarded,
         th.dt_extracted,
+        cf.dt_request,
         th.ts_created,
         th.ts_created_local,
         th.ts_updated,
