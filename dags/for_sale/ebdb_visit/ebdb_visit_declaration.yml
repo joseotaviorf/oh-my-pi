@@ -32,12 +32,15 @@ workflow:
       clean_table_name: entrance
     EntryAccessTracking:
       clean_table_name: entry_access_tracking
+      clean_primary_keys: [id]
     EntryAccess:
       clean_table_name: entry_access
+      clean_primary_keys: [id]
     FollowUpDetails:
       clean_table_name: follow_up_details
     KeyHolder:
       clean_table_name: key_holder
+      clean_primary_keys: [id]
     UserVisitPreferences:
       clean_table_name: user_visit_preferences
     UserVisitPreferences_AUD:
