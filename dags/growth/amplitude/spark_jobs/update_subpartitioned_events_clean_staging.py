@@ -51,6 +51,15 @@ def update_date_partitions(row):
     else:
         logger.info(f"m=__main__, msg=Table {subpartitioned_table_name} do not exist.")
 
+def get_table_names(database_name: str):
+    """Returns the table names, but ignoring views"""
+
+    return [
+        t.name
+        for t in spark.catalog.listTables(database_name)
+        if t.tableType != "VIEW"
+    ]
+
 
 if __name__ == "__main__":
     # args
@@ -79,7 +88,7 @@ if __name__ == "__main__":
     ).collect()
 
     # get existing tables
-    existing_tables = spark_metastore_service.get_table_names(
+    existing_tables = get_table_names(
         db_info["db_clean_staging_databricks"]
     )
 
