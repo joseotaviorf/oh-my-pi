@@ -32,7 +32,7 @@ automated_costs AS (
     id_region AS sk_region,
     BIGINT(DATE_FORMAT(dt_cost, 'yyyyMMdd')) AS sk_cost_date,
     NULL AS bk_sharing_rules,
-    name_convention_suffix,
+    naming_convention_sufix,
     origin,
     country_code,
     utm_campaign,

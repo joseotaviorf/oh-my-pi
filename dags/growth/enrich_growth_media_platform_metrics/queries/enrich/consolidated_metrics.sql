@@ -122,7 +122,7 @@ SELECT
     COALESCE(
         td.campaign_name_convention, -- sufix_from_dictionary,
         NULLIF(CONCAT_WS('.', SLICE(SPLIT(am.utm_campaign, '[.]'), 2, 7)), '') -- sufix_from_campaign
-    ) AS name_convention_suffix,
+    ) AS naming_convention_sufix,
     scd.current_campaign_name,
     scd.last_campaign_name,
     scd.dt_campaign_name_last_change,
@@ -195,7 +195,7 @@ SELECT
     bc.impressions + coalesce(unknown_impressions_city_group, 0) AS impressions, 
     bc.clicks + coalesce(unknown_clicks_city_group, 0) AS clicks,
     bc.conversions,
-    bc.name_convention_suffix,
+    bc.naming_convention_sufix,
     bc.current_campaign_name,
     bc.last_campaign_name,
     bc.dt_campaign_name_last_change,
