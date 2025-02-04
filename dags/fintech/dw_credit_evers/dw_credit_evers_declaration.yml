@@ -10,16 +10,25 @@ dag:
 
       This concept is closely related to the concept of an Over invoice. This table
       will bring benefits to Credit Analytics Team and Data Products Team, in order
-      to produce Machine Learning models."
+      to produce Machine Learning models.
+
+      The DAG is triggered once a month, on the first day following the first business day of the month."
 workflow:
   type: query_delta
   layer: dw
   short_circuit_customization:
-    function: CHECK_IS_LAST_BUSINESS_DAY_OF_MONTH
+    function: CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH
   custom_schema: credit_evers
   inner_dependencies:
     fact_credit_evers_original_due_date:
       - fact_ever_invoices
+    fact_ever_clean:
+      - fact_credit_overdue_invoices
+    fact_ever_full:
+      - fact_credit_overdue_invoices
+    fact_ever:
+      - fact_ever_clean
+      - fact_ever_full
   spark_session_configs:
     udfs: [FINTECHOPS_WORK_MIN_SLA]
 cluster:

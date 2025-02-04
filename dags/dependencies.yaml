@@ -271,15 +271,15 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.sorting_hat_credit_engine:load-clean-variant
 bietlejuice.dw_credit_evers:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation
-  - bietlejuice.ebdb_contract:load-clean-contract
-  - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
-  - bietlejuice.enrich_retsuko:load-enrich-bill-items
   - bietlejuice.enrich_retsuko:load-enrich-debt-forgiveness
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.retsuko:load-clean-account
-  - bietlejuice.retsuko:load-clean-contract
-  - bietlejuice.trato_feito:load-clean-debt
-  - bietlejuice.trato_feito:load-clean-negotiation
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-bridge-map-debt-negotiation
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-debt
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment
+  - bietlejuice.enrich_invoice:load-enrich-fraud
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
 bietlejuice.dw_crm:
   - bietlejuice.ebdb_inspections:load-clean-inspection
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal
@@ -1405,7 +1405,6 @@ bietlejuice.enrich_credit_analysis:
   - bietlejuice.sorting_hat_credit_engine:load-clean-checklist-group
   - bietlejuice.sorting_hat_credit_engine:load-clean-checklist-item
 bietlejuice.enrich_credit_evers:
-  - bietlejuice.enrich_invoice:load-enrich-credit-invoice
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
 bietlejuice.enrich_criteo:
   - bietlejuice.criteo_temp:load-clean-criteo-costs

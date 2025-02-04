@@ -10,7 +10,7 @@ columns:
     description: "External ID of contract, i.e from main"
   id_contract_retsuko:
     lineage:
-      - datalake_invoice.credit_invoice.id_contract_retsuko
+      - dw_credit_evers.fact_ever_invoices.id_contract_retsuko
     description: "Internal ID of contract, i.e from retsuko"
   id_proposal:
     lineage:
@@ -19,7 +19,7 @@ columns:
   invoice_anchor:
     description: "First invoice of the reference contract"
   invoice_origin:
-    description: "Last invoice of the reference contract"  
+    description: "Last invoice of the reference contract"
   months_of_contract:
     description: "Age of contracts in month, if ended, the total age"
   contract_mob_number:

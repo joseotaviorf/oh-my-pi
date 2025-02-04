@@ -10,7 +10,7 @@ columns:
     description: "External ID of contract, i.e from main"
   id_contract_retsuko:
     lineage:
-      - datalake_invoice.credit_invoice.id_contract_retsuko
+      - datalake_invoice.credit_invoice_original_due_date.id_contract_retsuko
     description: "Internal ID of contract, i.e from retsuko"
   id_proposal:
     lineage:
@@ -23,11 +23,11 @@ columns:
   contract_ever_number:
     description: "Auxiliary array for explode the contract by its delay classification"
   invoice_anchor:
-    description: "First invoice of the reference contract"  
+    description: "First invoice of the reference contract"
   invoice_anchor_debt_forgiveness:
-    description: "First invoice of the reference contract for debt forgiveness"  
+    description: "First invoice of the reference contract for debt forgiveness"
   invoice_anchor_fraud:
-    description: "First invoice of the reference contract for fraud"  
+    description: "First invoice of the reference contract for fraud"
   is_ever:
     description: "Operation that determines if the delay of invoice is higher than the auxiliary ever classification columns and takes the maximum"
   is_ever_debt_forgiveness:

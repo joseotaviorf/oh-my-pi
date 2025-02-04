@@ -10,7 +10,7 @@ columns:
     description: "External ID of contract, i.e from main"
   id_contract_retsuko:
     lineage:
-      - datalake_invoice.credit_invoice.id_contract_retsuko
+      - datalake_invoice.credit_invoice_original_due_date.id_contract_retsuko
     description: "Internal ID of contract, i.e from retsuko"
   id_proposal:
     lineage:
