@@ -48,6 +48,10 @@ base_delinquency AS (
     AND d.id_type = 4
   WHERE
     id_type IN ( 0, 4, 5, 6)
+    AND ( 
+          d.source NOT IN ( 'LEGACY_DIFFERENCE_INCORRECTED_CHARGE' ) 
+          OR d.source IS NULL
+        )
 ),
 delinquency AS (
   SELECT 
