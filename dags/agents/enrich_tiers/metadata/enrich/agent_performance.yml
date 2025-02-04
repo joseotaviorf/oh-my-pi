@@ -55,22 +55,32 @@ columns:
     lineage:
       - datalake_hub_services.business_unit.hub_name
     description: Business unit name.
+  total_offer_sent:
+    description: Total number of offers sent, in which the agent participated in one of the funnel stages
   total_offer_signed:
-    description: Total offers, where the broker was responsible for the visit, that were signed.
+    description: Total number of offers signed, in which the agent participated in one of the funnel stages
+  total_non_regular_offer_signed:
+    description:
+      Total number of offers signed, in which the agent participated in one of the funnel stages,
+      but without any participation by the Agent in programs such as CIQ and 'Traz Quem Compra' (TQC).
   total_offer_signed_with_tqc:
     description: 
-      Total offers, where the broker was responsible for the visit, which were signed, 
-      but with a buyer indication through the 'Tem Quem Compra' (TQC) program.
-  total_offer_signed_without_tqc:
-    description: 
-      Total offers, where the broker was responsible for the visit, which were signed 
-      in the normal way, that is, without any indication of a buyer through the 
-      'Tem Quem Compra' (TQC) program.
+      Total number of offers signed, in which the agent participated in one of the funnel stages, 
+      but with a buyer indicated by the Agent through the 'Traz Quem Compra' (TQC) program.
   total_offer_signed_with_ciq:
     description: 
-      Total signed offers, where the broker responsible for the visit was also the one who recommended the property for listing through the CIQ program.
+      Total number of offers signed, in which the agent participated in one of the funnel stages, 
+      but was also the one who recommended the property for listing through the CIQ program.
   total_first_listing:
     description: Total CIQ houses nominations that resulted in a first publication.
+  total_gross_merchandise_volume:
+    description: 
+      Gross merchandise volume (GMV) is the total sales value of all offers in which the 
+      Agent participated in one of the funnel stages.
+  ratio_offer_sent_to_signed:
+    description: 
+      Proportion between the total number of offers that converted into a 
+      purchase and sale contract, by the total number of offers sent.
   year:
     lineage:
       - datalake_quintoandar.aux_date.year

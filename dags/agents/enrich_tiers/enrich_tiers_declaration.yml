@@ -9,10 +9,10 @@ workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
-    agent_offers_signed:
+    agent_offers:
       - ciq_first_listing
     agent_performance:
-      - agent_offers_signed
+      - agent_offers
       - ciq_first_listing
   default_extraction_type: incremental
   default_partitions: [year, bimester]

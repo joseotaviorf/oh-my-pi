@@ -14,12 +14,14 @@ WITH filter_bimester AS (
 offer_signed AS (
     SELECT
         oa.id_user,
-        COUNT(DISTINCT oa.id_offer) AS total_offer_signed,
-        COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.has_tqc IS TRUE) AS total_offer_signed_with_tqc,
+        COUNT(DISTINCT oa.id_offer) AS total_offer_sent,
+        COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.is_contract_signed IS TRUE) AS total_offer_signed,
+        COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.is_contract_signed IS TRUE AND oa.has_tqc IS TRUE) AS total_offer_signed_with_tqc,
+        SUM(oa.sale_price_agreed) FILTER (WHERE oa.is_contract_signed IS TRUE) AS total_gross_merchandise_volume, 
         fb.year,
         fb.bimester
     FROM
-        datalake_tiers.agent_offers_signed AS oa
+        datalake_tiers.agent_offers AS oa
     JOIN
         filter_bimester AS fb
             ON fb.bimester = oa.bimester
@@ -33,11 +35,13 @@ ciq_offer_signed AS (
         fb.year,
         fb.bimester
     FROM
-        datalake_tiers.agent_offers_signed AS oa
+        datalake_tiers.agent_offers AS oa
     JOIN
         filter_bimester AS fb
             ON fb.bimester = oa.bimester
             AND fb.year = oa.year
+    WHERE
+        oa.is_contract_signed IS TRUE
     GROUP BY ALL
 ),
 ciq_first_listing AS (
@@ -52,6 +56,8 @@ ciq_first_listing AS (
         filter_bimester AS fb
             ON fb.bimester = cfl.bimester
             AND fb.year = cfl.year
+    WHERE
+        cfl.has_first_listing IS TRUE
     GROUP BY ALL
 ),
 member_profile AS (
@@ -113,11 +119,22 @@ SELECT
     mp.phone_number,
     mp.profile,
     mp.hub_name,
+    COALESCE(os.total_offer_sent, 0) AS total_offer_sent,
     COALESCE(os.total_offer_signed, 0) AS total_offer_signed,
+    (
+        COALESCE(os.total_offer_signed, 0) 
+        - COALESCE(os.total_offer_signed_with_tqc, 0) 
+        - COALESCE(cos.total_offer_signed_with_ciq, 0)
+    ) AS total_regular_offer_signed,
+    (
+        COALESCE(os.total_offer_signed_with_tqc, 0) 
+        + COALESCE(cos.total_offer_signed_with_ciq, 0)
+    ) AS total_non_regular_offer_signed,
     COALESCE(os.total_offer_signed_with_tqc, 0) AS total_offer_signed_with_tqc,
-    COALESCE(os.total_offer_signed - os.total_offer_signed_with_tqc, 0) AS total_offer_signed_without_tqc,
     COALESCE(cos.total_offer_signed_with_ciq, 0) AS total_offer_signed_with_ciq,
     COALESCE(cql.total_first_listing, 0) AS total_first_listing,
+    COALESCE(os.total_gross_merchandise_volume, 0) AS total_gross_merchandise_volume,
+    ROUND(COALESCE(os.total_offer_signed / os.total_offer_sent, 0), 2) AS ratio_offer_sent_to_signed,
     mp.year,
     mp.bimester
 FROM

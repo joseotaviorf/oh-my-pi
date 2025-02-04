@@ -31,6 +31,7 @@ SELECT
     cfl.id_house,
     cfl.id_user,
     cfl.consultant_type,
+    cfl.ts_first_listing IS NOT NULL AS has_first_listing,
     cfl.ts_first_listing,
     cfl.ts_updated,
     fb.year,

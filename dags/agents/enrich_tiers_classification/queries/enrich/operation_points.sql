@@ -17,7 +17,7 @@ agent_performance AS (
         IF(ap.profile = "Broker", "SALE_AGENT", "NEGOTIATION_EXECUTIVE") AS program_code,
         STACK(
             4,
-            ap.total_offer_signed_without_tqc, "CCV",
+            ap.total_regular_offer_signed, "CCV",
             ap.total_offer_signed_with_tqc, "CCV_TQC",
             ap.total_offer_signed_with_ciq, "CCV_CIQ",
             ap.total_first_listing, "FIRST_LISTING"
@@ -36,7 +36,7 @@ SELECT
     pr.id_points_rule,
     ap.bimester_name,
     ap.profile,
-    ap.program_code,
+    pr.program_code,
     ap.operation,
     ap.performance_points,
     CASE

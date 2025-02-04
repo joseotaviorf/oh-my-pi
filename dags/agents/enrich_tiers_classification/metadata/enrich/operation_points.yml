@@ -40,13 +40,11 @@ columns:
         until this results in a CCV (signed contract).
   program_code:
     lineage:
-      - datalake_tiers.agent_performance.program_code
+      - datalake_tiers.hub_points_rule.program_code
     description:
       Refers to which program this rule is associated with, for example, 
       it could be a rule associated with brokers or negociation executors.
   operation:
-    lineage:
-      - datalake_tiers.agent_performance.operation
     description:
       The rule's operation indicates the context in which it will be applied, for example, 
       for remuneration of For Sale brokers, we consider operations such as CCV (purchase and sale 
@@ -57,7 +55,10 @@ columns:
       FIRST_LISTING: First publication of the house captured by CIQ.
   performance_points:
     lineage:
-      - datalake_tiers.agent_performance.performance_points
+      - datalake_tiers.agent_performance.total_regular_offer_signed
+      - datalake_tiers.agent_performance.total_offer_signed_with_tqc
+      - datalake_tiers.agent_performance.total_offer_signed_with_ciq
+      - datalake_tiers.agent_performance.total_first_listing
     description: 
       Total performance points achieved by the agent, for example, if an agent managed to close 10 purchase and 
       sale contracts in the two-month period, then he has 10 performance points for this requirement.

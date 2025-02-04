@@ -1,7 +1,7 @@
 ---
 database_name: datalake_tiers
-table_name: agent_offers_signed
-description: Data on signed offers and the agents involved in the process.
+table_name: agent_offers
+description: Data on offers and the agents involved in the process.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
@@ -25,11 +25,17 @@ columns:
     description: Unique identifier of the CIQ user who captured/recommended the house through the CIQ program.
   agent_profile:
     description: Type of Agents (Negotiation Executive or Broker)
+  sale_price_agreed:
+    lineage:
+      - datalake_offer.sale_offer.sale_price_agreed
+    description: Final price agreed for this offer.
   has_tqc:
     description: Indicates that the offer had a buyer referral through the ‘Tem Quem Compra’ (TQC) program.
   is_ciq_first_listing:
     description: 
       Indicates that this house was recommended through the CIQ program, i.e. its first listing is linked to a CIQ user.
+  is_contract_signed:
+    description: Indicates whether the offer was signed and generated a purchase and sale agreement.
   ts_sale_agreement_signed:
     lineage:
       - datalake_offer.sale_offer.ts_sale_agreement_signed
