@@ -46,7 +46,7 @@ cross_mob_ever AS (
         CASE
           WHEN d.has_agreement_broken IS TRUE
             AND DATE_DIFF(DATE_TRUNC("MONTH", dt_agreement_cancelation), DATE_TRUNC("MONTH", ADD_MONTHS(d.dt_contract_signature, INT(ma.mob)))) <= 0
-            THEN DATE_DIFF(MONTH, DATE_TRUNC("MONTH", d.dt_contract_signature), DATE_TRUNC("MONTH", d.dt_agreement_cancelation))
+            THEN DATE_DIFF(MONTH, DATE_TRUNC("MONTH", d.dt_contract_signature), DATE_TRUNC("MONTH", DATE_ADD(d.dt_due_adjusted_based_accrual_year_month, ea.ever)))
           ELSE
               (12*(DATE_FORMAT(DATE_ADD(d.dt_due_adjusted_based_accrual_year_month, ea.ever), "y") - DATE_FORMAT(d.dt_contract_signature, "y")) +
                     (DATE_FORMAT(DATE_ADD(d.dt_due_adjusted_based_accrual_year_month, ea.ever), "M") - DATE_FORMAT(d.dt_contract_signature, "M")))
