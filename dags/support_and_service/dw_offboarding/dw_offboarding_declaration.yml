@@ -19,7 +19,7 @@ workflow:
     dim_termination:
       z_order_by: [sk_termination]
       merge_on: [sk_termination]
-    dim_house_listing_terminations:
+    fact_house_listing_terminations:
       z_order_by: [sk_termination]
       merge_on: [sk_termination]
 
