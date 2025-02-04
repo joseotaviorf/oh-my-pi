@@ -146,7 +146,7 @@ landlord_events_timestamp AS (
   LEFT JOIN
     datalake_offer.offer AS off
       ON off.id_offer_context = rde.id_offer
-      AND off.status = 'Rejeitada'
+      AND off.status IN ('Rejeitada', 'REJECTED')
   LEFT JOIN
     rejected_proposals AS rp
       ON rp.id_proposal = rde.id_proposal
@@ -200,7 +200,7 @@ landlord_journey_agg AS (
     -- In this case, we are not using the order_event, because we are interest in the last offer rejected date for all event_type equal to 3 (offer submitted)
     MIN(
       CASE
-        WHEN let.id_event_type = 3 AND let.offer_status = 'Rejeitada' AND let.ts_offer_rejected IS NOT NULL THEN DATEDIFF(DATE('{year}-{month}-{day}'), let.ts_offer_rejected)
+        WHEN let.id_event_type = 3 AND let.offer_status IN ('Rejeitada', 'REJECTED') AND let.ts_offer_rejected IS NOT NULL THEN DATEDIFF(DATE('{year}-{month}-{day}'), let.ts_offer_rejected)
       END
     ) AS total_days_since_last_offer_rejected,
     MAX(
@@ -292,7 +292,7 @@ landlord_journey_agg AS (
     COUNT(
       DISTINCT
         CASE
-          WHEN let.id_event_type = 3 AND let.offer_status = 'Rejeitada' THEN let.id_offer
+          WHEN let.id_event_type = 3 AND let.offer_status IN ('Rejeitada', 'REJECTED') THEN let.id_offer
         END
     ) AS total_rejected_offers,
     COUNT(
@@ -481,7 +481,7 @@ landlord_journey_agg AS (
     ) AS ts_last_offer_sending,
     MAX(
       CASE
-        WHEN let.id_event_type = 3 AND let.offer_status = 'Rejeitada' THEN let.ts_offer_rejected
+        WHEN let.id_event_type = 3 AND let.offer_status IN ('Rejeitada', 'REJECTED') THEN let.ts_offer_rejected
         END
     ) AS ts_last_offer_rejected,
     MAX(

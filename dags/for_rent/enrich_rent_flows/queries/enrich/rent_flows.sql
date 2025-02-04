@@ -192,7 +192,7 @@ invalid_rent_flows AS (
       IF(b.is_visit_performed = TRUE, dt_booking, NULL) AS ts_visit_performed,
       r.ts_created AS ts_reservation_created,
       of.ts_first_sent AS ts_offer_submitted,
-      IF(of.status = 'Aprovada', of.ts_analyzed, NULL) AS ts_offer_approved,
+      IF(of.status IN ('Aprovada', 'ACCEPTED'), of.ts_analyzed, NULL) AS ts_offer_approved,
       pp.ts_created AS ts_proposal_created,
       pp.ts_approved AS ts_proposal_approved,
       pp.ts_guarantee AS ts_guarantee_processed,

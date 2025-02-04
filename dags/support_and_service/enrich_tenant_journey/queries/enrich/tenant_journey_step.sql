@@ -110,7 +110,7 @@ tenant_events_timestamp AS (
   LEFT JOIN
     datalake_offer.offer AS off
       ON off.id_offer_context = rde.id_offer
-      AND off.status = 'Rejeitada'
+      AND off.status IN ('Rejeitada', 'REJECTED')
   LEFT JOIN
     rejected_proposals AS rp
       ON rp.id_proposal = rde.id_proposal
@@ -176,7 +176,7 @@ tenant_journey_agg AS (
     MIN(
       CASE
         WHEN tet.id_event_type = 3
-          AND tet.offer_status = 'Rejeitada'
+          AND tet.offer_status IN ('Rejeitada', 'REJECTED')
           AND tet.ts_offer_rejected IS NOT NULL THEN DATEDIFF(DATE('{year}-{month}-{day}'), tet.ts_offer_rejected)
       END
     ) AS total_days_since_last_offer_rejected,
@@ -274,7 +274,7 @@ tenant_journey_agg AS (
       DISTINCT
         CASE
           WHEN tet.id_event_type = 3
-            AND tet.offer_status = 'Rejeitada' THEN tet.id_offer
+            AND tet.offer_status IN ('Rejeitada', 'REJECTED') THEN tet.id_offer
         END
     ) AS total_rejected_offers,
     COUNT(
@@ -465,7 +465,7 @@ tenant_journey_agg AS (
     MAX(
       CASE
         WHEN tet.id_event_type = 3
-          AND tet.offer_status = 'Rejeitada' THEN tet.ts_offer_rejected
+          AND tet.offer_status IN ('Rejeitada', 'REJECTED') THEN tet.ts_offer_rejected
         END
     ) AS ts_last_offer_rejected,
     MAX(
