@@ -14,7 +14,7 @@ WITH BASE_VENCIMENTOS_PADRONIZADOS AS(
   base_2 AS(
     SELECT
       *,
-      row_number() OVER(PARTITION BY accrual_year_month ORDER BY qtd_faturas DESC, dt_due DESC) AS rowNumber
+      ROW_NUMBER() OVER(PARTITION BY accrual_year_month ORDER BY qtd_faturas DESC, dt_due DESC) AS rowNumber
     FROM
       base_1
   )
@@ -188,9 +188,9 @@ closing_union AS(
     is_international,
     is_paid_in_closing_day,
     is_writtendown_in_dead_time,
-    NULL AS is_write_off,
-    NULL AS is_contract_write_off,
-    NULL AS has_repair_offboarding_bill_item,
+    FALSE AS is_write_off,
+    FALSE AS is_contract_write_off,
+    FALSE AS has_repair_offboarding_bill_item,
     paid_amount,
     payment_status,
     user,
@@ -544,6 +544,7 @@ SELECT
   END AS delay_contamined_range_e,
   delta_days,
   due_amount,
+  paid_amount,
   frequency,
   full_delay_at_deal,
   IF(is_guarantee_paid is TRUE, 'PAID','FREE') as guarantee_type,
@@ -616,6 +617,7 @@ SELECT
   END AS delay_contamined_range,
   delta_days,
   due_amount,
+  paid_amount,
   frequency,
   full_delay_at_deal,
   guarantee_type,

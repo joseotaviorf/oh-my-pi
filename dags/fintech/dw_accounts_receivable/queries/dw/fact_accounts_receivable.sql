@@ -42,7 +42,8 @@ SELECT
         THEN od.dt_invoice_paid
         ELSE cr.dt_invoice_paid
     END AS dt_invoice_paid,
-    DATE(DATE_TRUNC('MONTH', l.dt_closing + INTERVAL '1' MONTH)) AS dt_month
+    DATE(DATE_TRUNC('MONTH', l.dt_closing + INTERVAL '1' MONTH)) AS dt_month,
+    NOW() AS ts_load
 FROM
     dw_losses.fact_losses l
 LEFT JOIN

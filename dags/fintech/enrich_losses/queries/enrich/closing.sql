@@ -34,6 +34,7 @@ BASE_INVOICES_SNAPSHOT_CLEAN AS (
                   ps.ts_canceled,
                   ps.dt_sent,
                   ps.dt_due,
+                  IF(dd.is_brz_fintech_business_day, ps.dt_due, dd.next_brz_fintech_business_day) AS dt_due_adjusted,
                   ps.dt_paid,
                   CASE
                         WHEN ps.dt_write_off IS NULL AND ps.reason IN ('write-off-negotiation-cyber',  'write-off-negotiation-5a') THEN DATE(ps.ts_created)
@@ -50,6 +51,12 @@ BASE_INVOICES_SNAPSHOT_CLEAN AS (
             LEFT JOIN
                   dw_public.dim_date dt
                         ON (dt.sk_date = CAST(DATE_FORMAT(DATEADD(MONTH,-1,ps.ts_snapshot), "yyyyMMdd") AS BIGINT))
+            LEFT JOIN
+                  dw_public.dim_date dd
+                        ON (dd.sk_date = CAST(DATE_FORMAT(DATE(ps.dt_due), "yyyyMMdd") AS BIGINT))
+            LEFT JOIN
+                  datalake_retsuko.invoice AS i
+                        ON i.id_external = ps.sk_invoice
             WHERE
                   TRUE
                   AND ps.due_amount <=0
@@ -160,7 +167,7 @@ BASE_CLOSING_DRAFT AS (
             BASE_INVOICES_SNAPSHOT_CLEAN AS m
       LEFT JOIN
             datalake_retsuko.invoice AS i
-                  ON id_external = m.sk_invoice
+                  ON i.id_external = m.sk_invoice
       LEFT JOIN
             datalake_retsuko_clean.contract AS cr
                   ON cr.id = i.id_contract
@@ -211,10 +218,12 @@ SELECT
       payment_status,
       COALESCE(user,'tenant') AS user,
       'SNAPSHOT' as origin_factor,
+      DATE(ts_created) AS dt_created,
       closing_day AS dt_closing,
       contract_signature_date as dt_contract_signature,
       dt_annulment,
       dt_due,
+      dt_due_adjusted,
       dt_paid,
       dt_sent,
       dt_write_off,

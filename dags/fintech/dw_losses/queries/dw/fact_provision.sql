@@ -1,7 +1,6 @@
 SELECT
     COALESCE(id_contract, -1) AS sk_contract,
     COALESCE(id_invoice, -1) AS sk_invoice,
-    due_amount,
     invoice_account_type,
     payment_status,
     invoice_status,
@@ -51,6 +50,8 @@ SELECT
     is_write_off,
     is_contract_write_off,
     has_repair_offboarding_bill_item,
+    due_amount,
+    paid_amount,
     dt_due_adjs,
     dt_due_deal_anchor,
     dt_due_general_accrual,
