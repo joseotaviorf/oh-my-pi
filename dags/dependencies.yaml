@@ -270,16 +270,16 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat_credit_engine:load-clean-variant
 bietlejuice.dw_credit_evers:
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-bridge-map-debt-negotiation
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-debt
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
+  - bietlejuice.enrich_invoice:load-enrich-fraud
   - bietlejuice.enrich_retsuko:load-enrich-debt-forgiveness
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.retsuko:load-clean-account
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-bridge-map-debt-negotiation
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-debt
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment
-  - bietlejuice.enrich_invoice:load-enrich-fraud
-  - bietlejuice.dw_contract:load-dw-rent-dim-contract
-  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
 bietlejuice.dw_crm:
   - bietlejuice.ebdb_inspections:load-clean-inspection
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal
@@ -629,13 +629,13 @@ bietlejuice.dw_listing_temp:
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
 bietlejuice.dw_losses:
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
+  - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.enrich_losses:load-enrich-bill-items
   - bietlejuice.enrich_losses:load-enrich-closing
   - bietlejuice.enrich_losses:load-enrich-delay
   - bietlejuice.enrich_losses:load-enrich-historical-closing
   - bietlejuice.enrich_losses:load-enrich-provision
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
-  - bietlejuice.dw_region:load-dw-public-dim-region
 bietlejuice.dw_media_platform_metrics:
   - bietlejuice.enrich_growth_manual_media_platform_metrics:load-enrich-manual-costs
   - bietlejuice.enrich_growth_media_platform_metrics:load-enrich-consolidated-metrics
@@ -1983,7 +1983,18 @@ bietlejuice.enrich_inspections:
   - bietlejuice.ebdb_visit:load-clean-booking-status-change
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.inspection_services:load-clean-assessment-aud
+  - bietlejuice.inspection_services:load-clean-issue-type-aud
+  - bietlejuice.inspection_services:load-clean-item-aud
+  - bietlejuice.inspection_services:load-clean-item-group-aud
+  - bietlejuice.inspection_services:load-clean-item-group-type-aud
+  - bietlejuice.inspection_services:load-clean-item-issue-aud
+  - bietlejuice.inspection_services:load-clean-item-media-aud
+  - bietlejuice.inspection_services:load-clean-item-type-aud
+  - bietlejuice.inspection_services:load-clean-room-aud
+  - bietlejuice.inspection_services:load-clean-room-type-aud
   - bietlejuice.inspections:load-clean-appointment
+  - bietlejuice.inspections:load-clean-appointment-aud
   - bietlejuice.inspections:load-clean-assessment
   - bietlejuice.inspections:load-clean-budget
   - bietlejuice.inspections:load-clean-contestation
@@ -3593,6 +3604,10 @@ bietlejuice.survicate_respondent_attributes:
   - bietlejuice.survicate_survey_attributes:load-raw-survey-responses
 bietlejuice.survicate_survey_attributes:
   - bietlejuice.survicate_surveys:load-raw-surveys
+quintoml.growth.contract_duration_model.inference:
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - wonka.house_main:load-house_main
 quintoml.growth.eltv.inference:
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
   - bietlejuice.ebdb_house:load-clean-house
@@ -3603,13 +3618,9 @@ quintoml.growth.rent_conversion_model.inference:
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - wonka.house_main:load-house_main
-quintoml.growth.contract_duration_model.inference:
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-  - bietlejuice.enrich_booking:load-enrich-booking
-  - wonka.house_main:load-house_main
 quintoml.growth.sale_conversion_model.inference:
-  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
   - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
   - wonka.house_main:load-house_main
 quintoml.growth.sale_discount_model.inference:
   - bietlejuice.ebdb_location:load-clean-region

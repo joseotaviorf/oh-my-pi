@@ -1,0 +1,113 @@
+---
+database_name: datalake_inspections
+table_name: inspector_reports
+description: |
+  Table and enrichment that aims to make report information available at the time the surveyor sends it for analysis.
+  Each line of this table is a combination of all levels of the report, from inspection to the media related to each item.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_inspection:
+    description: Inspection identification key (or in this case, report).
+    lineage:
+      - datalake_inspections_clean.inspection_aud.id_inspection
+  id_inspector:
+    description: Inspector identification key in IS.
+    lineage:
+      - datalake_inspections_clean.inspection_aud.id_inspector
+  id_contract:
+    description: Identification key of the contract related to the report.
+    lineage:
+      - datalake_inspections_clean.inspection_aud.id_contract
+  id_appointment:
+    description: Identification key of the appointment related to the report.
+    lineage:
+      - datalake_inspections_clean.appointment_aud.id_appointment
+  id_room:
+    description: Identification key of the room related to the report.
+    lineage:
+      - datalake_inspection_services_clean.room_aud.id_room
+  id_item:
+    description: Item condition identification key related to the item in the report.
+    lineage:
+      - datalake_inspection_services_clean.item_aud.id_item
+  id_item_group:
+    description: Identification key of the item related to the room in the report.
+    lineage:
+      - datalake_inspection_services_clean.item_group_aud.id_item_group
+  id_item_issue:
+    description: Problem identification key for the item marked in the report.
+    lineage:
+      - datalake_inspection_services_clean.item_issue_aud.id_item_issue
+  id_item_media:
+    description: Media identification key related to the item in the report.
+    lineage:
+      - datalake_inspection_services_clean.item_media_aud.id_item_media
+  inspection_type:
+    description: Type of inspection (onboarding or offboarding).
+    lineage:
+      - datalake_inspections_clean.inspection_aud.type
+  room_type:
+    description: Type of room related to the report (for example - kitchen, laundry room...)
+    lineage:
+      - datalake_inspection_services_clean.room_type_aud.type
+  item_group_type:
+    description: Type of item related to the room in the report.
+    lineage:
+      - datalake_inspection_services_clean.item_group_type_aud.type
+  item_type:
+    description: Type of condition of the item related to the room in the report.
+    lineage:
+      - datalake_inspection_services_clean.item_type_aud.type
+  issue_type:
+    description: Type of problem related to the item.
+    lineage:
+      - datalake_inspection_services_clean.issue_type_aud.type
+  media_type:
+    description: Type of media related to the item in the report.
+    lineage:
+      - datalake_inspection_services_clean.item_media_aud.type
+  item_group_status:
+    description: Item status in the report.
+    lineage:
+      - datalake_inspection_services_clean.item_group_aud.status
+  item_status:
+    description: Item condition status in the report.
+    lineage:
+      - datalake_inspection_services_clean.item_aud.status
+  item_comment:
+    description: Comment on the condition of the item in the report.
+    lineage:
+      - datalake_inspection_services_clean.item_aud.comment
+  issue_comment:
+    description: Comment on the problem related to the item in the report.
+    lineage:
+      - datalake_inspection_services_clean.item_issue_aud.comment
+  room_name:
+    description: Name of the room related to the report.
+    lineage:
+      - datalake_inspection_services_clean.room_aud.room_name
+  item_group_name:
+    description: Name of the item related to the report.
+    lineage:
+      - datalake_inspection_services_clean.item_group_aud.name
+  is_present_item:
+    description: Flag indicating whether the condition of the item in question is present.
+    lineage:
+      - datalake_inspection_services_clean.item_aud.is_present
+  ts_synced:
+    description: Date in timestamp format indicating when the inspection actually took place.
+    lineage:
+      - datalake_inspection_services_clean.assessment_aud.ts_created
+  year:
+    description: Year in which the inspection took place.
+    lineage:
+      - datalake_inspection_services_clean.assessment_aud.ts_created
+  month:
+    description: Month in which the inspection took place.
+    lineage:
+      - datalake_inspection_services_clean.assessment_aud.ts_created
+  day:
+    description: Day in which the inspection took place.
+    lineage:
+      - datalake_inspection_services_clean.assessment_aud.ts_created

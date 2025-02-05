@@ -33,6 +33,11 @@ workflow:
     inspection_booking:
       extraction_type: full
     inspection_status_change: {}
+    inspector_reports:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      z_order_by: [id_report]
+      merge_on: [id_report]
     item_group:
       partitions: [year, month, day]
       extraction_type: incremental
