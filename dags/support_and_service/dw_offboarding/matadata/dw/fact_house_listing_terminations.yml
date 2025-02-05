@@ -65,6 +65,16 @@ columns:
     lineage:
       - datalake_terminator.termination.is_early_relisting_enabled
     description: Boolean flag indicating if the house's owner opted-in/out of the early relisting.
+  days_termination_request_to_ended_rental_confirmed:
+    description: Days between termination request date and ended rental confirmed date.
+  days_termination_request_to_publication:
+    description: Days between termination request date and next listing's publication date.
+  days_termination_request_to_relisting_declined:
+    description: Days between termination request date and date when
+  days_termination_to_publication:
+    description: Days between termination and publication
+  days_termination_to_contract_signed:
+    description: Days between termination and contract signed
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_offboarding.
   year:
