@@ -76,6 +76,15 @@ class SparkClient(DBClient):
         :param verify_schema: verify data types of every row against schema
         :return: A Spark DataFrame
         """
-        df = self.conn.createDataFrame(data, schema, sampling_ratio, verify_schema)
+        try:
+            df = self.conn.createDataFrame(data, schema, sampling_ratio, verify_schema)
+        except TypeError:
+            # When using Shared Unity Catalog clusters, the createDataFrame method simply
+            # does not have the "sampling_ratio" and "verify_schema" parameters.
+            logger.warning(
+                "m=create_dataframe, msg=ignoring sampling_ratio and verify_schema, because they"
+                "are not allowed in UC shared clusters."
+            )
+            df = self.conn.createDataFrame(data, schema)
 
         return df
