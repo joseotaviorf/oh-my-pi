@@ -123,7 +123,7 @@ timeline_base AS (
         DATE(t.dt_created) AS dt_fatura,
         CASE
             WHEN t.id_delinquency < 5000000 THEN DATE(t.dt_due)
-            WHEN t.id_type IN (1, 2) THEN DATE(t.dt_due)
+            WHEN t.id_type IN (0, 4, 5, 6) THEN DATE(t.dt_due)
             ELSE DATE(t.dt_created)
         END AS dt_aging,
         de.dt_updated AS dt_delinquency_last_register
@@ -245,7 +245,7 @@ SELECT
     MAX(t.is_legacy_agreement) AS is_legacy_agreement,
     MAX(t.is_legacy_propose) AS is_legacy_propose,
     MAX(t.is_currently_active) AS is_currently_active,
-    MAX(IF(t.dt_updated_arq > t.`date`, TRUE, FALSE)) AS is_active_timeline,
+    MAX(IF(t.dt_updated_arq > t.`date`, FALSE, TRUE)) AS is_active_timeline,
     MAX(t.dt_due) AS dt_due,
     MAX(t.dt_ended_propose) AS dt_ended_propose,
     t.`date` AS dt_base,
