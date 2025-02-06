@@ -58,4 +58,3 @@ INNER JOIN
         ON c.sk_buyer = u.id
 WHERE
     days_since_event = 1
-    OR gap = true
