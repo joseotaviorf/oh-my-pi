@@ -1,0 +1,136 @@
+database_name: dw_credit_evers
+table_name: fact_credit_invoices
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: This table contains all invoices from a contract. It can be used as an analytical database to retrieve detailed information about an invoice, such as the purpose, status, due date, payment date and more. The fact_credit_invoices also contains data about any agreement made, and if the agreement was broken.
+columns:
+  sk_invoice:
+    lineage:
+      - datalake_retsuko.invoice.id_external
+    description: "External ID of invoice. It can be used in any join with the id_external from Retsuko."
+  sk_contract:
+    lineage:
+      - datalake_retsuko.invoice.id_contract_external
+    description: "External contract ID from Retsuko. It is the same as the EBDB contract ID and can be used in a join with dw_rent.dim_contract sk_contract."
+  sk_contract_retsuko:
+    lineage:
+      - datalake_retsuko.invoice.id_contract
+    description: "Internal ID of contract, i.e the contract ID of an invoice in Retsuko. It can be used in any join with the id_contract from Retsuko"
+  sk_contract_ebdb:
+    lineage:
+      - dw_rent.dim_contract.sk_contract
+    description: "Main ID of Contract."
+  sk_proposal:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_proposal
+    description: "Proposal ID attributed to the contract. It can be used in any join with id_proposal from main (EBDB)"
+  sk_negotiation:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_negotiation.sk_negotiation
+    description: "Negotiation ID of an invoice with agreement. It consists of the  id contract + id negotiation. The sk_negotiation is NULL when the invoice does not have any agreement."
+  id_negotiation_business:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_negotiation.id_negotiation
+    description: "Negotiation ID of an invoice with agreement."
+  purpose:
+    lineage:
+      - datalake_retsuko.invoice.purpose
+    description: "Purpose of the invoice."
+  account_type:
+    lineage:
+      - datalake_retsuko_clean.account.type
+    description: "Categorical type of account that the invoice is related. In this table all invoices are from tenant accounts."
+  status:
+    lineage:
+      - datalake_retsuko.invoice.status
+    description: "Current status of the invoice inside retsuko."
+  negotiation_status:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_negotiation.negotiation_status
+    description: "Negotiation status of an invoice with agreement."
+  due_amount:
+    lineage:
+      - datalake_retsuko.invoice.due_amount
+    description: "Due amount of the invoice."
+  paid_amount:
+    lineage:
+      - datalake_retsuko.invoice.paid_amount
+    description: "Paid of the invoice."
+  contract_guarantee:
+    lineage:
+      - dw_rent.dim_contract.guarantee
+    description: "Contract guarantee."
+  contract_country_code:
+    lineage:
+      - dw_rent.dim_contract.contract_country_code
+    description: "Country code of the contract."
+  has_agreement:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_negotiation.sk_negotiation
+    description: "Boolean checking if there is any agreement to the invoice. If true, it means that there is a negotiation ID for the invoice which means that it has an agreement."
+  has_agreement_broken:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_negotiation.sk_negotiation
+    description: "Boolean checking if the agreement was broken."
+  ts_due:
+    lineage:
+      - datalake_retsuko.invoice.ts_due
+    description: "Timestamp of the invoice due date."
+  is_debt_forgiveness:
+    lineage:
+      - datalake_retsuko.debt_forgiveness.id_invoice
+    description: "Flag to indicate whether an invoice with debt has been forgiven."
+  is_fraud:
+    lineage:
+      - datalake_invoice.fraud.id_invoice
+    description: "Flag to indicate whether an invoice with debt was fraud."
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+    description: "Competence of invoice, i.e expectation of month for cash flow."
+  dt_contract_signature:
+    lineage:
+      - dw_rent.dim_contract.ts_signature
+    description: "Date of the contract signature."
+  dt_contract_termination:
+    lineage:
+      - dw_rent.dim_contract.dt_annulment
+    description: "Date of the contract termination."
+  dt_contract_updated:
+    lineage:
+      - dw_rent.dim_contract.ts_updated
+    description: "Date for the most recent update of contract at main."
+  dt_due_adjusted:
+    lineage:
+      - datalake_retsuko.invoice.dt_due_adjusted
+    description: "Date of the invoice due with adjustment."
+  dt_due_based_accrual_year_month:
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+    description: "Adjusted date of the invoice competence. It adds one month to the accrual_year_month and considers the sixth day of the month."
+  dt_due_adjusted_based_accrual_year_month:
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+    description: "If dt_due_based_accrual_year_month is a holliday or weekend, the following business day is considered."
+  dt_due_calculated:
+    lineage:
+      - datalake_retsuko.invoice.accrual_year_month
+    description: "Calculated due date."
+  dt_agreement_cancelation:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_negotiation.dt_cancellation
+    description: "Date when the agreement was broken"
+  ts_paid:
+    lineage:
+      - datalake_retsuko.invoice.ts_paid
+    description: "Timestamp of the invoice paid date."
+  ts_paid_calculated:
+    lineage:
+      - datalake_retsuko.invoice.ts_paid
+    description: "Timestamp of the invoice calculated paid date."
+  ts_created:
+    lineage:
+      - datalake_retsuko.invoice.ts_created
+    description: "Timestamp of the invoice created date."
+  ts_load:
+    description: "Timestamp of when the table was last processed."

@@ -1,0 +1,44 @@
+database_name: dw_credit_evers
+table_name: fact_ever_clean
+owner: isabella.santos@quintoandar.com.br
+domain: Fintech
+description: This table contains all contracts with overdue invoices (delays) and the ever calculation. It reports Ever 'limpo'(only monthly and onboarding invoices), and Ever with agreement (contracts in which there is at least one agreement made to the invoice).
+columns:
+  sk_contract:
+    lineage:
+      - datalake_retsuko.invoice.id_contract_external
+    description: "External contract ID from Retsuko. It is the same as the EBDB contract ID and can be used in a join with dw_rent.dim_contract sk_contract."
+  sk_contract_retsuko:
+    lineage:
+      - datalake_retsuko.invoice.id_contract
+    description: "Internal ID of contract, i.e the contract ID of an invoice in Retsuko. It can be used in any join with the id_contract from Retsuko"
+  sk_contract_ebdb:
+    lineage:
+      - dw_rent.dim_contract.sk_contract
+    description: "Main ID of Contract."
+  sk_proposal:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.sk_proposal
+    description: "Proposal ID attributed to the contract. It can be used in any join with id_proposal from main (EBDB)."
+  mob:
+    description: "Integer representing the months on book. It is the number of months that have elapsed since the contract signature (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 30, 40)."
+  ever:
+    description: "Integer representing the number of days that the invoice was over (15, 30, 40, 60, 90, 120)"
+  is_ever:
+    description: "Boolean indicating if the contract had any invoice with delay"
+  is_ever_with_agreement:
+    description: "Boolean indicating if the contract had any broken agreement which originated a delay."
+  dt_contract_signature:
+    lineage:
+      - dw_rent.dim_contract.ts_signature
+    description: "Date of the contract signature."
+  dt_reference:
+    lineage:
+      - dw_rent.dim_contract.ts_signature
+    description: "Date of the contract signature + mob number."
+  dt_contract_updated:
+    lineage:
+      - dw_rent.dim_contract.ts_updated
+    description: "Date for the most recent update of contract at main."
+  ts_load:
+    description: "Timestamp of when the table was last processed."

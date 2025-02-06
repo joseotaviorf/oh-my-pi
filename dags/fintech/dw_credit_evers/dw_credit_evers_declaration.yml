@@ -20,12 +20,10 @@ workflow:
     function: CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH
   custom_schema: credit_evers
   inner_dependencies:
-    fact_credit_evers_original_due_date:
-      - fact_ever_invoices
     fact_ever_clean:
-      - fact_credit_overdue_invoices
+      - fact_credit_invoices
     fact_ever_full:
-      - fact_credit_overdue_invoices
+      - fact_credit_invoices
     fact_ever:
       - fact_ever_clean
       - fact_ever_full

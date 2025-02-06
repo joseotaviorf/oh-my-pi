@@ -11,7 +11,8 @@ SELECT
     f.is_ever_with_agreement AS is_ever_full_with_agreement,
     COALESCE(c.dt_contract_signature, f.dt_contract_signature) AS dt_contract_signature,
     COALESCE(c.dt_reference, f.dt_reference) AS dt_reference,
-    COALESCE(c.dt_contract_updated, f.dt_contract_updated) AS dt_contract_updated
+    COALESCE(c.dt_contract_updated, f.dt_contract_updated) AS dt_contract_updated,
+    NOW() AS ts_load
 FROM dw_credit_evers.fact_ever_full AS f
 FULL OUTER JOIN dw_credit_evers.fact_ever_clean AS c
   ON c.sk_contract = f.sk_contract

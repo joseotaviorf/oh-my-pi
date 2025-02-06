@@ -11,7 +11,7 @@ debtors_all_time AS (
           ADD_MONTHS(dt_contract_signature,-1)), 1
       )
     ) AS INTEGER) AS months_of_contract
-  FROM dw_credit_evers.fact_credit_overdue_invoices
+  FROM dw_credit_evers.fact_credit_invoices
   WHERE
     is_debt_forgiveness IS FALSE
     AND dt_contract_signature >= DATE('2018-01-01')
@@ -137,6 +137,7 @@ SELECT
     CAST(MAX(flag_ever_with_agreement) AS BOOLEAN) AS is_ever_with_agreement,
     dt_contract_signature,
     dt_reference,
-    dt_contract_updated
+    dt_contract_updated,
+    NOW() AS ts_load
 FROM ever_rule
 GROUP BY ALL

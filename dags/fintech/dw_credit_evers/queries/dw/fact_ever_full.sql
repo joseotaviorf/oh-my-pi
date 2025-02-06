@@ -2,7 +2,7 @@ WITH
 debtors_all_time AS (
   SELECT
     *
-  FROM dw_credit_evers.fact_credit_overdue_invoices
+  FROM dw_credit_evers.fact_credit_invoices
   WHERE
     dt_contract_signature >= DATE('2018-01-01')
     AND (paid_amount IS NULL
@@ -134,6 +134,7 @@ SELECT
     CAST(MAX(flag_ever_with_agreement) AS BOOLEAN) AS is_ever_with_agreement,
     dt_contract_signature,
     dt_reference,
-    dt_contract_updated
+    dt_contract_updated,
+    NOW() AS ts_load
 FROM ever_rule
 GROUP BY ALL
