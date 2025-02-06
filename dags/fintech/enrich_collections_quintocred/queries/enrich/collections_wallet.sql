@@ -139,7 +139,7 @@ evictions_day AS (
             OR e.dt_finalized IS NULL
             )
 WHERE
-    d.`date` < CURRENT_DATE()
+    d.`date` <= CURRENT_DATE()
     AND d.`date` >= '2022-01-01'
     AND (e.is_archived IS FALSE OR e.is_archived IS NULL )
 )
