@@ -32,9 +32,7 @@ columns:
   entity_origin:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.entity_origin_name
-  entity_origin_name:
-    lineage:
-      - datalake_hefesto_raw.worker_portfolio.context_group
+      - datalake_hefesto_raw.worker_portfolio.context_group   
   entity_origin_persona:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.entity_origin_persona

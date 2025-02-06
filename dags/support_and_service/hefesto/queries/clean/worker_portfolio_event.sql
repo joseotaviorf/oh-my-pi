@@ -1,7 +1,6 @@
 SELECT
     id,
-    portfolio_id as portfolio,
-    worker_portfolio_id AS id_portfolio,
+    COALESCE(portfolio_id, worker_portfolio_id) AS id_portfolio,
     portfolio_file_id AS id_portfolio_file,
     event_type,
     author,

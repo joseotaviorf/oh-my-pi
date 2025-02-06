@@ -4,11 +4,9 @@ columns:
   id:
     lineage:
       - datalake_hefesto_raw.worker_portfolio_event.id
-  portfolio:
-    lineage:
-      - datalake_hefesto_raw.worker_portfolio_event.portfolio_id
   id_portfolio:
     lineage:
+      - datalake_hefesto_raw.worker_portfolio_event.portfolio_id
       - datalake_hefesto_raw.worker_portfolio_event.worker_portfolio_id
   id_portfolio_file:
     lineage:
