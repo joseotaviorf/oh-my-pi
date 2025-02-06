@@ -56,10 +56,8 @@ dags_out_of_pattern:
         "wonka.house_visit_availability",
         "wonka.searched_house_main",
         "wonka.user_agg_search_filters",
-        "wonka.user_listing_page_viewed_cross_devices",
-        "wonka.user_region_listing_page_viewed",
+        "wonka.group_user_most_viewed",
         "wonka.user_sale_agg_search_filters",
-        "wonka.user_sale_listing_page_viewed_cross_devices",
         "wonka.house_user_rent_flows",
         "wonka.house_agg_rent_flows",
     ]

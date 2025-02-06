@@ -848,23 +848,10 @@ bietlejuice.enrich_wordpress_baroes:
 bietlejuice.enrich_velo_omie:
   override: []
 
-wonka.user_most_viewed_region:
-  add:
-    - wonka.user_region_listing_page_viewed:execute-job-cluster
-    - wonka.user_region_listing_page_viewed:load-user_region_listing_page_viewed
-    - wonka.user_region_listing_page_viewed:check-completion-notify-user_region_listing_page_viewed
-
-wonka.user_most_viewed_city:
-  add:
+wonka.group_user_most_viewed:
+  add: 
     - bietlejuice.ebdb_location:load-clean-region
-    - wonka.user_region_listing_page_viewed:execute-job-cluster
-    - wonka.user_region_listing_page_viewed:load-user_region_listing_page_viewed
-    - wonka.user_region_listing_page_viewed:check-completion-notify-user_region_listing_page_viewed
-
-wonka.user_region_listing_page_viewed:
-  add:
     - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.ebdb_location:load-clean-region
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
     - bietlejuice.amplitude:load-clean-170698-user-merge
 
@@ -939,8 +926,8 @@ quintoml.recs.house_user_embeddings_quintoml.inference:
     - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
     - wonka.user_agg_search_filters:load-user_agg_search_filters
     - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
-    - wonka.user_listing_page_viewed_cross_devices:load-user_listing_page_viewed_cross_devices
-    - wonka.user_sale_listing_page_viewed_cross_devices:load-user_sale_listing_page_viewed_cross_devices
+    - wonka.group_user_most_viewed:load-user_listing_page_viewed_cross_devices
+    - wonka.group_user_most_viewed:load-user_sale_listing_page_viewed_cross_devices
 
 wonka.house_demand_balancer_predictions:
   add:
