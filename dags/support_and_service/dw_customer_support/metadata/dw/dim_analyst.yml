@@ -6,6 +6,14 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_analyst:
     description: Unique agent identifier.
+  sk_user:
+    lineage:
+      - datalake_ebdb_user.user.user.id
+    description: Unique user identifier.
+  person_uuid:
+    lineage:
+      - datalake_ebdb_user.user.user.person_uuid
+    description: Unique agent identifier.
   sk_agent_twilio:
     lineage:
       - datalake_support_users.analysts.id_agent_twilio

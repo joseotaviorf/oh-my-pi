@@ -1,5 +1,7 @@
 SELECT
     MD5(a.email) AS sk_analyst,
+    u.id AS sk_user,
+    u.uuid_person,
     a.id_agent_twilio AS sk_agent_twilio,
     a.name AS full_name,
     a.email,
@@ -19,3 +21,6 @@ FROM
 LEFT JOIN
     datalake_gsheets_clean.agents_control AS ac
         ON LOWER(a.email) = LOWER(ac.email)
+LEFT JOIN
+    datalake_ebdb_user.user AS u
+        ON u.email = a.email
