@@ -124,22 +124,24 @@ timeline_final AS (
     GROUP BY 1,2,3,5,6,7,16,18
 ),
 evictions_day AS (
-    SELECT
+    SELECT DISTINCT
         d.`date`,
-        DATE_TRUNC('MONTH', d.`date`) AS month,
+        d.month_end,
+        d.month_start,
         REGEXP_REPLACE(e.cpf_cnpj, '[^0-9]', '') AS document
     FROM
         datalake_quintoandar.aux_date AS d
-    LEFT JOIN
+    RIGHT JOIN
         datalake_gsheets_clean.quintocred_process_evictions AS e
         ON d.`date` >= e.dt_register
         AND (
-            DATE_TRUNC('MONTH', d.`date`) <= e.dt_register
-            OR e.dt_register IS NULL
+            d.`date` <= e.dt_finalized
+            OR e.dt_finalized IS NULL
             )
 WHERE
     d.`date` < CURRENT_DATE()
-    AND e.is_archived IS FALSE
+    AND d.`date` >= '2022-01-01'
+    AND (e.is_archived IS FALSE OR e.is_archived IS NULL )
 )
 SELECT
     t.name,
@@ -158,7 +160,6 @@ SELECT
     t.is_finished_array,
     t.is_legacy_propose,
     t.is_currently_active,
-    IF(e.cpf_cnpj IS NOT NULL, TRUE, FALSE) AS has_month_eviction,
     IF(ed.document IS NOT NULL, TRUE, FALSE) AS has_active_day_eviction,
     IF(FIRST_VALUE(em.document) IS NOT NULL, TRUE, FALSE) AS has_active_month_eviction,
     t.dt_ended_propose,
@@ -184,6 +185,7 @@ LEFT JOIN
 LEFT JOIN
     evictions_day em
         ON t.document = em.document
-        AND em.month = DATE_TRUNC('MONTH', t.dt_base)
+        AND em.month_start = DATE_TRUNC('MONTH', t.dt_base)
+        AND em.`date` <= t.dt_base
 GROUP BY ALL
 ORDER BY 17,1
