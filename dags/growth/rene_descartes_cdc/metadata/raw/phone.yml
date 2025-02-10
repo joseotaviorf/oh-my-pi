@@ -1,0 +1,5 @@
+database_name: datalake_rene_descartes_cdc_raw
+table_name: phone
+owner: marcio.gomes@quintoandar.com.br
+domain: Data Growth
+description: The table contains data about phone numbers belonging to different owners.

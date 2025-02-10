@@ -1,0 +1,9 @@
+database_name: datalake_rene_descartes_clean
+table_name: revinfo
+columns:
+  rev:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.revinfo.rev
+  dt_rev:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.revinfo.revtstmp

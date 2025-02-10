@@ -1,0 +1,48 @@
+database_name: datalake_rene_descartes_clean
+table_name: address
+columns:
+  id:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.id
+  country_code:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.country
+  zip:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.zip
+  state:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.state
+  city:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.city
+  neighbourhood:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.neighbourhood
+  street_name:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.street_name
+  house_number:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.house_number
+  complement:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.complement
+  reference:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.reference
+  lat:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.lat
+  lng:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.lng
+  region:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.region
+  ts_created:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.created_at
+  ts_updated:
+    lineage:
+      - datalake_rene_descartes_cdc_raw.address.updated_at

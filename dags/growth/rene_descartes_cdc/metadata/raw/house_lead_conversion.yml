@@ -1,0 +1,5 @@
+database_name: datalake_rene_descartes_cdc_raw
+table_name: house_lead_conversion
+owner: arthur.gonzaga@quintoandar.com.br
+domain: Data Growth
+description: This table has data about events of lead conversion in houses.
