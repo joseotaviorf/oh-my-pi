@@ -13,6 +13,12 @@ columns:
   id_subscription:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.subscription
+  id_order:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.order_id
+  id_charge:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.payment.charge_id
   customer:
     lineage:
       - datalake_rental_guarantee_platform_raw.payment.customer

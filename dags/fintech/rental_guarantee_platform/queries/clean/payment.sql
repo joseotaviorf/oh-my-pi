@@ -2,6 +2,8 @@ SELECT
     CAST(id AS BIGINT) AS id,
     CAST(propose AS BIGINT) AS id_propose,
     CAST(subscription AS BIGINT) AS id_subscription,
+    order_id AS id_order,
+    charge_id AS id_charge,
     customer,
     card_token,
     code,
