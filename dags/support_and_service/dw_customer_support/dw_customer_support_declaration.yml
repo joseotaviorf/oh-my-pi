@@ -26,7 +26,7 @@ workflow:
     fact_analysts_performance:
       partitions: [year, month, day]
       extraction_type: incremental
-      z_order_by: [sk_snapshot, sk_agent, sk_last_ticket_updated_date]
+      z_order_by: [sk_snapshot, sk_agent, sk_reference_date]
     fact_sessions_chatbot:
       partitions: [year, month, day]
       extraction_type: incremental

@@ -54,6 +54,10 @@ columns:
     description: Integer type information that indicates the number of tickets that were in the analyst's backlog still within the SLA on the day.
   backlog_with_exceed_sla:
     description: Integer type information that indicates the number of tickets that exceeded the sla in the analyst's backlog on the day.
+  frt:
+    description: Average FRT (Full Resolution Time) calculates the total time from the beggining
+      of the support in the front until the end, considering the backoffice time if
+      there is back ticket related.
   year:
     description: Year of reference date.
   month:
