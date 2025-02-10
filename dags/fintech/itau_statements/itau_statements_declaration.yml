@@ -23,21 +23,25 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   tables_customization:
     statement_879200452685:
+      merge_on: [ 'id']
       extraction_type: incremental
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
       - statement_id: "879200452685"
     statement_879200452586:
+      merge_on: [ 'id']
       extraction_type: incremental
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
       - statement_id: "879200452586"
     statement_879200494588:
+      merge_on: [ 'id']
       extraction_type: incremental
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
       - statement_id: "879200494588"
     statement_067000392216:
+      merge_on: [ 'id']
       extraction_type: incremental
       partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
