@@ -60,6 +60,10 @@ columns:
     description: Information in json format that indicates the home's output feedback.
     lineage:
       - datalake_terminator_clean.termination.feedback
+  reason:
+    description: Reason of the termination.
+    lineage:
+      - datalake_terminator_clean.termination.feedback
   rescheduling_history:
     description: Json type data that indicates the termination rescheduling history.
     lineage:

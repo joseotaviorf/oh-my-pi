@@ -79,6 +79,7 @@ SELECT
     t.requested_by,
     t.status,
     t.feedback,
+    GET_JSON_OBJECT(t.feedback, '$.reason') AS reason,
     t.rescheduling_history,
     tw.current_step AS workflow_current_step,
     ln.fee_negotiation_status,

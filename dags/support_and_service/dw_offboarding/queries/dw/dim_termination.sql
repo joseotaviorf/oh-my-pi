@@ -5,6 +5,7 @@ SELECT
     requested_by,
     status,
     feedback,
+    reason,
     rescheduling_history,
     workflow_current_step,
     fee_negotiation_status,
