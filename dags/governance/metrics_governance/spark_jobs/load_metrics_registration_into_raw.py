@@ -3,6 +3,7 @@ from typing import List, Dict, Any, Set
 import boto3
 import logging
 import json
+import ast
 
 from json.decoder import JSONDecodeError
 
@@ -103,6 +104,10 @@ if __name__ == "__main__":
     parser.add_argument("source", type=str)
     parser.add_argument("table_name", type=str)
     parser.add_argument("execution_date_str", type=str)
+    parser.add_argument("metrics_bucket",type=str)
+    parser.add_argument("metrics_path",type=str)
+    parser.add_argument('partition_cols',type= str)
+    parser.add_argument('metric_cols',type= str)
 
     args = parser.parse_args()
     env = args.env
@@ -111,18 +116,19 @@ if __name__ == "__main__":
     table_name = args.table_name
     execution_date_str = args.execution_date_str
     execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
+    metrics_bucket = args.metrics_bucket
+    metrics_path = args.metrics_path
+    partition_cols = ast.literal_eval(args.partition_cols)
+    metric_cols = ast.literal_eval(args.metric_cols)
+
+    bucket_suffix = ".data.quintoandar.com.br" if env == "prod" else ".forno.data.quintoandar.com.br"
+    metrics_bucket = metrics_bucket + bucket_suffix
 
     logger.info(
         f"""m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, source={source},
-        table_name={table_name}, execution_date_str={execution_date_str}
+        table_name={table_name}, execution_date_str={execution_date_str}, metrics_bucket={metrics_bucket},
         msg=Job execution started."""
     )
-
-    config_service = ConfigurationService(source)
-    metrics_bucket = config_service.get_config("METRICS_BUCKET")
-    metrics_path = config_service.get_config("METRICS_PATH")
-    partition_cols = config_service.get_config("PARTITION_COLUMNS")
-    metric_cols = set(config_service.get_config("METRIC_COLUMNS"))
 
     s3_loader = S3Loader()
     spark_client = SparkClient()

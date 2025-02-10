@@ -1,0 +1,41 @@
+dag:
+  name: metrics_governance
+  owner: Data Governance
+  schedule_start_date: 2020, 6, 1
+  schedule_interval: "0 5 * * *"
+  documentation:
+    dag_purpose: |
+      Gets QuintoAndar Metrics that were registered through the Metrics Governance project.
+      The metrics are stored in the data-documentation S3 bucket.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_metrics_registration_into_raw
+  default_extraction_type: incremental
+  default_partitions:
+    - year
+    - month
+    - day
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+    - "{table_name}"
+    - "{load_start_date}"
+    - "data-documentation.s3"
+    - "metrics/"
+    - "['year','month','day']"
+    - "['name','acronym','description','company_line','business_stage','hierarchy_level','maturity_level','created_by','approved_by','datamart_name','is_additive','is_active','has_datamart','link_to_metric','calculation','observations','metric_source','ts_created','ts_updated', 'updated_by']"
+  tables_customization:
+    metrics_registration: {}
+cluster:
+  type: databricks_12_2_min_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
