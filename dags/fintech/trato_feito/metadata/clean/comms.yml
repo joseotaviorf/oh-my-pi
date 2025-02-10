@@ -1,0 +1,59 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: comms
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Register information about Communication Journeys and the respective A/B Tests that will be conducted.
+columns:
+  id:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.id
+  id_client:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.client_id
+  id_debtor_external:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.debtor_external_id
+  id_bill_external:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.bill_external_id
+  id_debtor:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.debtor_id
+  experiment:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.experiment
+  experiment_group:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.experiment_group
+  strategy:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.strategy
+  should_receive_comms:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.should_receive_comms
+  dt_start:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.start_date
+  dt_end:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.end_date
+  ts_created:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.created_at
+  ts_updated:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.comms.updated_at
