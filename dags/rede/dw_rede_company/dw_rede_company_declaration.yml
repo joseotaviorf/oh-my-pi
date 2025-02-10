@@ -2,22 +2,13 @@ dag:
   name: dw_rede_company
   schedule_start_date: 2020,8,29
   owner: Data Rede
+  documentation:
+    dag_purpose: "This DAG creates the model for companies of Rede QuintoAndar, which is a marketplace."
 workflow:
   type: query_delta
   layer: dw
   custom_schema: rede
   default_extraction_type: full
-  inner_dependencies:
-    fact_company_event:
-    - dim_company_event_type
-    - dim_company_lead
-    fact_company_journey:
-    - dim_company_lead
-  tables_customization:
-    fact_company_event:
-      partitions: [country_code, business_context]
-    fact_company_journey:
-      partitions: [country_code, business_context]
 cluster:
   type: databricks_12_2_min_general_cluster
   access_control_list:
