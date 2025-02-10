@@ -17,5 +17,3 @@ SELECT
     day
 FROM
     datalake_rene_descartes_raw.house_lead_aud
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id, rev ORDER BY dt DESC) = 1    

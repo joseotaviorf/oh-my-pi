@@ -9,42 +9,23 @@ dag:
       which is a Microservice for Owner Lead discard rules. For more information about the Database please refer
       to the [Rene Descartes Repository](https://github.com/quintoandar/rene-descartes).
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
-  dbutils_secret_key: RENE_DESCARTES_DB
+  source_database: renedescartes
+  source_schema: public
+  custom_schema: rene_descartes
+  dbutils_secret_key: RENEDESCARTES_DB
   lineage_product_database_name: renedescartes
-  default_raw_extraction_type: incremental
-  default_clean_extraction_type: full
-  default_partitions: ["year", "month", "day"]
-  default_clean_partitions: []
   tables_customization:
-    acquisition_misc_data:
-      date_filter_column: updated_at
-      read_from_sql: true
-    address:
-      date_filter_column: updated_at
-      read_from_sql: true
-    house_lead_aud:
-      date_filter_column: revtstmp
-      unixtime_measure: milliseconds
-      read_from_sql: true
-    house_lead_conversion:
-      date_filter_column: updated_at
-      read_from_sql: true
-    house_lead:
-      date_filter_column: updated_at
-      read_from_sql: true
-    lead_rejection:
-      date_filter_column: updated_at
-      read_from_sql: true
-    phone:
-      date_filter_column: updated_at
-      read_from_sql: true
-    revinfo:
-      date_filter_column: revtstmp
-      unixtime_measure: milliseconds
-      read_from_sql: true
+    acquisition_misc_data: {}
+    address: {}
+    house_lead_aud: {}
+    house_lead_conversion: {}
+    house_lead: {}
+    lead_rejection: {}
+    phone: {}
+    revinfo: {}
 cluster:
   type: databricks_13_3_med_memory_cluster
   databricks_conn_id: databricks_new

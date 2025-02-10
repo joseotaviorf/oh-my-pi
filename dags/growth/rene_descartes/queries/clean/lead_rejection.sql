@@ -11,5 +11,3 @@ SELECT
     day
 FROM
     datalake_rene_descartes_raw.lead_rejection
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id ORDER BY dt DESC) = 1    

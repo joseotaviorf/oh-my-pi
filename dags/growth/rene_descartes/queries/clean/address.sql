@@ -19,5 +19,3 @@ SELECT
     day
 FROM
     datalake_rene_descartes_raw.address
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id ORDER BY dt DESC) = 1    

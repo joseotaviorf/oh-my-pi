@@ -1,4 +1,4 @@
- SELECT 
+ SELECT
     id,
     house_lead_id AS id_lead,
     property_id AS id_house,
@@ -7,7 +7,5 @@
     year,
     month,
     day
-FROM 
+FROM
     datalake_rene_descartes_raw.house_lead_conversion
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id ORDER BY dt DESC) = 1

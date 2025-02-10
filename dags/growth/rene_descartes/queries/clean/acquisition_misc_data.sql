@@ -9,5 +9,3 @@ SELECT
     day
 FROM
     datalake_rene_descartes_raw.acquisition_misc_data
-QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id ORDER BY dt DESC) = 1    
