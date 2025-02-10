@@ -6,10 +6,12 @@ from argparse import ArgumentParser
 from functools import reduce
 import requests
 import tempfile
+from time import sleep
 
 import pandas as pd
-from pyspark.sql.types import StructType
+from pyspark.sql.types import StructType, StringType
 from pyspark.sql import DataFrame
+from pyspark.sql.functions import lit
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.api import APIEnum
@@ -41,6 +43,7 @@ def create_end_date(start_date):
 def get_data(statement_id, credentials, start_date):
     page = 1
     data = []
+    tries = 0
     while True:
         url = f"https://account-statement.api.itau.com/account-statement/v1/statements/{statement_id}"
         params = {
@@ -55,10 +58,22 @@ def get_data(statement_id, credentials, start_date):
             headers=credentials["headers"],
             params=params,
             cert=credentials["certs"],
-        ).json()
+        )
+        if response.status_code != 200:
+            credentials = reauth(credentials)
+            tries += 1
+            if tries > 3:
+                print(
+                    f"Error retriving data for statement_id={statement_id} and start_date={start_date}! Response: {response.text} - {response.status_code}"
+                )
+                response.raise_for_status()
+            sleep(2)
+            continue
+        response = response.json()
         data.extend(response.get("data", [{}])[0].get("events", []))
         if response["pagination"]["total_pages"] != response["pagination"]["page"]:
             page = response["pagination"]["page"] + 1
+            tries = 0
         else:
             break
     return pd.json_normalize(data, sep="_")
@@ -87,6 +102,14 @@ def get_token(credentials):
         raise Exception(
             f"Erro ao obter o token: {response.status_code}, msg={response.text}"
         )
+
+
+def reauth(credentials):
+    credentials["headers"] = {
+        "x-itau-correlationid": credentials["correlation_id"],
+        "Authorization": f"Bearer {get_token(credentials)}",
+    }
+    return credentials
 
 
 def prepare_temp_file(file_text):
@@ -165,9 +188,13 @@ if __name__ == "__main__":
     for load_dt in date_range:
         try:
             data = get_data(statement_id, conn_config, load_dt)
-            data["literal_complementary"] = (
-                data["literal_complementary"].replace("", None).astype(str)
-            )
+            if data.empty:
+                continue
+            print(statement_id, load_dt)
+            if "literal_complementary" in data.columns:
+                data["literal_complementary"] = (
+                    data["literal_complementary"].replace("", None).astype(str)
+                )
             df = spark_client.create_dataframe(data)
             df = (
                 SparkDataFrameService()
@@ -177,9 +204,22 @@ if __name__ == "__main__":
             )
             dfs.append(df)
         except Exception as e:
-            logger.info(f"{e}, m=Error loading data for {load_dt}, {e}")
+
+            logger.info(f"{e}, m=Error loading data for {load_dt}, msg={e}")
+            raise e
     if dfs:
-        df = reduce(DataFrame.unionAll, dfs)
+        all_columns = set()
+        for df in dfs:
+            all_columns.update(df.schema.names)
+
+        merged_dfs = []
+        for df in dfs:
+            for col in all_columns:
+                if col not in df.columns:
+                    df = df.withColumn(col, lit(None).cast(StringType()))
+            merged_dfs.append(df.select(*all_columns))
+
+        df = reduce(DataFrame.unionAll, merged_dfs)
         db_info = DatalakeMetastoreService.get_db_info(
             environment, source, datalake_bucket
         )
