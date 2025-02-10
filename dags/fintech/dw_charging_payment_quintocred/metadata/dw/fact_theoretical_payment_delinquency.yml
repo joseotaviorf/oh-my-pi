@@ -33,6 +33,10 @@ columns:
     description: ''
     lineage:
     - dw_charging_payment_quintocred.fact_propose_timeline.sk_delinquency
+  id_bill:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_payment_delinquency.id_bill
   gateway_final:
     description: ''
     lineage:

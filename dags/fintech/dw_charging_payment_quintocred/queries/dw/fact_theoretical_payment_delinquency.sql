@@ -13,6 +13,7 @@ SELECT
   p.sk_transaction,
   p.sk_propose_delinquency,
   p.sk_delinquency,
+  p.id_bill,
   CASE 
     WHEN pl.month_start IS NOT NULL 
     AND COALESCE( p.gateway_payment, IF( p.is_delinquency_active, p.gateway_delinquency, NULL ) ) IS NULL 

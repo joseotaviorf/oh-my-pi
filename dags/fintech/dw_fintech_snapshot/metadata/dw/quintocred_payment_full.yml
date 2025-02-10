@@ -49,6 +49,10 @@ columns:
     description: 'All invoice document id canceled'
     lineage:
     - dw_charging_payment_quintocred.fact_payment_full
+  id_bill:
+    description: "Bill document id"
+    lineage:
+      - dw_charging_payment_quintocred.fact_payment_full.id_bill
   gateway_final:
     description: 'Payment or delinqunecy gateway for the proposal for the month. Possible returns: BILLING DIRETO, CREDIT_CARD, DELINQUENCY, PIXAR, ANNUAL_CREDIT_CARD, DELINQUENCY_RENEWAL, vivendo de graça, ASAAS Anual, ASAAS RAW, ASAAS, IUGU'
     lineage:
@@ -137,6 +141,10 @@ columns:
     description: 'Propose monthly guarantee value for the month analyzed based on the Renewal table'
     lineage:
     - dw_charging_payment_quintocred.fact_payment_full
+  monthly_timeline_renewal_corrected:
+    description: "Propose monthly guarantee value for the month analyzed based on the Renewal table"
+    lineage:
+      - dw_charging_payment_quintocred.fact_payment_full.monthly_timeline_renewal_corrected
   monthly_timeline_propose_aud:
     description: 'Propose monthly guarantee value for the month analyzed based on the Propose table'
     lineage:
@@ -217,6 +225,10 @@ columns:
     description: 'Total value of canceled  and not canceled invoices'
     lineage:
     - dw_charging_payment_quintocred.fact_payment_full
+  is_corrected_robot:
+    description: "Is corrected by robot"
+    lineage:
+      - dw_charging_payment_quintocred.fact_payment_full.is_corrected_robot
   is_nf_canceled:
     description: 'Is invoice canceled, returning true or false'
     lineage:

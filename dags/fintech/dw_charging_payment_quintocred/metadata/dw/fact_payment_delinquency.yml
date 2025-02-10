@@ -13,6 +13,10 @@ columns:
     description: ''
     lineage:
     - dw_charging_payment_quintocred.fact_direct_billing.id
+  id_bill:
+    description: ''
+    lineage:
+    - dw_charging_payment_quintocred.fact_direct_billing.id_bill
   sk_propose_charge:
     description: ''
     lineage:

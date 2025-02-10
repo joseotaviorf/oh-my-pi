@@ -13,6 +13,10 @@ columns:
     description: ''
     lineage:
     - datalake_rental_guarantee_platform_clean.billing_report.id_boleto
+  id_bill:
+    description: ''
+    lineage:
+    - datalake_rental_guarantee_platform_clean.billing_report.id_boleto
   origin_table:
     description: ''
   value:

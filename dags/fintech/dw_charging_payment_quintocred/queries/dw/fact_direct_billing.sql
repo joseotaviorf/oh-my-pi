@@ -51,6 +51,7 @@ cobranca_billing AS (
 SELECT
     id_propose,
     CONCAT( id_boleto, CONCAT( id_propose, REPLACE( dt_ref_boleto, '-', '' ))) AS id,
+    id_boleto AS id_bill,
     "a_billing" AS origin_table,
     mensalidade_por_contrato AS value,
     CASE

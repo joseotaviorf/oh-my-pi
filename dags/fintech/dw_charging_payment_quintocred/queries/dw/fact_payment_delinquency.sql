@@ -3,6 +3,7 @@ base AS (
   SELECT
     id_propose,
     id,
+    id_bill,
     origin_table,
     status,
     order_status,
@@ -23,6 +24,7 @@ base AS (
   SELECT 
     id_propose,
     id,
+    NULL as id_bill,
     origin_table,
     status,
     order_status,
@@ -52,6 +54,7 @@ base_payment as (
 SELECT 
   p.id_propose AS sk_propose_payment,
   p.id AS sk_transaction,
+  p.id_bill,
   COALESCE(p.id_propose,d.id_propose) AS sk_propose_charge,
   d.id AS sk_delinquency,
   d.id_array_delinquency,

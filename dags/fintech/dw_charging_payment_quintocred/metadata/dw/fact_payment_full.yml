@@ -55,6 +55,10 @@ columns:
     description: "All invoice document id canceled"
     lineage:
       - dw_charging_payment_quintocred.fact_accounting_funnel.id_array_document_canceled
+  id_bill:
+    description: "Bill document id"
+    lineage:
+      - dw_charging_payment_quintocred.fact_theoretical_payment_delinquency.id_bill
   gateway_final:
     description: "Payment or delinqunecy gateway for the proposal for the month. Possible returns: BILLING DIRETO, CREDIT_CARD, DELINQUENCY, PIXAR, ANNUAL_CREDIT_CARD, DELINQUENCY_RENEWAL, vivendo de graça, ASAAS Anual, ASAAS RAW, ASAAS, IUGU"
     lineage:

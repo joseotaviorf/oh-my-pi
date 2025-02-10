@@ -565,6 +565,7 @@ SELECT DISTINCT
   m.sk_propose_delinquency,
   m.id_document,
   m.id_array_document_canceled,
+  m.id_bill,
   m.gateway_final,
   m.LEVEL_A,
   m.LEVEL_B,
