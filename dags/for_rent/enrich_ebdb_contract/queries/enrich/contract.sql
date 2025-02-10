@@ -79,31 +79,50 @@ contract_analyst_annulment_date as (
     from contract_terminations as ct
     where ct.row_number = 1
 ),
+terminations AS (
+    SELECT
+        id_contract,
+        status,
+        dt_vacancy
+    FROM
+        datalake_terminator_clean.termination
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created DESC) = 1
+),
 contract_metrics(
-    select
-      id as id_contract,
-      status in ('Minuta','PreAssinaturas') as is_waiting_to_be_signed,
-      status in ('Ativo','Finalizado') as is_active_or_ended,
-      status = 'Cancelado' as is_canceled,
-      status = 'Finalizado' as is_ended,
-      type = 'FullService' as is_full_service,
-      type = 'DealOnly' as is_deal_only
-    from datalake_ebdb_clean.contract
+    SELECT
+      id AS id_contract,
+      status IN ('Minuta','PreAssinaturas') AS is_waiting_to_be_signed,
+      status IN ('Ativo','Finalizado') AS is_active_or_ended,
+      status = 'Ativo' AS is_active,
+      status = 'Cancelado' AS is_canceled,
+      status = 'Finalizado' AS is_ended,
+      type = 'FullService' AS is_full_service,
+      type = 'DealOnly' AS is_deal_only
+    FROM
+      datalake_ebdb_clean.contract
 ),
 ongoing_contracts as (
-    select
-      c.id as id_contract,
-      case
-        when cm.is_active_or_ended
-          and not cm.is_deal_only
-          and current_date >= date(coalesce(coalesce(c.ts_signed, c.dt_started), c.dt_entered))
-          and (current_date < c.dt_termination or c.dt_termination is null)
-          then true
-        else false
-      end as is_ongoing_contract
-    from datalake_ebdb_clean.contract c
-    left join contract_metrics cm
-        on cm.id_contract = c.id
+    SELECT
+      c.id AS id_contract,
+      CASE
+        WHEN cm.is_active
+          AND NOT cm.is_deal_only
+          AND CURRENT_DATE >= DATE(COALESCE(c.ts_signed, c.dt_started, c.dt_entered))
+          AND (CURRENT_DATE <
+            IF(t.status = 'DONE' AND c.dt_termination > DATE('2020-01-07'), t.dt_vacancy, c.dt_termination)
+            OR c.dt_termination IS NULL)
+          THEN TRUE
+        ELSE FALSE
+      END AS is_ongoing_contract
+    FROM
+      datalake_ebdb_clean.contract AS c
+    JOIN
+      contract_metrics AS cm
+        ON cm.id_contract = c.id
+    LEFT JOIN
+      terminations AS t
+        ON c.id = t.id_contract
 ),
 tenant_service_fee_opt_out_info as (
   with contract_aud_join_rev as (
@@ -140,16 +159,6 @@ first_rent AS (
     datalake_ebdb_clean.contract_aud AS ca
   WHERE
     status_closing = 'ContratoAssinado'
-),
-terminations AS (
-    SELECT
-        id_contract,
-        status,
-        dt_vacancy
-    FROM
-        datalake_terminator_clean.termination
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_contract ORDER BY ts_created DESC) = 1
 )
 SELECT
   c.id,
