@@ -3,13 +3,10 @@ WITH raw_predicted_durations AS (
         CAST(input_data.id_rent_flow AS BIGINT) AS id_rent_flow,
         CAST(input_data.id_house AS BIGINT) AS id_house,
         CAST(input_data.id_tenant_prospect AS BIGINT) AS id_tenant_prospect,
-        COALESCE(BIGINT(DOUBLE(input_data.id_booking)), BIGINT(DOUBLE(input_data.id_offer))) AS id_event,
-        CASE 
-          WHEN input_data.id_booking IS NOT NULL THEN 'VB'
-          ELSE 'OS'
-        END AS event_type,
+        BIGINT(DOUBLE(input_data.id_event)) AS id_event,
+        input_data.event_type AS event_type,
         MAX_BY(
-            output_data.estimated_duration / 30,  -- Convert from days to months
+            output_data.prediction / 30,  -- Convert from days to months
             struct(model_version, ts_inference)
         ) AS predicted_duration,
         MAX_BY(
@@ -17,7 +14,7 @@ WITH raw_predicted_durations AS (
             struct(model_version, ts_inference)
         ) AS rent,
         MAX_BY(
-            from_unixtime(input_data.event_time / 1000)::TIMESTAMP,
+            from_unixtime(input_data.ts_event / 1000)::TIMESTAMP,
             struct(model_version, ts_inference)
         ) AS ts_event,
         CAST(MAX_BY(
@@ -29,13 +26,12 @@ WITH raw_predicted_durations AS (
             ts_inference,
             model_version,
             from_json(input_data, 'MAP<STRING, STRING>') AS input_data,
-            from_json(output_data, 'STRUCT<estimated_duration: DOUBLE>') AS output_data
+            from_json(output_data, 'STRUCT<prediction: DOUBLE>') AS output_data
         FROM
             datalake_batch_inference_clean.batch_inference
         WHERE
-            model_name = 'eCM-duration'
-            AND format_string("%04d-%02d-%02d", year, month, day) 
-                BETWEEN date_sub('{start_date}', 1) AND date_sub('{end_date}', 1)
+            model_name = '4rent-eCM-duration_model'
+            AND format_string("%04d-%02d-%02d", year, month, day) BETWEEN '{start_date}' AND '{end_date}'
     )
     GROUP BY ALL
 ),
