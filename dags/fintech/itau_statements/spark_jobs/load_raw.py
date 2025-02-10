@@ -166,9 +166,9 @@ if __name__ == "__main__":
     )
 
     config_service = ConfigurationService(source)
-    table_schema = config_service.get_config("tables_details")[table_name][
-        "table_schema"
-    ]
+    table_schema = config_service.get_config("tables_details")[
+        table_name.split("_")[0]
+    ]["table_schema"]
     table_schema = StructType.fromJson(json.loads(table_schema))
 
     spark_client = SparkClient()
