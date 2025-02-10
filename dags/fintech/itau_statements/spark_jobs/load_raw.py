@@ -175,7 +175,7 @@ if __name__ == "__main__":
     base_dbutils = BaseDBUtils()
     dbutils = base_dbutils.get_dbutils()
 
-    conn_config = _get_conn_config(dbutils, APIEnum.ITAU.value)
+    conn_config = _get_conn_config(dbutils, APIEnum.ITAU)
 
     load_start_dt = datetime.strptime(load_start_date, "%Y-%m-%d")
     load_end_dt = datetime.strptime(load_end_date, "%Y-%m-%d")
