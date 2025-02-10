@@ -1,4 +1,4 @@
-database_name: datalake_rene_descartes_clean
+database_name: datalake_rene_descartes_cdc_clean
 table_name: house_lead_aud
 columns:
   id:

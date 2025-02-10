@@ -428,7 +428,6 @@ bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.hub_services:load-clean-business-unit
   - bietlejuice.rene_descartes:load-clean-lead-rejection
-  - bietlejuice.rene_descartes_cdc:load-clean-lead-rejection
   - bietlejuice.wololo:load-clean-context-discard
   - bietlejuice.wololo:load-clean-conversion
   - bietlejuice.wololo:load-clean-prospect
@@ -780,8 +779,6 @@ bietlejuice.dw_rent_listing_flow:
   - bietlejuice.gsheets_growth:done-clean-taxonomy-growth
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
   - bietlejuice.rene_descartes:load-clean-house-lead
-  - bietlejuice.rene_descartes_cdc:load-clean-acquisition-misc-data
-  - bietlejuice.rene_descartes_cdc:load-clean-house-lead
 bietlejuice.dw_rental_contribution_margin:
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -882,8 +879,6 @@ bietlejuice.dw_sale_listing_flow:
   - bietlejuice.gsheets_growth:done-clean-taxonomy-growth
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
   - bietlejuice.rene_descartes:load-clean-house-lead
-  - bietlejuice.rene_descartes_cdc:load-clean-acquisition-misc-data
-  - bietlejuice.rene_descartes_cdc:load-clean-house-lead
 bietlejuice.dw_sale_listing_price_changes:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
 bietlejuice.dw_sale_listings:
@@ -1126,7 +1121,6 @@ bietlejuice.enrich_amplitude_inspections:
 bietlejuice.enrich_amplitude_lead:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.rene_descartes:load-clean-house-lead
-  - bietlejuice.rene_descartes_cdc:load-clean-house-lead
 bietlejuice.enrich_amplitude_magic_link:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_support_users:load-enrich-analysts
@@ -2100,16 +2094,11 @@ bietlejuice.enrich_lead:
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
   - bietlejuice.rene_descartes:load-clean-address
   - bietlejuice.rene_descartes:load-clean-house-lead
-  - bietlejuice.rene_descartes_cdc:load-clean-acquisition-misc-data
-  - bietlejuice.rene_descartes_cdc:load-clean-address
-  - bietlejuice.rene_descartes_cdc:load-clean-house-lead
 bietlejuice.enrich_lead_tracking:
   - bietlejuice.ebdb_lead:load-clean-lead
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
   - bietlejuice.rene_descartes:load-clean-house-lead
-  - bietlejuice.rene_descartes_cdc:load-clean-acquisition-misc-data
-  - bietlejuice.rene_descartes_cdc:load-clean-house-lead
 bietlejuice.enrich_legaut:
   - bietlejuice.legaut:load-clean-crawlers-crawler
   - bietlejuice.legaut:load-clean-crawlers-crawlergroup
@@ -2142,7 +2131,6 @@ bietlejuice.enrich_listing_flow:
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
   - bietlejuice.enrich_wololo:load-enrich-lead-sales-company
-  - bietlejuice.rene_descartes_cdc:load-clean-lead-rejection
   - bietlejuice.wololo:load-clean-prospect
 bietlejuice.enrich_listing_jobs:
   - bietlejuice.enrich_crm_tasks:load-enrich-task-status
@@ -2951,13 +2939,6 @@ bietlejuice.enrich_supply_acquisition:
   - bietlejuice.rene_descartes:load-clean-house-lead-conversion
   - bietlejuice.rene_descartes:load-clean-lead-rejection
   - bietlejuice.rene_descartes:load-clean-revinfo
-  - bietlejuice.rene_descartes_cdc:load-clean-acquisition-misc-data
-  - bietlejuice.rene_descartes_cdc:load-clean-address
-  - bietlejuice.rene_descartes_cdc:load-clean-house-lead
-  - bietlejuice.rene_descartes_cdc:load-clean-house-lead-aud
-  - bietlejuice.rene_descartes_cdc:load-clean-house-lead-conversion
-  - bietlejuice.rene_descartes_cdc:load-clean-lead-rejection
-  - bietlejuice.rene_descartes_cdc:load-clean-revinfo
   - bietlejuice.wololo:load-clean-prospect
 bietlejuice.enrich_supply_conversion:
   - bietlejuice.bob:load-clean-house-draft-aud
@@ -2992,10 +2973,6 @@ bietlejuice.enrich_supply_leads:
   - bietlejuice.rene_descartes:load-clean-address
   - bietlejuice.rene_descartes:load-clean-house-lead
   - bietlejuice.rene_descartes:load-clean-house-lead-conversion
-  - bietlejuice.rene_descartes_cdc:load-clean-acquisition-misc-data
-  - bietlejuice.rene_descartes_cdc:load-clean-address
-  - bietlejuice.rene_descartes_cdc:load-clean-house-lead
-  - bietlejuice.rene_descartes_cdc:load-clean-house-lead-conversion
 bietlejuice.enrich_supply_outbound_flows:
   - bietlejuice.enrich_braze_details:load-enrich-canvas-step-details
   - bietlejuice.enrich_braze_events_dispatches:load-enrich-webhook-owners
