@@ -1,0 +1,15 @@
+database_name: datalake_hefesto_test_clean
+table_name: account
+columns:
+  id_account:
+    lineage:
+      - datalake_hefesto_test_raw.account.id
+  id_account_twilio:
+    lineage:
+      - datalake_hefesto_test_raw.account.account_sid
+  id_workspace_twilio:
+    lineage:
+      - datalake_hefesto_test_raw.account.workspace_sid
+  id_workflow_twilio:
+    lineage:
+      - datalake_hefesto_test_raw.account.workflow_sid

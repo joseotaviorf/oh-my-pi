@@ -1,0 +1,12 @@
+database_name: datalake_hefesto_test_clean
+table_name: queue_type
+columns:
+  id_queue_type:
+    lineage:
+      - datalake_hefesto_test_raw.queue_type.id
+  name:
+    lineage:
+      - datalake_hefesto_test_raw.queue_type.name
+  description:
+    lineage:
+      - datalake_hefesto_test_raw.queue_type.description

@@ -1,0 +1,53 @@
+database_name: datalake_hefesto_test_clean
+table_name: worker_portfolio
+columns:
+  id_portfolio:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.id
+  id_worker:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.worker_id
+  id_user:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.user_identifier
+      - datalake_hefesto_test_raw.worker_portfolio.user_id
+  id_contract:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.contract_id
+  id_entity_origin:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.entity_origin_id
+  context_identifier:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.context_identifier
+  user_identifier_type:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.user_identifier_type
+  id_chat:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.chat_uuid,
+  status:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.status
+  entity_origin:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.entity_origin_name
+      - datalake_hefesto_test_raw.worker_portfolio.context_group   
+  entity_origin_persona:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.entity_origin_persona
+  ts_created:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.created_at
+  ts_updated:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.updated_at
+  year:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.year
+  month:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.month
+  day:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio.day

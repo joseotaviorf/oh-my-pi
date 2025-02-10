@@ -1,0 +1,37 @@
+database_name: datalake_hefesto_test_clean
+table_name: worker_portfolio_event
+columns:
+  id:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio_event.id
+  id_portfolio:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio_event.portfolio_id
+      - datalake_hefesto_test_raw.worker_portfolio_event.worker_portfolio_id
+  id_portfolio_file:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio_event.portfolio_file_id
+  event_type:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio_event.external_id
+  author:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio_event.author
+  description:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio_event.description
+  portfolio_unit_id:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio_event.portfolio_unit_id
+  ts_created:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio_event.created_at
+  year:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio_event.year
+  month:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio_event.month
+  day:
+    lineage:
+      - datalake_hefesto_test_raw.worker_portfolio_event.day

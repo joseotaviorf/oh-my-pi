@@ -1,0 +1,39 @@
+database_name: datalake_hefesto_test_clean
+table_name: queue
+columns:
+  id_queue:
+    lineage:
+      - datalake_hefesto_test_raw.queue.id
+  id_queue_twilio:
+    lineage:
+      - datalake_hefesto_test_raw.queue.queue_sid
+  id_account:
+    lineage:
+      - datalake_hefesto_test_raw.queue.account_id
+  id_type:
+    lineage:
+      - datalake_hefesto_test_raw.queue.type_id
+  queue_friendly_name:
+    lineage:
+      - datalake_hefesto_test_raw.queue.queue_friendly_name
+  attributes:
+    lineage:
+      - datalake_hefesto_test_raw.queue.attributes
+  order:
+    lineage:
+      - datalake_hefesto_test_raw.queue.order
+  ts_created:
+    lineage:
+      - datalake_hefesto_test_raw.queue.created_at
+  ts_updated:
+    lineage:
+      - datalake_hefesto_test_raw.queue.updated_at
+  year:
+    lineage:
+      - datalake_hefesto_test_raw.queue.year
+  month:
+    lineage:
+      - datalake_hefesto_test_raw.queue.month
+  day:
+    lineage:
+      - datalake_hefesto_test_raw.queue.day

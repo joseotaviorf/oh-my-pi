@@ -11,6 +11,4 @@ SELECT
     month,
     day
 FROM
-    datalake_hefesto_raw.worker_portfolio_event
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    datalake_hefesto_test_raw.worker_portfolio_event

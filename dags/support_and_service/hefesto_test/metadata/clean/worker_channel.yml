@@ -1,0 +1,45 @@
+database_name: datalake_hefesto_test_clean
+table_name: worker_channel
+columns:
+  id_worker_channel:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.id
+  id_worker_channel_twilio:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.sid
+  id_worker:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.worker_id
+  id_task_channel_twilio:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.task_channel_sid
+  id_worker_twilio:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.worker_sid
+  name:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.name
+  capacity:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.capacity
+  is_available:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.available
+  ts_created:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.created_at
+  ts_updated:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.updated_at
+  ts_last_event:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.last_event_at
+  year:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.year
+  month:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.month
+  day:
+    lineage:
+      - datalake_hefesto_test_raw.worker_channel.day

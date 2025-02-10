@@ -1,0 +1,39 @@
+database_name: datalake_hefesto_test_clean
+table_name: worker
+columns:
+  id_worker:
+    lineage:
+      - datalake_hefesto_test_raw.worker.id
+  id_worker_twilio:
+    lineage:
+      - datalake_hefesto_test_raw.worker.sid
+  name:
+    lineage:
+      - datalake_hefesto_test_raw.worker.name
+  email:
+    lineage:
+      - datalake_hefesto_test_raw.worker.email
+  attributes:
+    lineage:
+      - datalake_hefesto_test_raw.worker.attributes
+  active:
+    lineage:
+      - datalake_hefesto_test_raw.worker.active
+  ts_created:
+    lineage:
+      - datalake_hefesto_test_raw.worker.created_at
+  ts_updated:
+    lineage:
+      - datalake_hefesto_test_raw.worker.updated_at
+  ts_last_event:
+    lineage:
+      - datalake_hefesto_test_raw.worker.last_event_at
+  year:
+    lineage:
+      - datalake_hefesto_test_raw.worker.year
+  month:
+    lineage:
+      - datalake_hefesto_test_raw.worker.month
+  day:
+    lineage:
+      - datalake_hefesto_test_raw.worker.day
