@@ -1,0 +1,60 @@
+database_name: datalake_kill_queue_test_clean
+table_name: house_aud
+columns:
+  id:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.id
+  id_main:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.main_id
+  id_owner:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.owner_id
+  id_region:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.region_id
+  rev:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.rev
+  rev_type:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.revend
+  city:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.city
+  complement:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.complement
+  floor:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.floor
+  house_number:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.house_number
+  state:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.state
+  street_address:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.street_address
+  rent_price:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.rent_price
+  reservation_fee:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.reservation_fee
+  is_reservation_allowed:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.reservation_allowed
+  mod_has_rent_price:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.rent_price_mod
+  mod_has_reservation_fee:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.reservation_fee_mod
+  mod_is_reservation_allowed:
+    lineage:
+      - datalake_kill_queue_test_raw.house_aud.reservation_allowed_mod
