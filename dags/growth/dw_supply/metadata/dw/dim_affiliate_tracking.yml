@@ -6,27 +6,27 @@ domain: growth
 description: Table with information about affiliate tracking, such as the affiliate type, start and end dates, and referred user. Its a SCD dimension.
 columns:
   sk_user_affiliate:
-    - lineage: datalake_supply_flows.supply_events_tracking.id_referred_by
-    - description: Key from the dimension associated with the affiliate user.
+    lineage: datalake_supply_flows.supply_events_tracking.id_referred_by
+    description: Key from the dimension associated with the affiliate user.
   affiliate_type:
-    - lineage: datalake_supply_flows.supply_events_tracking.affiliate_type
-    - description: Type of affiliate associated with the supply event.
+    lineage: datalake_supply_flows.supply_events_tracking.affiliate_type
+    description: Type of affiliate associated with the supply event.
   last_affiliate_type:
-    - lineage: datalake_supply_flows.supply_events_tracking.affiliate_type
-    - description: The affiliate type in the previous event for the same referred user.
+    lineage: datalake_supply_flows.supply_events_tracking.affiliate_type
+    description: The affiliate type in the previous event for the same referred user.
   ts_started:
-    - lineage: datalake_supply_flows.supply_events_tracking.ts_event_adjusted
-    - description: Timestamp indicating the start of the affiliate type.
+    lineage: datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+    description: Timestamp indicating the start of the affiliate type.
   ts_ended:
-    - lineage: datalake_supply_flows.supply_events_tracking.ts_event_adjusted
-    - description: Timestamp indicating the end of the affiliate type.
+    lineage: datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+    description: Timestamp indicating the end of the affiliate type.
   version:
-    - description: Version number indicating the order of changes for the same referred user.
+    description: Version number indicating the order of changes for the same referred user.
   sk_start_date:
-    - lineage: datalake_supply_flows.supply_events_tracking.ts_event_adjusted
-    - description: SK associated date with the start date of the affiliate type.
+    lineage: datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+    description: SK associated date with the start date of the affiliate type.
   sk_end_date:
-    - lineage: datalake_supply_flows.supply_events_tracking.ts_event_adjusted
-    - description: SK associated date with the end date of the affiliate type.
+    lineage: datalake_supply_flows.supply_events_tracking.ts_event_adjusted
+    description: SK associated date with the end date of the affiliate type.
   ts_updated:
-    - description: Timestamp indicating when the affiliate tracking information was last updated.
+    description: Timestamp indicating when the affiliate tracking information was last updated.

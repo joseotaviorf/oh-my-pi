@@ -6,33 +6,33 @@ domain: growth
 description: Table with information about the operations related to supply events, such as the objective, agent, partner, contact medium, and approach.
 columns:
   sk_ops:
-    - description: Autoincremental surrogate key for the dim_supply_operation_flow dimension.
+    description: Autoincremental surrogate key for the dim_supply_operation_flow dimension.
   bk_ops:
-    - lineage:
-        - datalake_supply_flows.supply_events_tracking.ops_objective
-        - datalake_supply_flows.supply_events_tracking.ops_agent
-        - datalake_supply_flows.supply_events_tracking.ops_partner
-        - datalake_supply_flows.supply_events_tracking.ops_contact_medium
-        - datalake_supply_flows.supply_events_tracking.ops_approach
-        - datalake_supply_flows.supply_events_tracking.ops_assigned
-    - description: Concatenation of various columns related to operations.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.ops_objective
+      - datalake_supply_flows.supply_events_tracking.ops_agent
+      - datalake_supply_flows.supply_events_tracking.ops_partner
+      - datalake_supply_flows.supply_events_tracking.ops_contact_medium
+      - datalake_supply_flows.supply_events_tracking.ops_approach
+      - datalake_supply_flows.supply_events_tracking.ops_assigned
+    description: Concatenation of various columns related to operations.
   ds_objective:
-    - lineage: datalake_supply_flows.supply_events_tracking.ops_objective
-    - description: Description of the objective.
+    lineage: datalake_supply_flows.supply_events_tracking.ops_objective
+    description: Description of the objective.
   nm_agent:
-    - lineage: datalake_supply_flows.supply_events_tracking.ops_agent
-    - description: Name of the agent.
+    lineage: datalake_supply_flows.supply_events_tracking.ops_agent
+    description: Name of the agent.
   nm_partner:
-    - lineage: datalake_supply_flows.supply_events_tracking.ops_partner
-    - description: Name of the partner.
+    lineage: datalake_supply_flows.supply_events_tracking.ops_partner
+    description: Name of the partner.
   nm_assigned_partner:
-    - lineage: datalake_supply_flows.supply_events_tracking.ops_assigned
-    - description: Name of the assigned partner.
+    lineage: datalake_supply_flows.supply_events_tracking.ops_assigned
+    description: Name of the assigned partner.
   cd_contact_medium:
-    - lineage: datalake_supply_flows.supply_events_tracking.ops_contact_medium
-    - description: Code representing the contact medium.
+    lineage: datalake_supply_flows.supply_events_tracking.ops_contact_medium
+    description: Code representing the contact medium.
   cd_approach:
-    - lineage: datalake_supply_flows.supply_events_tracking.ops_approach
-    - description: Code representing the approach.
+    lineage: datalake_supply_flows.supply_events_tracking.ops_approach
+    description: Code representing the approach.
   ts_updated:
-    - description: Timestamp indicating when the record was last updated.
+    description: Timestamp indicating when the record was last updated.

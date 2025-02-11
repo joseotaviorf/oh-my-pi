@@ -6,22 +6,22 @@ domain: growth
 description: Dimensional table containing information about the funnel steps in supply funnel.
 columns:
   sk_funnel_step:
-    - description: Auto increment surrogate key for the dim_funnel_step dimension.
+    description: Auto increment surrogate key for the dim_funnel_step dimension.
   bk_funnel_step:
-    - lineage:
-        - datalake_supply_flows.supply_events_tracking.funnel_step
-        - datalake_supply_flows.supply_events_tracking.business_event
-    - description: Concatenation of `funnel_step` and `business_event` in lowercase.
+    lineage:
+      - datalake_supply_flows.supply_events_tracking.funnel_step
+      - datalake_supply_flows.supply_events_tracking.business_event
+    description: Concatenation of `funnel_step` and `business_event` in lowercase.
   cd_funnel_step:
-    - lineage: datalake_supply_flows.supply_events_tracking.funnel_step
-    - description: Code for the funnel step.
+    lineage: datalake_supply_flows.supply_events_tracking.funnel_step
+    description: Code for the funnel step.
   tp_business_event:
-    - lineage: datalake_supply_flows.supply_events_tracking.business_event
-    - description: Type of business event extracted from the `business_event` column.
+    lineage: datalake_supply_flows.supply_events_tracking.business_event
+    description: Type of business event extracted from the `business_event` column.
   cd_funnel_inter_step:
-    - lineage: datalake_supply_flows.supply_events_tracking.business_event
-    - description: Code for the intermediate step within the funnel.
+    lineage: datalake_supply_flows.supply_events_tracking.business_event
+    description: Code for the intermediate step within the funnel.
   ds_funnel_step:
-    - description: Descriptive label for the funnel step. 
+    description: Descriptive label for the funnel step.
   ts_updated:
-    - description: Timestamp indicating when the record was last updated.
+    description: Timestamp indicating when the record was last updated.
