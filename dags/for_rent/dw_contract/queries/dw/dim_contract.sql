@@ -45,7 +45,7 @@ SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a futur
   c.dt_entered AS dt_entrance,
   c.dt_contract_expected_end AS dt_intended_end,
   c.dt_termination AS dt_annulment,
-  t.ts_termination_requested,
+  t.ts_termination_request AS ts_termination_requested,
   c.ts_created,
   c.ts_updated,
   c.ts_expected_termination,
@@ -65,6 +65,6 @@ LEFT JOIN
     datalake_b2b.house_listing AS b2b
       ON b2b.id_contract = c.id
 LEFT JOIN
-    datalake_terminator.termination AS ct
+    datalake_terminator.termination AS t
       ON t.id_contract = c.id
         AND t.status <> 'CANCELED'

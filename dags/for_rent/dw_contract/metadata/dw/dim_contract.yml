@@ -309,7 +309,7 @@ columns:
       At this point, the tenant already left the property.
   ts_termination_requested:
     lineage:
-      - datalake_terminator.termination.ts_termination_requested
+      - datalake_terminator.termination.ts_termination_request
     description: Timestamp of when the termination was requested.
   ts_created:
     lineage:
