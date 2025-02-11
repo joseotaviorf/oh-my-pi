@@ -1,5 +1,5 @@
 WITH
-  max_status_order AS ( 
+  max_status_order AS (
   --------------------------------------------------------------------------------------------------------
   -- Identify the last status to each version                                                           --
   --------------------------------------------------------------------------------------------------------
@@ -18,9 +18,10 @@ WITH
     SELECT
         lbc_vo.id_house,
         lbc_vo.status,
-        LAG(status) OVER(PARTITION BY lbc_vo.id_house ORDER BY lbc_vo.ts_state_started) AS previous_status,
+        LAG(status) OVER(PARTITION BY lbc_vo.id_house ORDER BY lbc_vo.rev, lbc_vo.ts_state_started) AS previous_status,
         lbc_vo.status_reason,
         lbc_vo.revision_reason,
+        lbc_vo.rev,
         lbc_vo.ts_state_started,
         lbc_vo.ts_state_ended,
         lbc_vo.days_in_state,
@@ -36,14 +37,18 @@ WITH
               THEN ts_state_started
           END
         ) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS ts_last_unpublished,
+        MAX(
+          lbc_vo.status = 'alugado'
+          OR (lbc_vo.status = 'SUSPENDED' AND lbc_vo.status_reason = 'RENTED')
+        ) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS has_been_rented,
         IF(ms_o.max_order_status IS NOT NULL, lbc_vo.status, NULL) AS last_status,
         IF(ms_o.max_order_status IS NOT NULL, lbc_vo.status_reason, NULL) AS last_status_reason,
         MAX(lbc_vo.state_order) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS max_order_status_version,
         MAX(ms_o.is_extended_rental) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS is_extended_rental,
         MAX(ms_o.has_termination_canceled) OVER(PARTITION BY lbc_vo.id_house, lbc_vo.listing_version) AS has_termination_canceled
-    FROM 
+    FROM
       datalake_ebdb_listing.lbc_status_version_order AS lbc_vo
-    LEFT JOIN 
+    LEFT JOIN
       max_status_order AS ms_o
         ON lbc_vo.id_house = ms_o.id_house
         AND lbc_vo.listing_version = ms_o.listing_version
@@ -57,9 +62,9 @@ WITH
     SELECT
       id_house,
       listing_version,
-      FIRST(status) OVER(PARTITION BY id_house, listing_version ORDER BY ts_state_started DESC, ts_state_ended DESC) AS category_change,
-      FIRST(status_reason) OVER(PARTITION BY id_house, listing_version ORDER BY ts_state_started DESC, ts_state_ended DESC) AS category_change_reason
-    FROM 
+      FIRST(status) OVER(PARTITION BY id_house, listing_version ORDER BY rev DESC, ts_state_started DESC, ts_state_ended DESC) AS category_change,
+      FIRST(status_reason) OVER(PARTITION BY id_house, listing_version ORDER BY rev DESC, ts_state_started DESC, ts_state_ended DESC) AS category_change_reason
+    FROM
       house_status_version_last_status
     WHERE
       trigger_new_version = 1
@@ -79,6 +84,8 @@ WITH
         hs_v.ts_last_unpublished,
         hs_v.is_extended_rental,
         hs_v.has_termination_canceled,
+        hs_v.has_been_rented,
+        LAST(hs_v.days_in_status) AS days_in_status,
         MAX(hs_v.previous_status) AS status_history,
         MAX(hs_v.ts_state_started) AS ts_status_changed,
         MAX(hs_v.last_status) AS status,
@@ -88,11 +95,11 @@ WITH
         MAX(COALESCE(hs_v.ts_state_ended, CAST('2200-01-01 12:00:00' AS TIMESTAMP))) AS ts_listing_version_end
     FROM
       house_status_version_last_status AS hs_v
-    LEFT JOIN 
+    LEFT JOIN
       status_change_version AS sc_v
         ON hs_v.id_house = sc_v.id_house
         AND hs_v.listing_version = sc_v.listing_version
-    GROUP BY 
+    GROUP BY
       ALL
   )
 --------------------------------------------------------------------------------------------------------
@@ -103,26 +110,19 @@ SELECT
   id_house,
   country_code,
   version,
-  CASE 
+  CASE
     WHEN version = 0 THEN NULL
     WHEN version = 1 THEN 'First Listing'
-    WHEN 
-      version > 1 
-      AND (
-        LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) = 'alugado'
-        OR (
-          LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) = 'SUSPENDED'
-          AND
-          LAG(change_version_status_reason) OVER(PARTITION BY id_house ORDER BY version) = 'RENTED'
-        )
-      )
-    THEN 'Re-Listing'
-    WHEN 
+    WHEN
       version > 1
-      AND 
-      LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('despublicado', 'UNPUBLISHED') 
+      AND LAG(has_been_rented) OVER(PARTITION BY id_house ORDER BY version)
+    THEN 'Re-Listing'
+    WHEN
+      version > 1
+      AND LAG(change_version_status) OVER(PARTITION BY id_house ORDER BY version) IN ('despublicado', 'UNPUBLISHED')
+      AND LAG(days_in_status) OVER(PARTITION BY id_house ORDER BY version) >= 84
     THEN 'Recovered'
-    ELSE NULL 
+    ELSE NULL
   END AS listing_category,
   status,
   status_reason,
@@ -134,5 +134,5 @@ SELECT
   CAST(ts_listing_version_start AS TIMESTAMP) AS ts_listing_version_start,
   NULLIF(CAST(ts_listing_version_end AS TIMESTAMP), CAST('2200-01-01 12:00:00' AS TIMESTAMP)) AS ts_listing_version_end,
   CAST(ts_last_unpublished AS TIMESTAMP) AS ts_last_unpublished
-FROM 
+FROM
   house_listing_plain
