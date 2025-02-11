@@ -132,6 +132,8 @@ workflow:
       clean_table_name: sales_flow_aud
     sales_flow_contact:
       clean_table_name: sales_flow_contact
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id_sales_flow_contact"]
     sales_flow_contact_aud:
       clean_table_name: sales_flow_contact_aud
     sales_flow_details:
