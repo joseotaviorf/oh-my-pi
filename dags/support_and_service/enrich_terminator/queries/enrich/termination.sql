@@ -95,6 +95,7 @@ SELECT
     checklist.is_done AS is_checklist_done,
     cdr.is_relisting_enabled,
     cdr.is_early_relisting_enabled,
+    neg.needs_repair_by_tenant AS has_repair_by_tenant_needed,
     DATEDIFF(t.dt_termination, t.ts_created) AS leadtime_request_to_vacancy,
     ln.fee_discount_percentage,
     ln.fee_discount_value,
@@ -138,6 +139,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_contract.contract_declined_relisting AS cdr
         ON t.id = cdr.id_termination
+LEFT JOIN
+    datalake_terminator_clean.negotiation neg
+        ON t.id = neg.id_termination
 WHERE
     DATE(t.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY

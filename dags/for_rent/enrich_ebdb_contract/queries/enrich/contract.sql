@@ -83,7 +83,8 @@ terminations AS (
     SELECT
         id_contract,
         status,
-        dt_vacancy
+        dt_vacancy,
+        IF(status = 'DONE', DATE(ts_updated), NULL) AS dt_termination_finished
     FROM
         datalake_terminator_clean.termination
     QUALIFY
@@ -159,6 +160,20 @@ first_rent AS (
     datalake_ebdb_clean.contract_aud AS ca
   WHERE
     status_closing = 'ContratoAssinado'
+),
+contract_anomaly AS (
+  SELECT
+    c.id AS id_contract,
+    IF(DATE_ADD(t.dt_vacancy, 20) > t.dt_termination_finished
+      OR (t.dt_termination_finished IS NULL AND DATE_ADD(t.dt_vacancy, 20) > CURRENT_DATE()),
+    FALSE, TRUE) AS is_contract_anomaly
+  FROM
+    datalake_ebdb_clean.contract AS c
+  JOIN
+    terminations AS t
+      ON c.id = t.id_contract
+  WHERE
+    t.status != 'CANCELED'
 )
 SELECT
   c.id,
@@ -210,6 +225,7 @@ SELECT
   cm.is_full_service,
   cm.is_deal_only,
   COALESCE(c.is_relisting_enabled, FALSE) AS is_relisting_enabled,
+  ca.is_contract_anomaly,
   fc.monthly_administration_fee,
   ccr.cancellation_reason,
   ccr.ts_canceled,
@@ -256,3 +272,6 @@ JOIN
 LEFT JOIN
   terminations AS t
     ON t.id_contract = c.id
+LEFT JOIN
+  contract_anomaly AS ca
+    ON ca.id_contract = c.id

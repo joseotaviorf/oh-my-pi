@@ -39,13 +39,13 @@ SELECT DISTINCT -- [ODS] This table was migrated from ODS flow and needs a futur
   c.is_ongoing_contract,
   c.is_tenant_service_fee_opt_out,
   c.is_exit_inspection_opted_out,
-  ct.is_repair_tenant_duty,
-  ca.is_anomaly,
+  t.has_repair_by_tenant_needed AS is_repair_tenant_duty,
+  c.is_contract_anomaly AS is_anomaly,
   c.dt_started AS dt_start,
   c.dt_entered AS dt_entrance,
   c.dt_contract_expected_end AS dt_intended_end,
   c.dt_termination AS dt_annulment,
-  ct.ts_created AS ts_termination_requested,
+  t.ts_termination_requested,
   c.ts_created,
   c.ts_updated,
   c.ts_expected_termination,
@@ -65,9 +65,6 @@ LEFT JOIN
     datalake_b2b.house_listing AS b2b
       ON b2b.id_contract = c.id
 LEFT JOIN
-    datalake_offboarding.contract_termination AS ct
-      ON ct.id_contract = c.id
-        AND ct.status <> 'CANCELED'
-LEFT JOIN
-    datalake_offboarding.contract_anomaly AS ca
-      ON ca.id_contract = c.id
+    datalake_terminator.termination AS ct
+      ON t.id_contract = c.id
+        AND t.status <> 'CANCELED'

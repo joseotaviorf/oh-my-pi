@@ -124,6 +124,10 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract_declined_relisting.is_early_relisting_enabled
     description: Boolean flag indicating if the house's owner opted-in/out of the early relisting.
+  has_repair_by_tenant_needed:
+    lineage:
+      - datalake_terminator_clean.negotiation.needs_repair_by_tenant
+    description: Boolean flag indicating if needs repair by tenant.
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:

@@ -218,6 +218,9 @@ columns:
     lineage:
       - datalake_ebdb_clean.contract.is_relisting_enabled
     description: Boolean indicating if the listing is enabled to relist during the early relisting.
+  is_contract_anomaly:
+    description: Boolean value to check if the contract is an anomaly.
+      That is, when the termination was requested more than 20 days and it's not with status DONE.
   monthly_administration_fee:
     lineage:
       - datalake_ebdb_clean.full_contract.monthly_administration_fee

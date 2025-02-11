@@ -236,8 +236,7 @@ bietlejuice.dw_contract:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_ebdb_contract:load-enrich-ongoing-contracts
-  - bietlejuice.enrich_offboarding:load-enrich-contract-anomaly
-  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.enrich_terminator:load-enrich-termination
 bietlejuice.dw_credit_analysis:
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report
   - bietlejuice.docx:load-clean-credit-evaluation
@@ -3035,6 +3034,7 @@ bietlejuice.enrich_terminator:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.terminator:load-clean-checklist-item
+  - bietlejuice.terminator:load-clean-negotiation
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-aud
   - bietlejuice.terminator:load-clean-termination-fee

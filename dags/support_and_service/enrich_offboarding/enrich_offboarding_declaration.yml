@@ -9,26 +9,24 @@ workflow:
   layer: enrich
   inner_dependencies:
     customer_support:
-    - ongoing
+      - ongoing
     consolidate_data:
-    - budgeting_window
-    - customer_support
-    - inspection_analysis
-    - ongoing
-    - tickets
-    - nps_agg
-    contract_anomaly:
-    - contract_termination
+      - budgeting_window
+      - customer_support
+      - inspection_analysis
+      - ongoing
+      - tickets
+      - nps_agg
     inspection_analysis:
-    - ongoing
+      - ongoing
     ongoing:
-    - contract_termination
+      - contract_termination
     nps:
-    - contract_termination
+      - contract_termination
     nps_agg:
-    - nps
+      - nps
     tickets:
-    - ongoing
+      - ongoing
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -36,7 +34,7 @@ cluster:
     node_type_id: m5d.4xlarge
     num_workers: 3
     spark_version: 12.2.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

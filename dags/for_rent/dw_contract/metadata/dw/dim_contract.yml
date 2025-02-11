@@ -283,10 +283,10 @@ columns:
   is_repair_tenant_duty:
     description: Boolean identifying whether repairs are due by the Tenant.
     lineage:
-      - datalake_offboarding.contract_termination.is_repair_tenant_duty
+      - datalake_terminator.termination.has_repair_by_tenant_needed
   is_anomaly:
     lineage:
-      - datalake_offboarding.contract_anomaly.is_anomaly
+      - datalake_ebdb_contract.contract.is_contract_anomaly
     description: Boolean indicating if this contract termination is an anomaly.
   dt_start:
     lineage:
@@ -309,7 +309,7 @@ columns:
       At this point, the tenant already left the property.
   ts_termination_requested:
     lineage:
-      - datalake_offboarding.contract_termination.ts_created
+      - datalake_terminator.termination.ts_termination_requested
     description: Timestamp of when the termination was requested.
   ts_created:
     lineage:
