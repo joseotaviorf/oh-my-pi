@@ -35,6 +35,7 @@ workflow:
     - house_listing
     lbc_status_version_order:
     - business_context_history
+    - house_status_version_order
   tables_customization:
     agents_with_keys:
       partitions:

@@ -175,6 +175,13 @@ status_change_time AS (
     bch.id_house,
     bch.country_code,
     bch.status,
+    bch.status_reason,
+    IF(
+        bch.status <> bch.previous_state_status OR bch.previous_state_status IS NULL,
+        COALESCE(bch.status_reason, 'None'),
+        NULL
+    ) AS start_status_reason,
+    IF(bch.status <> bch.next_status, COALESCE(bch.status_reason, 'None'), NULL) AS end_status_reason,
     IF(
       bch.status <> bch.previous_state_status
       OR bch.previous_state_status IS NULL
@@ -199,6 +206,14 @@ status_change AS (
     sct.country_code,
     sct.status,
     COALESCE(
+        sct.start_status_reason,
+        LAG(sct.start_status_reason) OVER(PARTITION BY sct.id_house ORDER BY sct.ts_state_started, COALESCE(sct.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY)))
+    ) AS status_reason_started,
+    COALESCE(
+        sct.end_status_reason,
+        LEAD(sct.end_status_reason) OVER(PARTITION BY sct.id_house ORDER BY sct.ts_state_started, COALESCE(sct.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY)))
+    ) AS status_reason_ended,
+    COALESCE(
         sct.start_time,
         LAG(sct.start_time) OVER(PARTITION BY sct.id_house ORDER BY sct.ts_state_started, COALESCE(sct.ts_state_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY)))
     ) AS ts_status_started,
@@ -216,6 +231,8 @@ status_order AS (
     LAG(sc.status) OVER(PARTITION BY sc.id_house ORDER BY sc.ts_status_started, COALESCE(sc.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS prev_status,
     sc.status,
     LEAD(sc.status) OVER(PARTITION BY sc.id_house ORDER BY sc.ts_status_started, COALESCE(sc.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS next_status,
+    LAG(IF(sc.status_reason_ended = 'None', NULL, sc.status_reason_ended)) OVER(PARTITION BY sc.id_house ORDER BY sc.ts_status_started, COALESCE(sc.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS prev_status_reason,
+    LEAD(IF(sc.status_reason_started = 'None', NULL, sc.status_reason_started)) OVER(PARTITION BY sc.id_house ORDER BY sc.ts_status_started, COALESCE(sc.ts_status_ended, (CURRENT_TIMESTAMP - INTERVAL 1 DAY))) AS next_status_reason,
     sc.ts_status_started,
     sc.ts_status_ended,
     CAST((CAST(CAST(COALESCE(sc.ts_status_ended, now()) AS TIMESTAMP) AS LONG) - CAST(CAST(sc.ts_status_started AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_in_status
@@ -347,9 +364,9 @@ trigger AS (
             OR
             ( --Relisting
                 bch.status = 'UNPUBLISHED'
-                AND so.next_status = 'PUBLISHED'
-                AND bch.previous_state_status = 'SUSPENDED'
-                AND bch.previous_status_reason = 'RENTED'
+                AND bch.next_status = 'PUBLISHED'
+                AND so.prev_status = 'SUSPENDED'
+                AND so.prev_status_reason = 'RENTED'
             )
             OR --Early demand
             (
@@ -359,18 +376,6 @@ trigger AS (
                   bch.status = 'SUSPENDED'
                   AND
                   bch.status_reason = 'RENTED'
-                )
-            )
-            OR --Early demand
-            ( --This covers the new scenario where the admin suspends the listing before publishing it as early demand
-                bch.next_status = 'PUBLISHED'
-                AND bch.next_status_reason LIKE 'RELISTING_%'
-                AND (
-                  bch.status = 'SUSPENDED'
-                  AND
-                  bch.status_reason = 'Admin'
-                  AND
-                  (bch.previous_status_reason = 'RENTED' OR bch.previous_to_previous_status_reason = 'RENTED')
                 )
             )
           )
@@ -391,7 +396,8 @@ trigger AS (
     last_house_state AS lhs
       ON lhs.id_house = bch.id_house
 
-), merge_version AS (
+),
+merge_version AS (
   SELECT
     h.id_house,
     h.country_code,
@@ -446,7 +452,8 @@ trigger AS (
         AND t.status = bch.status
         AND COALESCE(t.status_reason, '') = COALESCE(bch.status_reason, '')
         AND t.ts_state_started = bch.ts_state_started
-), versioning AS (
+),
+versioning AS (
   SELECT
       m.id_house,
       m.country_code,
