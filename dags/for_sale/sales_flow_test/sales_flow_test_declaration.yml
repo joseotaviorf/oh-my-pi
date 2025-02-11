@@ -73,7 +73,7 @@ workflow:
     contact:
       clean_table_name: contact
       raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
+      clean_primary_keys: ["id_contact"]
     contact_aud:
       clean_table_name: contact_aud
     diligence:
