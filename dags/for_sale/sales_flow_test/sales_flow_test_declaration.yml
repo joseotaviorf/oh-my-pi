@@ -48,6 +48,8 @@ workflow:
       clean_table_name: ccv_edition_reason
     ccv_edition_reason_aud:
       clean_table_name: ccv_edition_reason_aud
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     ccv_termination:
       clean_table_name: ccv_termination
     clause_message:
@@ -70,6 +72,8 @@ workflow:
       clean_table_name: ccv_rule_aud
     contact:
       clean_table_name: contact
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     contact_aud:
       clean_table_name: contact_aud
     diligence:
@@ -84,6 +88,8 @@ workflow:
       clean_table_name: house
     house_aud:
       clean_table_name: house_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
     house_registration_order:
       clean_table_name: house_registration_order
     house_registration_order_aud:
