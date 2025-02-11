@@ -1,5 +1,5 @@
 database_name: dw_credit_evers
-table_name: fact_ever_clean
+table_name: fact_ever_full
 owner: isabella.santos@quintoandar.com.br
 domain: Fintech
 description: This table contains all contracts with overdue invoices (delays) and the ever calculation. It reports all invoices from a contract (monthly, onboarding, extra, pos-rental) and if there is any agreement made.
