@@ -6,6 +6,17 @@ WITH houses AS (
         OR house_type LIKE '%HOUSE%' AS is_house
     FROM
         datalake_brokers_supply_processor.lead_3p
+),
+listing_relation AS (
+    SELECT
+        lr.id_house,
+        lr.id_related
+    FROM
+        datalake_ebdb_clean.house_listing_relation AS lr
+    WHERE
+        lr.related_as = 'OWNER_AGENT'
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY lr.id_house ORDER BY lr.id_listing_business_context) = 1
 )
 SELECT
     lsk.sk_lead_3p,
@@ -15,6 +26,7 @@ SELECT
     l.id_house,
     COALESCE(l.id_by_real_estate, l.id_house_partner) AS id_by_real_estate,
     l.lead_hash,
+    lr.id_related AS uuid_person_owner_agent,
     COALESCE(lsc_sale.status, 'N/A') AS sale_status,
     COALESCE(lsc_rent.status, 'N/A') AS rent_status,
     COALESCE(lsc_sale.growth_status, 'N/A') AS sale_growth_status,
@@ -49,8 +61,6 @@ SELECT
     COALESCE(l.complement, CASE WHEN h.is_house THEN 'N/A' ELSE 'Unknown' END) AS complement,
     COALESCE(l.reference_point, 'Unknown') AS reference_point,
     COALESCE(l.condominium, 'Unknown') AS condominium,
-    COALESCE(l.owner_email, 'Unknown') AS owner_email,
-    COALESCE(l.owner_phone, 'Unknown') AS owner_phone,
     COALESCE(l.owner_person_type, 'Unknown') AS owner_person_type,
     COALESCE(l.access_type, 'Unknown') AS access_type,
     COALESCE(l.authorization_type, 'Unknown') AS authorization_type,
@@ -165,3 +175,6 @@ LEFT JOIN
     datalake_rede_lead_crawler.lead_3p_freshness AS lf_rent
         ON lf_rent.id_lead_3p = l.id
         AND lf_rent.business_context = 'RENT'
+LEFT JOIN
+    listing_relation AS lr
+        ON l.id_house = lr.id_house

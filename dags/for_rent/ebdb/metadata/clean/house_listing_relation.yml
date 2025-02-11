@@ -21,7 +21,7 @@ columns:
     lineage:
       - datalake_ebdb_raw.imovellistingrelation.relatedId
     description: ID of the entity related. 
-      It can be a user ID or a company UUID (see column dw_rede.dim_company.uuid_company), depending on source_type.
+      It can be a user ID, a company UUID (see column dw_rede.dim_company.uuid_company), or a person UUID (see column dw_public.dim_user.uuid_person) depending on source_type.
   related_as:
     lineage:
       - datalake_ebdb_raw.imovellistingrelation.relatedAs

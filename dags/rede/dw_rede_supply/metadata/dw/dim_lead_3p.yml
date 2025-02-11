@@ -36,6 +36,10 @@ columns:
     - datalake_brokers_supply_processor.lead_3p.id_by_real_estate
     - datalake_brokers_supply_processor.lead_3p.id_house_partner
     description: 'Identifier of the lead within the real estate agency.'
+  uuid_person_owner_agent:
+    lineage:
+    - datalake_ebdb_clean.house_listing_relation.id_related
+    description: Person UUID of the agent who owns the lead.
   lead_hash:
     lineage:
       - datalake_brokers_supply_processor.lead_3p.lead_hash
@@ -259,14 +263,6 @@ columns:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.condominium
     description: Condominium where the lead is located.
-  owner_email:
-    lineage:
-    - datalake_brokers_supply_processor.lead_3p.owner_email
-    description: Email of the lead's owner.
-  owner_phone:
-    lineage:
-    - datalake_brokers_supply_processor.lead_3p.owner_phone
-    description: Phone number of the lead's owner.
   owner_person_type:
     lineage:
     - datalake_brokers_supply_processor.lead_3p.owner_person_type

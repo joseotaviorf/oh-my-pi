@@ -208,8 +208,8 @@ SELECT
     MIN(rent_recurrency.ts_batch_sent) OVER(PARTITION BY l.lead_hash, l.uuid_company) AS ts_first_rent_version_created_by_company,
     sale_recurrency.ts_batch_sent AS ts_sale_lead_sent,
     rent_recurrency.ts_batch_sent AS ts_rent_lead_sent,
-    GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP AS ts_house_created,
-    GET_JSON_OBJECT(l.brokers, '$.updatedAt')::TIMESTAMP AS ts_house_updated,
+    IF(GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP < '1900-01-01T00:00:00.000+00:00', NULL, GET_JSON_OBJECT(l.brokers, '$.createdAt')::TIMESTAMP) AS ts_house_created,
+    IF(GET_JSON_OBJECT(l.brokers, '$.updatedAt')::TIMESTAMP < '1900-01-01T00:00:00.000+00:00', NULL, GET_JSON_OBJECT(l.brokers, '$.updatedAt')::TIMESTAMP) AS ts_house_updated,
     l.ts_created,
     l.ts_updated
 FROM
