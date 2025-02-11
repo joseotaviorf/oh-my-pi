@@ -89,15 +89,18 @@ SELECT
     fr.ts_first_unpublished,
     NOW() AS ts_load
 FROM
+    datalake_rede_supply.lead_3p_sks AS lsk
+LEFT JOIN
     funnel AS f
+        ON f.id_lead_3p = lsk.id_lead_3p
 LEFT JOIN
     first_registered AS fr
         ON f.id_lead_3p = fr.id_lead_3p
         AND f.business_context = fr.business_context
-JOIN
+LEFT JOIN
     datalake_brokers_supply_processor.lead_3p AS l3p
         ON f.id_lead_3p = l3p.id
-JOIN
+LEFT JOIN
     datalake_rede_supply.lead_3p_status_changes AS lsc
         ON f.id_lead_3p = lsc.id_lead_3p
         AND f.business_context = lsc.business_context
@@ -108,10 +111,7 @@ LEFT JOIN
 LEFT JOIN
     updates AS u
         ON COALESCE(lsc.id_house, lh.id_house) = u.id_house
-JOIN
-    datalake_rede_supply.lead_3p_sks AS lsk
-        ON lsk.id_lead_3p = lsc.id_lead_3p
-JOIN
+LEFT JOIN
     datalake_rede_supply.lead_3p_status AS ls
         ON lsc.status = ls.status
         AND lsc.growth_status = ls.growth_status
