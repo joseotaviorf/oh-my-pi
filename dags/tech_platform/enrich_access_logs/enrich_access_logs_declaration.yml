@@ -10,6 +10,7 @@ workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: incremental
+  execution_timeout_hours: 3
   default_partitions: [year, month, day]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
