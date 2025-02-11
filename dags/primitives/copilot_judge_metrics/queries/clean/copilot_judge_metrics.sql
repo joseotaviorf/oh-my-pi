@@ -1,0 +1,17 @@
+select
+    date,
+    base_model_purpose,
+    evaluation_steps,
+    grading_criteria,
+    evaluation_input,
+    score,
+    score_reason,
+    metadata,
+    evaluation_model,
+    task_name,
+    evaluation_type,
+    year,
+    month,
+    day
+from
+    datalake_copilot_judge_metrics_raw.copilot_judge_metrics

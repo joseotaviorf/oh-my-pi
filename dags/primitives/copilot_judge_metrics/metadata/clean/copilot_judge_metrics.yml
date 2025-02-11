@@ -1,0 +1,49 @@
+---
+database_name: datalake_copilot_judge_metrics_clean
+table_name: copilot_judge_metrics
+owner: daniel.adriano@quintoandar.com.br
+domain: primitives
+
+columns:
+  date:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.date
+  base_model_purpose:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.base_model_purpose
+  evaluation_steps:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.evaluation_steps
+  grading_criteria:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.grading_criteria
+  evaluation_input:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.evaluation_input
+  score:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.score
+  score_reason:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.score_reason
+  metadata:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.metadata
+  evaluation_model:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.evaluation_model
+  task_name:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.task_name
+  evaluation_type:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.evaluation_type
+  year:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.year
+  month:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.month
+  day:
+    lineage:
+      - datalake_copilot_judge_metrics_clean.copilot_judge_metrics.day

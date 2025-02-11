@@ -1,0 +1,35 @@
+dag:
+  name: copilot_judge_metrics
+  schedule_start_date: 2024, 1, 1
+  owner: Data Primitives
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_copilot_judge_metrics_into_datalake
+  default_partitions: [year, month, day]
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - s3://data-science.s3.data.quintoandar.com.br/copilot/evaluation/online_evaluation
+    - "{table_name}"
+    - "{partitions}"
+    - parquet
+    - full
+
+  default_extraction_type: incremental
+
+  tables_customization:
+    copilot_judge_metrics:
+      default_partitions:
+        - year
+        - month
+        - day
+
+cluster:
+    type: databricks_12_2_med_memory_photon_cluster
+    access_control_list:
+      group_name: data-products
+      permission_level: CAN_MANAGE
