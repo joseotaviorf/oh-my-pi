@@ -15,7 +15,7 @@ WITH assignment AS (
      LAG(a.band) OVER (
        PARTITION BY a.id_assignment
        ORDER BY
-         a.ts_valid_from
+         a.dt_effective_start
      ),
      1
    ) AS band,
