@@ -1,0 +1,39 @@
+steps:
+   create-dag-files:
+    image: public.ecr.aws/docker/library/python:3.7.16
+    commands:
+      - make create-dag-files
+    when:
+      event: push
+      branch: [ astro-forno ]
+
+   upload-bi-etl-ejuice-modules-s3-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.forno.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: bietlejuice
+    when:
+      event: push
+      branch: [ astro-forno ]
+
+   upload-dag-packages-dags-s3-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.forno.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: dags
+    when:
+      event: push
+      branch: [ astro-forno ]
+    depends_on: [create-dag-files]
+
+   astronomer-deploy-dags-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:forno-latest
+    pull: true
+    when:
+      event: push
+      branch: [ astro-forno ]
+    depends_on: [ upload-bi-etl-ejuice-modules-s3-forno, upload-dag-packages-dags-s3-forno ]
