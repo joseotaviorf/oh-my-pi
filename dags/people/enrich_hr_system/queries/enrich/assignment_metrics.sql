@@ -24,7 +24,7 @@ WITH assignment AS (
    a.assignment_status_type,
    a.dt_projected_start,
    IF(a.business_unit_name IN ('Benvi MX', 'Classifieds LATAM'),
-      TIMESTAMP(dt_effective_start), a.ts_last_update) AS ts_valid_from
+      TIMESTAMP(a.dt_effective_start), a.ts_last_update) AS ts_valid_from
  FROM
    datalake_hr_system.assignments AS a
 ),
@@ -49,7 +49,7 @@ assignments_present AS (
        ) THEN 1
        ELSE 0
      END
-   ) over (
+   ) OVER (
      PARTITION BY id_assignment
      ORDER BY
        ts_valid_from
@@ -86,7 +86,7 @@ assignments_future AS (
        ) THEN 1
        ELSE 0
      END
-   ) over (
+   ) OVER (
      PARTITION BY id_assignment
      ORDER BY
        ts_valid_from
@@ -110,10 +110,10 @@ managers_present AS (
  FROM
    datalake_hr_system.managers
  WHERE
-   DATE(ts_valid_from) <= DATE('{load_start_date}')
+   DATE(dt_effective_start) <= DATE('{load_start_date}')
    AND manager_type = 'LINE_MANAGER'
  QUALIFY
-   ts_valid_from = MAX(ts_valid_from) OVER (PARTITION BY id_assignment)
+   dt_effective_start = MAX(dt_effective_start) OVER (PARTITION BY id_assignment)
 ),
 managers_future AS (
  SELECT
@@ -123,10 +123,10 @@ managers_future AS (
  FROM
    datalake_hr_system.managers
  WHERE
-   DATE(ts_valid_from) > DATE('{load_start_date}')
+   DATE(dt_effective_start) > DATE('{load_start_date}')
    AND manager_type = 'LINE_MANAGER'
  QUALIFY
-   ts_valid_from = MAX(ts_valid_from) OVER (PARTITION BY id_assignment)
+   dt_effective_start = MAX(dt_effective_start) OVER (PARTITION BY id_assignment)
 ),
 hr_system_workers AS (
  SELECT
