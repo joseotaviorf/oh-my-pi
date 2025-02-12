@@ -554,6 +554,7 @@ bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-appointment-inspection
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_inspections:load-enrich-inspection-status-change
+  - bietlejuice.enrich_inspections:load-enrich-inspector-reports
   - bietlejuice.enrich_inspections:load-enrich-item
   - bietlejuice.enrich_inspections:load-enrich-item-group
   - bietlejuice.enrich_inspections:load-enrich-item-issue

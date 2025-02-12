@@ -29,6 +29,9 @@ workflow:
     dim_inspector:
       extraction_type: full
       partitions: []
+    dim_inspector_report:
+      z_order_by: [sk_report]
+      merge_on: [sk_report]
     dim_item_group:
       z_order_by: [sk_item_group]
       merge_on: [sk_item_group]
@@ -66,6 +69,9 @@ workflow:
       extraction_type: full
       z_order_by: [sk_inspection]
       merge_on: [sk_inspection]
+    fact_inspector:
+      z_order_by: [sk_report]
+      merge_on: [sk_report]
     fact_repair_request:
       extraction_type: full
       z_order_by: [sk_repair_request]

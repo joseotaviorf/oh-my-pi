@@ -102,12 +102,12 @@ columns:
   year:
     description: Year in which the inspection took place.
     lineage:
-      - datalake_inspection_services_clean.assessment_aud.ts_created
+      - datalake_inspections_clean.inspection_aud.year
   month:
     description: Month in which the inspection took place.
     lineage:
-      - datalake_inspection_services_clean.assessment_aud.ts_created
+      - datalake_inspections_clean.inspection_aud.month
   day:
     description: Day in which the inspection took place.
     lineage:
-      - datalake_inspection_services_clean.assessment_aud.ts_created
+      - datalake_inspections_clean.inspection_aud.day

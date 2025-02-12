@@ -1,0 +1,87 @@
+database_name: dw_inspections
+table_name: dim_inspector_report
+description:
+  Dimension table that has the function of grouping descriptive information from reports made by the surveyor.
+  Each row of the table represents an "id_report" which is a combination of all the data
+  levels involved in the report.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_report:
+    description: Unique identification key for the report record, generated based on all the keys in the context.
+    lineage:
+      - datalake_inspections.inspector_reports.id_report
+  inspection_type:
+    description: The type of inspection.
+    categories:
+      onboarding: Inspection carried out before the tenant enters the property, to certify the conditions of the house.
+      verification: Inspection carried out when there is any relevant change in the property, such as the creation of rooms, for example.
+      offboarding: Inspection carried out after the tenant leaves the property, to certify the conditions of the house.
+    lineage:
+      - datalake_inspections.inspector_reports.inspection_type
+  room_type:
+    description: Room type name, for example kitchen bedroom, etc.
+    lineage:
+      - datalake_inspections.inspector_reports.room_type
+  item_group_type:
+    description: Name of the object evaluated in the inspection.
+    lineage:
+      - datalake_inspections.inspector_reports.item_group_type
+  item_type:
+    description: Item problem name.
+    lineage:
+      - datalake_inspections.inspector_reports.item_type
+  issue_type:
+    description: Specify the sub-type problem.
+    lineage:
+      - datalake_inspections.inspector_reports.issue_type
+  media_type:
+    description: Indicates whether the media is a photo or a video.
+    lineage:
+      - datalake_inspections.inspector_reports.media_type
+  item_group_status:
+    description: Indicates the condition of the object for comparative surveys.
+    categories:
+      ABSENT: Object removed.
+      SAME: Object in the same conditions as the previous inspection.
+      REPLACED: Replaced object.
+    lineage:
+      - datalake_inspections.inspector_reports.item_group_status
+  item_status:
+    description: Item condition status related to the report.
+    lineage:
+      - datalake_inspections.inspector_reports.item_status
+  item_comment:
+    description: Displays a inspector's comment.
+    lineage:
+      - datalake_inspections.inspector_reports.item_comment
+  issue_comment:
+    description: Displays a inspector's comment.
+    lineage:
+      - datalake_inspections.inspector_reports.issue_comment
+  room_name:
+    description: Descriptive name of the room (typed by inspector).
+    lineage:
+      - datalake_inspections.inspector_reports.room_name
+  item_group_name:
+    description: Description of the item group, for example floor, paint, lighting, etc. (typed by inspector)
+    lineage:
+      - datalake_inspections.inspector_reports.item_group_name
+  ts_synced:
+    description: Date and time of the first synchronization of the inspection in the application.
+    lineage:
+      - datalake_inspections.inspector_reports.ts_synced
+  ts_load:
+    description: Date and time when the data was loaded.
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_inspections.inspector_reports.year
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_inspections.inspector_reports.month
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_inspections.inspector_reports.day

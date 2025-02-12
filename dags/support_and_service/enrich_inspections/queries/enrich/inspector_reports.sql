@@ -99,9 +99,9 @@ SELECT DISTINCT
     ig.name AS item_group_name,
     it.is_present AS is_present_item,
     ass.ts_created AS ts_synced,
-    YEAR(ass.ts_created) AS year,
-    MONTH(ass.ts_created) AS month,
-    DAY(ass.ts_created) AS day
+    ia.year,
+    ia.month,
+    ia.day
 FROM
     inspection AS ia
 LEFT JOIN

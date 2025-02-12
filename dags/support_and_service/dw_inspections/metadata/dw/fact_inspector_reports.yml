@@ -1,0 +1,72 @@
+---
+database_name: dw_inspections
+table_name: fact_inspector_reports
+description:
+  Fact table that has the function of grouping information from reports made by the surveyor.
+  Each row of the table represents an "id_report" which is a combination of all the data
+  levels involved in the report.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_report:
+    description: Unique identification key for the report record, generated based on all the keys in the context.
+    lineage:
+      - datalake_inspections.inspector_reports.id_report
+  sk_inspection:
+    description: Inspection identification key, can be used to have an overview of the report given that the combination of inspection records in this table returns the complete report.
+    lineage:
+      - datalake_inspections.inspector_reports.id_inspection
+  sk_inspector:
+    description: Inspector identification key in IS.
+    lineage:
+      - datalake_inspections.inspector_reports.id_inspector
+  sk_contract:
+    description: Identification key of the contract related to the report.
+    lineage:
+      - datalake_inspections.inspector_reports.id_contract
+  sk_appointment:
+    description: Identification key for the appointment related to the report.
+    lineage:
+      - datalake_inspections.inspector_reports.id_appointment
+  sk_room:
+    description: Identification key of the room related to the report.
+    lineage:
+      - datalake_inspections.inspector_reports.id_room
+  sk_item:
+    description: Identification key of the item related to the report.
+    lineage:
+      - datalake_inspections.inspector_reports.id_item
+  sk_item_group:
+    description: Identification key of the item related to the report.
+    lineage:
+      - datalake_inspections.inspector_reports.id_item_group
+  sk_item_issue:
+    description: Identification key of the problem related to the item.
+    lineage:
+      - datalake_inspections.inspector_reports.id_item_issue
+  sk_item_media:
+    description: Media identification key related to the report.
+    lineage:
+      - datalake_inspections.inspector_reports.id_item_media
+  is_present_item:
+    description: Flag that identifies whether the tag is present in the report.
+    lineage:
+      - datalake_inspections.inspector_reports.is_present_item
+  ts_synced:
+    description: Date and time of the first synchronization of the inspection in the application.
+    lineage:
+      - datalake_inspections.inspector_reports.ts_synced
+  ts_load:
+    description: Date and time when the data was loaded.
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_inspections.inspector_reports.year
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_inspections.inspector_reports.month
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_inspections.inspector_reports.day
