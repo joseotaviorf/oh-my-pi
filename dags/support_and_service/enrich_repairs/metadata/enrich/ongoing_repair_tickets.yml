@@ -1,0 +1,222 @@
+database_name: datalake_repairs
+table_name: ongoing_repair_tickets
+description:
+  Enrichment table that aims to consolidate information from the repair
+  service flow. Each line in this table represents a service ticket for this flow.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+    description: Unique identifier for the current ticket.
+  id_contact_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.custom_fields
+    description: Identifier for the contact ticket, extracted and cleaned from custom fields.
+  id_request:
+    lineage:
+      - datalake_repairs_clean.service_request.id_repair_request
+    description: Identifier for the repair request associated with the ticket.
+  id_contract:
+    lineage:
+      - datalake_zendesk.tickets_current.id_contract
+      - datalake_ebdb_contract.contract.id
+    description: Identifier for the contract associated with the ticket.
+  group_name:
+    lineage:
+      - datalake_zendesk.tickets_current.group_name
+    description: Name of the group handling the ticket.
+  client_type:
+    lineage:
+      - datalake_zendesk.tickets_current.client_type
+    description: Type of client associated with the ticket.
+  status:
+    lineage:
+      - datalake_zendesk.tickets_current.status
+    description: Current status of the ticket.
+  custom_fields:
+    lineage:
+      - datalake_zendesk.tickets_current.custom_fields
+    description: JSON object containing custom fields related to the ticket.
+  tags:
+    lineage:
+      - datalake_zendesk.tickets_current.tags
+    description: Tags associated with the ticket for categorization and tracking.
+  ticket_via:
+    lineage:
+      - datalake_zendesk.tickets_current.via_channel
+    description: Channel through which the ticket was received.
+  channel:
+    lineage:
+      - datalake_zendesk.tickets_current.channel
+    description: Communication channel of the ticket.
+  agent_name:
+    lineage:
+      - datalake_zendesk.tickets_current.analyst_name
+    description: Name of the analyst assigned to the ticket.
+  agent_email:
+    lineage:
+      - datalake_zendesk.tickets_current.analyst_email
+    description: Email of the analyst assigned to the ticket.
+  email_assigned:
+    lineage:
+      - datalake_support_users.zendesk_users.email
+    description: Email address assigned to handle the ticket.
+  email_requester:
+    lineage:
+      - datalake_support_users.zendesk_users.email
+    description: Email address of the ticket requester.
+  agent_organization:
+    lineage:
+      - datalake_zendesk.tickets_current.analyst_organization
+    description: Organization of the analyst handling the ticket.
+  contestation_task_origin:
+    lineage:
+      - repair_tickets.contestation_task_origin
+    description: Origin of the contestation task associated with the ticket.
+  service_provider:
+    lineage:
+      - service_provider.service_provider
+    description: Service provider involved in the repair request.
+  theme:
+    lineage:
+      - datalake_survicate.repairs_surveys.contact_theme_tag
+    description: Theme tag associated with the contact in the survey.
+  theme_detail:
+    lineage:
+      - datalake_survicate.repairs_surveys.contact_theme_detail_tag
+    description: Detailed theme tag associated with the contact in the survey.
+  request_type:
+    lineage:
+      - datalake_survicate.repairs_surveys.request_type
+    description: Type of request submitted by the customer.
+  customer_type_tag:
+    lineage:
+      - datalake_survicate.repairs_surveys.customer_type_tag
+    description: Tag indicating the type of customer.
+  motivation:
+    lineage:
+      - datalake_survicate.repairs_surveys.contact_motivation_tag
+    description: Motivation behind the customer's contact.
+  front_or_back:
+    lineage:
+      - datalake_survicate.repairs_surveys.front_or_back
+    description: Indicates if the interaction was front-end or back-end.
+  comment_csat:
+    lineage:
+      - datalake_survicate.repairs_surveys.respondent_comments
+    description: Comments provided by the respondent in the CSAT survey.
+  csat_tags:
+    lineage:
+      - datalake_survicate.repairs_surveys.improvement_tags
+    description: Tags indicating areas for improvement from the CSAT survey.
+  csat_score:
+    lineage:
+      - datalake_survicate.repairs_surveys.satisfaction_score
+    description: Customer satisfaction score from the CSAT survey.
+  csat_partes:
+    lineage:
+      - datalake_survicate.repairs_surveys.secondary_satisfaction_score
+    description: Secondary satisfaction score related to involved parties.
+  is_closed_by_merge:
+    lineage:
+      - repair_tickets.is_closed_by_merge
+    description: Indicates if the ticket was closed by a merge operation.
+  is_contestation_backlog:
+    lineage:
+      - repair_tickets.is_contestation_backlog
+    description: Indicates if the contestation is in the backlog.
+  is_ticket_followup:
+    lineage:
+      - repair_tickets.is_ticket_followup
+    description: Indicates if the ticket is a follow-up.
+  has_chat_negociation:
+    lineage:
+      - first_interaction.has_chat_negociation
+    description: Indicates if there was a chat negotiation for the ticket.
+  reopens:
+    lineage:
+      - datalake_zendesk.tickets_current.reopens
+    description: Number of times the ticket was reopened.
+  replies:
+    lineage:
+      - datalake_zendesk.tickets_current.replies
+    description: Number of replies to the ticket.
+  relisting:
+    lineage:
+      - relisting_distinct.relisting
+    description: Count of relistings associated with the contract.
+  minutes_first_reply_time_calendar:
+    lineage:
+      - datalake_zendesk.tickets_current.reply_time_min_calendar
+    description: Minutes taken for the first reply based on the calendar.
+  dt_definition:
+    lineage:
+      - datalake_zendesk.tickets_current.custom_fields
+    description: Date when the service provider was defined.
+  dt_chat:
+    lineage:
+      - first_interaction.dt_chat
+    description: Date of the chat interaction.
+  entrance_date:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_entered
+    description: Date when the contract was entered.
+  ts_contestation:
+    lineage:
+      - repair_tickets.ts_contestation
+    description: Timestamp when the contestation occurred.
+  ts_resolution_contestation:
+    lineage:
+      - repair_tickets.ts_resolution_contestation
+    description: Timestamp when the contestation was resolved.
+  ts_first_interaction:
+    lineage:
+      - first_interaction.ts_first_interaction
+      - repairs_interaction_pp.ts_updated
+    description: Timestamp of the first interaction related to the ticket.
+  ts_created_local:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_created
+    description: Local timestamp when the ticket was created.
+  ts_updated_local:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_updated
+    description: Local timestamp when the ticket was last updated.
+  ts_closed_local:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_updated
+    description: Local timestamp when the ticket was closed, if applicable.
+  ts_solved_local:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_solved
+    description: Local timestamp when the ticket was marked as solved.
+  ts_request_created:
+    lineage:
+      - service_provider.ts_created
+    description: Local timestamp when the repair request was created.
+  ts_csat_response_submitted:
+    lineage:
+      - datalake_survicate.repairs_surveys.ts_submitted
+    description: Date when the CSAT response was submitted.
+  ts_initially_assigned_local:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_initially_assigned
+    description: Local timestamp when the ticket was initially assigned.
+  ts_last_assigned_local:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_assigned
+    description: Local timestamp when the ticket was last assigned.
+  year:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_updated
+    description: Year extracted from the local updated timestamp.
+  month:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_updated
+    description: Month extracted from the local updated timestamp.
+  day:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_updated
+    description: Day extracted from the local updated timestamp.

@@ -10,7 +10,20 @@ workflow:
   default_extraction_type: full
   tables_customization:
     repair_tickets:
-      z_order_by: [id_ticket, id_request, id_contract]
+      z_order_by:
+        [
+          id_ticket,
+          id_request,
+          id_contract
+        ]
+      merge_on: [id_ticket]
+    ongoing_repair_tickets:
+      z_order_by:
+        [
+          id_ticket,
+          id_request,
+          id_contract
+        ]
       merge_on: [id_ticket]
 cluster:
   type: custom_cluster

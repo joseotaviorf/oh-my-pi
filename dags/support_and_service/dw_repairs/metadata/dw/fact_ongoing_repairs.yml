@@ -1,0 +1,233 @@
+database_name: dw_repairs
+table_name: fact_ongoing_repairs
+description:
+  Table stores data on ongoing repair requests. This data includes information about the customer
+  the repair the responsible analyst and the repair status. The table is used to analyze the performance of the repair process
+  including response time resolution time, costs, delay reasons, and success factors.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_ticket: 
+    description: Ticket unique identifier.
+    lineage:
+      - datalake_repairs.repair_tickets.id_ticket
+  sk_ticket_whatsapp:
+    description: Ticket unique identifier for WhatsApp.
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket_whatsapp
+  sk_contact_ticket:
+    description:
+    lineage:
+      - datalake_zendesk.tickets_current.id_contact_ticket
+  sk_request:
+    description: Repair request unique identifier.
+    lineage:
+      - datalake_repairs.repair_tickets.id_request
+  sk_contract:
+    description: Contract unique identifier.
+    lineage:
+      - datalake_repairs.repair_tickets.id_contract
+  sk_user:
+    description: User unique identifier.
+    lineage:
+      - datalake_zendesk.tickets_current.id_user_main
+  sk_agent:
+    description: Unique agent identifier.
+    lineage:
+      - datalake_repairs.repair_tickets.agent_email
+  sk_budget_sender: 
+    description: Sender Budget unique identifier.
+    lineage:
+      - datalake_repairs_clean.repair_request_budget.id_budget_sender
+  reopens:
+    description: The number of times the ticket was reopened after it was first marked as solved.
+    lineage:
+      - datalake_zendesk.tickets_current.reopens
+  relisting:
+    description: Integer type data that indicates the number of times the listing was updated.
+    lineage:
+      - datalake_repairs.repair_tickets.relisting
+  replies:
+    description: Integer type data that indicates the number of times the ticket was replied.
+    lineage:
+      - datalake_zendesk.tickets_current.replies
+  total_public_comments:
+    description:
+    lineage:
+      - datalake_zendesk.tickets_current.total_public_comments
+  total_private_comments:
+    description:
+    lineage:
+      - datalake_zendesk.tickets_current.total_private_comments
+  frt:
+    description: Full Repair Time, calculated as the difference in days between the ticket creation date (ts_created_local) and the ticket solved date (ts_solved_local).
+    lineage:
+      - datalake_repairs.repair_tickets.ts_created_local
+      - datalake_repairs.repair_tickets.ts_solved_local
+  days_to_first_reply:
+    description: Number of days it took for the ticket to receive its first reply after creation.
+    lineage:
+      - datalake_repairs.repair_tickets.ts_created_local
+      - datalake_repairs.repair_tickets.custom_fields
+  ldt_fr_minutes:
+    description: Amount of calendar minutes the ticket took to be replied
+    lineage:
+      - datalake_zendesk.tickets_current.reply_time_min_calendar
+  has_chat_negociation:
+    description: Boolean data that indicates whether the repair was negotiated via chat.
+    lineage:
+      - datalake_repairs.repair_tickets.has_chat_negociation
+  ongoing:
+    description: Indicates whether the repair request is still open (ongoing) or has been closed.
+    lineage:
+      - datalake_repairs.repair_tickets.ts_created_local
+  is_other_responsability:
+    description: Binary flag indicating whether the repair responsibility lies with a third-party company.
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+  is_reflux:
+    description:
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+  is_contestation:
+    description:
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+  is_ended_without_return:
+    description:
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+  is_execution_confirmed:
+    description:
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+  is_audited_ticket:
+    description:
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+  is_fup_iq_agreement:
+    description:
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+  is_solved_pspp_automation:
+    description:
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+  is_selfservice_migration:
+    description:
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+  is_closed_by_merge:
+    description:
+    lineage:
+      - datalake_repairs.repair_tickets.tags
+  dt_definition:
+    description:
+    lineage:
+      - datalake_repairs.repair_tickets.dt_definition
+  dt_chat:
+    description:
+    lineage:
+      - datalake_repairs.repair_tickets.dt_chat
+  ts_first_interaction:
+    description: Timestamp of the first interaction with the ticket.
+    lineage:
+      - datalake_repairs.repair_tickets.ts_first_interaction
+  ts_request_created:
+    description: Timestamp of the request creation.
+    lineage:
+      - datalake_repairs.repair_tickets.ts_request_created
+  ts_started:
+    description: Timestamp of the ticket start.
+    lineage:
+      - datalake_repairs_clean.repair_request_chat.ts_started
+  ts_initially_assigned_local:
+    description: Timestamp of the first analyst assignment.
+    lineage:
+      - datalake_repairs.repair_tickets.ts_initially_assigned_local
+  ts_last_assigned_local:
+    description: Timestamp of the last analyst assignment.
+    lineage:
+      - datalake_repairs.repair_tickets.ts_last_assigned_local
+  ts_measurement:
+    description: Timestamp of the measurement.
+    lineage:
+      - datalake_repairs.repair_tickets.custom_fields
+  ts_first_reply_milestone:
+    description: Timestamp of the first reply milestone.
+    lineage:
+      - datalake_repairs.repair_tickets.custom_fields
+  ts_first_public_comment:
+    description: Timestamp of the first public comment.
+    lineage:
+      - datalake_zendesk.tickets_current.ts_first_public_comment
+  ts_reflux:
+    description: Timestamp of the reflux.
+    lineage:
+      -  dw_customer_support.fact_ticket_events.ts_event
+      -  dw_customer_support.fact_ticket_events.tags
+  ts_contestation:
+    description: Timestamp of the contestation.
+    lineage:
+      -  dw_customer_support.fact_ticket_events.ts_event
+      -  dw_customer_support.fact_ticket_events.tags
+  ts_resolution_contestation:
+    description: Timestamp of the resolution contestation.
+    lineage:
+      -  dw_customer_support.fact_ticket_events.ts_event
+      -  dw_customer_support.fact_ticket_events.tags
+  ts_first_open:
+    description: Timestamp of the first open.
+    lineage:
+      -  dw_customer_support.fact_ticket_events.ts_event
+      -  dw_customer_support.fact_ticket_events.tags
+  ts_ps_iq:
+    description: Timestamp of the PS IQ.
+    lineage:
+      -  dw_customer_support.fact_ticket_events.ts_event
+      -  dw_customer_support.fact_ticket_events.tags
+  ts_ps_pp:
+    description: Timestamp of the PS PP.
+    lineage:
+      -  dw_customer_support.fact_ticket_events.ts_event
+      -  dw_customer_support.fact_ticket_events.tags
+  ts_compulsory:
+    description: Timestamp of the compulsory.
+    lineage:
+      -  dw_customer_support.fact_ticket_events.ts_event
+      -  dw_customer_support.fact_ticket_events.tags
+  ts_reopen:
+    description: Timestamp of the reopen.
+    lineage:
+      -  dw_customer_support.fact_ticket_events.ts_event
+      -  dw_customer_support.fact_ticket_events.tags
+  ts_help_request:
+    description: Timestamp of the help request.
+    lineage:
+      - datalake_repairs_clean.repair_request_tenant_negotiation_follow_up.ts_updated
+  ts_latest_customer_comment:
+    description: Timestamp of the latest customer comment.
+    lineage:
+      - datalake_zendesk_clean.ticket_comments.ts_created
+  ts_latest_analyst_comment:
+    description: Timestamp of the latest analyst comment.
+    lineage:
+      - datalake_zendesk_clean.ticket_comments.ts_created
+  ts_created_local:
+    description: Timestamp of the ticket creation.
+    lineage:
+      - datalake_repairs.repair_tickets.ts_created_local
+  ts_solved_local:
+    description: Timestamp of the ticket solved.
+    lineage:
+      - datalake_repairs.repair_tickets.ts_solved_local
+  ts_closed_local:
+    description: Timestamp of the ticket closed.
+    lineage:
+      - datalake_repairs.repair_tickets.ts_closed_local
+  ts_updated:
+    description: Timestamp of the ticket updated.
+    lineage:
+      - datalake_zendesk.tickets_current.ts_updated
+  ts_load:
+    description: Date in timestamp format that indicates when the ticket was loaded.

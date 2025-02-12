@@ -1,7 +1,6 @@
 database_name: dw_repairs
 table_name: fact_repair_ongoing
 description: 
-  THIS TABLE WILL BE DEPRECATED SOON!!!
   Stores data on ongoing repair requests, including information about the customer, the repair, the responsible analyst, and the repair status.
   This data is used to analyze the performance of the repair process, including response time, resolution time, costs, delay reasons, and success factors.
 domain: Support and Service

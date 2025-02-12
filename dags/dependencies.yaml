@@ -801,11 +801,13 @@ bietlejuice.dw_rental_payments:
 bietlejuice.dw_repairs:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events
   - bietlejuice.enrich_repairs:load-enrich-repair-tickets
+  - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.repairs:load-clean-repair-request
   - bietlejuice.repairs:load-clean-repair-request-budget
   - bietlejuice.repairs:load-clean-repair-request-chat
   - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up
+  - bietlejuice.zendesk:load-clean-ticket-comments
 bietlejuice.dw_reservation:
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
 bietlejuice.dw_retention:
