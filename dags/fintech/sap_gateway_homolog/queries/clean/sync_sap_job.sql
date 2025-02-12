@@ -22,7 +22,3 @@ SELECT
     day
 FROM
     datalake_sap_gateway_homolog_raw.sync_sap_job
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

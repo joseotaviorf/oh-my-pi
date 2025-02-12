@@ -21,7 +21,3 @@ SELECT
     day
 FROM
     datalake_sap_gateway_homolog_raw.feature
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
