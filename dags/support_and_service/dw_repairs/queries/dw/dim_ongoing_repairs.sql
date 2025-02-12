@@ -24,7 +24,7 @@ WITH criticidade AS (
         CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Classificação do atendimento (Tags)"]') AS STRING) IS NOT NULL
       THEN CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Classificação do atendimento (Tags)"]') AS STRING)
     END AS criticidade
-  FROM datalake_repairs.repair_tickets AS rt
+  FROM datalake_repairs.ongoing_repair_tickets AS rt
 )
 ,status_fup AS (
   SELECT
@@ -91,7 +91,7 @@ SELECT
   rt.tags,
   NOW() AS ts_load
 FROM
-  datalake_repairs.repair_tickets AS rt
+  datalake_repairs.ongoing_repair_tickets AS rt
 LEFT JOIN criticidade AS c
   ON c.id_ticket = rt.id_ticket
 LEFT JOIN

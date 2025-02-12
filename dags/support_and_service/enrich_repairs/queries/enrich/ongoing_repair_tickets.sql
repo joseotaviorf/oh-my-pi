@@ -333,9 +333,9 @@ WHERE
   AND tc.status NOT IN ('deleted')
   AND tc.tags NOT LIKE '%caso_ticket_agregador%'
   AND tc.client_type NOT LIKE '%prestador%'
-  AND dt.tags NOT LIKE '%reembolso_rep_ong%'
-  AND dt.tags NOT LIKE '%reembolso_sem_autorização%'
-  AND dt.tags NOT LIKE '%tarefacx_ongrep_solicitar_reembolso_reparos%'
-  AND dt.tags NOT LIKE '%whatspp_reparos%'
+  AND tc.tags NOT LIKE '%reembolso_rep_ong%'
+  AND tc.tags NOT LIKE '%reembolso_sem_autorização%'
+  AND tc.tags NOT LIKE '%tarefacx_ongrep_solicitar_reembolso_reparos%'
+  AND tc.tags NOT LIKE '%whatspp_reparos%'
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY tc.id_ticket ORDER BY tc.ts_updated DESC) = 1

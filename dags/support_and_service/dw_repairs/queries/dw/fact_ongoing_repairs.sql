@@ -293,7 +293,7 @@ SELECT
   FROM
     datalake_zendesk.tickets_current AS tc
   LEFT JOIN
-    datalake_repairs.repair_tickets AS rt
+    datalake_repairs.ongoing_repair_tickets AS rt
       ON rt.id_ticket = tc.id_ticket
   LEFT JOIN
     repair_request_budget AS b
