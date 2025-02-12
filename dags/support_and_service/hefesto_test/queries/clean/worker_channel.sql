@@ -14,4 +14,4 @@ SELECT
     month,
     day
 FROM
-    datalake_hefesto_raw.worker_channel
+    datalake_hefesto_test_raw.worker_channel
