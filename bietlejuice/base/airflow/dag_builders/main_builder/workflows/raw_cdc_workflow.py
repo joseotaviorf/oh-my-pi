@@ -159,6 +159,10 @@ class RawCDCWorkflow(BaseWorkflow):
         tables_per_cluster = math.ceil(len(tables_customization) / n_clusters)
         n_tables_so_far = 0
 
+        dummy_terminate_job_cluster_task = (
+            self.dummy_job_cluster_finished_task_creator.create_task()
+        )
+
         for transactional_table, raw_table, clean_table in zip(
             all_transactional_tables, all_raw_tables, all_clean_tables
         ):
@@ -168,6 +172,7 @@ class RawCDCWorkflow(BaseWorkflow):
                     cluster_raw_tables,
                     cluster_clean_tables,
                     execute_job_cluster_local_id,
+                    dummy_terminate_job_cluster_task,
                 )
                 cluster_transactional_tables = []
                 cluster_raw_tables = []
@@ -184,6 +189,7 @@ class RawCDCWorkflow(BaseWorkflow):
                 cluster_raw_tables,
                 cluster_clean_tables,
                 execute_job_cluster_local_id,
+                dummy_terminate_job_cluster_task,
             )
 
     def _create_all_tasks_for_cluster(
@@ -192,13 +198,16 @@ class RawCDCWorkflow(BaseWorkflow):
         cluster_raw_tables: List[TableAttributes],
         cluster_clean_tables: List[TableAttributes],
         execute_job_cluster_local_id: int,
+        dummy_terminate_job_cluster_task,
     ) -> None:
         """Creates all the tasks for the workflow and sets their dependencies."""
 
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task(
             execute_job_cluster_local_id
         )
-        dag_final_tasks = self._set_dag_final_tasks(execute_job_cluster_local_id)
+        dag_final_tasks = self._set_dag_final_tasks(
+            execute_job_cluster_local_id, dummy_terminate_job_cluster_task
+        )
         optimize_transactional_task = self.optimize_delta_table_task_creator.create_task(
             transactional_tables,
             parallelism=2,  # Lower because we don't want to overload the cluster while the next layers are being loaded
@@ -335,16 +344,14 @@ class RawCDCWorkflow(BaseWorkflow):
 
         return load_clean_task, last_clean_task
 
-    def _set_dag_final_tasks(self, execute_job_cluster_local_id: int):
+    def _set_dag_final_tasks(
+        self, execute_job_cluster_local_id: int, dummy_terminate_job_cluster_task
+    ):
         """
         The final task of the DAG will either be the dummy_terminate_job_cluster_task, or the get_table_metrics_task.
         This method creates the metrics task if it should be included in the workflow, and sets the dependencies. Otherwise,
         it simply returns the dummy_terminate_job_cluster_task.
         """
-        dummy_terminate_job_cluster_task = (
-            self.dummy_job_cluster_finished_task_creator.create_task()
-        )
-
         # Since we use a single task for get_metrics task extract metrics
         # from all tables, this validates if this is the first time the
         # task is being added.

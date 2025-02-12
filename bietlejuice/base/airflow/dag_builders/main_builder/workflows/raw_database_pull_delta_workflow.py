@@ -109,12 +109,17 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
         tables_per_cluster = math.ceil(len(tables_customization) / n_clusters)
         n_tables_so_far = 0
 
+        dummy_terminate_job_cluster_task = (
+            self.dummy_job_cluster_finished_task_creator.create_task()
+        )
+
         for raw_table, clean_table in zip(all_raw_tables, all_clean_tables):
             if n_tables_so_far != 0 and n_tables_so_far % tables_per_cluster == 0:
                 self._create_all_tasks_for_cluster(
                     cluster_raw_tables,
                     cluster_clean_tables,
                     execute_job_cluster_local_id,
+                    dummy_terminate_job_cluster_task,
                 )
                 cluster_raw_tables = []
                 cluster_clean_tables = []
@@ -125,7 +130,10 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
 
         if len(cluster_raw_tables) > 0:
             self._create_all_tasks_for_cluster(
-                cluster_raw_tables, cluster_clean_tables, execute_job_cluster_local_id
+                cluster_raw_tables,
+                cluster_clean_tables,
+                execute_job_cluster_local_id,
+                dummy_terminate_job_cluster_task,
             )
 
     def _create_all_tasks_for_cluster(
@@ -133,6 +141,7 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
         cluster_raw_tables: List[TableAttributes],
         cluster_clean_tables: List[TableAttributes],
         execute_job_cluster_local_id: int,
+        dummy_terminate_job_cluster_task,
     ) -> None:
         """Creates all the tasks from a cluster for the workflow and sets their dependencies."""
 
@@ -143,7 +152,9 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
             table_attributes=cluster_clean_tables,
             optimize_delta_table_local_id=execute_job_cluster_local_id,
         )
-        dag_final_tasks = self._set_dag_final_tasks(execute_job_cluster_local_id)
+        dag_final_tasks = self._set_dag_final_tasks(
+            execute_job_cluster_local_id, dummy_terminate_job_cluster_task
+        )
 
         for raw_table, clean_table in zip(cluster_raw_tables, cluster_clean_tables):
             raw_initial_task, raw_final_task = self._create_raw_tasks(
@@ -232,15 +243,14 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
 
         return load_clean_task, last_clean_task
 
-    def _set_dag_final_tasks(self, execute_job_cluster_local_id):
+    def _set_dag_final_tasks(
+        self, execute_job_cluster_local_id, dummy_terminate_job_cluster_task
+    ):
         """
         The final task of the DAG will either be the dummy_terminate_job_cluster_task, or the get_table_metrics_task.
         This method creates the metrics task if it should be included in the workflow, and sets the dependencies. Otherwise,
         it simply returns the dummy_terminate_job_cluster_task.
         """
-        dummy_terminate_job_cluster_task = (
-            self.dummy_job_cluster_finished_task_creator.create_task()
-        )
 
         # This guarantees that the task will be added only at the first local job cluster subdag.
         if (
