@@ -4,6 +4,7 @@ SELECT
     invoice_account_type,
     payment_status,
     invoice_status,
+    deal_status,
     risk_type,
     delay_contamined_range,
     provision_balance_p1_delay_d,

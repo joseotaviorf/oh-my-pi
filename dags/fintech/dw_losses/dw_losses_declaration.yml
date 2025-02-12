@@ -11,6 +11,8 @@ workflow:
     fact_losses:
       - fact_provision
       - fact_closing
+    fact_write_off_eligible:
+      - fact_losses
 cluster:
   type: databricks_13_3_med_general_photon_cluster
   access_control_list:
