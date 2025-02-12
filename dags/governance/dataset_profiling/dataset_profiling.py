@@ -12,6 +12,7 @@ from pendulum import datetime, timezone
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 # ENV setup
 ENV = os.environ.get("ENVIRONMENT")
@@ -48,13 +49,14 @@ if not schemas_list:
         f"into 'schemas_list' parameter of '{ENV}_conf' file."
     )
 
-
+opsgenie_callback = OpsgenieCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAGOwnerEnum.DATA_GOVERNANCE,
         "wait_for_downstream": False,
         "depends_on_past": False,
+        "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval="0 10 * * 0",

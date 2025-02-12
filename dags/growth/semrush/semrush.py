@@ -19,6 +19,7 @@ from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissi
 from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
     DAGRunDateValidators,
 )
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 ## fuction to fetch toggles
 def get_toggle_param(dag_run, toggle_param_name):
@@ -64,7 +65,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ]
 ENV = os.environ.get("ENVIRONMENT")
 
-
+opsgenie_callback = OpsgenieCallback()
 ## DAG
 dag = DAG(
     dag_id=DAG_ID,
@@ -72,6 +73,7 @@ dag = DAG(
         "owner": DAGOwnerEnum.DATA_GROWTH,
         "wait_for_downstream": False,
         "depends_on_past": False,
+        "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,

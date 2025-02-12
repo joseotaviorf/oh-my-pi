@@ -13,6 +13,7 @@ from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 # dag vars
 SOURCE = "batch_inference"
@@ -54,13 +55,14 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     }
 ]
-
+opsgenie_callback = OpsgenieCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAGOwnerEnum.MLOPS,
         "wait_for_downstream": False,
         "depends_on_past": False,
+        "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,

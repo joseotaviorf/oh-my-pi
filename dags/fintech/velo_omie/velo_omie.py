@@ -13,6 +13,7 @@ from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 SOURCE = "velo_omie"
 DAG_NAME = SOURCE
@@ -44,13 +45,14 @@ CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespac
 default_libs = config_service.get_config("default_libraries")
 custom_libs = config_service.get_config("cluster_libs")
 custom_libs[0]["whl"] = custom_libs[0]["whl"].format(artifacts_bucket=artifacts_bucket)
-
+opsgenie_callback = OpsgenieCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAGOwnerEnum.DATA_FINTECH,
         "wait_for_downstream": False,
         "depends_on_past": False,
+        "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,

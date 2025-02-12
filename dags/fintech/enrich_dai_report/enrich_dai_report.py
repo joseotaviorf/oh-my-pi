@@ -20,6 +20,8 @@ from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTas
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -29,6 +31,7 @@ DAG_NAME = f"enrich_{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 ENV = os.environ.get("ENVIRONMENT")
 
+opsgenie_callback = OpsgenieCallback()
 
 config_service = ConfigurationService(DAG_NAME)
 datalake_bucket = config_service.get_config("datalake_bucket")
@@ -61,6 +64,8 @@ dag = DAG(
         "owner": DAGOwnerEnum.DATA_FINTECH,
         "wait_for_downstream": False,
         "depends_on_past": False,
+        "on_failure_callback": opsgenie_callback.task_failure_alert,
+
     },
     start_date=MAIN_START_DATE,
     schedule_interval=None,

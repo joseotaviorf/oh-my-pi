@@ -7,6 +7,8 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.services import FileService
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+
 from dags import DAG_PACKAGES_ROOT
 
 logger = QuintoAndarLogger("dag_dependency_visualization")
@@ -46,12 +48,13 @@ def build_operator(dep_name, dag):
             task = SubDag_(dag=dag, task_id=dep_name.replace("-", "_"))
     return task
 
-
+opsgenie_callback = OpsgenieCallback()
 dag = DAG(
     dag_id=DAG_ID,
-    default_args={"owner": DAGOwnerEnum.DATA_INGESTION},
+    default_args={"owner": DAGOwnerEnum.DATA_INGESTION, "on_failure_callback": opsgenie_callback.task_failure_alert,},
     start_date=START_DATE,
     schedule_interval=None,
+    
 )
 
 dependencies_file_path = join(DAG_PACKAGES_ROOT, "dependencies.yaml")

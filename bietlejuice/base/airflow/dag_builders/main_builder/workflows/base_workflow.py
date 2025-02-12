@@ -17,6 +17,7 @@ from bietlejuice.base.airflow.task_creators.dag_execution_context import (
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 
 class BaseWorkflow(BuilderInterface):
@@ -53,6 +54,7 @@ class BaseWorkflow(BuilderInterface):
         doc_md = self._get_dag_documentation()
         user_defined_macros = {"get_date_param": self.get_date_param}
         user_defined_macros.update(kwargs.get("user_defined_macros", {}))
+        opsgenie_callback = OpsgenieCallback()
 
         dag = DAG(
             dag_id=self.dag_id,
@@ -61,6 +63,7 @@ class BaseWorkflow(BuilderInterface):
                 "owner": self.dag_args["owner"],
                 "wait_for_downstream": False,
                 "depends_on_past": False,
+                "on_failure_callback": opsgenie_callback.task_failure_alert,
             },
             start_date=schedule_start_date,
             schedule_interval=self.dag_args.get("schedule_interval", None),

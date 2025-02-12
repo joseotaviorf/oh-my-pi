@@ -15,6 +15,7 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
 
@@ -61,13 +62,14 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 LIBRARIES = [{"whl": f"{artifacts_bucket}/vespucio/{VESPUCIO_WHEEL_FILE}"}]
 DAG_DOCUMENTATION = config_service.get_config("dag_documentation")
 DAG_OWNER = DAGOwnerEnum.DATA_GROWTH
-
+opsgenie_callback = OpsgenieCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
         "owner": DAG_OWNER,
         "wait_for_downstream": False,
         "depends_on_past": False,
+        "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,

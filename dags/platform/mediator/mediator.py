@@ -14,6 +14,7 @@ from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
 from bietlejuice.base.dependencies.bietlejuice_redundant_dependency_finder import (
     BietlejuiceRedundantDependencyFinder,
 )
+from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 
 def validate_dependencies(dependencies_list):
@@ -54,7 +55,7 @@ def extract_skip_list(dependencies_dict):
 
     return list(force_skip_list)
 
-
+opsgenie_callback = OpsgenieCallback()
 # Define tasks
 DAG_NAME = "mediator"
 DAG_ID = f"airflow.{DAG_NAME}"
@@ -64,6 +65,7 @@ mediator_dag = DAG(
         "owner": DAGOwnerEnum.DATA_INGESTION,
         "wait_for_downstream": False,
         "depends_on_past": False,
+        "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=datetime(2020, 5, 8, 0, 0, 0),
     schedule_interval="*/12 * * * *",
