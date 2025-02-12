@@ -1,0 +1,34 @@
+database_name: datalake_authx_scim_clean
+table_name: users
+description: This table contains the users from the authx-scim database
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_authx_scim_raw.users.id
+    description: Unique user identifier
+  source:
+    lineage:
+      - datalake_authx_scim_raw.users.source
+    description: The source of where the user comes from
+  email:
+    lineage:
+      - datalake_authx_scim_raw.users.user_name
+    description: The user email
+  active:
+    lineage:
+      - datalake_authx_scim_raw.users.active
+    description: Whether the user is active or not
+  ts_created:
+    lineage:
+      - datalake_authx_scim_raw.users.created_at
+    description: The timestamp of when the user was created
+  ts_updated:
+    lineage:
+      - datalake_authx_scim_raw.users.updated_at
+    description: The timestamp of when the user was updated
+  ts_deleted:
+    lineage:
+      - datalake_authx_scim_raw.users.deleted_at
+    description: The timestamp of when the user was deleted

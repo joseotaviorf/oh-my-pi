@@ -1,0 +1,34 @@
+database_name: datalake_authx_scim_clean
+table_name: openapis
+description: This table contains the openapis from the authx-scim database
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_authx_scim_raw.openapis.id
+    description: Unique openapi identifier
+  commit_sha:
+    lineage:
+      - datalake_authx_scim_raw.openapis.commit_sha
+    description: The hash commit of where the openapi was generated
+  raw_json:
+    lineage:
+      - datalake_authx_scim_raw.openapis.raw_json
+    description: The json of the openapi
+  application:
+    lineage:
+      - datalake_authx_scim_raw.openapis.application
+    description: The application that the openapi belongs to
+  ts_created:
+    lineage:
+      - datalake_authx_scim_raw.openapis.created_at
+    description: The timestamp of when the openapi was created
+  ts_updated:
+    lineage:
+      - datalake_authx_scim_raw.openapis.updated_at
+    description: The timestamp of when the openapi was updated
+  ts_deleted:
+    lineage:
+      - datalake_authx_scim_raw.openapis.deleted_at
+    description: The timestamp of when the openapi was deleted

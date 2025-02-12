@@ -1,0 +1,30 @@
+database_name: datalake_authx_scim_clean
+table_name: user_entitlements
+description: This table contains the relationship between users and entitlements from the authx-scim database
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  entitlement_source:
+    lineage:
+      - datalake_authx_scim_raw.user_entitlements.entitlement_identity_source
+    description: The source of where the entitlement comes from
+  entitlement_id:
+    lineage:
+      - datalake_authx_scim_raw.user_entitlements.entitlement_identity_id
+    description: The id of the entitlement
+  user_source:
+    lineage:
+      - datalake_authx_scim_raw.user_entitlements.user_identity_source
+    description: The source of where the user comes from
+  user_id:
+    lineage:
+      - datalake_authx_scim_raw.user_entitlements.user_identity_id
+    description: The id of the user
+  ts_updated:
+    lineage:
+      - datalake_authx_scim_raw.user_entitlements.updated_at
+    description: The timestamp of when the relationship was updated
+  ts_deleted:
+    lineage:
+      - datalake_authx_scim_raw.user_entitlements.deleted_at
+    description: The timestamp of when the relationship was deleted

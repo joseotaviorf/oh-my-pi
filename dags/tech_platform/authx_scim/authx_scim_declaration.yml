@@ -1,0 +1,32 @@
+dag:
+  name: authx_scim
+  schedule_start_date: 2025, 02, 03
+  schedule_interval: 0 1 * * *
+  owner: Tech Platform Cyber Security
+  documentation:
+    dag_purpose: |
+      This DAG extracts authx-scim data and injects into the datalake
+workflow:
+  type: cdc
+  layer: raw
+  dbutils_secret_key: AUTHX-SCIM_DB
+  database_type: postgres
+  source_schema: public
+  source_database: authx-scim
+  custom_schema: authx_scim
+  tables_customization:
+    users:
+      {}
+    entitlements:
+      {}
+    user_entitlements:
+      {}
+    users_audit:
+      {}
+    openapis:
+      {}
+cluster:
+  type: databricks_12_2_med_general_cluster
+  access_control_list:
+    group_name: software-engineers
+    permission_level: CAN_MANAGE

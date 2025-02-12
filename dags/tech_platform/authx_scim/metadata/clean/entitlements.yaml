@@ -1,0 +1,38 @@
+database_name: datalake_authx_scim_clean
+table_name: entitlements
+description: This table contains the entitlements from the authx-scim database
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_authx_scim_raw.entitlements.id
+    description: Unique entitlement identifier
+  app_id:
+    lineage:
+      - datalake_authx_scim_raw.entitlements.app_id
+    description: Application identifier that the entitlement belongs to
+  source:
+    lineage:
+      - datalake_authx_scim_raw.entitlements.source
+    description: The source of where the entitlement comes from
+  display_name:
+    lineage:
+      - datalake_authx_scim_raw.entitlements.display_name
+    description: The entitlement friendly display name, used in the IdentityNow UI
+  description:
+    lineage:
+      - datalake_authx_scim_raw.entitlements.description
+    description: The entitlement description
+  ts_created:
+    lineage:
+      - datalake_authx_scim_raw.entitlements.created_at
+    description: The timestamp of when the entitlement was created
+  ts_updated:
+    lineage:
+      - datalake_authx_scim_raw.entitlements.updated_at
+    description: The timestamp of when the entitlement was updated
+  ts_deleted:
+    lineage:
+      - datalake_authx_scim_raw.entitlements.deleted_at
+    description: The timestamp of when the entitlement was deleted
