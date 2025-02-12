@@ -211,9 +211,10 @@ class MySqlConsumer(DBConsumer):
             FROM
                 INFORMATION_SCHEMA.COLUMNS
             WHERE
-                TABLE_NAME = '{table}'
+                TABLE_SCHEMA = '{db}'
+                AND TABLE_NAME = '{table}'
             """.format(
-            table=table_name
+            db=self.conn_config["db"], table=table_name
         )
 
         df = self.get_data_from_query(query)
@@ -382,7 +383,8 @@ class MySqlConsumer(DBConsumer):
                 FROM
                     information_schema.key_column_usage
                 WHERE
-                    table_name = '{table_name}'
+                    table_schema = '{self.conn_config["db"]}'
+                    AND table_name = '{table_name}'
                     AND constraint_name = 'PRIMARY'
                 """
         df = self.get_data_from_query(query).collect()
