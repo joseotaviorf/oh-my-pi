@@ -70,7 +70,6 @@ workflow:
     document_generation_aud: {}
     rollout_cyber_contract: {}
     comms: {}
-    comms_aud: {}
 cluster:
   type: custom_cluster
   custom_configurations:

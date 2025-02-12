@@ -1,8 +1,8 @@
 SELECT
     id,
     client_id AS id_client,
-    debtor_external_id AS id_debtor_external,
-    bill_external_id AS id_bill_external,
+    CAST(debtor_external_id AS BIGINT) AS id_debtor_external,
+    CAST(bill_external_id AS BIGINT) AS id_bill_external,
     debtor_id AS id_debtor,
     experiment,
     experiment_group,
