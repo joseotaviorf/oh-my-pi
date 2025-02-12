@@ -14,7 +14,8 @@ SELECT
   range_end,
   rejection_reason,
   CAST(ts_created AS DATE) AS dt_early_credit_created,
-  CAST(ts_expired AS DATE) AS dt_early_credit_expired
+  CAST(ts_expired AS DATE) AS dt_early_credit_expired,
+  NOW() AS ts_load
 FROM
   datalake_sorting_hat.early_credit_analysis ec
 WHERE

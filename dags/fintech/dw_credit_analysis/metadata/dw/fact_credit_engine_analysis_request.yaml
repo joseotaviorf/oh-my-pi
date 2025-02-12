@@ -7,11 +7,11 @@ columns:
   sk_checklist_item:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.id_checklist_item
-    description: "Key of the checklist item."
+    description: "Key of the checklist item. The checklist item ID is unique and corresponds to each item within a checklist evaluated by the credit engine from Sorting Hat."
   sk_checklist:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.id_checklist
-    description: "Key of the checklist."
+    description: "Key of the checklist attributed to an analysis request in Sorting Hat."
   sk_checklist_group:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.id_checklist_group
@@ -19,30 +19,30 @@ columns:
   sk_input_source:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.id_input_source
-    description: "Key of the input source. This ID is the analyst ID for manual analysis (manual input type) or the machine ID for automatic analysis (automatic input type)."
+    description: "ID of the input source. This ID is the analyst ID for manual analysis (manual input type) or the machine ID for automatic analysis (automatic input type)."
   sk_analysis_request:
     lineage:
       - datalake_credit_analysis.credit_engine_analysis_request.id_analysis_request
-    description: "Key of the analysis request."
+    description: "Key of the analysis request that will be processed by the credit engine from Sorting Hat."
   sk_proposal:
     lineage:
       - datalake_credit_analysis.credit_engine_analysis_request.id_proposal
-    description: "Key of the proposal related to the analysis request. This column can be used with other dimensions, such as dim_proposal, to retrive detailed information of a proposal"
+    description: "Key of proposal. This column can be used to join with the table dw_rent.dim_proposal to get the proposal details, or any other table that contains the proposal ID from EBDB (main)."
   input_type:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.input_type
-    description: "Type of the input"
+    description: "Type of the input. It can be MANUAL if the checklist item was manually processed by the credit desk or AUTOMATIC if it was processed automatically by the engine."
     categories:
-      MANUAL: Manual inputs that require interventions from the credit desk.
+      MANUAL: Manual inputs that require interventions from the credit desk (i.e bypass cases).
       AUTOMATIC: Automatic inputs processed by the credit engine.
   checklist_item_type:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.checklist_item_type
-    description: "Type of the checklist item"
+    description: "TType of the checklist item. I. e. a checklist item that verifies if a selfie is valid, the type could be SELFIE_VALID."
   checklist_group_subject_type:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.checklist_group_subject_type
-    description: "Type of the checklist group."
+    description: "Type of the checklist group. It is a enum that represents the type of the subject the group is related to (i.e. PROPOSAL or TENANT.)"
     categories:
       PROPOSAL: When the checklist items to be verified belongs to a proposal analysis request
       PROPOSAL_DECISION: When the checklist items to be verified refers to a proposal decision
@@ -50,7 +50,7 @@ columns:
   input_value:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.input_value
-    description: "Value of the input"
+    description: "Value of the input. It is the value chosen by the user/engine given a list of possible choices to be checked. Ex: blocklist check could have IN_BLOCKLIST and NOT_IN_BLOCKLIST inputs."
   input_description:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.input_description
@@ -65,7 +65,7 @@ columns:
   business_context:
     lineage:
       - datalake_credit_analysis.credit_engine_analysis_request.business_context
-    description: "Description of the input"
+    description: "Business context of the analysis request (i.e TENANT_RENTAL)"
   is_checklist_group_compliant:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.is_checklist_group_compliant

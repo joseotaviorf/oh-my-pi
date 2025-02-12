@@ -7,28 +7,30 @@ columns:
   sk_task:
     lineage:
     - dw_crm.fact_credit_tasks.sk_task
-    description: Task key
+    description: Key of the task. It is the unique ID attributed to any task created in the CRM.
   sk_proposal:
     lineage:
     - dw_crm.fact_credit_tasks.sk_proposal
-    description: Proposal key
+    description: Key of proposal. This column can be used to join with the table dw_rent.dim_proposal to get the proposal details, or any other table that contains the proposal ID from EBDB (main).
   sk_assignee:
     lineage:
     - dw_crm.fact_credit_tasks.sk_assignee
-    description: Assignee key
+    description: CRM User's ID of task assignee for the specific task
   action_user_name:
     lineage:
     - dw_crm.fact_credit_tasks.action_user_name
-    description: Contains the analyst name of a given task
+    description: Contains the analyst name assigned to a task
   documentation_policy:
     lineage:
     - datalake_sorting_hat_clean.credit_analysis.type
-    description: Indicates what documentation policy was applied to a given entry
+    description: Indicates what documentation policy was applied to the credit analysis that originated the task.
   task_total_min:
     description: Indicates the total minutes elapsed since task creation
   task_working_min:
     description: Indicates the working minutes elapsed since task creation
   ts_task_finished:
-    description: Timestamp of task ending
+    description: Timestamp indicating when the task was finished
   ts_task_started:
-    description: Timestamp of task start
+    description: Timestamp indicating when the task started
+  ts_load:
+    description: Timestamp of data recorded in the table.

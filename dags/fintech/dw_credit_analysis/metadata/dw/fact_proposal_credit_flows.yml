@@ -10,7 +10,7 @@ columns:
   sk_client:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_client
-    description: "Key of client that sent an offer or booked a visit."
+    description: "Key of client that sent an offer or booked a visit. This ID corresponds to the user ID from EBDB (main)."
   sk_house_listing:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_house_listing
@@ -18,50 +18,48 @@ columns:
   sk_house:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_house_listing
-    description: "Id of the house."
+    description: "Id of the house. This ID corresponds to the house ID from EBDB (main)."
   sk_contract:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract
-    description: "Key of contract. This column can be used to join with the table dw_rent.dim_contract to get the contract details. When the sk_contract value is -1, it means that the contract has not been created yet."
+    description: "Key of contract. This column can be used to join with the table dw_rent.dim_contract to get the contract details, or any other table that contains the contract ID from EBDB (main). When the sk_contract value is -1, it means that the contract has not been created yet."
   sk_contract_created_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
-    description: "Key of date when contract was created."
+    description: "Key of date when contract was created. When the value is -1, it means that the contract has not been created yet."
   sk_contract_signed_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
-    description: "Key of date when contract was signed."
+    description: "Key of date when contract was signed. When the value is -1, it means that the contract has not been created yet."
   sk_credit_analysis:
     lineage:
       - datalake_credit_analysis.credit_analysis.id_credit_analysis
-    description: "Key of the credit analysis."
+    description: "Key of the credit analysis.  When the value is -1, it means that the credit analysis has not been created yet in Sorting Hat. This ID can be used in any join with the credit analysis ID from Sorting Hat."
   sk_early_credit_analysis:
     lineage:
       - dw_credit.fact_early_credit.early_credit_analysis
-    description: "Key of the last early credit analysis created 1 month before the offer submitted date."
+    description: "Key of the last early credit analysis created 1 month before the offer submitted date. When the value is -1, it means that there is no early credit analysis submitted by the user. This ID can be used in any join with the early credit analysis ID from Sorting Hat."
   sk_analysis_request:
     lineage:
       - datalake_credit_analysis.credit_engine_analysis_request.id_analysis_request
-    description: "Key of the analysis request processed by the credit engine. This column may be -1 when the credit analysis was processed by the old credit engine."
+    description: "Key of the analysis request processed by the credit engine from Sorting Hat. This column may be -1 when the credit analysis was processed by the old credit engine."
   sk_checklist:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.id_checklist
-    description: "Key of the current checklist. The checklist is an entity with all checks (manual or automatic) associated to an analysis request. This column may be -1 when the credit analysis was processed by the old credit engine."
+    description: "Key of the current checklist. The checklist is an entity with all checks (manual or automatic) associated to an analysis request from Sorting Hat. This column may be -1 when the credit analysis was processed by the old credit engine."
   sk_credit_analysis_approved_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_credit_analysis_approved_date
-    description: "Key of date when credit analysis was approved."
+    description: "Key of date when credit analysis was approved. When the value is -1, it means that the credit analysis has not been approved yet."
   sk_credit_evaluation_approved_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_last_credit_evaluation_negative
     description:
-      "Key of the date when credit evaluation was approved. This field should
-      be used on Evaluation Positive (EP) on credit funnel as it contains the logic
-      for paid guarantees as well as for free guarantee."
+      "Key of the date when credit evaluation was approved. This field should be used on Evaluation Positive (EP) on credit funnel as it contains the logic for paid guarantees as well as for free guarantee."
   sk_first_credit_analysis:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.id_first_credit_analysis
-    description: "Key for the first credit analysis to a given proposal."
+    description: "Key for the first credit analysis ID to a given proposal. This ID can be used in any join with the credit analysis ID from Sorting Hat."
   sk_first_variant:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.id_first_variant
@@ -73,35 +71,35 @@ columns:
   sk_guarantee_category:
     lineage:
       - datalake_credit_analysis.credit_analysis.category
-    description: "Key for the guarantee category presented."
+    description: "Key for the guarantee category. Indicates the ID of the guarantee category in Rental Guarantee. Should be used as key to category on dim_guarantee_policy."
   sk_guarantee_paid_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_guarantee_paid_date
-    description: "Key of date of guarantee paid."
+    description: "Key of date of a paid guarantee. When the value is -1, it means that the guarantee has not been paid yet or the TP is eligible to a FREE guarantee."
   sk_guarantee_accepted_date:
     lineage:
       - datalake_credit_analysis.credit_analysis.ts_guarantee_accepted
-    description: "Guarantee acceptance key date."
+    description: "Guarantee acceptance key date. When the value is -1, it means that the guarantee has not been accepted yet or the TP is eligible to a FREE guarantee."
   sk_last_credit_analysis:
     lineage:
       - datalake_credit_analysis.credit_analysis_proposals.id_last_credit_analysis
-    description: "Key for the last credit analysis to a given proposal."
+    description: "Key for the last credit analysis ID to a given proposal. This ID can be used in any join with the credit analysis ID from Sorting Hat."
   sk_last_credit_evaluation_init:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_contract_signed_date
-    description: "Key of date when credit evaluation last was initiated."
+    description: "Key of date of the last credit evaluation."
   sk_last_credit_evaluation_negative:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_last_credit_evaluation_negative
-    description: "Key of date when credit evaluation last was negative."
+    description: "Key of date of the last negative credit evaluation."
   sk_last_credit_evaluation_positive:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_last_credit_evaluation_positive
-    description: "Key of date when credit evaluation last was positive."
+    description: "Key of date of the last positive credit evaluation."
   sk_offer:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_offer
-    description: "Key of offer."
+    description: "Key of offer. This column can be used to join with the table dw_rent.dim_offer to get the offer details, or any other table that contains the offer ID from EBDB (main). When the sk_offer value is -1, it means that the offer has not been created."
   sk_offer_approved_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_offer_approved_date
@@ -113,23 +111,23 @@ columns:
   sk_proposal:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_proposal
-    description: "Key of proposal (offer that was accepted)."
+    description: "Key of proposal. This column can be used to join with the table dw_rent.dim_proposal to get the proposal details, or any other table that contains the proposal ID from EBDB (main). When the sk_proposal value is -1, it means that the offer has not been accepted yet."
   sk_region:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_region
-    description: "Key of house region."
+    description: "Key of house region. This column can be used to join with the table dw_public.dim_region to get the region details, or any other table that contains the region ID from EBDB (main)."
   sk_tenant_doc_complete_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_tenant_doc_complete_date
-    description: "Key of date when tenant doc was completed."
+    description: "Key of date when tenant documentation was completed."
   sk_tenant_first_doc_sent_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
-    description: "Key of date when client sent first documentation."
+    description: "Key of date when client sent the documentation for the first time."
   sk_drop_reason:
     lineage:
       - dw_public.dim_drop_reason.id
-    description: "dw_public.dim_drop_reason Primary Key"
+    description: " Key of the drop reason. This column can be used to join with the table dw_public.dim_drop_reason to get more details about the drop reason."
   sk_early_credit_created:
     lineage:
       - dw_credit.fact_early_credit.dt_early_credit_created
@@ -187,21 +185,21 @@ columns:
       CLEAR_NO: "When no guarantee was accepted, as it was denied by some reason (such as income reasons)"
       NOT_ACCEPTED: "When 5A has offered a paid guarantee to the TP, but the person has not accepted it"
   ec_flag:
-    description: "Quantity of events or users in the early credit stage."
+    description: "When equals to 1 (TRUE), indicates if the user is in the early credit stage."
   os_flag:
-    description: "Quantity of events or users in the offer sent stage."
+    description: "When equals to 1 (TRUE), indicates if the user is in the offer sent stage."
   oa_flag:
-    description: "Quantity of events or users in the offer approved stage."
+    description: "When equals to 1 (TRUE), indicates if the user is in the offer approved stage."
   es_flag:
-    description: "Quantity of events or users in the evaluation star stage."
+    description: "When equals to 1 (TRUE), indicates if the user is in the evaluation star stage."
   ep_flag:
-    description: "Quantity of events or users in the evaluation positive stage."
+    description: "When equals to 1 (TRUE), indicates if the user is in the evaluation positive stage."
   ds_flag:
-    description: "Quantity of events or users in the document sent stage."
+    description: "When equals to 1 (TRUE), indicates if the user is in the document sent stage."
   ca_flag:
-    description: "Quantity of events or users in the credit approved stage."
+    description: "When equals to 1 (TRUE), indicates if the user is in the credit approved stage."
   cs_flag:
-    description: "Quantity of events or users in the contract signed stage."
+    description: "When equals to 1 (TRUE), indicates if the user is in the contract signed stage."
   is_guarantee_accepted:
     lineage:
       - datalake_rental_guarantee.guarantee
@@ -209,13 +207,13 @@ columns:
   is_first_credit_evaluation:
     description: "Indicates if the row presents the first credit evaluation."
   is_last_credit_evaluation:
-    description: "Indicates if the row presents the last credit evaluation."
+    description: "Indicates if the row presents the last credit evaluation. It can be used to deduplicate and ensure that there is only one credit evaluation per proposal, and the credit evaluation is the latest one."
   is_bypass:
     description: "True if the analysis was bypassed."
   is_early_credit:
     description: "Indicates if the offer had an early credit analysis 1 month before the offer submitted date."
   is_user_version:
-    description: "True to the user version of the funnel, this flag contain the filters: rental_administrator = QUINTOANDAR, country code = BR and is_last_credit_evaluation = TRUE"
+    description: "True to the user version of the funnel, this flag contains the filters: rental_administrator = QUINTOANDAR, country code = BR and is_last_credit_evaluation = TRUE. It can be used to deduplicate the database in the user perspective, since only one row is returned to indicate the last funnel step that the user reached."
   dt_early_credit_created:
     lineage:
       - dw_credit.fact_early_credit.dt_early_credit_created
@@ -250,7 +248,7 @@ columns:
   is_resend_request:
     lineage:
       - datalake_ebdb_clean.proposal_aud.is_proposal
-    description: "True if the sk_proposal has any resend request."
+    description: "True if the proposal has any resent request at the documentation sent (DS) step."
   is_single_tenant:
     lineage:
       - datalake_sorting_hat_clean.proponent
@@ -266,7 +264,7 @@ columns:
   dt_tenant_first_doc_sent_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_tenant_first_doc_sent_date
-    description: "Key of date when client sent first documentation."
+    description: "Date when client sent the documentation for the first time."
   dt_offer_submitted_date:
     lineage:
       - dw_rent.fact_listing_rent_flows.sk_offer_submitted_date

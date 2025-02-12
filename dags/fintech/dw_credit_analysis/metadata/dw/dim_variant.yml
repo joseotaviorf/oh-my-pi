@@ -12,7 +12,7 @@ columns:
   id_experiment:
     lineage:
       - datalake_sorting_hat_clean.variant.id_experiment
-    description: "Credit experiment ID. There always a experiment on with as many variants as desired."
+    description: "Credit experiment ID."
   variant_name:
     lineage:
       - datalake_sorting_hat_clean.variant.name
@@ -26,4 +26,4 @@ columns:
       - datalake_sorting_hat_clean.variant.percentage
     description: "Indicates the percentage participation of a variant during tests."
   ts_load:
-    description: "Date/time in which the row was loaded"
+    description: "Timestamp of data recorded in the table"

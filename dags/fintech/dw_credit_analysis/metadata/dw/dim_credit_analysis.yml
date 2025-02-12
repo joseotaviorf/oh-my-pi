@@ -9,29 +9,28 @@ columns:
   id_credit_analysis:
     lineage:
       - datalake_credit_analysis.credit_analysis.id_credit_analysis
-    description: "Credit Analysis ID."
+    description: "Credit Analysis ID. This ID can be used in any join with the credit analysis ID from Sorting Hat."
   id_proposal:
     lineage:
       - datalake_credit_analysis.credit_analysis.id_proposal
-    description: "Proposal ID."
+    description: "Proposal ID. This column can be used to join with the table dw_rent.dim_proposal to get the proposal details, or any other table that contains the proposal ID from EBDB (main)."
   id_analysis_request:
     lineage:
       - datalake_credit_analysis.credit_engine_analysis_request.id_analysis_request
-    description: "ID of the analysis request processed by the credit engine. This column may be null when the credit analysis was processed by the old credit engine."
+    description: "ID of the analysis request processed by the credit engine from Sorting Hat. This column may be null when the credit analysis was processed by the old credit engine."
   id_checklist:
     lineage:
       - datalake_credit_analysis.credit_engine_checklist.id_checklist
-    description: "ID of the current checklist. The checklist is an entity with all checks (manual or automatic) associated to an analysis request. This column may be null when the credit analysis was processed by the old credit engine."
+    description: "ID of the current checklist. The checklist is an entity with all checks (manual or automatic) associated to an analysis request from Sorting Hat. This column may be null when the credit analysis was processed by the old credit engine."
   id_analyst:
     lineage:
       - datalake_credit_analysis.credit_analysis.id_analyst
-    description: "Analyst ID."
+    description: "Analyst ID. This column may be null with the credit analysis was processed automatically."
   bypass:
     lineage:
       - datalake_credit_analysis.credit_analysis.bypass
     description:
-      "Indicate the reason that led a credit analysis to receive the bypass
-      treatment (if conditions apply)."
+      "Indicate the reason that led a credit analysis to receive the bypass treatment (if conditions apply). When an analysis is bypassed it may skip a few steps of the funnel and it will be analysed by the credit desk."
     categories:
       FOREIGNER: "Indicates when a proposal contains a proponent from another country."
       HIGH_INCOME:
@@ -106,15 +105,6 @@ columns:
     categories:
       LEVEL_1: "It's the default level and any analyst can evaluate"
       LEVEL_2: "Indicates a more problematic situation that should be evaluated by an experienced analyst."
-  liquidity:
-    lineage:
-      - datalake_credit_analysis.credit_analysis.liquidity
-    description: "Enginnering is not sure, it is not used currently (2023)."
-    categories:
-      A: "l"
-      B: "l"
-      C: "l"
-      D: "l"
   paid_guarantee_type:
     lineage:
       - datalake_credit_analysis.credit_analysis.paid_guarantee_type
@@ -136,20 +126,7 @@ columns:
   reason:
     lineage:
       - datalake_credit_analysis.credit_analysis.reason
-    description: "Indicates the reason that led to a credit analysis disapproval."
-  risk_category:
-    lineage:
-      - datalake_credit_analysis.credit_analysis.risk_category
-    description:
-      "Indicates the risk category defined to a given credit analysis. The
-      definition of each letter is done by the Credit Ops team. It was deprecated in favor to risk_category_canon."
-    categories:
-      A: "Best people evaluated"
-      B: "Riskier people, but enough to have access to free guarantee"
-      C: "Riskier than B, it's given the cheapest paid options dependending on the city."
-      D: "Riskier than C, it's given more expensive paid options. Also depends on the city."
-      E: "Riskier than D, its given the deposit option, factor dependending on the city."
-      F: "Riskier than E, clear-no."
+    description: "Indicates the reason that led to a credit analysis rejection."
   risk_category_canon:
     lineage:
       - datalake_credit_analysis.credit_analysis.risk_category_canon

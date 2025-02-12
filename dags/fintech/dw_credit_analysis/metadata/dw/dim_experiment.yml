@@ -21,27 +21,27 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.experiment.ts_started
       - datalake_sorting_hat_clean.experiment.ts_ended
-    description: "Checks if a particular experiment is on or off."
+    description: "Boolean indicating if the experiment is running (TRUE) or not (FALSE)."
   has_experiment_ran_last_month:
     lineage:
       - datalake_sorting_hat_clean.experiment.ts_started
       - datalake_sorting_hat_clean.experiment.ts_ended
-    description: "Checks if a particular experiment has runned at least a month ago."
+    description: "Boolean indicating if the experiment has runned at least one month ago."
   has_experiment_ran_last_3_months:
     lineage:
       - datalake_sorting_hat_clean.experiment.ts_started
       - datalake_sorting_hat_clean.experiment.ts_ended
-    description: "Checks if a particular experiment has runned at least 3 months ago."
+    description: "Boolean indicating if the experiment has runned at least 3 months ago."
   has_experiment_ran_last_6_months:
     lineage:
       - datalake_sorting_hat_clean.experiment.ts_started
       - datalake_sorting_hat_clean.experiment.ts_ended
-    description: "Checks if a particular experiment has runned at least 6 months ago."
+    description: "Boolean indicating if the experiment has runned at least 6 months ago."
   has_experiment_ran_last_year:
     lineage:
       - datalake_sorting_hat_clean.experiment.ts_started
       - datalake_sorting_hat_clean.experiment.ts_ended
-    description: "Checks if a particular experiment has runned at least a year ago."
+    description: "Boolean indicating if the experiment has runned last year."
   ts_experiment_started:
     lineage:
       - datalake_sorting_hat_clean.experiment.ts_started

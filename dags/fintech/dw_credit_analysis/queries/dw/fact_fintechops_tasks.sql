@@ -20,7 +20,7 @@ task_finish AS (
     dw_crm.fact_credit_tasks AS crm
   LEFT JOIN
     datalake_credit_analysis.credit_analysis AS ca
-      ON ca.id_proposal = crm.sk_proposal 
+      ON ca.id_proposal = crm.sk_proposal
   WHERE
     crm.action_type IN ('REALIZE')
     OR ca.reason IN ('AUTOMATIC_APPROVAL_WITH_MANUAL_INTERVENTION', 'AUTOMATIC_REJECTION_WITH_MANUAL_INTERVENTION', 'BYPASS_MANUAL_APPROVAL', 'BYPASS_MANUAL_REJECTION')
@@ -30,20 +30,20 @@ last_credit_analysis AS (
   SELECT
     id_proposal,
     MAX(ts_updated) AS ts_last_updated
-  FROM 
+  FROM
     datalake_sorting_hat_clean.credit_analysis
   WHERE
     type IS NOT NULL
-  GROUP BY id_proposal 
+  GROUP BY id_proposal
 ),
 
 credit_analysis AS (
   SELECT
     ca.*
   FROM
-    datalake_sorting_hat_clean.credit_analysis AS ca 
+    datalake_sorting_hat_clean.credit_analysis AS ca
   INNER JOIN
-    last_credit_analysis AS lca 
+    last_credit_analysis AS lca
       ON ca.id_proposal = lca.id_proposal
       AND ca.ts_updated = lca.ts_last_updated
 ),
@@ -81,8 +81,9 @@ SELECT DISTINCT
   CAST((UNIX_TIMESTAMP(ts_task_finished) - UNIX_TIMESTAMP(ts_task_started)) / 60.0 AS FLOAT) AS task_total_min,
   CAST(FINTECHOPS_WORK_MIN_SLA(ts_task_started, ts_task_finished) AS FLOAT) AS task_working_min,
   ts_task_started,
-  ts_task_finished
+  ts_task_finished,
+  NOW() AS ts_load
 FROM
-  tasks 
+  tasks
 WHERE
   ts_task_started >= '2022-01-01'

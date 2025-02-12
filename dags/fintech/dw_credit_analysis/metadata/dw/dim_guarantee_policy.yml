@@ -44,4 +44,4 @@ columns:
       - datalake_rental_guarantee_clean.risk_category.ts_updated
     description: "Date/time in which the category was updated."
   ts_load:
-    description: "Timestamp when row was loaded."
+    description: "Timestamp of data recorded in the table"

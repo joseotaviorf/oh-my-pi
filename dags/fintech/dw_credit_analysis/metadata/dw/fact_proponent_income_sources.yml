@@ -7,23 +7,23 @@ columns:
   sk_credit_evaluation_proponent:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.id
-    description: Unique identifier of the proponent credit evaluation.
+    description: Unique key identifier of the proponent credit evaluation. It is the ID generated in Docx to to any proponent that submitted a credit evaluation.
   sk_client:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_user
-    description: ID of the main user of the proposal.
+    description: Key of the main user of the proposal. This ID corresponds to the user ID from EBDB (main).
   sk_credit_evaluation:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.id_credit_evaluation
-    description: ID of the latest credit evaluation submitted within a proposal.
+    description: Key of the latest credit evaluation submitted within a proposal. This ID can be used in any join with the credit evaluation ID from DocX.
   sk_proposal:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_proposal
-    description: ID of the proposal.
+    description: Key of proposal. This column can be used to join with the table dw_rent.dim_proposal to get the proposal details, or any other table that contains the proposal ID from EBDB (main).
   proponent_cpf:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.cpf
-    description: Proponent CPF number.
+    description: Proponent CPF number. It can be the CPF number of the main user or other proponent in the proposal.
   proponent_monthly_income:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.monthly_income
@@ -51,7 +51,7 @@ columns:
   is_main_user:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.proponent_type
-    description: Boolean indicating if the proponent is the proposal main user (proponent_type = USER)
+    description: Boolean indicating if the proponent is the proposal main user (proponent_type = USER). If false the proponent type is classified as PERSON.
   is_resident:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.resident

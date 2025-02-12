@@ -7,11 +7,11 @@ columns:
   sk_proposal:
     lineage:
       - datalake_docx_clean.credit_evaluation.id_proposal
-    description: ID of the proposal.
+    description: Key of proposal. This column can be used to join with the table dw_rent.dim_proposal to get the proposal details, or any other table that contains the proposal ID from EBDB (main).
   proponent_cpf:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.cpf
-    description: Proponent CPF number.
+    description: Proponent CPF number. It can be the CPF number of the main user or other proponent in the proposal.
   occupation_area:
     lineage:
       - datalake_docx_clean.credit_evaluation_proponent.occupation_area

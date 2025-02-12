@@ -7,64 +7,66 @@ columns:
   sk_early_credit_analysis:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id
-    description: "ID of the credit analysis"
+    description: "Key of the early credit analysis created 1 month before the offer submitted date. This ID can be used in any join with the early credit analysis ID from Sorting Hat."
   sk_credit_evaluation:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_credit_evaluation
-    description: "ID of the credit evaluation"
+    description: "Key of the credit evaluation submitted within a proposal. This ID can be used in any join with the credit evaluation ID from DocX."
   sk_client:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_user
-    description: "ID of the client"
+    description: "Key of client that sent an offer to a property. This ID corresponds to the user ID from EBDB (main)."
   sk_house:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_house
-    description: "ID of the house"
+    description: "Id of the house. This ID corresponds to the house ID from EBDB (main)."
   id_variant:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.id_variant
-    description: "ID of the variant"
+    description: "Credit model+policy variant ID. This column can be used to join with the table dim_variant to get more details about the credit engine variant used in a model."
   city:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.city
-    description: "City of the tenant" 
+    description: "City in which the property that the client is interested in is located."
   version:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.version
-    description: "Version of the analysis"
+    description: "Version of the early credit analysis."
   risk_category_canon:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.risk_category_canon
-    description: "Risk score given by the model result plus the credit policy. Useful, but deprecated in favor to risk_category_canon"
+    description: "Risk score given by the credit model."
   bypass:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Bypass of the early credit"
+    description: "Bypass reason of the early credit analysis. When an analysis is bypassed it may skip a few steps of the funnel and it will be analysed by the credit desk."
   guarantee_offered:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Guarantee offered of the early credit"
+    description: "Guarantee offered for the early credit analysis. This is the guarantee that the TP would be offered if the user decides do submit an offer to the listing that he/she is interested in."
   category:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Analysis category"
+    description: "Credit analysis category. This column is an integer with an ID that represents a guarantee. It may be null if the credit analysis is rejected (clear no). The number 0 is attributed to free guarantees. -1 means that the credit engine could not make a decision. Else it was offered a paid guarantee to the TP. The category can be used in a join with dim_guarantee_policy to get the guarantee category description."
   range_start:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Value range start"
+    description: "The credit model defines the result based on a value range. This column indicates the value in which the range starts."
   range_end:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Value range end"
+    description: "The credit model defines the result based on a value range. This column indicates the value in which the range ends."
   rejection_reason:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.result
-    description: "Reason of the analysis rejection."
+    description: "Reason of the credit analysis rejection."
   dt_early_credit_created:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_created
-    description: "Creation timestamp"
+    description: "Creation date of the early credit analysis"
   dt_early_credit_expired:
     lineage:
       - datalake_sorting_hat_clean.early_credit_analysis.ts_expired
-    description: "Expiration timestamp"
+    description: "Expiration date of the early credit analysis. The early credit analysis expires 30 days after its creation."
+  ts_load:
+    description: "Timestamp of data recorded in the table."

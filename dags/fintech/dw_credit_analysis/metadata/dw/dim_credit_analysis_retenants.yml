@@ -7,7 +7,7 @@ columns:
   sk_credit_analysis:
     lineage:
       - datalake_sorting_hat_clean.credit_analysis.id_credit_analysis
-    description: "Credit Analysis ID. This column is the primary key of the table and can be joined with the credit analysis ID."
+    description: Credit Analysis ID. This ID can be used in any join with the credit analysis ID from Sorting Hat."
   last_active_contract:
     lineage:
       - datalake_ebdb_contract.contract.id
@@ -47,7 +47,7 @@ columns:
   retenant_policy:
     description: "Indicates which policy was applied to the proposal: the new retenant policy or the old one. All proposals created before 2023-12-06 are classified as 'old_retenant_policy'."
   retenant_classification:
-    description: "Retenants classification based on their score and previous experience with 5A (any pending bills, credit experience, etc). It is null for new users and historical data in which de retenant policy was not implemented yet (old retenant policy)."
+    description: "Retenants classification based on their score and previous experience with 5A (any pending bills, credit experience, etc). It is null for new users and historical data in which the retenant policy was not implemented yet (old retenant policy)."
     categories:
       GOOD_RETENANT: ""
       BAD_RETENANT: ""
