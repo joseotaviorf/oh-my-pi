@@ -161,7 +161,7 @@ repair_request_budget AS (
         OR REGEXP_LIKE(te.tags, 'testes_ro_especializacao_compulsoria_iq')
         OR REGEXP_LIKE(te.tags, 'testes_ro_especializacao_ps_iq')
         OR REGEXP_LIKE(te.tags, 'testes_ro_especializacao_ps_pp')
-    ) - INTERVAL 3 HOUR AS ts_manual_service_provider,
+    ) - INTERVAL 3 HOUR AS ts_manual_service_provider
   FROM
     dw_customer_support.fact_ticket_events AS te
   WHERE
@@ -315,7 +315,7 @@ SELECT
 )
 SELECT
   *
-FROM 
+FROM
   repairs
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY sk_ticket ORDER BY ts_updated DESC) = 1

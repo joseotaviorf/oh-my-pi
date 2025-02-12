@@ -2,13 +2,13 @@ WITH criticidade AS (
   SELECT
     rt.id_ticket,
     CASE
-      WHEN 
+      WHEN
         CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Nova criticidade"]') AS STRING) IS NOT NULL
         THEN CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Nova criticidade"]') AS STRING)
-      WHEN 
+      WHEN
         CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Criticidade"]') AS STRING) IS NOT NULL
       THEN CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Criticidade"]') AS STRING)
-      WHEN 
+      WHEN
         regexp_like(rt.tags,'triagem_automatica_comum')
         AND regexp_like(rt.tags, 'resolve_iq_pp_autosservico_prestadorpp')
       THEN 'comum_criticidade'
@@ -16,7 +16,7 @@ WITH criticidade AS (
         regexp_like(rt.tags, 'triagem_automatica_urgente')
         AND regexp_like(rt.tags, 'resolve_iq_pp_autosservico_prestadorpp')
       THEN 'urgente_criticidade'
-      WHEN 
+      WHEN
         regexp_like(rt.tags, 'triagem_automatica_emergencial')
         AND regexp_like(rt.tags, 'resolve_iq_pp_autosservico_prestadorpp')
       THEN 'emergencial_criticidade'
@@ -73,7 +73,7 @@ SELECT
       THEN 'Sem Defeito'
     ELSE 'Outros'
   END AS criticality,
-  IF(regexp_like(dt.tags,'tarefa_aberta_front') THEN 'FRONT' ELSE 'APP') AS ticket_opening,
+  IF(regexp_like(rt.tags,'tarefa_aberta_front'), 'FRONT', 'APP') AS ticket_opening,
   IF(DATEDIFF(DAY, rt.entrance_date, cast(rt.ts_created_local AS DATE)) <= 40, 'ONB', 'ONG') AS contract_journey,
   rt.service_provider,
   rt.front_or_back AS created_front_or_back,
