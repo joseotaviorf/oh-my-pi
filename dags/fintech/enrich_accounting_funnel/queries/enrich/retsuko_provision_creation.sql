@@ -25,10 +25,6 @@ retsuko_provisao AS (
                 'entry.bill-item/ipca-adm-fee',
                 'entry.bill-item/adjustment-agreement-adm-fee',
                 'entry.bill-item/lockin') THEN 'adm fee'
-            WHEN e.bill_item IN (
-                'entry.bill-item/adm-fee-adm-partner',
-                'entry.bill-item/igpm-adm-partner-adm-fee',
-                'entry.bill-item/ipca-adm-partner-adm-fee') THEN 'adm fee partner'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN 'brokerage quinto andar'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-partner-select') THEN 'brokerage select'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') AND LOWER(e.description) LIKE '%consultor imobiliário%' THEN 'brokerage ciq'
@@ -45,10 +41,6 @@ retsuko_provisao AS (
                 'entry.bill-item/ipca-adm-fee',
                 'entry.bill-item/adjustment-agreement-adm-fee',
                 'entry.bill-item/lockin') THEN '420021'
-            WHEN e.bill_item IN (
-                'entry.bill-item/adm-fee-adm-partner',
-                'entry.bill-item/igpm-adm-partner-adm-fee',
-                'entry.bill-item/ipca-adm-partner-adm-fee') THEN '420021'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN '420022'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-partner-select') THEN '700010'
             WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') AND LOWER(e.description) LIKE '%consultor imobiliário%' THEN '700007'
@@ -86,7 +78,6 @@ retsuko_provisao AS (
                 (
                     (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN (
                       'adm-fee',
-                      'adm-fee-adm-partner',
                       'igpm-adm-partner-adm-fee',
                       'ipca-adm-partner-adm-fee',
                       'brokerage-installment-fee',
@@ -228,7 +219,6 @@ metrics AS (
             WHEN revenue_name = 'brokerage ciq' THEN '5'
             WHEN revenue_name = 'brokerage partner' THEN '5'
             WHEN revenue_name = 'brokerage agent' THEN '5'
-            WHEN revenue_name = 'adm fee partner' THEN '6'
         END AS id_retsuko_provision_creation,
         id_contract AS id_business_entity,
         id_invoice AS id_finance_entity,

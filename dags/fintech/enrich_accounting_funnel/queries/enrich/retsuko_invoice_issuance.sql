@@ -48,26 +48,29 @@ invoice_nf_correct AS (
 ),
 
 retsuko_pre AS (
-    SELECT DISTINCT
-        ct.id_external AS id_business_entity,
-        ct.landlord_legal_person AS contract_type,
-        i.id_external AS id_finance_entity,
-        CAST(NULL AS INT) AS id_finance_entity_entry,
-        COALESCE(nf.id_invoice, i.id_external) AS id_entity,
-        nf.id_invoice AS id_original,
-        'seu barriga' AS source_name,
+  SELECT DISTINCT
+    ct.id_external AS id_business_entity,
+    ct.landlord_legal_person AS contract_type,
+    i.id_external AS id_finance_entity,
+    CAST(NULL AS INT) AS id_finance_entity_entry,
+    COALESCE(nf.id_invoice, i.id_external) AS id_entity,
+    nf.id_invoice AS id_original,
+    'seu barriga' AS source_name,
         CASE
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN '420002'
             WHEN e.bill_item = 'entry.bill-item/brokerage-quinto-andar' THEN '420001'
             WHEN e.bill_item = 'entry.bill-item/brokerage-installment-fee' THEN '420004'
+            WHEN e.bill_item = 'entry.bill-item/pro-guarantor-5A-installment' THEN '420010'
         END AS revenue_account,
         CASE
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN 'adm fee'
             WHEN e.bill_item = 'entry.bill-item/brokerage-quinto-andar' THEN 'brokerage quinto andar'
             WHEN e.bill_item = 'entry.bill-item/brokerage-installment-fee' THEN 'brokerage installment fee'
+            WHEN e.bill_item = 'entry.bill-item/pro-guarantor-5A-installment' THEN 'pro guarantor 5A installment'
         END AS revenue_name,
         i.accrual_year_month,
-        MIN(DATE(i.ts_due)) AS dt_source_trigger,
+        MIN(CASE WHEN e.bill_item = 'entry.bill-item/pro-guarantor-5A-installment' THEN DATE(i.ts_created)
+        ELSE DATE(i.ts_due) END) AS dt_source_trigger,
         CAST(SUM(amount) AS DECIMAL(12,2)) AS source_amount,
         e.accounting_version
     FROM
@@ -81,13 +84,14 @@ retsuko_pre AS (
     INNER JOIN
         datalake_retsuko.invoice_info ii
             ON ii.id_invoice = i.id_external
-    INNER JOIN
+      INNER JOIN
         datalake_retsuko_clean.contract ct
             ON ct.id = i.id_contract
-    WHERE
+      WHERE
         description != 'Crédito - Parcelamento corretagem - QuintoAndar'
-    AND agg > 0
-    AND (
+      AND agg > 0
+      AND (
+            (SPLIT(e.bill_item, 'entry.bill-item/')[1] IN ('pro-guarantor-5A-installment')) OR
             (
                 (ii.invoice_user = 'landlord') AND
                 (NOT(i.ts_due > current_date AND i.accrual_year_month < 202405)) AND
@@ -109,9 +113,9 @@ retsuko_pre AS (
     AND DATE(i.ts_created) >= '2024-01-01'
     AND NOT(ct.landlord_legal_person = 'physical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
     GROUP BY
-        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13
     HAVING
-        SUM(amount) != 0
+     SUM(amount) != 0
 ),
 
 retsuko_pos AS (
@@ -126,12 +130,10 @@ retsuko_pos AS (
         CASE
             WHEN e.bill_item = 'entry.bill-item/service-fee' THEN '420005'
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN '420002'
-            WHEN e.bill_item = 'entry.bill-item/pro-guarantor-5A-installment' THEN '420010'
         END AS revenue_account,
         CASE
             WHEN e.bill_item = 'entry.bill-item/service-fee' THEN 'service fee'
             WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') THEN 'adm fee'
-            WHEN e.bill_item = 'entry.bill-item/pro-guarantor-5A-installment' THEN 'pro guarantor 5A installment'
         END AS revenue_name,
         e.accrual_year_month,
         MIN(CASE
@@ -169,8 +171,7 @@ retsuko_pos AS (
                   'adjustment-agreement-adm-fee',
                   'igpm-adm-fee',
                   'ipca-adm-fee',
-                  'service-fee',
-                  'pro-guarantor-5A-installment'
+                  'service-fee'
                   )
                 )
             )
