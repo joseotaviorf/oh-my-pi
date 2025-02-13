@@ -131,6 +131,19 @@ columns:
     lineage:
       - datalake_credit_analysis.credit_analysis.risk_category_canon
     description: "New risk score given by the credit model."
+  risk_category:
+    lineage:
+      - datalake_credit_analysis.credit_analysis.risk_category
+    description:
+      "Indicates the risk category defined to a given credit analysis. The
+      definition of each letter is done by the Credit Ops team. It was deprecated in favor to risk_category_canon."
+    categories:
+      A: "Best people evaluated"
+      B: "Riskier people, but enough to have access to free guarantee"
+      C: "Riskier than B, it's given the cheapest paid options dependending on the city."
+      D: "Riskier than C, it's given more expensive paid options. Also depends on the city."
+      E: "Riskier than D, its given the deposit option, factor dependending on the city."
+      F: "Riskier than E, clear-no."
   internal_score:
     lineage:
       - datalake_credit_analysis.credit_analysis.internal_score

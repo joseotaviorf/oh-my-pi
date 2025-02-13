@@ -22,6 +22,7 @@ SELECT
   ca.documentation_policy,
   ca.guarantee_category,
   ca.level,
+  ca.risk_category,
   ca.paid_guarantee_type,
   ca.standalone_factor,
   ca.reason,
