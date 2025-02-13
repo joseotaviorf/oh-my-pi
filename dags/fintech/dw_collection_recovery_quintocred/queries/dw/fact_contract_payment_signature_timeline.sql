@@ -269,7 +269,7 @@ step_1 AS (
 step_2 AS (
     SELECT
         *,
-        ROW_NUMBER() OVER(PARTITION BY sk_propose, month_start ORDER BY property_dt_mod DESC) AS rn
+        ROW_NUMBER() OVER(PARTITION BY sk_propose, month_start ORDER BY property_dt_mod DESC, ts_started desc) AS rn
     FROM
         step_1
 ),
