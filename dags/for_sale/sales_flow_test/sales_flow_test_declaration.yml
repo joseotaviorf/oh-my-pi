@@ -80,8 +80,8 @@ workflow:
       clean_primary_keys: ["id"]
     ccv_edition_reason_aud:
       clean_table_name: ccv_edition_reason_aud
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
     ccv_termination:
       clean_table_name: ccv_termination
       raw_primary_keys: ["id"]
