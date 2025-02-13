@@ -31,7 +31,7 @@ SELECT
     month,
     day
 FROM
-    datalake_itau_statements_raw.statement_067000392216
+    datalake_itau_statements_raw.statement_879200494588
 WHERE
     MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
 QUALIFY

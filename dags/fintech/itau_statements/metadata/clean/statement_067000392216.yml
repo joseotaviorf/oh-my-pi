@@ -6,94 +6,94 @@ domain: fintech
 columns:
   id:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.id
+    - datalake_itau_statements_raw.statement_067000392216.id
   type:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.type
+    - datalake_itau_statements_raw.statement_067000392216.type
   operation:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.operation
+    - datalake_itau_statements_raw.statement_067000392216.operation
   reversal:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.reversal
+    - datalake_itau_statements_raw.statement_067000392216.reversal
   date_event:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.date_event
+    - datalake_itau_statements_raw.statement_067000392216.date_event
   date_accounting:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.date_accounting
+    - datalake_itau_statements_raw.statement_067000392216.date_accounting
   literal_code:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.literal_code
+    - datalake_itau_statements_raw.statement_067000392216.literal_code
   literal_shortened:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.literal_shortened
+    - datalake_itau_statements_raw.statement_067000392216.literal_shortened
   literal_complete:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.literal_complete
+    - datalake_itau_statements_raw.statement_067000392216.literal_complete
   literal_tip:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.literal_tip
+    - datalake_itau_statements_raw.statement_067000392216.literal_tip
   amount_value:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.amount_value
+    - datalake_itau_statements_raw.statement_067000392216.amount_value
   amount_currency:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.amount_currency
+    - datalake_itau_statements_raw.statement_067000392216.amount_currency
   literal_complementary:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.literal_complementary
+    - datalake_itau_statements_raw.statement_067000392216.literal_complementary
   counterpart_type:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.counterpart_type
+    - datalake_itau_statements_raw.statement_067000392216.counterpart_type
   counterpart_ispb:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.counterpart_ispb
+    - datalake_itau_statements_raw.statement_067000392216.counterpart_ispb
   counterpart_agency:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.counterpart_agency
+    - datalake_itau_statements_raw.statement_067000392216.counterpart_agency
   counterpart_account:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.counterpart_account
+    - datalake_itau_statements_raw.statement_067000392216.counterpart_account
   counterpart_digit:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.counterpart_digit
+    - datalake_itau_statements_raw.statement_067000392216.counterpart_digit
   counterpart_name:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.counterpart_name
+    - datalake_itau_statements_raw.statement_067000392216.counterpart_name
   counterpart_institution:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.counterpart_institution
+    - datalake_itau_statements_raw.statement_067000392216.counterpart_institution
   counterpart_document:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.counterpart_document
+    - datalake_itau_statements_raw.statement_067000392216.counterpart_document
   counterpart_person:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.counterpart_person
+    - datalake_itau_statements_raw.statement_067000392216.counterpart_person
   origin_identifier:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.origin_identifier
+    - datalake_itau_statements_raw.statement_067000392216.origin_identifier
   origin_type:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.origin_type
+    - datalake_itau_statements_raw.statement_067000392216.origin_type
   origin_operation:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.origin_operation
+    - datalake_itau_statements_raw.statement_067000392216.origin_operation
   origin_complement:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.origin_complement
+    - datalake_itau_statements_raw.statement_067000392216.origin_complement
   origin_channel:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.origin_channel
+    - datalake_itau_statements_raw.statement_067000392216.origin_channel
   counterpart_transfer_purpose:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.counterpart_transfer_purpose
+    - datalake_itau_statements_raw.statement_067000392216.counterpart_transfer_purpose
   year:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.year
+    - datalake_itau_statements_raw.statement_067000392216.year
   month:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.month
+    - datalake_itau_statements_raw.statement_067000392216.month
   day:
     lineage:
-    - datalake_itau_statements_raw.statement_879200452685.day
+    - datalake_itau_statements_raw.statement_067000392216.day
