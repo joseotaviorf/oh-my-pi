@@ -1,29 +1,37 @@
 database_name: datalake_credit_analysis
-table_name: credit_engine_machine
+table_name: credit_engine
 owner: isabella.santos@quintoandar.com.br
 domain: Fintech
-description: "Enrich table with credit engine machine analysis state data. The analysis machine is composed by state groups, which are composed by analysis sates. The analysis state is the smallest unit of the analysis machine."
+description: "Enrich table with credit engine analysis state data. The analysis machine is composed by state groups, which are composed by analysis sates. The analysis state is the smallest unit of the analysis machine. The credit engine lives in Sorting Hat micro service."
 columns:
+  id_analysis_state:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.id
+    description: Incremental column identifier of the analysis state. Each ID is unique."
   id_machine:
     lineage:
       - datalake_sorting_hat_clean.analysis_machine.id
-    description: Incremental column identifier of the machine"
+    description: Incremental column identifier of the credit machine"
   id_analysis_request:
     lineage:
-      - datalake_sorting_hat_clean.analysis_machine.id_analysis_request
+      - datalake_sorting_hat_clean.analysis_request.id
     description: "Foreign key which associates the analysis machine to an analysis request. It is the analysis request ID"
-  id_subject:
+  id_proposal:
     lineage:
-      - datalake_sorting_hat_clean.analysis_machine.id_subject
-    description: "Subject ID. Ex: if the subject type is CHECKLIST, the subject id would be the id of the checklist"
+      - datalake_sorting_hat_clean.analysis_request.id_external
+    description: "Proposal ID attributed to the analysis request processed by the credit engine."
   id_state_group:
     lineage:
       - datalake_sorting_hat_clean.analysis_state_group.id
     description: "State group ID"
   subject_type:
     lineage:
-      - datalake_sorting_hat_clean.analysis_machine.subject_type
-    description: "This column represents the type of the subject the machine is related to. Ex: CHECKLIST"
+      - datalake_sorting_hat_clean.analysis_state.subject_type
+    description: "This column represents the type of the subject the machine is related to. In this table only records with subject type CHECKLIST_ITEM_TYPE are considered, aiming to filter only the items related to credit engine checklist."
+  policy_type:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.id_subject
+    description: "Policy name."
   machine_status:
     lineage:
       - datalake_sorting_hat_clean.analysis_machine.status
@@ -43,19 +51,15 @@ columns:
   group_type:
     lineage:
       - datalake_sorting_hat_clean.analysis_state_group.group_type
-    description: "This column represents the type of the group processed by the machine"
-    categories:
-      RULE: "When the group is a rule"
-      POLICY: "When the group is a policy"
-      MACHINE_CONTROL: "When the group is a machine control"
+    description: "This column represents the type of the group processed by the machine. In this table all records refer to a POLICY group type."
   group_name:
     lineage:
       - datalake_sorting_hat_clean.analysis_state_group.group_name
-    description: "This column represents the name of the group processed by the machine. Ex: if the processor group type is RULE, the processor name could be the name of the rule, and if the subject type is POLICY, the name could be the policy name"
+    description: "This column represents the name of the group processed by the machine. Since the subject type is POLICY, the group name is the policy name."
   state_group_result:
     lineage:
       - datalake_sorting_hat_clean.analysis_state_group.result
-    description: "This column represents the result of the group. Ex: if it is a rule group, if some state from the group is not compliant the result of the group would reflect it"
+    description: "This column represents the result of the group. Ex: if some state from the policy is not compliant the result of the group would reflect it"
   input:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input
@@ -69,9 +73,9 @@ columns:
       RETRY: "When the analysis state has been run with error the status is retry"
   ts_updated:
     lineage:
-      - datalake_sorting_hat_clean.analysis_state_group.ts_updated
-    description: "Analysis state group updated timestamp"
+      - datalake_sorting_hat_clean.analysis_state.ts_updated
+    description: "Analysis state update timestamp"
   ts_created:
     lineage:
-      - datalake_sorting_hat_clean.analysis_machine.ts_created
-    description: "Analysis machine creation timestamp"
+      - datalake_sorting_hat_clean.analysis_state.ts_created
+    description: "Analysis state creation timestamp"
