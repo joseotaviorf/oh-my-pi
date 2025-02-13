@@ -1,25 +1,36 @@
 ---
 database_name: datalake_documentation_metrics_clean
 table_name: lineage_and_tags
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Ops & Governance
+description: This table records the lineage of the data
 columns:
   database_name:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.database_name
+    description: This column indicates the schema name of the table
   table_name:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.table_name
+    description: This column indicates the name of the tables
   has_lineage:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.has_lineage
+    description: This column indicates whether the data has lineage
   has_tags:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.has_tags
+    description: This column indicates whether the data has associated tags
   year:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.year
+    description: This column indicates the year this table was updated
   month:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.month
+    description: This column indicates the month in which the table was updated
+
   day:
     lineage:
       - datalake_documentation_metrics_raw.lineage_and_tags.day
+    description: This column indicates the day the table was updated

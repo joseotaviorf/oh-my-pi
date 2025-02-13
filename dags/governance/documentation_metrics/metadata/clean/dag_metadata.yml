@@ -1,28 +1,39 @@
 ---
 database_name: datalake_documentation_metrics_clean
 table_name: dag_metadata
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Ops & Governance
+description: This column provides the data from this table
 columns:
   layer:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.layer
+    description: This column indicates the layer of this table
   dag_name:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.dag_name
+    description: This column indicates the name of the dag on Airflow.
   database_name:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.database_name
+    description: This column indicates the schema name of the table
   has_lineage_from_product:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.has_lineage_from_product
+    description: This column shows whether or not the data has lineage from product databases. DEPRECATED.
   owner:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.owner
+    description: This column contains the name of the team associated with the data
   year:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.year
+    description: This column indicates the year this table was updated
   month:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.month
+    description: This column indicates the month in which the table was updated
   day:
     lineage:
       - datalake_documentation_metrics_raw.dag_metadata.day
+    description: This column indicates the day the table was updated

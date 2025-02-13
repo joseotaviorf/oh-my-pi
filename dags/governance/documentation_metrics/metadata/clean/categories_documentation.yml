@@ -1,31 +1,43 @@
 ---
 database_name: datalake_documentation_metrics_clean
 table_name: categories_documentation
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Ops & Governance
+description: This table pulls in all the columns that have a category value and checks whether the column has a description
 columns:
   layer:
     lineage:
       - datalake_documentation_metrics_raw.categories_documentation.layer
+    description: This column indicates the layer of this table
   database_name:
     lineage:
       - datalake_documentation_metrics_raw.categories_documentation.database_name
+    description: This column indicates the schema name of the table
   table_name:
     lineage:
       - datalake_documentation_metrics_raw.categories_documentation.table_name
+    description: This column indicates the name of the tables
   column_name:
     lineage:
       - datalake_documentation_metrics_raw.categories_documentation.column_name
+    description: This column indicates the name of the cells
   value:
     lineage:
       - datalake_documentation_metrics_raw.categories_documentation.value
+    description: This column indicates which fields are in the category field
   has_description:
     lineage:
       - datalake_documentation_metrics_raw.categories_documentation.has_description
+    description: This column indicates whether the description field is filled in
   year:
     lineage:
       - datalake_documentation_metrics_raw.categories_documentation.year
+    description: This column indicates the year this table was updated
   month:
     lineage:
       - datalake_documentation_metrics_raw.categories_documentation.month
+    description: This column indicates the month in which the table was updated
   day:
     lineage:
       - datalake_documentation_metrics_raw.categories_documentation.day
+    description: This column indicates the day the table was updated
