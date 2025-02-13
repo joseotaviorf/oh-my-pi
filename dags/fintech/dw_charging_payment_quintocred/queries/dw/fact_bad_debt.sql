@@ -1,6 +1,29 @@
 WITH selected_base AS (
 SELECT
-  m.*,
+  m.origin_table,
+  m.sk_propose,
+  m.sk_transaction,
+  m.client_cpf_cnpj,
+  m.dt_register,
+  m.dt_due,
+  m.dt_paid,
+  m.dias_atraso,
+  m.due_amount,
+  m.paid_amount,
+  m.open_amount,
+  m.discount_value,
+  m.bill_item,
+  m.provisional_group,
+  m.dt_contract_started,
+  m.dt_contract_ended,
+  m.valor_pacote,
+  m.sk_propose_20,
+  COALESCE( m.is_danos_imovel, FALSE ) AS is_danos_imovel,
+  COALESCE( m.is_contract_active, FALSE ) AS is_contract_active,
+  COALESCE( m.is_delinquency_renovacao, FALSE ) AS is_delinquency_renovacao,
+  COALESCE( m.is_perdao_divida, FALSE ) AS is_perdao_divida,
+  m.sk_key,
+  m.id_bill,
   m.ts_load::DATE - INTERVAL '1 day' AS dt_closing
 FROM 
   dw_velo.quintocred_ifrs_recurring_payment AS m
@@ -154,13 +177,56 @@ SELECT
     WHEN f.id_type = 4 
       THEN 'RENEWAL'
     ELSE  'OTHER' 
-  END AS id_type_class
+  END AS id_type_class,
+  CASE
+      WHEN days_late_bad_debt IS NULL 
+        THEN 'A.Current'
+      WHEN days_late_bad_debt <= 0 
+        THEN 'A.Current'
+      WHEN days_late_bad_debt BETWEEN 1 AND 30 
+        THEN 'B.1-30'
+      WHEN days_late_bad_debt BETWEEN 31 AND 60 
+        THEN 'C.31-60'
+      WHEN days_late_bad_debt BETWEEN 61 AND 90 
+        THEN 'D.61-90'
+      WHEN days_late_bad_debt BETWEEN 91 AND 120 
+        THEN 'E.91-120'
+      WHEN days_late_bad_debt BETWEEN 121 AND 150 
+        THEN 'F.121-150'
+      WHEN days_late_bad_debt BETWEEN 151 AND 180 
+        THEN 'G.151-180'
+      WHEN days_late_bad_debt > 180 
+        THEN 'H.>180'
+    END AS delay_range
 FROM 
   step_5 AS m
 LEFT JOIN 
   datalake_rental_guarantee_platform_clean.delinquency as f 
     ON (cast(f.id AS BIGINT) = cast(m.sk_transaction AS BIGINT) 
     AND m.origin_table = 'delinquency')
+),
+step_7 AS (
+SELECT
+  dt_closing,
+  COALESCE(sk_propose, '-1') AS sk_propose,
+  MAX(delay_range) AS delay_range_contaminated
+FROM
+  step_6
+WHERE
+  dt_register <= dt_closing 
+  AND open_amount_proportional > 0
+GROUP BY 1,2
+),
+step_8 AS (
+SELECT 
+  m.*, 
+  COALESCE( f.delay_range_contaminated, 'AA. Null Current' ) AS delay_range_contaminated
+FROM 
+  step_6 m
+LEFT JOIN 
+  step_7 f 
+  ON  f.dt_closing = m.dt_closing 
+  AND coalesce(m.sk_propose, '-1') = f.sk_propose
 )
 SELECT 
   origin_table,
@@ -195,6 +261,8 @@ SELECT
   is_perdao_divida,
   dias_atraso,
   days_late_bad_debt,
+  delay_range,
+  delay_range_contaminated,
   mobs_valid_renewal_base,
   mobs_valid_renewal,
   mob_bad_debt,
@@ -206,6 +274,6 @@ SELECT
   dt_paid,
   dt_contract_started,
   dt_contract_ended,
-  NOW() as ts_load
+  NOW() AS ts_load
 FROM 
-  step_6
+  step_8

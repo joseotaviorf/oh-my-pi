@@ -68,6 +68,10 @@ columns:
     description: ""
   days_late_bad_debt:
     description: ""
+  delay_range:
+    description: "delay categorized into specific groups"
+  delay_range_contaminated:
+    description: "delay categorized into specific groups at the proposal level"
   mobs_valid_renewal_base:
     description: ""
   mobs_valid_renewal: 
