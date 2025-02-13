@@ -37,7 +37,7 @@ workflow:
     buyer_data_aud:
       clean_table_name: buyer_data_aud
       raw_primary_keys: ["id", "rev"]
-      clean_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id_buyer", "rev"]
     bypass:
       clean_table_name: bypass
       raw_primary_keys: ["id"]
