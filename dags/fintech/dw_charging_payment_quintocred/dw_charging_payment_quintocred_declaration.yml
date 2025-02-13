@@ -19,7 +19,7 @@ workflow:
       - fact_accounting_funnel
       - fact_theoretical_payment_delinquency
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_13_3_med_memory_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
