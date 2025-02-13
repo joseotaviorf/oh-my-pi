@@ -140,6 +140,9 @@ class Tables:
     source_viva_real_houses = "vespucio_sources_delta.source_viva_real_house"
     source_zap_imoveis_houses = "vespucio_sources_delta.source_zap_imoveis_house"
 
+    direct_matches_clustering_image = "vespucio_pipeline_delta.direct_matches_clustering_image"
+    indirect_matches_clustering_image = "vespucio_pipeline_delta.indirect_matches_clustering_image"
+
     stage_step_condos = "vespucio_pipeline_delta.stage_step_condos"
     stage_step_houses = "vespucio_pipeline_delta.stage_step_houses"
     geocode_step_cache = "vespucio_pipeline_delta.geocode_step_cache"
@@ -316,6 +319,26 @@ source_tasks = [
     ),
 ]
 
+core_matchmaker_tasks = [
+    create_task(
+        entry_point="core_direct_matches_clustering_image_step",
+        parameters=[
+            f"--input_source_clustering_image_model={Tables.source_clustering_image_model}",
+            f"--overwrite_schema",
+            f"--output_direct_matches_clustering_image={Tables.direct_matches_clustering_image}",
+        ]
+    ),
+    create_task(
+        entry_point="core_indirect_matches_clustering_image_step",
+        parameters=[
+            f"--input_source_clustering_image_model={Tables.source_clustering_image_model}",
+            f"--input_direct_matches_clustering_image={Tables.direct_matches_clustering_image}",
+            f"--overwrite_schema",
+            f"--output_indirect_matches_clustering_image={Tables.indirect_matches_clustering_image}",
+        ]
+    ),
+]
+
 core_tasks = [
     create_task(
         entry_point="core_stage_step",
@@ -352,8 +375,12 @@ core_tasks = [
         parameters=[
             f"--input_geocoded_condos={Tables.geocode_step_condos}",
             f"--input_geocoded_houses={Tables.geocode_step_houses}",
+            f"--input_direct_matches_clustering_image={Tables.direct_matches_clustering_image}",
+            f"--input_indirect_matches_clustering_image={Tables.indirect_matches_clustering_image}",
             f"--input_source_cnefe_houses={Tables.source_cnefe_houses}",
+            f"--input_source_iptu_houses={Tables.source_iptu_houses}",
             f"--overwrite_schema",
+            f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--output_address_adjusted_condos={Tables.address_adjusted_step_condos}",
             f"--output_address_adjusted_houses={Tables.address_adjusted_step_houses}",
         ],
@@ -373,6 +400,7 @@ core_tasks = [
         parameters=[
             f"--input_staged_houses={Tables.stage_step_houses}",
             f"--input_clustered_houses={Tables.cluster_step_houses}",
+            f"--input_source_itbi_houses={Tables.source_itbi_houses}",
             f"--overwrite_schema",
             f"--output_source_predicted_houses={Tables.source_predict_step_houses}",
         ],
@@ -384,7 +412,6 @@ core_tasks = [
             f"--input_staged_houses={Tables.stage_step_houses}",
             f"--input_clustered_condos={Tables.cluster_step_condos}",
             f"--input_clustered_houses={Tables.cluster_step_houses}",
-            f"--input_source_predicted_houses={Tables.source_predict_step_houses}",
             f"--overwrite_schema",
             f"--output_merged_condos={Tables.merge_step_condos}",
             f"--output_merged_houses={Tables.merge_step_houses}",
@@ -434,6 +461,7 @@ predict_and_join_task = [
         parameters=[
             f"--input_images_houses={Tables.images_step_houses}",
             f"--input_linked_houses={Tables.link_step_houses}",
+            f"--input_source_predicted_houses={Tables.source_predict_step_houses}",
             f"--input_compound_predicted_houses={Tables.compound_predict_step_houses}",
             f"--overwrite_schema",
             f"--output_house_compounds={Tables.house_compounds}",
@@ -603,13 +631,21 @@ classifieds_tasks = [
 join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 
 execute_job_cluster_task >> source_tasks
+
+source_tasks[0] >> core_matchmaker_tasks[0]
+chain(*core_matchmaker_tasks)
+
 source_tasks >> core_tasks[0]
+core_matchmaker_tasks[-1] >> core_tasks[0]
 chain(*core_tasks)
+
 core_tasks[-1] >> images_and_relations_tasks
 images_and_relations_tasks >> predict_and_join_task[0]
 chain(*predict_and_join_task)
+
 predict_and_join_task[-1] >> after_join_tasks
 after_join_tasks >> join_plugins
+
 join_plugins >> plugin_tasks
 join_plugins >> classifieds_tasks[0]
 chain(*classifieds_tasks)
