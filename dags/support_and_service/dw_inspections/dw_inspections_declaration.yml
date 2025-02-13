@@ -62,6 +62,9 @@ workflow:
     fact_contestation:
       z_order_by: [sk_contestation]
       merge_on: [sk_contestation]
+    fact_item:
+      z_order_by: [sk_item]
+      merge_on: [sk_item]
     fact_item_issue:
       z_order_by: [sk_item_issue]
       merge_on: [sk_item_issue]

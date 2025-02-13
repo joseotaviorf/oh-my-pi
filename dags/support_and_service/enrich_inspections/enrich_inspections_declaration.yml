@@ -57,6 +57,8 @@ workflow:
     item:
       partitions: [year, month, day]
       extraction_type: incremental
+      z_order_by: [id_item]
+      merge_on: [id_item]
     repair_exempted:
       partitions: [year, month, day]
       extraction_type: incremental

@@ -56,3 +56,5 @@ LEFT JOIN
         ON a.id_inspection = ih.id_inspection
 WHERE
     MAKE_DATE(i.year, i.month, i.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY i.id_item ORDER BY i.ts_updated DESC) = 1
