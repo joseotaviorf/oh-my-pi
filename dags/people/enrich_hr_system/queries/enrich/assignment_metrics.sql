@@ -15,16 +15,14 @@ WITH assignment AS (
      LAG(a.band) OVER (
        PARTITION BY a.id_assignment
        ORDER BY
-         a.ts_valid_from
+         a.dt_effective_start
      ),
      1
    ) AS band,
    a.action_code,
    a.dt_effective_start,
    a.assignment_status_type,
-   a.dt_projected_start,
-   IF(a.business_unit_name IN ('Benvi MX', 'Classifieds LATAM'),
-      TIMESTAMP(dt_effective_start), a.ts_last_update) AS ts_valid_from
+   a.dt_projected_start
  FROM
    datalake_hr_system.assignments AS a
 ),
@@ -45,25 +43,24 @@ assignments_present AS (
        OR band != LAG(band) OVER (
          PARTITION BY id_assignment
          ORDER BY
-           a.ts_valid_from
+           dt_effective_start
        ) THEN 1
        ELSE 0
      END
    ) over (
      PARTITION BY id_assignment
      ORDER BY
-       ts_valid_from
+       dt_effective_start
    ) AS qnt_promotions,
    a.dt_effective_start,
    a.dt_projected_start,
-   a.assignment_status_type,
-   a.ts_valid_from
+   a.assignment_status_type
  FROM
    assignment a
  WHERE
-   DATE(a.ts_valid_from) <= DATE('{load_start_date}')
- QUALIFY
-   DATE(a.ts_valid_from) = MAX(DATE(a.ts_valid_from)) OVER (PARTITION BY a.id_assignment)
+   a.dt_effective_start <= DATE('{load_start_date}')
+ QUALIFY 
+   dt_effective_start = MAX(dt_effective_start) over (PARTITION BY a.id_assignment)
 ),
 assignments_future AS (
  SELECT
@@ -82,25 +79,24 @@ assignments_future AS (
        OR band != LAG(band) OVER (
          PARTITION BY id_assignment
          ORDER BY
-           ts_valid_from
+           dt_effective_start
        ) THEN 1
        ELSE 0
      END
    ) over (
      PARTITION BY id_assignment
      ORDER BY
-       ts_valid_from
+       dt_effective_start
    ) AS qnt_promotions,
    a.dt_effective_start,
    a.dt_projected_start,
-   a.assignment_status_type,
-   a.ts_valid_from
+   a.assignment_status_type
  FROM
    assignment a
  WHERE
-   DATE(a.ts_valid_from) > DATE('{load_start_date}')
- QUALIFY
-   ts_valid_from = MAX(ts_valid_from) OVER (PARTITION BY a.id_assignment)
+   a.dt_effective_start > DATE('{load_start_date}')
+ QUALIFY 
+   dt_effective_start = MAX(dt_effective_start) over (PARTITION BY a.id_assignment)
 ),
 managers_present AS (
  SELECT
@@ -110,10 +106,10 @@ managers_present AS (
  FROM
    datalake_hr_system.managers
  WHERE
-   DATE(ts_valid_from) <= DATE('{load_start_date}')
+   dt_effective_start <= DATE('{load_start_date}')
    AND manager_type = 'LINE_MANAGER'
- QUALIFY
-   ts_valid_from = MAX(ts_valid_from) OVER (PARTITION BY id_assignment)
+ QUALIFY 
+   dt_effective_start = MAX(dt_effective_start) over (PARTITION BY id_assignment)
 ),
 managers_future AS (
  SELECT
@@ -123,10 +119,10 @@ managers_future AS (
  FROM
    datalake_hr_system.managers
  WHERE
-   DATE(ts_valid_from) > DATE('{load_start_date}')
+   dt_effective_start > DATE('{load_start_date}')
    AND manager_type = 'LINE_MANAGER'
- QUALIFY
-   ts_valid_from = MAX(ts_valid_from) OVER (PARTITION BY id_assignment)
+ QUALIFY 
+   dt_effective_start = MAX(dt_effective_start) over (PARTITION BY id_assignment)
 ),
 hr_system_workers AS (
  SELECT
