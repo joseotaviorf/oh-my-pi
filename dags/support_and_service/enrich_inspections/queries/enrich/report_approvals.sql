@@ -56,13 +56,13 @@ union_reviewer_approvals AS (
         COALESCE(ra_owner.day, ra_tenant.day) AS day
     FROM
         owner_approvals AS ra_owner
-    JOIN
+    FULL OUTER JOIN
         tenant_approvals AS ra_tenant
           ON ra_owner.id_assessment = ra_tenant.id_assessment
-    JOIN
+    FULL OUTER JOIN
         assessment AS a
           ON a.id_assessment = ra_owner.id_assessment
-          OR a.id_inspection = ra_tenant.id_assessment
+          OR a.id_assessment = ra_tenant.id_assessment
     WHERE
         DATE(COALESCE(ra_owner.ts_updated, ra_tenant.ts_updated)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     QUALIFY
