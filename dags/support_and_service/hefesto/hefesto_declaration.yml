@@ -7,38 +7,31 @@ dag:
     dag_purpose: This DAG imports tables from [Hefesto](https://github.com/quintoandar/hefesto)
 
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
+  source_schema: public
   lineage_product_database_name: hefesto
   dbutils_secret_key: HEFESTO_DB
-  default_extraction_type: incremental
   tables_customization:
     worker:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
+      raw_primary_keys: ["id"]
     worker_portfolio:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
+      raw_primary_keys: ["id"]
     worker_portfolio_unit:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
+      raw_primary_keys: ["id"]
     worker_portfolio_event:
-      date_filter_column: created_at
-      partitions: [year, month, day]
+      raw_primary_keys: ["id"]
     worker_channel:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
+      raw_primary_keys: ["id"]
     queue:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
+      raw_primary_keys: ["id"]
     queue_type:
-      extraction_type: full
+      raw_primary_keys: ["id"]
     queue_event:
-      date_filter_column: created_at
-      partitions: [year, month, day]
+      raw_primary_keys: ["id"]
     account:
-      extraction_type: full
+      raw_primary_keys: ["id"]
 
 cluster:
   type: custom_cluster
