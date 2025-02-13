@@ -44,7 +44,7 @@ min_dates AS (
         date,
         MIN(CASE WHEN type_description = 'GUARANTEE' THEN dt_aging END) AS min_dt_guarantee,
         MIN(CASE WHEN type_description IN ('RENEWAL', 'SIGNATURE') THEN dt_aging END) AS min_dt_signature,
-        MIN(CASE WHEN type_description = 'RESCISAO' THEN dt_aging END) AS min_dt_termination
+        MIN(CASE WHEN type_description = 'TERMINATION' THEN dt_aging END) AS min_dt_termination
     FROM
         datalake_collections_quintocred.mob_delinquency_timeline
     GROUP BY 1,2
@@ -64,13 +64,13 @@ document_major_type AS (
         array_distinct(array_agg(major_type)) AS major_type_array,
         array_distinct(array_agg(monthly_major_type)) AS monthly_major_type_array,
         CASE
-            WHEN array_contains(array_agg(major_type), 'GARANTIA') THEN 'GARANTIA'
-            WHEN array_contains(array_agg(major_type), 'RESCISAO') THEN 'RESCISAO'
+            WHEN array_contains(array_agg(major_type), 'GUARANTEE') THEN 'GUARANTEE'
+            WHEN array_contains(array_agg(major_type), 'TERMINATION') THEN 'TERMINATION'
             ELSE any_value(major_type)
         END AS major_type,
         CASE
-            WHEN array_contains(array_agg(monthly_major_type), 'GARANTIA') THEN 'GARANTIA'
-            WHEN array_contains(array_agg(monthly_major_type), 'RESCISAO') THEN 'RESCISAO'
+            WHEN array_contains(array_agg(monthly_major_type), 'GUARANTEE') THEN 'GUARANTEE'
+            WHEN array_contains(array_agg(monthly_major_type), 'TERMINATION') THEN 'TERMINATION'
             ELSE any_value(monthly_major_type)
         END AS monthly_major_type
     FROM
@@ -97,10 +97,10 @@ timeline_final AS (
         dt_base,
         array_agg(t.dt_paid) AS dt_paid_array,
         CASE
-            WHEN ta.major_type = 'RESCISAO' AND md.min_dt_termination IS NULL THEN md.min_dt_guarantee
-            WHEN ta.major_type = 'RESCISAO' THEN md.min_dt_termination
-            WHEN ta.major_type = 'GARANTIA' THEN md.min_dt_guarantee
-            WHEN ta.major_type = 'ASSINATURA' THEN md.min_dt_signature
+            WHEN ta.major_type = 'TERMINATION' AND md.min_dt_termination IS NULL THEN md.min_dt_guarantee
+            WHEN ta.major_type = 'TERMINATION' THEN md.min_dt_termination
+            WHEN ta.major_type = 'GUARANTEE' THEN md.min_dt_guarantee
+            WHEN ta.major_type = 'SIGNATURE' THEN md.min_dt_signature
         END AS dt_min_major_type,
         MIN(mpd.min_dt_propose) AS dt_min_propose
     FROM

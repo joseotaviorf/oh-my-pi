@@ -1,4 +1,4 @@
-WITH timeline AS (
+WITH timeline_base AS (
     SELECT
         t.id_delinquency,
         t.id_propose,
@@ -23,6 +23,7 @@ WITH timeline AS (
         t.is_legacy_agreement,
         t.is_legacy_propose,
         t.is_currently_active,
+        t.is_active_timeline,
         t.dt_due,
         t.dt_ended_propose,
         t.dt_base,
@@ -38,43 +39,53 @@ WITH timeline AS (
         datalake_velo.propose_person AS pp
             ON p.id_primary_person = pp.id_person
 ),
-monthly_timeline AS (
-    SELECT
-        DATE_TRUNC('MONTH', t.dt_base) AS `date`,
-        t.document,
-        t.type_description,
-        t.dt_ended_propose
-    FROM
-        timeline AS t
-)
+timeline AS (
 -- major type and aging are calculed per person, not per propose
+    SELECT
+        t.name,
+        t.document,
+        t.id_propose,
+        MAX(t.mob_delinquency) AS mob,
+        t.is_finished,
+        t.is_active_timeline,
+        array_distinct(array_agg(t.type_description)) AS type_description_array,
+        CASE
+            WHEN array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'TERMINATION') THEN 'TERMINATION'
+            WHEN DATE_TRUNC('MONTH', MAX(t.dt_ended_propose)) < DATE_TRUNC('MONTH', t.`date`) AND array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'GUARANTEE') THEN "TERMINATION"
+            WHEN array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'GUARANTEE') THEN 'GUARANTEE'
+            WHEN array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'SIGNATURE') THEN 'SIGNATURE'
+            WHEN array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'RENEWAL') THEN 'SIGNATURE'
+            ELSE NULL
+        END AS major_type,
+        CASE
+            WHEN array_contains(array_agg(t.type_description), 'TERMINATION') THEN 'TERMINATION'
+            WHEN DATE_TRUNC('MONTH', MAX(t.dt_ended_propose)) < DATE_TRUNC('MONTH', t.`date`) AND array_contains(array_agg(t.type_description), 'GUARANTEE') THEN "TERMINATION"
+            WHEN array_contains(array_agg(t.type_description), 'GUARANTEE') THEN 'GUARANTEE'
+            WHEN array_contains(array_agg(t.type_description), 'SIGNATURE') THEN 'SIGNATURE'
+            WHEN array_contains(array_agg(t.type_description), 'RENEWAL') THEN 'SIGNATURE'
+            ELSE 'CHECK'
+        END AS monthly_major_type,
+        t.`date`
+    FROM
+        timeline_base t
+    GROUP BY 1,2,3,5,6,10
+    ORDER BY 7,1
+)
 SELECT
-    t.name,
-    t.document,
-    t.id_propose,
-    MAX(t.mob_delinquency) AS mob,
-    array_distinct(array_agg(t.type_description)) AS type_description_array,
-    CASE
-        WHEN array_contains(array_agg(t.type_description), 'TERMINATION') THEN 'RESCISAO'
-        WHEN DATE_TRUNC('MONTH', MAX(t.dt_ended_propose)) < DATE_TRUNC('MONTH', t.`date`) AND array_contains(array_agg(t.type_description), 'GUARANTEE') THEN "RESCISAO"
-        WHEN array_contains(array_agg(t.type_description), 'GUARANTEE') THEN 'GARANTIA'
-        WHEN array_contains(array_agg(t.type_description), 'SIGNATURE') THEN 'ASSINATURA'
-        WHEN array_contains(array_agg(t.type_description), 'RENEWAL') THEN 'ASSINATURA'
-        ELSE 'CHECK'
-    END AS major_type,
-    CASE
-        WHEN array_contains(array_agg(m.type_description), 'TERMINATION') THEN 'RESCISAO'
-        WHEN DATE_TRUNC('MONTH', MAX(t.dt_ended_propose)) < DATE_TRUNC('MONTH', t.`date`) AND array_contains(array_agg(t.type_description), 'GUARANTEE') THEN "RESCISAO"
-        WHEN array_contains(array_agg(m.type_description), 'GUARANTEE') THEN 'GARANTIA'
-        WHEN array_contains(array_agg(m.type_description), 'SIGNATURE') THEN 'ASSINATURA'
-        WHEN array_contains(array_agg(t.type_description), 'RENEWAL') THEN 'ASSINATURA'
-        ELSE 'CHECK'
-    END AS monthly_major_type,
-    t.`date`
+    name,
+    document,
+    id_propose,
+    mob,
+    type_description_array,
+    COALESCE(
+        major_type,
+        LAG(major_type) IGNORE NULLS OVER (
+            PARTITION BY name, document, id_propose
+            ORDER BY date
+        )
+    ) AS major_type,
+    monthly_major_type,
+    `date`
 FROM
-    timeline t
-LEFT JOIN
-    monthly_timeline m
-    ON m.document = t.document AND DATE_TRUNC('MONTH', t.`date`) = DATE_TRUNC('MONTH', m.`date`)
-GROUP BY 1,2,3,8
-ORDER BY 7,1
+    timeline
+GROUP BY 1,2,3,4,5,7,8, major_type
