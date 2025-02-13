@@ -1,0 +1,23 @@
+---
+dag:
+  name: enrich_dashboard_governance
+  schedule_start_date: 2022, 11, 10
+  owner: Data Governance
+  documentation:
+    dag_purpose:
+      This Dag uses data extracted from Metabase to classify dashboards and charts.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions:
+    - year
+    - month
+    - day
+cluster:
+  type: databricks_12_2_med_general_cluster
+  custom_configurations:
+    data_security_mode: SINGLE_USER
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new
