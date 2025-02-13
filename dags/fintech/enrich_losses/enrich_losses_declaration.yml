@@ -7,20 +7,20 @@ dag:
       Creates enriched tables for the `Losses` context, which aims to analyze NPV for Rental Contracts, initially.
       This Dag has a table from the DW as a dependency!
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     closing:
-    - bill_items
+      - bill_items
     delay:
-    - closing
+      - closing
     provision:
-    - delay
+      - delay
 cluster:
   type: databricks_13_3_med_general_photon_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

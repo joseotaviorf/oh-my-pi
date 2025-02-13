@@ -43,14 +43,14 @@ base_write_off AS (
     fl.deal_status,
     CASE
         WHEN fl.deal_status IN ('DEAL IN DELAY', 'DEAL ON TIME. DELAY AT ANCHOR')
-          AND iawo.dt_due_original_invoice IS NOT NULL
-          THEN DATE_DIFF(fl.dt_closing, iawo.dt_due_original_invoice)
+          AND ia.dt_due_original_invoice IS NOT NULL
+          THEN DATE_DIFF(fl.dt_closing, ia.dt_due_original_invoice)
         ELSE DATE_DIFF(fl.dt_closing, DATE(i.ts_due))
     END AS delay_days_wo,
     fl.due_amount,
     fl.dt_closing,
     fl.dt_contract_annulment,
-    iawo.dt_due_original_invoice AS dt_due_invoice_anchor,
+    ia.dt_due_original_invoice AS dt_due_invoice_anchor,
     DATE(i.ts_due) AS dt_due,
     i.dt_due_adjusted,
     fl.dt_due_invoice_adjusted AS dt_due_at_closing,
@@ -69,8 +69,8 @@ base_write_off AS (
     datalake_retsuko.invoice AS i
       ON i.id_external = fl.sk_invoice
   LEFT JOIN
-    invoice_anchor_wo AS iawo
-      ON iawo.id_invoice = fl.sk_invoice
+    invoice_anchor AS ia
+      ON ia.id_invoice = fl.sk_invoice
   WHERE
     IFNULL(i.is_write_off, FALSE) IS FALSE
     AND i.ts_write_off IS NULL
@@ -127,4 +127,4 @@ FROM
   contract_write_off
 WHERE
   is_invoice_write_off_eligible IS TRUE
-  OR is_contract_write_off IS TRUE
+  OR is_contract_write_off_eligible IS TRUE
