@@ -10,11 +10,17 @@ workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
+    delinquency_timeline:
+      - status_timeline
+    mob_delinquency_timeline:
+      - delinquency_timeline
     major_type_distribution:
       - delinquency_timeline
+      - mob_delinquency_timeline
     collections_wallet:
       - delinquency_timeline
       - major_type_distribution
+      - mob_delinquency_timeline
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new
@@ -23,10 +29,7 @@ cluster:
     data_security_mode: SINGLE_USER
     driver_node_type_id: m5d.4xlarge
     node_type_id: m5d.4xlarge
-    runtime_engine: PHOTON
     spark_version: 13.3.x-scala2.12
-    autoscale:
-      min_workers: 3
-      max_workers: 8
+    num_workers: 4
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"

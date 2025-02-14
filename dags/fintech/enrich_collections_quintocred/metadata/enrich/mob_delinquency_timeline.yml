@@ -83,6 +83,10 @@ columns:
     description: "If this propose was active on the moment of the base date"
     lineage:
       - datalake_quintocred_collections.delinquency_timeline.is_currently_active
+  is_active_timeline:
+    description: "If this propose was active on the moment of dt_base"
+    lineage:
+      - datalake_quintocred_collections.delinquency_timeline.is_active_timeline
   dt_due:
     description: "Date Due for this debt"
     lineage:

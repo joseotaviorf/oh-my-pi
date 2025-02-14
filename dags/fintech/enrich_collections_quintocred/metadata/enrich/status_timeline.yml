@@ -1,0 +1,19 @@
+---
+database_name: datalake_collections_quintocred
+table_name: status_timeline
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Intermediate table to create status timeline on delinquency_timeline"
+columns:
+  id:
+    description: "Delinquency ID"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency_aud.id
+  id_status:
+    description: "ID status of the delinquency in the reference date"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.delinquency_aud.id_status
+  dt_status_updated:
+    description: "Reference date for timeline"
+    lineage:
+      - datalake_quintoandar.aux_date.date

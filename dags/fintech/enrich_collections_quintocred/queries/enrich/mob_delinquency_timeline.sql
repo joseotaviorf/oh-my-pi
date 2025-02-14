@@ -22,6 +22,7 @@ SELECT
     t.is_legacy_agreement,
     t.is_legacy_propose,
     t.is_currently_active,
+    t.is_active_timeline,
     t.dt_due,
     t.dt_ended_propose,
     t.dt_base,
