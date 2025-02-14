@@ -27,7 +27,7 @@ cluster:
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
-    driver_node_type_id: m5d.4xlarge
+    driver_node_type_id: r4.2xlarge
     node_type_id: m5d.4xlarge
     spark_version: 13.3.x-scala2.12
     num_workers: 4
