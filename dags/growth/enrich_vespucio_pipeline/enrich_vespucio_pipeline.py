@@ -66,7 +66,12 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
         "permission_level": ClusterPermissionEnum.MANAGE,
     },
 ]
-LIBRARIES = [{"whl": f"{artifacts_bucket}/vespucio/{VESPUCIO_WHEEL_FILE}"}]
+
+LIBRARIES = [
+    {"whl": f"{artifacts_bucket}/vespucio/{VESPUCIO_WHEEL_FILE}"},
+    {"pypi": {"package": "networkx==3.2.1"}},
+]
+
 DAG_DOCUMENTATION = config_service.get_config("dag_documentation")
 DAG_OWNER = DAGOwnerEnum.DATA_GROWTH
 opsgenie_callback = OpsgenieCallback()
