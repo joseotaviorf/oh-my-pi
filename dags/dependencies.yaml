@@ -1644,6 +1644,8 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.gsheets_for_rent:done-clean-auxiliary-region
+  - bietlejuice.person:load-clean-contact-info
+  - bietlejuice.person:load-clean-person
 bietlejuice.enrich_ebdb_amenities:
   - bietlejuice.ebdb_condo:load-clean-amenities
   - bietlejuice.ebdb_condo:load-clean-condo-amenities

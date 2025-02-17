@@ -17,13 +17,21 @@ columns:
     lineage:
       - datalake_ebdb_clean.partner.uuid_company
     description: Company UUID of CIQ into Porfolio Manager.
+  uuid_person:
+    lineage:
+      - datalake_person_clean.person.uuid_person
+    description: Person UUID of CIQ.
   name:
     lineage:
       - datalake_ebdb_clean.partner.name
+      - datalake_person_clean.person.person_name
     description: Full name of user.
   email:
     lineage:
       - datalake_ebdb_clean.partner.email
+      - datalake_person_clean.contact_info.priority
+      - datalake_person_clean.contact_info.category
+      - datalake_person_clean.contact_info.contact_info
     description: Email of user.
   status:
     lineage:
