@@ -222,15 +222,24 @@ front_contacts AS (
     first_reply_time,
     total_handling_time,
     CASE
-      WHEN ROW_NUMBER() OVER(PARTITION BY sk_contact ORDER BY ts_reservation_created) = 1 THEN TRUE
+      WHEN channel = 'call'
+        AND ROW_NUMBER() OVER(PARTITION BY sk_contact ORDER BY ts_reservation_created) = 1 THEN TRUE
+      WHEN channel = 'chat'
+        AND ROW_NUMBER() OVER(PARTITION BY sk_contact ORDER BY ts_task_created) = 1 THEN TRUE
       ELSE FALSE
     END AS is_first_interaction,
     CASE
-      WHEN ROW_NUMBER() OVER(PARTITION BY sk_contact ORDER BY ts_reservation_created DESC) = 1 THEN TRUE
+      WHEN channel = 'call'
+        AND ROW_NUMBER() OVER(PARTITION BY sk_contact ORDER BY ts_reservation_created DESC) = 1 THEN TRUE
+      WHEN channel = 'chat'
+        AND ROW_NUMBER() OVER(PARTITION BY sk_contact ORDER BY ts_task_created DESC) = 1 THEN TRUE
       ELSE FALSE
     END AS is_last_interaction,
     CASE
-      WHEN ROW_NUMBER() OVER(PARTITION BY sk_contact, sk_department ORDER BY ts_reservation_created) = 1 THEN TRUE
+      WHEN channel = 'call'
+        AND ROW_NUMBER() OVER(PARTITION BY sk_contact, sk_department ORDER BY ts_reservation_created) = 1 THEN TRUE
+      WHEN channel = 'chat'
+        AND ROW_NUMBER() OVER(PARTITION BY sk_contact, sk_department ORDER BY ts_task_created) = 1 THEN TRUE
       ELSE FALSE
     END AS is_first_department_interaction,
     is_per_team_task,
