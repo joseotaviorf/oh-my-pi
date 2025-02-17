@@ -1,6 +1,7 @@
 SELECT
     id AS id_portfolio,
     worker_id AS id_worker,
+    queue_id AS id_queue,
     COALESCE(user_id, user_identifier) AS id_user,
     contract_id as id_contract,
     entity_origin_id AS id_entity_origin,

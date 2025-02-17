@@ -7,6 +7,9 @@ columns:
   id_worker:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.worker_id
+  id_queue:
+    lineage:
+      - datalake_hefesto_raw.worker_portfolio.queue_id
   id_user:
     lineage:
       - datalake_hefesto_raw.worker_portfolio.user_identifier
