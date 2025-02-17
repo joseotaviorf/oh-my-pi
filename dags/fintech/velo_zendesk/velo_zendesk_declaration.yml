@@ -1,7 +1,7 @@
 dag:
   name: velo_zendesk
   schedule_start_date: 2019, 9, 9
-  schedule_interval: 0 3 * * *
+  schedule_interval: 0 2 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: |
@@ -13,13 +13,13 @@ workflow:
   load_spark_job: add_partitions_to_raw_tables
   inner_dependencies:
     tickets:
-    - tickets_history
+      - tickets_history
   spark_job_arguments:
-  - "{environment}"
-  - "{bucket}"
-  - "{{ ds }}"
-  - "{{ next_ds }}"
-  - "{table_name}"
+    - "{environment}"
+    - "{bucket}"
+    - "{{ ds }}"
+    - "{{ next_ds }}"
+    - "{table_name}"
 
   default_partitions: [year, month, day]
   tables_customization:
@@ -67,6 +67,6 @@ cluster:
     autoscale:
       min_workers: 2
       max_workers: 6
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
   databricks_conn_id: databricks_new

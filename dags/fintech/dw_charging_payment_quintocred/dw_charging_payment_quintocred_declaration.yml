@@ -19,13 +19,15 @@ workflow:
       - fact_accounting_funnel
       - fact_theoretical_payment_delinquency
 cluster:
-  type: databricks_13_3_med_memory_general_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new
+  type: custom_cluster
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
+    autotermination_minutes: 20
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.2xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+  databricks_conn_id: databricks_new

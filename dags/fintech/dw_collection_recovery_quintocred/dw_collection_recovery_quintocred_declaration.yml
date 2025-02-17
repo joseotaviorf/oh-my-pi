@@ -20,15 +20,8 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
     autotermination_minutes: 20
-    driver_node_type_id: r5d.xlarge
-    node_type_id: r5d.xlarge
-    runtime_engine: PHOTON
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.2xlarge
     num_workers: 3
-    spark_version: 12.2.x-scala2.12
-    aws_attributes:
-      first_on_demand: 1
-      spot_bid_price_percent: 100
-      zone_id: us-east-1d
-      ebs_volume_size: 200
-      availability: SPOT_WITH_FALLBACK
+    spark_version: 13.3.x-scala2.12
   databricks_conn_id: databricks_new
