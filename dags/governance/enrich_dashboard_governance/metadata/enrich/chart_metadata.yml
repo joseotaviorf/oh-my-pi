@@ -1,32 +1,44 @@
 ---
 database_name: datalake_dashboard_governance
 table_name: chart_metadata
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Ops & Governance
+description: It aims to extract detailed information about Metabase charts
 columns:
   chart_path:
     lineage:
       - datalake_metabase_clean.collection.location
+    description: Shows the path where the chart is stored in the metabase
   chart_id:
     lineage:
       - datalake_metabase_clean.report_card.id
+    description: Shows a unique identifier assigned to each panel
   type:
     lineage:
       - datalake_metabase_clean.report_card.display
+    description: Sets the chart visualization style
   title:
     lineage:
       - datalake_metabase_clean.report_card.name
+    description: Describes the name or title of the chart
   chart_description:
     lineage:
       - datalake_metabase_clean.report_card.description
+    description: Describe the chart description
   last_view:
     lineage:
       - datalake_metabase_clean.view_log.ts_last_view
+    description: Indicates the last visualization
   chart_url:
     lineage:
       - datalake_metabase_clean.report_card.id
+    description: Brings the card link from Metabase
   dataset:
     lineage:
       - datalake_metabase_clean.metabase_database.name
       - datalake_metabase_clean.metabase_table.name
+    description: This column indicates from which datalake dataset this chart pulls data.
   ownership:
     lineage:
       - datalake_metabase_clean.core_user.email
+    description: It shows the email addresses of the people who created the chart

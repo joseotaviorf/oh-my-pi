@@ -1,50 +1,65 @@
 ---
 database_name: datalake_dashboard_governance
 table_name: dashboard_metadata
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Ops & Governance
+description: It aims to extract detailed information about Metabase dashboards
 columns:
   id_dashboard:
     lineage:
       - datalake_metabase_clean.report_dashboard.id
       - datalake_looker_clean.dashboards.id
+    description: Dashboard ID
   dashboard_path:
     lineage:
       - datalake_metabase_clean.collection.location
       - datalake_looker_clean.folders.path
+    description: Shows the dashboard path
   title:
     lineage:
       - datalake_metabase_clean.report_dashboard.name
       - datalake_looker_clean.dashboards.title
+    description: Dashboard title.
   description:
     lineage:
       - datalake_metabase_clean.report_dashboard.description
       - datalake_looker_clean.dashboards.description
+    description: Brings the description of the dashboard
   ownership:
     lineage:
       - datalake_metabase_clean.core_user.email
       - datalake_looker_clean.users.email
+    description: Shows the user email address who created the dashboards
   last_view:
     lineage:
       - datalake_metabase_clean.view_log.ts_last_view
       - datalake_looker_clean.dashboards.last_accessed_at
+    description: The date when it was created
   dashboard_url:
     lineage:
       - datalake_metabase_clean.report_dashboard.id
       - datalake_looker_clean.dashboards.url
+    description: Brings the dashboard link from the metabase
   id_charts:
     lineage:
       - datalake_metabase_clean.report_chart.id
       - datalake_looker_clean.dashboard_elements.id
+    description: Brings the ids of the dashboard charts
   dt_updated:
     lineage:
       - datalake_looker_clean.dashboards.year
       - datalake_looker_clean.dashboards.month
       - datalake_looker_clean.dashboards.day
+    description: Last update date
   year:
     lineage:
       - datalake_looker_clean.dashboards.year
+    description: Brings the year it was updated
   month:
     lineage:
       - datalake_looker_clean.dashboards.year
+    description: Brings the month in which it was updated
   day:
     lineage:
       - datalake_looker_clean.dashboards.year
+    description: Brings the day it was updated
