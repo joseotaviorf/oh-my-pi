@@ -21,8 +21,11 @@ WITH assignment AS (
    ) AS band,
    a.action_code,
    a.dt_effective_start,
+   a.dt_effective_end,
    a.assignment_status_type,
-   a.dt_projected_start
+   a.dt_projected_start,
+   a.ts_last_update,
+   IF(a.business_unit_name IN ('Classifieds Latam', 'Benvi MX'), DATE(a.ts_last_update), a.dt_effective_start) AS dt_valid_from
  FROM
    datalake_hr_system.assignments AS a
 ),
@@ -38,29 +41,23 @@ assignments_present AS (
    a.career_track,
    a.target_plr,
    SUM(
-     CASE
-       WHEN action_code = 'PROMOTION'
-       OR band != LAG(band) OVER (
-         PARTITION BY id_assignment
-         ORDER BY
-           dt_effective_start
-       ) THEN 1
-       ELSE 0
-     END
-   ) over (
+    IF(action_code = 'PROMOTION' OR band != LAG(band) OVER (
+         PARTITION BY id_assignment ORDER BY dt_effective_start
+       ), 1, 0)) OVER (
      PARTITION BY id_assignment
      ORDER BY
        dt_effective_start
    ) AS qnt_promotions,
    a.dt_effective_start,
    a.dt_projected_start,
-   a.assignment_status_type
+   a.assignment_status_type,
+   a.dt_valid_from
  FROM
    assignment a
  WHERE
-   a.dt_effective_start <= DATE('{load_start_date}')
- QUALIFY 
-   dt_effective_start = MAX(dt_effective_start) over (PARTITION BY a.id_assignment)
+   dt_effective_start <= DATE('{load_start_date}')
+ QUALIFY
+   ROW_NUMBER() OVER (PARTITION BY a.id_assignment ORDER BY a.dt_valid_from DESC, a.dt_effective_start DESC) = 1
 ),
 assignments_future AS (
  SELECT
@@ -83,7 +80,7 @@ assignments_future AS (
        ) THEN 1
        ELSE 0
      END
-   ) over (
+   ) OVER (
      PARTITION BY id_assignment
      ORDER BY
        dt_effective_start
@@ -95,12 +92,12 @@ assignments_future AS (
    assignment a
  WHERE
    a.dt_effective_start > DATE('{load_start_date}')
- QUALIFY 
-   dt_effective_start = MAX(dt_effective_start) over (PARTITION BY a.id_assignment)
+ QUALIFY
+   ROW_NUMBER() OVER (PARTITION BY a.id_assignment ORDER BY a.dt_valid_from DESC, a.dt_effective_start DESC) = 1
 ),
 managers_present AS (
- SELECT
-   DISTINCT id_period_of_service,
+ SELECT DISTINCT
+  id_period_of_service,
    id_assignment,
    id_manager_assignment
  FROM
@@ -108,8 +105,8 @@ managers_present AS (
  WHERE
    dt_effective_start <= DATE('{load_start_date}')
    AND manager_type = 'LINE_MANAGER'
- QUALIFY 
-   dt_effective_start = MAX(dt_effective_start) over (PARTITION BY id_assignment)
+ QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_assignment ORDER BY dt_effective_start DESC) = 1
 ),
 managers_future AS (
  SELECT
@@ -121,8 +118,8 @@ managers_future AS (
  WHERE
    dt_effective_start > DATE('{load_start_date}')
    AND manager_type = 'LINE_MANAGER'
- QUALIFY 
-   dt_effective_start = MAX(dt_effective_start) over (PARTITION BY id_assignment)
+ QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_assignment ORDER BY dt_effective_start DESC) = 1
 ),
 hr_system_workers AS (
  SELECT
@@ -137,7 +134,7 @@ hr_system_workers AS (
 external_identifiers_step1 AS (
  SELECT
    id_person,
-   explode(external_identifiers) external_identifiers
+   EXPLODE(external_identifiers) external_identifiers
  FROM
    hr_system_workers
 ),
@@ -152,7 +149,7 @@ external_identifiers AS (
 work_rel_step1 AS(
  SELECT
    id_person,
-   explode(work_relationships) as work_relationships
+   EXPLODE(work_relationships) as work_relationships
  FROM
    hr_system_workers
 ),
@@ -168,7 +165,7 @@ assignments_step1 AS (
  SELECT
    id_person,
    id_period_service,
-   explode(assignments) as assignments
+   EXPLODE(assignments) as assignments
  FROM
    work_rel
 ),
@@ -183,7 +180,7 @@ assignments AS (
 managers_direct_led AS (
  SELECT
    id_manager_assignment,
-   count(*) AS qnt_directly_led
+   COUNT(*) AS qnt_directly_led
  FROM
    managers_present
  GROUP BY
@@ -200,72 +197,31 @@ cte_enrich_disability AS (
     OR ts_last_updated is null
 )
 
-
-SELECT
+SELECT DISTINCT
  wr.id_period_of_service AS sk_assignment,
  wr.id_person AS sk_employee,
  COALESCE(da.sk_demographic_information, '-1') AS sk_demographic_information,
  COALESCE(ap.id_cost_center, af.id_cost_center, '-1') AS sk_cost_center,
  COALESCE(ap.id_business_unit, af.id_business_unit, '-1') AS sk_business_unit,
- coalesce(ap.id_job, af.id_job, '-1') AS sk_job,
- CASE
-   WHEN COALESCE(
-     ap_manager.id_assignment,
-     af_manager.id_assignment
-   ) IS NULL
-     THEN '-1'
-   ELSE COALESCE(ap_manager.id_person, af_manager.id_person, '-1')
- END AS sk_manager,
- CASE
-   WHEN COALESCE(
-     ap_manager.id_assignment,
-     af_manager.id_assignment
-   ) IS NULL
-     THEN '-1'
-   ELSE COALESCE(
-     ap_manager.id_period_of_service,
-     af_manager.id_period_of_service,
-     '-1'
-   )
- END AS sk_manager_assignment,
+ COALESCE(ap.id_job, af.id_job, '-1') AS sk_job,
+ COALESCE(ap_manager.id_person, af_manager.id_person, '-1') AS sk_manager,
+ COALESCE(ap_manager.id_period_of_service, af_manager.id_period_of_service,'-1') AS sk_manager_assignment,
  COALESCE(d.sk_disability, '-1') AS sk_disability,
  sm.sk_last_increase_date,
  sm.sk_first_promotion_date,
  wr.worker_type,
  COALESCE(ap.assignment_number, af.assignment_number) AS assignment_number,
  COALESCE(sm.currency_code, -1) AS salary_currency,
- CASE
-   WHEN wr.dt_start = MAX(wr.dt_start) OVER (PARTITION BY wr.id_person)
-     THEN TRUE
-   ELSE FALSE
- END AS is_last_work_relationship,
- CASE
-   WHEN ap.assignment_status_type = 'ACTIVE'
-     THEN TRUE
-   ELSE FALSE
- END AS is_active,
- CASE
-   WHEN wr.worker_type = 'P'
-     THEN TRUE
-   ELSE FALSE
- END AS is_pending_worker,
- CASE
-   WHEN ap.career_track = 'L'
-   OR mdl.qnt_directly_led > 0
-     THEN TRUE
-   ELSE FALSE
- END AS is_manager,
+ wr.dt_start = MAX(wr.dt_start) OVER (PARTITION BY wr.id_person) AS is_last_work_relationship,
+ ap.assignment_status_type = 'ACTIVE' AS is_active,
+ wr.worker_type = 'P' AS is_pending_worker,
+ ap.career_track = 'L' OR mdl.qnt_directly_led > 0 AS is_manager,
  COALESCE(d.has_self_declared_disability, FALSE) AS has_self_declared_disability,
- CASE
-   WHEN wr.worker_type = 'P'
-     THEN 0
-   ELSE INT(
-     months_between(
-       coalesce(wr.dt_termination, DATE('{load_start_date}')),
-       wr.dt_start
-     )
-   )
- END AS assignment_age_months,
+ IF(wr.worker_type = 'P', 0, INT(
+    MONTHS_BETWEEN(
+      COALESCE(wr.dt_termination, DATE('{load_start_date}')),
+      wr.dt_start))
+    ) AS assignment_age_months,
  COALESCE(mdl.qnt_directly_led, 0) AS qnt_directly_led,
  COALESCE(ap.qnt_promotions, 0) AS qnt_promotions,
  COALESCE(sm.current_salary_amount, -1) AS salary,
@@ -281,13 +237,8 @@ SELECT
  COALESCE(sm.first_promotion_salary, 0) AS first_promotion_salary,
  COALESCE(sm.nominal_increase_first_promotion, 0) AS nominal_increase_first_promotion,
  COALESCE(sm.pct_increase_first_promotion, 0) AS pct_increase_first_promotion,
- DATEDIFF(MONTH, CASE WHEN wr.worker_type = 'P' THEN COALESCE(ap.dt_projected_start, af.dt_projected_start) ELSE wr.dt_start END, sm.dt_first_promotion) AS months_to_first_promotion,
- CASE
-   WHEN wr.worker_type = 'P'
-     THEN
-       COALESCE(ap.dt_projected_start, af.dt_projected_start)
-   ELSE wr.dt_start
- END AS dt_start_work_relationship,
+ MONTHS_BETWEEN(IF(wr.worker_type = 'P', COALESCE(ap.dt_projected_start, af.dt_projected_start), wr.dt_start), sm.dt_first_promotion) AS months_to_first_promotion,
+ IF(wr.worker_type = 'P', COALESCE(ap.dt_projected_start, af.dt_projected_start), wr.dt_start) AS dt_start_work_relationship,
  wr.dt_termination AS dt_termination_work_relationship,
  NOW() AS ts_load
 FROM
