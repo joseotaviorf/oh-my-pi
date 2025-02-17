@@ -4,7 +4,7 @@ SELECT
     prop_business_unit_uid AS id_business_unit,
     resultado AS analysis_result,
     CAST(calc_argonautv3_score AS BIGINT) AS v3_model_score,
-    CAST(calc_argonautv4_score AS BIGINT) AS v4_model_score,
+    CAST(calc_argonautv4_score AS DECIMAL(32,2)) AS v4_model_score,
     CAST(calc_quantidade_proponentes AS BIGINT) AS proponents_count,
     CAST(calc_idade_rf1 AS BIGINT) AS first_proponent_age,
     CAST(calc_idade_rf2 AS BIGINT) AS second_proponent_age,
