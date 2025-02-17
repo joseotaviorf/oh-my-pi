@@ -17,6 +17,9 @@ columns:
   v3_model_score:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_argonautv3_score
+  v4_model_score:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_argonautv4_score
   proponents_count:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_quantidade_proponentes
@@ -227,6 +230,12 @@ columns:
   serasa_score_hspn_api_v3_list:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_api_v3_serasa_score_hspn
+  serasa_score_hspn_api_v4_list:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_api_v4_serasa_score_hspn
+  bvs_score_api_v4:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_credit_granting.calc_api_v4_bvs_score_p5
   neoway_income_bureau:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_neoway_income_bureau
