@@ -1,5 +1,7 @@
 from typing import Dict, List, Set
 
+import json
+import ast
 import logging
 
 from datetime import datetime
@@ -17,7 +19,6 @@ from bietlejuice.services import FileService
 
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_dag_metadata_to_raw"
 
@@ -75,6 +76,9 @@ if __name__ == "__main__":
     parser.add_argument("source", type=str)
     parser.add_argument("table_name", type=str)
     parser.add_argument("execution_date_str", type=str)
+    parser.add_argument("partitions", type=str)
+    parser.add_argument("lineage_from_product_source_skip_list", type=str)
+    parser.add_argument("dag_manual_mapping", type=str)
 
     args = parser.parse_args()
     env = args.env
@@ -83,19 +87,15 @@ if __name__ == "__main__":
     table_name = args.table_name
     execution_date_str = args.execution_date_str
     execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
+    partition_cols = ast.literal_eval(args.partitions)
+    lineage_from_product_source_skip_list = set(ast.literal_eval(args.lineage_from_product_source_skip_list))
+    dag_manual_mapping = json.loads(args.dag_manual_mapping)
 
     logger.info(
         f"""m={JOB_NAME}, datalake_bucket={datalake_bucket}, source={source},
         table_name={table_name}, execution_date_str={execution_date_str}
         msg=Job execution started."""
     )
-
-    config_service = ConfigurationService(source)
-    partition_cols = config_service.get_config("PARTITION_COLUMNS")
-    lineage_from_product_source_skip_list = set(
-        config_service.get_config("LINEAGE_FROM_PRODUCT_SOURCES_SKIP_LIST")
-    )
-    dag_manual_mapping = config_service.get_config("DAG_METADATA_MANUAL_MAPPING")
 
     s3_loader = S3Loader()
     spark_client = SparkClient()

@@ -1,6 +1,7 @@
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
+import ast
 
 from pyspark.sql.functions import udf, col
 from quintoandar_logger import QuintoAndarLogger
@@ -11,7 +12,6 @@ from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageForma
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_columns_metastore_to_raw"
@@ -68,6 +68,9 @@ if __name__ == "__main__":
     parser.add_argument("source", type=str)
     parser.add_argument("table_name", type=str)
     parser.add_argument("execution_date_str", type=str)
+    parser.add_argument("partitions", type=str)
+    parser.add_argument("documentation_bucket", type=str)
+    parser.add_argument("documentation_prefix", type=str)
 
     args = parser.parse_args()
     env = args.env
@@ -76,17 +79,18 @@ if __name__ == "__main__":
     table_name = args.table_name
     execution_date_str = args.execution_date_str
     execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
+    partition_cols = ast.literal_eval(args.partitions)
+    documentation_bucket = args.documentation_bucket
+    documentation_prefix = args.documentation_prefix
+
+    bucket_suffix = ".data.quintoandar.com.br" if env == "prod" else ".forno.data.quintoandar.com.br"
+    documentation_bucket = documentation_bucket + bucket_suffix
 
     logger.info(
         f"""m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, source={source},
-        table_name={table_name}, execution_date_str={execution_date_str}
+        table_name={table_name}, execution_date_str={execution_date_str}, documentation_bucket={documentation_bucket}
         msg=Job execution started."""
     )
-
-    config_service = ConfigurationService(source)
-    documentation_bucket = config_service.get_config("DOCUMENTATION_BUCKET")
-    documentation_prefix = config_service.get_config("DOCUMENTATION_PATH")
-    partition_cols = config_service.get_config("PARTITION_COLUMNS")
 
     s3_loader = S3Loader()
     spark_client = SparkClient()

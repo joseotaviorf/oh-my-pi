@@ -1,8 +1,0 @@
----
-partition_cols: ["year", "month", "day"]
-table_names:
-  - categories_documentation
-  - columns_metastore
-  - dag_metadata
-  - lineage_and_tags
-  - columns_documentation

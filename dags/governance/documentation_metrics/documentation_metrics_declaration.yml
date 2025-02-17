@@ -1,0 +1,67 @@
+dag:
+  name: documentation_metrics
+  owner: Data Governance
+  schedule_start_date: 2020, 6, 1
+  schedule_interval: "0 5 * * *"
+  documentation:
+    dag_purpose: This DAG extracts data from our spark metastore and documentation bucket, so we can create metrics about documentation, lineage and tags coverage.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_{table_name}_to_raw
+  default_extraction_type: incremental
+  default_partitions:
+    - year
+    - month
+    - day
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"   # env
+    - "{bucket}"   # datalake_bucket
+    - "{dag_name}"   # source
+    - "{table_name}"
+    - "{load_start_date}"   # load_start_date
+    - "{partitions}"
+  tables_customization:
+    categories_documentation:
+      extra_spark_job_arguments:
+        - "data-documentation.s3"
+        - "documentation/"
+    columns_documentation:
+      extra_spark_job_arguments:
+        - "data-documentation.s3"
+        - "documentation/"
+    columns_metastore:
+      extra_spark_job_arguments:
+        - "data-documentation.s3"
+        - "documentation/"
+    dag_metadata:
+      extra_spark_job_arguments:
+        - "['base', 'datamarts', 'mediator', 'gsheets_several_daily_runs', 'catalog_product_entities', 'regions_polygon', 'twitter', 'linkedin', 'facebook_insights', 'gsheets_by_context']"
+        - ebdb:
+            raw:
+              database_name: datalake_ebdb_raw
+            clean:
+              database_name: datalake_ebdb_clean
+            dw:
+              database_name: dw_quintoandar
+    lineage_and_tags:
+      extra_spark_job_arguments:
+        - "['base', 'datamarts', 'mediator', 'gsheets_several_daily_runs', 'catalog_product_entities', 'regions_polygon', 'twitter', 'linkedin', 'facebook_insights', 'gsheets_by_context']"
+        - ebdb:
+            raw:
+              database_name: datalake_ebdb_raw
+            clean:
+              database_name: datalake_ebdb_clean
+            dw:
+              database_name: dw_quintoandar
+cluster:
+  type: databricks_13_3_med_memory_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

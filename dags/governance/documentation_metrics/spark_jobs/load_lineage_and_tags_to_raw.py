@@ -1,9 +1,9 @@
 from typing import Dict, Union, List
 
+import json
+import ast
 import logging
-
 import yaml
-
 import boto3
 
 from datetime import datetime
@@ -50,6 +50,9 @@ if __name__ == "__main__":
     parser.add_argument("source", type=str)
     parser.add_argument("table_name", type=str)
     parser.add_argument("execution_date_str", type=str)
+    parser.add_argument("partitions", type=str)
+    parser.add_argument("lineage_from_product_source_skip_list", type=str)
+    parser.add_argument("dag_manual_mapping", type=str)
 
     args = parser.parse_args()
     env = args.env
@@ -58,6 +61,9 @@ if __name__ == "__main__":
     table_name = args.table_name
     execution_date_str = args.execution_date_str
     execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
+    partition_cols = ast.literal_eval(args.partitions)
+    lineage_from_product_source_skip_list = set(ast.literal_eval(args.lineage_from_product_source_skip_list))
+    dag_manual_mapping = json.loads(args.dag_manual_mapping)
 
     logger.info(
         f"""m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, source={source},
@@ -66,11 +72,6 @@ if __name__ == "__main__":
     )
 
     config_service = ConfigurationService(source)
-    partition_cols = config_service.get_config("PARTITION_COLUMNS")
-    lineage_from_product_source_skip_list = set(
-        config_service.get_config("LINEAGE_FROM_PRODUCT_SOURCES_SKIP_LIST")
-    )
-    dag_manual_mapping = config_service.get_config("DAG_METADATA_MANUAL_MAPPING")
     databricks_bucket = config_service.get_config("databricks_bucket")
     dags_packages_files_path_in_s3 = config_service.get_config(
         "dags_packages_files_path_in_s3"
