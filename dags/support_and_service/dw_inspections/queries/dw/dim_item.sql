@@ -12,7 +12,6 @@ SELECT
 FROM
     datalake_inspections.item i
 WHERE
-    is_present = TRUE
-    AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_item ORDER BY ts_updated DESC) = 1
