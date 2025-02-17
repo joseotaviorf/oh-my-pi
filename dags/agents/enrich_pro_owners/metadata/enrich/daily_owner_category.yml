@@ -11,11 +11,11 @@ columns:
     description: Id of the owner with it's category version. It's the concatenation of id_owner + 0 + owner_category.
   id_owner:
     lineage:
-    - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
+      - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
     description: Id user of the owner.
   country_code:
     lineage:
-    - datalake_pro_owners.daily_owner_houses_quantity_history.country_code
+      - datalake_pro_owners.daily_owner_houses_quantity_history.country_code
     description: Country code of the user. It's a partition of this table.
   owner_category:
     description: Integer with the number of the owner.
@@ -30,19 +30,25 @@ columns:
       "false": The owner is not participating in PP Multi program, so it's amateur.
   cluster_pp_multi:
     lineage:
-    - datalake_gsheets_clean.pp_multi_cluster.cluster
+      - datalake_gsheets_clean.pp_multi_cluster.cluster
     description: Classification of PP multi based on groups it can belong to and the number of ongoing houses it has.
   is_current_category:
     description: Boolean value to check if the owner's category is the most recent.
   dt_owner_category:
     lineage:
-    - datalake_pro_owners.daily_owner_houses_quantity_history.dt_houses_owned
+      - datalake_pro_owners.daily_owner_houses_quantity_history.dt_houses_owned
     description: Reference date of the table.
   year:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.year
     description: Year value of the date reference. Also, it's a partition.
   month:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.month
     description: Month value of the date reference. Also, it's a partition.
   day:
+    lineage:
+      - datalake_pro_owners.daily_owner_houses_quantity_history.day
     description: Day value of the date reference. Also, it's a partition.
   category:
     description: DEPRECATED.

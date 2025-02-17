@@ -2,61 +2,60 @@
 dag:
   name: enrich_pro_owners
   schedule_start_date: 2020, 7, 1
-  documentation: 
+  documentation:
     dag_purpose: |
-          Creates enriched tables for the context `pro_owners`|`pp_multi` from ebdb. This schema has tables that
-          extract metrics about owners and houses like quantity of house, owner classification, owner account manager 
-          and their changes in time. So, the grain in these tables is a owner, ts_change and a metric that was observed.
-          Basically, a SCD type 2.
+      Creates enriched tables for the context `pro_owners`|`pp_multi` from ebdb. This schema has tables that
+      extract metrics about owners and houses like quantity of house, owner classification, owner account manager
+      and their changes in time. So, the grain in these tables is a owner, ts_change and a metric that was observed.
+      Basically, a SCD type 2.
   owner: Data Agents
 workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
     daily_owner_houses_quantity_history:
-    - house_b2b_history
+      - house_b2b_history
     daily_owner_category:
-    - daily_owner_houses_quantity_history
-    - pro_owner_history
+      - daily_owner_houses_quantity_history
+      - pro_owner_history
     owner_houses_quantity_history:
-    - house_b2b_history
+      - house_b2b_history
     tracking_weekly_changes:
-    - owner_houses_quantity_history
+      - owner_houses_quantity_history
     pp_multi_assessor_history:
-    - daily_owner_houses_quantity_history
-    - pro_owner_history
+      - daily_owner_houses_quantity_history
+      - pro_owner_history
     pp_multi_assessor:
-    - daily_owner_houses_quantity_history
-    - pro_owner_history
+      - daily_owner_houses_quantity_history
+      - pro_owner_history
   tables_customization:
     daily_owner_category:
       partitions:
-      - year
-      - month
-      - day
-      - country_code
-      extraction_type: incremental
+        - year
+        - month
+        - day
+        - country_code
     daily_owner_houses_quantity_history:
       partitions:
-      - year
-      - month
-      - day
-      - country_code
+        - year
+        - month
+        - day
+        - country_code
       extraction_type: incremental
     tracking_weekly_changes:
       partitions:
-      - year
-      - month
-      - day
+        - year
+        - month
+        - day
       extraction_type: incremental
 cluster:
   type: custom_cluster
   custom_configurations:
     driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.2xlarge
+    node_type_id: m5a.4xlarge
     num_workers: 2
     spark_version: 13.3.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
