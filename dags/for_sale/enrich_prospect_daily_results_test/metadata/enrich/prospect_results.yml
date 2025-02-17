@@ -1,0 +1,175 @@
+---
+database_name: datalake_prospect_daily_results_test
+table_name: prospect_results
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: null
+columns:
+  id_demand_prospect_conversion_event:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_demand_prospect_conversion_event
+  id_prospect:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_prospect
+  business_context:
+    description: ''
+    lineage:
+    - .media_setup_ids.business_context
+  id_event_type:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_event_type
+  event_name:
+    description: ''
+    lineage:
+    - .media_setup_ids.event_name
+  media_setup_from_adhoc:
+    description: ''
+    lineage:
+    - .media_setup_ids.media_setup_from_adhoc
+  media_setup_from_dictionary:
+    description: ''
+    lineage:
+    - .media_setup_ids.media_setup_from_dictionary
+  media_setup_from_exception_flow:
+    description: ''
+    lineage:
+    - .media_setup_ids.media_setup_from_exception_flow
+  media_setup_from_naming_convention:
+    description: ''
+    lineage:
+    - .media_setup_ids.media_setup_from_naming_convention
+  naming_convention_sufix:
+    description: ''
+    lineage:
+    - .media_setup_ids.CASE WHEN NOT media_setup_from_adhoc IS NULL THEN media_setup_from_adhoc
+      WHEN NOT media_setup_from_exception_flow IS NULL AND media_setup_from_exception_flow
+      <> '' THEN media_setup_from_exception_flow WHEN NOT media_setup_from_dictionary
+      IS NULL THEN media_setup_from_dictionary WHEN NOT media_setup_from_naming_convention
+      IS NULL THEN media_setup_from_naming_convention END
+  naming_convention_sufix_origin:
+    description: ''
+    lineage:
+    - .media_setup_ids.CASE WHEN NOT media_setup_from_adhoc IS NULL THEN "adhoc rule"
+      WHEN NOT media_setup_from_exception_flow IS NULL AND media_setup_from_exception_flow
+      <> '' THEN "exception flow" WHEN NOT media_setup_from_dictionary IS NULL THEN
+      "dictionary" WHEN NOT media_setup_from_naming_convention IS NULL THEN "naming
+      convention" END
+  id_rent_flow:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_rent_flow
+  id_sale_flow:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_sale_flow
+  id_booking:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_booking
+  id_offer:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_offer
+  id_talk_to_agent:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_talk_to_agent
+  id_house:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_house
+  id_region:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_region
+  id_owner:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_owner
+  id_agent:
+    description: ''
+    lineage:
+    - .media_setup_ids.id_agent
+  utm_adhoc_rule:
+    description: ''
+    lineage:
+    - .media_setup_ids.utm_adhoc_rule
+  utm_campaign:
+    description: ''
+    lineage:
+    - .media_setup_ids.utm_campaign
+  utm_medium:
+    description: ''
+    lineage:
+    - .media_setup_ids.utm_medium
+  utm_source:
+    description: ''
+    lineage:
+    - .media_setup_ids.utm_source
+  utm_term:
+    description: ''
+    lineage:
+    - .media_setup_ids.utm_term
+  utm_content:
+    description: ''
+    lineage:
+    - .media_setup_ids.utm_content
+  entrance_uri:
+    description: ''
+    lineage:
+    - .media_setup_ids.entrance_uri
+  app_type:
+    description: ''
+    lineage:
+    - .media_setup_ids.app_type
+  booking_creator:
+    description: ''
+    lineage:
+    - .media_setup_ids.booking_creator
+  product_origin:
+    description: ''
+    lineage:
+    - .media_setup_ids.product_origin
+  is_3p_demand:
+    description: ''
+    lineage:
+    - .media_setup_ids.is_3p_demand
+  operation_channel:
+    description: ''
+    lineage:
+    - .media_setup_ids.operation_channel
+  referral_type:
+    description: ''
+    lineage:
+    - .media_setup_ids.referral_type
+  origin:
+    description: ''
+    lineage:
+    - .media_setup_ids.origin
+  platform:
+    description: ''
+    lineage:
+    - .media_setup_ids.platform
+  content_page:
+    description: ''
+    lineage:
+    - .media_setup_ids.content_page
+  ts_event:
+    description: ''
+    lineage:
+    - .media_setup_ids.ts_event
+  year:
+    description: ''
+    lineage:
+    - .media_setup_ids.year
+  month:
+    description: ''
+    lineage:
+    - .media_setup_ids.month
+  day:
+    description: ''
+    lineage:
+    - .media_setup_ids.day

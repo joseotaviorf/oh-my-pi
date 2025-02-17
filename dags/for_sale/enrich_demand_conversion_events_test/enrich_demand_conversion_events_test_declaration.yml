@@ -1,0 +1,29 @@
+---
+dag:
+  name: enrich_demand_conversion_events_test
+  schedule_start_date: 2023, 9, 25
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      This DAG enriches tables related to the process of demand conversion in Growth context.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -14), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  inner_dependencies:
+    buyer_prospect_status:
+      - conversion_events
+    tenant_prospect_status:
+      - conversion_events
+cluster:
+  type: databricks_12_2_med_io-memory_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,0 +1,147 @@
+---
+database_name: datalake_prospect_daily_results_test
+table_name: prospect_daily_results
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: null
+columns:
+  id_prospect_event:
+    description: ''
+    lineage:
+    - .prospect_results.MONOTONICALLY_INCREASING_ID()
+  id_demand_prospect_conversion_event:
+    description: ''
+    lineage:
+    - .prospect_results.id_demand_prospect_conversion_event
+  id_prospect:
+    description: ''
+    lineage:
+    - .prospect_results.id_prospect
+  business_context:
+    description: ''
+    lineage:
+    - .prospect_results.business_context
+  event_type:
+    description: ''
+    lineage:
+    - .prospect_results.event_type
+  event_name:
+    description: ''
+    lineage:
+    - .prospect_results.event_name
+  event_detail:
+    description: ''
+    lineage:
+    - .prospect_results.event_detail
+  naming_convention_sufix:
+    description: ''
+    lineage:
+    - .prospect_results.naming_convention_sufix
+  id_rent_flow:
+    description: ''
+    lineage:
+    - .prospect_results.id_rent_flow
+  id_sale_flow:
+    description: ''
+    lineage:
+    - .prospect_results.id_sale_flow
+  id_booking:
+    description: ''
+    lineage:
+    - .prospect_results.id_booking
+  id_offer:
+    description: ''
+    lineage:
+    - .prospect_results.id_offer
+  id_talk_to_agent:
+    description: ''
+    lineage:
+    - .prospect_results.id_talk_to_agent
+  id_house:
+    description: ''
+    lineage:
+    - .prospect_results.id_house
+  id_region:
+    description: ''
+    lineage:
+    - .prospect_results.id_region
+  id_owner:
+    description: ''
+    lineage:
+    - .prospect_results.id_owner
+  id_agent:
+    description: ''
+    lineage:
+    - .prospect_results.id_agent
+  product_origin:
+    description: ''
+    lineage:
+    - .prospect_results.product_origin
+  app_type:
+    description: ''
+    lineage:
+    - .prospect_results.app_type
+  origin:
+    description: ''
+    lineage:
+    - .prospect_results.origin
+  platform:
+    description: ''
+    lineage:
+    - .prospect_results.platform
+  content_page:
+    description: ''
+    lineage:
+    - .prospect_results.content_page
+  operation_channel:
+    description: ''
+    lineage:
+    - .prospect_results.operation_channel
+  referral_type:
+    description: ''
+    lineage:
+    - .prospect_results.referral_type
+  utm_campaign:
+    description: ''
+    lineage:
+    - .prospect_results.utm_campaign
+  utm_medium:
+    description: ''
+    lineage:
+    - .prospect_results.utm_medium
+  utm_source:
+    description: ''
+    lineage:
+    - .prospect_results.utm_source
+  utm_term:
+    description: ''
+    lineage:
+    - .prospect_results.utm_term
+  utm_content:
+    description: ''
+    lineage:
+    - .prospect_results.utm_content
+  entrance_uri:
+    description: ''
+    lineage:
+    - .prospect_results.entrance_uri
+  id_event_date:
+    description: ''
+    lineage:
+    - .prospect_results.INT(DATE_FORMAT(ts_event, 'yyyyMMdd'))
+  ts_event:
+    description: ''
+    lineage:
+    - .prospect_results.ts_event
+  year:
+    description: ''
+    lineage:
+    - .prospect_results.year
+  month:
+    description: ''
+    lineage:
+    - .prospect_results.month
+  day:
+    description: ''
+    lineage:
+    - .prospect_results.day

@@ -631,6 +631,10 @@ bietlejuice.dw_listing_temp:
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
 bietlejuice.dw_losses:
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-bridge-map-debt-negotiation
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-debt
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.enrich_losses:load-enrich-bill-items
@@ -638,10 +642,6 @@ bietlejuice.dw_losses:
   - bietlejuice.enrich_losses:load-enrich-delay
   - bietlejuice.enrich_losses:load-enrich-historical-closing
   - bietlejuice.enrich_losses:load-enrich-provision
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-bridge-map-debt-negotiation
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-debt
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment
   - bietlejuice.enrich_retsuko:load-enrich-invoice
 bietlejuice.dw_media_platform_metrics:
   - bietlejuice.enrich_growth_manual_media_platform_metrics:load-enrich-manual-costs
@@ -1583,6 +1583,15 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
+bietlejuice.enrich_demand_conversion_events_test:
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
+  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
 bietlejuice.enrich_demand_score_report:
   - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score
 bietlejuice.enrich_docpilot:
@@ -2394,6 +2403,22 @@ bietlejuice.enrich_proposal:
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+bietlejuice.enrich_prospect_daily_results_test:
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events
+  - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events
+  - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_demand_conversion_events_test:load-enrich-buyer-prospect-status
+  - bietlejuice.enrich_demand_conversion_events_test:load-enrich-conversion-events
+  - bietlejuice.enrich_demand_conversion_events_test:load-enrich-tenant-prospect-status
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary
+  - bietlejuice.enrich_offer:load-enrich-offer
+  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
+  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
 bietlejuice.enrich_public_date:
   - bietlejuice.google_calendar:load-clean-brazillian-holidays
   - bietlejuice.google_calendar:load-clean-mexican-holidays

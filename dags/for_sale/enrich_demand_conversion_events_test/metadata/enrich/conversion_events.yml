@@ -1,0 +1,84 @@
+---
+database_name: datalake_demand_conversion_events_test
+table_name: conversion_events
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: null
+columns:
+  id_demand_prospect_conversion_event:
+    description: ''
+    lineage:
+    - .union_events.MD5(CONCAT(ts_event, id_event_type, business_context, COALESCE(id_booking,
+      -1), COALESCE(id_offer, -1), COALESCE(id_talk_to_agent, -1), id_prospect, id_house))
+  id_rent_flow:
+    description: ''
+    lineage:
+    - .union_events.id_rent_flow
+  id_sale_flow:
+    description: ''
+    lineage:
+    - .union_events.id_sale_flow
+  id_talk_to_agent:
+    description: ''
+    lineage:
+    - .union_events.id_talk_to_agent
+  id_event_type:
+    description: ''
+    lineage:
+    - .union_events.id_event_type
+  id_booking:
+    description: ''
+    lineage:
+    - .union_events.id_booking
+  id_offer:
+    description: ''
+    lineage:
+    - .union_events.id_offer
+  id_house:
+    description: ''
+    lineage:
+    - .union_events.id_house
+  id_region:
+    description: ''
+    lineage:
+    - .union_events.id_region
+  id_prospect:
+    description: ''
+    lineage:
+    - .union_events.id_prospect
+  id_owner:
+    description: ''
+    lineage:
+    - .union_events.id_owner
+  id_agent:
+    description: ''
+    lineage:
+    - .union_events.id_agent
+  event_name:
+    description: ''
+    lineage:
+    - .union_events.event_name
+  business_context:
+    description: ''
+    lineage:
+    - .union_events.business_context
+  dt_event:
+    description: ''
+    lineage:
+    - .union_events.dt_event
+  ts_event:
+    description: ''
+    lineage:
+    - .union_events.ts_event
+  year:
+    description: ''
+    lineage:
+    - .union_events.YEAR(dt_event)
+  month:
+    description: ''
+    lineage:
+    - .union_events.MONTH(dt_event)
+  day:
+    description: ''
+    lineage:
+    - .union_events.DAY(dt_event)
