@@ -45,6 +45,15 @@ columns:
     lineage:
       - datalake_greenseer.sessions.ts_ended
     description: Chat end timestamp.
+  recontact_time:
+    lineage:
+      - datalake_greenseer.sessions.recontact_time
+    description: Time in minutes that the user took to recontact the service.
+    categories:
+      '<12h': Recontact before 12h
+      '12-96h': Recontact between 12h and 96h
+      '>96h': Recontact after 96h
+      'NR': Did not return
   is_menu_available:
     lineage:
       - datalake_greenseer.sessions.is_menu_available

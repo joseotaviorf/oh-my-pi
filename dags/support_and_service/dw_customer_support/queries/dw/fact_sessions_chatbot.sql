@@ -108,6 +108,7 @@ SELECT
   COALESCE(sf.id_answer, -1) AS sk_answer,
   COALESCE(CAST(DATE_FORMAT(gs.ts_started,'yyyyMMdd') AS BIGINT), -1) AS sk_started_chat,
   COALESCE(CAST(DATE_FORMAT(gs.ts_ended,'yyyyMMdd') AS BIGINT), -1) AS sk_ended_chat,
+  gs.recontact_time,
   gs.is_menu_available,
   gs.is_more_help_required,
   gs.is_problem_solved,
