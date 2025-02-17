@@ -22,9 +22,9 @@ owner_house_category AS(
     ohqh.id_owner,
     ohqh.country_code,
     ohqh.ongoing_houses >= 5 AS has_5_or_more_ongoing_houses,
-    CASE
+    CASE 
       WHEN poh.is_pro_owner THEN TRUE
-      WHEN (poh.id_owner IS NULL
+      WHEN (poh.id_owner IS NULL 
         OR poh.is_pro_owner) THEN FALSE
       ELSE FALSE
     END AS is_pp_multi,
@@ -49,6 +49,10 @@ owner_house_category AS(
   LEFT JOIN
     pp_multi_cluster AS pmc
       ON ohqh.id_owner = pmc.id_owner
+  WHERE
+    ohqh.year = {year}
+    AND ohqh.month = {month}
+    AND ohqh.day = {day}
 ),
 owner_house_category_changes AS (
   SELECT
@@ -96,9 +100,9 @@ SELECT
   ohc.cluster_pp_multi,
   COALESCE(oc.owner_category, 0) = COALESCE(cc.last_category, 0) AS is_current_category,
   ohc.dt_houses_owned AS dt_owner_category,
-  ohc.year,
-  ohc.month,
-  ohc.day
+  {year} AS year,
+  {month} AS month,
+  {day} AS day
 FROM
   owner_house_category AS ohc
 LEFT JOIN
