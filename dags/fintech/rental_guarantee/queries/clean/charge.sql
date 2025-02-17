@@ -1,12 +1,12 @@
-SELECT 
-    id, 
-    guarantee_id AS id_guarantee, 
+SELECT
+    id,
+    guarantee_id AS id_guarantee,
     cancellation_reason,
-    card_token, 
-    emv, 
+    card_token,
+    emv,
     installments,
-    pix_link, 
-    qr_code, 
+    pix_link,
+    qr_code,
     status AS charge_status,
     type AS charge_type,
     refund_amount,
@@ -15,9 +15,5 @@ SELECT
     year,
     month,
     day
-FROM 
+FROM
     datalake_rental_guarantee_raw.charge
-WHERE 
-    year = {year}
-    AND month = {month} 
-    AND day = {day}

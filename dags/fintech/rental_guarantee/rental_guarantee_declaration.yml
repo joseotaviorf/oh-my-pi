@@ -2,8 +2,11 @@ dag:
   name: rental_guarantee
   owner: Data Fintech
   schedule_interval: 0 0 * * *
+  documentation:
+    dag_purpose: |
+      This DAG handles the ingestion of our raw and clean data for our Rental Guarantee Microservice, which is a Microservice that was created to offer new possibilities for Tenants to be a part of 5A, when they weren’t approved in our credit policies. For more information about the Database please refer to [the repository](https://github.com/quintoandar/rental-guarantee).
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
   custom_schema: rental_guarantee

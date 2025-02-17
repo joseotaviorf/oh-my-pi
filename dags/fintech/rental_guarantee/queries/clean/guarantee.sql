@@ -26,7 +26,3 @@ SELECT
     day
 FROM
     datalake_rental_guarantee_raw.guarantee
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
