@@ -4,7 +4,6 @@ SELECT
     userupdate AS id_user_update,
     propose AS id_propose,
     status AS id_status,
-    company_plan AS id_company_plan,
     maintenant AS id_main_tenant,
     realestate AS id_real_estate,
     realtor AS id_realtor,

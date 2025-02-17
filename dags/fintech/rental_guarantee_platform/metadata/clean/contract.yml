@@ -17,9 +17,6 @@ columns:
   id_status:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.status
-  id_company_plan:
-    lineage:
-      - datalake_rental_guarantee_platform_raw.contract.company_plan
   id_main_tenant:
     lineage:
       - datalake_rental_guarantee_platform_raw.contract.maintenant
