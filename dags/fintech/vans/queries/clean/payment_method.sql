@@ -7,4 +7,4 @@ SELECT
     day,
     hour
 FROM
-    datalake_vans_homolog_raw.paymentmethod
+    datalake_vans_raw.paymentmethod

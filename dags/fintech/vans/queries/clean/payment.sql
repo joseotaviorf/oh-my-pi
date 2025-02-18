@@ -1,6 +1,7 @@
 SELECT
     id,
     related_document_id AS id_related_document,
+    bank_payment_id AS id_bank_payment,
     due_amount,
     due_date AS dt_dued,
     timestamp(issue_date_time) AS ts_issued,
@@ -24,8 +25,6 @@ SELECT
     related_document_status,
     paid_amount,
     bank_payment_code,
-    type,
-    style,
-    bank_payment_id AS id_bank_payment
+    type
 FROM
     datalake_vans_raw.payment

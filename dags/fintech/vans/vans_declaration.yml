@@ -1,5 +1,5 @@
 dag:
-  name: vans_homolog
+  name: vans
   schedule_start_date: 2019,10,1
   schedule_interval: 0 8 * * *
   owner: Data Fintech
@@ -11,7 +11,7 @@ workflow:
   layer: raw
   database_type: mysql
   source_schema: vans
-  custom_schema: vans_homolog
+  custom_schema: vans
   source_database: vans
   dbutils_secret_key: VANS_DB
   tables_customization:

@@ -3,7 +3,7 @@ SELECT
     bank_id AS id_bank,
     agency,
     account,
-    boolean(active) AS is_active,
-    account_digit
+    account_digit,
+    boolean(active) AS is_active
 FROM
     datalake_vans_raw.bankboleto

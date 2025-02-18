@@ -28,4 +28,4 @@ SELECT
   day,
   hour
 FROM
-  datalake_vans_homolog_raw.paymentboleto_status_log
+  datalake_vans_raw.paymentboleto_status_log
