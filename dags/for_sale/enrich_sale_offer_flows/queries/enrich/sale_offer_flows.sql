@@ -17,7 +17,7 @@ WITH flow_type AS (
         o.id_firestore AS id_offer,
         sf.flow_type
     FROM
-        datalake_sales_flow_clean.offer AS o
+        datalake_sales_flow_clean.offer_aud AS o
     LEFT JOIN
         last_sf_entry AS sf
             ON sf.id = o.id_sales_flow
@@ -32,7 +32,9 @@ offers AS (
         SELECT
             *
         FROM
-            datalake_sales_flow_clean.offer
+            datalake_sales_flow_clean.offer_aud
+        WHERE
+            offer_price IS NOT NULL
         QUALIFY
             ROW_NUMBER() OVER (PARTITION BY id_firestore ORDER BY ts_updated) = 1
     ),
@@ -133,7 +135,7 @@ ccvs AS (
             id_firestore AS id_offer,
             id_sales_flow
         FROM
-            datalake_sales_flow_clean.offer AS o
+            datalake_sales_flow_clean.offer_aud AS o
         GROUP BY
             id_firestore,
             id_sales_flow
@@ -157,7 +159,7 @@ ccvs AS (
                 id_firestore AS id_offer,
                 id_sales_flow
             FROM
-                datalake_sales_flow_clean.offer AS o
+                datalake_sales_flow_clean.offer_aud AS o
             GROUP BY
                 id_firestore,
                 id_sales_flow
@@ -306,7 +308,7 @@ first_update_payment AS (
         *,
         payment_method AS planned_payment_method
     FROM
-        datalake_sales_flow_clean.payment
+        datalake_sales_flow_clean.payment_aud
     QUALIFY
       ROW_NUMBER() OVER (PARTITION BY id_sales_flow ORDER BY ts_updated ASC) = 1
 ),

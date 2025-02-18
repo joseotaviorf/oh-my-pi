@@ -28,10 +28,10 @@ offers_specialists AS (
         id_firestore AS id_offer,
         id_sales_flow
     FROM
-        datalake_sales_flow_clean.offer AS o
+        datalake_sales_flow_clean.offer_aud AS o
     GROUP BY
-        1,
-        2
+        id_firestore,
+        id_sales_flow
 )
 SELECT
     id_offer,

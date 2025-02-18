@@ -35,7 +35,7 @@ first_update_diligence AS (
         id_diligence,
         MIN(ts_updated) AS ts_first_updated
     FROM
-        datalake_sales_flow_clean.diligence
+        datalake_sales_flow_clean.diligence_aud
     WHERE
         ts_buyer_seller_ended IS NOT NULL
     GROUP BY
@@ -46,7 +46,7 @@ first_update_mortgage AS (
         id_mortgage,
         MIN(ts_updated) AS ts_first_updated
     FROM
-        datalake_sales_flow_clean.mortgage
+        datalake_sales_flow_clean.mortgage_aud
     WHERE
         dt_credit_ended IS NOT NULL
     GROUP BY
