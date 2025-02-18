@@ -126,6 +126,12 @@ bietlejuice.dw_datamarts_spark.static:
 bietlejuice.dw_date:
   add:
     - bietlejuice.enrich_public_date:load-enrich-aux-date
+bietlejuice.dw_inspections:
+  remove:
+    - bietlejuice.inspection_services:load-clean-assessment
+    - bietlejuice.inspection_services:load-clean-contestation
+    - bietlejuice.inspection_services:load-clean-repair-request
+    - bietlejuice.inspection_services:load-clean-reviewer
 bietlejuice.dw_losses:
   remove:
     - bietlejuice.enrich_losses:load-enrich-provision-factor
@@ -194,6 +200,9 @@ bietlejuice.enrich_amplitude_agents_app:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.amplitude:load-clean-events
+bietlejuice.enrich_amplitude_inspections:
+  remove:
+    - bietlejuice.inspection_services:load-clean-inspection-aud
 bietlejuice.enrich_amplitude_lead:
   remove:
     - bietlejuice.amplitude:load-clean-events
@@ -359,6 +368,31 @@ bietlejuice.enrich_house_feature_inference:
     - bietlejuice.ebdb_house:load-clean-house
     - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
     - bietlejuice.enrich_ebdb_country:load-enrich-house
+bietlejuice.enrich_inspections:
+  remove:
+    - bietlejuice.inspection_services:load-clean-appointment
+    - bietlejuice.inspection_services:load-clean-appointment-aud
+    - bietlejuice.inspection_services:load-clean-assessment
+    - bietlejuice.inspection_services:load-clean-budget
+    - bietlejuice.inspection_services:load-clean-contestation
+    - bietlejuice.inspection_services:load-clean-contestation-media
+    - bietlejuice.inspection_services:load-clean-inspection
+    - bietlejuice.inspection_services:load-clean-inspection-aud
+    - bietlejuice.inspection_services:load-clean-issue-type
+    - bietlejuice.inspection_services:load-clean-item
+    - bietlejuice.inspection_services:load-clean-item-group
+    - bietlejuice.inspection_services:load-clean-item-group-type
+    - bietlejuice.inspection_services:load-clean-item-issue
+    - bietlejuice.inspection_services:load-clean-item-media
+    - bietlejuice.inspection_services:load-clean-item-type
+    - bietlejuice.inspection_services:load-clean-repair-request
+    - bietlejuice.inspection_services:load-clean-repair-request-media
+    - bietlejuice.inspection_services:load-clean-review
+    - bietlejuice.inspection_services:load-clean-review-media
+    - bietlejuice.inspection_services:load-clean-reviewer
+    - bietlejuice.inspection_services:load-clean-reviewer-aud
+    - bietlejuice.inspection_services:load-clean-room
+    - bietlejuice.inspection_services:load-clean-room-type
 bietlejuice.enrich_label_studio:
   remove:
     - bietlejuice.label_studio:load-clean-annotations
@@ -849,7 +883,7 @@ bietlejuice.enrich_velo_omie:
   override: []
 
 wonka.group_user_most_viewed:
-  add: 
+  add:
     - bietlejuice.ebdb_location:load-clean-region
     - bietlejuice.ebdb_house:load-clean-house
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean

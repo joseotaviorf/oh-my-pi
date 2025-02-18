@@ -1,0 +1,137 @@
+---
+database_name: datalake_inspections_clean
+table_name: appointment_aud
+description: This table contains data on scheduling, scheduling and canceling dates for property inspections.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_appointment:
+    description: Unique ID of the inspection schedule.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.id
+  id_external_appointment:
+    description: Unique external ID of the inspection schedule, this ID relates to the Planner (Main) schedule data.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.external_appointment_id
+  mod_id_external_appointment:
+    description: Indicates if the id_external_appointment field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment_aud.external_appointment_id_mod
+  id_schedules:
+    description: Scheduling identification key in the schedules databases.
+    lineage:
+      - datalake_inspections_raw.appointment.schedules_appointment_id
+  mod_id_schedules:
+    description: Indicates if the id_schedules field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment.schedules_appointment_id_mod
+  id_inspection:
+    description: Inspection unique identifier.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.inspection_id
+  mod_id_inspection:
+    description: Indicates if the id_inspection field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment_aud.inspection_id_mod
+  id_inspector:
+    description: Unique identifier of the inspector responsible for carrying out the inspection.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.inspector_id
+  mod_id_inspector:
+    description: Indicates if the id_inspection field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment_aud.inspector_id_mod
+  rev:
+    description: Foreign key of the RevInfo table, which indicates when the record was changed
+    lineage:
+      - datalake_inspections_raw.appointment_aud.rev
+  rev_type:
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.revtype
+  rev_end:
+    description: ""
+    lineage:
+      - datalake_inspections_raw.appointment_aud.revend
+  status:
+    description: Inspection schedule status.
+    categories:
+      DONE: Scheduling process completed, the inspection was carried out.
+      SCHEDULED: The property inspection date has been scheduled.
+      CANCELLED: The scheduled inspection date has been canceled.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.status
+  mod_status:
+    description: Indicates if the status field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment_aud.status_mod
+  mod_inspection:
+    description: ""
+    lineage:
+      - datalake_inspections_raw.appointment_aud.inspection_mod
+  observation:
+    description: Schedule observations, generally provide information about the location of keys.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.observation
+  mod_observation:
+    description: Indicates if the observation field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment_aud.observation_mod
+  cancellation_reason:
+    description: Description of the reason for canceling the inspection appointment
+    lineage:
+      - datalake_inspections_raw.appointment_aud.cancellation_reason
+  mod_cancellation_reason:
+    description: Indicates if the cancellation_reason field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment_aud.cancellation_reason_mod
+  is_fixed_agent:
+    description:
+      Indicates whether the inspection was scheduled with a specific agent,
+      rather than a temporary random assignment.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.fixed_agent
+  mod_is_fixed_agent:
+    description: Indicates if the is_fixed_agent field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment_aud.fixed_agent_mod
+  dt_scheduled:
+    description: Scheduled date for the inspection
+    lineage:
+      - datalake_inspections_raw.appointment_aud.scheduled_date
+  mod_dt_scheduled:
+    description: Indicates if the dt_scheduled field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment_aud.scheduled_date_mod
+  ts_updated:
+    description: Appointment update date.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.updated_at
+  mod_ts_updated:
+    description: Indicates if the ts_updated field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment_aud.updated_at_mod
+  ts_created:
+    description: Appointment creation date.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.created_at
+  mod_ts_created:
+    description: Indicates if the ts_created field has been changed
+    lineage:
+      - datalake_inspections_raw.appointment_aud.created_at_mod
+  year:
+    description: Year of update date.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.year
+  month:
+    description: Month of update date.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.month
+  day:
+    description: Day of update date.
+    lineage:
+      - datalake_inspections_raw.appointment_aud.day
