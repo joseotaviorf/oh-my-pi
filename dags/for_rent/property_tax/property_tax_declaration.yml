@@ -8,20 +8,22 @@ workflow:
   layer: raw
   database_type: postgres
   dbutils_secret_key: PROPERTY_TAX_DB
-  default_extraction_type: incremental
-  default_partitions: ["year", "month", "day"]
   tables_customization:
     tax_report:
       date_filter_column: updated_at
       read_from_sql: true
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
+    report_version: {}
+    report_item: {}
 cluster:
   type: custom_cluster
   custom_configurations:
     driver_node_type_id: m5a.xlarge
-    node_type_id: m5a.large
-    num_workers: 1
+    node_type_id: m5a.xlarge
+    num_workers: 2
     spark_version: 13.3.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

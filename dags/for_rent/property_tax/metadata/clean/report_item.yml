@@ -1,0 +1,40 @@
+database_name: datalake_property_tax_clean
+table_name: report_item
+description: Represents each item that composes the property's IPTU.
+  A report_version is associated with at least one report_item, referring to the IPTU
+  of the property. Additional IPTUs (e.g. parking spaces) are also represented as a report_item.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id_report_item:
+    lineage:
+      - datalake_property_tax_raw.report_item.id
+    description: Report item ID
+  id_report_version:
+    lineage:
+      - datalake_property_tax_raw.report_item.report_version_id
+    description: Report version ID.
+  id_external_document:
+    lineage:
+      - datalake_property_tax_raw.report_item.document_external_id
+    description: External document ID.
+  "description":
+    lineage:
+      - datalake_property_tax_raw.report_item.description
+    description: Item's description
+  is_finished:
+    lineage:
+      - datalake_property_tax_raw.report_item.finished
+    description: Boolean flag indicating if the report was finished.
+  value:
+    lineage:
+      - datalake_property_tax_raw.report_item.value
+    description: Item's value.
+  installments:
+    lineage:
+      - datalake_property_tax_raw.report_item.installments
+    description: Number of installments.
+  ts_created:
+    lineage:
+      - datalake_property_tax_raw.report_item.created_at
+    description: Timestamp when the register was created.
