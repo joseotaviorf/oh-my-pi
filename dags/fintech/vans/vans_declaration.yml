@@ -67,18 +67,6 @@ workflow:
       clean_table_name: payment_boleto
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    PaymentBoleto_Status_Log:
-      clean_table_name: payment_boleto_status_log
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
-    PaymentMethod:
-      clean_table_name: payment_method
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
-    Payment_Status_Log:
-      clean_table_name: payment_status_log
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
 cluster:
   type: custom_cluster
   custom_configurations:
