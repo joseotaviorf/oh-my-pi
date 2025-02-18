@@ -19,7 +19,7 @@ workflow:
         - "{environment}"
         - "{{ ds }}"
 cluster:
-  type: databricks_12_2_min_general_photon_cluster
+  type: databricks_13_3_min_general_cluster
   access_control_list:
     group_name: data-platform-engineers
     permission_level: CAN_MANAGE
