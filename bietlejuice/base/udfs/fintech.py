@@ -1,6 +1,7 @@
 import datetime
 import businesstimedelta
 import holidays as pyholidays
+import json
 
 
 class FintechUDFs:
@@ -36,4 +37,5 @@ class FintechUDFs:
         while invoice in invoice_map:
             invoice = invoice_map[invoice]
             level += 1
-        return invoice, level
+
+        return json.dumps({"invoice": invoice, "level": level})

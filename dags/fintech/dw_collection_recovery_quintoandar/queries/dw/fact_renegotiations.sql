@@ -39,12 +39,12 @@ calculate_anchor AS (
         b.dt_due_adjusted,
         b.sk_negotiation_created_by,
         b.sk_negotiation_created,
-        FINTECH_COLLECTIONS_RENEGOTIATION(
+        FROM_JSON(FINTECH_COLLECTIONS_RENEGOTIATION(
             b.id_invoice,
             map_from_entries(
                 collect_set(named_struct('key', i.child_invoice, 'value', i.parent_invoice))
             )
-        ) AS anchor_result
+        ),'MAP<string,string>') AS anchor_result
     FROM base_calculation b
     LEFT JOIN invoice_mapping i
       ON b.id_contract = i.id_contract
