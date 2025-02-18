@@ -24,3 +24,4 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_user.user AS u
         ON u.email = a.email
+        AND u.country_code = 'BR'
