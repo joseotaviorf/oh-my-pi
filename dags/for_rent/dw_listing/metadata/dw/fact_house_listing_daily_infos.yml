@@ -1,7 +1,8 @@
 ---
 database_name: dw_rent
 table_name: fact_house_listing_daily_infos
-description: Daily snapshot information related to rental house listings. Each line is a listing
+description:
+  Daily snapshot information related to rental house listings. Each line is a listing
   related to a house in a specific date with it's information about the agents, contract, account manager (PP Multi).
   The sk_house_listing is not unique in this table, but the sk_house_listing_day is unique. This column is the
   concatenation of sk_house_listing + sk_day.
@@ -10,7 +11,7 @@ owner: kleber.inoue@quintoandar.com.br
 columns:
   sk_house_listing_day:
     lineage:
-    - datalake_rental_historical_follow_up.house_listings_daily_info.id_house_listing_day
+      - datalake_rental_historical_follow_up.house_listings_daily_info.id_house_listing_day
     description: Unique key of table. It's the concatenation of sk_house_listing with the competence date (yyyymmdd).
   sk_house_listing:
     lineage:
@@ -34,8 +35,9 @@ columns:
     description: Key of user who's responsible to manage the user if the user is a PP Multi.
   sk_owner_category:
     lineage:
-      - datalake_rental_historical_follow_up.house_listings_daily_info.id_owner_category
-    description: Key of user version who's the house owner. It can be joined with dw_rent.dim_owner_category
+      - datalake_pro_owners.owner_category.id_owner_category
+    description:
+      Key of user version who's the house owner. It can be joined with dw_rent.dim_owner_category
       to check the owner's category.
   sk_occupant:
     lineage:

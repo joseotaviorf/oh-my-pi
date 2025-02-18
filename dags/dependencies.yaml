@@ -616,7 +616,7 @@ bietlejuice.dw_listing:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_lead:load-enrich-conversion-lead
   - bietlejuice.enrich_lead:load-enrich-lead
-  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-category
+  - bietlejuice.enrich_pro_owners:load-enrich-owner-category
   - bietlejuice.enrich_pro_owners:load-enrich-pro-owner-history
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
@@ -996,7 +996,7 @@ bietlejuice.dw_user:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-doorman
   - bietlejuice.enrich_ebdb_user:load-enrich-user-sales-rep
-  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-category
+  - bietlejuice.enrich_pro_owners:load-enrich-owner-category
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
 bietlejuice.dw_user_affiliate:
   - bietlejuice.ebdb_partner:load-clean-partner-agent
@@ -2528,7 +2528,7 @@ bietlejuice.enrich_rent_demand_events:
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
   - bietlejuice.enrich_offer:load-enrich-offer
-  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-category
+  - bietlejuice.enrich_pro_owners:load-enrich-owner-category
   - bietlejuice.enrich_pro_owners:load-enrich-house-b2b-history
   - bietlejuice.enrich_proposal:load-enrich-proposal
 bietlejuice.enrich_rent_flows:

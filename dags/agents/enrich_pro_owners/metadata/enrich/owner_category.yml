@@ -1,0 +1,39 @@
+database_name: datalake_pro_owners
+table_name: owner_category
+description: Historical daily enriched table for rent context.
+  Each row is presented with the category of the owner, which can have less or more than 5 houses and can be classified as PP Multi.
+  Each change in this table about the owner results in a new category.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_owner_category:
+    description: Id of the owner with it's category version. It's the concatenation of id_owner + 0 + owner_category.
+  id_owner:
+    lineage:
+      - datalake_pro_owners.daily_owner_category.id_owner
+    description: Id user of the owner.
+  country_code:
+    lineage:
+      - datalake_pro_owners.daily_owner_category.country_code
+    description: Country code of the user.
+  owner_category:
+    description: Integer with the number of the owner.
+      Any change in this table results a new category of the user, even if the owner had the same category previously.
+      It starts at 1.
+  has_5_or_more_ongoing_houses:
+    description: Boolean value to check if the owner has 5 or more ongoing houses (status published, rented or suspended) in a date.
+    lineage:
+      - datalake_pro_owners.daily_owner_category.has_5_or_more_ongoing_houses
+  is_pp_multi:
+    description: Boolean value to check if the owner is participating in the PP Multi program and is active.
+    categories:
+      "true": The owner is participating in PP Multi program and is active.
+      "false": The owner is not participating in PP Multi program, so it's amateur.
+    lineage:
+      - datalake_pro_owners.daily_owner_category.is_pp_multi
+  is_current_category:
+    description: Boolean value to check if the owner's category is the most recent.
+  dt_owner_category:
+    lineage:
+      - datalake_pro_owners.daily_owner_category.dt_owner_category
+    description: Reference date of the table.

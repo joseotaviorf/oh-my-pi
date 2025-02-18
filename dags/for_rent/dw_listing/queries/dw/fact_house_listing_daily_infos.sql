@@ -14,7 +14,7 @@ SELECT
   COALESCE(hldi.id_contract, -1) AS sk_contract,
   COALESCE(hldi.id_owner, -1) AS sk_owner,
   COALESCE(am.id_account_manager, -1) AS sk_account_manager,
-  COALESCE(doc.id_owner_category, -1) AS sk_owner_category,
+  COALESCE(oc.id_owner_category, -1) AS sk_owner_category,
   COALESCE(hldi.id_occupant, -1) AS sk_occupant,
   COALESCE(hldi.id_partner, -1) AS sk_partner,
   COALESCE(hldi.id_partner_big_agent, -1) AS sk_partner_big_agent,
@@ -41,11 +41,10 @@ SELECT
 FROM
   datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
 LEFT JOIN
-  datalake_pro_owners.daily_owner_category AS doc
-    ON hldi.id_owner = doc.id_owner
-    AND hldi.year = doc.year
-    AND hldi.month = doc.month
-    AND hldi.day = doc.day
+  datalake_pro_owners.owner_category AS oc
+    ON MAKE_DATE(hldi.year, hldi.month, hldi.day) >= oc.dt_owner_category_started
+    AND MAKE_DATE(hldi.year, hldi.month, hldi.day) < COALESCE(oc.dt_owner_category_ended, CURRENT_DATE())
+    AND hldi.id_owner = oc.id_owner
 LEFT JOIN
   account_manager AS am
     ON hldi.id_owner = am.id_owner

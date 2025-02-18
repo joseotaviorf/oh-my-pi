@@ -551,7 +551,7 @@ SELECT DISTINCT
   rde.id_house_listing,
   rde.id_region,
   rde.id_user AS id_owner,
-  doc.id_owner_category,
+  oc.id_owner_category,
   rde.uuid_company,
   rde.id_company_hubspot,
   rde.partner_3p_supply,
@@ -568,8 +568,7 @@ LEFT JOIN
     ON t.id_house_listing = rde.id_house_listing
     AND t.rank_order = 1
 LEFT JOIN
-  datalake_pro_owners.daily_owner_category AS doc
-    ON COALESCE(rde.id_owner_on_event, rde.id_user) = doc.id_owner
-    AND rde.year = doc.year
-    AND rde.month = doc.month
-    AND rde.day = doc.day
+  datalake_pro_owners.owner_category AS oc
+    ON MAKE_DATE(rde.year, rde.month, rde.day) >= oc.dt_owner_category_started
+    AND MAKE_DATE(rde.year, rde.month, rde.day) < COALESCE(oc.dt_owner_category_ended, CURRENT_DATE())
+    AND COALESCE(rde.id_owner_on_event, rde.id_user) = oc.id_owner

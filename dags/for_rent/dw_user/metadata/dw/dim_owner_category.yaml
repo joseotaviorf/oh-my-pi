@@ -9,14 +9,14 @@ owner: kleber.inoue@quintoandar.com.br
 columns:
   sk_owner_category:
     lineage:
-      - datalake_pro_owners.daily_owner_category.id_owner_category
+      - datalake_pro_owners.owner_category.id_owner_category
     description: Key of the owner (user) with it's category version.
       This columns is filled by the concatenation of id_owner + 0 + category (number).
       The category isn't a nominal value, it's a number. Each change on onwer's category results a new category,
       even if the owner had the same category before.
   sk_owner:
     lineage:
-      - datalake_pro_owners.daily_owner_category.id_owner
+      - datalake_pro_owners.owner_category.id_owner
     description: Key to identify the landlord/owner of a house.
       It can be joined with dim_user using sk_user
   country_code:
@@ -28,23 +28,23 @@ columns:
       MX: Mexico country code.
   has_5_or_more_ongoing_houses:
     lineage:
-      - datalake_pro_owners.daily_owner_category.has_5_or_more_ongoing_houses
+      - datalake_pro_owners.owner_category.has_5_or_more_ongoing_houses
     description: Boolean value to check if the owner has 5 or more ongoing houses (rented, suspended or published status).
   is_pp_multi:
     lineage:
-      - datalake_pro_owners.daily_owner_category.is_pp_multi
+      - datalake_pro_owners.owner_category.is_pp_multi
     description: Boolean value to check if the landlord/owner is participating in the PP Multi program and is active.
   is_current_category:
     lineage:
-      - datalake_pro_owners.daily_owner_category.is_curreint_category
+      - datalake_pro_owners.owner_category.is_curreint_category
     description: Boolean value to check if the owner's category is the current, i.e. the most recent category.
   dt_owner_category_started:
     lineage:
-      - datalake_pro_owners.daily_owner_category.dt_owner_category
+      - datalake_pro_owners.owner_category.dt_owner_category
     description: Timestamp of when the respective category started.
   dt_owner_category_ended:
     lineage:
-      - datalake_pro_owners.daily_owner_category.dt_owner_category
+      - datalake_pro_owners.owner_category.dt_owner_category
     description: Timestamp of when the respective category ended.
   ts_load:
     description: Timestamp of when the data was loaded.

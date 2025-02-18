@@ -8,19 +8,23 @@ domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_owner_category:
-    description: Id of the owner with it's category version. It's the concatenation of id_owner + 0 + owner_category.
+    description:
+      "[DEPRECATED - don't use. Use dw_rent.dim_owner_category instead]
+      Id of the owner with it's category version. It's the concatenation of id_owner + 0 + owner_category."
   id_owner:
     lineage:
-    - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
+      - datalake_pro_owners.daily_owner_houses_quantity_history.id_owner
     description: Id user of the owner.
   country_code:
     lineage:
-    - datalake_pro_owners.daily_owner_houses_quantity_history.country_code
+      - datalake_pro_owners.daily_owner_houses_quantity_history.country_code
     description: Country code of the user. It's a partition of this table.
   owner_category:
-    description: Integer with the number of the owner.
+    description:
+      "[DEPRECATED - don't use. Use dw_rent.dim_owner_category instead]
+      Integer with the number of the owner.
       Any change in this table results a new category of the user, even if the owner had the same category previously.
-      It starts at 0.
+      It starts at 0."
   has_5_or_more_ongoing_houses:
     description: Boolean value to check if the owner has 5 or more ongoing houses (status published, rented or suspended) in a date.
   is_pp_multi:
@@ -30,13 +34,15 @@ columns:
       "false": The owner is not participating in PP Multi program, so it's amateur.
   cluster_pp_multi:
     lineage:
-    - datalake_gsheets_clean.pp_multi_cluster.cluster
+      - datalake_gsheets_clean.pp_multi_cluster.cluster
     description: Classification of PP multi based on groups it can belong to and the number of ongoing houses it has.
   is_current_category:
-    description: Boolean value to check if the owner's category is the most recent.
+    description:
+      "[DEPRECATED - don't use. Use dw_rent.dim_owner_category instead]
+      Boolean value to check if the owner's category is the most recent."
   dt_owner_category:
     lineage:
-    - datalake_pro_owners.daily_owner_houses_quantity_history.dt_houses_owned
+      - datalake_pro_owners.daily_owner_houses_quantity_history.dt_houses_owned
     description: Reference date of the table.
   year:
     description: Year value of the date reference. Also, it's a partition.

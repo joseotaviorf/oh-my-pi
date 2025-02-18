@@ -35,16 +35,16 @@ columns:
   id_event_type:
     description: "Id of the event type."
     categories:
-      '1': "Id of the visit booked (VB) event."
-      '2': "Id of the visit completed (VC) event."
-      '3': "Id of the offer submitted (OS) event."
-      '4': "Id of the offer accepted/approved (OA) event."
-      '5': "Id of the evaluation started (ES) event."
-      '6': "Id of the evaluation positive (EP) event."
-      '7': "Id of the documentation sent (DS) event."
-      '8': "Id of the credit approved (CA) event."
-      '9': "Id of the contract signed (CS) event."
-      '10': "Id of the contract created (CC) event."
+      "1": "Id of the visit booked (VB) event."
+      "2": "Id of the visit completed (VC) event."
+      "3": "Id of the offer submitted (OS) event."
+      "4": "Id of the offer accepted/approved (OA) event."
+      "5": "Id of the evaluation started (ES) event."
+      "6": "Id of the evaluation positive (EP) event."
+      "7": "Id of the documentation sent (DS) event."
+      "8": "Id of the credit approved (CA) event."
+      "9": "Id of the contract signed (CS) event."
+      "10": "Id of the contract created (CC) event."
   id_tenant_prospect:
     lineage:
       - datalake_booking.booking.id_visitor
@@ -61,7 +61,8 @@ columns:
   id_agent:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.id_user_agent
-    description: "Id of the user that is the agent. Notice that it's not the id_agent, but the id_user of the agent
+    description:
+      "Id of the user that is the agent. Notice that it's not the id_agent, but the id_user of the agent
       (which comes from the EBDB's User table, column id). This was necessary in order to join with the fact_listing_rent_flows model,
       which already uses the agent's user id."
   id_rent_flow:
@@ -84,7 +85,7 @@ columns:
     description: "Id of the property owner."
   id_owner_category:
     lineage:
-      - datalake_pro_owners.daily_owner_version.id_owner_category
+      - datalake_pro_owners.owner_category.id_owner_category
     description: "ID of the property owner's version. We're not versioning the owners that are B2B, so NULL values can exist."
   uuid_company:
     lineage:
@@ -99,7 +100,8 @@ columns:
       - datalake_ebdb_listing.house.partner_3p_supply
     description: Short name of the Rede company.
   is_during_termination:
-    description: "Boolean flag indicating if the event happened between the listing's version start date and the listing's
+    description:
+      "Boolean flag indicating if the event happened between the listing's version start date and the listing's
       previous version contract end date.
       This flag may help understanding events during Early Demand, for example."
   ts_event:
