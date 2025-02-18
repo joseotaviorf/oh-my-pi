@@ -31,10 +31,10 @@ workflow:
       clean_table_name: bank_payment
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    BankPaymentRequestedBy:
-      clean_table_name: bank_payment_requested_by
-      raw_primary_keys: ["bank_payment_id"]
-      clean_primary_keys: ["id_bank_payment"]
+    # BankPaymentRequestedBy:
+    #   clean_table_name: bank_payment_requested_by
+    #   raw_primary_keys: ["bank_payment_id"]
+    #   clean_primary_keys: ["id_bank_payment"]
     Boleto:
       clean_table_name: boleto
       raw_primary_keys: ["id"]
