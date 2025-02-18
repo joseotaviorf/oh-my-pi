@@ -36,7 +36,7 @@ inmetro_bucket = config_service.get_config("inmetro_bucket")
 profiling_spark_job_path = f"{s3_prefix}/spark_jobs/{SOURCE}/run_profiling_on_schema.py"
 schemas_list = config_service.get_config("schemas_list")
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_10_4_med_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("databricks_13_3_med_general_cluster")
 
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
