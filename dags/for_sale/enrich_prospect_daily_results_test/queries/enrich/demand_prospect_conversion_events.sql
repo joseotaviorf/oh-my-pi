@@ -16,7 +16,7 @@ WITH conversion_events_filtered AS (
     dt_event,
     ts_event
   FROM
-    datalake_demand_conversion_events_test.conversion_events
+    datalake_demand_flows_test.conversion_events
   WHERE
     dt_event BETWEEN DATE('2025-01-21') AND DATE('2025-02-06')
 ),

@@ -79,7 +79,7 @@ WITH adhoc_rules AS (
     dpce.month,
     dpce.day
   FROM
-    datalake_demand_conversion_events_test.demand_prospect_conversion_events AS dpce
+    datalake_demand_flows_test.demand_prospect_conversion_events AS dpce
     LEFT JOIN datalake_tqc_referral.sale_events_flow sef 
       ON dpce.visit_code = sef.visit_code
   WHERE 

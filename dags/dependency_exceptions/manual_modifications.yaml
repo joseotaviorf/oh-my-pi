@@ -996,3 +996,9 @@ wonka.house_user_rent_flows:
 wonka.house_agg_rent_flows:
   add:
     - wonka.house_user_rent_flows:load-house_user_rent_flows
+
+bietlejuice.enrich_prospect_daily_results_test:
+  add:
+    - bietlejuice.enrich_demand_conversion_events_test:load-enrich-buyer-prospect-status
+    - bietlejuice.enrich_demand_conversion_events_test:load-enrich-conversion-events
+    - bietlejuice.enrich_demand_conversion_events_test:load-enrich-tenant-prospect-status

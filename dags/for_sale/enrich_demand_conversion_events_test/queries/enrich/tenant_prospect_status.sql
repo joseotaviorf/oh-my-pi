@@ -8,7 +8,7 @@ WITH rent_flows AS (
     TRUE AS is_rent_flow_event,
     dpce.ts_event
   FROM
-    datalake_demand_conversion_events_test.conversion_events AS dpce
+    datalake_demand_flows_test.conversion_events AS dpce
   LEFT JOIN
     datalake_region.region AS r
       ON dpce.id_region = r.id

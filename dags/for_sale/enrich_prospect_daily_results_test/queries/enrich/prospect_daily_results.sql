@@ -11,7 +11,7 @@ WITH prospect_status_events AS (
     tps.month,
     tps.day
   FROM
-    datalake_demand_conversion_events_test.tenant_prospect_status AS tps
+    datalake_demand_flows_test.tenant_prospect_status AS tps
   WHERE 
     DATE(tps.ts_status_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')   
   UNION ALL 
@@ -27,7 +27,7 @@ WITH prospect_status_events AS (
     bps.month,
     bps.day
   FROM
-    datalake_demand_conversion_events_test.buyer_prospect_status AS bps
+    datalake_demand_flows_test.buyer_prospect_status AS bps
   WHERE 
     DATE(bps.ts_status_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')   
 ),
@@ -70,7 +70,7 @@ prospect_results AS (
   FROM
     prospect_status_events AS pse
   LEFT JOIN
-    datalake_demand_conversion_events_test.prospect_results AS pcr
+    datalake_demand_flows_test.prospect_results AS pcr
       ON pse.id_demand_prospect_conversion_event = pcr.id_demand_prospect_conversion_event
   UNION ALL
   SELECT
@@ -108,7 +108,7 @@ prospect_results AS (
     pcr.month,
     pcr.day 
   FROM
-    datalake_demand_conversion_events_test.prospect_results AS pcr
+    datalake_demand_flows_test.prospect_results AS pcr
   WHERE 
     DATE(pcr.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')    
   QUALIFY   
