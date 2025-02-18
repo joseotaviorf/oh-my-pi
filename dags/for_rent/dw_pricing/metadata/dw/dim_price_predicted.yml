@@ -12,18 +12,34 @@ columns:
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_min_price
     description: Minimum price estimated by the calculator output. May also be referred to as 'p_10'.
+  p20_price:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p20_price
+    description: Estimated price related to the 20% percentile of the calculator's output. May also be referred to as just 'p_20'.
   p30_price:
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_p30_price
     description: Estimated price related to the 30% percentile of the calculator's output. May also be referred to as just 'p_30'.
+  p40_price:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p40_price
+    description: Estimated price related to the 40% percentile of the calculator's output. May also be referred to as just 'p_40'.
   estimated_price:
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_price
     description: Most likely estimated price of the calculator's output for the listing. Can also be referred to as just 'p_50'.
+  p60_price:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p60_price
+    description: Estimated price related to the 60% percentile of the calculator's output. May also be referred to as just 'p_60'.
   p70_price:
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_p70_price
     description: Estimated price related to the 70% percentile of the calculator's output. May also be referred to as just 'p_70'.
+  p80_price:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p80_price
+    description: Estimated price related to the 80% percentile of the calculator's output. May also be referred to as just 'p_80'.
   max_price:
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_max_price
@@ -44,5 +60,13 @@ columns:
     categories:
       RENT: For rent.
       SALE: For sale.
+  is_last_prediction:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.is_last_prediction
+    description: Boolean indicating whether is the most recent prediction.
+  is_last_prediction_of_day:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.is_last_prediction_of_day
+    description: Boolean indicating whether is the most recent prediction of the day.
   ts_load:
     description: Timestamp of when the table was loaded.

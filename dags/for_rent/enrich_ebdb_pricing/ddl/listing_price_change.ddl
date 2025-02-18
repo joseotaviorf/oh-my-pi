@@ -7,6 +7,7 @@ CREATE TABLE datalake_ebdb_pricing.listing_price_change (
     id_user_revision BIGINT,
     id_revision INT,
     business_context STRING,
+    change_reason STRING,
     price INT,
     previous_price INT,
     last_price_variation DOUBLE,
@@ -15,6 +16,7 @@ CREATE TABLE datalake_ebdb_pricing.listing_price_change (
     change_number INT,
     days_with_pricing_scheme INT,
     is_first_price BOOLEAN,
+    is_last_price BOOLEAN,
     is_last_price_of_day BOOLEAN,
     ts_price_started TIMESTAMP,
     ts_price_ended TIMESTAMP

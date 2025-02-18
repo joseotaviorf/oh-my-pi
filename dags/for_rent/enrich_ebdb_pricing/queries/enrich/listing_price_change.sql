@@ -5,6 +5,7 @@ WITH house_aud AS (
         r.id_user AS id_user_revision,
         h_aud.rev AS id_revision,
         h_aud.rev_type,
+        r.reason AS change_reason,
         h_aud.rent AS rent_price,
         h_aud.sale_price AS sale_price,
         lbc.ts_first_publication,
@@ -31,6 +32,7 @@ rent_price_threshold AS (
         business_context,
         id_user_revision,
         id_revision,
+        change_reason,
         rent_price,
         dt_change,
         ts_revision
@@ -46,6 +48,7 @@ sale_price_threshold AS (
         business_context,
         id_user_revision,
         id_revision,
+        change_reason,
         sale_price,
         dt_change,
         ts_revision
@@ -61,6 +64,7 @@ rent_price_lag AS (
         id_user_revision,
         id_revision,
         business_context,
+        change_reason,
         rent_price,
         LAG(rent_price) OVER (PARTITION BY id_house ORDER BY ts_revision) AS lag_price,
         dt_change,
@@ -76,6 +80,7 @@ sale_price_lag AS (
         id_user_revision,
         id_revision,
         business_context,
+        change_reason,
         sale_price,
         LAG(sale_price) OVER (PARTITION BY id_house ORDER BY ts_revision) AS lag_price,
         dt_change,
@@ -91,6 +96,7 @@ rent_price_interval AS (
         id_user_revision,
         id_revision,
         business_context,
+        change_reason,
         rent_price,
         lag_price,
         ts_revision AS ts_price_started,
@@ -104,6 +110,7 @@ sale_price_interval AS (
         id_user_revision,
         id_revision,
         business_context,
+        change_reason,
         sale_price,
         lag_price,
         ts_revision AS ts_price_started,
@@ -170,6 +177,7 @@ rent_price_changes_listing AS (
         pi.id_user_revision,
         pi.id_revision,
         pi.business_context,
+        pi.change_reason,
         pi.rent_price AS price,
         LAG(pi.rent_price) OVER (PARTITION BY pi.id_house ORDER BY ts_price_started) AS lag_price,
         pi.ts_price_started,
@@ -192,6 +200,7 @@ sale_price_changes_listing AS (
         pi.id_user_revision,
         pi.id_revision,
         pi.business_context,
+        pi.change_reason,
         pi.sale_price AS price,
         LAG(pi.sale_price) OVER (PARTITION BY pi.id_house ORDER BY ts_price_started) AS lag_price,
         pi.ts_price_started,
@@ -214,6 +223,7 @@ rent_price_changes_variation AS (
         id_user_revision,
         id_revision,
         business_context,
+        change_reason,
         price,
         lag_price AS previous_price,
         CASE
@@ -225,6 +235,7 @@ rent_price_changes_variation AS (
         (price - MIN(IF(lag_price IS NULL, price, NULL)) OVER (PARTITION BY id_house))/NULLIF(MIN(IF(lag_price IS NULL, price, NULL)) OVER (PARTITION BY id_house), 0) AS first_price_variation,
         IF(lag_price IS NULL, TRUE, FALSE) AS is_first_price,
         IF(ROW_NUMBER() OVER (PARTITION BY id_house, DATE(ts_price_started) ORDER BY ts_price_started DESC) = 1, TRUE, FALSE) AS is_last_price_of_day,
+        IF(ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_price_started DESC) = 1, TRUE, FALSE) AS is_last_price,
         ts_price_started,
         ts_price_ended
     FROM
@@ -237,6 +248,7 @@ sale_price_changes_variation AS (
         id_user_revision,
         id_revision,
         business_context,
+        change_reason,
         price,
         lag_price AS previous_price,
         CASE
@@ -248,6 +260,7 @@ sale_price_changes_variation AS (
         (price - MIN(IF(lag_price IS NULL, price, NULL)) OVER (PARTITION BY id_house))/NULLIF(MIN(IF(lag_price IS NULL, price, NULL)) OVER (PARTITION BY id_house), 0) AS first_price_variation,
         IF(lag_price IS NULL, TRUE, FALSE) AS is_first_price,
         IF(ROW_NUMBER() OVER (PARTITION BY id_house, DATE(ts_price_started) ORDER BY ts_price_started DESC) = 1, TRUE, FALSE) AS is_last_price_of_day,
+        IF(ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_price_started DESC) = 1, TRUE, FALSE) AS is_last_price,
         ts_price_started,
         ts_price_ended
     FROM
@@ -259,6 +272,7 @@ SELECT
     id_user_revision,
     id_revision,
     business_context,
+    change_reason,
     price,
     previous_price,
     ROUND(last_price_variation, 4) AS last_price_variation,
@@ -272,8 +286,9 @@ SELECT
     change_type,
     ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_price_started ASC) AS change_number,
     DATEDIFF(COALESCE(ts_price_ended, CURRENT_DATE), ts_price_started) AS days_with_pricing_scheme,
-    is_last_price_of_day,
     is_first_price,
+    is_last_price,
+    is_last_price_of_day,
     ts_price_started,
     ts_price_ended
 FROM
@@ -287,6 +302,7 @@ SELECT
     id_user_revision,
     id_revision,
     business_context,
+    change_reason,
     price,
     previous_price,
     ROUND(last_price_variation, 4) AS last_price_variation,
@@ -300,8 +316,9 @@ SELECT
     change_type,
     ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY ts_price_started ASC) AS change_number,
     DATEDIFF(COALESCE(ts_price_ended, CURRENT_DATE), ts_price_started) AS days_with_pricing_scheme,
-    is_last_price_of_day,
     is_first_price,
+    is_last_price,
+    is_last_price_of_day,
     ts_price_started,
     ts_price_ended
 FROM

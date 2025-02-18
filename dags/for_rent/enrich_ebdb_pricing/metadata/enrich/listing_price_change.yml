@@ -30,6 +30,8 @@ columns:
     categories:
       RENT: For rent.
       SALE: For sale.
+  change_reason:
+    description: The reason of the price change.
   price:
     lineage:
       - datalake_ebdb_clean.house_aud.sale_price
@@ -54,8 +56,6 @@ columns:
     description: Tells the number of listing price changes.
   days_with_pricing_scheme:
     description: Count how many days the listing stayed at that publication price. If it is the most recent price, it counts up to D-1.
-  is_last_status_of_day:
-    description: Boolean that tells if the status is the listing's most recent status of the day.
   is_first_price:
     description: Boolean that tells if the price is the first publication price of the listing.
   is_last_price:

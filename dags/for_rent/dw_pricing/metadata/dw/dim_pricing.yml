@@ -43,5 +43,13 @@ columns:
     categories:
       RENT: For rent.
       SALE: For sale.
+  is_last_price:
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.is_last_price
+    description: Boolean indicating whether is the most recent price.
+  is_last_price_of_day:
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.is_last_price_of_day
+    description: Boolean indicating whether is the most recent price of the day.
   ts_load:
     description: Timestamp of when the table was loaded.
