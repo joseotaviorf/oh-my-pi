@@ -20,15 +20,31 @@ columns:
       "3": "FINISHED - The delinquency was paid (with gain or loss)"
       "4": "UNDER_AGREEMENT - A confirmed agreement between QuintoCred and the defaulter"
       "5": "REQUESTED_AGREEMENT - Agreement requested but not confirmed yet"
+      "6": "ACTIVE_FALSE - The delinquency has active as false"
+      "7": "FORGIVEN - The delinquency was forgiven"
   id_type:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.type
+    categories:
+      "0": "SIGNATURE - represents a signature delinquency, wich happens when the contract monthly wasnt paid"
+      "1": "GUARANTEE - represents a guarantee delinquency"
+      "2": "TERMINATION - represents a termination delinquency"
+      "3": "BILLING - represents a billing delinquency"
+      "4": "RENEWAL - DEPRECATED"
+      "5": "RENEWAL_MONTH - represents the monthly bill of renewal, renewals are monthly by default"
+      "6": "ACTIVATION_PARTIAL_LINK - represents a partial link activation debt of migrated contract from asaas"
   id_user_insert:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.userinsert
   id_user_update:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.userupdate
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.status
+  type:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.type
   subcategory:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.subcategory
