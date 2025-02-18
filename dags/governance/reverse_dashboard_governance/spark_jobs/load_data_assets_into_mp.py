@@ -60,7 +60,9 @@ def _send_requests(endpoint:str, payloads:list, chunk_size:int=30) -> None:
     session.mount(endpoint, HTTPAdapter(max_retries=retries))
 
     for idx in range(0, len(payloads), chunk_size):
+        chunk_number = idx // chunk_size + 1
         chunk = payloads[idx: idx + chunk_size]
+        logger.info(f"m=_send_requests, message=Chunk: {chunk_number}, sending {len(chunk)} items")
         response = session.post(endpoint, json=chunk)
 
         try:
@@ -108,7 +110,7 @@ if __name__ == "__main__":
             METADATA_PROPAGATOR_PATH = "/dashboard"
         elif asset == "chart":
             METADATA_PROPAGATOR_PATH = "/chart"
-            chunk_size = 100
+            chunk_size = 200
         elif asset == "dataset":
             METADATA_PROPAGATOR_PATH = "/dataset"
 
