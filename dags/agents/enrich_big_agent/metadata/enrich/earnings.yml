@@ -14,10 +14,6 @@ columns:
     lineage:
       - datalake_big_agent_clean.earnings.id_agency
     description: ID of the agency.
-  id_agent:
-    lineage:
-      - datalake_big_agent_clean.earnings.id_agent
-    description: ID of the agent.
   id_program:
     lineage:
       - datalake_big_agent_clean.earnings.id_program
@@ -26,6 +22,14 @@ columns:
     lineage:
       - datalake_big_agent_clean.earnings.id_house_external
     description: ID house from EBDB source.
+  id_external_receiver:
+    lineage:
+      - datalake_big_agent_clean.earnings.id_external_receiver
+    description: Id of Receiver.
+  id_external_domain:
+    lineage:
+      - datalake_big_agent_clean.earnings.id_external_domain
+    description: Id of contract.
   status:
     lineage:
       - datalake_big_agent_clean.earnings.status
@@ -46,14 +50,14 @@ columns:
     lineage:
       - datalake_big_agent_clean.earnings.remuneration_value
     description: Remuneration value (in percent).
-  external_domain_id:
-    lineage:
-      - datalake_big_agent_clean.earnings.external_domain_id
-    description: Id of contract.
   external_domain_type:
     lineage:
       - datalake_big_agent_clean.earnings.external_domain_type
     description: Type of contract (SALES_FLOW or RENT_CONTRACT).
+  external_receiver_type:
+    lineage:
+      - datalake_big_agent_clean.earnings.external_receiver_type
+    description: Type of Receiver (AGENT or Other).
   ts_created:
     lineage:
       - datalake_big_agent_clean.earnings.ts_created

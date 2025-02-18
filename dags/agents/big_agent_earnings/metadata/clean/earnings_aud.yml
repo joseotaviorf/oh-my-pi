@@ -16,6 +16,12 @@ columns:
   id_house_external:
     lineage:
       - datalake_big_agent_raw.earnings_aud.house_external_id
+  id_external_domain:
+    lineage:
+        - datalake_big_agent_raw.earnings_aud.external_domain_id
+  id_external_receiver:
+    lineage:
+        - datalake_big_agent_raw.earnings_aud.external_receiver_id
   rev:
     lineage:
       - datalake_big_agent_raw.earnings_aud.rev
@@ -28,6 +34,15 @@ columns:
   details:
     lineage:
       - datalake_big_agent_raw.earnings_aud.details
+  remuneration_value:
+    lineage:
+        - datalake_big_agent_raw.earnings_aud.remuneration_value
+  external_domain_type:
+    lineage:
+        - datalake_big_agent_raw.earnings_aud.external_domain_type
+  external_receiver_type:
+    lineage:
+        - datalake_big_agent_raw.earnings_aud.external_receiver_type
   status:
     lineage:
       - datalake_big_agent_raw.earnings_aud.status
@@ -49,9 +64,24 @@ columns:
   mod_id_house_external:
     lineage:
       - datalake_big_agent_raw.earnings_aud.house_external_id_mod
+  mod_id_external_domain:
+    lineage:
+        - datalake_big_agent_raw.earnings_aud.external_domain_id_mod
+  mod_id_external_receiver:
+    lineage:
+        - datalake_big_agent_raw.earnings_aud.external_receiver_id_mod
   mod_details:
     lineage:
       - datalake_big_agent_raw.earnings_aud.details_mod
+  mod_remuneration_value:
+    lineage:
+        - datalake_big_agent_raw.earnings_aud.remuneration_value_mod
+  mod_external_domain_type:
+    lineage:
+        - datalake_big_agent_raw.earnings_aud.external_domain_type_mod
+  mod_external_receiver_type:
+    lineage:
+        - datalake_big_agent_raw.earnings_aud.external_receiver_type_mod
   mod_status:
     lineage:
       - datalake_big_agent_raw.earnings_aud.status_mod

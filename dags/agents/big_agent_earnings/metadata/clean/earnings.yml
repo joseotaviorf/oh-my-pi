@@ -7,15 +7,18 @@ columns:
   id_agency:
     lineage:
       - datalake_big_agent_raw.earnings.agency_id
-  id_agent:
-    lineage:
-      - datalake_big_agent_raw.earnings.agent_id
   id_program:
     lineage:
       - datalake_big_agent_raw.earnings.program_id
   id_house_external:
     lineage:
       - datalake_big_agent_raw.earnings.house_external_id
+  id_external_domain:
+    lineage:
+      - datalake_big_agent_raw.earnings.external_domain_id
+  id_external_receiver:
+    lineage:
+      - datalake_big_agent_raw.earnings.external_receiver_id
   status:
     lineage:
       - datalake_big_agent_raw.earnings.status
@@ -31,12 +34,12 @@ columns:
   remuneration_value:
     lineage:
       - datalake_big_agent_raw.earnings.remuneration_value
-  external_domain_id:
-    lineage:
-      - datalake_big_agent_raw.earnings.external_domain_id
   external_domain_type:
     lineage:
       - datalake_big_agent_raw.earnings.external_domain_type
+  external_receiver_type:
+    lineage:
+      - datalake_big_agent_raw.earnings.external_receiver_type
   ts_created:
     lineage:
       - datalake_big_agent_raw.earnings.created_at
