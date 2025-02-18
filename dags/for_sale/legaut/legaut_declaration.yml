@@ -21,6 +21,10 @@ workflow:
       clean_table_name: crawlers_crawler
     crawlers_crawlergroup:
       clean_table_name: crawlers_crawlergroup
+    crawlers_crawlerkey:
+      clean_table_name: crawlers_crawler_key
+    crawlers_crawlerkeytype:
+      clean_table_name: crawlers_crawler_key_type
     crawlers_crawlertype:
       clean_table_name: crawlers_crawlertype
     crawlers_owner:
