@@ -113,6 +113,7 @@ if __name__ == "__main__":
             chunk_size = 200
         elif asset == "dataset":
             METADATA_PROPAGATOR_PATH = "/dataset"
+            chunk_size = 120
 
         base_dbutils = BaseDBUtils()
         if base_dbutils.get_dbutils() is not None:

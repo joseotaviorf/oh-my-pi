@@ -18,4 +18,7 @@ SELECT
     DATE_FORMAT(s.ts_changed, 'yyyy-MM-dd hh:mm:ss') AS changed_on,
     s.entity_status AS status,
     s.last_90d_views
-FROM datalake_superset.slices s
+FROM
+    datalake_superset.slices s
+WHERE
+  DATE_DIFF(DAY, ts_changed, current_timestamp) <= 7
