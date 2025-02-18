@@ -6,12 +6,19 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: collection_recovery_quintoandar
+  spark_session_configs:
+    udfs: [FINTECH_COLLECTIONS_RENEGOTIATION]
   inner_dependencies:
     fact_negotiation:
       - bridge_map_debt_negotiation
       - fact_debt
       - fact_negotiation_installment
     fact_overdue_portfolio_timeline:
+      - bridge_map_debt_negotiation
+      - fact_debt
+      - fact_negotiation
+      - fact_negotiation_installment
+    fact_renegotiations:
       - bridge_map_debt_negotiation
       - fact_debt
       - fact_negotiation
@@ -36,4 +43,3 @@ cluster:
       ebs_volume_size: 200
       availability: SPOT_WITH_FALLBACK
   databricks_conn_id: databricks_new
-

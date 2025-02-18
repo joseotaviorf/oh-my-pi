@@ -133,6 +133,8 @@ bietlejuice.dw_inspections:
     - bietlejuice.inspection_services:load-clean-repair-request
     - bietlejuice.inspection_services:load-clean-reviewer
 bietlejuice.dw_losses:
+  add:
+    - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-renegotiations
   remove:
     - bietlejuice.enrich_losses:load-enrich-provision-factor
 bietlejuice.dw_offboarding:

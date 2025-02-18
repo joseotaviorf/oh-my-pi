@@ -9,20 +9,10 @@ exclusion_list_bill_items AS (
 ),
 invoice_anchor AS (
   SELECT
-    fni.id_invoice_extra AS id_invoice,
-    fn.sk_negotiation,
-    MAX(fd.dt_due) AS dt_due_original_invoice
-  FROM dw_collection_recovery_quintoandar.fact_debt AS fd
-  LEFT JOIN dw_collection_recovery_quintoandar.bridge_map_debt_negotiation AS bmdn
-    ON fd.sk_debt = bmdn.sk_debt
-  LEFT JOIN dw_collection_recovery_quintoandar.fact_negotiation AS fn
-    ON fn.sk_negotiation = bmdn.sk_negotiation
-  LEFT JOIN dw_collection_recovery_quintoandar.fact_negotiation_installment AS fni
-    ON fn.sk_negotiation = fni.sk_negotiation
-  WHERE fni.id_invoice_extra IS NOT NULL
-    AND fn.dt_down_payment IS NOT NULL
-    AND DATE_DIFF(DATE(fn.dt_promisse), DATE(fd.dt_due)) > 0
-  GROUP BY 1, 2
+    sk_invoice,
+    sk_anchor_invoice,
+    MAX(IF(sk_negotiation_created_by IS NULL, dt_due_adjusted, NULL)) OVER(PARTITION BY sk_anchor_invoice) AS dt_due_invoice_anchor
+  FROM dw_collection_recovery_quintoandar.fact_renegotiations
 ),
 max_closing AS (
   SELECT
@@ -43,14 +33,14 @@ base_write_off AS (
     fl.deal_status,
     CASE
         WHEN fl.deal_status IN ('DEAL IN DELAY', 'DEAL ON TIME. DELAY AT ANCHOR')
-          AND ia.dt_due_original_invoice IS NOT NULL
-          THEN DATE_DIFF(fl.dt_closing, ia.dt_due_original_invoice)
+          AND ia.dt_due_invoice_anchor IS NOT NULL
+          THEN DATE_DIFF(fl.dt_closing, ia.dt_due_invoice_anchor)
         ELSE DATE_DIFF(fl.dt_closing, DATE(i.ts_due))
     END AS delay_days_wo,
     fl.due_amount,
     fl.dt_closing,
     fl.dt_contract_annulment,
-    ia.dt_due_original_invoice AS dt_due_invoice_anchor,
+    ia.dt_due_invoice_anchor,
     DATE(i.ts_due) AS dt_due,
     i.dt_due_adjusted,
     fl.dt_due_invoice_adjusted AS dt_due_at_closing,
@@ -70,7 +60,7 @@ base_write_off AS (
       ON i.id_external = fl.sk_invoice
   LEFT JOIN
     invoice_anchor AS ia
-      ON ia.id_invoice = fl.sk_invoice
+      ON ia.sk_invoice = fl.sk_invoice
   WHERE
     IFNULL(i.is_write_off, FALSE) IS FALSE
     AND i.ts_write_off IS NULL

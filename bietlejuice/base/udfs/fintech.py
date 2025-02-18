@@ -29,3 +29,11 @@ class FintechUDFs:
             working_hours_delta.seconds + working_hours_delta_to_seconds
         ) / 60.0
         return ts_working_hours
+
+    @staticmethod
+    def fintech_collections_renegotiation(invoice: str, invoice_map: str) -> list:
+        level = 0
+        while invoice in invoice_map:
+            invoice = invoice_map[invoice]
+            level += 1
+        return invoice, level

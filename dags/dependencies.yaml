@@ -631,10 +631,6 @@ bietlejuice.dw_listing_temp:
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
 bietlejuice.dw_losses:
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-bridge-map-debt-negotiation
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-debt
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.enrich_losses:load-enrich-bill-items
@@ -643,6 +639,7 @@ bietlejuice.dw_losses:
   - bietlejuice.enrich_losses:load-enrich-historical-closing
   - bietlejuice.enrich_losses:load-enrich-provision
   - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-renegotiations
 bietlejuice.dw_media_platform_metrics:
   - bietlejuice.enrich_growth_manual_media_platform_metrics:load-enrich-manual-costs
   - bietlejuice.enrich_growth_media_platform_metrics:load-enrich-consolidated-metrics
