@@ -5,7 +5,8 @@ SELECT
             step_name
         )
     ) AS sk_interaction,
-    MD5(id_task) AS sk_task,
+    id_task AS sk_task,
+    id_call AS sk_call,
     from_phone_number,
     to_phone_number,
     step_name,

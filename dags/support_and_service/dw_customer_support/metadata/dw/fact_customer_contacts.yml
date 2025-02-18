@@ -34,6 +34,10 @@ columns:
       - datalake_customer_support.calls.id_task
       - datalake_customer_support.chats.id_task
     description: Task identifier associated with the contact.
+  sk_call:
+    lineage:
+      - datalake_customer_support.calls.id_call
+    description: Twilio call ID.
   sk_ticket:
     lineage:
       - datalake_customer_support.tickets.id_ticket

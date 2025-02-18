@@ -12,7 +12,11 @@ columns:
   sk_task:
     lineage:
       - datalake_customer_support.ivr_interactions.id_task
-    description: MD5 hash of id_task for task surrogate key.
+    description: Twilio task ID.
+  sk_call:
+    lineage:
+      - datalake_customer_support.ivr_interactions.id_call
+    description: Twilio call ID.
   from_phone_number:
     lineage:
       - datalake_customer_support.ivr_interactions.from_phone_number
