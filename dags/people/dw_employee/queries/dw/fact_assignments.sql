@@ -1,14 +1,40 @@
 WITH
+latest_assignments AS (
+    SELECT
+        id_assignment, assignment_status_type
+    FROM
+        datalake_hr_system.assignments
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY id_assignment
+            ORDER BY dt_effective_start DESC, ts_last_update DESC) = 1
+),
 subordinates AS (
-  SELECT
-    id_manager_assignment AS id_assignment,
-    COUNT(*) AS qnt_undirectly_led
-  FROM
-    datalake_hr_system.management_hierarchy
-  WHERE
-    NOT is_direct_manager
-  GROUP BY
-    id_manager_assignment
+    SELECT
+        id_manager_period_of_service AS id_assignment,
+        SUM(
+            IF(
+                mh.is_direct_manager
+                AND la.assignment_status_type = 'ACTIVE',
+                1,
+                0
+            )
+        ) AS qnt_directly_led,
+        SUM(
+            IF(
+                NOT mh.is_direct_manager
+                AND la.assignment_status_type = 'ACTIVE',
+                1,
+                0
+            )
+        ) AS qnt_undirectly_led
+    FROM
+        datalake_hr_system.management_hierarchy AS mh
+    LEFT JOIN
+        latest_assignments AS la
+            ON la.id_assignment = mh.id_assignment
+    GROUP BY
+        id_manager_period_of_service
 )
 
 SELECT
@@ -34,7 +60,7 @@ SELECT
   am.is_manager,
   am.has_self_declared_disability,
   am.assignment_age_months,
-  am.qnt_directly_led,
+  COALESCE(s.qnt_directly_led, 0) AS qnt_directly_led,
   COALESCE(s.qnt_undirectly_led, 0) AS qnt_undirectly_led,
   am.salary,
   am.target_plr,
@@ -53,9 +79,9 @@ SELECT
   NOW () AS ts_load
 FROM
   datalake_hr_system.assignment_metrics AS am
-  LEFT JOIN
-    subordinates AS s
-      ON s.id_assignment = am.sk_assignment
-  LEFT JOIN
-    datalake_hr_system.hierarchy_ids AS h
-      ON h.sk_assignment = am.sk_assignment
+LEFT JOIN
+  subordinates AS s
+    ON s.id_assignment = am.sk_assignment
+LEFT JOIN
+  datalake_hr_system.hierarchy_ids AS h
+    ON h.sk_assignment = am.sk_assignment

@@ -188,13 +188,110 @@ managers_direct_led AS (
 ),
 cte_enrich_disability AS (
   SELECT
-    sk_disability,
-    id_person,
-    has_self_declared_disability
-  FROM datalake_hr_system.disability
+    id_manager_assignment,
+    COUNT(*) AS qnt_directly_led
+  FROM
+    datalake_hr_system.managers
+  WHERE
+    dt_effective_start <= DATE('{load_start_date}')
+  GROUP BY
+    id_manager_assignment
+),
+assignments_present AS (
+  SELECT
+    a.id_period_of_service,
+    a.id_assignment,
+    a.assignment_number,
+    a.id_person,
+    a.id_business_unit,
+    a.id_cost_center,
+    a.id_job,
+    a.career_track,
+    a.target_plr,
+    SUM(
+      IF(
+        action_code = 'PROMOTION' OR band != LAG(band) OVER (
+          PARTITION BY id_assignment
+          ORDER BY dt_effective_start
+        ),
+        1,
+        0
+      )
+    ) OVER (
+      PARTITION BY id_assignment
+      ORDER BY dt_effective_start
+    ) AS qnt_promotions,
+    a.dt_effective_start,
+    a.dt_projected_start,
+    a.assignment_status_type,
+    a.ts_valid_from
+  FROM
+    assignment AS a
+  WHERE
+    DATE(a.ts_valid_from) <= DATE('{load_start_date}')
   QUALIFY
-    ts_last_updated = MAX(ts_last_updated) over (PARTITION BY id_person)
-    OR ts_last_updated is null
+    ROW_NUMBER() OVER (PARTITION BY a.id_assignment ORDER BY a.ts_valid_from DESC) = 1
+),
+assignments_future AS (
+  SELECT
+    a.id_period_of_service,
+    a.id_assignment,
+    a.assignment_number,
+    a.id_person,
+    a.id_business_unit,
+    a.id_cost_center,
+    a.id_job,
+    a.career_track,
+    a.target_plr,
+    SUM(
+      IF(
+        action_code = 'PROMOTION' OR band != LAG(band) OVER (
+          PARTITION BY id_assignment
+          ORDER BY dt_effective_start
+        ),
+        1,
+        0
+      )
+    ) OVER (
+      PARTITION BY id_assignment
+      ORDER BY dt_effective_start
+    ) AS qnt_promotions,
+    a.dt_effective_start,
+    a.dt_projected_start,
+    a.assignment_status_type,
+    a.ts_valid_from
+  FROM
+    assignment AS a
+  WHERE
+    DATE(a.ts_valid_from) <= DATE('{load_start_date}')
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY a.id_assignment ORDER BY a.ts_valid_from DESC) = 1
+),
+managers_present AS (
+  SELECT DISTINCT
+    id_period_of_service,
+    id_assignment,
+    id_manager_assignment
+  FROM
+    datalake_hr_system.managers
+  WHERE
+    dt_effective_start <= DATE('{load_start_date}')
+    AND manager_type = 'LINE_MANAGER'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_assignment ORDER BY dt_effective_start DESC) = 1
+),
+managers_future AS (
+  SELECT DISTINCT
+    id_period_of_service,
+    id_assignment,
+    id_manager_assignment
+  FROM
+    datalake_hr_system.managers
+  WHERE
+    dt_effective_start > DATE('{load_start_date}')
+    AND manager_type = 'LINE_MANAGER'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_assignment ORDER BY dt_effective_start DESC) = 1
 )
 
 SELECT DISTINCT
@@ -242,50 +339,27 @@ SELECT DISTINCT
  wr.dt_termination AS dt_termination_work_relationship,
  NOW() AS ts_load
 FROM
- datalake_hr_system.work_relationships AS wr
+  datalake_hr_system.work_relationships AS wr
 LEFT JOIN
- assignments_present AS ap
-   ON wr.id_period_of_service = ap.id_period_of_service
+  assignments_present AS ap
+    ON wr.id_period_of_service = ap.id_period_of_service
 LEFT JOIN
- assignments_future AS af
-   ON wr.id_period_of_service = af.id_period_of_service
+  assignments_future AS af
+    ON wr.id_period_of_service = af.id_period_of_service
 LEFT JOIN
- managers_present AS mp
-   ON wr.id_period_of_service = mp.id_period_of_service
+  managers_present AS mp
+    ON wr.id_period_of_service = mp.id_period_of_service
 LEFT JOIN
- managers_future AS mf
-   ON wr.id_period_of_service = mf.id_period_of_service
+  managers_future AS mf
+    ON wr.id_period_of_service = mf.id_period_of_service
 LEFT JOIN
- assignments_present AS ap_manager
-   ON COALESCE(
-         mp.id_manager_assignment,
-         mf.id_manager_assignment
-       ) = ap_manager.id_assignment
+  managers_direct_led AS mdl
+    ON ap.id_assignment = mdl.id_manager_assignment
 LEFT JOIN
- assignments_future AS af_manager
-   ON COALESCE(
-         mp.id_manager_assignment,
-         mf.id_manager_assignment
-       ) = af_manager.id_assignment
-LEFT JOIN
- managers_direct_led AS mdl
-   ON ap.id_assignment = mdl.id_manager_assignment
-LEFT JOIN
- datalake_hr_system.salary_metrics AS sm
-   ON COALESCE(ap.id_assignment, af.id_assignment) = sm.id_assignment
-LEFT JOIN
- datalake_hr_system.demographic_attributes AS da
-   ON wr.id_person = da.id_person
-     AND wr.legislation_code = da.legislation_code
-LEFT JOIN
- cte_enrich_disability AS d
-   ON wr.id_person = d.id_person
+  datalake_hr_system.salary_metrics AS sm
+    ON COALESCE(ap.id_assignment, af.id_assignment) = sm.id_assignment
 WHERE
- (
-   wr.dt_start <= DATE('{load_start_date}')
-   AND wr.worker_type IN ('E', 'C')
- )
- OR (
-   COALESCE(ap.dt_projected_start, af.dt_projected_start) > DATE('{load_start_date}')
-   AND wr.worker_type = 'P'
- )
+  (wr.dt_start <= DATE('{load_start_date}')
+  AND wr.worker_type IN ('E', 'C'))
+  OR (wr.worker_type = 'P'
+    AND COALESCE(ap.dt_projected_start, af.dt_projected_start) > DATE('{load_start_date}'))
