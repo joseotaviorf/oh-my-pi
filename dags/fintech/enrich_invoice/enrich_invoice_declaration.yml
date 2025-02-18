@@ -15,10 +15,14 @@ workflow:
     invoice_revenues:
       - invoice_all
 cluster:
-  type: databricks_12_2_med_2xlarge_general_cluster
-  databricks_conn_id: databricks_new
+  type: custom_cluster
   custom_configurations:
+    driver_node_type_id: m5d.xlarge
+    node_type_id: c5d.4xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
+  databricks_conn_id: databricks_new
