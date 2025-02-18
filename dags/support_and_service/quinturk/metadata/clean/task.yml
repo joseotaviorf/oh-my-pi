@@ -16,6 +16,9 @@ columns:
   id_inner:
     lineage:
       - datalake_quinturk_raw.task.inner_id
+  id_proposal:
+    lineage:
+      - datalake_quinturk_raw.task.data.id_proposal
   total_annotations:
     lineage:
       - datalake_quinturk_raw.task.total_annotations
@@ -31,6 +34,12 @@ columns:
   data:
     lineage:
       - datalake_quinturk_raw.task.data
+  proponent_cpf:
+    lineage:
+      - datalake_quinturk_raw.task.data.cpf
+  proponent_name:
+    lineage:
+      - datalake_quinturk_raw.task.data.name
   meta:
     lineage:
       - datalake_quinturk_raw.task.meta

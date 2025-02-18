@@ -19,6 +19,21 @@ columns:
   id_last_created_by:
     lineage:
       - datalake_quinturk_raw.task_completion.last_created_by_id
+  id_input:
+    lineage:
+      - datalake_quinturk_raw.task_completion.result.id
+  input_type:
+    lineage:
+      - datalake_quinturk_raw.task_completion.result.type
+  inpput_origin:
+    lineage:
+      - datalake_quinturk_raw.task_completion.result.origin
+  input_document_name:
+    lineage:
+      - datalake_quinturk_raw.task_completion.result.from_name
+  input_value:
+    lineage:
+      - datalake_quinturk_raw.task_completion.result.value
   prediction:
     lineage:
       - datalake_quinturk_raw.task_completion.prediction
