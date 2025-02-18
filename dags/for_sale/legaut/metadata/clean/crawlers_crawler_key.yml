@@ -1,0 +1,33 @@
+---
+database_name: datalake_legaut_clean
+table_name: crawlers_crawler_key
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: Table with the keys used by the crawlers
+columns:
+  id:
+    description: 'Id of the key'
+    lineage:
+    - datalake_legaut_raw.crawlers_crawlerkey.id
+  id_crawler:
+    description: 'Id of the crawler'
+    lineage:
+    - datalake_legaut_raw.crawlers_crawlerkey.crawler_id
+  id_crawler_group:
+    description: 'Id of the crawler group'
+    lineage:
+    - datalake_legaut_raw.crawlers_crawlerkey.crawlergroup_id
+  id_suggestion_group:
+    description: 'Id of the suggestion group'
+    lineage:
+    - datalake_legaut_raw.crawlers_crawlerkey.suggestiongroup_id
+  value:
+    description: 'Value of the key'
+    lineage:
+    - datalake_legaut_raw.crawlers_crawlerkey.value
+  type:
+    description: 'Type of the key'
+    lineage:
+    - datalake_legaut_raw.crawlers_crawlerkey.type
+  ts_load:
+    description: 'Timestamp when the data was loaded'
