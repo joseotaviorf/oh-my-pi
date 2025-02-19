@@ -30,6 +30,7 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
+      spark.sql.mapKeyDedupPolicy: LAST_WIN
     autotermination_minutes: 20
     driver_node_type_id: r5d.xlarge
     node_type_id: r5d.xlarge
