@@ -29,11 +29,11 @@ workflow:
     data_profiles:
       extra_spark_job_arguments:
         - "profile"
-        - False
+        - True
     data_validations:
       extra_spark_job_arguments:
         - "validation"
-        - True
+        - False
 cluster:
   type: databricks_13_3_min_general_cluster
   databricks_conn_id: databricks_new
