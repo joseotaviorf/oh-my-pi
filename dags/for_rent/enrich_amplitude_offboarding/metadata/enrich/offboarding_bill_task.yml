@@ -1,0 +1,88 @@
+database_name: datalake_amplitude_offboarding
+table_name: offboarding_bill_task
+description: This table contains event data related to offboarding bill task.
+  It contains the following events.
+  offboarding_bills_task_summary_page_viewed
+  offboarding_bills_task_condo_form_submitted
+  offboarding_bills_task_utility_bill_form_submitted
+  offboarding_bills_task_installation_code_page_viewed
+  offboarding_bills_task_installation_code_form_submitted
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id_app:
+    lineage:
+      - datalake_house_listing.house_listing.id_app
+    description: Amplitude's App ID.
+  id_event:
+    lineage:
+      - datalake_house_listing.house_listing.id_event
+    description: Event's ID.
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+    description: User's ID
+  uuid:
+    lineage:
+      - datalake_amplitude_clean.events.uuid
+    description: User's UUID.
+  event_properties:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Properties of the generated event.
+  user_properties:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Properties of the user who generated the event.
+  city:
+    lineage:
+      - datalake_amplitude_clean.events.city
+    description: City of origin of the event.
+  country:
+    lineage:
+      - datalake_amplitude_clean.events.country
+    description: Country of origin of the event.
+  event_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_type
+    description: Indicates the type of event generated in the application (event name).
+  os_name:
+    lineage:
+      - datalake_amplitude_clean.events.os_name
+    description: Device's OS name.
+  os_version:
+    lineage:
+      - datalake_amplitude_clean.events.os_version
+    description: Device's version.
+  platform:
+    lineage:
+      - datalake_amplitude_clean.events.platform
+    description: Event's platform.
+  library:
+    lineage:
+      - datalake_amplitude_clean.events.library
+    description: App's library.
+  region:
+    lineage:
+      - datalake_amplitude_clean.events.region
+    description: Region/State where the event happened.
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Timestamp when the event happened.
+  ts_processed:
+    lineage:
+      - datalake_amplitude_clean.events.ts_processed
+    description: Timestamp of when the data was processed by the pipeline.
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+    description: Year when the event happened. Also, it's a table partition.
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+    description: Month when the event happened. Also, it's a table partition.
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
+    description: Day when the event happened. Also, it's a table partition.

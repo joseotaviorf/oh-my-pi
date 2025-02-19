@@ -1,0 +1,38 @@
+SELECT
+    id_app,
+    id_event,
+    id_user,
+    uuid,
+    event_properties,
+    user_properties,
+    amplitude_event_type,
+    city,
+    country,
+    event_type,
+    os_name,
+    os_version,
+    platform,
+    library,
+    region,
+    version_name,
+    ts_client_event,
+    ts_client_uploaded,
+    ts_server_received,
+    ts_event,
+    ts_server_uploaded,
+    ts_processed,
+    year,
+    month,
+    day
+FROM
+    datalake_amplitude_clean.events
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND id_app = 170698
+    AND event_type IN (
+        'offboarding_bills_task_summary_page_viewed',
+        'offboarding_bills_task_condo_form_submitted',
+        'offboarding_bills_task_utility_bill_form_submitted',
+        'offboarding_bills_task_installation_code_page_viewed',
+        'offboarding_bills_task_installation_code_form_submitted'
+    )

@@ -1128,6 +1128,8 @@ bietlejuice.enrich_amplitude_magic_link:
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.zendesk:load-clean-groups
   - bietlejuice.zendesk:load-clean-users
+bietlejuice.enrich_amplitude_offboarding:
+  - bietlejuice.amplitude:load-clean-events
 bietlejuice.enrich_amplitude_offer:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_amplitude_page_viewed_events:
