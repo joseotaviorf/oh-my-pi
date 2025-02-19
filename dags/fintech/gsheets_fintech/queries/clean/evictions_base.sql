@@ -21,7 +21,6 @@ SELECT
     Correspondente AS correspondent,
     Aviso_recebimento AS notice_of_receipt,
     Total_pacote AS total_package,
-    Total_pagamento AS total_payment,
     Total_divida AS total_due_amount,
     Citacao_Arbitral AS arbitral_citation,
     Contestacao_Camara AS chamber_contestation,
