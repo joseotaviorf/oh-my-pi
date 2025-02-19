@@ -80,7 +80,7 @@ FROM VALUES
         "ab_beakman_search_services_demand_concentration_rent_experiment",
         named_struct(
             'begin_date', DATE('2024-12-19'),
-            'end_date', NULL,
+            'end_date', DATE('2025-01-29'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -133,6 +133,22 @@ FROM VALUES
                 )
             ),
             'filters', NULL
+        )
+    ),
+    -- demand balancer v2 policy v2
+    (
+        "ab_beakman_search_services_demand_concentration_v2_policy_2_rent_experiment",
+        named_struct(
+            'begin_date', DATE('2025-02-17'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment_1',
+                    '2', 'treatment_2'
+                )
+            ),
+            'filters', "business_context = 'rent'"
         )
     )
     -- Add new experiment here
