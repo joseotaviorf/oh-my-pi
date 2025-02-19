@@ -13,7 +13,3 @@ SELECT
     day
 FROM
     datalake_kill_queue_raw.user
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

@@ -1,5 +1,5 @@
 dag:
-  name: kill_queue_test
+  name: kill_queue
   schedule_start_date: 2019, 5, 31
   schedule_interval: 30 0 * * *
   owner: Data ForRent
@@ -8,7 +8,7 @@ dag:
 workflow:
   type: cdc
   layer: raw
-  custom_schema: kill_queue_test
+  custom_schema: kill_queue
   database_type: mysql
   source_database: killqueue
   source_schema: killqueue

@@ -20,7 +20,3 @@ SELECT
     day
 FROM
     datalake_kill_queue_raw.house
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
