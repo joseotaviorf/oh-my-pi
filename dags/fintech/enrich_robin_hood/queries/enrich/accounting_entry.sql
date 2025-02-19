@@ -10,7 +10,7 @@ SELECT
     GET_JSON_OBJECT(ae.metadata, '$.offer-id') AS id_offer,
     ae.cost_center_code,
     ae.source_bill_item,
-    ae.daescription,
+    ae.description,
     ae.type,
     ae.locale,
     aes.source_name,
