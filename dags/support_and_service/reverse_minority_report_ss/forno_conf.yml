@@ -24,6 +24,13 @@ tables:
     key_value: key_csat
     type: BPO_PERFORMANCE
 
+kafka_servers:
+  [
+    "kb0-consumer.forno.quintoandar.com.br:9092",
+    "kb1-consumer.forno.quintoandar.com.br:9092",
+  ]
+kafka_topic: ProfileEvents
+
 custom_cluster:
   autotermination_minutes: 20
   driver_node_type_id: r5a.4xlarge

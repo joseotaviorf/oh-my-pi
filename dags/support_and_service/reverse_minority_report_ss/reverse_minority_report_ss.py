@@ -38,8 +38,12 @@ cluster_description["data_security_mode"] = "SINGLE_USER"
 cluster_description["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
 cluster_description["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 default_libraries = config_service.get_config("default_libraries")
+custom_libraries = [
+    {"pypi": {"package": "kafka-python==2.0.3"}},
+]
 
-minority_report_endpoint = config_service.get_config("minority_report_endpoint")
+kafka_servers = config_service.get_config("kafka_servers")
+kafka_topic = config_service.get_config("kafka_topic")
 tables = config_service.get_config("tables")
 dag_documentation = config_service.get_config("dag_documentation")
 
@@ -73,7 +77,7 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn
     task_id="create-cluster",
     cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
-    libraries=default_libraries,
+    libraries=default_libraries + custom_libraries,
 )
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
@@ -87,9 +91,9 @@ for table in tables.keys():
             "spark_python_task": {
                 "python_file": reverse_spark_job_path,
                 "parameters": [
-                    ENV,
                     DAG_NAME,
-                    minority_report_endpoint,
+                    kafka_servers,
+                    kafka_topic,
                     tables[table]["type"],
                     tables[table]["key_name"],
                     tables[table]["key_value"],
