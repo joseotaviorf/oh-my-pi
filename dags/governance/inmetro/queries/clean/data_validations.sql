@@ -1,13 +1,13 @@
-select
+SELECT
     repo,
-    case
-        when repo = "wonka" then "feature_sets"
-        when substr(database, -4) = "_raw" then "raw"
-        when substr(database, -6) = "_clean" then "clean"
-        when substr(database, 1, 3) = "dw_" and substr(database, -8) = "_staging" then "dw_staging"
-        when substr(database, 1, 7) = "metric_" then "metric"
-        else "enrich"
-    end as layer,
+    CASE
+        WHEN repo = "wonka" THEN "feature_sets"
+        WHEN substr(database, -4) = "_raw" THEN "raw"
+        WHEN substr(database, -6) = "_clean" THEN "clean"
+        WHEN substr(database, 1, 3) = "dw_" AND substr(database, -8) = "_staging" THEN "dw_staging"
+        WHEN substr(database, 1, 7) = "metric_" THEN "metric"
+        ELSE "enrich"
+    END AS layer,
     database,
     table,
     metadata.suite_name,
@@ -18,14 +18,12 @@ select
     metadata.success_rate,
     TO_JSON(metadata) AS metadata,
     TO_JSON(validations) AS validations,
-    timestamp(metadata.run_date) AS ts_execution_utc,
+    TIMESTAMP(metadata.run_date) AS ts_execution_utc,
     FROM_UTC_TIMESTAMP(metadata.run_date, 'America/Sao_Paulo') AS ts_execution_local,
     year,
     month,
     day
-from
+FROM
     datalake_inmetro_raw.data_validations
-where
-    year = {year}
-    and month = {month}
-    and day = {day}
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

@@ -1,0 +1,44 @@
+dag:
+  name: inmetro
+  owner: Data Governance
+  schedule_start_date: 2021, 1, 20
+  schedule_interval: "0 5,13 * * *"
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for loading Inmetro's data into our Data Lake.
+
+      Every Data Quality task created in our DAGs sends the results of the validations to inmetro's bucket in S3.
+      This bucket also contains data from the Wonka dags. We bring all that data incrementally to our data lake.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_{dag_name}_raw
+  default_partitions: ['year', 'month', 'day']
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"   # env
+    - "{bucket}"   # datalake_bucket
+    - "{dag_name}"   # source
+    - "{table_name}"
+    - "{load_start_date}"   # load_start_date
+    - "['year', 'month', 'day']"
+  tables_customization:
+    data_profiles:
+      extra_spark_job_arguments:
+        - "profile"
+        - False
+    data_validations:
+      extra_spark_job_arguments:
+        - "validation"
+        - True
+cluster:
+  type: databricks_13_3_min_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,5 +1,5 @@
-import json
 import logging
+import ast
 
 from argparse import ArgumentParser
 from datetime import datetime
@@ -27,13 +27,10 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_inmetro_data(bucket_directory, partition_cols, execution_date):
+def get_inmetro_data(serialize_columns_from_directory, partition_cols, execution_date):
 
     config_service = ConfigurationService(source)
     inmetro_bucket = config_service.get_config("inmetro_bucket")
-    serialize_columns_from_directory = config_service.get_config(
-        "serialize_columns_from_directory"
-    )
 
     file_path = f"{inmetro_bucket}/*/*/*/{bucket_directory}/{execution_date}"
     path_attributes_pattern = (
@@ -43,7 +40,7 @@ def get_inmetro_data(bucket_directory, partition_cols, execution_date):
     try:
         df = spark.read.format("json").load(file_path)
 
-        if serialize_columns_from_directory[bucket_directory]:
+        if serialize_columns_from_directory:
             df = df.withColumn(
                 "inmetro_info", to_json(struct([df[x] for x in df.columns]))
             ).select("inmetro_info")
@@ -84,18 +81,20 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("table_name")
-    parser.add_argument("bucket_directory")
-    parser.add_argument("partition_cols")
     parser.add_argument("execution_date")
+    parser.add_argument("partition_cols")
+    parser.add_argument("bucket_directory")
+    parser.add_argument("serialize_columns_from_directory")
     args = parser.parse_args()
 
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
     table_name = args.table_name
-    bucket_directory = args.bucket_directory
-    partition_cols = json.loads(args.partition_cols)
     execution_date = args.execution_date
+    partition_cols = ast.literal_eval(args.partition_cols)
+    bucket_directory = args.bucket_directory
+    serialize_columns_from_directory = ast.literal_eval(args.serialize_columns_from_directory)
 
     logger.info(
         f"""
@@ -121,7 +120,7 @@ if __name__ == "__main__":
     database_location = datalake_info["db_raw_path"]
     database_name = datalake_info["db_raw_databricks"]
 
-    df = get_inmetro_data(bucket_directory, partition_cols, execution_date)
+    df = get_inmetro_data(serialize_columns_from_directory, partition_cols, execution_date)
 
     if not df:
         logger.warning(
