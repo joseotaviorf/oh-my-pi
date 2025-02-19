@@ -31,10 +31,12 @@ workflow:
         count: '*'
     BypassTerm:
       clean_table_name: bypass_term
+      clean_primary_keys: ["id"]
       get_table_metrics:
         count: '*'
     BypassTerm_AUD:
       clean_table_name: bypass_term_aud
+      clean_primary_keys: ["id", "rev"]
       get_table_metrics:
         count: '*'
     FinancialData:
