@@ -1,0 +1,57 @@
+dag:
+  name: ebdb_finance
+  schedule_start_date: 2021, 2, 20
+  schedule_interval: 10 21 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: Extraction of EBDB tables related to Finance into data lake. EBDB is the main database for QuintoAndar.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: mysql
+  source_database: ebdb
+  custom_schema: ebdb
+  source_schema: ebdb
+  tables_customization:
+    ContaCorrente:
+      clean_table_name: account
+      get_table_metrics:
+        count: '*'
+    OperacaoContaCorrente:
+      clean_table_name: account_transaction
+      get_table_metrics:
+        count: '*'
+    Banco:
+      clean_table_name: bank
+      get_table_metrics:
+        count: '*'
+    BankAccountValidation:
+      clean_table_name: bank_account_validation
+      get_table_metrics:
+        count: '*'
+    BypassTerm:
+      clean_table_name: bypass_term
+      get_table_metrics:
+        count: '*'
+    BypassTerm_AUD:
+      clean_table_name: bypass_term_aud
+      get_table_metrics:
+        count: '*'
+    FinancialData:
+      clean_table_name: financial_data
+      get_table_metrics:
+        count: '*'
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+      ebs_volume_size: 200
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

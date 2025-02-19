@@ -64,9 +64,9 @@ bietlejuice.dw_atta:
   - bietlejuice.sales_flow:load-clean-negotiation
   - bietlejuice.sales_flow:load-clean-offer
 bietlejuice.dw_banking:
-  - bietlejuice.ebdb:load-clean-account
-  - bietlejuice.ebdb:load-clean-account-transaction
-  - bietlejuice.ebdb:load-clean-bank
+  - bietlejuice.ebdb_finance:load-clean-account
+  - bietlejuice.ebdb_finance:load-clean-account-transaction
+  - bietlejuice.ebdb_finance:load-clean-bank
   - bietlejuice.ebdb_user:load-clean-user
 bietlejuice.dw_banking_file_payments:
   - bietlejuice.vans:load-clean-bank
@@ -975,8 +975,8 @@ bietlejuice.dw_tracksale:
   - bietlejuice.enrich_tracksale:load-enrich-dispatch
   - bietlejuice.enrich_tracksale:load-enrich-dispatch-attributes
 bietlejuice.dw_user:
-  - bietlejuice.ebdb:load-clean-bank
   - bietlejuice.ebdb_contract:load-clean-contract
+  - bietlejuice.ebdb_finance:load-clean-bank
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.ebdb_partner:load-clean-partner
   - bietlejuice.ebdb_partner:load-clean-partner-agent
@@ -1608,7 +1608,7 @@ bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.docx:load-clean-document
 bietlejuice.enrich_ebdb_affiliates_cost:
-  - bietlejuice.ebdb:load-clean-account-transaction
+  - bietlejuice.ebdb_finance:load-clean-account-transaction
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_lead:load-clean-conversion-lead
   - bietlejuice.ebdb_lead:load-clean-lead

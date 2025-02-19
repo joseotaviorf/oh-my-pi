@@ -481,6 +481,13 @@ table_block_list:
   - EntryAccessTracking
   - EntryAccess
   - KeyHolder
+  - ContaCorrente
+  - OperacaoContaCorrente
+  - Banco
+  - BankAccountValidation
+  - BypassTerm
+  - BypassTerm_AUD
+  - FinancialData
 
 view_allow_list:
   - MapRegiao
