@@ -2691,9 +2691,7 @@ bietlejuice.enrich_sale_closing_flows:
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
   - bietlejuice.monopoly:load-clean-sale
-  - bietlejuice.sales_flow:load-clean-diligence
   - bietlejuice.sales_flow:load-clean-diligence-aud
-  - bietlejuice.sales_flow:load-clean-mortgage
   - bietlejuice.sales_flow:load-clean-mortgage-aud
 bietlejuice.enrich_sale_demand_events:
   - bietlejuice.enrich_offer:load-enrich-sale-offer

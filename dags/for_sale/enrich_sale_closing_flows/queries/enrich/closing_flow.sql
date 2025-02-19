@@ -30,51 +30,29 @@ WITH payments_method_change AS (
     WHERE
         ROW =1
 ),
-first_update_diligence AS (
+diligence AS (
     SELECT
-        id_diligence,
-        MIN(ts_updated) AS ts_first_updated
+        id_diligence_aud AS id_diligence,
+        id_sales_flow,
+        CAST(ts_buyer_seller_ended AS DATE) AS dt_legal_analysis_ended
     FROM
         datalake_sales_flow_clean.diligence_aud
     WHERE
         ts_buyer_seller_ended IS NOT NULL
-    GROUP BY
-        id_diligence
+    QUALIFY
+        1 = ROW_NUMBER() OVER (PARTITION BY id_diligence_aud ORDER BY ts_updated)
 ),
-first_update_mortgage AS (
+mortgage AS (
     SELECT
-        id_mortgage,
-        MIN(ts_updated) AS ts_first_updated
+        id_mortgage_aud AS id_mortgage,
+        id_sales_flow,
+        CAST(dt_credit_ended AS DATE) AS dt_credit_analysis_ended
     FROM
         datalake_sales_flow_clean.mortgage_aud
     WHERE
         dt_credit_ended IS NOT NULL
-    GROUP BY
-        1
-),
-diligence AS (
-    SELECT
-        d.id_diligence,
-        d.id_sales_flow,
-        CAST(d.ts_buyer_seller_ended AS DATE) AS dt_legal_analysis_ended
-    FROM
-        datalake_sales_flow_clean.diligence AS d
-    INNER JOIN
-        first_update_diligence AS fud
-            ON d.id_diligence = fud.id_diligence
-            AND d.ts_updated = fud.ts_first_updated
-),
-mortgage AS (
-    SELECT
-        mg.id_mortgage,
-        mg.id_sales_flow,
-        CAST(mg.dt_credit_ended AS DATE) AS dt_credit_analysis_ended
-    FROM
-        datalake_sales_flow_clean.mortgage AS mg
-    INNER JOIN
-        first_update_mortgage AS fum
-        ON mg.id_mortgage = fum.id_mortgage
-        AND mg.ts_updated = fum.ts_first_updated
+    QUALIFY 
+      1 = ROW_NUMBER() over (PARTITION BY id_mortgage_aud ORDER BY ts_updated)
 ),
 payment_dates AS (
     SELECT
