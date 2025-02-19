@@ -241,7 +241,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     dag_name = args.dag_name
-    kafka_servers = args.kafka_servers
+    kafka_servers = json.loads(args.kafka_servers)
     kafka_topic = args.kafka_topic
     api_type = args.api_type
     key_name = args.key_name

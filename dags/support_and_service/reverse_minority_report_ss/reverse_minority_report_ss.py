@@ -92,7 +92,7 @@ for table in tables.keys():
                 "python_file": reverse_spark_job_path,
                 "parameters": [
                     DAG_NAME,
-                    kafka_servers,
+                    json.dumps(kafka_servers),
                     kafka_topic,
                     tables[table]["type"],
                     tables[table]["key_name"],
