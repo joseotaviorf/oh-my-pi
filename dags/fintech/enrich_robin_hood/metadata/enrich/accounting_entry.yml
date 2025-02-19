@@ -21,6 +21,10 @@ columns:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id_payee
     description: Payee id.
+  id_payee_external:
+    lineage:
+      - datalake_robin_hood_clean.payee.id_payee.id_external
+    description: Payee external id.
   id_lead:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.metadata
@@ -45,6 +49,10 @@ columns:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.source_bill_item
     description: Source bill item.
+  source_name:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry_source.source_name
+    description: Source name.
   description:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.description

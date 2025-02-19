@@ -2677,6 +2677,8 @@ bietlejuice.enrich_reverses_monitoring:
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
 bietlejuice.enrich_robin_hood:
   - bietlejuice.robin_hood:load-clean-accounting-entry
+  - bietlejuice.robin_hood:load-clean-accounting-entry-source
+  - bietlejuice.robin_hood:load-clean-payee
   - bietlejuice.robin_hood:load-clean-tax
 bietlejuice.enrich_sale_available_booking_hours:
   - bietlejuice.ebdb_house:load-clean-house
