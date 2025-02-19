@@ -1,5 +1,6 @@
 WITH conversion_events_filtered AS (
   SELECT
+    id_demand_prospect_conversion_event,
     id_rent_flow,
     id_sale_flow,
     id_event_type,
@@ -18,10 +19,11 @@ WITH conversion_events_filtered AS (
   FROM
     datalake_demand_flows_test.conversion_events
   WHERE
-    dt_event BETWEEN DATE('2025-01-21') AND DATE('2025-02-06')
+    dt_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 booking_attribution AS (
   SELECT
+    bce.id_demand_prospect_conversion_event,
     bce.id_rent_flow,
     bce.id_sale_flow,
     bce.id_event_type,
@@ -86,13 +88,11 @@ booking_attribution AS (
   LEFT JOIN 
     datalake_booking.booking AS b 
       ON bce.id_booking = b.id
-      AND DATE(b.ts_created) BETWEEN DATE('2025-01-21')
-      AND DATE('2025-02-06')
+      AND DATE(b.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   LEFT JOIN 
     datalake_amplitude_visit.amplitude_visit AS src 
       ON b.code = src.id_visit
-      AND DATE(src.ts_event) BETWEEN DATE('2025-01-21')
-      AND DATE('2025-02-06')
+      AND DATE(src.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   LEFT JOIN 
     datalake_tracked_events.attribution_cross_channel acc 
       ON b.code = acc.visit_code
@@ -100,7 +100,7 @@ booking_attribution AS (
         'visit_schedule_confirmed',
         'debug_visit_schedule_confirmed'
       )
-      AND DATE(acc.ts_event) BETWEEN DATE('2025-01-21') AND DATE('2025-02-06')
+      AND DATE(acc.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   WHERE
     bce.id_event_type = 1
 ),
@@ -132,6 +132,7 @@ sale_offer_from_amplitude AS (
 ),
 sale_offer_attribution AS (
   SELECT
+    soce.id_demand_prospect_conversion_event,
     soce.id_rent_flow,
     soce.id_sale_flow,
     soce.id_event_type,
@@ -200,14 +201,12 @@ sale_offer_attribution AS (
       soce.id_prospect = sor.id_user
       OR soce.id_house = sor.id_house
     )
-    AND sor.ts_event BETWEEN DATE('2025-01-21')
-    AND DATE('2025-02-06')
+    AND sor.ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     LEFT JOIN 
       datalake_tracked_events.attribution_cross_channel AS acc 
         ON sor.id_offer = acc.id_firestore
     AND acc.event_name = 'sale_offer_form_accepted'
-    AND DATE(acc.ts_event) BETWEEN DATE('2025-01-21')
-    AND DATE('2025-02-06')
+    AND DATE(acc.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   WHERE
     soce.id_event_type = 3
     AND soce.business_context = 'sale'
@@ -240,6 +239,7 @@ rent_offer_from_amplitude AS (
 ),
 rent_offer_attribution AS (
   SELECT
+    roce.id_demand_prospect_conversion_event,
     roce.id_rent_flow,
     roce.id_sale_flow,
     roce.id_event_type,
@@ -313,8 +313,7 @@ rent_offer_attribution AS (
           OR (roce.id_house = aos.id_house)
         )
         AND (
-          CAST(aos.ts_event AS DATE) BETWEEN DATE('2025-01-21')
-          AND DATE('2025-02-06')
+          CAST(aos.ts_event AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         )
     LEFT JOIN 
       datalake_tracked_events.attribution_cross_channel AS acc 
@@ -323,8 +322,7 @@ rent_offer_attribution AS (
           acc.event_name in ('offer_submitted', 'offer_submitted_new')
         )
         AND (
-          CAST(acc.ts_event AS DATE) BETWEEN DATE('2025-01-21')
-          AND DATE('2025-02-06')
+          CAST(acc.ts_event AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         )
   WHERE
     roce.id_event_type = 3
@@ -349,11 +347,11 @@ legacy_data_talk_to_agent AS (
     datalake_ebdb_clean.house AS h 
       ON h.id = a.house_id
   WHERE
-    DATE(a.first_message_ts) BETWEEN DATE('2025-01-21')
-    AND DATE('2025-02-06')
+    DATE(a.first_message_ts) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 events_with_attribution AS (
   SELECT
+    id_demand_prospect_conversion_event,
     INT(DATE_FORMAT(dt_event, 'yyyyMMdd')) AS id_event_date,
     id_rent_flow,
     id_sale_flow,
@@ -383,6 +381,7 @@ events_with_attribution AS (
     booking_attribution
   UNION ALL
   SELECT
+    id_demand_prospect_conversion_event,
     INT(DATE_FORMAT(dt_event, 'yyyyMMdd')) AS id_event_date,
     id_rent_flow,
     id_sale_flow,
@@ -412,6 +411,7 @@ events_with_attribution AS (
     sale_offer_attribution
   UNION ALL
   SELECT
+    id_demand_prospect_conversion_event,
     INT(DATE_FORMAT(dt_event, 'yyyyMMdd')) AS id_event_date,
     id_rent_flow,
     id_sale_flow,
@@ -441,6 +441,7 @@ events_with_attribution AS (
     rent_offer_attribution
   UNION ALL
   SELECT
+    id_demand_prospect_conversion_event,
     INT(DATE_FORMAT(ce.dt_event, 'yyyyMMdd')) AS id_event_date,
     ce.id_rent_flow,
     ce.id_sale_flow,
@@ -493,18 +494,7 @@ booking_info AS (
     datalake_booking.booking AS b
 ) -- , final AS(
 SELECT
-  MD5(
-    CONCAT(
-      e.ts_event,
-      e.id_event_type,
-      e.business_context,
-      COALESCE(e.id_booking, -1),
-      COALESCE(e.id_offer, -1),
-      COALESCE(e.id_talk_to_agent, -1),
-      e.id_prospect,
-      e.id_house
-    )
-  ) AS id_demand_prospect_conversion_event,
+  e.id_demand_prospect_conversion_event,
   e.id_event_date,
   e.id_rent_flow,
   e.id_sale_flow,
@@ -544,8 +534,7 @@ FROM
 LEFT JOIN 
   booking_info AS b 
     ON e.id_booking = b.id_booking
-  AND DATE(b.ts_created) BETWEEN DATE('2025-01-21')
-  AND DATE('2025-02-06')
+  AND DATE(b.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 LEFT JOIN 
   datalake_ebdb_listing.house AS h 
     ON e.id_house = h.id
