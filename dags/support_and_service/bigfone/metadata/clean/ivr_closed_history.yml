@@ -3,19 +3,19 @@ table_name: ivr_closed_history
 columns:
   id_ivr:
     lineage:
-      - datalake_bigfone_raw.ivr_closed_history.id
+      - datalake_bigfone_raw.ivrclosedhistory.id
   id_user:
     lineage:
-      - datalake_bigfone_raw.ivr_closed_history.user_id
+      - datalake_bigfone_raw.ivrclosedhistory.user_id
   user_phone:
     lineage:
-      - datalake_bigfone_raw.ivr_closed_history.user_phone
+      - datalake_bigfone_raw.ivrclosedhistory.user_phone
   origin:
     lineage:
-      - datalake_bigfone_raw.ivr_closed_history.origin
+      - datalake_bigfone_raw.ivrclosedhistory.origin
   strategy:
     lineage:
-      - datalake_bigfone_raw.ivr_closed_history.strategy
+      - datalake_bigfone_raw.ivrclosedhistory.strategy
   ts_requested:
     lineage:
-      - datalake_bigfone_raw.ivr_closed_history.requested_at
+      - datalake_bigfone_raw.ivrclosedhistory.requested_at

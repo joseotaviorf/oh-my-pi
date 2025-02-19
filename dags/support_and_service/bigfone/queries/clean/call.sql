@@ -1,5 +1,5 @@
 SELECT
-    uuid AS id_source_unique, 
+    uuid AS id_source_unique,
     caller_phone_number,
     destination_phone_number,
     direction,

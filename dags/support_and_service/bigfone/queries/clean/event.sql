@@ -38,7 +38,3 @@ SELECT
     day
 FROM
     datalake_bigfone_raw.event
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

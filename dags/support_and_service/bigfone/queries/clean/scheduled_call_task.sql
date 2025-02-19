@@ -18,8 +18,4 @@ SELECT
     month,
     day
 FROM
-    datalake_bigfone_raw.scheduled_call_task
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    datalake_bigfone_raw.scheduledcalltask
