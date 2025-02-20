@@ -6,9 +6,6 @@ table_level_validations:
     greater_than: 21000
     severity_level: Error
 column_level_validations:
-  id_agent:
-    is_complete:
-      severity_level: Error
   id_user:
     is_complete:
       severity_level: Error
