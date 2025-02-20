@@ -6,6 +6,75 @@ table_level_validations:
     greater_than: 60000
     severity_level: Error
 column_level_validations:
+  id_agent:
+    is_complete:
+      severity_level: Error
   id_user:
     is_complete:
       severity_level: Error
+  id_business_unit:
+    is_complete:
+      severity_level: Error
+  total_offer_sent:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  total_regular_offer_signed:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  total_offer_signed_with_agent_intermediation:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  total_offer_signed_with_demand_supply_capture:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  total_offer_signed_with_tqc:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  total_offer_signed_with_ciq:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  total_first_listing:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  total_gross_merchandise_volume:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+  ratio_offer_sent_to_signed:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 1
+  year:
+    is_complete:
+      severity_level: Error
+  bimester:
+    is_complete:
+      severity_level: Error
+

@@ -6,6 +6,9 @@ table_level_validations:
     greater_than: 6000
     severity_level: Error
 column_level_validations:
+  id_agent:
+    is_complete:
+      severity_level: Error
   id_user:
     is_complete:
       severity_level: Error
@@ -22,5 +25,17 @@ column_level_validations:
     is_complete:
       severity_level: Error
   program_code:
+    is_complete:
+      severity_level: Error
+  tier_name:
+    is_complete:
+      severity_level: Error
+  brokerage_value:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  bimester:
     is_complete:
       severity_level: Error

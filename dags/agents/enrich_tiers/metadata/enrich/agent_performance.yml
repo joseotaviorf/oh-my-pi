@@ -57,12 +57,14 @@ columns:
     description: Business unit name.
   total_offer_sent:
     description: Total number of offers sent, in which the agent participated in one of the funnel stages
-  total_offer_signed:
-    description: Total number of offers signed, in which the agent participated in one of the funnel stages
-  total_non_regular_offer_signed:
-    description:
-      Total number of offers signed, in which the agent participated in one of the funnel stages,
-      but without any participation by the Agent in programs such as CIQ and 'Traz Quem Compra' (TQC).
+  total_regular_offer_signed:
+    description: Total number of signed offers, in which the agent was responsible for visiting or negotiating the offer
+  total_offer_signed_with_agent_intermediation:
+    description: 
+      Total number of signed offers, in which the agent participated in one of 
+      the funnel stages (supply capture (CIQ), demand capture (TQC), visits stage or offer negotiation)
+  total_offer_signed_with_demand_supply_capture:
+    description: Total number of signed offers, in which the agent participated with the CIQ or 'Traz Quem Compra' (TQC) programs.
   total_offer_signed_with_tqc:
     description: 
       Total number of offers signed, in which the agent participated in one of the funnel stages, 

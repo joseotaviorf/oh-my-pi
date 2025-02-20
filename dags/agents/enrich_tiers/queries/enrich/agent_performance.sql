@@ -120,21 +120,20 @@ SELECT
     mp.profile,
     mp.hub_name,
     COALESCE(os.total_offer_sent, 0) AS total_offer_sent,
-    COALESCE(os.total_offer_signed, 0) AS total_offer_signed,
+    COALESCE(os.total_offer_signed, 0) AS total_regular_offer_signed,
     (
         COALESCE(os.total_offer_signed, 0) 
-        - COALESCE(os.total_offer_signed_with_tqc, 0) 
-        - COALESCE(cos.total_offer_signed_with_ciq, 0)
-    ) AS total_regular_offer_signed,
+        + COALESCE(cos.total_offer_signed_with_ciq, 0)
+    ) AS total_offer_signed_with_agent_intermediation,
     (
         COALESCE(os.total_offer_signed_with_tqc, 0) 
         + COALESCE(cos.total_offer_signed_with_ciq, 0)
-    ) AS total_non_regular_offer_signed,
+    ) AS total_offer_signed_with_demand_supply_capture,
     COALESCE(os.total_offer_signed_with_tqc, 0) AS total_offer_signed_with_tqc,
     COALESCE(cos.total_offer_signed_with_ciq, 0) AS total_offer_signed_with_ciq,
     COALESCE(cql.total_first_listing, 0) AS total_first_listing,
     COALESCE(os.total_gross_merchandise_volume, 0) AS total_gross_merchandise_volume,
-    ROUND(COALESCE(os.total_offer_signed / os.total_offer_sent, 0), 2) AS ratio_offer_sent_to_signed,
+    ROUND(COALESCE(os.total_offer_signed/ os.total_offer_sent, 0), 2) AS ratio_offer_sent_to_signed,
     mp.year,
     mp.bimester
 FROM
