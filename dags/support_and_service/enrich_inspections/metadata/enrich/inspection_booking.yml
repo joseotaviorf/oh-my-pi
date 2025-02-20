@@ -45,8 +45,7 @@ columns:
   id_appointment:
     description: Scheduling identification key in hash format that groups the main and IS ids.
     lineage:
-      - datalake_inspections_clean.appointment.id_appointment
-      - datalake_inspections.main_inspection_booking.id_booking
+      - datalake_inspections.appointment_inspection.id_appointment
   id_contract:
     description: Unique identifier of the contract related to the property to be inspected.
     lineage:

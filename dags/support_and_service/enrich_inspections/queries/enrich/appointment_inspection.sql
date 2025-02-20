@@ -41,7 +41,7 @@ appointment_history AS (
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_appointment ORDER BY ts_updated DESC) = 1
 ),
-appointment_union AS (
+inspection_appointment_data AS (
     SELECT
         a.id_appointment AS id_is_appointment,
         a.id_external_appointment AS id_main_appointment,
@@ -83,12 +83,13 @@ appointment_union AS (
         appointment_history AS ah
           ON b.id_schedule = ah.id_appointment
     WHERE
-        MAKE_DATE(a.year, a.month, a.day) BETWEEN '{load_start_date}' AND '{load_end_date}'
-    UNION ALL
+        DATE(a.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
+),
+main_appointment_data AS (
     SELECT
         a.id_appointment AS id_is_appointment,
         b.id AS id_main_appointment,
-        MD5(CONCAT(is.id_inspection, 'PWA')) AS id_inspection,
+        MD5(CONCAT(i.id, 'PWA')) AS id_inspection,
         b.id_agent AS id_inspector,
         CASE
             WHEN LOWER(b.type) IN ('vistoria', 'vistoriaquarteirizada') THEN 'INSPECTION'
@@ -143,6 +144,40 @@ appointment_union AS (
         LOWER(b.type) IN ('vistoria', 'vistoriaquarterizada')
         AND DATE(b.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ),
+coalesce_appointment_sources AS (
+    SELECT
+        COALESCE(iad.id_is_appointment, md.id_is_appointment) AS id_is_appointment,
+        COALESCE(iad.id_main_appointment, md.id_main_appointment) AS id_main_appointment,
+        COALESCE(iad.id_inspection, md.id_inspection) AS id_inspection,
+        COALESCE(iad.id_inspector, md.id_inspector) AS id_inspector,
+        COALESCE(iad.type, md.type) AS type,
+        COALESCE(iad.status, md.status) AS status,
+        iad.status_made_by,
+        iad.status_description,
+        COALESCE(iad.cancellation_reason, md.cancellation_reason) AS cancellation_reason,
+        iad.observation,
+        COALESCE(iad.source, md.source) AS source,
+        COALESCE(iad.slot_of_day, md.slot_of_day) AS slot_of_day,
+        COALESCE(iad.duration_in_slots, md.duration_in_slots) AS duration_in_slots,
+        COALESCE(iad.is_fixed_agent, md.is_fixed_agent) AS is_fixed_agent,
+        COALESCE(iad.is_confirmed, md.is_confirmed) AS is_confirmed,
+        COALESCE(iad.ts_appointment_inspected_local_tz, md.ts_appointment_inspected_local_tz) AS ts_appointment_inspected_local_tz,
+        COALESCE(iad.ts_appointment_created_utc, md.ts_appointment_created_utc) AS ts_appointment_created_utc,
+        COALESCE(iad.ts_appointment_updated_utc, md.ts_appointment_updated_utc) AS ts_appointment_updated_utc,
+        COALESCE(iad.ts_appointment_created_local_tz, md.ts_appointment_created_local_tz) AS ts_appointment_created_local_tz,
+        COALESCE(iad.ts_appointment_updated_local_tz, md.ts_appointment_updated_local_tz) AS ts_appointment_updated_local_tz,
+        COALESCE(iad.ts_first_appointment_cancelled_utc, md.ts_first_appointment_cancelled_utc) AS ts_first_appointment_cancelled_utc,
+        COALESCE(iad.ts_first_appointment_cancelled_local_tz, md.ts_first_appointment_cancelled_local_tz) AS ts_first_appointment_cancelled_local_tz,
+        COALESCE(iad.year, md.year) AS year,
+        COALESCE(iad.month, md.month) AS month,
+        COALESCE(iad.day, md.day) AS day
+    FROM
+        inspection_appointment_data AS iad
+    FULL OUTER JOIN
+        main_appointment_data AS md
+            ON iad.id_is_appointment = md.id_is_appointment
+            OR iad.id_main_appointment = md.id_main_appointment
+),
 inspection_data AS (
     SELECT
         id_inspection,
@@ -155,60 +190,60 @@ inspection_data AS (
         ROW_NUMBER() OVER(PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
 )
 SELECT
-    MD5(COALESCE(CONCAT(a.id_is_appointment, 'IS'), CONCAT(a.id_main_appointment, 'PWA'))) AS id_appointment,
-    a.id_is_appointment,
-    a.id_main_appointment,
-    a.id_inspection,
-    a.id_inspector,
-    a.type,
-    a.status,
-    a.status_made_by,
-    a.status_description,
-    a.cancellation_reason,
-    a.observation,
-    a.source,
-    a.slot_of_day,
-    a.duration_in_slots,
-    a.is_fixed_agent,
-    a.is_confirmed,
+    MD5(COALESCE(CONCAT(cas.id_is_appointment, 'IS'), CONCAT(cas.id_main_appointment, 'PWA'))) AS id_appointment,
+    cas.id_is_appointment,
+    cas.id_main_appointment,
+    cas.id_inspection,
+    cas.id_inspector,
+    cas.type,
+    cas.status,
+    cas.status_made_by,
+    cas.status_description,
+    cas.cancellation_reason,
+    cas.observation,
+    cas.source,
+    cas.slot_of_day,
+    cas.duration_in_slots,
+    cas.is_fixed_agent,
+    cas.is_confirmed,
     CASE
-        WHEN FIRST(i.id_inspection) OVER (PARTITION BY i.id_contract, i.inspection_type ORDER BY i.ts_updated) == a.id_inspection THEN TRUE
+        WHEN FIRST(i.id_inspection) OVER (PARTITION BY i.id_contract, i.inspection_type ORDER BY i.ts_updated) == cas.id_inspection THEN TRUE
         ELSE FALSE
     END AS is_first_schedule,
     CASE
-        WHEN DATE(ts_first_appointment_cancelled_utc) = DATE(TO_UTC_TIMESTAMP(a.ts_appointment_inspected_local_tz, 'UTC')) THEN TRUE
+        WHEN DATE(cas.ts_first_appointment_cancelled_utc) = DATE(TO_UTC_TIMESTAMP(cas.ts_appointment_inspected_local_tz, 'UTC')) THEN TRUE
         ELSE FALSE
     END AS is_d0_canceled,
     CASE
-        WHEN DATE(ts_first_appointment_cancelled_utc) = DATE_SUB(DATE(TO_UTC_TIMESTAMP(a.ts_appointment_inspected_local_tz, 'UTC')), 1) THEN TRUE
+        WHEN DATE(cas.ts_first_appointment_cancelled_utc) = DATE_SUB(DATE(TO_UTC_TIMESTAMP(cas.ts_appointment_inspected_local_tz, 'UTC')), 1) THEN TRUE
         ELSE FALSE
     END AS is_d1_canceled,
     CASE
-        WHEN a.cancellation_reason NOT IN (
+        WHEN cas.cancellation_reason NOT IN (
                 'INSPECTOR_BLOCKED_SCHEDULE',
                 'CANCELED_PROBLEM_INSPECTOR',
                 'CANCELED_INSPECTOR_NOT_ATTEND',
                 'CANCELED_INSPECTOR_CAN_NOT_ATTEND_INSPECTION'
             )
             THEN TRUE
-        WHEN a.cancellation_reason IS NULL THEN NULL
+        WHEN cas.cancellation_reason IS NULL THEN NULL
         ELSE FALSE
     END AS is_not_canceled_by_inspector,
-    TO_UTC_TIMESTAMP(a.ts_appointment_inspected_local_tz, 'UTC') AS ts_appointment_inspected_utc,
-    a.ts_appointment_inspected_local_tz,
-    a.ts_appointment_created_utc,
-    a.ts_appointment_updated_utc,
-    a.ts_appointment_created_local_tz,
-    a.ts_appointment_updated_local_tz,
-    a.ts_first_appointment_cancelled_utc,
-    a.ts_first_appointment_cancelled_local_tz,
-    a.year,
-    a.month,
-    a.day
+    TO_UTC_TIMESTAMP(cas.ts_appointment_inspected_local_tz, 'UTC') AS ts_appointment_inspected_utc,
+    cas.ts_appointment_inspected_local_tz,
+    cas.ts_appointment_created_utc,
+    cas.ts_appointment_updated_utc,
+    cas.ts_appointment_created_local_tz,
+    cas.ts_appointment_updated_local_tz,
+    cas.ts_first_appointment_cancelled_utc,
+    cas.ts_first_appointment_cancelled_local_tz,
+    cas.year,
+    cas.month,
+    cas.day
 FROM
-    appointment_union AS a
+    coalesce_appointment_sources AS cas
 LEFT JOIN
     inspection_data AS i
-      ON a.id_inspection = i.id_inspection
+      ON cas.id_inspection = i.id_inspection
 QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY MD5(COALESCE(CONCAT(a.id_is_appointment, 'IS'), CONCAT(a.id_main_appointment, 'PWA'))) ORDER BY a.ts_appointment_updated_utc DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY MD5(COALESCE(CONCAT(cas.id_is_appointment, 'IS'), CONCAT(cas.id_main_appointment, 'PWA'))) ORDER BY cas.ts_appointment_updated_utc DESC) = 1

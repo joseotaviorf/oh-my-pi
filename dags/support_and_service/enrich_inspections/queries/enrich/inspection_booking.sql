@@ -107,7 +107,7 @@ SELECT DISTINCT
     i.id_external,
     a.id_assessment,
     i.id_booking,
-    COALESCE(MD5(CONCAT(ad.id_appointment, 'IS')), i.id_appointment) AS id_appointment,
+    ad.id_appointment,
     i.id_contract,
     i.id_client_side,
     i.id_house,
