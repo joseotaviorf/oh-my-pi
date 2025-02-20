@@ -26,6 +26,8 @@ columns:
     description: "For 3.0 cases, it will be delinquency creation date (dt_register) , for 2.0 cases, it will be the dt_due."
   dt_due:
     description: "Due date of the original invoice that became delinquent"
+  dt_due_billing_report:
+    description: "Due date of the original billing report that became delinquent"  
   dt_paid:
     description: "Date of the most recent payment of the default."
   dias_atraso:

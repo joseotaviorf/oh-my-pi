@@ -197,7 +197,6 @@ base_omie AS (
             OR te.sk_category LIKE '%2.11.97%'
             THEN true ELSE false
         END AS is_danos_imovel,
-        IF(DATE_DIFF(COALESCE(te.dt_paid,current_date ), te.dt_due)<0,0,DATE_DIFF(COALESCE(te.dt_paid,current_date ), te.dt_due)) AS dias_atraso,
         IF (p.is_contract AND p.dt_ended IS NULL, true, false) AS is_contract_active,
         p.dt_contract_started,
         p.dt_ended_official AS dt_contract_ended,
@@ -241,7 +240,12 @@ base_omie_ifrs AS (
         dt_due,
         dt_paid,
         dt_paid AS dt_paid_aux,
-        dias_atraso,
+        CASE 
+          WHEN dt_paid IS NULL THEN DATE_DIFF(current_date,dt_due)
+          WHEN dt_paid IS NOT NULL AND open_amount >0 THEN DATE_DIFF(current_date,dt_due)
+          WHEN dt_paid IS NOT NULL AND open_amount<=0 THEN  DATE_DIFF(dt_paid,dt_due)
+          ELSE -1
+        END AS dias_atraso,
         due_amount,
         paid_amount,
         open_amount,
@@ -289,7 +293,12 @@ omie_asaas_match AS (
         omie.dt_due,
         DATE(p.dt_paid) AS dt_paid,
         DATE(p.dt_paid)dt_paid_aux,
-        IF(DATE_DIFF(COALESCE(DATE(p.dt_paid),current_date ), omie.dt_due)<0,0,DATE_DIFF(COALESCE(DATE(p.dt_paid),current_date ), omie.dt_due)) AS dias_atraso,
+        CASE 
+          WHEN p.dt_paid IS NULL THEN DATE_DIFF(current_date,omie.dt_due)
+          WHEN p.dt_paid IS NOT NULL AND (omie.due_amount - p.value) >0 THEN DATE_DIFF(current_date,omie.dt_due)
+          WHEN p.dt_paid IS NOT NULL AND (omie.due_amount - p.value)<=0 THEN  DATE_DIFF(p.dt_paid,omie.dt_due)
+          ELSE -1
+        END AS dias_atraso,
         omie.due_amount,
         p.value AS paid_amount,
         (omie.due_amount - p.value) AS open_amount,
@@ -402,7 +411,12 @@ omie_pgto_acordos AS (
         dt_due,
         dt_paid,
         dt_paid AS dt_paid_aux,
-        IF(DATE_DIFF(COALESCE(dt_paid,current_date), dt_due)<0,0,DATE_DIFF(COALESCE(dt_paid,current_date), dt_due)) AS dias_atraso,
+        CASE 
+          WHEN dt_paid IS NULL THEN DATE_DIFF(current_date,dt_due)
+          WHEN dt_paid IS NOT NULL AND open_amount >0 THEN DATE_DIFF(current_date,dt_due)
+          WHEN dt_paid IS NOT NULL AND open_amount<=0 THEN  DATE_DIFF(dt_paid,dt_due)
+          ELSE -1
+        END AS dias_atraso,
         due_amount,
         paid_amount,
         open_amount,
@@ -832,8 +846,6 @@ base_inadimplecia_assinatura AS (
         d.dt_due,
         d.dt_paid,
         IF(d.id_status=7, d.dt_due, d.dt_paid) AS dt_paid_aux,
-        DATE_DIFF(COALESCE(d.dt_paid,current_date),d.dt_due) AS dias_atraso,
-
         d.original_value AS due_amount_delinquency,
         d.amount_paid AS paid_amount_delinquency,
         IF(d.id_status IN (3,7) OR d.original_value - d.amount_paid < 0, 0, d.original_value - d.amount_paid) AS net_amount_delinquency,
@@ -902,7 +914,12 @@ base_inadimplecia_ifrs_assinatura AS (
         dt_due,
         dt_paid,
         dt_paid_aux,
-        dias_atraso,
+        CASE 
+          WHEN dt_paid IS NULL THEN DATE_DIFF(current_date,dt_due)
+          WHEN dt_paid IS NOT NULL AND net_amount_entry >0 THEN DATE_DIFF(current_date,dt_due)
+          WHEN dt_paid IS NOT NULL AND net_amount_entry<=0 THEN  DATE_DIFF(dt_paid,dt_due)
+          ELSE -1
+        END AS dias_atraso,
         due_amount_entry AS due_amount,
         paid_amount_entry AS paid_amount,
         net_amount_entry AS open_amount,
@@ -973,6 +990,7 @@ base_assinatura_ifrs_sem_repasse AS (
         client_cpf_cnpj,
         dt_register,
         dt_due,
+        NULL AS dt_due_billing_report,
         dt_paid,
         dias_atraso,
         CAST(due_amount AS DOUBLE) AS due_amount,
@@ -1088,6 +1106,7 @@ repasse_direto AS (
         client_cpf_cnpj,
         dt_ref_boleto AS dt_register,
         dt_ref_boleto AS dt_due,
+        fatura_vencimento AS dt_due_billing_report,
         boleto_compensando_em AS dt_paid,
         IF( DATE_DIFF(COALESCE(boleto_compensando_em,current_date),fatura_vencimento)<0, 0, DATE_DIFF(COALESCE(boleto_compensando_em,current_date),fatura_vencimento) ) AS dias_de_atraso,
         mensalidade_por_contrato AS due_amount,
@@ -1135,6 +1154,7 @@ base_final_unificada AS (
         client_cpf_cnpj,
         dt_register,
         dt_due,
+        dt_due_billing_report,
         dt_paid,
         dias_atraso,
         CAST(due_amount AS DOUBLE) AS due_amount,
@@ -1165,6 +1185,7 @@ SELECT
     client_cpf_cnpj,
     dt_register,
     dt_due,
+    dt_due_billing_report,
     dt_paid,
     dias_atraso,
     CAST(due_amount AS DOUBLE) AS due_amount,
