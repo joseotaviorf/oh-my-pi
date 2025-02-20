@@ -25,16 +25,16 @@ workflow:
       clean_primary_keys: ["id"]
     BankBoletoRequestedBy:
       clean_table_name: bank_boleto_requested_by
-      raw_primary_keys: ["bank_boleto_id"]
-      clean_primary_keys: ["id_bank_boleto"]
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     BankPayment:
       clean_table_name: bank_payment
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    # BankPaymentRequestedBy:
-    #   clean_table_name: bank_payment_requested_by
-    #   raw_primary_keys: ["bank_payment_id"]
-    #   clean_primary_keys: ["id_bank_payment"]
+    BankPaymentRequestedBy:
+      clean_table_name: bank_payment_requested_by
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     Boleto:
       clean_table_name: boleto
       raw_primary_keys: ["id"]

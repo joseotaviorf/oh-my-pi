@@ -1,12 +1,18 @@
 database_name: datalake_vans_clean
 table_name: bank_payment_requested_by
 columns:
-  requested_by:
+  id:
     lineage:
-      - datalake_vans_raw.bankpaymentrequestedby.requested_by
+      - datalake_vans_raw.bankpaymentrequestedby.id
   id_bank_payment:
     lineage:
       - datalake_vans_raw.bankpaymentrequestedby.bank_payment_id
+  id_payment_method:
+    lineage:
+      - datalake_vans_raw.bankpaymentrequestedby.payment_method_id
+  requested_by:
+    lineage:
+      - datalake_vans_raw.bankpaymentrequestedby.requested_by
   is_active:
     lineage:
       - datalake_vans_raw.bankpaymentrequestedby.active

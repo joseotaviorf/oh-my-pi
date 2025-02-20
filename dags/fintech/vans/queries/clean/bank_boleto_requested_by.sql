@@ -1,4 +1,5 @@
 SELECT
+    id,
     bank_boleto_id AS id_bank_boleto,
     requested_by,
     boolean(active) AS is_active,

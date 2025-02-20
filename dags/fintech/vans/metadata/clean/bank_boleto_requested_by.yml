@@ -1,6 +1,9 @@
 database_name: datalake_vans_clean
 table_name: bank_boleto_requested_by
 columns:
+  id:
+    lineage:
+      - datalake_vans_raw.bankboletorequestedby.id
   requested_by:
     lineage:
       - datalake_vans_raw.bankboletorequestedby.requested_by
