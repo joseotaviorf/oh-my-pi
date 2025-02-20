@@ -46,6 +46,12 @@ columns:
     lineage:
       - datalake_rental_transact_raw.offer_topic_aud.type
     description: Offer topic type.
+    categories:
+      PRICE: Topic related to rental price negotiation.
+      ADD: Topic related to add something in the house.
+      REPAIR: Topic related to repair something of the house.
+      MODIFY: Topic related to modify something of the house.
+      REMOVE: Topic related to remove something of the house.
   mod_status:
     lineage:
       - datalake_rental_transact_raw.offer_topic_aud.status_mod
