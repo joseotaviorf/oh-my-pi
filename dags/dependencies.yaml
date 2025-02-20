@@ -205,7 +205,6 @@ bietlejuice.dw_collection_recovery_quintocred:
   - bietlejuice.enrich_recupera:load-enrich-collection
   - bietlejuice.enrich_recupera:load-enrich-installment
   - bietlejuice.enrich_recupera:load-enrich-negotiation
-  - bietlejuice.enrich_recupera:load-enrich-snapshot-daily-debts
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.enrich_velo:load-enrich-junk

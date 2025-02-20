@@ -1,16 +1,6 @@
 WITH distributions_timeline AS (
-    WITH contracts AS (
-        SELECT
-            CAST(id_customer AS INT) AS document,
-            id_contract
-        FROM
-            datalake_recupera.snapshot_daily_debts
-        WHERE
-            id_creditor IN (3,5)
-        GROUP BY id_customer, id_contract
-    )
     SELECT DISTINCT
-        c.document,
+        pp.document,
         dd.id_contract,
         dd.partner AS team,
         dd.dt_start_interval,
@@ -18,11 +8,14 @@ WITH distributions_timeline AS (
     FROM
         datalake_recupera.changes_debts_distribution AS dd
     LEFT JOIN
-        contracts AS c
-            ON c.id_contract = dd.id_contract
+        dw_velo.fact_velo_propose AS p
+            ON p.sk_propose = CAST(dd.id_contract AS INT)
+    LEFT JOIN
+        dw_velo.dim_velo_propose_person AS pp
+            ON p.sk_primary_person = pp.sk_person
     WHERE
         dd.creditor = 'IQ QuintoCred'
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY dd.dt_start_interval ORDER BY
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY dd.dt_start_interval, pp.document ORDER BY
     CASE
         WHEN dd.partner = 'INTERNO VELO' THEN 1
         WHEN dd.partner = 'IAF' THEN 2
@@ -172,7 +165,7 @@ LEFT JOIN
         AND rt.dt_month_paid = DATE(DATE_TRUNC("MONTH",cw.dt_base))
 LEFT JOIN
     distributions_timeline AS dt
-        ON CAST(dt.document AS INT) = CAST(cw.document AS INT)
+        ON dt.document = cw.document
         AND cw.dt_base >= dt.dt_start_interval
         AND (
             cw.dt_base <= dt.dt_end_interval
