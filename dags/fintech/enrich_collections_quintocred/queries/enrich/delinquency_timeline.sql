@@ -211,3 +211,6 @@ LEFT JOIN
     payment_evol p
     ON t.id_delinquency = p.id_delinquency
     AND DATE(t.`date`) = DATE(p.`date`)
+WHERE
+    s.id_status IS NOT NULL
+GROUP BY 1,2,3,20,21
