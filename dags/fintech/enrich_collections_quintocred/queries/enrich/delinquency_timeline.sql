@@ -17,7 +17,7 @@ cte_base AS (
         d.amount_paid,
         d.value - d.amount_paid AS open_amount,
         IF(d.amount_paid > 0 AND (LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY COALESCE(r.ts_created, d.dt_paid)) <> d.amount_paid) , d.amount_paid - LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY COALESCE(r.ts_created, d.dt_paid)), 0) AS amount_paid_added,
-        IF(d.value <= d.amount_paid OR (d.id_status = 3 AND d.rev_end IS NULL), true, false) AS is_finished,
+        IF(d.value <= d.amount_paid OR (d.id_status = 3 AND d.rev_end IS NULL) OR (d.id_status = 7 AND d.rev_end IS NULL), TRUE, FALSE) AS is_finished,
         del.is_legacy_agreement,
         del.id_propose < 5000000 AS is_legacy_propose,
         del.is_active AS is_currently_active,
@@ -46,8 +46,9 @@ cte_base AS (
         datalake_velo.propose AS p
             ON d.id_propose = p.id_propose
     WHERE
-        (d.mod_amount_paid <> 0
+        ((d.mod_amount_paid <> 0
         OR d.rev_type IN (0,1))
+        AND NOT (d.id_status = 7 AND DATE(r.ts_created) = DATE(del.ts_created)))
 ),
 cte_final AS (
     SELECT
@@ -210,6 +211,3 @@ LEFT JOIN
     payment_evol p
     ON t.id_delinquency = p.id_delinquency
     AND DATE(t.`date`) = DATE(p.`date`)
-WHERE
-    s.id_status IS NOT NULL
-GROUP BY 1,2,3,20,21
