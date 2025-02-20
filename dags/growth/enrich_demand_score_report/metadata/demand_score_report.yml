@@ -41,6 +41,14 @@ columns:
     description: The quantity of LPV in the last 7 days in For Rent.
     lineage:
       - reverse_demand_score.listing_demand_score.qt_lpv_7d_for_rent
+  qt_lpv_14d_for_rent:
+    description: The quantity of LPV in the last 14 days in For Rent.
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_14d_for_rent
+  qt_lpv_21d_for_rent:
+    description: The quantity of LPV in the last 21 days in For Rent.
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_21d_for_rent        
   dt_publication_for_rent:
     description: The date of publication of the listing in For Rent.
     lineage:
@@ -57,6 +65,14 @@ columns:
     description: The quantity of LPV in the last 7 days in For Sale.
     lineage:
       - reverse_demand_score.listing_demand_score.qt_lpv_7d_for_sale
+  qt_lpv_14d_for_sale:
+    description: The quantity of LPV in the last 14 days in For Sale.
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_21d_for_sale
+  qt_lpv_21d_for_sale:
+    description: The quantity of LPV in the last 21 days in For Sale.
+    lineage:
+      - reverse_demand_score.listing_demand_score.qt_lpv_21d_for_sale        
   dt_publication_for_sale:
     description: The date of publication of the listing in For Sale.
     lineage:
