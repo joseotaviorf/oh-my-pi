@@ -11,6 +11,21 @@ WITH credit_analysis AS (
   FROM
     datalake_credit_analysis.credit_analysis
 ),
+credit_evaluation AS (
+  SELECT
+    cep.id_credit_evaluation,
+    ce.id_user,
+    ce.id_proposal,
+    cep.proponent_type
+  FROM
+    datalake_docx_clean.credit_evaluation_proponent AS cep
+  LEFT JOIN
+    datalake_docx_clean.credit_evaluation AS ce ON cep.id_credit_evaluation = ce.id
+  -- removing legacy data (latest record is 2021)
+  WHERE cep.proponent_type IS NOT NULL
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY cep.id_credit_evaluation ORDER BY cep.ts_updated DESC) = 1
+),
 guarantees AS (
   SELECT
     flrf.sk_proposal,
@@ -191,6 +206,7 @@ rent_flows AS (
       ELSE TRUE
     END AS is_guarantee_accepted, --fix rule: IF(g.guarantee_not_accepted = 1, TRUE, FALSE)
     pp.is_single_tenant,
+    IF(ce.proponent_type = 'PERSON', FALSE, TRUE) AS is_renting_for_others,
     pp.total_proposal_proponents
   FROM
     dw_rent.fact_listing_rent_flows AS flrf
@@ -218,6 +234,9 @@ rent_flows AS (
   LEFT JOIN
     proposal_proponents AS pp
       ON pp.id_proposal = flrf.sk_proposal
+  LEFT JOIN
+    credit_evaluation AS ce
+      ON ce.id_user = flrf.sk_client
 ),
 proposal_credit_flows AS (
   SELECT
@@ -299,6 +318,7 @@ proposal_credit_flows AS (
       ELSE TRUE
     END AS is_early_credit,
     rf.is_single_tenant,
+    rf.is_renting_for_others,
     rf.total_proposal_proponents,
     rf.dt_tenant_doc_complete_date,
     rf.dt_credit_analysis_approved_date,
@@ -382,6 +402,7 @@ early_credit_full (
     CAST(NULL AS BOOLEAN) AS is_bypass,
     TRUE AS is_early_credit,
     CAST(NULL AS BOOLEAN) AS is_single_tenant,
+    CAST(NULL AS BOOLEAN) AS is_renting_for_others,
     CAST(NULL AS INTEGER) AS total_proposal_proponents,
     eca.dt_early_credit_created,
     eca.dt_early_credit_expired,
@@ -458,6 +479,7 @@ SELECT
   is_bypass,
   is_early_credit,
   is_single_tenant,
+  is_renting_for_others,
   total_proposal_proponents,
   dt_early_credit_created,
   dt_early_credit_expired,
@@ -541,6 +563,7 @@ SELECT
   is_bypass,
   is_early_credit,
   is_single_tenant,
+  is_renting_for_others,
   total_proposal_proponents,
   dt_early_credit_created,
   dt_early_credit_expired,
@@ -672,6 +695,7 @@ SELECT
   IF(ed.ts_early_demand_started IS NULL, FALSE, TRUE) AS is_early_demand,
   IF(dt_tenant_first_doc_sent_date IS NOT NULL AND rr.resend_request IS NOT NULL, TRUE, FALSE) AS is_resend_request,
   is_single_tenant,
+  is_renting_for_others,
   total_proposal_proponents,
   dt_early_credit_created,
   dt_early_credit_expired,

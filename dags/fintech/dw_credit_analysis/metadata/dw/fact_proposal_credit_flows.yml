@@ -253,6 +253,10 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.proponent
     description: "True if the proposal has only one tenant."
+  is_renting_for_others:
+    lineage:
+      - datalake_docx_clean.credit_evaluation_proponent.proponent_type
+    description: "True if the user is renting for other person (I.E proponent type is PERSON). If False, it means that the client is the main user and she/he is renting for herself/himself."
   total_proposal_proponents:
     lineage:
       - datalake_sorting_hat_clean.proponent
