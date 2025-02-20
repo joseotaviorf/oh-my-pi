@@ -5,7 +5,7 @@ steps:
       - make create-dag-files
     when:
       event: push
-      branch: [ astro-forno ]
+      branch: [ astro-prod, astro-forno ]
 
    upload-bi-etl-ejuice-modules-s3-forno:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
@@ -37,3 +37,34 @@ steps:
       event: push
       branch: [ astro-forno ]
     depends_on: [ upload-bi-etl-ejuice-modules-s3-forno, upload-dag-packages-dags-s3-forno ]
+
+   upload-bi-etl-ejuice-modules-s3-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: bietlejuice
+    when:
+      event: push
+      branch: [ astro-prod ]
+
+   upload-dag-packages-dags-s3-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: dags
+    when:
+      event: push
+      branch: [ astro-prod ]
+    depends_on: [create-dag-files]
+
+   astronomer-deploy-dags-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:prod-latest
+    pull: true
+    when:
+      event: push
+      branch: [ astro-prod ]
+    depends_on: [ upload-bi-etl-ejuice-modules-s3-prod, upload-dag-packages-dags-s3-prod ]
