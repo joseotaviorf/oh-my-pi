@@ -1,0 +1,55 @@
+---
+database_name: datalake_repairs_test_clean
+table_name: repair_request_tenant_negotiation_follow_up
+description: This table has information on all follow-ups related to the tenant's negotiation regarding the repair.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    description: Unique identifier of table records
+    lineage:
+      - datalake_repairs_test_raw.repair_request_tenant_negotiation_follow_up.id
+  id_repair_request:
+    description: Repair Request unique identifier.
+    lineage:
+      - datalake_repairs_test_raw.repair_request_tenant_negotiation_follow_up.repair_request_id
+  description:
+    description: Open field where the tenant can send additional data.
+    lineage:
+      - datalake_repairs_test_raw.repair_request_tenant_negotiation_follow_up.description
+  status:
+    description: The status of the repair negotiation.
+    lineage:
+      - datalake_repairs_test_raw.repair_request_tenant_negotiation_follow_up.status
+  help_action:
+    description: It is filled in only when the status is HELP_NEEDED,
+      indicating the reason for requesting help (predefined list of options).
+    lineage:
+      - datalake_repairs_test_raw.repair_request_tenant_negotiation_follow_up.help_action
+  solving_action:
+    description:
+      It is filled in only when the status is SOLVED, indicating the agreement
+      signed between tenant and owner (predefined list of options)
+    lineage:
+      - datalake_repairs_test_raw.repair_request_tenant_negotiation_follow_up.solving_action
+  ts_expected_execution:
+    description:
+      Optional date field, the tenant can fill in when the status is ONGOING,
+      indicating the date on which the repair is expected to occur.
+    lineage:
+      - datalake_repairs_test_raw.repair_request_tenant_negotiation_follow_up.expected_execution_date
+  ts_reassign:
+    description:
+      Date calculated for recontact, in order to continue with the second FUP. If the tenant has completed
+      the expected_execution_date, the reassign_date equals the expected_execution_date plus 1 day. If the tenant has
+      not filled in, it is the creation date plus 5 days.
+    lineage:
+      - datalake_repairs_test_raw.repair_request_tenant_negotiation_follow_up.reassign_date
+  ts_created:
+    description: Creation date and time.
+    lineage:
+      - datalake_repairs_test_raw.repair_request_tenant_negotiation_follow_up.created_at
+  ts_updated:
+    description: Update date and time.
+    lineage:
+      - datalake_repairs_test_raw.repair_request_tenant_negotiation_follow_up.updated_at

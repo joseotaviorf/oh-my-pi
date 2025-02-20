@@ -1,0 +1,5 @@
+SELECT
+  repair_request_budget_id AS id_repair_request_budget,
+  attachment_id AS id_attachment
+FROM
+  datalake_repairs_test_raw.repair_request_budget_attachment

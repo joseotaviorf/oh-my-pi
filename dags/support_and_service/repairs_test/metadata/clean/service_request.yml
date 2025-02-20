@@ -1,0 +1,37 @@
+---
+database_name: datalake_repairs_test_clean
+table_name: service_request
+columns:
+  id:
+    lineage:
+      - datalake_repairs_test_raw.service_request.id
+  id_repair_request:
+    lineage:
+      - datalake_repairs_test_raw.service_request.repair_request_id
+  id_third_party_crm_ticket_external:
+    lineage:
+      - datalake_repairs_test_raw.service_request.third_party_crm_ticket_external_id
+  status:
+    lineage:
+      - datalake_repairs_test_raw.service_request.status
+  type:
+    lineage:
+      - datalake_repairs_test_raw.service_request.type
+  third_party_crm:
+    lineage:
+      - datalake_repairs_test_raw.service_request.third_party_crm
+  ts_created:
+    lineage:
+      - datalake_repairs_test_raw.service_request.created_at
+  ts_updated:
+    lineage:
+      - datalake_repairs_test_raw.service_request.updated_at
+  year:
+    lineage:
+      - datalake_repairs_test_raw.service_request.year
+  month:
+    lineage:
+      - datalake_repairs_test_raw.service_request.month
+  day:
+    lineage:
+      - datalake_repairs_test_raw.service_request.day

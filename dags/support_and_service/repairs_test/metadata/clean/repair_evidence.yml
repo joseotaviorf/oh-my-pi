@@ -1,0 +1,27 @@
+database_name: datalake_repairs_test_clean
+table_name: repair_evidence
+columns:
+  id:
+    lineage:
+      - datalake_repairs_test_raw.repair_evidence.id
+  id_repair_request_item:
+    lineage:
+      - datalake_repairs_test_raw.repair_evidence.repair_request_item_id
+  asset_url:
+    lineage:
+      - datalake_repairs_test_raw.repair_evidence.asset_url
+  ts_created:
+    lineage:
+      - datalake_repairs_test_raw.repair_evidence.created_at
+  ts_updated:
+    lineage:
+      - datalake_repairs_test_raw.repair_evidence.updated_at
+  year:
+    lineage:
+      - datalake_repairs_test_raw.repair_evidence.year
+  month:
+    lineage:
+      - datalake_repairs_test_raw.repair_evidence.month
+  day:
+    lineage:
+      - datalake_repairs_test_raw.repair_evidence.day

@@ -1,0 +1,41 @@
+dag:
+  name: repairs_test
+  schedule_start_date: 2019, 5, 31
+  schedule_interval: 0 1 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      This DAG handles the ingestion of the raw and clean data for our Repairs Service, \n
+      which is a Service that was created to make repairs experience faster and easier for \n
+      Tenants and Landlords. Check [its own repository](https://github.com/quintoandar/repairs) \n
+      for more informations.
+workflow:
+  type: cdc
+  layer: raw
+  source_database: repairs
+  source_schema: public
+  custom_schema: repairs_test
+  database_type: postgres
+  lineage_product_database_name: repairs
+  dbutils_secret_key: REPAIRS_DB
+  tables_customization:
+    instant_approval_preference: {}
+    repair_evidence: {}
+    repair_expense: {}
+    repair_expense_group: {}
+    repair_request: {}
+    repair_request_chat: {}
+    repair_request_item: {}
+    repair_request_tenant_negotiation_follow_up: {}
+    service_request: {}
+    attachment: {}
+    repair_request_budget: {}
+    repair_request_budget_attachment: {}
+cluster:
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

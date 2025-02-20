@@ -1,0 +1,30 @@
+database_name: datalake_repairs_test_clean
+table_name: repair_expense
+columns:
+  id:
+    lineage:
+      - datalake_repairs_test_raw.repair_expense.id
+  id_expense_group:
+    lineage:
+      - datalake_repairs_test_raw.repair_expense.expense_group_id
+  repair_name:
+    lineage:
+      - datalake_repairs_test_raw.repair_expense.name
+  repair_description:
+    lineage:
+      - datalake_repairs_test_raw.repair_expense.description
+  instant_approval:
+    lineage:
+      - datalake_repairs_test_raw.repair_expense.instant_approval
+  responsible_after_grace:
+    lineage:
+      - datalake_repairs_test_raw.repair_expense.responsible_after_grace
+  responsible_before_grace:
+    lineage:
+      - datalake_repairs_test_raw.repair_expense.responsible_before_grace
+  ts_created:
+    lineage:
+      - datalake_repairs_test_raw.repair_expense.created_at
+  ts_updated:
+    lineage:
+      - datalake_repairs_test_raw.repair_expense.updated_at
