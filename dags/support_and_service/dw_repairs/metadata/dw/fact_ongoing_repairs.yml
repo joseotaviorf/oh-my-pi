@@ -77,7 +77,7 @@ columns:
     description: Boolean data that indicates whether the repair was negotiated via chat.
     lineage:
       - datalake_repairs.repair_tickets.has_chat_negociation
-  ongoing:
+  is_ongoing:
     description: Indicates whether the repair request is still open (ongoing) or has been closed.
     lineage:
       - datalake_repairs.repair_tickets.ts_created_local

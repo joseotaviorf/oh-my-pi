@@ -30,17 +30,7 @@ WITH criticidade AS (
   SELECT
     rrtnf.id_repair_request AS sk_repair_request
     ,rrtnf.status AS status_fup_iq
-    ,CASE
-      WHEN rrtnf.help_action IN
-        (
-          'OWNER_NOT_REPLYING',
-          'OWNER_REFUSED',
-          'OWNER_PROVIDER_DIDNT_SHOW_UP',
-          'OWNER_NOT_CONTACTED',
-          'SERVICE_PROVIDER_WRONG_CONTACT'
-        )
-      THEN rrtnf.help_action ELSE 'Others'
-    END AS reason_help_request
+    ,rrtnf.help_action AS reason_help_request
   FROM datalake_repairs_clean.repair_request_tenant_negotiation_follow_up AS rrtnf
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY rrtnf.id ORDER BY rrtnf.ts_updated DESC) = 1

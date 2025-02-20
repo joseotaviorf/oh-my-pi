@@ -237,11 +237,7 @@ SELECT
   CAST(tc.replies AS INT) AS replies,
   rd.relisting,
   CAST(tc.reply_time_min_calendar AS INT) AS minutes_first_reply_time_calendar,
-  COALESCE(
-    TRY_CAST(from_unixtime(unix_timestamp(
-      CAST(GET_JSON_OBJECT(TO_JSON(tc.custom_fields), '$["[Data] Definição do prestador"]') AS STRING), 'dd/MM/yy HH')) AS TIMESTAMP),
-    TRY_CAST(SPLIT(SPLIT(TO_JSON(tc.custom_fields), '[Data] Definição do prestador":"')[1], '"')[0] AS DATE)
-  ) AS dt_definition,
+  DATE(tc.custom_fields['[Data] Definição do prestador']) AS dt_definition,
   fi.dt_chat,
   c.dt_entered AS entrance_date,
   th.ts_contestation,
