@@ -1,5 +1,5 @@
 ---
-database_name: datalake_ebdb_visit_clean
+database_name: datalake_ebdb_clean
 table_name: key_holder
 owner: leonardo.soares@quintoandar.com.br
 domain: for_sale
