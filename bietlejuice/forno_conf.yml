@@ -74,6 +74,7 @@ doc_md_chart_url: https://qb343dade3ecd6cd6p-tp.appspot.com/admin/airflow/chart?
 dw_bucket: dw.s3.forno.data.quintoandar.com.br
 inmetro_bucket: s3://inmetro-s3-forno-quintoandar-com-br
 metrics_bucket: 5a-business-metrics-com-br-forno
+minority_report_endpoint: http://minority-report-api.forno.quintoandar.com.br/profile/batch
 datahub_host: https://datahub.forno.data.quintoandar.com.br
 spectrum_iam_role: arn:aws:iam::713278628093:role/SpectrumAccess
 spark_jobs_logs_path: s3://databricks.s3.forno.data.quintoandar.com.br/logs/jobs/
