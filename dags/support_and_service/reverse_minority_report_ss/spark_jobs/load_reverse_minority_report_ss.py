@@ -20,23 +20,23 @@ def get_payload_context_fields(api_type, item):
         return {
             "ts_user_updated": item.get("ts_user_updated"),
             "ts_user_created": item.get("ts_user_created"),
-            "is_blocked": bool(item.get("is_blocked")),
+            "is_blocked": item.get("is_blocked"),
             "dt_user_birth": item.get("dt_user_birth"),
             "app": {
                 "ts_last_app_installed": item.get("ts_last_app_installed"),
-                "has_app_installed": bool(item.get("has_app_installed")),
+                "has_app_installed": item.get("has_app_installed"),
                 "app_version": item.get("app_version"),
             },
             "persona": {
-                "is_pp_multi": bool(item.get("is_pp_multi")),
-                "is_tenant": bool(item.get("is_tenant")),
-                "is_broker": bool(item.get("is_broker")),
-                "is_property_owner": bool(item.get("is_landlord")),
-                "is_photographer": bool(item.get("is_photographer")),
+                "is_pp_multi": item.get("is_pp_multi"),
+                "is_tenant": item.get("is_tenant"),
+                "is_broker": item.get("is_broker"),
+                "is_property_owner": item.get("is_landlord"),
+                "is_photographer": item.get("is_photographer"),
             },
             "support": {
                 "id_last_csi_ticket": item.get("id_last_csi_ticket"),
-                "has_created_csi_ticket": bool(item.get("has_created_csi_ticket")),
+                "has_created_csi_ticket": item.get("has_created_csi_ticket"),
                 "ts_most_recent_csi_ticket_creation_date": item.get(
                     "ts_most_recent_csi_ticket_creation_date"
                 ),
@@ -64,9 +64,9 @@ def get_payload_context_fields(api_type, item):
                 "total_bot_csat_answered_within_three_months": item.get(
                     "total_bot_csat_answered_within_three_months"
                 ),
-                "has_answered_bot_csat_within_three_months": bool(item.get(
+                "has_answered_bot_csat_within_three_months": item.get(
                     "has_answered_bot_csat_within_three_months"
-                )),
+                ),
                 "ts_last_bot_csat_created": item.get("ts_last_bot_csat_created"),
                 "human_csat_detractor_percentage_within_three_months": item.get(
                     "human_csat_detractor_percentage_within_three_months"
@@ -101,30 +101,30 @@ def get_payload_context_fields(api_type, item):
             "rental": {
                 "tenant_journey_step": item.get("tenant_journey_step"),
                 "tenant_persona_step": item.get("tenant_persona_step"),
-                "is_tenant_offboarding": bool(item.get("is_tenant_offboarding")),
-                "is_tenant_ongoing": bool(item.get("is_tenant_ongoing")),
-                "is_tenant_onboarding": bool(item.get("is_tenant_onboarding")),
-                "is_tenant_contract_to_entrance": bool(item.get(
+                "is_tenant_offboarding": item.get("is_tenant_offboarding"),
+                "is_tenant_ongoing": item.get("is_tenant_ongoing"),
+                "is_tenant_onboarding": item.get("is_tenant_onboarding"),
+                "is_tenant_contract_to_entrance": item.get(
                     "is_tenant_contract_to_entrance"
-                )),
-                "is_tenant_visits_to_offer": bool(item.get("is_tenant_visits_to_offer")),
-                "is_tenant_listing_and_search": bool(item.get("is_tenant_listing_and_search")),
-                "is_tenant_pre_contract": bool(item.get("is_tenant_pre_contract")),
-                "is_tenant_post_contract": bool(item.get("is_tenant_post_contract")),
+                ),
+                "is_tenant_visits_to_offer": item.get("is_tenant_visits_to_offer"),
+                "is_tenant_listing_and_search": item.get("is_tenant_listing_and_search"),
+                "is_tenant_pre_contract": item.get("is_tenant_pre_contract"),
+                "is_tenant_post_contract": item.get("is_tenant_post_contract"),
                 "landlord_journey_step": item.get("landlord_journey_step"),
                 "landlord_persona_step": item.get("landlord_persona_step"),
-                "is_landlord_offboarding": bool(item.get("is_landlord_offboarding")),
-                "is_landlord_ongoing": bool(item.get("is_landlord_ongoing")),
-                "is_landlord_onboarding": bool(item.get("is_landlord_onboarding")),
-                "is_landlord_contract_to_entrance": bool(item.get(
+                "is_landlord_offboarding": item.get("is_landlord_offboarding"),
+                "is_landlord_ongoing": item.get("is_landlord_ongoing"),
+                "is_landlord_onboarding": item.get("is_landlord_onboarding"),
+                "is_landlord_contract_to_entrance": item.get(
                     "is_landlord_contract_to_entrance"
-                )),
-                "is_landlord_visits_to_offer": bool(item.get("is_landlord_visits_to_offer")),
-                "is_landlord_listing_and_search": bool(item.get(
+                ),
+                "is_landlord_visits_to_offer": item.get("is_landlord_visits_to_offer"),
+                "is_landlord_listing_and_search": item.get(
                     "is_landlord_listing_and_search"
-                )),
-                "is_landlord_pre_contract": bool(item.get("is_landlord_pre_contract")),
-                "is_landlord_post_contract": bool(item.get("is_landlord_post_contract")),
+                ),
+                "is_landlord_pre_contract": item.get("is_landlord_pre_contract"),
+                "is_landlord_post_contract": item.get("is_landlord_post_contract"),
                 "total_bookings": item.get("total_bookings"),
                 "total_reservations": item.get("total_reservations"),
                 "total_canceled_bookings": item.get("total_canceled_bookings"),
@@ -149,22 +149,22 @@ def get_payload_context_fields(api_type, item):
                 "total_active_termination_contracts": item.get(
                     "total_active_termination_contracts"
                 ),
-                "has_searched_house": bool(item.get("has_searched_house")),
-                "has_published_listings": bool(item.get("has_published_listings")),
-                "has_opted_out_listings_only": bool(item.get("has_opted_out_listings_only")),
-                "has_pending_listings_only": bool(item.get("has_pending_listings_only")),
-                "has_funnel_step": bool(item.get("has_funnel_step")),
-                "has_booked_visit": bool(item.get("has_booked_visit")),
-                "has_completed_visit": bool(item.get("has_completed_visit")),
-                "has_sent_offer": bool(item.get("has_sent_offer")),
-                "has_offer_approved": bool(item.get("has_offer_approved")),
-                "has_started_evaluation": bool(item.get("has_started_evaluation")),
-                "has_evaluation_approved": bool(item.get("has_evaluation_approved")),
-                "has_sent_doc": bool(item.get("has_sent_doc")),
-                "has_credit_approved": bool(item.get("has_credit_approved")),
-                "has_active_contract": bool(item.get("has_active_contract")),
-                "has_finished_contract": bool(item.get("has_finished_contract")),
-                "has_active_termination": bool(item.get("has_active_termination")),
+                "has_searched_house": item.get("has_searched_house"),
+                "has_published_listings": item.get("has_published_listings"),
+                "has_opted_out_listings_only": item.get("has_opted_out_listings_only"),
+                "has_pending_listings_only": item.get("has_pending_listings_only"),
+                "has_funnel_step": item.get("has_funnel_step"),
+                "has_booked_visit": item.get("has_booked_visit"),
+                "has_completed_visit": item.get("has_completed_visit"),
+                "has_sent_offer": item.get("has_sent_offer"),
+                "has_offer_approved": item.get("has_offer_approved"),
+                "has_started_evaluation": item.get("has_started_evaluation"),
+                "has_evaluation_approved": item.get("has_evaluation_approved"),
+                "has_sent_doc": item.get("has_sent_doc"),
+                "has_credit_approved": item.get("has_credit_approved"),
+                "has_active_contract": item.get("has_active_contract"),
+                "has_finished_contract": item.get("has_finished_contract"),
+                "has_active_termination": item.get("has_active_termination"),
                 "ts_last_house_searching": item.get("ts_last_house_searching"),
                 "ts_last_listing_updated": item.get("ts_last_listing_updated"),
                 "ts_last_booking": item.get("ts_last_booking"),
@@ -199,9 +199,9 @@ def get_payload_context_fields(api_type, item):
     elif api_type == 'CUSTOMER_PHONE_NUMBER_WHITELIST':
         return {
             "id_user_list": item.get("users"),
-            "is_tenant_post_contract": bool(item.get("is_tenant_post_contract")),
-            "is_landlord_post_contract": bool(item.get("is_landlord_post_contract")),
-            "has_published_listings": bool(item.get("has_published_listings")),
+            "is_tenant_post_contract": item.get("is_tenant_post_contract"),
+            "is_landlord_post_contract": item.get("is_landlord_post_contract"),
+            "has_published_listings": item.get("has_published_listings"),
             "whitelist_group": item.get("whitelist_group"),
         }
     elif api_type == 'INSPECTORS_PERFORMANCE':
@@ -262,7 +262,7 @@ if __name__ == "__main__":
     )
 
     logger.info(
-        f"m={JOB_NAME}, source={dag_name}, execution_date={execution_date} Starting spark job..."
+        f"m={JOB_NAME}, source={dag_name}, execution_date={execution_date}\nStarting spark job..."
     )
 
     spark_client = SparkClient()
@@ -283,7 +283,7 @@ if __name__ == "__main__":
         for idx, message in enumerate(message_list):
             future = producer.send(kafka_topic, value=message)
             record_metadata = future.get(timeout=10)
-            if idx % 100 == 0 or idx == 0:
+            if idx % 100 or idx == 0:
                 logger.info(f"Sent {idx + 1} messages to topic {kafka_topic}")
     except Exception as e:
         print(f"Error sending message: {e}")
