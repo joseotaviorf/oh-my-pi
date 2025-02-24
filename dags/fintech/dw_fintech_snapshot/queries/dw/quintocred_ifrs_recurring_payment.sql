@@ -8,6 +8,7 @@ SELECT
     client_cpf_cnpj,
     dt_register,
     dt_due,
+    dt_due_billing_report,
     dt_paid,
     dias_atraso,
     due_amount,

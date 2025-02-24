@@ -1156,7 +1156,7 @@ base_final_unificada AS (
         dt_due,
         dt_due_billing_report,
         dt_paid,
-        dias_atraso,
+        if(dias_atraso<0,0,dias_atraso) AS dias_atraso,
         CAST(due_amount AS DOUBLE) AS due_amount,
         CAST(paid_amount AS DOUBLE) AS paid_amount,
         CAST(open_amount AS DOUBLE) AS open_amount,
