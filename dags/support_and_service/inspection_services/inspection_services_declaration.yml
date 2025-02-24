@@ -15,190 +15,62 @@ workflow:
   dbutils_secret_key: INSPECTIONS_DB
   lineage_product_database_name: inspections
   tables_customization:
-    appointment_aud:
-      clean_table_name: appointment_aud
-      clean_primary_keys: [id, rev]
-      raw_primary_keys: [id, rev]
-    appointment:
-      clean_table_name: appointment
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     assessment_aud:
       clean_table_name: assessment_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    assessment:
-      clean_table_name: assessment
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
-    budget_approval_payment_preference_aud:
-      clean_table_name: budget_approval_payment_preference_aud
-      clean_primary_keys: [id, rev]
-      raw_primary_keys: [id, rev]
-    budget_approval_payment_preference:
-      clean_table_name: budget_approval_payment_preference
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
-    budget_aud:
-      clean_table_name: budget_aud
-      clean_primary_keys: [id, rev]
-      raw_primary_keys: [id, rev]
-    budget:
-      clean_table_name: budget
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     contestation_media_aud:
       clean_table_name: contestation_media_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    contestation_media:
-      clean_table_name: contestation_media
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     contestation_aud:
       clean_table_name: contestation_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    contestation:
-      clean_table_name: contestation
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
-    inspection_aud:
-      clean_table_name: inspection_aud
-      clean_primary_keys: [id, rev]
-      raw_primary_keys: [id, rev]
-    inspection:
-      clean_table_name: inspection
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     issue_type_aud:
       clean_table_name: issue_type_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    issue_type:
-      clean_table_name: issue_type
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     item_group_type_aud:
       clean_table_name: item_group_type_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    item_group_type:
-      clean_table_name: item_group_type
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     item_group_aud:
       clean_table_name: item_group_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    item_group:
-      clean_table_name: item_group
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     item_issue_aud:
       clean_table_name: item_issue_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    item_issue:
-      clean_table_name: item_issue
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     item_media_aud:
       clean_table_name: item_media_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    item_media:
-      clean_table_name: item_media
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     item_type_aud:
       clean_table_name: item_type_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    item_type:
-      clean_table_name: item_type
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     item_aud:
       clean_table_name: item_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    item:
-      clean_table_name: item
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     repair_request_media_aud:
       clean_table_name: repair_request_media_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    repair_request_media:
-      clean_table_name: repair_request_media
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     repair_request_aud:
       clean_table_name: repair_request_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    repair_request:
-      clean_table_name: repair_request
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
-    repair_suggestion_aud:
-      clean_table_name: repair_suggestion_aud
-      clean_primary_keys: [id, rev]
-      raw_primary_keys: [id, rev]
-    repair_suggestion:
-      clean_table_name: repair_suggestion
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     review_media_aud:
       clean_table_name: review_media_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    review_media:
-      clean_table_name: review_media
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     review_aud:
       clean_table_name: review_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    review:
-      clean_table_name: review
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
-    reviewer_aud:
-      clean_table_name: reviewer_aud
-      clean_primary_keys: [id, rev]
-      raw_primary_keys: [id, rev]
-    reviewer:
-      clean_table_name: reviewer
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     room_aud:
       clean_table_name: room_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    room:
-      clean_table_name: room
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
     room_type_aud:
       clean_table_name: room_type_aud
-      clean_primary_keys: [id, rev]
       raw_primary_keys: [id, rev]
-    room_type:
-      clean_table_name: room_type
-      clean_primary_keys: [id]
-      raw_primary_keys: [id]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
-  type: databricks_12_2_med_2xlarge_general_cluster
+  type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
