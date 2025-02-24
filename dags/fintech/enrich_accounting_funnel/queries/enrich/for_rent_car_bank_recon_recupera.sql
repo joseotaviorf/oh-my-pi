@@ -18,7 +18,7 @@ WITH francesinha AS (
 sap AS (
     SELECT DISTINCT
         id_business_entity,
-        CAST(SPLIT_PART(id_external_payment, '|', 2) AS INTEGER) AS our_number,
+        COALESCE(CAST(SPLIT_PART(id_external_payment, '|', 2) AS INTEGER), id_external_payment) AS our_number,
         dt_tax AS dt_paid,
         SUM(debit_credit) AS amount
     FROM
@@ -27,7 +27,7 @@ sap AS (
         (
             (
                 dt_reference >= DATE('2024-01-01')
-                AND account_number = '11004X'
+                AND account_number IN ('11004X', '11036X')
             )
             OR
             (
@@ -46,7 +46,7 @@ sap AS (
         SUM(debit_credit) != 0
 ),
 
-vans_checkout_union AS (
+checkout AS (
     SELECT
         NULLIF(b.our_number, '') AS company_use,
         NULLIF(b.id_business_entity, '') AS id_contract,
@@ -70,28 +70,40 @@ vans_checkout_union AS (
         ROW_NUMBER() OVER (PARTITION BY b.your_number ORDER BY b.ts_paid DESC) = 1
 ),
 
-vans_checkout AS (
+checkout_union AS (
     SELECT
         CAST(UPPER(vc.our_number) AS INTEGER) AS our_number,
-        vc.id_contract,
-        vc.id_invoice,
-        DATE(dd.next_brz_fintech_business_day) AS dt_paid,
         vc.paid_amount AS amount,
-        vc.payer_name
+        DATE(dd.next_brz_fintech_business_day) AS dt_paid
     FROM
-        vans_checkout_union vc
+        checkout vc
     LEFT JOIN
         dw_public.dim_date dd
             ON vc.ts_paid = dd.date
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY our_number, paid_amount ORDER BY CASE WHEN id_invoice IS NOT NULL THEN company_use ELSE our_number END DESC) = 1
+    
+    UNION 
+
+    SELECT
+      b.our_number, 
+      b.paid_amount AS amount,
+      b.dt_credit AS dt_paid
+    FROM 
+      datalake_checkout_clean.bolecode b
+    WHERE
+        b.requester_name = 'trato-feito'
+        AND b.id NOT IN (5855, 5856, 5857)
+        AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
+        AND (b.beneficiary_account = '45268' OR b.beneficiary_account IS NULL)
+        AND b.dt_credit >= current_date - 180    
 ),
 
 df_all AS (
     SELECT DISTINCT
         our_number
     FROM
-        vans_checkout
+        checkout_union
     UNION ALL
     SELECT DISTINCT
         our_number
@@ -136,7 +148,7 @@ df AS (
         francesinha f
             on f.our_number = cs.our_number
     LEFT JOIN
-        vans_checkout vc
+        checkout_union vc
             ON vc.our_number = cs.our_number
     LEFT JOIN
         sap s

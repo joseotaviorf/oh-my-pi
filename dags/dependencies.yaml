@@ -1042,6 +1042,7 @@ bietlejuice.dw_visit:
 bietlejuice.enrich_3p:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
 bietlejuice.enrich_accounting_funnel:
+  - bietlejuice.checkout:load-clean-bolecode
   - bietlejuice.checkout:load-clean-boleto
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
