@@ -17,23 +17,11 @@ sheets_info:
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: cost_center_history
 
-  currency_quote_people:
-    clean_table_name: currency_quote_people
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: currency_quote_people
-
   department_history:
     clean_table_name: department_history
     sheet_context: people
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: department_history
-
-  executive_leadership_list:
-    clean_table_name: executive_leadership_list
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: executive_leadership_list
 
   managers_history:
     clean_table_name: managers_history
