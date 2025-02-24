@@ -1,0 +1,239 @@
+---
+database_name: datalake_amplitude_clean
+table_name: 183047_fs_mortgage_track_progress_page_viewed_events
+owner: leonardo.soares@quintoandar.com.br
+domain: Growth
+description: This table contains the events of the page viewed in the mortgage track progress.
+columns:
+  id_amplitude:
+    description: Amplitude user identifier
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.id_amplitude
+  ids_amplitude_attributed:
+    description: Amplitude user identifier after attritution
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.ids_amplitude_attributed
+  id_app:
+    description: Id from the origin app
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.id_app
+  id_device:
+    description: Device identifier
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.id_device
+  id_event:
+    description: Event identifier
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.id_event
+  id_session: 
+    description: Session identifier
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.id_session
+  id_inserted:
+    description: Inserted identifier
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.id_inserted
+  id_user:
+    description: User identifier (same as sk_user from the product database)
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.id_user
+  id_schema:
+    description: Schema identifier
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.id_schema
+  idfa:
+    description: IDFA
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.idfa
+  adid:
+    description: adid
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.adid
+  uuid:
+    description: Event unique identifier
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.uuid
+  id_offer:
+    description: Offer identifier (firestore)
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.event_properties
+  amplitude_event_type:
+    description: Event name
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.amplitude_event_type
+  city:
+    description: Amplitude city
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.city
+  country:
+    description: Amplitude country
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.country
+  region:
+    description: Amplitude region
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.region
+  data:
+    description: Amplitude data
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.data
+  device_brand:
+    description: Brand of the device
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.device_brand
+  device_carrier:
+    description: Carrier of the device
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.device_carrier
+  device_family:
+    description: Amplitude device family
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.device_family
+  device_manufacturer:
+    description: Device manufacturer
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.device_manufacturer
+  device_model:
+    description: Model of the device
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.device_model
+  device_type:
+    description: Type of the device
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.device_type
+  dma:
+    description: DMA
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.dma
+  event_type:
+    description: Event name
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.event_type
+  event_properties:
+    description: Properties from the event
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.event_properties
+  is_attribution_event:
+    description: Flag that identifies if the event is a attribution one.
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.is_attribution_event
+  ip_address:
+    description: IP from user
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.ip_address
+  location_lat:
+    description: Latitude of the user
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.location_lat
+  location_lng:
+    description: Longitude of the user
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.location_lng
+  os_name:
+    description: Operational system name
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.os_name
+  os_version:
+    description: Operational system version
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.os_version
+  platform:
+    description: User platform
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.platform
+  library:
+    description: Library
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.library
+  is_paying:
+    description: Flag that identifies if the user is paying
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.is_paying
+  start_version:
+    description: Start version
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.start_version
+  language:
+    description: Language
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.language
+  version_name:
+    description: Version name
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.version_name
+  sample_rate:
+    description: Rate of sample
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.sample_rate
+  user_properties:
+    description: Properties that describes the user
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.user_properties
+  up_app_type:
+    description: User property that identifies the app type
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.user_properties
+  up_utm_source:
+    description: User property that identifies the utm source
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.user_properties
+  up_utm_medium:
+    description: User property that identifies the utm medium
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.user_properties
+  up_utm_campaign:
+    description: User property that identifies the utm campaign
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.user_properties
+  up_utm_content:
+    description: User property that identifies the utm content
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.user_properties
+  up_utm_term:
+    description: User property that identifies the utm term
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.user_properties
+  dt_event:
+    description: Date when the event was triggered
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.ts_event
+  ts_event:
+    description: Timestamp when the event was triggered
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.ts_event
+  ts_server_uploaded:
+    description: Timestamp when the server uploaded the info
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.ts_server_uploaded
+  ts_user_created:
+    description: Timestamp when the user were created
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.ts_user_created
+  ts_client_event:
+    description: Timestamp when the event was triggered on client
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.ts_client_event
+  ts_client_uploaded:
+    description: Timestamp when the event was uploaded
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.ts_client_uploaded
+  ts_server_received:
+    description: Timestamp when the event was received
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.ts_server_received
+  ts_processed:
+    description: Timestamp when the event was processed
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.ts_processed
+  year:
+    description: Year when the data was received
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.year
+  month:
+    description: Month when the data was received
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.month
+  day:
+    description: Day when the data was received
+    lineage:
+    - datalake_amplitude_clean_staging.183047_fs_mortgage_track_progress_page_viewed_events.day
