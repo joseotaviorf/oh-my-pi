@@ -1,0 +1,69 @@
+---
+database_name: datalake_hefesto
+table_name: spoc_offboarding_contracts
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+description:
+  This table presents data for each portfolio of SPOC contracts, with their respective 
+  id_termination. It is important to highlight that more than one analyst can be associated
+  with an id_contract/id_termination pair, which generates an unique id_portfolio.
+columns:
+  id_portfolio:
+    lineage:
+      - datalake_hefesto_clean.worker_portfolio.id_portfolio
+    description: Portfolio unique id for each analyst of id_termination and id_contract
+  id_contract:
+    lineage:
+      - datalake_hefesto_clean.worker_portfolio_unit.origin_identifier
+      - datalake_hefesto_clean.worker_portfolio.id_contract
+    description: Contract identification
+  id_termination:
+    lineage:
+      - datalake_hefesto_clean.worker_portfolio_unit.metadata
+      - datalake_hefesto_clean.worker_portfolio.id_entity_origin
+    description: Contract termination identification
+  id_worker:
+    lineage:
+      - datalake_hefesto_clean.worker_portfolio.id_worker
+    description: Hefesto identification for the analyst responsable for the portfolio
+  id_worker_twilio:
+    lineage:
+      - datalake_hefesto_clean.worker.id_worker_twilio
+    description: Twilio unique identifier for each analyst
+  id_analyst:
+    lineage:
+      - datalake_support_users.analysts.email
+    description: ID analyst identification based on email
+  id_user:
+    lineage:
+      - datalake_hefesto_clean.worker_portfolio.id_user
+    description: Contract user identification 
+  user_persona:
+    lineage:
+      - datalake_hefesto_clean.worker_portfolio_unit.user_persona
+    description: 
+      The contract persona of the portfolio
+      Can assume 'tenant' or 'owner'
+  worker_email:
+    lineage:
+      - datalake_support_users.analysts.email
+    description: Analyst email
+  portfolio_status:
+    lineage:
+      - datalake_hefesto_clean.worker_portfolio_unit.status
+    description: The status of the portfolio
+  analyst_organization:
+    lineage:
+      - datalake_support_users.analysts.organization
+    description: Organization which tthe analyst works for
+  entity_origin:
+    lineage:
+      - datalake_hefesto_clean.worker_portfolio.entity_origin
+    description: 
+      Which contract process is the origin of the portfolio. 
+      The only value currently assumed is 'OFFBOARDING'
+  ts_created:
+    lineage:
+      - datalake_hefesto_clean.worker_portfolio_unit.ts_created
+    description: Timestamp from when the portfolio was created
+
