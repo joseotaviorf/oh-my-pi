@@ -10,6 +10,7 @@ workflow:
   layer: raw
   database_type: postgres
   custom_schema: rental_guarantee
+  source_database: rentalguarantee
   dbutils_secret_key: RENTAL_GUARANTEE_DB
   tables_customization:
     charge_aud: {}
