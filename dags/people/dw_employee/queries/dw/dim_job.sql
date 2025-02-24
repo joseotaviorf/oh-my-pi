@@ -34,12 +34,21 @@ WITH jobs AS (
     FROM
         job_customer_flex_step1
 ), band_ladder AS (
-    SELECT DISTINCT
+    SELECT
         id_band_ladder,
         comp_ladder_directorate
     FROM
         datalake_hr_system.assignments
-    QUALIFY dt_effective_start = MAX(dt_effective_start) OVER (PARTITION BY id_band_ladder)
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_band_ladder ORDER BY dt_effective_start DESC) = 1
+), band AS (
+    SELECT
+        id_job,
+        band
+    FROM
+        datalake_hr_system.assignments
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_job ORDER BY dt_effective_start DESC) = 1
 )
 SELECT DISTINCT
     -- ids
@@ -47,6 +56,7 @@ SELECT DISTINCT
     -- non-metrics
     j.job_code,
     j.job_name,
+    b.band,
     COALESCE(bl.comp_ladder_directorate, 'UNKNOWN') AS comp_ladder_directorate,
     CASE
         WHEN j.id_set = 300000004799082 THEN 'Benvi MX'
@@ -85,6 +95,9 @@ LEFT JOIN
 LEFT JOIN
     band_ladder AS bl
         ON j.id_grade_ladder = bl.id_band_ladder
+LEFT JOIN
+    band AS b
+        ON j.id_job = b.id_job
 LEFT JOIN
     datalake_hr_system_clean.job_families AS jf
         ON jf.id_job_family = j.id_job_family

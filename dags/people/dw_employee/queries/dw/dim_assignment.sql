@@ -103,7 +103,6 @@ SELECT
   ei.legacy_registration,
   wr.legislation_code,
   wr.worker_type,
-  COALESCE(ap.band, af.band) AS band,
   COALESCE(
     ap.assignment_status_type_code,
     af.assignment_status_type_code
