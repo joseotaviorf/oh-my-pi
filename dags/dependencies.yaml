@@ -1744,8 +1744,6 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.ebdb_offer:load-clean-instant-offer
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
-  - bietlejuice.ebdb_visit:load-clean-entry-access
-  - bietlejuice.ebdb_visit:load-clean-key-holder
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_country:load-enrich-user
