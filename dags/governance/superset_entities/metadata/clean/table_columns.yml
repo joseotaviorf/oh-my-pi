@@ -3,71 +3,93 @@ database_name: datalake_superset_clean
 table_name: table_columns
 description: Table that lists all dashboards in Superset and their metadata
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.table_columns.id
+    description: Unique ID of each record in the system
   id_table:
     lineage:
       - datalake_superset_raw.table_columns.table_id
+    description: Unique identifier for each table
   id_user_created:
     lineage:
       - datalake_superset_raw.table_columns.created_by_fk
+    description: ID of the user who created the table column
   id_user_changed:
     lineage:
       - datalake_superset_raw.table_columns.changed_by_fk
+    description: ID of the user who made the last change
   column_name:
     lineage:
       - datalake_superset_raw.table_columns.column_name
+    description: Column name within a table
   type:
     lineage:
       - datalake_superset_raw.table_columns.type
+    description: Column data type
   groupby:
     lineage:
       - datalake_superset_raw.table_columns.groupby
+    description: Indicates whether data has been grouped
   filterable:
     lineage:
       - datalake_superset_raw.table_columns.filterable
+    description: Indicates whether the data has been filtered
   description:
     lineage:
       - datalake_superset_raw.table_columns.description
+    description: Description about the table column
   expression:
     lineage:
       - datalake_superset_raw.table_columns.expression
+    description: Column description
   verbose_name:
     lineage:
       - datalake_superset_raw.table_columns.verbose_name
+    description: Descriptive column name
   python_date_format:
     lineage:
       - datalake_superset_raw.table_columns.python_date_format
+    description: Stores the date format used in the Python standard
   uuid:
     lineage:
       - datalake_superset_raw.table_columns.uuid
+    description: Stores a unique key to identify each view
   extra:
     lineage:
       - datalake_superset_raw.table_columns.extra
+    description: Column extra infos
   advanced_data_type:
     lineage:
       - datalake_superset_raw.table_columns.advanced_type
+    description: Advanced data type
   is_ddtm:
     lineage:
       - datalake_superset_raw.table_columns.is_dttm
+    description: Indicates if the data is ddtm format
   is_active:
     lineage:
       - datalake_superset_raw.table_columns.is_active
+    description: Indicates if the column is active
   ts_created:
     lineage:
-      - datalake_superset_raw.table_columns.created_on
+      - datalake_superset_raw.table_columns.created_ons
+    description: When it was created
   ts_changed:
     lineage:
       - datalake_superset_raw.table_columns.changed_on
+    description: When it was modified
   year:
     lineage:
       - datalake_superset_raw.table_columns.year
+    description: The year it was created
   month:
     lineage:
       - datalake_superset_raw.table_columns.month
+    description: The month it was created
   day:
     lineage:
       - datalake_superset_raw.table_columns.day
+    description: The day it was created

@@ -3,62 +3,81 @@ database_name: datalake_superset_clean
 table_name: sql_metrics
 description: Table that lists all metrics registered on datasets on Superset
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.sql_metrics.id
+    description: Unique ID for each record in the system
   id_table:
     lineage:
       - datalake_superset_raw.sql_metrics.table_id
+    description: ID of each table
   id_user_created:
     lineage:
       - datalake_superset_raw.sql_metrics.created_by_fk
+    description: ID of the user who created the record
   id_user_changed:
     lineage:
       - datalake_superset_raw.sql_metrics.changed_by_fk
+    description: ID of the user who made the last change
   metric_name:
     lineage:
       - datalake_superset_raw.sql_metrics.metric_name
+    description: Metric name
   verbose_name:
     lineage:
       - datalake_superset_raw.sql_metrics.verbose_name
+    description: Metric Description
   metric_type:
     lineage:
       - datalake_superset_raw.sql_metrics.metric_type
+    description: Type of metric used
   expression:
     lineage:
       - datalake_superset_raw.sql_metrics.expression
+    description: Expression used
   description:
     lineage:
       - datalake_superset_raw.sql_metrics.description
+    description: Detailed explanation of the metric
   d3format:
     lineage:
       - datalake_superset_raw.sql_metrics.d3format
+    description: Data display format
   warning_text:
     lineage:
       - datalake_superset_raw.sql_metrics.warning_text
+    description: Alert messages
   extra:
     lineage:
       - datalake_superset_raw.sql_metrics.extra
+    description: Additional notice information
   uuid:
     lineage:
       - datalake_superset_raw.sql_metrics.uuid
+    description: Stores a unique key to identify each view
   currency:
     lineage:
       - datalake_superset_raw.sql_metrics.is_currency
+    description: Type of currency
   ts_created:
     lineage:
       - datalake_superset_raw.sql_metrics.created_on
+    description: When it was created
   ts_changed:
     lineage:
       - datalake_superset_raw.sql_metrics.changed_on
+    description: When it was modified
   year:
     lineage:
       - datalake_superset_raw.sql_metrics.year
+    description: The year it was created
   month:
     lineage:
       - datalake_superset_raw.sql_metrics.month
+    description: The month it was created
   day:
     lineage:
       - datalake_superset_raw.sql_metrics.day
+    description: The day it was created

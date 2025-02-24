@@ -3,14 +3,17 @@ database_name: datalake_superset_clean
 table_name: slice_user
 description: Table that links charts to owner users
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.slice_user.id
+    description: ID unique table
   id_user:
     lineage:
       - datalake_superset_raw.slice_user.user_id
+    description: ID user
   id_slice:
     lineage:
       - datalake_superset_raw.slice_user.slice_id
+    description: ID slice

@@ -3,14 +3,17 @@ database_name: datalake_superset_clean
 table_name: sqltable_user
 description: Table that links datasets to owner users
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.sqltable_user.id
-  id_user: 
+    description: ID unique table
+  id_user:
     lineage:
       - datalake_superset_raw.sqltable_user.user_id
+    description: ID user
   id_table:
     lineage:
       - datalake_superset_raw.sqltable_user.table_id
+    description: ID table created

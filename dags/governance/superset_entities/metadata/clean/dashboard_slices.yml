@@ -3,14 +3,17 @@ database_name: datalake_superset_clean
 table_name: dashboard_slices
 description: Table that links dashboards to slices
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.dashboard_slices.id
+    description: This column represents an unique ID for the combination of id_dashboard and id_slice.
   id_dashboard:
     lineage:
       - datalake_superset_raw.dashboard_slices.dashboard_id
+    description: Contains the ID of each dashboard
   id_slice:
     lineage:
       - datalake_superset_raw.dashboard_slices.slice_id
+    description: This column represents the ID of each slice

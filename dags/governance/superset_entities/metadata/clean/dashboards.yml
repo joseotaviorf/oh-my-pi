@@ -2,29 +2,36 @@ database_name: datalake_superset_clean
 table_name: dashboards
 description: Table that lists all dashboards in Superset and their metadata
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.dashboards.id
+    description: Unique ID of each record in the system
   id_user_created:
     lineage:
       - datalake_superset_raw.dashboards.created_by_fk
+    description: ID of the user who created the dashboard
   id_user_changed:
     lineage:
       - datalake_superset_raw.dashboards.changed_by_fk
+    description: ID of the user who changed the dashboard
   dashboard_title:
     lineage:
       - datalake_superset_raw.dashboards.dashboard_title
+    description: Dashboard title
   position_json:
     lineage:
       - datalake_superset_raw.dashboards.position_json
+    description: Describes the dashboards elements and their relationships.
   css:
     lineage:
       - datalake_superset_raw.dashboards.css
+    description: Contains information about the layout of the dashboards
   json_metadata:
     lineage:
       - datalake_superset_raw.dashboards.json_metadata
+    description: Stores dashboard settings and data
   description:
     lineage:
       - datalake_superset_raw.dashboards.description
@@ -32,36 +39,48 @@ columns:
   slug:
     lineage:
       - datalake_superset_raw.dashboards.slug
+    description: Stores a simplified version of the panel name or title
   published:
     lineage:
       - datalake_superset_raw.dashboards.published
+    description: Brings a boolean value that indicates whether the dashboard is published or not
   uuid:
     lineage:
       - datalake_superset_raw.dashboards.uuid
+    description: Stores a distinct key for each dashboard
   certified_by:
     lineage:
       - datalake_superset_raw.dashboards.certified_by
+    description: If the dashboard is certified
   certification_details:
     lineage:
       - datalake_superset_raw.dashboards.certification_details
+    description: Which team created the dashboard
   is_managed_externally:
     lineage:
       - datalake_superset_raw.dashboards.is_managed_externally
+    description: Indicates whether the dashboard is managed externally
   external_url:
     lineage:
       - datalake_superset_raw.dashboards.external_url
+    description: Shows the dashboard url
   ts_created:
     lineage:
       - datalake_superset_raw.dashboards.created_on
+    description: When it was created
   ts_changed:
     lineage:
       - datalake_superset_raw.dashboards.changed_on
+    description: When it was modified
   year:
     lineage:
       - datalake_superset_raw.dashboards.year
+    description: The year it was created
   month:
     lineage:
       - datalake_superset_raw.dashboards.month
+    description: The month it was created
   day:
     lineage:
       - datalake_superset_raw.dashboards.day
+    description: The day it was created

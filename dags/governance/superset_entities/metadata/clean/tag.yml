@@ -1,40 +1,51 @@
 ---
 database_name: datalake_superset_clean
 table_name: tag
-description: Table that lists all tags in Superset
+description: Table that lists all tags in Superset (TAG feature not being used)
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.tag.id
+    description: Unique ID of each record in the system
   id_user_created:
     lineage:
       - datalake_superset_raw.tag.created_by_fk
+    description: ID of the user who created the tag
   id_user_changed:
     lineage:
       - datalake_superset_raw.tag.changed_by_fk
+    description: ID of the user who made the last change
   tag_name:
     lineage:
       - datalake_superset_raw.tag.name
+    description: Tag name
   type:
     lineage:
       - datalake_superset_raw.tag.type
+    description: Tag type
   description:
     lineage:
       - datalake_superset_raw.tag.description
+    description: Tag description
   ts_created:
     lineage:
       - datalake_superset_raw.tag.created_on
+    description: When it was created
   ts_changed:
     lineage:
       - datalake_superset_raw.tag.changed_on
+    description: When it was modified
   year:
     lineage:
       - datalake_superset_raw.tag.year
+    description: The year it was created
   month:
     lineage:
       - datalake_superset_raw.tag.month
+    description: The month it was created
   day:
     lineage:
       - datalake_superset_raw.tag.day
+    description: The day it was created

@@ -3,95 +3,125 @@ database_name: datalake_superset_clean
 table_name: tables
 description: Table that lists all tables in Superset and their metadata
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.tables.id
+    description: Unique ID of each record in the system
   id_database:
     lineage:
       - datalake_superset_raw.tables.database_id
+    description: ID of the database the table belongs to
   id_user_created:
     lineage:
       - datalake_superset_raw.tables.created_by_fk
+    description: User ID that created the table
   id_user_changed:
     lineage:
       - datalake_superset_raw.tables.changed_by_fk
+    description: ID of the user who made the last change
   table_name:
     lineage:
       - datalake_superset_raw.tables.table_name
+    description: Table names
   main_dttm_col:
     lineage:
       - datalake_superset_raw.tables.main_dttm_col
+    description: Main date column
   offset:
     lineage:
       - datalake_superset_raw.tables.offset
+    description: Data position
   description:
     lineage:
       - datalake_superset_raw.tables.description
+    description: Table description
   is_featured:
     lineage:
       - datalake_superset_raw.tables.is_featured
+    description: DEPRECATED
   cache_timeout:
     lineage:
       - datalake_superset_raw.tables.cache_timeout
+    description: Cache expiration time
   default_endpoint:
     lineage:
       - datalake_superset_raw.tables.default_endpoint
+    description: Default access point
   schema:
     lineage:
       - datalake_superset_raw.tables.schema
+    description: Table schema
   sql_code:
     lineage:
       - datalake_superset_raw.tables.sql
+    description: SQL code for the tables
   params:
     lineage:
       - datalake_superset_raw.tables.params
+    description: Table parameters
   perm:
     lineage:
       - datalake_superset_raw.tables.perm
+    description: Table database
   filter_select_enabled:
     lineage:
       - datalake_superset_raw.tables.filter_select_enabled
+    description: Indicates whether the table has a filter
   fetch_values_predicate:
     lineage:
       - datalake_superset_raw.tables.fetch_values_predicate
+    description: Shows the table predicate
   is_sqllab_view:
     lineage:
       - datalake_superset_raw.tables.is_sqllab_view
+    description: Shows if the table is a view in SQL Lab
   template_params:
     lineage:
       - datalake_superset_raw.tables.template_params
+    description: Parameters used to configure a template
   schema_perm:
     lineage:
-      - datalake_superset_raw.tables.schema_perm  
+      - datalake_superset_raw.tables.schema_perm
+    description: Parameter schema
   extra:
     lineage:
       - datalake_superset_raw.tables.extra
+    description: Stores additional info
   uuid:
     lineage:
       - datalake_superset_raw.tables.uuid
+    description: Stores a unique key to identify each view
   is_managed_externally:
     lineage:
       - datalake_superset_raw.tables.is_managed_externally
+    description: Whether the table is being managed by another system
   external_url:
     lineage:
       - datalake_superset_raw.tables.external_url
+    description: Table external link
   normalize_columns:
     lineage:
       - datalake_superset_raw.tables.normalize_columns
+    description: Indicates whether data columns are being adjusted
   ts_created:
     lineage:
       - datalake_superset_raw.tables.created_on
+    description: When it was created
   ts_changed:
     lineage:
       - datalake_superset_raw.tables.changed_on
+    description: When it was modified
   year:
     lineage:
       - datalake_superset_raw.tables.year
+    description: The year it was created
   month:
     lineage:
       - datalake_superset_raw.tables.month
+    description: The month it was created
   day:
     lineage:
       - datalake_superset_raw.tables.day
+    description: The day it was created

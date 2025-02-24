@@ -3,50 +3,65 @@ database_name: datalake_superset_clean
 table_name: table_schema
 description: Table that lists all tables and their schemas.
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.table_schema.id
+    description: Unique ID of each record in the system
   id_user_created:
     lineage:
       - datalake_superset_raw.table_schema.created_by_fk
+    description: ID of the user who created the table schema
   id_user_changed:
     lineage:
       - datalake_superset_raw.table_schema.changed_by_fk
+    description: ID of the user who made the last change
   id_tab_state:
     lineage:
       - datalake_superset_raw.table_schema.tab_state_id
+    description: Table State ID
   id_database:
     lineage:
       - datalake_superset_raw.table_schema.database_id
+    description: ID of the database the table belongs to
   extra_json:
     lineage:
       - datalake_superset_raw.table_schema.extra_json
-  schema: 
+    description: Additional information in JSON format
+  schema:
     lineage:
       - datalake_superset_raw.table_schema.schema
-  table: 
+    description: Table schema name
+  table:
     lineage:
       - datalake_superset_raw.table_schema.table
+    description: Schema table name
   description:
     lineage:
       - datalake_superset_raw.table_schema.description
+    description: Description of shema
   expanded:
     lineage:
       - datalake_superset_raw.table_schema.expanded
+    description: Indicates whether the table is displaying more details
   ts_created:
     lineage:
       - datalake_superset_raw.table_schema.created_on
+    description: When it was created
   ts_changed:
     lineage:
       - datalake_superset_raw.table_schema.changed_on
-  "year":
+    description: When it was modified
+  year:
     lineage:
       - datalake_superset_raw.table_schema.year
-  "month":
+    description: The year it was created
+  month:
     lineage:
       - datalake_superset_raw.table_schema.month
-  "day":
+    description: The month it was created
+  day:
     lineage:
       - datalake_superset_raw.table_schema.day
+    description: The day it was created

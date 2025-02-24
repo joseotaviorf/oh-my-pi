@@ -3,77 +3,101 @@ database_name: datalake_superset_clean
 table_name: slices
 description: Table that lists all charts in Superset and their metadata
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.slices.id
+    description: Unique ID for each record in the system
   id_datasource:
     lineage:
       - datalake_superset_raw.slices.datasource_id
+    description: Stores the database ID where each dataset comes from
   id_user_created:
     lineage:
       - datalake_superset_raw.slices.created_by_fk
+    description: ID of the user who created the slice
   id_user_changed:
     lineage:
       - datalake_superset_raw.slices.changed_by_fk
+    description: ID of the user who modified the slice
   slice_name:
     lineage:
       - datalake_superset_raw.slices.slice_name
+    description: Slice name
   datasource_type:
     lineage:
       - datalake_superset_raw.slices.datasource_type
+    description: Indicates data origin category
   viz_type:
     lineage:
       - datalake_superset_raw.slices.viz_type
+    description: Slice type
   params:
     lineage:
       - datalake_superset_raw.slices.params
+    description: Shows the parameters applied to the visualization
   description:
     lineage:
       - datalake_superset_raw.slices.description
+    description: The description of the visualization
   cache_timeout:
     lineage:
       - datalake_superset_raw.slices.cache_timeout
+    description: Defines how long data stays in the cache before being refreshed
   perm:
     lineage:
       - datalake_superset_raw.slices.perm
+    description: Stores the full path of a dataset
   schema_perm:
     lineage:
       - datalake_superset_raw.slices.schema_perm
+    description: Stores the data source and schema name
   uuid:
     lineage:
       - datalake_superset_raw.slices.uuid
+    description: Stores a unique key to identify each view
   external_url:
     lineage:
       - datalake_superset_raw.slices.external_url
+    description: Shows the preview URL
   query_context:
     lineage:
       - datalake_superset_raw.slices.query_context
+    description: Information about query execution
   certified_by:
     lineage:
       - datalake_superset_raw.slices.certified_by
+    description: Contains the user or area name when the visualization has a
   certification_details:
     lineage:
       - datalake_superset_raw.slices.certification_details
+    description: Certification details
   is_managed_externally:
     lineage:
       - datalake_superset_raw.slices.is_managed_externally
+    description: Indicates whether the visualization is managed externally
   ts_created:
     lineage:
       - datalake_superset_raw.slices.created_on
+    description: When it was created
   ts_changed:
     lineage:
       - datalake_superset_raw.slices.changed_on
+    description: When it was modified
   ts_last_saved:
     lineage:
       - datalake_superset_raw.slices.last_saved_at
+    description: Last time he was saved
   year:
     lineage:
       - datalake_superset_raw.slices.year
+    description: The year it was created
   month:
     lineage:
       - datalake_superset_raw.slices.month
+    description: The month it was created
   day:
     lineage:
       - datalake_superset_raw.slices.day
+    description: The day it was created
