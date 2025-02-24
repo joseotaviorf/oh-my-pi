@@ -1,0 +1,72 @@
+---
+database_name: datalake_inspections_clean
+table_name: appointment
+description: This table contains data on scheduling, scheduling and canceling dates for property inspections.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_appointment:
+    description: Unique ID of the inspection schedule.
+    lineage:
+      - datalake_inspections_raw.appointment.id
+  id_external_appointment:
+    description: Unique external ID of the inspection schedule, this ID relates to the Planner (Main) schedule data.
+    lineage:
+      - datalake_inspections_raw.appointment.external_appointment_id
+  id_schedules:
+    description: Scheduling identification key in the schedules databases.
+    lineage:
+      - datalake_inspections_raw.appointment.schedules_appointment_id
+  id_inspection:
+    description: Inspection unique identifier.
+    lineage:
+      - datalake_inspections_raw.appointment.inspection_id
+  id_inspector:
+    description: Unique identifier of the inspector responsible for carrying out the inspection.
+    lineage:
+      - datalake_inspections_raw.appointment.inspector_id
+  status:
+    description: Inspection schedule status.
+    categories:
+      DONE: Scheduling process completed, the inspection was carried out.
+      SCHEDULED: The property inspection date has been scheduled.
+      CANCELLED: The scheduled inspection date has been canceled.
+    lineage:
+      - datalake_inspections_raw.appointment.status
+  observation:
+    description: Schedule observations, generally provide information about the location of keys.
+    lineage:
+  cancellation_reason:
+    description: Description of the reason for canceling the inspection appointment
+    lineage:
+      - datalake_inspections_raw.appointment.cancellation_reason
+  is_fixed_agent:
+    description:
+      Indicates whether the inspection was scheduled with a specific agent,
+      rather than a temporary random assignment.
+    lineage:
+      - datalake_inspections_raw.appointment.fixed_agent
+  dt_scheduled:
+    description: Scheduled date for the inspection
+    lineage:
+      - datalake_inspections_raw.appointment.scheduled_date
+  ts_updated:
+    description: Appointment update date.
+    lineage:
+      - datalake_inspections_raw.appointment.updated_at
+  ts_created:
+    description: Appointment creation date.
+    lineage:
+      - datalake_inspections_raw.appointment.created_at
+  year:
+    description: Year of update date.
+    lineage:
+      - datalake_inspections_raw.appointment.year
+  month:
+    description: Month of update date.
+    lineage:
+      - datalake_inspections_raw.appointment.month
+  day:
+    description: Day of update date.
+    lineage:
+      - datalake_inspections_raw.appointment.day
