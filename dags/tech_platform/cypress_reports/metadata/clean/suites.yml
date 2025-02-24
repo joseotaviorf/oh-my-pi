@@ -1,8 +1,8 @@
 database_name: datalake_cypress_reports_clean
 table_name: suites
 description: This table contains information of the Cypress suites in a given executions.
-domain: Platform
-owner: thiago.nakamura@quintoandar.com.br
+domain: Tech Platform
+owner: gabriel.capanema@quintoandar.com.br
 columns:
   pwa:
     lineage:

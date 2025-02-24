@@ -1,13 +1,13 @@
 dag:
   name: cypress_reports
-  owner: Tech Platform Cyber Security
+  owner: Tech Platform Dev Foundation 
   schedule_start_date: 2023, 1, 1
   schedule_interval: "0 3 * * *"
   documentation:
     dag_purpose: |
       Cypress is an End to End testing framework used by the product team here at Quinto Andar.
       This DAG retrieves JSON data from Cypress' reports in S3 source bucket and make it available for
-      the QAs to analyse.
+      the QAs to analyse. Owner: gabriel.capanema@quintoandar.com.br
 workflow:
   layer: raw
   type: custom_ingestion

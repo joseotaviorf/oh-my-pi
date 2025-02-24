@@ -21,6 +21,7 @@ class DAGOwnerEnum:
     DATA_SS = "Data SS"
     MLOPS = "MLOps"
     TECH_PLATAFORM_CYBER_SECURITY = "Tech Platform Cyber Security"
+    TECH_PLATAFORM_DEV_FOUNDATION = "Tech Platform Dev Foundation"
 
     @classmethod
     def get_available_enum_values(cls):
