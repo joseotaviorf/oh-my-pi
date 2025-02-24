@@ -1,32 +1,4 @@
-WITH distributions_timeline AS (
-    SELECT DISTINCT
-        pp.document,
-        dd.id_contract,
-        dd.partner AS team,
-        dd.dt_start_interval,
-        dd.dt_end_interval
-    FROM
-        datalake_recupera.changes_debts_distribution AS dd
-    LEFT JOIN
-        dw_velo.fact_velo_propose AS p
-            ON p.sk_propose = CAST(dd.id_contract AS INT)
-    LEFT JOIN
-        dw_velo.dim_velo_propose_person AS pp
-            ON p.sk_primary_person = pp.sk_person
-    WHERE
-        dd.creditor = 'IQ QuintoCred'
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY dd.dt_start_interval, pp.document ORDER BY
-    CASE
-        WHEN dd.partner = 'INTERNO VELO' THEN 1
-        WHEN dd.partner = 'IAF' THEN 2
-        WHEN dd.partner = 'PASCHOALOTTO' THEN 3
-        WHEN dd.partner = 'BRBOTS' THEN 4
-        WHEN dd.partner = 'DIGTECH' THEN 5
-        ELSE 6
-    END) = 1
-),
-
-collection_recovery_team AS (
+WITH collection_recovery_team AS (
     SELECT
         DATE(DATE_TRUNC("MONTH",FNI.dt_paid)) AS dt_month_paid,
         FN.sk_debtor AS document,
@@ -164,7 +136,7 @@ LEFT JOIN
         ON rt.document = cw.document
         AND rt.dt_month_paid = DATE(DATE_TRUNC("MONTH",cw.dt_base))
 LEFT JOIN
-    distributions_timeline AS dt
+    dw_collection_recovery_quintocred.dim_wallet_distribution AS dt
         ON dt.document = cw.document
         AND cw.dt_base >= dt.dt_start_interval
         AND (

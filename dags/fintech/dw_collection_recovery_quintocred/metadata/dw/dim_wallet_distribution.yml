@@ -1,0 +1,25 @@
+---
+database_name: dw_collection_recovery
+table_name: dim_wallet_distribution
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: The table contains a timeline view of the wallet distribution for collections portfolio for QuintoCred context.
+columns:
+  document:
+    description: "Document number of the client"
+    lineage:
+      - dw_velo.dim_velo_propose_person.document
+  sk_contract:
+    description: "Surrogate key of table. Propose ID from QuintoCred"
+    lineage:
+      - datalake_recupera.changes_debts_distribution.id_contract
+  team_distribution:
+    description: "Team that received the debt via distribution"
+  dt_start_interval:
+    description: "Date when the propose entered the wallet"
+    lineage:
+      - datalake_recupera.changes_debts_distribution.dt_start_interval
+  dt_end_interval:
+    description: "Date when the propose left the wallet"
+    lineage:
+      - datalake_recupera.changes_debts_distribution.dt_end_interval
