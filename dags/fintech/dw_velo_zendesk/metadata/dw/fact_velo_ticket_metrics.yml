@@ -234,3 +234,15 @@ columns:
     description: "Date when the third contact by phone from the claims team was made"
     lineage:
       - datalake_velo_zendesk.ticket_metrics.dt_third_call
+  dt_first_whatsapp:
+    description: "Date when the first contact by whatsapp from the claims team was made"
+    lineage:
+      - datalake_velo_zendesk.ticket_metrics.dt_first_whatsapp
+  dt_second_whatsapp:
+    description: "Date when the second contact by whatsapp from the claims team was made"
+    lineage:
+      - datalake_velo_zendesk.ticket_metrics.dt_second_whatsapp
+  dt_third_whatsapp:
+    description: "Date when the third contact by whatsapp from the claims team was made"
+    lineage:
+      - datalake_velo_zendesk.ticket_metrics.dt_third_whatsapp

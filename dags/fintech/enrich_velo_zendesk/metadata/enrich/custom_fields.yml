@@ -100,6 +100,18 @@ columns:
         description: "Date when the third contact by phone from the claims team was made"
         lineage:
             - datalake_velo_zendesk_clean.tickets.custom_fields
+    dt_first_whatsapp:
+        description: "Date when the first contact by whatsapp from the claims team was made"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    dt_second_whatsapp:
+        description: "Date when the second contact by whatsapp from the claims team was made"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
+    dt_third_whatsapp:
+        description: "Date when the third contact by whatsapp from the claims team was made"
+        lineage:
+            - datalake_velo_zendesk_clean.tickets.custom_fields
     request_responsible:
         description: "Name of the responsible for the request"
         lineage:
