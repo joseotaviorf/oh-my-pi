@@ -8,8 +8,8 @@ column_level_validations:
     is_complete:
       severity_level: Error
   business_context:
-    is_complete:
-      severity_level: Error
+    has_completeness:
+      greater_than: 0.99 # Won't be 100% because of the default row
   ts_load:
-    is_complete:
-      severity_level: Error
+    has_completeness:
+      greater_than: 0.99 # Won't be 100% because of the default row
