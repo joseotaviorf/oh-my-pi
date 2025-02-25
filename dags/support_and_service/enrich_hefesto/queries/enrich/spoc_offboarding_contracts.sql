@@ -18,7 +18,7 @@ SELECT
   wpu.status AS portfolio_status,
   a.organization AS analyst_organization,
   wp.entity_origin,
-  wpu.ts_created
+  wpu.ts_updated
 FROM 
   datalake_hefesto_clean.worker_portfolio_unit wpu
 LEFT JOIN
@@ -36,3 +36,4 @@ LEFT JOIN
 WHERE 
   wp.entity_origin = 'OFFBOARDING'
   AND queue_friendly_name = 'CX Off Manager'
+  AND wpu.ts_updated BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

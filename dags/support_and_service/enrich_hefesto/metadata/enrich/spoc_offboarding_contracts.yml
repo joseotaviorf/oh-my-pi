@@ -62,8 +62,8 @@ columns:
     description: 
       Which contract process is the origin of the portfolio. 
       The only value currently assumed is 'OFFBOARDING'
-  ts_created:
+  ts_updated:
     lineage:
-      - datalake_hefesto_clean.worker_portfolio_unit.ts_created
-    description: Timestamp from when the portfolio was created
+      - datalake_hefesto_clean.worker_portfolio_unit.ts_updated
+    description: Timestamp from when the portfolio was updated
 
