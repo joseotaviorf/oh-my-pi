@@ -13,6 +13,22 @@ WITH francesinha AS (
         AND dt_credit >= current_date - 180
     GROUP BY
         1,2
+
+    UNION
+
+    SELECT 
+      CASE WHEN ext.origin_complement like '%BL%' THEN regexp_replace(
+        substring(ext.origin_complement, 20, 20), 
+        '^0+', 
+        ''
+      ) ELSE regexp_replace(ext.origin_complement, '^0+', '') END AS our_number,
+        DATE(ext.date_accounting) AS dt_paid,
+        ext.amount_value AS amount
+    FROM 
+        datalake_itau_statements_clean.statement_879200452685 ext 
+    WHERE 
+        ext.operation in ('C') 
+        AND ext.literal_code in ('9489')
 ),
 
 sap AS (
@@ -88,7 +104,7 @@ checkout_union AS (
     SELECT
       b.our_number, 
       b.paid_amount AS amount,
-      b.dt_credit AS dt_paid
+      COALESCE(dt_credit, DATE(ts_paid)) AS dt_paid
     FROM 
       datalake_checkout_clean.bolecode b
     WHERE
@@ -96,7 +112,7 @@ checkout_union AS (
         AND b.id NOT IN (5855, 5856, 5857)
         AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
         AND (b.beneficiary_account = '45268' OR b.beneficiary_account IS NULL)
-        AND b.dt_credit >= current_date - 180    
+        AND COALESCE(dt_credit, DATE(ts_paid)) >= current_date - 180    
 ),
 
 df_all AS (

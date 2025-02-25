@@ -1070,6 +1070,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_sap_gateway:load-enrich-feature
   - bietlejuice.enrich_sap_gateway:load-enrich-sync-sap-job
   - bietlejuice.gsheets_fintech:done-clean-cod-locale
+  - bietlejuice.itau_statements:load-clean-statement-879200452685
   - bietlejuice.kill_queue:load-clean-reservation
   - bietlejuice.monopoly:load-clean-accounting-entry
   - bietlejuice.monopoly:load-clean-sale
