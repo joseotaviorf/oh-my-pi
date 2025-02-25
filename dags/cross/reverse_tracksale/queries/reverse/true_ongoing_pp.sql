@@ -73,9 +73,12 @@ status_send AS (--Evaluat every ticket related to an birthday contract or contra
   FROM
     contracts AS c
   LEFT JOIN
-    dw_customer_support.fact_ticket AS ft
-      ON c.sk_contract = ft.sk_contract
-      AND ft.sk_contract IS NOT NULL
+    dw_customer_support.dim_ticket AS dt
+      ON c.sk_contract = dt.sk_contract
+      AND dt.sk_contract IS NOT NULL
+  LEFT JOIN
+    dw_customer_support.fact_tickets AS ft
+      ON ft.sk_ticket = ft.sk_ticket
   LEFT JOIN
     dw_customer_support.dim_department AS dp
       ON ft.sk_main_department = dp.sk_department

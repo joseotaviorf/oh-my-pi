@@ -11,7 +11,7 @@ WITH base_tickets AS (
     dd.department,
     COUNT(DISTINCT ft.sk_ticket) AS tickets
   FROM
-    dw_customer_support.fact_ticket AS ft
+    dw_customer_support.fact_tickets AS ft
   JOIN
     dw_customer_support.dim_taxonomy AS dt
       ON dt.sk_taxonomy = ft.sk_taxonomy
@@ -29,16 +29,13 @@ missing_tickets AS (
     dd.front_or_back AS ticket_type,
     COUNT(DISTINCT ft.sk_ticket) AS missing_theme_tickets
   FROM
-    dw_customer_support.fact_ticket AS ft
+    dw_customer_support.fact_tickets AS ft
   LEFT JOIN
     dw_customer_support.dim_department AS dd
       ON ft.sk_main_department = dd.sk_department
   LEFT JOIN
     dw_customer_support.dim_taxonomy AS dt
       ON dt.sk_taxonomy = ft.sk_taxonomy
-  LEFT JOIN
-    dw_customer_support.dim_channel AS dc
-      ON ft.sk_channel = dc.sk_channel
   WHERE
     dt.theme_detail IS NULL
     AND (
@@ -48,7 +45,7 @@ missing_tickets AS (
     AND ft.ts_solved >= '2022-01-01'
     AND dd.team <> 'Ong Back'
     AND dd.area = 'CX'
-    AND ft.main_department NOT IN
+    AND dd.department NOT IN
       ('Rescisão por Inadimplência [OFF][POS][BACK]',
         'Offboarding Reparos [OFF] [POS] [BACK]',
         'Offboarding pré saída [OFF] [POS] [BACK]',
@@ -63,22 +60,53 @@ missing_tickets AS (
     )
   GROUP BY 1, 2
 ),
-abandoned_calls AS (
-  SELECT
-    DATE(frc.ts_created) AS dt_started,
+abandoned_tasks AS (
+  SELECT DISTINCT
+    fcc.sk_task AS id_task,
     dd.front_or_back AS ticket_type,
-    COUNT(DISTINCT frc.sk_contact) AS contacts
+    dd.department,
+    DATE(fcc.ts_task_created) AS dt_started
   FROM
-    dw_customer_support.fact_received_contact AS frc
+    dw_customer_support.fact_customer_contacts AS fcc
   LEFT JOIN
     dw_customer_support.dim_department AS dd
-      ON frc.sk_department = dd.sk_department
+      ON fcc.sk_department = dd.sk_department
   WHERE
-    dd.front_or_back = 'front'
+    fcc.channel = 'call'
+    AND dd.front_or_back = 'front'
     AND dd.area = 'CX'
-    AND frc.is_answered = false
-    AND frc.channel = 'call'
-  GROUP BY 1, 2
+    AND fcc.is_contact_answered IS FALSE
+    AND fcc.direction != 'outbound'
+    AND fcc.ts_task_created >= '2023-01-01'
+  UNION ALL
+  SELECT DISTINCT
+    fcc.sk_task AS id_task,
+    dd.front_or_back AS ticket_type,
+    dd.department,
+    DATE(fcc.ts_task_created) AS dt_started
+  FROM
+    dw_customer_support.fact_customer_contacts AS fcc
+  LEFT JOIN
+    dw_customer_support.dim_department AS dd
+      ON fcc.sk_department = dd.sk_department
+  WHERE
+    fcc.channel = 'call'
+    AND dd.front_or_back = 'front'
+    AND dd.area = 'CX'
+    AND fcc.is_contact_answered IS TRUE
+    AND fcc.direction != 'outbound'
+    AND fcc.ts_task_created >= '2023-01-01'
+    AND status = 'abandoned'
+),
+abandoned_calls AS (
+  SELECT
+    ticket_type,
+    department,
+    COUNT(DISTINCT(id_task)) AS contacts,
+    dt_started
+  FROM
+    abandoned_tasks
+  GROUP BY 1, 2, 4
 ),
 base_themes AS (
   SELECT

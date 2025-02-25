@@ -8,8 +8,8 @@ owner: gustavo.silva@quintoandar.com.br
 columns:
   dt_started:
     lineage:
-      - dw_customer_support.fact_received_contact.ts_created
-      - dw_customer_support.fact_ticket.ts_solved
+      - dw_customer_support.customer_contacts.ts_task_created
+      - dw_customer_support.fact_tickets.ts_solved
     description: Reference month first day.
     dimension: True
   contact_theme_tag:

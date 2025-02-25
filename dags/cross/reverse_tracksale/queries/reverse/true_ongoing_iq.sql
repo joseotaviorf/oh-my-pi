@@ -44,7 +44,7 @@ status_send AS (--Evaluat every ticket related to an birthday contract ORcontrac
     dp.team,
     c.dt_start,
     c.dt_recap,
-    ft.ts_started,
+    ft.ts_created AS ts_started,
     ft.ts_solved,
     CASE
       WHEN c.birth_type = 'birthday'
@@ -56,7 +56,7 @@ status_send AS (--Evaluat every ticket related to an birthday contract ORcontrac
     CASE
       WHEN c.birth_type = 'recap_birthday'
         AND ft.sk_ticket IS NOT NULL
-        AND ft.ts_started < c.dt_recap
+        AND ft.ts_created < c.dt_recap
         AND (ft.ts_solved >= c.dt_recap OR ft.ts_solved IS NULL)
         AND (ft.front_or_back = 'back' OR dp.team IS NOT NULL) THEN 1
       ELSE 0
@@ -64,9 +64,12 @@ status_send AS (--Evaluat every ticket related to an birthday contract ORcontrac
   FROM
     contracts AS c
   LEFT JOIN
-    dw_customer_support.fact_ticket AS ft
-      ON c.sk_contract = ft.sk_contract
-      AND ft.sk_contract IS NOT NULL
+    dw_customer_support.dim_ticket AS dt
+      ON c.sk_contract = dt.sk_contract
+      AND dt.sk_contract IS NOT NULL
+  LEFT JOIN
+    dw_customer_support.fact_tickets AS ft
+      ON ft.sk_ticket = ft.sk_ticket
   LEFT JOIN
     dw_customer_support.dim_department AS dp
       ON ft.sk_main_department = dp.sk_department

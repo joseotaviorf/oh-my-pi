@@ -2,14 +2,14 @@
 database_name: metric_rent
 table_name: total_tickets_weekly
 description: Weekly total tickets related to the Ticket Rate classification.
-    This metric is being built with some specific filters for the FLUX context and is used to calculate Ticket Rate
-    in the new format proposed on Q1/2024.
+  This metric is being built with some specific filters for the FLUX context and is used to calculate Ticket Rate
+  in the new format proposed on Q1/2024.
 domain: For Rent
 owner: gustavo.silva@quintoandar.com.br
 columns:
   dt_week:
     lineage:
-      - dw_customer_support.fact_ticket.ts_solved
+      - dw_customer_support.fact_tickets.ts_solved
     description: "Reference week date."
     dimension: True
   context:
@@ -17,9 +17,9 @@ columns:
       - dw_customer_support.dim_taxonomy.sub_journey
     description: "Context of the ticket based on its sub journey."
     categories:
-     ForRent: "Ticket belongs to ForRent context"
-     ForSale: "Ticket belongs to ForSale context"
-     Partners: "Ticket belongs to Partners context"
+      ForRent: "Ticket belongs to ForRent context"
+      ForSale: "Ticket belongs to ForSale context"
+      Partners: "Ticket belongs to Partners context"
     dimension: True
   journey:
     lineage:
@@ -70,11 +70,13 @@ columns:
     description: "Driver of the ticket, which depends on the sub journey type."
     dimension: True
   total_tickets_pure:
-    description: "Volume of tickets marked as Ticket Rate, not considering weights and proportional distribution
+    description:
+      "Volume of tickets marked as Ticket Rate, not considering weights and proportional distribution
       of missing tickets and abandoned calls."
     metric:
       name: Total Tickets Pure
-      description: "Volume of tickets marked as Ticket Rate, not considering weights and proportional distribution
+      description:
+        "Volume of tickets marked as Ticket Rate, not considering weights and proportional distribution
         of missing tickets and abandoned calls."
       acronym: TTP
       is_additive: True
@@ -83,12 +85,14 @@ columns:
       approved_by: matheus.madeira@quintoandar.com.br
       link_to_metric: ""
   total_tickets_proportional:
-    description: "Volume of the tickets for Ticket Rate metric calculation, which is the sum of all tickets marked
+    description:
+      "Volume of the tickets for Ticket Rate metric calculation, which is the sum of all tickets marked
       as Ticket Rate after applying the respective weights and proportional distribution of missing tickets and
       abandoned calls."
     metric:
       name: Total Tickets Proportional
-      description: "Volume of the tickets for Ticket Rate metric calculation, which is the sum of all tickets marked
+      description:
+        "Volume of the tickets for Ticket Rate metric calculation, which is the sum of all tickets marked
         as Ticket Rate after applying the respective weights and proportional distribution of missing tickets and
         abandoned calls."
       acronym: ""

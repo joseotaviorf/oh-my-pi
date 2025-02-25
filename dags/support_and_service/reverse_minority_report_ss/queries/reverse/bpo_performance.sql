@@ -7,30 +7,29 @@ WITH satisfaction_balance_control AS (
         END AS bpo_name,
         ft.channel AS channel_type,
         dd.department,
-
-        COUNT(DISTINCT CASE WHEN DATE(ft.ts_csat_response) >= current_date - interval '7' day AND ft.csat_score IN (4,5) THEN ft.sk_ticket END) AS csat_7_day,
-        COUNT(DISTINCT CASE WHEN DATE(ft.ts_csat_response) >= current_date - interval '7' day AND ft.csat_score IS NOT NULL THEN ft.sk_ticket END) AS csat_answers_7_day,
-
-        COUNT(DISTINCT CASE WHEN DATE(ft.ts_csat_response) >= current_date - interval '30' day AND ft.csat_score IN (4,5) THEN ft.sk_ticket END) AS csat_30_day,
-        COUNT(DISTINCT CASE WHEN DATE(ft.ts_csat_response) >= current_date - interval '30' day AND ft.csat_score IS NOT NULL THEN ft.sk_ticket END) AS csat_answers_30_day,
-
-        COUNT(DISTINCT CASE WHEN DATE(ft.ts_csat_response) >= current_date - interval '7' day AND ft.resolution_survey = True THEN ft.sk_ticket END) AS resolution_7_day,
-        COUNT(DISTINCT CASE WHEN DATE(ft.ts_csat_response) >= current_date - interval '7' day AND ft.resolution_survey IS NOT NULL THEN ft.sk_ticket END) AS resolution_answers_7_day,
-
-        COUNT(DISTINCT CASE WHEN DATE(ft.ts_csat_response) >= current_date - interval '30' day AND ft.resolution_survey = True THEN ft.sk_ticket END) AS resolution_30_day,
-        COUNT(DISTINCT CASE WHEN DATE(ft.ts_csat_response) >= current_date - interval '30' day AND ft.resolution_survey IS NOT NULL THEN ft.sk_ticket END) AS resolution_answers_30_day
+        COUNT(DISTINCT CASE WHEN DATE(ftc.ts_last_response) >= CURRENT_DATE - interval '7' day AND ftc.last_csat_score IN (4,5) THEN ftc.sk_ticket END) AS csat_7_day,
+        COUNT(DISTINCT CASE WHEN DATE(ftc.ts_last_response) >= CURRENT_DATE - interval '7' day AND ftc.last_csat_score IS NOT NULL THEN ftc.sk_ticket END) AS csat_answers_7_day,
+        COUNT(DISTINCT CASE WHEN DATE(ftc.ts_last_response) >= CURRENT_DATE - interval '30' day AND ftc.last_csat_score IN (4,5) THEN ftc.sk_ticket END) AS csat_30_day,
+        COUNT(DISTINCT CASE WHEN DATE(ftc.ts_last_response) >= CURRENT_DATE - interval '30' day AND ftc.last_csat_score IS NOT NULL THEN ftc.sk_ticket END) AS csat_answers_30_day,
+        COUNT(DISTINCT CASE WHEN DATE(ftc.ts_last_response) >= CURRENT_DATE - interval '7' day AND ftc.is_solved = True THEN ftc.sk_ticket END) AS resolution_7_day,
+        COUNT(DISTINCT CASE WHEN DATE(ftc.ts_last_response) >= CURRENT_DATE - interval '7' day AND ftc.is_solved IS NOT NULL THEN ftc.sk_ticket END) AS resolution_answers_7_day,
+        COUNT(DISTINCT CASE WHEN DATE(ftc.ts_last_response) >= CURRENT_DATE - interval '30' day AND ftc.is_solved = True THEN ftc.sk_ticket END) AS resolution_30_day,
+        COUNT(DISTINCT CASE WHEN DATE(ftc.ts_last_response) >= CURRENT_DATE - interval '30' day AND ftc.is_solved IS NOT NULL THEN ftc.sk_ticket END) AS resolution_answers_30_day
     FROM
-        dw_customer_support.fact_ticket AS ft
+        dw_customer_support.fact_tickets AS ft
+    LEFT JOIN
+        dw_satisfaction_rating.fact_ticket_csat AS ftc
+            ON ftc.sk_ticket = ft.sk_ticket
     LEFT JOIN
         dw_customer_support.dim_department  AS dd
             ON ft.sk_main_department = dd.sk_department
     LEFT JOIN
         dw_customer_support.dim_analyst AS da
-            ON da.sk_analyst = ft.sk_last_agent
+            ON da.sk_analyst = ft.sk_last_analyst
     WHERE
-        ft.front_or_back = 'front'
+        dd.front_or_back = 'front'
         AND ft.channel IN ('chat', 'call')
-        AND DATE(ft.ts_csat_response) BETWEEN current_date - interval '30' day AND current_date
+        AND DATE(ftc.ts_last_response) BETWEEN CURRENT_DATE - INTERVAL '30' DAY AND CURRENT_DATE
         AND dd.team IS NOT NULL
         AND dd.area = 'CX'
         AND da.agent_organization IN ('webhelp', 'atento', 'webhelpbr', 'atn')

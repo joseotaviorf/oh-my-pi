@@ -8,15 +8,15 @@ WITH contract_signed AS (
         day >= DATE('2022-01-01')
         AND country_code = 'BR'
     GROUP BY 2
-), 
+),
 ccv AS (
-    SELECT 
+    SELECT
         COUNT(DISTINCT CASE WHEN fo.sk_sale_agreement_signed_date > 0 THEN sk_offer END) AS ccvs,
         dd.week_start AS dt_week
-    FROM 
+    FROM
         dw_sale.fact_offers fo
-    INNER JOIN 
-        dw_public.dim_date dd 
+    INNER JOIN
+        dw_public.dim_date dd
             ON dd.sk_date = fo.sk_sale_agreement_signed_date
     WHERE
         sk_date >= 20220101
@@ -47,9 +47,9 @@ ended_rentals AS (
     SELECT
         SUM(ended_rentals_confirmed) AS ended_rentals,
         DATE(DATE_TRUNC('week', day)) AS dt_week
-    FROM 
+    FROM
         metric_rent.ended_rentals_confirmed_daily
-    WHERE 
+    WHERE
         day >= DATE('2022-01-01')
         AND country_code = 'BR'
     GROUP BY 2
@@ -62,26 +62,26 @@ drivers AS (
         ers.ended_rentals,
         d.week_start AS dt_week
     FROM
-        dw_public.dim_date AS d 
+        dw_public.dim_date AS d
     LEFT JOIN
-        contract_signed AS cs 
+        contract_signed AS cs
             ON cs.dt_week = d.week_start
-    LEFT JOIN 
+    LEFT JOIN
         ccv
             ON ccv.dt_week = d.week_start
-    LEFT JOIN 
+    LEFT JOIN
         ongoing_rentals ors
             ON ors.dt_week = d.week_start
-    LEFT JOIN 
+    LEFT JOIN
         ended_rentals ers
             ON ers.dt_week = d.week_start
     WHERE
         d.sk_date >= 20220101
 ),
 total_tickets_prep AS (
-    SELECT 
+    SELECT
         DATE(DATE_TRUNC('week', ts_solved)) AS dt_week,
-        CASE 
+        CASE
             WHEN dt.sub_journey NOT IN ('Partners', 'For Sale') THEN 'ForRent'
             WHEN dt.sub_journey IN ('For Sale') THEN 'ForSale'
             WHEN dt.sub_journey IN ('Partners') THEN dt.sub_journey
@@ -101,22 +101,22 @@ total_tickets_prep AS (
             WHEN dt.sub_journey = 'Partners' THEN (dv.new_contracts_signed + dv.ccvs)
             WHEN dt.sub_journey = 'Ongoing' THEN dv.ongoing_rentals
             WHEN dt.sub_journey = 'Offboarding' THEN dv.ended_rentals
-            ELSE NULL 
+            ELSE NULL
         END AS driver,
         COUNT(ft.sk_ticket) AS total_tickets_pure,
         SUM(ft.total_tickets_proportional) AS total_tickets_proportional
-    FROM 
-        dw_customer_support.fact_ticket AS ft 
+    FROM
+        dw_customer_support.fact_tickets AS ft
     LEFT JOIN
         dw_customer_support.dim_taxonomy AS dt
-            ON ft.sk_taxonomy = dt.sk_taxonomy 
-    LEFT JOIN 
-        dw_customer_support.dim_department AS dd 
+            ON ft.sk_taxonomy = dt.sk_taxonomy
+    LEFT JOIN
+        dw_customer_support.dim_department AS dd
             ON ft.sk_main_department = dd.sk_department
-    LEFT JOIN 
+    LEFT JOIN
         drivers AS dv
             ON DATE(DATE_TRUNC('week', ft.ts_solved)) = dv.dt_week
-    WHERE 
+    WHERE
         ft.is_ticket_rate = TRUE
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 )
@@ -134,5 +134,5 @@ SELECT
     total_tickets_pure,
     total_tickets_proportional,
     (total_tickets_proportional/driver) AS ticket_rate_weekly
-FROM 
+FROM
     total_tickets_prep
