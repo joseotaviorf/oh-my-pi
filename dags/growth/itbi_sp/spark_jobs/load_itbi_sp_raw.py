@@ -58,9 +58,20 @@ def extract_urls(
   """
   try:
     pattern = r'<a\s+(?:[^>]*?\s+)?href="([^"]*itbi.*?[\.|\-]{source_format})"'.format(source_format=source_format)
+    year_pattern = re.compile(r'(\d{4})')
+
     urls = re.findall(pattern, request_response.text, re.IGNORECASE)
     full_urls = [urljoin(base_url, url) if url.startswith('/') else url for url in urls]
-    filtered_urls = list(set([url for url in full_urls if any(year in url for year in year_interval) and url not in blocklist_urls]))
+
+    filtered_urls = []
+    for url in full_urls:
+      match = year_pattern.search(url)
+      if match:
+        year = match.group(1)
+        if year in year_interval and url not in blocklist_urls:
+          filtered_urls.append(url)
+      else:
+        filtered_urls.append(url)
     logger.info(f"m=extract_urls, msg=Extracted {len(filtered_urls)} URLs for {source_download_page_url}.")
     return filtered_urls
   except Exception as e:
@@ -143,34 +154,6 @@ def rename_columns(
   return dataframe
 
 
-def transform_month_to_portuguese_relative(
-  month:str,
-  reverse=True,
-  ) -> List[str]:
-  """
-  Transforms a month number to its corresponding portuguese relative name.
-
-  Args:
-      month (str): The month number to be transformed.
-      reverse (bool, optional): Whether to reverse the mapping. Defaults to True.
-
-  Returns:
-      List[str]: A list of portuguese relative names corresponding to the given month numbers.
-  """
-
-  months = {
-      "1": "JAN", "2": "FEV", "3": "MAR",
-      "4": "ABR", "5": "MAI", "6": "JUN",
-      "7": "JUL", "8": "AGO", "9": "SET",
-      "10": "OUT", "11": "NOV", "12": "DEZ",
-  }
-
-  if reverse:
-      months = dict(zip(months.values(), months.keys()))
-
-  return months[str(month)]
-
-
 def extract_sheets(
   url: str,
 ) -> Dict[str, pd.DataFrame]:
@@ -220,10 +203,6 @@ def process_url(
 
   logger.info(f"m=process_url, msg=Processing data from URL: {url}")
 
-  udf_transform_month_to_portuguese_relative = F.udf(
-        transform_month_to_portuguese_relative, StringType()
-  )
-
   sheets = extract_sheets(url)
 
   try:
@@ -236,6 +215,13 @@ def process_url(
   list_of_sheets = [df.assign(name=n) for n, df in sheets.items()]
   treated_sheets: List[DataFrame] = []
 
+  month_map = {
+    "JAN": "1", "FEV": "2", "MAR": "3", "ABR": "4",
+    "MAI": "5", "JUN": "6", "JUL": "7", "AGO": "8",
+    "SET": "9", "OUT": "10", "NOV": "11", "DEZ": "12"
+  }
+  month_expr = F.create_map(*sum([[F.lit(k), F.lit(v)] for k, v in month_map.items()], []))
+
   for sheet in list_of_sheets:
     df = spark_client.conn.createDataFrame(sheet.astype(str))
     sheet_name = [row["name"] for row in df.select("name").distinct().collect()][0]
@@ -246,7 +232,7 @@ def process_url(
       .withColumn("source_file", F.lit(url)) \
       .withColumn("dt_load", F.lit(date.today())) \
       .withColumn("year", F.expr("substring(source_tab, 5, length(source_tab))").cast(IntegerType())) \
-      .withColumn("month", udf_transform_month_to_portuguese_relative(F.expr("substring(source_tab, 0, 3)")))
+      .withColumn("month", month_expr[F.expr("substring(source_tab, 0, 3)")].cast(IntegerType()))
 
     logger.info(f"m=process_url, msg=Added new columns for {sheet_name} from URL {url}.")
 
