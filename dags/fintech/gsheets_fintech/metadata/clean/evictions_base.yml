@@ -81,14 +81,6 @@ columns:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Honorario_sucumbencia
-  correspondent:
-    description: ""
-    lineage:
-      - datalake_gsheets_raw.evictions_base.Correspondente
-  notice_of_receipt:
-    description: ""
-    lineage:
-      - datalake_gsheets_raw.evictions_base.Aviso_recebimento
   total_package:
     description: ""
     lineage:
@@ -97,6 +89,10 @@ columns:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Total_divida
+  overdue_days_at_registration:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Dias_Inad_Registro
   dt_registered:
     description: ""
     lineage:
