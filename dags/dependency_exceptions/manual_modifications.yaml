@@ -137,6 +137,12 @@ bietlejuice.dw_losses:
     - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-renegotiations
   remove:
     - bietlejuice.enrich_losses:load-enrich-provision-factor
+bietlejuice.dw_collection_recovery_quintoandar:
+  remove:
+    - bietlejuice.enrich_recupera:load-enrich-collection
+    - bietlejuice.enrich_recupera:load-enrich-contract-advisory-distribution
+    - bietlejuice.enrich_recupera:load-enrich-installment
+    - bietlejuice.enrich_recupera:load-enrich-negotiation
 bietlejuice.dw_offboarding:
   add:
     - bietlejuice.enrich_inspections:load-enrich-repair-request
