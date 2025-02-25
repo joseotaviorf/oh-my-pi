@@ -1,0 +1,59 @@
+---
+database_name: datalake_inspections_clean
+table_name: repair_suggestion
+description:
+  This table aims to store the data that will be filled in the repair_request table, when the item_group_state criteria are met.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.id
+    description: 
+      Unique identifier (number)
+  service:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.service
+    description: 
+      Registers the service that will be requested in the repair request that will be made, based on this record.
+  type:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.type
+    description: 
+      Registers the type of repair request that will be made, from this record.
+  responsibility:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.responsibility
+    description: 
+      Registers the repair responsibility that will be made, based on this record.
+    categories:
+      TENANT: Responsible for the repair is the tenant of the property.
+      OWNER: Responsible for the repair is the owner of the property.
+      ABSORBED_BY_COMPANY: Responsible for the repair is the company.
+  is_exempted:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.exempted
+    description: 
+      Boolean information that indicates whether the repair is suggested to be exempt.
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.created_at
+    description: 
+      Creation date in timestamp format.
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.updated_at
+    description: 
+      Update date in timestamp format.
+  year:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspections_raw.repair_suggestion.day
+    description: Day of update date.

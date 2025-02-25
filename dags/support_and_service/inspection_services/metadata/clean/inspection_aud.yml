@@ -1,0 +1,188 @@
+---
+database_name: datalake_inspections_clean
+table_name: inspection_aud
+description:
+  Inspection audit table, which is responsible for the survey scheduling process,
+  including cancellations and rescheduling, until the survey actually takes place.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_inspection:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.id
+    description: Inspection unique identifier (number)
+  id_previous_inspection:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.previous_inspection_id
+    description:
+      If there is a previous inspection for the same contract, it will
+      be indicated in this column. It is usually completed in offboarding inspections,
+      bringing the identification of the onboarding or dispute inspection.
+  id_client_side:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.client_side_id
+    description: Inspection unique identifier (uuid)
+  id_contract:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.contract_id
+    description: Unique identifier of the contract related to the property to be inspected
+  id_external:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.external_id
+    description: Inspection correlational unique identifier in the PWA database
+  id_inspector:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.inspector_id
+    description:
+      Unique identifier of the inspector responsible for carrying out the
+      inspection
+  id_schedule:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.schedule_id
+    description: Unique identifier of the inspection date and time schedule
+  rev:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.rev
+    description: Foreign key of the RevInfo table, which indicates when the record was changed
+  rev_type:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.revtype
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
+    categories:
+      "0": Inclusion operation.
+      "1": Alteration operation.
+      "2": Deletion operation.
+  contract:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.contract
+    description: Data of the parties interested in the contract
+  house:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.house
+    description: Property address and brief description of the house
+  schedule:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.schedule
+    description:
+      Date and time of scheduling the inspection execution and location
+      of keys
+  status:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.status
+    categories:
+      scheduled: Inspection scheduled and awaiting execution
+      received: Inspection sent by the inspector, waiting for synchronization with the Main
+      sent_to_analysis: Inspection available for operations team interventions
+      sent_to_owner_review: Review available for owner review
+      review_started_by_owner: Survey whose owner has already done some intervention
+      sent_to_tenant_review: Survey available for tenant review
+      review_started_by_tenant: Survey whose tenant has already done some intervention
+      reviewed: Survey sent to the Operations team to validate interventions proposed by owner/tenant
+  type:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.type
+    description:
+      "An inspection can be of the following types: - onboarding: Inspection
+      carried out before the tenant enters the property, to certify the conditions
+      of the house - verification: inspection carried out when there is any relevant
+      change in the property, such as the creation of rooms, for example - offboarding:
+      Inspection carried out after the tenant leaves the property, to certify the
+      conditions of the house"
+  is_comparative:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.comparative
+    description:
+      Field that indicates whether a previous inspection will be used as
+      a basis for comparison
+  mod_id_previous_inspection:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.previous_inspection_id_mod
+    description: Indicates if the previous_inspection_id field has been changed
+  mod_id_contract:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.contract_id_mod
+    description: Indicates if the contract_id field has been changed
+  mod_id_external:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.external_id_mod
+    description: Indicates if the external_id field has been changed
+  mod_id_inspector:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.inspector_id_mod
+    description: Indicates if the inspector_id field has been changed
+  mod_id_schedule:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.schedule_id_mod
+    description: Indicates if the schedule_id field has been changed
+  mod_contract:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.contract_mod
+    description: Indicates if the contract field has been changed
+  mod_house:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.house_mod
+    description: Indicates if the house field has been changed
+  mod_schedule:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.schedule_mod
+    description: Indicates if the schedule field has been changed
+  mod_status:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.status_mod
+    description: Indicates if the status field has been changed
+  mod_type:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.type_mod
+    description: Indicates whether the type field has been changed
+  mod_assessments:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.assessments_mod
+    description: Indicates whether the relationship with the assessment table has changed
+  mod_uuid:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.uuid_mod
+    description: Indicates if the client_side_id field has been changed
+  mod_ts_created:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.created_at_mod
+    description: Indicates whether the created_at field has been changed
+  mod_ts_schedule:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.schedule_date_mod
+    description: Indicates if the schedule_at field has been changed
+  mod_ts_updated:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.updated_at_mod
+    description: Indicates whether the updated_at field has been changed
+  mod_is_comparative:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.comparative_mod
+    description: Indicates if the comparative field has been changed
+  ts_schedule:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.schedule_date
+    description: Scheduled date for carrying out the inspection
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.created_at
+    description:
+      Timestamp of when the inspection request was synchronized in the
+      database product
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.updated_at
+    description:
+      Timestamp of when the inspection request was updated in the database
+      product
+  year:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspections_raw.inspection_aud.day
+    description: Day of update date.

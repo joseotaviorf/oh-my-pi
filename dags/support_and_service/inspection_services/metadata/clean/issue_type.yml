@@ -1,0 +1,83 @@
+---
+database_name: datalake_inspections_clean
+table_name: issue_type
+description: Behind the standardized subtypes of item issues that we can have within the application.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_issue_type:
+    lineage:
+      - datalake_inspections_raw.issue_type.id
+    description: Issue Type unique identifier (number)
+  id_item_type:
+    lineage:
+      - datalake_inspections_raw.issue_type.item_type_id
+    description: Indicates the type of problem that has the sub-type of problem
+  inspection_type:
+    lineage:
+      - datalake_inspections_raw.issue_type.inspection_type
+    description: "-"
+  repair_suggestion:
+    lineage:
+      - datalake_inspections_raw.issue_type.repair_suggestion
+    description:
+      This column would keep repair suggestions for presentation in the
+      report, but this functionality was not integrated
+  responsibility:
+    lineage:
+      - datalake_inspections_raw.issue_type.responsibility
+    description:
+      This column would keep the person responsible for the damage, but
+      this functionality was not implemented
+  severity:
+    lineage:
+      - datalake_inspections_raw.issue_type.severity
+    description:
+      This column would store the degree of severity of data in the objects,
+      but this functionality was not implemented
+  type:
+    lineage:
+      - datalake_inspections_raw.issue_type.type
+    description: Specify the sub-type problem
+  require_manual_analysis:
+    lineage:
+      - datalake_inspections_raw.issue_type.require_manual_analysis
+    description:
+      This column presents whether this year needs to undergo a manual
+      assessment
+  number_order:
+    lineage:
+      - datalake_inspections_raw.issue_type.order
+    description: Defines the display order for the inspector
+  is_enabled:
+    lineage:
+      - datalake_inspections_raw.issue_type.enabled
+    description: " "
+  is_protected:
+    lineage:
+      - datalake_inspections_raw.issue_type.protected
+    description: " "
+  is_deleted:
+    lineage:
+      - datalake_inspections_raw.issue_type.deleted
+    description: Identifies whether the record is deleted
+  ts_created:
+    lineage:
+      - datalake_inspections_raw.issue_type.created_at
+    description: Creation date
+  ts_updated:
+    lineage:
+      - datalake_inspections_raw.issue_type.updated_at
+    description: Update date
+  year:
+    lineage:
+      - datalake_inspections_raw.issue_type.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspections_raw.issue_type.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspections_raw.issue_type.day
+    description: Day of update date.
