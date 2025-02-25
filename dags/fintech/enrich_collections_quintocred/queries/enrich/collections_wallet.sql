@@ -4,7 +4,7 @@ WITH min_dates AS (
         date,
         MIN(CASE WHEN type_description = 'GUARANTEE' THEN dt_aging END) AS min_dt_guarantee,
         MIN(CASE WHEN type_description IN ('RENEWAL', 'SIGNATURE') THEN dt_aging END) AS min_dt_signature,
-        MIN(CASE WHEN type_description = 'TERMINATION' THEN dt_aging END) AS min_dt_termination
+        MIN(CASE WHEN type_description IN ('TERMINATION', 'GUARANTEE') THEN dt_aging END) AS min_dt_termination
     FROM
         datalake_collections_quintocred.mob_delinquency_timeline
     GROUP BY 1,2
