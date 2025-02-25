@@ -33,6 +33,31 @@ columns:
     description: Array of Business IDs associated for this occurrence in Robin-Hood.
     lineage:
       - datalake_velo.occurrence.ids_accounting_entry
+  type:
+      description: Describes the category of the delinquency.
+      categories:
+        SIGNATURE: Related to the signature.
+        GUARANTEE: Involves a guarantee.
+        TERMINATION: Tied to termination.
+        BILLING: Related to billing.
+        RENEWAL: Concerns a renewal.
+        RENEWAL_MONTH: A monthly renewal.
+        ACTIVATION_PARTIAL_LINK: Activation with partial linking.
+      lineage:
+      - datalake_velo.occurrence.type
+  status:
+      description: Represents the current state of the delinquency.
+      categories:
+        REGISTERED: The delinquency is recorded.
+        RECOVERING: The process of recovering is underway.
+        PROGRESS: The delinquency is in progress.
+        FINISHED: The process has been completed.
+        UNDER_AGREEMENT: There is an agreement in place.
+        REQUESTED_AGREEMENT: An agreement is requested but not yet confirmed.
+        ACTIVE_FALSE: The delinquency is inactive.
+        FORGIVEN: The delinquency has been forgiven.
+      lineage:
+      - datalake_velo.occurrence.status
   description:
     description: Description comments for this occurrence.
     lineage:
