@@ -13,50 +13,50 @@ WITH ticket_perspective AS (
     dt.journey,
     dd.journey_step,
     CASE
-      WHEN ft.ticket_origin = 'call inapp' THEN null
-      WHEN dit.ticket_via = 'whatsapp' THEN 'OUTBOUND'
+      WHEN ft.ticket_origin = 'call inapp' THEN 'INBOUND'
       WHEN ft.ticket_origin = 'call inbound' THEN 'INBOUND'
       WHEN ft.ticket_origin = 'chat5a' THEN 'INBOUND'
       WHEN ft.ticket_origin = 'call outbound' THEN 'OUTBOUND'
-      WHEN dit.ticket_via = 'whatsapp' then null
-      ELSE null
+      ELSE UPPER(ft.direction)
     END AS refined_direction,
     CASE
-      WHEN dd.team IN (
-        'Repairs/Ongoing Front',
-        'Repairs/Ongoing Back')
+      WHEN dd.team IN 
+        (
+          'Repairs/Ongoing Front',
+          'Repairs/Ongoing Back',
+          'Ongoing Back',
+          'Ong Back'
+        )
       THEN 'Reparos'
       WHEN dd.team IN (
         'Rental Manager',
         'Rental Manager Gold',
-        'Rental Manager',
-        'Rental Manager Gold',
         'Rental Manager CTL')
       THEN 'Rental Manager'
-      WHEN dd.team IN (
-        'Payments',
-        'Payments Ativo Back',
-        'Payments Ativo Back')
+      WHEN dd.team IN 
+        (
+          'Payments',
+          'Payments Ativo Back'
+        )
       THEN 'Payments'
-      WHEN dd.team IN (
-        'CX Partners',
-        'CX Compra e Venda',
-        'CX Partners For Sale')
+      WHEN dd.team IN 
+        (
+          'CX Partners',
+          'CX Compra e Venda',
+          'CX Partners For Sale'
+          )
       THEN 'Partners'
-      WHEN dd.team IN (
-        'Ongoing Back',
-        'Ongoing Back',
-        'Ong Back')
-      THEN 'Ongoing'
-      WHEN dd.team IN (
-        'Onboarding Back',
-        'Onboarding Back',
-        'Moving')
+      WHEN dd.team IN 
+        (
+          'Onboarding Back',
+          'Moving'
+        )
       THEN 'Onboarding'
-      WHEN dd.team IN (
-        'Offboarding Front',
-        'Offboarding Back',
-        'Offboarding Back')
+      WHEN dd.team IN 
+        (
+          'Offboarding Front',
+          'Offboarding Back'
+        )
       THEN 'Offboarding'
       WHEN dd.team IN (
         'ReclameAqui',
@@ -75,6 +75,7 @@ WITH ticket_perspective AS (
       ELSE dd.team
     END AS team_adjusted,
     ft.replies,
+    ft.reopens,
     ft.ts_created AS ts_started
   FROM
     dw_customer_support.fact_tickets AS ft
@@ -91,25 +92,27 @@ WITH ticket_perspective AS (
     ft.sk_ticket IS NOT NULL
     AND ft.ts_created >= CAST('2023-01-01' AS DATE)
     AND dd.area NOT LIKE ('%MX%')
-    AND (
-      ft.channel = 'call'
-      OR ft.channel != 'call'
-    )
 )
 ,recontact AS (
   SELECT
     sk_ticket,
     CASE
-      WHEN DATEDIFF(LEAD(DATE(ts_started)) OVER(PARTITION BY sk_user, team ORDER BY ts_started), DATE(ts_started)) <= 4 THEN 1
+      WHEN
+        DATE_DIFF(DAY, DATE(ts_started), LEAD(DATE(ts_started)) OVER(PARTITION BY sk_user, team ORDER BY ts_started)) <= 4
+        AND sk_ticket != LEAD(sk_ticket) OVER(PARTITION BY sk_user_contract, team ORDER BY ts_started)
+      THEN 1
       ELSE 0
     END AS recontact_flag
   FROM
     ticket_perspective
   WHERE
-    channel IN ('call', 'chat','whatsapp','email')
-    AND sk_user IS NOT NULL
+    sk_user_contract > 0
     AND area = 'CX'
-    AND front_or_back = 'front'
+    AND (front_or_back = 'front'
+      OR department IN ('[WH] Credito [FRONT]', '[WH] Closing [FRONT]'))
+    AND (refined_direction = 'INBOUND'
+      AND channel IN ('call', 'chat','whatsapp'))
+    AND department NOT IN ('Welcome Onboarding [BACK] [POS]', 'CX Welcome Onboarding [FRONT][POS]' )
 )
 , back_penalizations AS (
   SELECT
@@ -117,16 +120,24 @@ WITH ticket_perspective AS (
       WHEN channel IN ('whatsapp') THEN 1 ELSE 0
     END AS flag_back_wpp,
     CASE
-      WHEN refined_direction NOT IN ('INBOUND')THEN 1
       WHEN
-        front_or_back = 'back'
-        AND channel = 'call'
+        refined_direction NOT IN ('INBOUND')
+        AND front_or_back = 'back'
       THEN 1
       ELSE 0
     END AS flag_back_outbound,
     CASE
-      WHEN replies >= 1 THEN 1 ELSE 0
+      WHEN (
+        (replies >= 1
+          OR reopens > 0)
+          AND front_or_back = 'back')
+      THEN 1
+      ELSE 0
     END AS flag_replies,
+    CASE
+      WHEN front_or_back = 'back' THEN 1
+      ELSE 0
+    END AS flag_back,
     sk_user_contract,
     team_adjusted,
     ts_started
@@ -134,13 +145,11 @@ WITH ticket_perspective AS (
     ticket_perspective
   WHERE
     area = 'CX'
-    AND (
-      channel IN ('whatsapp')
-      OR refined_direction NOT IN ('INBOUND')
-      OR (front_or_back = 'back'
-        AND channel = 'call')
-      OR replies >= 1)
-    AND sk_user_contract IS NOT NULL
+    AND (front_or_back = 'back'
+      OR channel = 'whatsapp')
+    AND department NOT IN ('Welcome Onboarding [BACK] [POS]', 'CX Welcome Onboarding [FRONT][POS]' )
+    AND (sk_user_contract IS NOT NULL
+      OR sk_user_contract > 0)
 )
 ,base AS (
   SELECT
@@ -157,6 +166,7 @@ WITH ticket_perspective AS (
     r.recontact_flag,
     bpe.flag_back_outbound,
     bpe.flag_back_wpp,
+    bpe.flag_back,
     bpe.flag_replies,
     DATE(tp.ts_started) AS dt_ticket_created
   FROM
@@ -169,23 +179,36 @@ WITH ticket_perspective AS (
       ON tp.sk_user_contract = bpe.sk_user_contract
       AND tp.team_adjusted = bpe.team_adjusted
       AND tp.ts_started <= bpe.ts_started
-      AND DATEDIFF(DATE(bpe.ts_started), DATE(tp.ts_started)) <= 4
+      AND DATE_DIFF(DAY, DATE(tp.ts_started), DATE(bpe.ts_started)) <= 4
   WHERE
     tp.front_or_back = 'front'
-    AND tp.sk_user IS NOT NULL
-    AND tp.department IN (
-      'CX Mudança [FRONT] [POS]',
-      'CX Parceiros Compra e Venda [FRONT]',
-      'CX Parceiros [FRONT] [PRE]',
-      'CX Parceiros da Portaria [FRONT] [PRE]',
-      'CX Propostas [FRONT] [PRE]',
-      'CX Visitas [FRONT] [PRE]',
-      'Consultores imobiliários 5A',
-      'CX Pagamentos [FRONT] [POS]',
-      'CX Reparos [FRONT] [POS]',
-      'CX Rescisão [FRONT] [POS]')
+    AND tp.sk_user_contract IS NOT NULL
+    AND tp.sk_user_contract > 0
+    AND tp.department IN
+      (
+        'CX Mudança [FRONT] [POS]',
+        'CX Parceiros Compra e Venda [FRONT]',
+        'CX Parceiros [FRONT] [PRE]',
+        'CX Parceiros da Portaria [FRONT] [PRE]',
+        'CX Propostas [FRONT] [PRE]',
+        'CX Visitas [FRONT] [PRE]',
+        'Consultores imobiliários 5A',
+        'CX Pagamentos [FRONT] [POS]',
+        'CX Reparos [FRONT] [POS]',
+        'CX Rescisão [FRONT] [POS]',
+        'CX Visitas N1 & N2 [VIS] [PRE] [FRONT] [OUT]',
+        'CX PROPOSTAS CALL/CHAT [PRO][PRE][FRONT]',
+        'Consultores imobiliários 5A',
+        'CX Plaquinhas [FRONT] [PRE]',
+        'CX Entrada no imóvel [ONB] [POS] [FRONT]',
+        'CX Pagamentos N1 [PAY] [POS] [FRONT]',
+        'CX Durante a locação e reparos [POS] [FRONT]',
+        'CX Rescisão e Vistoria [OFF] [POS] [FRONT]',
+        '[WH] Credito [FRONT]',
+        '[WH] Closing [FRONT]'
+      )
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY tp.sk_ticket ORDER BY CAST(bpe.ts_started AS timestamp) ASC) = 1
+    ROW_NUMBER() OVER(PARTITION BY bpe.sk_user_contract, tp.sk_ticket ORDER BY bpe.ts_started ASC) = 1
 )
 SELECT
   channel,
@@ -201,7 +224,7 @@ SELECT
       WHEN (recontact_flag = 1
       OR flag_back_outbound = 1
       OR flag_back_wpp = 1
-      OR flag_replies = 1) THEN NULL
+      OR flag_back = 1) THEN NULL
       ELSE sk_ticket
     END)
   AS amount_resolutions,
@@ -211,7 +234,7 @@ SELECT
       WHEN (recontact_flag = 1
       OR flag_back_outbound = 1
       OR flag_back_wpp = 1
-      OR flag_replies = 1) THEN NULL
+      OR flag_back = 1) THEN NULL
       ELSE sk_ticket
     END)
     /CAST(COUNT(DISTINCT sk_ticket) AS DOUBLE) AS fcr_rate,
