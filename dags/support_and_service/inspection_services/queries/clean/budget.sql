@@ -23,4 +23,4 @@ SELECT
     month,
     day
 FROM
-    datalake_inspections_raw.budget
+    datalake_inspection_services_raw.budget

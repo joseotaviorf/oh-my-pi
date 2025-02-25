@@ -10,4 +10,4 @@ SELECT
     month,
     day
 FROM
-    datalake_inspections_raw.repair_suggestion
+    datalake_inspection_services_raw.repair_suggestion

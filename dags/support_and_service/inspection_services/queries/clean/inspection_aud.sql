@@ -37,4 +37,4 @@ SELECT
     month,
     day
 FROM
-    datalake_inspections_raw.inspection_aud
+    datalake_inspection_services_raw.inspection_aud

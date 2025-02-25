@@ -1,5 +1,5 @@
 ---
-database_name: datalake_inspections_clean
+database_name: datalake_inspection_services_clean
 table_name: inspection
 description:
   It handles the entire process of scheduling an inspection, including cancellations and
@@ -9,54 +9,54 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspection:
     lineage:
-      - datalake_inspections_raw.inspection.id
+      - datalake_inspection_services_raw.inspection.id
     description: Inspection unique identifier (number)
   id_previous_inspection:
     lineage:
-      - datalake_inspections_raw.inspection.previous_inspection_id
+      - datalake_inspection_services_raw.inspection.previous_inspection_id
     description:
       If there is a previous inspection for the same contract, it will
       be indicated in this column. It is usually completed in offboarding inspections,
       bringing the identification of the onboarding or dispute inspection.
   id_client_side:
     lineage:
-      - datalake_inspections_raw.inspection.client_side_id
+      - datalake_inspection_services_raw.inspection.client_side_id
     description: Inspection unique identifier (uuid)
   id_contract:
     lineage:
-      - datalake_inspections_raw.inspection.contract_id
+      - datalake_inspection_services_raw.inspection.contract_id
     description: Unique identifier of the contract related to the property to be inspected
   id_external:
     lineage:
-      - datalake_inspections_raw.inspection.external_id
+      - datalake_inspection_services_raw.inspection.external_id
     description: Inspection correlational unique identifier in the PWA database
   id_inspector:
     lineage:
-      - datalake_inspections_raw.inspection.inspector_id
+      - datalake_inspection_services_raw.inspection.inspector_id
     description:
       Unique identifier of the inspector responsible for carrying out the
       inspection
   id_schedule:
     lineage:
-      - datalake_inspections_raw.inspection.schedule_id
+      - datalake_inspection_services_raw.inspection.schedule_id
     description: Unique identifier of the inspection date and time schedule
   contract:
     lineage:
-      - datalake_inspections_raw.inspection.contract
+      - datalake_inspection_services_raw.inspection.contract
     description: Data of the parties interested in the contract
   house:
     lineage:
-      - datalake_inspections_raw.inspection.house
+      - datalake_inspection_services_raw.inspection.house
     description: Property address and brief description of the house
   schedule:
     lineage:
-      - datalake_inspections_raw.inspection.schedule
+      - datalake_inspection_services_raw.inspection.schedule
     description:
       Date and time of scheduling the inspection execution and location
       of keys
   status:
     lineage:
-      - datalake_inspections_raw.inspection.status
+      - datalake_inspection_services_raw.inspection.status
     description: Identifies the stage of the inspection from scheduling to review.
     categories:
       scheduled: Inspection scheduled and awaiting execution [onboarding/offboarding]
@@ -74,7 +74,7 @@ columns:
         onboarding: When the review deadline is reached
   type:
     lineage:
-      - datalake_inspections_raw.inspection.type
+      - datalake_inspection_services_raw.inspection.type
     description: The type of inspection.
     categories:
       onboarding: Inspection carried out before the tenant enters the property, to certify the conditions of the house
@@ -82,35 +82,35 @@ columns:
       offboarding: Inspection carried out after the tenant leaves the property, to certify the conditions of the house
   is_comparative:
     lineage:
-      - datalake_inspections_raw.inspection.comparative
+      - datalake_inspection_services_raw.inspection.comparative
     description:
       Field that indicates whether a previous inspection will be used as
       a basis for comparison
   ts_schedule:
     lineage:
-      - datalake_inspections_raw.inspection.schedule_date
+      - datalake_inspection_services_raw.inspection.schedule_date
     description: Scheduled date for carrying out the inspection
   ts_created:
     lineage:
-      - datalake_inspections_raw.inspection.created_at
+      - datalake_inspection_services_raw.inspection.created_at
     description:
       Timestamp of when the inspection request was synchronized in the
       database product
   ts_updated:
     lineage:
-      - datalake_inspections_raw.inspection.updated_at
+      - datalake_inspection_services_raw.inspection.updated_at
     description:
       Timestamp of when the inspection request was updated in the database
       product
   year:
     lineage:
-      - datalake_inspections_raw.inspection.year
+      - datalake_inspection_services_raw.inspection.year
     description: Year of update date.
   month:
     lineage:
-      - datalake_inspections_raw.inspection.month
+      - datalake_inspection_services_raw.inspection.month
     description: Month of update date.
   day:
     lineage:
-      - datalake_inspections_raw.inspection.day
+      - datalake_inspection_services_raw.inspection.day
     description: Day of update date.

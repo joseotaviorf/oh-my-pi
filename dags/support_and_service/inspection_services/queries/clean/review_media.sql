@@ -11,4 +11,4 @@ SELECT
     month,
     day
 FROM
-    datalake_inspections_raw.review_media
+    datalake_inspection_services_raw.review_media

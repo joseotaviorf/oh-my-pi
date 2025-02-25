@@ -1,5 +1,5 @@
 ---
-database_name: datalake_inspections_clean
+database_name: datalake_inspection_services_clean
 table_name: item_type
 description: Behind the standardized types of item that we can have within the application.
 domain: Support and Service
@@ -7,15 +7,15 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_item_type:
     lineage:
-      - datalake_inspections_raw.item_type.id
+      - datalake_inspection_services_raw.item_type.id
     description: Item Type unique identifier (number)
   id_item_group_type:
     lineage:
-      - datalake_inspections_raw.item_type.item_group_type_id
+      - datalake_inspection_services_raw.item_type.item_group_type_id
     description: Indicates the type of object that has the type of problem
   display_type:
     lineage:
-      - datalake_inspections_raw.item_type.display_type
+      - datalake_inspection_services_raw.item_type.display_type
     description: Shows the component that renders this type of problem -
     categories:
       COUNTER: Registers the number of parts with problems.
@@ -28,51 +28,51 @@ columns:
       DEFAULT: overview with comment option.
   media_type:
     lineage:
-      - datalake_inspections_raw.item_type.media_type
+      - datalake_inspection_services_raw.item_type.media_type
     description: Supported media type.
     categories:
       PHOTO: images
   type:
     lineage:
-      - datalake_inspections_raw.item_type.type
+      - datalake_inspection_services_raw.item_type.type
     description: Problem name
   number_order:
     lineage:
-      - datalake_inspections_raw.item_type.order
+      - datalake_inspection_services_raw.item_type.order
     description: Defines the display order for the inspector
   is_allow_comments:
     lineage:
-      - datalake_inspections_raw.item_type.allow_comments
+      - datalake_inspection_services_raw.item_type.allow_comments
     description: Allows inspector comments
   is_allow_media:
     lineage:
-      - datalake_inspections_raw.item_type.allow_media
+      - datalake_inspection_services_raw.item_type.allow_media
     description: Allows upload of photos of the inspector
   is_deleted:
     lineage:
-      - datalake_inspections_raw.item_type.deleted
+      - datalake_inspection_services_raw.item_type.deleted
     description: Identifies whether the record is deleted
   is_show_label:
     lineage:
-      - datalake_inspections_raw.item_type.show_label
+      - datalake_inspection_services_raw.item_type.show_label
     description: Show description
   ts_created:
     lineage:
-      - datalake_inspections_raw.item_type.created_at
+      - datalake_inspection_services_raw.item_type.created_at
     description: Creation date
   ts_updated:
     lineage:
-      - datalake_inspections_raw.item_type.updated_at
+      - datalake_inspection_services_raw.item_type.updated_at
     description: Update date
   year:
     lineage:
-      - datalake_inspections_raw.item_type.year
+      - datalake_inspection_services_raw.item_type.year
     description: Year of update date.
   month:
     lineage:
-      - datalake_inspections_raw.item_type.month
+      - datalake_inspection_services_raw.item_type.month
     description: Month of update date.
   day:
     lineage:
-      - datalake_inspections_raw.item_type.day
+      - datalake_inspection_services_raw.item_type.day
     description: Day of update date.

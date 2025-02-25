@@ -1,5 +1,5 @@
 ---
-database_name: datalake_inspections_clean
+database_name: datalake_inspection_services_clean
 table_name: contestation
 description:
   When an repair of an object is requested and the tenant understand it
@@ -9,27 +9,27 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_contestation:
     lineage:
-      - datalake_inspections_raw.contestation.id
+      - datalake_inspection_services_raw.contestation.id
     description: Auto-incrementing internal ID
   id_repair_request:
     lineage:
-      - datalake_inspections_raw.contestation.repair_request_id
+      - datalake_inspection_services_raw.contestation.repair_request_id
     description: ID of the repair the contestation is referring to
   id_reviewer:
     lineage:
-      - datalake_inspections_raw.contestation.reviewer_id
+      - datalake_inspection_services_raw.contestation.reviewer_id
     description: Creator of the contestation
   uuid:
     lineage:
-      - datalake_inspections_raw.contestation.uuid
+      - datalake_inspection_services_raw.contestation.uuid
     description: Auto-incrementing external ID
   comment:
     lineage:
-      - datalake_inspections_raw.contestation.comment
+      - datalake_inspection_services_raw.contestation.comment
     description: Contestation description
   reason:
     lineage:
-      - datalake_inspections_raw.contestation.reason
+      - datalake_inspection_services_raw.contestation.reason
     description: "Reason/Justification for dispute"
     categories:
       DISAGREE: ""
@@ -38,39 +38,39 @@ columns:
       OTHER: ""
   origin:
     lineage:
-      - datalake_inspections_raw.contestation.origin
+      - datalake_inspection_services_raw.contestation.origin
     description: Descriptive information that indicates when the contestation occurred.
     categories:
       REVIEW: If the contestation occurred at the time of review.
       BUDGET_APPROVAL: If the contestation occurred at the time of budget approval process.
   type:
     lineage:
-      - datalake_inspections_raw.contestation.type
+      - datalake_inspection_services_raw.contestation.type
     description: Descriptive information indicating the type of contestation made.
     categories:
       RESPONSIBILITY: If it was a contestation of responsibility for the repair.
       COST: If it was a contestation of cost for the repair.
   cost:
     lineage:
-      - datalake_inspections_raw.contestation.cost
+      - datalake_inspection_services_raw.contestation.cost
     description: Float type information indicating the disputed value.
   ts_created:
     lineage:
-      - datalake_inspections_raw.contestation.created_at
+      - datalake_inspection_services_raw.contestation.created_at
     description: Record creation date
   ts_updated:
     lineage:
-      - datalake_inspections_raw.contestation.updated_at
+      - datalake_inspection_services_raw.contestation.updated_at
     description: Record update date
   year:
     lineage:
-      - datalake_inspections_raw.contestation.year
+      - datalake_inspection_services_raw.contestation.year
     description: Year of update date
   month:
     lineage:
-      - datalake_inspections_raw.contestation.month
+      - datalake_inspection_services_raw.contestation.month
     description: Month of update date
   day:
     lineage:
-      - datalake_inspections_raw.contestation.day
+      - datalake_inspection_services_raw.contestation.day
     description: Day of update date

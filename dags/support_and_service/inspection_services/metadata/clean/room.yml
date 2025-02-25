@@ -1,5 +1,5 @@
 ---
-database_name: datalake_inspections_clean
+database_name: datalake_inspection_services_clean
 table_name: room
 description: Data about the room being inspected.
 domain: Support and Service
@@ -7,47 +7,47 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_room:
     lineage:
-      - datalake_inspections_raw.room.id
+      - datalake_inspection_services_raw.room.id
     description: Room unique identifier (number)
   id_assessment:
     lineage:
-      - datalake_inspections_raw.room.assessment_id
+      - datalake_inspection_services_raw.room.assessment_id
     description: Assessment unique identifier
   id_type:
     lineage:
-      - datalake_inspections_raw.room.type_id
+      - datalake_inspection_services_raw.room.type_id
     description: Type of room evaluated by the inspector
   uuid:
     lineage:
-      - datalake_inspections_raw.room.uuid
+      - datalake_inspection_services_raw.room.uuid
     description: Room unique identifier (uuid)
   room_name:
     lineage:
-      - datalake_inspections_raw.room.name
+      - datalake_inspection_services_raw.room.name
     description: Descriptive name of the room (typed by inspector)
   comment:
     lineage:
-      - datalake_inspections_raw.room.comment
+      - datalake_inspection_services_raw.room.comment
     description:
       This column would keep the inspector's comments about the room, but
       the functionality was not implemented
   ts_created:
     lineage:
-      - datalake_inspections_raw.room.created_at
+      - datalake_inspection_services_raw.room.created_at
     description: Creation date
   ts_updated:
     lineage:
-      - datalake_inspections_raw.room.updated_at
+      - datalake_inspection_services_raw.room.updated_at
     description: Update date
   year:
     lineage:
-      - datalake_inspections_raw.room.year
+      - datalake_inspection_services_raw.room.year
     description: Year of update date.
   month:
     lineage:
-      - datalake_inspections_raw.room.month
+      - datalake_inspection_services_raw.room.month
     description: Month of update date.
   day:
     lineage:
-      - datalake_inspections_raw.room.day
+      - datalake_inspection_services_raw.room.day
     description: Day of update date.

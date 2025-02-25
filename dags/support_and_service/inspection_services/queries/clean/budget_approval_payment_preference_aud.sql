@@ -20,4 +20,4 @@ SELECT
     month,
     day
 FROM
-    datalake_inspections_raw.budget_approval_payment_preference_aud
+    datalake_inspection_services_raw.budget_approval_payment_preference_aud

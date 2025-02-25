@@ -17,4 +17,4 @@ SELECT
     month,
     day
 FROM
-    datalake_inspections_raw.issue_type
+    datalake_inspection_services_raw.issue_type

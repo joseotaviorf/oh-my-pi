@@ -15,4 +15,4 @@ SELECT
 	month,
 	day
 FROM
-	datalake_inspections_raw.appointment
+	datalake_inspection_services_raw.appointment

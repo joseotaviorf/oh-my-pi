@@ -12,4 +12,4 @@ SELECT
     month,
     day
 FROM
-    datalake_inspections_raw.item_media
+    datalake_inspection_services_raw.item_media

@@ -11,4 +11,4 @@ SELECT
     month,
     day
 FROM
-    datalake_inspections_raw.repair_request_media rrm
+    datalake_inspection_services_raw.repair_request_media rrm

@@ -1,5 +1,5 @@
 ---
-database_name: datalake_inspections_clean
+database_name: datalake_inspection_services_clean
 table_name: review_media
 description: Tenants and owners can detail their review comments with photos.
 domain: Support and Service
@@ -7,45 +7,45 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_review_media:
     lineage:
-      - datalake_inspections_raw.review_media.id
+      - datalake_inspection_services_raw.review_media.id
     description: Review Media unique identifier (number)
   id_review:
     lineage:
-      - datalake_inspections_raw.review_media.review_id
+      - datalake_inspection_services_raw.review_media.review_id
     description: Indicates which review the media belongs to
   id_main:
     lineage:
-      - datalake_inspections_raw.review_media.main_id
+      - datalake_inspection_services_raw.review_media.main_id
     description: Item id in Main monolith
   uuid:
     lineage:
-      - datalake_inspections_raw.review_media.uuid
+      - datalake_inspection_services_raw.review_media.uuid
     description: Review Media unique identifier (uuid)
   type:
     lineage:
-      - datalake_inspections_raw.review_media.type
+      - datalake_inspection_services_raw.review_media.type
     description: Indicates whether the media is a photo or a video
   path:
     lineage:
-      - datalake_inspections_raw.review_media.path
+      - datalake_inspection_services_raw.review_media.path
     description: Path of the photo in the inspection image bucket
   ts_created:
     lineage:
-      - datalake_inspections_raw.review_media.created_at
+      - datalake_inspection_services_raw.review_media.created_at
     description: Creation date
   ts_updated:
     lineage:
-      - datalake_inspections_raw.review_media.updated_at
+      - datalake_inspection_services_raw.review_media.updated_at
     description: Update date
   year:
     lineage:
-      - datalake_inspections_raw.review_media.year
+      - datalake_inspection_services_raw.review_media.year
     description: Year of update date.
   month:
     lineage:
-      - datalake_inspections_raw.review_media.month
+      - datalake_inspection_services_raw.review_media.month
     description: Month of update date.
   day:
     lineage:
-      - datalake_inspections_raw.review_media.day
+      - datalake_inspection_services_raw.review_media.day
     description: Day of update date.
