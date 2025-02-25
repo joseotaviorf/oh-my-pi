@@ -11,8 +11,6 @@ SELECT
     ccv_role,
     signer_status,
     triage_status,
-    investor AS is_investor,
-    investor_mod AS mod_investor,
     sales_flow_id_mod AS mod_id_sales_flow,
     triage_status_mod AS mod_triage_status,
     signer_status_mod AS mod_signer_status,
@@ -28,7 +26,3 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.buyer_data_aud
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

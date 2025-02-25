@@ -11,7 +11,3 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.reject_reason
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

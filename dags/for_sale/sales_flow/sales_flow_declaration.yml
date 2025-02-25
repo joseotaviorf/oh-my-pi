@@ -1,5 +1,5 @@
 dag:
-  name: sales_flow_test
+  name: sales_flow
   schedule_start_date: 2021, 3, 2
   schedule_interval: 0 21 * * *
   owner: Data ForSale
@@ -11,7 +11,7 @@ workflow:
   layer: raw
   database_type: postgres
   source_database: salesflow
-  custom_schema: sales_flow_test
+  custom_schema: sales_flow
   dbutils_secret_key: SALESFLOW_DB
   tables_customization:
     address_data:

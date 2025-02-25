@@ -12,8 +12,5 @@ SELECT
   day
 FROM
   datalake_sales_flow_raw.screening_buyer
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+
     

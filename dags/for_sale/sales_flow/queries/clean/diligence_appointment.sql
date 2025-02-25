@@ -10,7 +10,3 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.diligence_appointment
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

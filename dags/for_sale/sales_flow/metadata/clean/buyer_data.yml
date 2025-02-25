@@ -37,14 +37,6 @@ columns:
     description: Indicate if this user is a CCV signer.
     lineage:
       - datalake_sales_flow_raw.buyer_data.signer_status
-  triage_status:
-    description: This column is deprecated. Do not use.
-    lineage:
-      - datalake_sales_flow_raw.buyer_data.triage_status
-  is_investor:
-    description: Indicates if this user is an investor or not.
-    lineage:
-      - datalake_sales_flow_raw.buyer_data.investor
   ts_created:
     description: Timestamp that indicates when this entry was created.
     lineage:

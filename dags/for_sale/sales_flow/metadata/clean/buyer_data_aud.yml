@@ -57,14 +57,6 @@ columns:
     description: This column is deprecated. Do not use.
     lineage:
       - datalake_sales_flow_raw.buyer_data_aud.triage_status
-  is_investor:
-    description: Indicates if this user is an investor or not.
-    lineage:
-      - datalake_sales_flow_raw.buyer_data_aud.investor
-  mod_investor:
-    description: Flag indicating if the column investor has changed.
-    lineage:
-      - datalake_sales_flow_raw.buyer_data_aud.investor_mod
   mod_id_sales_flow:
     description: Flag indicating if the column id_sales_flow has changed.
     lineage:

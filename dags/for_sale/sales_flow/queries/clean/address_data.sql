@@ -14,7 +14,3 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.address_data
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

@@ -7,8 +7,6 @@ SELECT
     holding_value,
     ccv_role,
     signer_status,
-    triage_status,
-    investor AS is_investor,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
@@ -16,7 +14,4 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.buyer_data
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+

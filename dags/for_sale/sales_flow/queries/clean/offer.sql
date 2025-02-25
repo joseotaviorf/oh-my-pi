@@ -24,7 +24,4 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.offer
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+

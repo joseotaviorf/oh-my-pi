@@ -148,8 +148,6 @@ buyer_data AS (
         holding_value,
         ccv_role,
         signer_status,
-        triage_status,
-        is_investor,
         ts_created,
         ts_updated,
         year,

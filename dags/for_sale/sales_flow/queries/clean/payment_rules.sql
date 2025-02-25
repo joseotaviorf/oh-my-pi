@@ -43,7 +43,3 @@ SELECT
   day
 FROM
   datalake_sales_flow_raw.payment_rules
-WHERE
-  year = {year}
-  AND month = {month}
-  AND day = {day}

@@ -18,7 +18,3 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.sales_flow_contact_aud
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

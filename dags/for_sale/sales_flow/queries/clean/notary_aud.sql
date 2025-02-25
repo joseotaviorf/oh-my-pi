@@ -38,7 +38,3 @@ SELECT
     day
 FROM
     datalake_sales_flow_raw.notary_aud
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
