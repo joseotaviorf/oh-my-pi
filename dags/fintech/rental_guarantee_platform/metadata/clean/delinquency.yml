@@ -63,6 +63,10 @@ columns:
   bill_value:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.boleto_value
+  discount_amount:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.amount_paid
+      - datalake_rental_guarantee_platform_raw.delinquency.original_value
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.active
@@ -84,6 +88,9 @@ columns:
   dt_payment_scheduled:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.schedule_payment_date
+  dt_archived:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.delinquency.active
   ts_created:
     lineage:
       - datalake_rental_guarantee_platform_raw.delinquency.created_at
