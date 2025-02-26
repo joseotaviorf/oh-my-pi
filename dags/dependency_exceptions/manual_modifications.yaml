@@ -597,10 +597,12 @@ bietlejuice.enrich_revenue_lines:
     - bietlejuice.enrich_retsuko:load-enrich-invoice-entry
     - bietlejuice.enrich_retsuko:load-enrich-invoice-info
     - bietlejuice.fastforward:load-clean-gateway-loan-installment
+    - bietlejuice.fastforward:load-clean-lra-installment-option
     - bietlejuice.owner_fees:load-clean-contract
     - bietlejuice.rental_guarantee:load-clean-charge
     - bietlejuice.rental_guarantee:load-clean-guarantee
     - bietlejuice.retsuko:load-clean-contract
+
 bietlejuice.enrich_robin_hood:
   add:
     - bietlejuice.robin_hood:load-clean-tax

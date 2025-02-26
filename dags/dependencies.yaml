@@ -2642,7 +2642,6 @@ bietlejuice.enrich_revenue_lines:
   - bietlejuice.fastforward:load-clean-contract
   - bietlejuice.fastforward:load-clean-long-term-anticipation
   - bietlejuice.fastforward:load-clean-lra-installment
-  - bietlejuice.fastforward:load-clean-lra-installment-option
   - bietlejuice.gsheets_fintech:done-clean-mova-lra-owners
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
   - bietlejuice.rental_guarantee:load-clean-guarantee-aud
