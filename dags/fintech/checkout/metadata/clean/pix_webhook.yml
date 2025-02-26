@@ -21,10 +21,10 @@ columns:
     description: ''
     lineage:
     - datalake_checkout_raw.pix_webhook.status
-  message_error:
+  error_message:
     description: ''
     lineage:
-    - datalake_checkout_raw.pix_webhook.message_error
+    - datalake_checkout_raw.pix_webhook.error_message
   payload:
     description: ''
     lineage:
