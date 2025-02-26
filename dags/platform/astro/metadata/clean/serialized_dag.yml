@@ -1,0 +1,36 @@
+---
+database_name: datalake_astro_clean
+table_name: serialized_dag
+owner: gustavo.miller@quintoandar.com.br
+domain: platform
+columns:
+  id_dag:
+    lineage:
+      - datalake_astro_raw.serialized_dag.dag_id
+  json_data:
+    lineage:
+      - datalake_astro_raw.serialized_dag.data
+  fileloc:
+    lineage:
+      - datalake_astro_raw.serialized_dag.fileloc
+  fileloc_hash:
+    lineage:
+      - datalake_astro_raw.serialized_dag.fileloc_hash
+  dag_hash:
+    lineage:
+      - datalake_astro_raw.serialized_dag.dag_hash
+  processor_subdir:
+    lineage:
+      - datalake_astro_raw.serialized_dag.processor_subdir
+  ts_last_updated:
+    lineage:
+      - datalake_astro_raw.serialized_dag.last_updated
+  year:
+    lineage:
+      - datalake_astro_raw.serialized_dag.year
+  month:
+    lineage:
+      - datalake_astro_raw.serialized_dag.month
+  day:
+    lineage:
+      - datalake_astro_raw.serialized_dag.day

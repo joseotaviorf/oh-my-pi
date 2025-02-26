@@ -1,0 +1,35 @@
+SELECT
+    task_id AS id_task,
+    dag_id AS id_dag,
+    run_id AS id_run,
+    queued_by_job_id AS id_queued_by_job,
+    pid AS id_process,
+    trigger_id AS id_trigger,
+    job_id AS id_job,
+    state AS task_state,
+    hostname,
+    unixname,
+    pool,
+    queue,
+    operator,
+    custom_operator_name,
+    executor,
+    task_display_name,
+    map_index,
+    try_number,
+    max_tries,
+    duration,
+    pool_slots,
+    priority_weight,
+    trigger_timeout::TIMESTAMP AS ts_trigger_timeout,
+    queued_dttm::TIMESTAMP AS ts_queued,
+    start_date::TIMESTAMP AS ts_started,
+    end_date::TIMESTAMP AS ts_ended,
+    updated_at::TIMESTAMP AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_astro_raw.task_instance_history
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

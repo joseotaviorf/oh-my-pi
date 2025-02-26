@@ -1,0 +1,51 @@
+---
+database_name: datalake_astro_clean
+table_name: log
+owner: gustavo.miller@quintoandar.com.br
+domain: platform
+columns:
+  id_log:
+    lineage:
+      - datalake_astro_raw.log.id
+  id_dag:
+    lineage:
+      - datalake_astro_raw.log.dag_id
+  id_task:
+    lineage:
+      - datalake_astro_raw.log.task_id
+  id_run:
+    lineage:
+      - datalake_astro_raw.log.run_id
+  event:
+    lineage:
+      - datalake_astro_raw.log.event
+  extra:
+    lineage:
+      - datalake_astro_raw.log.extra
+  owner:
+    lineage:
+      - datalake_astro_raw.log.owner
+  owner_display_name:
+    lineage:
+      - datalake_astro_raw.log.owner_display_name
+  map_index:
+    lineage:
+      - datalake_astro_raw.log.map_index
+  try_number:
+    lineage:
+      - datalake_astro_raw.log.try_number
+  ts_event:
+    lineage:
+      - datalake_astro_raw.log.dttm
+  ts_executed:
+    lineage:
+      - datalake_astro_raw.log.execution_date
+  year:
+    lineage:
+      - datalake_astro_raw.log.year
+  month:
+    lineage:
+      - datalake_astro_raw.log.month
+  day:
+    lineage:
+      - datalake_astro_raw.log.day

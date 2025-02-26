@@ -1,0 +1,39 @@
+---
+database_name: datalake_astro_clean
+table_name: task_fail
+owner: gustavo.miller@quintoandar.com.br
+domain: platform
+columns:
+  id_fail:
+    lineage:
+      - datalake_astro_raw.task_fail.id
+  id_dag:
+    lineage:
+      - datalake_astro_raw.task_fail.dag_id
+  id_task:
+    lineage:
+      - datalake_astro_raw.task_fail.task_id
+  id_run:
+    lineage:
+      - datalake_astro_raw.task_fail.run_id
+  map_index:
+    lineage:
+      - datalake_astro_raw.task_fail.map_index
+  duration:
+    lineage:
+      - datalake_astro_raw.task_fail.duration
+  ts_started:
+    lineage:
+      - datalake_astro_raw.task_fail.start_date
+  ts_ended:
+    lineage:
+      - datalake_astro_raw.task_fail.end_date
+  year:
+    lineage:
+      - datalake_astro_raw.task_fail.year
+  month:
+    lineage:
+      - datalake_astro_raw.task_fail.month
+  day:
+    lineage:
+      - datalake_astro_raw.task_fail.day

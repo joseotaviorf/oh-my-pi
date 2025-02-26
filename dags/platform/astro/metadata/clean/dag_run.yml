@@ -1,0 +1,72 @@
+---
+database_name: datalake_astro_clean
+table_name: dag_run
+owner: gustavo.miller@quintoandar.com.br
+domain: platform
+columns:
+  id:
+    lineage:
+      - datalake_astro_raw.dag_run.id
+  dag_id:
+    lineage:
+      - datalake_astro_raw.dag_run.dag_id
+  id_run:
+    lineage:
+      - datalake_astro_raw.dag_run.run_id
+  id_log_template:
+    lineage:
+      - datalake_astro_raw.dag_run.log_template_id
+  id_creating_job:
+    lineage:
+      - datalake_astro_raw.dag_run.creating_job_id
+  state:
+    lineage:
+      - datalake_astro_raw.dag_run.state
+  run_type:
+    lineage:
+      - datalake_astro_raw.dag_run.run_type
+  configuration:
+    lineage:
+      - datalake_astro_raw.dag_run.conf
+  dag_hash:
+    lineage:
+      - datalake_astro_raw.dag_run.dag_hash
+  clear_number:
+    lineage:
+      - datalake_astro_raw.dag_run.clear_number
+  had_external_trigger:
+    lineage:
+      - datalake_astro_raw.dag_run.external_trigger
+  ts_last_scheduling_decision:
+    lineage:
+      - datalake_astro_raw.dag_run.last_scheduling_decision
+  ts_data_interval_started:
+    lineage:
+      - datalake_astro_raw.dag_run.data_interval_start
+  ts_data_interval_ended:
+    lineage:
+      - datalake_astro_raw.dag_run.data_interval_end
+  ts_updated:
+    lineage:
+      - datalake_astro_raw.dag_run.updated_at
+  ts_executed:
+    lineage:
+      - datalake_astro_raw.dag_run.execution_date
+  ts_queued:
+    lineage:
+      - datalake_astro_raw.dag_run.queued_at
+  ts_started:
+    lineage:
+      - datalake_astro_raw.dag_run.start_date
+  ts_ended:
+    lineage:
+      - datalake_astro_raw.dag_run.end_date
+  year:
+    lineage:
+      - datalake_astro_raw.dag_run.year
+  month:
+    lineage:
+      - datalake_astro_raw.dag_run.month
+  day:
+    lineage:
+      - datalake_astro_raw.dag_run.day

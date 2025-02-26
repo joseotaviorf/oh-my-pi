@@ -1,0 +1,33 @@
+SELECT
+    task_id,
+    dag_id,
+    run_id,
+    map_index,
+    state,
+    duration,
+    max_tries,
+    try_number,
+    end_date,
+    start_date,
+    hostname,
+    unixname,
+    job_id,
+    pool,
+    pool_slots,
+    queue,
+    priority_weight,
+    operator,
+    custom_operator_name,
+    queued_dttm,
+    queued_by_job_id,
+    pid,
+    executor,
+    updated_at,
+    trigger_id,
+    trigger_timeout,
+    task_display_name
+FROM
+    task_instance_history
+WHERE
+    updated_at >= DATE('{load_start_date}')
+    AND updated_at <= DATE('{load_end_date}')

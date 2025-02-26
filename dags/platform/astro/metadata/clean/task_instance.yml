@@ -1,0 +1,96 @@
+---
+database_name: datalake_astro_clean
+table_name: task_instance
+owner: gustavo.miller@quintoandar.com.br
+domain: platform
+columns:
+  id_task:
+    lineage:
+      - datalake_astro_raw.task_instance.task_id
+  id_dag:
+    lineage:
+      - datalake_astro_raw.task_instance.dag_id
+  id_run:
+    lineage:
+      - datalake_astro_raw.task_instance.run_id
+  id_queued_by_job:
+    lineage:
+      - datalake_astro_raw.task_instance.queued_by_job_id
+  id_process:
+    lineage:
+      - datalake_astro_raw.task_instance.pid
+  id_trigger:
+    lineage:
+      - datalake_astro_raw.task_instance.trigger_id
+  id_job:
+    lineage:
+      - datalake_astro_raw.task_instance.job_id
+  task_state:
+    lineage:
+      - datalake_astro_raw.task_instance.state
+  hostname:
+    lineage:
+      - datalake_astro_raw.task_instance.hostname
+  unixname:
+    lineage:
+      - datalake_astro_raw.task_instance.unixname
+  pool:
+    lineage:
+      - datalake_astro_raw.task_instance.pool
+  queue:
+    lineage:
+      - datalake_astro_raw.task_instance.queue
+  operator:
+    lineage:
+      - datalake_astro_raw.task_instance.operator
+  custom_operator_name:
+    lineage:
+      - datalake_astro_raw.task_instance.custom_operator_name
+  executor:
+    lineage:
+      - datalake_astro_raw.task_instance.executor
+  task_display_name:
+    lineage:
+      - datalake_astro_raw.task_instance.task_display_name
+  map_index:
+    lineage:
+      - datalake_astro_raw.task_instance.map_index
+  try_number:
+    lineage:
+      - datalake_astro_raw.task_instance.try_number
+  max_tries:
+    lineage:
+      - datalake_astro_raw.task_instance.max_tries
+  duration:
+    lineage:
+      - datalake_astro_raw.task_instance.duration
+  pool_slots:
+    lineage:
+      - datalake_astro_raw.task_instance.pool_slots
+  priority_weight:
+    lineage:
+      - datalake_astro_raw.task_instance.priority_weight
+  ts_trigger_timeout:
+    lineage:
+      - datalake_astro_raw.task_instance.trigger_timeout
+  ts_queued:
+    lineage:
+      - datalake_astro_raw.task_instance.queued_dttm
+  ts_started:
+    lineage:
+      - datalake_astro_raw.task_instance.start_date
+  ts_ended:
+    lineage:
+      - datalake_astro_raw.task_instance.end_date
+  ts_updated:
+    lineage:
+      - datalake_astro_raw.task_instance.updated_at
+  year:
+    lineage:
+      - datalake_astro_raw.task_instance.year
+  month:
+    lineage:
+      - datalake_astro_raw.task_instance.month
+  day:
+    lineage:
+      - datalake_astro_raw.task_instance.day

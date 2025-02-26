@@ -1,0 +1,36 @@
+SELECT
+    dag_id AS id_dag,
+    pickle_id AS id_pickle,
+    root_dag_id AS id_root_dag,
+    dag_display_name,
+    dataset_expression,
+    default_view,
+    description,
+    fileloc,
+    last_pickled,
+    owners,
+    schedule_interval,
+    scheduler_lock,
+    processor_subdir,
+    timetable_description,
+    max_active_runs,
+    max_active_tasks,
+    max_consecutive_failed_dag_runs,
+    has_import_errors,
+    has_task_concurrency_limits,
+    is_active AS is_active,
+    is_paused AS is_paused,
+    is_subdag AS is_subdag,
+    next_dagrun::TIMESTAMP AS ts_next_dagrun,
+    next_dagrun_create_after::TIMESTAMP AS ts_next_dagrun_create_after,
+    next_dagrun_data_interval_start::TIMESTAMP AS ts_next_dagrun_data_interval_start,
+    next_dagrun_data_interval_end::TIMESTAMP AS ts_next_dagrun_data_interval_end,
+    last_parsed_time::TIMESTAMP AS ts_last_parsed,
+    last_expired::TIMESTAMP AS ts_last_expired,
+    year,
+    month,
+    day
+FROM
+    datalake_astro_raw.dag
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
