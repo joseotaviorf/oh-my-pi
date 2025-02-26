@@ -159,10 +159,10 @@ SELECT DISTINCT
   offer.iteration,
   COALESCE(firestore.type, bus_offer.type, offer.type) AS type,
   offer.rent AS last_offered_rent,
-  negotiation.first_rent_offered_by_tenant,
-  negotiation.first_rent_offered_by_owner,
-  negotiation.last_rent_offered_by_tenant,
-  negotiation.last_rent_offered_by_owner,
+  MAX(negotiation.first_rent_offered_by_tenant) OVER (PARTITION BY offer.id_firestore) AS first_rent_offered_by_tenant,
+  MAX(negotiation.first_rent_offered_by_owner) OVER (PARTITION BY offer.id_firestore) AS first_rent_offered_by_owner,
+  MAX(negotiation.last_rent_offered_by_tenant) OVER (PARTITION BY offer.id_firestore) AS last_rent_offered_by_tenant,
+  MAX(negotiation.last_rent_offered_by_owner) OVER (PARTITION BY offer.id_firestore) AS last_rent_offered_by_owner,
   firestore.number_of_tenants,
   firestore.number_of_kids,
   firestore.rental_reason,
@@ -205,7 +205,7 @@ UNION
 
 SELECT
     STRING(offer.id_offer + 9312591) AS id_offer_history, --9312591 is the last offer ID coming from Main (EBDB)
-    offer.id_offer,
+    offer.id_offer AS id,
     (offer.id_offer * 100) + 2 AS id_offer_context,
     NULL AS id_firestore,
     NULL AS id_godfather,
