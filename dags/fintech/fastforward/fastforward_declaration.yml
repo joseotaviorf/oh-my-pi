@@ -29,8 +29,6 @@ workflow:
     long_term_anticipation_aud: {}
     lra_eligibility_process: {}
     lra_installment: {}
-    real_estate_agent_fee: {}
-    real_estate_agent_fee_aud: {}
     revinfo:
       clean_table_name: rev_info
     users: {}
