@@ -4,6 +4,12 @@ columns:
   id:
     lineage:
       - datalake_checkout_raw.boleto_webhook.id
+  id_bolecode:
+    lineage:
+      - datalake_checkout_raw.boleto_webhook.bolecode_id
+  id_boleto:
+    lineage:
+      - datalake_checkout_raw.boleto_webhook.boleto_id
   payload:
     lineage:
       - datalake_checkout_raw.boleto_webhook.payload

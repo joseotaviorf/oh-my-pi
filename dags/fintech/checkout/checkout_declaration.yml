@@ -15,24 +15,44 @@ workflow:
       clean_table_name: boleto
     boleto_webhook:
       clean_table_name: boleto_webhook
-    charge_status_log:
-      clean_table_name: charge_status_log
     charge:
       clean_table_name: charge
+    charge_status_log:
+      clean_table_name: charge_status_log
     credit_card:
       clean_table_name: credit_card
+    credit_card_capture_attempt:
+      clean_table_name: credit_card_capture_attempt
+    credit_card_fee:
+      clean_table_name: credit_card_fee
+    credit_card_fee_installment:
+      clean_table_name: credit_card_fee_installment
+    credit_card_webhook:
+      clean_table_name: credit_card_webhook
     order:
       clean_table_name: order
     payment_config:
       clean_table_name: payment_config
     payment_gateway_error:
       clean_table_name: payment_gateway_error
-    pix_refund:
-      clean_table_name: pix_refund
+    permission:
+      clean_table_name: permission
     pix:
       clean_table_name: pix
+    pix_refund:
+      clean_table_name: pix_refund
+    pix_webhook:
+      clean_table_name: pix_webhook
+    refund_attempt:
+      clean_table_name: refund_attempt
     requester:
       clean_table_name: requester
+    requester_role:
+      clean_table_name: requester_role
+    role:
+      clean_table_name: role
+    role_permission:
+      clean_table_name: role_permission
     webhook:
       clean_table_name: webhook
 cluster:

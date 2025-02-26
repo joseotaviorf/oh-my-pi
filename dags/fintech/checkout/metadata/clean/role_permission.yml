@@ -1,0 +1,23 @@
+---
+database_name: datalake_checkout_clean
+table_name: role_permission
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_role:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.role_permission.role_id
+  id_permission:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.role_permission.permission_id
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.role_permission.created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.role_permission.updated_at

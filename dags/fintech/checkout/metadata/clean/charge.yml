@@ -25,6 +25,9 @@ columns:
   payment_method:
     lineage:
       - datalake_checkout_raw.charge.payment_method
+  alternative_payment_method:
+    lineage:
+      - datalake_checkout_raw.charge.alternative_payment_method
   paid_via:
     lineage:
       - datalake_checkout_raw.charge.paid_via

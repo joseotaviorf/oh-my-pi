@@ -1,11 +1,11 @@
 SELECT
     id,
     bolecode_id AS id_bolecode,
-    boleto_id AS id_boleto,
+    pix_id AS id_pix,
     status,
-    error_message,
+    message_error,
     payload,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated
 FROM
-    datalake_checkout_raw.boleto_webhook
+    datalake_checkout_raw.pix_webhook
