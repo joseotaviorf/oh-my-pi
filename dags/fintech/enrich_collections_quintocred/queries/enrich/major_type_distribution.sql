@@ -5,8 +5,6 @@ WITH timeline AS (
         t.document,
         t.id_propose,
         MAX(t.mob_delinquency) AS mob,
-        t.is_finished,
-        t.is_active_timeline,
         array_distinct(array_agg(t.type_description)) AS type_description_array,
         CASE
             WHEN array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'TERMINATION') THEN 'TERMINATION'
@@ -27,7 +25,7 @@ WITH timeline AS (
         t.`date`
     FROM
         datalake_collections_quintocred.mob_delinquency_timeline t
-    GROUP BY 1,2,3,5,6,10
+    GROUP BY 1,2,3,8
 )
 SELECT
     name,
