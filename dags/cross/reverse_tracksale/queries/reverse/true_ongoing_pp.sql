@@ -53,7 +53,7 @@ status_send AS (--Evaluat every ticket related to an birthday contract or contra
     dp.team,
     c.dt_start,
     c.dt_recap,
-    ft.ts_started,
+    ft.ts_created AS ts_started,
     ft.ts_solved,
     CASE
       WHEN c.birth_type = 'birthday'
@@ -65,7 +65,7 @@ status_send AS (--Evaluat every ticket related to an birthday contract or contra
     CASE
       WHEN c.birth_type = 'recap_birthday'
         AND ft.sk_ticket IS NOT NULL
-        AND ft.ts_started < c.dt_recap
+        AND ft.ts_created < c.dt_recap
         AND (ft.ts_solved >= c.dt_recap OR ft.ts_solved IS NULL)
         AND (ft.front_or_back = 'back' OR dp.team IS NOT NULL) THEN 1
       ELSE 0
