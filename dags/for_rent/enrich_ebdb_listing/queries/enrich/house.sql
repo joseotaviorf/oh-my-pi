@@ -119,6 +119,32 @@ smart_price AS (
       ON l.id = p.id_listing_business_context
   GROUP BY
     1
+),
+entry_access AS (
+    SELECT
+        h.id AS id_house,
+        ea.id AS id_entry_access,
+        ea.access_type
+    FROM
+        datalake_ebdb_clean.house AS h
+    LEFT JOIN
+        datalake_ebdb_clean.entry_access AS ea
+            ON ea.id_house = h.id
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY ea.id_house ORDER BY ea.ts_updated DESC) = 1
+),
+key_entry_access AS (
+    SELECT
+        ea.id_house,
+        ea.access_type,
+        kh.holder_role
+    FROM
+        entry_access AS ea
+    LEFT JOIN
+        datalake_ebdb_clean.key_holder AS kh
+            ON kh.id_entry_access = ea.id_entry_access
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY kh.id_entry_access ORDER BY kh.ts_updated DESC) = 1
 )
 SELECT
   h.id,
@@ -213,6 +239,8 @@ SELECT
   h.land_area,
   h.predicted_price,
   h.sale_price,
+  kea.access_type,
+  kea.holder_role,
   o_type.name AS occupant_type,
   k_type.name AS key_type,
   a_a_type.name AS key_location,
@@ -356,6 +384,9 @@ LEFT JOIN
 LEFT JOIN
   datalake_ebdb_clean.restriction_type AS r_type
     ON a_type.id_restriction = r_type.id
+LEFT JOIN
+  key_entry_access AS kea
+    ON kea.id_house = h.id
 -- abandoned reason
 LEFT JOIN
   datalake_ebdb_clean.house_registration_status AS hrs

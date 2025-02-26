@@ -378,6 +378,29 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.sale_price
     description: 'Sale price of the house'
+  access_type:
+    lineage:
+      - datalake_ebdb_clean.entry_access.access_type
+    description: 'Type of entry access of the house'
+    categories:
+      LOCK_BOX: "There's a lock box"
+      FRONT_DOOR: "Front door"
+      PASSWORD: "Access through password"
+      BIOMETRY: "Access through biometry"
+      LOCKER: "Access through a locker"
+      KEY_HOLDER: "Someone holds the key"
+  holder_role:
+    lineage:
+      - datalake_ebdb_clean.key_holder.holder_role
+    description: 'Role of the house key holder'
+    categories:
+      OWNER: 'The key is with the owner'
+      TENANT: 'The key is with the tenant'
+      INSPECTOR: 'The key is with the inspector'
+      PHOTOGRAPHER: 'The key is with the photographer'
+      AGENT: 'The key is with the agent'
+      EXTERNAL_RESPONSIBLE: 'The key is with an external responsible'
+      PARTNER: 'The key is with the partner'
   occupant_type:
     lineage:
       - datalake_ebdb_clean.occupant_type.name
@@ -476,7 +499,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.is_follow_up_owner_upload_photos
     description: 'If the owner needs to upload photos (deprecated)'
-  has_rent_sign_permission: 
+  has_rent_sign_permission:
     lineage:
       - datalake_ebdb_clean.house.has_rent_sign_permission
     description: 'If the house is allowed to have a rent sign (placa aluga-se)'
