@@ -36,4 +36,3 @@ LEFT JOIN
 WHERE 
   wp.entity_origin = 'OFFBOARDING'
   AND queue_friendly_name = 'CX Off Manager'
-  AND wpu.ts_updated BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
