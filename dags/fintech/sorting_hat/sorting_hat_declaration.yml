@@ -100,6 +100,7 @@ workflow:
       clean_table_name: offer
     ProcessedMessage:
       clean_table_name: processed_message
+      clean_primary_keys: ["id_subscriber", "id_message"]
     Proponent:
       clean_table_name: proponent
     Proponent_Version:
