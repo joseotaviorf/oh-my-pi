@@ -1,81 +1,95 @@
-with analyzed_offers as (
-    select
+WITH 
+analyzed_offers AS (
+    SELECT
+        CONCAT(oa.id_offer, '-', oa.id_firestore) AS id_offer_history,
         oa.id_offer,
-        min(ts_revision) as first_ts_revision
-    from datalake_ebdb_clean.offer_aud oa
-    join datalake_ebdb_user.user_revision_entity ure
-        on oa.rev = ure.id
-    where oa.mod_status
-        and oa.status in ('Aprovada', 'Rejeitada')
-    group by 1
+        MIN(ts_revision) AS first_ts_revision
+    FROM 
+        datalake_ebdb_clean.offer_aud AS oa
+    JOIN 
+        datalake_ebdb_user.user_revision_entity AS ure
+            ON oa.rev = ure.id
+    WHERE 
+        ts_revision < '2025-01-06' --Oficial start of rental_transact database
+        AND oa.mod_status
+        AND oa.status IN ('Aprovada', 'Rejeitada')
+    GROUP BY 1, 2
 ),
-offer_negotiation as (
-    with offer_min_max_aud as (
-        select
+offer_negotiation AS (
+    WITH offer_min_max_aud AS (
+        SELECT
+          CONCAT(oa.id_offer, '-', oa.id_firestore) AS id_offer_history,
           id_offer,
           turn,
-          max(rev) as max_rev,
-          min(rev) as min_rev
-        from datalake_ebdb_clean.offer_aud as oa
-        group by 1, 2
+          MAX(rev) AS max_rev,
+          MIN(rev) AS min_rev
+        FROM 
+          datalake_ebdb_clean.offer_aud AS oa
+        GROUP BY 1, 2, 3
     )
-    select
+    SELECT
+        COALESCE(offer_max_aud.id_offer_history, offer_min_aud.id_offer_history) AS id_offer_history,
         o_aud.id_offer,
-        min(
-            if(
+        MIN(
+            IF(
                 offer_min_aud.turn = 'Owner'
-                   and offer_min_aud.min_rev is not null,
+                   AND offer_min_aud.min_rev IS NOT NULL,
                 o_aud.rent,
-                null
+                NULL
              )
-        ) as first_rent_offered_by_tenant,
-        min(
-            if(
+        ) AS first_rent_offered_by_tenant,
+        MIN(
+            IF(
                 offer_min_aud.turn = 'Tenant'
-                    and offer_min_aud.min_rev is not null,
+                    AND offer_min_aud.min_rev IS NOT NULL,
                 o_aud.rent,
-                null
+                NULL
             )
-        ) as first_rent_offered_by_owner,
-        max(
-            if(
+        ) AS first_rent_offered_by_owner,
+        MAX(
+            IF(
                 offer_max_aud.turn = 'Owner'
-                    and offer_max_aud.max_rev is not null,
+                    AND offer_max_aud.max_rev IS NOT NULL,
                 o_aud.rent,
-                null
+                NULL
             )
-        ) as last_rent_offered_by_tenant,
-        max(
-            if(
+        ) AS last_rent_offered_by_tenant,
+        MAX(
+            IF(
                 offer_max_aud.turn = 'Tenant'
-                    and offer_max_aud.max_rev is not null,
+                    AND offer_max_aud.max_rev IS NOT NULL,
                 o_aud.rent,
-                 null
+                NULL
             )
-        ) as last_rent_offered_by_owner
-    from datalake_ebdb_clean.offer_aud o_aud
-    left join offer_min_max_aud offer_max_aud
-        on offer_max_aud.id_offer = o_aud.id_offer
-        and offer_max_aud.max_rev = o_aud.rev
-    left join offer_min_max_aud offer_min_aud
-        on offer_min_aud.id_offer = o_aud.id_offer
-        and offer_min_aud.min_rev = o_aud.rev
-    group by 1
+        ) AS last_rent_offered_by_owner
+    FROM 
+        datalake_ebdb_clean.offer_aud AS o_aud
+    LEFT JOIN 
+        offer_min_max_aud AS offer_max_aud
+            ON offer_max_aud.id_offer = o_aud.id_offer
+            AND offer_max_aud.max_rev = o_aud.rev
+    LEFT JOIN 
+        offer_min_max_aud AS offer_min_aud
+            ON offer_min_aud.id_offer = o_aud.id_offer
+            AND offer_min_aud.min_rev = o_aud.rev
+    GROUP BY 1, 2
 ),
-firestore_offers as (
-  with offer_firestore as (
-    select
-        offer.id as id_offer,
-        max(coalesce(offer.id_godfather, g_offer.id))
-            over (partition by offer.id_firestore) as id_offer_godfather,
+firestore_offers AS (
+  WITH offer_firestore AS (
+    SELECT
+        CONCAT(offer.id, '-', offer.id_firestore) AS id_offer_history,
+        offer.id AS id_offer,
+        MAX(COALESCE(offer.id_godfather, g_offer.id)) OVER (PARTITION BY offer.id_firestore) AS id_offer_godfather,
         offer.id_firestore
-    from datalake_ebdb_clean.offer
-    left join datalake_godfather_clean.offer g_offer
-        on offer.id_firestore = g_offer.id_firestore
-        and offer.id_godfather is null
+    FROM
+        datalake_ebdb_clean.offer
+    LEFT JOIN
+        datalake_godfather_clean.offer AS g_offer
+            ON offer.id_firestore = g_offer.id_firestore
+            AND offer.id_godfather IS NULL
   ),
-  instant_offer_firestore as (
-      select distinct
+  instant_offer_firestore AS (
+      SELECT DISTINCT
         id_firestore,
         GET_JSON_OBJECT(resident, '$.people') AS number_of_tenants,
         GET_JSON_OBJECT(resident, '$.kids') AS number_of_kids,
@@ -90,10 +104,13 @@ firestore_offers as (
         ts_email_sent_to_owner,
         ts_first_sent,
         ts_last_sent
-      from datalake_firestore.rent_offer fo
-      where status not in ('Draft','DismissedDraft')
+      FROM
+          datalake_firestore.rent_offer AS fo
+      WHERE
+          status NOT IN ('Draft','DismissedDraft')
   )
-  select distinct
+  SELECT DISTINCT
+    o_firestore.id_offer_history,
     o_firestore.id_offer,
     bo_godfather.id_firestore,
     bo_godfather.id,
@@ -110,20 +127,25 @@ firestore_offers as (
     io_firestore.ts_email_sent_to_owner,
     COALESCE(bo_godfather.ts_first_sent, io_firestore.ts_first_sent) AS ts_first_sent,
     COALESCE(bo_godfather.ts_last_sent, io_firestore.ts_last_sent) AS ts_last_sent
-  from offer_firestore o_firestore
-  LEFT join datalake_godfather_clean.offer bo_godfather
-    on bo_godfather.id = o_firestore.id_offer_godfather
-  left join instant_offer_firestore io_firestore
-    on o_firestore.id_firestore = io_firestore.id_firestore
+  FROM 
+      offer_firestore AS o_firestore
+  LEFT JOIN
+      datalake_godfather_clean.offer AS bo_godfather
+          ON bo_godfather.id = o_firestore.id_offer_godfather
+  LEFT JOIN
+      instant_offer_firestore AS io_firestore
+          ON o_firestore.id_firestore = io_firestore.id_firestore
 )
-select distinct
+SELECT DISTINCT
+  CONCAT(offer.id, '-', offer.id_firestore) AS id_offer_history,
   offer.id,
-  (offer.id * 100) + 2 as id_offer_context,
+  (offer.id * 100) + 2 AS id_offer_context,
   offer.id_firestore,
   -- TODO [ODS] bug in Product attaching the same firestore id to different godfather entries
-  max(coalesce(offer.id_godfather, firestore.id)) over (partition by offer.id_firestore) as id_godfather,
+  MAX(COALESCE(offer.id_godfather, firestore.id)) OVER (PARTITION BY offer.id_firestore) AS id_godfather,
   hl.id_country,
   offer.id_client,
+  NULL AS id_owner,
   offer.id_house,
   offer.id_rent_flow,
   hl.country_code,
@@ -135,8 +157,8 @@ select distinct
   offer.turn,
   offer.rejection_reason,
   offer.iteration,
-  coalesce(firestore.type, bus_offer.type, offer.type) as type,
-  offer.rent as last_offered_rent,
+  COALESCE(firestore.type, bus_offer.type, offer.type) AS type,
+  offer.rent AS last_offered_rent,
   negotiation.first_rent_offered_by_tenant,
   negotiation.first_rent_offered_by_owner,
   negotiation.last_rent_offered_by_tenant,
@@ -149,25 +171,88 @@ select distinct
   firestore.tenant_pets_info,
   firestore.tenant_type,
   firestore.has_pets,
-  coalesce(firestore.is_instant_offer, false) as is_instant_offer,
-  coalesce(bus_offer.ts_last_sent, firestore.ts_last_sent) is not null as is_offer_submitted,
+  COALESCE(firestore.is_instant_offer, FALSE) AS is_instant_offer,
+  COALESCE(bus_offer.ts_last_sent, firestore.ts_last_sent) IS NOT NULL AS is_offer_submitted,
   firestore.ts_email_sent_to_owner,
   offer.ts_expired,
-  analyzed.first_ts_revision as ts_analyzed,
-  coalesce(bus_offer.ts_first_sent, firestore.ts_first_sent) as ts_first_sent,
-  coalesce(bus_offer.ts_last_sent, firestore.ts_last_sent) as ts_last_sent,
+  analyzed.first_ts_revision AS ts_analyzed,
+  COALESCE(bus_offer.ts_first_sent, firestore.ts_first_sent) AS ts_first_sent,
+  COALESCE(bus_offer.ts_last_sent, firestore.ts_last_sent) AS ts_last_sent,
   offer.ts_created,
   offer.ts_updated
-from datalake_ebdb_clean.offer offer
-left join analyzed_offers analyzed
-  on analyzed.id_offer = offer.id
-left join datalake_godfather_clean.offer bus_offer
-  on offer.id_godfather = bus_offer.id
-  and offer.id_godfather is not null
-left join firestore_offers firestore
-  on offer.id = firestore.id_offer
-left join offer_negotiation negotiation
-  on negotiation.id_offer = offer.id
+FROM 
+    datalake_ebdb_clean.offer AS offer
+LEFT JOIN 
+    analyzed_offers AS analyzed
+        ON analyzed.id_offer = offer.id
+LEFT JOIN 
+    datalake_godfather_clean.offer AS bus_offer
+        ON offer.id_godfather = bus_offer.id
+        AND offer.id_godfather IS NOT NULL
+LEFT JOIN 
+    firestore_offers AS firestore
+        ON offer.id = firestore.id_offer
+LEFT JOIN
+    offer_negotiation AS negotiation
+        ON negotiation.id_offer = offer.id
 JOIN
     datalake_ebdb_country.house AS hl
         ON hl.id_house = offer.id_house
+WHERE
+    offer.ts_created < '2025-01-06'
+
+UNION
+
+SELECT
+    STRING(offer.id_offer + 9312591) AS id_offer_history, --9312591 is the last offer ID coming from Main (EBDB)
+    offer.id_offer,
+    (offer.id_offer * 100) + 2 AS id_offer_context,
+    NULL AS id_firestore,
+    NULL AS id_godfather,
+    hl.id_country,
+    offer.id_tenant AS id_client,
+    offer.id_owner,
+    offer.id_house,
+    NULL AS id_rent_flow,
+    hl.country_code,
+    offer.original_condo,
+    offer.original_home_insurance,
+    offer.original_iptu,
+    offer.original_rent,
+    offer.status,
+    offer.turn,
+    offer.rejection_reason,
+    offer.iteration,
+    offer.type,
+    offer.rent AS last_offered_rent,
+    offer.first_rent_offered_by_tenant,
+    offer.first_rent_offered_by_owner,
+    offer.last_rent_offered_by_tenant,
+    offer.last_rent_offered_by_owner,
+    number_of_cohabitants AS number_of_tenants,
+    NULL AS number_of_kids,
+    NULL AS rental_reason,
+    NULL AS rental_urgency,
+    offer.tenant_description,
+    NULL AS tenant_pets_info,
+    NULL AS tenant_type,
+    NULL AS has_pets,
+    COALESCE(firestore.is_instant_offer, FALSE) AS is_instant_offer,
+    TRUE AS is_offer_submitted,
+    offer.ts_created AS ts_email_sent_to_owner,
+    offer.ts_expiration AS ts_expired,
+    offer.ts_analyzed,
+    offer.ts_created AS ts_first_sent,
+    offer.ts_updated AS ts_last_sent,
+    offer.ts_created,
+    offer.ts_updated
+FROM 
+    datalake_rental_transact.offer AS offer
+JOIN
+    datalake_ebdb_country.house AS hl
+        ON hl.id_house = offer.id_house
+LEFT JOIN 
+    firestore_offers AS firestore
+        ON offer.id_firestore = firestore.id_firestore
+WHERE 
+    offer.ts_created >= '2025-01-06'
