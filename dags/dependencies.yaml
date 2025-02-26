@@ -1388,12 +1388,6 @@ bietlejuice.enrich_credit_analysis:
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee
   - bietlejuice.rental_guarantee:load-clean-risk-category
-  - bietlejuice.sorting_hat:load-clean-credit-analysis
-  - bietlejuice.sorting_hat:load-clean-early-credit-analysis
-  - bietlejuice.sorting_hat:load-clean-proponent
-  - bietlejuice.sorting_hat:load-clean-proposal
-  - bietlejuice.sorting_hat:load-clean-proposal-version
-  - bietlejuice.sorting_hat:load-clean-screening-result
   - bietlejuice.sorting_hat:load-clean-analysis-machine
   - bietlejuice.sorting_hat:load-clean-analysis-request
   - bietlejuice.sorting_hat:load-clean-analysis-request-data
@@ -1403,6 +1397,12 @@ bietlejuice.enrich_credit_analysis:
   - bietlejuice.sorting_hat:load-clean-checklist-decision
   - bietlejuice.sorting_hat:load-clean-checklist-group
   - bietlejuice.sorting_hat:load-clean-checklist-item
+  - bietlejuice.sorting_hat:load-clean-credit-analysis
+  - bietlejuice.sorting_hat:load-clean-early-credit-analysis
+  - bietlejuice.sorting_hat:load-clean-proponent
+  - bietlejuice.sorting_hat:load-clean-proposal
+  - bietlejuice.sorting_hat:load-clean-proposal-version
+  - bietlejuice.sorting_hat:load-clean-screening-result
 bietlejuice.enrich_credit_evers:
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
 bietlejuice.enrich_criteo:
@@ -2326,7 +2326,6 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.enrich_rental_transact:load-enrich-offer
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
   - bietlejuice.godfather:load-clean-offer

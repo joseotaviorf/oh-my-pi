@@ -1,6 +1,7 @@
 database_name: dw_rent
 table_name: dim_offer
-description: Potential tenants make offers to owners when they want to rent a property.
+description:
+  Potential tenants make offers to owners when they want to rent a property.
   If an offer is accepted, it becomes a proposal (see dim_proposal table).
   Each line is an unique offer, identified by the key sk_offer.
 domain: For Rent
@@ -8,48 +9,44 @@ owner: matheus.baroni@quintoandar.com.br
 columns:
   sk_offer:
     lineage:
-    - datalake_offer.offer.id_offer_context
-    - datalake_ebdb_proposal.pre_proposal.id_offer_context
+      - datalake_offer.offer.id_offer_context
+      - datalake_ebdb_proposal.pre_proposal.id_offer_context
     description: Key of offer (id_offer)
-  sk_offer_history:
-    lineage:
-    - datalake_offer.offer.id_offer_history
-    description: Unique id offer to EBDB and Rental Transact databases.
   id_offer:
     lineage:
-    - datalake_offer.offer.id
-    - datalake_ebdb_proposal.pre_proposal.id
+      - datalake_offer.offer.id
+      - datalake_ebdb_proposal.pre_proposal.id
     description: ID of offer on ebdb
   id_godfather:
     lineage:
-    - datalake_offer.offer.id_godfather
+      - datalake_offer.offer.id_godfather
     description: ID of godfather database
   id_firestore:
     lineage:
-    - datalake_offer.offer.id_firestore
+      - datalake_offer.offer.id_firestore
     description: Last value on negotiation
   id_user:
     lineage:
-    - datalake_offer.offer.id_client
-    - datalake_ebdb_proposal.pre_proposal.id_user
+      - datalake_offer.offer.id_client
+      - datalake_ebdb_proposal.pre_proposal.id_user
     description: ID of tentant
   id_property:
     lineage:
-    - datalake_offer.offer.id_house
-    - datalake_ebdb_proposal.pre_proposal.id_house
+      - datalake_offer.offer.id_house
+      - datalake_ebdb_proposal.pre_proposal.id_house
     description: ID of house
   country_code:
     lineage:
-    - datalake_ebdb_proposal.pre_proposal.country_code
-    - datalake_offer.offer.country_code
+      - datalake_ebdb_proposal.pre_proposal.country_code
+      - datalake_offer.offer.country_code
     description: Country code related to the offer's country of origin. It's also a table partition.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
   editing:
     lineage:
-    - datalake_offer.offer.turn
-    - datalake_ebdb_proposal.pre_proposal.edition
+      - datalake_offer.offer.turn
+      - datalake_ebdb_proposal.pre_proposal.edition
     description: Who's turn of editing the offer
     categories:
       EdicaoInquilino: Waiting the tenant's turn to make an edit to the offer
@@ -59,8 +56,8 @@ columns:
       Tenant: Waiting the tenant's turn to make an edit to the offer
   status:
     lineage:
-    - datalake_offer.offer.status
-    - datalake_ebdb_proposal.pre_proposal.status
+      - datalake_offer.offer.status
+      - datalake_ebdb_proposal.pre_proposal.status
     description: Offer status
     categories:
       Aprovada: Offer approved by the owner
@@ -68,13 +65,14 @@ columns:
       Rejeitada: Offer rejected by the owner
   rejection_reason:
     lineage:
-    - datalake_offer.offer.rejection_reason
-    - datalake_ebdb_proposal.pre_proposal.rejection_reason
+      - datalake_offer.offer.rejection_reason
+      - datalake_ebdb_proposal.pre_proposal.rejection_reason
     description: Reason which offer was rejected
     categories:
-      HouseReserved: The house was reserved by another tenant, dropping all other
+      HouseReserved:
+        The house was reserved by another tenant, dropping all other
         offers for the same house
-      NDA: 'NDA'
+      NDA: "NDA"
       OwnerCustomReason: Owner custom reason
       OwnerDoesntAcceptPets: The owner does not accept pets
       OwnerDoesntAgreeNumberOfResidents: Owner does not agree with the number of residents
@@ -84,9 +82,11 @@ columns:
       OwnerHasOtherOngoingFlows: Owner has other ongoing flows
       OwnerMissedLimitReached: Limit for owner missed was reached
       OwnerRejected: Owner rejected
-      OwnerRentedForAnotherTenant5A: The owner ended up renting for another QuintoAndar
+      OwnerRentedForAnotherTenant5A:
+        The owner ended up renting for another QuintoAndar
         tenant
-      OwnerRentedForAnotherTenantOutside: The owner ended up renting for another tenant
+      OwnerRentedForAnotherTenantOutside:
+        The owner ended up renting for another tenant
         outside of QuintoAndar
       OwnerSoldHouse: The owner sold the house
       OwnerStalled: Owner stalled
@@ -97,22 +97,25 @@ columns:
       TenantGaveUpApartment: Tenant gave up apartment
       TenantGaveUpRenting: Tenant gave up renting
       TenantRejected: Tenant was rejected
-      TenantRented5A: '-'
+      TenantRented5A: "-"
       TenantRentedAnother5A: Tenant rented another house in QuintoAndar
       TenantRentedAnotherOutside: Tenant rented outside of QuintoAndar
       TenantStalled: Tenant stalled
       UnpublishedHouse: Unpublished house
   type:
     lineage:
-    - datalake_offer.offer.type
+      - datalake_offer.offer.type
     description: type of offer that was made
     categories:
-      Custom: 'When the tenant asks the owner to make changes to the property of any
-        type (example: painting, removing furniture, doing renovations, etc.)'
-      Express: When the tenant accepts the price and all conditions asked by the owner
+      Custom:
+        "When the tenant asks the owner to make changes to the property of any
+        type (example: painting, removing furniture, doing renovations, etc.)"
+      Express:
+        When the tenant accepts the price and all conditions asked by the owner
         and makes no other requests
       Other: Other
-      Price: When the tenant accepts all the conditions asked by the owner but wants
+      Price:
+        When the tenant accepts all the conditions asked by the owner but wants
         to negotiate the rental price
   app_type:
     lineage:
@@ -126,40 +129,41 @@ columns:
       ios: ios
       web_desktop: web (desktop)
       web_mobile: web (mobile)
-  app_version_name: 
+  app_version_name:
     lineage:
       - datalake_amplitude_offer.offer_submitted_events.version_name
     description: Version name of the app associated with the offer's event on Amplitude.
   utm_source:
     lineage:
-    - datalake_amplitude_offer.offer_submitted_events.utm_source
-    - datalake_tracked_events.attribution_cross_channel.final_attribution_source
+      - datalake_amplitude_offer.offer_submitted_events.utm_source
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_source
     description: UTM used to track the advertising source
   utm_medium:
     lineage:
-    - datalake_amplitude_offer.offer_submitted_events.utm_medium
-    - datalake_tracked_events.attribution_cross_channel.final_attribution_medium
+      - datalake_amplitude_offer.offer_submitted_events.utm_medium
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_medium
     description: UTM used to track the advertising medium
   utm_campaign:
     lineage:
-    - datalake_amplitude_offer.offer_submitted_events.utm_campaign
-    - datalake_tracked_events.attribution_cross_channel.final_attribution_campaign
+      - datalake_amplitude_offer.offer_submitted_events.utm_campaign
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_campaign
     description: UTM used to identify the campaign in the media
   utm_content:
     lineage:
-    - datalake_amplitude_offer.offer_submitted_events.utm_content
-    - datalake_tracked_events.attribution_cross_channel.final_attribution_content
-    description: Identifies what specifically was clicked to bring the user to the
+      - datalake_amplitude_offer.offer_submitted_events.utm_content
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_content
+    description:
+      Identifies what specifically was clicked to bring the user to the
       site, such as a banner ad or a text link. It is often used for A/B testing and
       content-targeted ads
   utm_term:
     lineage:
-    - datalake_amplitude_offer.offer_submitted_events.utm_term
-    - datalake_tracked_events.attribution_cross_channel.final_attribution_term
+      - datalake_amplitude_offer.offer_submitted_events.utm_term
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_term
     description: Identifies search terms that brought the lead
   final_attribution_origin:
     lineage:
-    - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
+      - datalake_tracked_events.attribution_cross_channel.final_attribution_origin
     description: Final attribution origin
     categories:
       CX: CX
@@ -168,85 +172,86 @@ columns:
       old_attribution: Old attribution (not mapped)
   mkt_category:
     lineage:
-    - datalake_gsheets_clean.taxonomy_demand.category
+      - datalake_gsheets_clean.taxonomy_demand.category
     description: standard category from the booking
   mkt_flow:
     lineage:
-    - datalake_gsheets_clean.taxonomy_demand.flow
+      - datalake_gsheets_clean.taxonomy_demand.flow
     description: Type of flow in the marketing funnel by the lead
   mkt_completion:
     lineage:
-    - datalake_gsheets_clean.taxonomy_demand.completion
+      - datalake_gsheets_clean.taxonomy_demand.completion
     description: Type of completion of marketing funnel by the lead
   mkt_origin:
     lineage:
-    - datalake_gsheets_clean.taxonomy_demand.origin
+      - datalake_gsheets_clean.taxonomy_demand.origin
     description: Origin of the lead in the marketing funnel
   mkt_channel:
     lineage:
-    - datalake_gsheets_clean.taxonomy_demand.channel
+      - datalake_gsheets_clean.taxonomy_demand.channel
     description: Channel level of the Taxonomy (used to describe the type of the channel)
   mkt_medium:
     lineage:
-    - datalake_gsheets_clean.taxonomy_demand.medium
+      - datalake_gsheets_clean.taxonomy_demand.medium
     description: Medium level of the taxonomy (used to describe the midia strategy)
   mkt_source:
     lineage:
-    - datalake_gsheets_clean.taxonomy_demand.source
+      - datalake_gsheets_clean.taxonomy_demand.source
     description: Source level of the taxonomy (used to describe the midia used)
   mkt_platform:
     lineage:
-    - datalake_gsheets_clean.taxonomy_demand.platform
+      - datalake_gsheets_clean.taxonomy_demand.platform
     description: Platform use by the lead in the marketing funnel
   last_offered_rent:
     lineage:
-    - datalake_offer.offer.last_offered_rent
-    - datalake_ebdb_proposal.pre_proposal.rent
+      - datalake_offer.offer.last_offered_rent
+      - datalake_ebdb_proposal.pre_proposal.rent
     description: Last value on negotiation
   original_rent:
     lineage:
-    - datalake_offer.offer.original_rent
-    - datalake_ebdb_proposal.pre_proposal.original_rent
+      - datalake_offer.offer.original_rent
+      - datalake_ebdb_proposal.pre_proposal.original_rent
     description: Rent value set on listing
   original_condo:
     lineage:
-    - datalake_offer.offer.original_condo
-    - datalake_ebdb_proposal.pre_proposal.original_condo
+      - datalake_offer.offer.original_condo
+      - datalake_ebdb_proposal.pre_proposal.original_condo
     description: Condo value set on listing
   is_instant_offer:
     lineage:
-    - datalake_offer.offer.is_instant_offer
-    description: Flag Is_Instat_Offer. Instant Offers are offers that are automatically
+      - datalake_offer.offer.is_instant_offer
+    description:
+      Flag Is_Instat_Offer. Instant Offers are offers that are automatically
       accepted, demanding no action by the owner (according to some specific the criteria)
   first_rent_offered_by_tenant:
     lineage:
-    - datalake_offer.offer.first_rent_offered_by_tenant
+      - datalake_offer.offer.first_rent_offered_by_tenant
     description: First value offer by tenant
   first_rent_offered_by_owner:
     lineage:
-    - datalake_offer.offer.first_rent_offered_by_owner
+      - datalake_offer.offer.first_rent_offered_by_owner
     description: First value offer by owner
   last_rent_offered_by_tenant:
     lineage:
-    - datalake_offer.offer.last_rent_offered_by_tenant
-    - datalake_ebdb_proposal.pre_proposal_aud.rent
+      - datalake_offer.offer.last_rent_offered_by_tenant
+      - datalake_ebdb_proposal.pre_proposal_aud.rent
     description: Last value offer by tentant
   last_rent_offered_by_owner:
     lineage:
-    - datalake_offer.offer.last_rent_offered_by_owner
-    - datalake_ebdb_proposal.pre_proposal_aud.rent
+      - datalake_offer.offer.last_rent_offered_by_owner
+      - datalake_ebdb_proposal.pre_proposal_aud.rent
     description: Last value offer by owner
   number_of_tenants:
     lineage:
-    - datalake_offer.offer.number_of_tenants
+      - datalake_offer.offer.number_of_tenants
     description: Number of tenants in the offer
   number_of_kids:
     lineage:
-    - datalake_offer.offer.number_of_kids
+      - datalake_offer.offer.number_of_kids
     description: Number of kids
   rental_reason:
     lineage:
-    - datalake_offer.offer.rental_reason
+      - datalake_offer.offer.rental_reason
     description: Rental reason
     categories:
       LeavingHome: Leaving home
@@ -257,7 +262,7 @@ columns:
       Other: Other
   rental_urgency:
     lineage:
-    - datalake_offer.offer.rental_urgency
+      - datalake_offer.offer.rental_urgency
     description: Rental urgency
     categories:
       NotHurry: Not in a hurry
@@ -266,62 +271,63 @@ columns:
       NextMonth: In the next month
   tenant_description:
     lineage:
-    - datalake_offer.offer.tenant_description
+      - datalake_offer.offer.tenant_description
     description: Offer's description
   tenant_pets_info:
     lineage:
-    - datalake_offer.offer.tenant_pets_info
+      - datalake_offer.offer.tenant_pets_info
     description: Description of tenent's pets
   tenant_type:
     lineage:
-    - datalake_offer.offer.tenant_type
+      - datalake_offer.offer.tenant_type
     description: Tenant type (Friends, Family or Alone)
     categories:
-      Friends: 'Friends'
-      Family: 'Family'
-      Alone: 'Alone'
+      Friends: "Friends"
+      Family: "Family"
+      Alone: "Alone"
   has_pets:
     lineage:
-    - datalake_offer.offer.has_pets
+      - datalake_offer.offer.has_pets
     description: True if tenant has pets
   ts_email_sent_to_owner:
     lineage:
-    - datalake_offer.offer.ts_email_sent_to_owner
+      - datalake_offer.offer.ts_email_sent_to_owner
     description: Timestamp when the email about the offer was sent to the owner
   last_updated_date:
     lineage:
-    - datalake_offer.offer.ts_updated
-    - datalake_ebdb_proposal.pre_proposal.ts_updated
+      - datalake_offer.offer.ts_updated
+      - datalake_ebdb_proposal.pre_proposal.ts_updated
     description: Date of last update on offer
   expiration_date:
     lineage:
-    - datalake_offer.offer.ts_expired
-    - datalake_ebdb_proposal.pre_proposal_aud.ts_expired
+      - datalake_offer.offer.ts_expired
+      - datalake_ebdb_proposal.pre_proposal_aud.ts_expired
     description: Date of offer expiration
   dt_analysis:
     lineage:
-    - datalake_offer.offer.ts_analyzed
-    - datalake_ebdb_proposal.pre_proposal.ts_last_analysis
+      - datalake_offer.offer.ts_analyzed
+      - datalake_ebdb_proposal.pre_proposal.ts_last_analysis
     description: Date of owner decision regarding offer, rejecting or approving
   dt_first_sent:
     lineage:
-    - datalake_offer.offer.ts_first_sent
-    - datalake_ebdb_proposal.pre_proposal.ts_first_sent
+      - datalake_offer.offer.ts_first_sent
+      - datalake_ebdb_proposal.pre_proposal.ts_first_sent
     description: Date of offer sent
   dt_created:
     lineage:
-    - datalake_offer.offer.ts_created
-    - datalake_ebdb_proposal.pre_proposal.ts_created
+      - datalake_offer.offer.ts_created
+      - datalake_ebdb_proposal.pre_proposal.ts_created
     description: Date of pre-offer creation
   dt_updated:
     lineage:
-    - datalake_offer.offer.ts_updated
-    - datalake_ebdb_proposal.pre_proposal.ts_updated
+      - datalake_offer.offer.ts_updated
+      - datalake_ebdb_proposal.pre_proposal.ts_updated
     description: Date of offer last update
   dt_timestamp:
     description: Date when record was update
   flg_branded:
-    description: If this booking came from a branded campaign as defined by the lead
+    description:
+      If this booking came from a branded campaign as defined by the lead
       taxonomy
   offer_submitted:
     description: True for offer submitted

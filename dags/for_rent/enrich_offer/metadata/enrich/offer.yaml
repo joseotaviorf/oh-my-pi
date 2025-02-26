@@ -1,28 +1,13 @@
 database_name: datalake_offer
 table_name: offer
-description: Enrich table for the offers flow gathering data from all the offers domains. 
-            Offers older than 2025-01-06 came from EBDB and after this date all offer data comes from Rental Transact database.
-            Tenants make offers to owners when they want to rent the properties. Table contains data from when the tenant 
-            makes an offer to when it is accepted or rejectd. Each line is an offer.
+description: Enrich table for the offers flow gathering data from all the offers domains (ebdb, firestore, godfather). Tenants make offers to owners when they want to rent the properties. Table contains data from when the tenant makes an offer to when it is accepted or rejectd. Each line is an offer
 domain: For Rent
-owner: jonas.fiorini@quintoandar.com.br
+owner: conrado.fabri@quintoandar.com.br
 columns:
-  id_offer_history:
-    lineage:
-      - datalake_rental_transact.offer.id_offer
-      - datalake_ebdb_clean.offer.id
-      - datalake_ebdb_clean.offer.id_firestore
-    description: Calculated offer ID integrating offers coming from EBDB(deprecated) and from Rental Transact.
   id:
     lineage:
       - datalake_ebdb_clean.offer.id
-      - datalake_rental_transact.offer.id_offer
     description: Id of offer on ebdb
-  id_offer:
-    lineage:
-      - datalake_ebdb_clean.offer.id
-      - datalake_rental_transact.offer.id_offer
-    description: Id of offer from EBDB and Rental Transact without duplicates (ids from Rental Transact have 9312591 added to prevent that).
   id_offer_context:
     lineage:
       - datalake_ebdb_clean.offer.id
@@ -30,12 +15,12 @@ columns:
   id_firestore:
     lineage:
       - datalake_ebdb_clean.offer.id_firestore
-    description: "[DEPRECATED] Id of offer on firestore."
+    description: Id of offer on firestore
   id_godfather:
     lineage:
       - datalake_ebdb_clean.offer.id_godfather
       - datalake_godfather_clean.offer.id
-    description: "[DEPRECATED] Id of offer on godfather."
+    description: Id of offer on godfather
   id_country:
     lineage:
       - datalake_ebdb_country.house.id_country
@@ -46,12 +31,7 @@ columns:
   id_client:
     lineage:
       - datalake_ebdb_clean.offer.id_client
-      - datalake_rental_transact.offer.id_tenant
-    description: Id of the tenant prospect who made the offer.
-  id_owner:
-    lineage:
-      - datalake_rental_transact.offer.id_owner
-    description: Id of the house owner.
+    description: Id of the tenant prospect who made the offer
   id_house:
     lineage:
       - datalake_ebdb_clean.offer.id_house
@@ -59,7 +39,7 @@ columns:
   id_rent_flow:
     lineage:
       - datalake_ebdb_clean.offer.id_rent_flow
-    description: "[DEPRECATED] Id of the rent flow related to that offer."
+    description: Id of the rent flow related to that offer
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
@@ -70,49 +50,37 @@ columns:
   original_condo:
     lineage:
       - datalake_ebdb_clean.offer.original_condo
-      - datalake_rental_transact.offer.original_condo
     description: Condo value set on listing at the time of the offer
   original_home_insurance:
     lineage:
       - datalake_ebdb_clean.offer.original_home_insurance
-      - datalake_rental_transact.offer.original_home_insurance
     description: Home Insurance value set on listing at the time of the offer
   original_iptu:
     lineage:
       - datalake_ebdb_clean.offer.original_iptu
-      - datalake_rental_transact.offer.original_iptu
     description: IPTU value set on listing at the time of the offer
   original_rent:
     lineage:
       - datalake_ebdb_clean.offer.original_rent
-      - datalake_rental_transact.offer.original_rent
     description: Rent value set on listing at the time of the offer
   status:
     lineage:
       - datalake_ebdb_clean.offer.status
-      - datalake_rental_transact.offer.status
     description: Current status of the offer
     categories:
-      Aprovada: "[DEPRECATED] Offer approved by the owner. To offers created after 2025-01-06, this value won't exist."
-      EmNegociacao: "[DEPRECATED] Offer still in negotiation. To offers created after 2025-01-06, this value won't exist."
-      Rejeitada: "[DEPRECATED] Offer rejected by one of the parties. To offers created after 2025-01-06, this value won't exist."
-      APPROVED: Offer approved by the owner.
-      REJECTED: Offer rejected by one of the parties.
-      DISMISSED: Offer dismissed.
+      Aprovada: Offer approved by the owner
+      EmNegociacao: Offer still in negotiation
+      Rejeitada: Offer rejected by one of the parties
   turn:
     lineage:
       - datalake_ebdb_clean.offer.turn
-      - datalake_rental_transact.offer.turn
     description: Whose turn it is to answer the offer. When tenant submits the offer it is the owner turn to answer. When owner counter proposes, it is the tenants turn, and so on
     categories:
-      Tenant: "[DEPRECATED] It is the tenants turn to answer the offer. To offers created after 2025-01-06, this value won't exist."
-      Owner: "[DEPRECATED] It is the owners turn to answer the offer. To offers created after 2025-01-06, this value won't exist."
-      SUPPLY: It is the owners turn to answer the offer.
-      DEMAND: It is the tenants turn to answer the offer.
+      Tenant: It is the tenants turn to answer the offer
+      Owner: It is the owners turn to answer the offer
   rejection_reason:
     lineage:
       - datalake_ebdb_clean.offer.rejection_reason
-      - datalake_rental_transact.offer.rejection_reason
     description: Reason why the offer was cancelled. Tenant and Owners can cancel offers and they also can be cancelled automatically
     categories:
       HouseReserved: Automatic reason. The house was suspended due to a reservation by another tenant
@@ -136,33 +104,15 @@ columns:
       TenantRentedAnother5A: Automatic reason. The tenant rented another tenant inside QuintoAndar
       TenantStalled: Automatic reason. The tenant didn't accept or rejected the offer counter proposal  in time, then it dropped automatically
       UnpublishedHouse: Automatic reason. The property was unpublished
-      HOUSE_RESERVED: Automatic reason. The house was suspended due to a reservation by another tenant
-      OWNER_DOESNT_AGREE_WITH_CONDITIONS: Filled by the owner. They don't agree with the tenants special requests
-      TENANT_STALLED: Automatic reason. The tenant didn't accept or rejected the offer counter proposal  in time, then it dropped automatically
-      OWNER_GAVE_UP_RENTING: Filled by the owner. They are not renting that property anymore
-      TENANT_GAVE_UP_APARTMENT: Filled by the tenant. When the tenant is no longer interested in that property
-      TENANT_RENTED_ANOTHER_5A: Automatic reason. The tenant rented another tenant inside QuintoAndar
-      OWNER_SOLD_HOUSE: Filled by the owner. The property was sold
-      TENANT_DOESNT_AGREE_WITH_CONDITIONS: Filled by the tenant. When the tenant doesn't agree with the negotiations proposed by the owner
-      OWNER_HAS_OTHER_ONGOING_FLOWS: Filled by the owner. They prefer another proposal on 5A
-      UNPUBLISHED_HOUSE: Automatic reason. The property was unpublished
-      TENANT_GAVE_UP_RENTING: Filled by the tenant. When the tenant is no longer interested in renting
-      OWNER_RENTED_FOR_ANOTHER_TENANT_5A: Automatic reason. The property was rented for another tenant inside QuintoAndar
-      OWNER_DOESNT_AGREE_NUMBER_OF_RESIDENTS: Filled by the Owner. There are too many residents
-      OWNER_RENTED_FOR_ANOTHER_TENANT_OUTSIDE: Filled by the owner. The property was rented outside of 5A
-      OWNER_STALLED: Automatic reason. The owner didn't accept or rejected the offer in time, then it dropped automatically
-      OWNER_MISSED_LIMIT_REACHED: Automatic reason. Limit for owner missed was reached
   iteration:
     lineage:
       - datalake_ebdb_clean.offer.iteration
-      - datalake_rental_transact.offer.iteration
     description: Number of iterations it happened on that offer
   type:
     lineage:
       - datalake_ebdb_clean.offer.type
       - datalake_firestore.rent_offer.type
       - datalake_godfather_clean.offer.type
-      - datalake_rental_transact.offer.type
     description: What is the type of the offer sent by the tenant
     categories:
       Custom: When the tenant asks the owner to make changes to the property of any type (painting, removing furniture, doing renovations, etc.). They can ask for a price discount as well
@@ -171,41 +121,35 @@ columns:
   last_offered_rent:
     lineage:
       - datalake_ebdb_clean.offer.rent
-      - datalake_rental_transact.offer.rent
     description: Last value on the negotiation of that offer. The tenant and owner can propose and counter propose numerous times. This is the last value proposed by one of the parties
   first_rent_offered_by_tenant:
     lineage:
       - datalake_ebdb_clean.offer_aud.rent
-      - datalake_rental_transact.offer.first_rent_offered_by_tenant
     description: This is the value proposed by the tenant on the moment they submitted the offer.
   first_rent_offered_by_owner:
     lineage:
       - datalake_ebdb_clean.offer_aud.rent
-      - datalake_rental_transact.offer.first_rent_offered_by_owner
     description: This is the value proposed by the owner on the first counter proposal for the tenant
   last_rent_offered_by_tenant:
     lineage:
       - datalake_ebdb_clean.offer_aud.rent
-      - datalake_rental_transact.offer.last_rent_offered_by_tenant
     description: This is the last value proposed by the tenant on the negotiation of that offer
   last_rent_offered_by_owner:
     lineage:
       - datalake_ebdb_clean.offer_aud.rent
-      - datalake_rental_transact.offer.last_rent_offered_by_owner
     description: This is the last value proposed by the owner on the negotiation of that offer
   number_of_tenants:
     lineage:
       - datalake_firestore.rent_offer.resident
-      - datalake_rental_transact.offer.number_of_cohabitants
     description: The number of residents that will live on that property, answered by the tenant before submitting the offer
   number_of_kids:
     lineage:
       - datalake_firestore.rent_offer.resident
-    description: "[DEPRECATED] The number of children that will live on that property, answered by the tenant before submitting the offer"
+    description: The number of children that will live on that property, answered by the tenant before submitting the offer
   rental_reason:
     lineage:
       - datalake_firestore.rent_offer.tenant_intent
-    description: "[DEPRECATED] Reason why the tenant wants to move in, answered by them before submitting the offer"
+    description: Reason why the tenant wants to move in, answered by them before submitting the offer
     categories:
       LeavingHome: Tenant needs to leave their current place
       Job: Work-related moving
@@ -216,7 +160,7 @@ columns:
   rental_urgency:
     lineage:
       - datalake_firestore.rent_offer.tenant_intent
-    description: "[DEPRECATED] Within how much time the tenant intends to move in, answered by them before submitting the offer"
+    description: Within how much time the tenant intends to move in, answered by them before submitting the offer
     categories:
       NotHurry: When the tenant is not in a hurry to move in and wants to proceed without compromise
       AsSoonAsPossible: When the tenant wants to move in the property as soon as possible
@@ -225,16 +169,15 @@ columns:
   tenant_description:
     lineage:
       - datalake_firestore.rent_offer.resident
-      - datalake_rental_transact.offer.tenant_description
     description: A presentation from the tenant to the owner when making an offer
   tenant_pets_info:
     lineage:
       - datalake_firestore.rent_offer.resident
-    description: "[DEPRECATED] A description of the tenants pets regarding the number of pets, their type, size, etc"
+    description: A description of the tenants pets regarding the number of pets, their type, size, etc
   tenant_type:
     lineage:
       - datalake_firestore.rent_offer.resident
-    description: "[DEPRECATED] Who will the tenant live with"
+    description: Who will the tenant live with
     categories:
       Friends: The residents are friends
       Family: The residents are family
@@ -242,7 +185,7 @@ columns:
   has_pets:
     lineage:
       - datalake_firestore.rent_offer.resident
-    description: "[DEPRECATED] Tenants answer to the question if they have pets or no"
+    description: Tenants answer to the question if they have pets or no
   is_instant_offer:
     lineage:
       - datalake_firestore.rent_offer.is_instant_offer
@@ -256,37 +199,30 @@ columns:
   ts_email_sent_to_owner:
     lineage:
       - datalake_firestore.rent_offer.ts_email_sent_to_owner
-      - datalake_rental_transact.offer.ts_created
     description: Timestamp when the email about the offer was sent to the owner
   ts_expired:
     lineage:
       - datalake_ebdb_clean.offer.ts_expired
-      - datalake_rental_transact.offer.ts_expiration
     description: Timestamp for when the offer expires and will be dropped. It changes everytime there is a counter proposal.
   ts_analyzed:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
-      - datalake_rental_transact.offer.ts_analysed
     description: Timsetamp of owner decision regarding offer, whether they rejected or approved it
   ts_first_sent:
     lineage:
       - datalake_firestore.rent_offer.ts_first_sent
       - datalake_godfather_clean.offer.ts_first_sent
-      - datalake_rental_transact.offer.ts_created
     description: Timestamp of when the offer was sent by the tenant
   ts_last_sent:
     lineage:
       - datalake_firestore.rent_offer.ts_last_sent
       - datalake_godfather_clean.offer.ts_last_sent
-      - datalake_rental_transact.offer.ts_updated
     description: Timestamp of the last update on that offer
   ts_created:
     lineage:
       - datalake_ebdb_clean.offer.ts_created
-      - datalake_rental_transact.offer.ts_created
     description: Timestamp of when the offer was created by the tenant
   ts_updated:
     lineage:
       - datalake_ebdb_clean.offer.ts_updated
-      - datalake_rental_transact.offer.ts_updated
     description: Timestamp of the last update on that offer
