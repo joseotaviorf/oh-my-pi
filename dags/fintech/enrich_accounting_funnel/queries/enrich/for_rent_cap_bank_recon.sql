@@ -13,7 +13,7 @@ WITH francesinha AS (
     AND
         is_latest_attempt IS TRUE
     AND
-        bank_account IN (426887, 79952, 433065, 502307)
+        bank_account IN (426887, 79952, 433065, 502307, 502331)
 ),
 
 cap AS (
@@ -49,7 +49,7 @@ sap AS (
     WHERE
         (
             dt_reference >= DATE('2024-01-01')
-            AND account_number IN ('11010X', '11118X', '110350X', '11016X')
+            AND account_number IN ('11010X', '11118X', '110350X', '11016X', '11057X')
         )
         OR
         (
@@ -121,4 +121,4 @@ LEFT JOIN
 WHERE
     cs.company_use IS NOT NULL
     AND NOT(cap.company_use IS NOT NULL AND f.company_use IS NULL AND sap.company_use IS NULL)
-    AND cs.dt_paid >= '2024-01-01'
+    AND cs.dt_paid >= CURRENT_DATE - 180
