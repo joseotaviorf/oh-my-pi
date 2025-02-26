@@ -258,7 +258,7 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.sorting_hat:load-clean-experiment
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
-  - bietlejuice.sorting_hat_credit_engine:load-clean-variant
+  - bietlejuice.sorting_hat:load-clean-variant
 bietlejuice.dw_credit_evers:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-bridge-map-debt-negotiation
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-debt
@@ -1393,15 +1393,15 @@ bietlejuice.enrich_credit_analysis:
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat:load-clean-proposal-version
   - bietlejuice.sorting_hat:load-clean-screening-result
-  - bietlejuice.sorting_hat_credit_engine:load-clean-analysis-machine
-  - bietlejuice.sorting_hat_credit_engine:load-clean-analysis-request
-  - bietlejuice.sorting_hat_credit_engine:load-clean-analysis-request-data
-  - bietlejuice.sorting_hat_credit_engine:load-clean-analysis-state
-  - bietlejuice.sorting_hat_credit_engine:load-clean-analysis-state-group
-  - bietlejuice.sorting_hat_credit_engine:load-clean-checklist
-  - bietlejuice.sorting_hat_credit_engine:load-clean-checklist-decision
-  - bietlejuice.sorting_hat_credit_engine:load-clean-checklist-group
-  - bietlejuice.sorting_hat_credit_engine:load-clean-checklist-item
+  - bietlejuice.sorting_hat:load-clean-analysis-machine
+  - bietlejuice.sorting_hat:load-clean-analysis-request
+  - bietlejuice.sorting_hat:load-clean-analysis-request-data
+  - bietlejuice.sorting_hat:load-clean-analysis-state
+  - bietlejuice.sorting_hat:load-clean-analysis-state-group
+  - bietlejuice.sorting_hat:load-clean-checklist
+  - bietlejuice.sorting_hat:load-clean-checklist-decision
+  - bietlejuice.sorting_hat:load-clean-checklist-group
+  - bietlejuice.sorting_hat:load-clean-checklist-item
 bietlejuice.enrich_credit_evers:
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date
 bietlejuice.enrich_criteo:
@@ -2922,7 +2922,7 @@ bietlejuice.enrich_seo_funnel:
 bietlejuice.enrich_sorting_hat:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis
-  - bietlejuice.sorting_hat_credit_engine:load-clean-policy-report
+  - bietlejuice.sorting_hat:load-clean-policy-report
 bietlejuice.enrich_ss_logic_model:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.chat_fup:load-clean-rating
