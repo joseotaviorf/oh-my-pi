@@ -67,6 +67,18 @@ contract_repair_metrics AS (
         repair_metrics
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY id_inspection DESC) = 1
+), 
+spoc_contracts AS (
+    SELECT
+        id_contract,
+        id_termination,
+        id_worker_twilio,
+        id_analyst,
+        true AS is_spoc_contract
+    FROM 
+        datalake_hefesto.spoc_offboarding_contracts 
+    QUALIFY 
+        ROW_NUMBER() OVER (PARTITION BY id_contract, id_termination ORDER BY ts_updated DESC) = 1
 )
 SELECT
     t.id_termination AS sk_termination,
@@ -79,6 +91,8 @@ SELECT
     BIGINT(t.id_zendesk_task) AS sk_zendesk_task,
     BIGINT(DATE_FORMAT(t.dt_termination, 'yyyyMMdd')) AS sk_termination_date,
     BIGINT(DATE_FORMAT(t.dt_last_rescheduled, 'yyyyMMdd')) AS sk_last_rescheduled_date,
+    sc.id_analyst AS sk_analyst,
+    sc.id_worker_twilio AS sk_worker_twilio,
     t.leadtime_request_to_vacancy,
     t.fee_discount_percentage,
     t.fee_discount_value,
@@ -91,6 +105,10 @@ SELECT
     crm.repairs_exempted_ac,
     crm.repairs_absorbed_ac,
     crm.total_tentant_repair_ac,
+    CASE 
+      WHEN sc.is_spoc_contract IS NULL THEN false
+      ELSE true
+    END AS is_spoc_contract,
     t.is_relisting,
     t.has_automatically_closed_task,
     t.is_contract_b2b,
@@ -116,5 +134,8 @@ FROM
 LEFT JOIN
     contract_repair_metrics AS crm
       ON t.id_contract = crm.id_contract
-WHERE
-    DATE(t.ts_termination_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+LEFT JOIN spoc_contracts AS sc
+    ON t.id_contract = sc.id_contract
+    AND t.id_termination = sc.id_termination
+WHERE 
+  DATE(t.ts_termination_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

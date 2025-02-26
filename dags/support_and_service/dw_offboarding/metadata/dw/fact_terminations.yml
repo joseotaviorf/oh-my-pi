@@ -47,6 +47,14 @@ columns:
     description: Date of last rescheduling of termination in sk format.
     lineage:
       - datalake_terminator.termination.dt_last_rescheduled
+  sk_analyst:
+    description: Identification for the responsable analyst for the id_contract/id_termination based on SPOC contracts.
+    lineage:
+      - datalake_hefesto.spoc_offboarding_contracts.id_analyst
+  sk_worker_twilio:
+    description: Twilio identification for the responsable analyst for the id_contract/id_termination based on SPOC contracts.
+    lineage:
+      - datalake_hefesto.spoc_offboarding_contracts.id_worker_twilio
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:
@@ -117,6 +125,8 @@ columns:
     lineage:
       - datalake_terminator.termination.is_early_relisting_enabled
     description: Boolean flag indicating if the house's owner opted-in/out of the early relisting.
+  is_spoc_contract:
+    description: Boolean flag indicating if the id_contract and the id_termination has an analyst responsable for
   ts_termination_request:
     description: Date in timestamp format that indicates when the termination request occurred.
     lineage:

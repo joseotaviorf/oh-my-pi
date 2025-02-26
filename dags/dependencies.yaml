@@ -637,6 +637,7 @@ bietlejuice.dw_media_sharing_rules:
 bietlejuice.dw_offboarding:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
+  - bietlejuice.enrich_hefesto:load-enrich-spoc-offboarding-contracts
   - bietlejuice.enrich_inspections:load-enrich-repair-request
   - bietlejuice.enrich_terminator:load-enrich-termination
 bietlejuice.dw_offer:
