@@ -1,0 +1,187 @@
+---
+database_name: datalake_sales_force_clean
+table_name: terminations
+description: Clean table for ingesting termination data from the Sales Force tool.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_termination:
+    lineage:
+      - datalake_sales_force_raw.terminations.Id
+    description: Unique identification key for termination in Sales Force.
+  id_owner:
+    lineage:
+      - datalake_sales_force_raw.terminations.OwnerId
+    description: Home Owner Identification Key in Salesforce.
+  id_contract:
+    lineage:
+      - datalake_sales_force_raw.terminations.ContractId__c
+    description: Contract identification key in Sales Force.
+  id_house:
+    lineage:
+      - datalake_sales_force_raw.terminations.PropertyId__c
+    description: House identification key in Sales Force.
+  id_external:
+    lineage:
+      - datalake_sales_force_raw.terminations.ExternalId__c
+    description: Termination identification key in the terminator source.
+  id_created_by:
+    lineage:
+      - datalake_sales_force_raw.terminations.CreatedById
+    description: Identification key of the user who created the record.
+  id_last_modified_by:
+    lineage:
+      - datalake_sales_force_raw.terminations.LastModifiedById
+    description: Identification key of the user who last updated the record.
+  termination_number:
+    lineage:
+      - datalake_sales_force_raw.terminations.Name
+    description: Unique termination reference number.
+  termination_status:
+    lineage:
+      - datalake_sales_force_raw.terminations.TerminationStatus__c
+    description: Current status of the termination process.
+  budget_approval_iq_response:
+    lineage:
+      - datalake_sales_force_raw.terminations.BudgetApprovalResponseIQ__c
+    description: Response status of budget approval for IQ process.
+  responsible_off_manager:
+    lineage:
+      - datalake_sales_force_raw.terminations.ResponsibleOffManager__c
+    description: Responsible officer or manager for termination.
+  termination_url:
+    lineage:
+      - datalake_sales_force_raw.terminations.TerminationUrl__c
+    description: URL link for the termination case in the system.
+  requested_by:
+    lineage:
+      - datalake_sales_force_raw.terminations.RequestedBy__c
+    description: User or entity that requested the termination.
+  budget_approval_pp_response:
+    lineage:
+      - datalake_sales_force_raw.terminations.BudgetApprovalResponsePP__c
+    description: Response status of budget approval for PP process.
+  admin_termination:
+    lineage:
+      - datalake_sales_force_raw.terminations.AdminTermination__c
+    description: Indicates whether the termination was administratively initiated.
+  all_repairs_exempted_by_owner:
+    lineage:
+      - datalake_sales_force_raw.terminations.AllRepairsExemptedByOwner__c
+    description: Flag indicating if the owner exempted all repairs.
+  before_rental:
+    lineage:
+      - datalake_sales_force_raw.terminations.BeforeRental__c
+    description: Indicates if the termination occurred before rental commencement.
+  agreement_and_improvements:
+    lineage:
+      - datalake_sales_force_raw.terminations.AgreementAndImprovements__c
+    description: Details about agreements and improvements related to termination.
+  eviction:
+    lineage:
+      - datalake_sales_force_raw.terminations.Eviction__c
+    description: Indicates whether the termination is due to eviction.
+  consumption_proof_submission_iq:
+    lineage:
+      - datalake_sales_force_raw.terminations.ConsumptionProofSubmissionIQ__c
+    description: Status of consumption proof submission in IQ process.
+  high_value_contract:
+    lineage:
+      - datalake_sales_force_raw.terminations.HighValueContract__c
+    description: Identifies if the termination involves a high-value contract.
+  inspection_opted_out:
+    lineage:
+      - datalake_sales_force_raw.terminations.InspectionOptedOut__c
+    description: Indicates if the inspection was opted out.
+  inspection_required:
+    lineage:
+      - datalake_sales_force_raw.terminations.InspectionRequired__c
+    description: Indicates if an inspection is required for termination.
+  intermediation_required:
+    lineage:
+      - datalake_sales_force_raw.terminations.IntermediationRequired__c
+    description: Identifies if intermediation is required in the termination process.
+  internal_administration:
+    lineage:
+      - datalake_sales_force_raw.terminations.InternalAdministration__c
+    description: Specifies if the termination is managed internally.
+  job_transfer:
+    lineage:
+      - datalake_sales_force_raw.terminations.JobTransfer__c
+    description: Indicates if the termination is due to a job transfer.
+  land_lord_selling:
+    lineage:
+      - datalake_sales_force_raw.terminations.LandlordSelling__c
+    description: Indicates if the termination is due to the landlord selling the property.
+  notice_due:
+    lineage:
+      - datalake_sales_force_raw.terminations.NoticeDue__c
+    description: Identifies if the notice period has ended.
+  pro_owner:
+    lineage:
+      - datalake_sales_force_raw.terminations.ProOwner__c
+    description: Indicates if the termination is in favor of the property owner.
+  repairs_charged_ar_or_pp:
+    lineage:
+      - datalake_sales_force_raw.terminations.RepairsChargedARorPP__c
+    description: Identifies if repairs are charged to AR or PP.
+  repairs_charged_pp:
+    lineage:
+      - datalake_sales_force_raw.terminations.RepairsChargedPP__c
+    description: Indicates if repairs are charged to PP.
+  repairs_charged_to_tenant:
+    lineage:
+      - datalake_sales_force_raw.terminations.RepairsChargedToTenant__c
+    description: Specifies if repairs are charged to the tenant.
+  repairs_contested_by_tenant:
+    lineage:
+      - datalake_sales_force_raw.terminations.RepairsContestedByTenant__c
+    description: Identifies if the tenant contested the repairs.
+  success_contract_iq:
+    lineage:
+      - datalake_sales_force_raw.terminations.SuccesContactIQ__c
+    description: Success status of contract IQ process.
+  termination_in_first_year:
+    lineage:
+      - datalake_sales_force_raw.terminations.TerminationInFirstYear__c
+    description: Indicates if the termination occurred within the first year.
+  termination_with_penalty:
+    lineage:
+      - datalake_sales_force_raw.terminations.TerminationWithPenalty__c
+    description: Specifies if the termination incurs a penalty.
+  ts_tr_termination_created:
+    lineage:
+      - datalake_sales_force_raw.terminations.TRTerminationCreatedDate__c
+    description: Timestamp when the termination record was created.
+  ts_vacancy:
+    lineage:
+      - datalake_sales_force_raw.terminations.VacancyDate__c
+    description: Timestamp indicating the vacancy date.
+  ts_created:
+    lineage:
+      - datalake_sales_force_raw.terminations.CreatedDate
+    description: Timestamp of when the record was created.
+  ts_last_modified:
+    lineage:
+      - datalake_sales_force_raw.terminations.LastModifiedDate
+    description: Timestamp of the last modification.
+  system_mod_stamp:
+    lineage:
+      - datalake_sales_force_raw.terminations.SystemModstamp
+    description: System modification timestamp.
+  dt_updated:
+    lineage:
+      - datalake_sales_force_raw.terminations.dt_updated
+    description: Timestamp of the last update in the system.
+  year:
+    lineage:
+      - datalake_sales_force_raw.terminations.year
+    description: Year of the termination record.
+  month:
+    lineage:
+      - datalake_sales_force_raw.terminations.month
+    description: Month of the termination record.
+  day:
+    lineage:
+      - datalake_sales_force_raw.terminations.day
+    description: Day of the termination record.

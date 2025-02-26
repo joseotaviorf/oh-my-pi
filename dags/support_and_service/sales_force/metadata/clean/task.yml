@@ -1,0 +1,194 @@
+database_name: datalake_sales_force_clean
+table_name: task
+description: Clean table for ingesting task data from the Sales Force tool.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_task:
+    lineage:
+      - datalake_sales_force_raw.task.Id
+    description: Unique identification key for task in Sales Force.
+  id_who:
+    lineage:
+      - datalake_sales_force_raw.task.WhoId
+    description: Identification key of the person related to the task.
+  id_what:
+    lineage:
+      - datalake_sales_force_raw.task.WhatId
+    description: Identification key of the object related to the task.
+  id_owner:
+    lineage:
+      - datalake_sales_force_raw.task.OwnerId
+    description: Owner identification key of the task.
+  id_account:
+    lineage:
+      - datalake_sales_force_raw.task.AccountId
+    description: Account identification key associated with the task.
+  id_recurrence_activity:
+    lineage:
+      - datalake_sales_force_raw.task.RecurrenceActivityId
+    description: Recurrence activity identification key.
+  id_contract:
+    lineage:
+      - datalake_sales_force_raw.task.ContractId
+    description: Contract identification key related to the task.
+  id_feed_item:
+    lineage:
+      - datalake_sales_force_raw.task.FeedItemId
+    description: Feed item identification key associated with the task.
+  who_count:
+    lineage:
+      - datalake_sales_force_raw.task.WhoCount
+    description: Count of related people.
+  what_count:
+    lineage:
+      - datalake_sales_force_raw.task.WhatCount
+    description: Count of related objects.
+  subject:
+    lineage:
+      - datalake_sales_force_raw.task.Subject
+    description: Subject of the task.
+  status:
+    lineage:
+      - datalake_sales_force_raw.task.Status
+    description: Current status of the task.
+  priority:
+    lineage:
+      - datalake_sales_force_raw.task.Priority
+    description: Priority level of the task.
+  type:
+    lineage:
+      - datalake_sales_force_raw.task.Type
+    description: Type of task.
+  call_duration_in_seconds:
+    lineage:
+      - datalake_sales_force_raw.task.CallDurationInSeconds
+    description: Duration of call in seconds.
+  call_type:
+    lineage:
+      - datalake_sales_force_raw.task.CallType
+    description: Type of call associated with the task.
+  call_disposition:
+    lineage:
+      - datalake_sales_force_raw.task.CallDisposition
+    description: Disposition status of the call.
+  call_object:
+    lineage:
+      - datalake_sales_force_raw.task.CallObject
+    description: Object reference of the call.
+  task_subtype:
+    lineage:
+      - datalake_sales_force_raw.task.TaskSubtype
+    description: Subtype of the task.
+  recurrence_type:
+    lineage:
+      - datalake_sales_force_raw.task.RecurrenceType
+    description: Type of recurrence pattern.
+  recurrence_interval:
+    lineage:
+      - datalake_sales_force_raw.task.RecurrenceInterval
+    description: Interval between recurrences.
+  recurrence_day_of_week_mask:
+    lineage:
+      - datalake_sales_force_raw.task.RecurrenceDayOfWeekMask
+    description: Mask representing recurring days of the week.
+  recurrence_day_of_month:
+    lineage:
+      - datalake_sales_force_raw.task.RecurrenceDayOfMonth
+    description: Day of the month for recurrence.
+  recurrence_instance:
+    lineage:
+      - datalake_sales_force_raw.task.RecurrenceInstance
+    description: Instance of recurrence within a month.
+  recurrence_month_of_year:
+    lineage:
+      - datalake_sales_force_raw.task.RecurrenceMonthOfYear
+    description: Month of the year for recurrence.
+  recurrence_regenerated_type:
+    lineage:
+      - datalake_sales_force_raw.task.RecurrenceRegeneratedType
+    description: Type of regenerated recurrence.
+  task_name:
+    lineage:
+      - datalake_sales_force_raw.task.TaskName
+    description: Name of the task.
+  task_interaction_type:
+    lineage:
+      - datalake_sales_force_raw.task.TaskInteractionType
+    description: Type of interaction related to the task.
+  case_criticality:
+    lineage:
+      - datalake_sales_force_raw.task.CaseCriticality
+    description: Criticality level of the related case.
+  case_account:
+    lineage:
+      - datalake_sales_force_raw.task.CaseAccount
+    description: Account associated with the case.
+  answer:
+    lineage:
+      - datalake_sales_force_raw.task.Answer
+    description: Response associated with the task.
+  observation:
+    lineage:
+      - datalake_sales_force_raw.task.Observation
+    description: Observations about the task.
+  delay_message:
+    lineage:
+      - datalake_sales_force_raw.task.DelayMessage
+    description: Message related to task delay.
+  is_high_priority:
+    lineage:
+      - datalake_sales_force_raw.task.IsHighPriority
+    description: Indicates if the task is of high priority.
+  is_deleted:
+    lineage:
+      - datalake_sales_force_raw.task.IsDeleted
+    description: Indicates if the task is deleted.
+  is_closed:
+    lineage:
+      - datalake_sales_force_raw.task.IsClosed
+    description: Indicates if the task is closed.
+  is_archived:
+    lineage:
+      - datalake_sales_force_raw.task.IsArchived
+    description: Indicates if the task is archived.
+  is_reminder_set:
+    lineage:
+      - datalake_sales_force_raw.task.IsReminderSet
+    description: Indicates if a reminder is set for the task.
+  is_recurrence:
+    lineage:
+      - datalake_sales_force_raw.task.IsRecurrence
+    description: Indicates if the task is recurrent.
+  responsability_contesting_is_good:
+    lineage:
+      - datalake_sales_force_raw.task.ResponsabilityContestingIsGood
+    description: Indicator of responsibility contesting.
+  ts_completed:
+    lineage:
+      - datalake_sales_force_raw.task.CompletedDateTime
+    description: Timestamp when the task was completed.
+  ts_reminder:
+    lineage:
+      - datalake_sales_force_raw.task.ReminderDateTime
+    description: Timestamp of the reminder set for the task.
+  ts_activity:
+    lineage:
+      - datalake_sales_force_raw.task.ActivityDate
+    description: Date of the task activity.
+  ts_pass_due:
+    lineage:
+      - datalake_sales_force_raw.task.PassDueDate
+    description: Past due date of the task.
+  ts_first_interaction:
+    lineage:
+      - datalake_sales_force_raw.task.FirstInteractionDate
+    description: Date of the first interaction.
+  ts_recurrence_start:
+    lineage:
+      - datalake_sales_force_raw.task.RecurrenceStartDateOnly
+    description: Start date of the recurrence.
+  ts_recurrence_end:
+    lineage:
+      - datalake_sales_force_raw.task.RecurrenceEndDateOnly
+    description: End date of the recurrence.

@@ -1,0 +1,59 @@
+dag:
+  name: sales_force
+  owner: Data SS
+  schedule_start_date: 2025, 02, 10
+  documentation:
+    dag_purpose: |
+      DAG for ingesting data from the Sales Force tool, this DAG uses the Sales Force API to query data from operations performed in the tool.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  custom_schema: sales_force
+  load_spark_job: load_sales_force_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    - "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    - "{table_name}"
+    - "{partitions}"
+    - "{schema}"
+    - "https://quintoandar--qa.sandbox.my.salesforce.com"
+    - "https://quintoandar.my.salesforce.com"
+
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    account:
+      extra_spark_job_arguments:
+        - "SELECT Id,IsDeleted,MasterRecordId,Name,Type,RecordTypeId,ParentId,BillingStreet,BillingCity,BillingState,BillingPostalCode,BillingCountry,BillingLatitude,BillingLongitude,BillingGeocodeAccuracy,BillingAddress,ShippingStreet,ShippingCity,ShippingState,ShippingPostalCode,ShippingCountry,ShippingLatitude,ShippingLongitude,ShippingGeocodeAccuracy,ShippingAddress,Phone,Fax,AccountNumber,Website,PhotoUrl,Sic,Industry,AnnualRevenue,NumberOfEmployees,Ownership,TickerSymbol,Description,Rating,Site,OwnerId,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,LastActivityDate,LastViewedDate,LastReferencedDate,SourceSystemIdentifier,Jigsaw,JigsawCompanyId,AccountSource,SicDesc,CustomerId__c,ExternalId__c,Email__c FROM Account"
+    case:
+      extra_spark_job_arguments:
+        - "SELECT Id,IsDeleted,MasterRecordId,CaseNumber,ContactId,AccountId,AssetId,ProductId,EntitlementId,SourceId,BusinessHoursId,ParentId,SuppliedName,SuppliedEmail,SuppliedPhone,SuppliedCompany,Type,RecordTypeId,Status,Reason,Origin,Language,Subject,Priority,Description,IsClosed,ClosedDate,IsEscalated,OwnerId,IsClosedOnCreate,SlaStartDate,SlaExitDate,IsStopped,StopStartDate,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,ContactPhone,ContactMobile,ContactEmail,ContactFax,Comments,LastViewedDate,LastReferencedDate,ServiceContractId,MilestoneStatus,ContestationResponsabilityValid__c,InformationCollected__c,LandlordInformedServiceProvider__c,PastDueDateSimulation__c,SimulationTenantBudgetTimeLimit__c,criticality__c,followUpDescription__c,followUpExpectedResolutionDate__c,followUpReassignDate__c,followUpStatus__c,isContest__c,RepairId__c,serviceProviderJourney__c,serviceProviderName__c,serviceProviderPhone__c,serviceProviderType__c,AlreadyAskedForApproval__c,AlreadyContested__c,CaseCreationStartMilestoneClosed__c,CaseCreationStartMilestone__c,LLBudgetApprovalTimeLimit__c,LLServiceConcluded__c,LandlordInformedTTServiceProvider__c,LandlordProviderNoHelpMilestoneClosed__c,LandlordProviderNoHelpMilestone__c,PPacceptedDoingRepair__c,RequestedHelpTimeLimit__c,TTsolicitedHelp__c,TenantProviderOwnerApprovalClosed__c,TenantProviderOwnerApprovalMilestone__c,TenantServiceProviderMilestoneClosed__c,TenantServiceProviderMilestone__c,ContractId__c,ZendeskId__c,ZendeskUrl__c,AgentRepublishedWithPP__c,ContactSuccess__c,MS_TT_Close_BudgetReviewIQ__c,MS_TT_Close_BudgetReviewPP__c,MS_TT_Close_ReportReviewIQ__c,MS_TT_Close_ReportReviewPP__c,MS_TT_Open_BudgetReviewIQ__c,MS_TT_Open_BudgetReviewPP__c,MS_TT_Open_ReportReviewIQ__c,MS_TT_Open_ReportReviewPP__c,Termination__c,ExternalId__c FROM Case"
+    checklist:
+      extra_spark_job_arguments:
+        - "SELECT Id,OwnerId,IsDeleted,Name,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,LastActivityDate,LastViewedDate,LastReferencedDate,Done__c,Active__c,Termination__c,Type__c,ExternalId__c FROM Checklist__c"
+    contract_member:
+      extra_spark_job_arguments:
+        - "SELECT Id,OwnerId,IsDeleted,Name,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,Type__c,Account__c,Contract__c,ExternalId__c FROM ContractMember__c"
+    contract:
+      extra_spark_job_arguments:
+        - "SELECT Id,OwnerId,IsDeleted,Name,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,LastActivityDate,LastViewedDate,LastReferencedDate,ContractTerm__c,ExternalId__c,StartDate__c FROM Contract__c"
+    task:
+      extra_spark_job_arguments:
+        - "SELECT Id,WhoId,WhatId,WhoCount,WhatCount,Subject,ActivityDate,Status,Priority,IsHighPriority,OwnerId,Description,Type,IsDeleted,AccountId,IsClosed,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,IsArchived,CallDurationInSeconds,CallType,CallDisposition,CallObject,ReminderDateTime,IsReminderSet,RecurrenceActivityId,IsRecurrence,RecurrenceStartDateOnly,RecurrenceEndDateOnly,RecurrenceTimeZoneSidKey,RecurrenceType,RecurrenceInterval,RecurrenceDayOfWeekMask,RecurrenceDayOfMonth,RecurrenceInstance,RecurrenceMonthOfYear,RecurrenceRegeneratedType,TaskSubtype,CompletedDateTime,PassDueDate__c,ResponsabilityContestingIsGood__c,TaskName__c,Type__c,TaskInteractionType__c,FirstInteractionDate__c,DelayMessage__c,CaseCriticality__c,CaseAccount__c,Answer__c,TaskCreatedDate__c,Observation__c,ContractId__c FROM Task"
+    terminations:
+      extra_spark_job_arguments:
+        - "SELECT Id,OwnerId,IsDeleted,Name,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,LastActivityDate,LastViewedDate,LastReferencedDate,AdminTermination__c,AgreementAndImprovements__c,AllRepairsExemptedByOwner__c,BeforeRental__c,BudgetApprovalResponseIQ__c,BudgetApprovalResponsePP__c,ConsumptionProofSubmissionIQ__c,Eviction__c,HasBudgetApproval__c,HighValueContract__c,InspectionOptedOut__c,InspectionRequired__c,IntermediationRequired__c,InternalAdministration__c,JobTransfer__c,LandlordSelling__c,NoticeDue__c,ProOwner__c,RepairsChargedARorPP__c,RepairsChargedPP__c,RepairsChargedToTenant__c,RepairsContestedByTenant__c,RepairsDetectedByOwner__c,RepairsDetectedInternally__c,SuccesContactIQ__c,SuccesContactPP__c,TenantCondominiumPayer__c,TerminationInFirstYear__c,TerminationStatus__c,TerminationWithPenalty__c,Case__c,Contract__c,ExternalId__c,IsValidLetter__c,ResponsibleOffManager__c,TRTerminationCreatedDate__c,TerminationDateSync__c,TerminationFinished__c,VacancyDate__c,TerminationUrl__c,PropertyId__c,RelistingEnabled__c,DescriptionAgreementAndImprovements__c,OwnerAnsweredBudgetApprovalReview__c,OwnerAgreedBudgetApprovalReview__c,TenantAnsweredBudgetApprovalReview__c,TenantAgreedBudgetApprovalReview__c,RequestedBy__c,ContractId__c,FeedItemComment__c FROM Termination__c"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+
+cluster:
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

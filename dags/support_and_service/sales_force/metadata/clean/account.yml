@@ -1,0 +1,234 @@
+database_name: datalake_sales_force_clean
+table_name: account
+description: Clean table for ingesting account data from the Sales Force tool.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_account:
+    lineage:
+      - datalake_sales_force_raw.account.Id
+    description: Unique identification key for account in Sales Force.
+  id_owner:
+    lineage:
+      - datalake_sales_force_raw.account.OwnerId
+    description: Account Owner Identification Key in Salesforce.
+  id_created_by:
+    lineage:
+      - datalake_sales_force_raw.account.CreatedById
+    description: Identification key of the user who created the record.
+  id_last_modified_by:
+    lineage:
+      - datalake_sales_force_raw.account.LastModifiedById
+    description: Identification key of the user who last updated the record.
+  id_master_record:
+    lineage:
+      - datalake_sales_force_raw.account.MasterRecordId
+    description: Master record identification key for merged records.
+  id_record_type:
+    lineage:
+      - datalake_sales_force_raw.account.RecordTypeId
+    description: Record type identifier for the account.
+  id_parent:
+    lineage:
+      - datalake_sales_force_raw.account.ParentId
+    description: Parent account identification key.
+  jigsaw_company_id:
+    lineage:
+      - datalake_sales_force_raw.account.JigsawCompanyId
+    description: Jigsaw company identification key.
+  id_customer:
+    lineage:
+      - datalake_sales_force_raw.account.CustomerId
+    description: Customer identification key.
+  id_external:
+    lineage:
+      - datalake_sales_force_raw.account.ExternalId
+    description: External identification key for the account.
+  account_name:
+    lineage:
+      - datalake_sales_force_raw.account.Name
+    description: Name of the account.
+  account_type:
+    lineage:
+      - datalake_sales_force_raw.account.Type
+    description: Type of the account.
+  billing_street:
+    lineage:
+      - datalake_sales_force_raw.account.BillingStreet
+    description: Street address for billing.
+  billing_city:
+    lineage:
+      - datalake_sales_force_raw.account.BillingCity
+    description: City for billing address.
+  billing_state:
+    lineage:
+      - datalake_sales_force_raw.account.BillingState
+    description: State for billing address.
+  billing_postal_code:
+    lineage:
+      - datalake_sales_force_raw.account.BillingPostalCode
+    description: Postal code for billing address.
+  billing_country:
+    lineage:
+      - datalake_sales_force_raw.account.BillingCountry
+    description: Country for billing address.
+  billing_latitude:
+    lineage:
+      - datalake_sales_force_raw.account.BillingLatitude
+    description: Latitude coordinate for billing address.
+  billing_longitude:
+    lineage:
+      - datalake_sales_force_raw.account.BillingLongitude
+    description: Longitude coordinate for billing address.
+  billing_geocode_accuracy:
+    lineage:
+      - datalake_sales_force_raw.account.BillingGeocodeAccuracy
+    description: Geocode accuracy level for billing address.
+  billing_address:
+    lineage:
+      - datalake_sales_force_raw.account.BillingAddress
+    description: Full billing address details.
+  shipping_street:
+    lineage:
+      - datalake_sales_force_raw.account.ShippingStreet
+    description: Street address for shipping.
+  shipping_city:
+    lineage:
+      - datalake_sales_force_raw.account.ShippingCity
+    description: City for shipping address.
+  shipping_state:
+    lineage:
+      - datalake_sales_force_raw.account.ShippingState
+    description: State for shipping address.
+  shipping_postal_code:
+    lineage:
+      - datalake_sales_force_raw.account.ShippingPostalCode
+    description: Postal code for shipping address.
+  shipping_country:
+    lineage:
+      - datalake_sales_force_raw.account.ShippingCountry
+    description: Country for shipping address.
+  shipping_latitude:
+    lineage:
+      - datalake_sales_force_raw.account.ShippingLatitude
+    description: Latitude coordinate for shipping address.
+  shipping_longitude:
+    lineage:
+      - datalake_sales_force_raw.account.ShippingLongitude
+    description: Longitude coordinate for shipping address.
+  shipping_geocode_accuracy:
+    lineage:
+      - datalake_sales_force_raw.account.ShippingGeocodeAccuracy
+    description: Geocode accuracy level for shipping address.
+  shipping_address:
+    lineage:
+      - datalake_sales_force_raw.account.ShippingAddress
+    description: Full shipping address details.
+  phone:
+    lineage:
+      - datalake_sales_force_raw.account.Phone
+    description: Primary phone number for the account.
+  fax:
+    lineage:
+      - datalake_sales_force_raw.account.Fax
+    description: Fax number for the account.
+  account_number:
+    lineage:
+      - datalake_sales_force_raw.account.AccountNumber
+    description: Account number.
+  website:
+    lineage:
+      - datalake_sales_force_raw.account.Website
+    description: Website URL associated with the account.
+  photo_url:
+    lineage:
+      - datalake_sales_force_raw.account.PhotoUrl
+    description: URL for the account's profile photo.
+  sic:
+    lineage:
+      - datalake_sales_force_raw.account.Sic
+    description: Standard Industrial Classification (SIC) code.
+  industry:
+    lineage:
+      - datalake_sales_force_raw.account.Industry
+    description: Industry category of the account.
+  annual_revenue:
+    lineage:
+      - datalake_sales_force_raw.account.AnnualRevenue
+    description: Annual revenue of the account.
+  number_of_employees:
+    lineage:
+      - datalake_sales_force_raw.account.NumberOfEmployees
+    description: Number of employees in the account.
+  ownership:
+    lineage:
+      - datalake_sales_force_raw.account.Ownership
+    description: Ownership structure of the account.
+  ticker_symbol:
+    lineage:
+      - datalake_sales_force_raw.account.TickerSymbol
+    description: Stock ticker symbol.
+  description:
+    lineage:
+      - datalake_sales_force_raw.account.Description
+    description: Description of the account.
+  rating:
+    lineage:
+      - datalake_sales_force_raw.account.Rating
+    description: Rating assigned to the account.
+  site:
+    lineage:
+      - datalake_sales_force_raw.account.Site
+    description: Site location of the account.
+  system_mod_stamp:
+    lineage:
+      - datalake_sales_force_raw.account.SystemModstamp
+    description: System modification timestamp.
+  source_system_identifier:
+    lineage:
+      - datalake_sales_force_raw.account.SourceSystemIdentifier
+    description: Source system identifier for tracking data origin.
+  jigsaw:
+    lineage:
+      - datalake_sales_force_raw.account.Jigsaw
+    description: Jigsaw data integration field.
+  account_source:
+    lineage:
+      - datalake_sales_force_raw.account.AccountSource
+    description: Source from which the account was created.
+  sic_desc:
+    lineage:
+      - datalake_sales_force_raw.account.SicDesc
+    description: Description of the SIC code.
+  email:
+    lineage:
+      - datalake_sales_force_raw.account.Email
+    description: Primary email associated with the account.
+  is_deleted:
+    lineage:
+      - datalake_sales_force_raw.account.IsDeleted
+    description: Indicates if the account record is deleted.
+  is_priority_record:
+    lineage:
+      - datalake_sales_force_raw.account.IsPriorityRecord
+    description: Flag indicating if the account is a priority record.
+  ts_created:
+    lineage:
+      - datalake_sales_force_raw.account.CreatedDate
+    description: Timestamp when the record was created.
+  ts_last_modified:
+    lineage:
+      - datalake_sales_force_raw.account.LastModifiedDate
+    description: Timestamp of the last modification.
+  ts_last_activity:
+    lineage:
+      - datalake_sales_force_raw.account.LastActivityDate
+    description: Timestamp of the last activity.
+  ts_last_viewed:
+    lineage:
+      - datalake_sales_force_raw.account.LastViewedDate
+    description: Timestamp of the last view.
+  ts_last_referenced:
+    lineage:
+      - datalake_sales_force_raw.account.LastReferencedDate
+    description: Timestamp of the last reference.
