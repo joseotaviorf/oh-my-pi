@@ -14,14 +14,74 @@ WITH francesinha AS (
         1,2
 ),
 
+seu_barriga AS (
+    SELECT
+        id_external AS id_invoice,
+        id_original_invoice_external,
+        UPPER(payment_company_use_number) AS company_use,
+        payment_status,
+        status,
+        paid_via,
+        reason,
+        paid_amount AS amount,
+        dd.next_brz_fintech_business_day AS dt_paid
+    FROM
+        datalake_retsuko.invoice
+    LEFT JOIN
+        dw_public.dim_date dd
+            ON invoice.ts_paid = dd.date
+    WHERE
+        payment_company_use_number IS NOT NULL
+        AND TRIM(payment_company_use_number) != ''
+        AND lower(reason) NOT IN ('negotiation-5a', 'negotiation-recupera')
+        AND lower(paid_via) IN ('cnab', 'checkout-boleto')
+        AND due_amount <= 0
+        AND payment_status != 'canceled'
+        AND status != 'canceled'
+        AND country_code = 'BR'
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_invoice, payment_company_use_number ORDER BY ts_created DESC) = 1
+),
+
+seu_barriga_sap AS (
+    SELECT
+        id_external AS id_invoice,
+        id_original_invoice_external,
+        UPPER(payment_company_use_number) AS company_use,
+        payment_status,
+        status,
+        paid_via,
+        reason,
+        paid_amount AS amount,
+        dd.next_brz_fintech_business_day AS dt_paid
+    FROM
+        datalake_retsuko.invoice
+    LEFT JOIN
+        dw_public.dim_date dd
+            ON invoice.ts_paid = dd.date
+    WHERE
+        payment_company_use_number IS NOT NULL
+        AND TRIM(payment_company_use_number) != ''
+        AND lower(paid_via) IN ('cnab', 'checkout-boleto', 'cyber-boleto')
+        AND due_amount <= 0
+        AND payment_status != 'canceled'
+        AND status != 'canceled'
+        AND country_code = 'BR'
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_invoice, payment_company_use_number ORDER BY ts_created DESC) = 1
+),
+
 sap AS (
     SELECT DISTINCT
         id_business_entity,
-        UPPER(id_external_payment) AS company_use,
+        COALESCE(UPPER(id_external_payment), sb.company_use) AS company_use,
         dt_tax AS dt_paid,
         SUM(debit_credit) AS amount
     FROM
-        datalake_pas.ledger
+        datalake_pas.ledger AS l
+    LEFT JOIN 
+        seu_barriga_sap AS sb 
+            ON l.id_finance_entity = sb.id_invoice
     WHERE
         (
             (
@@ -36,8 +96,8 @@ sap AS (
         )
         AND id_finance_entity <> ''
         AND id_finance_entity IS NOT NULL
-        AND id_external_payment IS NOT NULL
-        AND TRIM(id_external_payment) != ''
+        AND NOT(id_external_payment IS NULL AND sb.company_use IS NULL)
+        AND NOT(TRIM(id_external_payment) = '' AND sb.company_use IS NULL)
     GROUP BY
         1,2,3
     HAVING
@@ -104,35 +164,6 @@ vans_checkout AS (
     FROM
         pre_vans_checkout vc
     GROUP BY 1,2,3
-),
-
-seu_barriga AS (
-    SELECT
-        id_external AS id_invoice,
-        id_original_invoice_external,
-        UPPER(payment_company_use_number) AS company_use,
-        payment_status,
-        status,
-        paid_via,
-        reason,
-        paid_amount AS amount,
-        dd.next_brz_fintech_business_day AS dt_paid
-    FROM
-        datalake_retsuko.invoice
-    LEFT JOIN
-        dw_public.dim_date dd
-            ON invoice.ts_paid = dd.date
-    WHERE
-        payment_company_use_number IS NOT NULL
-        AND TRIM(payment_company_use_number) != ''
-        AND lower(reason) NOT IN ('negotiation-5a', 'negotiation-recupera')
-        AND paid_via NOT IN ('cyber-boleto', 'cyber-pix', 'collector-5A', 'credit-card', 'unknown', 'paypal', 'bank-transfer')
-        AND due_amount <= 0
-        AND payment_status != 'canceled'
-        AND status != 'canceled'
-        AND country_code = 'BR'
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_invoice, payment_company_use_number ORDER BY ts_created DESC) = 1
 ),
 
 df_all AS (
@@ -211,10 +242,10 @@ df AS (
         cs.company_use IS NOT NULL
     AND
         (
-            DATE(f.dt_paid) >= '2024-01-01' OR
-            DATE(vc.dt_paid) >= '2024-01-01' OR
-            DATE(sb.dt_paid) >= '2024-01-01' OR
-            DATE(s.dt_paid) >= '2024-01-01'
+            DATE(f.dt_paid) >= current_date - 120 OR
+            DATE(vc.dt_paid) >= current_date - 120 OR
+            DATE(sb.dt_paid) >= current_date - 120 OR
+            DATE(s.dt_paid) >= current_date - 120
     )
 )
 
