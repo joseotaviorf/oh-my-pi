@@ -1,42 +1,42 @@
 database_name: datalake_jira_clean
 table_name: issues
-description:
+description: Its purpose is to store information related to cards
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   change_log:
     lineage:
       - datalake_jira_raw.issues.changelog
-    description: ""
+    description: Indicates the change log
   expand:
     lineage:
       - datalake_jira_raw.issues.expand
-    description: ""
+    description: List Expansion
   fields:
     lineage:
       - datalake_jira_raw.issues.fields
-    description: ""
+    description: JSON containing card fields.
   id:
     lineage:
       - datalake_jira_raw.issues.id
-    description: ""
+    description: Card internal ID
   key:
     lineage:
       - datalake_jira_raw.issues.key
-    description: ""
+    description: Card Key on Jira
   self:
     lineage:
       - datalake_jira_raw.issues.self
-    description: ""
+    description: Shows the endpoint for this card
   year:
     lineage:
       - datalake_jira_raw.issues.year
-    description: ""
+    description: Year created
   month:
     lineage:
       - datalake_jira_raw.issues.month
-    description: ""
+    description: Month created
   day:
     lineage:
       - datalake_jira_raw.issues.day
-    description: ""
+    description: Day created

@@ -1,58 +1,58 @@
 database_name: datalake_jira_clean
 table_name: projects
-description: 
+description: Information about projects
 domain: governance
 owner: giuseppe.giovanelli@quintoandar.com.br
 columns:
   avatar_urls:
     lineage:
       - datalake_jira_raw.projects.avatarurls
-    description: ""
+    description: Avatar URLs
   id_entity:
     lineage:
       - datalake_jira_raw.projects.entityid
-    description: ""
+    description: Entity ID
   expand:
     lineage:
       - datalake_jira_raw.projects.expand
-    description: ""
+    description: List Expansion
   id:
     lineage:
       - datalake_jira_raw.projects.id
-    description: ""
+    description: Project internal ID
   is_private:
     lineage:
       - datalake_jira_raw.projects.isprivate
-    description: ""
+    description: If it is private data
   key:
     lineage:
       - datalake_jira_raw.projects.key
-    description: ""
+    description: Project Key
   name:
     lineage:
       - datalake_jira_raw.projects.name
-    description: ""
+    description: Project name
   project_type_key:
     lineage:
       - datalake_jira_raw.projects.projecttypekey
-    description: ""
+    description: Project type key
   properties:
     lineage:
       - datalake_jira_raw.projects.properties
-    description: ""
+    description: Additional information
   self:
     lineage:
       - datalake_jira_raw.projects.self
-    description: ""
+    description: Project URLs
   is_simplified:
     lineage:
       - datalake_jira_raw.projects.simplified
-    description: ""
+    description: Is simplified
   style:
     lineage:
       - datalake_jira_raw.projects.style
-    description: ""
+    description: Project style
   uuid:
     lineage:
       - datalake_jira_raw.projects.uuid
-    description: ""
+    description: Unique ID on any system
