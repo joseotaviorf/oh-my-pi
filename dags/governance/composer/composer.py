@@ -126,7 +126,7 @@ def create_extraction_tasks(table_name, has_query=False, is_incremental=False):
         s3_file_path="raw/composer/{table_name}{s3_suffix}".format(
             table_name=table_name, s3_suffix=s3_suffix
         ),
-        mysql_conn_id="airflow_db",
+        database_conn_id="airflow_db",
     )
 
     return raw_task
