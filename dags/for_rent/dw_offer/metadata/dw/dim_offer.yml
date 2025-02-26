@@ -11,6 +11,10 @@ columns:
     - datalake_offer.offer.id_offer_context
     - datalake_ebdb_proposal.pre_proposal.id_offer_context
     description: Key of offer (id_offer)
+  sk_offer_history:
+    lineage:
+    - datalake_offer.offer.id_offer_history
+    description: Unique id offer to EBDB and Rental Transact databases.
   id_offer:
     lineage:
     - datalake_offer.offer.id

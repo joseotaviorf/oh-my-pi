@@ -112,7 +112,7 @@ firestore_offers AS (
   SELECT DISTINCT
     o_firestore.id_offer_history,
     o_firestore.id_offer,
-    bo_godfather.id_firestore,
+    io_firestore.id_firestore,
     bo_godfather.id,
     io_firestore.number_of_tenants,
     io_firestore.number_of_kids,
@@ -139,6 +139,7 @@ firestore_offers AS (
 SELECT DISTINCT
   CONCAT(offer.id, '-', offer.id_firestore) AS id_offer_history,
   offer.id,
+  offer.id AS id_offer,
   (offer.id * 100) + 2 AS id_offer_context,
   offer.id_firestore,
   -- TODO [ODS] bug in Product attaching the same firestore id to different godfather entries
@@ -205,8 +206,9 @@ UNION
 
 SELECT
     STRING(offer.id_offer + 9312591) AS id_offer_history, --9312591 is the last offer ID coming from Main (EBDB)
-    offer.id_offer AS id,
-    (offer.id_offer * 100) + 2 AS id_offer_context,
+    firestore.id_offer AS id, --Temporary bring the id_offer from EBDB to prevent major impacts on the pipeline and give time to adjustments
+    (offer.id_offer + 9312591) AS id_offer,
+    (firestore.id_offer * 100) + 2 AS id_offer_context,
     NULL AS id_firestore,
     NULL AS id_godfather,
     hl.id_country,
@@ -251,7 +253,7 @@ FROM
 JOIN
     datalake_ebdb_country.house AS hl
         ON hl.id_house = offer.id_house
-LEFT JOIN 
+JOIN 
     firestore_offers AS firestore
         ON offer.id_firestore = firestore.id_firestore
 WHERE 

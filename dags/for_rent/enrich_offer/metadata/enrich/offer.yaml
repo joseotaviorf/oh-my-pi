@@ -18,6 +18,11 @@ columns:
       - datalake_ebdb_clean.offer.id
       - datalake_rental_transact.offer.id_offer
     description: Id of offer on ebdb
+  id_offer:
+    lineage:
+      - datalake_ebdb_clean.offer.id
+      - datalake_rental_transact.offer.id_offer
+    description: Id of offer from EBDB and Rental Transact without duplicates (ids from Rental Transact have 9312591 added to prevent that).
   id_offer_context:
     lineage:
       - datalake_ebdb_clean.offer.id

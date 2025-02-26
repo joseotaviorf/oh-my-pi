@@ -70,6 +70,7 @@ offer_submitted_events AS (
 ),
 old_pre_proposal AS (
     SELECT
+        NULL AS sk_offer_history,
         CAST(pp.id_offer_context AS INT) AS sk_offer,
         CAST(pp.id AS INT) AS id_offer,
         CAST(NULL AS INT) AS id_godfather,
@@ -113,6 +114,7 @@ old_pre_proposal AS (
 ),
 new_offer AS (
     SELECT
+        CAST(id_offer_history AS VARCHAR(255)) AS sk_offer_history,
         CAST(id_offer_context AS INT) AS sk_offer,
         CAST(id AS INT) AS id_offer,
         CAST(id_godfather AS INT) AS id_godfather,
