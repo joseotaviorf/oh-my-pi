@@ -46,10 +46,10 @@ WITH criticidade AS (
 
 SELECT
   CAST(rt.id_ticket AS BIGINT) AS sk_ticket,
-  CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Classificação de Reparo 1"]') AS STRING) AS repair_class,
-  CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Classificação de Reparo 2"]') AS STRING) AS repair_type,
-  CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Classificação de Reparo 3"]') AS STRING) AS repair_detailed,
-  CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Fluxo de execução dos reparos"]') AS STRING) AS execution_flow,
+  CAST(tc.custom_fields['Classificação de Reparo 1'] AS STRING) AS repair_class,
+  CAST(tc.custom_fields['Classificação de Reparo 2'] AS STRING) AS repair_type,
+  CAST(tc.custom_fields['Classificação de Reparo 3'] AS STRING) AS repair_detailed,
+  CAST(tc.custom_fields['Fluxo de execução dos reparos'] AS STRING) AS execution_flow,
   CASE
     WHEN regexp_like(c.criticidade, 'emergencial')
       THEN 'Emergencial'
@@ -63,32 +63,52 @@ SELECT
       THEN 'Sem Defeito'
     ELSE 'Outros'
   END AS criticality,
-  IF(regexp_like(rt.tags,'tarefa_aberta_front'), 'FRONT', 'APP') AS ticket_opening,
+  IF(regexp_like(tc.tags,'tarefa_aberta_front'), 'FRONT', 'APP') AS ticket_opening,
   IF(DATEDIFF(DAY, rt.entrance_date, cast(rt.ts_created_local AS DATE)) <= 40, 'ONB', 'ONG') AS contract_journey,
   rt.service_provider,
   rt.front_or_back AS created_front_or_back,
-  rt.agent_name,
-  rt.agent_email,
-  rt.email_assigned,
-  rt.email_requester,
-  rt.agent_organization,
+  tc.analyst_name AS agent_name,
+  tc.analyst_email AS agent_email,
+  u.email AS email_assigned,
+  dzr.email AS email_requester,
+  CASE
+    WHEN tc.analyst_organization IN ('atn','atento') THEN 'atento'
+    WHEN tc.analyst_organization IN ('webhelp','webhelpbr','contractors') THEN 'webhelp'
+    WHEN tc.analyst_organization IN ('quintoandar.com','quintoandar') THEN 'quintoandar'
+    ELSE tc.analyst_organization
+  END AS agent_organization,
   sf.status_fup_iq,
   sf.reason_help_request,
   rr.owner_approval,
-  rt.group_name,
-  rt.channel,
-  rt.client_type,
-  rt.tags,
+  tc.group_name,
+  tc.channel,
+  tc.client_type,
+  tc.tags,
+  tc.year,
+  tc.month,
+  tc.day,
   NOW() AS ts_load
 FROM
+  datalake_zendesk.tickets_current tc
+JOIN
   datalake_repairs.ongoing_repair_tickets AS rt
-LEFT JOIN criticidade AS c
-  ON c.id_ticket = rt.id_ticket
+    ON tc.id_ticket = rt.id_ticket
+LEFT JOIN 
+  criticidade AS c
+    ON c.id_ticket = rt.id_ticket
 LEFT JOIN
   status_fup AS sf
     ON sf.sk_repair_request = rt.id_request
 LEFT JOIN
   repair_request AS rr
     ON rr.sk_repair_request = rt.id_request
+LEFT JOIN
+  datalake_support_users.zendesk_users AS u
+    ON u.id_user_zendesk = tc.id_assignee
+LEFT JOIN
+  datalake_support_users.zendesk_users AS dzr
+    ON dzr.id_user_zendesk = tc.id_requester
+WHERE
+  tc.ts_created >= CURRENT_DATE - INTERVAL 3 YEAR
 QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY rt.id_ticket ORDER BY MAKE_DATE(rt.year,rt.month,rt.day) DESC) = 1
+  ROW_NUMBER() OVER (PARTITION BY rt.id_ticket ORDER BY tc.ts_updated DESC) = 1

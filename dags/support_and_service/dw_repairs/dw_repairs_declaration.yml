@@ -28,6 +28,9 @@ workflow:
     fact_ongoing_repairs:
       z_order_by:
         [
+          year,
+          month,
+          day,
           sk_ticket,
           sk_request,
           sk_contract,
@@ -36,6 +39,14 @@ workflow:
           sk_budget_sender
         ]
       merge_on: [sk_ticket]
+    dim_ongoing_repairs:
+      z_order_by:
+        [
+          year,
+          month,
+          day,
+          sk_ticket
+        ]
 cluster:
   type: custom_cluster
   custom_configurations:

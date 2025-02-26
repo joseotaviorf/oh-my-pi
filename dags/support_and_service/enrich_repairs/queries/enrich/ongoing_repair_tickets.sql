@@ -208,13 +208,9 @@ SELECT
   u.email AS email_assigned,
   dzr.email AS email_requester,
   CASE
-    WHEN tc.analyst_organization = 'atn' THEN 'atento'
-    WHEN tc.analyst_organization = 'atento' THEN 'atento'
-    WHEN tc.analyst_organization = 'webhelp' THEN 'webhelp'
-    WHEN tc.analyst_organization = 'webhelpbr' THEN 'webhelp'
-    WHEN tc.analyst_organization = 'quintoandar.com' THEN 'quintoandar'
-    WHEN tc.analyst_organization = 'quintoandar' THEN 'quintoandar'
-    WHEN tc.analyst_organization = 'contractors' THEN 'webhelp'
+    WHEN tc.analyst_organization IN ('atn','atento') THEN 'atento'
+    WHEN tc.analyst_organization IN ('webhelp','webhelpbr','contractors') THEN 'webhelp'
+    WHEN tc.analyst_organization IN ('quintoandar.com','quintoandar') THEN 'quintoandar'
     ELSE tc.analyst_organization
   END AS agent_organization,
   th.contestation_task_origin,
@@ -319,12 +315,7 @@ WHERE
       'Autosserviço Reparos [BACK]',
       'ReparAção (Piloto Urgente)'
     )
-  AND 
-    (
-      tc.ts_created >= CURRENT_DATE - INTERVAL 6 MONTH
-      OR tc.ts_solved >= CURRENT_DATE - INTERVAL 2 YEAR
-      OR tc.ts_solved IS NULL
-    )
+  AND tc.ts_created >= CURRENT_DATE - INTERVAL 3 YEAR
   AND tc.channel NOT IN ('call', 'whatsapp')
   AND tc.status NOT IN ('deleted')
   AND tc.tags NOT LIKE '%caso_ticket_agregador%'

@@ -20,6 +20,9 @@ workflow:
     ongoing_repair_tickets:
       z_order_by:
         [
+          year,
+          month,
+          day,
           id_ticket,
           id_request,
           id_contract

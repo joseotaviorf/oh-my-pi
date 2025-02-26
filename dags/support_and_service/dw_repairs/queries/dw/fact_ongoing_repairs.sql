@@ -314,6 +314,9 @@ SELECT
   rt.ts_solved_local,
   rt.ts_closed_local,
   tc.ts_updated,
+  tc.year,
+  tc.month,
+  tc.day,
   NOW() AS ts_load
 FROM
   datalake_zendesk.tickets_current AS tc
