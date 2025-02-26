@@ -2,31 +2,31 @@
 database_name: datalake_gsheets_clean
 table_name: proj_fup_agents
 columns:
-  visitor_id:
+  id_visitor:
     lineage:
-      - datalake_gsheets_raw.fup_agents_historico.tp_id
-  id_property:
+      - datalake_gsheets_raw.fup_agents_historico.visitor_id
+  id_house:
     lineage:
-      - datalake_gsheets_raw.fup_agents_historico.imovel_id
+      - datalake_gsheets_raw.fup_agents_historico.id_property
   region_code:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.region_code
-  owner_id:
+  id_owner:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.owner_id
-  offer_id:
+  id_offer:
     lineage:
-      - datalake_gsheets_raw.fup_agents_historico.offer_id
+      - datalake_gsheets_raw.fup_agents_historico.id_offer
   dt_offer_sent:
     lineage:
-      - datalake_gsheets_raw.fup_agents_historico.os_date
+      - datalake_gsheets_raw.fup_agents_historico.offer_sent_date
   offer_status:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.offer_status
   offer_type:
     lineage:
-      - datalake_gsheets_raw.fup_agents_historico.type_offer
-  agent_id:
+      - datalake_gsheets_raw.fup_agents_historico.offer_type
+  id_agent:
     lineage:
       - datalake_gsheets_raw.fup_agents_historico.agent_id
   fup_agents_type:
