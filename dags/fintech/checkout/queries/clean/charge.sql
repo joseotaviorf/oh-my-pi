@@ -7,7 +7,7 @@ SELECT
     refund_amount,
     status,
     payment_method,
-    alternative_payment_method,
+    alternative_payment_methods,
     paid_via,
     user_name,
     user_provider,
