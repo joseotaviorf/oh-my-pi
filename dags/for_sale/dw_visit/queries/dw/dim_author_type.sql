@@ -1,6 +1,6 @@
 SELECT DISTINCT
     author_user_type AS author_type,
-    author_user_role,
+    COALESCE(author_user_role, 'Undefined'),
     on_behalf_of,
     channel,
     NOW() AS ts_load

@@ -11,8 +11,8 @@ columns:
     categories:
         USUARIO: The user type comes from Main/EBDB. User id joins with dw_public.dim_user
         PERSON: The user type comes from Person.
-  author_role:
-    description: Name of the author role.
+  author_user_role:
+    description: Name of the author role or 'Undefined'.
   on_behalf_of:
     description: An identification to say the author is present at this event on behalf of those
   channel:
