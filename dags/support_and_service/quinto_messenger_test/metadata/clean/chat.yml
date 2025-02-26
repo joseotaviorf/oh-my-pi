@@ -1,0 +1,42 @@
+database_name: datalake_quinto_messenger_test_clean
+table_name: chat
+columns:
+  id_chat:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.id
+  id_external:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.external_id
+  id_session:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.source_id
+  id_channel:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.attributes
+  source:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.source
+  session_status:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.status
+  source_identity:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.source_identity
+  attributes:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.attributes
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.created_at
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.updated_at
+  year:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.year
+  month:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.month
+  day:
+    lineage:
+      - datalake_quinto_messenger_test_raw.chat.day

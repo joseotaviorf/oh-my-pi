@@ -1,0 +1,60 @@
+database_name: datalake_quinto_messenger_test_clean
+table_name: channel
+columns:
+  id:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.id
+  id_channel:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.channel_id
+  is_session:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.source_id
+  id_source_unique:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.source_uuid
+  channel_status:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.channel_status
+  channel_type:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.channel_attributes
+  user_phone:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.user_phone
+  twilio_phone_number:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.channel_attributes
+  number_of_messages:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.channel_attributes
+  number_of_members:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.channel_attributes
+  channel_attributes:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.channel_attributes
+  channel_resource:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.channel_resource
+  channel_proxy:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.channel_proxy
+  source:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.source
+  ts_created:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.created_at
+  ts_updated:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.updated_at
+  year:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.year
+  month:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.month
+  day:
+    lineage:
+      - datalake_quinto_messenger_test_raw.channel.day
