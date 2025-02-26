@@ -34,4 +34,4 @@ columns:
       - datalake_gsheets_raw.fup_agents_historico.fup_agents_type
   gt_gc:
     lineage:
-      - datalake_gsheets_raw.fup_agents_historico.gt_gc
+      - datalake_gsheets_raw.fup_agents_historico.gtgc

@@ -8,7 +8,7 @@ SELECT
     offer_status,
     offer_type,
     fup_agents_type,
-    gt_gc,
+    gtgc AS gt_gc,
     TO_DATE(offer_sent_date, 'yyyy-MM-dd') AS dt_offer_sent
 FROM
     datalake_gsheets_raw.fup_agents_historico
