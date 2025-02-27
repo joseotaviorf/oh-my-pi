@@ -32,10 +32,8 @@ SELECT
     updated_at_mod AS mod_ts_updated,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    year,
-    month,
-    day
+    YEAR(updated_at) AS year,
+    MONTH(updated_at) AS month,
+    DAY(updated_at) as day
 FROM
     datalake_bob_raw.house_draft_aud
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

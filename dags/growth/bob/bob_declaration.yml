@@ -7,53 +7,34 @@ dag:
     dag_purpose: |
       This DAG brings [Bob (bob-o-construtor)](https://github.com/quintoandar/bob-o-construtor) data,
       a service developed by B2B for house registry and now it has been used by AA (Autonomous Agents).
+
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
+  source_schema: public
+  custom_schema: bob
+  source_database: bob-o-construtor
   dbutils_secret_key: BOB_DB
   lineage_product_database_name: boboconstrutor
   tables_customization:
-    attribution_progress_aud:
-      date_filter_column: created_at
-      extraction_type: incremental
-      partitions: [year, month, day]
-    attribution_progress:
-      extraction_type: full
-    house_draft_aud:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      partitions: [year, month, day]
-      z_order_by: [id_house_draft]
-    house_draft:
-      extraction_type: full
-      z_order_by: [id]
-    location:
-      extraction_type: full
-      z_order_by: [id_house_draft]
-    location_aud:
-      extraction_type: full
-    registrar:
-      extraction_type: full
-      z_order_by: [id]
-    registrar_aud:
-      extraction_type: full
+    attribution_progress_aud: {}
+    attribution_progress: {}
+    house_draft: {}
+    house_draft_aud: {}
+    location: {}
+    location_aud: {}
+    registrar: {}
+    registrar_aud: {}
     revinfo:
       clean_table_name: rev_info
-      date_filter_column: revtstmp
-      extraction_type: incremental
-      unixtime_measure: milliseconds
-      partitions: [year, month, day]
-    submission_progress:
-      extraction_type: full
-      z_order_by: [id_house_draft]
-    submission_progress_aud:
-      extraction_type: full
+    submission_progress: {}
+    submission_progress_aud: {}
 cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
