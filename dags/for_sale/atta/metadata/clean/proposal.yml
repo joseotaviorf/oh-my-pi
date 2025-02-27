@@ -65,6 +65,9 @@ columns:
   chosen_by:
     lineage:
       - datalake_atta_raw.proposta.ChosenBy
+  cancellation_reason:
+    lineage:
+      - datalake_atta_raw.proposta.MotivoCancelamento
   ts_registration:
     lineage:
       - datalake_atta_raw.proposta.dtentrada

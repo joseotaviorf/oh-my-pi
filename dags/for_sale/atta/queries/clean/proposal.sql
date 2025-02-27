@@ -19,6 +19,7 @@ SELECT
     Nome                        AS client_name,
     StatusTranslation           AS status_translation,
     ChosenBy                    AS chosen_by,
+    MotivoCancelamento          AS cancellation_reason,
     Valor                       AS financing_value,
     TIMESTAMP(DtEntrada)        AS ts_registration,
     TIMESTAMP(DtFinalizacao)    AS ts_financing_ended,
