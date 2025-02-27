@@ -9,6 +9,7 @@ SELECT
     event_payload,
     created_at AS ts_created,
     updated_at AS ts_updated,
+    year_month,
     year,
     month,
     day

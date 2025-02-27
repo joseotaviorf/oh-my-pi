@@ -16,6 +16,7 @@ SELECT
     CAST(GET_JSON_OBJECT(channel_attributes,'$.forwarding') AS BOOLEAN) AS is_forwarded,
     created_at AS ts_created,
     updated_at AS ts_updated,
+    year_month,
     year,
     month,
     day

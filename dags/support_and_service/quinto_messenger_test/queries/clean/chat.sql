@@ -9,6 +9,7 @@ SELECT
     status AS session_status,
     created_at AS ts_created,
     updated_at AS ts_updated,
+    year_month,
     year,
     month,
     day
