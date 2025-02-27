@@ -1,0 +1,39 @@
+---
+database_name: datalake_bank_conciliation
+table_name: quintocred_cashin
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  company_use:
+    description: ''
+    lineage:
+    - .bank_union.company_use
+  type_transaction:
+    description: ''
+    lineage:
+    - .bank_union.type_transaction
+  bank_paid_amount:
+    description: ''
+    lineage:
+    - .bank_union.bu.paid_amount
+  dt_bank_paid:
+    description: ''
+    lineage:
+    - .bank_union.bu.dt_paid
+  charge_amount:
+    description: ''
+    lineage:
+    - .bank_union.p.paid_amount
+  dt_charge_paid:
+    description: ''
+    lineage:
+    - .bank_union.p.dt_paid
+  sap_paid_amount:
+    description: ''
+    lineage:
+    - .bank_union.s.paid_amount
+  dt_sap_paid:
+    description: ''
+    lineage:
+    - .bank_union.s.dt_paid

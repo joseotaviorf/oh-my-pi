@@ -1187,6 +1187,16 @@ bietlejuice.enrich_b2b:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
+bietlejuice.enrich_bank_conciliation:
+  - bietlejuice.enrich_sap:load-enrich-ledger
+  - bietlejuice.itau_statements:load-clean-statement-879200494588
+  - bietlejuice.nexxera:load-clean-cnab-charges-recupera-velo-2
+  - bietlejuice.pixar:load-clean-charge
+  - bietlejuice.rental_guarantee_platform:load-clean-bill
+  - bietlejuice.rental_guarantee_platform:load-clean-billing-report
+  - bietlejuice.trato_feito:load-clean-installment
+  - bietlejuice.trato_feito:load-clean-negotiation
+  - bietlejuice.trato_feito:load-clean-payment
 bietlejuice.enrich_betopera:
   - bietlejuice.betopera:load-clean-certificate
   - bietlejuice.betopera:load-clean-certificate-request
