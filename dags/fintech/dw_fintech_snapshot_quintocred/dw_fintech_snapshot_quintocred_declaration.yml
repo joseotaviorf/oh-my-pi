@@ -11,6 +11,8 @@ workflow:
       - quintocred_ifrs_recurring_payment
   default_partitions: ["year", "month", "day"]
   default_extraction_type: incremental
+  short_circuit_customization:
+    function: CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH
   tables_customization:
     quintocred_bad_debt:
       extraction_type: full

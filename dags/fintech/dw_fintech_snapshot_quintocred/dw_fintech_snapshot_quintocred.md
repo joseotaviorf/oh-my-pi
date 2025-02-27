@@ -1,4 +1,4 @@
-## DW Fintech Snapshot
+## DW Fintech Snapshot QuintoCred
 
 
 ### Purpose
@@ -11,8 +11,6 @@ This DAG creates a snapshot of several tables in order to provide "time travel" 
 ### Execution​ Interval
 
 This DAG is triggered when execution_date is the first business day, monthly, via Mediator.
-
-More information about run time [here]({chart_url}{dag_id}).
 
 ### Outputs
 
