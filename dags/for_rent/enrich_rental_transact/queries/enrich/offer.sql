@@ -129,21 +129,22 @@ SELECT
     DAY(o.ts_created) AS day
 FROM
     datalake_rental_transact_clean.offer AS o
-JOIN
+LEFT JOIN
     datalake_rental_transact_clean.offer_topic AS ot
         ON o.id = ot.id_offer
-JOIN
+        AND ot.type IN ('PRICE', 'CUSTOM')
+LEFT JOIN
     topic_message AS tm
         ON tm.id_offer_topic = ot.id
 JOIN
     datalake_ebdb_clean.house AS h
         ON o.id_house_external = h.id
-JOIN
+LEFT JOIN
     datalake_rental_transact_clean.resident_info AS ri
         ON o.id_resident_info = ri.id
-JOIN
+LEFT JOIN
     negotiation_rental_transact AS negotiation
         ON negotiation.id_offer = o.id
-JOIN
+LEFT JOIN
     analyzed_offers_rental_transact AS analyzed
         ON analyzed.id_offer = o.id
