@@ -1598,6 +1598,9 @@ bietlejuice.enrich_docpilot:
   - bietlejuice.docx:load-clean-document
   - bietlejuice.enrich_docx:load-enrich-personal-documentation
   - bietlejuice.enrich_ebdb_user:load-enrich-user
+  - bietlejuice.quinturk:load-clean-project
+  - bietlejuice.quinturk:load-clean-task
+  - bietlejuice.quinturk:load-clean-task-completion
 bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-categories-documentation
   - bietlejuice.documentation_metrics:load-clean-columns-documentation

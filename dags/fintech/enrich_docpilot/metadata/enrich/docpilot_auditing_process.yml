@@ -1,0 +1,91 @@
+database_name: datalake_docpilot
+table_name: docpilot_auditing_process
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: "This table stores the results returned by Quinturk (Label Studio) regarding the auditing of a percentage of the documents analysed by the credit desk and processed by Docpilot. Each line represents a task assigned to an analyst and the annotations done in an income documentation (payslip or bank statement). These annotations include the reported incomes (net, gross and committed), the document type and if there is any fraud."
+columns:
+  id_task:
+    lineage:
+      - datalake_quinturk_clean.task.id
+    description: "Unique task ID. It corresponds to the task identifier from Label Studio"
+  id_proposal:
+    lineage:
+      - datalake_quinturk_clean.task.id_proposal
+    description: "Proposal ID attributed to the TP."
+  id_project:
+    lineage:
+      - datalake_quinturk_clean.project.id
+    description: "ID of the project in Label Studio. In this table only projects related to the Docpilot auditing process is considered."
+  id_completed_by:
+    lineage:
+      - datalake_quinturk_clean.task_completion.id_completed_by
+    description: "ID of the analyst who completed the assigned task"
+  proponent_cpf:
+    lineage:
+      - datalake_quinturk_clean.task.proponent_cpf
+    description: "Proponent CPF number."
+  proponent_name:
+    lineage:
+      - datalake_quinturk_clean.task.proponent_name
+    description: "Proponent name"
+  lead_time:
+    lineage:
+      - datalake_quinturk_clean.task_completion.lead_time
+    description: "The lead time in minutes taken by the analyst to complete the task."
+  document_type:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The type of document submitted."
+    categories:
+      PAYSLIP: ""
+      BANK_STATEMENT: ""
+  document_name:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The name indicating which document was annotated."
+  net_income:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The net income extracted from a document in a reference month by the analyst."
+  gross_income:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The gross income extracted from a document in a reference month by the analyst."
+  committed_income:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The commited income extracted from a document in a reference month by the analyst."
+  payslip_reference_period:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The reference period of the payslip."
+  bank_statement_start_date:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The start date of the period when the document is a Bank Statement."
+  bank_statement_end_date:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The end date of the period when the document is a Bank Statement."
+  bank_statement_date_start_partial:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The start date of the period when the document is a Bank Statement, and part of the period was skipped/ignored."
+  bank_statement_date_end_partial:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "The end date of the period when the document is a Bank Statement, and part of the period was skipped/ignored."
+  is_fraud:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "True when the analyst checks the box indicating that the document may be a fraud"
+  is_partial:
+    lineage:
+      - datalake_quinturk_clean.task_completion.result
+    description: "True when the analyst checks the box indicating that part of the period of the bank statement was ignored"
+  ts_updated:
+    lineage:
+      - datalake_quinturk_clean.task_completion.ts_updated
+    description: "Updated timestamp."
+  ts_load:
+    description: "Load timestamp."

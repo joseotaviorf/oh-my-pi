@@ -2,7 +2,7 @@ database_name: datalake_docpilot
 table_name: income_extraction_processing
 owner: isabella.santos@quintoandar.com.br
 domain: fintech
-description: "This table stores the results returned by DocPilot regarding the processing of an income extraction."
+description: "This table stores the results returned by DocPilot regarding the processing of an income extraction. Each line represents the income extracted (net or gross) from a document in a reference month."
 columns:
   id_document:
     lineage:
@@ -55,14 +55,40 @@ columns:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
     description: "Bank statement type."
-  extracted_incomes:
+  net_income:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "The extracted incomes from the submitted document."
-  avg_extracted_income:
+    description: "The net income extracted from a document in a reference month."
+  gross_income:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
-    description: "The average of the extracted incomes."
+    description: "The gross income extracted from a document in a reference month."
+  committed_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The commited income extracted from a document in a reference month."
+  avg_net_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The average of the net income extracted from a document in a period."
+  avg_gross_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The average of the gross income extracted from a document in a period."
+  avg_committed_income:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The average of the committed income extracted from a document in a period."
+  reference_period:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The reference period of the extracted income, which corresponds to the period of the document."
+  reference_date:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data.reference_date
+    description: "The reference date of the extracted income, which corresponds to the date when the document was processed."
+  document_number:
+    description: "Ranking based on the document ID and reference period to indicate the order of the processed documents."
   any_suspicious_document:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
