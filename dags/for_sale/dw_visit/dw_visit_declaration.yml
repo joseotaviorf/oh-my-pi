@@ -42,6 +42,25 @@ workflow:
       dim_visit_status:
         extraction_type: incremental
         merge_on: [ "status_name" ]
+    inner_dependencies:
+      fact_visit_events:
+        - dim_event_type
+        - dim_author_type
+        - dim_cancellation_type
+      fact_visit_schedules:
+        - dim_origin_type
+        - dim_business_context
+        - dim_visit_model
+        - dim_behavior
+        - dim_entrance_type
+        - dim_business_model
+        - dim_visit_fup
+      fact_visits:
+        - dim_behavior
+        - dim_visit_status
+        - dim_business_context
+        - dim_entrance_type
+        - dim_business_model
 cluster:
     type: custom_cluster
     access_control_list:
