@@ -15,7 +15,7 @@ workflow:
   source_schema: public
   custom_schema: bob
   source_database: bob-o-construtor
-  dbutils_secret_key: BOB_DB
+  dbutils_secret_key: BOB-O-CONSTRUTOR_DB
   lineage_product_database_name: boboconstrutor
   tables_customization:
     attribution_progress_aud: {}
