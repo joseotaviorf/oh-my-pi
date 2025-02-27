@@ -1,4 +1,4 @@
-database_name: datalake_sales_force_clean
+database_name: datalake_salesforce_clean
 table_name: contract
 description: Clean table for ingesting contract data from the Sales Force tool.
 domain: Support and Service
@@ -6,61 +6,61 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_contract:
     lineage:
-      - datalake_sales_force_raw.contract.Id
+      - datalake_salesforce_raw.contract.Id
     description: Unique identification key for contract in Sales Force.
   id_owner:
     lineage:
-      - datalake_sales_force_raw.contract.OwnerId
+      - datalake_salesforce_raw.contract.OwnerId
     description: Home Owner Identification Key in Salesforce.
   id_external:
     lineage:
-      - datalake_sales_force_raw.contract.ExternalId
+      - datalake_salesforce_raw.contract.ExternalId
     description: External identification key for the contract.
   id_created_by:
     lineage:
-      - datalake_sales_force_raw.contract.CreatedById
+      - datalake_salesforce_raw.contract.CreatedById
     description: Identification key of the user who created the record.
   id_last_modified_by:
     lineage:
-      - datalake_sales_force_raw.contract.LastModifiedById
+      - datalake_salesforce_raw.contract.LastModifiedById
     description: Identification key of the user who last updated the record.
   contract_name:
     lineage:
-      - datalake_sales_force_raw.contract.Name
+      - datalake_salesforce_raw.contract.Name
     description: Name or reference of the contract.
   contract_term:
     lineage:
-      - datalake_sales_force_raw.contract.ContractTerm
+      - datalake_salesforce_raw.contract.ContractTerm
     description: Duration term of the contract.
   is_deleted:
     lineage:
-      - datalake_sales_force_raw.contract.IsDeleted
+      - datalake_salesforce_raw.contract.IsDeleted
     description: Indicates whether the contract record is deleted.
   system_mod_stamp:
     lineage:
-      - datalake_sales_force_raw.contract.SystemModstamp
+      - datalake_salesforce_raw.contract.SystemModstamp
     description: System modification timestamp.
   ts_start:
     lineage:
-      - datalake_sales_force_raw.contract.StartDate
+      - datalake_salesforce_raw.contract.StartDate
     description: Contract start date timestamp.
   ts_last_activity:
     lineage:
-      - datalake_sales_force_raw.contract.LastActivityDate
+      - datalake_salesforce_raw.contract.LastActivityDate
     description: Timestamp of the last activity associated with the contract.
   ts_last_viewed:
     lineage:
-      - datalake_sales_force_raw.contract.LastViewedDate
+      - datalake_salesforce_raw.contract.LastViewedDate
     description: Timestamp when the contract was last viewed.
   ts_last_referenced:
     lineage:
-      - datalake_sales_force_raw.contract.LastReferencedDate
+      - datalake_salesforce_raw.contract.LastReferencedDate
     description: Timestamp when the contract was last referenced.
   ts_created:
     lineage:
-      - datalake_sales_force_raw.contract.CreatedDate
+      - datalake_salesforce_raw.contract.CreatedDate
     description: Timestamp of when the record was created.
   ts_last_modified:
     lineage:
-      - datalake_sales_force_raw.contract.LastModifiedDate
+      - datalake_salesforce_raw.contract.LastModifiedDate
     description: Timestamp of the last modification.

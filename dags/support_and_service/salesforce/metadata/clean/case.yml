@@ -1,4 +1,4 @@
-database_name: datalake_sales_force_clean
+database_name: datalake_salesforce_clean
 table_name: case
 description: Clean table for ingesting cases data from the Sales Force tool.
 domain: Support and Service
@@ -6,185 +6,185 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_case:
     lineage:
-      - datalake_sales_force_raw.case.Id
+      - datalake_salesforce_raw.case.Id
     description: Unique identification key for the case in Sales Force.
   id_master_record:
     lineage:
-      - datalake_sales_force_raw.case.MasterRecordId
+      - datalake_salesforce_raw.case.MasterRecordId
     description: Master record identification key in Sales Force.
   case_number:
     lineage:
-      - datalake_sales_force_raw.case.CaseNumber
+      - datalake_salesforce_raw.case.CaseNumber
     description: Unique case reference number.
   id_contact:
     lineage:
-      - datalake_sales_force_raw.case.ContactId
+      - datalake_salesforce_raw.case.ContactId
     description: Contact identification key related to the case.
   id_account:
     lineage:
-      - datalake_sales_force_raw.case.AccountId
+      - datalake_salesforce_raw.case.AccountId
     description: Account identification key related to the case.
   id_asset:
     lineage:
-      - datalake_sales_force_raw.case.AssetId
+      - datalake_salesforce_raw.case.AssetId
     description: Asset identification key related to the case.
   id_product:
     lineage:
-      - datalake_sales_force_raw.case.ProductId
+      - datalake_salesforce_raw.case.ProductId
     description: Product identification key related to the case.
   id_entitlement:
     lineage:
-      - datalake_sales_force_raw.case.EntitlementId
+      - datalake_salesforce_raw.case.EntitlementId
     description: Entitlement identification key related to the case.
   id_source:
     lineage:
-      - datalake_sales_force_raw.case.SourceId
+      - datalake_salesforce_raw.case.SourceId
     description: Source identification key related to the case.
   id_business_hours:
     lineage:
-      - datalake_sales_force_raw.case.BusinessHoursId
+      - datalake_salesforce_raw.case.BusinessHoursId
     description: Business hours identification key.
   id_parent:
     lineage:
-      - datalake_sales_force_raw.case.ParentId
+      - datalake_salesforce_raw.case.ParentId
     description: Parent case identification key.
   id_record_type:
     lineage:
-      - datalake_sales_force_raw.case.RecordTypeId
+      - datalake_salesforce_raw.case.RecordTypeId
     description: Record type identification key.
   id_owner:
     lineage:
-      - datalake_sales_force_raw.case.OwnerId
+      - datalake_salesforce_raw.case.OwnerId
     description: Owner identification key of the case.
   id_contract:
     lineage:
-      - datalake_sales_force_raw.case.ContractId
+      - datalake_salesforce_raw.case.ContractId
     description: Contract identification key related to the case.
   id_external:
     lineage:
-      - datalake_sales_force_raw.case.ExternalId
+      - datalake_salesforce_raw.case.ExternalId
     description: External identification key for the case.
   id_repair:
     lineage:
-      - datalake_sales_force_raw.case.RepairId
+      - datalake_salesforce_raw.case.RepairId
     description: Repair identification key related to the case.
   id_termination:
     lineage:
-      - datalake_sales_force_raw.case.Termination
+      - datalake_salesforce_raw.case.Termination
     description: Termination identification key related to the case.
   id_service_contract:
     lineage:
-      - datalake_sales_force_raw.case.ServiceContractId
+      - datalake_salesforce_raw.case.ServiceContractId
     description: Service contract identification key.
   zendesk_id:
     lineage:
-      - datalake_sales_force_raw.case.ZendeskId
+      - datalake_salesforce_raw.case.ZendeskId
     description: Zendesk case identification key.
   supplied_name:
     lineage:
-      - datalake_sales_force_raw.case.SuppliedName
+      - datalake_salesforce_raw.case.SuppliedName
     description: Name supplied by the user for the case.
   supplied_email:
     lineage:
-      - datalake_sales_force_raw.case.SuppliedEmail
+      - datalake_salesforce_raw.case.SuppliedEmail
     description: Email supplied by the user for the case.
   supplied_phone:
     lineage:
-      - datalake_sales_force_raw.case.SuppliedPhone
+      - datalake_salesforce_raw.case.SuppliedPhone
     description: Phone number supplied by the user for the case.
   supplied_company:
     lineage:
-      - datalake_sales_force_raw.case.SuppliedCompany
+      - datalake_salesforce_raw.case.SuppliedCompany
     description: Company name supplied by the user for the case.
   case_type:
     lineage:
-      - datalake_sales_force_raw.case.Type
+      - datalake_salesforce_raw.case.Type
     description: Type of case.
   case_status:
     lineage:
-      - datalake_sales_force_raw.case.Status
+      - datalake_salesforce_raw.case.Status
     description: Current status of the case.
   case_reason:
     lineage:
-      - datalake_sales_force_raw.case.Reason
+      - datalake_salesforce_raw.case.Reason
     description: Reason for the case.
   case_origin:
     lineage:
-      - datalake_sales_force_raw.case.Origin
+      - datalake_salesforce_raw.case.Origin
     description: Origin of the case.
   case_language:
     lineage:
-      - datalake_sales_force_raw.case.Language
+      - datalake_salesforce_raw.case.Language
     description: Language in which the case was reported.
   case_subject:
     lineage:
-      - datalake_sales_force_raw.case.Subject
+      - datalake_salesforce_raw.case.Subject
     description: Subject of the case.
   case_priority:
     lineage:
-      - datalake_sales_force_raw.case.Priority
+      - datalake_salesforce_raw.case.Priority
     description: Priority level of the case.
   case_description:
     lineage:
-      - datalake_sales_force_raw.case.Description
+      - datalake_salesforce_raw.case.Description
     description: Description of the case.
   milestone_status:
     lineage:
-      - datalake_sales_force_raw.case.MilestoneStatus
+      - datalake_salesforce_raw.case.MilestoneStatus
     description: Status of the case milestone.
   zendesk_url:
     lineage:
-      - datalake_sales_force_raw.case.ZendeskUrl
+      - datalake_salesforce_raw.case.ZendeskUrl
     description: Zendesk URL for the case.
   contact_phone:
     lineage:
-      - datalake_sales_force_raw.case.ContactPhone
+      - datalake_salesforce_raw.case.ContactPhone
     description: Contact phone number associated with the case.
   contact_mobile:
     lineage:
-      - datalake_sales_force_raw.case.ContactMobile
+      - datalake_salesforce_raw.case.ContactMobile
     description: Contact mobile number associated with the case.
   contact_email:
     lineage:
-      - datalake_sales_force_raw.case.ContactEmail
+      - datalake_salesforce_raw.case.ContactEmail
     description: Contact email associated with the case.
   contact_fax:
     lineage:
-      - datalake_sales_force_raw.case.ContactFax
+      - datalake_salesforce_raw.case.ContactFax
     description: Contact fax number associated with the case.
   is_deleted:
     lineage:
-      - datalake_sales_force_raw.case.IsDeleted
+      - datalake_salesforce_raw.case.IsDeleted
     description: Flag indicating if the case is deleted.
   is_closed:
     lineage:
-      - datalake_sales_force_raw.case.IsClosed
+      - datalake_salesforce_raw.case.IsClosed
     description: Flag indicating if the case is closed.
   is_escalated:
     lineage:
-      - datalake_sales_force_raw.case.IsEscalated
+      - datalake_salesforce_raw.case.IsEscalated
     description: Flag indicating if the case is escalated.
   ts_created:
     lineage:
-      - datalake_sales_force_raw.case.CreatedDate
+      - datalake_salesforce_raw.case.CreatedDate
     description: Timestamp of when the case was created.
   ts_last_modified:
     lineage:
-      - datalake_sales_force_raw.case.LastModifiedDate
+      - datalake_salesforce_raw.case.LastModifiedDate
     description: Timestamp of the last modification of the case.
   ts_closed:
     lineage:
-      - datalake_sales_force_raw.case.ClosedDate
+      - datalake_salesforce_raw.case.ClosedDate
     description: Timestamp of when the case was closed.
   ts_last_activity:
     lineage:
-      - datalake_sales_force_raw.case.LastActivityDate
+      - datalake_salesforce_raw.case.LastActivityDate
     description: Timestamp of the last activity in the case.
   ts_last_viewed:
     lineage:
-      - datalake_sales_force_raw.case.LastViewedDate
+      - datalake_salesforce_raw.case.LastViewedDate
     description: Timestamp of when the case was last viewed.
   ts_last_referenced:
     lineage:
-      - datalake_sales_force_raw.case.LastReferencedDate
+      - datalake_salesforce_raw.case.LastReferencedDate
     description: Timestamp of when the case was last referenced.

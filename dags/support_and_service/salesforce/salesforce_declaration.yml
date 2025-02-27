@@ -1,5 +1,5 @@
 dag:
-  name: sales_force
+  name: salesforce
   owner: Data SS
   schedule_start_date: 2025, 02, 10
   documentation:
@@ -8,8 +8,8 @@ dag:
 workflow:
   type: custom_ingestion
   layer: raw
-  custom_schema: sales_force
-  load_spark_job: load_sales_force_raw
+  custom_schema: salesforce
+  load_spark_job: load_salesforce_raw
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"

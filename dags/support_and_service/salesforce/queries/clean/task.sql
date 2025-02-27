@@ -50,12 +50,11 @@ SELECT
     CreatedDate AS ts_created,
     LastModifiedDate AS ts_last_modified,
     SystemModstamp AS system_mod_stamp,
-    LastViewedDate AS ts_last_viewed,
     LastReferencedDate AS ts_last_referenced,
     year,
     month,
     day
 FROM
-    datalake_sales_force_raw.task
+    datalake_salesforce_raw.task
 WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

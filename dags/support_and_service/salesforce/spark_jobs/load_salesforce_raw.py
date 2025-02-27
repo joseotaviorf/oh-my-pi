@@ -19,7 +19,7 @@ from pyspark.sql.types import StructType, StructField, StringType
 from pyspark.sql.functions import col, year, month, day
 
 
-JOB_NAME = "load_sales_force_raw"
+JOB_NAME = "load_salesforce_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
@@ -65,7 +65,7 @@ def get_access_token(endpoint):
         dbutils = base_dbutils.get_dbutils()
 
     api_credentials = json.loads(
-        dbutils.secrets.get(scope="quintoandar", key=APIEnum.SALES_FORCE)
+        dbutils.secrets.get(scope="quintoandar", key=APIEnum.SALESFORCE)
     )
 
     req_url = f'{endpoint}/services/oauth2/token'

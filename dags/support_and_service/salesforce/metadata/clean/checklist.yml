@@ -1,4 +1,4 @@
-database_name: datalake_sales_force_clean
+database_name: datalake_salesforce_clean
 table_name: checklist
 description: Clean table for ingesting checklist data from the Sales Force tool.
 domain: Support and Service
@@ -6,69 +6,69 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_checklist:
     lineage:
-      - datalake_sales_force_raw.checklist.Id
+      - datalake_salesforce_raw.checklist.Id
     description: Unique identification key for checklist in Sales Force.
   id_owner:
     lineage:
-      - datalake_sales_force_raw.checklist.OwnerId
+      - datalake_salesforce_raw.checklist.OwnerId
     description: Owner identification key in Salesforce.
   id_termination:
     lineage:
-      - datalake_sales_force_raw.checklist.Termination
+      - datalake_salesforce_raw.checklist.Termination
     description: Termination identification key related to the checklist.
   id_external:
     lineage:
-      - datalake_sales_force_raw.checklist.ExternalId
+      - datalake_salesforce_raw.checklist.ExternalId
     description: Checklist identification key in the external source.
   id_created_by:
     lineage:
-      - datalake_sales_force_raw.checklist.CreatedById
+      - datalake_salesforce_raw.checklist.CreatedById
     description: Identification key of the user who created the checklist.
   id_last_modified_by:
     lineage:
-      - datalake_sales_force_raw.checklist.LastModifiedById
+      - datalake_salesforce_raw.checklist.LastModifiedById
     description: Identification key of the user who last updated the checklist.
   name:
     lineage:
-      - datalake_sales_force_raw.checklist.Name
+      - datalake_salesforce_raw.checklist.Name
     description: Checklist name.
   type:
     lineage:
-      - datalake_sales_force_raw.checklist.Type
+      - datalake_salesforce_raw.checklist.Type
     description: Checklist type.
   is_done:
     lineage:
-      - datalake_sales_force_raw.checklist.Done
+      - datalake_salesforce_raw.checklist.Done
     description: Indicates whether the checklist is completed.
   is_active:
     lineage:
-      - datalake_sales_force_raw.checklist.Active
+      - datalake_salesforce_raw.checklist.Active
     description: Indicates whether the checklist is active.
   is_deleted:
     lineage:
-      - datalake_sales_force_raw.checklist.IsDeleted
+      - datalake_salesforce_raw.checklist.IsDeleted
     description: Indicates whether the checklist is deleted.
   ts_created:
     lineage:
-      - datalake_sales_force_raw.checklist.CreatedDate
+      - datalake_salesforce_raw.checklist.CreatedDate
     description: Timestamp of when the checklist was created.
   ts_last_modified:
     lineage:
-      - datalake_sales_force_raw.checklist.LastModifiedDate
+      - datalake_salesforce_raw.checklist.LastModifiedDate
     description: Timestamp of the last modification of the checklist.
   system_mod_stamp:
     lineage:
-      - datalake_sales_force_raw.checklist.SystemModstamp
+      - datalake_salesforce_raw.checklist.SystemModstamp
     description: System modification timestamp.
   ts_last_activity:
     lineage:
-      - datalake_sales_force_raw.checklist.LastActivityDate
+      - datalake_salesforce_raw.checklist.LastActivityDate
     description: Timestamp of the last activity related to the checklist.
   ts_last_viewed:
     lineage:
-      - datalake_sales_force_raw.checklist.LastViewedDate
+      - datalake_salesforce_raw.checklist.LastViewedDate
     description: Timestamp of the last time the checklist was viewed.
   ts_last_referenced:
     lineage:
-      - datalake_sales_force_raw.checklist.LastReferencedDate
+      - datalake_salesforce_raw.checklist.LastReferencedDate
     description: Timestamp of the last time the checklist was referenced.

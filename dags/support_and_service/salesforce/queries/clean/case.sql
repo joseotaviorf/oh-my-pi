@@ -97,6 +97,6 @@ SELECT
     month,
     day
 FROM
-    datalake_sales_force_raw.case
+    datalake_salesforce_raw.case
 WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

@@ -1,4 +1,4 @@
-database_name: datalake_sales_force_clean
+database_name: datalake_salesforce_clean
 table_name: contract_member
 description: Clean table for ingesting contract member data from the Sales Force tool.
 domain: Support and Service
@@ -6,53 +6,53 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_contract_member:
     lineage:
-      - datalake_sales_force_raw.contractmember.Id
+      - datalake_salesforce_raw.contractmember.Id
     description: Unique identification key for contract member in Sales Force.
   id_owner:
     lineage:
-      - datalake_sales_force_raw.contractmember.OwnerId
+      - datalake_salesforce_raw.contractmember.OwnerId
     description: Owner identification key in Salesforce.
   id_contract:
     lineage:
-      - datalake_sales_force_raw.contractmember.Contract
+      - datalake_salesforce_raw.contractmember.Contract
     description: Contract identification key associated with the contract member.
   id_account:
     lineage:
-      - datalake_sales_force_raw.contractmember.Account
+      - datalake_salesforce_raw.contractmember.Account
     description: Account identification key linked to the contract member.
   id_external:
     lineage:
-      - datalake_sales_force_raw.contractmember.ExternalId
+      - datalake_salesforce_raw.contractmember.ExternalId
     description: External identification key for contract member source.
   id_created_by:
     lineage:
-      - datalake_sales_force_raw.contractmember.CreatedById
+      - datalake_salesforce_raw.contractmember.CreatedById
     description: Identification key of the user who created the record.
   id_last_modified_by:
     lineage:
-      - datalake_sales_force_raw.contractmember.LastModifiedById
+      - datalake_salesforce_raw.contractmember.LastModifiedById
     description: Identification key of the user who last updated the record.
   contract_member_name:
     lineage:
-      - datalake_sales_force_raw.contractmember.Name
+      - datalake_salesforce_raw.contractmember.Name
     description: Name of the contract member.
   contract_member_type:
     lineage:
-      - datalake_sales_force_raw.contractmember.Type
+      - datalake_salesforce_raw.contractmember.Type
     description: Type of contract member.
   is_deleted:
     lineage:
-      - datalake_sales_force_raw.contractmember.IsDeleted
+      - datalake_salesforce_raw.contractmember.IsDeleted
     description: Flag indicating whether the record is deleted.
   system_mod_stamp:
     lineage:
-      - datalake_sales_force_raw.contractmember.SystemModstamp
+      - datalake_salesforce_raw.contractmember.SystemModstamp
     description: System modification timestamp.
   ts_created:
     lineage:
-      - datalake_sales_force_raw.contractmember.CreatedDate
+      - datalake_salesforce_raw.contractmember.CreatedDate
     description: Timestamp of when the record was created.
   ts_last_modified:
     lineage:
-      - datalake_sales_force_raw.contractmember.LastModifiedDate
+      - datalake_salesforce_raw.contractmember.LastModifiedDate
     description: Timestamp of the last modification.
