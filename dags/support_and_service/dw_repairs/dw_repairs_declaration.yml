@@ -27,11 +27,7 @@ workflow:
       merge_on: [sk_ticket]
     fact_ongoing_repairs:
       z_order_by:
-        [
-          year,
-          month,
-          day,
-          sk_ticket,
+        [ sk_ticket,
           sk_request,
           sk_contract,
           sk_user,
@@ -40,20 +36,14 @@ workflow:
         ]
       merge_on: [sk_ticket]
     dim_ongoing_repairs:
-      z_order_by:
-        [
-          year,
-          month,
-          day,
-          sk_ticket
-        ]
+      z_order_by: [sk_ticket]
 cluster:
   type: custom_cluster
   custom_configurations:
     spark_version: 13.3.x-scala2.12
     driver_node_type_id: r6gd.4xlarge
     node_type_id: r6gd.4xlarge
-    num_workers: 3
+    num_workers: 4
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
