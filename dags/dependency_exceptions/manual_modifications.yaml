@@ -126,6 +126,11 @@ bietlejuice.dw_datamarts_spark.static:
 bietlejuice.dw_date:
   add:
     - bietlejuice.enrich_public_date:load-enrich-aux-date
+bietlejuice.dw_fintech_snapshot_quintocred:
+  remove:
+     - bietlejuice.dw_fintech_snapshot:load-dw-charging-payment-quintocred-fact-payment-full
+     - bietlejuice.dw_fintech_snapshot:load-dw-velo-quintocred-aging-recurring-payment-no-renewal
+     - bietlejuice.dw_fintech_snapshot:load-dw-velo-quintocred-aging-recurring-payment-renewal
 bietlejuice.dw_inspections:
   remove:
     - bietlejuice.inspection_services:load-clean-assessment

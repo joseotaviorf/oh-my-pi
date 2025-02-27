@@ -1,0 +1,59 @@
+database_name: dw_fintech_snapshot_quintocred
+table_name: quintocred_aging_recurring_payment_no_renewal
+description: Table made to measure PDD of non renewed Recurring Payments.
+domain: Fintech
+owner: guilherme.sacramento@quintoandar.com.br
+columns:
+  client_cpf_cnpj:
+    description: "For 3.0 cases, it will be the delinquency entry id, for 2.0 cases, it will be the delinquency id."
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_no_renewal.client_cpf_cnpj
+  delay_range_due:
+    description: "Range according to the days of delay"
+    categories:
+      "a.Current": "No delay"
+      "b.1 a 30": "Maximum days of delay between 1 and 30 days"
+      "c.31 a 60": "Maximum days of delay between 31 and 60 days"
+      "d.61 a 90": "Maximum days of delay between 61 and 90 days"
+      "e.91 a 120": "Maximum days of delay between 91 and 120 days"
+      "f.121 a 150": "Maximum days of delay between 121 and 150 days"
+      "g.151 a 180": "Maximum days of delay between 151 and 180 days"
+      "h.>180": "Maximum days of delay bigger than 180 days"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_no_renewal.delay_range_due
+  discount_amount:
+    description: "Value of the discount given when paying the delinquency"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_no_renewal.discount_amount
+  dt_due:
+    description: "Due date of the original invoice that became delinquent"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_no_renewal.dt_due
+  due_amount:
+    description: "Amount of the original unpaid charge."
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_no_renewal.due_amount
+  open_amount:
+    description: "Difference between the amount paid and the original invoice amount"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_no_renewal.open_amount
+  paid_amount:
+    description: "Delinquency amount paid"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_no_renewal.paid_amount
+  pdd:
+    description: "PDD value"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_no_renewal.pdd
+  pdd_percentage:
+    description: "PDD percentage, calculated according to the delay range: 'a.Current' = 0.35, 'b.1 a 30' = 0.86 and anything else = 1"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_no_renewal.pdd_percentage
+  sk_propose:
+    description: "Proposal ID related to payment information"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_no_renewal.sk_propose
+  ts_snapshot:
+    description: "Timestamp when the data was loaded"
+    lineage:
+      - dw_velo.quintocred_aging_recurring_payment_no_renewal.ts_snapshot

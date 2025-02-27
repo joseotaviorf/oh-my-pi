@@ -1,0 +1,28 @@
+dag:
+  name: dw_fintech_snapshot_quintocred
+  schedule_start_date: 2025,02,25
+  owner: Data Fintech
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: fintech_snapshot_quintocred
+  inner_dependencies:
+    quintocred_bad_debt:
+      - quintocred_ifrs_recurring_payment
+  default_partitions: ["year", "month", "day"]
+  default_extraction_type: incremental
+  tables_customization:
+    quintocred_bad_debt:
+      extraction_type: full
+      partitions: []
+cluster:
+  type: databricks_13_3_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"

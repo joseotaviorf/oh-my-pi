@@ -506,6 +506,14 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-occurrence
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
+bietlejuice.dw_fintech_snapshot_quintocred:
+  - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-payment-full
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-occurrence
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-recurring-payment-no-renewal
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-recurring-payment-renewal
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-occurrence
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency
 bietlejuice.dw_fintech_snapshot_second_business_day:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline
 bietlejuice.dw_hiring:
