@@ -46,6 +46,30 @@ workflow:
       raw_partitions: ["year", "month", "day"]
       extra_spark_job_arguments:
       - statement_id: "067000392216"
+    statement_879200426887:
+      merge_on: [ 'id']
+      extraction_type: incremental
+      raw_partitions: ["year", "month", "day"]
+      extra_spark_job_arguments:
+      - statement_id: "879200426887"
+    statement_879200429691:
+      merge_on: [ 'id']
+      extraction_type: incremental
+      raw_partitions: ["year", "month", "day"]
+      extra_spark_job_arguments:
+      - statement_id: "879200429691"
+    statement_879200433065:
+      merge_on: [ 'id']
+      extraction_type: incremental
+      raw_partitions: ["year", "month", "day"]
+      extra_spark_job_arguments:
+      - statement_id: "879200433065"
+    statement_879200502307:
+      merge_on: [ 'id']
+      extraction_type: incremental
+      raw_partitions: ["year", "month", "day"]
+      extra_spark_job_arguments:
+      - statement_id: "879200502307"
 
 cluster:
   type: databricks_13_3_med_general_cluster
