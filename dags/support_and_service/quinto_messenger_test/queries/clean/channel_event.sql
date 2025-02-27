@@ -14,4 +14,4 @@ SELECT
     month,
     day
 FROM
-    datalake_quinto_messenger_raw.channelevent
+    datalake_quinto_messenger_test_raw.channelevent

@@ -20,4 +20,4 @@ SELECT
     month,
     day
 FROM
-    datalake_quinto_messenger_raw.channel
+    datalake_quinto_messenger_test_raw.channel

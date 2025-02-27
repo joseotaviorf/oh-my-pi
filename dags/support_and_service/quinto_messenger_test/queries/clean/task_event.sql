@@ -13,4 +13,4 @@ SELECT
     month,
     day
 FROM
-    datalake_quinto_messenger_raw.taskevent
+    datalake_quinto_messenger_test_raw.taskevent
