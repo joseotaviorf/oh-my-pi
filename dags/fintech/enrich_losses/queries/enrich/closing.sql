@@ -34,7 +34,7 @@ BASE_INVOICES_SNAPSHOT_CLEAN AS (
                   ps.ts_canceled,
                   ps.dt_sent,
                   ps.dt_due,
-                  IF(dd.is_brz_fintech_business_day, ps.dt_due, dd.next_brz_fintech_business_day) AS dt_due_adjusted,
+                  COALESCE(ps.dt_due_adjusted, IF(dd.is_brz_fintech_business_day, ps.dt_due, dd.next_brz_fintech_business_day)) AS dt_due_adjusted_retsuko,
                   ps.dt_paid,
                   CASE
                         WHEN ps.dt_write_off IS NULL AND ps.reason IN ('write-off-negotiation-cyber',  'write-off-negotiation-5a') THEN DATE(ps.ts_created)
@@ -223,7 +223,7 @@ SELECT
       contract_signature_date as dt_contract_signature,
       dt_annulment,
       dt_due,
-      dt_due_adjusted,
+      dt_due_adjusted_retsuko,
       dt_paid,
       dt_sent,
       dt_write_off,

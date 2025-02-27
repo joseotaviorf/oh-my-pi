@@ -15,6 +15,7 @@ SELECT
     ts_canceled,
     dt_sent,
     dt_due,
+    dt_due_adjusted,
     dt_paid,
     dt_write_off,
     ts_load AS ts_snapshot,

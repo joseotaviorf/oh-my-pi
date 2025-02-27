@@ -16,6 +16,7 @@ SELECT
     i.ts_canceled,
     DATE(il.ts_sent) AS dt_sent,
     DATE(il.ts_due) AS dt_due,
+    DATE(dt_due_adjusted) AS dt_due_adjusted,
     DATE(il.ts_paid) AS dt_paid,
     DATE(i.ts_write_off) AS dt_write_off,
     NOW() AS ts_load

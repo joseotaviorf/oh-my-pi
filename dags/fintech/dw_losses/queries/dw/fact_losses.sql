@@ -49,6 +49,7 @@ losses_base AS (
       fc.dt_due,
       fp.dt_due_general_accrual,
       fp.dt_due_adjs AS dt_due_invoice_adjusted,
+      fc.dt_due_adjusted_retsuko,
       fp.dt_paid_adjs,
       fc.dt_contract_signature,
       fc.dt_annulment AS dt_contract_annulment,
