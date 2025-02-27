@@ -10,8 +10,8 @@ WITH get_docpilot_annotations AS (
     task.proponent_name,
     task_completion.result,
     EXPLODE(
-      from_json(
-        get_json_object(task_completion.result, "$"),
+      FROM_JSON(
+        GET_JSON_OBJECT(task_completion.result, "$"),
         "ARRAY<
           STRUCT<
             from_name: STRING,
@@ -28,11 +28,11 @@ WITH get_docpilot_annotations AS (
   FROM
     datalake_quinturk_clean.project
       INNER JOIN datalake_quinturk_clean.task
-        ON project.id == task.id_project
+        ON project.id = task.id_project
       INNER JOIN datalake_quinturk_clean.task_completion
         ON task_completion.id_task = task.id
   WHERE
-    title like "%[DocPilot] Auditoria%"
+    title LIKE "%[DocPilot] Auditoria%"
 ),
 extract_input_value AS (
   SELECT
@@ -45,15 +45,15 @@ extract_input_value AS (
     total_annotations,
     lead_time,
     REGEXP_REPLACE(
-      get_json_object(to_json(input_answer), "$.from_name"), '[A-Za-z_]+$', ""
+      GET_JSON_OBJECT(TO_JSON(input_answer), "$.from_name"), '[A-Za-z_]+$', ""
     ) AS document_name,
     REGEXP_REPLACE(
-      get_json_object(to_json(input_answer), "$.from_name"), '^document_[0-9]+_', ""
+      GET_JSON_OBJECT(TO_JSON(input_answer), "$.from_name"), '^document_[0-9]+_', ""
     ) AS field_type,
     REPLACE(
       COALESCE(
-        get_json_object(to_json(input_answer), "$.value.choices[0]"),
-        get_json_object(to_json(input_answer), "$.value.text[0]")
+        GET_JSON_OBJECT(TO_JSON(input_answer), "$.value.choices[0]"),
+        GET_JSON_OBJECT(TO_JSON(input_answer), "$.value.text[0]")
       ),
       ' ',
       ''
@@ -128,7 +128,7 @@ get_input_value AS (
     IF(
       (
         field_type = 'is_partial'
-        AND lower(trim(input_value)) LIKE '%sim%'
+        AND LOWER(TRIM(input_value)) LIKE '%sim%'
       ),
       TRUE,
       FALSE
@@ -165,7 +165,16 @@ get_documents_annotation AS (
   FROM
     get_input_value
   GROUP BY
-    ALL
+    id_task,
+    id_project,
+    id_proposal,
+    id_completed_by,
+    proponent_cpf,
+    proponent_name,
+    lead_time,
+    document_name,
+    is_fraud,
+    ts_updated
 ),
 get_payslip_data AS (
   SELECT
@@ -178,10 +187,10 @@ get_payslip_data AS (
     lead_time,
     document_name,
     document_type,
-    POSEXPLODE(net_income) AS (idx, net_income),
-    POSEXPLODE(gross_income) AS (idx2, gross_income),
-    POSEXPLODE(committed_income) AS (idx3, committed_income),
-    POSEXPLODE(payslip_reference_period) AS (idx4, payslip_reference_period),
+    get_documents_annotation.net_income[0] AS net_income,
+    get_documents_annotation.gross_income[0] AS gross_income,
+    get_documents_annotation.committed_income[0] AS committed_income,
+    get_documents_annotation.payslip_reference_period[0] AS payslip_reference_period,
     bank_statement_start_date,
     bank_statement_end_date,
     bank_statement_date_start_partial,
@@ -191,6 +200,10 @@ get_payslip_data AS (
     ts_updated
   FROM
     get_documents_annotation
+    LATERAL VIEW EXPLODE(net_income) AS net_income
+    LATERAL VIEW EXPLODE(gross_income) AS gross_income
+    LATERAL VIEW EXPLODE(committed_income) AS committed_income
+    LATERAL VIEW EXPLODE(payslip_reference_period) AS payslip_reference_period
   WHERE
     document_type = 'PAYSLIP'
 ),
@@ -205,10 +218,10 @@ get_bank_statement_data AS (
     lead_time,
     document_name,
     document_type,
-    POSEXPLODE(net_income) AS (idx, net_income),
-    POSEXPLODE(gross_income) AS (idx2, gross_income),
-    POSEXPLODE(committed_income) AS (idx3, committed_income),
-    POSEXPLODE(payslip_reference_period) AS (idx4, payslip_reference_period),
+    get_documents_annotation.net_income[0] AS net_income,
+    get_documents_annotation.gross_income[0] AS gross_income,
+    get_documents_annotation.committed_income[0] AS committed_income,
+    get_documents_annotation.payslip_reference_period[0] AS payslip_reference_period,
     bank_statement_start_date,
     bank_statement_end_date,
     bank_statement_date_start_partial,
@@ -218,10 +231,14 @@ get_bank_statement_data AS (
     ts_updated
   FROM
     get_documents_annotation
+    LATERAL VIEW EXPLODE(net_income) AS net_income
+    LATERAL VIEW EXPLODE(gross_income) AS gross_income
+    LATERAL VIEW EXPLODE(committed_income) AS committed_income
+    LATERAL VIEW EXPLODE(payslip_reference_period) AS payslip_reference_period
   WHERE
     document_type = 'BANK_STATEMENT'
 ),
-handle_payslip AS (
+union_documents AS (
   SELECT
     id_task,
     id_project,
@@ -232,10 +249,10 @@ handle_payslip AS (
     lead_time,
     document_name,
     document_type,
-    payslip_reference_period,
     net_income,
     gross_income,
     committed_income,
+    payslip_reference_period,
     bank_statement_start_date,
     bank_statement_end_date,
     bank_statement_date_start_partial,
@@ -245,64 +262,6 @@ handle_payslip AS (
     ts_updated
   FROM
     get_payslip_data
-  WHERE
-    idx = idx2
-    AND idx = idx3
-    AND idx = idx4
-),
-handle_bank_statement AS (
-  SELECT
-    id_task,
-    id_project,
-    id_proposal,
-    id_completed_by,
-    proponent_cpf,
-    proponent_name,
-    lead_time,
-    document_name,
-    document_type,
-    net_income,
-    gross_income,
-    committed_income,
-    payslip_reference_period,
-    bank_statement_start_date,
-    bank_statement_end_date,
-    bank_statement_date_start_partial,
-    bank_statement_date_end_partial,
-    is_fraud,
-    is_partial,
-    ts_updated
-  FROM
-    get_bank_statement_data
-  WHERE
-    idx = idx2
-    AND idx = idx3
-    AND idx = idx4
-),
-union_documents as (
-  SELECT
-    id_task,
-    id_project,
-    id_proposal,
-    id_completed_by,
-    proponent_cpf,
-    proponent_name,
-    lead_time,
-    document_name,
-    document_type,
-    net_income,
-    gross_income,
-    committed_income,
-    payslip_reference_period,
-    bank_statement_start_date,
-    bank_statement_end_date,
-    bank_statement_date_start_partial,
-    bank_statement_date_end_partial,
-    is_fraud,
-    is_partial,
-    ts_updated
-  FROM
-    handle_payslip
   UNION ALL
   SELECT
     id_task,
@@ -326,15 +285,15 @@ union_documents as (
     is_partial,
     ts_updated
   FROM
-    handle_bank_statement
+    get_bank_statement_data
 )
-SELECT
+SELECT DISTINCT
   CAST(id_task AS INT) AS id_task,
   CAST(id_project AS INT) AS id_project,
   CAST(id_proposal AS INT) AS id_proposal,
   CAST(id_completed_by AS INT) AS id_completed_by,
   proponent_cpf,
-  lower(proponent_name) AS proponent_name,
+  LOWER(proponent_name) AS proponent_name,
   lead_time,
   document_name,
   document_type,
@@ -342,10 +301,10 @@ SELECT
   ROUND(CAST(gross_income AS DECIMAL), 2) AS gross_income,
   ROUND(CAST(committed_income AS DECIMAL), 2) AS committed_income,
   payslip_reference_period,
-  to_date(bank_statement_start_date, 'dd/MM/yyyy')AS bank_statement_start_date,
-  to_date(bank_statement_end_date, 'dd/MM/yyyy') AS bank_statement_end_date,
+  TO_DATE(bank_statement_start_date, 'dd/MM/yyyy') AS bank_statement_start_date,
+  TO_DATE(bank_statement_end_date, 'dd/MM/yyyy') AS bank_statement_end_date,
   bank_statement_date_start_partial,
-  to_date(bank_statement_date_end_partial, 'dd/MM/yyyy')AS bank_statement_date_end_partial,
+  TO_DATE(bank_statement_date_end_partial, 'dd/MM/yyyy') AS bank_statement_date_end_partial,
   is_fraud,
   is_partial,
   ts_updated,
