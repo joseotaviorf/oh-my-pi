@@ -1,43 +1,55 @@
 ---
 database_name: datalake_superset_clean
 table_name: logs
-description: Table with Superset log data
+description: Detailed information about the operations carried out in the system
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.logs.id
+    description: Unique table id
   id_user:
     lineage:
       - datalake_superset_raw.logs.user_id
+    description: ID of the user who created logs
   id_dashboard:
     lineage:
       - datalake_superset_raw.logs.dashboard_id
+    description: Dashboard ID
   id_slice:
     lineage:
       - datalake_superset_raw.logs.slice_id
+    description: Slice ID
   action:
     lineage:
       - datalake_superset_raw.logs.action
+    description: Type of operation
   json:
     lineage:
       - datalake_superset_raw.logs.json
+    description: Additional logs information
   duration_ms:
     lineage:
       - datalake_superset_raw.logs.duration_ms
+    description: Duration time
   referrer:
     lineage:
       - datalake_superset_raw.logs.referrer
+    description: Link URL
   ts_event:
     lineage:
       - datalake_superset_raw.logs.dttm
+    description: Time it was registered
   year:
     lineage:
       - datalake_superset_raw.logs.year
+    description: Year created
   month:
     lineage:
       - datalake_superset_raw.logs.month
+    description: Month created
   day:
     lineage:
       - datalake_superset_raw.logs.day
+    description: Day created

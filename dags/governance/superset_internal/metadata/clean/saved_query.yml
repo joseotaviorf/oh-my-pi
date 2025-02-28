@@ -3,7 +3,7 @@ database_name: datalake_superset_clean
 table_name: saved_query
 description: Table with Superset saved queries. This is a personal features that only the creator can see.
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:

@@ -1,13 +1,15 @@
 ---
 database_name: datalake_superset_clean
 table_name: ab_role
-description: Table that lists all roles created on Superset.
+description: Access type information
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.ab_role.id
+    description: Id access
   name:
     lineage:
       - datalake_superset_raw.ab_role.name
+    description: Role name

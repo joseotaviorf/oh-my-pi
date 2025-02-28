@@ -1,16 +1,19 @@
 ---
 database_name: datalake_superset_clean
 table_name: ab_user_role
-description: Table that links roles with users on Superset.
+description: Information about the relationship between users and the table
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.ab_user_role.id
+    description: Unique table id
   id_user:
     lineage:
       - datalake_superset_raw.ab_user_role.user_id
+    description: User id
   id_role:
     lineage:
       - datalake_superset_raw.ab_user_role.role_id
+    description: Role ID

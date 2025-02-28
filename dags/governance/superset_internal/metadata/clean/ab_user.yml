@@ -1,55 +1,71 @@
 ---
 database_name: datalake_superset_clean
 table_name: ab_user
-description: Table that lists all users in Superset
+description: Information about system users
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_superset_raw.ab_user.id
+    description: Unique table id
   id_user_created:
     lineage:
       - datalake_superset_raw.ab_user.created_by_fk
+    description: User ID who created tables
   id_user_changed:
     lineage:
       - datalake_superset_raw.ab_user.changed_by_fk
+    description: User ID who modified tables
   first_name:
     lineage:
       - datalake_superset_raw.ab_user.first_name
+    description: User's first name
   last_name:
     lineage:
       - datalake_superset_raw.ab_user.last_name
+    description: About user name
   username:
     lineage:
       - datalake_superset_raw.ab_user.username
+    description: Email user
   email:
     lineage:
       - datalake_superset_raw.ab_user.email
+    description: Email user
   is_active:
     lineage:
       - datalake_superset_raw.ab_user.active
+    description: User is active
   login_count:
     lineage:
       - datalake_superset_raw.ab_user.login_count
+    description: Login count
   fail_login_count:
     lineage:
       - datalake_superset_raw.ab_user.fail_login_count
+    description: Failed login count
   ts_created:
     lineage:
       - datalake_superset_raw.ab_user.created_on
+    description: When created
   ts_changed:
     lineage:
       - datalake_superset_raw.ab_user.changed_on
+    description: When it was modified
   ts_last_login:
     lineage:
       - datalake_superset_raw.ab_user.last_login
+    description: Last login date
   year:
     lineage:
       - datalake_superset_raw.ab_user.year
+    description: Year created
   month:
     lineage:
       - datalake_superset_raw.ab_user.month
+    description: Moth created
   day:
     lineage:
       - datalake_superset_raw.ab_user.day
+    description: Day it was created

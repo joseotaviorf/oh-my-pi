@@ -1,9 +1,9 @@
 ---
 database_name: datalake_superset_clean
 table_name: query
-description: Table with queries executed on Superset
+description: Information about queries executed in the system
 domain: Data Governance
-owner: giuseppe.giovanelli@quintoandar.com.br
+owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -20,7 +20,7 @@ columns:
   id_sql_editor:
     lineage:
       - datalake_superset_raw.query.sql_editor_id
-    description: SQL Editor identifier. 
+    description: SQL Editor identifier.
   id_user:
     lineage:
       - datalake_superset_raw.query.user_id
@@ -28,7 +28,7 @@ columns:
   tmp_table_name:
     lineage:
       - datalake_superset_raw.query.tmp_table_name
-    description: ""
+    description: Name of the temporary table associated with the executed query
   tab_name:
     lineage:
       - datalake_superset_raw.query.tab_name
@@ -40,7 +40,7 @@ columns:
   schema:
     lineage:
       - datalake_superset_raw.query.schema
-    description: schema selected on the left panel.
+    description: Schema selected on the left panel.
   sql:
     lineage:
       - datalake_superset_raw.query.sql
@@ -48,7 +48,7 @@ columns:
   select_sql:
     lineage:
       - datalake_superset_raw.query.select_sql
-    description: ""
+    description: Query SQL code
   executed_sql:
     lineage:
       - datalake_superset_raw.query.executed_sql
@@ -56,15 +56,15 @@ columns:
   limit:
     lineage:
       - datalake_superset_raw.query.limit
-    description: row limit imposed on the query
+    description: Row limit imposed on the query
   select_as_cta:
     lineage:
       - datalake_superset_raw.query.select_as_cta
-    description: ""
+    description: Writing to create a CTE
   select_as_cta_used:
     lineage:
       - datalake_superset_raw.query.select_as_cta_used
-    description: ""
+    description: Tells if the query was used as a CTE
   progress:
     lineage:
       - datalake_superset_raw.query.progress
@@ -80,7 +80,7 @@ columns:
   results_key:
     lineage:
       - datalake_superset_raw.query.results_key
-    description: ""
+    description: Result key
   tracking_url:
     lineage:
       - datalake_superset_raw.query.tracking_url
@@ -92,44 +92,44 @@ columns:
   tmp_schema_name:
     lineage:
       - datalake_superset_raw.query.tmp_schema_name
-    description: ""
+    description: Name of the temporary schema associated with the executed query
   ctas_method:
     lineage:
       - datalake_superset_raw.query.ctas_method
-    description: ""
+    description: Type of method used to create the table
   limiting_factor:
     lineage:
       - datalake_superset_raw.query.limiting_factor
-    description: ""
+    description: Factor that limited the consultation
   ts_start_running:
     lineage:
       - datalake_superset_raw.query.start_running_time
-    description: unixtimestamp when the query started running.
+    description: Unixtimestamp when the query started running.
   ts_end_result_backend:
     lineage:
       - datalake_superset_raw.query.end_result_backend_time
-    description: ""
+    description: Date the query result was finalized in the backend
   ts_start:
     lineage:
       - datalake_superset_raw.query.start_time
-    description: unixtimestamp when the query started
+    description: Unixtimestamp when the query started
   ts_changed:
     lineage:
       - datalake_superset_raw.query.changed_on
-    description: timestamp when this entry was modified.
+    description: Timestamp when this entry was modified.
   ts_end:
     lineage:
       - datalake_superset_raw.query.end_time
-    description: unixtimestamp when the query ended.
+    description: Unixtimestamp when the query ended.
   year:
     lineage:
       - datalake_superset_raw.query.year
-    description: executed year
+    description: Executed year
   month:
     lineage:
       - datalake_superset_raw.query.month
-    description: executed month
+    description: Executed month
   day:
     lineage:
       - datalake_superset_raw.query.day
-    description: executed day
+    description: Executed day
