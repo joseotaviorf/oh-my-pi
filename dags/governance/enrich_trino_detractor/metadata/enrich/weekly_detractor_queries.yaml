@@ -8,44 +8,44 @@ columns:
   id_superset_dashboard:
     lineage:
       - datalake_trino.trino_detractor_queries.id_superset_dashboard
-    description: Trino query ID.
+    description: Superset dashboard Id
   superset_slice_id:
     lineage:
       - datalake_trino.trino_detractor_queries.superset_slice_id
-    description: Quarter for this entry date.
+    description: Superset slice Id
   dashboard_name:
     lineage:
       - datalake_trino.trino_detractor_queries.dashboard_name
-    description: Line name.
+    description: Dashboard Name
   slice_name:
     lineage:
       - datalake_trino.trino_detractor_queries.slice_name
-    description: Line name.
+    description: Slice name
   executor_email:
     lineage:
       - datalake_trino.trino_detractor_queries.executor_user
-    description: Line name.
+    description: User e-mail that executed the query
   last_owner_email:
     lineage:
       - datalake_trino.trino_detractor_queries.last_owner
-    description: Line name.
+    description: Last owner's email
   week_start:
     lineage:
       - dw_public.dim_date.week_start
-    description: Line name.
+    description: Week that this user became a detractor
   detractor_runs:
-    description: Trino query ID.
+    description: Detractor executions of week
   is_detractor:
-    description: Trino query ID.
+    description: Whether this user is considered a detractor or not for this query
   superset_runs:
-    description: Trino query ID.
+    description: How many times the query ran on a given week
   count_detractors:
-    description: Trino query ID.
+    description: How many times this user is being considered as a detractor.
   ts_last_detractor_of_week:
     lineage:
       - datalake_trino.trino_detractor_queries.ts_execution_start
-    description: Trino query ID.
+    description: Last detractor run on a given week.
   ts_last_superset_run_of_week:
     lineage:
       - datalake_superset_clean.logs.ts_event
-    description: Trino query ID.
+    description: Last query execution on a given week.
