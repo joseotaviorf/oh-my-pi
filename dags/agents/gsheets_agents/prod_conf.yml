@@ -11,6 +11,18 @@ sheets_info:
     clean_table_name: asp_consultants_allocation
     sheet_context: agents
 
+  asp_rent_fl_and_ciq_opportunity_distribution:
+    sheet_id: 1r9jdNq5ux4D60smnonIH6S4_7DDgjWF9D_bQtJNPyWc
+    sheet_name: export_dados
+    clean_table_name: asp_rent_fl_and_ciq_opportunity_distribution
+    sheet_context: agents
+  
+  asp_rent_relisting_opportunity_distribution:
+    sheet_id: 18UZUKEF9ByN1xJcs_o2WF8zM45LgeAMG2fBVELTGzBg
+    sheet_name: export_dados
+    clean_table_name: asp_rent_relisting_opportunity_distribution
+    sheet_context: agents
+
   broker_score_by_quartiles:
     sheet_id: 16GyMIRBWwvhkcbTAPatLEWLHkdIibybmiot3vXlTzmY
     sheet_name: Resumo Quartis
@@ -55,6 +67,12 @@ sheets_info:
     sheet_id: 1beK8cE7kXJ-fdbrJQB6LkdPtVxhMG7jsoQmNEkpSGXQ
     sheet_name: listings_date
     clean_table_name: sale_listings_date
+    sheet_context: agents
+
+  sale_listings_2025:
+    sheet_id: 1ntFRbqs8dSyoWIHHqsaSMZUkj7Q3Mpl17YiXzgoSdKU
+    sheet_name: listings_date
+    clean_table_name: sale_listings_2025
     sheet_context: agents
 
   sale_ongoing_listings_date:

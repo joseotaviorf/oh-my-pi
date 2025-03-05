@@ -1,0 +1,16 @@
+database_name: datalake_gsheets_clean
+table_name: sale_listings_2025
+description:
+  The table provides information about the allocation dates of each listing in internal processes (Distribution of opportunities) of the ASP team. 
+  The allocations of the listings contained in the table are related to the year 2025.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_listing:
+    lineage:
+      - datalake_gsheets_raw.sale_listings_2025.listing_id
+    description: Id of the sale listing.
+  dt_alloc:
+    lineage:
+      - datalake_gsheets_raw.sale_listings_2025.dt_alloc
+    description: Date of listing allocation.

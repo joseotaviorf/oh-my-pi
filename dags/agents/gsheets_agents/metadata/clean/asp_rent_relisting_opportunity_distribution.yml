@@ -1,0 +1,20 @@
+database_name: datalake_gsheets_clean
+table_name: asp_rent_relisting_opportunity_distribution
+description:
+  The table provides information about the allocation dates of each listing in internal processes (Distribution of opportunities) of the ASP team.
+  The results provided in the table in question are from Relistings.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.asp_rent_relisting_opportunity_distribution.id_house
+    description: Id of the sale listing.
+  dt_distribution:
+    lineage:
+      - datalake_gsheets_raw.asp_rent_relisting_opportunity_distribution.data_de_distribuicao
+    description: Distribution date of that listing.
+  dt_expiration:
+    lineage:
+      - datalake_gsheets_raw.asp_rent_relisting_opportunity_distribution.data_exp
+    description: Distribution expiration date of that listing.

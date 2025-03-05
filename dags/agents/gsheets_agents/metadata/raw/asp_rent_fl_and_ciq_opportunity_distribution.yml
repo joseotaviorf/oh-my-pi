@@ -1,0 +1,2 @@
+database_name: datalake_gsheets_raw
+table_name: asp_rent_fl_and_ciq_opportunity_distribution
