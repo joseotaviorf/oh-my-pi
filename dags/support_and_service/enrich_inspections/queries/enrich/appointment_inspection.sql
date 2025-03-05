@@ -138,7 +138,7 @@ main_appointment_data AS (
         canceled_date AS cd
           ON b.id = cd.id_booking
     WHERE
-        LOWER(b.type) IN ('vistoria', 'vistoriaquarterizada')
+        b.type IN ('Vistoria', 'VistoriaQuarteirizada')
         AND DATE(b.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ),
 coalesce_appointment_sources AS (

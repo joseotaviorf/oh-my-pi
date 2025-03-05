@@ -61,14 +61,6 @@ WITH union_inspection_history AS (
     FROM
         datalake_inspections.main_inspection_booking AS i
 ),
-appointment_data AS (
-    SELECT
-        *
-    FROM
-        datalake_inspections.appointment_inspection
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_appointment_updated_utc DESC) = 1
-),
 inspection_contract AS (
     SELECT
         c.id AS id_contract,
@@ -193,7 +185,8 @@ LEFT JOIN
     datalake_ebdb_clean.country c
         ON c.id = ic.id_country
 LEFT JOIN
-    appointment_data AS ad
+    datalake_inspections.appointment_inspection AS ad
       ON ad.id_inspection = i.id_inspection
+      OR ad.id_main_appointment = i.id_booking
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY i.id_inspection ORDER BY i.ts_updated DESC) = 1
