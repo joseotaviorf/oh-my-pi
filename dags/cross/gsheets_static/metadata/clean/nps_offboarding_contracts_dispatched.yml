@@ -1,0 +1,21 @@
+database_name: datalake_gsheets_clean
+table_name: nps_offboarding_contracts_dispatched
+columns:
+  id_ticket:
+    lineage:
+      - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.sk_ticket
+  id_user:
+    lineage:
+      - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.sk_user
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.sk_contract
+  status:
+    lineage:
+      - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.status
+  is_pp_multi:
+    lineage:
+      - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.is_pp_multi
+  dt_opened:
+    lineage:
+      - datalake_gsheets_raw.nps_offboarding_contracts_dispatched.data_abertura

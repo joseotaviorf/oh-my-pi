@@ -251,6 +251,12 @@ sheets_info:
     clean_table_name: mra_historical
     sheet_context: static
 
+  nps_offboarding_contracts_dispatched:
+    sheet_id: 16AZZkvHnYMzMbuHIfwF10szg6z62Xy4HhQ3XpiqTHwU
+    sheet_name: "Lista de tickets e contratos no teste"
+    clean_table_name: nps_offboarding_contracts_dispatched
+    sheet_context: static
+
   offline_and_branding_marketing_costs:
     sheet_id: 14la3wTA9DitbyiJ8Lb4X7FnyAMsSE32ICzwPBPD2j4E
     sheet_name: offline_and_branding_marketing_costs

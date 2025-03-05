@@ -21,7 +21,6 @@ WITH people_to_send AS (
   WHERE
     MAKE_DATE(topd.year, topd.month, topd.day) = CURRENT_DATE()
     AND hist.customer_email IS NULL
-
 )
 SELECT
   customer_name,

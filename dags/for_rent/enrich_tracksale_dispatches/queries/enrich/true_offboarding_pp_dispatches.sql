@@ -2,9 +2,9 @@ WITH b2b_listings AS (
   SELECT
     rf.sk_contract,
     b2b.is_b2b
-  FROM 
+  FROM
     dw_rent.fact_listing_rent_flows AS rf
-  JOIN 
+  JOIN
     datalake_b2b.house_listing AS b2b
       ON rf.sk_house_listing = b2b.id_house_listing
       AND b2b.is_b2b
@@ -138,6 +138,14 @@ LEFT JOIN
       OR u.id = po.id_user
       OR cci.id_user = po.id_user)
     AND po.is_active = TRUE
+/*
+  The NPS team will send some NPS surveys to some contracts to test the some changes that they are planning to do.
+  So this JOIN with gsheets is necessary to filter the contracts to avoid sending duplicated surveys.
+*/
+LEFT JOIN
+  datalake_gsheets_clean.nps_offboarding_contracts_dispatched AS nocd
+    ON cs.id_contract = nocd.id_contract
 WHERE
   cp.type IN ('Proprietario')
   AND po.is_active IS NULL
+  AND nocd.id_contract IS NULL
