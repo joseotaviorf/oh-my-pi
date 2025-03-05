@@ -25,7 +25,7 @@ workflow:
   tables_customization:
     criteo_campaigns: {}
 cluster:
-  type: databricks_13_3_min_io-general_cluster
+  type: databricks_13_3_med_general_2_workers_cluster
   custom_libraries:
   - whl: "{artifacts_bucket}/criteo-api-client-python/quintoandar_criteo_api_client-0.1.0-py2.py3-none-any.whl"
   databricks_conn_id: databricks_new
