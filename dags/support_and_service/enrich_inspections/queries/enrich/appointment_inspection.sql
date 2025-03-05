@@ -58,10 +58,7 @@ inspection_appointment_data AS (
         s.duration_in_slots,
         a.is_fixed_agent,
         s.is_confirmed,
-        CAST(a.dt_scheduled AS TIMESTAMP)
-          + FLOOR((s.slot_of_day * 15 / 60)+8) * INTERVAL 1 HOURS
-          + ABS(s.slot_of_day * 15 % 60) * INTERVAL 1 MINUTES
-        AS ts_appointment_inspected_local_tz,
+        a.dt_scheduled AS ts_appointment_inspected_local_tz,
         a.ts_created AS ts_appointment_created_utc,
         a.ts_updated AS ts_appointment_updated_utc,
         a.ts_created - INTERVAL 3 HOURS AS ts_appointment_created_local_tz,
