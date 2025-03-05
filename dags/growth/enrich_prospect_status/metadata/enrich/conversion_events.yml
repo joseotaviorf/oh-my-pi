@@ -1,0 +1,131 @@
+---
+database_name: datalake_prospect_status
+table_name: conversion_events
+owner: leonardo.soares@quintoandar.com.br
+domain: Growth
+description: This table contains the events that are related to the conversion of a prospect
+  into a customer. It is used to track the conversion funnel and to understand the
+  conversion rate of the company.
+columns:
+  id_demand_prospect_conversion_event:
+    description: 'ID of the event that represents the conversion of a prospect into a customer.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.ts_event
+    - datalake_rent_demand_events.rent_demand_events.ts_event
+    - datalake_talk_to_agent_events.talk_to_agent_events.first_message_ts
+    - datalake_sale_demand_events.sale_demand_events.sk_event_type
+    - datalake_rent_demand_events.rent_demand_events.id_event_type
+    - datalake_sale_demand_events.sale_demand_events.id_booking
+    - datalake_rent_demand_events.rent_demand_events.id_booking
+    - datalake_sale_demand_events.sale_demand_events.id_offer
+    - datalake_rent_demand_events.rent_demand_events.id_offer
+    - datalake_sale_demand_events.sale_demand_events.id_house
+    - datalake_rent_demand_events.rent_demand_events.id_house
+    - datalake_talk_to_agent.talk_to_agent.house_id
+    - datalake_talk_to_agent.talk_to_agent.agent_id
+    - datalake_talk_to_agent.talk_to_agent.tenant_id
+    - datalake_talk_to_agent.talk_to_agent.sk_house_listing
+    - datalake_sale_demand_events.sale_demand_events.id_buyer
+    - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+    - datalake_talk_to_agent.talk_to_agent.tenant_id
+  id_rent_flow:
+    description: 'ID of the rent flow that the event is related to.'
+    lineage:
+    - datalake_rent_demand_events.rent_demand_events.id_rent_flow
+    - datalake_talk_to_agent.talk_to_agent.tenant_id
+    - datalake_talk_to_agent.talk_to_agent.business_context
+    - datalake_talk_to_agent.talk_to_agent.house_id
+  id_sale_flow:
+    description: 'ID of the sale flow that the event is related to.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events
+    - datalake_talk_to_agent.talk_to_agent.tenant_id
+    - datalake_talk_to_agent.talk_to_agent.business_context
+    - datalake_talk_to_agent.talk_to_agent.house_id
+  id_talk_to_agent:
+    description: 'ID of the event that represents the first message sent by a prospect
+      to an agent.'
+    lineage:
+    - datalake_talk_to_agent.talk_to_agent.house_id
+    - datalake_talk_to_agent.talk_to_agent.agent_id
+    - datalake_talk_to_agent.talk_to_agent.tenant_id
+    - datalake_talk_to_agent_events.talk_to_agent_events.first_message_ts
+  id_event_type:
+    description: 'Identifier of the event type.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.sk_event_type
+    - datalake_rent_demand_events.rent_demand_events.id_event_type
+  id_booking:
+    description: 'ID of the booking that the event is related to.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.id_booking
+    - datalake_rent_demand_events.rent_demand_events.id_booking
+  id_offer:
+    description: 'ID of the offer that the event is related to.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.id_offer
+    - datalake_rent_demand_events.rent_demand_events.id_offer
+  id_house:
+    description: 'ID of the house that the event is related to.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.id_house
+    - datalake_rent_demand_events.rent_demand_events.id_house
+    - datalake_talk_to_agent.talk_to_agent.house_id
+  id_region:
+    description: 'Id of the region of the house that the event is related to.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.id_region
+    - datalake_rent_demand_events.rent_demand_events.id_region
+    - datalake_ebdb_clean.house.id_region
+  id_prospect:
+    description: 'ID of the prospect that the event is related to.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.id_buyer
+    - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+    - datalake_talk_to_agent.talk_to_agent.tenant_id
+  id_owner:
+    description: 'Id of the owner of the house that the event is related to.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.id_seller
+    - datalake_rent_demand_events.rent_demand_events.id_owner
+    - datalake_ebdb_clean.house.id_user
+  id_agent:
+    description: 'Id of the agent that the event is related to.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.id_agent
+    - datalake_rent_demand_events.rent_demand_events.id_agent
+    - datalake_talk_to_agent.talk_to_agent.agent_id
+  event_name:
+    description: 'Type of the event.'
+  business_context:
+    description: 'Tells if the event is related to a sale or a rent flow.'
+  dt_event:
+    description: 'Date of the event.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.ts_event
+    - datalake_rent_demand_events.rent_demand_events.ts_event
+    - datalake_talk_to_agent_events.talk_to_agent_events.first_message_ts
+  ts_event:
+    description: 'Timestamp of the event.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.ts_event
+    - datalake_rent_demand_events.rent_demand_events.ts_event
+    - datalake_talk_to_agent_events.talk_to_agent_events.first_message_ts
+  year:
+    description: 'Year of the event.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.ts_event
+    - datalake_rent_demand_events.rent_demand_events.ts_event
+    - datalake_talk_to_agent_events.talk_to_agent_events.first_message_ts
+  month:
+    description: 'Month of the event.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.ts_event
+    - datalake_rent_demand_events.rent_demand_events.ts_event
+    - datalake_talk_to_agent_events.talk_to_agent_events.first_message_ts
+  day:
+    description: 'Day of the event.'
+    lineage:
+    - datalake_sale_demand_events.sale_demand_events.ts_event
+    - datalake_rent_demand_events.rent_demand_events.ts_event
+    - datalake_talk_to_agent_events.talk_to_agent_events.first_message_ts

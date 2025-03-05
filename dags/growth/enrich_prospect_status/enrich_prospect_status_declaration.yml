@@ -1,8 +1,8 @@
 ---
 dag:
-  name: enrich_demand_conversion_events
+  name: enrich_prospect_status
   schedule_start_date: 2023, 9, 25
-  owner: Data Growth
+  owner: Data ForSale
   documentation:
     dag_purpose: |
       This DAG enriches tables related to the process of demand conversion in Growth context.
@@ -12,16 +12,14 @@ workflow:
   custom_schema: demand_flows
   default_extraction_type: incremental
   default_partitions: ["year", "month", "day"]
-  spark_session_configs:
-    udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -14), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   inner_dependencies:
-    prospect_daily_results:
-      - prospect_results
-    prospect_results:
-      - demand_prospect_conversion_events
+    buyer_prospect_status:
+      - conversion_events
+    tenant_prospect_status:
+      - conversion_events
 cluster:
   type: databricks_12_2_med_io-memory_photon_cluster
   databricks_conn_id: databricks_new

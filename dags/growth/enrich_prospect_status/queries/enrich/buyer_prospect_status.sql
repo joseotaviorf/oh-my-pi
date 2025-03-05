@@ -8,7 +8,7 @@ WITH sale_flows AS (
     TRUE AS is_sale_flow_event,
     dpce.ts_event
   FROM
-    datalake_demand_flows.demand_prospect_conversion_events AS dpce
+    datalake_demand_flows.conversion_events AS dpce
   JOIN datalake_sale_flows.sale_flow sf
     ON sf.id_sale_flow = dpce.id_sale_flow  
   LEFT JOIN

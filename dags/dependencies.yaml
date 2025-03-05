@@ -1319,17 +1319,17 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
 bietlejuice.enrich_bureaus:
-  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
+  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat:load-clean-screening-result-version
 bietlejuice.enrich_buyer_prospect:
   - bietlejuice.ebdb_contract:load-clean-contract-person
   - bietlejuice.enrich_booking:load-enrich-booking
-  - bietlejuice.enrich_demand_conversion_events:load-enrich-buyer-prospect-status
   - bietlejuice.enrich_offer:load-enrich-offer
+  - bietlejuice.enrich_prospect_status:load-enrich-buyer-prospect-status
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
 bietlejuice.enrich_ciq:
@@ -1578,17 +1578,12 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events
   - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit
   - bietlejuice.enrich_booking:load-enrich-booking
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary
   - bietlejuice.enrich_offer:load-enrich-offer
-  - bietlejuice.enrich_region:load-enrich-region
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
-  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
+  - bietlejuice.enrich_prospect_status:load-enrich-buyer-prospect-status
+  - bietlejuice.enrich_prospect_status:load-enrich-tenant-prospect-status
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
@@ -2416,6 +2411,15 @@ bietlejuice.enrich_proposal:
   - bietlejuice.enrich_credit_analysis:load-enrich-credit-analysis-proposals
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+bietlejuice.enrich_prospect_status:
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
+  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
 bietlejuice.enrich_public_date:
   - bietlejuice.google_calendar:load-clean-brazillian-holidays
   - bietlejuice.google_calendar:load-clean-mexican-holidays
@@ -3680,8 +3684,8 @@ wonka.house_listing_business_context:
 wonka.house_rent_offer:
   - bietlejuice.ebdb_offer:load-clean-offer
 wonka.house_rent_proposal:
-  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
+  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
 wonka.house_rent_search_page_viewed:
