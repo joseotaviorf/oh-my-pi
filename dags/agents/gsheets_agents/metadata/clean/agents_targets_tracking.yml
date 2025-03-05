@@ -1,0 +1,95 @@
+database_name: datalake_gsheets_clean
+table_name: agents_targets_tracking
+description: Clean table with information about the targets associated with each region. For each region, we can have targets for new agents and old agents.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.sk_user
+    description: A grouping of city or clusters of cities and neighborhoods (RMSP - Região Metropolitana de São Paulo)
+  city_group_resume:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.city_group_resumido
+    description: A grouping of city - RMSP, Rio de Janeiro, Belo Horizonte, Porto Alegre e Demais Cidades
+  region_code:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.region_code
+    description: Used mainly by agents team. A region code is a grouping of several sub-regions. 
+      This field is used by the agents team, for agent allocation and other purposes.
+  agent_type:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.agent_type
+    description: Type of Agent (OLD/NEW). Consider the time during which the agent is active.
+  tgt_tps:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_tps
+    description: Target tenant prospects (Growth).
+  tgt_vbs_vf:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_vbs_vf
+    description: Target visits booked (Visit flow).
+  tgt_vbba:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_vbba
+    description: Target visits booked by agent (Visit flow).
+  tgt_share_vbba:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_share_vbba
+    description: Target share visits booked by agent (Visit flow).
+  tgt_vcs_vf:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_3mais_vcs
+    description: Target visits completed (Visit flow)
+  tgt_vcs_tp:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_share_3maisvcs
+    description: Target share visits completed visit flow of tp
+  tgt_canc_by_agent:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_canc_by_agent
+    description: Target cancellation by agent visit flow
+  tgt_share_canc_by_agent:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_share_canc_by_agent
+    description: Target share cancellation by agent of visits booked visit flow
+  tgt_canc_reason_agent:
+    lineage: 
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_canc_reason_agent
+    description: Target cancellation reason agent (Visit flow).
+  tgt_share_canc_reason_agent:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_share_canc_reason_agent
+    description: Target share cancellation reason agent of visits booked (Visit flow).
+  tgt_canc_noshow:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_canc_noshow
+    description: Target no show (Visit flow).
+  tgt_share_canc_noshow:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_share_canc_noshow
+    description: Target share no show of visits booked (Visit flow).
+  tgt_amount_hours:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_horas_totais
+    description: Target the amount of hours that could be available.
+  tgt_available_hours:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_horas_disponibilizadas
+    description: Target the available hours to receive visits booked
+  tgt_engagement:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_engajamento
+    description: Target share available hours of amount of hours that could be available
+  tgt_tps_cr:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_3mais_vcs_mesmocr
+    description: Target tenant prospects growth with agent.
+  tgt_vcs_tp_cr:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.tgt_share_3mais_vcs_mesmocr
+    description: Target share visits completed visit flow of tp with agent.
+  dt_month_reference:
+    lineage:
+      - datalake_gsheets_raw.agents_targets_tracking.mes
+    description: Target reference month for that region.

@@ -1,0 +1,38 @@
+database_name: datalake_gsheets_clean
+table_name: agents_historical_quartile
+description: Clean table with information about agents according to the quartile they belong to. Each quartile has a group of agents separated by performance, with 1 being the worst and 4 being the best.
+domain: Data Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_user:
+    lineage:
+      - datalake_gsheets_raw.agents_historical_quartile.id_user
+    description:  Id of the user 
+  id_agent:
+    lineage:
+      - datalake_gsheets_raw.agents_historical_quartile.id_agent
+    description:  Id of the agent.
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.agents_historical_quartile.city_group
+    description:  A grouping of city or clusters of cities and neighborhoods (RMSP - Região Metropolitana de São Paulo)
+  region_code:
+    lineage:
+      - datalake_gsheets_raw.agents_historical_quartile.region_code
+    description: Used mainly by agents team. A region code is a grouping of several sub-regions. 
+      This field is used by the agents team, for agent allocation and other purposes.
+  agent_type:
+    lineage:
+      - datalake_gsheets_raw.agents_historical_quartile.agent_type
+    description:  Type of Agent (OLD/NEW). Consider the time during which the agent is active.
+  quartile:
+    lineage:
+      - datalake_gsheets_raw.agents_historical_quartile.quartil
+    description:  Its the quartil of performance, where 1 is the worst and 4 is the best.
+  dt_month_reference:
+    lineage:
+      - datalake_gsheets_raw.agents_historical_quartile.month
+    description: Reference month of that grouping by quartile.
+
+
+

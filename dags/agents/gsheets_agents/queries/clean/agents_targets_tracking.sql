@@ -1,0 +1,25 @@
+SELECT   
+    city_group,
+    city_group_resumido AS city_group_resume,
+    region_code,
+    agent_type,
+    tgt_tps,
+    tgt_vbs_vf,
+    tgt_vbba,
+    tgt_share_vbba,
+    tgt_3mais_vcs AS tgt_vcs_vf,
+    tgt_share_3maisvcs AS tgt_vcs_tp,
+    tgt_canc_by_agent,
+    tgt_share_canc_by_agent,
+    tgt_canc_reason_agent,
+    tgt_share_canc_reason_agent,
+    tgt_canc_noshow,
+    tgt_share_canc_noshow,
+    tgt_horas_totais AS tgt_amount_hours,
+    tgt_horas_disponibilizadas AS tgt_available_hours,
+    tgt_engajamento AS tgt_engagement,
+    tgt_3mais_vcs_mesmocr AS tgt_tps_cr,
+    tgt_share_3mais_vcs_mesmocr AS tgt_vcs_tp_cr,
+    DATE(mes) AS dt_month_reference
+FROM
+    datalake_gsheets_raw.agents_targets_tracking

@@ -4,6 +4,18 @@ sheets_info:
     sheet_name: analistas
     clean_table_name: account_managers_info
     sheet_context: agents
+  
+  agents_historical_quartile:
+    sheet_id: 172reBsDjSEJp-DnlMXDv-s8tY0W5jr3iutulVcvgfJU
+    sheet_name: dados_quartil_historico
+    clean_table_name: agents_historical_quartile
+    sheet_context: agents
+  
+  agents_targets_tracking:
+    sheet_id: 1NGVOSgoNKG_cTlocCe2zun30tYihRXtHZh2f6tSlQjw
+    sheet_name: dados_targets_input_metrics
+    clean_table_name: agents_targets_tracking
+    sheet_context: agents
 
   asp_consultants_allocation:
     sheet_id: 1xEMHNMbTb6tBLghGSDwv5kLi0vid66oUNEirUY672oY
