@@ -1,0 +1,108 @@
+---
+database_name: datalake_airflow
+table_name: dag_run
+description: Stores information on all past and current DAG runs including whether they were successful, whether they were scheduled
+  or manually triggered, and detailed timing information. It combines information from Composer (our old Airflow instance) and Astro.
+domain: Data Platform 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_composer_clean.dag_run.id
+      - datalake_astro_clean.dag_run.id
+    description: "Numerical primary key of the table. Important: for newer rows, it does not match the ID in the database. Since
+      we have rows both from Composer and Astro, we had to sum 1000000 in Astro rows to avoid conflicts. Subtract that number if you
+      need a match with the database."
+  id_dag:
+    lineage:
+      - datalake_composer_clean.dag_run.id_dag
+      - datalake_astro_clean.dag_run.id_dag
+    description: ID of the DAG that this run belongs to.
+  id_run:
+    lineage:
+      - datalake_composer_clean.dag_run.id_run
+      - datalake_astro_clean.dag_run.id_run
+    description: String ID of the run in the database. It must be unique for each DAG, but not between DAGs.
+  id_log_template:
+    lineage:
+      - datalake_astro_clean.dag_run.id_log_template
+    description: Id of the log template used in the run.
+  id_creating_job:
+    lineage:
+      - datalake_astro_clean.dag_run.id_creating_job
+    description: ID of the job that created this run.
+  source_provider:
+    description: Either "Astro" or "Composer", indicating where the run was created.
+  state:
+    lineage:
+      - datalake_composer_clean.dag_run.state
+      - datalake_astro_clean.dag_run.state
+    description: State of the DAG run.
+    categories:
+      QUEUED: The run is queued and waiting to be run.
+      RUNNING: The run is currently running.
+      SUCCESS: The run was successful.
+      FAILED: The run failed.
+  run_type:
+    lineage:
+      - datalake_astro_clean.dag_run.run_type
+    description: Type of the run.
+    categories:
+      backfill: A backfill run.
+      scheduled: A scheduled run.
+      manual: A manually triggered run.
+      dataset_triggered: A run triggered by a dataset.
+  configuration:
+    lineage:
+      - datalake_composer_clean.dag_run.configuration
+      - datalake_astro_clean.dag_run.configuration
+    description: Configuration of the run. It is a pickled string.
+  dag_hash:
+    lineage:
+      - datalake_astro_clean.dag_run.dag_hash
+    description: Hash of the DAG that this run belongs to.
+  clear_number:
+    lineage:
+      - datalake_astro_clean.dag_run.clear_number
+    description: Number of clear runs.
+  had_external_trigger:
+    lineage:
+      - datalake_composer_clean.dag_run.had_external_trigger
+      - datalake_astro_clean.dag_run.had_external_trigger
+    description: Whether the run was triggered externally.
+  ts_last_scheduling_decision:
+    lineage:
+      - datalake_astro_clean.dag_run.ts_last_scheduling_decision
+    description: When a scheduler last attempted to schedule task instances for this DagRun
+  ts_data_interval_started:
+    lineage:
+      - datalake_astro_clean.dag_run.ts_data_interval_started
+    description: Start of the data interval for this run. Equivalent to logical date or execution date.
+  ts_data_interval_ended:
+    lineage:
+      - datalake_astro_clean.dag_run.ts_data_interval_ended
+    description: End of the data interval for this run.
+  ts_updated:
+    lineage:
+      - datalake_astro_clean.dag_run.ts_updated
+    description: Last time the run was updated.
+  ts_executed:
+    lineage:
+      - datalake_composer_clean.dag_run.ts_executed
+      - datalake_astro_clean.dag_run.ts_executed
+    description: Execution date or logical date. Be aware that this is not necessarily the same as the date the run was actually executed.
+      For example, if the DAG is scheduled to be run daily, the execution date is always the previous day (because that is the start of the interval).
+  ts_queued:
+    lineage:
+      - datalake_astro_clean.dag_run.ts_queued
+    description: Time the run was queued.
+  ts_started:
+    lineage:
+      - datalake_composer_clean.dag_run.ts_started
+      - datalake_astro_clean.dag_run.ts_started
+    description: Time the run was started.
+  ts_ended:
+    lineage:
+      - datalake_composer_clean.dag_run.ts_ended
+      - datalake_astro_clean.dag_run.ts_ended
+    description: Time the run was ended.

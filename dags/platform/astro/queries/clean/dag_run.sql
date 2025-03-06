@@ -1,6 +1,6 @@
 SELECT
     id,
-    dag_id,
+    dag_id AS id_dag,
     run_id AS id_run,
     log_template_id AS id_log_template,
     creating_job_id AS id_creating_job,

@@ -1,0 +1,143 @@
+---
+database_name: datalake_airflow
+table_name: dag
+description: Stores information on all DAGs (Directed Acyclic Graphs) that have ever existed in the Airflow instance. This includes both
+  Composer (our old Airflow instance) and Astro (our new Airflow instance) DAGs.
+domain: Data Platform 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_dag:
+    lineage:
+      - datalake_composer_clean.dag.id_dag
+      - datalake_astro_clean.dag.id_dag
+    description: ID (name) of the DAG, and primary key of the table.
+  id_pickle:
+    lineage:
+      - datalake_composer_clean.dag.id_pickle
+      - datalake_astro_clean.dag.id_pickle
+    description: Foreign key to the latest pickle_id
+  id_root_dag:
+    lineage:
+      - datalake_composer_clean.dag.id_root_dag
+      - datalake_astro_clean.dag.id_root_dag
+    description: ID (name) of the root (parent) DAG, in case this DAG is a sub-DAG
+  source_provider:
+    description: Either "Astro" or "Composer", indicating where the DAG was last seen.
+  default_view:
+    lineage:
+      - datalake_composer_clean.dag.default_view
+      - datalake_astro_clean.dag.default_view
+    description: Specifies the DAG's default view in the UI
+    categories:
+      grid: The DAG is displayed in the grid view
+      graph: The DAG is displayed in the graph view
+      duration: The DAG is displayed in the duration view
+      gantt: The DAG is displayed in the gantt view
+      landing_times: The DAG is displayed in the landing times view
+  dag_display_name:
+    lineage:
+      - datalake_astro_clean.dag.dag_display_name
+    description: Display name of the DAG (if it has one)
+  description:
+    lineage:
+      - datalake_composer_clean.dag.description
+      - datalake_astro_clean.dag.description
+    description: Description of the DAG
+  dataset_expression:
+    lineage:
+      - datalake_astro_clean.dag.dataset_expression
+    description: Logical expression that defines which datasets need to be triggered in order for this DAG to be triggered.
+  fileloc:
+    lineage:
+      - datalake_composer_clean.dag.fileloc
+      - datalake_astro_clean.dag.fileloc
+    description: Path to the DAG file
+  last_pickled:
+    lineage:
+      - datalake_composer_clean.dag.last_pickled
+      - datalake_astro_clean.dag.last_pickled
+  owners:
+    lineage:
+      - datalake_composer_clean.dag.owners
+      - datalake_astro_clean.dag.owners
+    description: Owners of the DAG, separated by commas
+  schedule_interval:
+    lineage:
+      - datalake_composer_clean.dag.schedule_interval
+      - datalake_astro_clean.dag.schedule_interval
+    description: Schedule interval of the DAG. Usually cron-like strings.
+  timetable_description:
+    lineage:
+      - datalake_astro_clean.dag.timetable_description
+    description: Human readable description of the schedule interval
+  processor_subdir:
+    lineage:
+      - datalake_astro_clean.dag.processor_subdir
+    description: The base directory used by Dag Processor that parsed this dag.
+  scheduler_lock:
+    lineage:
+      - datalake_composer_clean.dag.scheduler_lock
+      - datalake_astro_clean.dag.scheduler_lock
+    description: Whether (one  of) the scheduler is scheduling this DAG at the moment
+  max_active_runs:
+    lineage:
+      - datalake_astro_clean.dag.max_active_runs
+    description: maximum number of active DAG runs, beyond this number of DAG runs in a running state, the scheduler won't create
+      new active DAG runs 
+  max_active_tasks:
+    lineage:
+      - datalake_astro_clean.dag.max_active_tasks
+    description: the number of task instances allowed to run concurrently
+  max_consecutive_failed_dag_runs:
+    lineage:
+      - datalake_astro_clean.dag.max_consecutive_failed_dag_runs
+    description: (experimental) maximum number of consecutive failed DAG runs, beyond this the scheduler will disable the DAG
+  is_active:
+    lineage:
+      - datalake_composer_clean.dag.is_active
+      - datalake_astro_clean.dag.is_active
+    description: Whether the DAG is active or not
+  is_paused:
+    lineage:
+      - datalake_composer_clean.dag.is_paused
+      - datalake_astro_clean.dag.is_paused
+    description: Whether the DAG is paused or not
+  is_subdag:
+    lineage:
+      - datalake_composer_clean.dag.is_subdag
+      - datalake_astro_clean.dag.is_subdag
+    description: Whether the DAG is a sub-DAG or not
+  has_import_errors:
+    lineage:
+      - datalake_astro_clean.dag.has_import_errors
+    description: Whether the DAG has import errors
+  has_task_concurrency_limits:
+    lineage:
+      - datalake_astro_clean.dag.has_task_concurrency_limits
+    description: Whether the DAG has task concurrency limits
+  ts_last_expired:
+    lineage:
+      - datalake_composer_clean.dag.ts_last_expired
+      - datalake_astro_clean.dag.ts_last_expired
+    description: Time when the DAG last received a refresh signal (e.g. the DAG's "refresh" button was clicked in the web UI)
+  ts_last_scheduler_ran:
+    lineage:
+      - datalake_composer_clean.dag.ts_last_scheduler_ran
+      - datalake_astro_clean.dag.ts_last_parsed
+    description: Last time the DAG was parsed
+  ts_next_dagrun:
+    lineage:
+      - datalake_astro_clean.dag.ts_next_dagrun
+    description: The logical date of the next dag run.
+  ts_next_dagrun_create_after:
+    lineage:
+      - datalake_astro_clean.dag.ts_next_dagrun_create_after
+    description: Earliest time at which this `next_dagrun` can be created.
+  ts_next_dagrun_data_interval_start:
+    lineage:
+      - datalake_astro_clean.dag.ts_next_dagrun_data_interval_start
+    description: Data interval start for the next dag run.
+  ts_next_dagrun_data_interval_end:
+    lineage:
+      - datalake_astro_clean.dag.ts_next_dagrun_data_interval_end
+    description: Data interval end for the next dag run.

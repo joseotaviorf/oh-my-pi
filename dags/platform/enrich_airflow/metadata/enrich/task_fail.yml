@@ -1,0 +1,57 @@
+---
+database_name: datalake_airflow
+table_name: task_fail
+description: Stores information on all failed task instances. It combines information from Composer (our old Airflow instance) and Astro.
+domain: Data Platform 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_fail:
+    lineage:
+      - datalake_composer_clean.task_fail.id_fail
+      - datalake_astro_clean.task_fail.id_fail
+    description: "Primary key of the table. It is not the same as task instance id. Important: for newer rows, it does not match the ID in the database. Since
+      we have rows both from Composer and Astro, we had to sum 1000000 in Astro rows to avoid conflicts. Subtract that number if you
+      need a match with the database."
+  id_dag:
+    lineage:
+      - datalake_composer_clean.task_fail.id_dag
+      - datalake_astro_clean.task_fail.id_dag
+    description: ID of the DAG associated with this failed task instance.
+  id_task:
+    lineage:
+      - datalake_composer_clean.task_fail.id_task
+      - datalake_astro_clean.task_fail.id_task
+    description: Id of the task associated with this failed task instance.
+  id_run:
+    lineage:
+      - datalake_composer_clean.task_fail.id_run
+      - datalake_astro_clean.task_fail.id_run
+    description: Id of the DAG run associated with this failed task instance.
+  source_provider:
+    description: Either "Astro" or "Composer", indicating where the failed task instance was created.
+  map_index:
+    lineage:
+      - datalake_astro_clean.task_fail.map_index
+    description: Map index of the task instance associated with this failed task instance.
+  duration:
+    lineage:
+      - datalake_composer_clean.task_fail.duration
+      - datalake_astro_clean.task_fail.duration
+    description: Duration of the failed task instance in seconds.
+  ts_ended:
+    lineage:
+      - datalake_composer_clean.task_fail.ts_ended
+      - datalake_astro_clean.task_fail.ts_ended
+    description: Timestamp when the failed task instance ended.
+  ts_started:
+    lineage:
+      - datalake_composer_clean.task_fail.ts_started
+      - datalake_astro_clean.task_fail.ts_started
+    description: Timestamp when the failed task instance started.
+  ts_executed:
+    lineage:
+      - datalake_composer_clean.task_fail.ts_executed
+      - datalake_astro_clean.task_fail.ts_executed
+    description: Execution date or logical date of the DAG run associated with the task instance. Be aware that this is not necessarily the
+      same as the date the run was actually executed. For example, if the DAG is scheduled to be run daily, the execution date is always the
+      previous day (because that is the start of the interval).

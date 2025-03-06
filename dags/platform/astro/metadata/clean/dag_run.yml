@@ -7,7 +7,7 @@ columns:
   id:
     lineage:
       - datalake_astro_raw.dag_run.id
-  dag_id:
+  id_dag:
     lineage:
       - datalake_astro_raw.dag_run.dag_id
   id_run:

@@ -1,0 +1,37 @@
+dag:
+  name: enrich_airflow
+  owner: Data Ingestion
+  schedule_interval: 30 5-18/1 * * *
+  documentation: 
+    dag_purpose: |
+      Consolidate data about Airflow's internal metadata database. It unites tables both from
+      Astronomer (our current Airflow) and Composer (our previous Airflow).
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  tables_customization:
+    dag_run:
+      merge_on:
+        - id
+      when_matched_update_condition: "source.ts_updated > target.ts_updated OR source.ts_updated IS NULL"
+    task_fail:
+      merge_on:
+        - id_fail
+    log:
+      partition_cols:
+        - year
+        - month
+        - day
+    task_instance:
+      partition_cols:
+        - year
+        - month
+        - day
+  inner_dependencies:
+    task_fail:
+      - dag_run
+    task_instance:
+      - dag_run
+cluster:
+  type: databricks_13_3_med_general_cluster

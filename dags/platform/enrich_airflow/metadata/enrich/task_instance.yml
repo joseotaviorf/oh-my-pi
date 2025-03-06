@@ -1,0 +1,161 @@
+---
+database_name: datalake_airflow
+table_name: task_instance
+description: Stores information on all Airflow task instances. It combines information from Composer (our old Airflow instance) and Astro.
+domain: Data Platform 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_task:
+    lineage:
+      - datalake_composer_clean.task_instance.id_task
+      - datalake_astro_clean.task_instance.id_task
+    description: ID of the task. (id_task, id_dag, id_run) is the primary key.
+  id_dag:
+    lineage:
+      - datalake_composer_clean.task_instance.id_dag
+      - datalake_astro_clean.task_instance.id_dag
+    description: ID of the DAG that the task belongs to. (id_task, id_dag, id_run) is the primary key.
+  id_run:
+    lineage:
+      - datalake_composer_clean.task_instance.id_run
+      - datalake_astro_clean.task_instance.id_run
+    description: ID of the DAG run that the task instance belongs to. (id_task, id_dag, id_run) is the primary key.
+  id_queued_by_job:
+    lineage:
+      - datalake_astro_clean.task_instance.id_queued_by_job
+    description: ID of the job that queued the task instance.
+  id_process:
+    lineage:
+      - datalake_astro_clean.task_instance.id_process
+    description: Process ID that the task instance executed on.
+  id_trigger:
+    lineage:
+      - datalake_astro_clean.task_instance.id_trigger
+    description: ID of the trigger that triggered the task instance.
+  id_job:
+    lineage:
+      - datalake_astro_clean.task_instance.id_job
+    description: Job ID of the task instance.
+  source_provider:
+    description: Either "Astro" or "Composer", indicating where the task instance was created.
+  task_state:
+    lineage:
+      - datalake_composer_clean.task_instance.task_state
+      - datalake_astro_clean.task_instance.task_state
+    description: State of the task instance.
+    categories:
+      removed: The task instance was removed from the DAG.
+      scheduled: The task instance was scheduled to run.
+      queued: The task instance was queued to run.
+      running: The task instance is running.
+      success: The task instance ran successfully.
+      failed: The task instance failed.
+      up_for_retry: The task instance is up for retry.
+      skipped: The task instance was skipped.
+      upstream_failed: The task instance didn't run because an upstream task failed.
+      up_for_reschedule: The task instance is up for reschedule.
+      restarting: The task instance is restarting.
+      deferred: The task instance is deferred.
+  hostname:
+    lineage:
+      - datalake_astro_clean.task_instance.hostname
+    description: Hostname of the machine that the task instance executed on.
+  unixname:
+    lineage:
+      - datalake_astro_clean.task_instance.unixname
+    description: Unix name of the user that the task instance executed as.
+  pool:
+    lineage:
+      - datalake_astro_clean.task_instance.pool
+    description: Pool that the task instance belongs to.
+  queue:
+    lineage:
+      - datalake_astro_clean.task_instance.queue
+    description: Worker queue that the task instance belongs to.
+  operator:
+    lineage:
+      - datalake_astro_clean.task_instance.operator
+    description: Class name of the operator that the task instance executed.
+  custom_operator_name:
+    lineage:
+      - datalake_astro_clean.task_instance.custom_operator_name
+    description: Custom name of the operator that the task instance executed.
+  executor:
+    lineage:
+      - datalake_astro_clean.task_instance.executor
+    description: Executor that the task instance executed on.
+  task_display_name:
+    lineage:
+      - datalake_astro_clean.task_instance.task_display_name
+    description: Display name of the task.
+  map_index:
+    lineage:
+      - datalake_astro_clean.task_instance.map_index
+    description: Map index of the task instance.
+  try_number:
+    lineage:
+      - datalake_composer_clean.task_instance.try_number
+      - datalake_astro_clean.task_instance.try_number
+    description: Number of the try that the task instance is on.
+  max_tries:
+    lineage:
+      - datalake_composer_clean.task_instance.max_tries
+      - datalake_astro_clean.task_instance.max_tries
+    description: Maximum number of tries that the task instance can have.
+  duration:
+    lineage:
+      - datalake_composer_clean.task_instance.duration
+      - datalake_astro_clean.task_instance.duration
+    description: Duration of the task instance in seconds.
+  pool_slots:
+    lineage:
+      - datalake_astro_clean.task_instance.pool_slots
+    description: Number of pool slots that the task instance used.
+  priority_weight:
+    lineage:
+      - datalake_astro_clean.task_instance.priority_weight
+    description: Priority weight of the task instance.
+  ts_trigger_timeout:
+    lineage:
+      - datalake_astro_clean.task_instance.ts_trigger_timeout
+    description: Timestamp of when the task instance would timeout.
+  ts_executed:
+    lineage:
+      - datalake_composer_clean.task_instance.ts_executed
+      - datalake_astro_clean.task_instance.ts_executed
+    description: Execution date or logical date of the DAG run associated with the task instance. Be aware that this is not necessarily the
+      same as the date the run was actually executed. For example, if the DAG is scheduled to
+  ts_queued:
+    lineage:
+      - datalake_astro_clean.task_instance.ts_queued
+    description: Timestamp when the task instance was queued.
+  ts_started:
+    lineage:
+      - datalake_composer_clean.task_instance.ts_started
+      - datalake_astro_clean.task_instance.ts_started
+    description: Timestamp when the task instance started.
+  ts_ended:
+    lineage:
+      - datalake_composer_clean.task_instance.ts_ended
+      - datalake_astro_clean.task_instance.ts_ended
+    description: Timestamp when the task instance ended.
+  ts_updated:
+    lineage:
+      - datalake_composer_clean.task_instance.ts_updated
+      - datalake_astro_clean.task_instance.ts_updated
+    description: Timestamp when the task instance was last updated.
+  year:
+    lineage:
+      - datalake_composer_clean.task_instance.year
+      - datalake_astro_clean.task_instance.year
+    description: Year of the last update of the task instance.
+  month:
+    lineage:
+      - datalake_composer_clean.task_instance.month
+      - datalake_astro_clean.task_instance.month
+    description: Month of the last update of the task instance.
+  day:
+    lineage:
+      - datalake_composer_clean.task_instance.day
+      - datalake_astro_clean.task_instance.day
+    description: Day of the last update of the task instance.
