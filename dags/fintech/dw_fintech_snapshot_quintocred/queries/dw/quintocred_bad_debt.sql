@@ -283,6 +283,7 @@ SELECT
   mob_bad_debt_payment,
   dt_reference_month,
   dt_closing,
+  dt_snapshot,
   dt_register,
   dt_due,
   dt_paid,
