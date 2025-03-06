@@ -29,11 +29,13 @@ WITH scr_data AS (
         >
         >')
     ) scr_data,
-    ts_created,
-    ts_database_transaction as ts_updated
-  FROM datalake_arquivo_confidencial_clean.integration_report_aud
+    aud.ts_created,
+    rev.ts_created as ts_updated
+  FROM datalake_arquivo_confidencial_clean.integration_report_aud AS aud
+  LEFT JOIN datalake_arquivo_confidencial_clean.rev_info AS rev
+    ON rev.rev = aud.rev
   WHERE integration_provider = 'QI_TECH_SCR'
-    AND ts_created >= DATE('2022-09-01')
+    AND aud.ts_created >= DATE('2022-09-01')
 
 ),
 mobs AS (

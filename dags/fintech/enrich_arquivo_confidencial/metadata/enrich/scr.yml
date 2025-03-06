@@ -71,7 +71,7 @@ columns:
   ts_updated:
     description: "Date information was last updated."
     lineage:
-        - datalake_arquivo_confidencial_clean.integration_report_aud.ts_updated
+        - datalake_arquivo_confidencial_clean.rev_info.ts_created
   ts_next_updated:
     description: "Next date the cpf had its data updated"
     lineage:
