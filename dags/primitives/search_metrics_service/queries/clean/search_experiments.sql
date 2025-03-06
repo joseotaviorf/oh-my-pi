@@ -12,6 +12,8 @@ select
     last_processed_date,
     is_last_date,
     total_days,
+    filter_contamination,
+    filter_is_stable,
     baseline_observations,
     baseline_conversions,
     treatment_observations,

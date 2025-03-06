@@ -44,6 +44,12 @@ columns:
   total_days:
     lineage:
       - datalake_search.search_experiments.total_days
+  filter_contamination:
+    lineage:
+      - datalake_search.search_experiments.filter_contamination
+  filter_is_stable:
+    lineage:
+      - datalake_search.search_experiments.filter_is_stable
   baseline_observations:
     lineage:
       - datalake_search.search_experiments.baseline_observations
