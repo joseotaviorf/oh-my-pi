@@ -1,29 +1,40 @@
 ---
 database_name: datalake_inmetro_clean
 table_name: data_profiles
+description: Information provided about data profiles
+domain: Data Governance
+owner: herivelto.junior@quintoandar.com.br
 columns:
   repo:
     lineage:
       - datalake_inmetro_raw.data_profiles.repo
+    description: Repository name
   layer:
     lineage:
       - datalake_inmetro_raw.data_profiles.repo
       - datalake_inmetro_raw.data_profiles.database
+    description: Layer name
   database:
     lineage:
       - datalake_inmetro_raw.data_profiles.database
+    description: Schema name
   table:
     lineage:
       - datalake_inmetro_raw.data_profiles.table
+    description: Table name
   inmetro_info:
     lineage:
       - datalake_inmetro_raw.data_profiles.inmetro_info
+    description: Additional information tables
   year:
     lineage:
       - datalake_inmetro_raw.data_profiles.year
+    description: Year created
   month:
     lineage:
       - datalake_inmetro_raw.data_profiles.month
+    description: Month created
   day:
     lineage:
       - datalake_inmetro_raw.data_profiles.day
+    description: Day created

@@ -1,56 +1,76 @@
 ---
 database_name: datalake_inmetro_clean
 table_name: data_validations
+escription: Information about validations applied to data
+domain: Data Governance
+owner: herivelto.junior@quintoandar.com.br
 columns:
   repo:
     lineage:
       - datalake_inmetro_raw.data_validations.repo
+    description: Repository name
   layer:
     lineage:
       - datalake_inmetro_raw.data_validations.repo
       - datalake_inmetro_raw.data_validations.database
+    description: Repository and database where feature_sets are stored
   database:
     lineage:
       - datalake_inmetro_raw.data_validations.database
+    description: Schema name
   table:
     lineage:
       - datalake_inmetro_raw.data_validations.table
+    description: Validation suite name
   suite_name:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
+    description: Validation suite name
   suite_result:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
+    description: Validation tests result
   validations_count:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
+    description: Total number of validations
   success_count:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
+    description: Total number of successful validations
   failure_count:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
+    description: Total number of validations that failed
   success_rate:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
+    description: Success rate
   metadata:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
+    description: Additional information about the data validation process
   validations:
     lineage:
       - datalake_inmetro_raw.data_validations.validations
+    description: Validations used in o test the data
   ts_execution_utc:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
+    description: Timestamp for this run in UTC format
   ts_execution_local:
     lineage:
       - datalake_inmetro_raw.data_validations.metadata
+    description: Timestamp for the given run in local time zone
   year:
     lineage:
       - datalake_inmetro_raw.data_validations.year
+    description: Year created
   month:
     lineage:
       - datalake_inmetro_raw.data_validations.month
+    description: Month created
   day:
     lineage:
       - datalake_inmetro_raw.data_validations.day
+    description: Day created
