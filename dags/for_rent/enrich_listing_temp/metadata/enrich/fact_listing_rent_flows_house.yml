@@ -245,10 +245,6 @@ columns:
     lineage:
       - dw_rent.dim_proposal.dt_guarantee_paid
     description: Key of the date of when the guarantee was paid. It's the guarantee's pay date transformed into a number. A rent flow can have none, one or more guarantees paid dates.
-  sk_agent_review_rating_date:
-    lineage:
-      - datalake_ebdb_agents.agents_review.ts_rating_created
-    description: Key of the agent review rating date related to a booked visit of the rent flow. It's the agent's review rating date transformed into a number. A rent flow can have none, one or more agent's review rating dates.
   country_code:
     lineage:
       - datalake_ebdb_listing.house.country_code

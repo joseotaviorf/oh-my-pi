@@ -179,9 +179,6 @@ column_level_validations:
   sk_guarantee_paid_date:
     is_complete:
       severity_level: Error
-  sk_agent_review_rating_date:
-    is_complete:
-      severity_level: Error
   days_booking_created_to_visit:
     has_max_value:
       less_than: 30
