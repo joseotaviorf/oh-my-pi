@@ -342,7 +342,6 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.dw_user:load-dw-public-dim-partner-agent
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate
-  - bietlejuice.ebdb:load-clean-agent-support
   - bietlejuice.enrich_big_agent:load-enrich-agency
   - bietlejuice.enrich_big_agent:load-enrich-agent
   - bietlejuice.enrich_big_agent:load-enrich-enrollment
@@ -1614,10 +1613,6 @@ bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
 bietlejuice.enrich_ebdb_agents:
-  - bietlejuice.ebdb:load-clean-device
-  - bietlejuice.ebdb:load-clean-rating-label
-  - bietlejuice.ebdb:load-clean-real-estate-agent-rating
-  - bietlejuice.ebdb:load-clean-real-estate-agent-rating-rating-label
   - bietlejuice.ebdb_agenda_allocation:load-clean-agent-specific-hour
   - bietlejuice.ebdb_agenda_allocation:load-clean-agent-weekly-hours-aud
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud
@@ -1631,8 +1626,6 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb_partner:load-clean-partner-agent-aud
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
-  - bietlejuice.ebdb_visit:load-clean-booking
-  - bietlejuice.ebdb_visit:load-clean-visit
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-agent-data

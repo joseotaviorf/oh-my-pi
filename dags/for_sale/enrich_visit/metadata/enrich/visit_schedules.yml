@@ -47,6 +47,10 @@ columns:
     lineage:
       - datalake_offer.sale_offer.id_offer
     description: If the house have a offer, we fill this field.
+  id_agent_schedule_review:
+    lineage:
+      - datalake_ebdb_clean.real_estate_agent_rating.id
+    description: If the house have a offer, we fill this field.
   id_fixed_agent:
     lineage:
       - datalake_ebdb_clean.preferred_fixed_agent.id_agent_data
@@ -199,6 +203,9 @@ columns:
       - datalake_ebdb_clean.visit_checkin.ts_checkin
     description:
       Visit checkin timestamp.
+  ts_agent_review_rating:
+    lineage:
+      - datalake_ebdb_clean.real_estate_agent_rating.ts_created
     description:
       Timestamp of the agent booking review.
   ts_buyer_review_rating:

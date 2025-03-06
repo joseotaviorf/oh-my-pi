@@ -88,6 +88,10 @@ columns:
     lineage:
     - datalake_offer.sale_offer.id_offer
     description: ID of the first offer associated with this booking.
+  id_agent_booking_review:
+    lineage:
+    - datalake_ebdb_clean.real_estate_agent_rating.id
+    description: ID of the visit review completed by the agent.
   id_buyer_booking_review:
     lineage:
     - datalake_booking.booking.id
@@ -157,6 +161,10 @@ columns:
     lineage:
     - datalake_booking.booking.ts_checkin
     description: Visit checkin timestamp
+  ts_agent_review_rating:
+    lineage:
+    - datalake_ebdb_clean.real_estate_agent_rating.ts_created
+    description: 'Timestamp of the agent booking review.'
   ts_buyer_review_rating:
     lineage:
     - datalake_insider_clean.review.dt_creation

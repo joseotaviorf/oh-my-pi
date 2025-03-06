@@ -61,7 +61,7 @@ columns:
     description: Amount of attendances made by the agent.
   first_attendance_ts:
     lineage:
-      - datalake_ebdb_clean.agent_support.ts_created
+      # - datalake_ebdb_clean.agent_support.ts_created
       - dw_public.dim_booking.dt_created
     description: Timestamp related to the first attendance.
   app_type:

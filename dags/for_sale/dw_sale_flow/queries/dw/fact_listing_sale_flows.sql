@@ -53,6 +53,7 @@ WITH listing_rent_flows AS (
             COALESCE(CAST(DATE_FORMAT(dim_house_listing.ts_last_de_publication, "yyyyMMdd") AS BIGINT), -1) AS sk_house_listing_de_publication_date,
             COALESCE(CAST(DATE_FORMAT(rent_flow.dt_booking_created, "yyyyMMdd") AS BIGINT), -1) AS sk_booking_created_date,
             COALESCE(CAST(DATE_FORMAT(rent_flow.dt_visit, "yyyyMMdd") AS BIGINT), -1) AS sk_visit_date,
+            COALESCE(CAST(DATE_FORMAT(ar.ts_rating_created, "yyyyMMdd") AS BIGINT), -1) AS sk_agent_review_rating_date,
             COALESCE(CAST(DATE_FORMAT(reservation.ts_created, "yyyyMMdd") AS BIGINT), -1) AS sk_reservation_created_date,
             CAST(reservation.reservation_attempts AS SMALLINT) AS reservation_attempts,
             CAST(NOW() AS TIMESTAMP) AS ts_load
@@ -64,6 +65,8 @@ WITH listing_rent_flows AS (
                 AND COALESCE(dim_house_listing.ts_listing_version_end, NOW())
         LEFT JOIN datalake_ebdb_listing.house h
             ON dim_house_listing.id_house = h.id
+        LEFT JOIN datalake_ebdb_agents.agents_review ar
+            ON rent_flow.id_booking = ar.id_booking
         LEFT JOIN reservation
             ON reservation.max_id = reservation.id_reservation
             AND rent_flow.id_house = reservation.id_house

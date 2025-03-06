@@ -366,6 +366,7 @@ SELECT DISTINCT
   v.id_agent AS id_user_agent,
   ua.id_agent,
   so.id_offer,
+  ar.id AS id_agent_schedule_review,
   fa.id_fixed_agent,
   su.id_user_5a AS id_user_sale_attendence_5a,
   sovd.id_user_secretariat_on_visit_date,
@@ -415,6 +416,7 @@ SELECT DISTINCT
   evd.ts_schedule_unsuccessful,
   evd.ts_schedule_canceled,
   v_cin.ts_checkin AS ts_visit_checkin,
+  ar.ts_created AS ts_agent_review_rating,
   br.dt_creation AS ts_buyer_review_rating,
   NOW() AS ts_load
 FROM
@@ -438,6 +440,8 @@ LEFT JOIN datalake_ebdb_clean.user AS ua
   ON v.id_agent = ua.id
 LEFT JOIN datalake_sale_visit_hubs.sale_visit_hubs AS svh
   ON svh.id_booking = vse.id_schedule
+LEFT JOIN datalake_ebdb_clean.real_estate_agent_rating AS ar
+  ON ar.id = v.id_real_estate_agent_rating
 LEFT JOIN reschedules
   ON reschedules.id_schedule = vse.id_schedule
 LEFT JOIN visit_model AS vm

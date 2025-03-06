@@ -20,12 +20,14 @@ SELECT
     COALESCE(id_visit, -1) AS sk_visit,
     visit_code AS sk_visit_code,
     COALESCE(id_offer, -1) AS sk_offer,
+    COALESCE(id_agent_booking_review, -1) AS sk_agent_booking_review,
     COALESCE(id_buyer_booking_review, -1) AS sk_buyer_booking_review,
     COALESCE(BIGINT(DATE_FORMAT(ts_booking_created, 'yyyyMMdd')), -1) AS sk_booking_created_date,
     COALESCE(BIGINT(DATE_FORMAT(ts_visit, 'yyyyMMdd')), -1) AS sk_visit_date,
     COALESCE(BIGINT(DATE_FORMAT(ts_visit_canceled, 'yyyyMMdd')), -1) AS sk_visit_canceled_date,
     COALESCE(BIGINT(DATE_FORMAT(ts_visit_completed, 'yyyyMMdd')), -1) AS sk_visit_completed_date,
     COALESCE(BIGINT(DATE_FORMAT(ts_visit_follow_up, 'yyyyMMdd')), -1) AS sk_visit_follow_up_date,
+    COALESCE(BIGINT(DATE_FORMAT(ts_agent_review_rating, 'yyyyMMdd')), -1) AS sk_agent_review_rating_date,
     COALESCE(BIGINT(DATE_FORMAT(ts_buyer_review_rating, 'yyyyMMdd')), -1) AS sk_buyer_review_rating_date,
     COALESCE(BIGINT(DATE_FORMAT(ts_visit_checkin, 'yyyyMMdd')), -1) AS sk_visit_checkin_date,
     hub_agent_region,
@@ -44,6 +46,7 @@ SELECT
     ts_visit_completed,
     ts_visit_follow_up,
     ts_visit_checkin,
+    ts_agent_review_rating,
     ts_buyer_review_rating,
     NOW() AS ts_load
 FROM

@@ -54,6 +54,7 @@ SELECT
     b.id_visit,
     b.code AS visit_code,
     so.id_offer,
+    ar.id AS id_agent_booking_review,
     b.id AS id_buyer_booking_review,
     b.hub_agent_region AS hub_agent_region,
     COALESCE(b.is_hub_flow,FALSE) AS is_hub_flow,
@@ -71,6 +72,7 @@ SELECT
     IF(b.is_visit_completed, b.ts_booking_utc, NULL) AS ts_visit_completed,
     b.ts_visit_fup AS ts_visit_follow_up,
     b.ts_checkin AS ts_visit_checkin,
+    ar.ts_created AS ts_agent_review_rating,
     br.dt_creation AS ts_buyer_review_rating,
     NOW() AS ts_load
 FROM
@@ -84,6 +86,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_sale_visit_hubs.sale_visit_hubs AS svh
         ON svh.id_booking = b.id
+LEFT JOIN
+    datalake_ebdb_clean.real_estate_agent_rating AS ar
+        ON ar.id = b.id_real_estate_agent_rating
 LEFT JOIN
     buyer_review AS br
         ON b.code = br.id_reviewed
