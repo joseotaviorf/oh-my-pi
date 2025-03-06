@@ -53,9 +53,6 @@ column_level_validations:
   sk_offer:
     is_complete:
       severity_level: Error
-  sk_agent_booking_review:
-    is_complete:
-      severity_level: Error
   sk_buyer_booking_review:
     is_complete:
       severity_level: Error
@@ -72,9 +69,6 @@ column_level_validations:
     is_complete:
       severity_level: Error
   sk_visit_follow_up_date:
-    is_complete:
-      severity_level: Error
-  sk_agent_review_rating_date:
     is_complete:
       severity_level: Error
   sk_buyer_review_rating_date:

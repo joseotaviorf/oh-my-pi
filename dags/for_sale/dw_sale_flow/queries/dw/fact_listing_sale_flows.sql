@@ -111,7 +111,6 @@ SELECT
     sk_house_listing_de_publication_date,
     sk_booking_created_date,
     sk_visit_date,
-    sk_agent_review_rating_date,
     visit_created_type,
     funnel_step,
     CASE
