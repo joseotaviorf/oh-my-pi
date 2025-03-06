@@ -108,6 +108,7 @@ def create_extraction_task(
             table_name=table_name, s3_suffix=s3_suffix
         ),
         database_conn_id="airflow_db",
+        s3_acl_policy="bucket-owner-full-control",
     )
 
     return raw_task
