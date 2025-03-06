@@ -3677,7 +3677,7 @@ wonka.house_agg_rent_flows:
 wonka.house_demand_balancer_predictions:
   - bietlejuice.demand_balancer_service:load-clean-demand-balancer
 wonka.house_embeddings_main:
-  - quintoml.recs.house_user_embeddings_quintoml.inference:batch-predict
+  - quintoml.recs.house_user_embeddings.inference:batch-predict
 wonka.house_listing_business_context:
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
@@ -3697,4 +3697,4 @@ wonka.house_user_rent_flows:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
   - wonka.house_listing_business_context:load-house_listing_business_context
 wonka.user_embeddings_main:
-  - quintoml.recs.house_user_embeddings_quintoml.inference:batch-predict
+  - quintoml.recs.house_user_embeddings.inference:batch-predict
