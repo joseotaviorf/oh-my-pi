@@ -852,7 +852,6 @@ bietlejuice.dw_sale_events:
 bietlejuice.dw_sale_flow:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
@@ -2842,7 +2841,6 @@ bietlejuice.enrich_sale_stranded_listings_thresholds:
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status
 bietlejuice.enrich_sale_visit:
-  - bietlejuice.ebdb:load-clean-real-estate-agent-rating
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_visit:load-clean-visit-status-log
@@ -3239,7 +3237,6 @@ bietlejuice.enrich_vespucio_pipeline:
 bietlejuice.enrich_visit:
   - bietlejuice.ebdb:load-clean-preferred-fixed-agent
   - bietlejuice.ebdb:load-clean-preferred-fixed-agent-aud
-  - bietlejuice.ebdb:load-clean-real-estate-agent-rating
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud
   - bietlejuice.ebdb_contract:load-clean-work-contract
   - bietlejuice.ebdb_house:load-clean-house

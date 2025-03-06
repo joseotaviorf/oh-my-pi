@@ -64,10 +64,6 @@ columns:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.dt_visit
     description: "[DEPRECATED]"
-  sk_agent_review_rating_date:
-    lineage:
-      - datalake_ebdb_agents.agents_review.ts_rating_created
-    description: "[DEPRECATED]"
   visit_created_type:
     lineage:
       - datalake_ebdb_rent_flow.rent_flow.visit_created_type
