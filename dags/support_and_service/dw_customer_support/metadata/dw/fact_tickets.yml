@@ -50,6 +50,14 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.id_assignee
     description: SK of the user who the ticket was assigned to.
+  sk_problem_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.id_problem_ticket
+    description: Problem ticket identification key.
+  sk_sale_offer:
+    lineage:
+      - datalake_zendesk.tickets_current.offer_ids
+    description: SK for Sale offer associated with the ticket
   sk_contract:
     lineage:
       - datalake_customer_support.tickets.id_contract
