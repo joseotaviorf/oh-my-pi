@@ -1,12 +1,11 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 from multiprocessing.pool import ThreadPool
 import re
+from pendulum import timezone
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from databricks_plugin.hooks.databricks_hook import QuintoAndarDatabricksHook
-from pendulum import datetime, timezone
-
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
@@ -30,8 +29,7 @@ def delete_databricks_jobs(
         job["job_id"]: job["settings"]["name"]
         for job in jobs_list
         if job["created_time"]
-        <= current_timestamp.subtract_timedelta(remove_before_timedelta).timestamp()
-        * 1000
+        <= (current_timestamp - remove_before_timedelta).timestamp() * 1000
         and re.search(job_name_regex, job["settings"]["name"])
     }
     databricks_hook.log.info(
