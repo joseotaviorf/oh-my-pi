@@ -21,8 +21,6 @@ workflow:
     - agents_slots
     agents_weekly_schedule_history:
     - slots_base_time
-    agents_review:
-    - rating_label
     agent_region_group:
     - agents_region
     - agents_slots
