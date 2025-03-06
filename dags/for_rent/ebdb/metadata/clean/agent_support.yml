@@ -1,0 +1,27 @@
+database_name: datalake_ebdb_clean
+table_name: agent_support
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.agentsupport.id
+  id_agent:
+    lineage:
+      - datalake_ebdb_raw.agentsupport.agent_id
+  id_user:
+    lineage:
+      - datalake_ebdb_raw.agentsupport.user_id
+  id_listing:
+    lineage:
+      - datalake_ebdb_raw.agentsupport.listing_id
+  status:
+    lineage:
+      - datalake_ebdb_raw.agentsupport.status
+  agent_comment:
+    lineage:
+      - datalake_ebdb_raw.agentsupport.agent_comment
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.agentsupport.created_at
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.agentsupport.updated_at

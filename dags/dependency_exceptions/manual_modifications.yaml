@@ -60,6 +60,7 @@ bietlejuice.dw_datamarts_cross:
     - bietlejuice.dw_user:load-dw-public-dim-partner
     - bietlejuice.dw_user:load-dw-public-dim-partner-agent
     - bietlejuice.dw_user:load-dw-public-dim-user
+    - bietlejuice.ebdb:load-clean-agent-support
     - bietlejuice.enrich_big_agent:load-enrich-agency
     - bietlejuice.enrich_big_agent:load-enrich-agent
     - bietlejuice.enrich_big_agent:load-enrich-enrollment

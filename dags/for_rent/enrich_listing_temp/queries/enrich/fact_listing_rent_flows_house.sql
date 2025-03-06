@@ -146,7 +146,6 @@ WITH listing_rent_flows AS (
             COALESCE(CAST(DATE_FORMAT(dim_proposal.dt_last_doc_analysis_rejected, "yyyyMMdd") AS BIGINT), -1) AS sk_last_doc_analysis_rejected_date,
             COALESCE(CAST(DATE_FORMAT(dim_proposal.dt_guarantee_paid, "yyyyMMdd") AS BIGINT), -1) AS sk_guarantee_paid_date,
             COALESCE(CAST(DATE_FORMAT(dim_proposal.ts_processed, "yyyyMMdd") AS BIGINT), -1) AS sk_proposal_processed_date,
-            COALESCE(CAST(DATE_FORMAT(ar.ts_rating_created, "yyyyMMdd") AS BIGINT), -1) AS sk_agent_review_rating_date,
             COALESCE(CAST(DATE_FORMAT(reservation.ts_created, "yyyyMMdd") AS BIGINT), -1) AS sk_reservation_created_date,
             CAST(reservation.reservation_attempts AS SMALLINT) AS reservation_attempts,
             CAST(NOW() AS TIMESTAMP) AS ts_load
@@ -182,8 +181,6 @@ WITH listing_rent_flows AS (
             datalake_listing_temp.dim_house_listing_house AS dhl_contract
                 ON con.id_house = dhl_contract.id_house
                 AND dim_contract.ts_created BETWEEN COALESCE(dhl_contract.ts_listing_version_start, '2000-01-01 00:00:00') AND COALESCE(dhl_contract.ts_listing_version_end, CURRENT_DATE)
-        LEFT JOIN datalake_ebdb_agents.agents_review ar
-            ON rent_flow.id_booking = ar.id_booking
         LEFT JOIN reservation
             ON reservation.max_id = reservation.id_reservation
             AND rent_flow.id_house = reservation.id_house
@@ -388,7 +385,6 @@ SELECT
     sk_first_doc_analysis_rejected_date AS sk_first_doc_analysis_rejected,
     sk_last_doc_analysis_rejected_date AS sk_last_doc_analysis_rejected,
     sk_guarantee_paid_date,
-    sk_agent_review_rating_date,
     country_code,
     visit_created_type,
     booking_utm_campaign,

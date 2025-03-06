@@ -93,10 +93,6 @@ columns:
     lineage:
     - datalake_sale_visit.sale_visit.id_offer
     description: ID of the first offer associated with this booking.
-  sk_agent_booking_review:
-    lineage:
-    - datalake_sale_visit.sale_visit.id_agent_booking_review
-    description: ID of the visit review completed by the agent.
   sk_buyer_booking_review:
     lineage:
     - datalake_sale_visit.sale_visit.id_buyer_booking_review
@@ -126,11 +122,6 @@ columns:
     - datalake_sale_visit.sale_visit.ts_visit_follow_up
     description: Date key to be joined with dim_date. Key to identify date of visit
       follow up.
-  sk_agent_review_rating_date:
-    lineage:
-    - datalake_sale_visit.sale_visit.ts_agent_review_rating
-    description: Date key to be joined with dim_date. Key to identify date of agent
-      booking review.
   sk_buyer_review_rating_date:
     lineage:
     - datalake_sale_visit.sale_visit.ts_buyer_review_rating
@@ -205,10 +196,6 @@ columns:
     lineage:
     - datalake_sale_visit.sale_visit.ts_visit_checkin
     description: Visit checkin timestamp
-  ts_agent_review_rating:
-    lineage:
-    - datalake_sale_visit.sale_visit.ts_agent_review_rating
-    description: 'Timestamp of the agent booking review.'
   ts_buyer_review_rating:
     lineage:
     - datalake_sale_visit.sale_visit.ts_buyer_review_rating
