@@ -24,10 +24,10 @@ if __name__ == "__main__":
     parser.add_argument("source")
     parser.add_argument("table_name")
     parser.add_argument("date_filter_column", help="Date filter column")
+    parser.add_argument("execution_date", type=str, help="DAG execution date")
     parser.add_argument(
         "unixtime_measure", type=str, help="Column unixtime unit", nargs="?"
     )
-    parser.add_argument("execution_date", type=str, help="DAG execution date")
 
     args = parser.parse_args()
 
@@ -36,8 +36,8 @@ if __name__ == "__main__":
     source = args.source
     table_name = args.table_name
     date_filter_column = args.date_filter_column
-    unixtime_measure = args.unixtime_measure
     execution_date = args.execution_date
+    unixtime_measure = args.unixtime_measure
 
     logger.info(
         f"""
