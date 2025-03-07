@@ -9,7 +9,7 @@ owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_dag:
     lineage:
-      - datalake_composer_clean.dag.id_dag
+      - datalake_airflow.dag.id_dag
     description: Unique DAG id, which is also the DAG name on Airflow.
   id_line:
     lineage:
@@ -17,7 +17,7 @@ columns:
     description: DAG line id, which is also known as the "DAG owner".
   line_name:
     lineage:
-      - datalake_composer_clean.dag.owners
+      - datalake_airflow.dag.owners
     description: Line responsible for the DAG, also the "DAG owner".
   layer:
     description: Data lake layer of which the DAG writes data into.
@@ -29,12 +29,12 @@ columns:
       reverse: 'Reverse layer'
   schedule_interval:
     lineage:
-      - datalake_composer_clean.dag.schedule_interval
+      - datalake_airflow.dag.schedule_interval
     description: Schedule interval of the Airflow in which the DAG runs.
       If none, this DAG has no schedule interval or is triggered by Mediator.
   state:
     lineage:
-      - datalake_composer_clean.dag_run.state
+      - datalake_airflow.dag_run.state
     description: State of the most recent DAG run of the DAG.
   utc_sla_hour:
       description: SLA UTC hour of the DAG, where each layer has a different SLA.
@@ -60,11 +60,11 @@ columns:
     description: The median duration of the DAG, in minutes.
   is_active:
     lineage:
-      - datalake_composer_clean.dag.is_active
+      - datalake_airflow.dag.is_active
     description: Boolean flag indicating if the DAG is currently active on Airflow, which means that it exists there.
   is_paused:
     lineage:
-      - datalake_composer_clean.dag.is_paused
+      - datalake_airflow.dag.is_paused
     description: Boolean flag indicating if the DAG is currently paused on Airflow, which means that it is turned off.
   is_in_exclusion_list:
     description: Boolean flag indicating if the DAG is present in the SLA exclusion list gsheet.

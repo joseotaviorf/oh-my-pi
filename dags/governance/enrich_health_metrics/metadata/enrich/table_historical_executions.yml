@@ -19,7 +19,7 @@ columns:
   dag_owner:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.owner
+      - datalake_airflow.log.owner
   dag_layer:
     description: WIP
     lineage:
@@ -27,16 +27,16 @@ columns:
   dt_executed:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.ts_executed
+      - datalake_airflow.log.ts_executed
   ts_task_started:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_airflow.log.ts_event
   ts_task_ended:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_airflow.log.ts_event
   duration_in_minutes:
     description: WIP
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_airflow.log.ts_event

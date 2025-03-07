@@ -14,7 +14,7 @@ dag_names AS (
         REGEXP_REPLACE(owners,'(airflow|\,)','') AS dag_owner,
         layer AS dag_layer,
         DATE(adt.date) AS dt_executed
-    FROM datalake_composer_clean.dag AS dag
+    FROM datalake_airflow.dag AS dag
     LEFT JOIN dag_layer AS layer
     ON dag.id_dag = layer.dag
     CROSS JOIN datalake_quintoandar.aux_date AS adt
@@ -39,7 +39,7 @@ execution_logs AS (
     FROM 
         dag_names AS dag
     INNER JOIN 
-        datalake_composer_clean.log AS log
+        datalake_airflow.log AS log
     ON 
         log.id_dag = dag.id_dag
         AND DATE(log.ts_executed) = dag.dt_executed - INTERVAL 1 day
@@ -60,7 +60,7 @@ SELECT
 FROM 
     execution_logs AS exec
 JOIN
-    datalake_composer_clean.log AS log_started
+    datalake_airflow.log AS log_started
 ON
     log_started.id_dag = exec.id_dag
     AND log_started.id_log = exec.id_log_first_task
@@ -68,7 +68,7 @@ ON
     --Due to new composer instance
     AND DATE(log_started.ts_event) > DATE(exec.dt_executed - INTERVAL 2 day)
 JOIN
-    datalake_composer_clean.log AS log_last_task
+    datalake_airflow.log AS log_last_task
 ON
     log_last_task.id_dag = exec.id_dag
     AND log_last_task.id_log = exec.id_log_last_task

@@ -10,11 +10,11 @@ columns:
     description: Unique id that identifies the line.
   line_name:
     lineage:
-      - datalake_composer_clean.dag.owners
+      - datalake_airflow.dag.owners
     description: Name of the line.
   is_data_line:
     description: Boolean flag indicating if the line is from the Data area, related to an Analytics Engineering team.
   ts_line_first_event:
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_airflow.log.ts_event
     description: Timestamp of when the line's first DAG event happened.

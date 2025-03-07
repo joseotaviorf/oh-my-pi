@@ -14,7 +14,7 @@ dags AS (
         REGEXP_REPLACE(owners,'(airflow|\,)','') AS dag_owner,
         layer AS dag_layer,
         DATE(adt.date) AS dt_executed
-    FROM datalake_composer_clean.dag AS dag
+    FROM datalake_airflow.dag AS dag
     LEFT JOIN dag_layer AS layer
     ON dag.id_dag = layer.dag
     CROSS JOIN datalake_quintoandar.aux_date AS adt
@@ -28,7 +28,7 @@ airflow_failed_tasks AS (
         DATE(ts_executed) AS dt_executed,
         COUNT(DISTINCT id_fail) AS qt_failed_airflow_tasks
     FROM 
-        datalake_composer_clean.task_fail
+        datalake_airflow.task_fail
     GROUP BY
         1, 2
 ),

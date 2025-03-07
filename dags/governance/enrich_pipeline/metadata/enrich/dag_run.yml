@@ -9,21 +9,21 @@ owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_dag_run:
     lineage:
-      - datalake_composer_clean.dag_run.id
+      - datalake_airflow.dag_run.id
     description: Unique DAG run id, identifying each DAG run.
   id_dag:
     lineage:
-      - datalake_composer_clean.dag_run.id_dag
+      - datalake_airflow.dag_run.id_dag
     description: DAG id, which is also the DAG name on Airflow.
   id_run:
     lineage:
-      - datalake_composer_clean.dag_run.id_run
+      - datalake_airflow.dag_run.id_run
     description: Run id of the DAG, which indicates the trigger type (scheduled, manual, Mediator)
       and the execution date (which is usually D-1). If null, it might indicate a manual DAG run that was created
       without following the regular name of a run. 
   state:
     lineage:
-      - datalake_composer_clean.dag_run.state
+      - datalake_airflow.dag_run.state
     description: Current state of the DAG run.
   duration:
     description: Total duration of the DAG run, in minutes.
@@ -31,7 +31,7 @@ columns:
     description: Boolean flag indicating if the DAG is present in the SLA exclusion list gsheet.
   had_external_trigger:
     lineage:
-      - datalake_composer_clean.dag_run.had_external_trigger
+      - datalake_airflow.dag_run.had_external_trigger
     description: Boolean flag indicating if the DAG run had an external trigger.
   is_triggered_by_mediator:
     description: Boolean flag indicating if the DAG run was triggered by Mediator.
@@ -51,66 +51,66 @@ columns:
       at least one more time.
   ts_run:
     lineage:
-      - datalake_composer_clean.dag_run.ts_executed
+      - datalake_airflow.dag_run.ts_executed
     description: The UTC timestamp of the DAG run, which usually is D-1.
   ts_run_brt:
     lineage:
-      - datalake_composer_clean.dag_run.ts_executed
+      - datalake_airflow.dag_run.ts_executed
     description: The timestamp of the DAG run, which usually is D-1, in Brasilia (BR) timezone.
   ts_started:
     lineage:
-      - datalake_composer_clean.dag_run.ts_started
+      - datalake_airflow.dag_run.ts_started
     description: The UTC timestamp of when the DAG execution has been started.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
   ts_started_brt:
     lineage:
-      - datalake_composer_clean.dag_run.ts_started
+      - datalake_airflow.dag_run.ts_started
     description: The timestamp of when the DAG execution has been started, in Brasilia (BR) timezone.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
   ts_ended:
     lineage:
-      - datalake_composer_clean.dag_run.ts_ended
+      - datalake_airflow.dag_run.ts_ended
     description: The UTC timestamp of when the DAG execution has ended.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
   ts_ended_brt:
     lineage:
-      - datalake_composer_clean.dag_run.ts_ended
+      - datalake_airflow.dag_run.ts_ended
     description: The timestamp of when the DAG execution has ended, in Brasilia (BR) timezone.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the most
       recent timestamp will be shown.
   ts_first_execution_success:
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_airflow.log.ts_event
     description: The UTC timestamp of when the DAG execution has first received a successful state.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
       successful timestamp will be shown.
   ts_first_execution_success_brt:
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_airflow.log.ts_event
     description: The timestamp of when the DAG execution has first received a successful state, in
       Brasilia (BR) timezone.
       A DAG run may suffer re-triggers (Mediator) or even manual clears, and in this case the first
       successful timestamp will be shown.
   ts_last_table_task_successful:
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_airflow.log.ts_event
     description: UTC timestamp of when the last table of the DAG executed successfully. This timestamp
       will only be assigned if all the tables of the DAG had run inside the expected SLA.
   ts_last_table_task_successful_brt:
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_airflow.log.ts_event
     description: BRT timestamp of when the last table of the DAG executed successfully. This timestamp
       will only be assigned if all the tables of the DAG had run inside the expected SLA.
   ts_last_composer_run:
     lineage:
-      - datalake_composer_clean.dag_run.ts_ended
+      - datalake_airflow.dag_run.ts_ended
     description: The UTC timestamp of when the last Composer extraction happened related to the execution date.
   ts_last_composer_run_brt:
     lineage:
-      - datalake_composer_clean.dag_run.ts_ended
+      - datalake_airflow.dag_run.ts_ended
     description: The BRT timestamp of when the last Composer extraction happened related to the execution date.
   ts_load:
     description: UTC timestamp of when the data was written in our data lake.

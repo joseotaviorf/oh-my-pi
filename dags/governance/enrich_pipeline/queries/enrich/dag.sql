@@ -49,7 +49,7 @@ first_execution AS (
         LOWER(id_dag) AS id_dag,    -- There're some cases of the same DAG written in caps
         CAST(MIN(ts_event) AS TIMESTAMP) AS ts_first_event
     FROM
-        datalake_composer_clean.log
+        datalake_airflow.log
     WHERE
         id_dag LIKE 'bietlejuice%'
     GROUP BY 1
@@ -61,7 +61,7 @@ base_amount_of_tasks AS (
         id_dag,
         CAST(MAX(ts_executed) AS TIMESTAMP) AS ts_last_run
     FROM
-        datalake_composer_clean.log
+        datalake_airflow.log
     WHERE
         id_dag LIKE 'bietlejuice%'
         AND id_task IN ('terminate-cluster', 'job-cluster-finished')
@@ -75,7 +75,7 @@ amount_of_tasks AS (
         COUNT(DISTINCT l.id_task) AS number_of_tasks,
         CAST(l.ts_executed AS TIMESTAMP) AS ts_run
     FROM
-        datalake_composer_clean.log AS l
+        datalake_airflow.log AS l
     JOIN
         base_amount_of_tasks AS b
             ON b.id_dag = l.id_dag
@@ -100,7 +100,7 @@ dag_info AS (
         IF(de.dag IS NOT NULL, TRUE, FALSE) AS is_in_exclusion_list,
         IF(ds.id_dag IS NOT NULL, TRUE, FALSE) AS has_special_scheduler
     FROM
-        datalake_composer_clean.dag AS d
+        datalake_airflow.dag AS d
     LEFT JOIN
         datalake_gsheets_clean.dags_special_scheduler AS ds
             ON ds.id_dag = d.id_dag

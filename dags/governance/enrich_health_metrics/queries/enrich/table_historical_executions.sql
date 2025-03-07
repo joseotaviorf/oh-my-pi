@@ -18,7 +18,7 @@ all_table_executions AS (
         ts_event::TIMESTAMP,    
         dt_executed
     FROM table_info AS tb
-    JOIN datalake_composer_clean.log AS lg
+    JOIN datalake_airflow.log AS lg
     ON 
         tb.task = lg.id_task
         AND DATE(lg.ts_executed) = DATE(tb.dt_executed - INTERVAL 1 DAY) 

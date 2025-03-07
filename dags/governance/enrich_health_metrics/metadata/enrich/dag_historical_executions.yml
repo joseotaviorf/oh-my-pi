@@ -7,11 +7,11 @@ columns:
   dag_name:
     description: Unique name identifier of the executed DAG.
     lineage:
-      - datalake_composer_clean.log.id_dag
+      - datalake_airflow.log.id_dag
   dag_owner:
     description: Name of the owner or team responsible for the DAG.
     lineage:
-      - datalake_composer_clean.dag.owners
+      - datalake_airflow.dag.owners
   dag_layer:
     description: Processing layer of the DAG.
     lineage:
@@ -19,16 +19,16 @@ columns:
   dt_executed:
     description: Date on which the DAG was executed.
     lineage:
-      - datalake_composer_clean.log.ts_executed
+      - datalake_airflow.log.ts_executed
   ts_dag_started:
     description: Timestamp marking the start of the DAG execution.
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_airflow.log.ts_event
   ts_dag_ended:
     description: Timestamp marking the end of the DAG execution.
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_airflow.log.ts_event
   duration_in_minutes:
     description: Total duration of the DAG execution in minutes.
     lineage:
-      - datalake_composer_clean.log.ts_event
+      - datalake_airflow.log.ts_event

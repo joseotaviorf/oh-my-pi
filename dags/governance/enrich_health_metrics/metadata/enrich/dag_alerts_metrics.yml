@@ -7,11 +7,11 @@ columns:
   dag_name:
     description: DAG's name.
     lineage:
-      - datalake_composer_clean.dag.dag_name
+      - datalake_airflow.dag.dag_name
   dag_owner:
     description: DAG's owner.
     lineage:
-      - datalake_composer_clean.dag.owners
+      - datalake_airflow.dag.owners
   dag_layer:
     description: WIP
     lineage:
@@ -23,8 +23,8 @@ columns:
   qt_failed_airflow_tasks:
     description: Quantity of failed Airflow tasks during DAG's execution.
     lineage:
-      - datalake_composer_clean.task_fail.dag_name
-      - datalake_composer_clean.task_fail.ts_executed
+      - datalake_airflow.task_fail.dag_name
+      - datalake_airflow.task_fail.ts_executed
   qt_opsgenie_alerts:
     description: Quantity of OpsGenie alerts during DAG's execution.
     lineage:

@@ -4,7 +4,7 @@ WITH first_run_ever AS (
     id_dag,
     ts_executed
   FROM
-    datalake_composer_clean.log
+    datalake_airflow.log
   WHERE
     id_dag LIKE 'bietlejuice%'
     AND (id_task IN ('create-cluster', 'execute-job-cluster')
@@ -39,7 +39,7 @@ first_task_success_log AS (
     TIMESTAMP(ts_event) AS ts_success_event,
     DATE(ts_executed) AS dt_run
   FROM
-    datalake_composer_clean.log
+    datalake_airflow.log
   WHERE
     id_dag LIKE 'bietlejuice%'
     AND event = 'success'
@@ -115,13 +115,13 @@ success_run AS (
         ELSE COALESCE(DATE(l.ts_event), DATE_ADD(l.ts_executed, 1)) + INTERVAL 11 HOUR
       END AS ts_expected_sla
   FROM
-    datalake_composer_clean.log AS l
+    datalake_airflow.log AS l
   LEFT JOIN -- We have cases where DAG Inventory was broken and didn't run
     dag_inventory AS di
       ON di.id_dag = l.id_dag
       AND di.dt_extracted = DATE(l.ts_executed)
   JOIN
-    datalake_composer_clean.dag_run AS dr
+    datalake_airflow.dag_run AS dr
       ON dr.id_dag = l.id_dag
       AND dr.ts_executed = l.ts_executed
       AND dr.id_run NOT LIKE 'manual%'  -- Excluding manual runs, which we're not considering on the SLA
@@ -139,7 +139,7 @@ dag_clear AS (
     id_dag,
     ts_executed
   FROM
-    datalake_composer_clean.log
+    datalake_airflow.log
   WHERE
     id_dag LIKE 'bietlejuice%'
     AND event IN ('clear', 'dagrun_clear')
@@ -155,7 +155,7 @@ composer_run AS (
     MAX(ts_started) AS ts_last_execution_started,
     MAX(ts_ended) AS ts_last_execution_ended
   FROM
-    datalake_composer_clean.dag_run
+    datalake_airflow.dag_run
   WHERE
     id_dag = 'bietlejuice.composer'
     AND DATE(ts_executed) = DATE(ts_ended)  -- Making sure that for every DAG execution date, we'll have the last extraction of the same day
@@ -197,9 +197,9 @@ SELECT
   NOW() AS ts_load,
   FROM_UTC_TIMESTAMP(NOW(), 'America/Sao_Paulo') AS ts_load_brt
 FROM
-  datalake_composer_clean.dag_run AS dr
+  datalake_airflow.dag_run AS dr
 INNER JOIN
-  datalake_composer_clean.dag AS d
+  datalake_airflow.dag AS d
     ON d.id_dag = dr.id_dag
     AND d.id_dag LIKE 'bietlejuice%'
 LEFT JOIN

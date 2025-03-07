@@ -4,9 +4,9 @@ WITH base AS (
         REPLACE(REPLACE(owners, 'airflow, ', ''), ', airflow', '') AS line_name,
         MIN(ts_event) AS ts_line_first_event
     FROM
-        datalake_composer_clean.log AS l
+        datalake_airflow.log AS l
     JOIN
-        datalake_composer_clean.dag AS d
+        datalake_airflow.dag AS d
             ON d.id_dag = l.id_dag
             AND d.id_dag LIKE 'bietlejuice%'
     GROUP BY 2

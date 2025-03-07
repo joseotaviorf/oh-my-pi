@@ -26,7 +26,7 @@ paused_dates AS (
         ts_event,
         LEAD(ts_event) OVER(PARTITION BY id_dag ORDER BY ts_event) AS ts_next_event
     FROM
-        datalake_composer_clean.log
+        datalake_airflow.log
     WHERE
         event IN ('paused', 'cli_run')
         AND id_dag LIKE 'bietlejuice%'
@@ -56,7 +56,7 @@ dag_base AS (
     FROM
         datalake_pipeline.dag AS d
     JOIN
-        datalake_composer_clean.dag AS dd
+        datalake_airflow.dag AS dd
             ON dd.id_dag = d.id_dag
     JOIN
         datalake_quintoandar.aux_date AS ad

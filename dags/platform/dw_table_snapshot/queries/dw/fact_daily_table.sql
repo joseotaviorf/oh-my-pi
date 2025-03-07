@@ -23,7 +23,7 @@ JOIN
         AND COALESCE(ltc.month, tu.month) = dit.month
         AND COALESCE(ltc.day, tu.day) = dit.day
 JOIN
-    datalake_composer_clean.dag AS cd
+    datalake_airflow.dag AS cd
         ON cd.id_dag = dit.dag
 JOIN
     datalake_pipeline.dag AS pd

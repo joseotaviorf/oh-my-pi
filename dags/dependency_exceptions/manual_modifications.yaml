@@ -196,7 +196,7 @@ bietlejuice.dw_supply:
     - bietlejuice.dw_datamarts_cross:load-dw-datamarts-affiliates-clusters
 bietlejuice.dw_table_snapshot:
   remove:
-    - bietlejuice.composer:load-clean-dag
+    - bietlejuice.enrich_airflow:load-enrich-dag
 bietlejuice.dw_tenant_documentation:
   remove:
     - bietlejuice.ebdb_proposal:load-clean-proponent-info-resend-request-aud
@@ -500,9 +500,9 @@ bietlejuice.enrich_pipeline:
   # We need to remove these dependencies because the Composer DAG runs several times during the day, and it's not
   # our intention to run this DAG the same amount of times.
   remove:
-    - bietlejuice.composer:load-clean-dag
-    - bietlejuice.composer:load-clean-dag-run
-    - bietlejuice.composer:load-clean-log
+    - bietlejuice.enrich_airflow:load-enrich-dag
+    - bietlejuice.enrich_airflow:load-enrich-dag-run
+    - bietlejuice.enrich_airflow:load-enrich-log
     - bietlejuice.dag_inventory:load-clean-table
     - bietlejuice.gsheets_cross:done-clean-dags-sla-exclusion-list
     - bietlejuice.gsheets_cross:done-clean-dags-special-scheduler
