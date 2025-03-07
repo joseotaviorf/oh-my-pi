@@ -20,14 +20,19 @@ workflow:
   tables_customization:
     chats_chat:
       raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     surveys_answer:
       raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     surveys_survey:
       raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     message_voting:
       raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     rating:
       raw_primary_keys: ["id"]
+      clean_primary_keys: ["id_rating"]
 
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
