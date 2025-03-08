@@ -15,4 +15,4 @@ FROM
     log
 WHERE
     dttm >= DATE('{load_start_date}')
-    AND dttm <= DATE('{load_end_date}')
+    AND dttm <= (DATE('{load_end_date}') + 1)

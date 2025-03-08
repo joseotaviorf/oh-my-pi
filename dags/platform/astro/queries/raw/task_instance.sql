@@ -30,4 +30,4 @@ FROM
     task_instance
 WHERE
     updated_at >= DATE('{load_start_date}')
-    AND updated_at <= DATE('{load_end_date}')
+    AND updated_at <= (DATE('{load_end_date}') + 1)

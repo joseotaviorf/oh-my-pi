@@ -10,4 +10,4 @@ FROM
     serialized_dag
 WHERE
     last_updated >= DATE('{load_start_date}')
-    AND last_updated <= DATE('{load_end_date}')
+    AND last_updated <= (DATE('{load_end_date}') + 1)

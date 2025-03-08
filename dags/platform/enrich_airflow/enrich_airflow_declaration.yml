@@ -19,12 +19,12 @@ workflow:
       merge_on:
         - id_fail
     log:
-      partition_cols:
+      partitions:
         - year
         - month
         - day
     task_instance:
-      partition_cols:
+      partitions:
         - year
         - month
         - day
