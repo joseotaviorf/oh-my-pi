@@ -13,7 +13,7 @@ from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 DAG_NAME = "skip_list_cleaner"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
-MAIN_START_DATE = datetime(2024, 9, 12, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_START_DATE = datetime(2024, 9, 12).replace(tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 0 * * *"
 
 

@@ -1,7 +1,7 @@
 from datetime import datetime, date, timedelta
 
 from airflow.models import DAG, Variable
-from dag_mediator_plugin import (
+from bietlejuice_plugin.dag_mediator_plugin import (
     QuintoAndarShortCircuitExternalSensor,
     QuintoAndarCustomTriggerDagOperator,
 )
@@ -68,7 +68,7 @@ mediator_dag = DAG(
         "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=datetime(2020, 5, 8, 0, 0, 0),
-    schedule_interval="*/12 * * * *",
+    schedule_interval="@continuous",
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=Variable.get("DOC_MD_BASE_URL"), dag_id=DAG_ID
     ),
