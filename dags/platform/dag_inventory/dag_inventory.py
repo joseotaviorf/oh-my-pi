@@ -131,15 +131,26 @@ def is_sync_metadata_task(task) -> bool:
 
     if not hasattr(task, "json"):
         return False
-    if "spark_python_task" not in task.json:
+
+    task_json_content = get_task_json_content(task)
+
+    if "spark_python_task" not in task_json_content:
         return False
-    if not task.json["spark_python_task"]["python_file"].endswith(
+
+    if not task_json_content["spark_python_task"]["python_file"].endswith(
         "sync_metadata.py"
-    ) and not task.json["spark_python_task"]["python_file"].endswith(
+    ) and not task_json_content["spark_python_task"]["python_file"].endswith(
         "sync_metastore_tables_structure.py"
     ):
         return False
     return True
+
+def get_task_json_content(task) -> dict:
+    # We're doing this because Airflow 2 treats the json as a string
+    # Airflow 1 treats it as a dictionary
+    if type(task.json) == str:
+        return json.loads(task.json)
+    return task.json
 
 
 def get_load_task_name_from_metadata_task(metadata_task) -> str:
@@ -155,7 +166,8 @@ def get_load_task_name_from_metadata_task(metadata_task) -> str:
 MetadataTaskParameters = collections.namedtuple("MetadataTaskParameters", ["bucket", "layer", "database", "table_name", "is_delta"])
 def extract_parameters_from_sync_metadata_task(task) -> MetadataTaskParameters:
     """Extracts the parameters from the sync_metadata task."""
-    params = task.json["spark_python_task"]["parameters"]
+    task_json_content = get_task_json_content(task)
+    params = task_json_content["spark_python_task"]["parameters"]
     bucket = params[0]
     layer = params[1]
     database = params[2]
@@ -220,6 +232,7 @@ def extract_table_to_s3(table_name: str, **kwargs) -> None:
         key=f"raw/dag_inventory/dag_bag_content/{table_name}/{partition_path}/{table_name}.json",
         bucket_name=datalake_bucket,
         replace=True,
+        acl_policy="bucket-owner-full-control",
     )
 
 
