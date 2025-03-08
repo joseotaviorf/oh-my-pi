@@ -98,67 +98,67 @@ steps:
       event: push
       branch: [forno, master, hotfix/*]
 
-  upload-bi-etl-ejuice-modules-gcs-forno:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync:forno-latest
-    settings:
-      bucket: us-east4-airflow-forno2-7f52154d-bucket
-      source: bietlejuice/
-      target: dags/bietlejuice/
-      delete: true
-      dry_run: false
-    secrets:
-      - source: google_cloud_composer_credentials
-        target: google_application_credentials
+  upload-bi-etl-ejuice-modules-s3-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.forno.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: bietlejuice
     when:
       event: push
       branch: [forno]
 
-  upload-bi-etl-ejuice-modules-gcs-prod:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync
-    settings:
-      bucket: us-east4-airflow-prod2-fdaf9748-bucket
-      source: bietlejuice/
-      target: dags/bietlejuice/
-      delete: true
-      dry_run: false
-    secrets:
-      - source: google_cloud_composer_credentials
-        target: google_application_credentials
+  upload-bi-etl-ejuice-modules-s3-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: bietlejuice
     when:
       event: push
       branch: [master, hotfix/*]
 
-  upload-dag-packages-dags-gcs-forno:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync:forno-latest
-    settings:
-      bucket: us-east4-airflow-forno2-7f52154d-bucket
-      source: dags/
-      target: dags/dags/
-      delete: true
-      dry_run: false
-    secrets:
-      - source: google_cloud_composer_credentials
-        target: google_application_credentials
+  upload-dag-packages-dags-s3-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.forno.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: dags
     when:
       event: push
       branch: [forno]
     depends_on: [create-dag-files]
 
-  upload-dag-packages-dags-gcs-prod:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/gcs-sync
-    settings:
-      bucket: us-east4-airflow-prod2-fdaf9748-bucket
-      source: dags/
-      target: dags/dags/
-      delete: true
-      dry_run: false
-    secrets:
-      - source: google_cloud_composer_credentials
-        target: google_application_credentials
+  upload-dag-packages-dags-s3-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
+    pull: true
+    environment:
+      BUCKET: artifacts.s3.data.quintoandar.com.br
+      S3_PREFIX: astronomer/dags
+      SOURCE: dags
     when:
       event: push
       branch: [master, hotfix/*]
     depends_on: [create-dag-files]
+
+  astronomer-deploy-dags-forno:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:forno-latest
+    pull: true
+    when:
+      event: push
+      branch: [ forno ]
+    depends_on: [ upload-bi-etl-ejuice-modules-s3-forno, upload-dag-packages-dags-s3-forno ]
+
+  astronomer-deploy-dags-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:prod-latest
+    pull: true
+    when:
+      event: push
+      branch: [master, hotfix/*]
+    depends_on: [ upload-bi-etl-ejuice-modules-s3-prod, upload-dag-packages-dags-s3-prod ]
 
   upload-dag-packages-spark-jobs-s3-forno:
     image: public.ecr.aws/docker/library/python:3.7.16
