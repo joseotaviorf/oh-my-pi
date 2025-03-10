@@ -1,0 +1,163 @@
+---
+database_name: datalake_amplitude_clean
+table_name: 183047_ad_improvements_first_access_page_viewed_events
+columns:
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.id_amplitude
+  ids_amplitude_attributed:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.ids_amplitude_attributed
+  id_house:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.event_properties
+  id_user:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.id_user    
+  id_device:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.id_device
+  id_event:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.id_event
+  id_app:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.id_app
+  uuid:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.uuid
+  adid:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.adid
+  id_session:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.id_session
+  id_schema:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.id_schema
+  id_inserted:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.id_inserted
+  idfa:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.idfa
+  event_type:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.event_type
+  amplitude_event_type:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.amplitude_event_type
+  up_ab_beakman_owner_house_setup:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.user_properties
+  ep_business_context:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.event_properties        
+  city:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.city
+  country:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.country
+  data:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.data
+  device_brand:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.device_brand
+  device_carrier:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.device_carrier
+  device_family:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.device_family
+  device_manufacturer:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.device_manufacturer
+  device_model:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.device_model
+  device_type:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.device_type
+  dma:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.dma
+  ip_address:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.ip_address
+  location_lat:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.location_lat
+  location_lng:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.location_lng
+  os_name:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.os_name
+  os_version:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.os_version
+  platform:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.platform
+  library:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.library
+  region:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.region
+  start_version:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.start_version
+  language:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.language
+  version_name:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.version_name
+  sample_rate:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.sample_rate
+  event_properties:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.event_properties
+  user_properties:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.user_properties
+  is_paying:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.is_paying
+  is_attribution_event:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.is_attribution_event
+  ts_server_received:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.ts_server_received
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.ts_event
+  ts_server_uploaded:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.ts_server_uploaded
+  ts_user_created:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.ts_user_created
+  ts_client_event:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.ts_client_event
+  ts_client_uploaded:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.ts_client_uploaded
+  ts_processed:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.ts_processed
+  year:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.year
+  month:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.month
+  day:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_first_access_page_viewed_events.day
