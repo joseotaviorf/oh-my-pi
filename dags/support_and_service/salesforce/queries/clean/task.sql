@@ -50,7 +50,6 @@ SELECT
     CreatedDate AS ts_created,
     LastModifiedDate AS ts_last_modified,
     SystemModstamp AS system_mod_stamp,
-    LastReferencedDate AS ts_last_referenced,
     year,
     month,
     day
