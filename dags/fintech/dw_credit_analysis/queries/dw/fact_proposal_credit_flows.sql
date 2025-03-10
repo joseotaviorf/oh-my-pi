@@ -23,8 +23,14 @@ credit_evaluation AS (
     datalake_docx_clean.credit_evaluation AS ce ON cep.id_credit_evaluation = ce.id
   -- removing legacy data (latest record is 2021)
   WHERE cep.proponent_type IS NOT NULL
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY cep.id_credit_evaluation ORDER BY cep.ts_updated DESC) = 1
+),
+proposal_proponent_type AS (
+  SELECT
+    id_proposal,
+    MAX(proponent_type) AS proposal_proponent_type
+  FROM
+    credit_evaluation
+  GROUP BY id_proposal
 ),
 guarantees AS (
   SELECT
@@ -206,7 +212,7 @@ rent_flows AS (
       ELSE TRUE
     END AS is_guarantee_accepted, --fix rule: IF(g.guarantee_not_accepted = 1, TRUE, FALSE)
     pp.is_single_tenant,
-    IF(ce.proponent_type = 'PERSON', FALSE, TRUE) AS is_renting_for_others,
+    IF(pt.proposal_proponent_type = 'PERSON', TRUE, FALSE) AS is_renting_for_others,
     pp.total_proposal_proponents
   FROM
     dw_rent.fact_listing_rent_flows AS flrf
@@ -235,8 +241,8 @@ rent_flows AS (
     proposal_proponents AS pp
       ON pp.id_proposal = flrf.sk_proposal
   LEFT JOIN
-    credit_evaluation AS ce
-      ON ce.id_user = flrf.sk_client
+    proposal_proponent_type AS pt
+      ON pt.id_proposal = flrf.sk_proposal
 ),
 proposal_credit_flows AS (
   SELECT
