@@ -59,6 +59,8 @@ dags_out_of_pattern:
         "wonka.group_user_most_viewed",
         "wonka.house_user_rent_flows",
         "wonka.house_agg_rent_flows",
+        "wonka.house_visit",
+        "wonka.user_visit"
     ]
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 databricks_bucket: 5a-databricks

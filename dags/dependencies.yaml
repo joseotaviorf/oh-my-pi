@@ -1150,8 +1150,8 @@ bietlejuice.enrich_app_installed:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_arquivo_confidencial:
-  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
+  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
 bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
@@ -3693,5 +3693,9 @@ wonka.house_user_rent_flows:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
   - wonka.house_listing_business_context:load-house_listing_business_context
+wonka.house_visit:
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
 wonka.user_embeddings_main:
   - quintoml.recs.house_user_embeddings.inference:batch-predict
+wonka.user_visit:
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows

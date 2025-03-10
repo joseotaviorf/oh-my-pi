@@ -1014,3 +1014,11 @@ wonka.house_user_rent_flows:
 wonka.house_agg_rent_flows:
   add:
     - wonka.house_user_rent_flows:load-house_user_rent_flows
+
+wonka.user_visit:
+  add:
+    - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+
+wonka.house_visit:
+  add:
+    - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
