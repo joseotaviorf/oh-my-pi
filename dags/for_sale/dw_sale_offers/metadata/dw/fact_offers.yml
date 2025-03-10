@@ -105,6 +105,18 @@ columns:
     - datalake_hub_services.daily_secretariat_allocation.sk_secretariat_user_version
     description: Surrogate key of the secretariat who was last associated with the buyer. Can be joined with dw_secretariat.dim_secretariat_user_version,
       on field sk_secretariat_user_version.
+  sk_buyer_prospect_type:
+    lineage:
+    - datalake_offer.sale_offer.sk_buyer_prospect_type
+    description: ID of the buyer prospect type
+  sk_listing_price_segment:
+    lineage:
+    - dw_sale.dim_sale_price_segment.sk_sale_price_segment
+    description: ID of the listing price segment
+  sk_buyer_prospect_price_segment:
+    lineage:
+    - dw_sale.dim_sale_price_segment.sk_sale_price_segment
+    description: ID of the buyer prospect type  
   sk_offer_submitted_date:
     lineage:
     - datalake_offer.sale_offer.ts_offer_submitted

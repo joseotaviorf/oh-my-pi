@@ -895,9 +895,13 @@ bietlejuice.dw_sale_offer_users:
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-users-info
 bietlejuice.dw_sale_offers:
+  - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-dim-sale-price-segment
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events
+  - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type
   - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation
   - bietlejuice.enrich_offer:load-enrich-sale-offer
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
 bietlejuice.dw_sale_ongoing_listings:
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type
