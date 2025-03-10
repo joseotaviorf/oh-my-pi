@@ -8,11 +8,18 @@ sqs_url_house_enrichment: "https://sqs.us-east-1.amazonaws.com/632540934959/Prod
 kodak_photo_sns_arn: "arn:aws:sns:us-east-1:632540934959:ProdKodakPhoto"
 
 custom_cluster:
-  driver_node_type_id: m5d.2xlarge
-  node_type_id: m5d.4xlarge
-  num_workers: 4
+  driver_node_type_id: r5d.4xlarge
+  node_type_id: r5d.4xlarge
+  num_workers: 5
   runtime_engine: PHOTON
   spark_version: 13.3.x-scala2.12
   aws_attributes:
     ebs_volume_size: 200
     instance_profile_arn: "{{ var.value.instance_profile_secret_arn_vespucio }}"
+  spark_conf:
+    spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.heartbeatInterval: "100s"
+    spark.executor.memory: "48g"
+    spark.executor.memoryOverhead: "3g"
+    spark.network.timeout: "600s"
