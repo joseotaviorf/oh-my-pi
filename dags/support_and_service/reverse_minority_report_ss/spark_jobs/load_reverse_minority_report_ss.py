@@ -1,7 +1,5 @@
+import ast
 import json
-import requests
-import threading
-import concurrent.futures
 from argparse import ArgumentParser
 from datetime import datetime
 
@@ -215,6 +213,18 @@ def get_payload_context_fields(api_type, item):
     else:
         raise Exception(f"Value api_type={api_type} is invalid")
 
+def serialize_item(item):
+    try:
+        if item == "-1":
+            # ensure -1 is string, as that is the standard in the MR database
+            serialized_item = item
+        else:
+            serialized_item = ast.literal_eval(item)
+    except (ValueError, SyntaxError):
+        # If conversion fails, return the original string
+        serialized_item = item
+    return serialized_item
+
 def create_payload(item):
     """
     Create the data payload based on the original spark dataframe.
@@ -224,39 +234,16 @@ def create_payload(item):
         "type": api_type,
     }
     data["keyValue"] = item[key_value]
-    data["contextFields"] = get_payload_context_fields(api_type, item)
+    context_fields = {key: serialize_item(str(value)) for key, value in item.items()}
+    data["contextFields"] = get_payload_context_fields(api_type, context_fields)
     return data
 
-def initialize_worker(local):
-    local.session = requests.Session()
-    local.session.headers.update(
-        {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {dbutils.secrets.get(scope='quintoandar', key='MINORITY_REPORT_API')}"
-        }
-    )
-    logger.info(f"Initializing session for thread {threading.current_thread().name}")
-
-
-def send_batch_data(local, total_batches, batch_number, batch):
-    session = local.session
-    try:
-        resp = session.post(
-            minority_report_endpoint,
-            data=json.dumps(batch),
-        )
-        resp.raise_for_status()
-        if batch_number % 10 == 0 or batch_number == total_batches :
-            logger.info(f"msg=Succesfully sent batch {batch_number}/{total_batches}")
-    except Exception as e:
-        logger.error(f"BATCH {batch_number}: {e}")
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     logger = QuintoAndarLogger("MinorityReportAPIClient")
 
     parser.add_argument("dag_name")
-    parser.add_argument("minority_report_endpoint")
     parser.add_argument("kafka_servers")
     parser.add_argument("kafka_topic")
     parser.add_argument("api_type")
@@ -268,7 +255,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     dag_name = args.dag_name
-    minority_report_endpoint = args.minority_report_endpoint
     kafka_servers = json.loads(args.kafka_servers)
     kafka_topic = args.kafka_topic
     api_type = args.api_type
@@ -290,55 +276,33 @@ if __name__ == "__main__":
     )
 
     logger.info(
-        f"m={JOB_NAME}, source={dag_name}, execution_date={execution_date}\nStarting spark job..."
+        f"m={JOB_NAME}, source={dag_name}, execution_date={execution_date} Starting spark job..."
     )
 
     spark_client = SparkClient()
-
-    batch_size = 100
-    max_cores = 10
-    local = threading.local()
 
     logger.info("m=Building dataframe from query...")
     df = spark_client.conn.sql(query)
     if df.isEmpty():
         logger.info("m=Empty Dataframe!")
 
-    df_list = df.toJSON().map(lambda str_json: json.loads(str_json)).collect()
+    message_list = [
+        create_payload({key: value for key, value in row.asDict().items()}) for row in df.collect()
+    ]
 
-    batches = [
-        df_list[x : x + batch_size] for x in range(0, len(df_list), batch_size)
-    ].copy()
+    producer = KafkaProducer(
+        bootstrap_servers=kafka_servers,
+        value_serializer=json_serializer
+    )
 
-    data_payload = [[create_payload(x) for x in batch] for batch in batches]
-
-    with concurrent.futures.ThreadPoolExecutor(
-        max_workers=max_cores, initializer=initialize_worker, initargs=(local,)
-    ) as executor:
-        future_to_batch = {
-            executor.submit(send_batch_data, local, len(data_payload), batch_number, batch): (
-                batch_number,
-                batch,
-            )
-            for batch_number, batch in enumerate(data_payload, start=1)
-        }
-
-    # COMMENTING KAFKA PART
-    # message_list = [create_payload({k: str(v) for k, v in row.asDict().items()}) for row in df.collect()]
-
-    # producer = KafkaProducer(
-    #     bootstrap_servers=kafka_servers,
-    #     value_serializer=json_serializer
-    # )
-
-    # try:
-    #     for idx, message in enumerate(message_list):
-    #         future = producer.send(kafka_topic, value=message)
-    #         record_metadata = future.get(timeout=10)
-    #         if idx % 100 == 0 or idx == 0:
-    #             logger.info(f"Sent {idx + 1} messages to topic {kafka_topic}")
-    # except Exception as e:
-    #     print(f"Error sending message: {e}")
-    # finally:
-    #     producer.flush()
-    #     producer.close()
+    try:
+        for idx, message in enumerate(message_list):
+            future = producer.send(kafka_topic, value=message)
+            record_metadata = future.get(timeout=10)
+            if idx + 1 % 100 == 0 or idx == 0:
+                logger.info(f"Sent {idx + 1} messages to topic {kafka_topic}")
+    except Exception as e:
+        print(f"Error sending message: {e}")
+    finally:
+        producer.flush()
+        producer.close()

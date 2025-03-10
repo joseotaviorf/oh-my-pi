@@ -44,7 +44,6 @@ custom_libraries = [
 
 kafka_servers = config_service.get_config("kafka_servers")
 kafka_topic = config_service.get_config("kafka_topic")
-minority_report_endpoint = config_service.get_config("minority_report_endpoint")
 tables = config_service.get_config("tables")
 dag_documentation = config_service.get_config("dag_documentation")
 
@@ -93,7 +92,6 @@ for table in tables.keys():
                 "python_file": reverse_spark_job_path,
                 "parameters": [
                     DAG_NAME,
-                    minority_report_endpoint,
                     json.dumps(kafka_servers),
                     kafka_topic,
                     tables[table]["type"],
