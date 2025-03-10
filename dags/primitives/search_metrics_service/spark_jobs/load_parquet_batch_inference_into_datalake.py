@@ -69,10 +69,10 @@ def get_df_raw(table_name, source_root_path, date_to_ingest):
     dt_start = datetime.strptime(date_to_ingest, "%Y-%m-%d") - timedelta(days=90)
 
     if table_name == 'search_metrics':
-        df = spark_client.conn.read.parquet(f"{source_root_path}/metrics").filter(col('date') >= dt_start)
+        df = spark_client.conn.read.option("mergeSchema", "true").parquet(f"{source_root_path}/metrics").filter(col('date') >= dt_start)
     elif table_name == 'search_experiments':
         list_experiments = (
-            spark_client.conn.read.parquet(f"{source_root_path}/experiments")
+            spark_client.conn.read.option("mergeSchema", "true").parquet(f"{source_root_path}/experiments")
             .filter(col('date') >= dt_start)
             .select('exp_name')
             .distinct()
@@ -81,7 +81,7 @@ def get_df_raw(table_name, source_root_path, date_to_ingest):
         list_experiments = [row[0] for row in list_experiments]
         logger.info(f"loaded experiments: {list_experiments}")
 
-        df = spark_client.conn.read.parquet(f"{source_root_path}/experiments").filter(col('exp_name').isin(list_experiments))
+        df = spark_client.conn.read.option("mergeSchema", "true").parquet(f"{source_root_path}/experiments").filter(col('exp_name').isin(list_experiments))
     else:
         raise ValueError(f'table_name: {table_name} not valid')
     return df
