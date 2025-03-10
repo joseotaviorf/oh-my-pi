@@ -1035,8 +1035,6 @@ bietlejuice.dw_visit:
   - bietlejuice.enrich_visit:load-enrich-visit-schedules
   - bietlejuice.enrich_visit:load-enrich-visit-status-events
   - bietlejuice.enrich_visit:load-enrich-visits
-bietlejuice.enrich_3p:
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
 bietlejuice.enrich_accounting_funnel:
   - bietlejuice.checkout:load-clean-bolecode
   - bietlejuice.checkout:load-clean-boleto
