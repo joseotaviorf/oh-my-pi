@@ -53,6 +53,7 @@ class DAGDeclarationValidator(Validator):
                 "execution_timeout_hours": {"type": "float", "empty": False},
                 "source_schema": {"type": "string", "empty": False},
                 "source_database": {"type": "string", "empty": False},
+                "has_clean_soft_delete": {"type": "boolean", "empty": False},
                 "custom_schema": {"type": "string", "empty": False},
                 "database_type": {"type": "string", "empty": False, "required": False},
                 "default_extraction_type": {"type": "string", "empty": False},
