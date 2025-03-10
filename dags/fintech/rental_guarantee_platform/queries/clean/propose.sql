@@ -17,6 +17,7 @@ SELECT
     monthly_value,
     total_coverage,
     active AS is_active,
+    broker_begin AS ts_broker_begin,
     dateinsert AS ts_inserted,
     dateupdate AS ts_updated,
     year,
