@@ -97,7 +97,24 @@ WITH
         ts_valid_from DESC,
         dt_effective_start DESC
     ) = 1
+  ),
+  termination_reason AS (
+    SELECT
+      wr.id_period_of_service,
+      al.description AS action_description
+    FROM
+      datalake_hr_system.work_relationships AS wr
+    LEFT JOIN
+      datalake_hr_system.assignments AS a
+        USING(id_period_of_service)
+    LEFT JOIN
+      datalake_hr_system_clean.actions_lov AS al
+        USING(action_code)
+    WHERE
+      wr.worker_type IN ('E', 'C')
+      AND dt_termination + 1 = dt_effective_start
   )
+
 SELECT
   wr.id_period_of_service AS sk_assignment,
   ei.legacy_registration,
@@ -112,17 +129,7 @@ SELECT
     af.assignment_status_type
   ) AS assignment_status_type,
   COALESCE(ap.union_name, af.union_name, '-1') AS union_name,
-  COALESCE(
-    CASE
-      WHEN wr.dt_termination < DATE ('{load_start_date}')
-      AND wr.worker_type IN ('E', 'C')
-      THEN ap.action_description
-      WHEN wr.dt_termination >= DATE ('{load_start_date}')
-      AND wr.worker_type IN ('E', 'C')
-      THEN af.action_description
-    END,
-    '-1'
-  ) AS dismissal_type,
+  IF(COALESCE(ap.assignment_status_type, af.assignment_status_type) = 'INACTIVE', tr.action_description, '-1') AS dismissal_type,
   s.action_reason AS reason_last_increase
 FROM
   datalake_hr_system.work_relationships wr
@@ -138,6 +145,9 @@ LEFT JOIN
 LEFT JOIN
   datalake_hr_system.employee_ids AS ei
     ON ei.id_period_of_service = wr.id_period_of_service
+LEFT JOIN
+  termination_reason AS tr
+    ON tr.id_period_of_service = wr.id_period_of_service
 WHERE
   (
     wr.dt_start <= DATE ('{load_start_date}')
