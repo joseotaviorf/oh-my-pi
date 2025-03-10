@@ -13,7 +13,7 @@ workflow:
   layer: raw
   database_type: postgres
   source_database: chatfup
-  custom_schema: chatfup_test
+  custom_schema: chat_fup_test
   source_schema: public
   lineage_product_database_name: chatfup
   dbutils_secret_key: CHAT_FUP_DB
