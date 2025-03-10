@@ -97,6 +97,7 @@ bietlejuice.dw_business_unit_region:
   - bietlejuice.enrich_hub_services:load-enrich-business-unit-region
 bietlejuice.dw_buyer_prospect:
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect
+  - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type
 bietlejuice.dw_charging_payment_quintocred:
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk
@@ -911,7 +912,11 @@ bietlejuice.dw_sale_ongoing_listings:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
 bietlejuice.dw_sale_visits:
+  - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-dim-sale-price-segment
+  - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type
   - bietlejuice.enrich_hub_services:load-enrich-daily-secretariat-allocation
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
   - bietlejuice.enrich_sale_visit:load-enrich-sale-visit
 bietlejuice.dw_satisfaction_rating:
   - bietlejuice.enrich_customer_support:load-enrich-csat

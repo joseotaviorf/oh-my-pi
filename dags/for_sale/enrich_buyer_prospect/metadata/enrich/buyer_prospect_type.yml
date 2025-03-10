@@ -1,6 +1,6 @@
 ---
 database_name: datalake_buyer_prospect
-table_name: buyer_prospect_category
+table_name: buyer_prospect_type
 owner: leonardo.soares@quintoandar.com.br
 domain: for_sale
 description: Table with categorization of buyer prospects of High Ticket and if is new prospect or recovery.
