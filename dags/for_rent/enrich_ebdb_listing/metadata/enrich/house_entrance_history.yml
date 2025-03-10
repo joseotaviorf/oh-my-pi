@@ -18,7 +18,7 @@ columns:
     categories:
       '1': None
       '2': Tenant
-      '3': Owner
+      '3': Owner      
       '4': Empty
   country_code:
     lineage:
@@ -33,14 +33,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.house_aud.doorman_type
     description: Type of doorman of the house during the period.
-  entry_access_type:
-    lineage:
-      - datalake_ebdb_clean.entry_access_tracking.entry_access_type
-    description: Type of the entry access of the house during the period.
-  key_holder_role:
-    lineage:
-      - datalake_ebdb_clean.entry_access_tracking.key_holder_role
-    description: Role of the house's key holder during the period.
   key_location:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name
