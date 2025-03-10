@@ -33,6 +33,17 @@ status AS (
         datalake_olos_dialer.outbound_contact_attempts AS olc
     QUALIFY first_call = 1
 ),
+pp_multi AS (
+SELECT
+  id_owner,
+  is_pp_multi_active,
+  dt_houses_owned
+FROM
+  datalake_pro_owners.daily_owner_houses_quantity_history AS ppm
+WHERE
+   is_pp_multi_active = TRUE
+   AND ppm.dt_houses_owned >= DATE '2024-01-01'
+),
 base AS (
     SELECT
         dd.date,
@@ -140,7 +151,8 @@ base AS (
         END AS funnel_order,
         fse.sk_supply,
         ac.affiliate_campaign,
-        ac.affiliate_objective
+        ac.affiliate_objective,
+        pp_m.is_pp_multi_active
     FROM
         dw_growth.fact_supply_events AS fse 
     LEFT JOIN
@@ -186,6 +198,11 @@ base AS (
     LEFT JOIN 
         datalake_growth_taxonomy.affiliates_classification AS ac
             ON dat.sk_user_affiliate = ac.sk_user_affiliate
+    LEFT JOIN
+        pp_multi AS pp_m 
+            ON pp_m.id_owner = fse.sk_owner
+            AND dd.date = dt_houses_owned
+            AND fse.nm_business_context = 'RENT'
     WHERE fse.sk_funnel_step IN (5,9,2,10,7,12)
 ),
 report_origin AS (
@@ -198,6 +215,10 @@ report_origin AS (
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel = 'ciq' THEN 'CIQ'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel = 'capta_ai' THEN 'Capta Aí'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel IN ('asp', 'account_manager_pp_multi') THEN 'PP Multi'
+            WHEN obt.funnel_order > 2 AND 
+                obt.acquisition_origin IN ('ownerlanding', 'ownerpropertyregistration', 'ownerpwa') 
+                AND (LOWER(obt.medium) = 'seo non-branded' OR LOWER(obt.behavior_type) = 'organic') AND is_pp_multi_active = TRUE
+            THEN 'PP Multi'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel = 'is_expert' THEN 'IS Expert'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
@@ -222,6 +243,10 @@ report_origin AS (
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel = 'ciq' THEN 'CIQ'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel = 'capta_ai' THEN 'Capta Aí'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel IN ('asp', 'account_manager_pp_multi') THEN 'PP Multi'
+            WHEN obt.funnel_order < 3 AND 
+                obt.acquisition_origin IN ('ownerlanding', 'ownerpropertyregistration', 'ownerpwa') 
+                AND (LOWER(obt.medium) = 'seo non-branded' OR LOWER(obt.behavior_type) = 'organic') AND is_pp_multi_active = TRUE
+            THEN 'PP Multi'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel = 'is_expert' THEN 'IS Expert'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'

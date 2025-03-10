@@ -946,6 +946,7 @@ bietlejuice.dw_supply:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-contact-attempts
+  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
 bietlejuice.dw_supply_outbound_contacts:
