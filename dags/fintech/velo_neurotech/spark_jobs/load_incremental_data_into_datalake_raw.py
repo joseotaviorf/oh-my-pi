@@ -146,7 +146,6 @@ if __name__ == "__main__":
             SparkDataFrameService()
             .input(df)
             .create_year_month_day_columns_from_date(dt_execution)
-            .optimize_partition(200000)
             .output()
         )
 
