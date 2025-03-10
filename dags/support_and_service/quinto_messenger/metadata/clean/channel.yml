@@ -58,3 +58,6 @@ columns:
   day:
     lineage:
       - datalake_quinto_messenger_raw.channel.day
+  year_month:
+    lineage:
+      - datalake_quinto_messenger_raw.channel.year_month

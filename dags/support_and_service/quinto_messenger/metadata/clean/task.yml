@@ -94,3 +94,6 @@ columns:
   day:
     lineage:
       - datalake_quinto_messenger_raw.task.day
+  year_month:
+    lineage:
+      - datalake_quinto_messenger_raw.task.year_month

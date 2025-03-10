@@ -10,10 +10,9 @@ SELECT
     event_payload,
     created_at AS ts_created,
     updated_at AS ts_updated,
+    year_month,
     year,
     month,
     day
 FROM
     datalake_quinto_messenger_raw.channelevent
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

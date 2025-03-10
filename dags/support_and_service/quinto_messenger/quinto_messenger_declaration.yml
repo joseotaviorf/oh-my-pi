@@ -7,37 +7,25 @@ dag:
     dag_purpose: Retrieve data from Quinto Messenger database (postgresql). [Quinto Messenger](https://github.com/quintoandar/quinto-messenger) is the service built to be the connection between Twilio and QuintoAdar's system.
 
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
+  source_schema: public
+  source_database: quintomessenger
   database_type: postgres
-  lineage_product_database_name: quintomessenger
-  dbutils_secret_key: QUINTO_MESSENGER_DB
+  dbutils_secret_key: QUINTOMESSENGER_DB
+
   default_extraction_type: incremental
   tables_customization:
     Channel:
       clean_table_name: channel
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      z_order_by: [id_channel]
     ChannelEvent:
       clean_table_name: channel_event
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      z_order_by: [id_channel]
     Task:
       clean_table_name: task
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      z_order_by: [id_task]
     TaskEvent:
       clean_table_name: task_event
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      z_order_by: [id_task]
     Chat:
       clean_table_name: chat
-      date_filter_column: updated_at
-      partitions: [year, month, day]
 
 cluster:
   type: custom_cluster
@@ -46,7 +34,7 @@ cluster:
     node_type_id: m5a.xlarge
     num_workers: 3
     spark_version: 13.3.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -40,3 +40,6 @@ columns:
   day:
     lineage:
       - datalake_quinto_messenger_raw.chat.day
+  year_month:
+    lineage:
+      - datalake_quinto_messenger_raw.chat.year_month
