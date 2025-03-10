@@ -389,6 +389,14 @@ columns:
     description: "Email real estate agency. TF: 5Cred.emailImobiliária"
     lineage:
       - datalake_cyber_raw.uda1.U1CT1
+  bpo_segmentation:
+    description: "This field represents the segmentation of BPOs (partners). Starting March 11, 2025, a new test was launched to evaluate the impact of delaying the assignment of delinquent accounts to BPOs. The experiment will compare three similarly sized groups, enabling an analysis of how this change affects credit recovery and operational efficiency."
+    lineage:
+      - datalake_cyber_raw.uda1.U1CT2
+  probability_group:
+    description: "To indicate the probability of recovery of a contract (High/Medium/Low/Very Low), a marking will be uploaded via a spreadsheet, storing key contract indicators in Cyber. These indicators will be used to assign contracts to specific queues for each group."
+    lineage:
+      - datalake_cyber_raw.uda1.U1INDCOR23
   reason_pause:
     description: "Pause reason.Possible reasons: fraud, legal proceedings, operational errors, friction"
     lineage:

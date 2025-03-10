@@ -85,6 +85,8 @@ SELECT
     U1NOMIMO AS real_state_agency,
     U1DAYS AS delay_contamined_days,
     U1CT1 AS real_estate_agency_email,
+    U1CT2 AS bpo_segmentation,
+    U1INDCOR23 AS probability_group,
     U1CDRETRSER AS bureau_latest_rehabilitation_rejection,
     U1CDRETNSER AS latest_bureau_denial_rejection,
     U1ENDCOMPAI AS business_address_country,
