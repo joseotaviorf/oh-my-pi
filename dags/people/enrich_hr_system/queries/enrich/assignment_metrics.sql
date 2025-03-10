@@ -198,49 +198,56 @@ cte_enrich_disability AS (
 )
 
 SELECT DISTINCT
- wr.id_period_of_service AS sk_assignment,
- wr.id_person AS sk_employee,
- COALESCE(da.sk_demographic_information, '-1') AS sk_demographic_information,
- COALESCE(ap.id_cost_center, af.id_cost_center, '-1') AS sk_cost_center,
- COALESCE(ap.id_business_unit, af.id_business_unit, '-1') AS sk_business_unit,
- COALESCE(ap.id_job, af.id_job, '-1') AS sk_job,
- COALESCE(ap_manager.id_person, af_manager.id_person, '-1') AS sk_manager,
- COALESCE(ap_manager.id_period_of_service, af_manager.id_period_of_service,'-1') AS sk_manager_assignment,
- COALESCE(d.sk_disability, '-1') AS sk_disability,
- sm.sk_last_increase_date,
- sm.sk_first_promotion_date,
- wr.worker_type,
- COALESCE(ap.assignment_number, af.assignment_number) AS assignment_number,
- COALESCE(sm.currency_code, -1) AS salary_currency,
- wr.dt_start = MAX(wr.dt_start) OVER (PARTITION BY wr.id_person) AS is_last_work_relationship,
- ap.assignment_status_type = 'ACTIVE' AS is_active,
- wr.worker_type = 'P' AS is_pending_worker,
- ap.career_track = 'L' OR mdl.qnt_directly_led > 0 AS is_manager,
- COALESCE(d.has_self_declared_disability, FALSE) AS has_self_declared_disability,
- IF(wr.worker_type = 'P', 0, INT(
-    MONTHS_BETWEEN(
-      COALESCE(wr.dt_termination, DATE('{load_start_date}')),
-      wr.dt_start))
-    ) AS assignment_age_months,
- COALESCE(mdl.qnt_directly_led, 0) AS qnt_directly_led,
- COALESCE(ap.qnt_promotions, 0) AS qnt_promotions,
- COALESCE(sm.current_salary_amount, -1) AS salary,
- COALESCE(ap.target_plr, 0) AS target_plr,
- COALESCE(sm.salary_reference, 0) AS salary_reference,
- COALESCE(sm.qnt_movimentations, 0) AS qnt_movimentations,
- COALESCE(sm.average_time_between_movimentations, 0) AS average_time_between_movimentations,
- COALESCE(sm.last_salary_increase, 0) AS last_increase,
- COALESCE(sm.pct_last_salary_increase, 0) AS pct_last_increase,
- COALESCE(sm.first_salary_amount, 0) AS first_salary,
- COALESCE(sm.previous_salary_amount, 0) AS last_salary,
- COALESCE(sm.range_salary_movement, 0) AS range_salary_movement,
- COALESCE(sm.first_promotion_salary, 0) AS first_promotion_salary,
- COALESCE(sm.nominal_increase_first_promotion, 0) AS nominal_increase_first_promotion,
- COALESCE(sm.pct_increase_first_promotion, 0) AS pct_increase_first_promotion,
- MONTHS_BETWEEN(IF(wr.worker_type = 'P', COALESCE(ap.dt_projected_start, af.dt_projected_start), wr.dt_start), sm.dt_first_promotion) AS months_to_first_promotion,
- IF(wr.worker_type = 'P', COALESCE(ap.dt_projected_start, af.dt_projected_start), wr.dt_start) AS dt_start_work_relationship,
- wr.dt_termination AS dt_termination_work_relationship,
- NOW() AS ts_load
+  wr.id_period_of_service AS sk_assignment,
+  wr.id_person AS sk_employee,
+  COALESCE(da.sk_demographic_information, '-1') AS sk_demographic_information,
+  COALESCE(ap.id_cost_center, af.id_cost_center, '-1') AS sk_cost_center,
+  COALESCE(ap.id_business_unit, af.id_business_unit, '-1') AS sk_business_unit,
+  COALESCE(ap.id_job, af.id_job, '-1') AS sk_job,
+  COALESCE(ap_manager.id_person, af_manager.id_person, '-1') AS sk_manager,
+  COALESCE(ap_manager.id_period_of_service, af_manager.id_period_of_service,'-1') AS sk_manager_assignment,
+  COALESCE(d.sk_disability, '-1') AS sk_disability,
+  sm.sk_last_increase_date,
+  sm.sk_first_promotion_date,
+  wr.worker_type,
+  COALESCE(ap.assignment_number, af.assignment_number) AS assignment_number,
+  COALESCE(sm.currency_code, -1) AS salary_currency,
+  CASE
+    WHEN wr.dt_start <= DATE('{load_start_date}')
+      AND wr.dt_start = MAX(wr.dt_start)
+        OVER (PARTITION BY wr.id_person
+        ORDER BY wr.dt_start ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+    THEN TRUE
+    ELSE FALSE
+  END AS is_last_work_relationship,
+  ap.assignment_status_type = 'ACTIVE' AS is_active,
+  wr.worker_type = 'P' AS is_pending_worker,
+  ap.career_track = 'L' OR mdl.qnt_directly_led > 0 AS is_manager,
+  COALESCE(d.has_self_declared_disability, FALSE) AS has_self_declared_disability,
+  IF(wr.worker_type = 'P', 0, INT(
+      MONTHS_BETWEEN(
+        COALESCE(wr.dt_termination, DATE('{load_start_date}')),
+        wr.dt_start))
+      ) AS assignment_age_months,
+  COALESCE(mdl.qnt_directly_led, 0) AS qnt_directly_led,
+  COALESCE(ap.qnt_promotions, 0) AS qnt_promotions,
+  COALESCE(sm.current_salary_amount, -1) AS salary,
+  COALESCE(ap.target_plr, 0) AS target_plr,
+  COALESCE(sm.salary_reference, 0) AS salary_reference,
+  COALESCE(sm.qnt_movimentations, 0) AS qnt_movimentations,
+  COALESCE(sm.average_time_between_movimentations, 0) AS average_time_between_movimentations,
+  COALESCE(sm.last_salary_increase, 0) AS last_increase,
+  COALESCE(sm.pct_last_salary_increase, 0) AS pct_last_increase,
+  COALESCE(sm.first_salary_amount, 0) AS first_salary,
+  COALESCE(sm.previous_salary_amount, 0) AS last_salary,
+  COALESCE(sm.range_salary_movement, 0) AS range_salary_movement,
+  COALESCE(sm.first_promotion_salary, 0) AS first_promotion_salary,
+  COALESCE(sm.nominal_increase_first_promotion, 0) AS nominal_increase_first_promotion,
+  COALESCE(sm.pct_increase_first_promotion, 0) AS pct_increase_first_promotion,
+  MONTHS_BETWEEN(IF(wr.worker_type = 'P', COALESCE(ap.dt_projected_start, af.dt_projected_start), wr.dt_start), sm.dt_first_promotion) AS months_to_first_promotion,
+  IF(wr.worker_type = 'P', COALESCE(ap.dt_projected_start, af.dt_projected_start), wr.dt_start) AS dt_start_work_relationship,
+  wr.dt_termination AS dt_termination_work_relationship,
+  NOW() AS ts_load
 FROM
  datalake_hr_system.work_relationships AS wr
 LEFT JOIN

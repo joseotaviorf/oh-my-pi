@@ -2,7 +2,7 @@ database_name: dw_employee
 table_name: fact_employees
 owner: isabella.araujo@quintoandar.com.br
 domain: people
-description: "Table storing detailed information about employees."
+description: " This table considers only employees with worker_type = C or E, excluding pending workers."
 columns:
   sk_assignment:
     description: "Unique identifier for the period of service related to the assignment."

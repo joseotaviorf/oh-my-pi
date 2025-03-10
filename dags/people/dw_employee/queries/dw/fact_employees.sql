@@ -359,3 +359,4 @@ LEFT JOIN
         ON h.sk_assignment = am.sk_assignment
 WHERE
     am.is_last_work_relationship
+    AND am.worker_type <> 'P'

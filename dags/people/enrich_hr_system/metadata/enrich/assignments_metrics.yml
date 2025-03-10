@@ -56,7 +56,7 @@ columns:
     lineage:
       - datalake_hr_system.work_relationships.dt_termination
   is_last_work_relationship:
-    description: "Indicates if is the last work relationship of the employee."
+    description: "Indicates if is the last work relationship of the employee. Doesn't include future relationships."
     lineage:
       - datalake_hr_system.work_relationships.dt_start
       - datalake_hr_system.work_relationships.id_person
