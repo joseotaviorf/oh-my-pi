@@ -95,6 +95,14 @@ workflow:
       clean_table_name: item_group
       clean_primary_keys: [id_item_group]
       raw_primary_keys: [id]
+    item_group_state_aud:
+      clean_table_name: item_group_state_aud
+      clean_primary_keys: [id, rev]
+      raw_primary_keys: [id, rev]
+    item_group_state:
+      clean_table_name: item_group_state
+      clean_primary_keys: [id]
+      raw_primary_keys: [id]
     item_issue_aud:
       clean_table_name: item_issue_aud
       clean_primary_keys: [id_item_issue, rev]
@@ -142,6 +150,10 @@ workflow:
     repair_request:
       clean_table_name: repair_request
       clean_primary_keys: [id_repair_request]
+      raw_primary_keys: [id]
+    repair_request_history:
+      clean_table_name: repair_request_history
+      clean_primary_keys: [id]
       raw_primary_keys: [id]
     repair_suggestion_aud:
       clean_table_name: repair_suggestion_aud

@@ -1,0 +1,93 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: repair_request_history
+description: Clean table with the objective of ingesting the historical information of the repair request, coming from the inspection services database.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.id
+    description: Unique identification key for the record in the repair request history.
+  id_repair_request:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.reviewer_id
+    description: Repair request identification key.
+  id_reviewer:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.main_id
+    description: Reviewer identification key.
+  id_granted_by:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.responsibility
+    description: Reviewer who assessed whether a repair was exempted. Being an owner or member of AN1
+  id_last_reviewer:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.item_group_id
+    description: Identification key of the last reviewer of the repair request.
+  uuid:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.granted_by_id
+    description: Repair Request unique identifier (uuid)
+  cost:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.repair_suggestion_id
+    description: Cost information linked to the repair request.
+  title:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.uuid
+    description: Information about the item linked to the repair request.
+  origin:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.type
+    description: Descriptive information indicating at which stage the request arose.
+  repair_service:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.comment
+    description: Descriptive information indicating which service was requested in the request.
+  type:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.type
+    description: A repair request type.
+    categories:
+      REPAIR: Make item repair.
+      CLEAN: Clean the item.
+      TAKE AWAY: Remove item left in the property.
+      GIVE BACK: Replace item that was in the property.
+      OTHER: Other types not listed.
+  comment:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.title
+    description: Commentary detailing the repair needed.
+  responsibility:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.cost
+    description: Indicates who will be responsible for the repair, as well as whether QuintoAndar will absorb a repair.
+  is_from_analysis:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.exempted
+    description: Indicates whether the repair request was created by AN1
+  is_exempted:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.is_exempted_from_budget
+    description: Indicates whether the repair suggested by the AN1 team was exempted by the owner or a member of AN1.
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.from_analysis
+    description: Creation date.
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.finished
+    description: Update date.
+  year:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.day
+    description: Day of update date.
