@@ -1,67 +1,91 @@
 ---
 database_name: datalake_sap_gateway_homolog_clean
 table_name: sync_sap_job
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id_sync_sap_job:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.id
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.id
   id_feature:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.feature_id
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.feature_id
   id_consolidated:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.consolidated_id
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.consolidated_id
   hash:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.hash
+    - datalake_sap_gateway_homolog_raw.sync_sap_job."hash"
   idoc:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.idoc
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.idoc
   response:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.response
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.response
   type:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.type
+    - datalake_sap_gateway_homolog_raw.sync_sap_job."type"
   status:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.status
+    - datalake_sap_gateway_homolog_raw.sync_sap_job."status"
   erp_solution:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.erp_solution
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.erp_solution
   sap_payload:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.sap_payload
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.sap_payload
   charge_back_of:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.charge_back_of
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.charge_back_of
   error:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.error
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.error
   retryable:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.retryable
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.retryable
   num_retry:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.num_retry
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.num_retry
   ts_updated_from_webhook:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.updated_from_webhook_at
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.updated_from_webhook_at
   ts_synced:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.synced_at
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.synced_at
   ts_created:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.created_at
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.created_at
   ts_updated:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.updated_at
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.updated_at
   year:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.year
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.year
   month:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.month
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.month
   day:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.sync_sap_job.day
+    - datalake_sap_gateway_homolog_raw.sync_sap_job.day

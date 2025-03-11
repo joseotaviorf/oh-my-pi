@@ -1,43 +1,59 @@
 ---
 database_name: datalake_sap_gateway_homolog_clean
 table_name: journal_entry_lines
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.id
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.id
   id_journal_entry:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.journal_entry_id
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.journal_entry_id
   id_finance_entity_entry:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.finance_entity_entry_id
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.finance_entity_entry_id
   id_person:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.person_id
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.person_id
   id_branch:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.branch_id
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.branch_id
   account_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.account_code
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.account_code
   costing_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.costing_code
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.costing_code
   location_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.location_code
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.location_code
   accounting_rule:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.accounting_rule
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.accounting_rule
   operation_type:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.operation_type
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.operation_type
   amount:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.amount
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.amount
   ts_created:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.created_at
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.created_at
   ts_updated:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry_lines.updated_at
+    - datalake_sap_gateway_homolog_raw.journal_entry_lines.updated_at

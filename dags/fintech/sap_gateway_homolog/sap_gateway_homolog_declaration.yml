@@ -21,6 +21,7 @@ workflow:
     consolidated_journal_entry_lines: {}
     consolidated_journal_entry: {}
     feature: {}
+    invoice: {}
     journal_entry_lines: {}
     journal_entry: {}
     operation: {}
@@ -28,6 +29,7 @@ workflow:
     rule_account_type: {}
     rule_modifier: {}
     rule: {}
+    schema_migrations: {}
     sync_sap_job: {}
     webhook_log: {}
 cluster:

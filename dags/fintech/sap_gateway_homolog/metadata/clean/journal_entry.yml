@@ -1,52 +1,71 @@
 ---
 database_name: datalake_sap_gateway_homolog_clean
 table_name: journal_entry
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.id
+    - datalake_sap_gateway_homolog_raw.journal_entry.id
   id_feature:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.feature_id
+    - datalake_sap_gateway_homolog_raw.journal_entry.feature_id
   id_consolidated:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.consolidated_id
+    - datalake_sap_gateway_homolog_raw.journal_entry.consolidated_id
   id_business_entity:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.business_entity_id
+    - datalake_sap_gateway_homolog_raw.journal_entry.business_entity_id
   id_finance_entity:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.finance_entity_id
+    - datalake_sap_gateway_homolog_raw.journal_entry.finance_entity_id
   id_external_payment:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.external_payment_id
+    - datalake_sap_gateway_homolog_raw.journal_entry.external_payment_id
   source_client:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.source_client
+    - datalake_sap_gateway_homolog_raw.journal_entry.source_client
   status:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.status
+    - datalake_sap_gateway_homolog_raw.journal_entry.status
   city_state:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.city_state
+    - datalake_sap_gateway_homolog_raw.journal_entry.city_state
   city:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.city
+    - datalake_sap_gateway_homolog_raw.journal_entry.city
   description:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.description
+    - datalake_sap_gateway_homolog_raw.journal_entry.description
   year_month:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.year_month
+    - datalake_sap_gateway_homolog_raw.journal_entry.year_month
   dt_event:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.event_date
+    - datalake_sap_gateway_homolog_raw.journal_entry.event_date
   dt_due:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.due_date
+    - datalake_sap_gateway_homolog_raw.journal_entry.due_date
   ts_created:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.created_at
+    - datalake_sap_gateway_homolog_raw.journal_entry.created_at
   ts_updated:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.journal_entry.updated_at
+    - datalake_sap_gateway_homolog_raw.journal_entry.updated_at

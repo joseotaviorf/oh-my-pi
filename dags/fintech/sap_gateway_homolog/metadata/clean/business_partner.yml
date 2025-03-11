@@ -1,28 +1,39 @@
 ---
 database_name: datalake_sap_gateway_homolog_clean
 table_name: business_partner
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id_business_partner:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.business_partner.id
+    - datalake_sap_gateway_homolog_raw.business_partner.id
   id_person:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.business_partner.person_id
+    - datalake_sap_gateway_homolog_raw.business_partner.person_id
   id_address:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.business_partner.address_id
+    - datalake_sap_gateway_homolog_raw.business_partner.address_id
   id_sync_sap_job:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.business_partner.sync_sap_job_id
+    - datalake_sap_gateway_homolog_raw.business_partner.sync_sap_job_id
   type:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.business_partner.type
+    - datalake_sap_gateway_homolog_raw.business_partner."type"
   ts_synced:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.business_partner.synced_at
+    - datalake_sap_gateway_homolog_raw.business_partner.synced_at
   ts_created:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.business_partner.created_at
+    - datalake_sap_gateway_homolog_raw.business_partner.created_at
   ts_updated:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.business_partner.updated_at
+    - datalake_sap_gateway_homolog_raw.business_partner.updated_at

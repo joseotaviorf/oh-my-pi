@@ -1,0 +1,19 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: schema_migrations
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.schema_migrations.id
+  applied:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.schema_migrations.applied
+  description:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.schema_migrations.description

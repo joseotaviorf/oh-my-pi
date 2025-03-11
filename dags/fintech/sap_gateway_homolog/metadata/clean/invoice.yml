@@ -1,0 +1,179 @@
+---
+database_name: datalake_sap_gateway_homolog_clean
+table_name: invoice
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.id
+  id_feature:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.feature_id
+  id_consolidated:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.consolidated_id
+  id_person:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_id
+  id_business_entity:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.business_entity_id
+  id_finance_entity:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.finance_entity_id
+  id_external_payment:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.external_payment_id
+  id_finance_entity_entry:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.finance_entity_entry_id
+  amount:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.amount
+  user_type:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.user_type
+  source_client:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.source_client
+  status:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.status
+  city_state:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.city_state
+  city:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.city
+  accounting_rule:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.accounting_rule
+  accounting_type:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.accounting_type
+  person_card_code:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_card_code
+  person_document:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_document
+  person_document_type:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_document_type
+  sequence_code:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.sequence_code
+  description:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.description
+  cost_center:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.cost_center
+  business_place:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.business_place
+  account_code:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.account_code
+  account_cfop_code:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.account_cfop_code
+  account_managerial_center:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.account_managerial_center
+  person_address:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_address
+  person_address_block:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_address_block
+  person_address_complement:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_address_complement
+  person_address_number:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_address_number
+  person_address_street_suffix:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_address_street_suffix
+  person_address_zip_code:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_address_zip_code
+  person_city:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_city
+  person_email:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_email
+  person_name:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_name
+  person_phone:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_phone
+  person_state:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.person_state
+  reference_year_month:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.reference_year_month
+  is_reversed:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.reversed
+  dt_event:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.DATE(event_date)
+  dt_due:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.DATE(due_date)
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.TIMESTAMP(created_at)
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.invoice.TIMESTAMP(updated_at)

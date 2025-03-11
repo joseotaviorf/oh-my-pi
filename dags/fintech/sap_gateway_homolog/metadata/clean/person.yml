@@ -1,52 +1,71 @@
 ---
 database_name: datalake_sap_gateway_homolog_clean
 table_name: person
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id_person:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.id
+    - datalake_sap_gateway_homolog_raw.person.id
   id_tax:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.tax_id
+    - datalake_sap_gateway_homolog_raw.person.tax_id
   id_tax_type:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.tax_id_type
-  name_person:
+    - datalake_sap_gateway_homolog_raw.person.tax_id_type
+  person_name:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.name
+    - datalake_sap_gateway_homolog_raw.person."name"
   email:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.email
+    - datalake_sap_gateway_homolog_raw.person.email
   phone:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.phone
-  ts_created:
-    lineage:
-      - datalake_sap_gateway_homolog_raw.person.created_at
-  ts_updated:
-    lineage:
-      - datalake_sap_gateway_homolog_raw.person.updated_at
+    - datalake_sap_gateway_homolog_raw.person.phone
   address:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.address
+    - datalake_sap_gateway_homolog_raw.person.address
   address_complement:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.address_complement
+    - datalake_sap_gateway_homolog_raw.person.address_complement
   address_street_sufix:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.address_street_sufix
+    - datalake_sap_gateway_homolog_raw.person.address_street_sufix
   address_number:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.address_number
+    - datalake_sap_gateway_homolog_raw.person.address_number
   address_block:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.address_block
+    - datalake_sap_gateway_homolog_raw.person.address_block
   city:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.city
+    - datalake_sap_gateway_homolog_raw.person.city
   state:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.state
+    - datalake_sap_gateway_homolog_raw.person.state
   zip_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.person.zip_code
+    - datalake_sap_gateway_homolog_raw.person.zip_code
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.person.created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.person.updated_at

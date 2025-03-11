@@ -1,43 +1,59 @@
 ---
 database_name: datalake_sap_gateway_homolog_clean
 table_name: webhook_log
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id_webhook_log:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.id
+    - datalake_sap_gateway_homolog_raw.webhook_log.id
   webhook_status:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.webhook_status
+    - datalake_sap_gateway_homolog_raw.webhook_log.webhook_status
   status:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.status
+    - datalake_sap_gateway_homolog_raw.webhook_log.status
   status_reason:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.status_reason
+    - datalake_sap_gateway_homolog_raw.webhook_log.status_reason
   error:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.error
+    - datalake_sap_gateway_homolog_raw.webhook_log.error
   error_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.error_code
+    - datalake_sap_gateway_homolog_raw.webhook_log.error_code
   idoc:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.idoc
+    - datalake_sap_gateway_homolog_raw.webhook_log.idoc
   payload:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.payload
+    - datalake_sap_gateway_homolog_raw.webhook_log.payload
   ts_created:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.created_at
+    - datalake_sap_gateway_homolog_raw.webhook_log.created_at
   ts_updated:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.updated_at
+    - datalake_sap_gateway_homolog_raw.webhook_log.updated_at
   year:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.year
+    - datalake_sap_gateway_homolog_raw.webhook_log.year
   month:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.month
+    - datalake_sap_gateway_homolog_raw.webhook_log.month
   day:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.webhook_log.day
+    - datalake_sap_gateway_homolog_raw.webhook_log.day

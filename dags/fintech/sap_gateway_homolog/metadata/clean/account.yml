@@ -1,25 +1,35 @@
 ---
 database_name: datalake_sap_gateway_homolog_clean
 table_name: account
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id_account:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.account.id
+    - datalake_sap_gateway_homolog_raw.account.id
   account_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.account.code
+    - datalake_sap_gateway_homolog_raw.account.code
   account_description:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.account.description
+    - datalake_sap_gateway_homolog_raw.account."description"
   cfop_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.account.cfop_code
+    - datalake_sap_gateway_homolog_raw.account.cfop_code
   managerial_center:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.account.managerial_center
+    - datalake_sap_gateway_homolog_raw.account.managerial_center
   ts_created:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.account.created_at
+    - datalake_sap_gateway_homolog_raw.account.created_at
   ts_updated:
+    description: ''
     lineage:
-      - datalake_sap_gateway_homolog_raw.account.updated_at
+    - datalake_sap_gateway_homolog_raw.account.updated_at
