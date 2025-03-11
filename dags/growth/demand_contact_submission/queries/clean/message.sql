@@ -6,10 +6,8 @@ SELECT
   payload,
   published,
   FROM_UNIXTIME(creation_time/1000) AS ts_creation,
-  year,
-  month,
-  day
+  YEAR(ts_creation) AS year,
+  MONTH(ts_creation) AS month,
+  DAY(ts_creation) as day
 FROM
   datalake_demand_contact_submission_raw.message
-WHERE
-  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

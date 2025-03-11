@@ -2,7 +2,7 @@
 database_name: datalake_demand_contact_submission_clean
 table_name: message
 columns:
-  id:
+  id_message:
     lineage:
       - datalake_demand_contact_submission_raw.message.id
   id_incremental:

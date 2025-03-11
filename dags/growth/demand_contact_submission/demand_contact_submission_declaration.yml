@@ -8,34 +8,28 @@ dag:
       This DAG imports the tables from Demand Contact Submission,
       a platform responsible manage the demand lead contact submission.
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
+  source_schema: public
+  custom_schema: demand_contact_submission
+  source_database: demand_contact_submission
   dbutils_secret_key: DEMAND_CONTACT_SUBMISSION_DB
   lineage_product_database_name: demand_contact_submission
-  default_extraction_type: incremental
-  default_partitions: [year, month, day]
   tables_customization:
-    contact_submission_types_aud:
-      date_filter_column: created_at
-    contact_submission_types:
-      date_filter_column: updated_at
-    contact_submissions_aud:
-      date_filter_column: created_at
-    contact_submissions:
-      date_filter_column: created_at
-    message:
-      date_filter_column: creation_time
-      unixtime_measure: milliseconds
+    contact_submission_types_aud: {}
+    contact_submission_types: {}
+    contact_submissions_aud: {}
+    contact_submissions: {}
+    message: {}
     revinfo:
       clean_table_name: rev_info
-      date_filter_column: revtstmp
-      unixtime_measure: milliseconds
+
 cluster:
   type: databricks_12_2_med_io-general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

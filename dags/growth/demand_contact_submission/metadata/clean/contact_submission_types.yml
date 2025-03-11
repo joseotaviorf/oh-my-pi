@@ -2,7 +2,7 @@
 database_name: datalake_demand_contact_submission_clean
 table_name: contact_submission_types
 columns:
-  id_contact_submission_types:
+  id_contact_submission_type:
     lineage:
       - datalake_demand_contact_submission_raw.contact_submission_types.id
   type:
