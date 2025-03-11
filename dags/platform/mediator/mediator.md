@@ -6,8 +6,7 @@ This DAG triggers the DAGs that have cross-DAG dependencies.
 Each dependent DAG declared in the [dependencies.yaml](https://github.com/quintoandar/bi-etl-ejuice/blob/master/bietlejuice/dags/dependencies.yaml) will have a trigger task in this DAG.
 The task `check-dependencies` checks for dependencies completion and skips the dependents DAGs' triggers that are not ok
 to be triggered.
-
-To force the Mediator to skip a DAG temporarily, use the variable [MEDIATOR_SKIP_LIST](/admin/variable/?flt1_0=MEDIATOR_SKIP_LIST).
+To force the Mediator to skip a DAG temporarily, use the variable [MEDIATOR_SKIP_LIST](/d03z8k7v/variable/list/?_flt_0_key=MEDIATOR_SKIP_LIST#).
 
 ### Execution Interval
 
