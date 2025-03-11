@@ -12,6 +12,7 @@ workflow:
   database_type: postgres
   source_schema: public
   dbutils_secret_key: RENTAL_TRANSACT_DB
+  has_clean_soft_delete: true
   tables_customization:
     offer:
       clean_table_name: offer
