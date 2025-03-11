@@ -558,6 +558,7 @@ plugin_tasks = [
             f"--output_nearest_neighborhoods=nearest_neighborhoods",
             f"--output_keys_and_values_to_city_slug=keys_and_values_to_city_slug",
             f"--output_keys_and_values_to_neighborhood_slug=keys_and_values_to_neighborhood_slug",
+            f"--output_avg_price_by_neighborhood_slug=avg_price_by_neighborhood_slug",
             f"--redis_host=redis.pwa-tenants-link-service.quintoandar.com.br",
             f"--redis_port=6379",
         ],
