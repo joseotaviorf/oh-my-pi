@@ -2,7 +2,7 @@
 table_name: datalake_offer.offer
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
-  id:
+  id_offer_history:
     is_complete:
       severity_level: Error
     is_unique:
