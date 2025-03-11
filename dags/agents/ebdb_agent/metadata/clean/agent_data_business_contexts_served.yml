@@ -1,5 +1,8 @@
+---
 database_name: datalake_ebdb_clean
 table_name: agent_data_business_contexts_served
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent_data:
     lineage:

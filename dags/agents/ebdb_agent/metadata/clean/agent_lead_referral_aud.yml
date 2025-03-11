@@ -1,8 +1,8 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: agent_lead_referral_aud
-owner: herivelto.junior@quintoandar.com.br
-domain: For Rent
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 description: Agent Lead Referral AUD table.
 columns:
   id:

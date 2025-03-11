@@ -490,9 +490,17 @@ table_block_list:
   - FinancialData
   - MapRegiao
   - RegionConfig
+  - HouseAgent
+  - HouseAgent_AUD
+  - PreferredFixedAgent
+  - PreferredFixedAgent_AUD
+  - AgentSupport
+  - AgentSupport_AUD
+  - RatingLabel
+  - RealEstateAgentRating
+  - RealEstateAgentRating_RatingLabel
 
-view_allow_list:
-  - MapRegiao
+view_allow_list: []
 
 block_list:
   - PoligonoRegiao

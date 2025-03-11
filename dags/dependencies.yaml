@@ -1238,9 +1238,9 @@ bietlejuice.enrich_bob:
   - bietlejuice.bob:load-clean-submission-progress
   - bietlejuice.ebdb_house:load-clean-house
 bietlejuice.enrich_booking:
-  - bietlejuice.ebdb:load-clean-preferred-fixed-agent
-  - bietlejuice.ebdb:load-clean-preferred-fixed-agent-aud
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud
+  - bietlejuice.ebdb_agent:load-clean-preferred-fixed-agent
+  - bietlejuice.ebdb_agent:load-clean-preferred-fixed-agent-aud
   - bietlejuice.ebdb_contract:load-clean-work-contract
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_lead:load-clean-conversion-lead
@@ -1708,13 +1708,13 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.company:load-clean-company
   - bietlejuice.company:load-clean-company-product
   - bietlejuice.company:load-clean-product
-  - bietlejuice.ebdb:load-clean-house-agent-aud
   - bietlejuice.ebdb:load-clean-house-listing-relation
   - bietlejuice.ebdb:load-clean-house-visit-information
   - bietlejuice.ebdb_administration:load-clean-property-fee
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned-aud
   - bietlejuice.ebdb_administration:load-clean-property-fee-aud
+  - bietlejuice.ebdb_agent:load-clean-house-agent-aud
   - bietlejuice.ebdb_agent:load-clean-house-agent-key-tracking-aud
   - bietlejuice.ebdb_condo:load-clean-access-authorization-type
   - bietlejuice.ebdb_condo:load-clean-access-type
@@ -3236,9 +3236,9 @@ bietlejuice.enrich_vespucio_pipeline:
   - bietlejuice.enrich_house_feature_inference:load-enrich-description-features
   - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities
 bietlejuice.enrich_visit:
-  - bietlejuice.ebdb:load-clean-preferred-fixed-agent
-  - bietlejuice.ebdb:load-clean-preferred-fixed-agent-aud
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud
+  - bietlejuice.ebdb_agent:load-clean-preferred-fixed-agent
+  - bietlejuice.ebdb_agent:load-clean-preferred-fixed-agent-aud
   - bietlejuice.ebdb_contract:load-clean-work-contract
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_location:load-clean-country
