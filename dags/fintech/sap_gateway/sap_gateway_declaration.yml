@@ -1,5 +1,5 @@
 dag:
-  name: sap_gateway_homolog
+  name: sap_gateway
   schedule_start_date: 2020,10,1
   owner: Data Fintech
   documentation:
@@ -10,7 +10,7 @@ workflow:
   layer: raw
   database_type: postgres
   source_schema: public
-  custom_schema: sap_gateway_homolog
+  custom_schema: sap_gateway
   source_database: sapgateway
   dbutils_secret_key: SAP_GATEWAY_DB
   extra_query_template_params:

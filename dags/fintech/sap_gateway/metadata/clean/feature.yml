@@ -1,83 +1,87 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: feature
-owner: juliana.hocihara@quintoandar.com.br
+owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: "Feature table from SAP Gateway"
+description: null
 columns:
   id_feature:
-    description: "Main ID for feature table"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.id
+    - datalake_sap_gateway_raw.feature.id
   id_source:
-    description: "Source ID"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.source_id
+    - datalake_sap_gateway_raw.feature.source_id
   id_business_entity:
-    description: "Business entity ID"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.business_entity_id
+    - datalake_sap_gateway_raw.feature.business_entity_id
   id_finance_entity:
-    description: "Finance entity ID"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.finance_entity_id
+    - datalake_sap_gateway_raw.feature.finance_entity_id
   id_external_payment:
-    description: "External payment ID"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.external_payment_id
+    - datalake_sap_gateway_raw.feature.external_payment_id
+  uuid:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.feature.uuid
   source:
-    description: "Source"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.source
+    - datalake_sap_gateway_raw.feature.source
   transaction_type:
-    description: "Type of transaction"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.transaction_type
+    - datalake_sap_gateway_raw.feature.transaction_type
   metadata:
-    description: "Metadata JSON"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.metadata
+    - datalake_sap_gateway_raw.feature.metadata
   request_payload:
-    description: "Request payload JSON"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.request_payload
+    - datalake_sap_gateway_raw.feature.request_payload
   sync_sap_status:
-    description: "Status from sync sap"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.sync_sap_status
+    - datalake_sap_gateway_raw.feature.sync_sap_status
   source_client:
-    description: "Source from client"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.source_client
+    - datalake_sap_gateway_raw.feature.source_client
   user_type:
-    description: "User type description"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.user_type
+    - datalake_sap_gateway_raw.feature.user_type
   finance_entity_type:
-    description: "Finance entity type description"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.finance_entity_type
+    - datalake_sap_gateway_raw.feature.finance_entity_type
   ts_accrual:
-    description: "Accural timestamp"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.accrual_date
+    - datalake_sap_gateway_raw.feature.TIMESTAMP(accrual_date)
   ts_created:
-    description: "Creation timestamp"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.created_at
+    - datalake_sap_gateway_raw.feature.created_at
   ts_updated:
-    description: "Update timestamp"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.updated_at
+    - datalake_sap_gateway_raw.feature.updated_at
   year:
-    description: "Update year"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.year
+    - datalake_sap_gateway_raw.feature.year
   month:
-    description: "Update month"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.month
+    - datalake_sap_gateway_raw.feature.month
   day:
-    description: "Update day"
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.feature.day
+    - datalake_sap_gateway_raw.feature.day

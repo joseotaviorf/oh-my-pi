@@ -1,31 +1,43 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: card_code
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id_tax:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.card_code.tax_id
+    - datalake_sap_gateway_raw.card_code.tax_id
   id_tax_type:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.card_code.tax_id_type
+    - datalake_sap_gateway_raw.card_code.tax_id_type
   supplier_landlord_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.card_code.supplier_landlord_code
+    - datalake_sap_gateway_raw.card_code.supplier_landlord_code
   supplier_tenant_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.card_code.supplier_tenant_code
+    - datalake_sap_gateway_raw.card_code.supplier_tenant_code
   supplier_estate_agent_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.card_code.supplier_estate_agent_code
+    - datalake_sap_gateway_raw.card_code.supplier_estate_agent_code
   customer_landlord_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.card_code.customer_landlord_code
+    - datalake_sap_gateway_raw.card_code.customer_landlord_code
   customer_tenant_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.card_code.customer_tenant_code
+    - datalake_sap_gateway_raw.card_code.customer_tenant_code
   customer_reservation_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.card_code.customer_reservation_code
+    - datalake_sap_gateway_raw.card_code.customer_reservation_code
   customer_seller_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.card_code.customer_seller_code
+    - datalake_sap_gateway_raw.card_code.customer_seller_code

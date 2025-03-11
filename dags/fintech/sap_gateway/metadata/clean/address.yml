@@ -1,37 +1,51 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: address
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id_address:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.address.id
+    - datalake_sap_gateway_raw.address.id
   ibge_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.address.ibge_code
+    - datalake_sap_gateway_raw.address.ibge_code
   zip_code:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.address.zip_code
+    - datalake_sap_gateway_raw.address.zip_code
   address_description:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.address.address
+    - datalake_sap_gateway_raw.address."address"
   address_block:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.address.block
+    - datalake_sap_gateway_raw.address."block"
   address_city:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.address.city
+    - datalake_sap_gateway_raw.address.city
   address_complement:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.address.complement
+    - datalake_sap_gateway_raw.address.complement
   address_country:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.address.country
+    - datalake_sap_gateway_raw.address.country
   address_state:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.address.state
+    - datalake_sap_gateway_raw.address."state"
   street_suffix:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.address.street_suffix
+    - datalake_sap_gateway_raw.address.street_suffix
   address_number:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.address.number
+    - datalake_sap_gateway_raw.address."number"

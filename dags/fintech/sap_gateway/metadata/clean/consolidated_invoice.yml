@@ -1,0 +1,87 @@
+---
+database_name: datalake_sap_gateway_clean
+table_name: consolidated_invoice
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.id
+  status:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.status
+  amount:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.amount
+  user_type:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.user_type
+  source_client:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.source_client
+  city_state:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.city_state
+  city:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.city
+  person_card_code:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.person_card_code
+  person_document:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.person_document
+  person_document_type:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.person_document_type
+  sequence_code:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.sequence_code
+  description:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.description
+  cost_center:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.cost_center
+  business_place:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.business_place
+  account_code:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.account_code
+  account_cfop_code:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.account_cfop_code
+  account_managerial_center:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.account_managerial_center
+  reference_year_month:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.reference_year_month
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.TIMESTAMP(created_at)
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.TIMESTAMP(updated_at)

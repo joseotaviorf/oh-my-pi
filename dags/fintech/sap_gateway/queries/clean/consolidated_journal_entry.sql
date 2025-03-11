@@ -1,6 +1,6 @@
 SELECT
     id,
-    sync_sap_job_id AS id_sync_sap_job,
+    originated_by,
     source_client,
     status,
     city_state,

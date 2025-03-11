@@ -1,13 +1,19 @@
 ---
 database_name: datalake_sap_gateway_clean
 table_name: rule_account_type
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id_rule:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.rule_account_type.rule_id
+    - datalake_sap_gateway_raw.rule_account_type.rule_id
   id_account:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.rule_account_type.account_id
+    - datalake_sap_gateway_raw.rule_account_type.account_id
   type:
+    description: ''
     lineage:
-      - datalake_sap_gateway_raw.rule_account_type.type
+    - datalake_sap_gateway_raw.rule_account_type."type"

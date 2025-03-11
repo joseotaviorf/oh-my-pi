@@ -20,4 +20,4 @@ SELECT
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated
 FROM 
-    datalake_sap_gateway_homolog_raw.consolidated_invoice
+    datalake_sap_gateway_raw.consolidated_invoice

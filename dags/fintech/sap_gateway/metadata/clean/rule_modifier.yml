@@ -1,0 +1,39 @@
+---
+database_name: datalake_sap_gateway_clean
+table_name: rule_modifier
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.rule_modifier.id
+  name:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.rule_modifier.name
+  person_type:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.rule_modifier.person_type
+  cost_center:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.rule_modifier.cost_center
+  business_place:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.rule_modifier.business_place
+  sequence_code:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.rule_modifier.sequence_code
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.rule_modifier.TIMESTAMP(created_at)
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.rule_modifier.TIMESTAMP(updated_at)
