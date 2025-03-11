@@ -117,33 +117,30 @@ if __name__ == "__main__":
                 .output()
             )
             df = df.drop("cpudt_dt")
-            dfs.append(df)
+
+            db_info = DatalakeMetastoreService.get_db_info(
+                environment, source, datalake_bucket
+            )
+            spark_metastore_service = SparkMetastoreService(SparkClient())
+            spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+
+            # create database if it doesn't exists
+            database_name = db_info["db_raw_databricks"]
+            format_options = SparkTableStorageFormat.DEFAULT_RAW
+            database_location = db_info["db_raw_path"]
+            spark_metastore_service.create_database(database_name)
+            if df:
+                IncrementalTableLoaderPipeline(
+                    database_name=database_name,
+                    table_name=table_name,
+                    database_location=database_location,
+                    layer=LayerEnum.RAW,
+                    query=None,
+                    partitions=partitions,
+                ).load_and_register(df, format_options)
+            else:
+                logger.info(f"m=No data to load for {load_dt}!")
         except Exception as e:
             logger.info(f"{e}, m=Error loading data for {load_dt}")
-    if dfs:
-        df = reduce(DataFrame.unionAll, dfs)
-        db_info = DatalakeMetastoreService.get_db_info(
-            environment, source, datalake_bucket
-        )
-        spark_metastore_service = SparkMetastoreService(SparkClient())
-        spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-
-        # create database if it doesn't exists
-        database_name = db_info["db_raw_databricks"]
-        format_options = SparkTableStorageFormat.DEFAULT_RAW
-        database_location = db_info["db_raw_path"]
-        spark_metastore_service.create_database(database_name)
-        if df:
-            IncrementalTableLoaderPipeline(
-                database_name=database_name,
-                table_name=table_name,
-                database_location=database_location,
-                layer=LayerEnum.RAW,
-                query=None,
-                partitions=partitions,
-            ).load_and_register(df, format_options)
-        else:
-            logger.info(f"m=No data to load for this period!")
-
     else:
         logger.info(f"m=No data to load for this period!")
