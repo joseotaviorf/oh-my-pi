@@ -80,7 +80,7 @@ bietlejuice.dw_datamarts_for_sale:
   add:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
     - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
-    - bietlejuice.ebdb:load-clean-map-region
+    - bietlejuice.ebdb_location:load-clean-map-region
     - bietlejuice.ebdb:load-clean-polygon-region
   remove:
     - bietlejuice.dw_agents_availability:load-dw-agent-fact-agent-daily-allocations
@@ -336,7 +336,7 @@ bietlejuice.enrich_customer_support:
     - bietlejuice.sauron:load-clean-bot-outgoing-messages
 bietlejuice.enrich_ebdb_photo_jobs:
   add:
-    - bietlejuice.ebdb:load-clean-map-region
+    - bietlejuice.ebdb_location:load-clean-map-region
     - bietlejuice.ebdb_location:load-clean-country
     - bietlejuice.ebdb_location:load-clean-state
     - bietlejuice.ebdb_house:load-clean-house
@@ -620,7 +620,7 @@ bietlejuice.enrich_sale_closing_flows:
     - bietlejuice.enrich_sale_firestore:load-enrich-monday
 bietlejuice.enrich_sale_crawlers_listings:
   remove:
-    - bietlejuice.ebdb:load-clean-map-region
+    - bietlejuice.ebdb_location:load-clean-map-region
     - bietlejuice.ebdb:load-clean-polygon-region
     - bietlejuice.enrich_region:load-enrich-region
     - bietlejuice.listings.em_casa:load-clean-em-casa

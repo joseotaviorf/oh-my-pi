@@ -488,6 +488,8 @@ table_block_list:
   - BypassTerm
   - BypassTerm_AUD
   - FinancialData
+  - MapRegiao
+  - RegionConfig
 
 view_allow_list:
   - MapRegiao

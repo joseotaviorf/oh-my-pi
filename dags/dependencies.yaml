@@ -386,12 +386,12 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-  - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
+  - bietlejuice.ebdb_location:load-clean-map-region
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.ebdb_visit:load-clean-house-visit-status-aud
   - bietlejuice.ebdb_visit:load-clean-house-weekly-schedule-aud
@@ -1711,7 +1711,6 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb:load-clean-house-agent-aud
   - bietlejuice.ebdb:load-clean-house-listing-relation
   - bietlejuice.ebdb:load-clean-house-visit-information
-  - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb_administration:load-clean-property-fee
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned-aud
@@ -1740,6 +1739,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb_listing:load-clean-listing-rent-model-aud
   - bietlejuice.ebdb_listing:load-clean-listing-sale-model
   - bietlejuice.ebdb_location:load-clean-local
+  - bietlejuice.ebdb_location:load-clean-map-region
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.ebdb_offer:load-clean-instant-offer
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
@@ -1750,12 +1750,12 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.enrich_ebdb_country:load-enrich-user
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
 bietlejuice.enrich_ebdb_photo_jobs:
-  - bietlejuice.ebdb:load-clean-map-region
   - bietlejuice.ebdb:load-clean-photographer-job
   - bietlejuice.ebdb:load-clean-photographer-job-aud
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-registration-status-aud
   - bietlejuice.ebdb_location:load-clean-country
+  - bietlejuice.ebdb_location:load-clean-map-region
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.ebdb_photo_job:load-clean-photographer-data
   - bietlejuice.ebdb_user:load-clean-user

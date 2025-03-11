@@ -125,7 +125,6 @@ Produces the following output tables:
     `listing_sale_model`
     `listing_sale_model_aud`
     `local`
-    `map_region`
     `occupant_type`
     `offer`
     `offer_aud`
@@ -163,7 +162,6 @@ Produces the following output tables:
     `region`
     `region_business_contexts_served`
     `region_business_contexts_served_aud`
-    `region_config`
     `rental_administrator_change_request`
     `rental_administrator_change_request_aud`
     `restriction_type_aud`

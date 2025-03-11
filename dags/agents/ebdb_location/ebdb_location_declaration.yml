@@ -23,6 +23,8 @@ workflow:
       clean_table_name: state_aud
     Local:
       clean_table_name: local
+    MapRegiao:
+      clean_table_name: map_region
     Municipio:
       clean_table_name: city
     Regiao:
