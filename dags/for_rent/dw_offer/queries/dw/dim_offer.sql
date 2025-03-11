@@ -70,7 +70,9 @@ offer_submitted_events AS (
 ),
 old_pre_proposal AS (
     SELECT
+        UUID() AS sk_offer_history,
         CAST(pp.id_offer_context AS INT) AS sk_offer,
+        NULL AS sk_offer_rental_transact,
         CAST(pp.id AS INT) AS id_offer,
         CAST(NULL AS INT) AS id_godfather,
         CAST(NULL AS VARCHAR(255)) AS id_firestore,
@@ -82,6 +84,8 @@ old_pre_proposal AS (
         pp.edition AS editing,
         pp.status,
         CAST(pp.id_user AS INT) AS id_user,
+        tenant.uuid_person AS uuid_person_tenant,
+        NULL AS uuid_person_owner,
         CAST(pp.id_house AS INT) AS id_property,
         CAST(pp.ts_created AS TIMESTAMP) AS dt_created,
         CAST(pp.ts_updated AS TIMESTAMP) AS dt_updated,
@@ -110,10 +114,15 @@ old_pre_proposal AS (
       datalake_ebdb_proposal.pre_proposal pp
     LEFT JOIN pre_proposal_aud pp_aud
         ON pp.id = pp_aud.id
+    LEFT JOIN
+        datalake_ebdb_clean.user AS tenant
+            ON tenant.id = pp.id_user
 ),
 new_offer AS (
     SELECT
+        id_offer_history AS sk_offer_history,
         CAST(id_offer_context AS INT) AS sk_offer,
+        CAST(id_offer_rental_transact AS INT) AS sk_offer_rental_transact,
         CAST(id AS INT) AS id_offer,
         CAST(id_godfather AS INT) AS id_godfather,
         CAST(id_firestore AS VARCHAR(255)) AS id_firestore,
@@ -125,6 +134,8 @@ new_offer AS (
         turn AS editing,
         status,
         CAST(id_client AS INT) AS id_user,
+        uuid_person_tenant,
+        uuid_person_owner,
         CAST(id_house AS INT) AS id_property,
         CAST(ts_created AS TIMESTAMP) AS dt_created,
         CAST(ts_updated AS TIMESTAMP) AS dt_updated,
@@ -218,11 +229,15 @@ taxonomy_demand AS (
             ORDER BY LOWER(app_type), LOWER(utm_source), LOWER(utm_medium), branded = 'Branded', id) = 1
 )
 SELECT
+    o.sk_offer_history,
     o.sk_offer,
+    o.sk_offer_rental_transact,
     o.id_offer,
     o.id_godfather,
     o.id_firestore,
     o.id_user,
+    o.uuid_person_tenant,
+    o.uuid_person_owner,
     o.id_property,
     o.country_code,
     o.editing,

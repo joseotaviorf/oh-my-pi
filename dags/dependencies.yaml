@@ -649,6 +649,7 @@ bietlejuice.dw_offboarding:
   - bietlejuice.enrich_inspections:load-enrich-repair-request
   - bietlejuice.enrich_terminator:load-enrich-termination
 bietlejuice.dw_offer:
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal-aud
@@ -2319,6 +2320,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.ebdb_location:load-clean-country
   - bietlejuice.ebdb_offer:load-clean-offer
   - bietlejuice.ebdb_offer:load-clean-offer-aud
+  - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.ebdb_visit:load-clean-booking
   - bietlejuice.ebdb_visit:load-clean-booking-status-change
@@ -2334,6 +2336,7 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_rental_transact:load-enrich-offer
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
   - bietlejuice.godfather:load-clean-offer

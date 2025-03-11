@@ -132,7 +132,7 @@ FROM
 LEFT JOIN
     datalake_rental_transact_clean.offer_topic AS ot
         ON o.id = ot.id_offer
-        AND ot.type IN ('PRICE', 'CUSTOM')
+        AND ot.type = 'PRICE'
 LEFT JOIN
     topic_message AS tm
         ON tm.id_offer_topic = ot.id

@@ -5,18 +5,26 @@ description:
   If an offer is accepted, it becomes a proposal (see dim_proposal table).
   Each line is an unique offer, identified by the key sk_offer.
 domain: For Rent
-owner: matheus.baroni@quintoandar.com.br
+owner: jonas.fiorini@quintoandar.com.br
 columns:
+  sk_offer_history:
+    lineage:
+      - datalake_offer.offer.id_offer_history
+    description: Offer primary key.
   sk_offer:
     lineage:
       - datalake_offer.offer.id_offer_context
       - datalake_ebdb_proposal.pre_proposal.id_offer_context
-    description: Key of offer (id_offer)
+    description: Key of offer from EBDB (id_offer)
+  sk_offer_rental_transact:
+    lineage:
+      - datalake_offer.offer.id_offer_rental_transact
+    description: Key of offer from Rental Transact.
   id_offer:
     lineage:
       - datalake_offer.offer.id
       - datalake_ebdb_proposal.pre_proposal.id
-    description: ID of offer on ebdb
+    description: ID of offer on EBDB.
   id_godfather:
     lineage:
       - datalake_offer.offer.id_godfather
@@ -30,6 +38,14 @@ columns:
       - datalake_offer.offer.id_client
       - datalake_ebdb_proposal.pre_proposal.id_user
     description: ID of tentant
+  uuid_person_tenant:
+    lineage:
+      - datalake_offer.offer.uuid_person_tenant
+    description: Person ID of the house owner involved in the offer. Can be used to JOIN with datalake_person_clean.person.uuid_person.
+  uuid_person_owner:
+    lineage:
+      - datalake_offer.offer.uuid_person_owner
+    description: Person ID of the house tenant prospect involved in the offer. Can be used to JOIN with datalake_person_clean.person.uuid_person.
   id_property:
     lineage:
       - datalake_offer.offer.id_house
