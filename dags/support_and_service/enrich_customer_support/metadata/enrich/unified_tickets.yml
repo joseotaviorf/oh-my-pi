@@ -125,16 +125,6 @@ columns:
     lineage:
       - datalake_customer_support.chat.service_status
     description: Unique identifier for the front office service status
-  id_main_session:
-    lineage:
-      - datalake_customer_resolution.customer_resolution_static.id_ticket
-    description:
-      Unique identifier of the ticket session (first user contact for this
-      team in a 7 days window). Only valid for front tickets.
-  id_next_ticket:
-    lineage:
-      - datalake_customer_resolution.customer_resolution_static.ticket_recontact_list
-    description: Identifier of the next ticket for this user within the same session.
   channel:
     description: Identify the channel for this ticket (call, chat, email).
   channel_type:

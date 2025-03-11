@@ -323,9 +323,6 @@ bietlejuice.enrich_customer_demand:
     - bietlejuice.ebdb_user:load-clean-user
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
-bietlejuice.enrich_customer_resolution:
-  add:
-    - bietlejuice.enrich_ebdb_user:load-enrich-user
 bietlejuice.enrich_customer_support:
   add:
     - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths

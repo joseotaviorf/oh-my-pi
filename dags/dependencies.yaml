@@ -1471,12 +1471,6 @@ bietlejuice.enrich_customer_demand:
   - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays
   - bietlejuice.gsheets_support_and_service:done-clean-tag-sla-target
   - bietlejuice.gsheets_support_and_service:done-clean-taxonomy-sla
-bietlejuice.enrich_customer_resolution:
-  - bietlejuice.enrich_customer_support:load-enrich-call
-  - bietlejuice.enrich_customer_support:load-enrich-chat
-  - bietlejuice.enrich_customer_support:load-enrich-email
-  - bietlejuice.enrich_ebdb_user:load-enrich-user
-  - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.enrich_customer_support:
   - bietlejuice.bigfone:load-clean-call
   - bietlejuice.bigfone:load-clean-event
