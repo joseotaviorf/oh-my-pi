@@ -285,7 +285,7 @@ WITH bic AS (
       AND ljs.id_snapshot = usm.id_snapshot
   WHERE
     usm.id_snapshot = DATE_FORMAT(DATE('{year}-{month}-{day}'), 'yyyyMMdd')
-    OR usm.id_snapshot = DATE_FORMAT(DATE_SUB('{year}-{month}-{day}', 20), 'yyyyMMdd')
+    OR usm.id_snapshot = DATE_FORMAT(DATE_SUB('{year}-{month}-{day}', 1), 'yyyyMMdd')
 )
 SELECT
   * EXCEPT(id_snapshot)
@@ -299,4 +299,4 @@ SELECT
 FROM
   bic
 WHERE
-  id_snapshot = DATE_FORMAT(DATE_SUB('{year}-{month}-{day}', 20), 'yyyyMMdd')
+  id_snapshot = DATE_FORMAT(DATE_SUB('{year}-{month}-{day}', 1), 'yyyyMMdd')

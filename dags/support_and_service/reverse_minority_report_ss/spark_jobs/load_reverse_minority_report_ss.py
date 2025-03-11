@@ -299,7 +299,7 @@ if __name__ == "__main__":
         for idx, message in enumerate(message_list):
             future = producer.send(kafka_topic, value=message)
             record_metadata = future.get(timeout=10)
-            if idx + 1 % 100 == 0 or idx == 0:
+            if (idx + 1) % 100 == 0 or idx == 0:
                 logger.info(f"Sent {idx + 1} messages to topic {kafka_topic}")
     except Exception as e:
         print(f"Error sending message: {e}")
