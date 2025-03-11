@@ -40,15 +40,7 @@ def parse_arguments():
         required=False,
         default=None,
     )
-    parser.add_argument(
-        "--has-clean-soft-delete",
-        nargs="?",
-        dest="has_clean_soft_delete",
-        required=False,
-        default=False,
-        const=True, 
-        help="Whether the Spark job should apply soft delete instead of hard delete for the clean layer",
-    )
+
     return parser.parse_args()
 
 
@@ -97,7 +89,6 @@ def main():
         table_privileges_dict = json.loads(args.table_privileges)
     else:
         table_privileges_dict = None
-    has_clean_soft_delete = args.has_clean_soft_delete
 
     if not clean_primary_keys:
         raise ValueError(
@@ -137,24 +128,15 @@ def main():
         table_privileges = TablePrivileges.from_environment_default(full_clean_table_name)
 
     loader = DeltaLoader()
-    if (has_clean_soft_delete):
-        loader.load_table(
+    loader.load_table(
         table_name=full_clean_table_name,
         path=f"s3://{datalake_bucket}/clean/{schema}/{table_name}/",
         source_df=clean_updates_df,
         merge_on=clean_primary_keys,
+        when_not_matched_insert_condition="source.op_cdc != 'd'",
         when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction",
+        when_matched_delete_condition="source.op_cdc = 'd'",
     )
-    else:
-        loader.load_table(
-            table_name=full_clean_table_name,
-            path=f"s3://{datalake_bucket}/clean/{schema}/{table_name}/",
-            source_df=clean_updates_df,
-            merge_on=clean_primary_keys,
-            when_not_matched_insert_condition="source.op_cdc != 'd'",
-            when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction",
-            when_matched_delete_condition="source.op_cdc = 'd'",
-        )
 
     if (
         table_privileges

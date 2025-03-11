@@ -28,7 +28,8 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
         clean_primary_keys = ",".join(
             table_attributes.table_customization.get("clean_primary_keys", [])
         )
-        parameters = [
+
+        return [
             self.dag_execution_context.dag_args["name"],
             self.dag_execution_context.environment,
             self.dag_execution_context.bucket,
@@ -41,11 +42,6 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
             "--table-privileges",
             json.dumps(table_attributes.table_privileges),
         ]
-
-        if table_attributes.has_clean_soft_delete:
-            parameters.append("--has-clean-soft-delete")
-
-        return parameters
 
     def create_task(
         self, table_attributes: TableAttributes

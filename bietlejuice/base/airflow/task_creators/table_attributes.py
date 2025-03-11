@@ -25,7 +25,6 @@ class TableAttributes:
             or "load_spark_job" in self.table_customization
         )
         self.table_privileges = self._get_table_privileges()
-        self.has_clean_soft_delete = self.get_has_clean_soft_delete()
 
     @staticmethod
     def from_attributes(
@@ -164,20 +163,3 @@ class TableAttributes:
             )
 
         return table_privileges
-
-    def get_has_clean_soft_delete(self) -> bool:
-        """
-        Follows this order of priority:
-        1. Table customization for that specific layer
-        2. Workflow args
-        If none of the above are set, or the informed value is different from True, it defaults to False
-        """
-
-        has_clean_soft_delete = self._workflow_args.get("has_clean_soft_delete", False)
-        table_has_clean_soft_delete = self.table_customization.get(
-            "has_clean_soft_delete", has_clean_soft_delete
-        )
-
-        if isinstance(table_has_clean_soft_delete, str):
-            return table_has_clean_soft_delete.lower() == "true"
-        return bool(table_has_clean_soft_delete)
