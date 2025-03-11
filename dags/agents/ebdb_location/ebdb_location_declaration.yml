@@ -25,6 +25,7 @@ workflow:
       clean_table_name: local
     MapRegiao:
       clean_table_name: map_region
+      raw_primary_keys: ["id"]
     Municipio:
       clean_table_name: city
     Regiao:
