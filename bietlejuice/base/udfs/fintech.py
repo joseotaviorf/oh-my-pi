@@ -10,12 +10,12 @@ class FintechUDFs:
         ts_started: datetime.datetime, ts_finished: datetime.datetime
     ) -> float:
         workday = businesstimedelta.WorkDayRule(
-            start_time=datetime.time(8),
-            end_time=datetime.time(20),
+            start_time=datetime.time(7),
+            end_time=datetime.time(21),
             working_days=[0, 1, 2, 3, 4],
         )
         workday_sat = businesstimedelta.WorkDayRule(
-            start_time=datetime.time(8), end_time=datetime.time(18), working_days=[5]
+            start_time=datetime.time(8), end_time=datetime.time(20), working_days=[5]
         )
 
         my_holidays = pyholidays.country_holidays("BR", subdiv="SP")
