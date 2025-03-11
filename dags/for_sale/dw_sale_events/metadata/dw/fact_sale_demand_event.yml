@@ -113,6 +113,21 @@ columns:
     - dw_sale.fact_offers.sk_last_secretariat
     description: Surrogate key of the secretariat who was last associated with the buyer. Can be joined with dw_secretariat.dim_secretariat_user_version,
       on field sk_secretariat_user_version.
+  sk_buyer_prospect_type:
+    lineage:
+    - dw_sale.fact_visits.sk_buyer_prospect_type
+    - dw_sale.fact_offers.sk_buyer_prospect_type
+    description: Key of the buyer's prospect type. Can be joined with dw_sale.dim_buyer_prospect_type.
+  sk_listing_price_segment:
+    lineage:
+    - dw_sale.fact_visits.sk_listing_price_segment
+    - dw_sale.fact_offers.sk_listing_price_segment
+    description: Key of the listing's price segment. Can be joined with dw_sale.dim_sale_price_segment.
+  sk_buyer_prospect_price_segment:
+    lineage:
+    - dw_sale.fact_visits.sk_buyer_prospect_price_segment
+    - dw_sale.fact_offers.sk_buyer_prospect_price_segment
+    description: Key of the buyer's prospect price segment. Can be joined with dw_sale.dim_sale_price_segment.
   year:
     lineage:
     - dw_public.dim_date.year
