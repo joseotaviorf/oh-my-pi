@@ -21,14 +21,18 @@ columns:
     description: ''
     lineage:
     - datalake_sap_gateway_homolog_raw.webhook_log.status_reason
-  error:
+  errors:
     description: ''
     lineage:
-    - datalake_sap_gateway_homolog_raw.webhook_log.error
-  error_code:
+    - datalake_sap_gateway_homolog_raw.webhook_log.errors
+  job_identifier:
     description: ''
     lineage:
-    - datalake_sap_gateway_homolog_raw.webhook_log.error_code
+    - datalake_sap_gateway_homolog_raw.webhook_log.job_identifier
+  entity_type:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_homolog_raw.webhook_log.entity_type
   idoc:
     description: ''
     lineage:

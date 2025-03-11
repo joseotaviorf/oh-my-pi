@@ -9,10 +9,10 @@ columns:
     description: ''
     lineage:
     - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.id
-  id_sync_sap_job:
+  originated_by:
     description: ''
     lineage:
-    - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.sync_sap_job_id
+    - datalake_sap_gateway_homolog_raw.consolidated_journal_entry.originated_by
   source_client:
     description: ''
     lineage:

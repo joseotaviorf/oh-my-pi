@@ -18,6 +18,7 @@ workflow:
     address: {}
     business_partner: {}
     card_code: {}
+    consolidated_invoice: {}
     consolidated_journal_entry_lines: {}
     consolidated_journal_entry: {}
     feature: {}
@@ -29,7 +30,6 @@ workflow:
     rule_account_type: {}
     rule_modifier: {}
     rule: {}
-    schema_migrations: {}
     sync_sap_job: {}
     webhook_log: {}
 cluster:
