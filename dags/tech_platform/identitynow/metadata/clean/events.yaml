@@ -1,0 +1,81 @@
+database_name: datalake_identitynow_audit_logs
+table_name: events
+description: Table with IdentityNow events.
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  ts_event:
+    lineage:
+      - s3_auditlogs_bucket.created
+  id_event:
+    lineage:
+      - s3_auditlogs_bucket.id
+  tracking_number:
+    lineage:
+      - s3_auditlogs_bucket.trackingNumber
+  name:
+    lineage:
+      - s3_auditlogs_bucket.name
+  technical_name:
+    lineage:
+      - s3_auditlogs_bucket.technicalName
+  operation:
+    lineage:
+      - s3_auditlogs_bucket.operation
+  status:
+    lineage:
+      - s3_auditlogs_bucket.status
+  type:
+    lineage:
+      - s3_auditlogs_bucket.type
+  details:
+    lineage:
+      - s3_auditlogs_bucket.details
+  action:
+    lineage:
+      - s3_auditlogs_bucket.action
+  actor_name:
+    lineage:
+      - s3_auditlogs_bucket.actor.name
+  target_name:
+    lineage:
+      - s3_auditlogs_bucket.target.name
+  attributes:
+    lineage:
+      - s3_auditlogs_bucket.attributes
+  objects:
+    lineage:
+      - s3_auditlogs_bucket.objects
+  org:
+    lineage:
+      - s3_auditlogs_bucket.org
+  pod:
+    lineage:
+      - s3_auditlogs_bucket.pod
+  ip_address:
+    lineage:
+      - s3_auditlogs_bucket.ipAddress
+  _type:
+    lineage:
+      - s3_auditlogs_bucket._type
+  _version:
+    lineage:
+      - s3_auditlogs_bucket._version
+  created:
+    lineage:
+      - s3_auditlogs_bucket.created
+  synced:
+    lineage:
+      - s3_auditlogs_bucket.synced
+  year:
+    lineage:
+      - s3_auditlogs_bucket.created
+  month:
+    lineage:
+      - s3_auditlogs_bucket.created
+  day:
+    lineage:
+      - s3_auditlogs_bucket.created
+  hour:
+    lineage:
+      - s3_auditlogs_bucket.created

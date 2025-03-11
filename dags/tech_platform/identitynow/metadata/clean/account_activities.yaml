@@ -1,0 +1,90 @@
+database_name: datalake_identitynow_audit_logs
+table_name: account_activities
+description: Table with IdentityNow account activities.
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+columns:
+  ts_event:
+    lineage:
+      - s3_auditlogs_bucket.created
+  id_account_activity:
+    lineage:
+      - s3_auditlogs_bucket.id
+  tracking_number:
+    lineage:
+      - s3_auditlogs_bucket.trackingNumber
+  type:
+    lineage:
+      - s3_auditlogs_bucket.type
+  sources:
+    lineage:
+      - s3_auditlogs_bucket.sources
+  action:
+    lineage:
+      - s3_auditlogs_bucket.action
+  status:
+    lineage:
+      - s3_auditlogs_bucket.status
+  stage:
+    lineage:
+      - s3_auditlogs_bucket.stage
+  id_requester:
+    lineage:
+      - s3_auditlogs_bucket.requester.id
+  requester_name:
+    lineage:
+      - s3_auditlogs_bucket.requester.name
+  requester_type:
+    lineage:
+      - s3_auditlogs_bucket.requester.type
+  id_recipient:
+    lineage:
+      - s3_auditlogs_bucket.recipient.id
+  recipient_name:
+    lineage:
+      - s3_auditlogs_bucket.recipient.name
+  recipient_type:
+    lineage:
+      - s3_auditlogs_bucket.recipient.type
+  account_requests:
+    lineage:
+      - s3_auditlogs_bucket.accountRequests
+  original_requests:
+    lineage:
+      - s3_auditlogs_bucket.originalRequests
+  expansion_items:
+    lineage:
+      - s3_auditlogs_bucket.expansionItems
+  org:
+    lineage:
+      - s3_auditlogs_bucket.org
+  pod:
+    lineage:
+      - s3_auditlogs_bucket.pod
+  _type:
+    lineage:
+      - s3_auditlogs_bucket._type
+  _version:
+    lineage:
+      - s3_auditlogs_bucket._version
+  created:
+    lineage:
+      - s3_auditlogs_bucket.created
+  modified:
+    lineage:
+      - s3_auditlogs_bucket.modified
+  synced:
+    lineage:
+      - s3_auditlogs_bucket.synced
+  year:
+    lineage:
+      - s3_auditlogs_bucket.created
+  month:
+    lineage:
+      - s3_auditlogs_bucket.created
+  day:
+    lineage:
+      - s3_auditlogs_bucket.created
+  hour:
+    lineage:
+      - s3_auditlogs_bucket.created
