@@ -9,26 +9,29 @@ dag:
       Chat FUP is a service to manage followups for whatsapp chats.
 
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
+  source_database: chatfup
+  source_schema: public
   lineage_product_database_name: chatfup
   dbutils_secret_key: CHAT_FUP_DB
   tables_customization:
     chats_chat:
-      extraction_type: full
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     surveys_answer:
-      extraction_type: full
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     surveys_survey:
-      extraction_type: full
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     message_voting:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      partitions: [year, month, day]
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     rating:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      partitions: [year, month, day]
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id_rating"]
 
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
@@ -41,3 +44,4 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      

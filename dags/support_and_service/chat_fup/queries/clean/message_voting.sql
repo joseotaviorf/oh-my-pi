@@ -13,7 +13,3 @@ SELECT
     day
 FROM
     datalake_chat_fup_raw.message_voting
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

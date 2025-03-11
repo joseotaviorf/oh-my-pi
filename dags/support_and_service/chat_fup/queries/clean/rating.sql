@@ -15,7 +15,3 @@ SELECT
     day
 FROM
     datalake_chat_fup_raw.rating
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
