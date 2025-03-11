@@ -7,6 +7,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.metric_query_workflow import (
     MetricQueryWorkflow,
 )
+from bietlejuice.base.airflow.dag_builders.main_builder.workflows.metric_query_delta_workflow import (
+    MetricQueryDeltaWorkflow,
+)
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.workflow_enum import (
     WorkflowEnum,
 )
@@ -18,7 +21,10 @@ class MetricFactory(BaseFactory):
     an object of a Metric Workflow (DAG), based on parameters.
     """
 
-    _WORKFLOW_ENUM_TO_CLASS_MAPPING = {WorkflowEnum.QUERY_WORKFLOW: MetricQueryWorkflow}
+    _WORKFLOW_ENUM_TO_CLASS_MAPPING = {
+        WorkflowEnum.QUERY_WORKFLOW: MetricQueryWorkflow,
+        WorkflowEnum.QUERY_DELTA_WORKFLOW: MetricQueryDeltaWorkflow,
+    }
 
     def __init__(self, dag_conf: dict, workflow_conf: dict, cluster_conf: dict):
         super().__init__()

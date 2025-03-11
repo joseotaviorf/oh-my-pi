@@ -1,0 +1,30 @@
+---
+database_name: metric_rent_test
+table_name: bookers_daily
+description: Daily table that contains the amount of bookers (sk_client) that scheduled a booking.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  day:
+    lineage:
+      - dw_public.dim_booking.dt_created
+    description: Date when users scheduled a booking.
+    dimension: True
+  country_code:
+    lineage:
+      - dw_rent.fact_listing_rent_flows.country_code
+    description: Country code identifier.
+    dimension: True
+  bookers:
+    description: Amount of users that scheduled a booking.
+    metric:
+      name: TP Bookers Daily
+      description: Amount of users that scheduled a booking on a day.
+        This amount is calculated by the count distinct of sk_client from fact_listing_rent_flows.
+        Also, there is a filter removing the sk_booking_created_date < -1.
+      acronym: TP Bookers
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analisys
+      approved_by: augusto.torres@quintoandar.com.br
+      link_to_metric: https://quintoandar.sa.looker.com/looks/4742
