@@ -409,7 +409,7 @@ house_entrance_history AS (
         hl.id_house_listing,
         ot.name,
         hl.version,
-        MAX(heh.rev) OVER(PARTITION BY hl.id_house_listing) = heh.rev AS is_last_status_in_listing,
+        MAX(heh.ts_entrance_started) OVER(PARTITION BY hl.id_house_listing) = heh.ts_entrance_started AS is_last_status_in_listing,
         heh.ts_entrance_started
   FROM
     datalake_ebdb_listing.house_entrance_history AS heh

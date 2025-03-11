@@ -429,7 +429,7 @@ house_entrance_history AS (
         hl.id_house_listing,
         ot.name,
         hl.version,
-        MAX(heh.rev) OVER(PARTITION BY hl.id_house_listing) = heh.rev AS is_last_status_in_listing,
+        MAX(heh.ts_entrance_started) OVER(PARTITION BY hl.id_house_listing) = heh.ts_entrance_started AS is_last_status_in_listing,
         heh.ts_entrance_started
   FROM datalake_ebdb_listing.house_entrance_history AS heh
   LEFT JOIN datalake_ebdb_clean.occupant_type AS ot
@@ -452,7 +452,7 @@ early_relisting_house_state AS (
       TRUE AS is_early_demand
   FROM
     datalake_ebdb_listing.business_context_history AS bch
-  JOIN 
+  JOIN
     datalake_ebdb_clean.user_revision_entity AS ure
       ON bch.rev = ure.id
   WHERE
@@ -462,7 +462,7 @@ early_relisting_house_state AS (
       AND bch.suspension_reason = 'RELISTING'
       AND ure.id_user != 4299181 --This filters data inputed by a faulty script. This rule will be replaced in the near future.
 ), early_relisting_dates AS (
-  SELECT 
+  SELECT
     hl.id_house_listing,
     hl.id_house,
     hs.status,
@@ -472,35 +472,35 @@ early_relisting_house_state AS (
     IF(hs.is_early_demand, hs.ts_state_started, NULL) AS ts_early_demand_started,
     IF(hs.is_early_demand, hs.ts_state_ended, NULL) AS ts_early_demand_ended,
     hs.ts_state_started
-  FROM 
+  FROM
     early_relisting_house_state AS hs
-  JOIN 
-    house_listing AS hl 
+  JOIN
+    house_listing AS hl
       ON hl.id_house = hs.id_house
         AND hs.ts_state_started BETWEEN hl.ts_listing_version_start AND COALESCE(hl.ts_listing_version_end, '2700-01-01')
 ),
 early_relisting_date_selection AS (
-  SELECT 
+  SELECT
     id_house_listing,
     id_house,
     status,
     status_reason,
     suspension_reason,
-    is_early_demand, 
+    is_early_demand,
     MIN(ts_early_demand_started) AS ts_early_demand_started,
     MIN(ts_early_demand_ended) AS ts_early_demand_ended
-  FROM 
+  FROM
     early_relisting_dates
-  GROUP BY 
+  GROUP BY
     id_house_listing,
     id_house,
     status,
     status_reason,
     suspension_reason,
     is_early_demand
-), 
+),
 house_lbc_state AS (
-  SELECT 
+  SELECT
     id_house,
     status,
     status_reason,
@@ -508,23 +508,23 @@ house_lbc_state AS (
     ts_state_started,
     ts_state_ended,
     ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_state_started DESC) AS state_order
-  FROM 
-    datalake_ebdb_listing.business_context_history 
-  WHERE 
+  FROM
+    datalake_ebdb_listing.business_context_history
+  WHERE
     business_context = 'RENT'
 ),
 lbc_early_relisting as (
-  SELECT 
+  SELECT
   ds.id_house_listing,
   ds.id_house,
   IF(hs.status = 'PUBLISHED' and hs.status_reason = 'RELISTING_OFFER' and hs.suspension_reason = 'RELISTING', TRUE, FALSE) AS is_early_demand,
   MAX(ds.ts_early_demand_started) AS ts_early_demand_started
-FROM 
+FROM
   early_relisting_date_selection AS ds
 JOIN house_lbc_state AS hs
   ON hs.id_house = ds.id_house
     AND hs.state_order = 1
-GROUP BY 
+GROUP BY
   1,2, hs.status, hs.status_reason, hs.suspension_reason
 )
 SELECT
@@ -543,7 +543,7 @@ SELECT
     heh.name AS who_is_living,
     COALESCE(adm_house.rental_administrator, 'QUINTOANDAR') AS house_rental_administrator,
     COALESCE(
-        LAST(adm_listing.rental_administrator) OVER(PARTITION BY hl.id_house_listing ORDER BY adm_listing.ts_started), 
+        LAST(adm_listing.rental_administrator) OVER(PARTITION BY hl.id_house_listing ORDER BY adm_listing.ts_started),
         'QUINTOANDAR'
     ) AS rental_administrator,
     IF(lbcer.id_house_listing is not null, TRUE, FALSE) AS is_early_relisting,
@@ -584,7 +584,7 @@ LEFT JOIN
   datalake_ebdb_rental_administration.rental_administrator_change_history AS adm_house
     ON adm_house.id_house = hl.id_house
     AND adm_house.ts_ended IS NULL
-LEFT JOIN 
+LEFT JOIN
   datalake_ebdb_rental_administration.rental_administrator_change_history AS adm_listing
     ON adm_listing.id_house = hl.id_house
     AND adm_listing.ts_started >= hl.ts_listing_version_start
