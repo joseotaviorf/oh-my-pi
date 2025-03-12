@@ -54,8 +54,8 @@ WITH listing_rent_flows AS (
             proposal.ts_credit_analysis_last_init AS dt_credit_analysis_init,
             proposal.ts_credit_analysis_last_end AS dt_credit_analysis_end,
             proposal.ts_credit_approved_last AS dt_credit_analysis_approved,
-            IF(dim_offer.status = 'Aprovada', dim_offer.dt_analysis, CAST(NULL AS TIMESTAMP)) AS dt_offer_approved,
-            IF(dim_offer.status IN ('Aprovada', 'Rejeitada'), dim_offer.dt_analysis, CAST(NULL AS TIMESTAMP)) AS dt_internal_analysis,
+            IF(dim_offer.status IN ('Aprovada', 'ACCEPTED'), dim_offer.dt_analysis, CAST(NULL AS TIMESTAMP)) AS dt_offer_approved,
+            IF(dim_offer.status IN ('Aprovada', 'ACCEPTED', 'Rejeitada', 'REJECTED', 'DISMISSED'), dim_offer.dt_analysis, CAST(NULL AS TIMESTAMP)) AS dt_internal_analysis,
             IF(proposal.status IN ('Aprovada', 'Rejeitada'), proposal.ts_updated, CAST(NULL AS TIMESTAMP)) AS dt_credit_analysis, -- old credit analysis date
             proposal.ts_processed AS ts_proposal_processed,
             CAST(contract.ts_canceled AS TIMESTAMP) AS ts_contract_canceled,
@@ -81,7 +81,7 @@ WITH listing_rent_flows AS (
             COALESCE(CAST(DATE_FORMAT(rent_flow.dt_agent_sign_up, "yyyyMMdd") AS BIGINT), -1) AS sk_agent_sign_up_date,
             COALESCE(CAST(DATE_FORMAT(rent_flow.dt_client_sign_up, "yyyyMMdd") AS BIGINT), -1) AS sk_client_sign_up_date,
             COALESCE(CAST(DATE_FORMAT(dim_offer.dt_first_sent, "yyyyMMdd") AS BIGINT), -1) AS sk_offer_submitted_date,
-            IF(dim_offer.status = 'Aprovada', COALESCE(CAST(DATE_FORMAT(dim_offer.dt_analysis, "yyyyMMdd") AS BIGINT), -1), -1) AS sk_offer_approved_date,
+            IF(dim_offer.status IN ('Aprovada', 'ACCEPTED'), COALESCE(CAST(DATE_FORMAT(dim_offer.dt_analysis, "yyyyMMdd") AS BIGINT), -1), -1) AS sk_offer_approved_date,
             COALESCE(CAST(DATE_FORMAT(rent_flow.dt_proposal_approved, "yyyyMMdd") AS BIGINT), -1) AS sk_proposal_approved_date,
             COALESCE(CAST(DATE_FORMAT(DATE_TRUNC('DAY', proposal.ts_tenant_first_doc_sent), "yyyyMMdd") AS BIGINT), -1) AS sk_tenant_manual_first_doc_sent_date,
             COALESCE(CAST(DATE_FORMAT(proposal.ts_tenant_auto_first_doc_sent, "yyyyMMdd") AS BIGINT), -1) AS sk_tenant_auto_first_doc_sent_date,
@@ -162,7 +162,7 @@ WITH listing_rent_flows AS (
                 ON reservation.max_id = reservation.id_reservation
                 AND rent_flow.id_house = reservation.id_house
                 AND rent_flow.id_client = id_tenant
-                AND dim_offer.status = 'Aprovada'
+                AND dim_offer.status IN ('Aprovada', 'ACCEPTED')
                 AND reservation.ts_created BETWEEN
                     COALESCE(house_listing.ts_listing_version_start, '1900-01-01')
                     AND COALESCE(house_listing.ts_listing_version_end, NOW())

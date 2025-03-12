@@ -65,12 +65,12 @@ WITH listing_rent_flows AS (
             dim_proposal.dt_credit_analysis_end,
             dim_proposal.dt_credit_last_approved AS dt_credit_analysis_approved,
             CASE
-                WHEN dim_offer.status = 'Aprovada'
+                WHEN dim_offer.status IN ('Aprovada', 'ACCEPTED')
                     THEN dim_offer.dt_analysis
                 ELSE CAST(NULL AS TIMESTAMP)
             END AS dt_offer_approved,
             CASE
-                WHEN dim_offer.status IN ('Aprovada', 'Rejeitada')
+                WHEN dim_offer.status IN ('Aprovada', 'ACCEPTED', 'Rejeitada', 'REJECTED', 'DISMISSED')
                     THEN dim_offer.dt_analysis
                 ELSE CAST(NULL AS TIMESTAMP)
             END AS dt_internal_analysis,
@@ -112,7 +112,7 @@ WITH listing_rent_flows AS (
             COALESCE(CAST(DATE_FORMAT(rent_flow.dt_client_sign_up, "yyyyMMdd") AS BIGINT), -1) AS sk_client_sign_up_date,
             COALESCE(CAST(DATE_FORMAT(dim_offer.dt_first_sent, "yyyyMMdd") AS BIGINT), -1) AS sk_offer_submitted_date,
             CASE
-                WHEN dim_offer.status = 'Aprovada'
+                WHEN dim_offer.status IN ('Aprovada', 'ACCEPTED')
                     THEN COALESCE(CAST(DATE_FORMAT(dim_offer.dt_analysis, "yyyyMMdd") AS BIGINT), -1)
                 ELSE -1
             END AS sk_offer_approved_date,
@@ -185,7 +185,7 @@ WITH listing_rent_flows AS (
             ON reservation.max_id = reservation.id_reservation
             AND rent_flow.id_house = reservation.id_house
             AND rent_flow.id_client = id_tenant
-            AND dim_offer.status = 'Aprovada'
+            AND dim_offer.status IN ('Aprovada', 'ACCEPTED')
             AND reservation.ts_created BETWEEN
                 COALESCE(dim_house_listing_house.ts_listing_version_start, '1900-01-01')
                 AND COALESCE(dim_house_listing_house.ts_listing_version_end, NOW())
