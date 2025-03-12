@@ -32,6 +32,10 @@ workflow:
     - sla_theme_detail
     csat:
     - tickets
+    tickets_backlog:
+    - sla_journey
+    - sla_theme
+    - sla_theme_detail
   tables_customization:
     calls:
       z_order_by: [id_task, id_reservation]
@@ -53,6 +57,8 @@ workflow:
       z_order_by: [theme]
     sla_theme_detail:
       z_order_by: [theme_detail]
+    tickets_backlog:
+      merge_on: [id_ticket, dt_snapshot]
 cluster:
   type: custom_cluster
   custom_configurations:
