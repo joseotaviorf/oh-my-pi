@@ -3,10 +3,8 @@ dag:
   schedule_start_date: 2020,07,01
   owner: Data ForRent
 workflow:
-  type: query_delta
+  type: query
   layer: metric
-  custom_schema: rent
-  bucket_config_name: 5a-business-metrics-com-br-prod
 cluster:
   type: databricks_12_2_med_2xlarge_general_photon_cluster
   access_control_list:
