@@ -68,16 +68,6 @@ front_tickets_list AS (
     AND ( (ft.channel = 'chat' AND ft.direction = 'inbound')
         OR (ft.ticket_origin IN ('call inbound', 'call in app')) )
 ),
-tbl_completion_reason AS (
-  SELECT
-    fs.sk_ticket,
-    MAX(CASE WHEN fs.completion_reason = 'task idled' THEN 1 ELSE 0 END) AS flag_last_completion_reason_idled
-  FROM
-    dw_customer_support.fact_segment AS fs
-  WHERE
-    fs.is_last_segment = True
-  GROUP BY ALL
-),
 recontact_check AS (
   SELECT
     rc.sk_ticket,
@@ -95,14 +85,14 @@ recontact_check AS (
     theme,
     theme_detail,
     CASE
-    WHEN rc.days_since_last_contact <= 3 AND rc.team IN ('CX Expert') THEN recontact_flag
-    WHEN rc.days_since_last_contact <= 1 AND rc.team IN ('Rental Manager', 'Rental Manager Gold') THEN recontact_flag
-    ELSE 0
-  END AS recontact_flag,
+      WHEN rc.days_since_last_contact <= 3 AND rc.team IN ('CX Expert') THEN recontact_flag
+      WHEN rc.days_since_last_contact <= 1 AND rc.team IN ('Rental Manager', 'Rental Manager Gold') THEN recontact_flag
+      ELSE 0
+    END AS recontact_flag,
     sk_ticket_previous_contact,
     ts_started_previous_contact,
     previous_contact_channel,
-    COALESCE(flag_last_completion_reason_idled,0) AS flag_last_completion_reason_idled,
+    0 AS flag_last_completion_reason_idled,
     previous_contact_taxonomy,
     csat_score,
     previous_contact_csat,

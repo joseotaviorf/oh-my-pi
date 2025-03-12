@@ -3399,7 +3399,6 @@ bietlejuice.metric_ss__tickets:
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
@@ -3595,7 +3594,6 @@ bietlejuice.reverse_tracksale:
 bietlejuice.reverse_webhelp:
   - bietlejuice.bigfone:load-clean-call
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-channel
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
