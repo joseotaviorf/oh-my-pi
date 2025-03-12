@@ -489,7 +489,6 @@ table_block_list:
   - BypassTerm_AUD
   - FinancialData
   - MapRegiao
-  - RegionConfig
   - HouseAgent
   - HouseAgent_AUD
   - PreferredFixedAgent
