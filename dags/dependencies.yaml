@@ -1588,6 +1588,7 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.enrich_prospect_status:load-enrich-buyer-prospect-status
   - bietlejuice.enrich_prospect_status:load-enrich-tenant-prospect-status
+  - bietlejuice.enrich_rental_transact:load-enrich-offer
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow

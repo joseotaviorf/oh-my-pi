@@ -246,7 +246,7 @@ rent_offer_attribution AS (
     roce.event_name,
     roce.id_booking,
     roce.id_offer,
-    off.id_firestore,
+    COALESCE(off.id_firestore, rto.id_firestore) AS id_firestore,
     roce.id_house,
     roce.id_region,
     roce.id_prospect,
@@ -305,25 +305,19 @@ rent_offer_attribution AS (
     LEFT JOIN 
       datalake_offer.offer AS off 
         ON (roce.id_offer = off.id_offer_context)
+    LEFT JOIN    
+      datalake_rental_transact.offer rto 
+        ON (off.id_offer_rental_transact = rto.id_offer) 
     LEFT JOIN 
       rent_offer_from_amplitude AS aos 
-        ON (off.id_firestore = aos.id_firestore)
-        AND (
-          (roce.id_prospect = aos.id_user)
-          OR (roce.id_house = aos.id_house)
-        )
-        AND (
-          CAST(aos.ts_event AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        )
+        ON (COALESCE(off.id_firestore, rto.id_firestore) = aos.id_firestore)
+        AND ((roce.id_prospect = aos.id_user) OR (roce.id_house = aos.id_house))
+        AND (CAST(aos.ts_event AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}'))
     LEFT JOIN 
       datalake_tracked_events.attribution_cross_channel AS acc 
-        ON (off.id_firestore = acc.id_firestore)
-        AND (
-          acc.event_name in ('offer_submitted', 'offer_submitted_new')
-        )
-        AND (
-          CAST(acc.ts_event AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        )
+        ON (COALESCE(off.id_firestore, rto.id_firestore) = acc.id_firestore)
+        AND (acc.event_name in ('offer_submitted', 'offer_submitted_new'))
+        AND (CAST(acc.ts_event AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}'))
   WHERE
     roce.id_event_type = 3
     AND roce.business_context = 'rent'
