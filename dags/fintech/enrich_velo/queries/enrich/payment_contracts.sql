@@ -150,9 +150,10 @@ deliquency AS (
     FROM
         datalake_rental_guarantee_platform_clean.delinquency
     WHERE
-        id_type IN (0,4, 5, 6)
+        id_type IN (0, 4, 5, 6)
         AND id_propose > 0
         AND is_active
+        AND id_status <> 7
 ),
 raw_asaas AS (
     WITH table_to_fix AS (
