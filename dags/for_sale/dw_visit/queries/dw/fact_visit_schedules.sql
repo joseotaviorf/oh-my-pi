@@ -44,6 +44,12 @@ SELECT
   COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_completed,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_completed,
   COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_canceled,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_canceled,
   COALESCE(CAST(REPLACE(SUBSTRING(ts_schedule_unsuccessful,1, 10),'-','') AS BIGINT), -1) AS sk_schedule_unsuccessful,
+  ts_schedule_created,
+  ts_schedule_confirmed,
+  ts_schedule_completed,
+  ts_schedule_canceled,
+  ts_schedule_unsuccessful,
+  ts_schedule_rescheduled,
   NOW() AS ts_load
 FROM
   datalake_visit.visit_schedules AS es

@@ -88,6 +88,42 @@ columns:
     description: Date of the canceled of the visit. (If applicable)
     lineage:
         - datalake_visit.visits.ts_visit_canceled
+  ts_visit_requested:
+    description: Requested timestamp of the visit.
+    lineage:
+        - datalake_visit.visits.ts_visit_requested
+  ts_visit_created:
+    description: Timestamp of visit creation, its first event.
+    lineage:
+        - datalake_visit.visits.ts_created
+  ts_visit_local_tz:
+    description: Timestamp of the visit.
+    lineage:
+        - datalake_visit.visits.ts_visit_local_tz
+  ts_first_visit_confirmed:
+    description: Timestamp of the first visit confirmed.
+    lineage:
+        - datalake_visit.visit_status_events.ts_event_created
+  ts_last_visit_confirmed:
+    description: Timestamp of the last visit confirmed.
+    lineage:
+        - datalake_visit.visit_status_events.ts_event_created
+  ts_first_visit_rescheduled:
+    description: Timestamp of the first visit rescheduled.
+    lineage:
+        - datalake_visit.visit_status_events.ts_event_created
+  ts_last_visit_reschedule:
+    description: Timestamp of the last visit rescheduled.
+    lineage:
+        - datalake_visit.visit_status_events.ts_event_created
+  ts_visit_done:
+    description: Timestamp of the end of the visit.
+    lineage:
+        - datalake_visit.visits.ts_visit_done
+  ts_visit_canceled:
+    description: Timestamp of the visit cancellation (if applicable).
+    lineage:
+        - datalake_visit.visits.ts_visit_canceled  
   nbr_reschedule:
     description: Number of reschedules.
     lineage:
@@ -108,6 +144,10 @@ columns:
     description: If the visit is completed.
     lineage:
       - datalake_visit.visits.is_completed
+  is_registered:
+    description: If the visit was registered by the agent.
+    lineage:
+      - datalake_visit.visits.is_registered
   is_reschedule:
     description: If the visit is reschedule.
     lineage:

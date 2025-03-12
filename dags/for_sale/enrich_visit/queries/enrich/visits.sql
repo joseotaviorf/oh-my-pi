@@ -132,6 +132,7 @@ SELECT
     DATEDIFF(HOUR, visit_log.ts_first_event, visit_log.ts_visit_supply_answer) AS hours_waiting_for_answers,
     DATEDIFF(DAY, visit_log.ts_first_event, visit_log.ts_visit_supply_answer) AS days_waiting_for_answers,
     visit_log.ts_visit_confirmed IS NOT NULL AS is_confirmed,
+    visit_log.ts_visit_registered IS NOT NULL AS is_registered,
     visit.computed_status = 'DONE'  AS is_completed,
     IF(nbr_reschedule >= 1, TRUE, FALSE) AS is_reschedule,
     visit.status = 'Canceled' AS is_canceled,

@@ -119,6 +119,8 @@ columns:
     description: Days until receive the answers.
   is_confirmed:
     description: If the visit was confirmed by all.
+  is_registered:
+    description: If the visit was registered by the agent.
   is_completed:
     description: If the visit is completed.
   is_reschedule:

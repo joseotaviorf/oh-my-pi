@@ -187,6 +187,8 @@ columns:
     description:
       If the schedule was unsuccessful.
   sk_schedule_created:
+    lineage:
+      - datalake_visit.visit_schedules.ts_schedule_created
     description:
       Sk with the creation date.
   sk_schedule_confirmed:
@@ -209,6 +211,36 @@ columns:
       - datalake_visit.visit_schedules.ts_schedule_unsuccessful
     description:
       Sk with the unsuccessful date.
+  ts_schedule_created:
+    lineage:
+      - datalake_visit.visit_schedules.ts_schedule_created
+    description:
+      Timestamp of the creation date.
+  ts_schedule_confirmed:
+    lineage:
+      - datalake_visit.visit_schedules.ts_schedule_confirmed
+    description:
+      Timestamp of the schedule confirmed.
+  ts_schedule_completed:
+    lineage:
+      - datalake_visit.visit_schedules.ts_schedule_completed
+    description:
+      Timestamp of the schedule completed.
+  ts_schedule_canceled:
+    lineage:
+      - datalake_visit.visit_schedules.ts_schedule_canceled
+    description:
+      Timestamp of the schedule canceled.
+  ts_schedule_unsuccessful:
+    lineage:
+      - datalake_visit.visit_schedules.ts_schedule_unsuccessful
+    description:
+      Timestamp of the unsuccessful schedule.
+  ts_schedule_rescheduled:
+    lineage:
+      - datalake_visit.visit_schedules.ts_schedule_rescheduled
+    description:
+      Timestamp of the reschedule.
   ts_load:
     description:
       Timestamp of the load of the table.
