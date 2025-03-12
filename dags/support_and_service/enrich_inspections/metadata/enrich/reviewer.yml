@@ -7,30 +7,30 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_reviewer:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.id_reviewer
+      - datalake_inspection_services_clean.reviewer_aud.id_reviewer
     description: Review unique identifier (number)
   id_user:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.id_user
+      - datalake_inspection_services_clean.reviewer_aud.id_user
     description: Id of the user who performed the review
   id_assessment:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.id_assessment
+      - datalake_inspection_services_clean.reviewer_aud.id_assessment
     description: Assessment unique identifier.
   id_previous_assessment:
     lineage:
-      - datalake_inspections_clean.assessment.id_previous_assessment
+      - datalake_inspection_services_clean.assessment.id_previous_assessment
     description:
       If there was any previous assessment for the same contract, it will
       be indicated in this column. Usually references an assessment from an onboarding
       or contestation inspection.
   id_inspection:
     lineage:
-      - datalake_inspections_clean.assessment.id_inspection
+      - datalake_inspection_services_clean.assessment.id_inspection
     description: Inspection unique identifier
   reviewer_type:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.reviewer_type
+      - datalake_inspection_services_clean.reviewer_aud.reviewer_type
     description: The types of reviewers.
     categories:
       OWNER: Owner of the property.
@@ -38,15 +38,15 @@ columns:
       ADMIN: Team of Repair Analysis.
   approval_reason:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.approval_reason
+      - datalake_inspection_services_clean.reviewer_aud.approval_reason
     description: Reason why the reviewer approved or disapproved
   approval_comment:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.approval_comment
+      - datalake_inspection_services_clean.reviewer_aud.approval_comment
     description: Reviewer's comment about approving or disapproving
   approval_type:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.approval_type
+      - datalake_inspection_services_clean.reviewer_aud.approval_type
     description: This field differentiates whether the reviewer came from review, repair analysis, contestation analysis or budget approval
     categories:
       REVIEW: Approval made by the analyst, owner or tenant, after completing the review of the inspection report and the required repairs.
@@ -54,39 +54,39 @@ columns:
       CONTESTATION_ANALYSIS: Approval made by the analyst, after completing the dispute analyzes and new repair requests made by the owner and tenant
   is_approved:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.is_approved
+      - datalake_inspection_services_clean.reviewer_aud.is_approved
     description: Indicates whether the owner completed the review manually
   mod_is_approved:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.mod_is_approved
+      - datalake_inspection_services_clean.reviewer_aud.mod_is_approved
     description: Indicates if the is_approved field has been changed
   dt_limit_revision:
     lineage:
-      - datalake_inspections_clean.assessment.dt_owner_limit_revision
-      - datalake_inspections_clean.assessment.dt_tenant_limit_revision
-    description: Deadline for the person to review the inspection report. 
+      - datalake_inspection_services_clean.assessment.dt_owner_limit_revision
+      - datalake_inspection_services_clean.assessment.dt_tenant_limit_revision
+    description: Deadline for the person to review the inspection report.
       This column only contains this information for tenants and owners
   ts_approved:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.ts_approved
+      - datalake_inspection_services_clean.reviewer_aud.ts_approved
     description: Timestamp of when it was approved
   ts_created:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.ts_created
+      - datalake_inspection_services_clean.reviewer_aud.ts_created
     description: Creation date
   ts_updated:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.ts_updated
+      - datalake_inspection_services_clean.reviewer_aud.ts_updated
     description: Update date
   year:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.year
+      - datalake_inspection_services_clean.reviewer_aud.year
     description: Year of update date.
   month:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.month
+      - datalake_inspection_services_clean.reviewer_aud.month
     description: Month of update date.
   day:
     lineage:
-      - datalake_inspections_clean.reviewer_aud.day
+      - datalake_inspection_services_clean.reviewer_aud.day
     description: Day of update date.

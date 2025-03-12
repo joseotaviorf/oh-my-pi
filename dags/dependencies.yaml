@@ -566,10 +566,10 @@ bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-room
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements
   - bietlejuice.gsheets_support_and_service:done-clean-inspectors-control
-  - bietlejuice.inspections:load-clean-assessment
-  - bietlejuice.inspections:load-clean-contestation
-  - bietlejuice.inspections:load-clean-repair-request
-  - bietlejuice.inspections:load-clean-reviewer
+  - bietlejuice.inspection_services:load-clean-assessment
+  - bietlejuice.inspection_services:load-clean-contestation
+  - bietlejuice.inspection_services:load-clean-repair-request
+  - bietlejuice.inspection_services:load-clean-reviewer
 bietlejuice.dw_invoice_entries:
   - bietlejuice.enrich_invoice:load-enrich-invoice-entries
   - bietlejuice.enrich_invoice:load-enrich-invoice-revenues
@@ -1124,7 +1124,7 @@ bietlejuice.enrich_amplitude_agents_app:
   - bietlejuice.enrich_ebdb_agents:load-enrich-business-context
 bietlejuice.enrich_amplitude_inspections:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.inspections:load-clean-inspection-aud
+  - bietlejuice.inspection_services:load-clean-inspection-aud
 bietlejuice.enrich_amplitude_lead:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.rene_descartes:load-clean-house-lead
@@ -2002,39 +2002,39 @@ bietlejuice.enrich_inspections:
   - bietlejuice.ebdb_visit:load-clean-booking-status-change
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.inspection_services:load-clean-appointment
+  - bietlejuice.inspection_services:load-clean-appointment-aud
+  - bietlejuice.inspection_services:load-clean-assessment
   - bietlejuice.inspection_services:load-clean-assessment-aud
+  - bietlejuice.inspection_services:load-clean-budget
+  - bietlejuice.inspection_services:load-clean-contestation
+  - bietlejuice.inspection_services:load-clean-contestation-media
+  - bietlejuice.inspection_services:load-clean-inspection
+  - bietlejuice.inspection_services:load-clean-inspection-aud
+  - bietlejuice.inspection_services:load-clean-issue-type
   - bietlejuice.inspection_services:load-clean-issue-type-aud
+  - bietlejuice.inspection_services:load-clean-item
   - bietlejuice.inspection_services:load-clean-item-aud
+  - bietlejuice.inspection_services:load-clean-item-group
   - bietlejuice.inspection_services:load-clean-item-group-aud
+  - bietlejuice.inspection_services:load-clean-item-group-type
   - bietlejuice.inspection_services:load-clean-item-group-type-aud
+  - bietlejuice.inspection_services:load-clean-item-issue
   - bietlejuice.inspection_services:load-clean-item-issue-aud
+  - bietlejuice.inspection_services:load-clean-item-media
   - bietlejuice.inspection_services:load-clean-item-media-aud
+  - bietlejuice.inspection_services:load-clean-item-type
   - bietlejuice.inspection_services:load-clean-item-type-aud
+  - bietlejuice.inspection_services:load-clean-repair-request
+  - bietlejuice.inspection_services:load-clean-repair-request-media
+  - bietlejuice.inspection_services:load-clean-review
+  - bietlejuice.inspection_services:load-clean-review-media
+  - bietlejuice.inspection_services:load-clean-reviewer
+  - bietlejuice.inspection_services:load-clean-reviewer-aud
+  - bietlejuice.inspection_services:load-clean-room
   - bietlejuice.inspection_services:load-clean-room-aud
+  - bietlejuice.inspection_services:load-clean-room-type
   - bietlejuice.inspection_services:load-clean-room-type-aud
-  - bietlejuice.inspections:load-clean-appointment
-  - bietlejuice.inspections:load-clean-appointment-aud
-  - bietlejuice.inspections:load-clean-assessment
-  - bietlejuice.inspections:load-clean-budget
-  - bietlejuice.inspections:load-clean-contestation
-  - bietlejuice.inspections:load-clean-contestation-media
-  - bietlejuice.inspections:load-clean-inspection
-  - bietlejuice.inspections:load-clean-inspection-aud
-  - bietlejuice.inspections:load-clean-issue-type
-  - bietlejuice.inspections:load-clean-item
-  - bietlejuice.inspections:load-clean-item-group
-  - bietlejuice.inspections:load-clean-item-group-type
-  - bietlejuice.inspections:load-clean-item-issue
-  - bietlejuice.inspections:load-clean-item-media
-  - bietlejuice.inspections:load-clean-item-type
-  - bietlejuice.inspections:load-clean-repair-request
-  - bietlejuice.inspections:load-clean-repair-request-media
-  - bietlejuice.inspections:load-clean-review
-  - bietlejuice.inspections:load-clean-review-media
-  - bietlejuice.inspections:load-clean-reviewer
-  - bietlejuice.inspections:load-clean-reviewer-aud
-  - bietlejuice.inspections:load-clean-room
-  - bietlejuice.inspections:load-clean-room-type
   - bietlejuice.schedules:load-clean-appointment
   - bietlejuice.schedules:load-clean-appointment-history
   - bietlejuice.terminator:load-clean-termination

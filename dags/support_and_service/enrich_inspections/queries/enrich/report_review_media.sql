@@ -14,9 +14,9 @@ WITH union_medias AS (
         rrm.month,
         rrm.day
     FROM
-        datalake_inspections_clean.repair_request_media AS rrm
+        datalake_inspection_services_clean.repair_request_media AS rrm
     JOIN
-        datalake_inspections_clean.repair_request AS rr
+        datalake_inspection_services_clean.repair_request AS rr
         ON rr.id_repair_request = rrm.id_repair_request
     WHERE
         MAKE_DATE(rrm.year, rrm.month, rrm.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
@@ -36,9 +36,9 @@ WITH union_medias AS (
         cm.month,
         cm.day
     FROM
-        datalake_inspections_clean.contestation_media AS cm
+        datalake_inspection_services_clean.contestation_media AS cm
     JOIN
-        datalake_inspections_clean.contestation AS c
+        datalake_inspection_services_clean.contestation AS c
         ON c.id_contestation = cm.id_contestation
     WHERE
         MAKE_DATE(cm.year, cm.month, cm.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
@@ -63,8 +63,8 @@ SELECT DISTINCT
 FROM
     union_medias AS m
 JOIN
-    datalake_inspections_clean.reviewer AS r
+    datalake_inspection_services_clean.reviewer AS r
         ON r.id_reviewer = m.id_reviewer
 JOIN
-    datalake_inspections_clean.assessment AS a
+    datalake_inspection_services_clean.assessment AS a
         ON a.id_assessment = r.id_assessment

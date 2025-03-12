@@ -7,49 +7,49 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_repair_request:
     lineage:
-      - datalake_inspections_clean.repair_request.id_repair_request
+      - datalake_inspection_services_clean.repair_request.id_repair_request
     description: Repair Request unique identifier (number)
   id_inspection:
     lineage:
-      - datalake_inspections_clean.inspection.id_inspection
+      - datalake_inspection_services_clean.inspection.id_inspection
     description: Inspection identification key.
   id_contract:
     lineage:
-      - datalake_inspections_clean.inspection
+      - datalake_inspection_services_clean.inspection
     description: Contract identification key.
   id_contestation:
     lineage:
-      - datalake_inspections_clean.contestation.id_contestation
+      - datalake_inspection_services_clean.contestation.id_contestation
     description: Identification key of the contestation related to the repair request.
   id_item_group:
     lineage:
-      - datalake_inspections_clean.repair_request.id_item_group
+      - datalake_inspection_services_clean.repair_request.id_item_group
     description: Item Group unique identifier.
   id_room:
     lineage:
-      - datalake_inspections_clean.room.id_room
+      - datalake_inspection_services_clean.room.id_room
     description: Room unique identifier.
   id_assessment:
     lineage:
-      - datalake_inspections_clean.assessment.id_assessment
+      - datalake_inspection_services_clean.assessment.id_assessment
     description: Unique identifier of an Assessment.
   id_requester:
     lineage:
-      - datalake_inspections_clean.repair_request.id_reviewer
+      - datalake_inspection_services_clean.repair_request.id_reviewer
     description: Author of repair request
   id_granted_by:
     lineage:
-      - datalake_inspections_clean.repair_request.id_granted_by
+      - datalake_inspection_services_clean.repair_request.id_granted_by
     description:
       Reviewer who assessed whether a repair was exempted. Being an owner
       or member of AN1
   id_contestation_requester:
     lineage:
-      - datalake_inspections_clean.contestation.id_reviewer
+      - datalake_inspection_services_clean.contestation.id_reviewer
     description: Identification key of the user who made the contestation.
   type:
     lineage:
-      - datalake_inspections_clean.repair_request.type
+      - datalake_inspection_services_clean.repair_request.type
     description: A repair request type.
     categories:
       REPAIR: Make item repair.
@@ -59,23 +59,23 @@ columns:
       OTHER: Other types not listed.
   cost:
     lineage:
-      - datalake_inspections_clean.repair_request.cost
+      - datalake_inspection_services_clean.repair_request.cost
     description: Estimated repair cost
   repair_type:
     lineage:
-      - datalake_inspections_clean.repair_request.type
+      - datalake_inspection_services_clean.repair_request.type
     description:
   comment:
     lineage:
-      - datalake_inspections_clean.repair_request.comment
+      - datalake_inspection_services_clean.repair_request.comment
     description: Commentary detailing the repair needed
   responsibility:
     lineage:
-      - datalake_inspections_clean.repair_request.responsibility
+      - datalake_inspection_services_clean.repair_request.responsibility
     description: Descriptive information indicating who is responsible for the repair request.
   repair_service:
     lineage:
-      - datalake_inspections_clean.repair_request.repair_service
+      - datalake_inspection_services_clean.repair_request.repair_service
     description: Repair service requested
   total_tenant_contestation:
     description: Numerical information indicating the total number of objections made by the tenant during the review.
@@ -99,13 +99,13 @@ columns:
     description: The cost of repair will be absorbed by the owner
   is_exempted:
     lineage:
-      - datalake_inspections_clean.repair_request.is_exempted
+      - datalake_inspection_services_clean.repair_request.is_exempted
     description:
       Indicates whether the repair suggested by the AN1 team was exempted
       by the owner or a analyst
   is_exempted_by_owner_from_budget:
     lineage:
-      - datalake_inspections_clean.repair_request.is_exempted_from_budget
+      - datalake_inspection_services_clean.repair_request.is_exempted_from_budget
     description: Flag that indicates whether the repair request was exempted by the owner in the budget approval stage.
   is_exempted_by_owner:
     description: The repair request was exempted by the owner
@@ -113,41 +113,41 @@ columns:
     description: The repair request was requested by the owner
   is_finished:
     lineage:
-      - datalake_inspections_clean.repair_request.is_finished
+      - datalake_inspection_services_clean.repair_request.is_finished
     description: Repair request ended
   has_automatically_identified:
     lineage:
-      - datalake_inspections_clean.repair_request.has_automatically_identified
+      - datalake_inspection_services_clean.repair_request.has_automatically_identified
     description: Boalean type information that indicates whether the repair was generated automatically.
   has_automatic_identification_accepted:
     lineage:
-      - datalake_inspections_clean.repair_request.has_automatic_identification_accepted
+      - datalake_inspection_services_clean.repair_request.has_automatic_identification_accepted
     description: Boalean type information that indicates whether the automatically generated repair was accepted.
   ts_granted:
     lineage:
-      - datalake_inspections_clean.repair_request.ts_granted
+      - datalake_inspection_services_clean.repair_request.ts_granted
     description:
       Indicates the time at which the repair request exempted assessment
       was made
   ts_created:
     lineage:
-      - datalake_inspections_clean.repair_request.ts_created
+      - datalake_inspection_services_clean.repair_request.ts_created
     description: Record creation date
   ts_updated:
     lineage:
-      - datalake_inspections_clean.repair_request.ts_updated
+      - datalake_inspection_services_clean.repair_request.ts_updated
     description: Record update date
   ts_load:
     description: Date and time when the data was loaded.
   year:
     lineage:
-      - datalake_inspections_clean.repair_request.year
+      - datalake_inspection_services_clean.repair_request.year
     description: Year of update date
   month:
     lineage:
-      - datalake_inspections_clean.repair_request.month
+      - datalake_inspection_services_clean.repair_request.month
     description: Month of update date
   day:
     lineage:
-      - datalake_inspections_clean.repair_request.day
+      - datalake_inspection_services_clean.repair_request.day
     description: Day of update date

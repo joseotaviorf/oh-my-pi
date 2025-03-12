@@ -69,7 +69,7 @@ inspection_appointment_data AS (
         a.month,
         a.day
     FROM
-        datalake_inspections_clean.appointment AS a
+        datalake_inspection_services_clean.appointment AS a
     LEFT JOIN
         datalake_ebdb_clean.booking AS b
           ON a.id_external_appointment = b.id
@@ -122,13 +122,13 @@ main_appointment_data AS (
     FROM
         datalake_ebdb_clean.booking AS b
     LEFT JOIN
-        datalake_inspections_clean.appointment AS a
+        datalake_inspection_services_clean.appointment AS a
           ON b.id = a.id_external_appointment
     LEFT JOIN
         datalake_ebdb_clean.inspection AS i
           ON b.id = i.id_booking
     LEFT JOIN
-        datalake_inspections_clean.inspection AS is
+        datalake_inspection_services_clean.inspection AS is
           ON i.id = is.id_external
     LEFT JOIN
         booking_status AS bs
@@ -182,7 +182,7 @@ inspection_data AS (
         type AS inspection_type,
         ts_updated
     FROM
-        datalake_inspections_clean.inspection
+        datalake_inspection_services_clean.inspection
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
 )

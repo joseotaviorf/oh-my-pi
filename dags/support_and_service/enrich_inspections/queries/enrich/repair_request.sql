@@ -5,9 +5,9 @@ WITH total_contestations AS (
         COUNT(CASE WHEN reviewer_type = 'TENANT' AND origin = 'BUDGET_APPROVAL' THEN 1 END) AS total_tenant_budget_approval_contestation,
         COUNT(CASE WHEN reviewer_type = 'OWNER' AND origin = 'BUDGET_APPROVAL' THEN 1 END) AS total_owner_budget_approval_contestation
     FROM
-        datalake_inspections_clean.contestation AS c
+        datalake_inspection_services_clean.contestation AS c
     LEFT JOIN
-        datalake_inspections_clean.reviewer AS r
+        datalake_inspection_services_clean.reviewer AS r
           ON r.id_reviewer = c.id_reviewer
     GROUP BY 1
 ),
@@ -74,30 +74,30 @@ SELECT
     rr.month,
     rr.day
 FROM
-    datalake_inspections_clean.repair_request AS rr
+    datalake_inspection_services_clean.repair_request AS rr
 LEFT JOIN
-    datalake_inspections_clean.item_group AS ig
+    datalake_inspection_services_clean.item_group AS ig
       ON rr.id_item_group = ig.id_item_group
 LEFT JOIN
-    datalake_inspections_clean.room AS ro
+    datalake_inspection_services_clean.room AS ro
       ON ro.id_room = ig.id_room
 LEFT JOIN
-    datalake_inspections_clean.assessment AS asm
+    datalake_inspection_services_clean.assessment AS asm
       ON asm.id_assessment = ro.id_assessment
 LEFT JOIN
-    datalake_inspections_clean.inspection AS ins
+    datalake_inspection_services_clean.inspection AS ins
       ON ins.id_inspection = asm.id_inspection
 LEFT JOIN
-    datalake_inspections_clean.reviewer AS rev1
+    datalake_inspection_services_clean.reviewer AS rev1
       ON rev1.id_reviewer = rr.id_reviewer
 LEFT JOIN
-    datalake_inspections_clean.reviewer AS rev2
+    datalake_inspection_services_clean.reviewer AS rev2
       ON rev2.id_reviewer = rr.id_granted_by
 LEFT JOIN
     total_contestations AS tc
       ON tc.id_repair_request = rr.id_repair_request
 LEFT JOIN
-    datalake_inspections_clean.contestation AS c
+    datalake_inspection_services_clean.contestation AS c
       ON rr.id_repair_request = c.id_repair_request
 LEFT JOIN
     repair_request_media AS rrm

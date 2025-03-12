@@ -5,7 +5,7 @@ WITH item_type AS (
         it.media_type,
         it.display_type
     FROM
-        datalake_inspections_clean.item_type it
+        datalake_inspection_services_clean.item_type it
     QUALIFY
         it.ts_updated = FIRST(it.ts_updated) OVER(PARTITION BY it.id_item_type ORDER BY it.ts_updated DESC)
 )
@@ -38,7 +38,7 @@ SELECT DISTINCT
     i.month,
     i.day
 FROM
-    datalake_inspections_clean.item i
+    datalake_inspection_services_clean.item i
 LEFT JOIN
     item_type it
         ON i.id_type = it.id_item_type
@@ -46,13 +46,13 @@ LEFT JOIN
     datalake_inspections.item_group ig
         ON i.id_item_group = ig.id_item_group
 LEFT JOIN
-    datalake_inspections_clean.room r
+    datalake_inspection_services_clean.room r
         ON ig.id_room = r.id_room
 LEFT JOIN
-    datalake_inspections_clean.assessment AS a
+    datalake_inspection_services_clean.assessment AS a
         ON r.id_assessment = a.id_assessment
 LEFT JOIN
-    datalake_inspections_clean.inspection AS ih
+    datalake_inspection_services_clean.inspection AS ih
         ON a.id_inspection = ih.id_inspection
 WHERE
     MAKE_DATE(i.year, i.month, i.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

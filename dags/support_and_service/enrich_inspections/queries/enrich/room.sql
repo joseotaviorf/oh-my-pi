@@ -3,7 +3,7 @@ WITH room_type AS (
         rt.id_room_type,
         rt.type AS room_type
     FROM
-        datalake_inspections_clean.room_type rt
+        datalake_inspection_services_clean.room_type rt
     QUALIFY
         rt.ts_updated= FIRST(rt.ts_updated) OVER(PARTITION BY rt.id_room_type ORDER BY rt.ts_updated DESC)
 )
@@ -19,7 +19,7 @@ SELECT
     r.month,
     r.day
 FROM
-    datalake_inspections_clean.room r
+    datalake_inspection_services_clean.room r
 JOIN
     room_type rt
         ON r.id_type = rt.id_room_type

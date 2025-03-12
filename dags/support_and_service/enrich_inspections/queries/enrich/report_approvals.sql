@@ -2,7 +2,7 @@ WITH owner_approvals AS (
     SELECT
         *
     FROM
-        datalake_inspections_clean.reviewer
+        datalake_inspection_services_clean.reviewer
     WHERE
         reviewer_type = 'OWNER'
     QUALIFY
@@ -12,7 +12,7 @@ tenant_approvals AS (
     SELECT
         *
     FROM
-        datalake_inspections_clean.reviewer
+        datalake_inspection_services_clean.reviewer
     WHERE
         reviewer_type = 'TENANT'
     QUALIFY
@@ -22,7 +22,7 @@ assessment AS (
     SELECT
         *
     FROM
-        datalake_inspections_clean.assessment
+        datalake_inspection_services_clean.assessment
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
 ),
@@ -92,7 +92,7 @@ union_reviewer_approvals AS (
         b.month,
         b.day
     FROM
-        datalake_inspections_clean.budget AS b
+        datalake_inspection_services_clean.budget AS b
     LEFT JOIN
         assessment AS a
             ON a.id_inspection = b.id_inspection
@@ -130,7 +130,7 @@ SELECT
 FROM
     union_reviewer_approvals AS ura
 LEFT JOIN
-    datalake_inspections_clean.budget AS b
+    datalake_inspection_services_clean.budget AS b
       ON b.id_inspection = ura.id_inspection
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY ura.id_inspection ORDER BY ura.ts_updated DESC) = 1

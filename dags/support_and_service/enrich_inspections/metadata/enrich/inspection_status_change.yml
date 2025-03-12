@@ -7,95 +7,95 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspection:
     lineage:
-      - datalake_inspections_clean.inspection_aud.id_inspection
+      - datalake_inspection_services_clean.inspection_aud.id_inspection
     description: Unique id to identify a inspection
   ts_pending_appointment:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Inspection awaiting scheduling [onboarding/offboarding]
   ts_scheduled:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Inspection scheduled and awaiting execution [onboarding/offboarding]
   ts_received:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Inspection sent by the inspector, waiting for synchronization with the Main [offboarding]
   ts_processing:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Survey has been received and will be performed by the surveyor [onboarding]
   ts_cancelled:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. The inspection was canceled (see the appointment table for the reason)
   ts_sent_to_review:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Indicates that the owner and tenant are able to do their reviews [onboarding]
   ts_review_started:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. When the owner or/and the tenant makes a comment [onboarding]
   ts_sent_to_inspection_editing:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Inspection at the report editing stage [offboarding]
   ts_automatic_repair_processing:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Inspection at the automatic repair identification stage [offboarding]
   ts_sent_to_repair_analysis:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. The inspection was sent to the analysis team to identify the need for repairs to the house
   ts_sent_to_owner_review:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Review available for owner review
   ts_review_started_by_owner:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Survey whose owner has already done some intervention
   ts_sent_to_tenant_review:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Survey available for tenant review
   ts_review_started_by_tenant:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Survey whose tenant has already done some intervention
   ts_sent_to_contestation_analysis:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. The inspection was sent to the analysis team, to evaluate the PP/IQ contestation
   ts_contestation_analysis_finished:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Inspection completed the contestation analysis stage
   ts_budget_approval:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Inspection at the budget approval stage
   ts_budget_approval_sent_to_owner:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Budget approval stage quote sent to the owner.
   ts_budget_approval_started_by_owner:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Inspection at the owner's review stage in the budget generated by budget approval
   ts_budget_approval_sent_to_tenant:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. The inspection was sent to the analysis team, to evaluate the PP/IQ contestation
   ts_budget_approval_started_by_tenant:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp. Budget approval quote sent to tenant.
   ts_reviewed:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: |
       Timestamp.
       In offboarding: Survey sent to the Operations team to validate interventions proposed by owner/tenant

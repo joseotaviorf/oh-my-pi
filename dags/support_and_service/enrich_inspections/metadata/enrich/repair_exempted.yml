@@ -7,25 +7,25 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_repair_request:
     lineage:
-      - datalake_inspections_clean.repair_request.id_repair_request
+      - datalake_inspection_services_clean.repair_request.id_repair_request
     description: Repair Request unique identifier (number)
   id_granted_by:
     lineage:
-      - datalake_inspections_clean.repair_request.id_granted_by
+      - datalake_inspection_services_clean.repair_request.id_granted_by
     description:
       Reviewer who assessed whether a repair was exempted. Being an owner
       or member of AN1
   exemption_granted_by:
     lineage:
-      - datalake_inspections_clean.reviewer.reviewer_type
+      - datalake_inspection_services_clean.reviewer.reviewer_type
     description: The types of reviewers.
   responsibility:
     lineage:
-      - datalake_inspections_clean.repair_request.responsibility
+      - datalake_inspection_services_clean.repair_request.responsibility
     description: Indicates who will be responsible for the repair, as well as whether QuintoAndar will absorb a repair
   is_exempted:
     lineage:
-      - datalake_inspections_clean.repair_request.is_exempted
+      - datalake_inspection_services_clean.repair_request.is_exempted
     description:
       Indicates whether the repair suggested by the AN1 team was exempted
       by the owner or a member of AN1
@@ -33,19 +33,19 @@ columns:
     description: When the analyst exempts the repair request, this means that the request was improper.
   ts_granted:
     lineage:
-      - datalake_inspections_clean.repair_request.ts_granted
+      - datalake_inspection_services_clean.repair_request.ts_granted
     description:
       Indicates the time at which the repair request exempted assessment
       was made
   year:
     lineage:
-      - datalake_inspections_clean.repair_request.year
+      - datalake_inspection_services_clean.repair_request.year
     description: Year of grant date
   month:
     lineage:
-      - datalake_inspections_clean.repair_request.month
+      - datalake_inspection_services_clean.repair_request.month
     description: Month of grant date
   day:
     lineage:
-      - datalake_inspections_clean.repair_request.day
+      - datalake_inspection_services_clean.repair_request.day
     description: Day of grant date

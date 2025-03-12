@@ -25,12 +25,12 @@ SELECT DISTINCT
     c.month,
     c.day
 FROM
-    datalake_inspections_clean.contestation AS c
+    datalake_inspection_services_clean.contestation AS c
 LEFT JOIN
     contestation_media AS cm
         ON cm.id_contestation = c.id_contestation
 LEFT JOIN
-    datalake_inspections_clean.reviewer AS r
+    datalake_inspection_services_clean.reviewer AS r
         ON r.id_reviewer = c.id_reviewer
 WHERE
     MAKE_DATE(c.year, c.month, c.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

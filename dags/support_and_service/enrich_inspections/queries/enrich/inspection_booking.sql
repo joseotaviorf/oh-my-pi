@@ -3,7 +3,7 @@ WITH union_inspection_history AS (
         SELECT
             *
         FROM
-            datalake_inspections_clean.inspection_aud AS ia
+            datalake_inspection_services_clean.inspection_aud AS ia
         QUALIFY
             ia.ts_updated = FIRST(ia.ts_updated) OVER (PARTITION BY ia.id_inspection ORDER BY ia.ts_updated DESC)
     )
@@ -34,7 +34,7 @@ WITH union_inspection_history AS (
     FROM
         last_inspection_update AS i
     LEFT JOIN
-        datalake_inspections_clean.appointment AS a
+        datalake_inspection_services_clean.appointment AS a
           ON i.id_inspection = a.id_inspection
     UNION
     SELECT
@@ -175,7 +175,7 @@ SELECT DISTINCT
 FROM
     union_inspection_history AS i
 LEFT JOIN
-    datalake_inspections_clean.assessment AS a
+    datalake_inspection_services_clean.assessment AS a
         ON a.id_inspection = i.id_inspection
 LEFT JOIN
     inspection_contract AS ic

@@ -10,59 +10,59 @@ columns:
   id_item:
     description: Item unique identifier.
     lineage:
-      - datalake_inspections_clean.item.id_item
+      - datalake_inspection_services_clean.item.id_item
   id_previous_item:
     description:
       If there is a previous evaluation for the item in the same contract, it will be indicated
       in this column. It is usually completed in offboarding inspections, bringing information from
       the onboarding or dispute inspection.
     lineage:
-      - datalake_inspections_clean.item.id_previous_item
+      - datalake_inspection_services_clean.item.id_previous_item
   id_item_type:
     description: Item Type unique identifier.
     lineage:
-      - datalake_inspections_clean.item_type.id_item_type
+      - datalake_inspection_services_clean.item_type.id_item_type
   id_item_group:
     description: Item Group unique identifier.
     lineage:
-      - datalake_inspections_clean.item.id_item_group
+      - datalake_inspection_services_clean.item.id_item_group
   id_external_item:
     description: Item correlational unique identifier in the PWA database.
     lineage:
-      - datalake_inspections_clean.item.id_main
+      - datalake_inspection_services_clean.item.id_main
   id_room:
     description: Room unique identifier.
     lineage:
-      - datalake_inspections_clean.room.id_room
+      - datalake_inspection_services_clean.room.id_room
   id_assessment:
     description: Unique identifier of an Assessment.
       This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
       This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the id_inspection will not be unique.
       It is observed that the extra Assessments are identical, with no data distinction between them.
     lineage:
-      - datalake_inspections_clean.room.id_assessment
+      - datalake_inspection_services_clean.room.id_assessment
   id_inspection:
     description: Inspection unique identifier.
     lineage:
-      - datalake_inspections_clean.inspection.id_inspection
+      - datalake_inspection_services_clean.inspection.id_inspection
   id_inspector:
     description: Unique identifier of the inspector responsible for carrying out the inspection.
     lineage:
-      - datalake_inspections_clean.inspection.id_inspector
+      - datalake_inspection_services_clean.inspection.id_inspector
   uuid:
     description: Item unique identifier (uuid).
     lineage:
-      - datalake_inspections_clean.item.uuid
+      - datalake_inspection_services_clean.item.uuid
   item_type:
     description: Item problem name.
     lineage:
-      - datalake_inspections_clean.item_type.type
+      - datalake_inspection_services_clean.item_type.type
   media_type:
     description: Supported media type.
     categories:
       PHOTO: images
     lineage:
-      - datalake_inspections_clean.item_type.media_type
+      - datalake_inspection_services_clean.item_type.media_type
   display_type:
     description: Shows the component that renders this type of problems.
     categories:
@@ -75,11 +75,11 @@ columns:
       OVERVIEW_WITH_CONDITIONS: overview with option to record conditions.
       DEFAULT: overview with comment option.
     lineage:
-      - datalake_inspections_clean.item_type.display_type
+      - datalake_inspection_services_clean.item_type.display_type
   room_name:
     description: Descriptive name of the room (typed by inspector).
     lineage:
-      - datalake_inspections_clean.room.room_name
+      - datalake_inspection_services_clean.room.room_name
   item_group_name:
     description: Description of the item group, for example floor, paint, lighting, etc. (typed by inspector).
     lineage:
@@ -91,32 +91,32 @@ columns:
   comment:
     description: Displays a inspector's comment.
     lineage:
-      - datalake_inspections_clean.item.comment
+      - datalake_inspection_services_clean.item.comment
   is_present:
     description: Indicates if the issue checklist item was checked by the inspector.
     lineage:
-      - datalake_inspections_clean.item.is_present
+      - datalake_inspection_services_clean.item.is_present
   count:
     description: Indicates the number of parts with problems.
     lineage:
-      - datalake_inspections_clean.item.count
+      - datalake_inspection_services_clean.item.count
   ts_created:
     description: Creation date and time.
     lineage:
-      - datalake_inspections_clean.item.ts_created
+      - datalake_inspection_services_clean.item.ts_created
   ts_updated:
     description: Update date and time.
     lineage:
-      - datalake_inspections_clean.item.ts_updated
+      - datalake_inspection_services_clean.item.ts_updated
   year:
     description: Year referring to date of update.
     lineage:
-      - datalake_inspections_clean.item.year
+      - datalake_inspection_services_clean.item.year
   month:
     description: Month referring to date of update.
     lineage:
-      - datalake_inspections_clean.item.month
+      - datalake_inspection_services_clean.item.month
   day:
     description: Day referring to date of update.
     lineage:
-      - datalake_inspections_clean.item.day
+      - datalake_inspection_services_clean.item.day

@@ -23,9 +23,9 @@ SELECT
     r.month,
     r.day
 FROM
-    datalake_inspections_clean.review r
+    datalake_inspection_services_clean.review r
 LEFT JOIN
-    datalake_inspections_clean.review_media rm
+    datalake_inspection_services_clean.review_media rm
         ON rm.id_review = r.id_review
 JOIN
     datalake_inspections.item i

@@ -3,7 +3,7 @@ WITH item_group_type AS (
         igt.id_item_group_type,
         igt.type AS item_group_type
     FROM
-        datalake_inspections_clean.item_group_type igt
+        datalake_inspection_services_clean.item_group_type igt
     QUALIFY
         igt.ts_updated = FIRST(igt.ts_updated) OVER(PARTITION BY igt.id_item_group_type ORDER BY igt.ts_updated DESC)
 )
@@ -22,7 +22,7 @@ SELECT
     ig.month,
     ig.day
 FROM
-    datalake_inspections_clean.item_group AS ig
+    datalake_inspection_services_clean.item_group AS ig
 JOIN
     item_group_type AS igt
         ON ig.id_type = igt.id_item_group_type

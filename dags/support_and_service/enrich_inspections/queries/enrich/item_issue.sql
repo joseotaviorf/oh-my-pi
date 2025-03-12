@@ -4,7 +4,7 @@ WITH issue_type AS (
         it.type AS issue_type,
         it.repair_suggestion
     FROM
-        datalake_inspections_clean.issue_type it
+        datalake_inspection_services_clean.issue_type it
     QUALIFY
         it.ts_updated = FIRST(it.ts_updated) OVER(PARTITION BY it.id_issue_type ORDER BY it.ts_updated DESC)
 )
@@ -33,7 +33,7 @@ SELECT
     ii.month,
     ii.day
 FROM
-    datalake_inspections_clean.item_issue AS ii
+    datalake_inspection_services_clean.item_issue AS ii
 JOIN
     issue_type AS it
         ON ii.id_type = it.id_issue_type

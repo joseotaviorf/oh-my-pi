@@ -13,9 +13,9 @@ SELECT DISTINCT
     rr.month,
     rr.day
 FROM
-    datalake_inspections_clean.repair_request AS rr
+    datalake_inspection_services_clean.repair_request AS rr
 LEFT JOIN
-    datalake_inspections_clean.reviewer AS r
+    datalake_inspection_services_clean.reviewer AS r
         ON r.id_reviewer = rr.id_granted_by
 WHERE
     MAKE_DATE(rr.year, rr.month, rr.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

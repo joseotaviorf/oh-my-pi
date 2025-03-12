@@ -16,7 +16,7 @@ SELECT
     im.month,
     im.day
 FROM
-    datalake_inspections_clean.item_media im
+    datalake_inspection_services_clean.item_media im
 JOIN
     datalake_inspections.item i
         ON i.id_item = im.id_item

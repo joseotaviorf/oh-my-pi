@@ -4,7 +4,7 @@ WITH status AS (
         ia.status,
         ia.ts_updated
     FROM
-        datalake_inspections_clean.inspection_aud AS ia
+        datalake_inspection_services_clean.inspection_aud AS ia
 ),
 pivot_status AS (
     SELECT

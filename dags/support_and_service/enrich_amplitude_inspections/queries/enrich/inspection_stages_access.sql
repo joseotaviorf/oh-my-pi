@@ -10,7 +10,7 @@ WITH inspections AS (
         month,
         day
     FROM
-        datalake_inspections_clean.inspection_aud AS ia
+        datalake_inspection_services_clean.inspection_aud AS ia
     WHERE
         DATE(ia.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     QUALIFY

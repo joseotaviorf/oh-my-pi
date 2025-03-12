@@ -7,19 +7,19 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspection:
     lineage:
-      - datalake_inspections_clean.inspection_aud.id_inspection
+      - datalake_inspection_services_clean.inspection_aud.id_inspection
     description: Unique id to identify a inspection.
   id_client_side:
     lineage:
-      - datalake_inspections_clean.inspection_aud.id_client_side
+      - datalake_inspection_services_clean.inspection_aud.id_client_side
     description: Inspection unique identifier (uuid)
   id_contract:
     lineage:
-      - datalake_inspections_clean.inspection_aud.id_contract
+      - datalake_inspection_services_clean.inspection_aud.id_contract
     description: Unique identifier of the contract related to the property to be inspected.
   inspection_type:
     lineage:
-      - datalake_inspections_clean.inspection_aud.inspection_type
+      - datalake_inspection_services_clean.inspection_aud.inspection_type
     description: The type of inspection.
   total_owner_access_review:
     description: Number of times the owner accessed the inspection report review home page
@@ -71,9 +71,9 @@ columns:
     description: Date in timestamp format indicating when the tenant last accessed the budget approval event home page.
   ts_inspection_created:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_created
+      - datalake_inspection_services_clean.inspection_aud.ts_created
     description: Timestamp of when the inspection request was synchronized in the database product.
   ts_inspection_updated:
     lineage:
-      - datalake_inspections_clean.inspection_aud.ts_updated
+      - datalake_inspection_services_clean.inspection_aud.ts_updated
     description: Timestamp of when the inspection request was updated in the database product.

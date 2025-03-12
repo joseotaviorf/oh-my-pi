@@ -44,10 +44,10 @@ SELECT
 FROM
     datalake_inspections.reviewer AS r
 LEFT JOIN
-    datalake_inspections_clean.repair_request AS rr
+    datalake_inspection_services_clean.repair_request AS rr
         ON rr.id_reviewer = r.id_reviewer
 LEFT JOIN
-    datalake_inspections_clean.contestation AS c
+    datalake_inspection_services_clean.contestation AS c
         ON c.id_reviewer = r.id_reviewer
 LEFT JOIN
     repair_exempted AS re

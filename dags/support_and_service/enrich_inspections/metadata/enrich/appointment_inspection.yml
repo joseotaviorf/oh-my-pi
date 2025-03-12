@@ -9,25 +9,25 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_appointment:
     lineage:
-      - datalake_inspections_clean.appointment.id_appointment
+      - datalake_inspection_services_clean.appointment.id_appointment
       - datalake_ebdb_clean.booking.id
     description: scheduling identification key in hash format that groups the main and IS ids.
   id_is_appointment:
     lineage:
-      - datalake_inspections_clean.appointment.id_appointment
+      - datalake_inspection_services_clean.appointment.id_appointment
     description: Unique scheduling identification key in IS.
   id_main_appointment:
     lineage:
-      - datalake_inspections_clean.appointment.id_external_appointment
+      - datalake_inspection_services_clean.appointment.id_external_appointment
       - datalake_ebdb_clean.booking.id
     description: Identification key for scheduling the inspection on the main.
   id_inspection:
     lineage:
-      - datalake_inspections_clean.appointment.id_inspection
+      - datalake_inspection_services_clean.appointment.id_inspection
     description: Inspection identification key in IS.
   id_inspector:
     lineage:
-      - datalake_inspections_clean.appointment.id_inspector
+      - datalake_inspection_services_clean.appointment.id_inspector
     description: Inspector identification key in IS.
   type:
     lineage:
@@ -36,7 +36,7 @@ columns:
     description: Descriptive information indicating the status of the inspection schedule.
   status:
     lineage:
-      - datalake_inspections_clean.appointment.status
+      - datalake_inspection_services_clean.appointment.status
       - datalake_ebdb_clean.booking.status
     description: Descriptive information indicating the status of the inspection schedule.
   status_made_by:
@@ -51,12 +51,12 @@ columns:
     description: Descriptive information detailing the category_name field.
   cancellation_reason:
     lineage:
-      - datalake_inspections_clean.appointment.cancellation_reason
+      - datalake_inspection_services_clean.appointment.cancellation_reason
       - datalake_ebdb_clean.booking.cancellation_reason
     description: Descriptive information indicating the reason for canceling the inspection appointment.
   observation:
     lineage:
-      - datalake_inspections_clean.appointment.observation
+      - datalake_inspection_services_clean.appointment.observation
     description: Descriptive information about the observation left when scheduling the inspection.
   source:
     description: Descriptive information indicating the source of the scheduling record.
@@ -70,7 +70,7 @@ columns:
     description: Integer information indicating how long the surveyor's appointment was scheduled.
   is_fixed_agent:
     lineage:
-      - datalake_inspections_clean.appointment.is_fixed_agent
+      - datalake_inspection_services_clean.appointment.is_fixed_agent
     description: Boolean information indicating whether the surveyor is fixed.
   is_confirmed:
     lineage:
@@ -86,55 +86,55 @@ columns:
     description: Boolean information indicating whether the appointment was cancelled by the inspector.
   ts_appointment_inspected_utc:
     lineage:
-      - datalake_inspections_clean.appointment.dt_scheduled
+      - datalake_inspection_services_clean.appointment.dt_scheduled
       - datalake_ebdb_clean.booking.ts_booking_utc
       - datalake_schedules_clean.appointment.slot_of_day
       - datalake_ebdb_clean.booking.slot_day
     description: Timestamp (UTC) information indicating the date and time the inspection was carried out.
   ts_appointment_inspected_local_tz:
     lineage:
-      - datalake_inspections_clean.appointment.dt_scheduled
+      - datalake_inspection_services_clean.appointment.dt_scheduled
       - datalake_ebdb_clean.booking.ts_booking_utc
     description: Timestamp (Local Timezone) information indicating the date and time the inspection was carried out.
   ts_appointment_created_utc:
     lineage:
-      - datalake_inspections_clean.appointment.ts_created
+      - datalake_inspection_services_clean.appointment.ts_created
       - datalake_ebdb_clean.booking.ts_created
     description: Timestamp(UTC) information indicating when the inspection schedule was created.
   ts_appointment_updated_utc:
     lineage:
-      - datalake_inspections_clean.appointment.ts_updated
+      - datalake_inspection_services_clean.appointment.ts_updated
       - datalake_ebdb_clean.booking.ts_updated
     description: Timestamp (UTC) information indicating when the inspection schedule was updated.
   ts_appointment_created_local_tz:
     lineage:
-      - datalake_inspections_clean.appointment.ts_created
+      - datalake_inspection_services_clean.appointment.ts_created
       - datalake_ebdb_clean.booking.ts_created_local_tz
     description: Timestamp (Local Timezone) information indicating when the inspection schedule was created.
   ts_appointment_updated_local_tz:
     lineage:
-      - datalake_inspections_clean.appointment.ts_updated
+      - datalake_inspection_services_clean.appointment.ts_updated
       - datalake_ebdb_clean.booking.ts_updated
     description: Timestamp (Local Timezone) information indicating when the inspection schedule was updated.
   ts_first_appointment_cancelled_utc:
     lineage:
-      - datalake_inspections_clean.appointment.ts_updated
+      - datalake_inspection_services_clean.appointment.ts_updated
       - datalake_ebdb_clean.booking.ts_first_canceled_unevaluated
     description: Timestamp (UTC) information indicating when the inspection schedule was cancelled.
   ts_first_appointment_cancelled_local_tz:
     lineage:
-      - datalake_inspections_clean.appointment.ts_updated
+      - datalake_inspection_services_clean.appointment.ts_updated
       - datalake_ebdb_clean.booking.ts_first_canceled_unevaluated_local_tz
     description: Timestamp (Local Timezone) information indicating when the inspection schedule was cancelled.
   year:
     lineage:
-      - datalake_inspections_clean.appointment.ts_updated
+      - datalake_inspection_services_clean.appointment.ts_updated
     description: Year referring to date of update.
   month:
     lineage:
-      - datalake_inspections_clean.appointment.ts_updated
+      - datalake_inspection_services_clean.appointment.ts_updated
     description: Month referring to date of update.
   day:
     lineage:
-      - datalake_inspections_clean.appointment.ts_updated
+      - datalake_inspection_services_clean.appointment.ts_updated
     description: Day referring to date of update.

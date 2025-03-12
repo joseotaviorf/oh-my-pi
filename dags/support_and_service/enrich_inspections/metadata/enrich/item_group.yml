@@ -10,27 +10,27 @@ columns:
   id_item_group:
     description: Item Group unique identifier.
     lineage:
-      - datalake_inspections_clean.item_group.id_item_group
+      - datalake_inspection_services_clean.item_group.id_item_group
   id_item_group_type:
     description: Item Group Type unique identifier.
     lineage:
-      - datalake_inspections_clean.item_group_type.id_item_group_type
+      - datalake_inspection_services_clean.item_group_type.id_item_group_type
   id_room:
     description: Room unique identifier.
     lineage:
-      - datalake_inspections_clean.item_group.id_room
+      - datalake_inspection_services_clean.item_group.id_room
   id_main:
     description: Item Group correlational unique identifier in the PWA database.
     lineage:
-      - datalake_inspections_clean.item_group.id_main
+      - datalake_inspection_services_clean.item_group.id_main
   item_group_name:
     description: Description of the item group, for example floor, paint, lighting, etc. (typed by inspector)
     lineage:
-      - datalake_inspections_clean.item_group.name
+      - datalake_inspection_services_clean.item_group.name
   item_group_type:
     description: Name of the object evaluated in the inspection.
     lineage:
-      - datalake_inspections_clean.item_group_type.type
+      - datalake_inspection_services_clean.item_group_type.type
   status:
     description: Indicates the condition of the object for comparative surveys.
     categories:
@@ -38,28 +38,28 @@ columns:
       SAME: Object in the same conditions as the previous inspection.
       REPLACED: Replaced object.
     lineage:
-      - datalake_inspections_clean.item_group.status
+      - datalake_inspection_services_clean.item_group.status
   is_inferior_quality:
     description: Indicates the quality of the object in case of replacement.
     lineage:
-      - datalake_inspections_clean.item_group.is_inferior_quality
+      - datalake_inspection_services_clean.item_group.is_inferior_quality
   ts_created:
     description: Creation date and time.
     lineage:
-      - datalake_inspections_clean.item_group.ts_created
+      - datalake_inspection_services_clean.item_group.ts_created
   ts_updated:
     description: Update date and time.
     lineage:
-      - datalake_inspections_clean.item_group.ts_updated
+      - datalake_inspection_services_clean.item_group.ts_updated
   year:
     description: Year referring to date of update.
     lineage:
-      - datalake_inspections_clean.item_group.year
+      - datalake_inspection_services_clean.item_group.year
   month:
     description: Month referring to date of update.
     lineage:
-      - datalake_inspections_clean.item_group.month
+      - datalake_inspection_services_clean.item_group.month
   day:
     description: Day referring to date of update.
     lineage:
-      - datalake_inspections_clean.item_group.day
+      - datalake_inspection_services_clean.item_group.day

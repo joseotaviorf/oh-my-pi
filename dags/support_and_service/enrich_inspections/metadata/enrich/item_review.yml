@@ -8,28 +8,28 @@ columns:
   id_item:
     description: Item unique identifier.
     lineage:
-      - datalake_inspections_clean.review.id_item
+      - datalake_inspection_services_clean.review.id_item
   id_review:
     description: Review unique identifier.
     lineage:
-      - datalake_inspections_clean.review.id_review
+      - datalake_inspection_services_clean.review.id_review
   id_review_media:
     description: Review Media unique identifier.
     lineage:
-      - datalake_inspections_clean.review_media.id_review_media
+      - datalake_inspection_services_clean.review_media.id_review_media
   id_external_media:
     description: Review media unique identifier in Main monolith.
     lineage:
-      - datalake_inspections_clean.review_media.id_main
+      - datalake_inspection_services_clean.review_media.id_main
   id_user:
     lineage:
-      - datalake_inspections_clean.review.id_user
+      - datalake_inspection_services_clean.review.id_user
     description: Reviewer user unique identifier (number). This field is legacy,
       meaning it is no longer updated. The column that currently contains this
       information is id_reviewer.
   id_reviewer:
     lineage:
-      - datalake_inspections_clean.review.id_reviewer
+      - datalake_inspection_services_clean.review.id_reviewer
     description: Reviewer unique identifier (number)
   id_assessment:
     description: Unique identifier of an Assessment.
@@ -45,48 +45,48 @@ columns:
   uuid:
     description: Item Media unique identifier (uuid)
     lineage:
-      - datalake_inspections_clean.review_media.uuid
+      - datalake_inspection_services_clean.review_media.uuid
   user_type:
     description: Indicates whether the user who reviewed was the tenant or owner.
     lineage:
-      - datalake_inspections_clean.review.user_type
+      - datalake_inspection_services_clean.review.user_type
   user_comment:
     description: Displays a reviewer user comment
     lineage:
-      - datalake_inspections_clean.review.comment
+      - datalake_inspection_services_clean.review.comment
   media_type:
     description: Indicates whether the media is a photo or a video.
     lineage:
-      - datalake_inspections_clean.review_media.type
+      - datalake_inspection_services_clean.review_media.type
   media_path:
     description: Path of the photo in the inspection image bucket.
     lineage:
-      - datalake_inspections_clean.review_media.path
+      - datalake_inspection_services_clean.review_media.path
   ts_media_created:
     description: Media creation date and time.
     lineage:
-      - datalake_inspections_clean.review_media.ts_created
+      - datalake_inspection_services_clean.review_media.ts_created
   ts_media_updated:
     description: Media update date and time.
     lineage:
-      - datalake_inspections_clean.review_media.ts_updated
+      - datalake_inspection_services_clean.review_media.ts_updated
   ts_created:
     description: Creation date and time.
     lineage:
-      - datalake_inspections_clean.review.ts_created
+      - datalake_inspection_services_clean.review.ts_created
   ts_updated:
     description: Update date and time.
     lineage:
-      - datalake_inspections_clean.review.ts_updated
+      - datalake_inspection_services_clean.review.ts_updated
   year:
     description: Year referring to date of update.
     lineage:
-      - datalake_inspections_clean.review.year
+      - datalake_inspection_services_clean.review.year
   month:
     description: Month referring to date of update.
     lineage:
-      - datalake_inspections_clean.review.month
+      - datalake_inspection_services_clean.review.month
   day:
     description: Day referring to date of update.
     lineage:
-      - datalake_inspections_clean.review.day
+      - datalake_inspection_services_clean.review.day

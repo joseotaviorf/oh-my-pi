@@ -7,38 +7,38 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   id_media:
     lineage:
-      - datalake_inspections_clean.contestation_media.id_media
-      - datalake_inspections_clean.repair_request_media.id_media
+      - datalake_inspection_services_clean.contestation_media.id_media
+      - datalake_inspection_services_clean.repair_request_media.id_media
     description: Media internal ID
   id_external_media:
     lineage:
-      - datalake_inspections_clean.repair_request_media.id_external_media
-    description:  Media id in Main monolith
+      - datalake_inspection_services_clean.repair_request_media.id_external_media
+    description: Media id in Main monolith
   id_reviewer:
     lineage:
-      - datalake_inspections_clean.contestation.id_reviewer
-      - datalake_inspections_clean.repair_request.id_reviewer
+      - datalake_inspection_services_clean.contestation.id_reviewer
+      - datalake_inspection_services_clean.repair_request.id_reviewer
     description: Author of media
   id_origin:
     lineage:
-      - datalake_inspections_clean.contestation_media.id_contestation
-      - datalake_inspections_clean.repair_request_media.id_repair_request
-    description: 
-      Identifier of the origin of the media, that is, if the media is from a contestation, 
-      this field will have the ID of the contestation. 
+      - datalake_inspection_services_clean.contestation_media.id_contestation
+      - datalake_inspection_services_clean.repair_request_media.id_repair_request
+    description:
+      Identifier of the origin of the media, that is, if the media is from a contestation,
+      this field will have the ID of the contestation.
       If it is a repair request media, it will be the ID of that request.
   id_assessment:
     lineage:
-      - datalake_inspections_clean.assessment.id_assessment
+      - datalake_inspection_services_clean.assessment.id_assessment
     description: Unique identifier of an Assessment.
   id_inspection:
     lineage:
-      - datalake_inspections_clean.assessment.id_inspection
+      - datalake_inspection_services_clean.assessment.id_inspection
     description: Unique id to identify a inspection.
   uuid:
     lineage:
-      - datalake_inspections_clean.contestation_media.uuid
-      - datalake_inspections_clean.repair_request_media.uuid
+      - datalake_inspection_services_clean.contestation_media.uuid
+      - datalake_inspection_services_clean.repair_request_media.uuid
     description: Auto-incrementing external ID
   origin:
     description: Identifies the source of the media.
@@ -47,7 +47,7 @@ columns:
       REPAIR_REQUEST: The media was generated in the repair request by the PP or analyst
   reviewer_type:
     lineage:
-      - datalake_inspections_clean.reviewer.reviewer_type
+      - datalake_inspection_services_clean.reviewer.reviewer_type
     description: Author of media.
     categories:
       OWNER: Owner of the property.
@@ -55,36 +55,36 @@ columns:
       ADMIN: Team of Repair Analysis.
   media_type:
     lineage:
-      - datalake_inspections_clean.contestation_media.media_type
-      - datalake_inspections_clean.repair_request_media.media_type
+      - datalake_inspection_services_clean.contestation_media.media_type
+      - datalake_inspection_services_clean.repair_request_media.media_type
     description: Indicates whether the media is a photo or a video
   media_path:
     lineage:
-      - datalake_inspections_clean.contestation_media.media_path
-      - datalake_inspections_clean.repair_request_media.media_path
+      - datalake_inspection_services_clean.contestation_media.media_path
+      - datalake_inspection_services_clean.repair_request_media.media_path
     description: Path of the media in the bucket
   ts_created:
     lineage:
-      - datalake_inspections_clean.contestation_media.ts_created
-      - datalake_inspections_clean.repair_request_media.ts_created
+      - datalake_inspection_services_clean.contestation_media.ts_created
+      - datalake_inspection_services_clean.repair_request_media.ts_created
     description: Creation date
   ts_updated:
     lineage:
-      - datalake_inspections_clean.contestation_media.ts_updated
-      - datalake_inspections_clean.repair_request_media.ts_updated
+      - datalake_inspection_services_clean.contestation_media.ts_updated
+      - datalake_inspection_services_clean.repair_request_media.ts_updated
     description: Update date
   year:
     lineage:
-      - datalake_inspections_clean.contestation_media.year
-      - datalake_inspections_clean.repair_request_media.year
+      - datalake_inspection_services_clean.contestation_media.year
+      - datalake_inspection_services_clean.repair_request_media.year
     description: Year of update date.
   month:
     lineage:
-      - datalake_inspections_clean.contestation_media.month
-      - datalake_inspections_clean.repair_request_media.month
+      - datalake_inspection_services_clean.contestation_media.month
+      - datalake_inspection_services_clean.repair_request_media.month
     description: Month of update date.
   day:
     lineage:
-      - datalake_inspections_clean.contestation_media.day
-      - datalake_inspections_clean.repair_request_media.day
+      - datalake_inspection_services_clean.contestation_media.day
+      - datalake_inspection_services_clean.repair_request_media.day
     description: Day of update date.

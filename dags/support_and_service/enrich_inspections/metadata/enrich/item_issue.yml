@@ -8,15 +8,15 @@ columns:
   id_item_issue:
     description: Item Issue unique identifier.
     lineage:
-      - datalake_inspections_clean.item_issue.id_item_issue
+      - datalake_inspection_services_clean.item_issue.id_item_issue
   id_issue_type:
     description: Issue Type unique identifier.
     lineage:
-      - datalake_inspections_clean.issue_type.id_issue_type
+      - datalake_inspection_services_clean.issue_type.id_issue_type
   id_item:
     description: Item unique identifier.
     lineage:
-      - datalake_inspections_clean.item_issue.id_item
+      - datalake_inspection_services_clean.item_issue.id_item
   id_room:
     description: Room unique identifier.
     lineage:
@@ -35,11 +35,11 @@ columns:
   uuid:
     description: Inspection unique identifier (uuid).
     lineage:
-      - datalake_inspections_clean.item_issue.uuid
+      - datalake_inspection_services_clean.item_issue.uuid
   issue_type:
     description: Specify the sub-type problem.
     lineage:
-      - datalake_inspections_clean.issue_type.type
+      - datalake_inspection_services_clean.issue_type.type
   display_type:
     description: Shows the component that renders this type of problem.
     categories:
@@ -72,28 +72,28 @@ columns:
   issue_comment:
     description: Displays a inspector's comment.
     lineage:
-      - datalake_inspections_clean.item_issue.comment
+      - datalake_inspection_services_clean.item_issue.comment
   repair_suggestion:
     description: This column would keep repair suggestions for presentation in the report, but this functionality was not integrated.
     lineage:
-      - datalake_inspections_clean.issue_type.repair_suggestion
+      - datalake_inspection_services_clean.issue_type.repair_suggestion
   ts_created:
     description: Creation date and time.
     lineage:
-      - datalake_inspections_clean.item_issue.ts_created
+      - datalake_inspection_services_clean.item_issue.ts_created
   ts_updated:
     description: Update date and time.
     lineage:
-      - datalake_inspections_clean.item_issue.ts_updated
+      - datalake_inspection_services_clean.item_issue.ts_updated
   year:
     description: Year referring to date of update.
     lineage:
-      - datalake_inspections_clean.item_issue.year
+      - datalake_inspection_services_clean.item_issue.year
   month:
     description: Month referring to date of update.
     lineage:
-      - datalake_inspections_clean.item_issue.month
+      - datalake_inspection_services_clean.item_issue.month
   day:
     description: Day referring to date of update.
     lineage:
-      - datalake_inspections_clean.item_issue.day
+      - datalake_inspection_services_clean.item_issue.day

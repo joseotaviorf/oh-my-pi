@@ -2,7 +2,7 @@ WITH inspection AS (
     SELECT
         *
     FROM
-        datalake_inspections_clean.inspection_aud
+        datalake_inspection_services_clean.inspection_aud
     WHERE
         MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
     QUALIFY
@@ -12,7 +12,7 @@ appointment AS (
     SELECT
         *
     FROM
-        datalake_inspections_clean.appointment_aud
+        datalake_inspection_services_clean.appointment_aud
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_inspection ORDER BY ts_updated DESC) = 1
 ),

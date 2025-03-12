@@ -6,8 +6,8 @@ WITH assessment AS (
         a.dt_owner_limit_revision,
         a.dt_tenant_limit_revision
     FROM
-        datalake_inspections_clean.assessment AS a 
-    QUALIFY 
+        datalake_inspection_services_clean.assessment AS a
+    QUALIFY
         a.ts_updated = MAX(a.ts_updated) OVER(PARTITION BY a.id_assessment)
 )
 SELECT DISTINCT
@@ -22,7 +22,7 @@ SELECT DISTINCT
     ra.approval_type,
     ra.is_approved,
     ra.mod_is_approved,
-    CASE 
+    CASE
       WHEN ra.reviewer_type = "OWNER" THEN a.dt_owner_limit_revision
       WHEN ra.reviewer_type = "TENANT" THEN a.dt_tenant_limit_revision
     END AS dt_limit_revision,
@@ -33,7 +33,7 @@ SELECT DISTINCT
     ra.month,
     ra.day
 FROM
-    datalake_inspections_clean.reviewer_aud AS ra
+    datalake_inspection_services_clean.reviewer_aud AS ra
 JOIN
     assessment AS a
       ON a.id_assessment = ra.id_assessment

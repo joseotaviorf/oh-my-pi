@@ -11,7 +11,7 @@ last_inspection_update AS (
     SELECT
         *
     FROM
-        datalake_inspections_clean.inspection_aud AS ia
+        datalake_inspection_services_clean.inspection_aud AS ia
     QUALIFY
         ia.ts_updated = FIRST(ia.ts_updated) OVER (PARTITION BY ia.id_inspection ORDER BY ia.ts_updated DESC)
 ),
