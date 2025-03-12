@@ -1,0 +1,148 @@
+database_name: dw_neurotech_quintocred
+table_name: dim_credit_evaluation
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Data from logs_credit_granting, contains all engine credit assessment information."
+columns:
+  sk_propose:
+    description: "QuintoCred's propose identification number (ID)"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.id_propose
+  rating:
+    description: "Neurotech rating of the propose"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.rating
+  status:
+    description: "Status of the analysis"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.status
+  status_cpf:
+    description: "Status of the proponents document"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.status_cpf
+    categories:
+      CPF Pending Regularization: ""
+      CPF Suspended: ""
+      Null CPF: ""
+      CPF Cancelled: ""
+      Deceased Holder: ""
+      CPF Ok: ""
+  proponent_age_classification:
+    description: "Classification of the proponents age"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.proponent_age_classification
+    categories:
+      Over 80 years old: "age >= 80"
+      Less than 80 years old: "age < 80"
+  legal_proceedings:
+    description: "Indicates if one or more of the proponents are related to a legal proceeding"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.legal_proceedings
+    categories:
+      No relevant legal proceeding: "None of the proponents are related to a legal proceedings"
+      Defendant in any legal proceeding: "One or more of the proponents are related to a legal proceedings"
+  pep:
+    description: "Indicates if one or more of the proponents are PEP"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.pep
+  legal_proceedings_type:
+    description: "Classification of the legal proceeding"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.legal_proceedings_type
+  legal_proceedings_share:
+    description: "Share of the legal proceeding"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.legal_proceedings_share
+    categories:
+      Only Predictus: ""
+      Only BigData: ""
+      Both: ""
+      No relevant legal proceeding: ""
+  reason_missing:
+    description: "Description of the reason why the propose number is null"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.reason_missing
+  indebted:
+    description: "Indicates if the proponent was rejected because of financial debts"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.indebted
+  main_proponent_name:
+    description: "Full name of the main proponent"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.main_proponent_name
+  main_proponent_email:
+    description: "E-mail of the main proponent"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.main_proponent_email
+  proponents_cpf:
+    description: "List of all proponents CPF"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.proponents_cpf
+  reason_document_on_blocklist_list:
+    description: "Reason why all CPFs in the propose are on the blocklist"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.reason_document_on_blocklist_list
+  name_check_rating:
+    description: "Match rate of the name provided with the name in the Federal Revenue Service"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.name_check_rating
+  name_check_rating_list:
+    description: "List of all match rate of the name provided with the name in the Federal Revenue Service"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.name_check_rating_list
+  is_blocklist_document_list:
+    description: "Flag indicating if all CPFs in the propose are on the blocklist"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.is_blocklist_document_list
+  serasa_income:
+    description: "Income according to SERASA"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.serasa_income
+  transunion_income:
+    description: "Income according to Transunion"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.transunion_income
+  proposal_declared_income:
+    description: "Declared income"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.proposal_declared_income
+  is_foreign_document:
+    description: "Flag indicating if the document is from another country"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.is_foreign_document
+  is_foreign_document_list:
+    description: "List of flags indicating if the documents are from another country"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.is_foreign_document_list
+  is_minor_age_document:
+    description: "Indicates whether the CPF of the proposal belongs to a minor"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.is_minor_age_document
+  is_minor_age_document_list:
+    description: "Indicates whether all CPFs in the proposal belong to a minor"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.is_minor_age_document_list
+  is_last_register:
+    description: "Flag indicating if the register is the last one of the related propose"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.is_last_register
+  dt_propose:
+    description: "First date of the propose"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.dt_propose
+  ts_begin:
+    description: "Start date of the analysis"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.ts_begin
+  ts_end:
+    description: "End date of the analysis"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.ts_end
+  ts_operation:
+    description: "Timestamp of the operation"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.ts_operation
+  ts_inserted:
+    description: "Timestamp of the register insertion"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.ts_inserted

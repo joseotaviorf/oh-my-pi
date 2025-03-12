@@ -1,6 +1,10 @@
 SELECT
     c.proposal_number AS id_propose,
-    c.proposal_rating AS rating,
+    CASE
+        WHEN c.proposal_rating IS NULL THEN 'Missing'
+        WHEN c.proposal_rating = 'NaN' THEN 'Missing'
+        ELSE c.proposal_rating
+    END AS rating,
     c.log_result AS status,
     CASE
       WHEN document_status_federal = 'PENDENTE DE REGULARIZAÇÃO' OR ARRAY_CONTAINS(document_status_federal_list,'PENDENTE DE REGULARIZAÇÃO') OR bigdataboost_document_status = 'PENDENTE DE REGULARIZACAO' OR ARRAY_CONTAINS(bigdataboost_document_status_list, 'PENDENTE DE REGULARIZACAO') THEN 'CPF Pending Regularization'

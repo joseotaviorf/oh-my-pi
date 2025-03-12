@@ -1,6 +1,10 @@
 SELECT
     m.proposal_number AS id_propose,
-    m.proposal_rating AS rating,
+    CASE
+        WHEN m.proposal_rating IS NULL THEN 'Missing'
+        WHEN m.proposal_rating = 'NaN' THEN 'Missing'
+        ELSE m.proposal_rating
+    END AS rating,
     m.calc_status AS status,
     m.proposal_name AS main_proponent_name,
     CASE

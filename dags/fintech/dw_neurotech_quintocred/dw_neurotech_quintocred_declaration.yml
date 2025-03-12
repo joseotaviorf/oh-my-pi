@@ -1,14 +1,14 @@
 ---
 dag:
-  name: enrich_neurotech_quintocred
+  name: dw_neurotech_quintocred
   schedule_start_date: 2022, 8, 28
   owner: Data Fintech
   documentation:
     dag_purpose: |
-      Creates enriched tables for QuintoCred Neurotech context.
+      Creates DW Model for QuintoCred Neurotech context.
 workflow:
   type: query_delta
-  layer: enrich
+  layer: dw
 cluster:
   type: databricks_13_3_min_general_cluster
   databricks_conn_id: databricks_new

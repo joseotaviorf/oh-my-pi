@@ -642,6 +642,9 @@ bietlejuice.dw_media_platform_metrics:
   - bietlejuice.enrich_growth_media_platform_metrics:load-enrich-consolidated-metrics
 bietlejuice.dw_media_sharing_rules:
   - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules
+bietlejuice.dw_neurotech_quintocred:
+  - bietlejuice.enrich_neurotech_quintocred:load-enrich-credit-evaluation
+  - bietlejuice.enrich_neurotech_quintocred:load-enrich-manual-evaluation
 bietlejuice.dw_offboarding:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing

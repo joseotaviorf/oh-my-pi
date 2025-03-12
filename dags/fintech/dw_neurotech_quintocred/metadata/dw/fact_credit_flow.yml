@@ -1,0 +1,56 @@
+database_name: dw_neurotech_quintocred
+table_name: fact_credit_flow
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Data from logs_scoping_policy and logs_credit_granting, contains all information from manual and automatic assessment."
+columns:
+  sk_propose:
+    description: "QuintoCred's propose identification number (ID)"
+    lineage:
+      - datalake_neurotech_quintocred.manual_evaluation.id_propose
+  rating:
+    description: "Neurotech rating of the propose"
+    lineage:
+      - datalake_neurotech_quintocred.manual_evaluation.rating
+  status:
+    description: "Status of the analysis"
+    lineage:
+      - datalake_neurotech_quintocred.manual_evaluation.status
+  main_proponent_name:
+    description: "Full name of the main proponent"
+    lineage:
+      - datalake_neurotech_quintocred.manual_evaluation.main_proponent_name
+  previous_status:
+    description: "Description of the status that came before the current"
+  previous_status_2:
+    description: "Description of the status that came before previous_status"
+  previous_date_begin:
+    description: "Begin date of the step that came before the current"
+  previous_date_begin_2:
+    description: "Begin date of the step that came before previous_date_begin_2"
+  next_status:
+    description: "Description of the status that came after the current"
+  sla_second:
+    description: "SLA between previous status and current"
+  rank_table:
+    description: "Order of steps the propose passed"
+  is_last_register:
+    description: "Flag indicating if the register is the last one of the related propose"
+    lineage:
+      - datalake_neurotech_quintocred.manual_evaluation.is_last_register
+  dt_propose:
+    description: "First date of the propose"
+    lineage:
+      - datalake_neurotech_quintocred.manual_evaluation.dt_propose
+  ts_begin:
+    description: "Start date of the analysis (In Brasilia time zone)"
+    lineage:
+      - datalake_neurotech_quintocred.manual_evaluation.ts_begin
+  ts_end:
+    description: "End date of the analysis"
+    lineage:
+      - datalake_neurotech_quintocred.manual_evaluation.ts_end
+  ts_operation:
+    description: "Timestamp of the operation"
+    lineage:
+      - datalake_neurotech_quintocred.manual_evaluation.ts_operation
