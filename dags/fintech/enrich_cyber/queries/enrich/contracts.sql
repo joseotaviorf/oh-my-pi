@@ -29,6 +29,8 @@ SELECT
     c.open_invoices,
     c.collection_flow,
     c.has_restrictive_evic_occurrence,
+    c.bpo_segmentation,
+    c.probability_group,
     dm.agreement_type,
     dm.agreement_status,
     dm.last_payment_promisse_status,
