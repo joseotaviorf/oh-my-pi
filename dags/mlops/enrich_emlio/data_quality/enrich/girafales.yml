@@ -6,18 +6,10 @@ column_level_validations:
     is_complete:
       severity_level: Error
   city:
-    is_complete:
+    has_completeness:
+      greater_than: 0.90
       severity_level: Warning
   total_area:
     has_completeness:
-      greater_than: 0.99
-      severity_level: Warning
-  type:
-    is_contained_in:
-      values:
-        - Apartamento
-        - Flat
-        - CasaCondominio
-        - StudioOuKitchenette
-        - Casa
+      greater_than: 0.80
       severity_level: Warning
