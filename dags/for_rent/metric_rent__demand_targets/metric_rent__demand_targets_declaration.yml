@@ -5,8 +5,9 @@ dag:
   documentation:
     dag_purpose: "This DAG creates the For Rent demand targets metrics, all related to the scope within the aggregation."
 workflow:
-  type: query
+  type: query_delta
   layer: metric
+  custom_schema: rent
 cluster:
   type: databricks_12_2_med_2_fixed_workers_general_photon_cluster
   access_control_list:
@@ -14,7 +15,7 @@ cluster:
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

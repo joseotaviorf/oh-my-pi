@@ -3319,8 +3319,6 @@ bietlejuice.metric_rent__bookings:
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
-bietlejuice.metric_rent__bookings_test:
-  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
 bietlejuice.metric_rent__contracts:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-rent-dim-contract

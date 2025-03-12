@@ -1,6 +1,0 @@
----
-table_name: metric_rent_test.bookers_daily
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  day:
-    is_complete:

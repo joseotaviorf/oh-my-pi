@@ -36,9 +36,6 @@ column_level_validations:
   addons_bfi:
     has_min_value:
       greater_than_or_equal_to: 0
-  addons_ccp:
-    has_min_value:
-      greater_than_or_equal_to: 0
   addons_new_business_revenue:
     has_min_value:
       greater_than_or_equal_to: 0
