@@ -106,10 +106,6 @@ recontact_check AS (
     ts_started
   FROM
     front_tickets_list AS rc
-  LEFT JOIN
-    tbl_completion_reason
-      ON tbl_completion_reason.sk_ticket = rc.sk_ticket_previous_contact
-      AND tbl_completion_reason.sk_ticket IS NOT NULL
   WHERE
     rc.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL '45' DAY AND DATE('{load_end_date}')
     AND department NOT LIKE '%[CNX]%'
