@@ -50,9 +50,9 @@ echo "BEGIN: Install QuintoAndar internal libs"
 aws s3 cp ${ARTIFACTS_BUCKET}/jars/spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar $spark_jars_path/spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar
 aws s3 cp ${ARTIFACTS_BUCKET}/bi-etl-ejuice/bi_etl_ejuice-latest-py3-none-any.whl /bi_etl_ejuice-latest-py3-none-any.whl
 aws s3 cp ${ARTIFACTS_BUCKET}/python-logger/quintoandar_logger-0.8.0-py3-none-any.whl /quintoandar_logger-0.8.0-py3-none-any.whl
-aws s3 cp ${ARTIFACTS_BUCKET}/inmetro/inmetro-4.7.1-py3-none-any.whl /inmetro-4.7.1-py3-none-any.whl
+aws s3 cp ${ARTIFACTS_BUCKET}/inmetro/inmetro-2.3.0-py3-none-any.whl /inmetro-2.3.0-py3-none-any.whl
 
 /databricks/python/bin/pip install -q /bi_etl_ejuice-latest-py3-none-any.whl
 /databricks/python/bin/pip install -q /quintoandar_logger-0.8.0-py3-none-any.whl
-/databricks/python/bin/pip install -q '/inmetro-4.7.1-py3-none-any.whl[pydeequ]'
+/databricks/python/bin/pip install -q '/inmetro-2.3.0-py3-none-any.whl[pydeequ]'
 echo "END: Install QuintoAndar internal libs"
