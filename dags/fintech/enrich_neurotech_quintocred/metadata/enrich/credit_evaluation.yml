@@ -1,0 +1,130 @@
+database_name: datalake_neurotech_quintocred
+table_name: credit_evaluation
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Data from logs_credit_granting, contains all engine credit assessment information."
+columns:
+  id_propose:
+    description: "QuintoCred's propose identification number (ID)"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.proposal_number
+  rating:
+    description: "Neurotech rating of the propose"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.proposal_rating
+  status:
+    description: "Status of the analysis"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.log_result
+  status_cpf:
+    description: "Status of the proponents document"
+    categories:
+      CPF Pending Regularization: ""
+      CPF Suspended: ""
+      Null CPF: ""
+      CPF Cancelled: ""
+      Deceased Holder: ""
+      CPF Ok: ""
+  proponent_age_classification:
+    description: "Classification of the proponents age"
+    categories:
+      Over 80 years old: "age >= 80"
+      Less than 80 years old: "age < 80"
+  legal_proceedings:
+    description: "Indicates if one or more of the proponents are related to a legal proceeding"
+    categories:
+      No relevant legal proceeding: "None of the proponents are related to a legal proceedings"
+      Defendant in any legal proceeding: "One or more of the proponents are related to a legal proceedings"
+  pep:
+    description: "Indicates if one or more of the proponents are PEP"
+  legal_proceedings_type:
+    description: "Classification of the legal proceeding"
+  legal_proceedings_share:
+    description: "Share of the legal proceeding"
+    categories:
+      Only Predictus: ""
+      Only BigData: ""
+      Both: ""
+      No relevant legal proceeding: ""
+  reason_missing:
+    description: "Description of the reason why the propose number is null"
+  indebted:
+    description: "Indicates if the proponent was rejected because of financial debts"
+  main_proponent_name:
+    description: "Full name of the main proponent"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.main_proponent_name
+  main_proponent_email:
+    description: "E-mail of the main proponent"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.main_proponent_email
+  proponents_cpf:
+    description: "List of all proponents CPF"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.proposal_cpfs
+  reason_document_on_blocklist_list:
+    description: "Reason why all CPFs in the propose are on the blocklist"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.reason_document_on_blocklist_list
+  name_check_rating:
+    description: ""
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.name_check_rating
+  name_check_rating_list:
+    description: ""
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.name_check_rating_list
+  is_blocklist_document_list:
+    description: ""
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.is_blocklist_document_list
+  serasa_income:
+    description: ""
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.serasa_income
+  transunion_income:
+    description: ""
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.transunion_income
+  proposal_declared_income:
+    description: ""
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.proposal_declared_income
+  is_foreign_document:
+    description: ""
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.is_foreign_document
+  is_foreign_document_list:
+    description: ""
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.is_foreign_document_list
+  is_minor_age_document:
+    description: ""
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.is_minor_age_document
+  is_minor_age_document_list:
+    description: ""
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.is_minor_age_document_list
+  is_last_register:
+    description: "Flag indicating if the register is the last one of the related propose"
+  dt_propose:
+    description: "First date of the propose"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.ts_begin
+  ts_begin:
+    description: "Start date of the analysis"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.ts_inserted
+  ts_end:
+    description: "End date of the analysis"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.ts_dh_processed
+  ts_operation:
+    description: "Timestamp of the operation"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.ts_operation
+  ts_inserted:
+    description: "Timestamp of the register insertion"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.ts_inserted

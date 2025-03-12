@@ -2236,6 +2236,10 @@ bietlejuice.enrich_monopoly:
   - bietlejuice.monopoly:load-clean-outcome-reference
   - bietlejuice.monopoly:load-clean-sale
   - bietlejuice.monopoly:load-clean-sale-transaction
+bietlejuice.enrich_neurotech_quintocred:
+  - bietlejuice.enrich_velo:load-enrich-propose
+  - bietlejuice.velo_neurotech:load-clean-logs-credit-granting
+  - bietlejuice.velo_neurotech:load-clean-logs-scoping-policy
 bietlejuice.enrich_nexxera:
   - bietlejuice.nexxera:load-clean-adjustments
   - bietlejuice.nexxera:load-clean-cnab-charges-341

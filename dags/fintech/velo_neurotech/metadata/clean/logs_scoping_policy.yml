@@ -143,6 +143,18 @@ columns:
   status_docs:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_docs
+  calc_denied_reason_first_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy.calc_motivos_recusa_proponente1
+  calc_denied_reason_second_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy.calc_motivos_recusa_proponente2
+  calc_denied_reason_third_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy.calc_motivos_recusa_proponente3
+  calc_denied_reason_fourth_proponent:
+    lineage:
+      - datalake_velo_neurotech_raw.logs_scoping_policy.calc_motivos_recusa_proponente4
   status_dti_max_percentage:
     lineage:
       - datalake_velo_neurotech_raw.logs_scoping_policy.calc_dti_maximo

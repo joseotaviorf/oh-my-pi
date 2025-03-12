@@ -1,0 +1,42 @@
+database_name: datalake_neurotech_quintocred
+table_name: manual_evaluation
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Data from logs_scoping_policy, contains all information from manual assessment."
+columns:
+  id_propose:
+    description: "QuintoCred's propose identification number (ID)"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_scoping_policy.proposal_number
+  rating:
+    description: "Neurotech rating of the propose"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_scoping_policy.proposal_rating
+  status:
+    description: "Status of the analysis"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_scoping_policy.calc_status
+  main_proponent_name:
+    description: "Full name of the main proponent"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_scoping_policy.proposal_name
+  reason_rejection:
+    description: "Description of the reason why the analysis was denied"
+  is_last_register:
+    description: "Flag indicating if the register is the last one of the related propose"
+  dt_propose:
+    description: "First date of the propose"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_scoping_policy.ts_begin
+  ts_begin:
+    description: "Start date of the analysis (In Brasilia time zone)"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_scoping_policy.ts_proposal_dh_registration
+  ts_end:
+    description: "End date of the analysis"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_scoping_policy.ts_operation
+  ts_operation:
+    description: "Timestamp of the operation"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_scoping_policy.ts_operation
