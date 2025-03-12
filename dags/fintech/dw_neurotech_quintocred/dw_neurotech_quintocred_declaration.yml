@@ -9,6 +9,7 @@ dag:
 workflow:
   type: query_delta
   layer: dw
+  custom_schema: neurotech_quintocred
 cluster:
   type: databricks_13_3_min_general_cluster
   databricks_conn_id: databricks_new
