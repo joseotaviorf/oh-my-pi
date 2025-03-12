@@ -8,6 +8,3 @@ column_level_validations:
   id_event_type:
     is_complete:
       severity_level: Error
-  id_rent_flow:
-    is_complete:
-      severity_level: Error
