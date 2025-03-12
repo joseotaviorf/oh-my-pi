@@ -35,7 +35,7 @@ ticket_sla_target AS (
         datalake_zendesk.tickets_current AS t
     LEFT JOIN
         datalake_gsheets_clean.department_control AS dc
-            ON dc.department = t.department
+            ON dc.department = t.group_name
     LEFT JOIN
         datalake_gsheets_clean.tag_sla_target AS tgs
             ON dc.journey_step = tgs.journey
@@ -58,11 +58,11 @@ ticket_sla_target AS (
     WHERE
         t.tags NOT LIKE '%robotserviceaccount02%'
         AND (
-        (
-            t.last_queue = 'Offboarding Reparos [OFF] [POS] [BACK]'
-            AND t.tags LIKE '%orçamentação_realizada%'
-        )
-        OR t.last_queue != 'Offboarding Reparos [OFF] [POS] [BACK]'
+            (
+                t.group_name = 'Offboarding Reparos [OFF] [POS] [BACK]'
+                AND t.tags LIKE '%orçamentação_realizada%'
+            )
+            OR t.group_name != 'Offboarding Reparos [OFF] [POS] [BACK]'
         )
         AND ts_created >= '{load_start_date}'
     GROUP BY ALL
