@@ -12,7 +12,3 @@ SELECT
     day
 FROM
     datalake_repairs_raw.service_request
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

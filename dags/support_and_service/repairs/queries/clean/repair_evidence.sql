@@ -9,7 +9,3 @@ SELECT
     day
 FROM
     datalake_repairs_raw.repair_evidence
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

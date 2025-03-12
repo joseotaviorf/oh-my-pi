@@ -9,7 +9,3 @@ SELECT
     day
 FROM
     datalake_repairs_raw.instant_approval_preference
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

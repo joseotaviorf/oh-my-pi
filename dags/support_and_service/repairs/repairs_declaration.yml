@@ -10,39 +10,23 @@ dag:
       Tenants and Landlords. Check [its own repository](https://github.com/quintoandar/repairs) \n
       for more informations.
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
+  source_database: repairs
+  source_schema: public
   database_type: postgres
   lineage_product_database_name: repairs
   dbutils_secret_key: REPAIRS_DB
   tables_customization:
-    instant_approval_preference:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      partitions: [year, month, day]
-    repair_evidence:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      partitions: [year, month, day]
+    instant_approval_preference: {}
+    repair_evidence: {}
     repair_expense: {}
     repair_expense_group: {}
-    repair_request:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      partitions: [year, month, day]
+    repair_request: {}
     repair_request_chat: {}
-    repair_request_item:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      partitions: [year, month, day]
-    repair_request_tenant_negotiation_follow_up:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      partitions: [year, month, day]
-    service_request:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      partitions: [year, month, day]
+    repair_request_item: {}
+    repair_request_tenant_negotiation_follow_up: {}
+    service_request: {}
     attachment: {}
     repair_request_budget: {}
     repair_request_budget_attachment: {}
