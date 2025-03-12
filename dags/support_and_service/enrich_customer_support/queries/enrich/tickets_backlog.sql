@@ -35,7 +35,7 @@ ticket_sla_target AS (
         datalake_zendesk.tickets_current AS t
     LEFT JOIN
         datalake_gsheets_clean.department_control AS dc
-            ON dc.department = ze.department
+            ON dc.department = t.department
     LEFT JOIN
         datalake_gsheets_clean.tag_sla_target AS tgs
             ON dc.journey_step = tgs.journey
