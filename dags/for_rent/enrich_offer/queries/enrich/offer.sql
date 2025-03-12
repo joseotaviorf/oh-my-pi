@@ -208,7 +208,7 @@ UNION
 
 SELECT
     UUID() AS id_offer_history, 
-    NULL AS id, --Temporary bring the id_offer from EBDB to prevent major impacts on the pipeline and give time to adjustments
+    firestore.id_offer AS id, --Temporary bring the id_offer from EBDB to prevent major impacts on the pipeline and give time to adjustments
     offer.id_offer AS id_offer_rental_transact,
     (firestore.id_offer * 100) + 2 AS id_offer_context,
     NULL AS id_firestore,

@@ -263,7 +263,7 @@ rent_demand_events AS (
       AND DATE(off.ts_analyzed) >= DATE(hbh.ts_started)
       AND DATE(off.ts_analyzed) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
-    off.status = 'Aprovada'
+    off.status IN ('Aprovada', 'ACCEPTED')
     AND ts_analyzed IS NOT NULL
   UNION ALL
   SELECT --evaluation_started
