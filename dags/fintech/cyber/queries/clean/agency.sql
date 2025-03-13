@@ -7,7 +7,8 @@ SELECT
         WHEN AGAGCYCD = "CC" THEN "Cyber Credit"
         WHEN AGAGCYCD = "AC" THEN "Assessoria Convencional"
         WHEN AGAGCYCD = "AD" THEN "Assessoria Digital"
-        WHEN AGAGCYCD = "PO" THEN "Portal"
+        WHEN AGAGCYCD IN ("PO", "AP") THEN "Portal"
+        WHEN AGAGCYCD = "SE" THEN "Serasa Digital"
         ELSE AGAGCYCD
     END AS agency_type,
     AGSUPER AS super_agency,

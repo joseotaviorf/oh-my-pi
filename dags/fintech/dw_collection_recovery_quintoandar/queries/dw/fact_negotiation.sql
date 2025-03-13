@@ -132,6 +132,7 @@ recupera_negotiation AS (
     CASE
       WHEN REPLACE(rn.origin_agreement, "_", " ") = "Portal Autonegociação" THEN "Portal Auto Negociação"
       WHEN REPLACE(rn.origin_agreement, "_", " ") =  "Operador" THEN "Operador Interno"
+      WHEN REPLACE(rn.origin_agreement, "_", " ") =  "Carta Campanha" THEN "Boletagem"
       ELSE REPLACE(rn.origin_agreement, "_", " ")
     END AS origin_agreement,
     rn.advisory,
@@ -222,13 +223,13 @@ union_sources AS (
     COALESCE(tfn.id_customer, cn.id_customer, rn.id_customer) AS id_debtor,
     tfn.id_negotiation_trato_feito,
     COALESCE(tfn.id_contract, cn.id_contract, rn.id_contract) AS id_contract,
-    COALESCE(cn.id_operator, rn.id_operator) AS id_operator,
-    COALESCE(cn.id_campaign, rn.id_campaign) AS id_campaign,
+    COALESCE(rn.id_operator, cn.id_operator) AS id_operator,
+    COALESCE(rn.id_campaign, cn.id_campaign) AS id_campaign,
     COALESCE(tfn.source, cn.source, rn.source) AS source,
     COALESCE(tfn.creditor, cn.creditor, rn.creditor) AS creditor,
-    COALESCE(cn.advisory, rn.advisory, tfn.advisory) AS advisory,
-    COALESCE(cn.agreement_type, rn.agreement_type) AS agreement_type,
-    COALESCE(cn.origin_agreement, rn.origin_agreement, tfn.origin_agreement) AS origin_agreement,
+    COALESCE(rn.advisory, cn.advisory, tfn.advisory) AS advisory,
+    COALESCE(rn.agreement_type, cn.agreement_type) AS agreement_type,
+    COALESCE(rn.origin_agreement, cn.origin_agreement, tfn.origin_agreement) AS origin_agreement,
     cn.campaign_status,
     COALESCE(tfn.status, cn.negotiation_status, rn.negotiation_status) AS negotiation_status,
     UPPER(COALESCE(i.promisse_payment_method, tfn.promisse_payment_method, cn.promisse_payment_method, rn.promisse_payment_method)) AS promisse_payment_method,

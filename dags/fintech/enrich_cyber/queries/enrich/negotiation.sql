@@ -212,7 +212,6 @@ SELECT
       WHEN ag.agency_type = "Portal" THEN "Portal Auto Negociação"
       WHEN ag.agency_type = "Cyber Credit" THEN "Operador Interno"
       WHEN a.id_user = "MIGRACAO" THEN "Migração"
-      WHEN ag.agency_type = "SE" THEN "Serasa Digital"
       ELSE ag.agency_type
     END AS origin_agreement,
     a.status AS original_negotiation_status,
