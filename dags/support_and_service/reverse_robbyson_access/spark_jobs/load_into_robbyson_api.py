@@ -1,13 +1,15 @@
-from argparse import ArgumentParser
-from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.base.spark import BaseDBUtils
 import json
 import logging
 import requests
-from quintoandar_logger import QuintoAndarLogger
+import time
+from argparse import ArgumentParser
+
+from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.services import ConfigurationService
-from bietlejuice.services.messaging_services.gchat_service import GChatService
-from datetime import datetime
+
+from quintoandar_logger import QuintoAndarLogger
+
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_into_robbyson_api"
