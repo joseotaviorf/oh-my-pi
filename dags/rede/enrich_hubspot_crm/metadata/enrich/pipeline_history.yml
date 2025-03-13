@@ -1,6 +1,9 @@
 ---
 database_name: datalake_hubspot
 table_name: pipeline_history
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: This table shows the history about pipelines registered in HubSpot. Each row is one change in a pipeline, limited to the most recent per day. If you want the current row, use datalake_hubspot.pipeline.
 columns:
   id_pipeline:
     lineage:

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_hubspot
 table_name: company_status
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 domain: Rede
 description: Every time the company lead status in HubSpot changes (either in Rent or Sale), the new status is recorded in this table.
 columns:

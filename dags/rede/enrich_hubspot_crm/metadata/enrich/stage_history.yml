@@ -1,6 +1,9 @@
 ---
 database_name: datalake_hubspot
 table_name: stage_history
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: This table shows the history about stages registered in HubSpot. Each row is one change in a stage, limited to the most recent per day. If you want the current row, use datalake_hubspot.stage.
 columns:
   id_stage:
     lineage:

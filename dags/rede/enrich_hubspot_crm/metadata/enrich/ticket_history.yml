@@ -1,10 +1,9 @@
 ---
 database_name: datalake_hubspot
 table_name: ticket_history
-description: This table shows the history about tickets registered in HubSpot. Each row is one change in a ticket, limited to the most
-  recent per day. If you want the current row, use datalake_hubspot.ticket.
+description: This table shows the history about tickets registered in HubSpot. Each row is one change in a ticket, limited to the most recent per day. If you want the current row, use datalake_hubspot.ticket.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_ticket:
     lineage:

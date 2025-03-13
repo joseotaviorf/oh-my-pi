@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: pipeline
 description: Table showing the types of pipelines that exist within the Rede business model. Each row is a different business pipeline.
 domain: Rede
-owner: data-for-sale@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_pipeline:
     lineage:

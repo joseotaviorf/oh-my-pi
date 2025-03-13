@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: ticket
 description: Each row is one ticket registered in HubSpot.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_ticket:
     lineage:

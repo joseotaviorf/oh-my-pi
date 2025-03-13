@@ -1,10 +1,7 @@
 ---
-table_name: datalake_hubspot.company
+table_name: datalake_hubspot.company_members
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
-  has_size:
-    greater_than: 4000
-    severity_level: Error
 column_level_validations:
   id_company:
     is_complete:
@@ -12,5 +9,7 @@ column_level_validations:
     is_unique:
       severity_level: Error
   cnpj:
+    is_complete:
+      severity_level: Error
     is_unique:
       severity_level: Error

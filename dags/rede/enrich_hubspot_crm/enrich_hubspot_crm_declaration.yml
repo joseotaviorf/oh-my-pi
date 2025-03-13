@@ -2,6 +2,8 @@ dag:
   name: enrich_hubspot_crm
   schedule_start_date: 2021, 8, 24
   owner: Data Rede
+  documentation:
+    dag_purpose: Creates enriched tables for `hubspot`. Due to limitation of Job Cluster, the enrich_hubspot was separated in two DAGs (enrich_hubspot_management and enrich_hubspot_crm).
 workflow:
   type: query_delta
   layer: enrich
@@ -12,6 +14,8 @@ workflow:
     - company_history
     company_contact:
     - contact
+    company_members:
+    - company_history
     company_status:
     - company
     contact:

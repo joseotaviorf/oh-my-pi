@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: deal
 description: Each row is one deal registered in HubSpot.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_deal:
     lineage:

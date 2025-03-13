@@ -1,7 +1,7 @@
 ---
 database_name: datalake_hubspot
 table_name: company_contact
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 domain: Rede
 description: Every row is an association between a company and a contact in HubSpot.
 columns:

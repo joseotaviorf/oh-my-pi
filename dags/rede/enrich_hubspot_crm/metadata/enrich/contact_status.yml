@@ -2,7 +2,7 @@
 database_name: datalake_hubspot
 table_name: contact_status
 description: This table shows the status changes of contacts registered in HubSpot. Each row is a status of a contact.
-owner: data-for-sale@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 domain: Rede 
 columns:
   id_contact:

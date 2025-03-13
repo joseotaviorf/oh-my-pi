@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: contact
 description: This table shows the contacts registered in HubSpot. Each row is one contact.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_contact:
     lineage:

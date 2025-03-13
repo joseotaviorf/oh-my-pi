@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: company
 description: Each row is a company lead registered in HubSpot.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_company:
     lineage:

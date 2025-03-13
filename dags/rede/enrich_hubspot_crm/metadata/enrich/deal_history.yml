@@ -1,10 +1,9 @@
 ---
 database_name: datalake_hubspot
 table_name: deal_history
-description: This table shows the history about deals registered in HubSpot. Each row is one change in a deal, limited to the most
-  recent per day. If you want the current row, use datalake_hubspot.deal.
+description: This table shows the history about deals registered in HubSpot. Each row is one change in a deal, limited to the most recent per day. If you want the current row, use datalake_hubspot.deal.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_deal:
     lineage:

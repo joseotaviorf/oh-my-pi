@@ -1,6 +1,9 @@
 ---
 database_name: datalake_hubspot
 table_name: stage
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: Every row is an association between a stage registered in HubSpot.
 columns:
   id_stage:
     lineage:

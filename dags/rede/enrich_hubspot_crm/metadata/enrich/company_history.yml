@@ -1,10 +1,9 @@
 ---
 database_name: datalake_hubspot
 table_name: company_history
-description: This table shows the history about company leads registered in HubSpot. Each row is one change in a company, limited to the most
-  recent per day. If you want the current row, use datalake_hubspot.company.
+description: This table shows the history about company leads registered in HubSpot. Each row is one change in a company, limited to the most recent per day. If you want the current row, use datalake_hubspot.company.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_company:
     lineage:

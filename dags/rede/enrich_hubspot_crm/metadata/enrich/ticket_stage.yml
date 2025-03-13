@@ -1,6 +1,9 @@
 ---
 database_name: datalake_hubspot
 table_name: ticket_stage
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: Every row is an association between a ticket and a stage in HubSpot.
 columns:
   id_ticket:
     lineage:

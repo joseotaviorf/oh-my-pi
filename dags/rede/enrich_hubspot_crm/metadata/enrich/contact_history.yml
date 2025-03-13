@@ -1,10 +1,9 @@
 ---
 database_name: datalake_hubspot
 table_name: contact_history
-description: This table shows the history about contacts registered in HubSpot. Each row is one change in a contact, limited to the most
-  recent per day. If you want the current row, use datalake_hubspot.contact.
+description: This table shows the history about contacts registered in HubSpot. Each row is one change in a contact, limited to the most recent per day. If you want the current row, use datalake_hubspot.contact.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_contact:
     lineage:
