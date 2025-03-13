@@ -1,6 +1,7 @@
 SELECT
     id_propose AS sk_propose,
     status,
+    user,
     status_cpf,
     proponent_age_classification,
     legal_proceedings,

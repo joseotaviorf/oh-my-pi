@@ -6,6 +6,7 @@ SELECT
         ELSE c.proposal_rating
     END AS rating,
     c.log_result AS status,
+    c.log_user AS user,
     CASE
       WHEN document_status_federal = 'PENDENTE DE REGULARIZAÇÃO' OR ARRAY_CONTAINS(document_status_federal_list,'PENDENTE DE REGULARIZAÇÃO') OR bigdataboost_document_status = 'PENDENTE DE REGULARIZACAO' OR ARRAY_CONTAINS(bigdataboost_document_status_list, 'PENDENTE DE REGULARIZACAO') THEN 'CPF Pending Regularization'
       WHEN document_status_federal = 'SUSPENSA' OR ARRAY_CONTAINS(document_status_federal_list, 'SUSPENSA') OR bigdataboost_document_status = 'SUSPENSA' OR ARRAY_CONTAINS(bigdataboost_document_status_list, 'SUSPENSA') THEN 'CPF Suspended'

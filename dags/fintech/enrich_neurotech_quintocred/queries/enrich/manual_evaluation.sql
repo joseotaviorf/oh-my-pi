@@ -6,6 +6,7 @@ SELECT
         ELSE m.proposal_rating
     END AS rating,
     m.calc_status AS status,
+    m.log_user AS user,
     m.proposal_name AS main_proponent_name,
     CASE
       WHEN calc_status = 'R' AND calc_denied_reason_first_proponent <> 'NaN' THEN calc_denied_reason_first_proponent
