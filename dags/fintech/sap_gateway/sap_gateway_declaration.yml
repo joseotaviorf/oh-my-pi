@@ -1,6 +1,7 @@
 dag:
   name: sap_gateway
   schedule_start_date: 2020,10,1
+  schedule_interval: 0 7 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: |
