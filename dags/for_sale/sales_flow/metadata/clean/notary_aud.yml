@@ -11,6 +11,9 @@ columns:
   id_specialist:
     lineage:
       - datalake_sales_flow_raw.notary_aud.specialist_id
+  id_notary_office:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.notary_office_id
   rev:
     lineage:
       - datalake_sales_flow_raw.notary_aud.rev
@@ -41,6 +44,24 @@ columns:
   seller_payment_status:
     lineage:
       - datalake_sales_flow_raw.notary_aud.seller_payment_status
+  customer_follow_up:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.customer_follow_up
+  deed_emission_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.deed_emission_finished_by
+  deed_signature_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.deed_signature_finished_by
+  crn_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.crn_finished_by
+  key_delivery_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.key_delivery_finished_by
+  cri_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.cri_finished_by
   mod_id_sales_flow:
     lineage:
       - datalake_sales_flow_raw.notary_aud.sales_flow_id_mod
@@ -83,6 +104,42 @@ columns:
   mod_ts_kit_sent:
     lineage:
       - datalake_sales_flow_raw.notary_aud.kit_sent_at_mod
+  mod_id_notary_office:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.notary_office_id_mod
+  mod_customer_follow_up:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.customer_follow_up_mod
+  mod_deed_emission_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.deed_emission_finished_by_mod
+  mod_deed_signature_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.deed_signature_finished_by_mod
+  mod_crn_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.crn_finished_by_mod
+  mod_key_delivery_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.key_delivery_finished_by_mod
+  mod_cri_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.cri_finished_by_mod
+  mod_ts_deed_emission_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.deed_emission_finished_at_mod
+  mod_ts_deed_signature_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.deed_signature_finished_at_mod
+  mod_ts_crn_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.crn_finished_at_mod
+  mod_ts_key_delivery_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.key_delivery_finished_at_mod
+  mod_ts_cri_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.cri_finished_at_mod
   ts_started:
     lineage:
       - datalake_sales_flow_raw.notary_aud.started_at
@@ -104,6 +161,21 @@ columns:
   ts_updated:
     lineage:
       - datalake_sales_flow_raw.notary_aud.updated_at
+  ts_deed_emission_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.deed_emission_finished_at
+  ts_deed_signature_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.deed_signature_finished_at
+  ts_crn_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.crn_finished_at
+  ts_key_delivery_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.key_delivery_finished_at
+  ts_cri_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary_aud.cri_finished_at
   year:
     lineage:
       - datalake_sales_flow_raw.notary_aud.year

@@ -11,6 +11,9 @@ columns:
   id_specialist:
     lineage:
       - datalake_sales_flow_raw.notary.specialist_id
+  id_notary_office:
+    lineage:
+      - datalake_sales_flow_raw.notary.notary_office_id
   label:
     lineage:
       - datalake_sales_flow_raw.notary.label
@@ -35,6 +38,21 @@ columns:
   customer_follow_up:
     lineage:
       - datalake_sales_flow_raw.notary.customer_follow_up
+  deed_emission_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary.deed_emission_finished_by
+  deed_signature_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary.deed_signature_finished_by
+  crn_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary.crn_finished_by
+  key_delivery_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary.key_delivery_finished_by
+  cri_finished_by:
+    lineage:
+      - datalake_sales_flow_raw.notary.cri_finished_by
   ts_started:
     lineage:
       - datalake_sales_flow_raw.notary.started_at
@@ -56,6 +74,21 @@ columns:
   ts_updated:
     lineage:
       - datalake_sales_flow_raw.notary.updated_at
+  ts_deed_emission_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary.deed_emission_finished_at
+  ts_deed_signature_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary.deed_signature_finished_at
+  ts_crn_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary.crn_finished_at
+  ts_key_delivery_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary.key_delivery_finished_at
+  ts_cri_finished:
+    lineage:
+      - datalake_sales_flow_raw.notary.cri_finished_at
   year:
     lineage:
       - datalake_sales_flow_raw.notary.year

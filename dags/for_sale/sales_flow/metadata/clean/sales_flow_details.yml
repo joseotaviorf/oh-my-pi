@@ -8,6 +8,21 @@ columns:
   id_sales_flow:
     lineage:
       - datalake_sales_flow_raw.sales_flow_details.sales_flow_id
+  taskmaster_id:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details.taskmaster_id
+  buyer_onboarding_taskmaster_id:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details.buyer_onboarding_taskmaster_id
+  seller_onboarding_taskmaster_id:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details.seller_onboarding_taskmaster_id
+  buyer_hefesto_portfolio_unit_id:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details.buyer_hefesto_portfolio_unit_id
+  seller_hefesto_portfolio_unit_id:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details.seller_hefesto_portfolio_unit_id
   opportunities_of_the_week:
     lineage:
       - datalake_sales_flow_raw.sales_flow_details.opportunities_of_the_week
@@ -17,6 +32,9 @@ columns:
   google_drive_link:
     lineage:
       - datalake_sales_flow_raw.sales_flow_details.google_drive_link
+  ticket_complexity_level:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details.ticket_complexity_level
   ts_seller_fups:
     lineage:
       - datalake_sales_flow_raw.sales_flow_details.seller_fup_at

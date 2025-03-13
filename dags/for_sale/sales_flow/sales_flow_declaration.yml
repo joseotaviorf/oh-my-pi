@@ -194,6 +194,10 @@ workflow:
       clean_table_name: notary_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id_notary_aud", "rev"]
+    notary_office:
+      clean_table_name: notary_office
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     offer:
       clean_table_name: offer
       raw_primary_keys: ["id"]

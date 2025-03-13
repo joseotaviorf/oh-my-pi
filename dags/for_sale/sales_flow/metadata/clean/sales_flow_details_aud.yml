@@ -8,6 +8,21 @@ columns:
   id_sales_flow:
     lineage:
       - datalake_sales_flow_raw.sales_flow_details_aud.sales_flow_id
+  id_taskmaster:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.taskmaster_id
+  id_buyer_onboarding_taskmaster:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.buyer_onboarding_taskmaster_id
+  id_seller_onboarding_taskmaster:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.seller_onboarding_taskmaster_id
+  id_buyer_hefesto_portfolio_unit:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.buyer_hefesto_portfolio_unit_id
+  id_seller_hefesto_portfolio_unit:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.seller_hefesto_portfolio_unit_id
   rev:
     lineage:
       - datalake_sales_flow_raw.sales_flow_details_aud.rev
@@ -26,6 +41,9 @@ columns:
   google_drive_link:
     lineage:
       - datalake_sales_flow_raw.sales_flow_details_aud.google_drive_link
+  ticket_complexity_level:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.ticket_complexity_level
   mod_isolve_link:
     lineage:
       - datalake_sales_flow_raw.sales_flow_details_aud.isolve_link_mod
@@ -35,6 +53,33 @@ columns:
   id_sales_flow_mod:
     lineage:
       - datalake_sales_flow_raw.sales_flow_details_aud.mod_sales_flow_id
+  opportunities_of_the_week_mod:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.opportunities_of_the_week_mod
+  seller_fup_at_mod:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.seller_fup_at_mod
+  buyer_fup_at_mod:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.buyer_fup_at_mod
+  taskmaster_id_mod:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.taskmaster_id_mod
+  ticket_complexity_level_mod:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.ticket_complexity_level_mod
+  buyer_onboarding_taskmaster_id_mod:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.buyer_onboarding_taskmaster_id_mod
+  seller_onboarding_taskmaster_id_mod:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.seller_onboarding_taskmaster_id_mod
+  buyer_hefesto_portfolio_unit_id_mod:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.buyer_hefesto_portfolio_unit_id_mod
+  seller_hefesto_portfolio_unit_id_mod:
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_details_aud.seller_hefesto_portfolio_unit_id_mod
   ts_seller_fups:
     lineage:
       - datalake_sales_flow_raw.sales_flow_details_aud.seller_fup_at
