@@ -8,7 +8,7 @@ WITH timeline AS (
         array_distinct(array_agg(t.type_description)) AS type_description_array,
         CASE
             WHEN array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'TERMINATION') THEN 'TERMINATION'
-            WHEN DATE_TRUNC('MONTH', MAX(t.dt_ended_propose)) < DATE_TRUNC('MONTH', t.`date`) AND array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'GUARANTEE') THEN "TERMINATION"
+            WHEN MAX(t.dt_ended_propose) < t.`date` AND array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'GUARANTEE') THEN "TERMINATION"
             WHEN array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'GUARANTEE') THEN 'GUARANTEE'
             WHEN array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'SIGNATURE') THEN 'SIGNATURE'
             WHEN array_contains(array_agg(if(t.is_active_timeline is TRUE AND t.is_finished IS FALSE,t.type_description,null)), 'RENEWAL') THEN 'SIGNATURE'
@@ -16,7 +16,7 @@ WITH timeline AS (
         END AS major_type,
         CASE
             WHEN array_contains(array_agg(t.type_description), 'TERMINATION') THEN 'TERMINATION'
-            WHEN DATE_TRUNC('MONTH', MAX(t.dt_ended_propose)) < DATE_TRUNC('MONTH', t.`date`) AND array_contains(array_agg(t.type_description), 'GUARANTEE') THEN "TERMINATION"
+            WHEN MAX(t.dt_ended_propose) < t.`date` AND array_contains(array_agg(t.type_description), 'GUARANTEE') THEN "TERMINATION"
             WHEN array_contains(array_agg(t.type_description), 'GUARANTEE') THEN 'GUARANTEE'
             WHEN array_contains(array_agg(t.type_description), 'SIGNATURE') THEN 'SIGNATURE'
             WHEN array_contains(array_agg(t.type_description), 'RENEWAL') THEN 'SIGNATURE'

@@ -29,7 +29,7 @@ cte_base AS (
             WHEN d.amount_paid > 0 AND d.dt_paid IS NULL AND (LAG(d.amount_paid) OVER (PARTITION BY d.id ORDER BY r.ts_created) = d.amount_paid) THEN NULL
             ELSE d.dt_paid
         END AS dt_paid,
-        p.dt_ended AS dt_ended_propose,
+        p.dt_analyst_annulment_input AS dt_ended_propose,
         DATE(COALESCE(DATEADD(HOUR, -3, r.ts_created), d.dt_paid)) AS dt_updated,
         IF(is_currently_active, DATE(COALESCE(r.ts_created, d.dt_paid)),DATE(del.ts_updated)) AS dt_updated_arq,
         IF(DATE(del.dt_payment_scheduled) < DATE(del.ts_created), DATE(del.dt_payment_scheduled), DATE(del.ts_created)) AS dt_created,

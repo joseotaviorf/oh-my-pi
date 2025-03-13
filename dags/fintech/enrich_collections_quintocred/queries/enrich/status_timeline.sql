@@ -46,7 +46,7 @@ WITH base_cte_status AS (
         fix_rev a
     GROUP BY 1,2,4,5,6,7,8,9,10,11
     QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY a.id, DATE(a.ts_created_local) ORDER BY a.ts_created_local DESC) = 1
+        ROW_NUMBER() OVER (PARTITION BY a.id, DATE(a.ts_created_local) ORDER BY a.ts_created_local DESC, CASE WHEN a.rev_end IS NULL THEN 0 ELSE 1 END, a.ts_created_local DESC) = 1
     )
     SELECT
         id,
@@ -104,7 +104,7 @@ LEFT JOIN
                  DATE(d.`date`) >= DATE(s.ts_created_local) AND
                     IF(s.ts_ended_fixed IS NOT NULL AND is_last_register,
                         DATE(d.`date`) <= LAST_DAY(s.ts_ended_fixed),
-                        DATE(d.`date`) < DATE(s.ts_ended_3)),
+                        DATE(d.`date`) <= DATE(s.ts_ended_3)),
                  DATE(d.`date`) >= DATE(s.ts_created_local))
 WHERE
     d.`date` > DATE('2020-01-01')
