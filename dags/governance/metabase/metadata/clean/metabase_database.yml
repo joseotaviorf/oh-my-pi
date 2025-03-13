@@ -1,51 +1,70 @@
 database_name: datalake_metabase_clean
 table_name: metabase_database
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Information about data sources configured in Metabase
 columns:
   id:
     lineage:
       - datalake_metabase_raw.metabase_database.id
+    description: Unique ID for each database
   name:
     lineage:
       - datalake_metabase_raw.metabase_database.name
+    description: Name of database instances
   description:
     lineage:
       - datalake_metabase_raw.metabase_database.description
+    description: Description about each database
   details:
     lineage:
       - datalake_metabase_raw.metabase_database.details
+    description: Information about each data source
   engine:
     lineage:
       - datalake_metabase_raw.metabase_database.engine
+    description: Type of database used for each data source configured in Metabase
   options:
     lineage:
       - datalake_metabase_raw.metabase_database.options
+    description: Additional Settings
   timezone:
     lineage:
       - datalake_metabase_raw.metabase_database.timezone
+    description: Time zone configured for the data source
   is_on_demand:
     lineage:
       - datalake_metabase_raw.metabase_database.is_on_demand
+    description: Whether the data source should be loaded on demand
   is_sample:
     lineage:
       - datalake_metabase_raw.metabase_database.is_sample
+    description: Indicates whether the data source is a sample
   is_full_sync:
     lineage:
       - datalake_metabase_raw.metabase_database.is_full_sync
+    description: Whether this database runs a full metadata sync
   has_auto_run_queries:
     lineage:
       - datalake_metabase_raw.metabase_database.auto_run_queries
+    description: Whether this database auto runs queries
   ts_created:
     lineage:
       - datalake_metabase_raw.metabase_database.created_at
+    description: Date it was created
   ts_updated:
     lineage:
       - datalake_metabase_raw.metabase_database.updated_at
+    description: Date it was updated
   year:
     lineage:
       - datalake_metabase_raw.metabase_database.year
+    description: Year created
   month:
     lineage:
       - datalake_metabase_raw.metabase_database.month
+    description: Month created
   day:
     lineage:
       - datalake_metabase_raw.metabase_database.day
+    description: Day created

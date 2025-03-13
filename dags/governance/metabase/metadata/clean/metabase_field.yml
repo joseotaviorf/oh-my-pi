@@ -1,75 +1,102 @@
 database_name: datalake_metabase_clean
 table_name: metabase_field
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Information about Metabase table columns
 columns:
   id:
     lineage:
       - datalake_metabase_raw.metabase_field.id
+    description: Id of each field in the table
   id_table:
     lineage:
       - datalake_metabase_raw.metabase_field.table_id
+    description: ID table
   id_parent:
     lineage:
       - datalake_metabase_raw.metabase_field.parent_id
+    description: ID of a top field
   id_fk_target_field:
     lineage:
       - datalake_metabase_raw.metabase_field.fk_target_field_id
+    description: Id of a target field that is related to the current table field
   name:
     lineage:
       - datalake_metabase_raw.metabase_field.name
+    description: Field name
   display_name:
     lineage:
       - datalake_metabase_raw.metabase_field.display_name
+    description: Display name
   description:
     lineage:
       - datalake_metabase_raw.metabase_field.description
+    description: Field description
   base_type:
     lineage:
       - datalake_metabase_raw.metabase_field.base_type
+    description: Primary data type
   special_type:
     lineage:
       - datalake_metabase_raw.metabase_field.special_type
+    description: Information about the modification applied
   position:
     lineage:
       - datalake_metabase_raw.metabase_field.position
+    description: The position of the field
   field_values:
     lineage:
       - datalake_metabase_raw.metabase_field.has_field_values
+    description: Which type of field it is
   visibility_type:
     lineage:
       - datalake_metabase_raw.metabase_field.visibility_type
+    description: Type of field visibility
   fingerprint:
     lineage:
       - datalake_metabase_raw.metabase_field.fingerprint
+    description: Statistical summary of data contained in the field
   fingerprint_version:
     lineage:
       - datalake_metabase_raw.metabase_field.fingerprint_version
+    description: Fingerprint version number
   database_field_type:
     lineage:
       - datalake_metabase_raw.metabase_field.database_type
+    description: Database field type
   settings:
     lineage:
       - datalake_metabase_raw.metabase_field.settings
+    description: Custom Settings
   is_active:
     lineage:
       - datalake_metabase_raw.metabase_field.active
+    description: Field is active
   has_preview_display:
     lineage:
       - datalake_metabase_raw.metabase_field.preview_display
+    description: Configured preview view
   ts_last_analyzed:
     lineage:
       - datalake_metabase_raw.metabase_field.last_analyzed
+    description: Date of last analysis
   ts_created:
     lineage:
       - datalake_metabase_raw.metabase_field.created_at
+    description: Date it was created
   ts_updated:
     lineage:
       - datalake_metabase_raw.metabase_field.updated_at
+    description: Date it was updated
   year:
     lineage:
       - datalake_metabase_raw.metabase_field.year
+    description: Year created
   month:
     lineage:
       - datalake_metabase_raw.metabase_field.month
+    description: Month created
   day:
     lineage:
       - datalake_metabase_raw.metabase_field.day
+    description: Day created

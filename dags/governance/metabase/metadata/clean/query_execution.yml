@@ -1,45 +1,62 @@
 database_name: datalake_metabase_clean
 table_name: query_execution
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Query execution information
 columns:
   id:
     lineage:
       - datalake_metabase_raw.query_execution.id
+    description: Unique Id table
   id_user_executor:
     lineage:
       - datalake_metabase_raw.query_execution.executor_id
+    description: Executor ID
   id_card:
     lineage:
       - datalake_metabase_raw.query_execution.card_id
+    description: Card Id
   id_dashboard:
     lineage:
       - datalake_metabase_raw.query_execution.dashboard_id
+    description: Dashboard Id
   id_pulse:
     lineage:
       - datalake_metabase_raw.query_execution.pulse_id
+    description: Pulse Id
   id_database:
     lineage:
       - datalake_metabase_raw.query_execution.database_id
+    description: Database Id
   hash:
     lineage:
       - datalake_metabase_raw.query_execution.hash
+    description: Hash value in bytes
   hash_string:
     lineage:
       - datalake_metabase_raw.query_execution.hash_string
+    description: Stores a generated hash value
   context:
     lineage:
       - datalake_metabase_raw.query_execution.context
+    description: Contextual information associated with a query
   result_rows:
     lineage:
       - datalake_metabase_raw.query_execution.result_rows
+    description: Stores results returned by an operation performed on the database
   error_message:
     lineage:
       - datalake_metabase_raw.query_execution.error
+    description: Error message
   running_time_in_milliseconds:
     lineage:
       - datalake_metabase_raw.query_execution.running_time
+    description: Execution time
   is_native:
     lineage:
       - datalake_metabase_raw.query_execution.native
+    description: Operation is native to the database or system
   ts_started:
     lineage:
       - datalake_metabase_raw.query_execution.started_at
+    description: Date the operation was initiated

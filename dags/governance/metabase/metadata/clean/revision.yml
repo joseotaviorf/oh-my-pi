@@ -1,30 +1,42 @@
 database_name: datalake_metabase_clean
 table_name: revision
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Stores object revision history in Metabase
 columns:
   id:
     lineage:
       - datalake_metabase_raw.revision.id
+    description: Unique Id table
   id_user_revisor:
     lineage:
       - datalake_metabase_raw.revision.user_id
+    description: ID of the user who made the review
   id_model:
     lineage:
       - datalake_metabase_raw.revision.model_id
+    description: Revision model id
   model:
     lineage:
       - datalake_metabase_raw.revision.model
+    description: Review model
   object:
     lineage:
       - datalake_metabase_raw.revision.object
+    description: Contains information about the query
   message:
     lineage:
       - datalake_metabase_raw.revision.message
+    description: Additional information about execution
   is_reversion:
     lineage:
       - datalake_metabase_raw.revision.is_reversion
+    description: Whether the action is a rollback of a previous change
   is_creation:
     lineage:
       - datalake_metabase_raw.revision.is_creation
+    description: If the action corresponds to the creation of a new record
   ts_revision:
     lineage:
       - datalake_metabase_raw.revision.timestamp
+    description: Date a review was made

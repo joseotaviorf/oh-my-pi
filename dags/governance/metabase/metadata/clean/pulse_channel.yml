@@ -1,45 +1,62 @@
 database_name: datalake_metabase_clean
 table_name: pulse_channel
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Information about the channels through which Pulse reports are sent
 columns:
   id:
     lineage:
       - datalake_metabase_raw.pulse_channel.id
+    description: Unique table id
   id_pulse:
     lineage:
       - datalake_metabase_raw.pulse_channel.pulse_id
+    description: Pulse id
   channel_type:
     lineage:
       - datalake_metabase_raw.pulse_channel.channel_type
+    description: Channel type
   details:
     lineage:
       - datalake_metabase_raw.pulse_channel.details
+    description: Channel details
   schedule_type:
     lineage:
       - datalake_metabase_raw.pulse_channel.schedule_type
+    description: Schedule type
   schedule_frame:
     lineage:
       - datalake_metabase_raw.pulse_channel.schedule_frame
+    description: Exact time when the Pulse report will be sent
   schedule_hour:
     lineage:
       - datalake_metabase_raw.pulse_channel.schedule_hour
+    description: Exact time of day a Pulse report will be sent
   schedule_day:
     lineage:
       - datalake_metabase_raw.pulse_channel.schedule_day
+    description: Specific day a Pulse report will be sent
   is_enabled:
     lineage:
       - datalake_metabase_raw.pulse_channel.enabled
+    description: The setting is on or off
   ts_created:
     lineage:
       - datalake_metabase_raw.pulse_channel.created_at
+    description: Date it was created
   ts_updated:
     lineage:
       - datalake_metabase_raw.pulse_channel.updated_at
+    description: Date it was updated
   year:
     lineage:
       - datalake_metabase_raw.pulse_channel.year
+    description: Year created
   month:
     lineage:
       - datalake_metabase_raw.pulse_channel.month
+    description: Month created
   day:
     lineage:
       - datalake_metabase_raw.pulse_channel.day
+    description: Day created

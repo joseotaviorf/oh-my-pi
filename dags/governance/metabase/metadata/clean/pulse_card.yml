@@ -1,21 +1,30 @@
 database_name: datalake_metabase_clean
 table_name: pulse_card
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Store information about pulse cards
 columns:
   id:
     lineage:
       - datalake_metabase_raw.pulse_card.id
+    description: Unique Id table
   id_pulse:
     lineage:
       - datalake_metabase_raw.pulse_card.pulse_id
+    description: Pulse Id
   id_card:
     lineage:
       - datalake_metabase_raw.pulse_card.card_id
+    description: Card Id
   position:
     lineage:
       - datalake_metabase_raw.pulse_card.position
+    description: Numerical position of a card
   has_csv_included:
     lineage:
       - datalake_metabase_raw.pulse_card.include_csv
+    description: Indicates whether a CSV file is included
   has_xls_included:
     lineage:
       - datalake_metabase_raw.pulse_card.include_xls
+    description: Indicates whether an xls file is included

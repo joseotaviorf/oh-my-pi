@@ -1,60 +1,82 @@
 database_name: datalake_metabase_clean
 table_name: report_card
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Information about report cards in Metabase
 columns:
   id:
     lineage:
       - datalake_metabase_raw.report_card.id
+    description: Unique question id
   id_user_creator:
     lineage:
       - datalake_metabase_raw.report_card.creator_id
+    description: Unique creator id
   id_database:
     lineage:
       - datalake_metabase_raw.report_card.database_id
+    description: Database id
   id_table:
     lineage:
       - datalake_metabase_raw.report_card.table_id
+    description: Table id
   id_collection:
     lineage:
       - datalake_metabase_raw.report_card.collection_id
+    description: Colection id
   name:
     lineage:
       - datalake_metabase_raw.report_card.name
+    description: Question name
   description:
     lineage:
       - datalake_metabase_raw.report_card.description
+    description: Detailed description about the report card
   display:
     lineage:
       - datalake_metabase_raw.report_card.display
+    description: Report view type in Metabase
   query_type:
     lineage:
       - datalake_metabase_raw.report_card.query_type
+    description: Shows the type of query
   dataset_query:
     lineage:
       - datalake_metabase_raw.report_card.dataset_query
+    description: Query code executed
   visualization_settings:
     lineage:
       - datalake_metabase_raw.report_card.visualization_settings
+    description: Preview Provided Settings
   embedding_params:
     lineage:
       - datalake_metabase_raw.report_card.embedding_params
+    description: Configuration parameters
   is_enabled_for_embedding:
     lineage:
       - datalake_metabase_raw.report_card.enable_embedding
+    description: Whether visualization can be incorporated into external systems
   is_archived:
     lineage:
       - datalake_metabase_raw.report_card.archived
+    description: If it is archived
   ts_created:
     lineage:
       - datalake_metabase_raw.report_card.created_at
+    description: Date it was created
   ts_updated:
     lineage:
       - datalake_metabase_raw.report_card.updated_at
+    description: Date it was updated
   year:
     lineage:
       - datalake_metabase_raw.report_card.year
+    description: Year created
   month:
     lineage:
       - datalake_metabase_raw.report_card.month
+    description: Month created
   day:
     lineage:
       - datalake_metabase_raw.report_card.day
+    description: Day created

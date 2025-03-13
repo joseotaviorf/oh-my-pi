@@ -1,48 +1,66 @@
 database_name: datalake_metabase_clean
 table_name: core_user
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Information about Metabase users
 columns:
   id:
     lineage:
       - datalake_metabase_raw.core_user.id
+    description: Unique table user ID
   email:
     lineage:
       - datalake_metabase_raw.core_user.email
+    description: User email
   first_name:
     lineage:
       - datalake_metabase_raw.core_user.first_name
+    description: First name
   last_name:
     lineage:
       - datalake_metabase_raw.core_user.last_name
+    description: Last name
   is_active:
     lineage:
       - datalake_metabase_raw.core_user.is_active
+    description: The collection is activated
   is_superuser:
     lineage:
       - datalake_metabase_raw.core_user.is_superuser
+    description: Whether the user is a member of the built-in Admin group.
   is_qbnewb:
     lineage:
       - datalake_metabase_raw.core_user.is_qbnewb
+    description: If false then the user has been introduced to how the Query Builder
   has_google_auth:
     lineage:
       - datalake_metabase_raw.core_user.google_auth
+    description: Whether the user was created via Google SSO. Note, if this is enabled then username/password log-in will not be possible
   has_ldap_auth:
     lineage:
       - datalake_metabase_raw.core_user.ldap_auth
+    description: User uses LDAP as an authentication method
   ts_joined:
     lineage:
       - datalake_metabase_raw.core_user.date_joined
+    description: Date and time the user registered in the system
   ts_last_login:
     lineage:
       - datalake_metabase_raw.core_user.last_login
+    description: Last time the user logged in
   ts_updated:
     lineage:
       - datalake_metabase_raw.core_user.updated_at
+    description: Update date
   year:
     lineage:
       - datalake_metabase_raw.core_user.year
+    description: Year created
   month:
     lineage:
       - datalake_metabase_raw.core_user.month
+    description: Month created
   day:
     lineage:
       - datalake_metabase_raw.core_user.day
+    description: Day created

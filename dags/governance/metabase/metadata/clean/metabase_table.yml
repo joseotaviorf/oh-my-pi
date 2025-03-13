@@ -1,51 +1,70 @@
 database_name: datalake_metabase_clean
 table_name: metabase_table
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Table structure information within the Metabase system
 columns:
   id:
     lineage:
       - datalake_metabase_raw.metabase_table.id
+    description: Unique table id
   id_database:
     lineage:
       - datalake_metabase_raw.metabase_table.db_id
+    description: Database id
   name:
     lineage:
       - datalake_metabase_raw.metabase_table.name
+    description: Table name
   display_name:
     lineage:
       - datalake_metabase_raw.metabase_table.display_name
+    description: Display name
   description:
     lineage:
       - datalake_metabase_raw.metabase_table.description
+    description: Description table
   entity_name:
     lineage:
       - datalake_metabase_raw.metabase_table.entity_name
+    description: Entity name
   entity_type:
     lineage:
       - datalake_metabase_raw.metabase_table.entity_type
+    description: Entity type
   schema:
     lineage:
       - datalake_metabase_raw.metabase_table.schema
+    description: Table schema
   visibility_type:
     lineage:
       - datalake_metabase_raw.metabase_table.visibility_type
+    description: Visibility type of a table
   is_active:
     lineage:
       - datalake_metabase_raw.metabase_table.active
+    description: The table is active
   has_table_showing_in_getting_started:
     lineage:
       - datalake_metabase_raw.metabase_table.show_in_getting_started
+    description: Start guide appears
   ts_created:
     lineage:
       - datalake_metabase_raw.metabase_table.created_at
+    description: Date it was created
   ts_updated:
     lineage:
       - datalake_metabase_raw.metabase_table.updated_at
+    description: Date it was updated
   year:
     lineage:
       - datalake_metabase_raw.metabase_table.year
+    description: Year created
   month:
     lineage:
       - datalake_metabase_raw.metabase_table.month
+    description: Month created
   day:
     lineage:
       - datalake_metabase_raw.metabase_table.day
+    description: Day created

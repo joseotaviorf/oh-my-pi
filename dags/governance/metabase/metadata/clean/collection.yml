@@ -1,24 +1,34 @@
 database_name: datalake_metabase_clean
 table_name: collection
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Information about collections
 columns:
   id:
     lineage:
       - datalake_metabase_raw.collection.id
+    description: Collection ID
   id_user_personal_owner:
     lineage:
       - datalake_metabase_raw.collection.personal_owner_id
+    description: Collection owner user ID
   name:
     lineage:
       - datalake_metabase_raw.collection.name
+    description: Collection name
   description:
     lineage:
       - datalake_metabase_raw.collection.description
+    description: Collection description
   location:
     lineage:
       - datalake_metabase_raw.collection.location
+    description: Collection location
   slug:
     lineage:
       - datalake_metabase_raw.collection.slug
+    description: Collection name slug
   is_archived:
     lineage:
       - datalake_metabase_raw.collection.archived
+    description: Collection is archived

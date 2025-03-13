@@ -1,54 +1,74 @@
 database_name: datalake_metabase_clean
 table_name: report_dashboard
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Information about dashboards created in Metabase
 columns:
   id:
     lineage:
       - datalake_metabase_raw.report_dashboard.id
+    description: Unique table id
   id_user_creator:
     lineage:
       - datalake_metabase_raw.report_dashboard.creator_id
+    description: Unique creator id
   id_collection:
     lineage:
       - datalake_metabase_raw.report_dashboard.collection_id
+    description: Colection id
   name:
     lineage:
       - datalake_metabase_raw.report_dashboard.name
+    description: Dashboard name in Metabase
   description:
     lineage:
       - datalake_metabase_raw.report_dashboard.description
+    description: Detailed description of the dashboard in Metabase
   position:
     lineage:
       - datalake_metabase_raw.report_dashboard.position
+    description: Display position of a dashboard within a Metabase interface
   collection_position:
     lineage:
       - datalake_metabase_raw.report_dashboard.collection_position
+    description: Position of a dashboard within a collection in Metabase
   parameters:
     lineage:
       - datalake_metabase_raw.report_dashboard.parameters
+    description: Parameters used in queries
   embedding_params:
     lineage:
       - datalake_metabase_raw.report_dashboard.embedding_params
+    description: Parameters used to embed a visualization
   is_archived:
     lineage:
       - datalake_metabase_raw.report_dashboard.archived
+    description: If it is archived
   has_show_in_getting_started:
     lineage:
       - datalake_metabase_raw.report_dashboard.show_in_getting_started
+    description: Whether to display the preview in the Getting Started section
   is_enabled_for_embedding:
     lineage:
       - datalake_metabase_raw.report_dashboard.enable_embedding
+    description: Whether the visualization can be embedded in external systems
   ts_created:
     lineage:
       - datalake_metabase_raw.report_dashboard.created_at
+    description: Date it was created
   ts_updated:
     lineage:
       - datalake_metabase_raw.report_dashboard.updated_at
+    description: Date it was updated
   year:
     lineage:
       - datalake_metabase_raw.report_dashboard.year
+    description: Year created
   month:
     lineage:
       - datalake_metabase_raw.report_dashboard.month
+    description: Month created
   day:
     lineage:
       - datalake_metabase_raw.report_dashboard.day
+    description: Day created

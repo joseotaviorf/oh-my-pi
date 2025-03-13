@@ -1,18 +1,26 @@
 database_name: datalake_metabase_clean
 table_name: view_log
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Log view records within the metabase
 columns:
   id:
     lineage:
       - datalake_metabase_raw.view_log.id
+    description: Unique Id table
   id_user_viewer:
     lineage:
       - datalake_metabase_raw.view_log.user_id
+    description: User ID who viewed
   id_model:
     lineage:
       - datalake_metabase_raw.view_log.model_id
+    description: Model ID
   model:
     lineage:
       - datalake_metabase_raw.view_log.model
+    description: Model type
   ts_viewed:
     lineage:
       - datalake_metabase_raw.view_log.timestamp
+    description: Data from the last time viewed

@@ -1,45 +1,62 @@
 database_name: datalake_metabase_clean
 table_name: report_dashboard_card
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Information about report cards that are part of dashboards in Metabase
 columns:
   id:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.id
+    description: Unique Id table
   id_card:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.card_id
+    description: Card id
   id_dashboard:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.dashboard_id
+    description: Dashboard id
   size_x:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.sizex
+    description: Report card width
   size_y:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.sizey
+    description: Report card height
   row:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.row
+    description: Report card position
   column:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.col
+    description: Sets the column position of the report card
   parameter_mappings:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.parameter_mappings
+    description: Parameter mappings used in a query
   visualization_settings:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.visualization_settings
+    description: Display and formatting settings
   ts_created:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.created_at
+    description: Date it was created
   ts_updated:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.updated_at
+    description: Date it was updated
   year:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.year
+    description: Year created
   month:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.month
+    description: Month created
   day:
     lineage:
       - datalake_metabase_raw.report_dashboardcard.day
+    description: Day created

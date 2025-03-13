@@ -1,48 +1,66 @@
 database_name: datalake_metabase_clean
 table_name: pulse
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Governance
+description: Contains refined and structured data related to pulse measurements
 columns:
   id:
     lineage:
       - datalake_metabase_raw.pulse.id
+    description: Unique Id table
   id_user_creator:
     lineage:
       - datalake_metabase_raw.pulse.creator_id
+    description: Unique creator id
   id_collection:
     lineage:
       - datalake_metabase_raw.pulse.collection_id
+    description: Collection Id
   name:
     lineage:
       - datalake_metabase_raw.pulse.name
+    description: Pulse name
   collection_position:
     lineage:
       - datalake_metabase_raw.pulse.collection_position
+    description: Collection position
   alert_condition:
     lineage:
       - datalake_metabase_raw.pulse.alert_condition
+    description: Condition that triggers an alert
   is_archived:
     lineage:
       - datalake_metabase_raw.pulse.archived
+    description: If the record has been archived
   is_skipped_if_empty:
     lineage:
       - datalake_metabase_raw.pulse.skip_if_empty
+    description: is_skipped_if_empty
   has_alert_if_first_only:
     lineage:
       - datalake_metabase_raw.pulse.alert_first_only
+    description: Indicates that an alert should be generated only for the first event
   has_alert_if_above_goal:
     lineage:
       - datalake_metabase_raw.pulse.alert_above_goal
+    description: Indicates whether an alert should be generated when the value exceeds the target
   ts_created:
     lineage:
       - datalake_metabase_raw.pulse.created_at
+    description: Date it was created
   ts_updated:
     lineage:
       - datalake_metabase_raw.pulse.updated_at
+    description: Date it was updated
   year:
     lineage:
       - datalake_metabase_raw.pulse.year
+    description: Year created
   month:
     lineage:
       - datalake_metabase_raw.pulse.month
+    description: Month created
   day:
     lineage:
       - datalake_metabase_raw.pulse.day
+    description: Day created
