@@ -1,6 +1,0 @@
----
-table_name: metric_rent.ppmulti_new_first_listings_monthly
-alert_channel: "#alerts-de-airflow-dags"
-column_level_validations:
-  month:
-    is_complete:

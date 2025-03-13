@@ -2,6 +2,10 @@ dag:
   name: metric_rent__listings
   schedule_start_date: 2020,07,01
   owner: Data ForSale
+  documentation:
+    dag_purpose:
+      "The listings domain follows the house publication, and intermediate steps until its rent.
+      Here, it usually is interesting to follow conversions during the listing life."
 workflow:
   type: query
   layer: metric
@@ -12,7 +16,7 @@ cluster:
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

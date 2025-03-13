@@ -2,6 +2,8 @@ dag:
   name: metric_rent__contracts
   schedule_start_date: 2020,07,01
   owner: Data ForRent
+  documentation:
+    dag_purpose: "Rental contracts metrics, including active and ended, to get the information about the new rentals, new and ended contracts."
 workflow:
   type: query
   layer: metric
