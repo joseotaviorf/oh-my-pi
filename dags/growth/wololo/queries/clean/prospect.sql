@@ -28,6 +28,7 @@ SELECT
     affiliatetype AS affiliate_type,
     affiliatename AS affiliate_name,
     mktorigin AS mkt_origin,
+    scoringinfo AS scoring_info,
     longtail AS is_long_tail,
     whatsappoptedin AS is_whatsapp_opted_in,
     forsale AS is_for_sale,

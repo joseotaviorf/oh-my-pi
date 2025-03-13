@@ -88,6 +88,9 @@ columns:
   mkt_origin:
     lineage:
       - datalake_wololo_raw.prospect.mktorigin
+  scoring_info:
+    lineage:
+      - datalake_wololo_raw.prospect.scoringinfo
   is_long_tail:
     lineage:
       - datalake_wololo_raw.prospect.longtail

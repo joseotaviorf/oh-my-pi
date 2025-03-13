@@ -34,6 +34,9 @@ columns:
   longtail:
     lineage:
       - datalake_wololo_raw.prospect_aud.longtail
+  scoring_info:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.scoringinfo
   mod_id_reference:
     lineage:
       - datalake_wololo_raw.prospect_aud.referenceid_mod
@@ -49,3 +52,6 @@ columns:
   mod_status:
     lineage:
       - datalake_wololo_raw.prospect_aud.status_mod
+  mod_scoring_info:
+    lineage:
+      - datalake_wololo_raw.prospect_aud.scoringinfo_mod
