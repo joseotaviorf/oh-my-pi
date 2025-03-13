@@ -52,7 +52,7 @@ SELECT
     kit_sent_at AS ts_kit_sent,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    deed_emission_finished_at, AS ts_deed_emission_finished,
+    deed_emission_finished_at AS ts_deed_emission_finished,
     deed_signature_finished_at AS ts_deed_signature_finished,
     crn_finished_at AS ts_crn_finished,
     key_delivery_finished_at AS ts_key_delivery_finished,
