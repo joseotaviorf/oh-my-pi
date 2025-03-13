@@ -1,0 +1,17 @@
+dag:
+  name: enrich_person
+  schedule_start_date: 2020, 1, 1
+  owner: Data Rede
+  documentation:
+    dag_purpose: This DAG creates the enriched table for the Person Database. This DAG is triggered by Mediator and loads the table via full load.
+workflow:
+  type: query_delta
+  layer: enrich
+cluster:
+  type: databricks_12_2_min_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

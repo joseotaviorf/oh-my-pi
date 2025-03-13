@@ -2379,6 +2379,13 @@ bietlejuice.enrich_people_public:
   - bietlejuice.gsheets_people:done-clean-position-class
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
   - bietlejuice.hr_system:load-clean-organizations
+bietlejuice.enrich_person:
+  - bietlejuice.company:load-clean-member-profile
+  - bietlejuice.person:load-clean-contact-info
+  - bietlejuice.person:load-clean-credential-reference
+  - bietlejuice.person:load-clean-person
+  - bietlejuice.person:load-clean-preference-settings
+  - bietlejuice.person:load-clean-right-to-be-forgotten
 bietlejuice.enrich_pixar:
   - bietlejuice.pixar:load-clean-account
   - bietlejuice.pixar:load-clean-charge

@@ -1,0 +1,119 @@
+---
+database_name: datalake_person
+table_name: person_sks
+description: Generates the surrogate keys for Person database and consolidate related foreign keys.
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_person:
+    lineage:
+      - datalake_person_clean.person.id
+    description: Surrogate key for Person's table in dimensional modeling.
+  id_person:
+    lineage:
+      - datalake_person_clean.person.id
+    description: Primary key for Person's person table.
+  id_contact_info_email:
+    lineage:
+      - datalake_person_clean.contact_info.id
+    description: Foreign key to Person's contact_info table.
+  id_credential_reference:
+    lineage:
+      - datalake_person_clean.credential_reference.id
+    description: Foreign key to Person's credential_reference table.
+  id_preference_settings:
+    lineage:
+      - datalake_person_clean.preference_settings.id
+    description: Foreign key to Person's preference_settings table.
+  id_right_to_be_forgotten:
+    lineage:
+      - datalake_person_clean.right_to_be_forgotten.id
+    description: Foreign key to Person's right_to_be_forgotten table.
+  uuid_person:
+    lineage:
+      - datalake_person_clean.person.uuid_person
+    description: UUID of the Person.
+  has_affiliated_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has an affiliated member with a member profile in Company product.
+  has_buyer_prospect_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a buyer prospect member profile in Company product.
+  has_ciq_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a CIQ member profile in Company product.
+  has_company_admin_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a company admin member profile in Company product.
+  has_company_owner_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a company owner member profile in Company product.
+  has_company_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a company member profile in Company product.
+  has_contract_person_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a contract person member profile in Company product.
+  has_customer_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a customer member profile in Company product.
+  has_legal_person_tenant_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a legal person tenant member profile in Company product.
+  has_partner_agent_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a partner agent member profile in Company product.
+  has_photographer_agent_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a photographer agent member profile in Company product.
+  has_photographer_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a photographer member profile in Company product.
+  has_property_inspector_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a property inspector member profile in Company product.
+  has_property_owner_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a property owner member profile in Company product.
+  has_property_owner_prospect_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a property owner prospect member profile in Company product.
+  has_realtor_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a realtor member profile in Company product.
+  has_tenant_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a tenant member profile in Company product.
+  has_tenant_prospect_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a tenant prospect member profile in Company product.
+  has_third_party_agent_member_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True if the person has a third party agent member profile in Company product.
+  ts_created:
+    lineage:
+      - datalake_person_clean.person.ts_created
+    description: Timestamp of when the record of the Person was created.
+  ts_updated:
+    lineage:
+      - datalake_person_clean.person.ts_updated
+    description: Timestamp of when the record of the Person was updated.
