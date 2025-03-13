@@ -7,7 +7,7 @@ WITH listing_rent_flows AS (
             id_tenant,
             MAX(id_reservation) OVER (PARTITION BY id_house, id_tenant) AS max_id,
             COUNT(1) OVER (PARTITION BY id_house, id_tenant) AS reservation_attempts
-        FROM
+        FROM 
             datalake_kill_queue.reservation
     ),
     rent_flows_base AS (
@@ -118,22 +118,22 @@ WITH listing_rent_flows AS (
             COALESCE(CAST(contract.ts_signed AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_contract_signed,
             COALESCE(CAST(contract.ts_created AS TIMESTAMP),CAST(NULL AS TIMESTAMP)) AS ts_contract_created,
             CAST(NOW() AS TIMESTAMP) AS ts_load
-        FROM
+        FROM 
             datalake_ebdb_rent_flow.rent_flow
-        JOIN
+        JOIN 
             datalake_ebdb_listing.house_listing -- 1:M (M rent_flow x 1 listing)
                 ON house_listing.id_house = rent_flow.id_house
                 AND COALESCE(rent_flow.dt_rent_flow_created, '1900-01-01') BETWEEN
                     COALESCE(house_listing.ts_listing_version_start, '1900-01-01')
                     AND COALESCE(house_listing.ts_listing_version_end, NOW())
-        JOIN
+        JOIN 
             datalake_ebdb_listing.house h
                 ON house_listing.id_house = h.id
-        LEFT JOIN
+        LEFT JOIN 
             dw_rent.dim_offer
                 ON dim_offer.sk_offer = COALESCE(rent_flow.id_offer_context, -1)
                 AND dim_offer.sk_offer != -1
-        LEFT JOIN
+        LEFT JOIN 
             datalake_proposal.proposal
                 ON rent_flow.id_proposal = proposal.id
         LEFT JOIN
@@ -149,15 +149,15 @@ WITH listing_rent_flows AS (
                 ON contract.id_house = rent_flow.id_house
                 AND contract.id = rent_flow.id_contract
                 /*
-                    The contract join considering listing version will stay as a comment until the rent_flow creation without house status restrictions are not implemented,
+                    The contract join considering listing version will stay as a comment until the rent_flow creation without house status restrictions are not implemented, 
                     so we can present contract signed and creation dates.
                 */
-                /*
-                AND contract.ts_created BETWEEN
-                    COALESCE(house_listing.ts_listing_version_start, '2000-01-01 00:00:00')
+                /* 
+                AND contract.ts_created BETWEEN 
+                    COALESCE(house_listing.ts_listing_version_start, '2000-01-01 00:00:00') 
                     AND COALESCE(house_listing.ts_listing_version_end, CURRENT_DATE)
                 */
-        LEFT JOIN
+        LEFT JOIN 
             reservation
                 ON reservation.max_id = reservation.id_reservation
                 AND rent_flow.id_house = reservation.id_house
@@ -169,7 +169,7 @@ WITH listing_rent_flows AS (
                 AND reservation.ts_created BETWEEN
                     COALESCE(dim_offer.dt_created, '1900-01-01')
                     AND COALESCE(proposal.ts_processed, proposal.ts_updated)
-        LEFT JOIN
+        LEFT JOIN 
             dw_public.dim_booking
                 ON dim_booking.sk_booking = rent_flow.id_booking
         LEFT JOIN
@@ -187,7 +187,7 @@ WITH listing_rent_flows AS (
                     AND h.id_company_hubspot IS NULL
                     AND h.partner_3p_supply = cs.extracted_3p_tag
                 ))
-        WHERE
+        WHERE 
             house_listing.is_for_rent
             AND (
                 COALESCE(dim_booking.visit_intent, '') <> 'SALE'
@@ -203,17 +203,17 @@ WITH listing_rent_flows AS (
         SELECT
             sla.sk_contract,
             sla.sk_proposal,
-            IF(sla.ts_contract_created IS NULL, NULL, sla.ca2cc_working_minutes) AS ca2cc_working_minutes,
-            IF(sla.ts_contract_signed IS NULL, NULL, sla.ca2cs_working_minutes) as ca2cs_working_minutes,
-            IF(sla.ts_contract_signed IS NULL, NULL, sla.cc2cs_working_minutes) as cc2cs_working_minutes
+            sla.ca2cc_working_minutes,
+            sla.ca2cs_working_minutes,
+            sla.cc2cs_working_minutes
         FROM
         (
             SELECT
                 rf.sk_contract,
                 rf.sk_proposal,
-                ts_credit_last_approved,
-                ts_contract_created,
-                ts_contract_signed,
+                COALESCE(rf.ts_credit_last_approved, TIMESTAMP '1900-01-01') AS ts_credit_last_approved,
+                COALESCE(rf.ts_contract_created, TIMESTAMP '1900-01-01') AS ts_contract_created,
+                COALESCE(rf.ts_contract_signed, TIMESTAMP '1900-01-01') AS ts_contract_signed,
                 CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_credit_last_approved, TIMESTAMP '1900-01-01'),coalesce(ts_contract_created, TIMESTAMP '1900-01-01')) AS FLOAT) AS ca2cc_working_minutes,
                 CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_credit_last_approved, TIMESTAMP '1900-01-01'),coalesce(ts_contract_signed, TIMESTAMP '1900-01-01')) AS FLOAT) ca2cs_working_minutes,
                 CAST(FINTECHOPS_WORK_MIN_SLA(coalesce(ts_contract_created, TIMESTAMP '1900-01-01'),coalesce(ts_contract_signed, TIMESTAMP '1900-01-01')) AS FLOAT) cc2cs_working_minutes
@@ -221,6 +221,10 @@ WITH listing_rent_flows AS (
             FROM
                 rent_flows_base rf
         ) sla
+        WHERE
+            sla.ts_credit_last_approved <> CAST('1900-01-01' AS TIMESTAMP)
+            AND sla.ts_contract_created <> CAST('1900-01-01' AS TIMESTAMP)
+            AND sla.ts_contract_signed <> CAST('1900-01-01' AS TIMESTAMP)
     )
     SELECT
         rent_flows_base.*,
@@ -341,8 +345,8 @@ WITH listing_rent_flows AS (
         sla.cc2cs_working_minutes
     FROM
         rent_flows_base
-    LEFT JOIN
-        sla_working_minutes sla
+    LEFT JOIN 
+        sla_working_minutes sla 
             ON rent_flows_base.sk_proposal = sla.sk_proposal
             AND rent_flows_base.sk_contract = sla.sk_contract
 )
