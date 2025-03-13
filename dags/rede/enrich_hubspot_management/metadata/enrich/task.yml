@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: task
 description: This table has one row per task in HubSpot.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachior@quintoandar.com.br
 columns:
   id_task:
     lineage:

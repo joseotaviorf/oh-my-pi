@@ -3,16 +3,28 @@ database_name: datalake_hubspot
 table_name: owner
 description: Table showing the user and team information of the owners of tickets created in Hubspot. Each row is an owner.
 domain: Rede
-owner: data-for-sale@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_owner:
     lineage:
       - datalake_hubspot.owner_history.id_owner
     description: ID of the owner.
+  id_current_team:
+    lineage:
+      - datalake_hubspot.owner_history.teams
+    description: ID of the current Hubspot team the owner belongs to. Foreign key to the team Hubspot table.
   id_user:
     lineage:
       - datalake_hubspot.owner_history.id_user
-    description: ID of the user who belongs to the owner.
+    description: ID of the user in Hubspot who belongs to the owner. Foreign key to the user Hubspot table.
+  uuid_person:
+    lineage:
+      - datalake_hubspot.owner_history.uuid_person
+    description: UUID of the person in QuintoAndar's Person service.
+  current_team_name:
+    lineage:
+      - datalake_hubspot.owner_history.teams
+    description: Name of the current Hubspot team the owner belongs to.
   email:
     lineage:
       - datalake_hubspot.owner_history.email
@@ -25,6 +37,10 @@ columns:
     lineage:
       - datalake_hubspot.owner_history.last_name
     description: Last name of the owner.
+  owner_user:
+    lineage:
+      - datalake_hubspot.owner_history.email
+    description: User of the owner, based on the owner's email.
   teams:
     lineage:
       - datalake_hubspot.owner_history.teams

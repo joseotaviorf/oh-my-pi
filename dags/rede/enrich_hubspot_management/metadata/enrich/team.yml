@@ -1,10 +1,9 @@
 ---
 database_name: datalake_hubspot
 table_name: team
-description: "Table with the Rede QuintoAndar teams. 
-  E. g: Product, Engineering, Sales and etc. Each row is a team."
+description: "Table with the Rede QuintoAndar teams. E. g: Product, Engineering, Sales and etc. Each row is a team."
 domain: Rede
-owner: data-for-sale@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_team:
     lineage:

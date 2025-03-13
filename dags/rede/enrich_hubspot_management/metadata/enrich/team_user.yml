@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: team_user
 description: "Table linking each user to a team. Each row is a user who belongs to a team"
 domain: Rede
-owner: data-for-sale@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_team:
     lineage:

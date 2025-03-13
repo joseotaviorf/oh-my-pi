@@ -1,6 +1,9 @@
 ---
 database_name: datalake_hubspot
 table_name: email
+description: This table has one row per e-mail in HubSpot.
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_email:
     lineage:

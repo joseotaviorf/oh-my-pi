@@ -1,40 +1,55 @@
 ---
 database_name: datalake_hubspot
 table_name: owner_history
+description: This table has one row per day that has a modification or creation of a owner in HubSpot. If you want one row per owner, use datalake_hubspot.owner.
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_owner:
     lineage:
       - datalake_hubspot_clean.owner.id_owner
+    description: ID of the owner.
   id_user:
     lineage:
       - datalake_hubspot_clean.owner.id_user
+    description: ID of the user in Hubspot who belongs to the owner. Foreign key to the user Hubspot table.
   email:
     lineage:
       - datalake_hubspot_clean.owner.email
+    description: Email of the owner.
   first_name:
     lineage:
       - datalake_hubspot_clean.owner.first_name
+    description: First name of the owner.
   last_name:
     lineage:
       - datalake_hubspot_clean.owner.last_name
+    description: Last name of the owner.
   teams:
     lineage:
       - datalake_hubspot_clean.owner.teams
+    description: A column in struct format showing the owner's relationship with the teams he is part of.
   is_archived:
     lineage:
       - datalake_hubspot_clean.owner.is_archived
+    description: Whether the owner is archived.
   ts_created:
     lineage:
       - datalake_hubspot_clean.owner.ts_created
+    description: Timestamp of when the owner was created.
   ts_updated:
     lineage:
       - datalake_hubspot_clean.owner.ts_updated
+    description: Timestamp of when the owner was last updated.
   year:
     lineage:
       - datalake_hubspot_clean.owner.year
+    description: Year of the update.
   month:
     lineage:
       - datalake_hubspot_clean.owner.month
+    description: Month of the update.
   day:
     lineage:
       - datalake_hubspot_clean.owner.day
+    description: Day of the update.

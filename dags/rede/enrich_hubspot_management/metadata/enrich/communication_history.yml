@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: communication_history
 description: This table has one row per day that has a modification or creation of a communication in HubSpot. If you want one row per communication, use datalake_hubspot.communication. 
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_communication:
     lineage:

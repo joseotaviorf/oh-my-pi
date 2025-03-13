@@ -1995,6 +1995,8 @@ bietlejuice.enrich_hubspot_management:
   - bietlejuice.hubspot:load-clean-owner
   - bietlejuice.hubspot:load-clean-task
   - bietlejuice.hubspot:load-clean-team
+  - bietlejuice.person:load-clean-contact-info
+  - bietlejuice.person:load-clean-person
 bietlejuice.enrich_inspections:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_inspections:load-clean-inspection

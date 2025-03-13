@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: communication
 description: This table has one row per communication in HubSpot.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_communication:
     lineage:

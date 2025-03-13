@@ -1,6 +1,9 @@
 ---
 database_name: datalake_hubspot
 table_name: email_history
+description: This table has one row per day that has a modification or creation of a e-mail in HubSpot. If you want one row per e-mail, use datalake_hubspot.email. 
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_email:
     lineage:
@@ -164,9 +167,6 @@ columns:
   ts_hubspot_owner_assigned:
     lineage:
       - datalake_hubspot_clean.email.properties
-  ts_updated:
-    lineage:
-      - datalake_hubspot_clean.email.ts_updated
   ts_updated:
     lineage:
       - datalake_hubspot_clean.email.ts_updated

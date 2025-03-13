@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: note_history
 description: This table has one row per day that has a modification or creation of a note in HubSpot. If you want one row per note, use datalake_hubspot.note. 
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_note:
     lineage:

@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: call_history
 description: This table has one row per day that has a modification or creation of a call in HubSpot. If you want one row per call, use datalake_hubspot.call. 
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_call:
     lineage:

@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: task_history
 description: This table has one row per day that has a modification or creation of a task in HubSpot. If you want one row per task, use datalake_hubspot.task. 
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_task:
     lineage:

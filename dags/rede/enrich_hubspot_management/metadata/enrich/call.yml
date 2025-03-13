@@ -3,7 +3,7 @@ database_name: datalake_hubspot
 table_name: call
 description: This table has one row per call in HubSpot.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   id_call:
     lineage:
