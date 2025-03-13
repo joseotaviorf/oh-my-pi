@@ -208,7 +208,7 @@ UNION
 
 SELECT
     UUID() AS id_offer_history, 
-    firestore.id_offer AS id, --Temporary bring the id_offer from EBDB to prevent major impacts on the pipeline and give time to adjustments
+    firestore.id_offer AS id, --Temporarily bring the id_offer from EBDB to prevent major impacts on the pipeline and give time to adjustments
     offer.id_offer AS id_offer_rental_transact,
     (firestore.id_offer * 100) + 2 AS id_offer_context,
     NULL AS id_firestore,
@@ -219,7 +219,7 @@ SELECT
     tenant.uuid_person AS uuid_person_tenant,
     owner.uuid_person AS uuid_person_owner,
     offer.id_house,
-    NULL AS id_rent_flow,
+    ebdb_offer.id_rent_flow AS id_rent_flow, --Temporarily bring the id_rent_flow from EBDB to prevent major impacts on the pipeline and give time to adjustments
     hl.country_code,
     offer.original_condo,
     offer.original_home_insurance,
@@ -260,6 +260,9 @@ JOIN
 JOIN 
     firestore_offers AS firestore
         ON offer.id_firestore = firestore.id_firestore
+LEFT JOIN
+    datalake_ebdb_clean.offer AS ebdb_offer
+        ON ebdb_offer.id_firestore = offer.id_firestore
 LEFT JOIN
     datalake_ebdb_clean.user AS tenant
         ON tenant.uuid_person = offer.id_tenant
