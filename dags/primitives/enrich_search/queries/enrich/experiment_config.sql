@@ -150,6 +150,21 @@ FROM VALUES
             ),
             'filters', "business_context = 'rent'"
         )
+    ),
+    -- HUE vs listing-claw (LTR)
+    (
+        "ab_beakman_search_services_hue_candidate_generation_experiment",
+        named_struct(
+            'begin_date', DATE('2025-03-14'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL
+        )
     )
     -- Add new experiment here
 
