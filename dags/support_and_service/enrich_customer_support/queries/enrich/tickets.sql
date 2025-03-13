@@ -23,6 +23,16 @@ departments AS (
   FROM
     datalake_gsheets_clean.department_control
 ),
+session_contracts AS (
+  SELECT
+      id_session,
+      CAST(GET_JSON_OBJECT(memory, "$.basic.user.contract.deeplink.contract_id") AS BIGINT) AS id_contract
+  FROM
+    datalake_greenseer_clean.session
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 90 DAY AND '{load_end_date}'
+    AND GET_JSON_OBJECT(memory, "$.basic.user.contract.deeplink.contract_id") IS NOT NULL
+),
 incoming_tickets AS (
   SELECT
     id_ticket,
@@ -176,7 +186,7 @@ tickets_per_task AS (
     t.id_house,
     t.id_contract,
     t.id_call,
-    t.id_session,
+    COALESCE(ch.id_session, ca1.id_session, ca2.id_session, t.id_session) AS id_session,
     COALESCE(
       FIRST(ch.id_task) OVER(PARTITION BY ch.id_session ORDER BY ch.ts_created DESC),
       ca1.id_task,
@@ -607,84 +617,87 @@ ticket_metrics AS (
         AND t.contact_theme_tag = tr.macro_taxonomy
 )
 SELECT
-  id_ticket,
-  id_problem_ticket,
-  id_user_main,
-  id_house,
-  id_contract,
-  id_call,
-  id_session,
-  id_twilio,
-  first_queue,
-  last_queue,
-  first_analyst_email,
-  last_analyst_email,
-  front_or_back,
-  journey_step,
-  team,
-  area,
-  status,
-  channel,
-  direction,
-  ticket_origin,
-  tags,
-  type,
-  description,
-  request_type,
-  client_type,
-  step_tag,
-  customer_type_tag,
-  contact_theme_tag,
-  contact_motivation_tag,
-  contact_theme_detail_tag,
-  custom_fields,
-  reopens,
-  replies,
-  back_ticket_list,
-  total_backoffice_minutes_time,
-  sla_target,
-  days_elapsed_business,
-  days_elapsed_calendar,
-  days_off,
+  tc.id_ticket,
+  tc.id_problem_ticket,
+  tc.id_user_main,
+  tc.id_house,
+  COALESCE(sc.id_contract, tc.id_contract) AS id_contract,
+  tc.id_call,
+  tc.id_session,
+  tc.id_twilio,
+  tc.first_queue,
+  tc.last_queue,
+  tc.first_analyst_email,
+  tc.last_analyst_email,
+  tc.front_or_back,
+  tc.journey_step,
+  tc.team,
+  tc.area,
+  tc.status,
+  tc.channel,
+  tc.direction,
+  tc.ticket_origin,
+  tc.tags,
+  tc.type,
+  tc.description,
+  tc.request_type,
+  tc.client_type,
+  tc.step_tag,
+  tc.customer_type_tag,
+  tc.contact_theme_tag,
+  tc.contact_motivation_tag,
+  tc.contact_theme_detail_tag,
+  tc.custom_fields,
+  tc.reopens,
+  tc.replies,
+  tc.back_ticket_list,
+  tc.total_backoffice_minutes_time,
+  tc.sla_target,
+  tc.days_elapsed_business,
+  tc.days_elapsed_calendar,
+  tc.days_off,
   CASE
-    WHEN sub_journey IN ('Contract to Entrance', 'Listing & Search', 'Offboarding', 'Onboarding', 'Visits to Offer')
+    WHEN tc.sub_journey IN ('Contract to Entrance', 'Listing & Search', 'Offboarding', 'Onboarding', 'Visits to Offer')
       THEN 'FOR RENT'
-    WHEN sub_journey = 'For Sale' THEN 'FOR SALE'
-    WHEN sub_journey = 'Partners' THEN 'PARTNERS'
+    WHEN tc.sub_journey = 'For Sale' THEN 'FOR SALE'
+    WHEN tc.sub_journey = 'Partners' THEN 'PARTNERS'
     ELSE NULL
   END AS context,
   CASE
-    WHEN is_ticket_rate AND sub_journey = 'Ongoing' THEN
+    WHEN tc.is_ticket_rate AND tc.sub_journey = 'Ongoing' THEN
       CASE
-        WHEN front_or_back = 'front' THEN 15
-        WHEN front_or_back = 'back' THEN 30
+        WHEN tc.front_or_back = 'front' THEN 15
+        WHEN tc.front_or_back = 'back' THEN 30
       END
-    WHEN is_ticket_rate AND sub_journey IN (
+    WHEN tc.is_ticket_rate AND tc.sub_journey IN (
       'Contract to Entrance', 'For Sale',
       'Listing & Search', 'Offboarding',
       'Onboarding', 'Partners', 'Visits to Offer'
     ) THEN
       CASE
-        WHEN front_or_back = 'front' THEN 1
-        WHEN front_or_back = 'back' THEN 2
+        WHEN tc.front_or_back = 'front' THEN 1
+        WHEN tc.front_or_back = 'back' THEN 2
       END
     ELSE NULL
   END AS ticket_rate_weight,
-  has_open_back_ticket,
-  is_backlog_in_time,
-  is_back_ticket,
-  is_closed_by_merge,
-  is_call_answered,
-  is_ticket_rate,
-  ts_budget,
-  ts_created,
-  ts_created_twilio,
-  ts_sla_started,
-  ts_solved,
-  ts_closed,
-  ts_updated,
-  year,
-  month,
-  day
+  tc.has_open_back_ticket,
+  tc.is_backlog_in_time,
+  tc.is_back_ticket,
+  tc.is_closed_by_merge,
+  tc.is_call_answered,
+  tc.is_ticket_rate,
+  tc.ts_budget,
+  tc.ts_created,
+  tc.ts_created_twilio,
+  tc.ts_sla_started,
+  tc.ts_solved,
+  tc.ts_closed,
+  tc.ts_updated,
+  tc.year,
+  tc.month,
+  tc.day
 FROM
-  ticket_metrics
+  ticket_metrics AS tc
+LEFT JOIN
+  session_contracts AS sc
+    ON sc.id_session = tc.id_session
