@@ -129,7 +129,7 @@ SELECT
     af.assignment_status_type
   ) AS assignment_status_type,
   COALESCE(ap.union_name, af.union_name, '-1') AS union_name,
-  IF(COALESCE(ap.assignment_status_type, af.assignment_status_type) = 'INACTIVE', tr.action_description, '-1') AS dismissal_type,
+  IF(wr.dt_termination IS NOT NULL, tr.action_description, -1) AS dismissal_type,
   s.action_reason AS reason_last_increase
 FROM
   datalake_hr_system.work_relationships wr
