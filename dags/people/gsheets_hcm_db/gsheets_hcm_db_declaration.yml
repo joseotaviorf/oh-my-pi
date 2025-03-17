@@ -1,0 +1,42 @@
+dag:
+  name: gsheets_hcm_db
+  description: |
+    This DAG is responsible for generating tables in the raw and clean layers for spreadsheets extracted from the Oracle system using PIN reports.
+
+    These datasets cannot be retrieved via the HCM API and are manually downloaded while the People Engineering team works on an automated solution.
+
+    **Important notes:**
+    - The extracted reports must follow the expected format to ensure proper ingestion.
+    - Changes in the report structure may require adjustments to the ingestion logic.
+    - Data availability depends on the manual extraction process.
+
+    For further details, please check the documentation: [https://docs.google.com/document/d/1sH4u3mLCCuGCyWZI3rLD0p5NwzOD1a7Iu7Krvq1jTGs/edit?tab=t.x1oy5mitopa]
+  schedule_interval: 0 2 * * *
+  owner: Data People
+cluster:
+  type: databricks_13_3_high_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  custom_libraries:
+    - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
+    - pypi:
+        package: "google-auth==2.13.0"
+    - pypi:
+        package: "google-api-python-client==2.55.0"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+workflow:
+  type: gsheets
+  layer: raw
+  has_hive_sync: false
+  credentials_scope: people
+  bucket_config_name: people_bucket
+  custom_schema: gsheets_hcm_db
+  default_table_privileges:
+    people-team:
+      - ALL PRIVILEGES

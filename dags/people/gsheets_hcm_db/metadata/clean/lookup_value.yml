@@ -1,0 +1,30 @@
+---
+database_name: datalake_gsheets_hcm_db_clean
+table_name: lookup_value
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  Stores predefined lookup values used across Oracle HCM, including employment statuses,
+  job categories, and other reference data. It provides meaningful descriptions for
+  coded values to standardize data interpretation.
+  The corresponding table in the raw layer is fnd_lookup_values.
+
+columns:
+  lookup_code:
+    description: "Represents the specific value for a given lookup type, serving as the key for reference data."
+    lineage:
+      - datalake_gsheets_hcm_db_raw.fnd_lookup_values.lookup_code
+  lookup_type:
+    description: "Defines the category or type of the lookup value, grouping related codes together."
+    lineage:
+      - datalake_gsheets_hcm_db_raw.fnd_lookup_values.lookup_type
+  language_code:
+    description: "Indicates the language code in which the lookup value's meaning is stored."
+    lineage:
+      - datalake_gsheets_hcm_db_raw.fnd_lookup_values.language
+  meaning:
+    description: "Provides a user-friendly description of the lookup code, making it easier to interpret."
+    lineage:
+      - datalake_gsheets_hcm_db_raw.fnd_lookup_values.meaning
+  ts_load:
+    description: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing."
