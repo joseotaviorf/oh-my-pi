@@ -25,10 +25,10 @@ SELECT
   t.day
 FROM
   datalake_terminator.termination AS t
-JOIN
+LEFT JOIN
   datalake_ebdb_listing.house_listing AS hl
     ON t.id_house_listing = hl.id_house_listing
-JOIN
+LEFT JOIN
   datalake_ebdb_contract.contract AS c
     ON t.id_contract = c.id
 LEFT JOIN
