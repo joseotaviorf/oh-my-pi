@@ -36,6 +36,8 @@ workflow:
       clean_table_name: region_business_contexts_served
     Regiao_businessContextsServed_AUD:
       clean_table_name: region_business_contexts_served_aud
+    RegionConfig:
+      clean_table_name: region_config
 cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new

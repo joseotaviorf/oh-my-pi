@@ -498,6 +498,7 @@ table_block_list:
   - RatingLabel
   - RealEstateAgentRating
   - RealEstateAgentRating_RatingLabel
+  - RegionConfig
 
 
 view_allow_list: []

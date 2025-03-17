@@ -1,5 +1,8 @@
+---
 database_name: datalake_ebdb_clean
 table_name: country
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
 columns:
   id:
     lineage:
