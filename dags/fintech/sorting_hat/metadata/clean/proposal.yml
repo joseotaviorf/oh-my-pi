@@ -106,3 +106,6 @@ columns:
   pre_analysis_reason:
     lineage:
       - datalake_sorting_hat_raw.proposal.pre_analysis_reason
+  proposal_source:
+    lineage:
+      - datalake_sorting_hat_raw.proposal.proposal_source

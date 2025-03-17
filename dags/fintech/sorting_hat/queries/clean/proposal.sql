@@ -33,5 +33,6 @@ select
     home_last_published_at as ts_home_last_published,
     bypass_pre_analysis as has_bypassed_pre_analysis,
     pre_analysis_result,
-    pre_analysis_reason
+    pre_analysis_reason,
+    proposal_source
 from datalake_sorting_hat_raw.proposal
