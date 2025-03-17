@@ -3,7 +3,7 @@ import os
 from datetime import datetime, date
 from airflow.models import DAG, Variable
 from airflow.operators.python_operator import PythonOperator
-from pendulum import datetime, timezone
+from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
