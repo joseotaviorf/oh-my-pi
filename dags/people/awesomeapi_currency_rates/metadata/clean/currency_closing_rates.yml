@@ -1,0 +1,52 @@
+---
+database_name: datalake_awesomeapi_currency_rates_clean
+table_name: currency_closing_rates
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: |
+  Table storing exchange rate information between currencies.
+  Data is extracted from [AwesomeAPI](https://docs.awesomeapi.com.br/api-de-moedas)."
+
+columns:
+  currency_from:
+    description: "Currency code representing the origin currency (ARS - Argentine Peso)."
+    lineage:
+      - datalake_awesomeapi_currency_rates_raw.currency_closing_rates.code
+  currency_to:
+    description: "Currency code representing the destination currency (BRL - Brazilian Real)."
+    lineage:
+      - datalake_awesomeapi_currency_rates_raw.currency_closing_rates.codein
+  currency_pair:
+    description: "FROM-TO currencies. It's the given param for AwesomeAPI"
+    lineage:
+      - datalake_awesomeapi_currency_rates_raw.currency_closing_rates.currency_pair
+  high_rate:
+    description: "Highest exchange rate recorded for ARS to BRL in the given period."
+    lineage:
+      - datalake_awesomeapi_currency_rates_raw.currency_closing_rates.high
+  low_rate:
+    description: "Lowest exchange rate recorded for ARS to BRL in the given period."
+    lineage:
+      - datalake_awesomeapi_currency_rates_raw.currency_closing_rates.low
+  bid_variation:
+    description: "Variation in the bid price compared to the previous recorded value."
+    lineage:
+      - datalake_awesomeapi_currency_rates_raw.currency_closing_rates.varBid
+  percent_change:
+    description: "Percentage change in the exchange rate compared to the previous recorded value."
+    lineage:
+      - datalake_awesomeapi_currency_rates_raw.currency_closing_rates.pctChange
+  bid_price:
+    description: "Current bid price for the ARS to BRL exchange rate."
+    lineage:
+      - datalake_awesomeapi_currency_rates_raw.currency_closing_rates.bid
+  ask_price:
+    description: "Current ask price for the ARS to BRL exchange rate."
+    lineage:
+      - datalake_awesomeapi_currency_rates_raw.currency_closing_rates.ask
+  ts_recorded_at:
+    description: "Timestamp indicating when the exchange rate data was recorded."
+    lineage:
+      - datalake_awesomeapi_currency_rates_raw.currency_closing_rates.timestamp
+  ts_load:
+    description: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing."

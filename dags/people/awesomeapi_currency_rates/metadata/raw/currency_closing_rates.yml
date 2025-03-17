@@ -1,0 +1,36 @@
+---
+database_name: datalake_awesomeapi_currency_rates_raw
+table_name: currency_closing_rates
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: |
+  Stores exchange rate data.
+  Data is extracted from [AwesomeAPI](https://docs.awesomeapi.com.br/api-de-moedas).
+
+columns:
+  code:
+    description: "Currency being converted."
+  codein:
+    description: "Target currency."
+  currency_pair:
+    description: "FROM-TO currencies. It's the given param for AwesomeAPI"
+  name:
+    description: "Description of the exchange pair."
+  high:
+    description: "Maximum exchange rate recorded during the period."
+  low:
+    description: "Minimum exchange rate recorded during the period."
+  var_bid:
+    description: "Variation of the bid price during the period."
+  pct_variation:
+    description: "Percentage variation in the exchange rate."
+  bid:
+    description: "Purchase price of the currency exchange."
+  ask:
+    description: "Sale price of the currency exchange."
+  timestamp:
+    description: "Time of the transaction (UTC) in Unix timestamp format."
+  create_date:
+    description: "Time of the transaction in UTC-3 timezone."
+  ts_load:
+    description: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the current_timestamp() function. This value changes if the data undergoes reprocessing."

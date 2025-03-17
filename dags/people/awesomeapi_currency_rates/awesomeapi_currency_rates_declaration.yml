@@ -1,0 +1,51 @@
+dag:
+  name: awesomeapi_currency_rates
+  dag_documentation:
+    dag_purpose: |
+      This DAG aims to ingest exchange rate data from the Awesome API.
+  schedule_interval: 0 3 * * *
+  owner: Data People
+
+cluster:
+  type: databricks_13_3_min_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+
+workflow:
+  layer: raw
+  has_hive_sync: false
+  type: custom_ingestion
+  bucket_config_name: people_bucket
+  default_extraction_type: incremental
+  load_spark_job: load_awesomeapi_currency_rates_raw
+  default_table_privileges:
+    people-team:
+      - ALL PRIVILEGES
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ ds }}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  extra_query_template_params:
+    load_start_date: "{{ yesterday_ds }}"
+    load_end_date: "{{ ds }}"
+  tables_customization:
+    currency_closing_rates:
+      merge_on: ["currency_pair", "ts_created"]
+      extra_spark_job_arguments:
+        - currencies:
+            - "USD-BRL"
+            - "EUR-BRL"
+            - "ARS-BRL"
+            - "MXN-BRL"
