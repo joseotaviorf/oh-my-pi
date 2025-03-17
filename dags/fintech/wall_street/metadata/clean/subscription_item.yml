@@ -1,0 +1,42 @@
+database_name: datalake_wall_street_clean
+table_name: subscription_item
+columns:
+  id:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.id
+  id_subscription:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.subscriptionid
+  id_business_entity:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.businessentityid
+  id_finance_entity:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.financeentityid
+  id_external:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.externalid
+  code:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.code
+  status:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.status
+  price_in_cents:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.priceincents
+  cycles:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.cycles
+  quantity:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.quantity
+  ts_canceled:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.canceled_at
+  ts_created:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.created_at
+  ts_updated:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.updated_at

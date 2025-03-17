@@ -17,6 +17,8 @@ workflow:
     - "{table_name}"
   default_extraction_type: full
   tables_customization:
+    Blocklist:
+      clean_table_name: blocklist
     Charge_AUD:
       clean_table_name: charge_aud
     ChargeMundipagg:
@@ -25,6 +27,8 @@ workflow:
       clean_table_name: charge
     Subscription:
       clean_table_name: subscription
+    SubscriptionItem:
+      clean_table_name: subscription_item
     CreditCard:
       clean_table_name: creditcard
     Store:

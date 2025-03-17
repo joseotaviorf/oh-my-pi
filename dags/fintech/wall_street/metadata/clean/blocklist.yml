@@ -1,0 +1,18 @@
+database_name: datalake_wall_street_clean
+table_name: blocklist
+columns:
+  id:
+    lineage:
+      - datalake_wall_street_raw.blocklist.id
+  id_risk_type:
+    lineage:
+      - datalake_wall_street_raw.blocklist.risktypeid
+  blocked_by:
+    lineage:
+      - datalake_wall_street_raw.blocklist.blockedby
+  value:
+    lineage:
+      - datalake_wall_street_raw.blocklist.value
+  ts_created:
+    lineage:
+      - datalake_wall_street_raw.blocklist.created_at
