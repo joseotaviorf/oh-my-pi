@@ -216,7 +216,8 @@ report_origin AS (
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel = 'capta_ai' THEN 'Capta Aí'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel IN ('asp', 'account_manager_pp_multi') THEN 'PP Multi'
             WHEN obt.funnel_order > 2 AND 
-                obt.acquisition_origin IN ('ownerlanding', 'ownerpropertyregistration', 'ownerpwa') 
+                obt.acquisition_origin IN ('ownerlanding', 'ownerpropertyregistration')
+                AND obt.conversion_origin = 'ownerpwa' 
                 AND (LOWER(obt.medium) = 'seo non-branded' OR LOWER(obt.behavior_type) = 'organic') AND is_pp_multi_active = TRUE
             THEN 'PP Multi'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel = 'is_expert' THEN 'IS Expert'
