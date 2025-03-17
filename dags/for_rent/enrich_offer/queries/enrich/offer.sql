@@ -211,7 +211,7 @@ SELECT
     firestore.id_offer AS id, --Temporarily bring the id_offer from EBDB to prevent major impacts on the pipeline and give time to adjustments
     offer.id_offer AS id_offer_rental_transact,
     (firestore.id_offer * 100) + 2 AS id_offer_context,
-    NULL AS id_firestore,
+    offer.id_firestore AS id_firestore,
     NULL AS id_godfather,
     hl.id_country,
     tenant.id AS id_client,
