@@ -1,14 +1,17 @@
 database_name: datalake_gsheets_clean
 table_name: looker_users_history
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Ops & Governance
+description: User activity history within the source platform
 
 columns:
     user_email:
         lineage:
-        - datalake_gsheets_raw.looker_users_history.user_email
-        description: Email do usuário
+            - datalake_gsheets_raw.looker_users_history.user_email
+        description: User email
     platform:
-        description: Plataforma de origem
+        description: Source platform
     ts_entered:
         lineage:
-        - datalake_gsheets_raw.looker_users_history.history_created_date
-        description: Data de entrada do registro
+            - datalake_gsheets_raw.looker_users_history.history_created_date
+        description: Record Entry Date

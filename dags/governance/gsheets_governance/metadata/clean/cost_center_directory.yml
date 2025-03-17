@@ -1,12 +1,15 @@
 database_name: datalake_gsheets_clean
 table_name: cost_center_directory
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Ops & Governance
+description: Information about an organization's cost centers
 
 columns:
-    cost_center:
-      lineage:
-        - datalake_gsheets_raw.de_para_cc_diretoria.cost_center
-      description: Código do centro de custo
-    line:
-      lineage:
-        - datalake_gsheets_raw.de_para_cc_diretoria.linha_normalizada
-      description: Linha quinto andar
+  cost_center:
+    lineage:
+      - datalake_gsheets_raw.de_para_cc_diretoria.cost_center
+    description: Cost center code
+  line:
+    lineage:
+      - datalake_gsheets_raw.de_para_cc_diretoria.linha_normalizada
+    description: Line of Quinto Andar
