@@ -132,6 +132,18 @@ firestore_offers AS (
     LEFT JOIN 
         instant_offer_firestore AS io_firestore
             ON o_firestore.id_firestore = io_firestore.id_firestore
+),
+rental_transact_io AS (
+    SELECT 
+        o.id AS id_offer_rental_transact
+    FROM 
+        datalake_rental_transact_clean.offer AS o 
+    JOIN 
+        datalake_rental_transact_clean.event_log AS el 
+            ON el.id_rent_flow = o.id
+    WHERE 
+        el.type = 'NEGOTIATION_OFFER_ACCEPTED'
+        AND el.actor_role = 'SYSTEM'
 )
 SELECT DISTINCT
     UUID() AS id_offer_history,
@@ -243,7 +255,7 @@ SELECT
     NULL AS tenant_pets_info,
     NULL AS tenant_type,
     NULL AS has_pets,
-    COALESCE(firestore.is_instant_offer, FALSE) AS is_instant_offer,
+    (io.id_offer_rental_transact IS NOT NULL) AS is_instant_offer,
     TRUE AS is_offer_submitted,
     offer.ts_created AS ts_email_sent_to_owner,
     offer.ts_expiration AS ts_expired,
@@ -269,5 +281,8 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_clean.user AS owner
         ON owner.uuid_person = offer.id_owner
+LEFT JOIN
+    rental_transact_io AS io
+        ON io.id_offer_rental_transact = offer.id_offer
 WHERE 
     offer.ts_created >= '2025-01-06'

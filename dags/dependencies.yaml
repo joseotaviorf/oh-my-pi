@@ -2337,6 +2337,8 @@ bietlejuice.enrich_offer:
   - bietlejuice.godfather:load-clean-offer
   - bietlejuice.gsheets_for_sale:done-clean-offers-hub-central
   - bietlejuice.hub_services:load-clean-business-unit
+  - bietlejuice.rental_transact:load-clean-event-log
+  - bietlejuice.rental_transact:load-clean-offer
 bietlejuice.enrich_olos_dialer:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.olos_dialer:load-clean-attempts-raw-data
