@@ -1,0 +1,63 @@
+database_name: datalake_taskmaster_test_clean
+table_name: task
+description: Table containing all tasks generated via taskmaster and their origin
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_taskmaster_test_raw.task.id
+  id_case:
+    lineage:
+      - datalake_taskmaster_test_raw.task.case_id
+  id_correlation:
+    lineage:
+      - datalake_taskmaster_test_raw.task.correlation_id
+  id_external:
+    lineage:
+      - datalake_taskmaster_test_raw.task.external_id
+  body:
+    lineage:
+      - datalake_taskmaster_test_raw.task.body
+  context_fields:
+    lineage:
+      - datalake_taskmaster_test_raw.task.context_fields
+  customer:
+    lineage:
+      - datalake_taskmaster_test_raw.task.customer
+  origin:
+    lineage:
+      - datalake_taskmaster_test_raw.task.origin
+  priority:
+    lineage:
+      - datalake_taskmaster_test_raw.task.priority
+  status:
+    lineage:
+      - datalake_taskmaster_test_raw.task.status
+  task_manager:
+    lineage:
+      - datalake_taskmaster_test_raw.task.task_manager
+  type:
+    lineage:
+      - datalake_taskmaster_test_raw.task.type
+  version:
+    lineage:
+      - datalake_taskmaster_test_raw.task.version
+  ts_created:
+    lineage:
+      - datalake_taskmaster_test_raw.task.created_at
+  ts_updated:
+    lineage:
+      - datalake_taskmaster_test_raw.task.updated_at
+  ts_external_updated:
+    lineage:
+      - datalake_taskmaster_test_raw.task.last_external_update_at
+  year:
+    lineage:
+      - datalake_taskmaster_test_raw.task.year
+  month:
+    lineage:
+      - datalake_taskmaster_test_raw.task.month
+  day:
+    lineage:
+      - datalake_taskmaster_test_raw.task.day
