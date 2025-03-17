@@ -31,7 +31,7 @@ workflow:
     repair_request_budget: {}
     repair_request_budget_attachment: {}
 cluster:
-  type: databricks_13_3_med_general_cluster
+  type: databricks_13_3_med_memory_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
