@@ -1,7 +1,12 @@
 import ast
 import json
+import os
+import queue
+import threading
+import time
 from argparse import ArgumentParser
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
 
 from kafka import KafkaProducer
 
@@ -214,6 +219,10 @@ def get_payload_context_fields(api_type, item):
         raise Exception(f"Value api_type={api_type} is invalid")
 
 def serialize_item(item):
+    """
+    Turn a string object into an appropriate type, if possible, e.g. '1' to 1
+    or 'false' to False
+    """
     try:
         if item == "-1":
             # ensure -1 is string, as that is the standard in the MR database
@@ -238,10 +247,45 @@ def create_payload(item):
     data["contextFields"] = get_payload_context_fields(api_type, context_fields)
     return data
 
+def send_messages_worker(q, producer, kafka_topic):
+    """
+    Worker function that continuously retrieves messages from the queue and sends them to Kafka.
+    """
+    while True:
+        try:
+            message = q.get(block=False)
+        except queue.Empty:
+            break
+        try:
+            future = producer.send(kafka_topic, value=message)
+            record_metadata = future.get(timeout=10)
+
+            # this sleep was added to avoid driver overhead when
+            # this process was done sequentially  - not sure if still necessary
+            time.sleep(0.01) 
+        except Exception as e:
+            logger.error(f"Error sending message: {message} {e}")
+        finally:
+            q.task_done()
+
+def monitor_queue(q, total):
+    """
+    Simple function to monitors the queue progress and log how empty it is.
+    """
+    threshold = 5
+    while True:
+        processed = total - q.qsize()
+        percent = (processed / total) * 100
+        if percent >= threshold:
+            logger.info(f" {percent:.0f}% of messages sent")
+            threshold += 5
+        if q.empty():
+            break
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
-    logger = QuintoAndarLogger("MinorityReportAPIClient")
+    logger = QuintoAndarLogger("reverse_etl_minority_report")
 
     parser.add_argument("dag_name")
     parser.add_argument("kafka_servers")
@@ -290,19 +334,27 @@ if __name__ == "__main__":
         create_payload({key: value for key, value in row.asDict().items()}) for row in df.collect()
     ]
 
+    q = queue.Queue()
+    for message in message_list:
+        q.put(message)
+
     producer = KafkaProducer(
         bootstrap_servers=kafka_servers,
         value_serializer=json_serializer
     )
 
-    try:
-        for idx, message in enumerate(message_list):
-            future = producer.send(kafka_topic, value=message)
-            record_metadata = future.get(timeout=10)
-            if (idx + 1) % 100 == 0 or idx == 0:
-                logger.info(f"Sent {idx + 1} messages to topic {kafka_topic}")
-    except Exception as e:
-        print(f"Error sending message: {e}")
-    finally:
-        producer.flush()
-        producer.close()
+    # single thread for monitoring the queue and logging
+    monitor_thread = threading.Thread(target=monitor_queue, args=(q, len(message_list)))
+    monitor_thread.start()
+
+    num_workers = os.cpu_count()
+
+    with ThreadPoolExecutor(max_workers=num_workers) as executor:
+        for _ in range(num_workers):
+            executor.submit(send_messages_worker, q, producer, kafka_topic)
+        q.join()
+
+    monitor_thread.join()
+
+    producer.flush()
+    producer.close()
