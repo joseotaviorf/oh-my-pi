@@ -1,0 +1,13 @@
+---
+table_name: datalake_rental_transact_clean.transact_flow
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error

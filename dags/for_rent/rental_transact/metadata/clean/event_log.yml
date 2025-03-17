@@ -1,0 +1,39 @@
+database_name: datalake_rental_transact_clean
+table_name: event_log
+description: This table has logs of all Rental Transact events. Each line is a unique event.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_rental_transact_raw.event_log.id
+  id_flow:
+    lineage:
+      - datalake_rental_transact_raw.event_log.flow_id
+  id_external_author:
+    lineage:
+      - datalake_rental_transact_raw.event_log.author_external_id
+  id_rent_flow:
+    lineage:
+      - datalake_rental_transact_raw.event_log.rent_flow_id
+  id_event_domain:
+    lineage:
+      - datalake_rental_transact_raw.event_log.event_domain_id
+  actor_role:
+    lineage:
+      - datalake_rental_transact_raw.event_log.actor_role
+  type:
+    lineage:
+      - datalake_rental_transact_raw.event_log.type
+  debug_additional_info:
+    lineage:
+      - datalake_rental_transact_raw.event_log.debug_additional_info
+  source:
+    lineage:
+      - datalake_rental_transact_raw.event_log.source
+  ts_created:
+    lineage:
+      - datalake_rental_transact_raw.event_log.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_transact_raw.event_log.updated_at

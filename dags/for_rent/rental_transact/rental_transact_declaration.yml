@@ -14,6 +14,10 @@ workflow:
   dbutils_secret_key: RENTAL_TRANSACT_DB
   has_clean_soft_delete: true
   tables_customization:
+    event_log:
+      clean_table_name: event_log
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     offer:
       clean_table_name: offer
       raw_primary_keys: [id]
@@ -42,6 +46,14 @@ workflow:
       clean_table_name: rev_info
       raw_primary_keys: [rev]
       clean_primary_keys: [rev]
+    transact_flow:
+      clean_table_name: transact_flow
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    transact_flow_aud:
+      clean_table_name: transact_flow_aud
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
 cluster:
   type: databricks_13_3_med_memory_2_workers_cluster
   databricks_conn_id: databricks_new

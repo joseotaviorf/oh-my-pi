@@ -1,0 +1,33 @@
+database_name: datalake_rental_transact_clean
+table_name: transact_flow_aud
+description: This table has the all status changes of each transact flow. Each line is a different transact flow update.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow_aud.id
+  id_house:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow_aud.house_external_id
+  rev:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow_aud.rev
+  rev_end:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow_aud.revend
+  rev_type:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow_aud.revtype
+  mod_status:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow_aud.status_mod
+  status:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow_aud.status
+  ts_created:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow_aud.updated_at

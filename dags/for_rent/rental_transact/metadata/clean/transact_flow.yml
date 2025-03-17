@@ -1,0 +1,21 @@
+database_name: datalake_rental_transact_clean
+table_name: transact_flow
+description: This table has the current state of each transact flow. Each line is a different transact flow.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow.id
+  id_house:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow.house_external_id
+  status:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow.status
+  ts_created:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_transact_raw.transact_flow.updated_at
