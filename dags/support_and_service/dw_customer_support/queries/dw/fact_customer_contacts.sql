@@ -24,6 +24,18 @@ average_reply_time AS (
     AND ts_created >= DATE('{load_start_date}') - INTERVAL 2 YEAR
   GROUP BY 1, 2
 ),
+chat_reservation_timestamp AS (
+  SELECT
+    id_task,
+    ts_created - INTERVAL 3 HOUR AS ts_reservation_created
+  FROM
+    datalake_quinto_messenger_clean.task_event
+  WHERE
+    event_type = 'reservation.accepted'
+    AND MAKE_DATE(year, month, day) >= DATE('{load_start_date}') - INTERVAL 2 YEAR
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_created) = 1
+),
 customer_email AS (
   SELECT DISTINCT
     customer_contact AS email,
@@ -166,7 +178,7 @@ twilio_contacts AS (
     d.is_contact_answered,
     d.is_interaction_answered,
     d.ts_task_created,
-    d.ts_reservation_created,
+    COALESCE(d.ts_reservation_created, crt.ts_reservation_created) AS ts_reservation_created,
     d.ts_reservation_ended,
     NOW() AS ts_load
   FROM
@@ -181,19 +193,23 @@ twilio_contacts AS (
       AND art.agent_email = d.worker_email
       AND d.channel = 'chat'
   LEFT JOIN
-      datalake_customer_support.tickets AS t1
-        ON t1.id_twilio = d.id_call
-        AND STARTSWITH(t1.id_twilio, "CA")
-        AND d.channel = 'call'
-    LEFT JOIN
-      datalake_customer_support.tickets AS t2
-        ON t2.id_twilio = d.id_task
-        AND STARTSWITH(t2.id_twilio, "WT")
-        AND d.channel = 'call'
-    LEFT JOIN
-      datalake_customer_support.tickets AS t3
-        ON t3.id_session = d.id_session
-        AND d.channel = 'chat'
+    datalake_customer_support.tickets AS t1
+      ON t1.id_twilio = d.id_call
+      AND STARTSWITH(t1.id_twilio, "CA")
+      AND d.channel = 'call'
+  LEFT JOIN
+    datalake_customer_support.tickets AS t2
+      ON t2.id_twilio = d.id_task
+      AND STARTSWITH(t2.id_twilio, "WT")
+      AND d.channel = 'call'
+  LEFT JOIN
+    datalake_customer_support.tickets AS t3
+      ON t3.id_session = d.id_session
+      AND d.channel = 'chat'
+  LEFT JOIN
+    chat_reservation_timestamp AS crt
+      ON crt.id_task = d.id_task
+      AND d.channel = 'chat'
 ),
 front_contacts AS (
   SELECT DISTINCT
