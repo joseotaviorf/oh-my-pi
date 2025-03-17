@@ -12,10 +12,6 @@ columns:
     lineage:
       - datalake_metabase_raw.query.query_hash
     description: Hash for the query
-  query_hash_string:
-    lineage:
-      - datalake_metabase_raw.query
-    description: Hash for the query as string
   average_execution_time_in_milliseconds:
     lineage:
       - datalake_metabase_raw.query.average_execution_time
