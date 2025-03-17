@@ -369,11 +369,5 @@ columns:
     description: Number of days between the visit booked date and the offer submitted.
   reservation_attempts:
     description: The number of attempts that the tenant prospect did to reserve the property.
-  working_min_credit_approved_to_contract_created:
-    description: Number of working minutes between the credit analysis last approval and the contract creation.
-  working_min_credit_approved_to_contract_signed:
-    description: Number of working minutes between the credit analysis last approval and the contract signature.
-  working_min_contract_created_to_contract_signed:
-    description: Number of working minutes between the contract creation and the contract signature.
   ts_load:
     description: Timestamp indicating the data load into our system. It has nothing related to the rent flow itself.
