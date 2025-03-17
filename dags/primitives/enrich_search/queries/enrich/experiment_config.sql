@@ -25,7 +25,7 @@ Add
                 )
             ),
             'filters',
-            -- add and sql expression to filter the experiment participants here
+            -- Add and sql expression to filter the experiment participants here
             "business_context = 'rent' "\
             "AND id_user IS NOT NULL"
         )
@@ -60,81 +60,6 @@ FROM VALUES
             'filters', "business_context = 'sale'"
         )
     ),
-    -- ab_beakman_ranking_sale_pclick_v1
-    (
-        "ab_beakman_ranking_sale_pclick_v1",
-        named_struct(
-            'begin_date', DATE('2024-10-19'),
-            'end_date', DATE('2024-12-15'),
-            'variants', to_json(
-                named_struct(
-                    '0', 'baseline',
-                    '1', 'treatment'
-                )
-            ),
-            'filters', "business_context = 'sale'"
-        )
-    ),
-    -- ab_beakman_search_services_demand_concentration_rent_experiment
-    (
-        "ab_beakman_search_services_demand_concentration_rent_experiment",
-        named_struct(
-            'begin_date', DATE('2024-12-19'),
-            'end_date', DATE('2025-01-29'),
-            'variants', to_json(
-                named_struct(
-                    '0', 'baseline',
-                    '1', 'treatment'
-                )
-            ),
-            'filters', "business_context = 'rent'"
-        )
-    ),
-    -- AB_TEST_RECS_HUE_INDEXED_RENT
-    (
-        "AB_TEST_RECS_HUE_INDEXED_RENT",
-        named_struct(
-            'begin_date', DATE('2024-12-09'),
-            'end_date', DATE('2025-01-01'),
-            'variants', to_json(
-                named_struct(
-                    '0', 'baseline',
-                    '1', 'treatment'
-                )
-            ),
-            'filters', "business_context = 'rent'"
-        )
-    ),
-    -- AB_TEST_RECS_HUE_INDEXED_SALE
-    (
-        "AB_TEST_RECS_HUE_INDEXED_SALE",
-        named_struct(
-            'begin_date', DATE('2024-12-09'),
-            'end_date', DATE('2025-01-01'),
-            'variants', to_json(
-                named_struct(
-                    '0', 'baseline',
-                    '1', 'treatment'
-                )
-            ),
-            'filters', "business_context = 'sale'"
-        )
-    ),
-    -- Copilot exp
-    (
-        "native_copilot_experiment",
-        named_struct(
-            'begin_date', DATE('2024-11-07'),
-            'end_date', DATE('2025-01-01'),
-            'variants', to_json(
-                named_struct(
-                    'baseline', 'baseline',
-                    'treatment', 'treatment'
-                )
-            ),
-            'filters', NULL
-        )
-    ),
     -- demand balancer v2 policy v2
     (
         "ab_beakman_search_services_demand_concentration_v2_policy_2_rent_experiment",
@@ -143,6 +68,7 @@ FROM VALUES
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
+                    '-1', 'baseline_contaminated',
                     '0', 'baseline',
                     '1', 'treatment_1',
                     '2', 'treatment_2'
@@ -159,6 +85,7 @@ FROM VALUES
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
+                    '-1', 'baseline',
                     '0', 'baseline',
                     '1', 'treatment'
                 )
