@@ -36,7 +36,7 @@ columns:
   status:
     lineage:
       - datalake_accounting_funnel.ledger.hash
-      - datalake_sap_gateway.id_feature
+      - datalake_sap_gateway_clean.id_feature
     description: "Indicates, if broken, which source had failed: SG - SAP Gateway, SB - Seu Barriga"
   source_amount:
     lineage:
@@ -53,7 +53,7 @@ columns:
   is_completeness_compliance:
     lineage:
       - datalake_accounting_funnel.ledger.hash
-      - datalake_sap_gateway.id_feature
+      - datalake_sap_gateway_clean.id_feature
     description: "Indicates if the funnel is complete: same ID throught all products until arrive in SAP"
   is_correctness_compliance:
     lineage:
@@ -75,7 +75,7 @@ columns:
       - datalake_retsuko.invoice.amount
       - datalake_retsuko.entry.amount
       - datalake_accounting_funnel.ledger.hash
-      - datalake_sap_gateway.id_feature
+      - datalake_sap_gateway_clean.id_feature
   dt_source_trigger:
     lineage:
       - datalake_retsuko.invoice.ts_created

@@ -5,9 +5,9 @@ WITH sap_gateway AS (
         s.status,
         s.hash
     FROM
-        datalake_sap_gateway.feature f
+        datalake_sap_gateway_clean.feature f
     LEFT JOIN
-        datalake_sap_gateway.sync_sap_job s
+        datalake_sap_gateway_clean.sync_sap_job s
             ON f.id_feature = s.id_feature
     WHERE
         f.source = 'kill-queue/reservation'

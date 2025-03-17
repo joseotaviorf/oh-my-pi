@@ -44,7 +44,7 @@ columns:
   is_completeness_compliance:
     lineage:
       - datalake_accounting_funnel.ledger.hash
-      - datalake_sap_gateway.id_feature
+      - datalake_sap_gateway_clean.id_feature
     description: "Indicates if the funnel is complete: same ID throught all products until arrive in SAP"
   is_correctness_compliance:
     lineage:
