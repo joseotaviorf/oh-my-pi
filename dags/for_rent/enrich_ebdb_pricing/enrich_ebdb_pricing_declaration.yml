@@ -10,9 +10,9 @@ workflow:
   layer: enrich
   tables_customization:
     listing_price_change:
-      merge_on: [ 'id_house', 'id_house_listing', 'id_revision', 'business_context' ]
+      merge_on: [ 'id_house', 'id_revision', 'business_context', 'ts_price_started' ]
     listing_prediction_changes:
-      merge_on: [ 'id_house', 'id_house_listing', 'id_revision', 'business_context' ]
+      merge_on: [ 'id_house', 'id_revision', 'business_context', 'ts_calculator_result_started' ]
 cluster:
   type: custom_cluster
   custom_configurations:

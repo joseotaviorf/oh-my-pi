@@ -1,0 +1,64 @@
+---
+table_name: datalake_ebdb_pricing.listing_prediction_changes
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_prediction_change:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  id_house_listing:
+    is_complete:
+      severity_level: Error
+  id_revision:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - RENT
+        - SALE
+  calculator_min_price:
+    is_complete:
+      severity_level: Error
+  calculator_p20_price:
+    is_complete:
+      severity_level: Error
+  calculator_p30_price:
+    is_complete:
+      severity_level: Error
+  calculator_p40_price:
+    is_complete:
+      severity_level: Error
+  calculator_price:
+    is_complete:
+      severity_level: Error
+  calculator_p60_price:
+    is_complete:
+      severity_level: Error
+  calculator_p70_price:
+    is_complete:
+      severity_level: Error
+  calculator_p80_price:
+    is_complete:
+      severity_level: Error
+  calculator_max_price:
+    is_complete:
+      severity_level: Error
+  calculator_certainty:
+    is_complete:
+      severity_level: Error
+  is_last_prediction:
+    is_complete:
+      severity_level: Error
+  is_last_prediction_of_day:
+    is_complete:
+      severity_level: Error
+  ts_calculator_result_started:
+    is_complete:
+      severity_level: Error

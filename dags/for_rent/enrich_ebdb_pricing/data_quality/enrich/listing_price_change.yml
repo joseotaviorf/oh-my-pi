@@ -1,0 +1,40 @@
+---
+table_name: datalake_ebdb_pricing.listing_price_change
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_price_change:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  id_house_listing:
+    is_complete:
+      severity_level: Error
+  id_revision:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - RENT
+        - SALE
+  price:
+    is_complete:
+      severity_level: Error
+  is_first_price:
+    is_complete:
+      severity_level: Error
+  is_last_price:
+    is_complete:
+      severity_level: Error
+  is_last_price_of_day:
+    is_complete:
+      severity_level: Error
+  ts_price_started:
+    is_complete:
+      severity_level: Error
