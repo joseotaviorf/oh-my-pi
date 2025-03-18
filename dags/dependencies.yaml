@@ -100,21 +100,30 @@ bietlejuice.dw_buyer_prospect:
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type
 bietlejuice.dw_charging_payment_quintocred:
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment
+  - bietlejuice.dw_velo:load-dw-velo-bridge-velo-propose-person
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-omie-client
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-person
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
   - bietlejuice.dw_velo:load-dw-velo-fact-velo-payment
   - bietlejuice.dw_velo:load-dw-velo-fact-velo-payment-legacy
   - bietlejuice.dw_velo:load-dw-velo-fact-velo-propose
   - bietlejuice.dw_velo:load-dw-velo-fact-velo-transaction-entries
   - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
+  - bietlejuice.enrich_velo:load-enrich-junk
+  - bietlejuice.enrich_velo:load-enrich-payment
   - bietlejuice.rental_guarantee_platform:load-clean-bill
+  - bietlejuice.rental_guarantee_platform:load-clean-bill-checkout
+  - bietlejuice.rental_guarantee_platform:load-clean-bill-payment
   - bietlejuice.rental_guarantee_platform:load-clean-billing-report
+  - bietlejuice.rental_guarantee_platform:load-clean-company
+  - bietlejuice.rental_guarantee_platform:load-clean-contract
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
   - bietlejuice.rental_guarantee_platform:load-clean-entry
   - bietlejuice.rental_guarantee_platform:load-clean-payment
   - bietlejuice.rental_guarantee_platform:load-clean-propose
   - bietlejuice.rental_guarantee_platform:load-clean-propose-aud
+  - bietlejuice.rental_guarantee_platform:load-clean-propose-person
   - bietlejuice.rental_guarantee_platform:load-clean-renewal
   - bietlejuice.rental_guarantee_platform:load-clean-rev-info
   - bietlejuice.sap_gateway:load-clean-feature
@@ -496,7 +505,6 @@ bietlejuice.dw_employee:
   - bietlejuice.hr_system:load-clean-salaries
   - bietlejuice.hr_system:load-clean-workers
 bietlejuice.dw_fintech_snapshot:
-  - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-payment-full
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry

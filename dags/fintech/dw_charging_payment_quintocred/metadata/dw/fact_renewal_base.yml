@@ -1,0 +1,436 @@
+database_name: dw_charging_payment_quintocred
+table_name: fact_renewal_base
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+
+sk_propose_official:
+  description: "Official proposal identification number (ID), determined by either sk_propose or sk_propose_append"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.sk_propose
+
+sk_propose:
+  description: "Proposal identification number (ID)"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.sk_propose
+
+sk_propose_append:
+  description: "Alternate proposal identification number (ID) for appends"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.sk_propose
+
+id_imob:
+  description: "Real estate property identification number (ID)"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.company.id
+
+id_link_renewal:
+  description: "Link identification number for the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.id
+
+id_partial_link:
+  description: "Partial link identification number in case of partial renewals"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.id
+
+id_arr_type_valid:
+  description: "Array of valid ID types associated with the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency
+
+id_arr_delinquency_valid:
+  description: "Array of valid delinquency IDs associated with the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency
+
+id_arr_type_valid_active:
+  description: "Array of active valid ID types associated with the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency
+
+id_arr_delinquency_valid_active:
+  description: "Array of active valid delinquency IDs associated with the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency
+
+id_arr_type_archived_valid:
+  description: "Array of archived valid ID types associated with the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency
+
+id_arr_delinquency_archived_valid:
+  description: "Array of archived valid delinquency IDs associated with the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency
+
+id_arr_type:
+  description: "Array of all ID types associated with the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency
+
+id_arr_delinquency:
+  description: "Array of all delinquency IDs associated with the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency
+
+id_arr_delinquency_active:
+  description: "Array of active delinquency IDs associated with the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency
+
+id_arr_delinquency_archived:
+  description: "Array of archived delinquency IDs associated with the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.delinquency
+
+cycle:
+  description: "Renewal cycle associated with the process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal.cycle
+
+ref_month_renewal:
+  description: "Reference month for the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal
+
+days_step:
+  description: "Step count representing the days in the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal
+
+previous_amount:
+  description: "Amount paid previously in the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal.previous_monthly_amount
+
+current_amount:
+  description: "Amount due in the current renewal cycle"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal.updated_monthly_amount
+
+value_percent:
+  description: "Percentage of the total amount that has been paid"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal
+
+price_index_type:
+  description: "Type of price index applied during renewal"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal.price_index_type
+
+payment_method:
+  description: "Payment method used for the renewal"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.contract.current_payment_method
+
+renewal_step_logic:
+  description: "Logic used to determine the renewal step"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal.step
+
+billing_model_at_renewal:
+  description: "Billing model applied at the time of renewal"
+  lineage:
+    - dw_velo.fact_velo_propose.is_direct_billing
+
+step_from_product:
+  description: "Step from the product phase in the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal.step
+
+link_checkout:
+  description: "URL for the checkout link associated with the renewal"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.id
+
+link_checkout_creation:
+  description: "Date and time when the checkout link was created"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.ts_creation
+
+flow_type:
+  description: "Type of flow used in the checkout process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.flow_type
+
+link_checkout_propose:
+  description: "Proposal checkout link associated with the renewal"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.link_checkout_propose
+
+link_checkout_creation_propose:
+  description: "Creation date and time of the proposal checkout link"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.link_checkout_creation_propose
+
+flow_type_propose:
+  description: "Type of flow used in the proposal checkout process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.flow_type
+
+n_installments_partial_link:
+  description: "Number of installments in the partial checkout link"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.installments
+
+name:
+  description: "Customer's full name"
+  lineage:
+    - dw_velo.dim_velo_propose_person.name
+
+phone:
+  description: "Customer's phone number"
+  lineage:
+    - dw_velo.dim_velo_propose_person.name
+
+email:
+  description: "Customer's email address"
+  lineage:
+    - dw_velo.dim_velo_propose_person.email
+
+renewal_link_status:
+  description: "Status of the renewal link (paid, unpaid, etc.)"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.status
+
+partial_link_status:
+  description: "Status of the partial link (paid, unpaid, etc.)"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.status
+
+billing_mode_at_ref:
+  description: "Billing mode at reference time"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.billing_mode_at_ref
+
+mob:
+  description: "Month of reference"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.mob
+
+status_compliance:
+  description: "Compliance status of the renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal
+
+status_compliance_v2:
+  description: "Version 2 of compliance status"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal
+
+status_compliance_v3:
+  description: "Version 3 of compliance status"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal
+
+status_life:
+  description: "Life cycle status of the customer account"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal
+
+years_old_at_renewal:
+  description: "Number of years old the customer is at the time of renewal"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal
+
+qtd_delinquencies:
+  description: "Quantity of delinquent payments associated with the renewal"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+qtd_delinquencies_active:
+  description: "Quantity of active delinquent payments"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+qtd_delinquencies_archived:
+  description: "Quantity of archived delinquent payments"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+qtd_delinquencies_total:
+  description: "Total quantity of delinquent payments"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+qtd_delinquencies_active_total:
+  description: "Total quantity of active delinquent payments"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+qtd_delinquencies_archived_total:
+  description: "Total quantity of archived delinquent payments"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+total_amount:
+  description: "Total amount due for the renewal"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+amount_paid:
+  description: "Amount that has been paid toward the renewal"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+total_amount_active:
+  description: "Total amount due for active delinquent payments"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+amount_paid_active:
+  description: "Amount paid toward active delinquent payments"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+total_amount_archived:
+  description: "Total amount due for archived delinquent payments"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+total_amount_active_annual:
+  description: "Annual total amount due for active delinquent payments"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+amount_paid_active_total_annual:
+  description: "Annual amount paid for active delinquent payments"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+min_mob_delinquency_distance:
+  description: "Minimum distance between delinquency and mobility events"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+min_mob_delinquency_payment_distance:
+  description: "Minimum distance between delinquency and payment events"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+year_of_renewal:
+  description: "Year of the renewal"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.ref_month
+
+ref_month_renewal_coalesce:
+  description: "Coalesced reference month for the renewal process"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.ref_month
+
+ref_month:
+  description: "Reference month for the renewal process"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.ref_month
+
+year_of_renewal_timeline:
+  description: "Year of renewal in the timeline"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.ref_month
+
+dt_arr_created_valid:
+  description: "Array of valid creation dates"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+dt_arr_paid_valid:
+  description: "Array of valid paid dates"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+dt_arr_created_valid_active:
+  description: "Array of valid creation dates for active records"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+dt_arr_due_valid_active:
+  description: "Array of valid due dates for active records"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+dt_arr_created_archived_valid:
+  description: "Array of valid creation dates for archived records"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+dt_arr_due_archived_valid:
+  description: "Array of valid due dates for archived records"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+dt_arr_due:
+  description: "Array of due dates"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+dt_arr_paid:
+  description: "Array of paid dates"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+dt_arr_created:
+  description: "Array of creation dates"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+dt_due_renewal_coalesce:
+  description: "Coalesced due date for renewal"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal.dt_due
+
+dt_ended_official:
+  description: "Official end date of the renewal process"
+  lineage:
+    - dw_velo.fact_velo_propose.dt_ended
+
+dt_due_renewal:
+  description: "Due date for the renewal"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal.dt_due
+
+dt_ended:
+  description: "End date for the renewal process"
+  lineage:
+    - dw_velo.fact_velo_propose.dt_ended
+
+dt_paid_renewal:
+  description: "Payment date for the renewal"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.renewal.dt_paid
+
+dt_due_link_checkout:
+  description: "Due date for checkout in the ink renewal process"
+  lineage:
+    - datalake_rental_guarantee_platform_clean.bill_checkout.dt_due
+
+dt_due_link_checkout_propose:
+  description: "Due date for the proposal checkout in the ink renewal process"
+  lineage:
+    - dw_velo.fact_velo_propose.dt_due
+
+dt_paid_link_renewal:
+  description: "Payment date for the renewal link"
+  lineage:
+    - datalake_velo.payment.dt_created
+
+dt_paid_link_partial:
+  description: "Payment date for the partial link renewal"
+  lineage:
+    - datalake_velo.payment.dt_created
+
+dt_expected_day_renewal:
+  description: "Expected day for renewal payment"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline
+
+dt_contract_started:
+  description: "Start date of the contract"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.dt_contract_started
+
+dt_ended_append:
+  description: "End date for the append process of the renewal"
+  lineage:
+    - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.dt_ended

@@ -18,6 +18,9 @@ workflow:
     fact_payment_full:
       - fact_accounting_funnel
       - fact_theoretical_payment_delinquency
+    fact_renewal:
+      - fact_payment_full
+      - fact_renewal_base
 cluster:
   type: custom_cluster
   custom_configurations:
