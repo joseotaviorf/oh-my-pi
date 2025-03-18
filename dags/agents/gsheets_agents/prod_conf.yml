@@ -63,7 +63,7 @@ sheets_info:
   ciq_tiers_sale:
     sheet_id: 1TjK-wY__QbsMz6yQBUW2HDYQoADhvkkk4ynbrFAszxc
     sheet_name: ciq_tiers_sale
-    clean_table_name: ciq_tiers_rent
+    clean_table_name: ciq_tiers_sale
     sheet_context: agents
   
   pp_multi_cluster:
