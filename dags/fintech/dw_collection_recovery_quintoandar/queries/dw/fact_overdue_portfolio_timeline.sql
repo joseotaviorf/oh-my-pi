@@ -1,8 +1,8 @@
 WITH
 invoice_payment_option_clicked_events AS (
   SELECT DISTINCT
-    event_properties:invoice_id AS id_invoice,
-    event_properties:contract_id AS id_contract
+    ep_invoice_id AS id_invoice,
+    ep_contract_id AS id_contract
   FROM datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events
   WHERE
     event_properties:contract_id IS NOT NULL
@@ -10,8 +10,8 @@ invoice_payment_option_clicked_events AS (
 ),
 pending_invoices_invoice_pay_button_clicked_events AS (
   SELECT DISTINCT
-    event_properties:invoice_id AS id_invoice,
-    event_properties:contract_id AS id_contract
+    ep_invoice_id AS id_invoice,
+    ep_id_contract AS id_contract
   FROM datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events
   WHERE
     event_properties:contract_id IS NOT NULL

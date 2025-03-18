@@ -1,0 +1,13 @@
+---
+dag:
+  name: enrich_collections_quintoandar
+  schedule_start_date: 2025, 3, 14
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Creates enriched tables for QuintoAndar Collection context.
+workflow:
+  type: query_delta
+  layer: enrich
+cluster:
+  type: databricks_13_3_med_general_2_workers_cluster

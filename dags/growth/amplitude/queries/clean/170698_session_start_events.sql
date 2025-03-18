@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id_amplitude,
     id_app,
     id_device,
@@ -49,7 +49,7 @@ SELECT
     year,
     month,
     day
-FROM 
+FROM
     datalake_amplitude_clean_staging.170698_session_start_events
 WHERE
   year={} and month={} and day={}

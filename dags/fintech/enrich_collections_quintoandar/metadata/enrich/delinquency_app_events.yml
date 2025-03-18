@@ -1,0 +1,79 @@
+---
+database_name: datalake_collections_quintoandar
+table_name: delinquency_app_events
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Table that contains app engagement events of defaulting customers, tracking their interaction with the app, including session starts, contract page views, pending invoice page views, and self-service negotiation actions.
+columns:
+  id_amplitude:
+    description: Unique identifier for the Amplitude event.
+    lineage:
+      - datalake_amplitude_clean.170698_session_start_events.id_amplitude
+      - datalake_amplitude_clean.170698_contract_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_pending_invoices_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.id_amplitude
+      - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.id_amplitude
+  id_session:
+    description: Unique session identifier for the user's app interaction.
+    lineage:
+      - datalake_amplitude_clean.170698_session_start_events.id_session
+      - datalake_amplitude_clean.170698_contract_page_viewed_events.id_session
+      - datalake_amplitude_clean.170698_pending_invoices_page_viewed_events.id_session
+      - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.id_session
+      - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.id_session
+      - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.id_session
+  id_contract:
+    description: Identifier of the contract associated with the event.
+    lineage:
+      - datalake_ebdb_contract.contract_person.id_contract
+      - datalake_amplitude_clean.170698_contract_page_viewed_events.ep_id_contract
+      - datalake_amplitude_clean.170698_pending_invoices_page_viewed_events.ep_id_contract
+      - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.ep_id_contract
+      - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.ep_id_contract
+      - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.ep_id_contract
+  id_invoice:
+    description: Identifier of the invoice associated with the event, if applicable.
+    lineage:
+      - datalake_amplitude_clean.170698_pending_invoices_page_viewed_events.ep_id_invoice
+      - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.ep_id_invoice
+      - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.ep_id_invoice
+      - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.ep_id_invoice
+  device_brand:
+    description: Brand of the device used during the event.
+    lineage:
+      - datalake_amplitude_clean.170698_session_start_events.device_brand
+      - datalake_amplitude_clean.170698_contract_page_viewed_events.device_brand
+      - datalake_amplitude_clean.170698_pending_invoices_page_viewed_events.device_brand
+      - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.device_brand
+      - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.device_brand
+      - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.device_brand
+  event_name:
+    description: Type of event recorded in the app.
+    categories:
+      session_start: ""
+      contract_page_viewed: ""
+      pending_invoices_page_viewed: ""
+      rm_pending_invoices_page_viewed: ""
+      pending_invoices_invoice_pay_button_clicked: ""
+      rm_invoice_payment_option_clicked: ""
+  funnel_step:
+    description: Step in the user's journey related to app engagement.
+    categories:
+      Session Start: ""
+      Contract Page: ""
+      Pending Invoice Page: ""
+      Self Service Negotiation: ""
+  month_event:
+    description: Month of the recorded event (truncated to month level).
+    lineage:
+      - Derived from ts_event
+  ts_event:
+    description: Timestamp of the recorded event.
+    lineage:
+      - datalake_amplitude_clean.170698_session_start_events.ts_event
+      - datalake_amplitude_clean.170698_contract_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_pending_invoices_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.ts_event
+      - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.ts_event
+      - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.ts_event
