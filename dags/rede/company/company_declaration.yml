@@ -1,0 +1,41 @@
+dag:
+  name: company
+  owner: Data Rede
+  schedule_interval: 0 21 * * *
+  documentation:
+    dag_purpose: This DAG imports the tables from Company, a service that centralizes legal entity data.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: company
+  database_type: postgres
+  source_database: company
+  source_schema: public
+  default_partitions: [year, month, day]
+  tables_customization:
+    address: {}
+    banking_information: {}
+    company_address:
+      raw_primary_keys: ["address_id", "company_id"]
+    company_document:
+      raw_primary_keys: ["document_id", "company_id"]
+    company_product:
+      raw_primary_keys: ["product_id", "company_id"]
+    company: {}
+    document: {}
+    member_profile: {}
+    product: {}
+    profile_hierarchy: {}
+    profile: {}
+    revenue_share: {}
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

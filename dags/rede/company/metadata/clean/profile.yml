@@ -1,6 +1,9 @@
 ---
 database_name: datalake_company_clean
 table_name: profile
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: 'Contains information about the possible positions a user can take The relationship of this table to Member Profile is many-to-one. The relationship of this table to Profile Hierarchy is many-to-one.'
 columns:
   id:
     lineage:

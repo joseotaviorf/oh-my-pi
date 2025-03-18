@@ -1,6 +1,9 @@
 ---
 database_name: datalake_company_clean
 table_name: document
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: 'Contains the record of all company documents. These can be distinguished by the combination of documentType and documentNumber columns. The documentValidationStatus column is an enum referring to the document authenticity validation process. Also there is a need to archive the document file. So the documentName, attachmentPath and status fields were added to provide a versioning and a logical exclusion strategy. The relationship between this table and Company is many-to-many.'
 columns:
   id:
     lineage:

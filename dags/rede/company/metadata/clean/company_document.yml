@@ -1,6 +1,9 @@
 ---
 database_name: datalake_company_clean
 table_name: company_document
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: 'Result of a relationship between a company and a document. This design provides the flexibility for a company to have N documents. The relationship of this table to Company is many-to-one.'
 columns:
   id_document:
     lineage:

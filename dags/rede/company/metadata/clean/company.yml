@@ -1,6 +1,9 @@
 ---
 database_name: datalake_company_clean
 table_name: company
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: 'Abstraction to deal with the paradigm shift that For Brokers will bring to QuintoAndar. In this design, all companies will be persisted in this table, QuintoAndar itself being one of them. Thus, it is possible to list documents, addresses, products and, through that partners. The companyUUID column represents a unique company identifier across the entire QuintoAndar services ecosystem, so was implemented a logical exclusion using the status field.'
 columns:
   id:
     lineage:

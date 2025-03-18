@@ -1,6 +1,9 @@
 ---
 database_name: datalake_company_clean
 table_name: profile_hierarchy
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: 'Contains the record of the hierarchy of profiles in a given product and a given company. Rules that must be applied in the hierarchy of profiles will not be treated in this domain. The relationship of this table to Product is many-to-one. The relationship of this table to Profile is many-to-one.'
 columns:
   id:
     lineage:

@@ -1,6 +1,9 @@
 ---
 database_name: datalake_company_clean
 table_name: product
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: 'Contains the record of products that a company works with. In the current design of the Company domain, partners must be associated with products. So the relationship of this table with Member Profile is one-to-many. The businessSegment field is an enum that defines which business segment the product belongs to. The concept of logical exclusion was implemented in this table using the status field. The relationship of this table to Company is many-to-one.'
 columns:
   id:
     lineage:

@@ -1,6 +1,9 @@
 ---
 database_name: datalake_company_clean
 table_name: member_profile
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: 'Result of a relationship between a person, a company, a product and a profile. This design provides the flexibility for a person to be part of N companies, in N products and with N profiles. Rules that must be applied in the hierarchy of profiles will not be treated in this domain. The concept of logical exclusion was implemented in this table using the status field. The relationship of this table to Product is many-to-one. The relationship of this table to Profile is many-to-one.'
 columns:
   id:
     lineage:

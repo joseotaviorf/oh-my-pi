@@ -1,6 +1,9 @@
 ---
 database_name: datalake_company_clean
 table_name: company_product
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: 'Result of a relationship between a company and a products. This design provides the flexibility for a company to have N products. The relationship of this table to Company is many-to-one.'
 columns:
   id_company:
     lineage:

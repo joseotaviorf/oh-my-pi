@@ -1,6 +1,9 @@
 ---
 database_name: datalake_company_clean
 table_name: banking_information
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: 'Contains the record of companys banking information. The relationship between this table and Company is many-to-many.'
 columns:
   id:
     lineage:

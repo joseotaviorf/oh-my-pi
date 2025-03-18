@@ -1,6 +1,9 @@
 ---
 database_name: datalake_company_clean
 table_name: revenue_share
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description: 'Contains the record of companys revenue share. The relationship between this table and Company is many-to-many.'
 columns:
   id:
     lineage:
