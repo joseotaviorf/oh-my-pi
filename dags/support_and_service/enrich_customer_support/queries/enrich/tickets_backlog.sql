@@ -25,9 +25,9 @@ ticket_sla_target AS (
     MAX(
         CASE
             WHEN CAST(t.dt_budgeted AS TIMESTAMP) IS NOT NULL
-                AND CAST(t.dt_budgeted AS TIMESTAMP) >= t.ts_created
+                AND CAST(t.dt_budgeted AS TIMESTAMP) >= t.ts_created - INTERVAL 3 HOUR
                 AND CAST(t.dt_budgeted AS TIMESTAMP) < COALESCE(t.ts_solved, TIMESTAMP('{load_end_date}')) THEN CAST(t.dt_budgeted AS TIMESTAMP)
-            ELSE t.ts_created
+            ELSE t.ts_created - INTERVAL 3 HOUR
         END
     ) AS ts_sla_started,
     t.ts_solved
@@ -64,7 +64,7 @@ ticket_sla_target AS (
             )
             OR t.group_name != 'Offboarding Reparos [OFF] [POS] [BACK]'
         )
-        AND ts_created >= '{load_start_date}'
+        AND ts_created >= DATE('{load_start_date}') - INTERVAL 3 MONTH
     GROUP BY ALL
 ),
 ticket_date_intervals AS (
