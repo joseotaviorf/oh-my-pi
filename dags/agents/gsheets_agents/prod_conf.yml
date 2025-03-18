@@ -54,6 +54,18 @@ sheets_info:
     sheet_context: agents
     partitioned: true
   
+  ciq_tiers_rent:
+    sheet_id: 1TjK-wY__QbsMz6yQBUW2HDYQoADhvkkk4ynbrFAszxc
+    sheet_name: ciq_tiers_rent
+    clean_table_name: ciq_tiers_rent
+    sheet_context: agents
+  
+  ciq_tiers_sale:
+    sheet_id: 1TjK-wY__QbsMz6yQBUW2HDYQoADhvkkk4ynbrFAszxc
+    sheet_name: ciq_tiers_sale
+    clean_table_name: ciq_tiers_rent
+    sheet_context: agents
+  
   pp_multi_cluster:
     sheet_id: 1K1bDKoIgZ3XoxoWdpYEgGpYYE40481FB4kqOaDJJwhc
     sheet_name: pp_multi_cluster

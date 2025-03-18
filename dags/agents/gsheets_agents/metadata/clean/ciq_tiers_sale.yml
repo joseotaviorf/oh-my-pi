@@ -1,0 +1,76 @@
+database_name: datalake_gsheets_clean
+table_name: ciq_tiers_sale
+description: Table containing the calculation of Tiers and quarterly Revenue Share values for CIQs in the Sale context.
+  The table in question may not follow the tiering rules used in the datalake. 
+  It is the sole responsibility of the CIQ Experience team.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_user:
+    description: User ID.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.id_user
+  id_partner:
+    description: Partner ID in the Partner structure.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.id_partner
+  status_ciq:
+    description: CIQ status, it should stop at the partnership where it was de-registered.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.status_ciq
+  ciq_type:
+    description: Type of CIQ partnership.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.ciq_type
+  city_group_partner:
+    description: Operating city (Agent) or main city for acquisitions (Only).
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.city_group_partner
+  dt_start_audit:
+    description: Start date of the audit.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.dt_start_audit
+  dt_end_audit:
+    description: End date of the audit.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.dt_end_audit
+  n_ccvs:
+    description: Total number of CCVs.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.n_ccvs
+  n_ccvs_ht:
+    description: Number of High Ticket CCVs.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.n_ccvs_ht
+  value_vgv:
+    description: General sales value.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.value_vgv
+  value_vgv_ht:
+    description: General High Ticket sales value.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.value_vgv_ht
+  dt_start_validity:
+    description: Start date of Revenue Share.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.dt_start_validity
+  dt_end_validity:
+    description: End date of Revenue Share.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.dt_end_validity
+  rev_share_default:
+    description: Default Revenue Share value paid.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.rev_share_default
+  rev_share_ht:
+    description: Revenue Share value for HT properties (Will be the same depending on the range).
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.rev_share_ht
+  value_ht_reference:
+    description: Reference value for High Ticket in that specific region (Campaign control).
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.value_ht_reference
+  ts_updated:
+    description: Timestamp of last update.
+    lineage:
+      - datalake_gsheets_raw.ciq_tiers_sale.ts_updated
