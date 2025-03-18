@@ -1,5 +1,5 @@
 quintoandar-logger>=0.4.0
 validations-engine==1.0.0
 Cerberus==1.3.4
-databricks_cli==0.17.6
+databricks_cli==0.18.0
 workalendar==17.0.0

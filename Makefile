@@ -9,12 +9,24 @@ clone-local-airflow-plugins:
 	@echo "Cloning 'airflow-plugins' from branch '$(branch)'"
 	@echo "=========="
 	@echo ""
-	@rm -fR ./local/airflow/plugins || true
-	@rm -fR ./local/airflow/plugins_temp || true
-	@git clone -b $(branch) --quiet --depth 1 https://github.com/quintoandar/airflow-plugins.git ./local/airflow/plugins_temp
-	@cp -Rf ./local/airflow/plugins_temp/quintoandar_airflow_plugins/ ./local/airflow/plugins
-	@rm -fR ./local/airflow/plugins_temp
-	@echo "Cloning succeeded at ./local/airflow/plugins"
+	@rm -fR ./local/astro/plugins || true
+	@rm -fR ./local/astro/plugins_temp || true
+	@git clone -b $(branch) --quiet --depth 1 https://github.com/quintoandar/airflow-plugins.git ./local/astro/plugins_temp
+	@cp -Rf ./local/astro/plugins_temp/quintoandar_airflow_plugins/ ./local/astro/plugins
+	@rm -fR ./local/astro/plugins_temp
+	@rm -fR ./local/astro/plugins/databricks_plugin.py
+	@echo "Cloning succeeded at ./local/astro/plugins"
+
+.PHONY: setup-bietlejuice
+setup-bietlejuice:
+	@echo "Setup bietlejuice at local airflow deployment"
+	@echo "=========="
+	@rm -fR ./local/astro/dags || true
+	@rm -fR ./local/astro/bietlejuice || true
+	@rm -fR ./local/astro/scripts || true
+	@cp -Rf ./dags/ ./local/astro/dags
+	@cp -Rf ./bietlejuice/ ./local/astro/bietlejuice
+	@cp -Rf ./scripts/ ./local/astro/scripts
 
 .PHONY: setup-local-variables
 ## receives and sets up local shell variables to store token credentials used in the local Airflow environment.
@@ -38,45 +50,46 @@ setup-local-variables:
 	@echo "All variables set!"
 	@echo "~> Restart your shell to apply changes!"
 
+.PHONY: import-variables-and-connections
+import-variables-and-connections:
+	@echo "Import Variables and Connections"
+	@cd ./local/astro; \
+	astro dev run variables import variables.json; \
+	sh import_conn.sh
+
+
 branch ?= forno
 .PHONY: run-local-environment
 ## runs a local Airflow environment containing both bi-etl-ejuice DAGs and QuintoAndar's custom Airflow Plugins.
 ## May receive an optional `branch={branch}` argument to clone a specified branch of Airflow Plugins repo. Defaults to `forno`.
-## May receive an optional `database={database}` argument to set up a specified database. Defaults to `postgres`.
 run-local-environment:
+	@make setup-bietlejuice
 	@make clone-local-airflow-plugins branch=$(branch)
 	@echo "Recreating local Airflow environment"
 	@echo "=========="
 	@echo ""
-	@if [ "${database}" = "mysql" ]; then\
-		echo "Running local environment with MySQL database";\
-        docker-compose -f local/docker/docker-compose-mysql.yml up -d --build --force-recreate;\
-	else\
-		echo "Running local environment with Postgres database";\
-		docker-compose -f local/docker/docker-compose.yml up -d --build --force-recreate;\
-    fi
+	@cd ./local/astro; \
+	astro dev start --build-secrets id=GITHUB_TOKEN
+	@make import-variables-and-connections
 
 .PHONY: restart-local-environment
-## May receive an optional `database={database}` argument to set up a specified database. Defaults to `postgres`.
 restart-local-environment:
-	@if [ "${database}" = "mysql" ]; then\
-		echo "Restarting local environment with MySQL database";\
-        docker-compose -f local/docker/docker-compose-mysql.yml up -d --build;\
-	else\
-		echo "Restarting local environment with Postgres database";\
-		docker-compose -f local/docker/docker-compose.yml up -d --build;\
-    fi
+	@echo "Restart local Airflow environment"
+	@make setup-bietlejuice
+	@cd ./local/astro; \
+	astro dev restart --build-secrets id=GITHUB_TOKEN 
 
 .PHONY: stop-local-environment
-## May receive an optional `database={database}` argument to set up a specified database. Defaults to `postgres`.
 stop-local-environment:
-	@if [ "${database}" = "mysql" ]; then\
-		echo "Stopping local environment with MySQL database";\
-		docker-compose -f local/docker/docker-compose-mysql.yml down;\
-	else\
-		echo "Stopping local environment with Postgres database";\
-		docker-compose -f local/docker/docker-compose.yml down;\
-	fi
+	@echo "Restart local Airflow environment"
+	@cd ./local/astro; \
+	astro dev stop
+	
+.PHONY: stop-local-environment
+kill-local-environment:
+	@echo "Delete local Airflow environment"
+	@cd ./local/astro; \
+	astro dev kill
 
 ###############################################################################
 ###################### Local Tests Docker environment #########################

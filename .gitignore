@@ -139,7 +139,12 @@ logs/
 requirements-freeze.txt
 
 # local environment files
-local/airflow/plugins*
+local/astro/dags/*
+local/astro/bietlejuice/*
+local/astro/plugins/*
+local/astro/scripts/*
+
 
 # Airflow DAG Builder Python tfiles
 dags/**/*_dag.py
+

@@ -1,0 +1,24 @@
+{
+  "envs": [
+    {
+      "conn_id": "databricks_default",
+      "conn_type": "http",
+      "host": "dbc-324f044d-4b9d.cloud.databricks.com",
+      "extra": 
+        {
+          "token": "{DATABRICKS_TOKEN}"
+        }
+      
+    },
+    {
+      "conn_id": "databricks_new",
+      "conn_type": "http",
+      "host": "https://dbc-324f044d-4b9d.cloud.databricks.com",
+      "extra": 
+        {
+          "token": "{DATABRICKS_TOKEN}"
+        }
+      
+    }
+  ]
+}

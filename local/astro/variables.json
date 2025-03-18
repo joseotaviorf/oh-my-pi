@@ -1,0 +1,1442 @@
+{
+    "AWS_ACCESS_KEY_ID": "<your_key>",
+    "AWS_DEFAULT_REGION": "us-east-1",
+    "AWS_NEW_ACCESS_KEY_ID": "<your_key>",
+    "AWS_NEW_SECRET_ACCESS_KEY": "<your_key>",
+    "AWS_REGION": "us-east-1",
+    "AWS_SECRET_ACCESS_KEY": "<your_key>",
+    "CASIO_CONFIG": {
+        "estimator": {
+            "hyperparameters": {
+                "number_layers": 1
+            },
+            "train_instance_count": 1,
+            "train_instance_type": "ml.m5.2xlarge"
+        },
+        "experiment_tag": "casio-master-latest",
+        "training_dataset_name": "1587576174"
+    },
+    "CITADEL_BERT_S3_DIR": "s3://5a-model-academy/prod/citadel/bert_large/",
+    "DOC_MD_BASE_URL": "https://de1a6b4bd8430e163-tp.appspot.com/admin/airflow/chart?chart_id=3&iteration_no=0&dag_id=",
+    "GOOGLE_API_SCOPE": "https://www.googleapis.com/auth/spreadsheets.readonly",
+    "JONSNOW_CONFIG": {},
+    "MEDIATOR_SKIP_LIST": {
+        "_______ATTENTION!______": "ALWAYS validate your modifications in this JSON here: https://jsonlint.com/. If it's invalid, the Mediator will break and die.",
+        "_documentation": "Instructions: to prevent a dependent DAG to be triggered by the mediator, you can update its date to the CURRENT DATE. Then the Mediator will ignore in following executions of the given date. You don't need to duplicate a key, if your DAG is already registered, ***DO NOT DUPLICATE THE ENTRY***.",
+        "_last_updater": "Gustavo Akashi",
+        "dags_not_to_trigger": {},
+        "skip_all_dependents_from_dags": {
+            "bietlejuice.dw_booking": "2024-09-17"
+        }
+    },
+    "MODEL_ACADEMY_BUILD_DATASET_DEFAULT_CLUSTER": {
+        "autoscale": {
+            "max_workers": 4,
+            "min_workers": 2
+        },
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 100,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1a"
+        },
+        "custom_tags": [
+            {
+                "key": "app",
+                "value": "airflow"
+            },
+            {
+                "key": "environment",
+                "value": "forno"
+            },
+            {
+                "key": "service",
+                "value": "airflow"
+            },
+            {
+                "key": "owner",
+                "value": "mlops"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            },
+            {
+                "key": "dag id",
+                "value": "{{ dag.dag_id }}"
+            }
+        ],
+        "driver_node_type_id": "c4.2xlarge",
+        "enable_elastic_disk": true,
+        "node_type_id": "c4.2xlarge",
+        "spark_conf": {
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "a32e99cee07a64577ad38d0e132b9c07-20b220daa39bc736.elb.us-east-1.amazonaws.com",
+            "spark.metrics.conf.*.sink.graphite.period": 15,
+            "spark.metrics.conf.*.sink.graphite.port": 9109,
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}"
+        },
+        "spark_env_vars": {
+            "ENVIRONMENT": "forno",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+        },
+        "spark_version": "10.4.x-scala2.12",
+        "ssh_public_keys": []
+    },
+    "MODEL_ACADEMY_S3_BUCKET": "model-academy.s3.forno.data.quintoandar.com.br",
+    "MODEL_ACADEMY__MLFLOW_EXPERIMENTS_BASE_PATH": "/MLOps/experiments/",
+    "QUINTOANDAR_ECR_REPO": "713278628093.dkr.ecr.us-east-1.amazonaws.com",
+    "SAGEMAKER_ROLE": "arn:aws:iam::713278628093:role/service-role/AmazonSageMaker-ExecutionRole-20191125T030367",
+    "WONKA_START_DATE": "2025-01-05",
+    "artifacts_bucket": "s3://artifacts.s3.forno.data.quintoandar.com.br",
+    "artifacts_s3_bucket": "s3://artifacts.s3.forno.data.quintoandar.com.br",
+    "bietlejuice_default_libraries": [
+        {
+            "whl": "s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/bi_etl_ejuice-latest-py3-none-any.whl"
+        },
+        {
+            "whl": "s3://artifacts.s3.forno.data.quintoandar.com.br/python-logger/quintoandar_logger-latest-py3-none-any.whl"
+        }
+    ],
+    "databricks_9_1_med_general_cluster": {
+        "autoscale": {
+            "max_workers": 3,
+            "min_workers": 1
+        },
+        "autotermination_minutes": 20,
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 100,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1a"
+        },
+        "cluster_log_conf": {
+            "s3": {
+                "destination": "s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id }}",
+                "region": "us-east-1"
+            }
+        },
+        "cluster_name": "{{ dag.dag_id }}_{{ run_id }}",
+        "cluster_source": "API",
+        "custom_tags": [
+            {
+                "key": "application",
+                "value": "airflow"
+            },
+            {
+                "key": "resource-name",
+                "value": "databricks"
+            },
+            {
+                "key": "environment",
+                "value": "{{ var.value.environment }}"
+            },
+            {
+                "key": "owner",
+                "value": "analytics-engineering"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data-engineering"
+            },
+            {
+                "key": "data-classification",
+                "value": "private"
+            },
+            {
+                "key": "sensitive-data",
+                "value": true
+            },
+            {
+                "key": "cost-center",
+                "value": "c052"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            }
+        ],
+        "driver_node_type_id": "m5a.xlarge",
+        "enable_elastic_disk": "true",
+        "init_scripts": [
+            {
+                "s3": {
+                    "destination": "{{ var.value.artifacts_s3_bucket }}/bi-etl-ejuice/init_script.sh",
+                    "region": ""
+                }
+            }
+        ],
+        "node_type_id": "m5a.xlarge",
+        "spark_conf": {
+            "spark.cernSparkPlugin.cloudFsName": "s3a",
+            "spark.extraListeners": "ch.cern.sparkmeasure.FlightRecorderStageMetrics",
+            "spark.jars.packages": "ch.cern.sparkmeasure:spark-plugins_2.12:0.2,ch.cern.sparkmeasure:spark-measure_2.12:0.21",
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "a32e99cee07a64577ad38d0e132b9c07-20b220daa39bc736.elb.us-east-1.amazonaws.com",
+            "spark.metrics.conf.*.sink.graphite.period": 15,
+            "spark.metrics.conf.*.sink.graphite.port": 9109,
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}",
+            "spark.plugins": "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics",
+            "spark.rpc.message.maxSize": "2000",
+            "spark.sparkmeasure.outputFilename": "/tmp/stageMetrics_flightRecorder.json",
+            "spark.sparkmeasure.outputFormat": "json",
+            "spark.sparkmeasure.printToStdout": "false",
+            "spark.sql.legacy.createHiveTableByDefault": "true",
+            "spark.sql.parquet.filterPushdown": "true",
+            "spark.sql.sources.default": "parquet",
+            "spark.sql.sources.partitionOverwriteMode": "dynamic"
+        },
+        "spark_env_vars": {
+            "ENVIRONMENT": "{{ var.value.environment }}",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+        },
+        "spark_version": "9.1.x-scala2.12",
+        "ssh_public_keys": []
+    },
+    "databricks_9_1_min_general_cluster": {
+        "autoscale": {
+            "max_workers": 2,
+            "min_workers": 1
+        },
+        "autotermination_minutes": 20,
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 100,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1a"
+        },
+        "cluster_log_conf": {
+            "s3": {
+                "destination": "s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id }}",
+                "region": "us-east-1"
+            }
+        },
+        "cluster_name": "{{ dag.dag_id }}_{{ run_id }}",
+        "cluster_source": "API",
+        "custom_tags": [
+            {
+                "key": "application",
+                "value": "airflow"
+            },
+            {
+                "key": "resource-name",
+                "value": "databricks"
+            },
+            {
+                "key": "environment",
+                "value": "{{ var.value.environment }}"
+            },
+            {
+                "key": "owner",
+                "value": "analytics-engineering"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data-engineering"
+            },
+            {
+                "key": "data-classification",
+                "value": "private"
+            },
+            {
+                "key": "sensitive-data",
+                "value": true
+            },
+            {
+                "key": "cost-center",
+                "value": "c052"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            }
+        ],
+        "driver_node_type_id": "m5a.large",
+        "enable_elastic_disk": true,
+        "init_scripts": [
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/init_script.sh",
+                    "region": ""
+                }
+            }
+        ],
+        "node_type_id": "m5a.large",
+        "spark_conf": {
+            "spark.cernSparkPlugin.cloudFsName": "s3a",
+            "spark.extraListeners": "ch.cern.sparkmeasure.FlightRecorderStageMetrics",
+            "spark.jars.packages": "ch.cern.sparkmeasure:spark-plugins_2.12:0.2,ch.cern.sparkmeasure:spark-measure_2.12:0.21",
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "a32e99cee07a64577ad38d0e132b9c07-20b220daa39bc736.elb.us-east-1.amazonaws.com",
+            "spark.metrics.conf.*.sink.graphite.period": 15,
+            "spark.metrics.conf.*.sink.graphite.port": 9109,
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}",
+            "spark.plugins": "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics",
+            "spark.rpc.message.maxSize": "2000",
+            "spark.sparkmeasure.outputFilename": "/tmp/stageMetrics_flightRecorder.json",
+            "spark.sparkmeasure.outputFormat": "json",
+            "spark.sparkmeasure.printToStdout": "false",
+            "spark.sql.legacy.createHiveTableByDefault": "true",
+            "spark.sql.legacy.parquet.datetimeRebaseModeInRead": "LEGACY",
+            "spark.sql.legacy.parquet.datetimeRebaseModeInWrite": "LEGACY",
+            "spark.sql.legacy.timeParserPolicy": "LEGACY",
+            "spark.sql.parquet.filterPushdown": "true",
+            "spark.sql.sources.default": "parquet",
+            "spark.sql.sources.partitionOverwriteMode": "dynamic"
+        },
+        "spark_env_vars": {
+            "ARTIFACTS_BUCKET": "s3://artifacts.s3.forno.data.quintoandar.com.br",
+            "ENVIRONMENT": "{{ var.value.environment }}",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+        },
+        "spark_version": "9.1.x-scala2.12",
+        "ssh_public_keys": []
+    },
+    "databricks_bietlejuice_s3_prefix": "s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice",
+    "databricks_ebdb_cluster": {
+        "autotermination_minutes": 20,
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 100,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
+            "spot_bid_price_percent": 100,
+            "zone_id": "auto"
+        },
+        "cluster_log_conf": {
+            "s3": {
+                "destination": "s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id}}",
+                "region": "us-east-1"
+            }
+        },
+        "cluster_name": "{{ dag.dag_id }}_{{ run_id }}",
+        "cluster_source": "API",
+        "custom_tags": [
+            {
+                "key": "app",
+                "value": "airflow"
+            },
+            {
+                "key": "environment",
+                "value": "prod"
+            },
+            {
+                "key": "service",
+                "value": "airflow"
+            },
+            {
+                "key": "owner",
+                "value": "data"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            },
+            {
+                "key": "dag id",
+                "value": "{{ dag.dag_id }}"
+            }
+        ],
+        "driver_node_type_id": "c5.4xlarge",
+        "enable_elastic_disk": "true",
+        "init_scripts": [
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/init_script.sh",
+                    "region": ""
+                }
+            }
+        ],
+        "node_type_id": "m5.2xlarge",
+        "num_workers": 6,
+        "spark_conf": {
+            "spark.cernSparkPlugin.cloudFsName": "s3a",
+            "spark.extraListeners": "ch.cern.sparkmeasure.FlightRecorderStageMetrics",
+            "spark.hadoop.fs.s3a.connection.maximum": 480,
+            "spark.jars.packages": "ch.cern.sparkmeasure:spark-plugins_2.12:0.2,ch.cern.sparkmeasure:spark-measure_2.12:0.21",
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "graphite-exporter.forno.quintoandar.com.br",
+            "spark.metrics.conf.*.sink.graphite.period": 15,
+            "spark.metrics.conf.*.sink.graphite.port": 9109,
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}",
+            "spark.plugins": "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,br.com.quintoandar.GangliaMetrics",
+            "spark.rpc.message.maxSize": "2000",
+            "spark.sparkmeasure.outputFilename": "/tmp/stageMetrics_flightRecorder.json",
+            "spark.sparkmeasure.outputFormat": "json",
+            "spark.sparkmeasure.printToStdout": "false",
+            "spark.sql.parquet.filterPushdown": "true",
+            "spark.sql.shuffle.partitions": "200",
+            "spark.sql.sources.partitionOverwriteMode": "dynamic"
+        },
+        "spark_env_vars": {
+            "ARTIFACTS_BUCKET": "s3://artifacts.s3.forno.data.quintoandar.com.br",
+            "ENVIRONMENT": "forno",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+        },
+        "spark_version": "10.4.x-scala2.12",
+        "ssh_public_keys": []
+    },
+    "databricks_model_academy_s3_prefix": "s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/model-academy",
+    "databricks_s3_bucket": "databricks.s3.forno.data.quintoandar.com.br",
+    "databricks_single_user_name": "gustavo.miller@quintoandar.com.br",
+    "databricks_wonka_s3_prefix": "s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/wonka",
+    "datalake_bucket": "datalake.s3.forno.data.quintoandar.com.br",
+    "default_cluster_ecr": {
+        "autotermination_minutes": 10,
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 32,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1a"
+        },
+        "cluster_log_conf": {
+            "s3": {
+                "destination": "LOGS_OUTPUT_PATH",
+                "region": "us-east-1"
+            }
+        },
+        "cluster_name": "{{ dag.dag_id }}_{{ run_id }}",
+        "cluster_source": "API",
+        "custom_tags": [
+            {
+                "key": "app",
+                "value": "airflow"
+            },
+            {
+                "key": "environment",
+                "value": "{{ var.value.environment }}"
+            },
+            {
+                "key": "service",
+                "value": "airflow"
+            },
+            {
+                "key": "owner",
+                "value": "data"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            },
+            {
+                "key": "dag id",
+                "value": "{{ dag.dag_id }}"
+            }
+        ],
+        "docker_image": {
+            "url": "713278628093.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:test"
+        },
+        "driver_node_type_id": "m5.xlarge",
+        "enable_elastic_disk": "true",
+        "init_scripts": [],
+        "node_type_id": "m5.xlarge",
+        "num_workers": 1,
+        "spark_conf": {
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "a32e99cee07a64577ad38d0e132b9c07-20b220daa39bc736.elb.us-east-1.amazonaws.com",
+            "spark.metrics.conf.*.sink.graphite.period": 15,
+            "spark.metrics.conf.*.sink.graphite.port": 9109,
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}",
+            "spark.rpc.message.maxSize": "1024",
+            "spark.sql.sources.partitionOverwriteMode": "dynamic"
+        },
+        "spark_env_vars": {
+            "ENVIRONMENT": "{{ var.value.environment }}",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+        },
+        "spark_version": "6.6.x-scala2.11",
+        "ssh_public_keys": []
+    },
+    "dw_bucket": "dw.s3.forno.data.quintoandar.com.br",
+    "emr_default_cluster_config": {
+        "Applications": [
+            {
+                "Name": "Hadoop"
+            },
+            {
+                "Name": "Spark"
+            },
+            {
+                "Name": "Livy"
+            },
+            {
+                "Name": "Ganglia"
+            }
+        ],
+        "AutoScalingRole": "EMR_AutoScaling_DefaultRole",
+        "Configurations": [
+            {
+                "Classification": "spark-hive-site",
+                "Properties": {
+                    "hive.metastore.client.factory.class": "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
+                }
+            },
+            {
+                "Classification": "spark-env",
+                "Configurations": [
+                    {
+                        "Classification": "export",
+                        "Properties": {
+                            "PYSPARK_PYTHON": "/usr/bin/python3"
+                        }
+                    }
+                ]
+            },
+            {
+                "Classification": "livy-conf",
+                "Properties": {
+                    "livy.impersonation.enabled": "true",
+                    "livy.server.session.max-creation": "30",
+                    "livy.server.session.timeout": "2h",
+                    "livy.server.session.timeout-check": "true",
+                    "livy.server.yarn.app-lookup-timeout": "120s"
+                }
+            },
+            {
+                "Classification": "core-site",
+                "Properties": {
+                    "hadoop.proxyuser.livy.groups": "*",
+                    "hadoop.proxyuser.livy.hosts": "*"
+                }
+            }
+        ],
+        "EbsRootVolumeSize": 10,
+        "Instances": {
+            "Ec2KeyName": "ribs",
+            "Ec2SubnetId": "subnet-2078417c",
+            "EmrManagedMasterSecurityGroup": "sg-04394510cbc9d1ea9",
+            "EmrManagedSlaveSecurityGroup": "sg-04394510cbc9d1ea9",
+            "InstanceGroups": [
+                {
+                    "InstanceCount": 1,
+                    "InstanceRole": "MASTER",
+                    "InstanceType": "m3.xlarge",
+                    "Market": "ON_DEMAND",
+                    "Name": "Master node"
+                },
+                {
+                    "InstanceCount": 1,
+                    "InstanceRole": "CORE",
+                    "InstanceType": "m3.2xlarge",
+                    "Market": "ON_DEMAND",
+                    "Name": "Slave node"
+                }
+            ],
+            "KeepJobFlowAliveWhenNoSteps": true
+        },
+        "JobFlowRole": "EMR_EC2_DefaultRole",
+        "LogUri": "{EMR_BUCKET}/clusters/{{ dag.dag_id }}_{{ run_id }}/logs/",
+        "Name": "{{ dag.dag_id }}_{{ run_id }}",
+        "ReleaseLabel": "emr-6.0.0",
+        "ScaleDownBehavior": "TERMINATE_AT_TASK_COMPLETION",
+        "ServiceRole": "EMR_DefaultRole",
+        "StepConcurrencyLevel": 30,
+        "Steps": [
+            {
+                "ActionOnFailure": "CONTINUE",
+                "HadoopJarStep": {
+                    "Args": [
+                        "s3://emr.s3.forno.data.quintoandar.com.br/steps/bi-etl-ejuice/install_wheels.sh"
+                    ],
+                    "Jar": "s3://us-east-1.elasticmapreduce/libs/script-runner/script-runner.jar"
+                },
+                "Name": "Install wheels"
+            }
+        ],
+        "VisibleToAllUsers": true
+    },
+    "environment": "forno",
+    "estimator": {
+        "hyperparameters": {
+            "C": 1.0
+        },
+        "train_instance_count": 1,
+        "train_instance_type": "ml.p2.xlarge"
+    },
+    "experiment_tag": "experiment-jon-snow-latest",
+    "gcp_project": "airflow-forno",
+    "gsheets_several_daily_runs_task_pool": "gsheets_several_daily_runs_pool",
+    "gsheets_task_pool": "gsheets_pool",
+    "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
+    "instance_profile_arn_wonka": "arn:aws:iam::713278628093:instance-profile/databricks-wonka",
+    "instance_profile_secret_arn_cognito_ingestion": "arn:aws:iam::713278628093:instance-profile/databricks-cognito-ingestion",
+    "instance_profile_secret_arn_people": "arn:aws:iam::713278628093:instance-profile/databricks-people",
+    "instance_profile_secret_arn_reverse_listings_report": "arn:aws:iam::713278628093:instance-profile/databricks-reports-service",
+    "instance_profile_secret_arn_vespucio": "arn:aws:iam::713278628093:instance-profile/databricks-vespucio",
+    "looker_bucket": "looker.s3.forno.data.quintoandar.com.br",
+    "spectrum_iam_role": "arn:aws:iam::713278628093:role/SpectrumAccess",
+    "teste_gov_cluster": {
+        "autoscale": {
+            "max_workers": 3,
+            "min_workers": 1
+        },
+        "autotermination_minutes": 60,
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 32,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1d"
+        },
+        "cluster_log_conf": {
+            "s3": {
+                "canned_acl": "bucket-owner-full-control",
+                "destination": "s3://databricks.s3.forno.data.quintoandar.com.br/logs/tests/data_governance",
+                "enable_encryption": true,
+                "region": "us-east-1"
+            }
+        },
+        "cluster_name": "Gov Teste",
+        "cluster_source": "API",
+        "custom_tags": [
+            {
+                "key": "application",
+                "value": "airflow"
+            },
+            {
+                "key": "resource-name",
+                "value": "databricks"
+            },
+            {
+                "key": "environment",
+                "value": "{{ var.value.environment }}"
+            },
+            {
+                "key": "owner",
+                "value": "analytics-engineering"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data-engineering"
+            },
+            {
+                "key": "data-classification",
+                "value": "private"
+            },
+            {
+                "key": "sensitive-data",
+                "value": true
+            },
+            {
+                "key": "cost-center",
+                "value": "c052"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            }
+        ],
+        "driver_node_type_id": "m5a.large",
+        "enable_elastic_disk": false,
+        "init_scripts": [
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/init_script.sh",
+                    "region": ""
+                }
+            }
+        ],
+        "libraries": [
+            {
+                "whl": "dbfs:/FileStore/artifacts/geo_spark/geospark-1.3.2-py3-none-any.whl"
+            },
+            {
+                "jar": "dbfs:/FileStore/artifacts/geo_spark/geospark-1.3.2.jar"
+            },
+            {
+                "jar": "dbfs:/FileStore/artifacts/geo_spark/geospark-sql_2.3-1.3.2.jar"
+            }
+        ],
+        "node_type_id": "m5a.xlarge",
+        "spark_conf": {
+            "spark.hadoop.fs.s3.impl": "com.databricks.s3a.S3AFileSystem",
+            "spark.hadoop.fs.s3a.acl.default": "BucketOwnerFullControl",
+            "spark.hadoop.fs.s3a.canned.acl": "BucketOwnerFullControl",
+            "spark.hadoop.fs.s3a.impl": "com.databricks.s3a.S3AFileSystem",
+            "spark.hadoop.fs.s3n.impl": "com.databricks.s3a.S3AFileSystem",
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "a32e99cee07a64577ad38d0e132b9c07-20b220daa39bc736.elb.us-east-1.amazonaws.com",
+            "spark.metrics.conf.*.sink.graphite.period": 15,
+            "spark.metrics.conf.*.sink.graphite.port": 9109,
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}",
+            "spark.sql.sources.partitionOverwriteMode": "dynamic"
+        },
+        "spark_env_vars": {
+            "ENVIRONMENT": "forno",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3",
+            "SPARK_VERSION": "3.0.1"
+        },
+        "spark_version": "9.1.x-scala2.12",
+        "ssh_public_keys": []
+    },
+    "training_dataset_name": "train-dataset",
+    "tuner": {
+        "early_stopping_type": "Auto",
+        "hyperparameter_ranges": {
+            "C": {
+                "ContinuousParameter": {
+                    "max_value": 1,
+                    "min_value": 0
+                }
+            },
+            "max_features": {
+                "IntegerParameter": {
+                    "max_value": 10000,
+                    "min_value": 3000
+                }
+            }
+        },
+        "max_jobs": 5,
+        "max_parallel_jobs": 20,
+        "metric_definitions": [
+            {
+                "Name": "val_roc_auc",
+                "Regex": "Validation.*ROC AUC: (\\d+\\.\\d+)"
+            },
+            {
+                "Name": "val_accuracy",
+                "Regex": "Validation.*Accuracy score: (\\d+\\.\\d+)"
+            },
+            {
+                "Name": "val_f1_no_context",
+                "Regex": "Validation.*F1: \\[(\\d+\\.\\d+)"
+            },
+            {
+                "Name": "val_f1_context",
+                "Regex": "Validation.*F1: .*(\\d+\\.\\d+)\\]"
+            },
+            {
+                "Name": "val_precision_no_context",
+                "Regex": "Validation.*Precision score: \\[(\\d+\\.\\d+)"
+            },
+            {
+                "Name": "val_precision_context",
+                "Regex": "Validation.*Precision score: .*(\\d+\\.\\d+)\\]"
+            },
+            {
+                "Name": "val_recall_no_context",
+                "Regex": "Validation.*Recall score: \\[(\\d+\\.\\d+)"
+            },
+            {
+                "Name": "val_recall_context",
+                "Regex": "Validation.*Recall score: .*(\\d+\\.\\d+)\\]"
+            },
+            {
+                "Name": "val_support_no_context",
+                "Regex": "Validation.*Support: \\[(\\d+)"
+            },
+            {
+                "Name": "val_support_context",
+                "Regex": "Validation.*Support: .*(\\d+)\\]"
+            },
+            {
+                "Name": "test_roc_auc",
+                "Regex": "Test.*ROC AUC: (\\d+\\.\\d+)"
+            },
+            {
+                "Name": "test_accuracy",
+                "Regex": "Test.*Accuracy score: (\\d+\\.\\d+)"
+            },
+            {
+                "Name": "test_f1_no_context",
+                "Regex": "Test.*F1: \\[(\\d+\\.\\d+)"
+            },
+            {
+                "Name": "test_f1_context",
+                "Regex": "Test.*F1: .*(\\d+\\.\\d+)\\]"
+            },
+            {
+                "Name": "test_precision_no_context",
+                "Regex": "Test.*Precision score: \\[(\\d+\\.\\d+)"
+            },
+            {
+                "Name": "test_precision_context",
+                "Regex": "Test.*Precision score: .*(\\d+\\.\\d+)\\]"
+            },
+            {
+                "Name": "test_recall_no_context",
+                "Regex": "Test.*Recall score: \\[(\\d+\\.\\d+)"
+            },
+            {
+                "Name": "test_recall_context",
+                "Regex": "Test.*Recall score: .*(\\d+\\.\\d+)\\]"
+            },
+            {
+                "Name": "test_support_no_context",
+                "Regex": "Test.*Support: \\[(\\d+)"
+            },
+            {
+                "Name": "test_support_context",
+                "Regex": "Test.*Support: .*(\\d+)\\]"
+            }
+        ],
+        "objective_metric_name": "val_f1_context",
+        "objective_type": "Maximize"
+    },
+    "wonka_10.4_cluster": {
+        "autoscale": {
+            "max_workers": 4,
+            "min_workers": 2
+        },
+        "autotermination_minutes": 300,
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 100,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1a"
+        },
+        "cluster_log_conf": {
+            "s3": {
+                "canned_acl": "bucket-owner-full-control",
+                "destination": "s3://databricks.s3.forno.data.quintoandar.com.br/logs/wonka/batch/feature_store/{ENTITY_NAME}/{FEATURE_SET}",
+                "enable_encryption": true,
+                "region": "us-east-1"
+            }
+        },
+        "cluster_name": "{{ dag.dag_id }}_{{ run_id }}",
+        "custom_tags": [
+            {
+                "key": "app",
+                "value": "airflow"
+            },
+            {
+                "key": "environment",
+                "value": "forno"
+            },
+            {
+                "key": "service",
+                "value": "airflow"
+            },
+            {
+                "key": "owner",
+                "value": "data"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            },
+            {
+                "key": "dag id",
+                "value": "{{ dag.dag_id }}"
+            }
+        ],
+        "driver_node_type_id": "c4.2xlarge",
+        "enable_elastic_disk": true,
+        "init_scripts": [
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.forno.data.quintoandar.com.br/scripts/init-scripts/get-cassandra-credentials-from-vault-on-databricks.sh",
+                    "region": ""
+                }
+            },
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.forno.data.quintoandar.com.br/scripts/init-scripts/wonka-install-dependencies.sh",
+                    "region": ""
+                }
+            }
+        ],
+        "node_type_id": "c4.2xlarge",
+        "spark_conf": {
+            "spark.hadoop.fs.s3a.acl.default": "BucketOwnerFullControl",
+            "spark.hadoop.fs.s3a.canned.acl": "BucketOwnerFullControl",
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "a32e99cee07a64577ad38d0e132b9c07-20b220daa39bc736.elb.us-east-1.amazonaws.com",
+            "spark.metrics.conf.*.sink.graphite.period": 15,
+            "spark.metrics.conf.*.sink.graphite.port": 9109,
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}",
+            "spark.sql.legacy.parquet.datetimeRebaseModeInRead": "LEGACY",
+            "spark.sql.legacy.parquet.datetimeRebaseModeInWrite": "LEGACY",
+            "spark.sql.legacy.timeParserPolicy": "LEGACY"
+        },
+        "spark_env_vars": {
+            "ARTIFACTS_BUCKET": "artifacts.s3.forno.data.quintoandar.com.br",
+            "CASSANDRA_HOST": "node1.cassandra-thundera.forno.quintoandar.com.br",
+            "CASSANDRA_KEYSPACE": "wonka",
+            "CASSANDRA_LOCAL_DC": "us-east",
+            "CASSANDRA_READ_CONSISTENCY_LEVEL": "LOCAL_QUORUM",
+            "ENVIRONMENT": "forno",
+            "FEATURE_STORE_HISTORICAL_DATABASE": "wonka",
+            "FEATURE_STORE_S3_BUCKET": "wonka.s3.forno.data.quintoandar.com.br/wonka",
+            "KAFKA_CONNECTION_STRING": "kb0.forno.quintoandar.com.br:9092,kb1.forno.quintoandar.com.br:9092,kb2.forno.quintoandar.com.br:9092",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3",
+            "VAULT_SECRET": "{{ '{{secrets/mlops/VAULT_SECRET}}' }}"
+        },
+        "spark_version": "10.4.x-scala2.12",
+        "ssh_public_keys": []
+    },
+    "wonka_10.4_cluster_incremental": {
+        "autoscale": {
+            "max_workers": 4,
+            "min_workers": 2
+        },
+        "autotermination_minutes": 300,
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 100,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1a"
+        },
+        "cluster_log_conf": {
+            "s3": {
+                "canned_acl": "bucket-owner-full-control",
+                "destination": "s3://databricks.s3.forno.data.quintoandar.com.br/logs/wonka/batch/feature_store/{ENTITY_NAME}/{FEATURE_SET}",
+                "enable_encryption": true,
+                "region": "us-east-1"
+            }
+        },
+        "cluster_name": "{{ dag.dag_id }}_{{ run_id }}",
+        "custom_tags": [
+            {
+                "key": "app",
+                "value": "airflow"
+            },
+            {
+                "key": "environment",
+                "value": "forno"
+            },
+            {
+                "key": "service",
+                "value": "airflow"
+            },
+            {
+                "key": "owner",
+                "value": "data"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            },
+            {
+                "key": "dag id",
+                "value": "{{ dag.dag_id }}"
+            }
+        ],
+        "driver_node_type_id": "c4.2xlarge",
+        "enable_elastic_disk": true,
+        "init_scripts": [
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.forno.data.quintoandar.com.br/scripts/init-scripts/get-cassandra-credentials-from-vault-on-databricks.sh",
+                    "region": ""
+                }
+            },
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.forno.data.quintoandar.com.br/scripts/init-scripts/wonka-install-dependencies.sh",
+                    "region": ""
+                }
+            }
+        ],
+        "node_type_id": "c4.2xlarge",
+        "spark_conf": {
+            "spark.cassandra.output.concurrent.writes": 3,
+            "spark.hadoop.fs.s3a.acl.default": "BucketOwnerFullControl",
+            "spark.hadoop.fs.s3a.canned.acl": "BucketOwnerFullControl",
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "a32e99cee07a64577ad38d0e132b9c07-20b220daa39bc736.elb.us-east-1.amazonaws.com",
+            "spark.metrics.conf.*.sink.graphite.period": 15,
+            "spark.metrics.conf.*.sink.graphite.port": 9109,
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}",
+            "spark.sql.legacy.parquet.datetimeRebaseModeInRead": "LEGACY",
+            "spark.sql.legacy.parquet.datetimeRebaseModeInWrite": "LEGACY",
+            "spark.sql.legacy.timeParserPolicy": "LEGACY",
+            "spark.sql.sources.partitionOverwriteMode": "dynamic"
+        },
+        "spark_env_vars": {
+            "ARTIFACTS_BUCKET": "artifacts.s3.forno.data.quintoandar.com.br",
+            "CASSANDRA_HOST": "node1.cassandra-thundera.forno.quintoandar.com.br",
+            "CASSANDRA_KEYSPACE": "wonka",
+            "CASSANDRA_LOCAL_DC": "us-east",
+            "CASSANDRA_READ_CONSISTENCY_LEVEL": "LOCAL_QUORUM",
+            "ENVIRONMENT": "forno",
+            "FEATURE_STORE_HISTORICAL_DATABASE": "wonka",
+            "FEATURE_STORE_S3_BUCKET": "wonka.s3.forno.data.quintoandar.com.br/wonka",
+            "KAFKA_CONNECTION_STRING": "kb0.forno.quintoandar.com.br:9092,kb1.forno.quintoandar.com.br:9092,kb2.forno.quintoandar.com.br:9092",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3",
+            "SPARK_VERSION": "3.0.1",
+            "VAULT_SECRET": "{{ '{{secrets/mlops/VAULT_SECRET}}' }}"
+        },
+        "spark_version": "10.4.x-scala2.12",
+        "ssh_public_keys": []
+    },
+    "wonka_10.4_cluster_libraries": [
+        {
+            "maven": {
+                "coordinates": "com.datastax.spark:spark-cassandra-connector-assembly_2.12:3.2.0"
+            }
+        }
+    ],
+    "wonka_10.4_fixed_workers": {
+        "autotermination_minutes": 300,
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 100,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1a"
+        },
+        "cluster_id": "0713-073041-b0o7r6h6",
+        "cluster_log_conf": {
+            "s3": {
+                "canned_acl": "bucket-owner-full-control",
+                "destination": "s3://databricks.s3.forno.data.quintoandar.com.br/logs/wonka/batch/feature_store/{ENTITY_NAME}/{FEATURE_SET}",
+                "enable_encryption": false,
+                "region": "us-east-1"
+            }
+        },
+        "cluster_name": "wonka.user_listing_favorite_set_row_windows_scheduled__2023-07-12T07:30:00+00:00",
+        "cluster_source": "API",
+        "custom_tags": [
+            {
+                "key": "app",
+                "value": "airflow"
+            },
+            {
+                "key": "environment",
+                "value": "forno"
+            },
+            {
+                "key": "service",
+                "value": "airflow"
+            },
+            {
+                "key": "owner",
+                "value": "data"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            },
+            {
+                "key": "dag id",
+                "value": "{{ dag.dag_id }}"
+            }
+        ],
+        "driver_node_type_id": "c4.2xlarge",
+        "enable_elastic_disk": true,
+        "enable_local_disk_encryption": false,
+        "init_scripts": [
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.forno.data.quintoandar.com.br/scripts/init-scripts/get-cassandra-credentials-from-vault-on-databricks.sh",
+                    "region": ""
+                }
+            },
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.forno.data.quintoandar.com.br/scripts/init-scripts/wonka-install-dependencies.sh",
+                    "region": ""
+                }
+            }
+        ],
+        "node_type_id": "c4.2xlarge",
+        "num_workers": 8,
+        "spark_conf": {
+            "spark.cassandra.output.concurrent.writes": "3",
+            "spark.hadoop.fs.s3a.acl.default": "BucketOwnerFullControl",
+            "spark.hadoop.fs.s3a.canned.acl": "BucketOwnerFullControl",
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "graphite-exporter.quintoandar.com.br",
+            "spark.metrics.conf.*.sink.graphite.period": "15",
+            "spark.metrics.conf.*.sink.graphite.port": "9109",
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "wonka.user_listing_favorite_set_row_windows",
+            "spark.sql.legacy.parquet.datetimeRebaseModeInRead": "LEGACY",
+            "spark.sql.legacy.parquet.datetimeRebaseModeInWrite": "LEGACY",
+            "spark.sql.legacy.timeParserPolicy": "LEGACY"
+        },
+        "spark_env_vars": {
+            "ARTIFACTS_BUCKET": "artifacts.s3.data.quintoandar.com.br",
+            "CASSANDRA_HOST": "10.224.108.73,10.224.6.217,10.224.149.233",
+            "CASSANDRA_KEYSPACE": "wonka",
+            "CASSANDRA_LOCAL_DC": "AWS_VPC_US_EAST_1",
+            "CASSANDRA_READ_CONSISTENCY_LEVEL": "LOCAL_QUORUM",
+            "ENVIRONMENT": "prod",
+            "FEATURE_STORE_HISTORICAL_DATABASE": "wonka",
+            "FEATURE_STORE_S3_BUCKET": "wonka.s3.data.quintoandar.com.br/wonka",
+            "INMETRO_DATA_ALARMS_SLACK_WEBHOOK": "https://hooks.slack.com/services/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",
+            "INMETRO_S3_BUCKET_LOADER": "inmetro-s3-data-quintoandar-com-br",
+            "KAFKA_CONNECTION_STRING": "kb0.quintoandar.com.br:9092,kb1.quintoandar.com.br:9092,kb2.quintoandar.com.br:9092",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3",
+            "SPARK_VERSION": "3.0.1",
+            "STREAM_CHECKPOINT_PATH": "s3://wonka.s3.data.quintoandar.com.br/checkpoints/online_feature_store",
+            "STREAM_PROCESSING_TIME": "0 seconds",
+            "VAULT_SECRET": "{{ '{{secrets/mlops/VAULT_SECRET}}' }}"
+        },
+        "spark_version": "10.4.x-scala2.12",
+        "ssh_public_keys": []
+    },
+    "wonka_7.3_cluster": {
+        "autoscale": {
+            "max_workers": 4,
+            "min_workers": 2
+        },
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 100,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "arn:aws:iam::632540934959:instance-profile/Databricks",
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1a"
+        },
+        "cluster_log_conf": {
+            "s3": {
+                "canned_acl": "bucket-owner-full-control",
+                "destination": "s3://databricks.s3.data.quintoandar.com.br/logs/wonka/batch/feature_store/{ENTITY_NAME}/{FEATURE_SET}",
+                "enable_encryption": true,
+                "region": "us-east-1"
+            }
+        },
+        "cluster_name": "{{ dag.dag_id }}_{{ run_id }}",
+        "custom_tags": [
+            {
+                "key": "app",
+                "value": "airflow"
+            },
+            {
+                "key": "environment",
+                "value": "prod"
+            },
+            {
+                "key": "service",
+                "value": "airflow"
+            },
+            {
+                "key": "owner",
+                "value": "data"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            },
+            {
+                "key": "dag id",
+                "value": "{{ dag.dag_id }}"
+            }
+        ],
+        "driver_node_type_id": "c4.2xlarge",
+        "enable_elastic_disk": "true",
+        "init_scripts": [
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.data.quintoandar.com.br/scripts/wonka-install-dependencies.sh",
+                    "region": ""
+                }
+            }
+        ],
+        "node_type_id": "c4.2xlarge",
+        "spark_conf": {
+            "spark.cassandra.output.concurrent.writes": 3,
+            "spark.hadoop.fs.s3.impl": "com.databricks.s3a.S3AFileSystem",
+            "spark.hadoop.fs.s3a.acl.default": "BucketOwnerFullControl",
+            "spark.hadoop.fs.s3a.canned.acl": "BucketOwnerFullControl",
+            "spark.hadoop.fs.s3a.impl": "com.databricks.s3a.S3AFileSystem",
+            "spark.hadoop.fs.s3n.impl": "com.databricks.s3a.S3AFileSystem",
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "a61dcb3032d4546639973b793b54c597-a35adbd566e5d96d.elb.us-east-1.amazonaws.com",
+            "spark.metrics.conf.*.sink.graphite.period": 15,
+            "spark.metrics.conf.*.sink.graphite.port": 9109,
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}",
+            "spark.sql.legacy.parquet.datetimeRebaseModeInRead": "LEGACY",
+            "spark.sql.legacy.parquet.datetimeRebaseModeInWrite": "LEGACY",
+            "spark.sql.legacy.timeParserPolicy": "LEGACY"
+        },
+        "spark_env_vars": {
+            "ARTIFACTS_BUCKET": "artifacts.s3.data.quintoandar.com.br",
+            "CASSANDRA_HOST": "10.224.6.217",
+            "CASSANDRA_KEYSPACE": "wonka",
+            "CASSANDRA_LOCAL_DC": "AWS_VPC_US_EAST_1",
+            "CASSANDRA_PASSWORD": "46efc43156742568551e1aa8011dfab4",
+            "CASSANDRA_READ_CONSISTENCY_LEVEL": "LOCAL_QUORUM",
+            "CASSANDRA_USERNAME": "wonka",
+            "ENVIRONMENT": "prod",
+            "FEATURE_STORE_HISTORICAL_DATABASE": "wonka",
+            "FEATURE_STORE_S3_BUCKET": "wonka.s3.data.quintoandar.com.br/wonka",
+            "INMETRO_DATA_ALARMS_SLACK_WEBHOOK": "https://hooks.slack.com/services/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",
+            "INMETRO_S3_BUCKET_LOADER": "inmetro-s3-data-quintoandar-com-br",
+            "KAFKA_CONNECTION_STRING": "kb0.quintoandar.com.br:9092,kb1.quintoandar.com.br:9092,kb2.quintoandar.com.br:9092",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3",
+            "SPARK_VERSION": "3.0.1",
+            "STREAM_CHECKPOINT_PATH": "s3://wonka.s3.data.quintoandar.com.br/checkpoints/online_feature_store",
+            "STREAM_PROCESSING_TIME": "0 seconds"
+        },
+        "spark_version": "custom:release__7.3.x-snapshot-scala2.12__databricks-universe__head__d7d915d__d4bd56a__jenkins__95f9723__format-2",
+        "ssh_public_keys": []
+    },
+    "wonka_custom_cluster": {
+        "autoscale": {
+            "max_workers": 4,
+            "min_workers": 2
+        },
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 100,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1a"
+        },
+        "cluster_log_conf": {
+            "s3": {
+                "canned_acl": "bucket-owner-full-control",
+                "destination": "s3://databricks.s3.forno.data.quintoandar.com.br/logs/wonka/batch/feature_store/{ENTITY_NAME}/{FEATURE_SET}",
+                "enable_encryption": true,
+                "region": "us-east-1"
+            }
+        },
+        "custom_tags": [
+            {
+                "key": "app",
+                "value": "airflow"
+            },
+            {
+                "key": "environment",
+                "value": "forno"
+            },
+            {
+                "key": "service",
+                "value": "airflow"
+            },
+            {
+                "key": "owner",
+                "value": "data"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            },
+            {
+                "key": "dag id",
+                "value": "{{ dag.dag_id }}"
+            }
+        ],
+        "driver_node_type_id": "c4.2xlarge",
+        "enable_elastic_disk": true,
+        "init_scripts": [
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.forno.data.quintoandar.com.br/scripts/install-inmetro-on-databricks.sh",
+                    "region": ""
+                }
+            }
+        ],
+        "node_type_id": "c4.2xlarge",
+        "spark_conf": {
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "a32e99cee07a64577ad38d0e132b9c07-20b220daa39bc736.elb.us-east-1.amazonaws.com",
+            "spark.metrics.conf.*.sink.graphite.period": 15,
+            "spark.metrics.conf.*.sink.graphite.port": 9109,
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}"
+        },
+        "spark_env_vars": {
+            "CASSANDRA_HOST": "node1.cassandra-thundera.forno.quintoandar.com.br",
+            "CASSANDRA_KEYSPACE": "wonka",
+            "CASSANDRA_PASSWORD": "b48d8e119fd3988b9ca3cd2cd1c3def8",
+            "CASSANDRA_USERNAME": "wonka",
+            "ENVIRONMENT": "forno",
+            "FEATURE_STORE_HISTORICAL_DATABASE": "wonka",
+            "FEATURE_STORE_S3_BUCKET": "wonka.s3.forno.data.quintoandar.com.br/wonka",
+            "KAFKA_CONNECTION_STRING": "kb0.forno.quintoandar.com.br:9092,kb1.forno.quintoandar.com.br:9092,kb2.forno.quintoandar.com.br:9092",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+        },
+        "spark_version": "6.2.x-scala2.11",
+        "ssh_public_keys": []
+    },
+    "wonka_default_cluster": {
+        "autoscale": {
+            "max_workers": 4,
+            "min_workers": 2
+        },
+        "aws_attributes": {
+            "availability": "SPOT_WITH_FALLBACK",
+            "ebs_volume_count": 1,
+            "ebs_volume_size": 100,
+            "ebs_volume_type": "GENERAL_PURPOSE_SSD",
+            "first_on_demand": 1,
+            "instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/Databricks-forno",
+            "spot_bid_price_percent": 100,
+            "zone_id": "us-east-1a"
+        },
+        "cluster_log_conf": {
+            "s3": {
+                "canned_acl": "bucket-owner-full-control",
+                "destination": "s3://databricks.s3.forno.data.quintoandar.com.br/logs/wonka/batch/feature_store/{ENTITY_NAME}/{FEATURE_SET}",
+                "enable_encryption": true,
+                "region": "us-east-1"
+            }
+        },
+        "custom_tags": [
+            {
+                "key": "app",
+                "value": "airflow"
+            },
+            {
+                "key": "environment",
+                "value": "forno"
+            },
+            {
+                "key": "service",
+                "value": "airflow"
+            },
+            {
+                "key": "owner",
+                "value": "data"
+            },
+            {
+                "key": "ecosystem",
+                "value": "data"
+            },
+            {
+                "key": "provisioner",
+                "value": "databricks"
+            },
+            {
+                "key": "dag id",
+                "value": "{{ dag.dag_id }}"
+            }
+        ],
+        "driver_node_type_id": "c4.2xlarge",
+        "enable_elastic_disk": true,
+        "init_scripts": [
+            {
+                "s3": {
+                    "destination": "s3://artifacts.s3.forno.data.quintoandar.com.br/scripts/install-inmetro-on-databricks.sh",
+                    "region": ""
+                }
+            }
+        ],
+        "node_type_id": "c4.2xlarge",
+        "spark_conf": {
+            "spark.metrics.conf.*.sink.graphite.class": "org.apache.spark.metrics.sink.GraphiteSink",
+            "spark.metrics.conf.*.sink.graphite.host": "a32e99cee07a64577ad38d0e132b9c07-20b220daa39bc736.elb.us-east-1.amazonaws.com",
+            "spark.metrics.conf.*.sink.graphite.period": 15,
+            "spark.metrics.conf.*.sink.graphite.port": 9109,
+            "spark.metrics.conf.*.sink.graphite.unit": "seconds",
+            "spark.metrics.conf.*.source.jvm.class": "org.apache.spark.metrics.source.JvmSource",
+            "spark.metrics.namespace": "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}"
+        },
+        "spark_env_vars": {
+            "CASSANDRA_HOST": "node1.cassandra-thundera.forno.quintoandar.com.br",
+            "CASSANDRA_KEYSPACE": "wonka",
+            "CASSANDRA_PASSWORD": "b48d8e119fd3988b9ca3cd2cd1c3def8",
+            "CASSANDRA_USERNAME": "wonka",
+            "ENVIRONMENT": "forno",
+            "FEATURE_STORE_HISTORICAL_DATABASE": "wonka",
+            "FEATURE_STORE_S3_BUCKET": "wonka.s3.forno.data.quintoandar.com.br/wonka",
+            "KAFKA_CONNECTION_STRING": "kb0.forno.quintoandar.com.br:9092,kb1.forno.quintoandar.com.br:9092,kb2.forno.quintoandar.com.br:9092",
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+        },
+        "spark_version": "6.2.x-scala2.11",
+        "ssh_public_keys": []
+    },
+    "wonka_default_cluster_libraries": [
+        {
+            "maven": {
+                "coordinates": "com.datastax.spark:spark-cassandra-connector-assembly_2.12:3.2.0"
+            }
+        }
+    ],
+    "wonka_inmetro_library_dependencies": [
+        {
+            "maven": {
+                "coordinates": "com.datastax.spark:spark-cassandra-connector-assembly_2.12:3.2.0"
+            }
+        },
+        {
+            "maven": {
+                "coordinates": "com.amazon.deequ:deequ:2.0.1-spark-3.2"
+            }
+        }
+    ],
+    "wonka_spark_jobs_s3_path": "s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/wonka/spark_jobs"
+}

@@ -2,17 +2,22 @@
 
 ## Table of contents
 
+## Table of contents
+
 - [Cloning repository locally](#cloning-repository-locally)
-- [Local Airflow environment using Docker](#local-airflow-environment-using-docker)
+- [Local Airflow environment Astro CLI](#local-airflow-environment-astro-cli)
+  - [Install astro cli](#install-astro-cli)
   - [Docker requirements](#docker-requirements)
-  - [1. Changing variables value](#1-change-variables-value)
-  - [4. Deploying Docker local environment](#4-deploying-docker-local-environment)
-    - [4.1 Running Airflow in Docker local environment](#4.1-running-airflow-in-docker-local-environment)
-    - [4.2 Restarting Airflow local environment](#4.2-restarting-airflow-local-environment)
-    - [4.3 Stopping Airflow local environment](#4.3-stopping-airflow-local-environment)
+  - [1. Changing variables value](#1-changing-variables-value)
+  - [2. Running Airflow](#2-running-airflow)
+    - [2.1 Generate Dag files](#21-generate-dag-files)
+    - [2.2 Start the airflow](#22-start-the-airflow)
+    - [2.3 Restarting Airflow local environment](#23-restarting-airflow-local-environment)
+    - [2.4 Stopping Airflow local environment](#24-stopping-airflow-local-environment)
+    - [2.5 Killing Airflow local environment](#25-killing-airflow-local-environment)
   - [3. Deploying local Spark jobs and package](#3-deploying-local-spark-jobs-and-package)
-    - [3.1 Uploading local Spark jobs into the cloud](#3.1-uploading-local-spark-jobs-into-the-cloud)
-    - [3.2 Uploading local package into the cloud](#3.2-uploading-local-package-into-the-cloud)
+    - [3.1 Uploading local Spark jobs into the cloud](#31-uploading-local-spark-jobs-into-the-cloud)
+    - [3.2 Uploading local package into the cloud](#32-uploading-local-package-into-the-cloud)
 - [Local Python environment using Pyenv](#local-python-environment-using-pyenv)
   - [Pyenv requirements](#pyenv-requirements)
   - [1. Deploying local Pyenv environment](#1-deploying-local-pyenv-environment)
@@ -27,14 +32,21 @@ cd bi-etl-ejuice
 
 > **Note:** references to the repo path on the following topics are identified as `{{BIETLEJUICE_PROJECT_PATH}}`
 
-## Local Airflow environment using Docker
+## Local Airflow environment Astro CLI
 
 The Airflow will run in your machine and at Databricks, thereby we can simulate the forno environment.
 
+### Install astro cli
+
+On Mac, run:
+
+```bash
+  brew install astro
+```
+
 ### Docker requirements
 
-- [docker](https://docs.docker.com/get-docker/)
-- [docker-compose](https://docs.docker.com/compose/install/)
+- [Colima](https://docs.google.com/document/d/1S1nonH-HBK9-CUX19YczVR2abYchwtGzBDhzclMk7W8/edit?tab=t.0#heading=h.20gk8wb7m9e1)
 
 > **Note:** it's recommended using the QuintoAndar's [local-setup](https://github.com/quintoandar/local-setup) repo.
 
@@ -55,62 +67,59 @@ make setup-local-variables
 > If any of the variables already exist, the recipe **will not** prompt you for a new value, using the existing values instead.
 > However, **if any variable is added by you, remember to restart your shell/code editor before continuing!**
 
-### 2. Deploying Docker local environment
+### 2. Running Airflow ([Astronomer reference](https://www.astronomer.io/docs/astro/cli/run-airflow-locally/))
 
-Local environment deploys 4 services using `docker-compose`:
+**Attention, you should run the following commands in the repository root folder.**
 
-- Airflow webserver
-- Airflow worker
-- Redis
-- Postgres
+#### 2.1 Generate Dag files
+Before running the airflow locally, you might want to generate the dag files for all the dags in the dag builder:
 
-> For macOS users
->
-> We use volumes inside `docker-compose` containers to allow reflecting file changes onto the Docker environment. In order to enable acccess to local folders - so Docker sets them as volumes -, Docker for Mac uses "shared paths", where folders paths are added explicitly to be allowed as Docker volumes (check [this page](https://docs.docker.com/docker-for-mac) for more info).
-> You may configure shared paths in `Docker -> Preferences -> Resources -> File Sharing`.
->
-> Add the following path into your shared paths settings:
->
-> - `{{BIETLEJUICE_PROJECT_PATH}}/bietlejuice/dags`
-> - `/tmp/PostgreSQL/airflow`
+```bash
+make create-dag-files
+```
 
-#### Requirements files
+Or to generate the dag file for a specific dag, run:
 
-- `requirements_local_composer`
+```bash
+make create-dag-files dag_name=your_dag_name
+```
 
-  The libs inside `requirements_local_composer.txt` locally simulate the Composer environment with the same libs as disposed in the current Composer version in use by QuintoAndar Engineering team, [available here](https://cloud.google.com/composer/docs/concepts/versioning/composer-versions). Its purpose is to replicate the same static environment that we find in Composer as a test environment.
-
-- `requirements_local_custom_libs`
-
-  The `requirements_local_custom_libs.txt` file provides a flexible way to add, into the same environment, custom libs installed in environments outside Composer, like in Spark clusters. This includes libs that are being currently installed in Production pipelines using the `libs_install.sh` shell (which includes the `quintoandar-logger` lib added into the file) and custom libs added into clusters by DAGs, to be used by Spark jobs.
-
-#### 2.1 Running Airflow in Docker local environment
+#### 2.2 Start the airflow:
+**-----> Run the repository root folder**
 
 ```bash
 make run-local-environment
 ```
 
-The Airflow launch process may take a while, as all DAGs must be rendered by Airflow inside the Docker container twice: once for the database creation - which occurs at the continar startup - and once for the Airflow webserver startup after the database creation, when the Airflow DAG Bag is updated.
 Follow the rendering through the Docker container logs. Once it's done, you may access the Airflow webserver GUI on:
 
 `https://localhost:8080`
 
-#### 2.2 Restarting Airflow local environment
+#### 2.3 Restarting Airflow local environment
+**-----> Run the repository root folder**
 
 ```bash
 make restart-local-environment
 ```
 
-Usually the `docker-compose` containers might have to be restarted due to memory outage when reading DAGs, or when changes are made in any `requirements` file.
+Restarting your Airflow environment rebuilds your image and restarts the Docker containers running on your local machine with the new image. Restart your environment to apply changes from specific files in your project, or to troubleshoot issues that occur when your project is running.
 
-#### 2.3 Stopping Airflow local environment
+#### 2.4 Stopping Airflow local environment
+**-----> Run the repository root folder**
 
 ```bash
 make stop-local-environment
 ```
+Airflow connections and task history will be preserved. Use this command when you're finished testing Airflow and you want to stop running its components locally.
 
-Shuts down Airflow's local environment, killing Docker containers, including Airflow webserver, workers, Postgres backend service and Redis queue service.
-All Airflow backend data is kept locally in the path `/tmp/PostgreSQL/airflow`, so **all DAG runs, connections and variables are persisted and retrieved when the environment is started again.**
+#### 2.5 Killing Airflow local environment
+**-----> Run the repository root folder**
+
+```bash
+make kill-local-environment
+```
+
+In most cases, restarting your local project is sufficient for testing and making changes to your project. However, it is sometimes necessary to kill your Docker containers and metadata database for testing purposes. This command (astro dev kill) forces your running containers to stop and deletes all data associated with your local Postgres metadata database, including Airflow connections, logs, and task history.
 
 ### 3. Deploying local Spark jobs and package
 
@@ -137,7 +146,7 @@ make upload-local-package
 
 ## Local Python environment using Pyenv
 
-This setup is only used to run unit tests, linting and style check. To run Airflow, use the [Docker environment](#local-airflow-environment-using-docker)
+This setup is only used to run unit tests, linting and style check. To run Airflow, use the [Docker environment](#local-airflow-environment-astro-cli)
 
 ### Pyenv requirements
 
