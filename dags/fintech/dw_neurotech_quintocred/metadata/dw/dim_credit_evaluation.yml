@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_neurotech_quintocred.credit_evaluation.status
   status_cpf:
-    description: "Status of the proponents document"
+    description: "Status of the proponents document "
     lineage:
       - datalake_neurotech_quintocred.credit_evaluation.status_cpf
     categories:
@@ -106,6 +106,22 @@ columns:
     description: "Declared income"
     lineage:
       - datalake_neurotech_quintocred.credit_evaluation.proposal_declared_income
+  proposal_rating:
+    description: "Rate scale of the propose"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.proposal_rating
+  elected_income:
+    description: "Income used for the decision (declared, presumed or determined)"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.elected_income
+  elected_income_type:
+    description: "Indicates whether the decision was based on declared, verified or presumed income"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.elected_income_type
+  dti:
+    description: "Declaration of Real Estate Transactions"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.dti
   is_foreign_document:
     description: "Flag indicating if the document is from another country"
     lineage:

@@ -67,45 +67,61 @@ columns:
     lineage:
       - datalake_velo_neurotech_clean.logs_credit_granting.reason_document_on_blocklist_list
   name_check_rating:
-    description: ""
+    description: "Match rate of the name provided with the name in the Federal Revenue Service"
     lineage:
       - datalake_velo_neurotech_clean.logs_credit_granting.name_check_rating
   name_check_rating_list:
-    description: ""
+    description: "List of all match rate of the name provided with the name in the Federal Revenue Service"
     lineage:
       - datalake_velo_neurotech_clean.logs_credit_granting.name_check_rating_list
   is_blocklist_document_list:
-    description: ""
+    description: "Flag indicating if all CPFs in the propose are on the blocklist"
     lineage:
       - datalake_velo_neurotech_clean.logs_credit_granting.is_blocklist_document_list
   serasa_income:
-    description: ""
+    description: "Income according to SERASA"
     lineage:
       - datalake_velo_neurotech_clean.logs_credit_granting.serasa_income
   transunion_income:
-    description: ""
+    description: "Income according to Transunion"
     lineage:
       - datalake_velo_neurotech_clean.logs_credit_granting.transunion_income
   proposal_declared_income:
-    description: ""
+    description: "Declared income"
     lineage:
       - datalake_velo_neurotech_clean.logs_credit_granting.proposal_declared_income
   is_foreign_document:
-    description: ""
+    description: "Flag indicating if the document is from another country"
     lineage:
       - datalake_velo_neurotech_clean.logs_credit_granting.is_foreign_document
   is_foreign_document_list:
-    description: ""
+    description: "List of flags indicating if the documents are from another country"
     lineage:
       - datalake_velo_neurotech_clean.logs_credit_granting.is_foreign_document_list
   is_minor_age_document:
-    description: ""
+    description: "Indicates whether the CPF of the proposal belongs to a minor"
     lineage:
       - datalake_velo_neurotech_clean.logs_credit_granting.is_minor_age_document
   is_minor_age_document_list:
-    description: ""
+    description: "Indicates whether all CPFs in the proposal belong to a minor"
     lineage:
       - datalake_velo_neurotech_clean.logs_credit_granting.is_minor_age_document_list
+  proposal_rating:
+    description: "Rate scale of the propose"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.proposal_rating
+  elected_income:
+    description: "Income used for the decision (declared, presumed or determined)"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.elected_income
+  elected_income_type:
+    description: "Indicates whether the decision was based on declared, verified or presumed income"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.elected_income_type
+  dti:
+    description: "Declaration of Real Estate Transactions"
+    lineage:
+      - datalake_velo_neurotech_clean.logs_credit_granting.dti
   is_last_register:
     description: "Flag indicating if the register is the last one of the related propose"
   dt_propose:
