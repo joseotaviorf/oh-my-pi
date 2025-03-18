@@ -13,6 +13,14 @@ workflow:
   custom_schema: ebdb
   source_schema: ebdb
   tables_customization:
+    HouseEnrichment:
+      clean_table_name: house_enrichment
+      get_table_metrics:
+        count: '*'
+    HouseEnrichment_AUD:
+      clean_table_name: house_enrichment_aud
+      get_table_metrics:
+        count: '*'
     HouseMaintenanceCondition:
       clean_table_name: house_maintenance_condition
       get_table_metrics:
@@ -35,6 +43,12 @@ workflow:
         count: '*'
     HouseRating:
       clean_table_name: house_rating
+      get_table_metrics:
+        count: '*'
+    HouseRating_RatingLabel:
+      raw_primary_keys: ["HouseRating_id", "ratingLabels_id"]
+      clean_table_name: house_rating_rating_label
+      clean_primary_keys: ["id_house_rating", "id_rating_labels"]
       get_table_metrics:
         count: '*'
     HouseRegistrationStatus:

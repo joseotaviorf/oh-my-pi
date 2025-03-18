@@ -1647,9 +1647,9 @@ bietlejuice.enrich_ebdb_amenities:
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_condo:
-  - bietlejuice.ebdb:load-clean-house-enrichment-aud
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-aud
+  - bietlejuice.ebdb_house:load-clean-house-enrichment-aud
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity

@@ -488,6 +488,9 @@ table_block_list:
   - BypassTerm
   - BypassTerm_AUD
   - FinancialData
+  - HouseRating_RatingLabel
+  - HouseEnrichment
+  - HouseEnrichment_AUD
   - MapRegiao
   - HouseAgent
   - HouseAgent_AUD
