@@ -1,6 +1,9 @@
 ---
 database_name: datalake_person_clean
 table_name: preference_settings
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description:
 columns:
   id:
     lineage:

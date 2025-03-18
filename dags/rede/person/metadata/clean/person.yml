@@ -1,7 +1,7 @@
 ---
 database_name: datalake_person_clean
 table_name: person
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 domain: Rede
 description: Entity of a natural person.
 columns:

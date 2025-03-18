@@ -1,11 +1,3 @@
-WITH deleted_rows AS (
-    SELECT
-        id AS id_deleted_row
-    FROM
-        datalake_person_clean.person_aud
-    WHERE
-        rev_type = 2
-)
 SELECT
     id,
     personuuid AS uuid_person,
@@ -22,11 +14,6 @@ SELECT
     month,
     day
 FROM
-    datalake_person_raw.person AS p
-LEFT JOIN
-    deleted_rows AS dr
-        ON dr.id_deleted_row = p.id
+    datalake_person_raw.person
 WHERE
-    dr.id_deleted_row IS NULL
-QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id ORDER BY updated_at DESC) = 1
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

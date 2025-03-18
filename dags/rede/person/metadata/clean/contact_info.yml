@@ -1,7 +1,7 @@
 ---
 database_name: datalake_person_clean
 table_name: contact_info
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 domain: Rede
 description: Contact info of the person, such as phone number, email, etc.
 columns:

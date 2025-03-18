@@ -1,6 +1,9 @@
 ---
 database_name: datalake_person_clean
 table_name: right_to_be_forgotten
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
+description:
 columns:
   id:
     lineage:

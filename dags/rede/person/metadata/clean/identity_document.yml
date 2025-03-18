@@ -1,7 +1,7 @@
 ---
 database_name: datalake_person_clean
 table_name: identity_document
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 domain: Rede
 description: Identity documents associated with the person, such as RG or CPF.
 columns:
