@@ -1,0 +1,22 @@
+---
+database_name: datalake_condominium_payments_test_clean
+table_name: invoice_issuer
+columns:
+  id:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto_issuer.id
+  name:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto_issuer.name
+  document:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto_issuer.document
+  document_type:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto_issuer.document_type
+  ts_created:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto_issuer.created_at
+  ts_updated:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto_issuer.updated_at

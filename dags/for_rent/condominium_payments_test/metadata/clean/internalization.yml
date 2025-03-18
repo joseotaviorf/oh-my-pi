@@ -1,0 +1,31 @@
+---
+database_name: datalake_condominium_payments_test_clean
+table_name: internalization
+columns:
+  id:
+    lineage:
+      - datalake_condominium_payments_test_raw.internalization.id
+  id_non_payment_report_invoice:
+    lineage:
+      - datalake_condominium_payments_test_raw.internalization.non_payment_report_invoice_id
+  due_amount:
+    lineage:
+      - datalake_condominium_payments_test_raw.internalization.due_amount
+  fine_amount:
+    lineage:
+      - datalake_condominium_payments_test_raw.internalization.fine_amount
+  is_already_paid:
+    lineage:
+      - datalake_condominium_payments_test_raw.internalization.already_paid
+  ts_accrual:
+    lineage:
+      - datalake_condominium_payments_test_raw.internalization.accrual_date
+  ts_paid_to_administrator:
+    lineage:
+      - datalake_condominium_payments_test_raw.internalization.paid_to_administrator_at
+  ts_created:
+    lineage:
+      - datalake_condominium_payments_test_raw.internalization.created_at
+  ts_updated:
+    lineage:
+      - datalake_condominium_payments_test_raw.internalization.updated_at

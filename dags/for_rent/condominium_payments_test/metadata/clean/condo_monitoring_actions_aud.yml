@@ -1,0 +1,49 @@
+---
+database_name: datalake_condominium_payments_test_clean
+table_name: condo_monitoring_actions_aud
+columns:
+  id:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.id
+  id_contract:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.contract_id
+  id_action_main_user:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.action_main_user_id
+  rev:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.rev
+  rev_end:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.revend
+  rev_type:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.revtype
+  action_type:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.action_type
+  action_main_user_email:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.action_main_user_email
+  action_system:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.action_system
+  invoice_user_name:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.boleto_user_name
+  invoice_user_document:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.boleto_user_document
+  invoice_issuer_name:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.boleto_issuer_name
+  invoice_issuer_document:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.boleto_issuer_document
+  ts_created:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_condominium_payments_test_raw.condo_monitoring_actions_aud.updated_at

@@ -1,0 +1,34 @@
+---
+database_name: datalake_condominium_payments_test_clean
+table_name: invoice
+columns:
+  id:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto.id
+  id_external:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto.external_id
+  id_invoice_user:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto.boleto_user_id
+  id_contract:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto.contract_id
+  value:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto.value
+  status:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto.status
+  raw_data:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto.raw_data
+  dt_due:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto.due_date
+  ts_created:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto.created_at
+  ts_updated:
+    lineage:
+      - datalake_condominium_payments_test_raw.boleto.updated_at
