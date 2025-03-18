@@ -70,7 +70,7 @@ status_send AS (
     ut.ts_started,
     ut.ts_solved,
     CASE
-      WHEN (dp.department IN ('Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão por Inadimplência [OFF] [POS] [BACK]', 'Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
+      WHEN (dp.department IN ('Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão por Inadimplência [OFF][POS][BACK]', 'Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
         OR (c.termination_type = 'termination'
         AND ut.id_ticket IS NOT NULL
@@ -79,7 +79,7 @@ status_send AS (
        ELSE 0
      END AS flg_not_send,
     CASE
-      WHEN (dp.department IN ('Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão por Inadimplência [OFF] [POS] [BACK]', 'Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
+      WHEN (dp.department IN ('Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão por Inadimplência [OFF][POS][BACK]', 'Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions')) THEN 0
       WHEN c.termination_type = 'recap_termination'
         AND ut.id_ticket IS NOT NULL
@@ -97,7 +97,7 @@ status_send AS (
   LEFT JOIN
     dw_customer_support.dim_department AS dp
       ON ut.id_main_department = dp.sk_department
-      AND (dp.department IN ('Offboarding [OFF] [POS] [BACK]', 'Atendimento Escalado [OFF] [POS] [BACK]','Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão por Inadimplência [OFF] [POS] [BACK]', 'Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
+      AND (dp.department IN ('Offboarding [OFF] [POS] [BACK]', 'Atendimento Escalado [OFF] [POS] [BACK]','Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão por Inadimplência [OFF][POS][BACK]', 'Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
   WHERE
     c.termination_type IS NOT NULL  --('termination', 'recap_termination')
