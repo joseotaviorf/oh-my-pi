@@ -79,9 +79,9 @@ FROM VALUES
     ),
     -- HUE vs listing-claw (LTR)
     (
-        "ab_beakman_search_services_hue_candidate_generation_experiment",
+        "ab_beakman_search_services_hue_candidate_generation_experiment_v2",
         named_struct(
-            'begin_date', DATE('2025-03-14'),
+            'begin_date', DATE('2025-03-19'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
