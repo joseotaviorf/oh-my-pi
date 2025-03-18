@@ -24,6 +24,10 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract
     description: Number of working minutes between the contract creation and the contract signature.
+  is_contract_signed:
+    lineage:
+      - datalake_ebdb_contract.contract.ts_signed
+    description: Boolean indicating if the contract was signed.
   ts_credit_analysis_approved:
     lineage:
       - datalake_ebdb_proposal.proposal.ts_credit_approved_last

@@ -6,6 +6,8 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: rent
+  spark_session_configs:
+    udfs: [FINTECHOPS_WORK_MIN_SLA]
   tables_customization:
     dim_rent_flow_type:
       partitions: [country_code, first_touchpoint]
