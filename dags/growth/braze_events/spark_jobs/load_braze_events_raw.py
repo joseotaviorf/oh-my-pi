@@ -158,5 +158,3 @@ if __name__ == "__main__":
                 table_name=table_name,
                 partition_cols=partition_cols,
             )
-
-    spark_metastore_service.refresh_table(database_name, table_name)
