@@ -7,77 +7,28 @@ dag:
     dag_purpose: |
       This DAG creates the tables from [Ownerfees](https://github.com/quintoandar/owner-fees), a service that deals with fees related to the contract, listing and bills that are charged to the owner.
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
+  has_hive_sync: false
   database_type: postgres
-  dbutils_secret_key: OWNER_FEES_DB
+  source_schema: public
+  source_database: ownerfees
+  custom_schema: owner_fees
+  dbutils_secret_key: OWNERFEES_DB
   lineage_product_database_name: ownerfees
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   tables_customization:
-    admin_fee_option:
-      extraction_type: incremental
-      date_filter_column: updated_at
-      partitions: ["year", "month", "day"]
-    admin_fee_option_aud:
-      extraction_type: full
-    charge_delay:
-      extraction_type: incremental
-      date_filter_column: updated_at
-      partitions: ["year", "month", "day"]
-    charge_delay_aud:
-      extraction_type: incremental
-      date_filter_column: updated_at
-      partitions: ["year", "month", "day"]
-    contract:
-      extraction_type: incremental
-      date_filter_column: updated_at
-      partitions: ["year", "month", "day"]
-    contract_aud:
-      extraction_type: full
-    contract_brokerage_fee:
-      extraction_type: incremental
-      date_filter_column: updated_at
-      partitions: ["year", "month", "day"]
-    contract_brokerage_fee_aud:
-      extraction_type: full
-    house:
-      extraction_type: incremental
-      date_filter_column: updated_at
-      partitions: ["year", "month", "day"]
-    house_aud:
-      extraction_type: full
-    house_brokerage_fee:
-      extraction_type: incremental
-      date_filter_column: updated_at
-      partitions: ["year", "month", "day"]
-    house_brokerage_fee_aud:
-      extraction_type: full
-    installment_option:
-      extraction_type: incremental
-      date_filter_column: updated_at
-      partitions: ["year", "month", "day"]
-    installment_option_aud:
-      extraction_type: incremental
-      date_filter_column: updated_at
-      partitions: ["year", "month", "day"]
-    user_rev_info:
-      extraction_type: full
-    users:
-      extraction_type: incremental
-      date_filter_column: updated_at
-      partitions: ["year", "month", "day"]
-    users_aud:
-      extraction_type: full
+    admin_fee_option: {}
+    admin_fee_option_aud: {}
+    contract: {}
+    contract_aud: {}
+    contract_brokerage_fee: {}
+    contract_brokerage_fee_aud: {}
+    house: {}
+    house_aud: {}
+    house_brokerage_fee: {}
+    house_brokerage_fee_aud: {}
+    user_rev_info: {}
+    users: {}
+    users_aud: {}
 cluster:
   type: databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new
-  custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
