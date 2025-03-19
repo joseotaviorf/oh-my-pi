@@ -42,7 +42,7 @@ columns:
     description: Number of the agent's slots allocated.
   max_slots_allocation_available:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_agenda_allocation.agents_slots_hourly.ts_slot_hour
       - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
       - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_09_and_10_available
       - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_10_and_11_available

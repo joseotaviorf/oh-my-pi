@@ -1,0 +1,16 @@
+---
+table_name: datalake_agenda_allocation.agenda_hourly_allocations
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_agent:
+    is_complete:
+      severity_level: Error
+  id_slot_date:
+    is_complete:
+      severity_level: Error
+  id_slot_date_hour:
+    is_complete:
+      severity_level: Error
+  agent_type:
+    is_complete:
+      severity_level: Error

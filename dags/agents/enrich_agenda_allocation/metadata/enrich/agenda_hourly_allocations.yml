@@ -1,0 +1,110 @@
+---
+database_name: datalake_agenda_allocation
+table_name: agenda_hourly_allocations
+description: This table shows data on the agents' agenda by time slot.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent:
+    lineage:
+      - datalake_agenda_allocation.agents_slots_hourly.id_agent
+    description: Unique Agent Identifier
+  id_slot_date:
+    lineage:
+      - datalake_agenda_allocation.agents_slots_hourly.ts_slot_hour
+    description: Unique date slot identifier
+  id_slot_date_hour:
+    lineage:
+      - datalake_agenda_allocation.agents_slots_hourly.ts_slot_hour
+    description: Unique identifier of the date-time slot
+  id_agent_region:
+    lineage:
+      - datalake_ebdb_agents.agent_region_group.dt
+    description: Unique identifier of the group of regions served by the Agent
+  id_slot_date_agent:
+    lineage:
+      - datalake_agenda_allocation.agents_slots_hourly.id_slot_date
+      - datalake_agenda_allocation.agents_slots_hourly.id_agent
+    description: Unique identifier by Agent and date
+  id_work_contract:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+    description: Unique identifier of the Agent's employment/service contract type
+  id_region:
+    lineage:
+      - datalake_ebdb_agents.agents_region.id_region
+    description: Unique identifier of the last region associated with the Agent
+  agent_type:
+    lineage:
+      - datalake_agenda_allocation.agents_slots_hourly.agent_type
+    description: Identifies the type of Agent.
+    categories:
+      Visita: Agents who are part of the visit funnel, and can be Brokers, Negotiation Executives, Associate Executives and Select Program Executives.
+      Vistoria: Inspector Agents who perform the property inspection service during the tenant's onboarding and offboarding.
+      VistoriaQuarteirizada: They work in the same way as Inspector Agents, but these are outsourced services.
+      SessaoFotos: Photographer Agents, who take photos of the property for publication of the listing on the 5A platform, in addition to assessing the quality of the property.
+  allocated_slots:
+    lineage:
+      - datalake_agenda_allocation.agents_slots_hourly.allocated_slots
+    description: Number of slots allocated 24h in advance
+  specific_allocated_slots:
+    lineage:
+      - datalake_agenda_allocation.agents_slots_hourly.specific_allocated_slots
+    description: Number of the agent's specific slots allocated.
+  agent_business_context:
+    lineage:
+      - datalake_ebdb_agents.agent_business_context_history.agent_business_context
+    description: If it is an Agent in the Visits context, it will be linked to at least one business context, which could be Sale or Rent.
+  area:
+    lineage:
+      - datalake_ebdb_agents.agent_region_group.area
+    description: "Description of the agent's area of activity."
+  area_deprecated:
+    lineage:
+      - datalake_ebdb_agents.agent_region_group.area_deprecated
+    description: "Description of the agent's deprecated area of activity."
+  is_allocation_available:
+    lineage:
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_09_and_10_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_10_and_11_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_11_and_12_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_12_and_13_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_13_and_14_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_14_and_15_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_15_and_16_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_16_and_17_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_17_and_18_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_18_and_19_available
+      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_19_and_20_available
+    description: Boolean indicating if the specific hour slot is available.
+  ts_first_visit_booked:
+    lineage:
+      - datalake_booking.booking.ts_booking_utc
+    description: Date of the first visit booked to this agent.
+  ts_first_inspection_booked:
+    lineage:
+      - datalake_booking.booking.ts_booking_utc
+    description: Date of the first inspection booked to this agent.
+  ts_first_photo_job_booked:
+    lineage:
+      - datalake_booking.booking.ts_booking_utc
+    description: Date of the first photo job booked to this agent.
+  ts_slot_hour:
+    lineage:
+      - datalake_agenda_allocation.agents_slots_hourly.ts_slot_hour
+    description: Timestamp of the hour slot.
+  year:
+    lineage:
+      - datalake_agenda_allocation.agents_slots_hourly.year
+    description: Year of the slot. This column is a table partition.
+  month:
+    lineage:
+      - datalake_agenda_allocation.agents_slots_hourly.month
+    description: Month of the slot. This column is a table partition.
+  day:
+    lineage:
+      - datalake_agenda_allocation.agents_slots_hourly.day
+    description: Day of the slot. This column is a table partition.
+  ts_load:
+    description: Timestamp of when this data was loaded.

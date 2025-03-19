@@ -1,0 +1,108 @@
+database_name: datalake_agenda_allocation
+table_name: agents_slots
+description: Table for the criation of the fact_agent_allocations. Contains infos
+  on agent allocation hours on the slot granularity
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent:
+    lineage:
+      - datalake_agenda_allocation.agents_weekly_schedule_history.id_agent
+    description: ID of the agent.
+  agent_type:
+    lineage:
+      - datalake_agenda_allocation.agents_weekly_schedule_history.agent_type
+    description: Agent type according to the activity performed by the agent.
+    categories:
+      CheckUpLar: Agent responsible for the house repairs.
+      SessaoFotos: Agent responsible for the house photos.
+      Visita: Agent responsible to visit.
+      Vistoria: Agent responsible for the house inspection.
+      VistoriaQuarteirizada: Outsourced agent responsible for the house inspection.
+  day_of_week:
+    lineage:
+      - datalake_agenda_allocation.agents_weekly_schedule_history.day_of_week
+    description: Day of the week (starting at 1 for Monday).
+  last_change_reason:
+    lineage:
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_available_slot
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_off_work
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.ts_updated
+      - datalake_agenda_allocation.agents_weekly_schedule_history.is_available_slot
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_slot
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_updated
+    description: Last change in hour allocation, 'day off' means that agent won't
+      be available in that hour, even if it's flag as allocated.
+  slot_number:
+    lineage:
+      - datalake_agenda_allocation.agents_weekly_schedule_history.slot_number
+    description: Slot number on day 8:00 = 0, 08:15 = 1 ...
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.is_active
+    description: Boolean value to check if the agent is active.
+  is_available_specific_slot:
+    lineage:
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_available_slot
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_off_work
+      - datalake_agenda_allocation.agents_weekly_schedule_history.is_available_slot
+    description: Boolean value to check if the specif slot is available for the agent.
+  is_available_slot:
+    lineage:
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_available_slot
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_off_work
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.ts_updated
+      - datalake_agenda_allocation.agents_weekly_schedule_history.is_available_slot
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_slot
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_updated
+    description: Boolean value to check if the specif slot is available for the agent.
+  is_available_slot_24h:
+    lineage:
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_available_slot
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_off_work
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.ts_updated
+      - datalake_agenda_allocation.agents_weekly_schedule_history.is_available_slot
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_slot
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_updated
+    description: Boolean value to check if the agent is available for 24h.
+  is_specif_update:
+    lineage:
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_available_slot
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_off_work
+      - datalake_agenda_allocation.agents_weekly_schedule_history.is_available_slot
+    description: Boolean value to check if the specific slot was updated.
+  is_time_window_update:
+    lineage:
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_available_slot
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_off_work
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.ts_updated
+      - datalake_agenda_allocation.agents_weekly_schedule_history.is_available_slot
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_slot
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_updated
+    description: Boolean value to check if the time window was updated.
+  ts_last_specific_updated:
+    lineage:
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.is_available_slot
+      - datalake_agenda_allocation.agents_specific_weekly_schedule.ts_updated
+      - datalake_agenda_allocation.agents_weekly_schedule_history.is_available_slot
+    description: Timestamp of the last update of the specific slot.
+  ts_last_weekly_updated:
+    lineage:
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_updated
+    description: Timestamp of the last update of the slot.
+  ts_slot:
+    lineage:
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_slot
+    description: Timestamp of the slot.
+  year:
+    lineage:
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_slot
+    description: Year of the slot. It's a partition of the table.
+  month:
+    lineage:
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_slot
+    description: Month of the slot. It's a partition of the table.
+  day:
+    lineage:
+      - datalake_agenda_allocation.agents_weekly_schedule_history.ts_slot
+    description: Day of the slot. It's a partition of the table.

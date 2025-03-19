@@ -1,0 +1,45 @@
+---
+dag:
+  name: enrich_agenda_allocation
+  schedule_start_date: 2024, 1, 1
+  owner: Data Agents
+  documentation:
+    dag_purpose: Creates enriched tables for the context `Agenda Allocation` of ebdb. Mainly, related to agents availability/slots.
+workflow:
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    agenda_hourly_allocations:
+      - agents_slots_hourly
+    agents_slots_hourly:
+      - agents_slots
+    agents_slots:
+      - agents_specific_weekly_schedule
+      - agents_weekly_schedule_history
+    agents_weekly_schedule_history:
+      - slots_base_time
+  tables_customization:
+    agenda_hourly_allocations:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    agents_slots_hourly:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    agents_slots:
+      extraction_type: incremental
+      partitions: [year, month, day]
+  extra_query_template_params:
+      load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+      load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

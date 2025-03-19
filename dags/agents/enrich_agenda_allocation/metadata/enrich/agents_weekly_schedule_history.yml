@@ -1,5 +1,5 @@
 ---
-database_name: datalake_ebdb_agents
+database_name: datalake_agenda_allocation
 table_name: agents_weekly_schedule_history
 description: Enrich table with the weekly schedule history for agent booking. 
   Each row of this table is a time slot for a agent. 
@@ -57,7 +57,7 @@ columns:
     description: Boolean indicating if this slot is or was available for booking
   ts_slot:
     lineage:
-      - datalake_ebdb_agents.slots_base_time.ts_slot
+      - datalake_agenda_allocation.slots_base_time.ts_slot
     description: Timestamp of the slot
   ts_updated:
     lineage:

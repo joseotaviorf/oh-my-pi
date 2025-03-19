@@ -14,16 +14,8 @@ workflow:
     agent_unified_contract_changes:
     - agent_coincident_business_contexts
     - agents_activations_suspensions_contracts_changes
-    agents_slots:
-    - agents_specific_weekly_schedule
-    - agents_weekly_schedule_history
-    agents_slots_hourly:
-    - agents_slots
-    agents_weekly_schedule_history:
-    - slots_base_time
     agent_region_group:
     - agents_region
-    - agents_slots
     ciq_agents:
     - ciq_users
   extra_query_template_params:
@@ -37,18 +29,6 @@ workflow:
       - month
       - day
     agent_region_group:
-      extraction_type: incremental
-      partitions:
-      - year
-      - month
-      - day
-    agents_slots:
-      extraction_type: incremental
-      partitions:
-      - year
-      - month
-      - day
-    agents_slots_hourly:
       extraction_type: incremental
       partitions:
       - year

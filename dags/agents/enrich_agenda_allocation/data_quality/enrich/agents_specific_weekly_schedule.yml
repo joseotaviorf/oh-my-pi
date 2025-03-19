@@ -1,5 +1,5 @@
 ---
-table_name: datalake_ebdb_agents.agents_specific_weekly_schedule
+table_name: datalake_agenda_allocation.agents_specific_weekly_schedule
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:

@@ -7,84 +7,70 @@ owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_agent:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.id_agent
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_agent
     description: Id of the agent.
   sk_agent_region:
     lineage:
-      - datalake_ebdb_agents.agents_region.id_region
-      - datalake_ebdb_agents.agents_slots_hourly.id_agent
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_agent_region
     description: Id combining agent and region.
   sk_agent_slot_date:
     lineage:
-       - datalake_ebdb_agents.agents_slots_hourly.id_agent
-       - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_slot_date_agent
     description: Id combining agent and slot information.
   sk_region:
     lineage:
-      - datalake_ebdb_agents.agents_region.id_region
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_region
     description: Id of the region.
   sk_slot_date:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_slot_date
     description: Id of the date slot.
   sk_slot_date_hour:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_slot_date_hour
     description: Id of the hour slot.
   sk_work_contract:
     lineage:
-      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_work_contract
     description: Id of the agent's work contract.
   agent_type:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.agent_type
+      - datalake_agenda_allocation.agenda_hourly_allocations.agent_type
     description: Type of the agent.
     categories:
       Vistoria: Agent responsible for the house inspection.
       VistoriaQuarteirizada: Outsourced agent responsible for the house inspection.
   allocated_slots:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.allocated_slots
+      - datalake_agenda_allocation.agenda_hourly_allocations.allocated_slots
     description: Number of the agent's slots allocated.
   specific_allocated_slots:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.specific_allocated_slots
+      - datalake_agenda_allocation.agenda_hourly_allocations.specific_allocated_slots
     description: Number of the agent's specific slots allocated.
   is_allocation_available:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_09_and_10_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_10_and_11_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_11_and_12_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_12_and_13_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_13_and_14_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_14_and_15_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_15_and_16_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_16_and_17_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_17_and_18_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_18_and_19_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_19_and_20_available
+      - datalake_agenda_allocation.agenda_hourly_allocations.is_allocation_available
     description: Boolean indicating if the specific hour slot is available.
   dt_first_inspection:
     lineage:
-      - datalake_ebdb_clean.booking.dt_booking
+      - datalake_agenda_allocation.agenda_hourly_allocations.ts_first_inspection_booked
     description: Date of the first inspection booked to this agent.
   ts_slot_hour:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_agenda_allocation.agenda_hourly_allocations.ts_slot_hour
     description: Timestamp of the hour slot.
   year:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_agenda_allocation.agenda_hourly_allocations.year
     description: Year of the slot. This column is a table partition.
   month:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_agenda_allocation.agenda_hourly_allocations.month
     description: Month of the slot. This column is a table partition.
   day:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_agenda_allocation.agenda_hourly_allocations.day
     description: Day of the slot. This column is a table partition.
   ts_load:
     description: Timestamp of when this data was loaded.

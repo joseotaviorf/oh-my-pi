@@ -44,7 +44,7 @@ agents_with_allocated_slots AS (
     FROM
         intervals AS i
     LEFT JOIN
-        datalake_ebdb_agents.agents_slots_hourly AS ash
+        datalake_agenda_allocation.agents_slots_hourly AS ash
             ON ash.year = i.year
             AND ash.month = i.month
             AND ash.day = i.day

@@ -8,7 +8,7 @@ columns:
   dt:
     description: Date of the agent's allocated slots.
     lineage:
-      - datalake_ebdb_agents.agents_slots.ts_slot
+      - datalake_agenda_allocation.agents_slots.ts_slot
   dadosagente_id:
     description: ID of the agent (as found on dw_public.dim_user.dados_agente_id).
     lineage:
@@ -38,12 +38,12 @@ columns:
   year:
     description: Year, partition of the table. It can be used to enhance the query's performance.
     lineage:
-      - datalake_ebdb_agents.agents_slots.ts_slot
+      - datalake_agenda_allocation.agents_slots.ts_slot
   month:
     description: Month, partition of the table. It can be used to enhance the query's performance.
     lineage:
-      - datalake_ebdb_agents.agents_slots.ts_slot
+      - datalake_agenda_allocation.agents_slots.ts_slot
   day:
     description: Day, partition of the table. It can be used to enhance the query's performance.
     lineage:
-      - datalake_ebdb_agents.agents_slots.ts_slot
+      - datalake_agenda_allocation.agents_slots.ts_slot

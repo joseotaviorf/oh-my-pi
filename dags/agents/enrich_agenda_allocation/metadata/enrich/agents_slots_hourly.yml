@@ -1,5 +1,5 @@
 ---
-database_name: datalake_ebdb_agents
+database_name: datalake_agenda_allocation
 table_name: agents_slots_hourly
 description: Table with information about the agents allocated slots hourly.
 domain: Agents
@@ -8,15 +8,15 @@ columns:
   id_agent:
     description: ID of the agent.
     lineage:
-      - datalake_ebdb_agents.agents_slots.id_agent
+      - datalake_agenda_allocation.agents_slots.id_agent
   agent_type:
     description: Agent type according to the activity performed by the agent.
     lineage:
-      - datalake_ebdb_agents.agents_slots.agent_type
+      - datalake_agenda_allocation.agents_slots.agent_type
   day_of_week:
     description: Day of the week (starting at 1 for Monday).
     lineage:
-      - datalake_ebdb_agents.agents_slots.day_of_week
+      - datalake_agenda_allocation.agents_slots.day_of_week
   allocated_slots:
     description: Number of allocated slots for the hour.
   specific_allocated_slots:
@@ -24,16 +24,16 @@ columns:
   ts_slot_hour:
     description: Timestamp of the slot.
     lineage:
-      - datalake_ebdb_agents.agents_slots.ts_slot
+      - datalake_agenda_allocation.agents_slots.ts_slot
   year:
     description: Year of the slot.
     lineage:
-      - datalake_ebdb_agents.agents_slots.ts_slot
+      - datalake_agenda_allocation.agents_slots.ts_slot
   month:
     description: Month of the slot.
     lineage:
-      - datalake_ebdb_agents.agents_slots.ts_slot
+      - datalake_agenda_allocation.agents_slots.ts_slot
   day:
     description: Day of the slot.
     lineage:
-      - datalake_ebdb_agents.agents_slots.ts_slot
+      - datalake_agenda_allocation.agents_slots.ts_slot

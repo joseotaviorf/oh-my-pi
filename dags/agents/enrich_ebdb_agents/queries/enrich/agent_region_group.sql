@@ -39,7 +39,7 @@ daily_region AS (
             ar.region_code,
             ar.region_code_deprecated
         FROM
-            datalake_ebdb_agents.agents_slots AS ag
+            datalake_agenda_allocation.agents_slots AS ag
         LEFT JOIN
           daily_region AS ar
             ON ag.id_agent = ar.id_agent

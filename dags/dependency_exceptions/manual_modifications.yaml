@@ -401,7 +401,6 @@ bietlejuice.enrich_listing_temp:
     - bietlejuice.ebdb_house_properties:load-clean-special-condition
     - bietlejuice.ebdb_house_properties:load-clean-special-condition-aud
     - bietlejuice.ebdb_user:load-clean-user-revision-entity
-    - bietlejuice.enrich_ebdb_agents:load-enrich-agents-review
     - bietlejuice.enrich_ebdb_listing:load-enrich-business-context-history
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-status-version-order

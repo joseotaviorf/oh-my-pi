@@ -1,5 +1,5 @@
 ---
-table_name: datalake_ebdb_agents.slots_base_time
+table_name: datalake_agenda_allocation.slots_base_time
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:

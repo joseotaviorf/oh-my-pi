@@ -7,75 +7,63 @@ owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_agent:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.id_agent
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_agent
     description: Id of the agent.
   sk_slot_date:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_slot_date
     description: Id of the date slot.
   sk_slot_date_hour:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_slot_date_hour
     description: Id of the hour slot.
   sk_agent_region:
     lineage:
-      - dw_public.dim_agent_region.sk_agent_region
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_agent_region
     description: Id combining agent and region.
   sk_slot_date_agent:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-      - datalake_ebdb_agents.agents_slots_hourly.id_agent
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_slot_date_agent
     description: Id combining slot and agent information.
   id_work_contract:
     lineage:
-      - datalake_ebdb_clean.agent_data_aud.id_work_contract
+      - datalake_agenda_allocation.agenda_hourly_allocations.id_work_contract
     description: Id of the photographer's work contract.
   id_dados_fotografo:
     lineage:
-      - dw_public.dim_user.dados_fotografo_id
+      - datalake_ebdb_clean.user.id_photographer_data
     description: Id of the photographer's personal data.
   ts_slot_hour:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
+      - datalake_agenda_allocation.agenda_hourly_allocations.ts_slot_hour
     description: Timestamp of the hour slot.
   is_allocation_available:
     lineage:
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_08_and_09_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_09_and_10_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_10_and_11_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_11_and_12_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_12_and_13_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_13_and_14_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_14_and_15_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_15_and_16_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_16_and_17_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_17_and_18_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_18_and_19_available
-      - datalake_ebdb_clean.mask_weekly_hour.has_hours_between_19_and_20_available
+      - datalake_agenda_allocation.agenda_hourly_allocations.is_allocation_available
     description: Boolean indicating if the specific hour slot is available.
   area:
     lineage:
-      - dw_public.dim_agent_region.area_deprecated
+      - datalake_agenda_allocation.agenda_hourly_allocations.area_deprecated
     description: Covered area by this photographer.
-  year:
-    lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-    description: Year of the slot. This column is a table partition.
-  month:
-    lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-    description: Month of the slot. This column is a table partition.
-  day:
-    lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.ts_slot_hour
-    description: Day of the slot. This column is a table partition.
   allocated_slots:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.allocated_slots
+      - datalake_agenda_allocation.agenda_hourly_allocations.allocated_slots
     description: Number of the photographer's slots allocated.
   allocated_slots_0:
     lineage:
-      - datalake_ebdb_agents.agents_slots_hourly.specific_allocated_slots
+      - datalake_agenda_allocation.agenda_hourly_allocations.specific_allocated_slots
     description: Number of the photographer's specific slots allocated.
+  year:
+    lineage:
+      - datalake_agenda_allocation.agenda_hourly_allocations.year
+    description: Year of the slot. This column is a table partition.
+  month:
+    lineage:
+      - datalake_agenda_allocation.agenda_hourly_allocations.month
+    description: Month of the slot. This column is a table partition.
+  day:
+    lineage:
+      - datalake_agenda_allocation.agenda_hourly_allocations.day
+    description: Day of the slot. This column is a table partition.
   ts_load:
     description: Timestamp of when this data was loaded.

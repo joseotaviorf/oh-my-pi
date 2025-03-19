@@ -56,9 +56,9 @@ specific_updates AS (
         bs.ts_updated AS ts_last_weekly_updated,
         bs.ts_slot
     FROM
-        datalake_ebdb_agents.agents_weekly_schedule_history bs
+        datalake_agenda_allocation.agents_weekly_schedule_history bs
     LEFT JOIN 
-        datalake_ebdb_agents.agents_specific_weekly_schedule ss
+        datalake_agenda_allocation.agents_specific_weekly_schedule ss
             ON bs.id_agent = ss.id_agent
             AND bs.ts_slot = ss.ts_slot
 ),

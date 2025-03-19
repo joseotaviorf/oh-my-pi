@@ -1,9 +1,9 @@
 ---
-table_name: datalake_ebdb_agents.agents_weekly_schedule_history
+table_name: datalake_agenda_allocation.agents_slots
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
-    greater_than: 1200000000
+    greater_than: 640000000
     severity_level: Error
 column_level_validations:
   id_agent:

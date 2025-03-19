@@ -25,22 +25,15 @@ bietlejuice.dw_agent:
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
 bietlejuice.dw_agent_contract:
   - bietlejuice.dw_rede_company:load-dw-rede-dim-company
+  - bietlejuice.enrich_agenda_allocation:load-enrich-agents-slots-hourly
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-coincident-business-contexts
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-activations-suspensions-contracts-changes
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-slots-hourly
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.dw_agents_availability:
-  - bietlejuice.dw_agent:load-dw-public-dim-agent-region
-  - bietlejuice.dw_booking:load-dw-public-dim-booking
-  - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.ebdb_agenda_allocation:load-clean-mask-weekly-hour
-  - bietlejuice.ebdb_agent:load-clean-agent-data-aud
-  - bietlejuice.ebdb_user:load-clean-user-revision-entity
-  - bietlejuice.ebdb_visit:load-clean-booking
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agent-business-context-history
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-region
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agents-slots-hourly
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.enrich_agenda_allocation:load-enrich-agenda-hourly-allocations
 bietlejuice.dw_analytical_costs:
   - bietlejuice.enrich_databricks_usage_costs:load-enrich-usage-costs
 bietlejuice.dw_atta:
@@ -1112,6 +1105,13 @@ bietlejuice.enrich_affiliates_cost_attributions:
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-accounting-entry-source
   - bietlejuice.robin_hood:load-clean-payee
+bietlejuice.enrich_agenda_allocation:
+  - bietlejuice.ebdb_agenda_allocation:load-clean-agent-specific-hour
+  - bietlejuice.ebdb_agenda_allocation:load-clean-agent-weekly-hours-aud
+  - bietlejuice.ebdb_agenda_allocation:load-clean-mask-weekly-hour
+  - bietlejuice.ebdb_agent:load-clean-agent-data-aud
+  - bietlejuice.ebdb_agent:load-clean-agent-data-types
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_agreement_hourly:
   - bietlejuice.trato_feito:load-clean-debtor
   - bietlejuice.trato_feito_hourly:load-clean-installment
@@ -1623,8 +1623,6 @@ bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
 bietlejuice.enrich_ebdb_agents:
-  - bietlejuice.ebdb_agenda_allocation:load-clean-agent-specific-hour
-  - bietlejuice.ebdb_agenda_allocation:load-clean-agent-weekly-hours-aud
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud
   - bietlejuice.ebdb_agent:load-clean-agent-data-business-contexts-served-aud
   - bietlejuice.ebdb_agent:load-clean-agent-data-types
@@ -2330,7 +2328,6 @@ bietlejuice.enrich_offer:
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.ebdb_visit:load-clean-booking
   - bietlejuice.ebdb_visit:load-clean-booking-status-change
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user
@@ -3130,12 +3127,10 @@ bietlejuice.enrich_tqc_referral:
   - bietlejuice.ebdb_visit:load-clean-booking-status-change
   - bietlejuice.ebdb_visit:load-clean-visit
   - bietlejuice.ebdb_visit:load-clean-visit-origin
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agent-unified-contract-changes
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_hub_services:load-enrich-agent-hub-relation
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
-  - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.gsheets_for_sale:done-clean-tqc-leads
 bietlejuice.enrich_tracked_events:
   - bietlejuice.bigfone:load-clean-event
@@ -3148,7 +3143,6 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
   - bietlejuice.enrich_quinto_messenger:load-enrich-tasks
-  - bietlejuice.enrich_tqc_referral:load-enrich-unified-lead-referral-flow
   - bietlejuice.hmb_ada:load-clean-backoffices
   - bietlejuice.hub_services:load-clean-lead
   - bietlejuice.hub_services:load-clean-visitor
