@@ -10,7 +10,7 @@ columns:
     description: Offer ID.
   id_offer_topic:
     lineage:
-      - datalake_rental_transact_clean.offer_topic_message.id_offer_topic
+      - datalake_rental_transact_clean.offer_topic.id
     description: Offer topic ID.
   id_firestore:
     lineage:
@@ -47,7 +47,8 @@ columns:
   rent:
     lineage:
       - datalake_rental_transact_clean.offer_topic_message.proposed_rent_value
-    description: Proposed offer rent value.
+      - datalake_rental_transact_clean.offer.original_rent_value
+    description: Last proposed offer rent value.
   status:
     lineage:
       - datalake_rental_transact_clean.offer.status

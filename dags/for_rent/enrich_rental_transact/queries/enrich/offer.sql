@@ -10,6 +10,8 @@ topic_message AS (
     JOIN
         datalake_rental_transact_clean.offer_topic AS ot
             ON otm.id_offer_topic = ot.id
+    WHERE
+        otm.proposed_rent_value IS NOT NULL
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY ot.id_offer ORDER BY otm.iteration DESC) = 1
 ),
@@ -23,7 +25,7 @@ analyzed_offers_rental_transact AS (
         datalake_rental_transact_clean.rev_info AS ri
             ON oa.rev = ri.rev
     WHERE 
-        oa.ts_created >= '2025-01-06' --Oficial start of rental_transact database
+        oa.ts_created >= '2025-01-13' --Oficial start of rental_transact database
         AND oa.mod_status
         AND oa.status IN ('ACCEPTED', 'REJECTED')
     GROUP BY 1
@@ -99,7 +101,7 @@ negotiation_rental_transact AS (
 )
 SELECT
     o.id AS id_offer,
-    tm.id_offer_topic,
+    ot.id AS id_offer_topic,
     o.id_firestore_offer AS id_firestore,
     o.id_tenant_external AS id_tenant,
     o.id_owner_external as id_owner,
@@ -108,7 +110,7 @@ SELECT
     h.insurance_value AS original_home_insurance,
     h.iptu AS original_iptu,
     o.original_rent_value AS original_rent,
-    tm.proposed_rent_value as rent,
+    COALESCE(tm.proposed_rent_value, o.original_rent_value) as rent,
     o.status,
     o.turn,
     o.iteration,
