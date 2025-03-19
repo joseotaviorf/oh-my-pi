@@ -1,38 +1,30 @@
-WITH hr_system_workers AS (
-  SELECT
-    id_person,
-    emails
+WITH
+external_identifiers AS (
+  SELECT DISTINCT
+    id_person
   FROM
-    datalake_hr_system_clean.workers
-  QUALIFY
-    dt_effective = MAX(dt_effective) OVER (
-      PARTITION BY
-        id_person
-    )
-),
-emails_step1 AS (
-  SELECT
-    id_person,
-    EXPLODE (emails) AS emails
-  FROM
-    hr_system_workers
+    datalake_hr_system_clean.workers AS w
+  LATERAL VIEW
+    EXPLODE(w.external_identifiers) AS e
+  WHERE
+    e.ExternalIdentifierType = 'ID_ONDA1'
 ),
 emails AS (
   SELECT
     id_person,
-    emails['EmailAddress'] AS email_address,
-    emails['EmailType'] AS email_type
+    w.dt_effective,
+    e.EmailAddress AS email_address,
+    e.EmailType AS email_type,
+    e.LastUpdateDate
   FROM
-    emails_step1
+    datalake_hr_system_clean.workers AS w
+  LATERAL VIEW
+    EXPLODE(w.emails) AS e
   WHERE
-    emails['ToDate'] IS NULL
-    OR emails['ToDate'] = '4712-12-31'
+    e.ToDate IS NULL OR e.ToDate = '4712-12-31'
   QUALIFY
-    emails['LastUpdateDate'] = MAX(emails['LastUpdateDate']) OVER (
-      PARTITION BY
-        id_person,
-        emails['EmailType']
-    )
+    w.dt_effective = MAX(w.dt_effective) OVER (PARTITION BY id_person)
+    AND e.LastUpdateDate = MAX(e.LastUpdateDate) OVER (PARTITION BY id_person, email_type)
 )
 SELECT DISTINCT
   a.id_assignment,
@@ -40,9 +32,12 @@ SELECT DISTINCT
   a.id_person,
   COALESCE(wr.registration, lr.legacy_registration) AS legacy_registration,
   a.assignment_number,
+  a.assignment_type,
+  emp_info.person_number,
   emp_info.full_name AS full_name,
   LOWER(ew.email_address) AS work_email,
-  LOWER(eh.email_address) AS personal_email
+  LOWER(eh.email_address) AS personal_email,
+  ext.id_person IS NOT NULL AS is_user_test
 FROM
   datalake_hr_system.assignments AS a
 LEFT JOIN
@@ -62,3 +57,6 @@ LEFT JOIN
 LEFT JOIN
   datalake_hr_system_custom_clean.workers_registration wr
     ON a.assignment_number = wr.assignment_number
+LEFT JOIN
+  external_identifiers AS ext
+    ON ext.id_person = a.id_person
