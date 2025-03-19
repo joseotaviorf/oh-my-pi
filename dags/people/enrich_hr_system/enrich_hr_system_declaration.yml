@@ -11,7 +11,7 @@ cluster:
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
@@ -24,11 +24,14 @@ workflow:
       - demographic_attributes
       - disability
       - salary_metrics
+      - work_relationships
     assignment_salaries:
       - assignments
     employee_ids:
       - assignments
       - employee_info
+    assignment_effective_status:
+      - assignments
   default_extraction_type: full
   has_hive_sync: false
   bucket_config_name: people_bucket
