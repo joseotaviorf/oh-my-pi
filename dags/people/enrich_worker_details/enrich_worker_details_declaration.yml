@@ -1,9 +1,9 @@
 dag:
-  name: enrich_hr_system
+  name: enrich_worker_details
   schedule_start_date: 2024, 3, 14
   owner: Data People
   documentation:
-    dag_purpose: Enrich HR System data.
+    dag_purpose: Processes worker_details table separately to optimize pipeline performance.
 cluster:
   type: databricks_13_3_min_memory_people_cluster
   access_control_list:
@@ -18,23 +18,12 @@ cluster:
 workflow:
   type: query_delta
   layer: enrich
-  inner_dependencies:
-    assignment_effective_status:
-      - assignments
+  custom_schema: hr_system
   default_extraction_type: full
   has_hive_sync: false
   bucket_config_name: people_bucket
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
-  tables_customization:
-    assignments:
-      extraction_type: incremental
-      merge_on: ["id_assignment", "dt_effective_start"]
-      z_order_by: ["id_assignment"]
-    managers:
-      extraction_type: incremental
-      merge_on: ["id_assignment", "dt_effective_start"]
-      z_order_by: ["id_assignment"]
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]

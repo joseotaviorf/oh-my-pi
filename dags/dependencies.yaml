@@ -485,7 +485,6 @@ bietlejuice.dw_employee:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
   - bietlejuice.enrich_hr_system:load-enrich-disability
-  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.enrich_hr_system:load-enrich-employee-info
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy
@@ -1826,8 +1825,17 @@ bietlejuice.enrich_ebdb_work_contract:
 bietlejuice.enrich_emlio:
   - bietlejuice.emlio:load-clean-emlio-logs
 bietlejuice.enrich_employee:
-  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
+  - bietlejuice.enrich_hr_system:load-enrich-assignments
+  - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
+  - bietlejuice.enrich_hr_system:load-enrich-disability
+  - bietlejuice.enrich_hr_system:load-enrich-employee-info
+  - bietlejuice.enrich_hr_system:load-enrich-managers
+  - bietlejuice.enrich_hr_system:load-enrich-salary-metrics
+  - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy
+  - bietlejuice.hr_system:load-clean-salaries
+  - bietlejuice.hr_system:load-clean-workers
+  - bietlejuice.hr_system_custom:load-clean-workers-registration
 bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.batch_inference:load-clean-batch-inference
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues
@@ -1939,12 +1947,8 @@ bietlejuice.enrich_house_feature_inference:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_ebdb_country:load-enrich-house
 bietlejuice.enrich_hr_system:
-  - bietlejuice.hr_system:load-clean-action-reasons-lov
-  - bietlejuice.hr_system:load-clean-actions-lov
-  - bietlejuice.hr_system:load-clean-organizations
   - bietlejuice.hr_system:load-clean-salaries
   - bietlejuice.hr_system:load-clean-workers
-  - bietlejuice.hr_system_custom:load-clean-workers-registration
 bietlejuice.enrich_hr_system_custom:
   - bietlejuice.enrich_hr_system:load-enrich-managers
 bietlejuice.enrich_hub_services:
@@ -2371,7 +2375,6 @@ bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
 bietlejuice.enrich_people_public:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
-  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.enrich_hr_system:load-enrich-managers
   - bietlejuice.gsheets_people:done-clean-position-class
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
@@ -3279,7 +3282,6 @@ bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-round
 bietlejuice.enrich_workable:
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids
-  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.hr_system:load-clean-organizations
   - bietlejuice.workable_redshift:load-clean-activities
@@ -3292,6 +3294,12 @@ bietlejuice.enrich_workable:
   - bietlejuice.workable_redshift:load-clean-jobs
   - bietlejuice.workable_redshift:load-clean-members
   - bietlejuice.workable_redshift:load-clean-requisitions
+bietlejuice.enrich_worker_details:
+  - bietlejuice.hr_system:load-clean-action-reasons-lov
+  - bietlejuice.hr_system:load-clean-actions-lov
+  - bietlejuice.hr_system:load-clean-organizations
+  - bietlejuice.hr_system:load-clean-salaries
+  - bietlejuice.hr_system:load-clean-workers
 bietlejuice.enrich_zendesk:
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
