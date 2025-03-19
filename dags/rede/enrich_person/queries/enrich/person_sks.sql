@@ -55,7 +55,7 @@ member_profile AS (
     ALL
 )
 SELECT
-  p.id + MONOTONICALLY_INCREASING_ID() + 1 AS sk_person,
+  XXHASH64(p.id) AS sk_person,
   p.id AS id_person,
   cie.id_contact_info_email,
   cr.id_credential_reference,
