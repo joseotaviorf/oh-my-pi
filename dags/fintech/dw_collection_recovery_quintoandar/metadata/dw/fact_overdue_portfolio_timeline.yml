@@ -69,6 +69,34 @@ columns:
       Original debt: ""
       Negotiation: ""
       Negotiation installments (extra): ""
+  has_session_start_event_in_dt_reference:
+    lineage:
+      - datalake_collections_quintoandar.delinquency_app_events.id_invoice
+      - datalake_collections_quintoandar.delinquency_app_events.id_contract
+      - datalake_collections_quintoandar.delinquency_app_events.dt_event
+      - datalake_collections_quintoandar.delinquency_app_events.funnel_step
+    description: Boolean flag indicating whether a "Session Start" event occurred for the given contract and invoice on the reference date.
+  has_contract_event_in_dt_reference:
+    lineage:
+      - datalake_collections_quintoandar.delinquency_app_events.id_invoice
+      - datalake_collections_quintoandar.delinquency_app_events.id_contract
+      - datalake_collections_quintoandar.delinquency_app_events.dt_event
+      - datalake_collections_quintoandar.delinquency_app_events.funnel_step
+    description: Boolean flag indicating whether a "Contract Page" event occurred for the given contract and invoice on the reference date.
+  has_pending_invoice_event_in_dt_reference:
+    lineage:
+      - datalake_collections_quintoandar.delinquency_app_events.id_invoice
+      - datalake_collections_quintoandar.delinquency_app_events.id_contract
+      - datalake_collections_quintoandar.delinquency_app_events.dt_event
+      - datalake_collections_quintoandar.delinquency_app_events.funnel_step
+    description: Boolean flag indicating whether a "Pending Invoice Page" event occurred for the given contract and invoice on the reference date.
+  has_ssn_event_in_dt_reference:
+    lineage:
+      - datalake_collections_quintoandar.delinquency_app_events.id_invoice
+      - datalake_collections_quintoandar.delinquency_app_events.id_contract
+      - datalake_collections_quintoandar.delinquency_app_events.dt_event
+      - datalake_collections_quintoandar.delinquency_app_events.funnel_step
+    description: Boolean flag indicating whether a "Self Service Negotiation" event occurred for the given contract and invoice on the reference date.
   debtor_type:
     lineage:
       - datalake_invoice.overdue_portfolio_timeline.debtor_type

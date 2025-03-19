@@ -166,7 +166,7 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.trato_feito:load-clean-eviction
   - bietlejuice.trato_feito:load-clean-eviction-data
 bietlejuice.dw_collection_recovery_quintoandar:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.enrich_collections_quintoandar:load-enrich-delinquency-app-events
   - bietlejuice.enrich_cyber:load-enrich-collection
   - bietlejuice.enrich_cyber:load-enrich-contract-agency-distribution
   - bietlejuice.enrich_cyber:load-enrich-installment

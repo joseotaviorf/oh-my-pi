@@ -7,51 +7,71 @@ get_session_start AS (
     c.id_contract,
     e.device_brand,
     e.country,
+    e.year,
+    e.month,
+    e.day,
     e.ts_event
   FROM datalake_amplitude_clean.170698_session_start_events AS e
   LEFT JOIN datalake_ebdb_contract.contract_person AS c
     ON e.id_user = c.id_user_contract_person
+  WHERE
+    MAKE_DATE(e.year, e.month, e.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 pending_invoices_events AS (
   SELECT
     id_amplitude,
     id_session,
-    ep_id_contracts,
-    ep_id_invoices,
+    FROM_JSON(ep_id_contracts, 'array<bigint>') AS id_contract,
+    FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
     device_brand,
     "pending_invoices_page_viewed" AS event_name,
     "Pending Invoice Page" AS funnel_step,
+    year,
+    month,
+    day,
     ts_event
   FROM datalake_amplitude_clean.170698_pending_invoices_page_viewed_events
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
   UNION ALL
 
   SELECT
     id_amplitude,
     id_session,
-    ep_id_contracts,
-    ep_id_invoices,
+    FROM_JSON(ep_id_contracts, 'array<bigint>') AS id_contract,
+    FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
     device_brand,
     "rm_pending_invoices_page_viewed" AS event_name,
     "Pending Invoice Page" AS funnel_step,
+    year,
+    month,
+    day,
     ts_event
   FROM datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 explode_pending_invoices_events AS (
   SELECT
-    id_contract,
-    id_invoice,
-    ep_id_contracts AS id_contracts,
-    ep_id_invoices AS id_invoices,
+    contract_invoice.id_contract,
+    contract_invoice.id_invoice,
     id_amplitude,
     id_session,
     device_brand,
     event_name,
     funnel_step,
+    year,
+    month,
+    day,
     ts_event
   FROM pending_invoices_events
-  LATERAL VIEW EXPLODE(from_json(ep_id_contracts, 'array<bigint>')) AS id_contract
-  LATERAL VIEW EXPLODE(from_json(ep_id_invoices, 'array<string>')) AS id_invoice
+  LATERAL VIEW EXPLODE(
+    ARRAYS_ZIP(
+      id_contract,
+      id_invoice
+    )
+  ) AS contract_invoice
 ),
 union_all_events (
   SELECT
@@ -62,6 +82,9 @@ union_all_events (
     device_brand,
     "session_start" AS event_name,
     "Session Start" AS funnel_step,
+    year,
+    month,
+    day,
     ts_event
   FROM get_session_start
 
@@ -75,8 +98,13 @@ union_all_events (
     device_brand,
     "contract_page_viewed" AS event_name,
     "Contract Page" AS funnel_step,
+    year,
+    month,
+    day,
     ts_event
   FROM datalake_amplitude_clean.170698_contract_page_viewed_events
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
   UNION ALL
 
@@ -88,6 +116,9 @@ union_all_events (
     device_brand,
     event_name,
     funnel_step,
+    year,
+    month,
+    day,
     ts_event
   FROM explode_pending_invoices_events
 
@@ -101,8 +132,13 @@ union_all_events (
     device_brand,
     "pending_invoices_invoice_pay_button_clicked" AS event_name,
     "Self Service Negotiation" AS funnel_step,
+    year,
+    month,
+    day,
     ts_event
   FROM datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
   UNION ALL
 
@@ -114,8 +150,13 @@ union_all_events (
     device_brand,
     "rm_invoice_payment_option_clicked" AS event_name,
     "Self Service Negotiation" AS funnel_step,
+    year,
+    month,
+    day,
     ts_event
   FROM datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 SELECT
   id_amplitude,
@@ -125,6 +166,8 @@ SELECT
   device_brand,
   event_name,
   funnel_step,
-  DATE_TRUNC("MONTH", ts_event) AS month_event,
+  year,
+  month,
+  day,
   ts_event
 FROM union_all_events
