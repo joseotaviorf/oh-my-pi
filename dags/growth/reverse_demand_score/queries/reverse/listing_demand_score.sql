@@ -276,6 +276,32 @@ for_rent_score AS (
     -- Only listings with more than 3 days
     DATE_DIFF(DAY, listing_pub_dt, CURRENT_DATE) >= 3 
 ),
+lpv_14_days_for_sale_base AS (
+  SELECT 
+    ol.sk_house AS id_house,
+    d.date AS dt_event,
+    qt_listing_page_viewed,
+    ROUND(AVG(ol.qt_listing_page_viewed) 
+      OVER (PARTITION BY ol.sk_house 
+            ORDER BY d.date 
+            ROWS BETWEEN 14 PRECEDING AND 1 PRECEDING), 1) AS qt_lpv_14d_for_sale
+  FROM 
+    dw_sale.fact_daily_ongoing_listing AS ol
+  LEFT JOIN 
+    dw_public.dim_date AS d
+      ON d.sk_date = ol.sk_snapshot_date
+  WHERE 
+    d.date >= DATE_ADD(MONTH,-3,CURRENT_DATE)
+  GROUP BY all
+),
+last_lpv_14_days_for_sale AS (
+SELECT 
+  id_house,
+  MAX(CASE WHEN qt_lpv_14d_for_sale < 3 THEN dt_event END) AS dt_last_lpv_14_below_3,
+  MAX(CASE WHEN qt_lpv_14d_for_sale > 8 THEN dt_event END) AS dt_last_lpv_14_above_8
+FROM lpv_14_days_for_sale_base
+GROUP BY ALL
+),
 for_sale_score AS (
   SELECT 
     ol.sk_house AS id_house,
@@ -283,6 +309,8 @@ for_sale_score AS (
     dr.city_group,
     dr.city_name,
     dr.region_code,
+    dt_last_lpv_14_below_3,
+    dt_last_lpv_14_above_8,
     if(date(dhl.ts_last_publication) is null,date(dhl.ts_first_publication),date(dhl.ts_first_publication)) as dt_publication,
     ROUND(AVG(CASE WHEN d.date >= DATE_ADD(DAY,-1,CURRENT_DATE) THEN ol.qt_listing_page_viewed END),1) AS qt_lpv_1d_for_sale,
     ROUND(AVG(CASE WHEN d.date >= DATE_ADD(DAY,-3,CURRENT_DATE) THEN ol.qt_listing_page_viewed END),1) AS qt_lpv_3d_for_sale,
@@ -306,9 +334,12 @@ for_sale_score AS (
   LEFT JOIN 
     sales_liquidity_score.predicted_scores ls
       ON ls.sk_house = ol.sk_house
+  LEFT JOIN 
+    last_lpv_14_days_for_sale lpv_14 
+      ON lpv_14.id_house = ol.sk_house
   WHERE 
-    d.date >= DATE_ADD(DAY,-7,CURRENT_DATE)
-  GROUP BY 1,2,3,4,5,6
+    d.date >= DATE_ADD(DAY,-21,CURRENT_DATE)
+  GROUP BY 1,2,3,4,5,6,7,8
 ),
 results AS (
   SELECT 
@@ -332,6 +363,8 @@ results AS (
     fs.qt_lpv_14d_for_sale,
     fs.qt_lpv_21d_for_sale,
     fs.dt_publication AS dt_publication_for_sale,
+    DATEDIFF(DATE_ADD(DAY,-1,CURRENT_DATE), dt_last_lpv_14_below_3) AS days_last_lpv_14_below_3,
+    DATEDIFF(DATE_ADD(DAY,-1,CURRENT_DATE), dt_last_lpv_14_above_8) AS days_last_lpv_14_above_8,
     CASE
       WHEN liquidity_score >= 0 AND liquidity_score < 10 THEN 'A'
       WHEN liquidity_score >= 10 AND liquidity_score < 20 THEN 'B'
@@ -554,14 +587,16 @@ results AS (
       COALESCE(listing_age, 'X'),
       COALESCE(quality_score_result, 'X'),
       COALESCE(liquidity_score_result, 'X'),
-      COALESCE(lpv_3d_for_rent, 'X'),
-      COALESCE(lpv_3d_for_sale, 'X'),
+      -- COALESCE(lpv_3d_for_rent, 'X'), -- Removed at the request of SH on 2025-03-18
+      -- COALESCE(lpv_3d_for_sale, 'X'), -- Removed at the request of SH on 2025-03-18
       COALESCE(lpv_7d_for_rent, 'X'), -- Adding at the request of SH on 2025-01-06
       COALESCE(lpv_7d_for_sale, 'X'), -- Adding at the request of SH on 2025-01-06
       COALESCE(lpv_14d_for_rent, 'X'), -- Adding at the request of SH on 2025-02-20
       COALESCE(lpv_14d_for_sale, 'X'),-- Adding at the request of SH on 2025-02-20
-      COALESCE(lpv_21d_for_rent, 'X'), -- Adding at the request of SH on 2025-02-20
-      COALESCE(lpv_21d_for_sale, 'X')-- Adding at the request of SH on 2025-02-20
+      -- COALESCE(lpv_21d_for_rent, 'X'), -- Removed at the request of SH on 2025-03-18
+      -- COALESCE(lpv_21d_for_sale, 'X'),-- Removed at the request of SH on 2025-03-18
+      COALESCE(days_last_lpv_14_below_3, 'X'), -- Adding at the request of SH on 2025-03-18
+      COALESCE(days_last_lpv_14_above_8, 'X') -- Adding at the request of SH on 2025-03-18
       -- COALESCE(lpv_1d_for_rent, 'X'), -- Removed at the request of SH on 2024-11-05
       -- COALESCE(lpv_1d_for_sale, 'X') -- Removed at the request of SH on 2024-11-05
     ) AS demand_score,

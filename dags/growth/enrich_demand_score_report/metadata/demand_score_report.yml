@@ -77,6 +77,14 @@ columns:
     description: The date of publication of the listing in For Sale.
     lineage:
       - reverse_demand_score.listing_demand_score.dt_publication_for_sale
+  days_last_lpv_14_below_3:
+    description: The number of days since the last time the 14-day LPV average was below 3.
+    lineage:
+      - reverse_demand_score.listing_demand_score.days_last_lpv_14_below_3
+  days_last_lpv_14_above_8:
+    description: The number of days since the last time the 14-day LPV average was above 8.
+    lineage:
+      - reverse_demand_score.listing_demand_score.days_last_lpv_14_above_8   
   demand_score:
     description: The demand score of the listing.
     lineage:

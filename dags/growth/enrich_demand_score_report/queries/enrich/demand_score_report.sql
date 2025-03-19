@@ -17,6 +17,8 @@ SELECT
     qt_lpv_7d_for_sale,
     qt_lpv_14d_for_sale,
     qt_lpv_21d_for_sale,
+    days_last_lpv_14_below_3,
+    days_last_lpv_14_above_8,
     demand_score,
     dt_publication_for_sale,
     dt_publication_for_rent,
