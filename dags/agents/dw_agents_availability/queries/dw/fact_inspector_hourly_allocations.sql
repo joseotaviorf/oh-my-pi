@@ -20,3 +20,4 @@ FROM
     datalake_agenda_allocation.agenda_hourly_allocations AS ash
 WHERE
     ash.agent_type IN ('Vistoria', 'VistoriaQuarteirizada')
+    AND DATE(ts_slot_hour) BETWEEN DATE('{year}-{month}-{day}') AND (DATE('{year}-{month}-{day}') + INTERVAL 21 DAYS)

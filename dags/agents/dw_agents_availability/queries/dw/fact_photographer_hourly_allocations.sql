@@ -22,3 +22,4 @@ LEFT JOIN
         ON u.id_agent = ash.id_agent
 WHERE
     ash.agent_type IN ('SessaoFotos')
+    AND DATE(ts_slot_hour) BETWEEN DATE('{year}-{month}-{day}') AND (DATE('{year}-{month}-{day}') + INTERVAL 21 DAYS)
