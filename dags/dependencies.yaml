@@ -481,6 +481,7 @@ bietlejuice.dw_demand:
   - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
   - bietlejuice.enrich_demand_conversion_events:load-enrich-top-of-funnel-results
 bietlejuice.dw_employee:
+  - bietlejuice.enrich_employee:load-enrich-employee-ids
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids
   - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
@@ -2374,6 +2375,7 @@ bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
 bietlejuice.enrich_people_public:
+  - bietlejuice.enrich_employee:load-enrich-employee-ids
   - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-managers
   - bietlejuice.gsheets_people:done-clean-position-class
@@ -3281,6 +3283,7 @@ bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-rev-info
   - bietlejuice.wololo:load-clean-round
 bietlejuice.enrich_workable:
+  - bietlejuice.enrich_employee:load-enrich-employee-ids
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.hr_system:load-clean-organizations
