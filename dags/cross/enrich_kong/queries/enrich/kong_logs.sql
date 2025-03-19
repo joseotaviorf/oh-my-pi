@@ -1,28 +1,26 @@
 SELECT
-  kl.app,
-  kl.cluster_name,
-  kl.container_name,
-  kl.env,
-  kl.message,
-  kl.namespace,
-  kl.pod_name,
-  kl.stream,
-  REGEXP_EXTRACT(kl.message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 1) as client_ip,
-  REGEXP_EXTRACT(kl.message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 2) as request_user,
-  REGEXP_EXTRACT(kl.message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 3) as request_host,
-  REGEXP_EXTRACT(kl.message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 4) as request_method,
-  REGEXP_EXTRACT(kl.message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 5) as request_uri,
-  REGEXP_EXTRACT(kl.message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 6) as response_code,
-  kl.ts_event,
-  kl.year,
-  kl.month,
-  kl.day,
-  kl.hour
+  app,
+  cluster_name,
+  container_name,
+  env,
+  message,
+  namespace,
+  pod_name,
+  stream,
+  REGEXP_EXTRACT(message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 1) AS client_ip,
+  REGEXP_EXTRACT(message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 2) AS request_user,
+  REGEXP_EXTRACT(message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 3) AS request_host,
+  REGEXP_EXTRACT(message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 4) AS request_method,
+  REGEXP_EXTRACT(message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 5) AS request_uri,
+  REGEXP_EXTRACT(message, "^(.*) \- (.*) \- \\[.*\\] (.*) \"(.*) (.*)\" (\\d+)", 6) AS response_code,
+  ts_event,
+  year,
+  month,
+  day,
+  hour
 FROM
-  datalake_kong_clean.kong_logs AS kl
+  datalake_kong_clean.kong_logs
 WHERE
-  year = {year}
-  AND month = {month}
-  AND day = {day}
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   AND message NOT LIKE "%[warn]%"
   AND message NOT LIKE "%[notice]%"
