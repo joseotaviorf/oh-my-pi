@@ -1,24 +1,20 @@
 dag:
   name: taskmaster
   schedule_start_date: 2022, 7, 27
-  schedule_interval: 0 3 * * *
+  schedule_interval: 0 1 * * *
   owner: Data SS
   documentation:
     dag_purpose: This DAG imports the tables from [Taskmaster](https://github.com/quintoandar/taskmaster)
 
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
-  lineage_product_database_name: taskmaster
-  load_options:
-    max_records_per_file: 250000
+  source_database: taskmaster
+  source_schema: public
   dbutils_secret_key: TASKMASTER_DB
-  default_extraction_type: incremental
-  default_partitions: [year, month, day]
   tables_customization:
-    task:
-      date_filter_column: updated_at
+    task: {}
 
 cluster:
   type: custom_cluster

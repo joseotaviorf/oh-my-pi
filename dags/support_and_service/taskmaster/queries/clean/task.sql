@@ -19,8 +19,4 @@ SELECT
     month,
     day
 FROM
-    datalake_taskmaster_raw.task
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+    datalake_taskmaster_test_raw.task
