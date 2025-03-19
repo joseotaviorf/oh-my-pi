@@ -13,6 +13,7 @@ SELECT
     status,
     city_state,
     city,
+    locale,
     accounting_rule,
     accounting_type,
     person_card_code,

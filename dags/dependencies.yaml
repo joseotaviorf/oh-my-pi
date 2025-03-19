@@ -3634,9 +3634,6 @@ bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-taxonomy
   - bietlejuice.reverse_webhelp:load-reverse-tickets-transferred
   - bietlejuice.reverse_webhelp:load-reverse-twilio-chat-aht
-quintoml.search.search_monitoring.inference:
-  - bietlejuice.enrich_search:load-enrich-global-metrics
-  - bietlejuice.enrich_search:load-enrich-search-impressions
 bietlejuice.search_metrics_service:
   - quintoml.search.search_monitoring.inference:batch-predict
 bietlejuice.survicate_respondent_attributes:
@@ -3673,6 +3670,9 @@ quintoml.recs.house_user_embeddings_quintoml.inference:
   - wonka.house_main:load-house_main
   - wonka.user_agg_search_filters:load-user_agg_search_filters
   - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
+quintoml.search.search_monitoring.inference:
+  - bietlejuice.enrich_search:load-enrich-global-metrics
+  - bietlejuice.enrich_search:load-enrich-search-impressions
 wonka.group_user_most_viewed:
   - bietlejuice.amplitude:load-clean-170698-user-merge
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean

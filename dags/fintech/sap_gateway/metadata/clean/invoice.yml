@@ -61,6 +61,10 @@ columns:
     description: ''
     lineage:
     - datalake_sap_gateway_raw.invoice.city
+  locale:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.invoice.locale
   accounting_rule:
     description: ''
     lineage:
