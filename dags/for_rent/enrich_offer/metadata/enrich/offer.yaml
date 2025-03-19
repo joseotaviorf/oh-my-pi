@@ -1,7 +1,7 @@
 database_name: datalake_offer
 table_name: offer
 description: Enrich table for the offers flow gathering data from all the offers domains. 
-            Offers older than 2025-01-06 came from EBDB and after this date all offer data comes from Rental Transact database.
+            Offers older than 2025-01-13 came from EBDB and after this date all offer data comes from Rental Transact database.
             Tenants make offers to owners when they want to rent the properties. Table contains data from when the tenant 
             makes an offer to when it is accepted or rejectd. Each line is an offer.
 domain: For Rent
@@ -99,9 +99,9 @@ columns:
       - datalake_rental_transact.offer.status
     description: Current status of the offer
     categories:
-      Aprovada: "[DEPRECATED] Offer approved by the owner. To offers created after 2025-01-06, this value won't exist."
-      EmNegociacao: "[DEPRECATED] Offer still in negotiation. To offers created after 2025-01-06, this value won't exist."
-      Rejeitada: "[DEPRECATED] Offer rejected by one of the parties. To offers created after 2025-01-06, this value won't exist."
+      Aprovada: "[DEPRECATED] Offer approved by the owner. To offers created after 2025-01-13, this value won't exist."
+      EmNegociacao: "[DEPRECATED] Offer still in negotiation. To offers created after 2025-01-13, this value won't exist."
+      Rejeitada: "[DEPRECATED] Offer rejected by one of the parties. To offers created after 2025-01-13, this value won't exist."
       APPROVED: Offer approved by the owner.
       REJECTED: Offer rejected by one of the parties.
       DISMISSED: Offer dismissed.
@@ -111,8 +111,8 @@ columns:
       - datalake_rental_transact.offer.turn
     description: Whose turn it is to answer the offer. When tenant submits the offer it is the owner turn to answer. When owner counter proposes, it is the tenants turn, and so on
     categories:
-      Tenant: "[DEPRECATED] It is the tenants turn to answer the offer. To offers created after 2025-01-06, this value won't exist."
-      Owner: "[DEPRECATED] It is the owners turn to answer the offer. To offers created after 2025-01-06, this value won't exist."
+      Tenant: "[DEPRECATED] It is the tenants turn to answer the offer. To offers created after 2025-01-13, this value won't exist."
+      Owner: "[DEPRECATED] It is the owners turn to answer the offer. To offers created after 2025-01-13, this value won't exist."
       SUPPLY: It is the owners turn to answer the offer.
       DEMAND: It is the tenants turn to answer the offer.
   rejection_reason:

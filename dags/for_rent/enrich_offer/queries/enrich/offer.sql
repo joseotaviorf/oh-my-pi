@@ -214,7 +214,7 @@ LEFT JOIN
     datalake_ebdb_clean.user AS client
         ON client.id = offer.id_client
 WHERE
-    COALESCE(bus_offer.ts_first_sent, firestore.ts_first_sent) < '2025-01-06'
+    COALESCE(bus_offer.ts_first_sent, firestore.ts_first_sent) < '2025-01-13'
 
 UNION
 
@@ -285,4 +285,4 @@ LEFT JOIN
     rental_transact_io AS io
         ON io.id_offer_rental_transact = offer.id_offer
 WHERE 
-    offer.ts_created >= '2025-01-06'
+    offer.ts_created >= '2025-01-13'
