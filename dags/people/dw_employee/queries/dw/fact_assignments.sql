@@ -8,33 +8,6 @@ latest_assignments AS (
         ROW_NUMBER() OVER (
             PARTITION BY id_assignment
             ORDER BY dt_effective_start DESC, ts_last_update DESC) = 1
-),
-subordinates AS (
-    SELECT
-        id_manager_period_of_service AS id_assignment,
-        SUM(
-            IF(
-                mh.is_direct_manager
-                AND la.assignment_status_type = 'ACTIVE',
-                1,
-                0
-            )
-        ) AS qnt_directly_led,
-        SUM(
-            IF(
-                NOT mh.is_direct_manager
-                AND la.assignment_status_type = 'ACTIVE',
-                1,
-                0
-            )
-        ) AS qnt_undirectly_led
-    FROM
-        datalake_hr_system.management_hierarchy AS mh
-    LEFT JOIN
-        latest_assignments AS la
-            ON la.id_assignment = mh.id_assignment
-    GROUP BY
-        id_manager_period_of_service
 )
 
 SELECT
@@ -47,8 +20,8 @@ SELECT
   am.sk_job,
   am.sk_manager,
   am.sk_manager_assignment,
-  REPLACE(am.dt_start_work_relationship, '-', '') AS sk_start_work_relationship_date,
-  REPLACE(am.dt_termination_work_relationship, '-', '') AS sk_termination_work_relationship_date,
+  REPLACE(am.dt_work_relationship_started, '-', '') AS sk_start_work_relationship_date,
+  REPLACE(am.dt_work_relationship_ended, '-', '') AS sk_termination_work_relationship_date,
   h.sk_hierarchy,
   am.assignment_number,
   am.salary_currency,
@@ -60,8 +33,8 @@ SELECT
   am.is_manager,
   am.has_self_declared_disability,
   am.assignment_age_months,
-  COALESCE(s.qnt_directly_led, 0) AS qnt_directly_led,
-  COALESCE(s.qnt_undirectly_led, 0) AS qnt_undirectly_led,
+  am.qnt_directly_led,
+  am.qnt_undirectly_led,
   am.salary,
   am.target_plr,
   am.salary_reference,
@@ -79,9 +52,6 @@ SELECT
   NOW () AS ts_load
 FROM
   datalake_hr_system.assignment_metrics AS am
-LEFT JOIN
-  subordinates AS s
-    ON s.id_assignment = am.sk_assignment
 LEFT JOIN
   datalake_hr_system.hierarchy_ids AS h
     ON h.sk_assignment = am.sk_assignment

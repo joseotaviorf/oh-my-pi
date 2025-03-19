@@ -3,19 +3,19 @@ WITH
         SELECT
             sk_employee,
             sk_assignment,
-            dt_start_work_relationship,
-            dt_termination_work_relationship,
-            LEAD (dt_start_work_relationship, 1) OVER (
+            dt_work_relationship_started,
+            dt_work_relationship_ended,
+            LEAD (dt_work_relationship_started, 1) OVER (
                 PARTITION BY
                     sk_employee
                 ORDER BY
-                    dt_start_work_relationship
-            ) AS next_dt_start_work_relationship,
+                    dt_work_relationship_started
+            ) AS next_dt_work_relationship_started,
             COALESCE(
                 DATEDIFF (
                     DAY,
-                    dt_termination_work_relationship,
-                    next_dt_start_work_relationship
+                    dt_work_relationship_ended,
+                    next_dt_work_relationship_started
                 ),
                 -1
             ) AS days_untill_next_work_relationship
@@ -26,26 +26,26 @@ WITH
         SELECT
             sk_employee,
             sk_assignment,
-            dt_start_work_relationship AS max_invalid_dt_start_work_relationship
+            dt_work_relationship_started AS max_invalid_dt_work_relationship_started
         FROM
             cte_days_between_assignments
         WHERE
             days_untill_next_work_relationship > 7
         QUALIFY
-            ROW_NUMBER() OVER ( PARTITION BY sk_employee ORDER BY dt_start_work_relationship DESC ) = 1
+            ROW_NUMBER() OVER ( PARTITION BY sk_employee ORDER BY dt_work_relationship_started DESC ) = 1
     ),
     cte_dt_hiring AS (
         SELECT
             ba.sk_employee,
-            MIN(ba.dt_start_work_relationship) AS dt_hiring
+            MIN(ba.dt_work_relationship_started) AS dt_hiring
         FROM
             cte_days_between_assignments AS ba
             LEFT JOIN
                 cte_invalid_relationships AS ur
                     ON ba.sk_employee = ur.sk_employee
         WHERE
-            ur.max_invalid_dt_start_work_relationship IS NULL
-            OR ba.dt_start_work_relationship > ur.max_invalid_dt_start_work_relationship
+            ur.max_invalid_dt_work_relationship_started IS NULL
+            OR ba.dt_work_relationship_started > ur.max_invalid_dt_work_relationship_started
         GROUP BY
             ba.sk_employee
     ),
@@ -315,8 +315,8 @@ SELECT
     am.sk_manager,
     am.sk_manager_assignment,
     am.sk_disability,
-    REPLACE (am.dt_start_work_relationship, '-', '') AS sk_work_relationship_started_date,
-    REPLACE (am.dt_termination_work_relationship, '-', '') AS sk_dt_termination_work_relationship,
+    REPLACE (am.dt_work_relationship_started, '-', '') AS sk_work_relationship_started_date,
+    REPLACE (am.dt_work_relationship_ended, '-', '') AS sk_dt_work_relationship_ended,
     am.sk_last_increase_date,
     REPLACE (se.dt_first_promotion, '-', '') AS sk_dt_first_promotion,
     h.sk_hierarchy,

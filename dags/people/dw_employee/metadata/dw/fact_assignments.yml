@@ -43,11 +43,11 @@ columns:
   sk_start_work_relationship_date:
     description: "Start date of the work relationship related to the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.dt_start_work_relationship
+      - datalake_hr_system.assignments_metrics.dt_work_relationship_started
   sk_termination_work_relationship_date:
     description: "Termination date of the work relationship related to the assignment, formatted as SK (replacing hyphens with spaces)."
     lineage:
-      - datalake_hr_system.assignments_metrics.dt_termination_work_relationship
+      - datalake_hr_system.assignments_metrics.dt_work_relationship_ended
   sk_last_increase_date:
     description: "Date of the last increase related to the assignment, formatted as SK."
     lineage:

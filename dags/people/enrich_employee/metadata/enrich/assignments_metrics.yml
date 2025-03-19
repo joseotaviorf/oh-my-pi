@@ -47,11 +47,11 @@ columns:
     description: "Unique identifier for the disability related to the assignment."
     lineage:
       - datalake_hr_system.disability.sk_disability
-  dt_start_work_relationship:
+  dt_work_relationship_started:
     description: "Date key for the start of the work relationship. Format: YYYYMMDD"
     lineage:
       - datalake_hr_system.work_relationships.dt_start
-  dt_termination_work_relationship:
+  dt_work_relationship_ended:
     description: "Date key for the termination of the work relationship. Format: YYYYMMDD"
     lineage:
       - datalake_hr_system.work_relationships.dt_termination
