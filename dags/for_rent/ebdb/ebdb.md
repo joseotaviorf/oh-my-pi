@@ -30,7 +30,7 @@ Produces the following output tables:
     `conservation_item_functional`
     `conservation_item_status`
     `conservation_room`
-    `consumption_bill`
+    `country`
     `device`
     `follow_up_details_feedback_tag`
     `house_agent`
@@ -52,4 +52,3 @@ Produces the following output tables:
     `suspected_unavailability_listings_aud`
 
     </div>
-

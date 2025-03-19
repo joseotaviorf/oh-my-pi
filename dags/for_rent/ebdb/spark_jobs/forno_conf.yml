@@ -502,6 +502,8 @@ table_block_list:
   - RealEstateAgentRating
   - RealEstateAgentRating_RatingLabel
   - RegionConfig
+  - ContaConsumo
+  - ContaConsumo_AUD
 
 view_allow_list: []
 
