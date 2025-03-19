@@ -28,6 +28,7 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
+      spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
     autotermination_minutes: 20
     driver_node_type_id: r5d.2xlarge
     node_type_id: r5d.2xlarge
