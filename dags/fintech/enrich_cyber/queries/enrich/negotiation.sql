@@ -190,10 +190,11 @@ SELECT
     COALESCE(c.id_client, a.id_client) AS id_customer,
     a.id_user AS id_operator,
     a.id_campaign,
+    COALESCE(u.id_agency, a.id_agency) AS id_agency,
     COALESCE(c.creditor, a.creditor) AS creditor,
     CASE
       WHEN a.id_user = "MIGRACAO" THEN "MIGRACAO"
-      WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name)) LIKE "PASCH%" THEN "PASCHOALOTTO"
+      WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "PASCH%" THEN "PASCHOALOTTO"
       WHEN UPPER(a.id_user) LIKE "PSC%" THEN "PASCHOALOTTO"
       WHEN UPPER(a.id_user) LIKE "%SERASA%" THEN "SERASA DIGITAL"
       ELSE UPPER(COALESCE(agg.agency_name, ag.agency_name))
@@ -209,7 +210,7 @@ SELECT
     at.min_down_payment_percentage,
     CASE
       WHEN a.id_campaign IS NOT NULL OR UPPER(a.agreement_type) LIKE '%CAM%' THEN "Boletagem"
-      WHEN ag.agency_type = "Portal" THEN "Portal Auto Negociação"
+      WHEN LOWER(ag.agency_type) = "portal" THEN "Portal Auto Negociação"
       WHEN ag.agency_type = "Cyber Credit" THEN "Operador Interno"
       WHEN a.id_user = "MIGRACAO" THEN "Migração"
       ELSE ag.agency_type

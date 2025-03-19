@@ -14,9 +14,6 @@ column_level_validations:
   sk_debtor:
     is_complete:
       severity_level: Error
-  id_operator:
-    is_complete:
-      severity_level: Error
   action:
     is_complete:
       severity_level: Error

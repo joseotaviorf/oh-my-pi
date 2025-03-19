@@ -3,7 +3,8 @@ deduplicate_payment AS (
     SELECT
         ts_updated,
         type,
-        id_installment
+        id_installment,
+        GET_JSON_OBJECT(metadata, "$.our_number") AS our_number
     FROM datalake_trato_feito_clean.payment
     QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_created DESC) = 1
 ),
@@ -19,6 +20,7 @@ cte_pay AS (
         i.*,
         p.ts_updated AS ts_payment_updated,
         p.type AS payment_type,
+        p.our_number,
         DATEDIFF(p.ts_updated, i.dt_due) AS ts_paid_diff
     FROM
         datalake_trato_feito_clean.installment AS i
@@ -44,7 +46,7 @@ SELECT
     n.id_debtor_external AS id_contract,
     COALESCE(external_index + 1, DENSE_RANK() OVER(PARTITION BY cp.id_negotiation ORDER BY cp.ts_created, cp.id_external)) AS installment_number,
     ie.id_invoice_extra,
-    COALESCE(cc.our_number, cp.id_external) AS our_number,
+    COALESCE(cc.our_number, cp.our_number, cp.id_external) AS our_number,
     cp.status,
     cp.payment_type,
     cp.adm_fee_amount,

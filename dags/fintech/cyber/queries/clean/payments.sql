@@ -11,9 +11,10 @@ SELECT
         ELSE PMACCTG
     END AS creditor,
     CASE
-        WHEN PMTCODE = "PE" THEN "Pagamento espontâneo"
+        WHEN PMTCODE = "PE" THEN "Pagamento Espontâneo"
         WHEN PMTCODE = "PC" THEN "Pagamento Acordo"
         WHEN PMTCODE = "PP" THEN "Promessa Pagamento"
+        WHEN PMTCODE = "CC" THEN "Pagamento Campanha"
         WHEN PMTCODE = "ES" THEN "Estorno"
         ELSE PMTCODE
     END AS payment_type,
