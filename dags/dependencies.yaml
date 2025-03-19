@@ -288,7 +288,6 @@ bietlejuice.dw_crm:
   - bietlejuice.enrich_ebdb_photo_jobs:load-enrich-photo-job
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
-  - bietlejuice.enrich_firestore:load-enrich-rent-offer
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
   - bietlejuice.enrich_offer:load-enrich-offer
   - bietlejuice.heimdall:load-clean-activity

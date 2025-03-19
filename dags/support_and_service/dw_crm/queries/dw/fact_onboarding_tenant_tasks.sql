@@ -1,12 +1,9 @@
 WITH offers AS (
   SELECT
      o.id_firestore,
-     MAX(oe.id) AS id
+     MAX(o.id) AS id
   FROM
-    datalake_firestore.rent_offer o
-  LEFT JOIN
-    datalake_ebdb_clean.offer oe
-      ON o.id_firestore = oe.id_firestore
+    datalake_offer.offer o
   GROUP BY 1
 ),
 contracts AS (
