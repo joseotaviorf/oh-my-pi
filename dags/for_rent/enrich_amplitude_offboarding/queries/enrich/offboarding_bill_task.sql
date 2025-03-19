@@ -35,4 +35,5 @@ WHERE
         'offboarding_bills_task_utility_bill_form_submitted',
         'offboarding_bills_task_installation_code_page_viewed',
         'offboarding_bills_task_installation_code_form_submitted'
+        'offboarding_bills_task_success_page_viewed'
     )
