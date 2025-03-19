@@ -3099,6 +3099,7 @@ bietlejuice.enrich_ticket_rate_classification_snapshot:
 bietlejuice.enrich_tiers:
   - bietlejuice.big_agent:load-clean-points-rule
   - bietlejuice.big_agent:load-clean-share-rule
+  - bietlejuice.enrich_big_agent:load-enrich-house-rent-listing-consultant
   - bietlejuice.enrich_big_agent:load-enrich-house-sale-listing-consultant
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-user
