@@ -19,6 +19,7 @@ SELECT
     GET_JSON_OBJECT(event_properties, '$.total_tasks') AS ep_total_tasks,
     GET_JSON_OBJECT(event_properties, '$.pending_tasks') AS ep_pending_tasks,
     GET_JSON_OBJECT(event_properties, '$.rent_price_task_status') AS ep_rent_price_task_status,
+    GET_JSON_OBJECT(event_properties, '$.available_hours_task_status') AS ep_available_hours_task_status,
     city,
     country,
     data,

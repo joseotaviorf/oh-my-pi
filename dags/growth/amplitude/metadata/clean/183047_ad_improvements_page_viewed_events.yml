@@ -61,7 +61,10 @@ columns:
       - datalake_amplitude_clean_staging.183047_ad_improvements_page_viewed_events.event_properties
   ep_rent_price_task_status:
     lineage:
-      - datalake_amplitude_clean_staging.183047_ad_improvements_page_viewed_events.event_properties        
+      - datalake_amplitude_clean_staging.183047_ad_improvements_page_viewed_events.event_properties
+  ep_available_hours_task_status:
+    lineage:
+      - datalake_amplitude_clean_staging.183047_ad_improvements_page_viewed_events.event_properties          
   city:
     lineage:
       - datalake_amplitude_clean_staging.183047_ad_improvements_page_viewed_events.city
