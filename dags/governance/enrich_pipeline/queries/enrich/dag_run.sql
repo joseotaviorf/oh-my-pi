@@ -145,9 +145,10 @@ dag_clear AS (
     AND event IN ('clear', 'dagrun_clear')
 ),
 composer_run AS (
-  /** Finding the most recent run of the Composer DAG for each execution date.
-    Composer is a DAG that runs D0 and several times a day, which means that if today is 2024-04-10, the execution date will also be 2024-04-10.
-    On the next day (2024-04-11) in its first Composer extraction, it will extract the data related to the end of the day of the 2024-04-10.
+  /** Finding the most recent run of the Airflow ingestion DAG for each execution date.
+    The Airflow ingestion DAG used to be bietlejuice.composer, but it's now been bietlejuice.astro since March 2025.
+    It is a DAG that runs D0 and several times a day, which means that if today is 2024-04-10, the execution date will also be 2024-04-10.
+    On the next day (2024-04-11) in its first extraction, it will extract the data related to the end of the day of the 2024-04-10.
     So in this case, the execution date 2024-04-10 will have as it last run marked as the date of 2024-04-11
   ***/ 
   SELECT
@@ -157,7 +158,7 @@ composer_run AS (
   FROM
     datalake_airflow.dag_run
   WHERE
-    id_dag = 'bietlejuice.composer'
+    id_dag IN ('bietlejuice.composer', 'bietlejuice.astro')
     AND DATE(ts_executed) = DATE(ts_ended)  -- Making sure that for every DAG execution date, we'll have the last extraction of the same day
   GROUP BY 1
 )
