@@ -338,6 +338,9 @@ bietlejuice.enrich_ebdb_user:
 bietlejuice.enrich_expected_contribution_margin:
   remove:
     - bietlejuice.enrich_losses:load-enrich-provision
+bietlejuice.enrich_firestore:
+  remove:
+    - bietlejuice.firestore:load-clean-rent-offer
 bietlejuice.enrich_golden_set:
   remove:
     - bietlejuice.enrich_vespucio:load-enrich-dejavu
@@ -439,6 +442,7 @@ bietlejuice.enrich_offer:
   remove:
     - bietlejuice.enrich_sale_firestore:load-enrich-monday
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
+    - bietlejuice.enrich_firestore:load-enrich-rent-offer
 bietlejuice.enrich_olos_dialer:
   remove:
     - bietlejuice.olos_dialer:load-clean-mailing

@@ -1838,8 +1838,6 @@ bietlejuice.enrich_expected_contribution_margin:
 bietlejuice.enrich_fintech_snapshot:
   - bietlejuice.enrich_accounting_funnel:load-enrich-accounts-payable
   - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all
-bietlejuice.enrich_firestore:
-  - bietlejuice.firestore:load-clean-rent-offer
 bietlejuice.enrich_golden_set:
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
 bietlejuice.enrich_google_search_console:
@@ -2332,7 +2330,6 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
-  - bietlejuice.enrich_firestore:load-enrich-rent-offer
   - bietlejuice.enrich_gsheets:load-enrich-sale-hub-offer
   - bietlejuice.enrich_hub_services:load-enrich-buyer-secretariat-changes
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
