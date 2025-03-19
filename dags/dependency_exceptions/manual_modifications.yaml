@@ -944,6 +944,11 @@ quintoml.recs.house_user_embeddings_quintoml.inference:
     - wonka.group_user_most_viewed:load-user_listing_page_viewed_cross_devices
     - wonka.group_user_most_viewed:load-user_sale_listing_page_viewed_cross_devices
 
+quintoml.search.search_monitoring.inference:
+  add:
+    - bietlejuice.enrich_search:load-enrich-global-metrics
+    - bietlejuice.enrich_search:load-enrich-search-impressions
+
 wonka.house_demand_balancer_predictions:
   add:
     - bietlejuice.demand_balancer_service:load-clean-demand-balancer
