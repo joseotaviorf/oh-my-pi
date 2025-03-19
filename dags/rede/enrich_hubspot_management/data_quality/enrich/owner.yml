@@ -11,9 +11,6 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
-  id_user:
-    is_unique:
-      severity_level: Error
   email:
-    is_complete:
+    is_unique:
       severity_level: Error
