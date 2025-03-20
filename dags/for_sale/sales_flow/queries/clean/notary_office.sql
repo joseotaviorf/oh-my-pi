@@ -12,8 +12,8 @@ SELECT
   type,
   latitude,
   longitude,
-  created_at,
-  updated_at,
+  created_at AS ts_created,
+  updated_at AS ts_updated,
   year,
   month,
   day

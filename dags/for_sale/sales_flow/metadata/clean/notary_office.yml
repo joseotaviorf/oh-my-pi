@@ -1,0 +1,79 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: notary_office
+owner: leonardo.soares@quintoandar.com.br
+domain: for_sale
+description: Table that stores the data about the notary offices.
+columns:
+  id:
+    description: 'Id of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.id
+  id_hubs:
+    description: 'Hubs that the notary office is part of.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.hubs_id
+  name:
+    description: 'Name of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.name
+  mobile_phone:
+    description: 'Mobile phone of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.mobile_phone
+  phone:
+    description: 'Phone of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.phone
+  email:
+    description: 'Email of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.email
+  address:
+    description: 'Address of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.address
+  city:
+    description: 'City of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.city
+  state:
+    description: 'State of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.state
+  label:
+    description: 'Label of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.label
+  type:
+    description: 'Type of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.type
+  latitude:
+    description: 'Latitude of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.latitude
+  longitude:
+    description: 'Longitude of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.longitude
+  ts_created:
+    description: 'Timestamp of the creation of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.created_at
+  ts_updated:
+    description: 'Timestamp of the last update of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.updated_at
+  year:
+    description: 'Year of the last update of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.year
+  month:
+    description: 'Month of the last update of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.month
+  day:
+    description: 'Day of the last update of the notary office.'
+    lineage:
+    - datalake_sales_flow_raw.notary_office.day
