@@ -14,8 +14,6 @@ workflow:
     agent_unified_contract_changes:
     - agent_coincident_business_contexts
     - agents_activations_suspensions_contracts_changes
-    agent_region_group:
-    - agents_region
     ciq_agents:
     - ciq_users
   extra_query_template_params:
@@ -23,12 +21,6 @@ workflow:
       load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   tables_customization:
     agents_activations_suspensions_contracts_changes:
-      extraction_type: incremental
-      partitions:
-      - year
-      - month
-      - day
-    agent_region_group:
       extraction_type: incremental
       partitions:
       - year

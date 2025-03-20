@@ -11,6 +11,9 @@ workflow:
   inner_dependencies:
     agenda_hourly_allocations:
       - agents_slots_hourly
+      - agent_region_group
+    agent_region_group:
+      - agents_slots
     agents_slots_hourly:
       - agents_slots
     agents_slots:
@@ -20,6 +23,9 @@ workflow:
       - slots_base_time
   tables_customization:
     agenda_hourly_allocations:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    agent_region_group:
       extraction_type: incremental
       partitions: [year, month, day]
     agents_slots_hourly:

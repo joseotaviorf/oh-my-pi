@@ -19,7 +19,7 @@ columns:
     description: Unique identifier of the date-time slot
   id_agent_region:
     lineage:
-      - datalake_ebdb_agents.agent_region_group.dt
+      - datalake_agenda_allocation.agent_region_group.dt
     description: Unique identifier of the group of regions served by the Agent
   id_slot_date_agent:
     lineage:
@@ -57,11 +57,11 @@ columns:
     description: If it is an Agent in the Visits context, it will be linked to at least one business context, which could be Sale or Rent.
   area:
     lineage:
-      - datalake_ebdb_agents.agent_region_group.area
+      - datalake_agenda_allocation.agent_region_group.area
     description: "Description of the agent's area of activity."
   area_deprecated:
     lineage:
-      - datalake_ebdb_agents.agent_region_group.area_deprecated
+      - datalake_agenda_allocation.agent_region_group.area_deprecated
     description: "Description of the agent's deprecated area of activity."
   is_allocation_available:
     lineage:

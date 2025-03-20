@@ -6,28 +6,28 @@ owner: data-ae-agents@quintoandar.com.br
 columns:
   sk_agent_region:
     lineage:
-    - datalake_ebdb_agents.agent_region_group.dt
-    - datalake_ebdb_agents.agent_region_group.dadosagente_id
+    - datalake_agenda_allocation.agent_region_group.dt
+    - datalake_agenda_allocation.agent_region_group.dadosagente_id
     description: ID of this Agent Region
   sk_regions_date:
     lineage:
-    - datalake_ebdb_agents.agent_region_group.dt
+    - datalake_agenda_allocation.agent_region_group.dt
     description: Sk date of when agent was allocated to this region
   sk_agent:
     lineage:
-    - datalake_ebdb_agents.agent_region_group.dadosagente_id
+    - datalake_agenda_allocation.agent_region_group.dadosagente_id
     description: ID for the agent
   regioes:
     lineage:
-    - datalake_ebdb_agents.agent_region_group.regioes
+    - datalake_agenda_allocation.agent_region_group.regioes
   area:
     lineage:
-    - datalake_ebdb_agents.agent_region_group.area
+    - datalake_agenda_allocation.agent_region_group.area
     description: Region codes (region_code) of neighborhoods that agent is allocated
       on that day. You can find these regions in the dim_region table
   secondary_area:
     lineage:
-    - datalake_ebdb_agents.agent_region_group.secondary_area
+    - datalake_agenda_allocation.agent_region_group.secondary_area
     description: If the regions where the agent works in span multiple region_code,
       the secondary region_code will be listed here
     categories:
@@ -89,13 +89,13 @@ columns:
       STA 01: '#N/A'
   area_deprecated:
     lineage:
-    - datalake_ebdb_agents.agent_region_group.area_deprecated
+    - datalake_agenda_allocation.agent_region_group.area_deprecated
     description: Deprecated region codes (region_code_deprecated) of neighborhoods
       that agent is allocated on that day. You can find these regions in the dim_region
       table
   secondary_area_deprecated:
     lineage:
-    - datalake_ebdb_agents.agent_region_group.secondary_area_deprecated
+    - datalake_agenda_allocation.agent_region_group.secondary_area_deprecated
     description: If the regions where the agent works in span multiple region_code_deprecated,
       the secondary region_code_deprecated will be listed here
     categories:

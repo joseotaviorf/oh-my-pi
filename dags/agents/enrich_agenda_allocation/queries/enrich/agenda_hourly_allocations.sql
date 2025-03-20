@@ -106,7 +106,7 @@ daily_agent_region_group AS (
         arg.area_deprecated,
         arg.dt AS dt_reference
     FROM
-        datalake_ebdb_agents.agent_region_group AS arg
+        datalake_agenda_allocation.agent_region_group AS arg
     WHERE
         arg.dt BETWEEN '{load_start_date}' AND '{load_end_date}' + INTERVAL 21 DAYS
     QUALIFY

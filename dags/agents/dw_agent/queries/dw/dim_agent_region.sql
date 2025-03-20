@@ -7,7 +7,7 @@ SELECT
 	secondary_area,
 	area_deprecated,
 	secondary_area_deprecated
-FROM datalake_ebdb_agents.agent_region_group r
+FROM datalake_agenda_allocation.agent_region_group r
 )
 SELECT
 	CAST(CONCAT(sk_regions_date, sk_agent) AS BIGINT) AS sk_agent_region,
