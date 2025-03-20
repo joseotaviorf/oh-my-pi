@@ -21,17 +21,11 @@ WITH recontact_data AS (
     rt.ts_updated_local,
     NULL AS ts_csat_response_submitted
   FROM
-    datalake_repairs.repair_tickets AS rt
+    datalake_repairs.ongoing_repair_tickets AS rt
   WHERE
-    (rt.channel NOT IN ('call', 'whatsapp')
-    AND rt.tags NOT LIKE '%teste_ps_pp_grupo_b_intermediacao_autosservico%'
-    AND rt.tags NOT LIKE '%mvp_fup_iq_intermediacao_autosservico%'
-    AND rt.client_type NOT LIKE '%prestador%'
-    AND rt.tags NOT LIKE '%reembolso_rep_ong%'
-    AND rt.tags NOT LIKE '%reembolso_sem_autorização%'
-    AND rt.tags NOT LIKE '%tarefacx_ongrep_solicitar_reembolso_reparos%'
-    AND rt.tags NOT LIKE '%whatspp_reparos%'
-    OR  rt.tags like '%mvp_fup_iq_intermediacao_autosservico%')
+    (rt.tags NOT LIKE '%teste_ps_pp_grupo_b_intermediacao_autosservico%'
+      AND rt.tags NOT LIKE '%mvp_fup_iq_intermediacao_autosservico%'
+      OR  rt.tags like '%mvp_fup_iq_intermediacao_autosservico%')
     AND COALESCE(DATE(rt.ts_solved_local),DATE(rt.ts_closed_local)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
   UNION ALL
@@ -47,17 +41,11 @@ WITH recontact_data AS (
     rt.ts_updated_local,
     rt.ts_csat_response_submitted AS ts_csat_response_submitted
   FROM
-    datalake_repairs.repair_tickets AS rt
+    datalake_repairs.ongoing_repair_tickets AS rt
   WHERE
-    (rt.channel NOT IN ('call', 'whatsapp')
-    AND rt.tags NOT LIKE '%teste_ps_pp_grupo_b_intermediacao_autosservico%'
-    AND rt.tags NOT LIKE '%mvp_fup_iq_intermediacao_autosservico%'
-    AND rt.client_type NOT LIKE '%prestador%'
-    AND rt.tags NOT LIKE '%reembolso_rep_ong%'
-    AND rt.tags NOT LIKE '%reembolso_sem_autorização%'
-    AND rt.tags NOT LIKE '%tarefacx_ongrep_solicitar_reembolso_reparos%'
-    AND rt.tags NOT LIKE '%whatspp_reparos%'
-    OR  rt.tags like '%mvp_fup_iq_intermediacao_autosservico%')
+    (rt.tags NOT LIKE '%teste_ps_pp_grupo_b_intermediacao_autosservico%'
+      AND rt.tags NOT LIKE '%mvp_fup_iq_intermediacao_autosservico%'
+      OR  rt.tags like '%mvp_fup_iq_intermediacao_autosservico%')
     AND DATE(rt.ts_csat_response_submitted) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 )
 ,without_agg_infos AS (
