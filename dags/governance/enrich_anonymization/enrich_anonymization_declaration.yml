@@ -15,7 +15,7 @@ workflow:
       spark_job_arguments:
         - "{environment}" # env
         - "{bucket}" # datalake_bucket
-        - "{dag_name}" # source
+        - "{schema}" # source
         - "{table_name}"
         - "{load_start_date}" # load_start_date
         - "{load_end_date}"

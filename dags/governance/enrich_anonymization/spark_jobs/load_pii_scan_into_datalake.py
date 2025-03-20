@@ -316,3 +316,5 @@ def main():
         args.table_name,
         partition_cols
     )
+if __name__ == "__main__":
+    main()
