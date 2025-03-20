@@ -9,11 +9,12 @@ workflow:
   type: custom_ingestion
   layer: raw
   load_spark_job: load_incremental_arquivo_confidencial_raw
-  custom_schema: arquivo_confidencial
+  custom_schema: "arquivo_confidencial"
   spark_job_arguments:
   - "{environment}"
   - "{bucket}"
   - "{dag_name}"
+  - "{schema}"
   - "{table_name}"
   tables_customization:
     integration_report:

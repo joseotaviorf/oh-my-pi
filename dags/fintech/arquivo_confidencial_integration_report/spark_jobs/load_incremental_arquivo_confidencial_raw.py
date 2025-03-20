@@ -22,6 +22,7 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
+    parser.add_argument("schema")
     parser.add_argument("table_name")
     parser.add_argument("date_filter_column", help="Date filter column")
     parser.add_argument("execution_date", type=str, help="DAG execution date")
@@ -34,6 +35,7 @@ if __name__ == "__main__":
     environment = args.env
     datalake_bucket = args.datalake_bucket
     source = args.source
+    schema = args.schema
     table_name = args.table_name
     date_filter_column = args.date_filter_column
     execution_date = args.execution_date
@@ -41,7 +43,7 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-                m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
+                m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket}, schema={schema}
                 table_name={table_name}, date_filter_column={date_filter_column}, unixtime_measure={unixtime_measure},
                 execution_date={execution_date}, msg=Starting spark job...
         """
@@ -58,7 +60,7 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     mysql_consumer = MySqlConsumer(conn_config, spark_client)
 
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     metastore_service = SparkMetastoreService(spark_client)
 
     # create database if it doesn't exists
