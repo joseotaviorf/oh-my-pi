@@ -7,6 +7,7 @@ SELECT
     NULLIF(credit_segmentation, '') AS credit_segmentation,
     NULLIF(status_imob, '') AS status_imob,
     NULLIF(status, '') AS status,
-    NULLIF(executivo, '') AS executivo
+    NULLIF(executivo, '') AS executivo,
+    NULLIF(hunter, '') AS hunter
 FROM
     datalake_gsheets_raw.quintocred_real_estates

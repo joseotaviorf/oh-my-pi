@@ -302,3 +302,9 @@ sheets_info:
     sheet_name: quintocred_excluded_proposals
     clean_table_name: quintocred_excluded_proposals
     sheet_context: fintech
+
+  quintocred_wallet_history:
+    sheet_id: 10LrirX0uAGO5oNJ07F1D8n4a6KVMMUyGhfPcb83bS7c
+    sheet_name: wallet_history
+    clean_table_name: quintocred_wallet_history
+    sheet_context: fintech

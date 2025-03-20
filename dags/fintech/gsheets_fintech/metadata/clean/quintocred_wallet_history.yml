@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: quintocred_wallet_history
+columns:
+  executive:
+    lineage:
+      - datalake_gsheets_raw.quintocred_wallet_history.executive
+  id_broker:
+    lineage:
+      - datalake_gsheets_raw.quintocred_wallet_history.id_broker
+  dt_updated:
+    lineage:
+      - datalake_gsheets_raw.quintocred_wallet_history.dt_updated
+  month:
+    lineage:
+      - datalake_gsheets_raw.quintocred_wallet_history.month
+  year:
+    lineage:
+      - datalake_gsheets_raw.quintocred_wallet_history.year

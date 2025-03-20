@@ -4,55 +4,59 @@ table_name: quintocred_executives_targets_commercial
 columns:
   group:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.group
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Portfolio
   team:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.team
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Team
   executive:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.executive
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Executivo
   brokers_wes:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.brokers_wes
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Total_Brokers_wES_Target
   target_contatos:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.target_contatos
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Contatos_Efetivos_Target
   target_evaluation_started:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.target_evaluation_started
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Evaluation_Started_Target
   target_credit_approved:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.target_credit_approved
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Credit_Approved_Target
   target_new_contract:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.target_credit_approved
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.New_Contracts_Target
   effective_contacts:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.effective_contacts
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Contatos_Efetivos_Actual
   registrations:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.registrations
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Registrations_Target
   activations:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.activations
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Activations_Target
   calls:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.calls
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Calls_Target
   online_time:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.online_time
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Online_time_Target
   appointments:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.appointments
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Appointments_Target
   opportunities:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.opportunities
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Opportunities_Target
   month_trunc:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.month_trunc
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Month
   month:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.month
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Month
   year:
     lineage:
-      - datalake_gsheets_raw.quintocred_executives_targets_commercial.year
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Year
+  date:
+    lineage:
+      - datalake_gsheets_raw.quintocred_executives_targets_commercial.Date
+
