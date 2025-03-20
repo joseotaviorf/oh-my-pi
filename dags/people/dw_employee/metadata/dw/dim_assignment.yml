@@ -1,20 +1,27 @@
----
 database_name: dw_employee
 table_name: dim_assignment
 owner: leonardo.soares@quintoandar.com.br
 domain: people
-description: Table with data about the assignments of the employees.
+description: "Table with data about the assignments of the employees."
 columns:
   sk_assignment:
-    description: "Surrogate key for the assignment. Just the id_period_of_service"
+    description: "Surrogate key for the assignment. Just the id_period_of_service."
     lineage:
       - datalake_hr_system.work_relationships.id_period_of_service
+  assignment_number:
+    description: "Unique identifier for the assignment."
+    lineage:
+      - datalake_hr_system.employee_ids.assignment_number
   legacy_registration:
     description: "Legacy employee registration at TMF."
     lineage:
       - datalake_hr_system.employee_ids.legacy_registration
+  legislation_code:
+    description: "Legislation code associated with the assignment."
+    lineage:
+      - datalake_hr_system.work_relationships.legislation_code
   worker_type:
-    description: "Worker type"
+    description: "Type of worker."
     categories:
       "E": "Employee"
       "P": "Pending Worker"
@@ -22,40 +29,31 @@ columns:
       "N": "Nonworker"
     lineage:
       - datalake_hr_system.work_relationships.worker_type
-  assignment_number:
-    description: "Unique identifier for the assignment."
-    lineage:
-      - datalake_hr_system.assignments.assignment_number
   assignment_status_type_code:
-    description: "Column that indicates the status of the assignment."
+    description: "Code that indicates the status of the assignment."
     lineage:
-      - datalake_hr_system.assignments.assignment_status_type_code
+      - datalake_hr_system.assignment_effective_state.assignment_status_type_code
   assignment_status_type:
-    description: "Column that indicates the status of the assignment."
+    description: "Status type of the assignment."
     lineage:
-      - datalake_hr_system.assignment.assignment_status_type
+      - datalake_hr_system.assignment_effective_state.assignment_status_type
   union_name:
     description: "Name of the union that the employee is associated with."
     lineage:
-      - datalake_hr_system.assignments.union_name,
-        '-1')
+      - datalake_hr_system.assignment_effective_state.union_name
   dismissal_type:
     description: "Type of dismissal."
     categories:
-      "Voluntário": "Voluntary"
-      "Involuntário": "Involuntary"
+      "Desligamento Voluntário": "Voluntary"
+      "Desligamento Involuntário": "Involuntary"
+      "Falecimento": "Death"
+      "Transferência entre Empresas": "Transfer between Companies"
     lineage:
       - datalake_hr_system.work_relationships.dt_termination
-      - datalake_hr_system.work_relationships.worker_type
-      - datalake_hr_system.assignment.action_description
       - datalake_hr_system_clean.actions_lov.description
-  salary_currency:
-    description: "Currency of the salary."
-    lineage:
-      - datalake_hr_system_clean.salaries.currency_code
-  reason_last_increase:
-    description: "Reason for last salary increase."
+  reason_last_salary_increase:
+    description: "Reason for the last salary increase."
     lineage:
       - datalake_hr_system_clean.salaries.action_reason
   ts_load:
-    description: "Timestamp of the load."
+    description: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing."

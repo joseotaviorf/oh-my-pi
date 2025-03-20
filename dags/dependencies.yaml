@@ -483,6 +483,7 @@ bietlejuice.dw_demand:
 bietlejuice.dw_employee:
   - bietlejuice.enrich_employee:load-enrich-employee-ids
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids
+  - bietlejuice.enrich_hr_system:load-enrich-assignment-effective-status
   - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
   - bietlejuice.enrich_hr_system:load-enrich-disability
