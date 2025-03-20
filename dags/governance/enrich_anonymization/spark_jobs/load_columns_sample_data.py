@@ -54,22 +54,22 @@ def create_query_to_sample_data(table: Row, load_start_date: str):
     columns = dict_table["table_columns"]
 
     for column in columns:
-        column_sample = """
+        column_sample = f"""
             (
             SELECT
                 '{layer}' AS layer,
                 '{database_name}' AS database_name,
                 '{table_name}' AS table_name,
-                '{column_name}' AS column_name,
-                CAST({column_name} AS STRING) AS column_value
+                '{column}' AS column_name,
+                CAST({column} AS STRING) AS column_value
             FROM
                 {database_name}.{table_name}
             WHERE
-                {column_name} IS NOT NULL
-                OR CAST({column_name} AS STRING) != ''
+                {column} IS NOT NULL
+                OR CAST({column} AS STRING) != ''
             LIMIT 10
             )
-        """.format(layer=layer, database_name=database_name, table_name=table_name, column_name=column)
+        """
 
     if not union_query_sample:
         union_query_sample = column_sample
@@ -109,6 +109,7 @@ def get_columns_to_sample(spark_client: SparkClient, load_start_date: str, load_
             datalake_documentation_metrics_clean.columns_metastore
         WHERE
             MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+            AND layer in ('dw', 'enrich', 'clean')
         ),
         columns_to_sample AS (
         SELECT
@@ -136,7 +137,7 @@ def get_columns_to_sample(spark_client: SparkClient, load_start_date: str, load_
     return spark_client.get_records(sql)
 
 
-def get_sample_data(spark_client: SparkClient, execution_date: datetime, partition_cols: list):
+def get_sample_data(spark_client: SparkClient, table: Row, execution_date: datetime, partition_cols: list):
     sql = create_query_to_sample_data(table, execution_date.strftime("%Y-%m-%d"))
     sample_df = spark_client.get_records(sql)
     return (
