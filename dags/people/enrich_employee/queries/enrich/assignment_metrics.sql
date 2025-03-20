@@ -83,6 +83,17 @@ cte_enrich_disability AS (
   QUALIFY
     ts_last_updated = MAX(ts_last_updated) OVER (PARTITION BY id_person)
     OR ts_last_updated IS NULL
+),
+last_work_relationship AS (
+  SELECT
+    id_period_of_service
+  FROM
+    datalake_hr_system.work_relationships
+  WHERE
+    worker_type <> 'P'
+    AND dt_start < DATE('{load_start_date}')
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_start DESC) = 1
 )
 
 SELECT
@@ -100,19 +111,23 @@ SELECT
   wr.worker_type,
   a.assignment_number AS assignment_number,
   COALESCE(sm.currency_code, -1) AS salary_currency,
+  IF(lw.id_period_of_service IS NOT NULL, TRUE, FALSE) AS is_last_work_relationship,
   CASE
-    WHEN wr.dt_start <= DATE('{load_start_date}')
-      AND wr.worker_type IN ('C', 'E')
-      AND wr.dt_start = MAX(wr.dt_start) OVER (
-        PARTITION BY wr.id_person, wr.worker_type
-        ORDER BY wr.dt_start
-        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    WHEN a.assignment_status_type = 'ACTIVE'
     THEN TRUE
     ELSE FALSE
-  END) AS is_last_work_relationship,
-  a.assignment_status_type = 'ACTIVE' AS is_active,
-  wr.worker_type = 'P' AS is_pending_worker,
-  a.career_track = 'L' OR s.qnt_directly_led > 0 AS is_manager,
+  END AS is_active,
+  CASE
+    WHEN wr.worker_type = 'P'
+    THEN TRUE
+    ELSE FALSE
+  END AS is_pending_worker,
+  CASE
+    WHEN a.career_track = 'L'
+      OR s.qnt_directly_led > 0
+    THEN TRUE
+    ELSE FALSE
+  END AS is_manager,
   COALESCE(d.has_self_declared_disability, FALSE) AS has_self_declared_disability,
   IF(wr.worker_type = 'P', 0, INT(MONTHS_BETWEEN(COALESCE(wr.dt_termination, DATE('{load_start_date}')), wr.dt_start))) AS assignment_age_months,
   COALESCE(s.qnt_directly_led, 0) AS qnt_directly_led,
@@ -162,6 +177,9 @@ LEFT JOIN
 LEFT JOIN
   cte_enrich_disability AS d
     ON wr.id_person = d.id_person
+LEFT JOIN
+  last_work_relationship AS lw
+    ON lw.id_period_of_service = wr.id_period_of_service
 WHERE
   (wr.dt_start <= DATE('{load_start_date}')
     AND wr.worker_type IN ('E', 'C'))
