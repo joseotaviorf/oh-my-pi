@@ -11,5 +11,3 @@ SELECT
     day
 FROM
     datalake_person_raw.preference_settings
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
