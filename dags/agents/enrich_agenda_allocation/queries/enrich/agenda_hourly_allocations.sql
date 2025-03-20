@@ -104,6 +104,7 @@ daily_agent_region_group AS (
         arg.dadosagente_id AS id_agent,
         arg.area,
         arg.area_deprecated,
+        ROW_NUMBER() OVER (PARTITION BY arg.dadosagente_id ORDER BY arg.dt DESC) = 1 AS is_last_updated,
         arg.dt AS dt_reference
     FROM
         datalake_agenda_allocation.agent_region_group AS arg
@@ -117,7 +118,9 @@ SELECT
     ash.id_slot_date,
     CAST(DATE_FORMAT(ash.ts_slot_hour, 'yyyyMMddHH') AS BIGINT) AS id_slot_date_hour, 
     COALESCE(
-        CAST(DATE_FORMAT(arg.dt_reference, 'yyyyMMddHH') || ash.id_agent AS BIGINT)
+        CAST(DATE_FORMAT(
+          COALESCE(arg.dt_reference, arg_future.dt_reference)
+          , 'yyyyMMddHH') || ash.id_agent AS BIGINT)
         , -1
     ) AS id_agent_region,
     CAST(ash.id_slot_date || ash.id_agent AS BIGINT) AS id_slot_date_agent,
@@ -127,8 +130,8 @@ SELECT
     ash.allocated_slots,
     ash.specific_allocated_slots,
     abc.agent_business_context,
-    COALESCE(arg.area, '-1') AS area,
-    COALESCE(arg.area_deprecated, '-1') AS area_deprecated,
+    COALESCE(arg.area, arg_future.area, '-1') AS area,
+    COALESCE(arg.area_deprecated, arg_future.area_deprecated, '-1') AS area_deprecated,
     COALESCE(
         CASE HOUR(ash.ts_slot_hour)
             WHEN 8 THEN mwh.has_hours_between_08_and_09_available
@@ -165,6 +168,11 @@ LEFT JOIN
     daily_agent_region_group AS arg
         ON arg.id_agent = ash.id_agent
         AND arg.dt_reference = d.date
+LEFT JOIN 
+    daily_agent_region_group AS arg_future
+        ON arg_future.id_agent = ash.id_agent
+        AND arg.id_agent IS NULL
+        AND arg_future.is_last_updated IS TRUE
 LEFT JOIN 
     first_booking AS fb
         ON fb.id_agent = ash.id_agent
