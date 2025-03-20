@@ -24,9 +24,6 @@ Produces the following output tables:
 
     `category_house`
     `category`
-    `condo_manager_emails`
-    `condo_manager_phones`
-    `condo_names_history`
     `conservation_item_functional`
     `conservation_item_status`
     `conservation_room`

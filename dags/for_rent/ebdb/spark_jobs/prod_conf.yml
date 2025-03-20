@@ -504,6 +504,9 @@ table_block_list:
   - RegionConfig
   - ContaConsumo
   - ContaConsumo_AUD
+  - CondoManagerEmails
+  - CondoManagerPhones
+  - CondoNamesHistory
 
 view_allow_list: []
 
