@@ -41,6 +41,7 @@ dags_out_of_pattern:
         "reverse_tracksale",
         "reverse_webhelp",
         "reverse_birdie",
+        "reverse_birdie_access",
         "reverse_webhelp_test",
         "survicate_surveys",
         "survicate_survey_attributes",

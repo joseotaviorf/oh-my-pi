@@ -3456,6 +3456,8 @@ bietlejuice.reverse_atlas_pricing_report_access:
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-engagement
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-listing-price-history
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-region
+bietlejuice.reverse_birdie_access:
+  - bietlejuice.reverse_birdie:load-reverse-dummy-nps-answer
 bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
   - bietlejuice.enrich_superset:load-enrich-dashboards

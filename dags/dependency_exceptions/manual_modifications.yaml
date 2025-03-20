@@ -777,6 +777,9 @@ bietlejuice.reverse_atento_access:
     - bietlejuice.reverse_atento:load-reverse-tickets-transferred
     - bietlejuice.reverse_atento:load-reverse-tmr
     - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
+bietlejuice.reverse_birdie_access:
+  add:
+    - bietlejuice.reverse_birdie:load-reverse-dummy-nps-answer
 bietlejuice.reverse_dashboard_governance:
   add:
     - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
