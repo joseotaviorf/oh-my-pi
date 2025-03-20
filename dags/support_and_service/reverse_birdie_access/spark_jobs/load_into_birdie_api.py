@@ -150,7 +150,7 @@ def main():
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    api_key = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.BIRDIE_API)
+    api_key = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.BIRDIE)
     headers = {
       'Content-type': 'application/json', 
       'Authorization': api_key}
