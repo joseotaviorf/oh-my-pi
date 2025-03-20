@@ -1,150 +1,161 @@
+---
 database_name: dw_employee
 table_name: fact_employees
 owner: isabella.araujo@quintoandar.com.br
 domain: people
-description: " This table considers only employees with worker_type = C or E, excluding pending workers."
+description: "This table considers only employees with worker_type = C or E, excluding pending workers."
 columns:
   sk_assignment:
     description: "Unique identifier for the period of service related to the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_period_of_service
+      - datalake_hr_system.assignment_metrics.sk_assignment
   sk_employee:
     description: "Unique identifier for the person related to the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_person
+      - datalake_hr_system.assignment_metrics.sk_employee
   sk_demographic_information:
     description: "Unique identifier for the demographic information related to the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_demographic_information
+      - datalake_hr_system.assignment_metrics.sk_demographic_information
   sk_cost_center:
     description: "Unique identifier for the cost center related to the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_cost_center
+      - datalake_hr_system.assignment_metrics.sk_cost_center
   sk_business_unit:
     description: "Unique identifier for the business unit related to the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_business_unit
+      - datalake_hr_system.assignment_metrics.sk_business_unit
   sk_job:
     description: "Unique identifier for the job related to the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_job
+      - datalake_hr_system.assignment_metrics.sk_job
   sk_manager:
     description: "Unique identifier for the manager related to the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_manager
+      - datalake_hr_system.assignment_metrics.sk_manager
   sk_manager_assignment:
     description: "Unique identifier for the manager’s assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_manager_assignment
+      - datalake_hr_system.assignment_metrics.sk_manager_assignment
   sk_disability:
     description: "Unique identifier for the disability related to the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_disability
-  sk_start_work_relationship_date:
-    description: "Start date of the work relationship related to the assignment, formatted as SK."
+      - datalake_hr_system.assignment_metrics.sk_disability
+  sk_work_relationship_started_date:
+    description: "Start date of the work relationship, formatted as SK."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_start_work_relationship_date
-  sk_hiring_date:
-    description: "Hiring date of the employee, formatted as SK."
+      - datalake_hr_system.assignment_metrics.dt_work_relationship_started
+  sk_work_relationship_ended_date:
+    description: "End date of the work relationship, formatted as SK."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_hiring_date
-  sk_termination_work_relationship_date:
-    description: "Termination date of the work relationship related to the assignment, formatted as SK (replacing hyphens with spaces)."
-    lineage:
-      - datalake_hr_system.assignments_metrics.sk_termination_work_relationship_date
+      - datalake_hr_system.assignment_metrics.dt_work_relationship_terminated
   sk_last_increase_date:
-    description: "Date of the last increase related to the assignment, formatted as SK."
+    description: "Date of the last salary increase, formatted as SK."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_last_increase_date
+      - datalake_hr_system.assignment_metrics.sk_last_increase_date
   sk_first_promotion_date:
-    description: "Date of the first promotion related to the assignment, formatted as SK."
+    description: "Date of the first promotion, formatted as SK."
     lineage:
-      - datalake_hr_system.assignments_metrics.sk_first_promotion_date
+      - salaries_for_employee.dt_first_promotion
+  sk_hierarchy:
+    description: "Unique identifier for the hierarchy related to the assignment."
+    lineage:
+      - datalake_hr_system.hierarchy_ids.sk_hierarchy
+  assignment_number:
+    description: "Employee registration number in PIN."
+    lineage:
+      - datalake_hr_system.assignment_metrics.assignment_number
+  salary_currency_code:
+    description: "Currency code of the salary."
+    lineage:
+      - datalake_hr_system.assignment_metrics.salary_currency
   is_active:
     description: "Indicates if the assignment is active (TRUE or FALSE)."
     lineage:
-      - datalake_hr_system.assignments_metrics.is_active
+      - datalake_hr_system.assignment_metrics.is_active
   is_pending_worker:
     description: "Indicates if the worker is pending (TRUE or FALSE)."
     lineage:
-      - datalake_hr_system.assignments_metrics.is_pending_worker
+      - datalake_hr_system.assignment_metrics.is_pending_worker
   is_manager:
     description: "Indicates if the assignment is for a managerial position (TRUE or FALSE)."
     lineage:
-      - datalake_hr_system.assignments_metrics.is_manager
+      - datalake_hr_system.assignment_metrics.is_manager
   has_self_declared_disability:
-    description: "Indicates if the worker has self-declared disability (TRUE or FALSE), self declared."
+    description: "Indicates if the worker has self-declared disability (TRUE or FALSE)."
     lineage:
-      - datalake_hr_system.assignments_metrics.has_self_declared_disability
+      - datalake_hr_system.assignment_metrics.has_self_declared_disability
   assignment_age_months:
     description: "Age of the assignment in months."
     lineage:
-      - datalake_hr_system.assignments_metrics.assignment_age_months
+      - datalake_hr_system.assignment_metrics.assignment_age_months
   qnt_directly_led:
     description: "Number of employees directly led by the manager."
     lineage:
-      - datalake_hr_system.assignments_metrics.qnt_directly_led
+      - datalake_hr_system.assignment_metrics.qnt_directly_led
   qnt_undirectly_led:
     description: "Number of employees indirectly led by the manager."
     lineage:
-      - datalake_hr_system.assignments_metrics.qnt_undirectly_led
+      - datalake_hr_system.assignment_metrics.qnt_undirectly_led
+  qnt_promotions:
+    description: "Number of promotions during the assignment."
+    lineage:
+      - datalake_hr_system.assignment_metrics.qnt_promotions
   salary:
     description: "Salary of the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.salary
+      - datalake_hr_system.assignment_metrics.salary
   target_plr:
     description: "Target PLR (Profit Sharing)."
     lineage:
-      - datalake_hr_system.assignments_metrics.target_plr
+      - datalake_hr_system.assignment_metrics.target_plr
   salary_range_midpoint:
     description: "Midpoint of the salary range for the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.salary_range_midpoint
+      - datalake_hr_system.assignment_metrics.salary_reference
   qnt_movimentations:
-    description: "Number of movements during the assignment."
+    description: "Number of salary movements."
     lineage:
-      - datalake_hr_system.assignments_metrics.qnt_movimentations_employee
+      - salaries_for_employee.qnt_movimentations
   average_time_between_movimentations:
     description: "Average time between movements during the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.average_time_between_movimentations_employee
-  last_increase:
+      - salaries_for_employee.average_time_between_movimentations
+  last_salary_increase:
     description: "Last salary increase amount."
     lineage:
-      - datalake_hr_system.assignments_metrics.last_increase
-  pct_last_increase:
+      - datalake_hr_system.assignment_metrics.last_increase
+  pct_last_salary_increase:
     description: "Last salary increase percentage."
     lineage:
-      - datalake_hr_system.assignments_metrics.pct_last_increase
+      - datalake_hr_system.assignment_metrics.pct_last_increase
   first_salary:
     description: "Initial salary for the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.first_salary_employee
+      - salaries_for_employee.first_salary
   last_salary:
     description: "Most recent salary for the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.last_salary
+      - datalake_hr_system.assignment_metrics.last_salary
   range_salary_movement:
     description: "Salary movement range during the assignment."
     lineage:
-      - datalake_hr_system.assignments_metrics.range_salary_movement_employee
+      - salaries_for_employee.range_salary_movement
   first_promotion_salary:
     description: "Salary after the first promotion."
     lineage:
-      - datalake_hr_system.assignments_metrics.first_promotion_salary
-  nominal_increase_first_promotion:
+      - salaries_for_employee.first_promotion_salary
+  nominal_salary_increase_first_promotion:
     description: "Nominal increase after the first promotion."
     lineage:
-      - datalake_hr_system.assignments_metrics.nominal_increase_first_promotion_employee
-  pct_increase_first_promotion:
+      - salaries_for_employee.nominal_increase_first_promotion
+  pct_salary_increase_first_promotion:
     description: "Percentage increase after the first promotion."
     lineage:
-      - datalake_hr_system.assignments_metrics.pct_increase_first_promotion_employee
+      - salaries_for_employee.pct_increase_first_promotion
   months_to_first_promotion:
     description: "Months to the first promotion."
     lineage:
-      - datalake_hr_system.assignments_metrics.months_to_first_promotion_employee
+      - salaries_for_employee.months_to_first_promotion
   ts_load:
-    description: "Timestamp of when the data was loaded."
-    lineage:
-      - datalake_hr_system.assignments_metrics.NOW()
+    description: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing."

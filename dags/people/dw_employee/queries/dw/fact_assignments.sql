@@ -1,15 +1,3 @@
-WITH
-latest_assignments AS (
-    SELECT
-        id_assignment, assignment_status_type
-    FROM
-        datalake_hr_system.assignments
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY id_assignment
-            ORDER BY dt_effective_start DESC, ts_last_update DESC) = 1
-)
-
 SELECT
   am.sk_assignment,
   am.sk_employee,
@@ -20,12 +8,12 @@ SELECT
   am.sk_job,
   am.sk_manager,
   am.sk_manager_assignment,
-  REPLACE(am.dt_work_relationship_started, '-', '') AS sk_start_work_relationship_date,
-  REPLACE(am.dt_work_relationship_ended, '-', '') AS sk_termination_work_relationship_date,
+  REPLACE(am.dt_work_relationship_started, '-', '') AS sk_work_relationship_started_date,
+  REPLACE(am.dt_work_relationship_terminated, '-', '') AS sk_work_relationship_ended_date,
   h.sk_hierarchy,
   am.assignment_number,
-  am.salary_currency,
-  am.sk_last_increase_date,
+  am.salary_currency AS salary_currency_code,
+  am.sk_last_increase_date AS sk_last_salary_increase_date,
   am.sk_first_promotion_date,
   am.is_last_work_relationship,
   am.is_active,
@@ -40,16 +28,16 @@ SELECT
   am.salary_reference,
   am.qnt_movimentations,
   am.average_time_between_movimentations,
-  am.last_increase,
-  am.pct_last_increase,
+  am.last_increase AS last_salary_increase,
+  am.pct_last_increase AS pct_last_salary_increase,
   am.first_salary,
   am.last_salary,
   am.range_salary_movement,
   am.first_promotion_salary,
-  am.nominal_increase_first_promotion,
-  am.pct_increase_first_promotion,
+  am.nominal_increase_first_promotion AS nominal_salary_increase_first_promotion,
+  am.pct_increase_first_promotion AS pct_salary_increase_first_promotion,
   am.months_to_first_promotion,
-  NOW () AS ts_load
+  NOW() AS ts_load
 FROM
   datalake_hr_system.assignment_metrics AS am
 LEFT JOIN

@@ -4,7 +4,7 @@ WITH
             sk_employee,
             sk_assignment,
             dt_work_relationship_started,
-            dt_work_relationship_ended,
+            dt_work_relationship_terminated,
             LEAD (dt_work_relationship_started, 1) OVER (
                 PARTITION BY
                     sk_employee
@@ -14,7 +14,7 @@ WITH
             COALESCE(
                 DATEDIFF (
                     DAY,
-                    dt_work_relationship_ended,
+                    dt_work_relationship_terminated,
                     next_dt_work_relationship_started
                 ),
                 -1
@@ -266,43 +266,6 @@ WITH
         WHERE
             qnt_movimentations = 1
             OR change_date = dt_last_increase
-    ),
-    latest_assignments AS (
-        SELECT
-            id_assignment, assignment_status_type
-        FROM
-            datalake_hr_system.assignments
-        QUALIFY
-            ROW_NUMBER() OVER (
-                PARTITION BY id_assignment
-                ORDER BY dt_effective_start DESC, ts_last_update DESC) = 1
-    ),
-    subordinates AS (
-        SELECT
-            id_manager_period_of_service AS id_assignment,
-            SUM(
-                IF(
-                    mh.is_direct_manager
-                    AND la.assignment_status_type = 'ACTIVE',
-                    1,
-                    0
-                )
-            ) AS qnt_directly_led,
-            SUM(
-                IF(
-                    NOT mh.is_direct_manager
-                    AND la.assignment_status_type = 'ACTIVE',
-                    1,
-                    0
-                )
-            ) AS qnt_undirectly_led
-        FROM
-            datalake_hr_system.management_hierarchy AS mh
-        LEFT JOIN
-            latest_assignments AS la
-                ON la.id_assignment = mh.id_assignment
-        GROUP BY
-            id_manager_period_of_service
     )
 
 SELECT
@@ -315,45 +278,41 @@ SELECT
     am.sk_manager,
     am.sk_manager_assignment,
     am.sk_disability,
-    REPLACE (am.dt_work_relationship_started, '-', '') AS sk_work_relationship_started_date,
-    REPLACE (am.dt_work_relationship_ended, '-', '') AS sk_dt_work_relationship_ended,
-    am.sk_last_increase_date,
-    REPLACE (se.dt_first_promotion, '-', '') AS sk_dt_first_promotion,
+    REPLACE(am.dt_work_relationship_started, '-', '') AS sk_work_relationship_started_date,
+    REPLACE(am.dt_work_relationship_terminated, '-', '') AS sk_work_relationship_ended_date,
+    am.sk_last_increase_date AS sk_last_salary_increase_date,
+    REPLACE(se.dt_first_promotion, '-', '') AS sk_first_promotion_date,
     h.sk_hierarchy,
     am.assignment_number,
-    am.salary_currency,
-    am.is_last_work_relationship,
+    am.salary_currency AS salary_currency_code,
     am.is_active,
     am.is_pending_worker,
     am.is_manager,
     am.has_self_declared_disability,
     am.assignment_age_months,
-    COALESCE(s.qnt_directly_led, 0) AS qnt_directly_led,
-    COALESCE(s.qnt_undirectly_led, 0) AS qnt_undirectly_led,
+    am.qnt_directly_led,
+    am.qnt_undirectly_led,
     am.qnt_promotions,
     am.salary,
     am.target_plr,
-    am.salary_reference AS salary_range_midpoint,
+    am.salary_reference,
     se.qnt_movimentations,
     se.average_time_between_movimentations,
-    am.last_increase,
-    am.pct_last_increase,
+    am.last_increase AS last_salary_increase,
+    am.pct_last_increase AS pct_last_salary_increase,
     se.first_salary,
     am.last_salary,
     se.range_salary_movement,
     se.first_promotion_salary,
-    se.nominal_increase_first_promotion,
-    se.pct_increase_first_promotion,
+    se.nominal_increase_first_promotion AS nominal_salary_increase_first_promotion,
+    se.pct_increase_first_promotion AS pct_salary_increase_first_promotion,
     se.months_to_first_promotion,
-    NOW () AS ts_load
+    NOW() AS ts_load
 FROM
     datalake_hr_system.assignment_metrics AS am
 LEFT JOIN
     salaries_for_employee AS se
         ON am.sk_employee = se.id_person
-LEFT JOIN
-    subordinates AS s
-        ON s.id_assignment = am.sk_assignment
 LEFT JOIN
     datalake_hr_system.hierarchy_ids AS h
         ON h.sk_assignment = am.sk_assignment

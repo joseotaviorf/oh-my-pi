@@ -100,12 +100,16 @@ SELECT
   wr.worker_type,
   a.assignment_number AS assignment_number,
   COALESCE(sm.currency_code, -1) AS salary_currency,
-  wr.dt_start <= DATE('{load_start_date}')
-    AND wr.dt_start = MAX(wr.dt_start) OVER (
-      PARTITION BY wr.id_person
-      ORDER BY wr.dt_start
-      ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-  ) AS is_last_work_relationship,
+  CASE
+    WHEN wr.dt_start <= DATE('{load_start_date}')
+      AND wr.worker_type IN ('C', 'E')
+      AND wr.dt_start = MAX(wr.dt_start) OVER (
+        PARTITION BY wr.id_person, wr.worker_type
+        ORDER BY wr.dt_start
+        ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    THEN TRUE
+    ELSE FALSE
+  END) AS is_last_work_relationship,
   a.assignment_status_type = 'ACTIVE' AS is_active,
   wr.worker_type = 'P' AS is_pending_worker,
   a.career_track = 'L' OR s.qnt_directly_led > 0 AS is_manager,
