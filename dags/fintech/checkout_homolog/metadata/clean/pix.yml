@@ -1,0 +1,115 @@
+---
+database_name: datalake_checkout_homolog_clean
+table_name: pix
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.id
+  id_charge:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.charge_id
+  id_transaction:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.transaction_id
+  id_bank_payment:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.bank_payment_id
+  id_requester:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.requester_id
+  due_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.due_amount
+  status:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.status
+  pix_link:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.pix_link
+  emv:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.emv
+  qr_code:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.qr_code
+  payer_name:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.payer_name
+  payer_identifiable_document:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.payer_identifiable_document
+  payer_person_type:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.payer_person_type
+  payer_email:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.payer_email
+  payer_city:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.payer_city
+  payer_neighborhood:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.payer_neighborhood
+  payer_state:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.payer_state
+  payer_street_address:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.payer_street_address
+  payer_zipcode:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.payer_zipcode
+  requester_name:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.requester_name
+  expiration_in_seconds:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.expiration_in_seconds
+  payer_solicitation:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.payer_solicitation
+  additional_info:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.additional_info
+  ts_started_processing:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.TIMESTAMP(started_processing_at)
+  ts_paid:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.TIMESTAMP(paid_at)
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.TIMESTAMP(created_at)
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.pix.TIMESTAMP(updated_at)

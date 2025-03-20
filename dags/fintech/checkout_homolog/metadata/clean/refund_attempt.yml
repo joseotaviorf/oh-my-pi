@@ -1,0 +1,67 @@
+---
+database_name: datalake_checkout_homolog_clean
+table_name: refund_attempt
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.id
+  id_order:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.order_id
+  id_charge:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.charge_id
+  id_payment:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.payment_id
+  refunded_by:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.refunded_by
+  payment_method:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.payment_method
+  reason:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.reason
+  status:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.status
+  error_message:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.error_message
+  refund_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.refund_amount
+  ts_requested:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.TIMESTAMP(requested_at)
+  ts_completed:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.TIMESTAMP(completed_at)
+  ts_failed:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.TIMESTAMP(failed_at)
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.TIMESTAMP(created_at)
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.refund_attempt.TIMESTAMP(updated_at)

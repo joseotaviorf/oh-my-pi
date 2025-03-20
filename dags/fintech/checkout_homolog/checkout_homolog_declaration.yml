@@ -1,0 +1,57 @@
+dag:
+  name: checkout_homolog
+  schedule_start_date: 2020,10,1
+  schedule_interval: 0 3 * * *
+  owner: Data Fintech
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  source_database: checkout
+  custom_schema: checkout_homolog
+  dbutils_secret_key: CHECKOUT_DB
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
+  tables_customization:
+    bank_account: {}
+    bolecode: {}
+    boleto: {}
+    boleto_webhook: {}
+    boleto_webhook_config: {}
+    change_owner_control: {}
+    charge: {}
+    charge_status_log: {}
+    credit_card: {}
+    credit_card_acquire_fee: {}
+    credit_card_capture_attempt: {}
+    credit_card_fee: {}
+    credit_card_fee_installment: {}
+    credit_card_status_log: {}
+    credit_card_token: {}
+    credit_card_webhook: {}
+    order: {}
+    payment_config: {}
+    payment_gateway_error: {}
+    permission: {}
+    pix: {}
+    pix_refund: {}
+    pix_webhook: {}
+    refund_attempt: {}
+    requester: {}
+    requester_role: {}
+    role: {}
+    role_permission: {}
+    webhook: {}
+cluster:
+  type: databricks_12_2_med_general_photon_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

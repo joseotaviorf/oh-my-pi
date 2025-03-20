@@ -1,0 +1,39 @@
+---
+database_name: datalake_checkout_homolog_clean
+table_name: payment_gateway_error
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.payment_gateway_error.id
+  id_requester:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.payment_gateway_error.requester_id
+  original_payload:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.payment_gateway_error.original_payload
+  payment_gateway_response:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.payment_gateway_error.payment_gateway_response
+  payment_gateway:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.payment_gateway_error.payment_gateway
+  payment_method:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.payment_gateway_error.payment_method
+  ts_sent:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.payment_gateway_error.TIMESTAMP(sent_at)
+  ts_error:
+    description: ''
+    lineage:
+    - datalake_checkout_homolog_raw.payment_gateway_error.TIMESTAMP(error_at)
