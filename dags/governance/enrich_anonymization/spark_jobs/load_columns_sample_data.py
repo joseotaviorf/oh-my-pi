@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from argparse import ArgumentParser
 
-from pyspark.sql import DataFrame
+from pyspark.sql import DataFrame, Row
 from pyspark.errors import AnalysisException
 
 from bietlejuice.clients.db_clients import SparkClient
@@ -43,14 +43,7 @@ def load_table(
     )
 
 
-def create_query_to_sample_data(table: list):
-    """
-    Create a query to sample the data.
-
-    :param columns: List of columns to be smapled.
-    :type columns: List
-    :rtype: str
-    """
+def create_query_to_sample_data(table: Row, load_start_date: str):
     union_query_sample = ""
 
     dict_table = table.asDict()
@@ -92,7 +85,7 @@ def create_query_to_sample_data(table: list):
             table_name,
             column_name,
             array_agg(column_value) AS sample,
-            date_sub(current_timestamp(), 1) AS ts_ingest
+            to_timestamp("{load_start_date}") as
         FROM
             sample
         GROUP BY
@@ -104,13 +97,6 @@ def create_query_to_sample_data(table: list):
 
 
 def get_columns_to_sample(spark_client: SparkClient, load_start_date: str, load_end_date: str):
-    """
-    Read documentation_metrics.columns_metastore to identify all datalake tables and sample data.
-
-    :param sparck_client: QuintoAndar class to manage spark session
-    :type spark_client: SparkClient
-    :rtype: PySpark DataFrame
-    """
     sql = """
         WITH columns_datalake AS (
         SELECT
@@ -151,7 +137,7 @@ def get_columns_to_sample(spark_client: SparkClient, load_start_date: str, load_
 
 
 def get_sample_data(spark_client: SparkClient, execution_date: datetime, partition_cols: list):
-    sql = create_query_to_sample_data(table)
+    sql = create_query_to_sample_data(table, execution_date.strftime("%Y-%m-%d"))
     sample_df = spark_client.get_records(sql)
     return (
         SparkDataFrameService()
@@ -169,9 +155,9 @@ if __name__ == "__main__":
     parser.add_argument("source", type=str)
     parser.add_argument("table_name", type=str)
     parser.add_argument("load_start_date", type=str)
-    parser.add_argument("load_end_date", tyoe=str)
+    parser.add_argument("load_end_date", type=str)
     parser.add_argument("partitions", type=str)
-    parser.add_argument("merge_on", type=list)
+    parser.add_argument("merge_on", type=str)
 
     args = parser.parse_args()
     env = args.env
@@ -182,7 +168,7 @@ if __name__ == "__main__":
     load_end_date = args.load_end_date
     execution_date = datetime.strptime(load_start_date, "%Y-%m-%d")
     partition_cols = ast.literal_eval(args.partitions)
-    merge_on = args.merge_on
+    merge_on = ast.literal_eval(args.merge_on)
 
     spark_client = SparkClient()
 
