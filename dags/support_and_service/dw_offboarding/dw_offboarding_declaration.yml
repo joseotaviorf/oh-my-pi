@@ -21,8 +21,8 @@ workflow:
       merge_on: [sk_termination]
     fact_house_listing_terminations:
       z_order_by: [sk_termination]
-      merge_on: [sk_termination]
-
+      extraction_type: full
+      partitions: []
 cluster:
   type: custom_cluster
   custom_configurations:

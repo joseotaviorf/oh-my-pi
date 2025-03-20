@@ -37,6 +37,3 @@ LEFT JOIN
 LEFT JOIN
   datalake_ebdb_listing.house_listing AS next_hl
     ON hl.id_next_house_listing_consolidated = next_hl.id_house_listing
-WHERE
-  (DATE(t.ts_termination_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  OR DATE(c.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}'))
