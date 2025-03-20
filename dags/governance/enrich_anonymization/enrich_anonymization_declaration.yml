@@ -1,0 +1,45 @@
+dag:
+  name: enrich_anonymization
+  owner: Data Governance
+  schedule_start_date: 2025, 3, 12
+  documentation:
+    dag_purpose: This DAG sample all data lake tables data, so we can analyse and classify PII information.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_partitions: [year, month, day]
+  tables_customization:
+    columns_sample_data:
+      load_spark_job: load_columns_sample_data
+      spark_job_arguments:
+        - "{environment}" # env
+        - "{bucket}" # datalake_bucket
+        - "{dag_name}" # source
+        - "{table_name}"
+        - "{load_start_date}" # load_start_date
+        - "{load_end_date}"
+        - "{partitions}"
+        - '["id_entity"]'
+    pii_scan_results:
+      load_spark_job: load_pii_scan_into_datalake
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{table_name}"
+        - "{load_start_date}"
+        - "{partitions}"
+  inner_dependencies:
+    pii_scan_results:
+      - columns_sample_data
+cluster:
+  type: databricks_13_3_med_memory_general_cluster
+  custom_libraries:
+    - pypi:
+        package: "presidio_analyzer==2.2.357"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,0 +1,103 @@
+# Source: https://github.com/microsoft/presidio/blob/main/presidio-analyzer/presidio_analyzer/conf/example_recognizers.yaml
+# Documentation: https://microsoft.github.io/presidio/analyzer/adding_recognizers/
+recognizers:
+  - name: "Brazil CPF Recognizer"
+    supported_language: "en"
+    patterns:
+      - name: "Brazil CPF Regex (weak)"
+        regex: "\\b\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}\\b"
+        score: 0.85
+      - name: "Brazil CPF column name Regex (weak)"
+        regex: ".*cpf.*"
+        score: 0.85
+    context:
+      - cpf
+    supported_entity: "BRAZIL_CPF"
+  - name: "Brazil RG Recognizer"
+    supported_language: "en"
+    patterns:
+      - name: "Brazil RG regex (weak)"
+        regex: "(^\\d{1,2}).?(\\d{3}).?(\\d{3})-?(\\d{1}|X|x$)"
+        score: 0.85
+      - name: "Brazil RG column name Regex (weak)"
+        regex: "rg|RG|identidade|identidade_.*"
+        score: 0.85
+    supported_entity: "BRAZIL_RG"
+  - name: "Brazil CNPJ Recognizer"
+    supported_language: "en"
+    patterns:
+      - name: "Brazil CNPJ regex (weak)"
+        regex: "(^\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}$)"
+        score: 0.85
+      - name: "Brazil CNPJ column name Regex (weak)"
+        regex: "cnpj|CNPJ|cnpj_.*"
+        score: 0.85
+    supported_entity: "BRAZIL_CNPJ"
+  - name: "Brazil Location Recognizer"
+    supported_language: "en"
+    patterns:
+      - name: "Brazil CEP Regex (weak)"
+        regex: "\\b\\d{5}-?\\d{3}\\b"
+        score: 0.85
+      - name: "Brazil CEP column name Regex (weak)"
+        regex: ".*cep.*"
+        score: 0.85
+      - name: "Address column name regex (weak)"
+        regex: "\\b(address|addr|street|st|road|rd|avenue|ave|boulevard|blvd|lane|way|drive|place|city|state|endereço|endereco|rua|rua_|avenida|av|logradouro|bairro|cidade|estado|neighborhood|complement|complemento|Apto|apto|apto_|bloco|casa|torre|Torre)\\b"
+        score: 0.85
+      - name: "Zip Code column name regex (weak)"
+        regex: "\\b(zip(_)?code|zip|postal(_)?code|postcode|cep|código(_)?postal|cod(_)?postal)\\b"
+        score: 0.85
+    context:
+      - CEP
+      - cep
+      - Rua
+      - Avenida
+      - Av
+      - Av.
+    supported_entity: "LOCATION"
+  - name: "Brazil Phone Number Recognizer"
+    supported_language: "en"
+    patterns:
+      - name: "Phone Number column name regex (weak)"
+        regex: "phone_.*|number|telefone"
+        score: 0.85
+    context:
+      - Phone Number
+      - Telefone
+      - Celular
+      - Whatsapp
+    supported_entity: "PHONE_NUMBER"
+  - name: "Brazil Email Recognizer"
+    supported_language: "en"
+    patterns:
+      - name: "Email column name regex (weak)"
+        regex: "mail|email|e_mail"
+        score: 0.85
+    context:
+      - Email
+      - E-mail
+      - email
+    supported_entity: "EMAIL_ADDRESS"
+  - name: "Brazil Name Recognizer"
+    supported_language: "en"
+    patterns:
+      - name: "Name column name regex (weak)"
+        regex: "nome|nome_completo|name|fullname|full_name|first_name|last_name|nome_.*|sobrenome|last_name"
+        score: 0.85
+    context:
+      - Nome
+      - Name
+    supported_entity: "PERSON"
+
+  - name: "Brazil Birth Date Recognizer"
+    supported_language: "en"
+    patterns:
+      - name: "Birth Date column name regex (weak)"
+        regex: "\\b(dob|date(_of)?_birth|birth(_)?date|data(_de)?_nascimento|nascimento|dn|birthdate)\\b"
+        score: 0.85
+    context:
+      - Nascimento
+      - Aniversario
+      - Birth Date
+    supported_entity: "BIRTH_DATE"

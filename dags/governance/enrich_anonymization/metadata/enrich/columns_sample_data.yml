@@ -1,0 +1,33 @@
+---
+database_name: datalake_anonymization
+table_name: columns_sample_data
+owner: herivelto.junior@quintoandar.com.br
+domain: Data Ops & Governance
+description: Table with sample of all datalake tables.
+columns:
+  layer:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_metastore.layer
+    description: This column indicates the layer of this table
+  database_name:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_metastore.database_name
+    documentation: This column indicates the schema name of the table
+  table_name:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_metastore.table_name
+    description: This column indicates the name of the tables
+  column_name:
+    lineage:
+      - datalake_documentation_metrics_clean.columns_metastore.column_name
+    description: This column indicates the name of the column
+  sample:
+    description: This colum bring a sample data to this column
+  ts_ingest:
+    description: Indicate the ingestion time, the timestima this gable was updated
+  year:
+    description: This column indicates the year this table was updated
+  month:
+    description: This column indicates the month in which the table was updated
+  day:
+    description: This column indicates the day the table was updated
