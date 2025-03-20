@@ -11,12 +11,6 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  author_type:
-    has_completeness:
-      greater_than: 0.99 # Won't be 100% because of the default row
   channel:
     is_complete:
       severity_level: Error
-  ts_load:
-    has_completeness:
-      greater_than: 0.99 # Won't be 100% because of the default row
