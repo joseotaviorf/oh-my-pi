@@ -42,7 +42,8 @@ def parse_arguments():
     args.execution_date = parser.parse(args.execution_date)
 
     config_service = ConfigurationService(args.source)
-    args.path = config_service.get_config("path")
+    args.input_path = config_service.get_config("input_path")
+    args.output_path = config_service.get_config("output_path")
 
     return args
 
@@ -126,7 +127,7 @@ def main():
     )
 
     input_path = (
-        f"{args.path}/raw/"
+        f"{args.input_path}/raw/"
         f"{args.execution_date.year}/{args.execution_date.month:02}/{args.execution_date.day:02}/*/"
         "events-*.json.gz"
     )
@@ -143,7 +144,7 @@ def main():
     loader = DeltaLoader()
     loader.load_table(
         table_name=full_clean_table_name,
-        path=f"{args.path}/clean/{args.schema}/{args.table_name}/",
+        path=f"{args.output_path}/clean/{args.schema}/{args.table_name}/",
         source_df=df,
         partition_by=args.partition_cols,
     )
