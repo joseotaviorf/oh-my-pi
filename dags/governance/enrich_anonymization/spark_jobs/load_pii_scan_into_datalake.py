@@ -191,7 +191,7 @@ def parse_args() -> argparse.Namespace:
 
     logger.info(f"m=main,msg='starting job',environment={args.environment},"
                 f"datalake_bucket={args.datalake_bucket},schema={args.schema},"
-                f"table_name={args.table_name},project_ids={args.project_ids}"
+                f"table_name={args.table_name}"
     )
 
     return args

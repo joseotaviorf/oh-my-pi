@@ -85,7 +85,7 @@ def create_query_to_sample_data(table: Row, load_start_date: str):
             table_name,
             column_name,
             array_agg(column_value) AS sample,
-            to_timestamp("{load_start_date}") as
+            to_timestamp("{load_start_date}") as ts_ingested
         FROM
             sample
         GROUP BY
