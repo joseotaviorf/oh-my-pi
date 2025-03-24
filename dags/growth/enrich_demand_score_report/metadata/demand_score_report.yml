@@ -16,7 +16,7 @@ columns:
   city_group:
     description: The city group of the listing.
     lineage:
-      - reverse_demand_score.listing_demand_score.city_group 
+      - reverse_demand_score.listing_demand_score.city_group
   city_name:
     description: The city name of the listing.
     lineage:
@@ -24,7 +24,7 @@ columns:
   region_code:
     description: The region code of the listing.
     lineage:
-      - reverse_demand_score.listing_demand_score.region_code   
+      - reverse_demand_score.listing_demand_score.region_code
   quality_score:
     description: The quality score of the listing in For Rent.
     lineage:
@@ -48,7 +48,7 @@ columns:
   qt_lpv_21d_for_rent:
     description: The quantity of LPV in the last 21 days in For Rent.
     lineage:
-      - reverse_demand_score.listing_demand_score.qt_lpv_21d_for_rent        
+      - reverse_demand_score.listing_demand_score.qt_lpv_21d_for_rent
   dt_publication_for_rent:
     description: The date of publication of the listing in For Rent.
     lineage:
@@ -72,7 +72,7 @@ columns:
   qt_lpv_21d_for_sale:
     description: The quantity of LPV in the last 21 days in For Sale.
     lineage:
-      - reverse_demand_score.listing_demand_score.qt_lpv_21d_for_sale        
+      - reverse_demand_score.listing_demand_score.qt_lpv_21d_for_sale
   dt_publication_for_sale:
     description: The date of publication of the listing in For Sale.
     lineage:
@@ -84,7 +84,11 @@ columns:
   days_last_lpv_14_above_8:
     description: The number of days since the last time the 14-day LPV average was above 8.
     lineage:
-      - reverse_demand_score.listing_demand_score.days_last_lpv_14_above_8   
+      - reverse_demand_score.listing_demand_score.days_last_lpv_14_above_8
+  days_since_test_started:
+    description: The number of days since test started 2025-03-26.
+    lineage:
+      - reverse_demand_score.listing_demand_score.days_since_test_started
   demand_score:
     description: The demand score of the listing.
     lineage:

@@ -1,5 +1,5 @@
 WITH listing_base AS (
-  SELECT 
+  SELECT
     dhl.ts_listing_version_start::DATE AS listing_start_dt,
     dhl.listing_category_start AS listing_category_start,
     dr.city_group,
@@ -12,62 +12,62 @@ WITH listing_base AS (
     dhl.sk_house_listing,
     dhl.id_house,
     COALESCE(dhl.rent, dhl.house_rent) AS rent
-  FROM 
+  FROM
     dw_public.dim_house_listing AS dhl
-  LEFT JOIN 
-    dw_public.fact_house_listings AS fhl 
+  LEFT JOIN
+    dw_public.fact_house_listings AS fhl
       ON fhl.sk_house_listing = dhl.sk_house_listing
-  LEFT JOIN 
-    dw_public.dim_region AS dr 
+  LEFT JOIN
+    dw_public.dim_region AS dr
       ON dr.sk_region = fhl.sk_region
-  WHERE 
+  WHERE
     (dr.country_code = 'BR' OR dr.country_code IS NULL)
     AND (dhl.version > 0)
     AND (dhl.status IN ('publicado', 'PUBLISHED'))
     AND (dhl.ts_listing_version_start::DATE >= '2023-10-01'::DATE)
 ),
 days_published AS (
-  SELECT 
+  SELECT
     dhl.sk_house_listing,
     DATE(dhl.ts_listing_version_start) AS dt_publication,
     COUNT(
-      DISTINCT 
+      DISTINCT
       CASE
         WHEN hldi.status_history in ('publicado', 'PUBLISHED') AND hldi.dt_day >= date_add (DAY, -21, CURRENT_DATE) THEN hldi.dt_day
         ELSE NULL
       END
     ) AS days_pub_21,
    COUNT(
-      DISTINCT 
+      DISTINCT
       CASE
         WHEN hldi.status_history in ('publicado', 'PUBLISHED') AND hldi.dt_day >= date_add (DAY, -14, CURRENT_DATE) THEN hldi.dt_day
         ELSE NULL
       END
     ) AS days_pub_14,
    COUNT(
-      DISTINCT 
+      DISTINCT
       CASE
         WHEN hldi.status_history in ('publicado', 'PUBLISHED') AND hldi.dt_day >= date_add (DAY, -7, CURRENT_DATE) THEN hldi.dt_day
         ELSE NULL
       END
-    ) AS days_pub_7, 
+    ) AS days_pub_7,
     COUNT(
-      DISTINCT 
+      DISTINCT
       CASE
         WHEN hldi.status_history in ('publicado', 'PUBLISHED') AND hldi.dt_day >= date_add (DAY, -3, CURRENT_DATE) THEN hldi.dt_day
         ELSE NULL
       END
     ) AS days_pub_3,
     COUNT(
-      DISTINCT 
+      DISTINCT
       CASE
         WHEN hldi.status_history in ('publicado', 'PUBLISHED') AND hldi.dt_day >= date_add (DAY, -1, CURRENT_DATE) THEN hldi.dt_day
         ELSE NULL
       END
     ) AS days_pub_1
-  FROM 
+  FROM
     dw_public.dim_house_listing AS dhl
-  LEFT JOIN 
+  LEFT JOIN
     datalake_rental_historical_follow_up.house_listings_daily_info AS hldi
       ON (hldi.id_house_listing = dhl.sk_house_listing)
       AND (hldi.dt_day BETWEEN dhl.ts_listing_version_start::DATE AND COALESCE(dhl.ts_listing_version_END::DATE, CURRENT_DATE::DATE))
@@ -76,23 +76,23 @@ days_published AS (
   GROUP BY 1, 2
 ),
 lpv_amplitude AS (
-  SELECT 
+  SELECT
     ts_client_event::DATE AS dt_event,
     CASE
       WHEN ep_house_id LIKE '%.%' THEN NULL
       ELSE ep_house_id::BIGINT
     END AS id_house,
     COUNT(1) AS lpv
-  FROM 
+  FROM
     datalake_amplitude_clean.170698_listing_page_viewed_events
-  WHERE 
+  WHERE
     (year >= 2023)
     AND (ts_client_event::DATE >= '2023-10-01'::DATE)
     AND (LOWER(business_context) = 'rent')
   GROUP BY 1, 2
 ),
 lpv AS (
-  SELECT 
+  SELECT
     dhl.ts_publication::DATE AS dt_publication,
     dhl.sk_house_listing,
     p.days_pub_21,
@@ -110,22 +110,22 @@ lpv AS (
     SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -3, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub_3 = 0 THEN 1 ELSE p.days_pub_3 END)::DOUBLE AS avg_lpv_days_pub_3d,
     SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -1, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END) AS lpv_1d,
     SUM(CASE WHEN lpv_amplitude.dt_event >= DATE_ADD(DAY, -1, CURRENT_DATE) THEN lpv_amplitude.lpv ELSE 0 END)/(CASE WHEN p.days_pub_1 = 0 THEN 1 ELSE p.days_pub_1 END)::DOUBLE AS avg_lpv_days_pub_1d
-  FROM 
+  FROM
     dw_public.dim_house_listing AS dhl
-  LEFT JOIN 
+  LEFT JOIN
     lpv_amplitude
     ON (lpv_amplitude.id_house = dhl.id_house)
       AND (lpv_amplitude.dt_event::DATE BETWEEN dhl.ts_listing_version_start::DATE AND COALESCE(dhl.ts_listing_version_end::DATE, CURRENT_DATE))
-  LEFT JOIN 
-    days_published AS p 
+  LEFT JOIN
+    days_published AS p
       ON (p.sk_house_listing = dhl.sk_house_listing)
-  WHERE 
+  WHERE
     (dhl.version > 0)
     AND (dhl.ts_listing_version_start::DATE >= '2023-10-01'::DATE)
   GROUP BY 1, 2, 3, 4, 5, 6, 7
 ),
 booking_availability_hours AS (
-  SELECT 
+  SELECT
     id_house,
     dt_available_started::DATE AS start_date,
     day_of_week,
@@ -135,23 +135,23 @@ booking_availability_hours AS (
       )
     ) AS end_date,
     day_hours_available
-  FROM 
+  FROM
     datalake_booking.house_available_hours
 ),
 available_hours AS (
-  SELECT 
+  SELECT
     dt.date,
     ah.id_house,
     SUM(ah.day_hours_available) AS hours_available
-  FROM 
+  FROM
     booking_availability_hours AS ah
-  CROSS JOIN 
+  CROSS JOIN
     dw_public.dim_date dt
       ON (dt.date BETWEEN ah.start_date AND ah.end_date)
   GROUP BY 1, 2
 ),
 scores AS (
-  SELECT 
+  SELECT
     hdi.dt_day,
     dhl.sk_house_listing,
     dhl.ts_publication::DATE AS dt_published,
@@ -183,15 +183,15 @@ scores AS (
       WHEN hdi.is_exclusive = TRUE THEN 2.3
       ELSE 0.0
     END AS is_exclusive_score
-  FROM 
+  FROM
     datalake_rental_historical_follow_up.house_listings_daily_info AS hdi
-  JOIN 
+  JOIN
     dw_public.dim_house_listing dhl
       ON dhl.sk_house_listing = hdi.id_house_listing
-  JOIN 
+  JOIN
     dw_public.dim_region dr
       ON dr.sk_region = hdi.id_region
-  LEFT JOIN 
+  LEFT JOIN
     available_hours ah
       ON ah.id_house = dhl.id_house
         AND ah.date = hdi.dt_day
@@ -203,7 +203,7 @@ scores AS (
   GROUP BY ALL
 ),
 final_db AS (
-  SELECT 
+  SELECT
     dd.month_start AS listing_pub_mth,
     dd.date AS listing_pub_dt,
     CASE
@@ -240,23 +240,23 @@ final_db AS (
     s.is_easy_entry_score,
     s.is_exclusive_score,
     s.well_priced_score + s.good_hours_score + s.is_easy_entry_score + s.is_exclusive_score AS changeable_characteristics_score
-  FROM 
+  FROM
     listing_base AS bd
-  LEFT JOIN 
-    lpv 
+  LEFT JOIN
+    lpv
       ON lpv.sk_house_listing = bd.sk_house_listing
-  LEFT JOIN 
-    days_published AS p 
+  LEFT JOIN
+    days_published AS p
       ON p.sk_house_listing = bd.sk_house_listing
-  LEFT JOIN 
-    scores AS s 
+  LEFT JOIN
+    scores AS s
       ON bd.sk_house_listing = s.sk_house_listing
-  LEFT JOIN 
-    dw_public.dim_date AS dd 
+  LEFT JOIN
+    dw_public.dim_date AS dd
       ON dd.date = bd.listing_start_dt
 ),
 for_rent_score AS (
-  SELECT 
+  SELECT
     id_house,
     listing_age,
     sk_house_listing,
@@ -270,32 +270,32 @@ for_rent_score AS (
     avg_lpv_days_pub_21d AS qt_lpv_21d_for_rent,
     well_priced_score AS quality_score,
     listing_pub_dt AS dt_publication
-  FROM 
+  FROM
     final_db
-  WHERE 
+  WHERE
     -- Only listings with more than 3 days
-    DATE_DIFF(DAY, listing_pub_dt, CURRENT_DATE) >= 3 
+    DATE_DIFF(DAY, listing_pub_dt, CURRENT_DATE) >= 3
 ),
 lpv_14_days_for_sale_base AS (
-  SELECT 
+  SELECT
     ol.sk_house AS id_house,
     d.date AS dt_event,
     qt_listing_page_viewed,
-    ROUND(AVG(ol.qt_listing_page_viewed) 
-      OVER (PARTITION BY ol.sk_house 
-            ORDER BY d.date 
+    ROUND(AVG(ol.qt_listing_page_viewed)
+      OVER (PARTITION BY ol.sk_house
+            ORDER BY d.date
             ROWS BETWEEN 14 PRECEDING AND 1 PRECEDING), 1) AS qt_lpv_14d_for_sale
-  FROM 
+  FROM
     dw_sale.fact_daily_ongoing_listing AS ol
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_date AS d
       ON d.sk_date = ol.sk_snapshot_date
-  WHERE 
+  WHERE
     d.date >= DATE_ADD(MONTH,-3,CURRENT_DATE)
   GROUP BY all
 ),
 last_lpv_14_days_for_sale AS (
-SELECT 
+SELECT
   id_house,
   MAX(CASE WHEN qt_lpv_14d_for_sale < 3 THEN dt_event END) AS dt_last_lpv_14_below_3,
   MAX(CASE WHEN qt_lpv_14d_for_sale > 8 THEN dt_event END) AS dt_last_lpv_14_above_8
@@ -303,7 +303,7 @@ FROM lpv_14_days_for_sale_base
 GROUP BY ALL
 ),
 for_sale_score AS (
-  SELECT 
+  SELECT
     ol.sk_house AS id_house,
     ls.liquidity_score,
     dr.city_group,
@@ -317,32 +317,32 @@ for_sale_score AS (
     ROUND(AVG(CASE WHEN d.date >= DATE_ADD(DAY,-7,CURRENT_DATE) THEN ol.qt_listing_page_viewed END),1) AS qt_lpv_7d_for_sale,
     ROUND(AVG(CASE WHEN d.date >= DATE_ADD(DAY,-14,CURRENT_DATE) THEN ol.qt_listing_page_viewed END),1) AS qt_lpv_14d_for_sale,
     ROUND(AVG(CASE WHEN d.date >= DATE_ADD(DAY,-21,CURRENT_DATE) THEN ol.qt_listing_page_viewed END),1) AS qt_lpv_21d_for_sale
-  FROM 
+  FROM
     dw_sale.fact_daily_ongoing_listing AS ol
-  LEFT JOIN 
+  LEFT JOIN
     dw_public.dim_date AS d
       ON d.sk_date = ol.sk_snapshot_date
-  LEFT JOIN 
+  LEFT JOIN
     dw_sale.dim_listing AS dhl
       ON dhl.sk_house = ol.sk_house
-  LEFT JOIN 
-    dw_sale.fact_listings AS fl 
+  LEFT JOIN
+    dw_sale.fact_listings AS fl
       ON fl.sk_house = dhl.sk_house
   LEFT JOIN
-    dw_public.dim_region AS dr 
+    dw_public.dim_region AS dr
       ON dr.sk_region = fl.sk_region
-  LEFT JOIN 
+  LEFT JOIN
     sales_liquidity_score.predicted_scores ls
       ON ls.sk_house = ol.sk_house
-  LEFT JOIN 
-    last_lpv_14_days_for_sale lpv_14 
+  LEFT JOIN
+    last_lpv_14_days_for_sale lpv_14
       ON lpv_14.id_house = ol.sk_house
-  WHERE 
+  WHERE
     d.date >= DATE_ADD(DAY,-21,CURRENT_DATE)
   GROUP BY 1,2,3,4,5,6,7,8
 ),
 results AS (
-  SELECT 
+  SELECT
     COALESCE(fr.id_house, fs.id_house) AS id_house,
     fr.sk_house_listing AS id_house_listing,
     COALESCE(fr.city_group, fs.city_group) AS city_group,
@@ -365,6 +365,7 @@ results AS (
     fs.dt_publication AS dt_publication_for_sale,
     DATEDIFF(DATE_ADD(DAY,-1,CURRENT_DATE), dt_last_lpv_14_below_3) AS days_last_lpv_14_below_3,
     DATEDIFF(DATE_ADD(DAY,-1,CURRENT_DATE), dt_last_lpv_14_above_8) AS days_last_lpv_14_above_8,
+    DATEDIFF(DATE_ADD(DAY,-1,CURRENT_DATE), DATE('2025-03-26')) AS days_since_test_started,
     CASE
       WHEN liquidity_score >= 0 AND liquidity_score < 10 THEN 'A'
       WHEN liquidity_score >= 10 AND liquidity_score < 20 THEN 'B'
@@ -391,7 +392,7 @@ results AS (
     CASE
       WHEN qt_lpv_21d_for_rent >= 0 AND qt_lpv_21d_for_rent < 1 THEN 'A'
       WHEN qt_lpv_21d_for_rent >= 1 AND qt_lpv_21d_for_rent < 2 THEN 'B'
-      WHEN qt_lpv_21d_for_rent >= 2 AND qt_lpv_21d_for_rent < 3 THEN 'C' 
+      WHEN qt_lpv_21d_for_rent >= 2 AND qt_lpv_21d_for_rent < 3 THEN 'C'
       WHEN qt_lpv_21d_for_rent >= 3 AND qt_lpv_21d_for_rent < 4 THEN 'D'
       WHEN qt_lpv_21d_for_rent >= 4 AND qt_lpv_21d_for_rent < 5 THEN 'E'
       WHEN qt_lpv_21d_for_rent >= 5 AND qt_lpv_21d_for_rent < 10 THEN 'F'
@@ -410,7 +411,7 @@ results AS (
     CASE
       WHEN qt_lpv_21d_for_sale >= 0 AND qt_lpv_21d_for_sale < 1 THEN 'A'
       WHEN qt_lpv_21d_for_sale >= 1 AND qt_lpv_21d_for_sale < 2 THEN 'B'
-      WHEN qt_lpv_21d_for_sale >= 2 AND qt_lpv_21d_for_sale < 3 THEN 'C' 
+      WHEN qt_lpv_21d_for_sale >= 2 AND qt_lpv_21d_for_sale < 3 THEN 'C'
       WHEN qt_lpv_21d_for_sale >= 3 AND qt_lpv_21d_for_sale < 4 THEN 'D'
       WHEN qt_lpv_21d_for_sale >= 4 AND qt_lpv_21d_for_sale < 5 THEN 'E'
       WHEN qt_lpv_21d_for_sale >= 5 AND qt_lpv_21d_for_sale < 10 THEN 'F'
@@ -430,7 +431,7 @@ results AS (
     CASE
       WHEN qt_lpv_14d_for_rent >= 0 AND qt_lpv_14d_for_rent < 1 THEN 'A'
       WHEN qt_lpv_14d_for_rent >= 1 AND qt_lpv_14d_for_rent < 2 THEN 'B'
-      WHEN qt_lpv_14d_for_rent >= 2 AND qt_lpv_14d_for_rent < 3 THEN 'C' 
+      WHEN qt_lpv_14d_for_rent >= 2 AND qt_lpv_14d_for_rent < 3 THEN 'C'
       WHEN qt_lpv_14d_for_rent >= 3 AND qt_lpv_14d_for_rent < 4 THEN 'D'
       WHEN qt_lpv_14d_for_rent >= 4 AND qt_lpv_14d_for_rent < 5 THEN 'E'
       WHEN qt_lpv_14d_for_rent >= 5 AND qt_lpv_14d_for_rent < 10 THEN 'F'
@@ -449,7 +450,7 @@ results AS (
     CASE
       WHEN qt_lpv_14d_for_sale >= 0 AND qt_lpv_14d_for_sale < 1 THEN 'A'
       WHEN qt_lpv_14d_for_sale >= 1 AND qt_lpv_14d_for_sale < 2 THEN 'B'
-      WHEN qt_lpv_14d_for_sale >= 2 AND qt_lpv_14d_for_sale < 3 THEN 'C' 
+      WHEN qt_lpv_14d_for_sale >= 2 AND qt_lpv_14d_for_sale < 3 THEN 'C'
       WHEN qt_lpv_14d_for_sale >= 3 AND qt_lpv_14d_for_sale < 4 THEN 'D'
       WHEN qt_lpv_14d_for_sale >= 4 AND qt_lpv_14d_for_sale < 5 THEN 'E'
       WHEN qt_lpv_14d_for_sale >= 5 AND qt_lpv_14d_for_sale < 10 THEN 'F'
@@ -469,7 +470,7 @@ results AS (
     CASE
       WHEN qt_lpv_7d_for_rent >= 0 AND qt_lpv_7d_for_rent < 1 THEN 'A'
       WHEN qt_lpv_7d_for_rent >= 1 AND qt_lpv_7d_for_rent < 2 THEN 'B'
-      WHEN qt_lpv_7d_for_rent >= 2 AND qt_lpv_7d_for_rent < 3 THEN 'C' 
+      WHEN qt_lpv_7d_for_rent >= 2 AND qt_lpv_7d_for_rent < 3 THEN 'C'
       WHEN qt_lpv_7d_for_rent >= 3 AND qt_lpv_7d_for_rent < 4 THEN 'D'
       WHEN qt_lpv_7d_for_rent >= 4 AND qt_lpv_7d_for_rent < 5 THEN 'E'
       WHEN qt_lpv_7d_for_rent >= 5 AND qt_lpv_7d_for_rent < 10 THEN 'F'
@@ -488,7 +489,7 @@ results AS (
     CASE
       WHEN qt_lpv_7d_for_sale >= 0 AND qt_lpv_7d_for_sale < 1 THEN 'A'
       WHEN qt_lpv_7d_for_sale >= 1 AND qt_lpv_7d_for_sale < 2 THEN 'B'
-      WHEN qt_lpv_7d_for_sale >= 2 AND qt_lpv_7d_for_sale < 3 THEN 'C' 
+      WHEN qt_lpv_7d_for_sale >= 2 AND qt_lpv_7d_for_sale < 3 THEN 'C'
       WHEN qt_lpv_7d_for_sale >= 3 AND qt_lpv_7d_for_sale < 4 THEN 'D'
       WHEN qt_lpv_7d_for_sale >= 4 AND qt_lpv_7d_for_sale < 5 THEN 'E'
       WHEN qt_lpv_7d_for_sale >= 5 AND qt_lpv_7d_for_sale < 10 THEN 'F'
@@ -508,7 +509,7 @@ results AS (
   CASE
     WHEN qt_lpv_3d_for_rent >= 0 AND qt_lpv_3d_for_rent < 1 THEN 'A'
     WHEN qt_lpv_3d_for_rent >= 1 AND qt_lpv_3d_for_rent < 2 THEN 'B'
-    WHEN qt_lpv_3d_for_rent >= 2 AND qt_lpv_3d_for_rent < 3 THEN 'C' 
+    WHEN qt_lpv_3d_for_rent >= 2 AND qt_lpv_3d_for_rent < 3 THEN 'C'
     WHEN qt_lpv_3d_for_rent >= 3 AND qt_lpv_3d_for_rent < 4 THEN 'D'
     WHEN qt_lpv_3d_for_rent >= 4 AND qt_lpv_3d_for_rent < 5 THEN 'E'
     WHEN qt_lpv_3d_for_rent >= 5 AND qt_lpv_3d_for_rent < 10 THEN 'F'
@@ -527,7 +528,7 @@ results AS (
   CASE
     WHEN qt_lpv_3d_for_sale >= 0 AND qt_lpv_3d_for_sale < 1 THEN 'A'
     WHEN qt_lpv_3d_for_sale >= 1 AND qt_lpv_3d_for_sale < 2 THEN 'B'
-    WHEN qt_lpv_3d_for_sale >= 2 AND qt_lpv_3d_for_sale < 3 THEN 'C' 
+    WHEN qt_lpv_3d_for_sale >= 2 AND qt_lpv_3d_for_sale < 3 THEN 'C'
     WHEN qt_lpv_3d_for_sale >= 3 AND qt_lpv_3d_for_sale < 4 THEN 'D'
     WHEN qt_lpv_3d_for_sale >= 4 AND qt_lpv_3d_for_sale < 5 THEN 'E'
     WHEN qt_lpv_3d_for_sale >= 5 AND qt_lpv_3d_for_sale < 10 THEN 'F'
@@ -547,7 +548,7 @@ results AS (
   CASE
     WHEN qt_lpv_1d_for_rent >= 0 AND qt_lpv_1d_for_rent < 1 THEN 'A'
     WHEN qt_lpv_1d_for_rent >= 1 AND qt_lpv_1d_for_rent < 2 THEN 'B'
-    WHEN qt_lpv_1d_for_rent >= 2 AND qt_lpv_1d_for_rent < 3 THEN 'C' 
+    WHEN qt_lpv_1d_for_rent >= 2 AND qt_lpv_1d_for_rent < 3 THEN 'C'
     WHEN qt_lpv_1d_for_rent >= 3 AND qt_lpv_1d_for_rent < 4 THEN 'D'
     WHEN qt_lpv_1d_for_rent >= 4 AND qt_lpv_1d_for_rent < 5 THEN 'E'
     WHEN qt_lpv_1d_for_rent >= 5 AND qt_lpv_1d_for_rent < 10 THEN 'F'
@@ -566,7 +567,7 @@ results AS (
   CASE
     WHEN qt_lpv_1d_for_sale >= 0 AND qt_lpv_1d_for_sale < 1 THEN 'A'
     WHEN qt_lpv_1d_for_sale >= 1 AND qt_lpv_1d_for_sale < 2 THEN 'B'
-    WHEN qt_lpv_1d_for_sale >= 2 AND qt_lpv_1d_for_sale < 3 THEN 'C' 
+    WHEN qt_lpv_1d_for_sale >= 2 AND qt_lpv_1d_for_sale < 3 THEN 'C'
     WHEN qt_lpv_1d_for_sale >= 3 AND qt_lpv_1d_for_sale < 4 THEN 'D'
     WHEN qt_lpv_1d_for_sale >= 4 AND qt_lpv_1d_for_sale < 5 THEN 'E'
     WHEN qt_lpv_1d_for_sale >= 5 AND qt_lpv_1d_for_sale < 10 THEN 'F'
@@ -596,9 +597,10 @@ results AS (
       -- COALESCE(lpv_21d_for_rent, 'X'), -- Removed at the request of SH on 2025-03-18
       -- COALESCE(lpv_21d_for_sale, 'X'),-- Removed at the request of SH on 2025-03-18
       COALESCE(days_last_lpv_14_below_3, 'X'), -- Adding at the request of SH on 2025-03-18
-      COALESCE(days_last_lpv_14_above_8, 'X') -- Adding at the request of SH on 2025-03-18
+      COALESCE(days_last_lpv_14_above_8, 'X'), -- Adding at the request of SH on 2025-03-18
       -- COALESCE(lpv_1d_for_rent, 'X'), -- Removed at the request of SH on 2024-11-05
       -- COALESCE(lpv_1d_for_sale, 'X') -- Removed at the request of SH on 2024-11-05
+      CASE WHEN days_since_test_started < 0 THEN 0 ELSE days_since_test_started END -- Added at the request of SH on 2025-03-24
     ) AS demand_score,
     CURRENT_DATE AS dt_snapshot
   FROM for_rent_score AS fr
@@ -606,8 +608,8 @@ results AS (
     ON (fr.id_house = fs.id_house)
 )
 
-SELECT 
+SELECT
   *
-FROM 
+FROM
   results
 GROUP BY ALL

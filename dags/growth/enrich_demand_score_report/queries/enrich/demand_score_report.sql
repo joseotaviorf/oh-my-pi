@@ -19,6 +19,7 @@ SELECT
     qt_lpv_21d_for_sale,
     days_last_lpv_14_below_3,
     days_last_lpv_14_above_8,
+    days_since_test_started,
     demand_score,
     dt_publication_for_sale,
     dt_publication_for_rent,
