@@ -1,0 +1,61 @@
+---
+database_name: datalake_amplitude_clean
+table_name: 440441_home_page_viewed_events
+columns:
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.id_amplitude
+  id_event:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.id_event
+  id_user:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.id_user
+  company_id:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.company_id
+  email:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.email
+  login_status:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.login_status
+  source:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.source
+  product:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.product
+  role:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.role
+  language:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.language
+  city:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.city
+  id_device:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.id_device
+  device_type:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.device_type
+  os_name:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.os_name
+  platform:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.platform
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.ts_event
+  year:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.year
+  month:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.month
+  day:
+    lineage:
+      - datalake_amplitude_clean_staging.440441_home_page_viewed_events.day
