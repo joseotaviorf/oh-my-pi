@@ -38,6 +38,10 @@ workflow:
       clean_primary_keys: [id]
     FollowUpDetails:
       clean_table_name: follow_up_details
+    FollowUpDetails_FeedbackTag:
+      raw_primary_keys: [FollowUpDetails_id, tags_id]
+      clean_table_name: follow_up_details_feedback_tag
+      clean_primary_keys: [id_follow_up_details, id_tags]
     KeyHolder:
       clean_table_name: key_holder
       clean_primary_keys: [id]
