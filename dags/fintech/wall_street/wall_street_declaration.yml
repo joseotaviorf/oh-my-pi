@@ -19,24 +19,28 @@ workflow:
   tables_customization:
     Blocklist:
       clean_table_name: blocklist
-    Charge_AUD:
-      clean_table_name: charge_aud
-    ChargeMundipagg:
-      clean_table_name: charge_mundipagg
     Charge:
       clean_table_name: charge
+    Charge_AUD:
+      clean_table_name: charge_aud
+    Chargeback:
+      clean_table_name: chargeback
+    ChargeMundipagg:
+      clean_table_name: charge_mundipagg
+    ChargebackNotification:
+      clean_table_name: chargeback_notification
+    CreditCard:
+      clean_table_name: creditcard
+    Invoice:
+      clean_table_name: invoice
+    InvoiceSubscriptionItem:
+      clean_table_name: invoice_subscription_item
     Subscription:
       clean_table_name: subscription
     SubscriptionItem:
       clean_table_name: subscription_item
-    CreditCard:
-      clean_table_name: creditcard
     Store:
       clean_table_name: store
-    Chargeback:
-      clean_table_name: chargeback
-    ChargebackNotification:
-      clean_table_name: chargeback_notification
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:

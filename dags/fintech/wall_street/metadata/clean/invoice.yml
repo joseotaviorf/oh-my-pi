@@ -1,0 +1,45 @@
+---
+database_name: datalake_wall_street_clean
+table_name: invoice
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_wall_street_raw.invoice.id
+  id_subscription:
+    lineage:
+    - datalake_wall_street_raw.invoice.subscriptionid
+  id_charge:
+    lineage:
+    - datalake_wall_street_raw.invoice.chargeid
+  id_external:
+    lineage:
+    - datalake_wall_street_raw.invoice.externalid
+  id_store:
+    lineage:
+    - datalake_wall_street_raw.invoice.storeid
+  price_in_cents:
+    lineage:
+    - datalake_wall_street_raw.invoice.priceincents
+  status:
+    lineage:
+    - datalake_wall_street_raw.invoice.status
+  ts_created_external:
+    lineage:
+    - datalake_wall_street_raw.invoice.externalcreatedat
+  ts_due:
+    lineage:
+    - datalake_wall_street_raw.invoice.dueat
+  ts_billing:
+    lineage:
+    - datalake_wall_street_raw.invoice.billingat
+  ts_canceled:
+    lineage:
+    - datalake_wall_street_raw.invoice.canceledat
+  ts_created:
+    lineage:
+    - datalake_wall_street_raw.invoice.createdat
+  ts_updated:
+    lineage:
+    - datalake_wall_street_raw.invoice.updatedat
