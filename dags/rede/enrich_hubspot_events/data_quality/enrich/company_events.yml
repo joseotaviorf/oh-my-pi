@@ -1,0 +1,22 @@
+---
+table_name: datalake_hubspot.company_events
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_event:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_hubspot:
+    is_complete:
+      severity_level: Error
+  sk_company:
+    is_complete:
+      severity_level: Error 
+  event_update:
+    is_complete:
+      severity_level: Error

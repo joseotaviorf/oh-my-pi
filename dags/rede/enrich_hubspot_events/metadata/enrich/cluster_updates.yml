@@ -1,0 +1,29 @@
+database_name: datalake_hubspot
+table_name: cluster_updates
+description: Table that shows the period during which a Rede partner company belonged to a certain cluster (Decola, Tier, etc.), according to the classification criteria defined by the Operations team on HubSpot.
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_cluster_update:
+    lineage: 
+      - datalake_hubspot.company_history.id_company
+      - datalake_hubspot.company_history.ts_updated
+    description: Primary key of the table, composed of the combination of id_company, and ts_cluster_start.
+  id_hubspot:
+    lineage: 
+      - datalake_hubspot.company_history.id_company
+    description: Identification of a company registered on HubSpot.
+  company_cluster:
+    lineage:
+      - datalake_hubspot.company_history.company_cluster
+    description: Classification assigned by the Operations team to the Rede partner company.
+  is_current_cohort:
+    description: True if the cluster is the company's current cluster, otherwise false.
+  ts_start:
+    lineage:
+      - datalake_hubspot.company_history.ts_updated
+    description: Effective date of the cluster assigned to the company.
+  ts_end:
+    lineage:
+      - datalake_hubspot.company_history.ts_updated
+    description: End date of the cluster assigned to the company (if this field is null, it means that this is the current company cluster).

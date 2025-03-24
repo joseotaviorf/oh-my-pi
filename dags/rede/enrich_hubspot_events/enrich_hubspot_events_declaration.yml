@@ -1,0 +1,22 @@
+dag:
+  name: enrich_hubspot_events
+  schedule_start_date: 2020, 1, 1
+  owner: Data Rede
+  documentation:
+    dag_purpose: DAG created to load the tables consolidates all HubSpot events that will support the `fact_company_events` and `dim_company_events` in DW Company, consolidating all the events observed in Hubspot.
+workflow:
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    company_events:
+      - cluster_updates
+      - membership_updates
+      - owner_updates
+cluster:
+  type: databricks_12_2_min_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

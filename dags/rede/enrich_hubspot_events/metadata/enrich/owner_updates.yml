@@ -1,0 +1,29 @@
+database_name: datalake_hubspot
+table_name: owner_updates
+description: Table that shows the period during which a Rede partner company belonged to a certain owner (Account Manager), according to the classification criteria defined by the Operations team on HubSpot.
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_owner_update:
+    lineage: 
+      - datalake_hubspot.company_history.id_company
+      - datalake_hubspot.company_history.ts_updated
+    description: Primary key of the table, composed of the combination of id_company, and ts_cluster_start.
+  id_hubspot:
+    lineage: 
+      - datalake_hubspot.company_history.id_company
+    description: Identification of a company registered on HubSpot.
+  uuid_person:
+    lineage:
+      - datalake_hubspot.owner.uuid_person
+    description: UUID person related to the company owner in HubSpot. Used as external id for the Person's entity
+  is_current_cohort:
+    description: True if the owner is the company's current owner, otherwise false.
+  ts_start:
+    lineage:
+      - datalake_hubspot.company_history.ts_updated
+    description: Effective date of the cluster assigned to the company.
+  ts_end:
+    lineage:
+      - datalake_hubspot.company_history.ts_updated
+    description: End date of the cluster assigned to the company (if this field is null, it means that this is the current company cluster).

@@ -1,0 +1,49 @@
+database_name: datalake_hubspot
+table_name: cluster_updates
+description: Table that consolidates all HubSpot events that will support the `fact_company_events` and `dim_company_events` in DW Company.
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_event:
+    lineage: 
+      - datalake_hubspot.cluster_updates.id_cluster_update
+      - datalake_hubspot.membership_updates.id_membership_update
+      - datalake_hubspot.owner_updates.id_owner_update
+    description: Primary key of the table, composed of the combination of id_company, event_type and event_source.
+  id_hubspot:
+    lineage:
+      - datalake_hubspot.cluster_updates.id_hubspot
+      - datalake_hubspot.membership_updates.id_hubspot
+      - datalake_hubspot.owner_updates.id_hubspot
+    description: Identification of a company registered on HubSpot.
+  sk_company:
+    lineage:
+      - datalake_rede_company.company_sks.sk_company
+    description: Surrogate key of the company entity.
+  event_update:
+    lineage:
+      - datalake_hubspot.cluster_updates.company_cluster
+      - datalake_hubspot.membership_updates.hubspot_status
+      - datalake_hubspot.owner_updates.uuid_person
+    description: Classification assigned by the Operations team to the Rede partner company.
+  event_type:
+    description: Type of event that triggered the update in HubSpot.
+  event_source:
+    description: Source of the event that triggered the update in HubSpot.
+  is_current_cohort:
+    lineage:
+      - datalake_hubspot.cluster_updates.is_current_cohort
+      - datalake_hubspot.membership_updates.is_current_cohort
+      - datalake_hubspot.owner_updates.is_current_cohort
+    description: True if the cluster is the company's current cluster, otherwise false.
+  ts_start:
+    lineage:
+      - datalake_hubspot.cluster_updates.ts_start
+      - datalake_hubspot.membership_updates.ts_start
+      - datalake_hubspot.owner_updates.ts_start
+    description: Effective date of the cluster assigned to the company.
+  ts_end:
+    lineage:
+      - datalake_hubspot.cluster_updates.ts_end
+      - datalake_hubspot.membership_updates.ts_end
+      - datalake_hubspot.owner_updates.ts_end
+    description: End date of the cluster assigned to the company (if this field is null, it means that this is the current company cluster).

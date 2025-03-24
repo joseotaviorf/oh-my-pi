@@ -2014,6 +2014,10 @@ bietlejuice.enrich_hubspot_crm:
   - bietlejuice.hubspot:load-clean-deal-pipeline
   - bietlejuice.hubspot:load-clean-ticket
   - bietlejuice.hubspot:load-clean-ticket-pipeline
+bietlejuice.enrich_hubspot_events:
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company-history
+  - bietlejuice.enrich_hubspot_management:load-enrich-owner
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.enrich_hubspot_management:
   - bietlejuice.hubspot:load-clean-call
   - bietlejuice.hubspot:load-clean-communication
