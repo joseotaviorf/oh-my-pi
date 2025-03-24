@@ -1110,11 +1110,19 @@ bietlejuice.enrich_agenda_allocation:
   - bietlejuice.ebdb_agenda_allocation:load-clean-mask-weekly-hour
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud
   - bietlejuice.ebdb_agent:load-clean-agent-data-types
+  - bietlejuice.enrich_agent_accreditation:load-enrich-business-context
   - bietlejuice.enrich_booking:load-enrich-booking
-  - bietlejuice.enrich_ebdb_agents:load-enrich-agent-business-context-history
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-region
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.gsheets_for_rent:done-clean-auxiliary-region
+bietlejuice.enrich_agent_accreditation:
+  - bietlejuice.ebdb_agent:load-clean-agent-data-aud
+  - bietlejuice.ebdb_agent:load-clean-agent-data-business-contexts-served-aud
+  - bietlejuice.ebdb_agent:load-clean-agent-data-types-aud
+  - bietlejuice.ebdb_agent:load-clean-agent-region-data-aud
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.enrich_agreement_hourly:
   - bietlejuice.trato_feito:load-clean-debtor
   - bietlejuice.trato_feito_hourly:load-clean-installment
@@ -1649,6 +1657,7 @@ bietlejuice.enrich_ebdb_agents:
   - bietlejuice.ebdb_partner:load-clean-partner-agent-aud
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
+  - bietlejuice.enrich_agent_accreditation:load-enrich-business-context
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
   - bietlejuice.enrich_ebdb_user:load-enrich-agent-data

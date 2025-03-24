@@ -1,0 +1,37 @@
+---
+database_name: datalake_agent_accreditation
+table_name: agent_profile
+description: "This table contains Agents' profile data and their revisions/updates."
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent_profile:
+    lineage:
+      - datalake_ebdb_clean.agent_data_types_aud.id_agent_data
+      - datalake_ebdb_clean.agent_data_types_aud.types
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: |
+      Unique identifier for the profile review, generated using an XXHASH64 function 
+      based on the agent ID, profile, and revision start date.
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_data_types_aud.id_agent_data
+    description: Unique Agent Identifier
+  profile:
+    lineage:
+      - datalake_ebdb_clean.agent_data_types_aud.types
+    description: "Agent's performance profile"
+    categories:
+      Visit: Agents who are responsible for conducting property visits
+      Inspection: Agents responsible for conducting property inspections before the tenant moves into the property and after the end of the contract
+      Photo Session: Photographer agents responsible for taking photos of the properties that will be published
+      Quarterly Inspection: Outsourced agents who are responsible for conducting property visits
+      CheckUpLar: Agents responsible for performing/analyzing reported repairs to the properties
+  ts_revision_started:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Date when the Agent started on the profile
+  ts_revision_ended:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Date when the Agent ended on the profile

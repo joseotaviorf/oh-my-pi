@@ -1,0 +1,18 @@
+---
+table_name: datalake_agent_accreditation.agent_registration_actions_log
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_action:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_agent:
+    is_complete:
+      severity_level: Error
+  action:
+    is_complete:
+      severity_level: Error
+  dt_action:
+    is_complete:
+      severity_level: Error

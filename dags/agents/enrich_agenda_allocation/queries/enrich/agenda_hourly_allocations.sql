@@ -61,17 +61,17 @@ daily_agent_work_contract AS (
 daily_agent_business_context AS (
     SELECT 
         ad.date AS dt_reference,
-        abch.id_agent_data AS id_agent,
-        abch.agent_business_context
+        abch.id_agent,
+        abch.business_context AS agent_business_context
     FROM
-        datalake_ebdb_agents.agent_business_context_history AS abch
+        datalake_agent_accreditation.business_context AS abch
     JOIN
         datalake_quintoandar.aux_date AS ad
-            ON ad.date BETWEEN abch.ts_agent_business_context_started AND COALESCE(abch.ts_agent_business_context_ended, '{load_end_date}' + INTERVAL 21 DAYS)
+            ON ad.date BETWEEN abch.ts_revision_started AND COALESCE(abch.ts_revision_ended, '{load_end_date}' + INTERVAL 21 DAYS)
     WHERE 
         ad.date BETWEEN '{load_start_date}' AND '{load_end_date}' + INTERVAL 21 DAYS
     QUALIFY
-        1 = ROW_NUMBER() OVER(PARTITION BY abch.id_agent_data, ad.date ORDER BY abch.ts_agent_business_context_started DESC)
+        1 = ROW_NUMBER() OVER(PARTITION BY abch.id_agent, ad.date ORDER BY abch.ts_revision_started DESC)
 ),
 agents_region AS (
     SELECT 

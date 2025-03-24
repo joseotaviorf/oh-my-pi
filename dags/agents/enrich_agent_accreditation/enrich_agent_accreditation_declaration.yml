@@ -1,0 +1,57 @@
+---
+dag:
+  name: enrich_agent_accreditation
+  schedule_start_date: 2024, 1, 1
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      O pipeline process tracks and enriches data related to agent operations, covering business context assignments, regional coverage, and registration actions. 
+      It integrates multiple data sources to generate insights into an agent’s predominant region, active periods within a business context, and key changes to their registration over time.
+
+      This workflow consists of three main stages:
+
+      - Business Context Tracking: Records the historical assignment of business contexts to agents and enriches it with activity periods.
+      - Regional Coverage Analysis: Determines the agent’s predominant region code over time based on the number of associated regions.
+      - Registration Actions Log: Captures and stores key modifications in an agent’s profile, such as accreditation, de-accreditation, and business context changes.
+      This pipeline ensures accurate historical tracking of agent operations, enabling data-driven decisions regarding their performance and coverage.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  inner_dependencies:
+    agent_registration_actions_log:
+      - agent_profile
+      - business_context
+    business_context_activity:
+      - agent_registration_actions_log
+  tables_customization:
+    agent_major_region_code:
+      merge_on: [id_major_region_code]
+      z_order_by: [id_agent, dt_started]
+    agent_profile:
+      merge_on: [id_agent_profile]
+      z_order_by: [id_agent, ts_revision_started]
+    agent_registration_actions_log:
+      merge_on: [id_action]
+      z_order_by: [id_agent, dt_action]
+    business_context_activity:
+      merge_on: [id_business_context_activity]
+      z_order_by: [id_agent, dt_started]
+    business_context:
+      merge_on: [id_agent_business_context]
+      z_order_by: [id_agent, ts_revision_started]
+  extra_query_template_params:
+      load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+      load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

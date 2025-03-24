@@ -1,0 +1,34 @@
+---
+database_name: datalake_agent_accreditation
+table_name: business_context
+description: |
+  Stores the historical record of business contexts assigned to agents over time. 
+  This table does not contain enriched data—only the start and end dates for each assigned context. 
+  It exclusively includes data for visit agents; other operational contexts are not covered.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent_business_context:
+    lineage:
+      - datalake_ebdb_clean.agent_data_business_contexts_served_aud.id_agent_data
+      - datalake_ebdb_clean.agent_data_business_contexts_served_aud.business_context
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: |
+      Unique identifier for the business context review, generated using an XXHASH64 function 
+      based on the agent ID, business context, and revision start date.
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_data_business_contexts_served_aud.id_agent_data
+    description: Unique Agent Identifier
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.agent_data_business_contexts_served_aud.business_context
+    description: Business context of the agent's activity, which can be Sale or Rent
+  ts_revision_started:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Date when the Agent started in the business context
+  ts_revision_ended:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Date when the Agent ended in the business context

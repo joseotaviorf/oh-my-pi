@@ -68,6 +68,7 @@ column_level_validations:
       severity_level: Error
     has_max_value:
       less_than_or_equal_to: 1
+      severity_level: Error
   year:
     is_complete:
       severity_level: Error

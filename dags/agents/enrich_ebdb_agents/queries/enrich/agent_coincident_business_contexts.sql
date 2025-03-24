@@ -1,33 +1,33 @@
 WITH business_context_changes_aux AS (
     SELECT
-        id_agent_data,
+        id_agent AS id_agent_data,
         CASE
-            WHEN agent_business_context = 'SALE' THEN TRUE
+            WHEN business_context = 'SALE' THEN TRUE
             ELSE NULL
         END AS is_agent_for_sale,
         CASE
-            WHEN agent_business_context = 'RENT' THEN TRUE
+            WHEN business_context = 'RENT' THEN TRUE
             ELSE NULL
         END AS is_agent_for_rent,
-        ts_agent_business_context_started AS ts_business_context_changed
+        ts_revision_started AS ts_business_context_changed
     FROM
-        datalake_ebdb_agents.agent_business_context_history
+        datalake_agent_accreditation.business_context
     UNION ALL
     SELECT
-        id_agent_data,
+        id_agent AS id_agent_data,
         CASE
-            WHEN agent_business_context = 'SALE' THEN FALSE
+            WHEN business_context = 'SALE' THEN FALSE
             ELSE NULL
         END AS is_agent_for_sale,
         CASE
-            WHEN agent_business_context = 'RENT' THEN FALSE
+            WHEN business_context = 'RENT' THEN FALSE
             ELSE NULL
         END AS is_agent_for_rent,
-        ts_agent_business_context_ended AS ts_business_context_changed
+        ts_revision_ended AS ts_business_context_changed
     FROM
-        datalake_ebdb_agents.agent_business_context_history
+        datalake_agent_accreditation.business_context
     WHERE
-        ts_agent_business_context_ended IS NOT NULL
+        ts_revision_ended IS NOT NULL
 )
 SELECT
     id_agent_data,

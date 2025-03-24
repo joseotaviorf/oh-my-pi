@@ -1,0 +1,51 @@
+---
+database_name: datalake_agent_accreditation
+table_name: business_context_activity
+description: |
+  Extends the historical business context data by incorporating the agent's activity status within the defined periods, 
+  breaking down intervals into active and inactive segments.
+  Additionally, it calculates the total number of days the agent was active within each context. 
+  This table only includes data for visit agents; other operational contexts are not covered
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_business_context_activity:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.id_agent
+      - datalake_agent_accreditation.agent_registration_actions_log.business_context
+      - datalake_agent_accreditation.agent_registration_actions_log.dt_action
+    description: |
+      Unique identifier for the business context activity, generated using an XXHASH64 function 
+      based on the agent ID, business context, and start date.
+  id_agent:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.id_agent
+    description: Unique identifier of the agent associated with this business context activity.
+  id_user:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.id_user
+    description: Unique identifier of the agent user associated with this business context activity.
+  business_context:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.business_context
+    description: Represents the specific business context assigned to the agent during the given period. Which can be Sale or Rent.
+    categories:
+      SALE: The agent is responsible for conducting visits with potential buyers for properties on sale.
+      RENT: The agent is responsible for conducting visits with potential tenants for rental properties.
+      Not Defined: The agent is not assigned to a specific business context during this period.
+  total_active_days:
+    description: Total number of days the agent was active within this business context, calculated as the difference between the first and last recorded active action.
+  is_active:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.is_active
+    description: Indicates whether the agent was active at any point during the recorded period
+  dt_started:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.dt_action
+    description: "The earliest date when the agent's activity in this business context was recorded."
+  dt_ended:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.dt_action
+    description: "The latest date when the agent's activity in this business context was recorded."
+
+    

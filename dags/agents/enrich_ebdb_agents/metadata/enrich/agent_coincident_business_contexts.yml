@@ -4,7 +4,7 @@ table_name: agent_coincident_business_contexts
 description: Each row of this table is a period in which the agent belonged to certain
   business contexts, be it in SALE or RENT context. They can be in both contexts at
   the same time, which is why each context is a flag is_agent_for_sale or is_agent_for_rent.
-  This is different from the table agent_business_context_history, since that one
+  This is different from the table datalake_agent_accreditation.business_context, since that one
   generates a row for each different context, whereas this one merges both in a single
   row with a specified validity period.
 domain: Agents
@@ -12,17 +12,17 @@ owner: data-ae-agents@quintoandar.com.br
 columns:
   id_agent_data:
     lineage:
-    - datalake_ebdb_agents.agent_business_context_history.id_agent_data
+      - datalake_agent_accreditation.business_context.id_agent
     description: Key of the agent, also known as "Dados Agente ID"
   ts_agent_business_context_started:
     lineage:
-    - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_started
-    - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_ended
+      - datalake_agent_accreditation.business_context.ts_revision_started
+      - datalake_agent_accreditation.business_context.ts_revision_ended
     description: Beginning of the period in which that row is valid.
   ts_agent_business_context_ended:
     lineage:
-    - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_started
-    - datalake_ebdb_agents.agent_business_context_history.ts_agent_business_context_ended
+      - datalake_agent_accreditation.business_context.ts_revision_started
+      - datalake_agent_accreditation.business_context.ts_revision_ended
     description: End of the period in which that row is valid (null if it is currently valid).
   is_agent_for_sale:
     description: Boolean to tell if an agent belonged to ForSale business context

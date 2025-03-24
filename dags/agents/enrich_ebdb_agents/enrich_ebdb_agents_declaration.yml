@@ -9,8 +9,6 @@ workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
-    agent_coincident_business_contexts:
-    - agent_business_context_history
     agent_unified_contract_changes:
     - agent_coincident_business_contexts
     - agents_activations_suspensions_contracts_changes

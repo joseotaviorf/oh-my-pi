@@ -53,7 +53,7 @@ columns:
     description: Number of the agent's specific slots allocated.
   agent_business_context:
     lineage:
-      - datalake_ebdb_agents.agent_business_context_history.agent_business_context
+      - datalake_agent_accreditation.business_context.business_context
     description: If it is an Agent in the Visits context, it will be linked to at least one business context, which could be Sale or Rent.
   area:
     lineage:

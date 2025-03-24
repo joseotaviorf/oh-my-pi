@@ -1,0 +1,76 @@
+---
+database_name: datalake_agent_accreditation
+table_name: agent_registration_actions_log
+description: |
+  Stores a historical log of actions related to an agent’s registration, tracking key modifications over time. 
+  Each record represents a specific action performed on an agent’s profile, such as updates, credential changes, or business context modifications. 
+  The table includes details such as the work contract, CRECI number, company, profile type, visit agent classification, 
+  and activity status at the time of the action. 
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_action:
+    lineage:
+      - datalake_agent_accreditation.agent_accreditation.id_agent
+      - datalake_agent_accreditation.agent_accreditation.ts_revision_started
+    description: |
+      Unique identifier for the action performed in the Agent registration, generated using an XXHASH64 function 
+      based on the agent ID, profile, and revision start date.
+  id_agent:
+    lineage:
+      - datalake_agent_accreditation.agent_accreditation.id_agent
+    description: Unique Agent Identifier
+  id_user:
+    lineage:
+      - datalake_agent_accreditation.agent_accreditation.id_user
+    description: Unique User Identifier
+  id_work_contract:
+    lineage:
+      - datalake_agent_accreditation.agent_accreditation.id_work_contract
+    description: Unique Work Contract Identifier
+  creci_number:
+    lineage:
+      - datalake_agent_accreditation.agent_accreditation.creci_number
+    description: CRECI (Conselho Regional de Corretores de Imóveis) registration number for Visiting Agents
+  uuid_company:
+    lineage:
+      - datalake_agent_accreditation.agent_accreditation.uuid_company
+    description: Unique identifier of the company associated with the Agent, when the Visit Agent is linked to a real estate agency (3P)
+  agent_profile:
+    lineage:
+      - datalake_agent_accreditation.agent_profile.profile
+    description: "Agent's performance profile"
+    categories:
+      Visit: Agents who are responsible for conducting property visits
+      Inspection: Agents responsible for conducting property inspections before the tenant moves into the property and after the end of the contract
+      Photo Session: Photographer agents responsible for taking photos of the properties that will be published
+      Quarterly Inspection: Outsourced agents who are responsible for conducting property visits
+      CheckUpLar: Agents responsible for performing/analyzing reported repairs to the properties
+  visit_agent_type:
+    lineage:
+      - datalake_agent_accreditation.agent_accreditation.agent_type
+    description: "Describe the type of Visiting Agent: Whether it is a 5A agent or associated with a partner real estate agency"
+    categories:
+      CORRETOR_5A: Visiting Agents who have a contract directly with 5A
+      CORRETOR_REDE: Visiting Agents who are associated with a real estate agency that is a partner of 5A
+  business_context:
+    lineage:
+      - datalake_agent_accreditation.business_context.business_context
+    description: Business context of the Agent's operations
+  action:
+    description: Describes what action was performed on the Agent registration
+    categories:
+      "Accreditation": "The agent has been officially accredited and registered in the system for the first time."
+      "Record Removed": "The agent's registration record has been permanently removed from the system."
+      "First activation after accreditation": "The agent has been activated for the first time after the initial accreditation process."
+      "De-accreditation": "The agent's accreditation has been revoked, making them ineligible to operate."
+      "Re-accreditation": "The agent has been re-accredited after a previous de-accreditation, restoring their ability to operate."
+      "Record Updated": "Changes have been made to the agent's registration details, such as profile information or credentials."
+  is_active:
+    lineage:
+      - datalake_agent_accreditation.agent_accreditation.is_active
+    description: Indicates whether the Agent has an active registration
+  dt_action:
+    lineage:
+      - datalake_agent_accreditation.agent_accreditation.ts_revision_started
+    description: Date when the action was performed on the Agent's registry
