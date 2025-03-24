@@ -1,0 +1,26 @@
+database_name: datalake_terminator_test_clean
+table_name: termination_step
+description: Macro steps of a contract on termination.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_terminator_test_raw.termination_step.id
+    description: The ID of the termination step.
+  id_termination:
+    lineage:
+      - datalake_terminator_test_raw.termination_step.termination_id
+    description: The ID of the termination.
+  step:
+    lineage:
+      - datalake_terminator_test_raw.termination_step.step
+    description: The step in the termination process.
+  ts_created:
+    lineage:
+      - datalake_terminator_test_raw.termination_step.created_at
+    description: The creation timestamp of the termination step.
+  ts_updated:
+    lineage:
+      - datalake_terminator_test_raw.termination_step.updated_at
+    description: The update timestamp of the termination step.

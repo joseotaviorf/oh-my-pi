@@ -1,0 +1,48 @@
+database_name: datalake_terminator_test_clean
+table_name: inspection_aud
+columns:
+  id:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.id
+  rev:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.rev
+  rev_type:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.revend
+  id_contract:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.contract_id
+  type:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.type
+  status:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.status
+  ts_inspected:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.date
+  ts_created:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.updated_at
+  keys_location:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.keys_location
+  keys_location_comment:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.keys_location_comment
+  year:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.year
+  month:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.month
+  day:
+    lineage:
+      - datalake_terminator_test_raw.inspection_aud.day

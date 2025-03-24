@@ -1,0 +1,66 @@
+database_name: datalake_terminator_test_clean
+table_name: termination_aud
+columns:
+  id:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.id
+  id_contract:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.contract_id
+  id_exit_inspection:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.exit_inspection_id
+  rev:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.rev
+  rev_type:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.revend
+  feedback:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.feedback
+  tenant_keys_location:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.tenant_keys_location
+  owner_keys_location:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.owner_keys_location
+  status:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.status
+  internal_status:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.internal_status
+  source:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.source
+  requested_by:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.requested_by
+  dt_termination:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.date
+  dt_vacancy:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.vacancy_date
+  ts_canceled:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.canceled_at
+  ts_created:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.updated_at
+  year:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.year
+  month:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.month
+  day:
+    lineage:
+      - datalake_terminator_test_raw.termination_aud.day

@@ -1,0 +1,48 @@
+database_name: datalake_terminator_test_clean
+table_name: termination_fee_negotiation_aud
+columns:
+  id:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.id
+  id_termination_fee:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.termination_fee_id
+  rev:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.rev
+  rev_type:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.revend
+  discount_value:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.discount_value
+  final_amount:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.final_amount
+  number_of_installments:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.number_of_installments
+  payment_option:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.payment_option
+  status:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.status
+  ts_created:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.updated_at
+  year:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.year
+  month:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.month
+  day:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_negotiation_aud.day

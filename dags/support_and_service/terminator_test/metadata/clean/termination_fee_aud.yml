@@ -1,0 +1,90 @@
+database_name: datalake_terminator_test_clean
+table_name: termination_fee_aud
+columns:
+  id:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.id
+  id_termination:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.termination_id
+  contract_adm_fee:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.contract_adm_fee
+  category:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.category
+  rev:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.rev
+  rev_type:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.revtype
+  rev_end:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.revend
+  period_occupancy_days:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.period_occupancy_days
+  period_fee_missing_days:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.period_fee_missing_days
+  period_fee_days:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.period_fee_days
+  period_fee_months:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.period_fee_months
+  fee_ratio:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.fee_ratio
+  fee_factor:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.fee_factor
+  contract_rental_amount:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.contract_rental_amount
+  tenant_amount:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.tenant_amount
+  landlord_amount:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.landlord_amount
+  is_fee_prior_notice:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.fee_prior_notice
+  is_pre_living:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.pre_living
+  dt_period_started_charge:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.period_start_charge
+  dt_period_ended_charge:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.period_end_charge
+  dt_period_min_ended:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.period_min_end_date
+  dt_period_fee_ended:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.period_fee_end_date
+  dt_requested:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.request_date
+  ts_created:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.updated_at
+  ts_outdated:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.outdated_at
+  year:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.year
+  month:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.month
+  day:
+    lineage:
+      - datalake_terminator_test_raw.termination_fee_aud.day

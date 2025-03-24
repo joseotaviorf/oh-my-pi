@@ -1,0 +1,30 @@
+database_name: datalake_terminator_test_clean
+table_name: contract
+description: table with contract information.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_terminator_test_raw.contract.id
+    description: The unique identifier for the contract in the database.
+  condominium_payer:
+    lineage:
+      - datalake_terminator_test_raw.contract.condominium_payer
+    description: Indicates whether the tenant or landlord is responsible for paying the condominium fees.
+  dt_start:
+    lineage:
+      - datalake_terminator_test_raw.contract.start_date
+    description: The start date of the contract.
+  rent_value:
+    lineage:
+      - datalake_terminator_test_raw.contract.rent_value
+    description: The monthly rental amount agreed upon in the contract.
+  ts_created:
+    lineage:
+      - datalake_terminator_test_raw.contract.created_at
+    description: The timestamp when the contract was initially created in the system.
+  ts_updated:
+    lineage:
+      - datalake_terminator_test_raw.contract.updated_at
+    description: The timestamp of the most recent update made to the contract details.

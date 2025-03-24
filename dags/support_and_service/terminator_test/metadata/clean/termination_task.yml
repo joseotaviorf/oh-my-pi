@@ -1,0 +1,54 @@
+database_name: datalake_terminator_test_clean
+table_name: termination_task
+description: Table with tickets that are created by the Terminator.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.id
+    description: It's the ID of termination_task.
+  id_termination:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.termination_id
+    description: It's the id_termination associated with this task.
+  id_external:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.external_id
+    description: It's the ID of the task opened in Zendesk.
+  origin:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.origin
+    description: It's the origin from where the task was opened.
+  priority:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.priority
+    description: Priority of the task.
+  title:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.title
+    description: It's the title of the task opened in Zendesk.
+  task_manager:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.task_manager
+    description: Shows who is the manager of that task.
+  status:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.status
+    description: Refers to the status of the task.
+  version:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.version
+    description: Shows what the version is.
+  type:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.type
+    description: What is the type of task created.
+  ts_created:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.created_at
+    description: Creation date of the task.
+  ts_updated:
+    lineage:
+      - datalake_terminator_test_raw.termination_task.updated_at
+    description: Date of the last update of the task.

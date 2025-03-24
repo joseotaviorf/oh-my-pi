@@ -1,0 +1,34 @@
+database_name: datalake_terminator_test_clean
+table_name: checklist_item
+description: The git that a termination is expected to fulfill according to its characteristics.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_terminator_test_raw.checklist_item.id
+    description: The ID of the termination checklist_item.
+  id_termination:
+    lineage:
+      - datalake_terminator_test_raw.checklist_item.termination_id
+    description: The ID of the termination.
+  checklist_item:
+    lineage:
+      - datalake_terminator_test_raw.checklist_item.name
+    description: The name of the checklist.
+  is_active:
+    lineage:
+      - datalake_terminator_test_raw.checklist_item.active
+    description: If de checklit is active.
+  is_done:
+    lineage:
+      - datalake_terminator_test_raw.checklist_item.done
+    description: If the checklist is done.
+  ts_created:
+    lineage:
+      - datalake_terminator_test_raw.checklist_item.created_at
+    description: The creation timestamp of the termination checklist.
+  ts_updated:
+    lineage:
+      - datalake_terminator_test_raw.checklist_item.updated_at
+    description: The update timestamp of the termination checklist.

@@ -1,0 +1,30 @@
+database_name: datalake_terminator_test_clean
+table_name: negotiation
+columns:
+  id:
+    lineage:
+      - datalake_terminator_test_raw.negotiation.id
+  id_termination:
+    lineage:
+      - datalake_terminator_test_raw.negotiation.termination_id
+  has_landlord_comment:
+    lineage:
+      - datalake_terminator_test_raw.negotiation.has_landlord_comment
+  needs_repair_by_tenant:
+    lineage:
+      - datalake_terminator_test_raw.negotiation.needs_repair_by_tenant
+  repair_resolution:
+    lineage:
+      - datalake_terminator_test_raw.negotiation.repair_resolution
+  repair_cost:
+    lineage:
+      - datalake_terminator_test_raw.negotiation.repair_cost
+  tenant_repair_costs_info:
+    lineage:
+      - datalake_terminator_test_raw.negotiation.tenant_repair_costs_info
+  ts_created:
+    lineage:
+      - datalake_terminator_test_raw.negotiation.created_at
+  ts_updated:
+    lineage:
+      - datalake_terminator_test_raw.negotiation.updated_at
