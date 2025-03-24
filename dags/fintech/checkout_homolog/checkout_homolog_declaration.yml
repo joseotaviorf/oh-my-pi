@@ -20,7 +20,6 @@ workflow:
     boleto: {}
     boleto_webhook: {}
     boleto_webhook_config: {}
-    change_owner_control: {}
     charge: {}
     charge_status_log: {}
     credit_card: {}
