@@ -12,6 +12,10 @@ workflow:
   inner_dependencies:
     condo_monitoring_events:
       - communication
+  tables_customization:
+    communication:
+      extraction_type: incremental
+      partitions: ["year", "month", "day"]
 cluster:
   type: databricks_13_3_med_general_cluster
   databricks_conn_id: databricks_new

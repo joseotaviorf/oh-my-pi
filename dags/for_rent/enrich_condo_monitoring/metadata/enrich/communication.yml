@@ -48,3 +48,15 @@ columns:
     lineage:
       - datalake_jaiminho_clean.user_notifications.id_entity
     description: Due date of the invoice related to the notification.
+  year:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.year
+    description: Year of when the notification was sent. Also, it's a partition of this table.
+  month:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.month
+    description: Month of when the notification was sent. Also, it's a partition of this table.
+  day:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.day
+    description: Day of when the notification was sent. Also, it's a partition of this table.

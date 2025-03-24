@@ -14,7 +14,10 @@ jaiminho AS (
     un.entity_name,
     un.status IN ('read', 'delivered') AS was_delivered,
     un.ts_sent,
-    DATE(REGEXP_EXTRACT(un.id_entity, r'(\d{4}-\d{2}-\d{2})')) AS dt_due
+    DATE(REGEXP_EXTRACT(un.id_entity, r'(\d{{4}}-\d{{2}}-\d{{2}})')) AS dt_due,
+    un.year,
+    un.month,
+    un.day
   FROM
     datalake_jaiminho_clean.user_notifications AS un
   LEFT JOIN
@@ -41,7 +44,10 @@ jaiminho AS (
       ELSE FALSE
     END AS was_comm_sent_on_time,
     j.ts_sent,
-    COALESCE(j.dt_due, i.dt_due) AS dt_due
+    COALESCE(j.dt_due, i.dt_due) AS dt_due,
+    j.year,
+    j.month,
+    j.day
   FROM
     jaiminho AS j
   LEFT JOIN
