@@ -2,6 +2,7 @@ from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.base.spark.base_spark import BaseSparkContext
 from bietlejuice.pipeline.table_loader_pipeline import TableLoaderPipeline
 from bietlejuice.services.metastore_services.spark_metastore_service import (
     SparkMetastoreService,
@@ -32,6 +33,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         when_matched_operation: dict = None,
         when_not_matched_operation: dict = None,
         table_privileges: TablePrivileges = None,
+        spark=BaseSparkContext.spark,
     ):
         """
         By default, it will simply do a write operation of a Delta table.
@@ -84,11 +86,12 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         self.when_matched_delete_condition = when_matched_delete_condition
         self.when_matched_operation = when_matched_operation
         self.when_not_matched_operation = when_not_matched_operation
+        self.spark = spark
 
     def load_and_register(self, df, format_options):
         spark_client = SparkClient()
         spark_metastore_service = SparkMetastoreService(spark_client)
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=self.spark)
 
         s3_path = self.target_database_location + self.table_name
         full_table_name = f"{self.target_database_name}.{self.table_name}"

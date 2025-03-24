@@ -48,6 +48,7 @@ if __name__ == "__main__":
             database_name=database_name,
             table_name=args.table_name,
             database_location=database_location,
+            spark=spark,
         )
     else:
         default_row_addition_pipeline = DefaultRowAdditionPipeline(

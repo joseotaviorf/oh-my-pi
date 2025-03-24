@@ -4,18 +4,23 @@ from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropert
 
 
 class TestSparkTablePropertyHelper(unittest.TestCase):
-    @patch(
-        "bietlejuice.base.spark.spark_table_property_helper.SparkTablePropertyHelper.get_table_properties"
-    )
-    def test_get_property_when_it_exists(self, mock_get_table_properties):
+    @patch("bietlejuice.base.spark.spark_table_property_helper.BaseSparkContext")
+    def test_get_property_when_it_exists(self, mock_base_spark_context):
         # arrange
         table_name = "test_table"
         property_name = "property_name"
         property_value = "property_value"
-        mock_get_table_properties.return_value = {property_name: property_value}
+        prop_mock = MagicMock()
+        prop_mock.key = property_name
+        prop_mock.value = property_value
+        mock_base_spark_context.spark.sql.return_value.collect.return_value = [
+            prop_mock
+        ]
 
         # act
-        result = SparkTablePropertyHelper.get_property(table_name, property_name)
+        result = SparkTablePropertyHelper.get_property(
+            table_name, property_name, mock_base_spark_context.spark
+        )
 
         # assert
         self.assertEqual(result, property_value)
@@ -32,7 +37,9 @@ class TestSparkTablePropertyHelper(unittest.TestCase):
         ]
 
         # act
-        result = SparkTablePropertyHelper.get_table_properties(table_name)
+        result = SparkTablePropertyHelper.get_table_properties(
+            table_name, mock_base_spark_context.spark
+        )
 
         # assert
         self.assertEqual(result, {prop_mock.key: prop_mock.value})
@@ -45,7 +52,9 @@ class TestSparkTablePropertyHelper(unittest.TestCase):
         property_value = "property_value"
 
         # act
-        SparkTablePropertyHelper.set_property(table_name, property_name, property_value)
+        SparkTablePropertyHelper.set_property(
+            table_name, property_name, property_value, mock_base_spark_context.spark
+        )
 
         # assert
         mock_base_spark_context.spark.sql.assert_called_once_with(

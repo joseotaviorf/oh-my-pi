@@ -9,7 +9,11 @@ class DeltaDefaultRowAdditionPipeline(AbstractPipeline):
     """
 
     def __init__(
-        self, database_name: str, table_name: str, database_location: str
+        self,
+        database_name: str,
+        table_name: str,
+        database_location: str,
+        spark=BaseSparkContext.spark,
     ) -> None:
         """
         :param database_name: database name for the table to be processed
@@ -20,6 +24,7 @@ class DeltaDefaultRowAdditionPipeline(AbstractPipeline):
         self.table_name = table_name
         self.database_location = database_location
         self.full_table_name = f"{self.database_name}.{self.table_name}"
+        self.spark = spark
 
     def run(self):
         if not self.is_dim():
@@ -31,14 +36,12 @@ class DeltaDefaultRowAdditionPipeline(AbstractPipeline):
         return self.table_name.startswith("dim_")
 
     def generate_default_row(self):
-        schema = BaseSparkContext.spark.table(self.full_table_name).schema
+        schema = self.spark.table(self.full_table_name).schema
         sk_col_name = schema[0].name
-        return BaseSparkContext.spark.createDataFrame(
-            data=[{sk_col_name: -1}], schema=schema
-        )
+        return self.spark.createDataFrame(data=[{sk_col_name: -1}], schema=schema)
 
     def merge_default_row(self, default_row_df):
-        loader = DeltaLoader()
+        loader = DeltaLoader(self.spark)
         loader.load_table(
             table_name=self.full_table_name,
             path=f"{self.database_location}/{self.table_name}",

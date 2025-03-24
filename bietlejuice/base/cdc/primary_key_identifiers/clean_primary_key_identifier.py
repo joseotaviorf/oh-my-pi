@@ -10,13 +10,16 @@ from bietlejuice.base.spark import BaseSparkContext
 
 
 class CleanPrimaryKeyIdentifier(PrimaryKeyIdentifier):
-    def __init__(self, data_documentation_bucket: str) -> None:
+    def __init__(
+        self, data_documentation_bucket: str, spark=BaseSparkContext.spark
+    ) -> None:
         """
         This class identifies the primary keys of the clean table based on the lineage documentation
         and the raw primary keys.
         """
 
         self.data_documentation_bucket = data_documentation_bucket
+        self.spark = spark
 
     def find_primary_keys(self, schema: str, table_name: str) -> List[str]:
         clean_primary_keys = []
@@ -61,10 +64,9 @@ class CleanPrimaryKeyIdentifier(PrimaryKeyIdentifier):
     def _find_raw_primary_keys(self, metadata: dict) -> List[str]:
         """Returns the primary keys of the raw table from the DeltaTable properties."""
 
-        spark = BaseSparkContext.spark
         first_column_origin = list(metadata["columns"].values())[0]["lineage"][0]
         raw_table_name = ".".join(first_column_origin.split(".")[:2])
-        raw_table = DeltaTable.forName(spark, raw_table_name)
+        raw_table = DeltaTable.forName(self.spark, raw_table_name)
         try:
             return raw_table.detail().collect()[0].properties["primary_keys"].split(",")
         except KeyError:

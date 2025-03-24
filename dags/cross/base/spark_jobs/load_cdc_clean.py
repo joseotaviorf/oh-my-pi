@@ -62,7 +62,7 @@ def get_primary_keys_from_args(args: Namespace) -> List[str]:
         return [key.strip() for key in args.primary_keys.split(",")]
 
     clean_pk_identifier = CleanPrimaryKeyIdentifier(
-        args.data_documentation_bucket,
+        args.data_documentation_bucket, spark
     )
     return clean_pk_identifier.find_primary_keys(args.schema, args.table_name)
 
@@ -136,7 +136,7 @@ def main():
     else:
         table_privileges = TablePrivileges.from_environment_default(full_clean_table_name)
 
-    loader = DeltaLoader()
+    loader = DeltaLoader(spark)
     if (has_clean_soft_delete):
         loader.load_table(
         table_name=full_clean_table_name,

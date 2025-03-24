@@ -78,7 +78,8 @@ class TestDeltaLoader:
         partition_by = ["column1", "column2"]
         mock_spark_context.spark.catalog.tableExists.return_value = False
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
         delta_loader.load_table(table_name, path, mock_source_df, partition_by)
 
         mock_spark_context.spark.sql.assert_called_once_with(
@@ -113,7 +114,7 @@ class TestDeltaLoader:
             ]
         )
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.load_table(table_name, path, mock_source_df, partition_by)
 
         delta_table_builder_mock.addColumns.assert_called_once_with(
@@ -132,7 +133,7 @@ class TestDeltaLoader:
         mock_spark_context.spark.catalog.tableExists.return_value = True
         mock_delta_table.isDeltaTable.return_value = False
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.load_table(table_name, None, mock_source_df)
 
         mock_spark_context.spark.sql.assert_called_with("CONVERT TO DELTA test_table")
@@ -157,7 +158,7 @@ class TestDeltaLoader:
             mock.MagicMock(),
         ]
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.load_table(table_name, None, mock_source_df)
 
         mock_spark_context.spark.sql.assert_any_call("CONVERT TO DELTA test_table")
@@ -183,7 +184,7 @@ class TestDeltaLoader:
             mock.MagicMock(),
         ]
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.load_table(table_name, None, mock_source_df)
 
         mock_spark_context.spark.sql.assert_any_call("CONVERT TO DELTA test_table")
@@ -213,20 +214,21 @@ class TestDeltaLoader:
             mock.MagicMock(),
         ]
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.load_table(table_name, None, mock_source_df)
 
         mock_spark_context.spark.sql.assert_any_call("CONVERT TO DELTA test_table")
         mock_spark_context.spark.sql.assert_any_call("DROP TABLE test_table")
         delta_table_builder_mock.execute.assert_called_once()
 
-    def test_write_to_table(self, mock_source_df):
+    def test_write_to_table(self, mock_spark_context, mock_source_df):
         table_name = "test_table"
         path = "test_path"
         partition_by = ["column1", "column2"]
         merge_schema = True
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
         delta_loader.load_table(
             table_name, path, mock_source_df, partition_by, merge_schema
         )
@@ -252,7 +254,7 @@ class TestDeltaLoader:
         when_not_matched_insert_condition = "condition1"
         when_matched_update_condition = "condition2"
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.load_table(
             table_name,
             None,
@@ -294,7 +296,7 @@ class TestDeltaLoader:
         when_matched_update_condition = "condition2"
         when_matched_delete_condition = "condition3"
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.load_table(
             table_name,
             None,
@@ -329,7 +331,7 @@ class TestDeltaLoader:
         table_name = "test_table"
         retention_hours = 24
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.vacuum_table(table_name, retention_hours)
 
         mock_spark_context.spark.sql.assert_called_once_with(
@@ -339,7 +341,7 @@ class TestDeltaLoader:
     def test_optimize_table_without_z_order(self, mock_spark_context):
         table_name = "test_table"
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.optimize_table(table_name)
 
         mock_spark_context.spark.sql.assert_called_once_with(f"OPTIMIZE test_table")
@@ -348,7 +350,8 @@ class TestDeltaLoader:
         table_name = "test_table"
         z_order_by = ["column1", "column2"]
 
-        delta_loader = DeltaLoader()
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
         delta_loader.optimize_table(table_name, z_order_by)
 
         mock_spark_context.spark.sql.assert_called_once_with(

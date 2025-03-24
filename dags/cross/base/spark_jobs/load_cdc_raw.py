@@ -110,6 +110,7 @@ def main():
                 dbutils_secret_key=dbutils_secret_key,
             ).get_cdc_schema_finder(DatabaseTypeEnum(database_type)),
             datalake_table_schema=f"datalake_{schema}_raw",
+            spark=spark,
         )
         primary_keys = pk_identifier.find_primary_keys(
             args.table_name
@@ -146,7 +147,7 @@ def main():
 
     full_raw_table_name = f"datalake_{schema}_raw.{table_name}"
 
-    loader = DeltaLoader()
+    loader = DeltaLoader(spark)
     loader.load_table(
         table_name=full_raw_table_name,
         path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
@@ -155,7 +156,7 @@ def main():
         when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction",
     )
     SparkTablePropertyHelper.set_property(
-        full_raw_table_name, "primary_keys", ",".join(primary_keys)
+        full_raw_table_name, "primary_keys", ",".join(primary_keys), spark
     )
 
 

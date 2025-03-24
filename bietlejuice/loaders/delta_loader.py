@@ -13,6 +13,9 @@ logger = QuintoAndarLogger("DeltaLoader")
 class DeltaLoader:
     """Class for loading data into a Delta table"""
 
+    def __init__(self, spark=BaseSparkContext.spark) -> None:
+        self.spark = spark
+
     def load_table(
         self,
         table_name: str,
@@ -47,10 +50,10 @@ class DeltaLoader:
         where keys are the columns to insert, and values are the data to be inserted. Again, source.<column_name> or target.<column_name> can be used to clarify data origin.
         """
         database_name = table_name.split(".")[0].replace("`", "")
-        BaseSparkContext.spark.sql(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
+        self.spark.sql(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
 
-        exists = BaseSparkContext.spark.catalog.tableExists(table_name)
-        is_delta = DeltaTable.isDeltaTable(BaseSparkContext.spark, path)
+        exists = self.spark.catalog.tableExists(table_name)
+        is_delta = DeltaTable.isDeltaTable(self.spark, path)
         if exists and not is_delta:
             logger.info(f"Path {path} is not a Delta Table. Running conversion.")
             self._convert_to_delta_table(table_name)
@@ -91,9 +94,9 @@ class DeltaLoader:
     ) -> DeltaTable:
         """Create an empty Delta table"""
         if replace_if_exists:
-            builder = DeltaTable.createOrReplace(BaseSparkContext.spark)
+            builder = DeltaTable.createOrReplace(self.spark)
         else:
-            builder = DeltaTable.createIfNotExists(BaseSparkContext.spark)
+            builder = DeltaTable.createIfNotExists(self.spark)
         builder = builder.tableName(table_name)
         schema = self.convert_schema_to_nullable(source_df.schema)
         builder = builder.addColumns(schema)
@@ -111,7 +114,7 @@ class DeltaLoader:
     def _convert_to_delta_table(self, table_name: str) -> None:
         """Convert a table to a Delta table"""
         try:
-            BaseSparkContext.spark.sql(f"CONVERT TO DELTA {table_name}")
+            self.spark.sql(f"CONVERT TO DELTA {table_name}")
             logger.info(f"Table {table_name} converted to Delta format.")
         except Py4JJavaError as e:
             error_class = e.java_exception.getClass().getName()
@@ -120,7 +123,7 @@ class DeltaLoader:
             if error_class != "java.io.FileNotFoundException":
                 raise e
             logger.info(f"Table {table_name} exists, but has no data. Dropping it.")
-            BaseSparkContext.spark.sql(f"DROP TABLE {table_name}")
+            self.spark.sql(f"DROP TABLE {table_name}")
         except AnalysisException as e:
             error_class = e.getErrorClass()
             # These errors happen, respectively:
@@ -135,7 +138,7 @@ class DeltaLoader:
             logger.info(
                 f"Delta log or table {table_name} was deleted. Dropping from Metastore so it can be recreated."
             )
-            BaseSparkContext.spark.sql(f"DROP TABLE {table_name}")
+            self.spark.sql(f"DROP TABLE {table_name}")
 
     def _write_to_table(
         self,
@@ -178,11 +181,9 @@ class DeltaLoader:
         """
 
         # Necessary for schema evolution
-        BaseSparkContext.spark.conf.set(
-            "spark.databricks.delta.schema.autoMerge.enabled", "true"
-        )
+        self.spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
 
-        target_table = DeltaTable.forName(BaseSparkContext.spark, table_name)
+        target_table = DeltaTable.forName(self.spark, table_name)
         join_condition = " AND ".join(
             [f"source.{col} = target.{col}" for col in merge_on]
         )
@@ -218,19 +219,17 @@ class DeltaLoader:
     def vacuum_table(self, table_name: str, retention_hours: int) -> None:
         """Vacuum a Delta table"""
 
-        spark = BaseSparkContext.spark
         command = f"VACUUM {table_name} RETAIN {retention_hours} HOURS"
         logger.info(f"Running vacuum with command {command}")
-        spark.sql(command)
+        self.spark.sql(command)
         logger.info(f"Vacuum successful for table {table_name}")
 
     def optimize_table(self, table_name: str, z_order_by: list = None) -> None:
         """Optimize a Delta table, optionally using ZORDER BY"""
 
-        spark = BaseSparkContext.spark
         command = f"OPTIMIZE {table_name}"
         if z_order_by:
             command += f" ZORDER BY {','.join(z_order_by)}"
         logger.info(f"Running optimize with command {command}")
-        spark.sql(command)
+        self.spark.sql(command)
         logger.info(f"Optimize successful for table {table_name}")

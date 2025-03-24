@@ -76,6 +76,7 @@ def main():
         when_matched_operation=json.loads(args.when_matched_operation),
         when_not_matched_operation=json.loads(args.when_not_matched_operation),
         table_privileges=table_privileges,
+        spark=spark
     )
     table_loader_pipeline.run()
 

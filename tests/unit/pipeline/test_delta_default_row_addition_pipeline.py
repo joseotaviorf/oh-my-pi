@@ -52,7 +52,10 @@ class TestDeltaDefaultRowAdditionPipeline:
         table_name = "dim_foo"
         database_location = "s3://foo/bar"
         pipeline = DeltaDefaultRowAdditionPipeline(
-            database_name, table_name, database_location
+            database_name,
+            table_name,
+            database_location,
+            spark=mock_base_spark_context.spark,
         )
 
         # Act

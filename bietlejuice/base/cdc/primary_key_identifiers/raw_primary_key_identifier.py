@@ -11,10 +11,14 @@ from pyspark.sql.utils import AnalysisException
 
 class RawPrimaryKeyIdentifier(PrimaryKeyIdentifier):
     def __init__(
-        self, schema_finder: CdcSchemaFinder, datalake_table_schema: str
+        self,
+        schema_finder: CdcSchemaFinder,
+        datalake_table_schema: str,
+        spark=BaseSparkContext.spark,
     ) -> None:
         self.schema_finder = schema_finder
         self.datalake_table_schema = datalake_table_schema
+        self.spark = spark
 
     def find_primary_keys(self, table_name: str) -> List[str]:
         primary_keys = self._try_find_existing_delta_table_pks(
@@ -38,9 +42,8 @@ class RawPrimaryKeyIdentifier(PrimaryKeyIdentifier):
     ) -> Optional[list]:
         """Try to find the primary keys in the metadata of a saved datalake table, if it exists."""
         try:
-            spark = BaseSparkContext.spark
             delta_table = DeltaTable.forName(
-                spark, f"{datalake_table_schema}.{table_name}"
+                self.spark, f"{datalake_table_schema}.{table_name}"
             )
             return (
                 delta_table.detail().collect()[0].properties["primary_keys"].split(",")

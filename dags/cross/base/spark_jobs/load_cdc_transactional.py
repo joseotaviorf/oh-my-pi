@@ -63,7 +63,7 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
         f"m=load_df_into_transactional, file_format=delta, msg=Loading DataFrame into transactional layer..."
     )
 
-    loader = DeltaLoader()
+    loader = DeltaLoader(spark)
 
     loader.load_table(
         f"datalake_{schema}_transactional.{table_name}",

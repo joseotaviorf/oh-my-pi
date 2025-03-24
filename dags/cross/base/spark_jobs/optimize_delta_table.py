@@ -13,7 +13,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 def main():
     args = parse_arguments()
-    loader = DeltaLoader()
+    loader = DeltaLoader(spark)
     tables = json.loads(args.tables)
     logger.info(f"Starting vacuum and optimize for {len(tables)} tables, parallelism = {args.parallelism}.")
     pool = ThreadPool(processes=args.parallelism)
