@@ -1,30 +1,28 @@
 import argparse
 import ast
-import json
 from datetime import datetime
-from typing import Dict, Iterator
+from typing import Dict
 
 from presidio_analyzer.nlp_engine import NlpEngineProvider
 from presidio_analyzer import (
     AnalyzerEngine,
     BatchAnalyzerEngine,
-    DictAnalyzerResult,
     RecognizerRegistry,
 )
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import udf, from_json, col, explode_outer, explode, lit
-from pyspark.sql.types import StructType, StringType, StructField, ArrayType, DoubleType
+from pyspark.sql.functions import col, explode, count, collect_list, struct
+from pyspark.sql.types import StructType, StringType, StructField, ArrayType, IntegerType, MapType
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.services import ConfigurationService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_pii_scan_into_datalake"
 logger = QuintoAndarLogger(JOB_NAME)
 
-RECOGNIZERS_PATH = "prod_conf.yml"
 SCORE_THRESHOLD = 0.6
 
 ENTITIES_LIST = [
@@ -70,16 +68,24 @@ LABELS_TO_IGNORE = {
     "FAC",
 }
 
-def load_recognizers_from_yaml() -> RecognizerRegistry:
+def load_recognizers_from_dict() -> RecognizerRegistry:
     """
     Load custom recognizers from a YAML configuration file and add them to the registry.
 
     Returns:
         registry: A RecognizerRegistry instance with the custom recognizers loaded.
     """
+    source = source_broadcast.value
+    config_service = ConfigurationService(source)
+    recognizer_dict_list = config_service.get_config("recognizers")
+
+    if not recognizer_dict_list:
+      raise Exception("dict_recognizer_list is required.")
+
     registry = RecognizerRegistry()
     registry.load_predefined_recognizers()
-    registry.add_recognizers_from_yaml(RECOGNIZERS_PATH)
+    for dict_recognizer in recognizer_dict_list:
+      registry.add_pattern_recognizer_from_dict(dict_recognizer)
 
     return registry
 
@@ -106,7 +112,7 @@ def build_batch_analyzer() -> BatchAnalyzerEngine:
         BatchAnalyzerEngine: An instance of BatchAnalyzerEngine configured with the custom recognizers and NLP engine.
     """
     nlp_config = load_nlp_config()
-    registry = load_recognizers_from_yaml()
+    registry = load_recognizers_from_dict()
     provider = NlpEngineProvider(nlp_configuration=nlp_config)
 
     nlp_engine = provider.create_engine()
@@ -116,46 +122,47 @@ def build_batch_analyzer() -> BatchAnalyzerEngine:
 
     return batch_analyzer
 
-def analyze(df_dict, is_column_name=False) -> Iterator[DictAnalyzerResult]:
-    """
-    Analyze a dictionary of data for PII entities.
+def clean_result(result, matched_value):
+  if not result:
+        return [{"type": "NOT_FOUND", "score": 0.0, "matched_value": matched_value}]
+  return [
+      {"type": r.entity_type, "score": r.score, "matched_value": matched_value}
+      for r in result
+  ]
 
-    Args:
-        df_dict (dict): The input dictionary containing data to be analyzed.
-        is_column_name (bool): Flag indicating whether to use column name entities for analysis.
+def process_partition(iter_of_rows):
+    batch_analyzer = build_batch_analyzer()
+    rows_list = list(iter_of_rows)
 
-    Returns:
-        Iterator[DictAnalyzerResult]: A list of detected PII entities.
-    """
-    analyzer = build_batch_analyzer()
-    entities_list = ENTITIES_LIST
-    if is_column_name:
-        entities_list = COLUMN_NAME_ENTITIES
+    df_dict = {
+      row["id_entity"] : row["sample"]
+      for row in rows_list
+    }
+    df_dict_columns = {
+      row["id_entity"] : row["list_column_name"]
+      for row in rows_list
+    }
 
-    return analyzer.analyze_dict(
-        input_dict=df_dict,
-        entities=entities_list,
-        score_threshold=SCORE_THRESHOLD,
-        language="en",
-    )
+    # pprint(df_dict)
+    results = list(batch_analyzer.analyze_dict(
+      input_dict=df_dict,
+      entities=ENTITIES_LIST,
+      score_threshold=SCORE_THRESHOLD,
+      language="en",
+    ))
 
-def analyze_udf(column_name: str, sample: list, is_column_name=False) -> str:
-  dict_to_analyze = {
-    column_name: sample
-  }
-  analyzer_results = list(analyze(dict_to_analyze, is_column_name=is_column_name))
-  row = []
-  for index, value in enumerate(analyzer_results[0].value):
-    row.append({
-        "value": str(value),
-        "recognizer_results": []
-    })
-    results = analyzer_results[0].recognizer_results[index]
-    if not results:
-      row[index]["recognizer_results"].append({"type": "NOT_FOUND", "score": 0.0})
-    for item in results:
-      row[index]["recognizer_results"].append({"type": item.entity_type, "score": str(item.score)})
-  return json.dumps(row)
+    col_results = list(batch_analyzer.analyze_dict(
+      input_dict=df_dict_columns,
+      entities=COLUMN_NAME_ENTITIES,
+      score_threshold=SCORE_THRESHOLD,
+      language="en",
+    ))
+    for col_result, result, row in zip(col_results, results, rows_list):
+      yield (
+        *row,
+        [clean_result(r, matched_value) for (r, matched_value) in zip(result.recognizer_results, result.value)],
+        [clean_result(c, c_matched_value) for (c, c_matched_value) in zip(col_result.recognizer_results, col_result.value)],
+      )
 
 def load_table(
     dataframe: DataFrame,
@@ -229,87 +236,150 @@ def get_sample(date_filter) -> DataFrame:
         WHERE
           MAKE_DATE(year, month, day) = '{date_filter}'
         GROUP BY ALL
-        LIMIT 10
+        LIMIT 1000
       """
     return spark.sql(query)
 
 def main():
     """
     Main function to load PII scan results into the datalake.
+
+    //TODO: Move DF transformations from main function.
     """
     logger.info("m=main,msg='Starting PII scan load into the datalake'")
     args = parse_args()
     partition_cols = ast.literal_eval(args.partitions)
+    source_broadcast = spark.sparkContext.broadcast(args.schema)
 
-    object_schema = StructType([
-        StructField("type", StringType(), True),
-        StructField("score", DoubleType(), True)
+    schema = StructType([
+        StructField("layer", StringType(), True),
+        StructField("id_entity", StringType(), True),
+        StructField("database_name", StringType(), True),
+        StructField("table_name", StringType(), True),
+        StructField("column_name", StringType(), True),
+        StructField("sample", ArrayType(StringType()), True),
+        StructField("list_column_name", ArrayType(StringType()), True),
+        StructField("year", IntegerType(), True),
+        StructField("month", IntegerType(), True),
+        StructField("day", IntegerType(), True),
+        StructField("sample_results", ArrayType(
+            ArrayType(
+                MapType(StringType(), StringType(), True),
+                True
+            ),
+            True
+        ), True),
+        StructField("col_results", ArrayType(
+            ArrayType(
+                MapType(StringType(), StringType(), True),
+                True
+            ),
+            True
+        ), True),
     ])
 
-    recognizer_schema = ArrayType(StructType([
-        StructField("value", StringType(), True),
-        StructField("recognizer_results", ArrayType(object_schema), True)
-    ]), True)
+    df = get_sample(date_filter=args.load_start_date)
 
-    udf_analyzer = udf(analyze_udf)
-    df = get_sample(date_filter= args.load_start_date)
+    rdd = df.rdd.mapPartitions(process_partition)
+    df_rebuilt = spark.createDataFrame(data=rdd, schema=schema)
 
-    df_analysis = (
-        df
-        .withColumn("analysis", udf_analyzer(df["column_name"], df["sample"]))
-        .withColumn("column_name_analysis", udf_analyzer(df["column_name"], df["list_column_name"], lit(True)))
-        .withColumn("analysis_parsed", from_json(
-            col("analysis"),
-            recognizer_schema
-        ))
-        .withColumn("column_analysis_parsed", from_json(
-            col("column_name_analysis"),
-            recognizer_schema
-        ))
-    )
-
-    df_explode = (
-        df_analysis
+    df_explode_sample = (
+        df_rebuilt
         .select(
             "layer",
             "id_entity",
             "database_name",
             "table_name",
             "column_name",
-            "analysis_parsed",
-            "column_analysis_parsed",
+            "sample_results",
             "year",
             "month",
             "day"
         )
-        .withColumn("analysis_exploded", explode(col("analysis_parsed").alias("analysis_exploded")))
-        .withColumn("column_analysis_exploded",
-                    explode(col("column_analysis_parsed").alias("column_analysis_exploded")))
-        .withColumn("parsed_value", col("analysis_exploded.value").alias("value"))
-        .withColumn("recognizer_results",
-                    explode_outer(col("analysis_exploded.recognizer_results")).alias("recognizer_results"))
-        .withColumn("column_parsed_value", col("column_analysis_exploded.value").alias("column_value"))
-        .withColumn("column_recognizer_results",
-                    explode_outer(col("column_analysis_exploded.recognizer_results")).alias(
-                        "column_recognizer_results"))
+        .withColumn("sample_results_exploded", explode(col("sample_results").alias("sample_results_exploded")))
+        .withColumn("sample_results_exploded_inner",
+                    explode(col("sample_results_exploded").alias("sample_results_exploded_inner")))
         .select(
             "layer",
             "id_entity",
             "database_name",
             "table_name",
             "column_name",
-            "parsed_value",
-            col("recognizer_results.type").alias("type"),
-            col("recognizer_results.score").alias("score"),
-            col("column_recognizer_results.type").alias("column_type"),
-            col("column_recognizer_results.score").alias("column_score"),
+            "sample_results",
+            col("sample_results_exploded_inner.matched_value").alias("sample_matched_value"),
+            col("sample_results_exploded_inner.type").alias("type"),
+            col("sample_results_exploded_inner.score").alias("score"),
             "year",
             "month",
             "day"
         )
     )
+    grouped_sample = df_explode_sample.groupBy(
+        "layer", "id_entity", "database_name", "table_name", "column_name", "sample_results",
+        "year", "month", "day", "type"
+    ).agg(
+        count("*").alias("count")
+    )
+
+    summary_sample = grouped_sample.groupBy(
+        "layer", "id_entity", "database_name", "table_name", "column_name", "sample_results",
+        "year", "month", "day"
+    ).agg(
+        collect_list(struct("type", "count")).alias("sample_summary")
+    )
+
+    df_explode_col = (
+        df_rebuilt
+        .select(
+            "layer",
+            "id_entity",
+            "database_name",
+            "table_name",
+            "column_name",
+            "col_results",
+            "year",
+            "month",
+            "day"
+        )
+        .withColumn("col_results_exploded", explode(col("col_results").alias("col_results_exploded")))
+        .withColumn("col_results_exploded_inner",
+                    explode(col("col_results_exploded").alias("col_results_exploded_inner")))
+        .select(
+            "layer",
+            "id_entity",
+            "database_name",
+            "table_name",
+            "column_name",
+            "col_results",
+            col("col_results_exploded_inner.matched_value").alias("col_matched_value"),
+            col("col_results_exploded_inner.type").alias("type"),
+            col("col_results_exploded_inner.score").alias("score"),
+            "year",
+            "month",
+            "day"
+        )
+    )
+    grouped_col = df_explode_col.groupBy(
+        "layer", "id_entity", "database_name", "table_name", "column_name", "col_results",
+        "year", "month", "day", "type"
+    ).agg(
+        count("*").alias("count")
+    )
+
+    summary_col = grouped_col.groupBy(
+        "layer", "id_entity", "database_name", "table_name", "column_name", "col_results",
+        "year", "month", "day"
+    ).agg(
+        collect_list(struct("type", "count")).alias("col_summary")
+    )
+    final_df = summary_sample.join(
+        summary_col,
+        on=["layer", "id_entity", "database_name", "table_name", "column_name", "year", "month", "day"],
+        how="inner"
+    )
+
     load_table(
-        df_explode,
+        final_df,
         args.environment,
         args.datalake_bucket,
         args.schema,
