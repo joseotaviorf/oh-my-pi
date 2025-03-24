@@ -8,7 +8,7 @@ workflow:
   type: query
   layer: metric
 cluster:
-  type: databricks_13_3_med_io-general_cluster
+  type: databricks_13_3_med_memory_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
