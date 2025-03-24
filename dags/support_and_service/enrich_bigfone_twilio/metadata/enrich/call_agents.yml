@@ -1,8 +1,9 @@
 database_name: datalake_bigfone_twilio
 table_name: call_agents
-description: Enrichment table that aims to consolidate information from analysts in 
+description:
+  Enrichment table that aims to consolidate information from analysts in
   the call context (bigfone). The granularity of this table is the analyst id.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_agent:

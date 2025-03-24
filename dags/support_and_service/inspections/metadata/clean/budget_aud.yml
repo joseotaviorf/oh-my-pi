@@ -2,7 +2,7 @@
 database_name: datalake_inspections_clean
 table_name: budget_aud
 description: This table aims to store information about the budget approval context with the update history.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_budget:

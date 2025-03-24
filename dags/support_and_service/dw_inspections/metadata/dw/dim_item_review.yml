@@ -5,7 +5,7 @@ description:
   This dimension brings reviews performed by tenants and/or landlords for an inspection.
   Here we find the user's comment with his review and the type of user who created the review.
   Each row is a unique review, identified by the sk_item_review column.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_item_review:

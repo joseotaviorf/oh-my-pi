@@ -3,7 +3,7 @@ table_name: fact_payment_tasks
 description:
   Information about CRM tasks from Payment workgroups. Each line is an
   action from a CRM task.
-domain: Support and Service
+domain: Support and Services
 owner: ana.maia@quintoandar.com.br
 columns:
   sk_task:

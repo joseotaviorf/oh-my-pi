@@ -1,9 +1,8 @@
 ---
 database_name: datalake_tracksale
 table_name: dispatch
-description:
-  In this table, we clean the dispatch data bringing only the most up-to-date ones.
-domain: Support and Service
+description: In this table, we clean the dispatch data bringing only the most up-to-date ones.
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
@@ -13,7 +12,8 @@ columns:
   id_campaign:
     lineage:
       - datalake_tracksale_clean.dispatch.campaign
-    description: Key of NPS campaign, which is a definition of a certain customer
+    description:
+      Key of NPS campaign, which is a definition of a certain customer
       experience survey.
   campaign_name:
     lineage:

@@ -1,7 +1,7 @@
 database_name: datalake_bigfone_twilio
 table_name: call_flex_reservations
 description: A table originated in Twilio containing calls, tasks, reservations, queues, and agents that had initiated and completed interactions.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_call:
@@ -19,11 +19,11 @@ columns:
   id_agent:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description:  Unique identifier for each agent.
+    description: Unique identifier for each agent.
   id_queue:
     lineage:
       - datalake_bigfone_events.events.metadata
-    description:  Unique identifier for each queue.
+    description: Unique identifier for each queue.
   queue_name:
     lineage:
       - datalake_bigfone_events.events.metadata

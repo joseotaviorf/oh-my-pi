@@ -1,8 +1,8 @@
 database_name: datalake_crm_tasks
 table_name: task_status
-description: Enrichment table that consolidates information about the steps 
+description: Enrichment table that consolidates information about the steps
   of a CRM task. Each row in this table represents a CRM task.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_task:

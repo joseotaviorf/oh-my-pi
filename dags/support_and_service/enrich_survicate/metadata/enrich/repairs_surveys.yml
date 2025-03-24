@@ -2,7 +2,7 @@
 database_name: datalake_survicate
 table_name: repairs_surveys
 description: Answers to repair service forms
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_answer:

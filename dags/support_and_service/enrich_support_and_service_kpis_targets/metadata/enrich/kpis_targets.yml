@@ -1,9 +1,9 @@
 ---
 database_name: datalake_support_and_service_kpis_targets
 table_name: kpis_targets
-description: Enrich, which unifies the monitoring data of S&S indicators, 
+description: Enrich, which unifies the monitoring data of S&S indicators,
   has 2 gsheets as its source and its granularity is the monitoring date.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   metric_name:
@@ -24,8 +24,8 @@ columns:
   vertical:
     description: Front of action related to the indicator.
     categories:
-      Support: ''
-      Service: ''
+      Support: ""
+      Service: ""
   target:
     lineage:
       - datalake_gsheets_clean.target_service_kpis.target

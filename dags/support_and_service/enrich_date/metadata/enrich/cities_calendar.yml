@@ -4,7 +4,7 @@ table_name: cities_calendar
 description:
   Calculates the interval of working days after a referenced date, indicating whether they are working days or not.
   The granularity of the table is given by id_date and id_city.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_date:

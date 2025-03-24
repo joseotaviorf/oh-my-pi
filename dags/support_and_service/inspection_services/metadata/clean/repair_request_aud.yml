@@ -4,7 +4,7 @@ table_name: repair_request_aud
 description:
   This table provides information on repair requests after the inspection
   process.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_repair_request:

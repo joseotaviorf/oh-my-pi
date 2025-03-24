@@ -1,7 +1,7 @@
 database_name: datalake_support_users
 table_name: zendesk_users
 description: Contains data from all Zendesk users
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_user_main:

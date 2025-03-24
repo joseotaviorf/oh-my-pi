@@ -4,7 +4,7 @@ table_name: inspector_reports
 description: |
   Table and enrichment that aims to make report information available at the time the surveyor sends it for analysis.
   Each line of this table is a combination of all levels of the report, from inspection to the media related to each item.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspection:

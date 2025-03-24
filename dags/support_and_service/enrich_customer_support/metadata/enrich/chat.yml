@@ -6,7 +6,7 @@ description:
   resulted in a Zendesk ticket. By aggregating all chat and ticket metrics in a unified
   table, it provides a holistic view of the customer support activity, enabling
   smoother analysis and tracking of key performance indicators.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_segment:

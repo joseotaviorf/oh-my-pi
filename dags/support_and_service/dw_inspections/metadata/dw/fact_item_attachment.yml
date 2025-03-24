@@ -5,7 +5,7 @@ description:
   This table brings data from the item's attachments, which can be a review with media,
   a review without media or just a media without a linked review.
   Each row is a unique attachment, identified by the sk_item_attachment column.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_item_attachment:

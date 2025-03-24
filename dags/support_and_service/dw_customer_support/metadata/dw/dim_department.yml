@@ -3,7 +3,7 @@ table_name: dim_department
 description:
   Dimension containing department attributes. Those attributes are collected
   from Controle Analistas 2.0 sheet.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_department:

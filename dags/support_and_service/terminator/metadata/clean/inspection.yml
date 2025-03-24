@@ -1,7 +1,7 @@
 database_name: datalake_terminator_clean
 table_name: inspection
 description: Table with informations about inspections services that are important for termination process.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:

@@ -3,7 +3,7 @@ table_name: fact_linhadireta_chat_tasks
 description:
   Fact table that contains events data, flags and its related foreign keys
   on each "linhadireta" tasks
-domain: Support and Service
+domain: Support and Services
 owner: nathalia.paula@quintoandar.com.br
 columns:
   sk_action_date:

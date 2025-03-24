@@ -1,9 +1,8 @@
 ---
 database_name: datalake_tracksale
 table_name: customer_conversions
-description:
-  This table unifies dispatch-level records, especially customer information. Each row in this table must be a dispatch record.
-domain: Support and Service
+description: This table unifies dispatch-level records, especially customer information. Each row in this table must be a dispatch record.
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_dispatch:
@@ -18,8 +17,9 @@ columns:
   id_customer:
     lineage:
       - datalake_tracksale.dispatch.customers
-    description: 'Key of NPS customer in a dispatch. Formed by the three contact info
-      availables: email, phone and name, if provided.'
+    description:
+      "Key of NPS customer in a dispatch. Formed by the three contact info
+      availables: email, phone and name, if provided."
   customer_email:
     lineage:
       - datalake_tracksale.dispatch.customers
@@ -31,10 +31,12 @@ columns:
   id_answer:
     lineage:
       - datalake_tracksale.answer.id
-    description: Key of the NPS answer from the customer in each dispatch (the last
+    description:
+      Key of the NPS answer from the customer in each dispatch (the last
       if multiple, which is rare).
   is_customer_identified:
     lineage:
       - datalake_tracksale.dispatch.customers
-    description: Boolean that indicates if the customer is identified through the
+    description:
+      Boolean that indicates if the customer is identified through the
       id_customer, if the id_customer exists then it is True.

@@ -2,9 +2,9 @@
 database_name: datalake_tracksale
 table_name: answer_justifications
 description:
-  This table provides information on the level of justification per response, 
+  This table provides information on the level of justification per response,
   each line must contain an nps response, its justification and the level of justification.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_answer:
@@ -14,8 +14,10 @@ columns:
   justification:
     lineage:
       - datalake_tracksale.answer.justifications
-    description: Justification for the answer provided by the client, which might
+    description:
+      Justification for the answer provided by the client, which might
       be multiple for answers and comes from a list.
   level:
-    description: Hierarchy level of the justification provided, main if the first
+    description:
+      Hierarchy level of the justification provided, main if the first
       selection or second if in drop-down options.

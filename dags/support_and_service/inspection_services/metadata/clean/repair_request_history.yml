@@ -2,7 +2,7 @@
 database_name: datalake_inspection_services_clean
 table_name: repair_request_history
 description: Clean table with the objective of ingesting the historical information of the repair request, coming from the inspection services database.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:

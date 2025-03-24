@@ -3,7 +3,7 @@ table_name: fact_onboarding_tenant_tasks
 description:
   Fact table that contains events data, flags and its related foreign keys
   on each Tenant's Onborading task grouped by task action
-domain: Support and Service
+domain: Support and Services
 owner: nathalia.paula@quintoandar.com.br
 columns:
   sk_task:

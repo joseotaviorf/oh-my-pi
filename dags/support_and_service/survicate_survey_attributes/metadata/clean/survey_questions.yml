@@ -2,7 +2,7 @@
 database_name: datalake_survicate_clean
 table_name: survey_questions
 description: This table contains all questions included in a specific survey, making it easier to review or analyze the survey structure.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_question:

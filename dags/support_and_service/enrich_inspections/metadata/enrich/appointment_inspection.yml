@@ -4,7 +4,7 @@ table_name: appointment_inspection
 description: |
   Enrichment table that aims to store the processed inspection scheduling data.
   Each line of this table contains a scheduling record linked to the inspection process.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_appointment:

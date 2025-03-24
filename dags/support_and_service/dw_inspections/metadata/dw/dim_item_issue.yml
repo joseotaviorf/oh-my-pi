@@ -6,7 +6,7 @@ description:
   Here we find what type of problem was found, what was the comment, tag or checklist marked by the surveyor and the
   suggestion for repairing the problem.
   Each row is a unique issue, identified by the sk_item_issue column.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_item_issue:

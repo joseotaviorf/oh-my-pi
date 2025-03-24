@@ -2,7 +2,7 @@
 database_name: datalake_inspection_services_clean
 table_name: contestation_media_aud
 description: When an tenant makes a contestation of a requested repair, it is possible to add photos as evidence.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_contestation_media:

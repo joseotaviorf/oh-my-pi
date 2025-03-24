@@ -1,9 +1,8 @@
 ---
 database_name: datalake_tracksale
 table_name: answer
-description:
-  This table concentrates general information from nps responses, gathering both respondent information and information from the response itself.
-domain: Support and Service
+description: This table concentrates general information from nps responses, gathering both respondent information and information from the response itself.
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
@@ -13,7 +12,8 @@ columns:
   id_campaign:
     lineage:
       - datalake_tracksale_clean.answer.id_campaign
-    description: Key of the NPS campaign from which the dispatch was sent to target
+    description:
+      Key of the NPS campaign from which the dispatch was sent to target
       customers.
   campaign_name:
     lineage:
@@ -58,12 +58,14 @@ columns:
   nps_answer:
     lineage:
       - datalake_tracksale_clean.answer.nps_answer
-    description: Average score of responses provided by NPS customers, ranging from
+    description:
+      Average score of responses provided by NPS customers, ranging from
       0 to 10.
   score_category:
     lineage:
       - datalake_tracksale_clean.answer.nps_answer
-    description: Score category of the answer score, defined by theory as promoter,
+    description:
+      Score category of the answer score, defined by theory as promoter,
       passive or detractor.
   last_nps_answer:
     lineage:
@@ -72,12 +74,14 @@ columns:
   nps_comment:
     lineage:
       - datalake_tracksale_clean.answer.nps_comment
-    description: Comment written by customer in some answers, which is an optional
+    description:
+      Comment written by customer in some answers, which is an optional
       custom field in survey.
   justifications:
     lineage:
       - datalake_tracksale_clean.answer.justifications
-    description: The answer rationale provided by the customer, which can be multiple
+    description:
+      The answer rationale provided by the customer, which can be multiple
       for answers and comes from a list.
   lot_code:
     lineage:
@@ -95,7 +99,7 @@ columns:
     lineage:
       - datalake_tracksale_clean.answer.categories
     description: Array that indicates the category of answers
-                 Example - name = Business Model
+      Example - name = Business Model
   seconds_spent_answering:
     lineage:
       - datalake_tracksale_clean.answer.seconds_spent_answering

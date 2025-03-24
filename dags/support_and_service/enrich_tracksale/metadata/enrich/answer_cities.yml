@@ -1,10 +1,10 @@
 ---
 database_name: datalake_tracksale
 table_name: answer_cities
-description: 
-  With this table we have the objective of applying business rules to facilitate analyzes by city, 
+description:
+  With this table we have the objective of applying business rules to facilitate analyzes by city,
   each line of this table must refer to an nps response.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_answer:

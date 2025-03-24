@@ -1,78 +1,83 @@
 database_name: dw_crm
 table_name: dim_lead_task
-description: Information about task to convert leads on CRM. Each line is a task of
+description:
+  Information about task to convert leads on CRM. Each line is a task of
   an Inside Sales analyst
-domain: Support and Service
+domain: Support and Services
 owner: marcus.pinto@quintoandar.com.br
 columns:
   sk_task:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.id_task
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.id_task
     description: Key to identify task on CRM
   score_factor:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.score_factor
-    description: A ranking with degree of importance of that task. It's no longer
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.score_factor
+    description:
+      A ranking with degree of importance of that task. It's no longer
       used because now we use dialer
   version:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.version
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.version
     description: Specifies the MongoDB (CRM Production database technology) version
   origin:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.origin
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.origin
     description: Funnel step in which the task starts
     categories:
-      Lead: ''
+      Lead: ""
   type:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
-    description: Indicates whether the task is Manual or the task name when it is
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
+    description:
+      Indicates whether the task is Manual or the task name when it is
       automatic-type
     categories:
-      ConverterLead: ''
-      ConverterLeadPrioritario: ''
+      ConverterLead: ""
+      ConverterLeadPrioritario: ""
   description:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.description
-    description: The task description field filled by an analyst as an additional
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.description
+    description:
+      The task description field filled by an analyst as an additional
       information or remark (for task manual-type only).
   subject:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.subject
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.subject
     description: Subject of the task
   titles:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.titles
-    description: The task title which should be standardized according to the task
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.titles
+    description:
+      The task title which should be standardized according to the task
       type
   workgroups:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.workgroups
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.workgroups
     description: The specific workgroup on which a task belongs to
   hours_task_start_to_completed:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.hours_task_started_to_completed
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.hours_task_started_to_completed
     description: Hours between task start and complete by a inside sales analyst
   flg_solved:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_resolved
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_resolved
     description: Boolean if the task has been already solved or not
   is_task_auto_completed:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_task_auto_completed
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_task_auto_completed
     description: If the task is completed automatically by CRM
   ts_start:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
     description: Date of task start on brazilian timezone
   ts_completed:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
     description: Date of task completion on brazilian timezone
   ts_silenced_until:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_silenced_until
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_silenced_until
     description: Date of until when the task is snoozed on brazilian timezone
   ts_load:
     description: Timestamp of when the date in this table was last loaded

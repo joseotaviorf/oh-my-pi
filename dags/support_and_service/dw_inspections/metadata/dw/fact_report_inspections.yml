@@ -4,7 +4,7 @@ table_name: fact_report_inspections
 description: |
   Transactional fact table that aims to gather information from the inspection stages.
   Each line of this table represents an inspection report with approval dates and summarized metrics.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_inspection:

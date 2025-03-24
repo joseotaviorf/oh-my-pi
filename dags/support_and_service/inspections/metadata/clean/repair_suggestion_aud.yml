@@ -1,31 +1,26 @@
 ---
 database_name: datalake_inspections_clean
 table_name: repair_suggestion_aud
-description:
-  This audit table aims to store the data that will be filled in the repair_request table, when the item_group_state criteria are met with history.
-domain: Support and Service
+description: This audit table aims to store the data that will be filled in the repair_request table, when the item_group_state criteria are met with history.
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.id
-    description: 
-      Unique identifier (number)
+    description: Unique identifier (number)
   service:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.service
-    description: 
-      Registers the service that will be requested in the repair request that will be made, based on this record.
+    description: Registers the service that will be requested in the repair request that will be made, based on this record.
   type:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.type
-    description: 
-      Registers the type of repair request that will be made, from this record.
+    description: Registers the type of repair request that will be made, from this record.
   responsibility:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.responsibility
-    description: 
-      Registers the repair responsibility that will be made, based on this record.
+    description: Registers the repair responsibility that will be made, based on this record.
     categories:
       TENANT: Responsible for the repair is the tenant of the property.
       OWNER: Responsible for the repair is the owner of the property.
@@ -33,63 +28,51 @@ columns:
   is_exempted:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.exempted
-    description: 
-      Boolean information that indicates whether the repair is suggested to be exempt.
+    description: Boolean information that indicates whether the repair is suggested to be exempt.
   rev:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.rev
-    description: 
-      Foreign key of the RevInfo table, which indicates when the record was changed.
+    description: Foreign key of the RevInfo table, which indicates when the record was changed.
   rev_type:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.revtype
-    description: 
-      Indicates whether the line refers to an inclusion, alteration or deletion.
+    description: Indicates whether the line refers to an inclusion, alteration or deletion.
   rev_end:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.revend
-    description: 
-      ""
+    description: ""
   mod_service:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.service_mod
-    description: 
-      Boolean information that indicates the modification of service data.
+    description: Boolean information that indicates the modification of service data.
   mod_type:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.type_mod
-    description: 
-      Boolean information that indicates the modification of type data.
+    description: Boolean information that indicates the modification of type data.
   mod_responsibility:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.responsibility_mod
-    description: 
-      Boolean information that indicates the modification of responsability data.
+    description: Boolean information that indicates the modification of responsability data.
   mod_is_exempted:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.exempted_mod
-    description: 
-      Boolean information that indicates the modification of is_exempted data.
+    description: Boolean information that indicates the modification of is_exempted data.
   mod_ts_created:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.created_at_mod
-    description: 
-      Boolean information that indicates the modification of ts_created data.
+    description: Boolean information that indicates the modification of ts_created data.
   mod_ts_updated:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.updated_at_mod
-    description: 
-      Boolean information that indicates the modification of ts_updated data.
+    description: Boolean information that indicates the modification of ts_updated data.
   ts_created:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.created_at
-    description: 
-      Creation date in timestamp format.
+    description: Creation date in timestamp format.
   ts_updated:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.updated_at
-    description: 
-      Update date in timestamp format.
+    description: Update date in timestamp format.
   year:
     lineage:
       - datalake_inspections_raw.repair_suggestion_aud.year

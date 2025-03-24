@@ -3,7 +3,7 @@ table_name: csat
 description:
   The customer support CSAT table consolidates all CSAT answers from tickets across
   chat, call, and email channels.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_ticket:

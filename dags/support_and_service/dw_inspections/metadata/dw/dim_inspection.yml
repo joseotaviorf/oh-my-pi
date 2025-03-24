@@ -4,7 +4,7 @@ description:
   This dimension brings information about the type, origin and status of the inspection, as well as information about its scheduling.
   It also brings data from each inspection scheduled by the Inspection Service and historical data from the PWA.
   Each row is a unique inspection, identified by the sk_inspection column.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_inspection:

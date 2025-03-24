@@ -9,7 +9,7 @@ description:
   "Offboarding Reparos [OFF] [POS] [BACK]" department that have the
   "orçamentação realizada" tag, or from the "Midias Ops [POS] [BACK]" department that
   have either the "escalar back video" tag or the "escalar ouvidoria hard cases" tag.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_task:

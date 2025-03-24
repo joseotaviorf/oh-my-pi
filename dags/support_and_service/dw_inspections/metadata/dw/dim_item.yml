@@ -5,7 +5,7 @@ description:
   This dimension brings the characterization of the inspected item, such as its type, status and the inspector's
   comments regarding the conditions in which this item was found.
   Each row is a unique item, identified by the sk_item column.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_item:

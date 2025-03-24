@@ -4,7 +4,7 @@ table_name: dim_inspector
 description:
   This dimension provides general information about the inspector responsible for inspecting the property.
   Each line is a register of an inspector, identified by the sk_inspector column.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_inspector:

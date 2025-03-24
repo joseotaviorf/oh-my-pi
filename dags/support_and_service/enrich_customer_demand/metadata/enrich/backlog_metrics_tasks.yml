@@ -6,7 +6,7 @@ description:
   The tasks are obtained from the base_tasks table. The table tracks the SLA compliance
   of each task day by day until it is solved. It stores the historical record of each
   task, and its content is incremental, capturing the information on a day-by-day basis.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_task:

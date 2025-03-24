@@ -5,7 +5,7 @@ description:
   This dimension refers to the descriptive data of the inspected room, such as the name and type of room.
   Although simple, this table supports analysis with granular fact_item data.
   Each row is a unique room, identified by the sk_room column.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_room:

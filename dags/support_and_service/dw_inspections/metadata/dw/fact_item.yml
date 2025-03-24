@@ -5,7 +5,7 @@ description:
   This fact table relates room, item and item_group dimension data with the most granular information possible,
   so that it is possible to analyze and correlate volumetric indicators, property conditions and even inspection quality.
   Each row is a unique item, identified by the sk_item column.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_item:

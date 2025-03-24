@@ -1,8 +1,9 @@
 database_name: dw_customer_support
 table_name: fact_sessions_chatbot
-description: This table presents session data from the chatbots along with retention attempt data
+description:
+  This table presents session data from the chatbots along with retention attempt data
   from the JourneyFlow service and customer support data from the Sauron service.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_session:
@@ -50,10 +51,10 @@ columns:
       - datalake_greenseer.sessions.recontact_time
     description: Time in minutes that the user took to recontact the service.
     categories:
-      '<12h': Recontact before 12h
-      '12-96h': Recontact between 12h and 96h
-      '>96h': Recontact after 96h
-      'NR': Did not return
+      "<12h": Recontact before 12h
+      "12-96h": Recontact between 12h and 96h
+      ">96h": Recontact after 96h
+      "NR": Did not return
   is_menu_available:
     lineage:
       - datalake_greenseer.sessions.is_menu_available
@@ -69,21 +70,23 @@ columns:
   is_retention:
     lineage:
       - datalake_greenseer.sessions.is_retention
-    description: Boolean value that indicates whether the session is retention. 
-      The concept of a session is retained when the user receives a retention response (either Emma's response or citadel's response) 
+    description: Boolean value that indicates whether the session is retention.
+      The concept of a session is retained when the user receives a retention response (either Emma's response or citadel's response)
       and did that response helped OR abandons the session after the response;
   is_abandonmet:
     lineage:
       - datalake_greenseer.sessions.is_retention
       - datalake_greenseer.sessions.id_ticket
-    description: Boolean value that indicates whether the session is abandonment. A session is abandoned when':'
+    description:
+      Boolean value that indicates whether the session is abandonment. A session is abandoned when':'
       1 - User opens the session and does not interact;
       2 - User is asked to send more information (requested more context) and does not interact;
       3 - User receives a Citadel menu and does not interact;
   is_recontact:
     lineage:
       - datalake_greenseer.sessions.is_recontact
-    description: indicates whether the session was recontacted via call or chat within 96 hours after the user was retained in the bot.
+    description:
+      indicates whether the session was recontacted via call or chat within 96 hours after the user was retained in the bot.
       A session is no longer considered a retention and becomes a recontact when':'
       1 - User is retained, but contacts via call within 96 hours;
       2 - User is retained, but contacts via chat to talk about the same topic OR another topic 96 hours later.

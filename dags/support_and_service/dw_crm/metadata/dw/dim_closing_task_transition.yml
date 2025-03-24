@@ -1,68 +1,73 @@
 database_name: dw_crm
 table_name: dim_closing_task_transition
-description: Dim table that contains the flow of each transition. Each transition
+description:
+  Dim table that contains the flow of each transition. Each transition
   involves two tasks (start and end), except for the last one. Each line is a transition
-domain: Support and Service
+domain: Support and Services
 owner: marcus.pinto@quintoandar.com.br
 columns:
   sk_transition:
     lineage:
-    - datalake_crm_tasks_transitions.tasks_transitions.id_transition
-    description: Key to identify transition. When there is a migration from one task
+      - datalake_crm_tasks_transitions.tasks_transitions.id_transition
+    description:
+      Key to identify transition. When there is a migration from one task
       to another
   origin_type:
     lineage:
-    - datalake_crm_tasks_transitions.tasks_transitions.origin_type
+      - datalake_crm_tasks_transitions.tasks_transitions.origin_type
     description: Task type that started a transition
   destination_type:
     lineage:
-    - datalake_crm_tasks_transitions.tasks_transitions.destination_type
+      - datalake_crm_tasks_transitions.tasks_transitions.destination_type
     description: Destinated task type from a transition
   conclusion_option:
     lineage:
-    - datalake_crm_tasks_transitions.tasks_transitions.conclusion_option
-    description: The option chosen by the analyst at the time of completing the origin
+      - datalake_crm_tasks_transitions.tasks_transitions.conclusion_option
+    description:
+      The option chosen by the analyst at the time of completing the origin
       task. At this moment that a transition is generated
     categories:
-      Solve Owner Pendency: ''
-      Solve Tenant Pendency: ''
+      Solve Owner Pendency: ""
+      Solve Tenant Pendency: ""
   conclusion_context:
     lineage:
-    - datalake_crm_tasks_transitions.tasks_transitions.conclusion_context
-    description: Once the analyst chose an conclusion option, there are some categories
+      - datalake_crm_tasks_transitions.tasks_transitions.conclusion_context
+    description:
+      Once the analyst chose an conclusion option, there are some categories
       inside that option, which the analyst has also to select. This is called context
   contact_channel:
     lineage:
-    - datalake_crm_tasks_transitions.tasks_transitions.contact_channel
+      - datalake_crm_tasks_transitions.tasks_transitions.contact_channel
     description: The channel used to contact a client related to the origin task
     categories:
-      E-mail: ''
-      Chat: ''
-      Telefone: ''
+      E-mail: ""
+      Chat: ""
+      Telefone: ""
   status:
     lineage:
-    - datalake_crm_tasks_transitions.tasks_transitions.status
-    description: The status of the workflow of it transition, if is still happening
+      - datalake_crm_tasks_transitions.tasks_transitions.status
+    description:
+      The status of the workflow of it transition, if is still happening
       iterations on that event or not
     categories:
-      CANCELLED: ''
-      FINISHED: ''
-      RUNNING: ''
+      CANCELLED: ""
+      FINISHED: ""
+      RUNNING: ""
   ts_transitioned:
     lineage:
-    - datalake_crm_tasks_transitions.tasks_transitions.ts_transitioned
+      - datalake_crm_tasks_transitions.tasks_transitions.ts_transitioned
     description: Timestamp of when a task was migrated/ transitioned from one to another
   year:
     lineage:
-    - datalake_crm_tasks_transitions.tasks_transitions.year
+      - datalake_crm_tasks_transitions.tasks_transitions.year
     description: Integer type data that indicates the year in which we had the transaction in the crm.
   month:
     lineage:
-    - datalake_crm_tasks_transitions.tasks_transitions.month
+      - datalake_crm_tasks_transitions.tasks_transitions.month
     description: Integer type data that indicates the month in which we had the transaction in the crm.
   day:
     lineage:
-    - datalake_crm_tasks_transitions.tasks_transitions.day
+      - datalake_crm_tasks_transitions.tasks_transitions.day
     description: Integer type data that indicates the day in which we had the transaction in the crm.
   ts_load:
     description: Timestamp of when the data was last loaded in this table

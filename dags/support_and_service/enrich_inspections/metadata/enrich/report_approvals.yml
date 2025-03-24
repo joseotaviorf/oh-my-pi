@@ -4,7 +4,7 @@ table_name: report_approvals
 description:
   Table that follows the inspection granularity, this table aims to gather information related to the approval flow through which the inspection went.
   Here we have a link between the approvals through the review flow and the budget approval flow
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspection:

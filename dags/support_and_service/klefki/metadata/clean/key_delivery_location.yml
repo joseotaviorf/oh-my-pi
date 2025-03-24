@@ -2,7 +2,7 @@
 database_name: datalake_klefki_clean
 table_name: key_delivery_location
 description: Table with information on messages received with the location of the keys provided by the Tenant
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:

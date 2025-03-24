@@ -2,7 +2,7 @@
 database_name: datalake_satisfaction_rating
 table_name: chat_fup_surveys
 description: Unifies and enriches form satisfaction responses coming from Chat FUP.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_answer:

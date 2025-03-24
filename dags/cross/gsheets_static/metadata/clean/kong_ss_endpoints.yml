@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: kong_ss_endpoints
 description: "S&S Endpoints Relations."
-domain: Support and Service
+domain: Support and Services
 owner: andre.melo@quintoandar.com.br
 columns:
   host:

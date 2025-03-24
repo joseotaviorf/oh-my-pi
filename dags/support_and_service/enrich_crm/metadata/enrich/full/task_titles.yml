@@ -1,7 +1,7 @@
 database_name: datalake_crm
 table_name: task_titles
 description: Enrichment table that aims to gather information from the title of CRM tasks.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:

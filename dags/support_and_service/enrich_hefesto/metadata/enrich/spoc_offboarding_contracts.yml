@@ -1,10 +1,10 @@
 ---
 database_name: datalake_hefesto
 table_name: spoc_offboarding_contracts
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 description:
-  This table presents data for each portfolio of SPOC contracts, with their respective 
+  This table presents data for each portfolio of SPOC contracts, with their respective
   id_termination. It is important to highlight that more than one analyst can be associated
   with an id_contract/id_termination pair, which generates an unique id_portfolio.
 columns:
@@ -37,12 +37,11 @@ columns:
   id_user:
     lineage:
       - datalake_hefesto_clean.worker_portfolio.id_user
-    description: Contract user identification 
+    description: Contract user identification
   user_persona:
     lineage:
       - datalake_hefesto_clean.worker_portfolio_unit.user_persona
-    description: 
-      The contract persona of the portfolio
+    description: The contract persona of the portfolio
       Can assume 'tenant' or 'owner'
   worker_email:
     lineage:
@@ -59,11 +58,9 @@ columns:
   entity_origin:
     lineage:
       - datalake_hefesto_clean.worker_portfolio.entity_origin
-    description: 
-      Which contract process is the origin of the portfolio. 
+    description: Which contract process is the origin of the portfolio.
       The only value currently assumed is 'OFFBOARDING'
   ts_updated:
     lineage:
       - datalake_hefesto_clean.worker_portfolio_unit.ts_updated
     description: Timestamp from when the portfolio was updated
-

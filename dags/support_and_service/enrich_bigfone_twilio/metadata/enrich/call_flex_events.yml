@@ -1,7 +1,7 @@
 database_name: datalake_bigfone_twilio
 table_name: call_flex_events
 description: Enrichment table that aims to consolidate information from call flex service. The main source of the table is Twillio's call service base, and each line represents a service event.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:

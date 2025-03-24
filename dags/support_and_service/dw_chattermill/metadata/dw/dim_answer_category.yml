@@ -1,7 +1,7 @@
 database_name: dw_chattermill
 table_name: dim_answer_category
 description: Dimension table that contains descriptive information about the categories a response can have.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_category:

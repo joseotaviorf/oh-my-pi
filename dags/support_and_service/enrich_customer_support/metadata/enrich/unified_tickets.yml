@@ -5,7 +5,7 @@ description:
   By centralizing all tickets metrics in a single table,
   it provides a full overview of the customer support activity.
   Also, this table is the base to build fact_ticket model.
-domain: Support and Service
+domain: Support and Services
 owner: william.angelo@quintoandar.com.br
 columns:
   id_ticket:

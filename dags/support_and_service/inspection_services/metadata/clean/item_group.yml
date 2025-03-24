@@ -4,7 +4,7 @@ table_name: item_group
 description:
   This table deals with the items that were evaluated during the inspection. It is worth emphasizing
   that, when dealing with IS data, the item_group object refers to an item, such as window, door, floor, etc.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_item_group:

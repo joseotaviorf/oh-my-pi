@@ -3,7 +3,7 @@ table_name: fact_photo_job_tasks
 description:
   Fact table that contains data and foreign keys related to "agendarjobdefotografo"
   and "fupfoto" task event
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_action_date:

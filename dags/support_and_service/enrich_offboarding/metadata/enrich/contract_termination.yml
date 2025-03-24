@@ -4,7 +4,7 @@ table_name: contract_termination
 description:
   It consolidates each step that occurs during the termination of a contract, including
   termination data, output inspection, repairs, related customer support and NPS metrics.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_termination:

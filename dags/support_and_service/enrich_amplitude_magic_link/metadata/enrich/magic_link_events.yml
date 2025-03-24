@@ -4,7 +4,7 @@ table_name: magic_link_events
 description:
   Enrichment table with the aim of unifying information about magic link
   events and assigned analysts. Each row in this table represents an event.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_amplitude:

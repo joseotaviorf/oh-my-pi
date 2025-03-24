@@ -5,7 +5,7 @@ description:
   This table reports the performance of inspectors. This data is mainly used by the logistics
   efficiency team to optimize inspection schedules. Data will be saved daily in snapshots
   with data from the last 60 days.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspector:

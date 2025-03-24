@@ -4,7 +4,7 @@ table_name: user_ss_metrics
 description:
   This table consolidates the key metrics of S&S for each user, encompassing all
   personas they assume.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_snapshot:

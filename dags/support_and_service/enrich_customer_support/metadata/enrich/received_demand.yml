@@ -5,7 +5,7 @@ description:
   Call, Chat and Email channels. Each row is a received demand. For chat and call,
   it uses Twilio Events IDs created for Tasks that were sent to an assigned queue
   and waiting for acceptance. For email, it considers all front office tickets.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_call:

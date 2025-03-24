@@ -2,7 +2,7 @@
 database_name: datalake_inspections_metrics
 table_name: inspection_achievements
 description: This table is responsible for calculating the achievement of targets for carrying out the inspection.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspection:

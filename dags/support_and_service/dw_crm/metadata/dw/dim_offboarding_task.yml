@@ -1,92 +1,101 @@
 database_name: dw_crm
 table_name: dim_offboarding_task
-description: Information about CRM tasks from Offboarding workgroups. Each line is
+description:
+  Information about CRM tasks from Offboarding workgroups. Each line is
   a CRM task.
-domain: Support and Service
+domain: Support and Services
 owner: ana.maia@quintoandar.com.br
 columns:
   sk_task:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.id_task
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.id_task
     description: Key of a task in CRM Offboarding.
   score_factor:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.score_factor
-    description: The factor to define the task importance weight to be ordered in
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.score_factor
+    description:
+      The factor to define the task importance weight to be ordered in
       analysts' task backlog.
   version:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.version
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.version
     description: Specifies the MongoDB (CRM Production database technology) version.
   origin:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.origin
-    description: The type of the origin entity which generated the task, such as rent
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.origin
+    description:
+      The type of the origin entity which generated the task, such as rent
       flow, offer, contract.
     categories:
-      Contrato: ''
-      FluxoLocacao: ''
-      Imovel: ''
-      Negociacao: ''
-      Offer: ''
-      PreProposta: ''
-      Vistoria: ''
-      contrato: ''
+      Contrato: ""
+      FluxoLocacao: ""
+      Imovel: ""
+      Negociacao: ""
+      Offer: ""
+      PreProposta: ""
+      Vistoria: ""
+      contrato: ""
   type:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
-    description: Category to indicates the task type, which could be task name for
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
+    description:
+      Category to indicates the task type, which could be task name for
       automatic tasks or manual.
     categories:
-      EncerrarContrato: ''
-      Manual: ''
+      EncerrarContrato: ""
+      Manual: ""
   description:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.description
-    description: The task context provided by an analyst as an additional information
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.description
+    description:
+      The task context provided by an analyst as an additional information
       for the action. Only manual tasks will have descriptions.
   subject:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.subject
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.subject
     description: Main subject of the task
   titles:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.titles
-    description: The task title with required action. It is always standardized for
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.titles
+    description:
+      The task title with required action. It is always standardized for
       automatic tasks, but might be custom text for manual tasks.
   workgroups:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.workgroups
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.workgroups
     description: The specific workgroup to which a task was destined when created.
     categories:
-      '[DEP_OFFBOARDING_2]': ''
-      '[DEP_OFFBOARDING_ID]': ''
+      "[DEP_OFFBOARDING_2]": ""
+      "[DEP_OFFBOARDING_ID]": ""
   hours_task_start_to_completed:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.hours_task_started_to_completed
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.hours_task_started_to_completed
     description: Number of hours elapsed between the task start and completion timestamps.
   flg_solved:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_resolved
-    description: Boolean column which indicates whether a task was solved (actions
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_resolved
+    description:
+      Boolean column which indicates whether a task was solved (actions
       resolve or realize) or not.
   is_task_auto_completed:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_task_auto_completed
-    description: Boolean column which indicates whether a task was automatically closed
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_task_auto_completed
+    description:
+      Boolean column which indicates whether a task was automatically closed
       by system or not.
   ts_start:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
-    description: Timestamp of task start event (UTC timezone). It might be the same
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
+    description:
+      Timestamp of task start event (UTC timezone). It might be the same
       as task creation timestamp or not, if the task action is for the future.
   ts_completed:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
     description: Timestamp of task completion event (UTC timezone).
   ts_silenced_until:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_silenced_until
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_silenced_until
     description: Timestamp of expiration of a task snooze event (UTC).
   ts_load:
     description: Timestamp of data load event (UTC timezone)

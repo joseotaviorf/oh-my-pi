@@ -4,7 +4,7 @@ table_name: main_inspection_booking
 description:
   Enrichment table that aims to isolate the history of main inspection records.
   In the future, this table will become static.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspection:

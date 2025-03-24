@@ -2,7 +2,7 @@
 database_name: dw_satisfaction_rating
 table_name: fact_analyst_answers
 description: This table contains information about analyst's satisfaction responses. Its granularity is given by the sk_answer column.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_answer:
@@ -10,7 +10,7 @@ columns:
     lineage:
       - datalake_survicate.single_station_surveys.id_response
   sk_analyst:
-    description: Unique identifier 
+    description: Unique identifier
     lineage:
       - datalake_survicate.single_station_surveys.email
   sk_survey:

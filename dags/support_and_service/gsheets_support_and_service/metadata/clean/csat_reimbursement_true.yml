@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: csat_reimbursement_true
 description: This worksheet contains the satisfaction form responses for the tenant/landlord refund or repair refund process.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_activity:

@@ -2,7 +2,7 @@
 database_name: datalake_satisfaction_rating
 table_name: survicate_surveys
 description: Unifies and enriches form satisfaction responses coming from Survicate.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_answer:
@@ -80,8 +80,7 @@ columns:
       - datalake_survicate.scheduling_surveys.respondent_type
       - datalake_survicate.photo_surveys.respondent_type
   survey_name:
-    description:
-      Descriptive information indicating the name of the submitted survey.
+    description: Descriptive information indicating the name of the submitted survey.
     lineage:
       - datalake_survicate.inspections_surveys.survey_name
       - datalake_survicate.repairs_surveys.survey_name

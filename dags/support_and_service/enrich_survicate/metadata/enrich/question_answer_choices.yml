@@ -2,7 +2,7 @@
 database_name: datalake_survicate
 table_name: question_answer_choices
 description: Pre-defined answer options for the survey question.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_answer_choice:

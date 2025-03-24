@@ -5,7 +5,7 @@ description:
   This table provides quality metrics for the tasks in the base tasks table, with a
   focus on the CSAT metric. It provides insights into both answered resolution and
   customer satisfaction rating.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_agent:

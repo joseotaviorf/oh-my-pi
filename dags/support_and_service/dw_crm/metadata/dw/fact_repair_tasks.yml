@@ -1,7 +1,7 @@
 database_name: dw_crm
 table_name: fact_repair_tasks
 description: ""
-domain: Support and Service
+domain: Support and Services
 owner: nathalia.paula@quintoandar.com.br
 columns:
   sk_action_date:

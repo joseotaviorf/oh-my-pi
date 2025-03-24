@@ -1,7 +1,7 @@
 database_name: dw_customer_support
 table_name: dim_taxonomy
 description: Dimension containing taxonomy information.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_taxonomy:

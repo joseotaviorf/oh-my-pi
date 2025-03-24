@@ -11,7 +11,7 @@ description:
   and interactions that customers go through during their experience with the rental
   context. It provides a snapshot view of the different steps involved in the
   customer journey.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_snapshot:

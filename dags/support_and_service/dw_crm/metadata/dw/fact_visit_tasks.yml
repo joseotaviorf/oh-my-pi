@@ -2,7 +2,7 @@ database_name: dw_crm
 table_name: fact_visit_tasks
 description: Fact table that consolidates information about CRM actions tasks
   within the visits stage, each line is a task.
-domain: Support and Service
+domain: Support and Services
 owner: cassio.bastos@quintoandar.com.br
 columns:
   sk_action_date:

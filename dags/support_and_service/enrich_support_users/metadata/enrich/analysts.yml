@@ -3,7 +3,7 @@ table_name: analysts
 description:
   This table is intended to gather user information segmented by the analyst entity.
   The main source of this table is the zendesk base and the granularity is built in at the analyst level.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_agent:

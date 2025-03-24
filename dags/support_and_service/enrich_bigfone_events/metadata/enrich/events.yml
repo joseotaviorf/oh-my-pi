@@ -3,7 +3,7 @@ table_name: events
 description:
   Base responsible for processing event data from the Bigfone microservice intended for calls to Twilio,
   with the call ID and event ID as the main key.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:

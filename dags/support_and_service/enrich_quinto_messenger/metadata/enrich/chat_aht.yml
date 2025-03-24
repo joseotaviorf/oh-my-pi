@@ -1,7 +1,7 @@
 database_name: datalake_quinto_messenger
 table_name: chat_aht
 description: Enrichment table that aims to calculate metrics related to twilio chat tasks.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   dt_task_created_local:

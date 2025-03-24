@@ -1,13 +1,13 @@
 database_name: dw_customer_support
 table_name: dim_chatbot
 description: Dimension containing chatbot attributes. Values obtained from Greenseer base.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_session:
     lineage:
       - datalake_greenseer.sessions.id_session
-    description: Session unique identifier.  
+    description: Session unique identifier.
   app_version:
     lineage:
       - datalake_greenseer.sessions.memory
@@ -39,7 +39,8 @@ columns:
   session_type:
     lineage:
       - datalake_greenseer.sessions.memory
-    description: indicates whether the session is before_bot (did not go through the bot - the questions say before reception) 
+    description:
+      indicates whether the session is before_bot (did not go through the bot - the questions say before reception)
       or BOT (went through the bot) (there are the rules in the question)
   taxonomy:
     lineage:

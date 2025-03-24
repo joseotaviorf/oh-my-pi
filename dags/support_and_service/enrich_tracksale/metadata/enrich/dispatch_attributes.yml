@@ -1,10 +1,9 @@
 ---
 database_name: datalake_tracksale
 table_name: dispatch_attributes
-description:
-  Table that unifies information about attributes of dispatches. 
+description: Table that unifies information about attributes of dispatches.
   Each dispatch has its own attributes, here we only want information about these attributes.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
@@ -30,7 +29,8 @@ columns:
   status:
     lineage:
       - datalake_tracksale_clean.dispatch.customers
-    description: Information related to the trigger stage, whether it is in the queue
+    description:
+      Information related to the trigger stage, whether it is in the queue
       or a reminder sent, for example.
   has_answered:
     lineage:

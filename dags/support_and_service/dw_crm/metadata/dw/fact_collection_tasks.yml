@@ -2,7 +2,7 @@ database_name: dw_crm
 table_name: fact_collection_tasks
 description: Fact table that consolidates task information and metrics,
   each line is a task and its relationship with the house, tenant, owner, etc.
-domain: Support and Service
+domain: Support and Services
 owner: nathalia.paula@quintoandar.com.br
 columns:
   sk_action_date:

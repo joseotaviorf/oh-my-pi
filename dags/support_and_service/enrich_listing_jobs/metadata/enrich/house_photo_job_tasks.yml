@@ -1,8 +1,9 @@
 database_name: datalake_listing_jobs
 table_name: house_photo_job_tasks
-description: Enrichment table that aims to bring together the relationship between home 
+description:
+  Enrichment table that aims to bring together the relationship between home
   and job photos. The granularity of the table is the key.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_house:

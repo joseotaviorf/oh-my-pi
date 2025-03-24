@@ -1,109 +1,112 @@
 database_name: dw_crm
 table_name: fact_lead_task_actions
-description: Fact table that contains data and foreign keys related to  "converterlead"
+description:
+  Fact table that contains data and foreign keys related to  "converterlead"
   and "converterleadprioritario" task events
-domain: Support and Service
+domain: Support and Services
 owner: marcus.pinto@quintoandar.com.br
 columns:
   sk_task:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task
     description: Key to identify task
   sk_receiver:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_receiver
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_receiver
     description: Key to identify task action received
   sk_origin:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_origin
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_origin
     description: Key to identify task action origin
   sk_assignee:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_assignee
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_assignee
     description: Key of task assignee for a specific task
   sk_user_action:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_user_action
-    description: Key of analyst who act on the task's action, that may be either the
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_user_action
+    description:
+      Key of analyst who act on the task's action, that may be either the
       assignee or other one
   sk_lead:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_origin
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_origin
     description: Key to identify lead
   sk_start_date:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_start_date
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_start_date
     description: Key to identify task action start
   sk_completed_date:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_completed_date
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_completed_date
     description: Key to identify task action finished
   sk_action_date:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_action_date
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_action_date
     description: Key of task action event
   sk_task_action_start_date:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_start_date
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_start_date
     description: Key to identify task action started date
   sk_task_action_end_date:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_end_date
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_task_user_end_date
     description: Key to identify task action finished date
   action_user_name:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_user_name
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_user_name
     description: User's name of task assignee who act on the task's action
   action_type:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_type
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.action_type
     description: The task's action categories
     categories:
-      COMMENT: ''
-      CREATE: ''
-      REALIZE: ''
-      RESOLVE: ''
-      SNOOZE: ''
-      UPDATE: ''
+      COMMENT: ""
+      CREATE: ""
+      REALIZE: ""
+      RESOLVE: ""
+      SNOOZE: ""
+      UPDATE: ""
   task_action_type:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_type
-    description: The action type designated that should be done for that specific
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_type
+    description:
+      The action type designated that should be done for that specific
       task
     categories:
-      COMMENT: ''
-      CREATE: ''
-      REALIZE: ''
-      RESOLVE: ''
-      SNOOZE: ''
-      UPDATE: ''
+      COMMENT: ""
+      CREATE: ""
+      REALIZE: ""
+      RESOLVE: ""
+      SNOOZE: ""
+      UPDATE: ""
   task_user_action_resolve_hours:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_resolve_hours
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.task_user_resolve_hours
     description: How long the user take to resolve that task
   ts_action:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_action
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_action
     description: Timestamp of action event on the task happened
   ts_task_action_start:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_start
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_start
     description: Timestamp of date that the action was started
   ts_task_action_end:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_end
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.ts_task_user_end
     description: Timestamp of date that the action was finished
   year:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.year
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.year
     description: Integer type data that indicates the year in which we had the task events in the crm.
   month:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.month
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.month
     description: Integer type data that indicates the month in which we had the task events in the crm.
   day:
     lineage:
-    - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day
+      - datalake_crm_tasks_flows.tasks_users_resolutions_flow.day
     description: Integer type data that indicates the day in which we had the task events in the crm.
   ts_load:
     description: Timestamp of when the date in this table was last loaded

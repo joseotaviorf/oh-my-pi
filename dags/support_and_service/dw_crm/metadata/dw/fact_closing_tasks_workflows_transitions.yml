@@ -1,16 +1,18 @@
 database_name: dw_crm
 table_name: fact_closing_tasks_workflows_transitions
-description: Fact table that contains the flow of each transition and its workflow.
+description:
+  Fact table that contains the flow of each transition and its workflow.
   A transition is when one task goes to another task and a workflow is an event that
   group transitions. A workflow can have many transitions, but a transition have only
   one workflow. In this table each line is a transition
-domain: Support and Service
+domain: Support and Services
 owner: marcus.pinto@quintoandar.com.br
 columns:
   sk_transition:
     lineage:
       - datalake_crm.workflows_transitions.id_transition
-    description: Key to identify a transition. When there is a migration from one
+    description:
+      Key to identify a transition. When there is a migration from one
       task to another
   sk_workflow:
     lineage:

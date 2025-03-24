@@ -4,7 +4,7 @@ table_name: user_csat_bot_metric
 description:
   This table retrieves the csat bot metrics by user. It is a snapshot ingestion, so in
   this case, only csat answered until the snapshot date are being considered.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_snapshot:

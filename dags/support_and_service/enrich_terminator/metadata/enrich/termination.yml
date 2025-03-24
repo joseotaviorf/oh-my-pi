@@ -4,7 +4,7 @@ table_name: termination
 description:
   Enrichment table created with the aim of gathering information from the termination context.
   The granularity of this table is the requested termination.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_termination:

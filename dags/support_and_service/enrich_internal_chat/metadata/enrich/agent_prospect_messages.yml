@@ -1,7 +1,7 @@
 database_name: datalake_internal_chat
 table_name: agent_prospect_messages
 description: Messages exchanged between agent and prospect via Agents app
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_channel:

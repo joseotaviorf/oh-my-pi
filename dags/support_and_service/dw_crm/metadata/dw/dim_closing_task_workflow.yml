@@ -1,48 +1,50 @@
 database_name: dw_crm
 table_name: dim_closing_task_workflow
-description: Dim table that contains the flow of each workflow. A workflow is when
+description:
+  Dim table that contains the flow of each workflow. A workflow is when
   a flow with a task starts, for example, starts with task A, then it can stop or
   goes to task B, then C and goes on. The workflow shows all task originated from
   the same event. Each line is a workflow
-domain: Support and Service
+domain: Support and Services
 owner: marcus.pinto@quintoandar.com.br
 columns:
   sk_workflow:
     lineage:
-    - datalake_crm.workflows_transitions.id_workflow
+      - datalake_crm.workflows_transitions.id_workflow
     description: Key to identify workflow that ties tasks and transitions
   status:
     lineage:
-    - datalake_crm.workflows_transitions.status
-    description: The status of that workflow, if is still happening iterations on
+      - datalake_crm.workflows_transitions.status
+    description:
+      The status of that workflow, if is still happening iterations on
       that event or not
     categories:
-      CANCELLED: ''
-      FINISHED: ''
-      RUNNING: ''
+      CANCELLED: ""
+      FINISHED: ""
+      RUNNING: ""
   ts_started:
     lineage:
-    - datalake_crm.workflows_transitions.ts_workflow_started
+      - datalake_crm.workflows_transitions.ts_workflow_started
     description: Timestamp of when a workflow started
   ts_updated:
     lineage:
-    - datalake_crm.workflows_transitions.ts_workflow_updated
+      - datalake_crm.workflows_transitions.ts_workflow_updated
     description: Timestamp of when a workflow was updated
   ts_ended:
     lineage:
-    - datalake_crm.workflows_transitions.ts_workflow_ended
+      - datalake_crm.workflows_transitions.ts_workflow_ended
     description: Timestamp of when a workflow ended
   year:
     lineage:
-    - datalake_crm.workflows_transitions.year
+      - datalake_crm.workflows_transitions.year
     description: Integer type data that indicates the year in which we had the workflow in the crm.
   month:
     lineage:
-    - datalake_crm.workflows_transitions.month
+      - datalake_crm.workflows_transitions.month
     description: Integer type data that indicates the month in which we had the workflow in the crm.
   day:
     lineage:
-    - datalake_crm.workflows_transitions.day
+      - datalake_crm.workflows_transitions.day
     description: Integer type data that indicates the day in which we had the workflow in the crm.
   ts_load:
     description: Timestamp of when the data was last loaded in this table

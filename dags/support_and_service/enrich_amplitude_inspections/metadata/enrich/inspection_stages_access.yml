@@ -2,7 +2,7 @@
 database_name: datalake_amplitude_inspections
 table_name: inspection_stages_access
 description: Creation of access indicators for the inspection report review page, both by the owner and the tenant
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspection:

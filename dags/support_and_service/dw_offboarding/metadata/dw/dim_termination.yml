@@ -2,7 +2,7 @@
 database_name: dw_offboarding
 table_name: dim_termination
 description: This table aims to store termination information, each line must contain the termination record in its most current state.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_termination:

@@ -7,7 +7,7 @@ description: |
   The granularity of the table is given by the id_inspection, which will be unique.
   This is just not true for data prior to August 19, 2023, because of a bug in the product
   (read the description of the id_assessment column for more details).
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspection:

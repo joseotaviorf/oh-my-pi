@@ -1,8 +1,9 @@
 database_name: datalake_ebdb_customer_contact_identification
 table_name: customer_contact_identification
-description: Enrichment table with the aim of consolidating contact information for main 
+description:
+  Enrichment table with the aim of consolidating contact information for main
   users. Each row in this table represents a user (of any type) in ebdb.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_user:

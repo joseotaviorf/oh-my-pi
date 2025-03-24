@@ -2,7 +2,7 @@
 database_name: datalake_inspection_services_clean
 table_name: room
 description: Data about the room being inspected.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_room:

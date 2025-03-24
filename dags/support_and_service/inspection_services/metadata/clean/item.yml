@@ -4,7 +4,7 @@ table_name: item
 description:
   The item object found in the database refers to a sub-item or sub-conditions within an item,
   for example breakdowns, humidity, door problem, etc.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_item:

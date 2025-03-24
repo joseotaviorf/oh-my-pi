@@ -1,7 +1,7 @@
 ---
 database_name: datalake_listing_jobs
 table_name: listing_quality_tasks
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 description:
   Enrichment table that aims to consolidate information related to listing quality service.

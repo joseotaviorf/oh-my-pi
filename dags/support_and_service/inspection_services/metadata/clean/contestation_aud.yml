@@ -4,7 +4,7 @@ table_name: contestation_aud
 description:
   When an repair of an object is requested and the tenant understand it
   as improper, it is possible to contest the repair request.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_contestation:

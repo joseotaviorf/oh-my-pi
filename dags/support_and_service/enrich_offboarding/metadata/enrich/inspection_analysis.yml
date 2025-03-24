@@ -1,9 +1,9 @@
 ---
 database_name: datalake_offboarding
 table_name: inspection_analysis
-description: Enrichment table that brings together information from inspection 
+description: Enrichment table that brings together information from inspection
   services sources to facilitate analyzes in this context.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_contract:
@@ -20,11 +20,10 @@ columns:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_start_date
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_completed_date
   dt_start_date:
-    description:  Start date of the task.
+    description: Start date of the task.
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_start_date
   dt_completed_date:
-    description:  Task completion date.
+    description: Task completion date.
     lineage:
       - datalake_crm_tasks_flows.tasks_users_resolutions_flow.id_completed_date
-  

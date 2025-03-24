@@ -7,7 +7,7 @@ description:
   An Assessment must be unique per inspection, however for dates before August 19, 2023 there is residual data of a product bug.
   This bug erroneously created more than one Assessment per inspection. Therefore, for these cases, the Assessment will not be unique per inspection.
   It is observed that the extra Assessments are identical, with no data distinction between them.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_assessment:

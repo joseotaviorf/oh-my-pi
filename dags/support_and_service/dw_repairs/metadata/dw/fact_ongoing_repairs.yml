@@ -4,10 +4,10 @@ description:
   Table stores data on ongoing repair requests. This data includes information about the customer
   the repair the responsible analyst and the repair status. The table is used to analyze the performance of the repair process
   including response time resolution time, costs, delay reasons, and success factors.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
-  sk_ticket: 
+  sk_ticket:
     description: Ticket unique identifier.
     lineage:
       - datalake_repairs.repair_tickets.id_ticket
@@ -35,7 +35,7 @@ columns:
     description: Unique agent identifier.
     lineage:
       - datalake_repairs.repair_tickets.agent_email
-  sk_budget_sender: 
+  sk_budget_sender:
     description: Sender Budget unique identifier.
     lineage:
       - datalake_repairs_clean.repair_request_budget.id_budget_sender
@@ -164,43 +164,43 @@ columns:
   ts_reflux:
     description: Timestamp of the reflux.
     lineage:
-      -  dw_customer_support.fact_ticket_events.ts_event
-      -  dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+      - dw_customer_support.fact_ticket_events.tags
   ts_contestation:
     description: Timestamp of the contestation.
     lineage:
-      -  dw_customer_support.fact_ticket_events.ts_event
-      -  dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+      - dw_customer_support.fact_ticket_events.tags
   ts_resolution_contestation:
     description: Timestamp of the resolution contestation.
     lineage:
-      -  dw_customer_support.fact_ticket_events.ts_event
-      -  dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+      - dw_customer_support.fact_ticket_events.tags
   ts_first_open:
     description: Timestamp of the first open.
     lineage:
-      -  dw_customer_support.fact_ticket_events.ts_event
-      -  dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+      - dw_customer_support.fact_ticket_events.tags
   ts_ps_iq:
     description: Timestamp of the PS IQ.
     lineage:
-      -  dw_customer_support.fact_ticket_events.ts_event
-      -  dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+      - dw_customer_support.fact_ticket_events.tags
   ts_ps_pp:
     description: Timestamp of the PS PP.
     lineage:
-      -  dw_customer_support.fact_ticket_events.ts_event
-      -  dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+      - dw_customer_support.fact_ticket_events.tags
   ts_compulsory:
     description: Timestamp of the compulsory.
     lineage:
-      -  dw_customer_support.fact_ticket_events.ts_event
-      -  dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+      - dw_customer_support.fact_ticket_events.tags
   ts_reopen:
     description: Timestamp of the reopen.
     lineage:
-      -  dw_customer_support.fact_ticket_events.ts_event
-      -  dw_customer_support.fact_ticket_events.tags
+      - dw_customer_support.fact_ticket_events.ts_event
+      - dw_customer_support.fact_ticket_events.tags
   ts_help_request:
     description: Timestamp of the help request.
     lineage:

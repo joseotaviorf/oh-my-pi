@@ -6,7 +6,7 @@ description:
   Zendesk ticket. By centralizing all call and ticket metrics in a single table,
   it provides a comprehensive view of the customer support activity, allowing for
   easier analysis and tracking of key performance indicators.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_ticket:

@@ -1,10 +1,10 @@
 ---
 database_name: datalake_inspections
 table_name: report_approval
-description: 
-  This table contains approval indicators for owners, tenants and analysts involved in the inspection review. 
+description:
+  This table contains approval indicators for owners, tenants and analysts involved in the inspection review.
   Because it is fully loaded, this table shows the last status (D-1) of approvals
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_assessment:
@@ -26,7 +26,7 @@ columns:
   dt_tenant_limit_revision:
     lineage:
       - datalake_inspections.reviewer.dt_tenant_limit_revision
-    description: 
+    description:
       Indicates the deadline for tenant to complete its review of the report.
       After this date, completion is compulsory.
   ts_first_approval:

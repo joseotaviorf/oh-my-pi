@@ -1,6 +1,6 @@
 database_name: datalake_greenseer
 table_name: sessions
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 description:
   This table presents session data from the chatbots along with retention attempt data
@@ -95,10 +95,10 @@ columns:
     lineage:
       - datalake_greenseer_clean.session.memory
     categories:
-      '<12h': Recontact before 12h
-      '12-96h': Recontact between 12h and 96h
-      '>96h': Recontact after 96h
-      'NR': Did not return
+      "<12h": Recontact before 12h
+      "12-96h": Recontact between 12h and 96h
+      ">96h": Recontact after 96h
+      "NR": Did not return
   memory:
     lineage:
       - datalake_greenseer_clean.session.memory

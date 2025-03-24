@@ -5,7 +5,7 @@ description:
   Fact table that has the function of grouping information from reports made by the surveyor.
   Each row of the table represents an "id_report" which is a combination of all the data
   levels involved in the report.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_report:

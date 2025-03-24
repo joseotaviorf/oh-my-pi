@@ -2,7 +2,7 @@
 database_name: datalake_survicate_clean
 table_name: survey_responses
 description: Responses to a specific survey identified by their unique ID.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   response_uuid:

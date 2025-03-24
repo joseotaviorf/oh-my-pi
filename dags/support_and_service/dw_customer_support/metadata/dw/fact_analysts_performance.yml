@@ -1,30 +1,34 @@
 database_name: dw_customer_support
 table_name: fact_analysts_performance
-description: 
-  Fact table that aims to gather data on metrics related to analysts' performance. This table is a 
-  periodic snapshot type with the frequency being daily, this means that the base will contain a day-by-day 
+description:
+  Fact table that aims to gather data on metrics related to analysts' performance. This table is a
+  periodic snapshot type with the frequency being daily, this means that the base will contain a day-by-day
   photo of each analyst's performance numbers. The granularity of this table is sk_agent + date.
   For more information, [access ](docs.google.com/document/d/17mRa7cBu2P-gTwQucxZi-DFsY2y5uqh5cVBpW66-8yQ/edit?tab=t.0#heading=h.7q84d2nz0ikj).
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_snapshot:
-    description: String/varchar column that represents the smallest *granularity of the table. It is formed by joining the sk_agent
+    description:
+      String/varchar column that represents the smallest *granularity of the table. It is formed by joining the sk_agent
       column and the sk_reference_date column.
     lineage:
       - datalake_repairs.repair_tickets.agent_email
       - datalake_customer_support.tickets.last_analyst_email
   sk_agent:
-    description: String/varchar column (surrogate key) that indicates the analyst. For descriptive information such as
+    description:
+      String/varchar column (surrogate key) that indicates the analyst. For descriptive information such as
       name, email, agent_organization, it is necessary to do a JOIN with the dw_customer_support.dim_analyst table.
     lineage:
       - datalake_customer_support.unified_tickets.id_last_agent
   sk_reference_date:
-    description: Column of type bigint (surrogate key) that represents the reference date on which the indicator metrics were calculated. 
-      This date serves as a temporal anchor for each indicator and can reflect different business contexts — that is, 
+    description:
+      Column of type bigint (surrogate key) that represents the reference date on which the indicator metrics were calculated.
+      This date serves as a temporal anchor for each indicator and can reflect different business contexts — that is,
       the same date can have different meanings depending on the indicator or the business area associated with the calculation.
   total_tickets:
-    description: Bigint type column that represents the tickets that the analyst had assigned in his/her name, taking into account the reference_date compared with the solved_date,
+    description:
+      Bigint type column that represents the tickets that the analyst had assigned in his/her name, taking into account the reference_date compared with the solved_date,
       closed_date and ts_updated for the same date.
     lineage:
       - datalake_customer_support.tickets.id_ticket
@@ -33,9 +37,10 @@ columns:
     description: Bigint type column that represents the number of tickets assigned to the analyst that were reopened for a new service
     lineage:
       - datalake_customer_support.tickets.reopens
-      - datalake_repairs.repair_tickets.reopens 
+      - datalake_repairs.repair_tickets.reopens
   ticket_responses:
-    description: Bigint type column that represents the total number of responses among all services performed 
+    description:
+      Bigint type column that represents the total number of responses among all services performed
       by the analyst for the reference date of the metric calculation
     lineage:
       - datalake_customer_support.tickets.replies
@@ -46,7 +51,8 @@ columns:
       - datalake_customer_support.tickets.ts_solved
       - datalake_customer_support.tickets.ts_created
   total_tickets_recontact:
-    description: Bigint type column that represents the number of tickets that underwent some update after the ticket was resolved,
+    description:
+      Bigint type column that represents the number of tickets that underwent some update after the ticket was resolved,
       indicating that there was some re-contact.
     lineage:
       - datalake_customer_support.tickets.ts_updated
@@ -57,7 +63,8 @@ columns:
       - datalake_customer_support.tickets.ts_solved
       - datalake_customer_support.tickets.ts_closed
   total_productivity:
-    description: Bigint type column that indicates the number of tickets that were closed on the reference date of the calculation 
+    description:
+      Bigint type column that indicates the number of tickets that were closed on the reference date of the calculation
       by the analyst considering their respective context
     lineage:
       - datalake_repairs.repair_tickets.ts_solved_local
@@ -69,37 +76,43 @@ columns:
       - datalake_survicate.zendesk_email_surveys.csat_score
       - datalake_customer_support.csat.first_csat_score
   tickets_csat_satisfied:
-    description: Column of type bigint that represents the number of tickets that received some response to 
+    description:
+      Column of type bigint that represents the number of tickets that received some response to
       the satisfaction survey and the score corresponds to the values ​​4 or 5.
     lineage:
       - datalake_survicate.zendesk_email_surveys.csat_score
       - datalake_customer_support.csat.first_csat_score
   tickets_csat_neutral:
-    description: Column of type bigint that represents the number of tickets that received some response 
+    description:
+      Column of type bigint that represents the number of tickets that received some response
       to the satisfaction survey and the score corresponds to the value 3.
     lineage:
       - datalake_survicate.zendesk_email_surveys.csat_score
       - datalake_customer_support.csat.first_csat_score
   tickets_csat_dissatisfied:
-    description: Column of type bigint that represents the number of tickets that received some response
+    description:
+      Column of type bigint that represents the number of tickets that received some response
       to the satisfaction survey and the score corresponds to the values ​​1 or 2.
     lineage:
       - datalake_survicate.zendesk_email_surveys.csat_score
       - datalake_customer_support.csat.first_csat_score
   tickets_with_resolution_answered:
-    description: Bigint column that represents the number of tickets that have a response from the satisfaction survey 
+    description:
+      Bigint column that represents the number of tickets that have a response from the satisfaction survey
       and a true or false service solution signal associated with the survey
     lineage:
       - datalake_customer_support.csat.is_solved
       - datalake_customer_support.csat.ts_first_response
   tickets_with_resolution:
-    description: Bigint type column that represents the number of tickets that have a response from the satisfaction survey and some signaling 
+    description:
+      Bigint type column that represents the number of tickets that have a response from the satisfaction survey and some signaling
       of a solution as true from the service associated with the survey sent.
     lineage:
       - datalake_customer_support.csat.is_solved
       - datalake_customer_support.csat.ts_first_response
   tickets_transferred:
-    description: Bigint column that represents the number of tickets that were transferred considering that the
+    description:
+      Bigint column that represents the number of tickets that were transferred considering that the
       first service was provided by the analyst and the team is not “Inside Sales”.
     lineage:
       - datalake_customer_support.received_demand.status
@@ -107,7 +120,8 @@ columns:
       - datalake_gsheets_clean.department_control.team
       - datalake_customer_support.tickets.id_ticket
   tickets_in_backlog:
-    description: Bigint column that represents the quantity where the condition assumes True if the total number of days worked is less than or equal
+    description:
+      Bigint column that represents the quantity where the condition assumes True if the total number of days worked is less than or equal
       to the task's sla_target, or if it is greater than the task's sla_target, according to the logic defined for each case. Otherwise, it assumes the value False.
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.is_backlog_in_time
@@ -121,7 +135,8 @@ columns:
     lineage:
       - datalake_customer_demand.backlog_metrics_tasks.is_backlog_not_in_time
   frt:
-    description: Average FRT (Full Resolution Time) calculates the total time from the beggining
+    description:
+      Average FRT (Full Resolution Time) calculates the total time from the beggining
       of the support in the front until the end, considering the backoffice time if
       there is back ticket related.
     lineage:
@@ -129,19 +144,23 @@ columns:
       - datalake_repairs.repair_tickets.ts_solved_local
       - datalake_repairs.repair_tickets.ts_closed_local
   replies:
-    description: Column of type bigint that represents the average number of days for the (Full Resolution Time) calculates the total time from the creation of the 
+    description:
+      Column of type bigint that represents the average number of days for the (Full Resolution Time) calculates the total time from the creation of the
       ticket until its due closure considering the reference date of the calculation considering its respective context
     lineage:
       - datalake_repairs.repair_tickets.replies
       - datalake_customer_support.tickets.replies
   year:
-    description: Integer column that indicates the year in which the processing and/or loading of the table data was performed. Also used as table partitioning, 
+    description:
+      Integer column that indicates the year in which the processing and/or loading of the table data was performed. Also used as table partitioning,
       aiming to provide better query performance when used in the WHERE clause.
   month:
-    description: Integer column that indicates the month on which the processing and/or loading of the table data was performed. Also used as table partitioning,
+    description:
+      Integer column that indicates the month on which the processing and/or loading of the table data was performed. Also used as table partitioning,
       aiming to provide better query performance when used in the WHERE clause.
   day:
-    description: Integer column that indicates the day on which the processing and/or loading of the table data was performed. Also used as table partitioning,
+    description:
+      Integer column that indicates the day on which the processing and/or loading of the table data was performed. Also used as table partitioning,
       aiming to provide better query performance when used in the WHERE clause.
   ts_load:
     description: Timestamp column that indicates the date and time the processing and/or loading of the table data was performed

@@ -1,13 +1,13 @@
 database_name: datalake_chattermill
 table_name: responses
-description:
-  Base responsible for processing NPS survey response data, with id_response_tag as its main key.
-domain: Support and Service
+description: Base responsible for processing NPS survey response data, with id_response_tag as its main key.
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_response_tag:
     lineage:
-    description: Key used in the fact_answer_category model, comes from the concatenation between the response id and the category id.
+    description:
+      Key used in the fact_answer_category model, comes from the concatenation between the response id and the category id.
       - datalake_chattermill_clean.responses.user_attributes
       - datalake_chattermill_clean.responses.themes
   id:

@@ -1,8 +1,9 @@
 database_name: dw_chattermill
 table_name: fact_answer_category
-description: Fact table whose objective is to consolidate the relationship rules between answers <> category. 
+description:
+  Fact table whose objective is to consolidate the relationship rules between answers <> category.
   The granularity of this table is a concatenation between response id and category id.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_answer_category:

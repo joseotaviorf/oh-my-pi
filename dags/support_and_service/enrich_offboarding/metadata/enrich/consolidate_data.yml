@@ -1,7 +1,7 @@
 database_name: datalake_offboarding
 table_name: consolidate_data
 description: Table that consolidates offboarding information.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:
@@ -149,15 +149,15 @@ columns:
   num_ticket_off_front_satisfied:
     lineage:
       - datalake_offboarding.customer_support.num_ticket_satisfied
-    description:  Sum of the number of tickets classified as satisfactory and where front_or_back = 'front'.
+    description: Sum of the number of tickets classified as satisfactory and where front_or_back = 'front'.
   num_ticket_off_front_neutral:
     lineage:
       - datalake_offboarding.customer_support.num_ticket_neutral
-    description:   Sum of the number of tickets classified as neutral and where front_or_back = 'front'.
+    description: Sum of the number of tickets classified as neutral and where front_or_back = 'front'.
   num_ticket_off_front_dissatisfied:
     lineage:
       - datalake_offboarding.customer_support.num_ticket_dissatisfied
-    description:  Sum of the number of tickets classified as dissatisfied and where front_or_back = 'front'.
+    description: Sum of the number of tickets classified as dissatisfied and where front_or_back = 'front'.
   is_interaction_pp:
     lineage:
       - datalake_offboarding.budgeting_window.interaction_pp

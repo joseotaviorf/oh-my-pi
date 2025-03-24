@@ -1,7 +1,7 @@
 database_name: datalake_crm_tasks_transitions
 table_name: tasks_transitions
 description: Data from case transitions between CRM tasks
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_transition:
@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_crm.workflows_transitions.id_task_from
   origin_type:
-    description: Identifies the origin of the task, whether it is frontEnd or backEnd service 
+    description: Identifies the origin of the task, whether it is frontEnd or backEnd service
     lineage:
       - datalake_crm.tasks.type
   id_task_to:

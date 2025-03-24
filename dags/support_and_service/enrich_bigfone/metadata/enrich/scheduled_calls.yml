@@ -3,7 +3,7 @@ table_name: reservations
 description:
   Table that consolidates every reservation event that happened for every Call. A reservation
   is an assignment of a support analyst to a call from a customer.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_task:

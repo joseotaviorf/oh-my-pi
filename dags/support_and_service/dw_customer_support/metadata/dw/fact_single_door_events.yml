@@ -1,7 +1,7 @@
 database_name: dw_customer_support
 table_name: fact_single_door_events
 description: Table with events related to Single Door features
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_event:

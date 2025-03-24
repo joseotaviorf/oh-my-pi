@@ -4,7 +4,7 @@ description:
   Fact table that describes all contacts that happen in the front office. Each contact is made of
   one or many interactions between the customer and an analyst. Time metrics for each interaction are
   also present in this table
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_contact:

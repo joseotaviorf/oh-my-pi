@@ -3,7 +3,7 @@ table_name: ongoing_repair_tickets
 description:
   Enrichment table that aims to consolidate information from the repair
   service flow. Each line in this table represents a service ticket for this flow.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_ticket:

@@ -2,7 +2,7 @@
 database_name: datalake_gsheets_clean
 table_name: tool_access_mapping
 description: Tool Access Mapping for atento agents.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   name:

@@ -2,7 +2,7 @@
 database_name: datalake_satisfaction_rating
 table_name: gsheets_surveys
 description: Unifies and enriches form satisfaction responses coming from Gsheets.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_answer:

@@ -1,135 +1,141 @@
 database_name: dw_crm
 table_name: dim_onboarding_tenant_task
 description: Information about CRM tasks from Onboarding (Tenant) workgroups. Each line is a CRM task.
-domain: Support and Service
+domain: Support and Services
 owner: nathalia.paula@quintoandar.com.br
 columns:
   sk_task:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.id_task
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.id_task
     description: Key of task in CRM
   score_factor:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.score_factor
-    description: Defines the task importance weight to be ordered in analysts' task
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.score_factor
+    description:
+      Defines the task importance weight to be ordered in analysts' task
       backlog
   version:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.version
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.version
     description: Specifies the MongoDB (CRM Production database technology) version
   origin:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.origin
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.origin
     description: The origin entity that generates a specific task.
     categories:
-      Contrato: ''
-      FluxoLocacao: ''
-      Imovel: ''
-      Manual: ''
-      Offer: ''
-      Onboarding: ''
-      PreProposta: ''
+      Contrato: ""
+      FluxoLocacao: ""
+      Imovel: ""
+      Manual: ""
+      Offer: ""
+      Onboarding: ""
+      PreProposta: ""
   type:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
-    description: Indicates whether the task is Manual or the task name when it is
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.type
+    description:
+      Indicates whether the task is Manual or the task name when it is
       automatic-type
     categories:
-      AgendarBuscaEEntregaDeChaves: ''
-      AtualizaInfoChavesProp: ''
-      AtualizaInfoChavesRecebidas: ''
-      BuscarChaveProprietario: ''
-      ConfirmarComprovantesContas: ''
-      ConfirmarDados: ''
-      ConfirmarLocalChaves: ''
-      ContatarInquilinoInfoEntregaChaves: ''
-      EntregaChavesParaInquilino: ''
-      InquilinoNaoRecebeuTodasChaves: ''
-      Manual: ''
-      PagarContasConsumo: ''
-      SendLongTermEmailOwner: ''
-      SendLongTermEmailTenant: ''
-      SendShortTerm: ''
-      TransferenciaContasConsumoAgua: ''
-      TransferenciaContasConsumoGas: ''
-      TransferenciaContasConsumoLuz: ''
-      VerificarContrato: ''
+      AgendarBuscaEEntregaDeChaves: ""
+      AtualizaInfoChavesProp: ""
+      AtualizaInfoChavesRecebidas: ""
+      BuscarChaveProprietario: ""
+      ConfirmarComprovantesContas: ""
+      ConfirmarDados: ""
+      ConfirmarLocalChaves: ""
+      ContatarInquilinoInfoEntregaChaves: ""
+      EntregaChavesParaInquilino: ""
+      InquilinoNaoRecebeuTodasChaves: ""
+      Manual: ""
+      PagarContasConsumo: ""
+      SendLongTermEmailOwner: ""
+      SendLongTermEmailTenant: ""
+      SendShortTerm: ""
+      TransferenciaContasConsumoAgua: ""
+      TransferenciaContasConsumoGas: ""
+      TransferenciaContasConsumoLuz: ""
+      VerificarContrato: ""
   description:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.description
-    description: The task description field filled by an analyst as an additional
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.description
+    description:
+      The task description field filled by an analyst as an additional
       information or remark (for task manual-type only).
   subject:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.subject
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.subject
     description: Descriptive information that indicates which stage the task is at.
     categories:
-      Aditivo. - Valor de IPTU.: '#N/A'
-      Aditivos acordados em contrato: '#N/A'
-      Ajustes Iniciais - Garagem: '#N/A'
-      Ajustes Iniciais - Medidas e Voltagens: '#N/A'
-      Alteração de vigência: '#N/A'
-      Alteração de vigência - Envio de Aditivo: '#N/A'
-      Autorização de entrada: '#N/A'
-      Contas de Consumo - Cobrança/Reembolso: '#N/A'
-      Contas de Consumo - Informações: '#N/A'
-      Contas de Consumo - Religação: '#N/A'
-      Contas de Consumo - Transferência de Titularidade: '#N/A'
-      Contas de consumo - Religação: '#N/A'
-      Dados do Condomínio: '#N/A'
-      Entrega de Chaves: '#N/A'
-      Entrega de chaves: '#N/A'
-      Itens de Acesso: '#N/A'
-      Múltiplas dúvidas / solicitações: '#N/A'
-      Retirada de itens: '#N/A'
+      Aditivo. - Valor de IPTU.: "#N/A"
+      Aditivos acordados em contrato: "#N/A"
+      Ajustes Iniciais - Garagem: "#N/A"
+      Ajustes Iniciais - Medidas e Voltagens: "#N/A"
+      Alteração de vigência: "#N/A"
+      Alteração de vigência - Envio de Aditivo: "#N/A"
+      Autorização de entrada: "#N/A"
+      Contas de Consumo - Cobrança/Reembolso: "#N/A"
+      Contas de Consumo - Informações: "#N/A"
+      Contas de Consumo - Religação: "#N/A"
+      Contas de Consumo - Transferência de Titularidade: "#N/A"
+      Contas de consumo - Religação: "#N/A"
+      Dados do Condomínio: "#N/A"
+      Entrega de Chaves: "#N/A"
+      Entrega de chaves: "#N/A"
+      Itens de Acesso: "#N/A"
+      Múltiplas dúvidas / solicitações: "#N/A"
+      Retirada de itens: "#N/A"
   titles:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.titles
-    description: The task title which should be standardized for manual or automatic
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.titles
+    description:
+      The task title which should be standardized for manual or automatic
       task or, in some cases, non-standardized if manual-type due this field being
       a text input
   workgroups:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.workgroups
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.workgroups
     description: The specific workgroup on which a task belongs to
     categories:
-      '[DEP_BACKSTAGE, DEP_CONFIRMAR_DADOS]': ''
-      '[DEP_BACKSTAGE, DEP_CONFIRMAR_FORNECEDORAS]': ''
-      '[DEP_BACKSTAGE, DEP_VERIFICAR_CONTRATO]': ''
-      '[DEP_CHAVES]': ''
-      '[DEP_CONFIRMAR_DADOS, DEP_BACKSTAGE]': ''
-      '[DEP_CONFIRMAR_FORNECEDORAS, DEP_BACKSTAGE]': ''
-      '[DEP_MOTOBOY]': ''
-      '[DEP_ONBOARDING_EMAIL, DEP_ONBOARDING_INQUILINO]': ''
-      '[DEP_ONBOARDING_INQUILINO, DEP_ONBOARDING_EMAIL]': ''
-      '[DEP_ONBOARDING_INQUILINO]': ''
-      '[DEP_VERIFICAR_CONTAS]': ''
-      '[DEP_VERIFICAR_CONTRATO, DEP_BACKSTAGE]': ''
+      "[DEP_BACKSTAGE, DEP_CONFIRMAR_DADOS]": ""
+      "[DEP_BACKSTAGE, DEP_CONFIRMAR_FORNECEDORAS]": ""
+      "[DEP_BACKSTAGE, DEP_VERIFICAR_CONTRATO]": ""
+      "[DEP_CHAVES]": ""
+      "[DEP_CONFIRMAR_DADOS, DEP_BACKSTAGE]": ""
+      "[DEP_CONFIRMAR_FORNECEDORAS, DEP_BACKSTAGE]": ""
+      "[DEP_MOTOBOY]": ""
+      "[DEP_ONBOARDING_EMAIL, DEP_ONBOARDING_INQUILINO]": ""
+      "[DEP_ONBOARDING_INQUILINO, DEP_ONBOARDING_EMAIL]": ""
+      "[DEP_ONBOARDING_INQUILINO]": ""
+      "[DEP_VERIFICAR_CONTAS]": ""
+      "[DEP_VERIFICAR_CONTRATO, DEP_BACKSTAGE]": ""
   hours_task_start_to_completed:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.hours_task_started_to_completed
-    description: Number of hours that the task takes between the start and completion
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.hours_task_started_to_completed
+    description:
+      Number of hours that the task takes between the start and completion
       timestamps
   flg_solved:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_resolved
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_resolved
     description: boolean column that indicates whether a task was solved or not
   is_task_auto_completed:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_task_auto_completed
-    description: Boolean column which indicates whether a task was automatically closed
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.is_task_auto_completed
+    description:
+      Boolean column which indicates whether a task was automatically closed
       by system or not.
   ts_start:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_started
     description: Timestamp of task start event (UTC timezone)
   ts_completed:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_completed
     description: Timestamp of task completion event (UTC timezone)
   ts_silenced_until:
     lineage:
-    - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_silenced_until
+      - datalake_crm_tasks_flows.tasks_actions_resolutions_flow.ts_silenced_until
     description: Timestamp of expiration of a task snooze event (UTC)
   ts_load:
     description: Timestamp of data load event (UTC timezone)

@@ -4,7 +4,7 @@ table_name: review
 description:
   After the inspection, the tenant and the property owner can review the
   report and contest the result given by the inspector.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_review:

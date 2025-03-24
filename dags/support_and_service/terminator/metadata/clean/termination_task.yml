@@ -1,7 +1,7 @@
 database_name: datalake_terminator_clean
 table_name: termination_task
 description: Table with tickets that are created by the Terminator.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:

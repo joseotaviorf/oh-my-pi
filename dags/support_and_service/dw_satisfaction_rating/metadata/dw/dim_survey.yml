@@ -5,7 +5,7 @@ description:
   "This table contains information about the satisfaction surveys. Its granularity is given by the sk_survey column.
   Query notes: The data source table is at answer granularity, not survey granularity. A survey can have several
   answers, that's why we apply the distinct function, avoiding the duplication of the same id_survey."
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_survey:

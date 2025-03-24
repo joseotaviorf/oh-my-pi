@@ -2,7 +2,7 @@
 database_name: dw_inspections
 table_name: fact_reviewer_approval
 description: History of approval/disapproval of the inspection report by reviewers
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_reviewer:

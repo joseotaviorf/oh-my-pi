@@ -2,7 +2,7 @@
 database_name: datalake_inspection_services_clean
 table_name: item_group_type_aud
 description: It brings the standard types of item group that we can have within the application.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_item_group_type:

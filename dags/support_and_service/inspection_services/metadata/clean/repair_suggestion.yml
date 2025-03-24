@@ -2,7 +2,7 @@
 database_name: datalake_inspection_services_clean
 table_name: repair_suggestion
 description: This table aims to store the data that will be filled in the repair_request table, when the item_group_state criteria are met.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id:

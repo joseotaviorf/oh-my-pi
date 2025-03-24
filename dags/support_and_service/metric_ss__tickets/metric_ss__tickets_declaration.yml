@@ -1,7 +1,7 @@
 dag:
   name: metric_ss__tickets
   schedule_start_date: 2021,01,01
-  domain: Support and Service
+  domain: Support and Services
   owner: Data SS
   documentation:
     dag_purpose: "This DAG creates the Data Support And Service KPIS with targets metrics, all related to the scope within the aggregation."
@@ -15,7 +15,7 @@ cluster:
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

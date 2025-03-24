@@ -1,9 +1,8 @@
 ---
 database_name: datalake_tracksale
 table_name: answer_tags
-description:
-  With this table we apply business rules to provide information about the tagging of nps responses.
-domain: Support and Service
+description: With this table we apply business rules to provide information about the tagging of nps responses.
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_answer:

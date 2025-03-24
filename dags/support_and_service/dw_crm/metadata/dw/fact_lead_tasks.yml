@@ -1,37 +1,38 @@
 database_name: dw_crm
 table_name: fact_lead_tasks
-description: Fact table that contains the flow of each task to treat the lead, in
+description:
+  Fact table that contains the flow of each task to treat the lead, in
   order to convert it. Each line is a task flow
-domain: Support and Service
+domain: Support and Services
 owner: marcus.pinto@quintoandar.com.br
 columns:
   sk_created_date:
     lineage:
-    - dw_crm.fact_lead_task_actions.sk_action_date
+      - dw_crm.fact_lead_task_actions.sk_action_date
     description: Key to identify date of task creation on CRM
   sk_first_realized_date:
     lineage:
-    - dw_crm.fact_lead_task_actions.sk_action_date
+      - dw_crm.fact_lead_task_actions.sk_action_date
     description: Key to identify date of task realization by an inside sales analyst
   sk_first_resolved_date:
     lineage:
-    - dw_crm.fact_lead_task_actions.sk_action_date
+      - dw_crm.fact_lead_task_actions.sk_action_date
     description: Key to identify date of task completion, automatically by the CRM
   sk_lead:
     lineage:
-    - dw_crm.fact_lead_task_actions.sk_created_date.sk_lead
+      - dw_crm.fact_lead_task_actions.sk_created_date.sk_lead
     description: Key to identify lead
   sk_task:
     lineage:
-    - dw_crm.fact_lead_task_actions.sk_created_date.sk_task
+      - dw_crm.fact_lead_task_actions.sk_created_date.sk_task
     description: Key to identify task on CRM
   sk_user_first_assignee:
     lineage:
-    - dw_crm.fact_lead_task_actions.sk_created_date.sk_assignee
+      - dw_crm.fact_lead_task_actions.sk_created_date.sk_assignee
     description: Key of first user assignee for a specific task
   sk_user_first_resolver:
     lineage:
-    - dw_crm.fact_lead_task_actions.sk_created_date.sk_assignee
+      - dw_crm.fact_lead_task_actions.sk_created_date.sk_assignee
     description: Key of first user resolver for a specific task
   is_closed:
     description: Boolean if the task is closed or not

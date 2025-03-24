@@ -6,7 +6,7 @@ description:
   what the situation is and if there were any comments from the inspector. It's worth noting that the
   item_group refers to things like a window, door, floor, cabinets, etc.
   Each row is a unique item_group, identified by the sk_item_group column.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_item_group:

@@ -4,7 +4,7 @@ table_name: dim_appointment_component
 description: |
   Dimension table that creates a combination of descriptive data about the appointment context.
   Each row in this table is a combination of descriptive appointment data.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_appointment_component:

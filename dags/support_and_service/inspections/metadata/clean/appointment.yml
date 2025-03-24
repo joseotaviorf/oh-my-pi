@@ -2,7 +2,7 @@
 database_name: datalake_inspections_clean
 table_name: appointment
 description: This table contains data on scheduling, scheduling and canceling dates for property inspections.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_appointment:

@@ -2,7 +2,7 @@
 database_name: datalake_inspections
 table_name: inspection_status_change
 description: This table transforms status changes into date and time columns to facilitate analysis of the inspection lifecycle.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspection:

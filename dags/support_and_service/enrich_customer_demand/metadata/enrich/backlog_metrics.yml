@@ -4,7 +4,7 @@ table_name: backlog_metrics
 description:
   This table contains the backlog demands for each agent on a daily basis.
   It is updated on a daily basis, without freezing the historical metric-reference data.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_agent:

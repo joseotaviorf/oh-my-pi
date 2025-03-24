@@ -1,7 +1,7 @@
 database_name: datalake_zendesk
 table_name: tickets
 description: Table containing all ticket information, including custom_fields
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_ticket:

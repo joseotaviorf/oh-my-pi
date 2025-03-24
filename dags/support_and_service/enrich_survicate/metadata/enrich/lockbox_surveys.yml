@@ -2,7 +2,7 @@
 database_name: datalake_survicate
 table_name: lockbox_surveys
 description: Responses to forms relating to the key lockbox service
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_answer:
