@@ -22,8 +22,6 @@ Produces the following output tables:
 2. In datalake clean:
     <div style="overflow-x: scroll; height: 200px">
 
-    `category_house`
-    `category`
     `conservation_item_functional`
     `conservation_item_status`
     `conservation_room`

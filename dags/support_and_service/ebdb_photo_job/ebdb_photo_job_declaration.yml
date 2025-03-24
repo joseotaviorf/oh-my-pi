@@ -15,6 +15,14 @@ workflow:
   custom_schema: ebdb
   dbutils_secret_key: EBDB_DB
   tables_customization:
+    Category:
+      clean_table_name: category
+      raw_primary_keys: [id]
+      clean_primary_keys: [id_category]
+    CategoryImovel:
+      clean_table_name: category_house
+      raw_primary_keys: [imovelId, categoryId]
+      clean_primary_keys: [id_house, id_category]
     DadosFotografo:
       clean_table_name: photographer_data
       raw_primary_keys: [id]
