@@ -1375,6 +1375,18 @@ bietlejuice.enrich_company:
   - bietlejuice.ebdb:load-clean-house-listing-relation
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.ebdb_location:load-clean-state
+bietlejuice.enrich_condo_monitoring:
+  - bietlejuice.condominium_payments:load-clean-condo-monitoring-actions
+  - bietlejuice.condominium_payments:load-clean-condo-monitoring-actions-aud
+  - bietlejuice.condominium_payments:load-clean-condo-monitoring-eligibility-aud
+  - bietlejuice.condominium_payments:load-clean-invoice
+  - bietlejuice.condominium_payments:load-clean-invoice-aud
+  - bietlejuice.condominium_payments:load-clean-non-payment-report
+  - bietlejuice.ebdb_contract:load-clean-contract
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
+  - bietlejuice.jaiminho:load-clean-user-notifications
 bietlejuice.enrich_consolidated_growth_metrics:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns
   - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes

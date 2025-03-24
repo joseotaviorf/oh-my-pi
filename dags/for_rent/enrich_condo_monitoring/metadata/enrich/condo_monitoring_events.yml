@@ -1,0 +1,63 @@
+database_name: datalake_condo_monitoring
+table_name: condo_monitoring_events
+description: This table contains all the events related to the Condo Monitoring.
+  When the contracts was eligible, when the feature was activated by the user, status of the invoices and when the communication was sent to the user.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id_contract:
+    lineage:
+      - datalake_condominium_payments_clean.condo_monitoring_actions_aud.id_contract
+      - datalake_condominium_payments_clean.non_payment_report.id_contract
+      - datalake_condominium_payments_clean.condo_monitoring_eligibility_aud.id_contract
+      - datalake_condominium_payments_clean.invoice_aud.id_contract
+      - datalake_condo_monitoring.communication.id_contract
+    description: ID of the contract.
+  id_invoice:
+    lineage:
+      - datalake_condominium_payments_clean.invoice_aud.id_invoice
+      - datalake_condo_monitoring.communication.id_invoice
+    description: ID of the invoice.
+  id_communication:
+    lineage:
+      - datalake_condo_monitoring.communication.id_communication
+    description: ID of the communication sent to the user.
+  id_house_listing:
+    lineage:
+      - datalake_listing_contracts.listing_contracts.id_house_listing
+    description: ID of the house listing associated to the contract.
+  id_house:
+    lineage:
+      - datalake_listing_contracts.listing_contracts.id_house
+    description: ID of the house associated to the contract.
+  uuid_owner:
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+    description: Owner's UUID of the house.
+  uuid_tenant:
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+    description: Tenant's UUID of the house.
+  source:
+    description: Source of the information to facilitate the understanding and filter of the data.
+    categories:
+      CONDO_MONITORING: The event comes from the Condo Monitoring and the events of it is related to the activation of the feature, for example.
+      NON_PAYMENT_REPORT: The event comes from the reports of non payments and the events of it is related to the reports that the owners sent when the condo bill wasn't paid.
+      ELEGIBILITY: The event comes from the eligibility of the Condo Monitoring.
+      INVOICE: The event comes from the invoices of the Condo Monitoring.
+      COMMUNICATION: The event comes from the communications of the Condo Monitoring.
+  event_name:
+    lineage:
+      - datalake_condominium_payments_clean.condo_monitoring_actions_aud.action_type
+      - datalake_condominium_payments_clean.condo_monitoring_eligibility_aud.eligibility
+      - datalake_condominium_payments_clean.invoice_aud.status
+      - datalake_condo_monitoring.communication.communication_type
+    description: Name of the event that happened.
+  ts_event:
+    lineage:
+      - datalake_condominium_payments_clean.condo_monitoring_actions_aud.ts_updated
+      - datalake_condominium_payments_clean.non_payment_report.ts_updated
+      - datalake_condominium_payments_clean.condo_monitoring_eligibility_aud.ts_updated
+      - datalake_condominium_payments_clean.invoice_aud.ts_updated
+      - datalake_condo_monitoring.communication.ts_sent
+    description: Timestamp of the event that happened.

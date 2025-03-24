@@ -1,0 +1,22 @@
+dag:
+  name: enrich_condo_monitoring
+  schedule_start_date: 2020, 7, 1
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Creates enriched table for the context of Condo Monitoring.
+      The schema datalake_condo_monitoring contains information about the communications and interactions between the Condo Monitoring.
+workflow:
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    condo_monitoring_events:
+      - communication
+cluster:
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

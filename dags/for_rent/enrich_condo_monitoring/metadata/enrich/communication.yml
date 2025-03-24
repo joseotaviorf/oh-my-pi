@@ -1,0 +1,50 @@
+database_name: datalake_condo_monitoring
+table_name: communication
+description: This table contains the information about the communications related to the Condo Monitoring.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  uuid_person:
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+    description: UUID of the person who received the communication.
+  id_communication:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.id
+    description: Notification's ID.
+  id_entity:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.id_entity
+    description: Jaiminhos' ID entity.
+      It's a string containing the information about the notification sent to the user.
+  id_contract:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.id_entity
+    description: ID of the contract related to the notification.
+  id_invoice:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.id_contract
+    description: ID of the invoice related to the notification.
+  communication_type:
+    description: Type of the notification.
+    categories:
+      WARMING: The notification type was a warming saying that the condo bill was not paid.
+      REMINDER: The notification type was a reminder to remember the user to pay the condo bill.
+  status:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.status
+    description: Status of the notification.
+  entity_name:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.entity_name
+    description: Entity name of the notification.
+  was_delivered:
+    description: Boolean flag to check if the notification was delivered.
+  ts_sent:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.ts_sent
+    description: Timestamp of when the notification was sent.
+  dt_due:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.id_entity
+    description: Due date of the invoice related to the notification.
