@@ -7,7 +7,7 @@ columns:
   id_task:
     lineage:
       - datalake_quinturk_clean.task.id
-    description: "Unique task ID. It corresponds to the task identifier from Label Studio"
+    description: "Unique task ID. It corresponds to the task identifier from Label Studio. This task corresponds to the latest version available in Label Studio to a document."
   id_proposal:
     lineage:
       - datalake_quinturk_clean.task.id_proposal

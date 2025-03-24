@@ -249,9 +249,30 @@ union_documents AS (
     lead_time,
     document_name,
     document_type,
-    net_income,
-    gross_income,
-    committed_income,
+    CASE
+      WHEN net_income LIKE '%,%' THEN REGEXP_REPLACE(
+        REGEXP_REPLACE(net_income, '\\.', ''),
+        ',',
+        '.'
+      )
+      ELSE net_income
+    END AS net_income,
+    CASE
+      WHEN gross_income LIKE '%,%' THEN REGEXP_REPLACE(
+        REGEXP_REPLACE(gross_income, '\\.', ''),
+        ',',
+        '.'
+      )
+      ELSE gross_income
+    END AS gross_income,
+    CASE
+      WHEN committed_income LIKE '%,%' THEN REGEXP_REPLACE(
+        REGEXP_REPLACE(committed_income, '\\.', ''),
+        ',',
+        '.'
+      )
+      ELSE committed_income
+    END AS committed_income,
     payslip_reference_period,
     bank_statement_start_date,
     bank_statement_end_date,
@@ -273,9 +294,30 @@ union_documents AS (
     lead_time,
     document_name,
     document_type,
-    net_income,
-    gross_income,
-    committed_income,
+    CASE
+      WHEN net_income LIKE '%,%' THEN REGEXP_REPLACE(
+        REGEXP_REPLACE(net_income, '\\.', ''),
+        ',',
+        '.'
+      )
+      ELSE net_income
+    END AS net_income,
+    CASE
+      WHEN gross_income LIKE '%,%' THEN REGEXP_REPLACE(
+        REGEXP_REPLACE(gross_income, '\\.', ''),
+        ',',
+        '.'
+      )
+      ELSE gross_income
+    END AS gross_income,
+    CASE
+      WHEN committed_income LIKE '%,%' THEN REGEXP_REPLACE(
+        REGEXP_REPLACE(committed_income, '\\.', ''),
+        ',',
+        '.'
+      )
+      ELSE committed_income
+    END AS committed_income,
     payslip_reference_period,
     bank_statement_start_date,
     bank_statement_end_date,
@@ -287,8 +329,8 @@ union_documents AS (
   FROM
     get_bank_statement_data
 )
-SELECT DISTINCT
-  CAST(id_task AS INT) AS id_task,
+SELECT
+  DISTINCT CAST(id_task AS INT) AS id_task,
   CAST(id_project AS INT) AS id_project,
   CAST(id_proposal AS INT) AS id_proposal,
   CAST(id_completed_by AS INT) AS id_completed_by,
@@ -297,12 +339,12 @@ SELECT DISTINCT
   lead_time,
   document_name,
   document_type,
-  ROUND(CAST(net_income AS DECIMAL), 2) AS net_income,
-  ROUND(CAST(gross_income AS DECIMAL), 2) AS gross_income,
-  ROUND(CAST(committed_income AS DECIMAL), 2) AS committed_income,
+  CAST(net_income AS DECIMAL(10, 2)) AS net_income,
+  CAST(gross_income AS DECIMAL(10, 2)) AS gross_income,
+  CAST(committed_income AS DECIMAL(10, 2)) AS committed_income,
   payslip_reference_period,
   TO_DATE(bank_statement_start_date, 'dd/MM/yyyy') AS bank_statement_start_date,
-  TO_DATE(bank_statement_end_date, 'dd/MM/yyyy') AS bank_statement_end_date,
+  bank_statement_end_date,
   bank_statement_date_start_partial,
   TO_DATE(bank_statement_date_end_partial, 'dd/MM/yyyy') AS bank_statement_date_end_partial,
   is_fraud,
@@ -311,3 +353,5 @@ SELECT DISTINCT
   NOW() AS ts_load
 FROM
   union_documents
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_task, document_name ORDER BY ts_updated DESC) = 1
