@@ -507,6 +507,7 @@ table_block_list:
   - CondoManagerEmails
   - CondoManagerPhones
   - CondoNamesHistory
+  - Device
   - Category
   - CategoryImovel
 

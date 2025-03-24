@@ -26,7 +26,6 @@ Produces the following output tables:
     `conservation_item_status`
     `conservation_room`
     `country`
-    `device`
     `follow_up_details_feedback_tag`
     `house_agent`
     `house_agent_aud`

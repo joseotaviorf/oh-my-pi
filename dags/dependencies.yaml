@@ -1820,7 +1820,6 @@ bietlejuice.enrich_ebdb_smart_price:
   - bietlejuice.enrich_ebdb_listing:load-enrich-lbc-status-version-order
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_user:
-  - bietlejuice.ebdb:load-clean-device
   - bietlejuice.ebdb_administration:load-clean-doorman-affiliate-data
   - bietlejuice.ebdb_administration:load-clean-doorman-affiliate-occupation
   - bietlejuice.ebdb_agent:load-clean-agent-data
@@ -1831,6 +1830,7 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.ebdb_partner:load-clean-affiliate-data-aud
   - bietlejuice.ebdb_proposal:load-clean-proposal
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud
+  - bietlejuice.ebdb_user:load-clean-device
   - bietlejuice.ebdb_user:load-clean-sales-rep
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-merge

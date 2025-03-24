@@ -17,6 +17,8 @@ workflow:
       clean_table_name: sales_rep
     DadosVendedor_AUD:
       clean_table_name: sales_rep_aud
+    Device:
+      clean_table_name: device
     HouseUser:
       clean_table_name: house_user
     UserDocument:
