@@ -35,6 +35,20 @@ company_info AS (
             ON c.uuid_company = comp.uuid_company
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY c.id ORDER BY comp.ts_updated DESC) = 1
+),
+company_document AS (
+  SELECT 
+    uuid_company,
+    document_type,
+    status,
+    identification_number
+  FROM
+    datalake_company_clean.document
+  WHERE 
+    status = 'ACTIVE'
+    and uuid_company = '0a07174c-56a1-4f80-9a57-bf4cb09786c1'
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY uuid_company, document_type  ORDER BY ts_updated DESC) = 1
 )
 SELECT
     c.id AS id_broker,
@@ -62,12 +76,12 @@ LEFT JOIN
     address AS a
         ON c.uuid_company = a.uuid_company
 LEFT JOIN
-    datalake_company_clean.document AS d
+    company_document AS d
         ON c.uuid_company = d.uuid_company
         AND d.document_type = 'CRECI'
         AND d.status = 'ACTIVE'
 LEFT JOIN
-    datalake_company_clean.document AS d2
+    company_document AS d2
         ON c.uuid_company = d2.uuid_company
         AND d2.document_type = 'CNPJ'
         AND d2.status = 'ACTIVE'
