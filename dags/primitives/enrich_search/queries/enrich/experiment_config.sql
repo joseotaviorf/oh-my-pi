@@ -85,13 +85,26 @@ FROM VALUES
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
-                    '-1', 'baseline',
                     '0', 'baseline',
                     '1', 'treatment'
                 )
             ),
             'filters', NULL
         )
+    )
+    -- Copilot entrypoint exp
+    (
+        "ab_beakman_native_cockpit_copilot_entry_point_experiment",
+        named_struct(
+            'begin_date', DATE('2025-03-11'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    'baseline', 'baseline',
+                    'treatment', 'treatment'
+                )
+            ),
+            'filters', NULL
     )
     -- Add new experiment here
 
