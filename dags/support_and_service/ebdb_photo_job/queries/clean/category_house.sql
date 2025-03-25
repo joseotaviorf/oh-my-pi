@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     imovelId AS id_house,
     categoryId AS id_category
 FROM
