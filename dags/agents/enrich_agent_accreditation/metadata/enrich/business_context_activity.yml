@@ -35,10 +35,6 @@ columns:
       Not Defined: The agent is not assigned to a specific business context during this period.
   total_active_days:
     description: Total number of days the agent was active within this business context, calculated as the difference between the first and last recorded active action.
-  is_active:
-    lineage:
-      - datalake_agent_accreditation.agent_registration_actions_log.is_active
-    description: Indicates whether the agent was active at any point during the recorded period
   dt_started:
     lineage:
       - datalake_agent_accreditation.agent_registration_actions_log.dt_action

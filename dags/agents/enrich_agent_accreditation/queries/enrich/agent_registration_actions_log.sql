@@ -191,7 +191,17 @@ union_actions AS (
     SELECT * FROM business_profile_actions
 )
 SELECT 
-    XXHASH64(a.id_agent, a.action, a.dt_revision) AS id_action,
+    XXHASH64(a.id_agent, a.action, a.dt_revision) AS id_action_log,
+    CASE 
+        WHEN a.action = "Accreditation" THEN 0
+        WHEN a.action = "First activation after accreditation" THEN 1
+        WHEN a.action = "De-accreditation" THEN 2
+        WHEN a.action = "Re-accreditation" THEN 3
+        WHEN a.action = "Business Context Update" THEN 4
+        WHEN a.action = "Performance Profile Update" THEN 5
+        WHEN a.action = "Record Updated" THEN 6
+        WHEN a.action = "Record Removed" THEN 7     
+    END AS id_action,
     a.id_agent,
     a.id_user,
     a.id_work_contract,
@@ -209,4 +219,4 @@ FROM
 WHERE 
     a.action IS NOT NULL 
 QUALIFY
-    1 = ROW_NUMBER() OVER (PARTITION BY id_action ORDER BY a.ts_revision DESC)
+    1 = ROW_NUMBER() OVER (PARTITION BY id_action_log ORDER BY a.ts_revision DESC)

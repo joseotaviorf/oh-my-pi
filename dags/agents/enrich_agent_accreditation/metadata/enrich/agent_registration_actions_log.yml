@@ -14,8 +14,19 @@ columns:
       - datalake_agent_accreditation.agent_accreditation.id_agent
       - datalake_agent_accreditation.agent_accreditation.ts_revision_started
     description: |
-      Unique identifier for the action performed in the Agent registration, generated using an XXHASH64 function 
-      based on the agent ID, profile, and revision start date.
+      A unique identifier for the action performed in the Agent registration, generated using the XXHASH64 function based on the agent's ID, 
+      the action executed, and the revision date. This field maintains the history of actions taken during the Agent's registration or update process.
+  id_action:
+    description: A numeric code that categorizes the actions performed in the Agent's registration and update process.
+    categories:
+      0: Accreditation
+      1: First activation after accreditation
+      2: De-accreditation
+      3: Re-accreditation
+      4: Business Context Update
+      5: Performance Profile Update
+      6: Record Updated
+      7: Record Removed
   id_agent:
     lineage:
       - datalake_agent_accreditation.agent_accreditation.id_agent
