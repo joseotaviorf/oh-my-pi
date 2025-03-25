@@ -1,0 +1,239 @@
+---
+database_name: datalake_checkout_clean
+table_name: credit_card_status_log
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.id
+  id_charge:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.charge_id
+  id_requester:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.requester_id
+  id_credit_card:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.credit_card_id
+  id_acquire_auth_code:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.acquire_auth_code
+  id_business_entity:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.business_entity_id
+  id_finance_entity:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.finance_entity_id
+  id_external:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.external_id
+  code:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.code
+  acquire_name:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.acquire_name
+  acquire_nsu:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.acquire_nsu
+  acquire_tid:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.acquire_tid
+  block_entity:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.block_entity
+  canceled_by_email:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.canceled_by_email
+  cancellation_reason:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.cancellation_reason
+  capture_fail_reason:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.capture_fail_reason
+  card_brand:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.card_brand
+  fine_type:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.fine_type
+  first_six_digits:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.first_six_digits
+  interest_type:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.interest_type
+  installments:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.installments
+  last_four_digits:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.last_four_digits
+  max_installments:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.max_installments
+  min_installments:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.min_installments
+  payer_city:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.payer_city
+  payer_email:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.payer_email
+  payer_identifiable_document:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.payer_identifiable_document
+  payer_name:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.payer_name
+  payer_neighborhood:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.payer_neighborhood
+  payer_person_type:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.payer_person_type
+  payer_state:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.payer_state
+  payer_street_address:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.payer_street_address
+  payer_zipcode:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.payer_zipcode
+  raw_response:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.raw_response
+  requester_name:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.requester_name
+  status:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.status
+  token:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.token
+  acquire_fee_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.acquire_fee_amount
+  convenience_fee_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.convenience_fee_amount
+  due_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.due_amount
+  fine_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.fine_amount
+  fine_amount_percentage:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.fine_amount_percentage
+  fine_paid_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.fine_paid_amount
+  fixed_cost_of_transaction:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.fixed_cost_of_transaction
+  installment_fee_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.installment_fee_amount
+  interest_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.interest_amount
+  interest_amount_percentage:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.interest_amount_percentage
+  interest_paid_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.interest_paid_amount
+  paid_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.paid_amount
+  refund_amount:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.refund_amount
+  dt_due:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.due_date
+  dt_fine_start:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.fine_start_at
+  dt_interest_start:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.interest_start_at
+  dt_last_date_to_pay:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.last_date_to_pay
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.created_at
+  ts_canceled:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.canceled_at
+  ts_paid:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.paid_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_status_log.updated_at

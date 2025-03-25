@@ -16,10 +16,27 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
   tables_customization:
     bank_account: {}
-    bolecode: {}
-    boleto: {}
+    bolecode:
+      transactional_datatype_overrides: 
+        due_amount: decimal(38,20)
+        interest_amount: decimal(38,20)
+        interest_amount_percentage: decimal(38,20)
+        fine_amount: decimal(38,20)
+        fine_amount_percentage: decimal(38,20)
+        paid_amount: decimal(38,20)
+        interest_paid_amount: decimal(38,20)
+        fine_paid_amount: decimal(38,20)
+    boleto:
+      transactional_datatype_overrides:
+        due_amount: decimal(38,20)
+        interest_amount: decimal(38,20)
+        interest_amount_percentage: decimal(38,20)
+        fine_amount: decimal(38,20)
+        fine_amount_percentage: decimal(38,20)
+        paid_amount: decimal(38,20)
+        interest_paid_amount: decimal(38,20)
+        fine_paid_amount: decimal(38,20)  
     boleto_webhook: {}
-    boleto_webhook_config: {}
     charge: {}
     charge_status_log: {}
     credit_card: {}
@@ -28,7 +45,6 @@ workflow:
     credit_card_fee: {}
     credit_card_fee_installment: {}
     credit_card_status_log: {}
-    credit_card_token: {}
     credit_card_webhook: {}
     order: {}
     payment_config: {}
