@@ -1,6 +1,7 @@
 import argparse
 import ast
 from datetime import datetime
+from functools import partial
 from typing import Dict
 
 from presidio_analyzer.nlp_engine import NlpEngineProvider
@@ -68,15 +69,14 @@ LABELS_TO_IGNORE = {
     "FAC",
 }
 
-def load_recognizers_from_dict() -> RecognizerRegistry:
+def load_recognizers_from_dict(schema) -> RecognizerRegistry:
     """
     Load custom recognizers from a YAML configuration file and add them to the registry.
 
     Returns:
         registry: A RecognizerRegistry instance with the custom recognizers loaded.
     """
-    source = source_broadcast.value
-    config_service = ConfigurationService(source)
+    config_service = ConfigurationService(schema)
     recognizer_dict_list = config_service.get_config("recognizers")
 
     if not recognizer_dict_list:
@@ -104,7 +104,7 @@ def load_nlp_config() -> Dict:
 
     return nlp_config
 
-def build_batch_analyzer() -> BatchAnalyzerEngine:
+def build_batch_analyzer(schema) -> BatchAnalyzerEngine:
     """
     Build and return a BatchAnalyzerEngine instance.
 
@@ -112,7 +112,7 @@ def build_batch_analyzer() -> BatchAnalyzerEngine:
         BatchAnalyzerEngine: An instance of BatchAnalyzerEngine configured with the custom recognizers and NLP engine.
     """
     nlp_config = load_nlp_config()
-    registry = load_recognizers_from_dict()
+    registry = load_recognizers_from_dict(schema)
     provider = NlpEngineProvider(nlp_configuration=nlp_config)
 
     nlp_engine = provider.create_engine()
@@ -130,8 +130,8 @@ def clean_result(result, matched_value):
       for r in result
   ]
 
-def process_partition(iter_of_rows):
-    batch_analyzer = build_batch_analyzer()
+def process_partition(iter_of_rows, schema):
+    batch_analyzer = build_batch_analyzer(schema)
     rows_list = list(iter_of_rows)
 
     df_dict = {
@@ -249,7 +249,6 @@ def main():
     logger.info("m=main,msg='Starting PII scan load into the datalake'")
     args = parse_args()
     partition_cols = ast.literal_eval(args.partitions)
-    source_broadcast = spark.sparkContext.broadcast(args.schema)
 
     schema = StructType([
         StructField("layer", StringType(), True),
@@ -280,7 +279,8 @@ def main():
 
     df = get_sample(date_filter=args.load_start_date)
 
-    rdd = df.rdd.mapPartitions(process_partition)
+
+    rdd = df.rdd.mapPartitions(partial(process_partition, args.schema))
     df_rebuilt = spark.createDataFrame(data=rdd, schema=schema)
 
     df_explode_sample = (
