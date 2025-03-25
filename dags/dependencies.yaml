@@ -1222,16 +1222,16 @@ bietlejuice.enrich_betopera:
   - bietlejuice.betopera:load-clean-certificate-request
   - bietlejuice.betopera:load-clean-insurance
 bietlejuice.enrich_big_agent:
+  - bietlejuice.big_agent:load-clean-agency
+  - bietlejuice.big_agent:load-clean-agency-aud
+  - bietlejuice.big_agent:load-clean-agent
+  - bietlejuice.big_agent:load-clean-earnings
+  - bietlejuice.big_agent:load-clean-enrollment
+  - bietlejuice.big_agent:load-clean-external-invoice
   - bietlejuice.big_agent:load-clean-house
   - bietlejuice.big_agent:load-clean-installment
   - bietlejuice.big_agent:load-clean-program
   - bietlejuice.big_agent:load-clean-user-revision-entity
-  - bietlejuice.big_agent_earnings:load-clean-agency
-  - bietlejuice.big_agent_earnings:load-clean-agency-aud
-  - bietlejuice.big_agent_earnings:load-clean-agent
-  - bietlejuice.big_agent_earnings:load-clean-earnings
-  - bietlejuice.big_agent_earnings:load-clean-enrollment
-  - bietlejuice.big_agent_earnings:load-clean-external-invoice
   - bietlejuice.ebdb_partner:load-clean-partner-agent
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing

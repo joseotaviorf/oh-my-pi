@@ -18,7 +18,3 @@ SELECT
     day
 FROM
     datalake_big_agent_raw.share_rule
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

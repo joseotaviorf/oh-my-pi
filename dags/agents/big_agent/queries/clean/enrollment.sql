@@ -10,7 +10,3 @@ SELECT
     day
 FROM
     datalake_big_agent_raw.enrollment
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

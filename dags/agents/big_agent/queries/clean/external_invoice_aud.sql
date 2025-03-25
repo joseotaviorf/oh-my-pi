@@ -26,7 +26,3 @@ SELECT
     day
 FROM
     datalake_big_agent_raw.external_invoice_aud
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

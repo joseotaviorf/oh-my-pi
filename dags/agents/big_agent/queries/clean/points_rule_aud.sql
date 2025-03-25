@@ -32,7 +32,3 @@ SELECT
     day
 FROM
     datalake_big_agent_raw.points_rule_aud
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

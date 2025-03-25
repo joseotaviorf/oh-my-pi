@@ -7,7 +7,3 @@ SELECT
     day
 FROM
     datalake_big_agent_raw.user_revision_entity
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

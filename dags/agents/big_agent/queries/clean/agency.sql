@@ -11,7 +11,3 @@ SELECT
     day
 FROM
     datalake_big_agent_raw.agency
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

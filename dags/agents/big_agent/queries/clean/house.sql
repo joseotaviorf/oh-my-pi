@@ -8,7 +8,3 @@ SELECT
     day
 FROM
     datalake_big_agent_raw.house
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
