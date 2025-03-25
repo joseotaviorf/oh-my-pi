@@ -29,7 +29,6 @@ bietlejuice.dw_agent_contract:
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-coincident-business-contexts
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-activations-suspensions-contracts-changes
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.dw_agents_availability:
   - bietlejuice.ebdb_agenda_allocation:load-clean-mask-weekly-hour
   - bietlejuice.ebdb_user:load-clean-user
@@ -530,7 +529,6 @@ bietlejuice.dw_house_amenities:
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history
   - bietlejuice.enrich_ebdb_amenities:load-enrich-pivotted-amenities
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.dw_hub_services:
   - bietlejuice.enrich_hub_services_agents:load-enrich-member-profile
   - bietlejuice.enrich_hub_services_agents:load-enrich-profile
@@ -608,7 +606,6 @@ bietlejuice.dw_listing:
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_pro_owners:load-enrich-owner-category
   - bietlejuice.enrich_pro_owners:load-enrich-pro-owner-history
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info
 bietlejuice.dw_listing_owners:
   - bietlejuice.ebdb_partner:load-clean-partner-agent
@@ -707,7 +704,6 @@ bietlejuice.dw_rede_company:
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-history
   - bietlejuice.enrich_hubspot_management:load-enrich-owner
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.dw_rede_supply:
   - bietlejuice.ebdb:load-clean-house-listing-relation
   - bietlejuice.ebdb_house:load-clean-house
@@ -716,7 +712,6 @@ bietlejuice.dw_rede_supply:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rede_lead_acquisition:load-enrich-lead-3p-acquisition
   - bietlejuice.enrich_rede_lead_crawler:load-enrich-lead-3p-freshness
   - bietlejuice.enrich_rede_supply:load-enrich-file-sks
@@ -731,7 +726,6 @@ bietlejuice.dw_region:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.dw_rent_demand_events:
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
@@ -751,7 +745,6 @@ bietlejuice.dw_rent_flow:
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_kill_queue:load-enrich-reservation
   - bietlejuice.enrich_proposal:load-enrich-proposal
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
@@ -835,7 +828,6 @@ bietlejuice.dw_sale_closing_flows:
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_sale_closing_flows:load-enrich-closing-flow
 bietlejuice.dw_sale_events:
   - bietlejuice.dw_agent_contract:load-dw-agent-fact-agent-contract
@@ -880,7 +872,6 @@ bietlejuice.dw_sale_listings:
   - bietlejuice.enrich_big_agent:load-enrich-house-sale-listing-consultant
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_sale_listing_demand:load-enrich-sale-listing-demand
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
@@ -905,7 +896,6 @@ bietlejuice.dw_sale_ongoing_listings:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
@@ -923,7 +913,6 @@ bietlejuice.dw_satisfaction_rating:
   - bietlejuice.enrich_survicate:load-enrich-single-station-surveys
 bietlejuice.dw_search_session_event:
   - bietlejuice.ebdb_house:load-clean-house
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
 bietlejuice.dw_secretariat_user:
@@ -2017,7 +2006,6 @@ bietlejuice.enrich_hubspot_crm:
 bietlejuice.enrich_hubspot_events:
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-history
   - bietlejuice.enrich_hubspot_management:load-enrich-owner
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.enrich_hubspot_management:
   - bietlejuice.hubspot:load-clean-call
   - bietlejuice.hubspot:load-clean-communication
@@ -2369,7 +2357,6 @@ bietlejuice.enrich_offer:
   - bietlejuice.enrich_gsheets:load-enrich-sale-hub-offer
   - bietlejuice.enrich_hub_services:load-enrich-buyer-secretariat-changes
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_rental_transact:load-enrich-offer
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
@@ -2513,10 +2500,12 @@ bietlejuice.enrich_recupera:
   - bietlejuice.trato_feito:load-clean-client
   - bietlejuice.trato_feito:load-clean-contract
 bietlejuice.enrich_rede_company:
-  - bietlejuice.enrich_company:load-enrich-company
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house
-  - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
-  - bietlejuice.enrich_hubspot_crm:load-enrich-company
+  - bietlejuice.company:load-clean-company
+  - bietlejuice.company:load-clean-company-address
+  - bietlejuice.company:load-clean-company-document
+  - bietlejuice.company:load-clean-company-product
+  - bietlejuice.company:load-clean-document
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company-members
 bietlejuice.enrich_rede_company_event:
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.enrich_booking:load-enrich-booking
@@ -2550,7 +2539,6 @@ bietlejuice.enrich_rede_lead_acquisition:
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes
 bietlejuice.enrich_rede_lead_crawler:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.enrich_rede_supply:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail-aud
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p-aud
@@ -2895,7 +2883,6 @@ bietlejuice.enrich_sale_visit:
   - bietlejuice.ebdb_visit:load-clean-visit-status-log
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_offer:load-enrich-sale-offer
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
   - bietlejuice.insider:load-clean-review
 bietlejuice.enrich_sale_visit_hubs:
@@ -3305,7 +3292,6 @@ bietlejuice.enrich_visit:
   - bietlejuice.enrich_hub_services:load-enrich-buyer-secretariat-changes
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-hierarchy
   - bietlejuice.enrich_offer:load-enrich-sale-offer
-  - bietlejuice.enrich_rede_company:load-enrich-company-sks
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
   - bietlejuice.insider:load-clean-review

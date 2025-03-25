@@ -1,5 +1,5 @@
 ---
-table_name: datalake_rede_company.company_sks
+table_name: datalake_company.company_sks
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
@@ -9,11 +9,21 @@ column_level_validations:
   sk_company:
     is_complete:
       severity_level: Error
-  sk_company_lead:
+    is_unique:
+      severity_level: Error
+  id_company:
     is_complete:
       severity_level: Error
     is_unique:
       severity_level: Error
   id_hubspot:
+    is_unique:
+      severity_level: Error
+  uuid_company:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  cnpj:
     is_unique:
       severity_level: Error

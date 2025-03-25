@@ -1,86 +1,92 @@
-WITH starting_value AS (
-    SELECT
-        COALESCE(MAX(sk_company), 0) AS max_sk_company,
-        COALESCE(MAX(sk_company_lead), 0) AS max_sk_company_lead
-    FROM
-        datalake_rede_company.company_sks
+WITH company_product AS (
+  SELECT
+    cp.id_company,
+    MAX(GET_JSON_OBJECT(cp.product_settings, '$.bankingInformationUUId')) AS uuid_banking_information,
+    MAX(GET_JSON_OBJECT(cp.product_settings, '$.integratorPartnerUUId')) AS uuid_integrator_partner,
+    MAX(GET_JSON_OBJECT(cp.product_settings, '$.revenueShareUUId')) AS uuid_revenue_share,
+    MAX(cp.id_product) = 33 AS is_company_asp,
+    MAX(cp.id_product) = 32 AS is_company_ciq,
+    MAX(cp.id_product) = 28 AS is_company_legal_person_rental_guarantee,
+    MAX(cp.id_product) = 29 AS is_company_pp_multi,
+    MAX(cp.id_product) = 27 AS is_company_rede_broker,
+    MAX(cp.id_product) = 1 AS is_company_rental_guarantee
+  FROM
+    datalake_company_clean.company_product AS cp
+  GROUP BY
+    ALL
 ),
-partners_not_found_on_hubspot AS (
-    SELECT -- 3P Houses without id_hubspot
-        partner_3p_supply AS partner_not_found,
-        MAX(UPPER(internal_admin_info) LIKE '%[3PBH-%]%') AS is_3p_bh
-    FROM
-        datalake_ebdb_listing.house
-    WHERE
-        id_company_hubspot IS NULL
-        AND uuid_company IS NULL
-        AND partner_3p_supply IS NOT NULL
-    GROUP BY
-        partner_3p_supply
-    UNION
-    SELECT -- 3P Work contracts without id_hubspot
-        3p_partner AS partner_not_found,
-        FALSE AS is_3p_bh
-    FROM
-        datalake_ebdb_work_contract.work_contract
-    WHERE
-        id_company_hubspot IS NULL
-        AND 3p_partner IS NOT NULL
+company_address AS (
+  SELECT
+    ca.id_company,
+    ca.id_address
+  FROM
+    datalake_company_clean.company_address AS ca
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY ca.id_company ORDER BY ca.ts_updated DESC) = 1
 ),
-total_partners AS (
-    SELECT
-        hc.id_company AS id_hubspot,
-        COALESCE(hc.uuid_company, c.uuid_company) AS uuid_company,
-        NULL AS extracted_3p_tag,
-        NULL AS is_3p_bh,
-        COALESCE(
-            hc.has_been_rent_member
-            OR hc.has_been_sale_member
-            OR c.has_rede_product
-            OR c.houses_currently_owned > 0
-            OR c.leads_currently_owned > 0
-        , FALSE) AS has_been_member
-    FROM
-        datalake_hubspot.company AS hc
-    FULL OUTER JOIN
-        datalake_company.company AS c
-            ON c.uuid_company = hc.uuid_company
-    WHERE
-        hc.id_company IS NOT NULL
-        OR c.id_company IS NULL
-        OR c.has_rede_product
-        OR c.houses_currently_owned > 0
-        OR c.leads_currently_owned > 0
-    UNION ALL
-    SELECT
-        NULL AS id_hubspot,
-        NULL AS uuid_company,
-        partner_not_found AS extracted_3p_tag,
-        is_3p_bh,
-        TRUE AS has_been_member
-    FROM
-        partners_not_found_on_hubspot
+company_cnpj AS (
+  SELECT
+    cd.id_company,
+    d.identification_number,
+    d.document_type
+  FROM
+    datalake_company_clean.company_document AS cd
+  LEFT JOIN
+    datalake_company_clean.document AS d
+      ON cd.id_document = d.id
+        AND d.document_type = 'CNPJ'
+        AND d.status = 'ACTIVE'
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY cd.id_company ORDER BY cd.ts_updated DESC) = 1
+),
+company_creci AS (
+  SELECT
+    cd.id_company,
+    d.identification_number,
+    d.document_type
+  FROM
+    datalake_company_clean.company_document AS cd
+  LEFT JOIN
+    datalake_company_clean.document AS d
+      ON cd.id_document = d.id
+        AND d.document_type = 'CRECI'
+        AND d.status = 'ACTIVE'
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY cd.id_company ORDER BY cd.ts_updated DESC) = 1
 )
 SELECT
-    COALESCE(
-        IF(NOT tp.has_been_member, -1, NULL), -- If the company is not a member, set the sk_company to -1
-        NULLIF(sk_company, -1), -- Keep the sk_company if it is already defined, so it is durable
-        sv.max_sk_company + MONOTONICALLY_INCREASING_ID() + 1 -- if not, use a number after the previous maximum value
-    ) AS sk_company,
-    COALESCE(
-        sk_company_lead, -- Keep the sk_company if it is already defined, so it is durable
-        sv.max_sk_company_lead + MONOTONICALLY_INCREASING_ID() + 1 -- if not, use a number after the previous maximum value
-    ) AS sk_company_lead,
-    tp.id_hubspot, -- Natural key (HubSpot)
-    tp.uuid_company, -- Natural key (Internal Company Database)
-    tp.extracted_3p_tag, -- Natural key for companies not present in HubSpot
-    tp.is_3p_bh,
-    tp.has_been_member
+  XXHASH64(c.id) AS sk_company,
+  c.id AS id_company,
+  ca.id_address,
+  cm.id_company AS id_hubspot,
+  cp.uuid_banking_information,
+  c.uuid_company,
+  cp.uuid_integrator_partner,
+  cp.uuid_revenue_share,
+  REGEXP_REPLACE(ccn.identification_number, '[^0-9]', '') AS cnpj,
+  REGEXP_REPLACE(ccr.identification_number, '[^0-9]', '') AS creci,
+  cp.is_company_asp,
+  cp.is_company_ciq,
+  cp.is_company_legal_person_rental_guarantee,
+  cp.is_company_pp_multi,
+  cp.is_company_rede_broker,
+  cp.is_company_rental_guarantee,
+  c.ts_created,
+  c.ts_updated
 FROM
-    total_partners AS tp,
-    starting_value AS sv
+  datalake_company_clean.company AS c
 LEFT JOIN
-    datalake_rede_company.company_sks AS cs
-        ON tp.id_hubspot IS NOT DISTINCT FROM cs.id_hubspot
-        AND tp.uuid_company IS NOT DISTINCT FROM cs.uuid_company
-        AND tp.extracted_3p_tag IS NOT DISTINCT FROM cs.extracted_3p_tag
+  company_product AS cp
+    ON c.id = cp.id_company
+LEFT JOIN
+  company_address AS ca
+    ON c.id = ca.id_company
+LEFT JOIN
+  company_cnpj AS ccn
+    ON c.id = ccn.id_company
+LEFT JOIN
+  company_creci AS ccr
+    ON c.id = ccr.id_company
+LEFT JOIN
+  datalake_hubspot.company_members AS cm
+    ON REGEXP_REPLACE(ccn.identification_number, '[^0-9]', '') = cm.cnpj

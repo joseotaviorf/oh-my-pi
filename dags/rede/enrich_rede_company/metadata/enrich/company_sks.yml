@@ -1,28 +1,79 @@
 ---
-database_name: datalake_rede_company
+database_name: datalake_company
 table_name: company_sks
-description: Generates the surrogate keys for Rede companies and company leads.
+description: Generates the surrogate keys for companies and cosolidates IDs and uuids from related entities.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_company:
-    description: Surrogate key for Rede companies. -1 if it is not a member.
-  sk_company_lead:
-    description: Surrogate key for Rede company leads.
-  id_hubspot:
-    description: Hubspot ID for the company.
+    description: Surrogate key for Rede companies.
     lineage:
-      - datalake_hubspot.company.id_company
+      - datalake_company_clean.company.id
+  id_company:
+    description: Primary key of the company in the Company.
+    lineage:
+      - datalake_company_clean.company.id
+  id_address:
+    description: Foreign key of the address entity in the Company domain.
+    lineage:
+      - datalake_company_clean.company_address.id_address
+  id_hubspot:
+    description: Foreign key of the Hubspot Company entity when it is or has been a member.
+    lineage:
+      - datalake_hubspot.company_members.id_company
+  uuid_banking_information:
+    description: UUID of the banking information entity in the Company domain.
+    lineage:
+      - datalake_company_clean.company_product.product_settings
   uuid_company:
     description: UUID of the company in the Company domain.
     lineage:
       - datalake_company_clean.company.uuid_company
-  extracted_3p_tag:
-    description: Content of the 3P tag ([3P-<name>]) of the company.
+  uuid_integrator_partner:
+    description: UUID of the company related as a integrator partner in the Company domain.
     lineage:
-      - datalake_ebdb_listing.house.partner_3p_supply
-      - datalake_ebdb_work_contract.work_contract.3p_partner
-  is_3p_bh:
-    description: Whether the company is from 3P BH.
-  has_been_member:
-    description: Whether the company has been a member.
+      - datalake_company_clean.company_product.product_settings
+  uuid_revenue_share:
+    description: UUID of the revenue share entity in the Company domain.
+    lineage:
+      - datalake_company_clean.company_product.product_settings
+  cnpj:
+    description: Current CNPJ of the company from document entity.
+    lineage:
+      - datalake_company_clean.document.identification_number
+  creci:
+    description: Current CRECI of the company from document entity.
+    lineage:
+      - datalake_company_clean.document.identification_number
+  is_company_asp:
+    description: Flag to indicate if the company is a ASP.
+    lineage:
+      - datalake_company_clean.company_product.id_product
+  is_company_ciq:
+    description: Flag to indicate if the company is a CIQ.
+    lineage:
+      - datalake_company_clean.company_product.id_product
+  is_company_legal_person_rental_guarantee:
+    description: Flag to indicate if the company is a legal person rental guarantee.
+    lineage:
+      - datalake_company_clean.company_product.id_product
+  is_company_pp_multi:
+    description: Flag to indicate if the company is a PP Multi.
+    lineage:
+      - datalake_company_clean.company_product.id_product
+  is_company_rede_broker:
+    description: Flag to indicate if the company is a Rede broker.
+    lineage:
+      - datalake_company_clean.company_product.id_product
+  is_company_rental_guarantee:
+    description: Flag to indicate if the company is a rental guarantee.
+    lineage:
+      - datalake_company_clean.company_product.id_product
+  ts_created:
+    description: Timestamp of the creation of the Company record.
+    lineage:
+      - datalake_company_clean.company.ts_created
+  ts_updated:
+    description: Timestamp of the last update of the Company record.
+    lineage:
+      - datalake_company_clean.company.ts_updated
