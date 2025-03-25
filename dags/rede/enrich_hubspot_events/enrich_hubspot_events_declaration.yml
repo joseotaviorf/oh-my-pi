@@ -7,6 +7,7 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  custom_schema: hubspot
   inner_dependencies:
     company_events:
       - cluster_updates

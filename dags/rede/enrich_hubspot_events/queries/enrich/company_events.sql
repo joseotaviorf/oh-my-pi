@@ -53,5 +53,5 @@ SELECT
 FROM
   events AS e
 LEFT JOIN
-  datalake_rede_company.company_sks AS cs
+  datalake_company.company_sks AS cs
     ON e.id_hubspot = cs.id_hubspot
