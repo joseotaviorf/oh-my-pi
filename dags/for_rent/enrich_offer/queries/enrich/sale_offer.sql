@@ -1207,7 +1207,7 @@ SELECT
     ts_last_updated_pendency,
     ts_seller_fup,
     ts_buyer_fup,
-    ts_updated
+    br.ts_updated
 FROM
     business_rules AS br
 LEFT JOIN
