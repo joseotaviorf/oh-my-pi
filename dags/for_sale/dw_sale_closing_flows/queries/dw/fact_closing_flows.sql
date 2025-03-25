@@ -80,7 +80,7 @@ SELECT
   days_house_registry_ended_to_sale_key_delivered,
   days_house_registry_ended_to_sale_transaction_paid,
   --
-  ts_updated,
+  cf.ts_updated,
   ts_load AS ts_monday_load,
   NOW() AS ts_load
 FROM
