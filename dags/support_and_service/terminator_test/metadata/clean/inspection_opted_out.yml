@@ -1,0 +1,30 @@
+database_name: datalake_terminator_test_clean
+table_name: inspection_opted_out
+description: Clean table that aims to store inspection opt out information.
+domain: Support and Service
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_inspection_opted_out:
+    lineage:
+      - datalake_terminator_test_raw.inspection_opted_out.id
+    description: Unique identification key of the inspection opted out
+  id_terminator:
+    lineage:
+      - datalake_terminator_test_raw.inspection_opted_out.terminator_id
+    description: Identification key in terminator.
+  is_exit_inspection_opt_out:
+    lineage:
+      - datalake_terminator_test_raw.inspection_opted_out.exit_inspection_opt_out
+    description: Boolean information indicating whether it was exit inspection opt out.
+  reason:
+    lineage:
+      - datalake_terminator_test_raw.inspection_opted_out.reason
+    description: Reason for inspection opted out.
+  reason_details:
+    lineage:
+      - datalake_terminator_test_raw.inspection_opted_out.reason_details
+    description: Details of the reason why inspection opted out.
+  dt_opt_out:
+    lineage:
+      - datalake_terminator_test_raw.inspection_opted_out.date_opt_out
+    description: Inspection opted out date.
