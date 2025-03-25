@@ -45,7 +45,13 @@ def parse_arguments():
     parser.add_argument("primary_keys", help="Comma separated list of primary keys")
     parser.add_argument("dbutils_secret_key")
     parser.add_argument("transactional_datatype_overrides")
-    
+    parser.add_argument(
+        "--database-column-alias",
+        dest="database_column_alias",
+        required=False,
+        default="{}",
+    )
+
     return parser.parse_args()
 
 
@@ -115,7 +121,9 @@ def get_incoming_data(
         return None
 
 
-def format_and_deduplicate_df(df, partitions, database_type, primary_key_columns):
+def format_and_deduplicate_df(
+    df, partitions, database_type, primary_key_columns, database_column_alias
+):
     """
     Extract and format informations from Debezium payload
     and Deduplicate
@@ -161,8 +169,19 @@ def format_and_deduplicate_df(df, partitions, database_type, primary_key_columns
             f"m=format_and_deduplicate_df, database_type={database_type}, msg=Database not supported."
         )
 
+    data_schema = incoming_df.select("data").schema.fields[0].dataType
+    apply_data_alias_expr = []
+
+    for data_field in data_schema.names:
+        if data_field in database_column_alias.keys():
+            apply_data_alias_expr.append(
+                col(f"data.{data_field}").alias(database_column_alias[data_field])
+            )
+        else:
+            apply_data_alias_expr.append(col(f"data.{data_field}"))
+
     transactional_df = incoming_df.select(
-        col("data.*"),
+        *apply_data_alias_expr,
         col("op").alias("op_cdc"),
         to_timestamp(col("ts_ms") / 1000).alias("ts_cdc_transaction"),
         col(cdc_binlog_position_column).alias("cdc_binlog_position"),
@@ -190,6 +209,7 @@ def main():
     partitions = json.loads(args.partitions.replace("'", '"'))
     dbutils_secret_key = args.dbutils_secret_key
     transactional_datatype_overrides = json.loads(args.transactional_datatype_overrides)
+    database_column_alias = json.loads(args.database_column_alias)
     full_table_name = f"datalake_{schema}_transactional.{table_name}"
     schema_finder = CdcSchemaFinderFactory(
         dbutils_secret_key=dbutils_secret_key
@@ -251,7 +271,7 @@ def main():
         return
 
     transactional_df = format_and_deduplicate_df(
-        df, partitions, database_type, primary_keys
+        df, partitions, database_type, primary_keys, database_column_alias
     )
 
     logger.info("m=__main__, msg=Applying schema pre treatment...")
@@ -260,6 +280,7 @@ def main():
         schema_finder=schema_finder,
         datalake_table_schema=f"datalake_{schema}_transactional",
         transactional_datatype_overrides=transactional_datatype_overrides,
+        database_column_alias=database_column_alias,
     ).get_cdc_schema_treatment(DatabaseTypeEnum(database_type))
 
     transactional_df = pre_treatment.treat_dataframe(table_name, transactional_df)

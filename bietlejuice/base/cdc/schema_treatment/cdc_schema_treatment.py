@@ -88,3 +88,21 @@ class CdcSchemaTreatment(ABC):
                 column, col(column).cast(datatype)
             )
         return transactional_dataframe
+
+    def _apply_columns_alias_to_table_change(
+        self, latest_table_change: dict
+    ) -> DataFrame:
+        """Applies the column alias to the transactional dataframe, if they exist."""
+
+        latest_table_change["primaryKeyColumnNames"] = [
+            self.database_column_alias[column_name]
+            if column_name in self.database_column_alias.keys()
+            else column_name
+            for column_name in latest_table_change["primaryKeyColumnNames"]
+        ]
+
+        for column in latest_table_change["columns"]:
+            if column["name"] in self.database_column_alias.keys():
+                column["name"] = self.database_column_alias[column["name"]]
+
+        return latest_table_change

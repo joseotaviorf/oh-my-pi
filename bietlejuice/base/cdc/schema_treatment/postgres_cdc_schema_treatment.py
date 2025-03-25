@@ -17,10 +17,12 @@ class PostgresCdcSchemaTreatment(CdcSchemaTreatment):
         schema_finder: PostgresCdcSchemaFinder,
         datalake_table_schema: str,
         transactional_datatype_overrides: dict,
+        database_column_alias: dict,
     ) -> None:
         self.schema_finder = schema_finder
         self.datalake_table_schema = datalake_table_schema
         self.transactional_datatype_overrides = transactional_datatype_overrides
+        self.database_column_alias = database_column_alias
 
     def treat_dataframe(
         self, table_name: str, transactional_dataframe: DataFrame
@@ -49,6 +51,10 @@ class PostgresCdcSchemaTreatment(CdcSchemaTreatment):
         self, latest_table_change: dict, transactional_dataframe: DataFrame
     ) -> DataFrame:
         """Forces the columns of the transactional dataframe to match the latest table DDL change in the source database, which is found in the Postgres database."""
+        latest_table_change = self._apply_columns_alias_to_table_change(
+            latest_table_change
+        )
+
         transactional_dataframe = self._apply_declared_types(transactional_dataframe)
 
         transactional_dataframe = self._treat_timestamp_columns(

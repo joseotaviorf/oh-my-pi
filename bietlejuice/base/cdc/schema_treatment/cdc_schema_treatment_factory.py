@@ -17,10 +17,12 @@ class CdcSchemaTreatmentFactory:
         schema_finder: CdcSchemaFinder,
         datalake_table_schema: str,
         transactional_datatype_overrides: dict,
+        database_column_alias: dict,
     ) -> None:
         self.schema_finder = schema_finder
         self.datalake_table_schema = datalake_table_schema
         self.transactional_datatype_overrides = transactional_datatype_overrides
+        self.database_column_alias = database_column_alias
 
     def get_cdc_schema_treatment(
         self, database_type: DatabaseTypeEnum
@@ -36,6 +38,7 @@ class CdcSchemaTreatmentFactory:
             self.schema_finder,
             self.datalake_table_schema,
             self.transactional_datatype_overrides,
+            self.database_column_alias,
         )
 
     def get_mysql_cdc_schema_treatment(self) -> CdcSchemaTreatment:
@@ -43,4 +46,5 @@ class CdcSchemaTreatmentFactory:
             self.schema_finder,
             self.datalake_table_schema,
             self.transactional_datatype_overrides,
+            self.database_column_alias,
         )

@@ -43,6 +43,9 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
         transactional_datatype_overrides = table_attributes.table_customization.get(
             "transactional_datatype_overrides", {}
         )
+        database_column_alias = table_attributes.table_customization.get(
+            "database_column_alias", {}
+        )
 
         parameters = [
             self.dag_execution_context.environment,
@@ -59,6 +62,8 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
             primary_keys,
             dbutils_secret_key,
             json.dumps(transactional_datatype_overrides),
+            "--database-column-alias",
+            json.dumps(database_column_alias),
         ]
         return parameters
 
