@@ -1,0 +1,35 @@
+---
+database_name: datalake_checkout_clean
+table_name: credit_card_acquire_fee
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_acquire_fee.id
+  acquire_name:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_acquire_fee.acquire_name
+  card_brand:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_acquire_fee.card_brand
+  fee_percentage:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_acquire_fee.fee_percentage
+  installments:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_acquire_fee.installments
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_acquire_fee.created_at
+  ts_disabled:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.credit_card_acquire_fee.disabled_at
