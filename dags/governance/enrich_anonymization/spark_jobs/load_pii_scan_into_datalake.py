@@ -11,7 +11,7 @@ from presidio_analyzer import (
     RecognizerRegistry,
 )
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import col, explode, count, collect_list, struct
+from pyspark.sql.functions import col, explode, count, collect_list, struct, to_json
 from pyspark.sql.types import StructType, StringType, StructField, ArrayType, IntegerType, MapType
 
 from quintoandar_logger import QuintoAndarLogger
@@ -69,16 +69,13 @@ LABELS_TO_IGNORE = {
     "FAC",
 }
 
-def load_recognizers_from_dict(source) -> RecognizerRegistry:
+def load_recognizers_from_dict(recognizer_dict_list) -> RecognizerRegistry:
     """
     Load custom recognizers from a YAML configuration file and add them to the registry.
 
     Returns:
         registry: A RecognizerRegistry instance with the custom recognizers loaded.
     """
-    config_service = ConfigurationService(source)
-    recognizer_dict_list = config_service.get_config("recognizers")
-
     if not recognizer_dict_list:
       raise Exception("dict_recognizer_list is required.")
 
@@ -104,7 +101,7 @@ def load_nlp_config() -> Dict:
 
     return nlp_config
 
-def build_batch_analyzer(source) -> BatchAnalyzerEngine:
+def build_batch_analyzer(registry) -> BatchAnalyzerEngine:
     """
     Build and return a BatchAnalyzerEngine instance.
 
@@ -112,7 +109,6 @@ def build_batch_analyzer(source) -> BatchAnalyzerEngine:
         BatchAnalyzerEngine: An instance of BatchAnalyzerEngine configured with the custom recognizers and NLP engine.
     """
     nlp_config = load_nlp_config()
-    registry = load_recognizers_from_dict(source)
     provider = NlpEngineProvider(nlp_configuration=nlp_config)
 
     nlp_engine = provider.create_engine()
@@ -130,8 +126,9 @@ def clean_result(result, matched_value):
       for r in result
   ]
 
-def process_partition(iter_of_rows, source):
-    batch_analyzer = build_batch_analyzer(source)
+def process_partition(iter_of_rows, recognizer_dict_list):
+    registry = load_recognizers_from_dict(recognizer_dict_list)
+    batch_analyzer = build_batch_analyzer(registry)
     rows_list = list(iter_of_rows)
 
     df_dict = {
@@ -250,6 +247,8 @@ def main():
     logger.info("m=main,msg='Starting PII scan load into the datalake'")
     args = parse_args()
     partition_cols = ast.literal_eval(args.partitions)
+    config_service = ConfigurationService(args.source)
+    recognizer_dict_list = config_service.get_config("recognizers")
 
     schema = StructType([
         StructField("layer", StringType(), True),
@@ -281,7 +280,7 @@ def main():
     df = get_sample(date_filter=args.load_start_date)
 
 
-    rdd = df.rdd.mapPartitions(partial(process_partition, args.source))
+    rdd = df.rdd.mapPartitions(partial(process_partition, recognizer_dict_list=recognizer_dict_list))
     df_rebuilt = spark.createDataFrame(data=rdd, schema=schema)
 
     df_explode_sample = (
@@ -300,13 +299,14 @@ def main():
         .withColumn("sample_results_exploded", explode(col("sample_results").alias("sample_results_exploded")))
         .withColumn("sample_results_exploded_inner",
                     explode(col("sample_results_exploded").alias("sample_results_exploded_inner")))
+        .withColumn("sample_results_json", to_json(col("sample_results")))
         .select(
             "layer",
             "id_entity",
             "database_name",
             "table_name",
             "column_name",
-            "sample_results",
+            "sample_results_json",
             col("sample_results_exploded_inner.matched_value").alias("sample_matched_value"),
             col("sample_results_exploded_inner.type").alias("type"),
             col("sample_results_exploded_inner.score").alias("score"),
@@ -316,14 +316,14 @@ def main():
         )
     )
     grouped_sample = df_explode_sample.groupBy(
-        "layer", "id_entity", "database_name", "table_name", "column_name", "sample_results",
+        "layer", "id_entity", "database_name", "table_name", "column_name", "sample_results_json",
         "year", "month", "day", "type"
     ).agg(
         count("*").alias("count")
     )
 
     summary_sample = grouped_sample.groupBy(
-        "layer", "id_entity", "database_name", "table_name", "column_name", "sample_results",
+        "layer", "id_entity", "database_name", "table_name", "column_name", "sample_results_json",
         "year", "month", "day"
     ).agg(
         collect_list(struct("type", "count")).alias("sample_summary")
@@ -345,13 +345,14 @@ def main():
         .withColumn("col_results_exploded", explode(col("col_results").alias("col_results_exploded")))
         .withColumn("col_results_exploded_inner",
                     explode(col("col_results_exploded").alias("col_results_exploded_inner")))
+        .withColumn("col_results_json", to_json(col("col_results")))
         .select(
             "layer",
             "id_entity",
             "database_name",
             "table_name",
             "column_name",
-            "col_results",
+            "col_results_json",
             col("col_results_exploded_inner.matched_value").alias("col_matched_value"),
             col("col_results_exploded_inner.type").alias("type"),
             col("col_results_exploded_inner.score").alias("score"),
@@ -361,14 +362,14 @@ def main():
         )
     )
     grouped_col = df_explode_col.groupBy(
-        "layer", "id_entity", "database_name", "table_name", "column_name", "col_results",
+        "layer", "id_entity", "database_name", "table_name", "column_name", "col_results_json",
         "year", "month", "day", "type"
     ).agg(
         count("*").alias("count")
     )
 
     summary_col = grouped_col.groupBy(
-        "layer", "id_entity", "database_name", "table_name", "column_name", "col_results",
+        "layer", "id_entity", "database_name", "table_name", "column_name", "col_results_json",
         "year", "month", "day"
     ).agg(
         collect_list(struct("type", "count")).alias("col_summary")

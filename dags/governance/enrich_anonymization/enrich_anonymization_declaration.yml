@@ -35,7 +35,7 @@ workflow:
     pii_scan_results:
       - columns_sample_data
 cluster:
-  type: databricks_13_3_med_memory_general_cluster
+  type: databricks_13_3_med_general_driver_2_min_workers_cluster
   custom_libraries:
     - pypi:
         package: "presidio_analyzer==2.2.357"
@@ -43,6 +43,6 @@ cluster:
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
-    spark_version: 15.4.x-scala2.12
+    spark_version: 14.3.x-scala2.12
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
