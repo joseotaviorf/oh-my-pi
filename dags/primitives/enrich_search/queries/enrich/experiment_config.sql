@@ -91,7 +91,7 @@ FROM VALUES
             ),
             'filters', NULL
         )
-    )
+    ),
     -- Copilot entrypoint exp
     (
         "ab_beakman_native_cockpit_copilot_entry_point_experiment",
@@ -105,6 +105,7 @@ FROM VALUES
                 )
             ),
             'filters', NULL
+        )
     )
     -- Add new experiment here
 
