@@ -357,12 +357,31 @@ core_tasks = [
         parameters=[
             f"--input_geocoded_condos={Tables.geocode_step_condos}",
             f"--input_geocoded_houses={Tables.geocode_step_houses}",
-            f"--input_source_clustering_image_model={Tables.source_clustering_image_model}",
             f"--input_source_cnefe_houses={Tables.source_cnefe_houses}",
             f"--input_source_iptu_houses={Tables.source_iptu_houses}",
             f"--overwrite_schema",
             f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--output_address_adjusted_condos={Tables.address_adjusted_step_condos}",
+            f"--output_address_adjusted_houses={Tables.address_adjusted_step_houses}",
+        ],
+    ),
+    create_task(
+        entry_point="core_direct_matches_clustering_image_step",
+        parameters=[
+            f"--input_address_adjusted_houses={Tables.address_adjusted_step_houses}",
+            f"--input_source_clustering_image_model={Tables.source_clustering_image_model}",
+            f"--overwrite_schema",
+            f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
+            f"--output_address_adjusted_houses={Tables.address_adjusted_step_houses}",
+        ],
+    ),
+    create_task(
+        entry_point="core_indirect_matches_clustering_image_step",
+        parameters=[
+            f"--input_address_adjusted_houses={Tables.address_adjusted_step_houses}",
+            f"--input_source_clustering_image_model={Tables.source_clustering_image_model}",
+            f"--overwrite_schema",
+            f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--output_address_adjusted_houses={Tables.address_adjusted_step_houses}",
         ],
     ),
