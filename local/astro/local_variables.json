@@ -408,7 +408,6 @@
     },
     "databricks_model_academy_s3_prefix": "s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/model-academy",
     "databricks_s3_bucket": "databricks.s3.forno.data.quintoandar.com.br",
-    "databricks_single_user_name": "gustavo.miller@quintoandar.com.br",
     "databricks_wonka_s3_prefix": "s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/wonka",
     "datalake_bucket": "datalake.s3.forno.data.quintoandar.com.br",
     "default_cluster_ecr": {

@@ -47,6 +47,13 @@ setup-local-variables:
 		read -r DATABRICKS_TOKEN;\
 		echo export DATABRICKS_TOKEN=$$DATABRICKS_TOKEN >> $$SHELL_RC;\
 	fi
+	@if [ -z "${DATABRICKS_USERNAME}" ]; then\
+		if [ -f $$HOME/.zshrc ]; then SHELL_RC="$$HOME/.zshrc"; else SHELL_RC="$$HOME/.bashrc"; fi;\
+		printf 'Enter your Databricks Username (email@quintoandar.com.br) ';\
+		read -r DATABRICKS_USERNAME;\
+		echo export DATABRICKS_USERNAME=$$DATABRICKS_USERNAME >> $$SHELL_RC;\
+	fi
+	
 	@echo "All variables set!"
 	@echo "~> Restart your shell to apply changes!"
 
@@ -54,9 +61,7 @@ setup-local-variables:
 import-variables-and-connections:
 	@echo "Import Variables and Connections"
 	@cd ./local/astro; \
-	astro dev run variables import variables.json; \
-	sh import_conn.sh
-
+	sh import_conn_vars.sh
 
 branch ?= forno
 .PHONY: run-local-environment

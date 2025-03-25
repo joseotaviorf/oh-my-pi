@@ -5,10 +5,12 @@ if [ -z "$DATABRICKS_TOKEN" ]; then
   exit 1
 fi
 
-CONNECTIONS_FILE="connections.json"
+if [ -z "$DATABRICKS_USERNAME" ]; then
+  echo "Error: DATABRICKS_USERNAME is not set."
+  exit 1
+fi
 
-# Process each connection
-for row in $(jq -c '.envs[]' "$CONNECTIONS_FILE"); do
+for row in $(jq -c '.envs[]' "local_connections.json"); do
   echo "Processing connection: $row"  # Debug statement
 
   conn_id=$(echo "$row" | jq -r '.conn_id // empty')
@@ -29,3 +31,6 @@ for row in $(jq -c '.envs[]' "$CONNECTIONS_FILE"); do
     --conn-password "$conn_password" \
     --conn-extra "$conn_extra"
 done
+
+astro dev run variables import local_variables.json
+astro dev run variables set databricks_single_user_name "$DATABRICKS_USERNAME"
