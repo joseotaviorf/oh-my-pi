@@ -46,7 +46,6 @@ company_document AS (
     datalake_company_clean.document
   WHERE 
     status = 'ACTIVE'
-    and uuid_company = '0a07174c-56a1-4f80-9a57-bf4cb09786c1'
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY uuid_company, document_type  ORDER BY ts_updated DESC) = 1
 )
