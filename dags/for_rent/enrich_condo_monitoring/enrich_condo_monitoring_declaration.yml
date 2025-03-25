@@ -12,6 +12,8 @@ workflow:
   inner_dependencies:
     condo_monitoring_events:
       - communication
+    invoice:
+      - communication
   tables_customization:
     communication:
       extraction_type: incremental

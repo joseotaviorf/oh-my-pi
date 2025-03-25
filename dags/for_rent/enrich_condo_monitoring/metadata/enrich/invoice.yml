@@ -1,0 +1,47 @@
+database_name: datalake_condo_monitoring
+table_name: invoice
+description: This table contains all the invoices related to the Condo Monitoring.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id_invoice:
+    lineage:
+      - datalake_condominium_payments_clean.invoice.id
+    description: ID of the invoice.
+  id_contract:
+    lineage:
+      - datalake_condominium_payments_clean.invoice.id_contract
+    description: ID of the contract related to the invoice.
+  status:
+    lineage:
+      - datalake_condo_monitoring.communication.id_communication
+    description: Status of the invoice.
+  communications_sent:
+    lineage: -datalake_condo_monitoring.communication.communication_type
+    description: Array column to indicate the communications sent to the user.
+  communication_funnel_step_reached:
+    description: Column to indicate the funnel step reached by the communication.
+    categories:
+      REMINDER: Just the reminder communication was sent.
+      WARNING: The warning communication was sent, but this doesn't mean that the reminder communication was sent as well.
+      COMMUNICATION_NOT_FOUND: No communication was found.
+  value:
+    lineage:
+      - datalake_condominium_payments_clean.invoice.id_contract
+    description: Invoice's value.
+  was_reminder_comm_required:
+    description: Boolean flag to indicate if a reminder communication was required.
+  was_warning_comm_required:
+    description: Boolean flag to indicate if a warning communication was required.
+  dt_due:
+    lineage:
+      - datalake_condominium_payments_clean.invoice.dt_due
+    description: ID of the contract related to the invoice.
+  ts_issued:
+    lineage:
+      - datalake_condominium_payments_clean.invoice.ts_created
+    description: ID of the contract related to the invoice.
+  ts_paid:
+    lineage:
+      - datalake_condominium_payments_clean.invoice_aud.ts_updated
+    description: ID of the contract related to the invoice.
