@@ -16,6 +16,7 @@ from pyspark.sql.functions import col, explode, count, collect_list, struct, to_
 from pyspark.sql.types import StructType, StringType, StructField, ArrayType, IntegerType, MapType
 
 from quintoandar_logger import QuintoAndarLogger
+from bietlejuice.base.spark.base_spark import BaseDBUtils
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.loaders.delta_loader import DeltaLoader
@@ -253,6 +254,8 @@ def main():
     spacy.cli.download("en_core_web_lg")
     spacy.load('en_core_web_lg')
 
+    base_dbutils = BaseDBUtils()
+    dbutils = base_dbutils.get_dbutils()
     dbutils.library.restartPython()
 
     schema = StructType([
