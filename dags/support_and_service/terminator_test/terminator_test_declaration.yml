@@ -42,7 +42,9 @@ workflow:
     termination: {}
     utility_bill_aud: {}
     utility_bill: {}
-    inspection_opted_out: {}
+    inspection_opted_out:
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id_inspection_opted_out"]
 cluster:
   type: custom_cluster
   custom_configurations:
