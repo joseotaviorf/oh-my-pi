@@ -69,14 +69,14 @@ LABELS_TO_IGNORE = {
     "FAC",
 }
 
-def load_recognizers_from_dict(schema) -> RecognizerRegistry:
+def load_recognizers_from_dict(source) -> RecognizerRegistry:
     """
     Load custom recognizers from a YAML configuration file and add them to the registry.
 
     Returns:
         registry: A RecognizerRegistry instance with the custom recognizers loaded.
     """
-    config_service = ConfigurationService(schema)
+    config_service = ConfigurationService(source)
     recognizer_dict_list = config_service.get_config("recognizers")
 
     if not recognizer_dict_list:
@@ -104,7 +104,7 @@ def load_nlp_config() -> Dict:
 
     return nlp_config
 
-def build_batch_analyzer(schema) -> BatchAnalyzerEngine:
+def build_batch_analyzer(source) -> BatchAnalyzerEngine:
     """
     Build and return a BatchAnalyzerEngine instance.
 
@@ -112,7 +112,7 @@ def build_batch_analyzer(schema) -> BatchAnalyzerEngine:
         BatchAnalyzerEngine: An instance of BatchAnalyzerEngine configured with the custom recognizers and NLP engine.
     """
     nlp_config = load_nlp_config()
-    registry = load_recognizers_from_dict(schema)
+    registry = load_recognizers_from_dict(source)
     provider = NlpEngineProvider(nlp_configuration=nlp_config)
 
     nlp_engine = provider.create_engine()
@@ -130,8 +130,8 @@ def clean_result(result, matched_value):
       for r in result
   ]
 
-def process_partition(iter_of_rows, schema):
-    batch_analyzer = build_batch_analyzer(schema)
+def process_partition(iter_of_rows, source):
+    batch_analyzer = build_batch_analyzer(source)
     rows_list = list(iter_of_rows)
 
     df_dict = {
@@ -194,6 +194,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("table_name", help="name of the table to be saved in the data lake")
     parser.add_argument("load_start_date", help="timestamp of the ingest to get the sample from")
     parser.add_argument("partitions", type=str)
+    parser.add_argument("source", type=str)
     args = parser.parse_args()
 
     logger.info(f"m=main,msg='starting job',environment={args.environment},"
@@ -280,7 +281,7 @@ def main():
     df = get_sample(date_filter=args.load_start_date)
 
 
-    rdd = df.rdd.mapPartitions(partial(process_partition, args.schema))
+    rdd = df.rdd.mapPartitions(partial(process_partition, args.source))
     df_rebuilt = spark.createDataFrame(data=rdd, schema=schema)
 
     df_explode_sample = (

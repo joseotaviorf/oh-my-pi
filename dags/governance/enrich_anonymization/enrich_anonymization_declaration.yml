@@ -30,6 +30,7 @@ workflow:
         - "{table_name}"
         - "{load_start_date}"
         - "{partitions}"
+        - "{dag_name}"
   inner_dependencies:
     pii_scan_results:
       - columns_sample_data
