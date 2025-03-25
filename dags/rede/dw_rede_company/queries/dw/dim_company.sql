@@ -2,11 +2,11 @@ SELECT
     cs.sk_company,
     cs.id_hubspot,
     ce.uuid_company,
-    COALESCE(ce.company_name, c.name, cs.extracted_3p_tag, 'Unknown') AS company_name,
+    COALESCE(ce.company_name, c.name, c.extracted_3p_tag, 'Unknown') AS company_name,
     COALESCE(ce.trade_name, 'Unknown') AS trade_name,
     COALESCE(c.name, 'Unknown') AS hubspot_company_name,
-    COALESCE(c.tag_real_estate_agency, cs.extracted_3p_tag, 'Unknown') AS tag,
-    COALESCE(c.extracted_3p_tag, cs.extracted_3p_tag, ce.trade_name, 'Unknown') AS extracted_3p_tag,
+    COALESCE(c.tag_real_estate_agency, c.extracted_3p_tag, 'Unknown') AS tag,
+    COALESCE(c.extracted_3p_tag, ce.trade_name, 'Unknown') AS extracted_3p_tag,
     COALESCE(ce.status, 'Unknown') AS company_domain_status,
     COALESCE(c.lead_status, 'Unknown') AS lead_status,
     -- The row below will be duplicated with the row above until June 7th, so we give time for people to update their queries
@@ -15,8 +15,7 @@ SELECT
     COALESCE(c.rent_lead_status, 'Unknown') AS rent_lead_status,
     CASE
         WHEN (
-            (cs.is_3p_bh IS NOT NULL AND cs.is_3p_bh)
-            OR ce.state_abbreviation IS NOT DISTINCT FROM 'MG'
+            ce.state_abbreviation IS NOT DISTINCT FROM 'MG'
             OR c.state IS NOT DISTINCT FROM 'MG'
             OR COALESCE(UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%', FALSE)
         )
@@ -64,14 +63,12 @@ SELECT
     COALESCE(c.sale_lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento'), FALSE) AS is_sale_partner,
     COALESCE(c.rent_lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento'), FALSE) AS is_rent_partner,
     (
-        (cs.is_3p_bh IS NOT NULL AND cs.is_3p_bh)
-        OR ce.state_abbreviation IS NOT DISTINCT FROM 'MG'
+      ce.state_abbreviation IS NOT DISTINCT FROM 'MG'
         OR c.state IS NOT DISTINCT FROM 'MG'
         OR COALESCE(UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%', FALSE)
     ) AS is_3p_bh,
     (
-        (cs.is_3p_bh IS NULL OR NOT cs.is_3p_bh)
-        AND ce.state_abbreviation IS DISTINCT FROM 'MG'
+      ce.state_abbreviation IS DISTINCT FROM 'MG'
         AND c.state IS DISTINCT FROM 'MG'
         AND COALESCE(UPPER(c.tag_real_estate_agency) NOT LIKE '%[3PBH-%]%', TRUE)
     ) AS is_3p_5a,
@@ -98,4 +95,5 @@ LEFT JOIN
     datalake_hubspot.owner AS o
         ON c.id_hubspot_owner = o.id_owner
 WHERE
-    cs.has_been_member
+  c.has_been_sale_member
+    OR c.has_been_rent_member
