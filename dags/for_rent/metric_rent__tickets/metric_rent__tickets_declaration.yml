@@ -5,8 +5,9 @@ dag:
   documentation:
     dag_purpose: "This DAG consolidates the main metrics related to the Ticket Rate (FLUX) context."
 workflow:
-  type: query
+  type: query_delta
   layer: metric
+  custom_schema: rent
 cluster:
   type: databricks_13_3_med_memory_cluster
   access_control_list:

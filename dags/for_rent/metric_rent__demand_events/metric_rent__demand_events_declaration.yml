@@ -3,8 +3,9 @@ dag:
   schedule_start_date: 2014,06,17
   owner: Data ForRent
 workflow:
-  type: query
+  type: query_delta
   layer: metric
+  custom_schema: rent
 cluster:
   type: databricks_12_2_med_2_fixed_workers_general_photon_cluster
   access_control_list:

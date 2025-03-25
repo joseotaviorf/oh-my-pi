@@ -28,7 +28,14 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
 
     def build_dag(self):
         dag = self.dag_instance()
-        bucket_config = self.workflow_args.get("bucket_config_name", "datalake_bucket")
+        if self.layer == LayerEnum.METRIC:
+            bucket_config = self.workflow_args.get(
+                "bucket_config_name", "metrics_bucket"
+            )
+        else:
+            bucket_config = self.workflow_args.get(
+                "bucket_config_name", "datalake_bucket"
+            )
         bucket = self.config_service.get_config(bucket_config)
         dag_execution_context = self._get_dag_execution_context(dag, bucket)
         self._initialize_task_creators(dag_execution_context)
