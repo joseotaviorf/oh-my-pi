@@ -1,4 +1,3 @@
-%sql
 WITH events AS (
   SELECT
     cu.id_cluster_update AS id_event,
