@@ -28,8 +28,8 @@ columns:
   ts_created:
     description: ''
     lineage:
-    - datalake_checkout_raw.credit_card_webhook.created_at
+    - datalake_checkout_raw.credit_card_webhook.TIMESTAMP(created_at)
   ts_updated:
     description: ''
     lineage:
-    - datalake_checkout_raw.credit_card_webhook.updated_at
+    - datalake_checkout_raw.credit_card_webhook.TIMESTAMP(updated_at)

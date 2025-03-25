@@ -24,8 +24,8 @@ columns:
   ts_created:
     description: ''
     lineage:
-    - datalake_checkout_raw.credit_card_fee.created_at
-  ts_updated:
+    - datalake_checkout_raw.credit_card_fee.TIMESTAMP(created_at)
+  ts_disabled:
     description: ''
     lineage:
-    - datalake_checkout_raw.credit_card_fee.updated_at
+    - datalake_checkout_raw.credit_card_fee.TIMESTAMP(disabled_at)

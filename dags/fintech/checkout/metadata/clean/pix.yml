@@ -1,84 +1,115 @@
+---
 database_name: datalake_checkout_clean
 table_name: pix
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.id
+    - datalake_checkout_raw.pix.id
   id_charge:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.charge_id
+    - datalake_checkout_raw.pix.charge_id
   id_transaction:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.transaction_id
+    - datalake_checkout_raw.pix.transaction_id
   id_bank_payment:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.bank_payment_id
+    - datalake_checkout_raw.pix.bank_payment_id
   id_requester:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.requester_id
+    - datalake_checkout_raw.pix.requester_id
   due_amount:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.due_amount
+    - datalake_checkout_raw.pix.due_amount
   status:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.status
+    - datalake_checkout_raw.pix.status
   pix_link:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.pix_link
+    - datalake_checkout_raw.pix.pix_link
   emv:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.emv
+    - datalake_checkout_raw.pix.emv
   qr_code:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.qr_code
+    - datalake_checkout_raw.pix.qr_code
   payer_name:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.payer_name
+    - datalake_checkout_raw.pix.payer_name
   payer_identifiable_document:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.payer_identifiable_document
+    - datalake_checkout_raw.pix.payer_identifiable_document
   payer_person_type:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.payer_person_type
+    - datalake_checkout_raw.pix.payer_person_type
   payer_email:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.payer_email
+    - datalake_checkout_raw.pix.payer_email
   payer_city:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.payer_city
+    - datalake_checkout_raw.pix.payer_city
   payer_neighborhood:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.payer_neighborhood
+    - datalake_checkout_raw.pix.payer_neighborhood
   payer_state:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.payer_state
+    - datalake_checkout_raw.pix.payer_state
   payer_street_address:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.payer_street_address
+    - datalake_checkout_raw.pix.payer_street_address
   payer_zipcode:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.payer_zipcode
+    - datalake_checkout_raw.pix.payer_zipcode
   requester_name:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.requester_name
+    - datalake_checkout_raw.pix.requester_name
   expiration_in_seconds:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.expiration_in_seconds
+    - datalake_checkout_raw.pix.expiration_in_seconds
   payer_solicitation:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.payer_solicitation
+    - datalake_checkout_raw.pix.payer_solicitation
   additional_info:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.additional_info
+    - datalake_checkout_raw.pix.additional_info
   ts_started_processing:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.started_processing_at
+    - datalake_checkout_raw.pix.TIMESTAMP(started_processing_at)
   ts_paid:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.paid_at
+    - datalake_checkout_raw.pix.TIMESTAMP(paid_at)
   ts_created:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.created_at
+    - datalake_checkout_raw.pix.TIMESTAMP(created_at)
   ts_updated:
+    description: ''
     lineage:
-      - datalake_checkout_raw.pix.updated_at
+    - datalake_checkout_raw.pix.TIMESTAMP(updated_at)

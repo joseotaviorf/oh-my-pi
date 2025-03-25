@@ -48,20 +48,20 @@ columns:
   ts_requested:
     description: ''
     lineage:
-    - datalake_checkout_raw.refund_attempt.requested_at
+    - datalake_checkout_raw.refund_attempt.TIMESTAMP(requested_at)
   ts_completed:
     description: ''
     lineage:
-    - datalake_checkout_raw.refund_attempt.completed_at
+    - datalake_checkout_raw.refund_attempt.TIMESTAMP(completed_at)
   ts_failed:
     description: ''
     lineage:
-    - datalake_checkout_raw.refund_attempt.failed_at
+    - datalake_checkout_raw.refund_attempt.TIMESTAMP(failed_at)
   ts_created:
     description: ''
     lineage:
-    - datalake_checkout_raw.refund_attempt.created_at
+    - datalake_checkout_raw.refund_attempt.TIMESTAMP(created_at)
   ts_updated:
     description: ''
     lineage:
-    - datalake_checkout_raw.refund_attempt.updated_at
+    - datalake_checkout_raw.refund_attempt.TIMESTAMP(updated_at)

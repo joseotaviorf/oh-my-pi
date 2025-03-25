@@ -32,8 +32,8 @@ columns:
   ts_created:
     description: ''
     lineage:
-    - datalake_checkout_raw.pix_webhook.created_at
+    - datalake_checkout_raw.pix_webhook.TIMESTAMP(created_at)
   ts_updated:
     description: ''
     lineage:
-    - datalake_checkout_raw.pix_webhook.updated_at
+    - datalake_checkout_raw.pix_webhook.TIMESTAMP(updated_at)

@@ -16,8 +16,8 @@ columns:
   ts_created:
     description: ''
     lineage:
-    - datalake_checkout_raw.role.created_at
+    - datalake_checkout_raw.role.TIMESTAMP(created_at)
   ts_updated:
     description: ''
     lineage:
-    - datalake_checkout_raw.role.updated_at
+    - datalake_checkout_raw.role.TIMESTAMP(updated_at)

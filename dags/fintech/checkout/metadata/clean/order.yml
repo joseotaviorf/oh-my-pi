@@ -1,57 +1,79 @@
+---
 database_name: datalake_checkout_clean
 table_name: order
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.id
+    - datalake_checkout_raw.order.id
   id_external:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.external_id
+    - datalake_checkout_raw.order.external_id
   id_business_entity:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.business_entity_id
+    - datalake_checkout_raw.order.business_entity_id
   id_finance_entity:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.finance_entity_id
+    - datalake_checkout_raw.order.finance_entity_id
   id_tracking:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.tracking_id
+    - datalake_checkout_raw.order.tracking_id
   id_requester:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.requester_id
+    - datalake_checkout_raw.order.requester_id
   due_amount:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.due_amount
+    - datalake_checkout_raw.order.due_amount
   paid_amount:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.paid_amount
+    - datalake_checkout_raw.order.paid_amount
   discount:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.discount
+    - datalake_checkout_raw.order.discount
   status:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.status
+    - datalake_checkout_raw.order.status
   requester_name:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.requester_name
+    - datalake_checkout_raw.order.requester_name
   ts_started_processing:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.started_processing_at
+    - datalake_checkout_raw.order.TIMESTAMP(started_processing_at)
   ts_created:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.created_at
+    - datalake_checkout_raw.order.TIMESTAMP(created_at)
   dt_due:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.due_date
+    - datalake_checkout_raw.order.DATE(due_date)
   ts_paid:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.paid_at
+    - datalake_checkout_raw.order.TIMESTAMP(paid_at)
   ts_canceled:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.canceled_at
-  ts_created:
+    - datalake_checkout_raw.order.TIMESTAMP(canceled_at)
+  ts_deleted:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.deleted_at
+    - datalake_checkout_raw.order.TIMESTAMP(deleted_at)
   ts_updated:
+    description: ''
     lineage:
-      - datalake_checkout_raw.order.updated_at
+    - datalake_checkout_raw.order.TIMESTAMP(updated_at)

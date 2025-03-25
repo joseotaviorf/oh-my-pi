@@ -16,29 +16,33 @@ More information about run time [here]({chart_url}{dag_id}).
 
 This pipeline produces the following output tables: 
 
-1. In data lake raw: 
-    - All tables available in source's database, except for operational tables:
-      - `change_owner_control`
-      - `flyway_schema_history`
-      - `permission`
-      - `requester_role`
-      - `role`
-      - `role_permission`
-
-2. In data lake clean:
-
-      - `boleto`
-      - `boleto_webhook`
-      - `webhook`
-      - `payment_config`
-      - `requester`
-      - `bolecode`
-      - `bank_account`
-      - `pix`
-      - `pix_refund`
-      - `payment_gateway_error`
-      - `charge`
-      - `charge_status_log`
-      - `order`
+- bank_account
+- bolecode
+- boleto
+- boleto_webhook
+- boleto_webhook_config
+- charge
+- charge_status_log
+- credit_card
+- credit_card_acquire_fee
+- credit_card_capture_attempt
+- credit_card_fee
+- credit_card_fee_installment
+- credit_card_status_log
+- credit_card_token
+- credit_card_webhook
+- order
+- payment_config
+- payment_gateway_error
+- permission
+- pix
+- pix_refund
+- pix_webhook
+- refund_attempt
+- requester
+- requester_role
+- role
+- role_permission
+- webhook
 
 </details>

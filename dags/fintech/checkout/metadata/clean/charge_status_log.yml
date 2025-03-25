@@ -1,78 +1,107 @@
+---
 database_name: datalake_checkout_clean
 table_name: charge_status_log
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.id
-  charge_id:
+    - datalake_checkout_raw.charge_status_log.id
+  id_charge:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.id_charge
-  order_id:
+    - datalake_checkout_raw.charge_status_log.charge_id
+  id_order:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.id_order
-  user_external_id:
+    - datalake_checkout_raw.charge_status_log.order_id
+  id_user_external:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.id_user_external
-  requester_id:
+    - datalake_checkout_raw.charge_status_log.user_external_id
+  id_requester:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.id_requester
+    - datalake_checkout_raw.charge_status_log.requester_id
   due_amount:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.due_amount
+    - datalake_checkout_raw.charge_status_log.due_amount
   paid_amount:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.paid_amount
+    - datalake_checkout_raw.charge_status_log.paid_amount
   status:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.status
+    - datalake_checkout_raw.charge_status_log.status
   payment_method:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.payment_method
+    - datalake_checkout_raw.charge_status_log.payment_method
   user_name:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.user_name
+    - datalake_checkout_raw.charge_status_log.user_name
   user_provider:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.user_provider
+    - datalake_checkout_raw.charge_status_log.user_provider
   user_identifiable_document:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.user_identifiable_document
+    - datalake_checkout_raw.charge_status_log.user_identifiable_document
   user_person_type:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.user_person_type
+    - datalake_checkout_raw.charge_status_log.user_person_type
   user_email:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.user_email
+    - datalake_checkout_raw.charge_status_log.user_email
   user_city:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.user_city
+    - datalake_checkout_raw.charge_status_log.user_city
   user_neighborhood:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.user_neighborhood
+    - datalake_checkout_raw.charge_status_log.user_neighborhood
   user_state:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.user_state
+    - datalake_checkout_raw.charge_status_log.user_state
   user_street_address:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.user_street_address
+    - datalake_checkout_raw.charge_status_log.user_street_address
   user_zipcode:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.user_zipcode
+    - datalake_checkout_raw.charge_status_log.user_zipcode
   ts_started_processing:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.started_processing_at
+    - datalake_checkout_raw.charge_status_log.TIMESTAMP(started_processing_at)
   ts_created:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.created_at
+    - datalake_checkout_raw.charge_status_log.TIMESTAMP(created_at)
   ts_paid:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.paid_at
+    - datalake_checkout_raw.charge_status_log.TIMESTAMP(paid_at)
   ts_canceled:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.canceled_at
+    - datalake_checkout_raw.charge_status_log.TIMESTAMP(canceled_at)
   ts_deleted:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.deleted_at
+    - datalake_checkout_raw.charge_status_log.TIMESTAMP(deleted_at)
   ts_updated:
+    description: ''
     lineage:
-      - datalake_checkout_raw.charge_status_log.updated_at
+    - datalake_checkout_raw.charge_status_log.TIMESTAMP(updated_at)

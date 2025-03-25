@@ -72,12 +72,12 @@ columns:
   ts_paid:
     description: ''
     lineage:
-    - datalake_checkout_raw.credit_card_capture_attempt.paid_at
+    - datalake_checkout_raw.credit_card_capture_attempt.TIMESTAMP(paid_at)
   ts_created:
     description: ''
     lineage:
-    - datalake_checkout_raw.credit_card_capture_attempt.created_at
+    - datalake_checkout_raw.credit_card_capture_attempt.TIMESTAMP(created_at)
   ts_updated:
     description: ''
     lineage:
-    - datalake_checkout_raw.credit_card_capture_attempt.updated_at
+    - datalake_checkout_raw.credit_card_capture_attempt.TIMESTAMP(updated_at)

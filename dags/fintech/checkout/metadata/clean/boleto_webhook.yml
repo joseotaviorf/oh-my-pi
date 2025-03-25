@@ -1,24 +1,39 @@
+---
 database_name: datalake_checkout_clean
 table_name: boleto_webhook
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
 columns:
   id:
+    description: ''
     lineage:
-      - datalake_checkout_raw.boleto_webhook.id
+    - datalake_checkout_raw.boleto_webhook.id
   id_bolecode:
+    description: ''
     lineage:
-      - datalake_checkout_raw.boleto_webhook.bolecode_id
+    - datalake_checkout_raw.boleto_webhook.bolecode_id
   id_boleto:
+    description: ''
     lineage:
-      - datalake_checkout_raw.boleto_webhook.boleto_id
-  payload:
-    lineage:
-      - datalake_checkout_raw.boleto_webhook.payload
+    - datalake_checkout_raw.boleto_webhook.boleto_id
   status:
+    description: ''
     lineage:
-      - datalake_checkout_raw.boleto_webhook.status
+    - datalake_checkout_raw.boleto_webhook.status
+  error_message:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.boleto_webhook.error_message
+  payload:
+    description: ''
+    lineage:
+    - datalake_checkout_raw.boleto_webhook.payload
   ts_created:
+    description: ''
     lineage:
-      - datalake_checkout_raw.boleto_webhook.created_at
+    - datalake_checkout_raw.boleto_webhook.TIMESTAMP(created_at)
   ts_updated:
+    description: ''
     lineage:
-      - datalake_checkout_raw.boleto_webhook.updated_at
+    - datalake_checkout_raw.boleto_webhook.TIMESTAMP(updated_at)
