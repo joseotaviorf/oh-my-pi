@@ -53,7 +53,7 @@ LEFT JOIN
     rent_flow_type AS rt
         ON rt.id_rent_flow = rde.id_rent_flow
 LEFT JOIN
-    datalake_rede_company.company_sks AS cs_supply
+    datalake_company.company_sks AS cs_supply
         ON (
             rde.uuid_company IS NOT NULL
             AND rde.uuid_company = cs_supply.uuid_company
@@ -61,8 +61,4 @@ LEFT JOIN
             rde.uuid_company IS NULL
             AND rde.id_company_hubspot IS NOT NULL
             AND rde.id_company_hubspot = cs_supply.id_hubspot
-        ) OR (
-            rde.uuid_company IS NULL
-            AND rde.id_company_hubspot IS NULL
-            AND rde.partner_3p_supply = cs_supply.extracted_3p_tag
         )

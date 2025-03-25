@@ -31,7 +31,7 @@ columns:
   sk_company:
     description: SK of the Rede company that owns the house.
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+      - datalake_company.company_sks.sk_company
   sk_revision_date:
     description: Date key of when the change was made.
     lineage:

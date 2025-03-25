@@ -20,7 +20,7 @@ joined_with_supply_processor AS (
     FROM
         distinct_supply_recurrence AS sr
     JOIN
-        datalake_rede_company.company_sks AS cs
+        datalake_company.company_sks AS cs
             ON sr.sk_company = cs.sk_company
     JOIN
         datalake_brokers_supply_processor.lead_3p AS l

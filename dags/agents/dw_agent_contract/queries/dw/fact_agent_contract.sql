@@ -157,9 +157,7 @@ LEFT JOIN
         AND dwc.is_for_sale_contract = hlc.is_agent_for_sale
         AND dwc.is_for_rent_contract = hlc.is_agent_for_rent
 LEFT JOIN
-    datalake_rede_company.company_sks AS cs
+    datalake_company.company_sks AS cs
         ON (wc.id_company_hubspot IS NOT NULL
         AND wc.id_company_hubspot = cs.id_hubspot)
-        OR (wc.id_company_hubspot IS NULL
-        AND wc.3p_partner = cs.extracted_3p_tag)
 WHERE hlc.ts_status_started IS NOT NULL -- added clause on rotation to fix NULL values

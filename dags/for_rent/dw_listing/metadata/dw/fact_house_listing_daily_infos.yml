@@ -61,7 +61,7 @@ columns:
     description: Key of house's status and status_reason.
   sk_company_supply:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+      - datalake_company.company_sks.sk_company
     description: Key of the Rede company that owns the house. It can be joined with dw_rede.dim_company.
   sk_pricing:
     lineage:

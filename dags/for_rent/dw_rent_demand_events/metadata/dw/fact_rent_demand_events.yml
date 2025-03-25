@@ -84,7 +84,7 @@ columns:
       It can be joined with dw_rent.dim_owner_category to check the owner's category.
   sk_company_supply:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+      - datalake_company.company_sks.sk_company
     description:
       Foreign key of the Rede company associated with the event. Can be joined with
       dw_rede.dim_company.

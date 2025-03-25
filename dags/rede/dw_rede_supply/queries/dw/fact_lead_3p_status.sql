@@ -33,9 +33,8 @@ LEFT JOIN
     datalake_rede_supply.file_sks AS fsk
         ON fsk.id_file = lsc.id_file
 LEFT JOIN
-    datalake_rede_company.company_sks AS csk
+    datalake_company.company_sks AS csk
     ON (lsc.id_company_hubspot IS NOT NULL AND csk.id_hubspot = lsc.id_company_hubspot)
-    OR (lsc.id_company_hubspot IS NULL AND csk.extracted_3p_tag = COALESCE(NULLIF(l3p.cnpj, 'Não informado'), 'Unknown'))
 LEFT JOIN
     datalake_rede_lead_acquisition.lead_3p_acquisition AS la
         ON la.id_lead_3p = lsc.id_lead_3p

@@ -34,7 +34,7 @@ JOIN datalake_ebdb_listing.house h
 LEFT JOIN listing_business_context lbc
     ON lbc.id_house = h.id
 LEFT JOIN
-    datalake_rede_company.company_sks AS cs
+    datalake_company.company_sks AS cs
         ON h.is_rent_3p_supply 
         AND ((
             h.uuid_company IS NOT NULL
@@ -43,10 +43,6 @@ LEFT JOIN
             h.uuid_company IS NULL
             AND h.id_company_hubspot IS NOT NULL
             AND h.id_company_hubspot = cs.id_hubspot
-        ) OR (
-            h.uuid_company IS NULL
-            AND h.id_company_hubspot IS NULL
-            AND h.partner_3p_supply = cs.extracted_3p_tag
         ))
 WHERE
     lbc.id_house IS NULL

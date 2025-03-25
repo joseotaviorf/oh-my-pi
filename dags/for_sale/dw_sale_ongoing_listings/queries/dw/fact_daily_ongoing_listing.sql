@@ -145,7 +145,7 @@ LEFT JOIN
         AND rhh.business_context = 'SALE'
         AND dol.dt_snapshot BETWEEN rhh.ts_status_started AND COALESCE(rhh.ts_status_ended, NOW())
 LEFT JOIN
-    datalake_rede_company.company_sks AS cs_supply
+    datalake_company.company_sks AS cs_supply
         ON (
             rhh.uuid_company IS NOT NULL
             AND rhh.uuid_company = cs_supply.uuid_company
@@ -153,10 +153,6 @@ LEFT JOIN
             rhh.uuid_company IS NULL
             AND rhh.id_company_hubspot IS NOT NULL
             AND rhh.id_company_hubspot = cs_supply.id_hubspot
-        ) OR (
-            rhh.uuid_company IS NULL
-            AND rhh.id_company_hubspot IS NULL
-            AND rhh.partner_3p_supply = cs_supply.extracted_3p_tag
         )
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY dol.sk_sale_listing, dol.sk_snapshot_date ORDER BY slpc.ts_price_started DESC, rhh.ts_status_started DESC) = 1

@@ -173,7 +173,7 @@ WITH listing_rent_flows AS (
             dw_public.dim_booking
                 ON dim_booking.sk_booking = rent_flow.id_booking
         LEFT JOIN
-            datalake_rede_company.company_sks AS cs
+            datalake_company.company_sks AS cs
                 ON h.is_rent_3p_supply
                 AND ((
                     h.uuid_company IS NOT NULL
@@ -182,10 +182,6 @@ WITH listing_rent_flows AS (
                     h.uuid_company IS NULL
                     AND h.id_company_hubspot IS NOT NULL
                     AND h.id_company_hubspot = cs.id_hubspot
-                ) OR (
-                    h.uuid_company IS NULL
-                    AND h.id_company_hubspot IS NULL
-                    AND h.partner_3p_supply = cs.extracted_3p_tag
                 ))
         WHERE
             house_listing.is_for_rent

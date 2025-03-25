@@ -1229,13 +1229,11 @@ LEFT JOIN
     last_secretariat AS ls
         ON ls.id_offer = br.id_offer
 LEFT JOIN
-    datalake_rede_company.company_sks AS cs_demand
+    datalake_company.company_sks AS cs_demand
         ON (br.id_company_demand IS NOT NULL
         AND br.id_company_demand = cs_demand.id_hubspot)
-        OR (br.id_company_demand IS NULL
-        AND br.partner_3p_demand = cs_demand.extracted_3p_tag)
 LEFT JOIN
-    datalake_rede_company.company_sks AS cs_supply
+    datalake_company.company_sks AS cs_supply
         ON (
         br.uuid_company_supply IS NOT NULL
         AND br.uuid_company_supply = cs_supply.uuid_company
@@ -1243,8 +1241,4 @@ LEFT JOIN
         br.uuid_company_supply IS NULL
         AND br.id_company_supply IS NOT NULL
         AND br.id_company_supply = cs_supply.id_hubspot
-        ) OR (
-        br.uuid_company_supply IS NULL
-        AND br.id_company_supply IS NULL
-        AND br.partner_3p_supply = cs_supply.extracted_3p_tag
-    )
+        )

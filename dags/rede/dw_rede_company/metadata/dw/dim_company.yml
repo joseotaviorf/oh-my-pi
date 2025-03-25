@@ -7,7 +7,7 @@ owner: gustavo.miller@quintoandar.com.br
 columns:
   sk_company:
     lineage:
-    - datalake_rede_company.company_sks.sk_company
+    - datalake_company.company_sks.sk_company
     description: Primary key for the table. It is generated artificially in the ETL,
       so it has no meaning or correspondence in any product.
   id_hubspot:
@@ -22,7 +22,7 @@ columns:
     lineage:
     - datalake_company.company.company_name
     - datalake_hubspot.company.name
-    - datalake_rede_company.company_sks.extracted_3p_tag
+    - datalake_company.company_sks.extracted_3p_tag
     description: Name of the company. Prioritizes the company name in the Company
       Database, then the company name in HubSpot.
   trade_name:
@@ -36,13 +36,13 @@ columns:
   tag:
     lineage:
     - datalake_hubspot.company.tag
-    - datalake_rede_company.company_sks.extracted_3p_tag
+    - datalake_company.company_sks.extracted_3p_tag
     description: Tag that represents the real estate agency in HubSpot. These tags
       come in the format "[3P-<value>]".
   extracted_3p_tag:
     lineage:
     - datalake_hubspot.company.extracted_3p_tag
-    - datalake_rede_company.company_sks.extracted_3p_tag
+    - datalake_company.company_sks.extracted_3p_tag
     - datalake_company.company.trade_name
     description: Represents the real estate agency. It is extracted from the tag column,
       like "[3P-<extracted_3p_tag>]"

@@ -74,7 +74,7 @@ columns:
     description: Key of the rent flow taxonomy related to the rent flow. A rent flow can have none, one or more taxonomies related.
   sk_company_supply:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+      - datalake_company.company_sks.sk_company
     description: Key of the Rede company that owns the house related to the rent flow. Can be joined with dw_rede.dim_company.
   sk_house_first_listing_date:
     lineage:

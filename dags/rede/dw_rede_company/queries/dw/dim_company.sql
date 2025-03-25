@@ -84,7 +84,7 @@ SELECT
     GREATEST(c.ts_updated, ce.ts_updated) AS ts_updated,
     NOW() AS ts_load
 FROM
-    datalake_rede_company.company_sks AS cs
+    datalake_company.company_sks AS cs
 LEFT JOIN
     datalake_hubspot.company AS c
         ON c.id_company = cs.id_hubspot

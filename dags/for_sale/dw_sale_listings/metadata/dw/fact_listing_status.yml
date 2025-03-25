@@ -21,7 +21,7 @@ columns:
     description: Foreign key of region where house listing is located in. Can be joined with dw_public.dim_region.
   sk_company:
     lineage:
-    - datalake_rede_company.company_sks.sk_company
+    - datalake_company.company_sks.sk_company
     description: Key of company that owned the listing at that point in time.
   sk_first_publication_date:
     lineage:

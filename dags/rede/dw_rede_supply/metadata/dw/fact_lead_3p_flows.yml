@@ -28,7 +28,7 @@ columns:
       with dw_rede.dim_file.
   sk_company:
     lineage:
-    - datalake_rede_company.company_sks.sk_company
+    - datalake_company.company_sks.sk_company
     description: Foreign Key to the company that sent this lead, obtained by looking
       for the CNPJ in HubSpot. Can be joined with dw_rede.dim_company.
   sk_lead_3p_status:

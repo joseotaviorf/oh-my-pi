@@ -92,13 +92,11 @@ LEFT JOIN
     datalake_ebdb_clean.user AS ua
         ON ua.id_agent = b.id_agent
 LEFT JOIN
-    datalake_rede_company.company_sks AS cs_demand
+    datalake_company.company_sks AS cs_demand
         ON (b.id_company_demand IS NOT NULL
         AND b.id_company_demand = cs_demand.id_hubspot)
-        OR (b.id_company_demand IS NULL
-        AND b.partner_3p_demand = cs_demand.extracted_3p_tag)
 LEFT JOIN
-    datalake_rede_company.company_sks AS cs_supply
+    datalake_company.company_sks AS cs_supply
         ON (
           b.uuid_company_supply IS NOT NULL
           AND b.uuid_company_supply = cs_supply.uuid_company
@@ -106,10 +104,6 @@ LEFT JOIN
           b.uuid_company_supply IS NULL
           AND b.id_company_supply IS NOT NULL
           AND b.id_company_supply = cs_supply.id_hubspot
-        ) OR (
-          b.uuid_company_supply IS NULL
-          AND b.id_company_supply IS NULL
-          AND b.partner_3p_supply = cs_supply.extracted_3p_tag
         )
 LEFT JOIN 
   status_log AS vsl

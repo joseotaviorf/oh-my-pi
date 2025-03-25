@@ -24,11 +24,11 @@ columns:
     description: Key of House
   sk_company_supply:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+      - datalake_company.company_sks.sk_company
     description: Surrogate key for Rede companies. -1 if it is not a member.
   sk_company_demand:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+      - datalake_company.company_sks.sk_company
     description: Surrogate key for Rede companies. -1 if it is not a member.
   sk_sale_agreement_created_date:
     lineage:

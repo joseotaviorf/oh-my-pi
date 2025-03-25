@@ -51,7 +51,7 @@ LEFT JOIN
     AND MAKE_DATE(hldi.year, hldi.month, hldi.day) >= am.dt_account_manager_started
     AND MAKE_DATE(hldi.year, hldi.month, hldi.day) < COALESCE(am.dt_account_manager_started, CURRENT_DATE())
 LEFT JOIN
-  datalake_rede_company.company_sks AS cs
+  datalake_company.company_sks AS cs
     ON hldi.is_rent_3p_supply
     AND ((
       hldi.uuid_company IS NOT NULL
@@ -60,10 +60,6 @@ LEFT JOIN
       hldi.uuid_company IS NULL
       AND hldi.id_company_hubspot IS NOT NULL
       AND hldi.id_company_hubspot = cs.id_hubspot
-    ) OR (
-      hldi.uuid_company IS NULL
-      AND hldi.id_company_hubspot IS NULL
-      AND hldi.partner_3p_supply = cs.extracted_3p_tag
     ))
 LEFT JOIN
   dw_listing.fact_house_listing_daily_available_hours AS avh

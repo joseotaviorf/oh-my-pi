@@ -37,7 +37,7 @@ columns:
       with dw_public.dim_region.
   sk_company:
     lineage:
-    - datalake_rede_company.company_sks.sk_company
+    - datalake_company.company_sks.sk_company
     description: Foreign key of the company associated with the event. Can be joined with
       dw_rede.dim_company.
   price:

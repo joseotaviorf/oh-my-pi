@@ -34,7 +34,7 @@ columns:
   sk_company:
     description: Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company.
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+      - datalake_company.company_sks.sk_company
   sk_sale_price_segment:
     description: Key of the sale price segment. Can be joined with dw_sale.dim_sale_price_segment.
     lineage:

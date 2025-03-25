@@ -184,7 +184,7 @@ JOIN
         AND rf.has_tta_flow <=> rt.has_tta_flow
         AND IF(c.nbr_contracts_signed > 0, TRUE, FALSE) <=> rt.had_contract_signed
 LEFT JOIN
-    datalake_rede_company.company_sks AS cs
+    datalake_company.company_sks AS cs
         ON (
             rf.uuid_company IS NOT NULL
             AND rf.uuid_company = cs.uuid_company
@@ -192,8 +192,4 @@ LEFT JOIN
             rf.uuid_company IS NULL
             AND rf.id_company_hubspot IS NOT NULL
             AND rf.id_company_hubspot = cs.id_hubspot
-        ) OR (
-            rf.uuid_company IS NULL
-            AND rf.id_company_hubspot IS NULL
-            AND rf.partner_3p_supply = cs.extracted_3p_tag
         )

@@ -18,7 +18,7 @@ columns:
     description: Foreign key of the work contract. Can be joined with dw_agent.dim_work_contract to obtain contract, activation and business context.
   sk_company:
     lineage:
-      - datalake_rede_company.company_sks.sk_company
+      - datalake_company.company_sks.sk_company
     description: Foreign key of the company. Can be joined with dw_rede.dim_company.
   sk_last_contract_changed_date:
     lineage:
