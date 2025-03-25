@@ -27,6 +27,8 @@ WITH recontact_data AS (
       AND rt.tags NOT LIKE '%mvp_fup_iq_intermediacao_autosservico%'
       OR  rt.tags like '%mvp_fup_iq_intermediacao_autosservico%')
     AND COALESCE(DATE(rt.ts_solved_local),DATE(rt.ts_closed_local)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND rt.tags NOT LIKE '%closed_by_merge%'
+    AND rt.group_name <> 'FullService [BACK]'
 
   UNION ALL
 
@@ -179,6 +181,7 @@ SELECT
   wa.id_agent || dt_reference AS sk_snapshot,
   wa.id_agent AS sk_agent,
   COALESCE(CAST(DATE_FORMAT(wa.dt_reference,'yyyyMMdd') AS BIGINT), -1) AS sk_reference_date,
+  COUNT_IF(DISTINCT wa.is_productive_ticket = TRUE) AS total_days_worked,
   COUNT(DISTINCT id_ticket) AS total_tickets,
   SUM(wa.reopened_tickets) AS ticket_reopenings,
   SUM(wa.replied_tickets) AS ticket_responses,

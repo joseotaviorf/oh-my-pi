@@ -26,6 +26,13 @@ columns:
       Column of type bigint (surrogate key) that represents the reference date on which the indicator metrics were calculated.
       This date serves as a temporal anchor for each indicator and can reflect different business contexts — that is,
       the same date can have different meanings depending on the indicator or the business area associated with the calculation.
+  total_days_worked:
+    description:
+      Bigint type column that represents the total number of days worked by the analyst on the reference date of the metric calculation.
+    lineage:
+      - datalake_customer_support.tickets.ts_solved
+      - datalake_repairs.ongoing_repair_tickets.ts_solved_local
+      - datalake_repairs.ongoing_repair_tickets.ts_closed_local
   total_tickets:
     description:
       Bigint type column that represents the tickets that the analyst had assigned in his/her name, taking into account the reference_date compared with the solved_date,
