@@ -4,6 +4,7 @@ from datetime import datetime
 from functools import partial
 from typing import Dict
 
+import spacy
 from presidio_analyzer.nlp_engine import NlpEngineProvider
 from presidio_analyzer import (
     AnalyzerEngine,
@@ -249,6 +250,11 @@ def main():
     partition_cols = ast.literal_eval(args.partitions)
     config_service = ConfigurationService(args.source)
     recognizer_dict_list = config_service.get_config("recognizers")
+
+    spacy.cli.download("en_core_web_lg")
+    spacy.load('en_core_web_lg')
+
+    dbutils.library.restartPython()
 
     schema = StructType([
         StructField("layer", StringType(), True),
