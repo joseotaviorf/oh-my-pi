@@ -233,9 +233,8 @@ def get_sample(date_filter) -> DataFrame:
         FROM
           datalake_anonymization.columns_sample_data
         WHERE
-          MAKE_DATE(year, month, day) = '{date_filter}'
+          ts_ingested = MAKE_DATE({year}, {month}, {day})
         GROUP BY ALL
-        LIMIT 1000
       """
     return spark.sql(query)
 

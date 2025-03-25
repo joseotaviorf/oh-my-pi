@@ -35,7 +35,7 @@ workflow:
     pii_scan_results:
       - columns_sample_data
 cluster:
-  type: databricks_13_3_med_general_driver_2_min_workers_cluster
+  type: databricks_13_3_med_memory_2_workers_cluster
   custom_libraries:
     - pypi:
         package: "presidio_analyzer==2.2.357"
@@ -46,3 +46,5 @@ cluster:
     spark_version: 14.3.x-scala2.12
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      spark.sql.execution.arrow.pyspark.enabled: True
+      spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: True
