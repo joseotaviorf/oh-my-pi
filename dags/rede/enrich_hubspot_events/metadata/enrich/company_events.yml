@@ -5,6 +5,7 @@ owner: vitor.musachio@quintoandar.com.br
 columns:
   id_event:
     lineage: 
+      - datalake_rede_company.company_sks.sk_company
       - datalake_hubspot.cluster_updates.id_cluster_update
       - datalake_hubspot.membership_updates.id_membership_update
       - datalake_hubspot.owner_updates.id_owner_update

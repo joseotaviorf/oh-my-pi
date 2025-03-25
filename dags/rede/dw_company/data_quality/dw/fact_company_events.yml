@@ -1,0 +1,19 @@
+---
+table_name: dw_public.fact_company_events
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_company_event:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_company_event_type:
+    is_complete:
+      severity_level: Error
+  sk_company:
+    is_complete:
+      severity_level: Error

@@ -224,6 +224,12 @@ bietlejuice.dw_collection_recovery_quintocred:
   - bietlejuice.trato_feito:load-clean-accounting-installment
   - bietlejuice.trato_feito:load-clean-debt
   - bietlejuice.trato_feito:load-clean-payment
+bietlejuice.dw_company:
+  - bietlejuice.company:load-clean-address
+  - bietlejuice.company:load-clean-company
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company-members
+  - bietlejuice.enrich_hubspot_events:load-enrich-membership-updates
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract

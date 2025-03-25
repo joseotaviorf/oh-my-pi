@@ -1,0 +1,36 @@
+database_name: dw_public
+table_name: fact_company_events
+description: 
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_company_event:
+    lineage: 
+      - datalake_hubspot.company_events.
+    description: Primary key of the table, each row is a triggered event update in a company.
+  sk_company_event_type:
+    lineage: 
+      - dw_public.dim_company_event_type.sk_company_event_type
+    description: Surrogate key for the dw_public.dim_company_event_type table. Composed of the combination of event_type, and event_source.
+  sk_company: 
+    lineage:
+      - datalake_hubspot.company_events.sk_company
+    description: Surrogate key that identifies a company in the dw_public.dim_company table.
+  event_update: 
+    lineage:
+      - datalake_hubspot.company_events.event_update
+    description: Item description updated in the company responsible for triggering the event.
+  is_current_cohort: 
+    lineage:
+      - datalake_hubspot.company_events.is_current_cohort
+    description: Flag indicating whether the event represents the current company description.
+  ts_start: 
+    lineage:
+      - datalake_hubspot.company_events.ts_start
+    description: Event effective date
+  ts_end: 
+    lineage:
+      - datalake_hubspot.company_events.ts_end
+    description: Event end date. If null, it means the event is still in effect.
+  ts_load:
+    description: Date when the table data was updated.

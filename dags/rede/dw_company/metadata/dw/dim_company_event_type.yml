@@ -1,0 +1,21 @@
+database_name: dw_public
+table_name: dim_company_event_type
+description: Table that details the event type and source of information for the events described in the dw_public.fact_company_events table.
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_company_event_type:
+    lineage: 
+      - datalake_hubspot.company_events.event_type
+      - datalake_hubspot.company_events.event_source
+    description: Primary key of the table, composed of the combination of event_type, and event_source. Surrogate key for the dw_public.fact_company_events table.
+  event_type:
+    lineage: 
+      - datalake_hubspot.company_events.event_type
+    description: Attribute type updated in company flow.
+  event_source: 
+    lineage:
+      - datalake_hubspot.company_events.event_source
+    description: Source of the related event type, such as Hubspot or Person.
+  ts_load:
+    description: Date when the table data was updated.

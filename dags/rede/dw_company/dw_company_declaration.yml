@@ -1,0 +1,24 @@
+dag:
+  name: dw_company
+  schedule_start_date: 2020, 1, 1
+  owner: Data Rede
+  documentation:
+    dag_purpose: "This DAG creates the model for QuintoAndar's companies partners."
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: public
+  inner_dependencies:
+    fact_company_events:
+      - dim_company_event_type
+cluster:
+  type: databricks_12_2_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

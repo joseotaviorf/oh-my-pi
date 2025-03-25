@@ -1,0 +1,96 @@
+database_name: dw_public
+table_name: dim_company
+description: Table that describes all QuintoAndar's company partners. To detail only Rede Companies with HubSpot data verify dw_public.dim_company_rede_partners.
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_company:
+    lineage: 
+      - datalake_company.company_sks.sk_company
+    description: Surrogate key and unique identifier for the company in the data lakehouse.
+  id_company:
+    lineage: 
+      - datalake_company.company_sks.id_company 
+    description: Unique identifier for the company in Company entity.
+  uuid_company:
+    lineage: 
+      - datalake_company.company_sks.uuid_company
+    description: External unique identifier for the company in Company entity.
+  company_city:
+    lineage: 
+      - datalake_company_clean.address.city
+    description: City where the company is located, registered in the company's address entity.
+  company_cnpj:
+    lineage: 
+      - datalake_company.company_sks.cnpj
+    description: Company's CNPJ document, registered in the company's document entity.
+  company_country:
+    lineage: 
+      - datalake_company_clean.address.country
+    description: Country where the company is located, registered in the company's address entity.
+  company_integrator_partner:
+    lineage: 
+      - datalake_company_clean.company.company_name
+    description: Name of the supply integrator company, registered in the company's entity. 
+  company_name: 
+    lineage: 
+      - datalake_company_clean.company.company_name
+    description: Name of the company, registered in the company's entity.
+  company_creci:
+    lineage: 
+      - datalake_company.company_sks.creci
+    description: Company's CRECI document, registered in the company's document entity.
+  company_neigborhood:
+    lineage: 
+      - datalake_company_clean.address.neighborhood
+    description: Neighborhood where the company is located, registered in the company's address entity.
+  company_state:
+    lineage: 
+      - datalake_company_clean.address.state
+    description: Address where the company is located, registered in the company's address entity.
+  company_status:
+    lineage: 
+      - datalake_company_clean.company.status
+    description: Status of the company, registered in the company's entity. Can be "ACTIVE" or "INACTIVE".
+  company_trade_name:
+    lineage: 
+      - datalake_company_clean.company.trade_name
+    description: Company's trade name (as known as "Nome Fantasia"), registered in the company's entity.
+  company_zip_code:
+    lineage: 
+      - datalake_company_clean.address.zip_code
+    description: Zip code where the company is located, registered in the company's address entity.
+  is_company_asp:
+    lineage: 
+      - datalake_company.company_sks.is_company_asp
+    description: Flag indicating whether the company has a Company ASP profile, registered in the company's profile entity.
+  is_company_ciq:
+    lineage: 
+      - datalake_company.company_sks.is_company_ciq
+    description: Flag indicating whether the company has a Company CIQ profile, registered in the company's profile entity.
+  is_company_legal_person_rental_guarantee:
+    lineage: 
+      - datalake_company.company_sks.is_company_legal_person_rental_guarantee
+    description: Flag indicating whether the company is a legal person rental guarantee, registered in the company's profile entity.
+  is_company_pp_multi:
+    lineage: 
+      - datalake_company.company_sks.is_company_pp_multi
+    description: Flag indicating whether the company has a Company PP Multi profile, registered in the company's profile entity.
+  is_company_rede_broker:
+    lineage: 
+      - datalake_company.company_sks.is_company_rede_broker
+    description: Flag indicating whether the company is a Rede Broker, registered in the company's profile entity.
+  is_company_rental_guarantee:
+    lineage: 
+      - datalake_company.company_sks.is_company_rental_guarantee
+    description: Flag indicating whether the company is a rental guarantee, registered in the company's profile entity.
+  ts_created:
+    lineage: 
+      - datalake_company_clean.company.ts_created
+    description: Date when the company was created in the company entity.
+  ts_updated:
+    lineage: 
+      - datalake_company_clean.company.ts_updated
+    description: Date when the company was updated in the company entity.
+  ts_load:
+    description: Date when the table data was updated.

@@ -40,7 +40,7 @@ WITH events AS (
     datalake_hubspot.owner_updates AS ou
 )
 SELECT
-  CONCAT(e.id_event, CRC32(CONCAT(e.event_type, e.event_source))) AS id_event,
+  CONCAT(e.id_event, CRC32(CONCAT(cs.sk_company, e.event_type, e.event_source))) AS id_event,
   e.id_hubspot,
   cs.sk_company,
   e.event_update,
