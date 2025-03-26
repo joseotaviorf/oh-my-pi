@@ -188,3 +188,8 @@ if __name__ == "__main__":
                 logging.warning(f"Table {entity_id} not found.")
             elif error_class in [INSUFFICIENT_PERMISSIONS]:
                 logging.warning(f"Insufficient permission to read table {entity_id}.")
+            else:
+                logging.warning(f"Not handled error. Table: {entity_id}. Error: {error_class}")
+
+        except Exception as exc:
+            logging.warning(f"Exception. Table: {entity_id}. Error: {type(exc)}")
