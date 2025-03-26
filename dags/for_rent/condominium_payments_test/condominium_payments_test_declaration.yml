@@ -16,46 +16,8 @@ workflow:
   source_schema: condominium_payments
   custom_schema: condominium_payments_test
   tables_customization:
-    attachment:
-      clean_table_name: attachment
-    boleto:
-      clean_table_name: invoice
-    boleto_aud:
-      clean_table_name: invoice_aud
-      raw_primary_keys: ["id", "rev"]
-    boleto_issuer:
-      clean_table_name: invoice_issuer
-    boleto_issuer_aud:
-      clean_table_name: invoice_issuer_aud
-      raw_primary_keys: ["id", "rev"]
-    boleto_user:
-      clean_table_name: invoice_user
-    boleto_user_aud:
-      clean_table_name: invoice_user_aud
-      raw_primary_keys: ["id", "rev"]
-    boleto_user_issuer:
-      clean_table_name: invoice_user_issuer
-    boleto_user_issuer_aud:
-      clean_table_name: invoice_user_issuer_aud
-      raw_primary_keys: ["id", "rev"]
-    internalization:
-      clean_table_name: internalization
-    non_payment_report_invoice:
-      clean_table_name: non_payment_report_invoice
-    non_payment_report:
-      clean_table_name: non_payment_report
-    condo_monitoring_actions:
-      clean_table_name: condo_monitoring_actions
-    condo_monitoring_actions_aud:
-      clean_table_name: condo_monitoring_actions_aud
-      raw_primary_keys: ["id", "rev"]
-    condo_monitoring_eligibility:
-      clean_table_name: condo_monitoring_eligibility
-    condo_monitoring_eligibility_aud:
-      clean_table_name: condo_monitoring_eligibility_aud
-      raw_primary_keys: ["id", "rev"]
-    revinfo:
-      clean_table_name: rev_info
+    non_payment_report_invoice: {}
+    non_payment_report: {}
 cluster:
   type: databricks_13_3_med_general_cluster
   databricks_conn_id: databricks_new
