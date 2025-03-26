@@ -1,4 +1,13 @@
-WITH grouped_adm_fee AS (
+WITH not_write_off_invoice AS (
+    SELECT DISTINCT
+        id_external
+    FROM 
+        datalake_retsuko.invoice 
+    WHERE 
+        (is_write_off = FALSE OR is_write_off IS NULL)
+),
+
+grouped_adm_fee AS (
     SELECT
         e.id_invoice,
         e.ts_created,
@@ -426,5 +435,8 @@ SELECT DISTINCT
     dt_sap_reference
 FROM
     df_final
+INNER JOIN
+    not_write_off_invoice
+        ON df_final.id_finance_entity = not_write_off_invoice.id_external
 GROUP BY
     1, 2, 3, 4, 6, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 20, 21

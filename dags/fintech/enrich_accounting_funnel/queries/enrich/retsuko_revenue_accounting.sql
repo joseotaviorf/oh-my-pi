@@ -1,4 +1,13 @@
-WITH sap_entity AS (
+WITH not_write_off_invoice AS (
+    SELECT DISTINCT
+        id_external
+    FROM 
+        datalake_retsuko.invoice 
+    WHERE 
+        (is_write_off = FALSE OR is_write_off IS NULL)
+),
+
+sap_entity AS (
     SELECT
         id_finance_entity,
         id_sap_gateway_feature,
@@ -278,3 +287,6 @@ SELECT
     dt_sap_reference
 FROM
     df_final
+INNER JOIN
+    not_write_off_invoice
+        ON df_final.id_finance_entity = not_write_off_invoice.id_external

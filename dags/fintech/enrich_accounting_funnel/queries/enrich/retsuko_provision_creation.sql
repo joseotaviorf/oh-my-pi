@@ -1,4 +1,13 @@
-WITH invoice_entry_version AS (
+WITH not_write_off_invoice AS (
+    SELECT DISTINCT
+        id_external
+    FROM 
+        datalake_retsuko.invoice 
+    WHERE 
+        (is_write_off = FALSE OR is_write_off IS NULL)
+),
+
+invoice_entry_version AS (
     SELECT DISTINCT
         e.id_external AS id_finance_entity,
         s.version
@@ -263,3 +272,6 @@ SELECT
     dt_sap_reference
 FROM
     metrics
+INNER JOIN
+    not_write_off_invoice
+        ON metrics.id_finance_entity = not_write_off_invoice.id_external
