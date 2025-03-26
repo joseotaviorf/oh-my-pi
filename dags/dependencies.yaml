@@ -3567,6 +3567,10 @@ bietlejuice.reverse_nazare:
   - bietlejuice.gsheets_rede:done-clean-forbrokers-3p-partner-conditions
 bietlejuice.reverse_nexxera:
   - bietlejuice.enrich_nexxera:load-enrich-dtw-filter
+bietlejuice.reverse_rent_listings_report_access:
+  - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-offer-sent
+  - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-traffic
+  - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-visit-scheduled
 bietlejuice.reverse_rent_listings_report_load:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-daily-infos

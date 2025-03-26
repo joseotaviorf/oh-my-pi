@@ -2,13 +2,11 @@ SELECT
   UUID() AS id,
   CONCAT(dl.id_house, dd.year, dd.month, dd.day) AS business_id,
   fl.sk_region AS location_id,
+  IF(di.sk_company_supply = -1, '1P', di.sk_company_supply) AS company_uuid,
   dl.id_house AS property_id,
-  se.sk_owner AS owner_id, 
-  ciq.id_partner AS partner_id, 
-  fl.sk_user_registration AS user_registration_id, 
   'RENT' AS business_context,
-  SUM(di.visits_booked) AS total_visits_scheduled,
-  dd.date AS ts_event,
+  SUM(di.visits_booked) AS visits_scheduled_count,
+  TIMESTAMP(dd.date) AS ts_event,
   dd.year,
   dd.month,
   dd.day
@@ -21,21 +19,13 @@ INNER JOIN
 INNER JOIN
   dw_rent.fact_house_listings AS fl
     ON fl.sk_house_listing = dl.sk_house_listing
-INNER JOIN 
-  dw_growth.fact_supply_events AS se
-    ON se.sk_house = dl.id_house 
-      AND se.sk_funnel_step = 12 -- first listing step
-LEFT JOIN 
-  datalake_ebdb_agents.ciq_users AS ciq 
-    ON ciq.id_user = se.sk_user_affiliate
-      AND ciq.is_last_status
-LEFT JOIN 
-  dw_public.dim_date AS dd 
+LEFT JOIN
+  dw_public.dim_date AS dd
     ON dd.sk_date = di.sk_date
 WHERE
   MAKE_DATE(dd.year, dd.month, dd.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    AND dl.status IN ('publicado', 'PUBLISHED')
+  AND dl.status IN ('publicado', 'PUBLISHED')
 GROUP BY
-  ALL
+  2, 3, 4, 5, 6, 8, 9, 10, 11
 HAVING
-  SUM(di.visits_booked) > 0
+  visits_scheduled_count > 0

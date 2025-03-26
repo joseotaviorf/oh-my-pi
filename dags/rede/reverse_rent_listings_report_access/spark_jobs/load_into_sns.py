@@ -16,25 +16,26 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def main():
-    dag_name, database_name, table_name, event_type, execution_date, sns_topic_arn = (
+    dag_name, database_name, table_name, event_type, load_start_date, load_end_date, sns_topic_arn = (
         parse_arguments()
     )
     config_service = ConfigurationService(dag_name)
     sns_topic_arn = config_service.get_config(sns_topic_arn)
     logger.info(
         f"""m=__main__, database_name={database_name}, table_name={table_name},
-        event_type={event_type}, sns_topic_arn={sns_topic_arn}, execution_date={execution_date}"""
+        event_type={event_type}, sns_topic_arn={sns_topic_arn}, load_start_date={load_start_date},
+        load_end_date={load_end_date}"""
     )
 
     load_table_into_sns(
-        database_name, table_name, event_type, sns_topic_arn, execution_date
+        database_name, table_name, event_type, sns_topic_arn, load_start_date, load_end_date
     )
 
 
 def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     """
     Parse the arguments passed to the job.
-    Returns a tuple with the DAG name, database name, table name, event type, and execution date.
+    Returns a tuple with the DAG name, database name, table name, event type, load start and end date.
     """
 
     parser = ArgumentParser(description=JOB_NAME)
@@ -42,7 +43,10 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     parser.add_argument("database_name", help="Name of the database where the table is")
     parser.add_argument("table_name", help="Name of the table to be loaded")
     parser.add_argument(
-        "execution_date", help="Date of the execution in the format YYYY-MM-DD"
+        "load_start_date", help="Start date of the load in the format YYYY-MM-DD"
+    )
+    parser.add_argument(
+        "load_end_date", help="End date of the load in the format YYYY-MM-DD"
     )
     parser.add_argument("event_type", help="Type of event to be sent to SNS")
     parser.add_argument("sns_topic_arn", help="ARN of the SNS topic to send the messages to")
@@ -53,10 +57,11 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     database_name = args.database_name
     table_name = args.table_name
     event_type = args.event_type
-    execution_date = datetime.fromisoformat(args.execution_date)
+    load_start_date = args.load_start_date
+    load_end_date = args.load_end_date
     sns_topic_arn = args.sns_topic_arn
 
-    return dag_name, database_name, table_name, event_type, execution_date, sns_topic_arn
+    return dag_name, database_name, table_name, event_type, load_start_date, load_end_date, sns_topic_arn
 
 
 def load_table_into_sns(
@@ -64,17 +69,18 @@ def load_table_into_sns(
     table_name: str,
     event_type: str,
     sns_topic_arn: str,
-    execution_date: datetime,
+    load_start_date: datetime,
+    load_end_date: datetime,
 ):
     """
     Load the table into SNS.
     """
+
     df = spark.table(f"{database_name}.{table_name}")
 
     filtered_df = df.filter(
-        (df.year == execution_date.year)
-        & (df.month == execution_date.month)
-        & (df.day == execution_date.day)
+        (df.ts_event >= load_start_date)
+        & (df.ts_event <= load_end_date)
     ).drop("business_id", "year", "month", "day")
 
     region = sns_topic_arn.split(":")[3]
