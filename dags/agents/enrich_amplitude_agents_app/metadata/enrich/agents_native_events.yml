@@ -33,6 +33,30 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.user_properties
     description: Country of origin of the event
+  action_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Indicates the type of action performed in the application
+  current_page:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Indicates the current page accessed in the application
+  reason:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Indicates the reason performed in the application
+  uri:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Indicates the URI of the event accessed in the application
+  visit_code:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Indicates the code of the visit accessed in the application
+  visit_label:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Indicates the label of the visit accessed in the application
   user_properties:
     lineage:
       - datalake_amplitude_clean.events.user_properties
@@ -41,6 +65,14 @@ columns:
     lineage:
       - datalake_amplitude_clean.events.event_properties
     description: Properties of the generated event
+  has_login_status:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Indicates whether the user has a login status
+  is_cqa_event:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Indicates whether the event is related to the CQA (Clientes QuintoAndar, as known as Lead Gen)
   is_sale_agent:
     lineage:
       - datalake_amplitude_clean.events.user_properties

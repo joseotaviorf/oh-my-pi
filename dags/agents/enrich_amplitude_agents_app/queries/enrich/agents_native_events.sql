@@ -6,9 +6,23 @@ SELECT
     e.os_name,
     e.event_type,
     GET_JSON_OBJECT(e.user_properties, '$.country') AS country,
+    GET_JSON_OBJECT(e.event_properties, '$.action_type') AS action_type,
+    COALESCE(GET_JSON_OBJECT(e.event_properties, '$.current_page'), GET_JSON_OBJECT(e.event_properties, '$.pageName')) AS current_page,
+    GET_JSON_OBJECT(e.event_properties, '$.reason') AS reason,
+    GET_JSON_OBJECT(e.event_properties, '$.uri') AS uri,
+    NULLIF(TRIM(COALESCE(GET_JSON_OBJECT(e.event_properties, '$.visit_code'), REGEXP_EXTRACT(GET_JSON_OBJECT(e.event_properties, '$.uri'), 'visitCode=([A-Z0-9]+)', 1))), '') AS visit_code,
+    GET_JSON_OBJECT(e.event_properties, '$.visit_label') AS visit_label,
     e.user_properties,
     e.event_properties,
     CAST(GET_JSON_OBJECT(e.user_properties, '$.login_status') AS BOOLEAN) AS has_login_status,
+    COALESCE(
+      GET_JSON_OBJECT(e.event_properties, '$.pageName') = 'AgendaDetalhes'
+        OR e.event_type IN ('agenda_visit_detail_page_call_clicked','agenda_visit_detail_page_wpp_clicked')
+        OR e.event_type IN ('agenda_visit_card_action_clicked') AND GET_JSON_OBJECT(e.event_properties, '$.action_type') = 'SEND_INTRODUCTION' AND GET_JSON_OBJECT(e.event_properties, '$.current_page') = 'Agenda'
+        OR e.event_type IN ('agenda_visit_detail_action_clicked') AND GET_JSON_OBJECT(e.event_properties, '$.action_type') = 'SEND_INTRODUCTION' AND GET_JSON_OBJECT(e.event_properties, '$.current_page') = 'AgendaDetalhes'
+        OR e.event_type IN ('visitorinfo_phone_clicked','visitorinfo_whatsapp_clicked'),
+      FALSE
+    ) AS is_cqa_event,
     CAST(GET_JSON_OBJECT(e.user_properties, '$.isSaleAgent') AS BOOLEAN) AS is_sale_agent,
     CAST(GET_JSON_OBJECT(e.user_properties, '$.isRentAgent') AS BOOLEAN) AS is_rent_agent,
     e.ts_event,
@@ -71,5 +85,12 @@ WHERE
         'chatcrpp_access_chat_clicked',
         'chatcrpp_accep_terms_button_clicked',
         'time_block_new_block_clicked',
-        'crm_CP_page_viewed'
+        'crm_CP_page_viewed',
+        'owner_contact_success_page_viewed',
+        'agenda_visit_detail_page_call_clicked',
+        'agenda_visit_detail_page_wpp_clicked',
+        'agenda_visit_detail_action_clicked',
+        'agenda_visit_card_action_clicked',
+        'visitorinfo_phone_clicked',
+        'visitorinfo_whatsapp_clicked'
     )
