@@ -1,0 +1,40 @@
+database_name: dw_rent
+table_name: dim_condo_monitoring_communication
+description: Dim table containing the communication sent to the users of the Condo Monitoring.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  sk_communication:
+    lineage:
+      - datalake_condo_monitoring.communication.id_communication
+    description: key of smartprice
+  communication_type:
+    lineage:
+      - datalake_condo_monitoring.communication.communication_type
+    description: Type of the communication.
+    categories:
+      REMINDER: The communication is a reminder to pay the invoice.
+      WARNING: The communication is a warning saying that the invoice wasn't paid.
+  status:
+    lineage:
+      - datalake_condo_monitoring.communication.status
+    description: Status of the communication.
+  entity_name:
+    lineage:
+      - datalake_condo_monitoring.communication.entity_name
+    description: Entity name of the communication in Jaiminho.
+  was_delivered:
+    lineage:
+      - datalake_condo_monitoring.communication.was_delivered
+    description: Boolean that indicates if the communication was delivered.
+      It's TRUE when the status are read or delivered.
+  was_comm_sent_on_time:
+    lineage:
+      - datalake_condo_monitoring.communication.was_comm_sent_on_time
+    description: Boolean that indicates if the communication was sent on time.
+  ts_sent:
+    lineage:
+      - datalake_condo_monitoring.communication.ts_sent
+    description: Timestamp of when the communication was sent.
+  ts_load:
+    description: Timestamp of when the data was load into the table.

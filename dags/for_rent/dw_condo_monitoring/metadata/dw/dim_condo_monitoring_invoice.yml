@@ -1,0 +1,52 @@
+database_name: dw_rent
+table_name: dim_condo_monitoring_invoice
+description: Dim table containing the invoices from Condo Monitoring.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  sk_invoice:
+    lineage:
+      - datalake_condo_monitoring.invoice.id_invoice
+    description: Key of the invoice.
+  status:
+    lineage:
+      - datalake_condo_monitoring.invoice.status
+    description: Status of the invoice.
+  communication_sent:
+    lineage:
+      - datalake_condo_monitoring.invoice.communication_sent
+    description: Array column to indicate the communications sent to the user.
+  communication_funnel_step_reached:
+    lineage:
+      - datalake_condo_monitoring.invoice.communication_funnel_step_reached
+    description: Column to indicate the funnel step reached by the communication.
+    categories:
+      REMINDER: Just the reminder communication was sent.
+      WARNING: The warning communication was sent, but this doesn't mean that the reminder communication was sent as well.
+      COMMUNICATION_NOT_FOUND: No communication was found.
+  value:
+    lineage:
+      - datalake_condo_monitoring.invoice.value
+    description: Invoice's value.
+  was_reminder_comm_required:
+    lineage:
+      - datalake_condo_monitoring.invoice.was_reminder_comm_required
+    description: Boolean to indicate if a reminder communication was required.
+  was_warning_comm_required:
+    lineage:
+      - datalake_condo_monitoring.invoice.was_warning_comm_required
+    description: Boolean to indicate if a warning communication was required.
+  ts_issued:
+    lineage:
+      - datalake_condo_monitoring.invoice.ts_issued
+    description: Timestamp of when the invoice was issued.
+  dt_due:
+    lineage:
+      - datalake_condo_monitoring.invoice.dt_due
+    description: Date of when the invoice is due.
+  ts_paid:
+    lineage:
+      - datalake_condo_monitoring.invoice.ts_paid
+    description: Timestamp of when the invoice was paid.
+  ts_load:
+    description: Timestamp of when the data was load in the table.

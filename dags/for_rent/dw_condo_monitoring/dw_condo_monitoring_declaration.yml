@@ -1,0 +1,22 @@
+dag:
+  name: dw_condo_monitoring
+  schedule_start_date: 2024,07,20
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      This DAG loads to dw layer our models related to condo monitoring.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: rent
+cluster:
+  type: databricks_13_3_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

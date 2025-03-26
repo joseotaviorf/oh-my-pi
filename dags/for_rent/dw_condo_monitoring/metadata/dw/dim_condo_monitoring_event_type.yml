@@ -1,0 +1,37 @@
+database_name: dw_rent
+table_name: dim_condo_monitoring_event_type
+description: Dim table containing the event types of the condo monitoring
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  sk_event_type:
+    description: Key of the event type on dw_rent.fact_condo_monitoring_events.
+  source:
+    lineage:
+      - datalake_condo_monitoring.condo_monitoring_events.source
+    description: Source of the event.
+    categories:
+      NON_PAYMENT_REPORT: The event are related to the non payment report.
+      ELEGIBILITY: The events are related to the elegibility from Condo Monitoring.
+      CONDO_MONITORING: The events are related to the Condo Monitoring.
+      INVOICE: The events are related to the invoices from Condo Monitoring.
+      COMMUNICATION: The events are related to the communication with the customer (jaiminho).
+  event_name:
+    lineage:
+      - datalake_condo_monitoring.condo_monitoring_events.event_name
+    description: Name of the event.
+    categories:
+      "NON PAYMENT REPORT": The event is related to a non payment report that the owner sent to QuintoAndar.
+      ELEGIBLE: The event is related to the elegibility of the owner to the Condo Monitoring. i.e when the owner was elegible to the Condo Monitoring.
+      CREATED: The event is related to the creation of the user on Condo Monitoring.
+      ACTIVATED: The event is related to the activation of the user on Condo Monitoring.
+      WAITING: The event is related to the creation of the user on Condo Monitoring.
+      DEACTIVATED: The event is related to the deactivation of the user on Condo Monitoring.
+      PENDING: The event is related to the invoice, that is, when the invoice wasn't paid yet.
+      PAID: The event is related to the invoice, that is, when the invoice was paid.
+      CANCELED: The event is related to the invoice, that is, when the invoice was canceled.
+      WRITTENOFF: The event is related to the invoice, that is, when the invoice was written off.
+      WARNING: The event is related to the communication, that is, when the user received a communication that the invoice wasn't paid.
+      REMINDER: The event is related to the communication, that is, when the user received a communication to remeber to pay the invoice.
+  ts_load:
+    description: Timestamp of the load.

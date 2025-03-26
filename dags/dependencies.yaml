@@ -230,6 +230,10 @@ bietlejuice.dw_company:
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-members
   - bietlejuice.enrich_hubspot_events:load-enrich-membership-updates
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
+bietlejuice.dw_condo_monitoring:
+  - bietlejuice.enrich_condo_monitoring:load-enrich-communication
+  - bietlejuice.enrich_condo_monitoring:load-enrich-condo-monitoring-events
+  - bietlejuice.enrich_condo_monitoring:load-enrich-invoice
 bietlejuice.dw_contract:
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract

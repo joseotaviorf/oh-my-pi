@@ -1,0 +1,44 @@
+database_name: dw_rent
+table_name: fact_condo_monitoring_events
+description: Fact table containing the events from Condo Monitoring.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  sk_contract:
+    lineage:
+      - datalake_condo_monitoring.condo_monitoring_events.id_contract
+    description: Key of the contract.
+  sk_invoice:
+    lineage:
+      - datalake_condo_monitoring.condo_monitoring_events.id_invoice
+    description: Key of the invoice.
+      This column will be different from -1 when the event is associated with the invoice.
+  sk_communication:
+    lineage:
+      - datalake_condo_monitoring.condo_monitoring_events.id_communication
+    description: Key of the communication.
+      This column will be different from -1 when the event is associated with the communication.
+  sk_event_type:
+    description: Key to identify the event type.
+  sk_house_listing:
+    lineage:
+      - datalake_condo_monitoring.condo_monitoring_events.id_house_listing
+    description: key to indetifiy the house's listing related to the contract.
+  sk_house:
+    lineage:
+      - datalake_condo_monitoring.condo_monitoring_events.id_house
+    description: Key to identify house related to the contract.
+  uuid_owner:
+    lineage:
+      - datalake_condo_monitoring.condo_monitoring_events.uuid_owner
+    description: UUID of the owner related to the contract.
+  uuid_tenant:
+    lineage:
+      - datalake_condo_monitoring.condo_monitoring_events.uuid_tenant
+    description: UUID of the tenant related to the contract.
+  ts_event:
+    lineage:
+      - datalake_condo_monitoring.condo_monitoring_events.ts_event
+    description: Timestamp of when the event happened.
+  ts_load:
+    description: Timestamp of when the data was loaded in the table.
