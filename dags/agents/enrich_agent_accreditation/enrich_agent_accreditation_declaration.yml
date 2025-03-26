@@ -32,7 +32,7 @@ workflow:
       merge_on: [id_agent_profile]
       z_order_by: [id_agent, ts_revision_started]
     agent_registration_actions_log:
-      merge_on: [id_action]
+      merge_on: [id_action_log]
       z_order_by: [id_agent, dt_action]
     business_context_activity:
       merge_on: [id_business_context_activity]
