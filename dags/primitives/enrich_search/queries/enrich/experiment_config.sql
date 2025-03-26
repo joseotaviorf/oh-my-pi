@@ -106,6 +106,21 @@ FROM VALUES
             ),
             'filters', NULL
         )
+    ),
+    -- Important exp from another team
+    (
+        "ab_beakman_wpp_alert",
+        named_struct(
+            'begin_date', DATE('2025-03-18'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL
+        )
     )
     -- Add new experiment here
 
