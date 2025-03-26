@@ -36,6 +36,7 @@ SELECT
         WHEN AHEXCP = "MUL" THEN "Acordos negociados com desconto maior do que o permitido na alçada do usuário e com pagamento fora da política"
         ELSE AHEXCP
     END AS exception,
+    AHFORMAPAG AS payment_method,
     AHCSINITNT AS payments_to_notify,
     AHDSCQB AS description_broken_agreement,
     AHCNDPAYN AS number_payments_to_exempt,

@@ -25,6 +25,10 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_clean.agreements.id_user
+  id_user_authorized:
+    description: "It indicates that there was an authorization, either for cancellation or approval. When the status is 'C' (Cancelled), it is filled with the user who requested the cancellation."
+    lineage:
+      - datalake_cyber_clean.agreements.authorized_by_manager
   advisory:
     description: ""
     lineage:
@@ -45,6 +49,10 @@ columns:
     description: ""
     lineage:
       - datalake_cyber_clean.agreements.agreement_type_description
+  payment_method:
+    description: "Payment method selected during agreement creation"
+    lineage:
+      - datalake_cyber_clean.agreements.payment_method
   promisse_payment_method:
     description: ""
     lineage:

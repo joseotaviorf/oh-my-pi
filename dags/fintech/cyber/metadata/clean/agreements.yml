@@ -112,6 +112,10 @@ columns:
     description: "Exception when the agreement was created"
     lineage:
       - datalake_cyber_raw.agrhdr.AHEXCP
+  payment_method:
+    description: "Payment method selected during agreement creation"
+    lineage:
+      - datalake_cyber_raw.agrhdr.AHFORMAPAG
   times_accordion_updated:
     description: ""
     lineage:
