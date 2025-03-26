@@ -1,0 +1,148 @@
+database_name: dw_public
+table_name: dim_person
+description: Table that describes all QuintoAndar's natural persons. Here, all the characteristics of natural persons will be centralized, including their user IDs and relationships with other entities in the data lake.
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_person:
+    lineage: 
+      - datalake_person.person_sks.sk_person
+    description: Surrogate key and unique identifier for a natural person in the data lakehouse.
+  id_person:
+    lineage: 
+      - datalake_person.person_sks.id_person
+    description: Unique identifier for the person in Person entity.
+  id_user:
+    lineage: 
+      - datalake_person.person_sks.id_user
+    description: Unique identifier for the person user in Main.
+  id_user_email:
+    lineage: 
+      - datalake_person_clean.contact_info.contact_info
+    description: Unique identifier for the person user based in QuintoAndar's email.
+  uuid_person:
+    lineage: 
+      - datalake_person.person_sks.uuid_person
+    description: External unique identifier for the company in Person entity.
+  country_code:
+    lineage: 
+      - datalake_person_clean.person.country_code
+    description: Country code where the person is located, registered in the person's entity.
+  language:
+    lineage: 
+      - datalake_person_clean.preference_settings.language
+    description: Language used by the person, registered in the person's preference_settings entity.
+  person_email:
+    lineage: 
+      - datalake_person_clean.contact_info.contact_info
+    description: Email of the person, registered in the person's contact_info entity.
+  person_name:
+    lineage: 
+      - datalake_person_clean.person.person_name
+    description: Name of the person, registered in the person's entity.
+  person_phone:
+    lineage: 
+      - datalake_person_clean.contact_info.contact_info
+    description: Phone number of the person, registered in the person's contact_info entity.
+  timezone:
+    lineage: 
+      - datalake_person_clean.preference_settings.timezone
+    description: Timezone used by the person, registered in the person's preference_settings entity.
+  is_blocked:
+    lineage: 
+      - datalake_person_clean.person.is_blocked
+    description: Flag indicating whether the person is blocked, registered in the person's entity.
+  has_right_to_be_forgotten:
+    lineage: 
+      - datalake_person_clean.person.has_right_to_be_forgotten
+    description: Flag indicating whether the person has the right to be forgotten, registered in the person's entity. Indicates that the person has requested to be removed from the QuintoAndar database and should not have their information propagated to any entity in the data lake.
+  has_affiliated_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_affiliated_member_profile
+    description: Flag indicating whether the person has an affiliated member profile, registered in the company's entity.
+  has_buyer_prospect_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_buyer_prospect_member_profile
+    description: Flag indicating whether the person has a buyer prospect member profile, registered in the company's entity.
+  has_ciq_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_ciq_member_profile
+    description: Flag indicating whether the person has a CIQ member profile, registered in the company's entity.
+  has_company_admin_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_company_admin_member_profile
+    description: Flag indicating whether the person has a company admin member profile, registered in the company's entity.
+  has_company_owner_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_company_owner_member_profile
+    description: Flag indicating whether the person has a company owner member profile, registered in the company's entity.
+  has_company_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_company_member_profile
+    description: Flag indicating whether the person has a company member profile, registered in the company's entity.
+  has_contract_person_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_contract_person_member_profile
+    description: Flag indicating whether the person has a contract person member profile, registered in the company's entity.
+  has_customer_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_customer_member_profile
+    description: Flag indicating whether the person has a customer member profile, registered in the company's entity.
+  has_legal_person_tenant_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_legal_person_tenant_member_profile
+    description: Flag indicating whether the person has a legal person tenant member profile, registered in the company's entity.
+  has_partner_agent_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_partner_agent_member_profile
+    description: Flag indicating whether the person has a partner agent member profile, registered in the company's entity.
+  has_photographer_agent_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_photographer_agent_member_profile
+    description: Flag indicating whether the person has a photographer agent member profile, registered in the company's entity.
+  has_photographer_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_photographer_member_profile
+    description: Flag indicating whether the person has a photographer member profile, registered in the company's entity.
+  has_property_inspector_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_property_inspector_member_profile
+    description: Flag indicating whether the person has a property inspector member profile, registered in the company's entity.
+  has_property_owner_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_property_owner_member_profile
+    description: Flag indicating whether the person has a property owner member profile, registered in the company's entity.
+  has_property_owner_prospect_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_property_owner_prospect_member_profile
+    description: Flag indicating whether the person has a property owner prospect member profile, registered in the company's entity.
+  has_realtor_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_realtor_member_profile
+    description: Flag indicating whether the person has a realtor member profile, registered in the company's entity.
+  has_tenant_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_tenant_member_profile
+    description: Flag indicating whether the person has a tenant member profile, registered in the company's entity.
+  has_tenant_prospect_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_tenant_prospect_member_profile
+    description: Flag indicating whether the person has a tenant prospect member profile, registered in the company's entity.
+  has_third_party_agent_member_profile:
+    lineage: 
+      - datalake_person.person_sks.has_third_party_agent_member_profile
+    description: Flag indicating whether the person has a third party agent member profile, registered in the company's entity.
+  dt_birth:
+    lineage: 
+      - datalake_person_clean.person.dt_birth
+    description: Date of birth of the person, registered in the person's entity
+  ts_created:
+    lineage: 
+      - datalake_person_clean.person.ts_created
+    description: Date when the person was created in the company entity.
+  ts_updated:
+    lineage: 
+      - datalake_person_clean.person.ts_updated
+    description: Date when the person was updated in the company entity.
+  ts_load:
+    description: Date when the table data was updated.

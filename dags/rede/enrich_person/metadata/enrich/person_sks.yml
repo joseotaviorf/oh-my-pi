@@ -16,11 +16,11 @@ columns:
   id_contact_info_email:
     lineage:
       - datalake_person_clean.contact_info.id
-    description: Foreign key to Person's contact_info table.
-  id_credential_reference:
+    description: Foreign key to Person's contact_info table filtering e-mail.
+  id_contact_info_phone:
     lineage:
-      - datalake_person_clean.credential_reference.id
-    description: Foreign key to Person's credential_reference table.
+      - datalake_person_clean.contact_info.id
+    description: Foreign key to Person's contact_info table filtering phone.
   id_preference_settings:
     lineage:
       - datalake_person_clean.preference_settings.id
@@ -29,6 +29,10 @@ columns:
     lineage:
       - datalake_person_clean.right_to_be_forgotten.id
     description: Foreign key to Person's right_to_be_forgotten table.
+  id_user:
+    lineage:
+      - datalake_person_clean.credential_reference.id_reference
+    description: User ID from main.
   uuid_person:
     lineage:
       - datalake_person_clean.person.uuid_person

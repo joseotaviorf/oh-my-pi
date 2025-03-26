@@ -9,12 +9,25 @@ WITH contact_info_email AS (
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY ci.id_person ORDER BY ci.ts_updated DESC) = 1
 ),
-credential_reference AS (
+contact_info_phone AS (
   SELECT
-    cr.id AS id_credential_reference,
-    cr.id_person
+    ci.id AS id_contact_info_phone,
+    ci.id_person
+  FROM
+    datalake_person_clean.contact_info AS ci
+  WHERE
+    ci.category = 'PHONE'
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY ci.id_person ORDER BY ci.ts_updated DESC) = 1
+),
+main_user AS (
+  SELECT
+    cr.id_person,
+    cr.id_reference AS id_user
   FROM
     datalake_person_clean.credential_reference AS cr
+  WHERE
+    cr.origin = 'main'
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY cr.id_person ORDER BY cr.ts_updated DESC) = 1
 ),
@@ -58,9 +71,10 @@ SELECT
   XXHASH64(p.id) AS sk_person,
   p.id AS id_person,
   cie.id_contact_info_email,
-  cr.id_credential_reference,
+  cip.id_contact_info_phone,
   ps.id AS id_preference_settings,
   rf.id_right_to_be_forgotten,
+  mu.id_user,
   p.uuid_person,
   mp.has_affiliated_member_profile,
   mp.has_buyer_prospect_member_profile,
@@ -89,8 +103,11 @@ LEFT JOIN
   contact_info_email AS cie
     ON p.id = cie.id_person
 LEFT JOIN
-  credential_reference AS cr
-    ON p.id = cr.id_person
+  contact_info_phone AS cip
+    ON p.id = cip.id_person
+LEFT JOIN
+  main_user AS mu
+    ON p.id = mu.id_person
 LEFT JOIN
   datalake_person_clean.preference_settings AS ps
     ON p.id = ps.id_person

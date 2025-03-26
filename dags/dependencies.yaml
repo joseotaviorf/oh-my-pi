@@ -664,6 +664,12 @@ bietlejuice.dw_operator_performance:
   - bietlejuice.paschoalotto:load-clean-user
   - bietlejuice.recupera:load-clean-operators
   - bietlejuice.webhelp:load-clean-login
+bietlejuice.dw_person:
+  - bietlejuice.enrich_person:load-enrich-person-sks
+  - bietlejuice.person:load-clean-contact-info
+  - bietlejuice.person:load-clean-person
+  - bietlejuice.person:load-clean-preference-settings
+  - bietlejuice.person:load-clean-right-to-be-forgotten
 bietlejuice.dw_photo_jobs:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_photo_jobs:load-enrich-photo-job
