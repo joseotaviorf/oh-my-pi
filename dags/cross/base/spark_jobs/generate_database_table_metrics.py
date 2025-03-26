@@ -9,7 +9,7 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import MySqlConsumer, PostgresConsumer
-from bietlejuice.pipeline import IncrementalTableLoaderPipeline
+from bietlejuice.pipeline.delta_table_loader_pipeline import DeltaTableLoaderPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "generate_database_table_metrics"
@@ -134,13 +134,14 @@ def main():
     union_all_query = '\nUNION ALL\n'.join(query)
     df_metrics = consumer.get_data_from_query(union_all_query)
 
-    IncrementalTableLoaderPipeline(
+    DeltaTableLoaderPipeline(
         database_name,
         table_name.lower(),
         database_location,
         LayerEnum.CLEAN,
         None,
         partition_cols,
+        spark=spark
     ).load_and_register(df_metrics, format_options)
 
 

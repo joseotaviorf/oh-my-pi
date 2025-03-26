@@ -261,7 +261,7 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
         ):
             first_metrics_task, last_metrics_task = self._create_generate_metrics_task_group(
                 self.generate_database_table_metrics_task_creator,
-                self.sync_metadata_task_creator,
+                self.register_delta_table_task_creator,
             )
             last_metrics_task >> dummy_terminate_job_cluster_task
             return first_metrics_task
