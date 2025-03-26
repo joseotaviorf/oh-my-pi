@@ -1,0 +1,64 @@
+---
+database_name: datalake_growth_commission_costs
+table_name: ciq_costs
+owner: isabela.matsumoto@quintoandar.com.br
+domain: Data Growth
+description: This table consolidates the commission costs within the context of CIQ(Consultor Imobiliario QuintoAndar).
+columns:
+  id_house:
+    lineage:
+      - datalake_robin_hood.accounting_entry.id_house
+      - datalake_ebdb_contract.contract.id_house
+    description: Unique house identifier.
+  id_region:
+    lineage:
+      - datalake_ebdb_listing.house.id_region
+      - datalake_offer.sale_offer.id_region
+    description: Unique region identifier.
+  id_ciq:
+    lineage:
+      - datalake_monopoly_clean.person_sale.id_ciq
+      - datalake_robin_hood.accounting_entry.id_payee_external
+    description: Unique CIQ identifier.
+  comission_listing_fr:
+    lineage:
+      - datalake_robin_hood.accounting_entry.due_amount
+    description: Sum of the due_amount for a specific cost center (R01450).
+  comission_listing_fs:
+    lineage:
+      - datalake_robin_hood.accounting_entry.due_amount
+    description: Sum of due_amount for a specific cost center (S01450).
+  revshare_cs_ciq_full:
+    lineage:
+      - datalake_robin_hood.accounting_entry.due_amount
+    description: Revenue share amount
+  revshare_ccv_ciq_full_fs:
+    lineage:
+      - datalake_monopoly_clean.outcome.amount
+    description: Revenue share amount
+  dt_paid:
+    lineage:
+      - datalake_robin_hood.accounting_entry.accounting_year_month
+      - datalake_robin_hood.accounting_entry.accrual_year_month
+      - datalake_monopoly_clean.outcome_reference.dt_outcome
+    description: Payment date
+  year:
+    lineage:
+      - datalake_robin_hood.accounting_entry.accounting_year_month
+      - datalake_robin_hood.accounting_entry.accrual_year_month
+      - datalake_monopoly_clean.outcome_reference.dt_outcome
+    description: Partition column.
+  month:
+    lineage:
+      - datalake_robin_hood.accounting_entry.accounting_year_month
+      - datalake_robin_hood.accounting_entry.accrual_year_month
+      - datalake_monopoly_clean.outcome_reference.dt_outcome
+    description: Partition column.
+  day:
+    lineage:
+      - datalake_robin_hood.accounting_entry.accounting_year_month
+      - datalake_robin_hood.accounting_entry.accrual_year_month
+      - datalake_monopoly_clean.outcome_reference.dt_outcome
+    description: Partition column.
+  ts_load:
+    description: Timestamp of when the table was last processed.

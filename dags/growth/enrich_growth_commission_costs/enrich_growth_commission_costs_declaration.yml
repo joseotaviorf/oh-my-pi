@@ -1,0 +1,23 @@
+dag:
+  name: enrich_growth_commission_costs
+  schedule_start_date: 2025, 3, 25
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for consolidating commission cost data related to CIQ (Consultor Imobiliario QuintoAndar).
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1902,6 +1902,21 @@ bietlejuice.enrich_greenseer:
 bietlejuice.enrich_growth_automatic_daily_costs:
   - bietlejuice.enrich_consolidated_growth_metrics:load-enrich-consolidated-media-metrics
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
+bietlejuice.enrich_growth_commission_costs:
+  - bietlejuice.enrich_ebdb_agents:load-enrich-ciq-users
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+  - bietlejuice.enrich_offer:load-enrich-sale-offer
+  - bietlejuice.enrich_region:load-enrich-region
+  - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry
+  - bietlejuice.monopoly:load-clean-outcome
+  - bietlejuice.monopoly:load-clean-outcome-reference
+  - bietlejuice.monopoly:load-clean-person-sale
+  - bietlejuice.monopoly:load-clean-revenue-share
+  - bietlejuice.monopoly:load-clean-sale
+  - bietlejuice.monopoly:load-clean-sale-revision
+  - bietlejuice.robin_hood:load-clean-accounting-entry-balance
+  - bietlejuice.robin_hood:load-clean-payment-request
 bietlejuice.enrich_growth_costs_sharing_rules:
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
