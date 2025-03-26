@@ -174,6 +174,15 @@ contract_anomaly AS (
       ON c.id = t.id_contract
   WHERE
     t.status != 'CANCELED'
+),
+last_status_condo_monitoring AS (
+  SELECT
+    id_contract,
+    action_type
+  FROM
+    datalake_condominium_payments_clean.condo_monitoring_actions
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY ts_updated DESC) = 1
 )
 SELECT
   c.id,
@@ -202,6 +211,7 @@ SELECT
   c.responsible_for_condo,
   c.paying_iptu,
   c.responsible_for_iptu,
+  lscm.action_type AS condo_monitoring_status,
   c.rental_guarantee_installment,
   c.rental_guarantee_value,
   c.home_insurance_installment,
@@ -226,6 +236,8 @@ SELECT
   cm.is_deal_only,
   COALESCE(c.is_relisting_enabled, FALSE) AS is_relisting_enabled,
   ca.is_contract_anomaly,
+  cme.id_contract IS NOT NULL AS is_condo_monitoring_eligible,
+  lscm.action_type = 'ACTIVATED' AS is_condo_monitoring_active,
   fc.monthly_administration_fee,
   ccr.cancellation_reason,
   ccr.ts_canceled,
@@ -275,3 +287,9 @@ LEFT JOIN
 LEFT JOIN
   contract_anomaly AS ca
     ON ca.id_contract = c.id
+LEFT JOIN
+  datalake_condominium_payments_clean.condo_monitoring_eligibility AS cme
+    ON c.id = cme.id_contract
+LEFT JOIN
+  last_status_condo_monitoring AS lscm
+    ON c.id = lscm.id_contract

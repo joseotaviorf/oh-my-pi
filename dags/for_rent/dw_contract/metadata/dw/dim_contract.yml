@@ -104,6 +104,10 @@ columns:
       Proprietario: The property owner is responsible for paying the IPTU.
       QuintoAndar: QuintoAndar is responsible for paying the IPTU.
       "null": If the responsible of paying the IPTU is null.
+  condo_monitoring_status:
+    lineage:
+      - datalake_ebdb_contract.contract.condo_monitoring_status
+    description: Status of the contract in the Condo Monitoring.
   rental_insurance_installments:
     lineage:
       - datalake_ebdb_contract.contract.rental_guarantee_installment
@@ -288,6 +292,14 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract.is_contract_anomaly
     description: Boolean indicating if this contract termination is an anomaly.
+  is_condo_monitoring_eligible:
+    lineage:
+      - datalake_ebdb_contract.contract.is_condo_monitoring_eligible
+    description: Boolean value to indicate if the contract is eligible for Condo Monitoring.
+  is_condo_monitoring_active:
+    lineage:
+      - datalake_ebdb_contract.contract.is_condo_monitoring_active
+    description: Boolean value to indicate if the contract is active on Condo monitoring.
   dt_start:
     lineage:
       - datalake_ebdb_contract.contract.dt_started

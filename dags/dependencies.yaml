@@ -1702,6 +1702,8 @@ bietlejuice.enrich_ebdb_condo:
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ebdb_contract:
+  - bietlejuice.condominium_payments:load-clean-condo-monitoring-actions
+  - bietlejuice.condominium_payments:load-clean-condo-monitoring-eligibility
   - bietlejuice.ebdb:load-clean-photographer-job
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_contract:load-clean-contract-aud
