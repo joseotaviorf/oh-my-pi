@@ -1,0 +1,20 @@
+database_name: datalake_legaut_clean
+table_name: accounts_user_email
+description: Users and emails of users from diligence cases of legaut
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_legaut_raw.accounts_useremail.id
+    description: "ID of QuintoAndar analysts"
+  email:
+    lineage:
+      - datalake_legaut_raw.accounts_useremail.email
+    description: "Email of QuintoAndar analysts"
+  name:
+    lineage:
+      - datalake_legaut_raw.accounts_useremail.name
+    description: "Name of QuintoAndar analysts"
+  ts_load:
+    descrition: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing."

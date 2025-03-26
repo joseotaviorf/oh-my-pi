@@ -1,0 +1,16 @@
+---
+database_name: datalake_legaut_raw
+table_name: accounts_useremail
+columns:
+  id:
+    tags:
+      - PII
+      - Confidential
+  name:
+    tags:
+      - PII
+      - Confidential
+  email:
+    tags:
+      - PII
+      - Confidential

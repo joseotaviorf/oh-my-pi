@@ -15,6 +15,8 @@ workflow:
   custom_schema: legaut
   dbutils_secret_key: LEGAUT_DB
   tables_customization:
+    accounts_useremail:
+      clean_table_name: accounts_user_email
     crawlers_company:
       clean_table_name: crawlers_company
     crawlers_crawler:
@@ -51,4 +53,4 @@ cluster:
   type: databricks_13_3_med_memory_general_cluster
   custom_configurations:
     aws_attributes:
-        ebs_volume_size: 200
+      ebs_volume_size: 200
