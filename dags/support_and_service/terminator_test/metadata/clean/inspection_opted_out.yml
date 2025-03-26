@@ -8,10 +8,10 @@ columns:
     lineage:
       - datalake_terminator_test_raw.inspection_opted_out.id
     description: Unique identification key of the inspection opted out
-  id_terminator:
+  id_termination:
     lineage:
-      - datalake_terminator_test_raw.inspection_opted_out.terminator_id
-    description: Identification key in terminator.
+      - datalake_terminator_test_raw.inspection_opted_out.termination_id
+    description: Identification key of termination.
   is_exit_inspection_opt_out:
     lineage:
       - datalake_terminator_test_raw.inspection_opted_out.exit_inspection_opt_out
@@ -28,3 +28,15 @@ columns:
     lineage:
       - datalake_terminator_test_raw.inspection_opted_out.date_opt_out
     description: Inspection opted out date.
+  year:
+    lineage:
+      - datalake_terminator_test_raw.inspection_opted_out.year
+    description: Year when the data was loaded.
+  month:
+    lineage:
+      - datalake_terminator_test_raw.inspection_opted_out.month
+    description: Month when the data was loaded.
+  day:
+    lineage:
+      - datalake_terminator_test_raw.inspection_opted_out.day
+    description: Day when the data was loaded.
