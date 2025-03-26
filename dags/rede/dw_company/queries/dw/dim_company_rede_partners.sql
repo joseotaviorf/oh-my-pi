@@ -34,7 +34,7 @@ LEFT JOIN
 LEFT JOIN
   datalake_company_clean.address AS a
     ON cs.id_address = a.id
-LEFT JOIN
+INNER JOIN
   datalake_hubspot.company_members AS cm
     ON cs.cnpj = cm.cnpj
 LEFT JOIN
@@ -43,7 +43,5 @@ LEFT JOIN
 LEFT JOIN
   datalake_company_clean.company AS ci
     ON cs.uuid_integrator_partner = ci.uuid_company
-WHERE
-  cs.is_company_rede_broker
 GROUP BY
   ALL

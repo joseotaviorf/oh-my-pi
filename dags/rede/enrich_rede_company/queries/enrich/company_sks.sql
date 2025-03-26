@@ -24,14 +24,14 @@ company_address AS (
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY ca.id_company ORDER BY ca.ts_updated DESC) = 1
 ),
-company_cnpj AS (
+company_cnpj_aux AS (
   SELECT
     cd.id_company,
-    d.identification_number,
-    d.document_type
+    REGEXP_REPLACE(d.identification_number, '[^0-9]', '') AS identification_number,
+    cd.ts_updated
   FROM
     datalake_company_clean.company_document AS cd
-  LEFT JOIN
+  INNER JOIN
     datalake_company_clean.document AS d
       ON cd.id_document = d.id
         AND d.document_type = 'CNPJ'
@@ -39,14 +39,23 @@ company_cnpj AS (
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY cd.id_company ORDER BY cd.ts_updated DESC) = 1
 ),
+company_cnpj AS (
+  SELECT
+    ca.id_company,
+    ca.identification_number,
+    ca.ts_updated
+  FROM
+    company_cnpj_aux AS ca
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY identification_number ORDER BY ts_updated DESC) = 1
+),
 company_creci AS (
   SELECT
     cd.id_company,
-    d.identification_number,
-    d.document_type
+    d.identification_number
   FROM
     datalake_company_clean.company_document AS cd
-  LEFT JOIN
+  INNER JOIN
     datalake_company_clean.document AS d
       ON cd.id_document = d.id
         AND d.document_type = 'CRECI'
@@ -63,8 +72,8 @@ SELECT
   c.uuid_company,
   cp.uuid_integrator_partner,
   cp.uuid_revenue_share,
-  REGEXP_REPLACE(ccn.identification_number, '[^0-9]', '') AS cnpj,
-  REGEXP_REPLACE(ccr.identification_number, '[^0-9]', '') AS creci,
+  ccn.identification_number AS cnpj,
+  ccr.identification_number AS creci,
   cp.is_company_asp,
   cp.is_company_ciq,
   cp.is_company_legal_person_rental_guarantee,
@@ -89,4 +98,4 @@ LEFT JOIN
     ON c.id = ccr.id_company
 LEFT JOIN
   datalake_hubspot.company_members AS cm
-    ON REGEXP_REPLACE(ccn.identification_number, '[^0-9]', '') = cm.cnpj
+    ON ccn.identification_number = cm.cnpj
