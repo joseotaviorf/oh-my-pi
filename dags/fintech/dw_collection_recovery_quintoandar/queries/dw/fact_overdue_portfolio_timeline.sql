@@ -1,28 +1,4 @@
 WITH
-main_delinquency_app_events_contract AS (
-  SELECT
-    id_contract,
-    DATE(ts_event) AS dt_event,
-    MAX(CASE WHEN funnel_step = 'Contract Page' THEN TRUE ELSE FALSE END) AS has_contract_event,
-    MAX(CASE WHEN funnel_step = 'Session Start' THEN TRUE ELSE FALSE END) AS has_session_start_event
-  FROM datalake_collections_quintoandar.delinquency_app_events
-  WHERE
-    id_contract IS NOT NULL
-  GROUP BY ALL
-),
-main_delinquency_app_events_invoice AS (
-  SELECT
-    id_contract,
-    id_invoice,
-    DATE(ts_event) AS dt_event,
-    MAX(CASE WHEN funnel_step = 'Self Service Negotiation' THEN TRUE ELSE FALSE END) AS has_ssn_event,
-    MAX(CASE WHEN funnel_step = 'Pending Invoice Page' THEN TRUE ELSE FALSE END) AS has_pending_invoice_event
-  FROM datalake_collections_quintoandar.delinquency_app_events
-  WHERE
-    id_contract IS NOT NULL
-    AND id_invoice IS NOT NULL
-  GROUP BY ALL
-),
 ssn_original_payment AS (
     SELECT DISTINCT
         id_contract,
@@ -112,10 +88,6 @@ SELECT
         AND o.invoice_type = "extra"
       THEN "Negotiation installments (extra)"
     END AS recovery_method,
-    IFNULL(mdaec.has_contract_event, FALSE) AS has_contract_event_in_dt_reference,
-    IFNULL(mdaec.has_session_start_event, FALSE) AS has_session_start_event_in_dt_reference,
-    IFNULL(mdaei.has_ssn_event, FALSE) AS has_ssn_event_in_dt_reference,
-    IFNULL(mdaei.has_pending_invoice_event, FALSE) AS has_pending_invoice_event_in_dt_reference,
     o.debtor_type,
     o.delay_contamined_at_closure,
     o.delay_contamined_range,
@@ -152,15 +124,6 @@ LEFT JOIN
     ssn_original_payment AS possn
       ON possn.id_invoice = o.id_invoice
       AND possn.id_contract = o.id_contract
-LEFT JOIN
-    main_delinquency_app_events_contract AS mdaec
-      ON o.id_contract = mdaec.id_contract
-        AND o.dt_reference = mdaec.dt_event
-LEFT JOIN
-    main_delinquency_app_events_invoice AS mdaei
-      ON o.id_contract = mdaei.id_contract
-        AND o.id_invoice = mdaei.id_invoice
-        AND o.dt_reference = mdaei.dt_event
 LEFT JOIN
     datalake_recupera.contract_advisory_distribution AS rc
       ON o.id_contract = rc.id_contract
@@ -207,10 +170,6 @@ SELECT
     a.is_ssn,
     a.type_ssn,
     a.recovery_method,
-    a.has_session_start_event_in_dt_reference,
-    a.has_contract_event_in_dt_reference,
-    a.has_pending_invoice_event_in_dt_reference,
-    a.has_ssn_event_in_dt_reference,
     a.debtor_type,
     a.delay_contamined_at_closure,
     a.delay_contamined_range,

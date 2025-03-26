@@ -75,7 +75,7 @@ columns:
       - datalake_amplitude_clean_staging.170698_offerinfo_page_viewed_events.event_type
   event_properties:
     lineage:
-      - datalake_amplitude_clean_staging.datalake_amplitude_clean_staging.170698_offerinfo_page_viewed_events
+      - datalake_amplitude_clean_staging.170698_offerinfo_page_viewed_events
   is_attribution_event:
     lineage:
       - datalake_amplitude_clean_staging.170698_offerinfo_page_viewed_events.is_attribution_event

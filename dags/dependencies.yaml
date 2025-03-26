@@ -1381,7 +1381,6 @@ bietlejuice.enrich_ciq_comissioning:
   - bietlejuice.gsheets_agents:done-clean-sale-comission-for-strategic-region
 bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
 bietlejuice.enrich_collections_quintocred:
   - bietlejuice.enrich_velo:load-enrich-propose
   - bietlejuice.enrich_velo:load-enrich-propose-person
