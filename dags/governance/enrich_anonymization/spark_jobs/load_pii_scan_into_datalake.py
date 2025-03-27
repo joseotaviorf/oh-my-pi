@@ -128,9 +128,7 @@ def clean_result(result, matched_value):
       for r in result
   ]
 
-def process_partition(iter_of_rows, recognizer_dict_list):
-    registry = load_recognizers_from_dict(recognizer_dict_list)
-    batch_analyzer = build_batch_analyzer(registry)
+def process_partition(iter_of_rows, batch_analyzer):
     rows_list = list(iter_of_rows)
 
     df_dict = {
@@ -254,9 +252,8 @@ def main():
     spacy.cli.download("en_core_web_lg")
     spacy.load('en_core_web_lg')
 
-    base_dbutils = BaseDBUtils()
-    dbutils = base_dbutils.get_dbutils()
-    dbutils.library.restartPython()
+    registry = load_recognizers_from_dict(recognizer_dict_list)
+    batch_analyzer = build_batch_analyzer(registry)
 
     schema = StructType([
         StructField("layer", StringType(), True),
@@ -288,7 +285,7 @@ def main():
     df = get_sample(date_filter=args.load_start_date)
 
 
-    rdd = df.rdd.mapPartitions(partial(process_partition, recognizer_dict_list=recognizer_dict_list))
+    rdd = df.rdd.mapPartitions(partial(process_partition, batch_analyzer=batch_analyzer))
     df_rebuilt = spark.createDataFrame(data=rdd, schema=schema)
 
     df_explode_sample = (
