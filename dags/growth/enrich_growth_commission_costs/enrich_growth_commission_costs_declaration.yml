@@ -8,11 +8,8 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  default_extraction_type: incremental
+  default_extraction_type: full
   default_partitions: ["year", "month", "day"]
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_13_3_med_general_cluster
   databricks_conn_id: databricks_new

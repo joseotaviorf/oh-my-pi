@@ -44,7 +44,6 @@ WITH upfront_payments_robinhood AS (
       (ae.ts_blocked IS NULL OR pr.status IN ('paid','scheduled'))
       AND pr.id_next_attempt IS NULL
       AND ae.id_source IN (8,9)
-      AND ae.ts_created::DATE BETWEEN '{load_start_date}'::DATE AND '{load_end_date}'::DATE
 ),
 robin_hood AS (
   SELECT
@@ -63,6 +62,7 @@ robin_hood AS (
   WHERE
     h.city IS NOT NULL
     AND r.city_group IS NOT NULL
+    AND up.accounting_year_month >= '2024-01-01'
   GROUP BY ALL
 ),
 outcome_reference AS (
@@ -95,9 +95,9 @@ monopolly AS (
       LEFT JOIN datalake_offer.sale_offer AS so
         ON so.id_offer = s.id_external_offer
   WHERE
-      oref.dt_outcome BETWEEN '{load_start_date}'::DATE AND '{load_end_date}'::DATE
-      AND rs.type = 'CIQ'
+      rs.type = 'CIQ'
       AND o.outcome_status = 'paid'
+      AND oref.dt_outcome >= '2024-01-01'
   GROUP BY ALL
 )
 SELECT
