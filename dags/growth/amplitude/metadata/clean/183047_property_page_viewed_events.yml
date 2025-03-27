@@ -52,6 +52,9 @@ columns:
       - datalake_amplitude_clean_staging.183047_property_page_viewed_events.user_properties
   ep_business_context:
     lineage:
+      - datalake_amplitude_clean_staging.183047_property_page_viewed_events.event_properties
+  ep_ad_improvements_button_available:
+    lineage:
       - datalake_amplitude_clean_staging.183047_property_page_viewed_events.event_properties        
   city:
     lineage:
