@@ -92,6 +92,7 @@ payment_systems AS (
 
 sap AS (
     SELECT
+        id_transaction,
         CASE
             WHEN regexp_like(replace(accounting_rule , '+','-'), 'baixa-contas-receber:conta-banco-cash-in|baixa-conta-receber:valores-receber-imobiliaria-conta-banco-cash-in')
             THEN id_finance_entity 
@@ -106,20 +107,21 @@ sap AS (
         account_number IN ('11035X')
         AND source_client IN ('rental-guarantee-pla')
     GROUP BY
-        1,2,4
+        1,2,3,5
 )
 
 SELECT 
     bu.company_use,
+    s.id_transaction AS id_sap_transaction,
     bu.type_transaction,
     '49458-8' AS bank_account,
     bu.paid_amount AS bank_paid_amount,
-    bu.dt_paid AS dt_bank_paid,
     p.paid_amount AS charge_amount,
-    IF(p.our_number IS NULL, FALSE, TRUE) AS is_charge_concilied,
-    IF(s.company_use IS NULL, FALSE, TRUE) AS is_sap_concilied,
-    p.dt_paid AS dt_charge_paid,
     s.paid_amount AS sap_paid_amount,
+    IF(p.our_number IS NOT NULL AND p.paid_amount = bu.paid_amount AND p.dt_paid = bu.dt_paid, TRUE, FALSE) AS is_charge_concilied,
+    IF(s.company_use IS NOT NULL AND s.paid_amount = bu.paid_amount AND s.dt_paid = bu.dt_paid, TRUE, FALSE) AS is_sap_concilied,
+    bu.dt_paid AS dt_bank_paid,
+    p.dt_paid AS dt_charge_paid,
     s.dt_paid AS dt_sap_paid
 FROM 
     bank_union AS bu

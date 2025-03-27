@@ -9,6 +9,10 @@ columns:
     description: ''
     lineage:
     - .bank_union.company_use
+  id_sap_transaction:
+    description: ''
+    lineage:
+    - .bank_union.s.id_transaction
   type_transaction:
     description: ''
     lineage:
@@ -21,30 +25,32 @@ columns:
     description: ''
     lineage:
     - .bank_union.bu.paid_amount
-  dt_bank_paid:
-    description: ''
-    lineage:
-    - .bank_union.bu.dt_paid
   charge_amount:
     description: ''
     lineage:
     - .bank_union.p.paid_amount
-  is_charge_concilied:
-    description: ''
-    lineage:
-    - .bank_union.CASE WHEN p.our_number IS NULL THEN FALSE ELSE TRUE END
-  is_sap_concilied:
-    description: ''
-    lineage:
-    - .bank_union.CASE WHEN s.company_use IS NULL THEN FALSE ELSE TRUE END
-  dt_charge_paid:
-    description: ''
-    lineage:
-    - .bank_union.p.dt_paid
   sap_paid_amount:
     description: ''
     lineage:
     - .bank_union.s.paid_amount
+  is_charge_concilied:
+    description: ''
+    lineage:
+    - .bank_union.CASE WHEN NOT p.our_number IS NULL AND p.paid_amount = bu.paid_amount
+      AND p.dt_paid = bu.dt_paid THEN TRUE ELSE FALSE END
+  is_sap_concilied:
+    description: ''
+    lineage:
+    - .bank_union.CASE WHEN NOT s.company_use IS NULL AND s.paid_amount = bu.paid_amount
+      AND s.dt_paid = bu.dt_paid THEN TRUE ELSE FALSE END
+  dt_bank_paid:
+    description: ''
+    lineage:
+    - .bank_union.bu.dt_paid
+  dt_charge_paid:
+    description: ''
+    lineage:
+    - .bank_union.p.dt_paid
   dt_sap_paid:
     description: ''
     lineage:
