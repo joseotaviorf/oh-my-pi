@@ -45,8 +45,8 @@ jaiminho AS (
     j.was_delivered,
     CASE
       WHEN j.communication_type = 'INVITE' THEN NULL
-      WHEN j.communication_type = 'WARNING' AND DATE(j.ts_sent) = DATE_ADD(i.dt_due, 3) THEN TRUE
-      WHEN j.communication_type = 'REMINDER' AND DATE(j.ts_sent) = DATE_ADD(i.dt_due, -1) THEN TRUE
+      WHEN j.communication_type = 'WARNING' AND DATE(j.ts_sent) = DATE_ADD(COALESCE(j.dt_due, i.dt_due), 3) THEN TRUE
+      WHEN j.communication_type = 'REMINDER' AND DATE(j.ts_sent) = DATE_ADD(COALESCE(j.dt_due, i.dt_due), -1) THEN TRUE
       ELSE FALSE
     END AS was_comm_sent_on_time,
     j.ts_sent,
