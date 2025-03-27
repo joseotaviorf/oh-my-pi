@@ -368,6 +368,11 @@ columns:
     - datalake_ebdb_listing.house.is_casa_mineira_migration
     description: >
       Flag if supply belongs to a CasaMineira migration. CasaMineira is a real estate agency that was acquired by QuintoAndar in 2021 and migrated at the end of 2022.
+  is_high_ticket:
+    lineage:
+    - datalake_ebdb_listing.house.sale_price
+    description: >
+      Boolean column that identifies whether the listing is considered a high ticket. High ticket listings are those with a price above R$ 1,000,000.
   is_primary_market:
     lineage:
     - datalake_ebdb_listing.house.is_sale_primary_market

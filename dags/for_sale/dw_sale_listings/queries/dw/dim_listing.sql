@@ -36,6 +36,7 @@ SELECT
   h.is_3p_supply_5a AND h.is_sale_3p_supply AS is_3p_supply_5a,
   h.is_3p_supply_bh AND h.is_sale_3p_supply AS is_3p_supply_bh,
   h.is_casa_mineira_migration,
+  h.sale_price > 1000000 AS is_high_ticket,
   h.is_sale_primary_market AS is_primary_market,
   ssl.is_offer_and_visit_stranded,
   sl.is_for_rent,
