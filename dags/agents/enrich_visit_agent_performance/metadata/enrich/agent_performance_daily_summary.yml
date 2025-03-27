@@ -158,16 +158,16 @@ columns:
   dt_reference:
     lineage:
       - datalake_agent_accreditation.business_context_activity.dt_reference
-    description:
+    description: Reference date for evaluating agent performance.
   year:
     lineage:
       - datalake_agent_accreditation.business_context_activity.year
-    description:
+    description: Year corresponding to the reference date.
   month:
     lineage:
       - datalake_agent_accreditation.business_context_activity.month
-    description:
+    description: Month corresponding to the reference date.
   day:
     lineage:
       - datalake_agent_accreditation.business_context_activity.day
-    description:
+    description: Day corresponding to the reference date.

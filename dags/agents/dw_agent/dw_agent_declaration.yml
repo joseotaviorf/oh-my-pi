@@ -6,7 +6,17 @@ dag:
 workflow:
   type: query_delta
   layer: dw
-  custom_schema: public
+  custom_schema: agent
+  tables_customization:
+    dim_agent_region:
+      custom_schema: public
+    dim_agent:
+      custom_schema: public
+    fact_visit_agent_performance:
+      partitions: [year, month, day]
+      extraction_type: incremental
+      merge_on: [sk_agent_performance]
+      z_order_by: [sk_agent, business_context]
 cluster:
   type: databricks_13_3_med_general_2_workers_cluster
   databricks_conn_id: databricks_new

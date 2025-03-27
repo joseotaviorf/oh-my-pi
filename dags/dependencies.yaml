@@ -23,6 +23,7 @@ bietlejuice.dw_agent:
   - bietlejuice.ebdb_agent:load-clean-agent-data-types
   - bietlejuice.enrich_agenda_allocation:load-enrich-agent-region-group
   - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
+  - bietlejuice.enrich_visit_agent_performance:load-enrich-agent-performance-daily-summary
 bietlejuice.dw_agent_contract:
   - bietlejuice.dw_rede_company:load-dw-rede-dim-company
   - bietlejuice.enrich_agenda_allocation:load-enrich-agents-slots-hourly

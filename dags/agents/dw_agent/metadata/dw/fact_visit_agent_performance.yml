@@ -1,0 +1,175 @@
+---
+database_name: dw_agent
+table_name: fact_visit_agent_performance
+description: |
+  This table provides a daily summary of visit agent performance, covering key metrics across various stages of the sales or rental process. 
+  It includes data on agent availability, visit bookings, cancellations, supply activities, and the progression of leads through stages like offer 
+  submission and contract signing. Additionally, it tracks performance in relation to schedules, offers, and leads, with flags indicating whether 
+  the agent is involved in rental or sale contexts. The dataset is filtered by a specific date range and focuses solely on agents involved in visits.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  sk_agent_performance:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.id_agent_performance
+    description: Unique hash generated from the agent ID and reference date, used to identify agent performance records.
+  sk_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.id_agent
+    description: Unique identifier for the agent.
+  major_region_code:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.major_region_code
+    description: Code of the agent's primary macro region.
+  total_active_days:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_active_days
+    description: Total number of days the agent has been active.
+  total_active_days_in_current_context:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_active_days_in_current_context
+    description: Difference in days between the reference date and the agent's start date in the current context.
+  total_hours_available_by_contract:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_hours_available_by_contract
+    description: Total hours available for scheduling based on the agent's contract.
+  total_hours_allocation_available_by_schedule:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_hours_allocation_available_by_schedule
+    description: Total scheduled hours available for allocation, calculated from allocated slots.
+  total_supply_first_listing:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_supply_first_listing
+    description: Number of first listings (properties) added by the agent.
+  total_visit_booked:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_visit_booked
+    description: Total number of booked visits.
+  total_visit_booking_by_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_visit_booking_by_agent
+    description: Number of visits booked directly by the agent.
+  total_visit_completed:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_visit_completed
+    description: Number of completed visits.
+  total_booking_stalled:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_booking_stalled
+    description: Number of scheduled visits that did not progress—appointments that remain in "limbo," neither confirmed nor canceled.
+  total_booking_cancellation_by_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_booking_cancellation_by_agent
+    description: Total number of scheduled visits canceled due to the agent's responsibility.
+  total_visit_cancellation_by_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_visit_cancellation_by_agent
+    description: Total number of scheduled visits canceled due to the agent's responsibility.
+  total_booking_no_show_by_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_booking_no_show_by_agent
+    description: Number of scheduled visits where the agent did not show up.
+  total_offer_submitted:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_offer_submitted
+    description: Total number of submitted offers.
+  total_offer_approved:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_offer_approved
+    description: Total number of approved offers.
+  total_document_sent:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_document_sent
+    description: Number of documents sent for review.
+  total_credit_approved:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_credit_approved
+    description: Number of approved credits for offers.
+  total_contract_signed:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_contract_signed
+    description: Total number of signed contracts.
+  total_proposal_evaluation_started:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_proposal_evaluation_started
+    description: Total number of proposals that entered the evaluation phase.
+  total_leads:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_leads
+    description: Total distinct leads that interacted with the agent.
+  total_leads_with_three_or_more_confirmed_visits:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_leads_with_three_or_more_confirmed_visits
+    description: Number of leads who had at least three confirmed visits with the same agent.
+  total_lead_to_visit_booking:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_lead_to_visit_booking
+    description: Number of leads who progressed to the visit booking stage.
+  total_lead_to_visit_booking_by_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_lead_to_visit_booking_by_agent
+    description: Number of leads who had visits booked directly by the agent.
+  total_lead_to_visit_completed:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_lead_to_visit_completed
+    description: Number of leads who completed visits.
+  total_lead_to_offer_submitted:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_lead_to_offer_submitted
+    description: Number of leads who progressed to submitting an offer.
+  total_lead_to_offer_approved:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_lead_to_offer_approved
+    description: Number of leads whose offers were approved.
+  total_lead_to_document_sent:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_lead_to_document_sent
+    description: Number of leads whose documents were sent.
+  total_lead_to_credit_approved:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_lead_to_credit_approved
+    description: Number of leads with approved credit.
+  total_lead_to_contract_signed:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_lead_to_contract_signed
+    description: Number of leads who signed a purchase or rental contract.
+  total_lead_to_proposal_evaluation_started:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_lead_to_proposal_evaluation_started
+    description: Number of leads whose proposals entered evaluation.
+  total_leads_to_contract_signed_cohort_7_days:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.total_leads_to_contract_signed_cohort_7_days
+    description: Number of leads who signed a contract within 7 days after the first visit booking.
+  has_schedule_performance:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.has_schedule_performance
+    description: Boolean indicating if the agent has schedule performance data.
+  has_offer_performance:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.has_offer_performance
+    description: Boolean indicating if the agent has offer performance data.
+  has_lead_performance:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.has_lead_performance
+    description: Boolean indicating if the agent has lead performance data.
+  is_rent_agent:
+    description: This column returns TRUE if the business context is "RENT", meaning the agent is involved in rental-related activities.
+  is_sale_agent:
+    description: This column returns TRUE if the business context is "SALE", meaning the agent is involved in sale-related activities.
+  dt_reference:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.dt_reference
+    description: Reference date for evaluating agent performance.
+  year:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.year
+    description: Year corresponding to the reference date.
+  month:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.month
+    description: Month corresponding to the reference date.
+  day:
+    lineage:
+      - datalake_visit_agent_performance.agent_performance_daily_summary.day
+    description: Day corresponding to the reference date.
