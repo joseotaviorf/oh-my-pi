@@ -150,21 +150,13 @@ class RawDMSCDCWorkflow(BaseWorkflow):
         load_raw_task >> optimize_raw_task
 
         if self._check_include_sync_hive_tasks(raw_table_attributes_lower_case):
-            register_delta_table_raw_task = self.register_delta_table_task_creator.create_task(
-                raw_table_attributes_lower_case
-            )
-            load_raw_task >> register_delta_table_raw_task
             if self._check_include_propagate_metadata_task(raw_table_attributes):
                 propagate_table_lineage_raw_task = self.sync_metadata_task_creator.create_task(
                     raw_table_attributes, "--bypass-hive"
                 )
-                (
-                    register_delta_table_raw_task
-                    >> propagate_table_lineage_raw_task
-                    >> dag_final_tasks
-                )
+                (load_raw_task >> propagate_table_lineage_raw_task >> dag_final_tasks)
             else:
-                register_delta_table_raw_task >> dag_final_tasks
+                load_raw_task >> dag_final_tasks
 
         if self._check_include_data_quality_task(raw_table_attributes_lower_case):
             data_quality_tests_raw_task = self.data_quality_task_creator.create_task(
