@@ -17,6 +17,9 @@ workflow:
       extraction_type: incremental
       merge_on: [sk_agent_performance]
       z_order_by: [sk_agent, sk_agent_performance]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_13_3_med_general_2_workers_cluster
   databricks_conn_id: databricks_new
