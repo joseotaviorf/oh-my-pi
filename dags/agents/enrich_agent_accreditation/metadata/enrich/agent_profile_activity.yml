@@ -1,0 +1,48 @@
+---
+database_name: datalake_agent_accreditation
+table_name: agent_profile_activity
+description: |
+  Extends the historical profile data by incorporating the agent's activity status within the defined periods, 
+  breaking down intervals into active and inactive segments.
+  Additionally, it calculates the total number of days the agent was active within each context.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent_profile_activity:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.id_agent
+      - datalake_agent_accreditation.agent_registration_actions_log.agent_profile
+      - datalake_agent_accreditation.agent_registration_actions_log.dt_action
+    description: |
+      Unique identifier for the profile activity, generated using an XXHASH64 function 
+      based on the agent ID, profile, and start date.
+  id_agent:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.id_agent
+    description: Unique identifier of the agent associated with this profile activity.
+  id_user:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.id_user
+    description: Unique identifier of the agent user associated with this profile activity.
+  agent_profile:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.agent_profile
+    description: "Agent's performance profile"
+    categories:
+      Visit: Agents who are responsible for conducting property visits
+      Inspection: Agents responsible for conducting property inspections before the tenant moves into the property and after the end of the contract
+      Photo Session: Photographer agents responsible for taking photos of the properties that will be published
+      Quarterly Inspection: Outsourced agents who are responsible for conducting property visits
+      CheckUpLar: Agents responsible for performing/analyzing reported repairs to the properties
+  total_active_days:
+    description: Total number of days the agent was active within this profile, calculated as the difference between the first and last recorded active action.
+  dt_started:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.dt_action
+    description: "The earliest date when the agent's activity in this profile was recorded."
+  dt_ended:
+    lineage:
+      - datalake_agent_accreditation.agent_registration_actions_log.dt_action
+    description: "The latest date when the agent's activity in this profile was recorded."
+
+    

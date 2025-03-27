@@ -1,0 +1,60 @@
+---
+table_name: datalake_visit_agent_performance.agent_leads_performance
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_agent_performance:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_agent:
+    is_complete:
+      severity_level: Error
+  total_leads:
+    is_complete:
+      severity_level: Error
+  has_three_or_more_confirmed_visits_same_agent:
+    is_complete:
+      severity_level: Error
+  total_lead_to_visit_booking:
+    is_complete:
+      severity_level: Error
+  total_lead_to_visit_booking_by_agent:
+    is_complete:
+      severity_level: Error
+  total_lead_to_visit_completed:
+    is_complete:
+      severity_level: Error
+  total_lead_to_offer_submitted:
+    is_complete:
+      severity_level: Error
+  total_lead_to_offer_approved:
+    is_complete:
+      severity_level: Error
+  total_lead_to_document_sent:
+    is_complete:
+      severity_level: Error
+  total_lead_to_credit_approved:
+    is_complete:
+      severity_level: Error
+  total_lead_to_contract_signed:
+    is_complete:
+      severity_level: Error
+  total_lead_to_proposal_evaluation_started:
+    is_complete:
+      severity_level: Error
+  total_leads_to_contract_signed_cohort_7_days:
+    is_complete:
+      severity_level: Error
+  dt_reference:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

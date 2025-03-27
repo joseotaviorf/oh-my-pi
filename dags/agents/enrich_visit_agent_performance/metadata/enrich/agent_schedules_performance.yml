@@ -1,0 +1,67 @@
+---
+database_name: datalake_visit_agent_performance
+table_name: agent_schedules_performance
+description: |
+  The agent_schedules_performance table provides key performance metrics related to the scheduling and management of visits by agents, 
+  focusing on the agent's ability to book, complete, and manage visits in the context of real estate transactions. 
+  This table tracks the effectiveness and outcomes of visits managed by the agents over a specific period.
+
+  It includes various indicators that measure an agent's performance in terms of booking, cancellations, visit completion, and visit stalls, 
+  which are crucial for understanding their efficiency in handling leads and appointments. The table does not consider visits where the agent 
+  was the first touchpoint for the lead (as indicated by the filter on has_direct_first_touchpoint).
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent_performance:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_agent
+      - datalake_visit_agent_performance.agent_schedules.ts_created
+    description: Unique hash generated from the agent ID and reference date, used to identify agent performance records.
+  id_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_agent
+    description: Unique identifier for the agent.
+  total_visit_booked:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_booking
+    description: Total number of booked visits.
+  total_visit_booking_by_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_booking
+    description: Number of visits booked directly by the agent.
+  total_visit_completed:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_booking
+    description: Number of completed visits.
+  total_booking_stalled:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_booking
+    description: Number of scheduled visits that did not progress—appointments that remain in "limbo," neither confirmed nor canceled.
+  total_booking_cancellation_by_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_booking
+    description: Total number of scheduled visits canceled due to the agent's responsibility.
+  total_visit_cancellation_by_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_booking
+    description: Number of visits canceled by the agent.
+  total_booking_no_show_by_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_booking
+    description: Number of scheduled visits where the agent did not show up.
+  dt_reference:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.ts_created
+    description: Reference date for evaluating agent performance.
+  year:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.year
+    description: Year corresponding to the reference date.
+  month:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.month
+    description: Month corresponding to the reference date.
+  day:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.day
+    description: Day corresponding to the reference date.

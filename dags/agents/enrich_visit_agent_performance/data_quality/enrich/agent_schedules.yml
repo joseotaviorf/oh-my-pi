@@ -1,24 +1,33 @@
 ---
-table_name: datalake_agent_accreditation.business_context_activity
+table_name: datalake_visit_agent_performance.agent_schedules
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
-  id_business_context_activity:
+  id_agent_schedule:
     is_complete:
       severity_level: Error
     is_unique:
       severity_level: Error
   id_agent:
     is_complete:
-      severity_level: Error
-  business_context:
+      severity_level: Error  
+  id_booking:
     is_complete:
       severity_level: Error
-  total_active_days:
+  has_direct_first_touchpoint:
     is_complete:
       severity_level: Error
-  dt_started:
+  ts_updated:
     is_complete:
       severity_level: Error
-  dt_ended:
+  ts_created:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
     is_complete:
       severity_level: Error

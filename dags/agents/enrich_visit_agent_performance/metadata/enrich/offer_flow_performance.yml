@@ -1,0 +1,63 @@
+---
+database_name: datalake_visit_agent_performance
+table_name: offer_flow_performance
+description: |
+  The offer_flow_events_performance table tracks the performance of agents in managing offer-related events throughout the sales or rental process. 
+  It records various stages of the offer flow, from submission to contract signing, reflecting the agent's effectiveness in progressing leads through 
+  the stages of the offer process. The table excludes events where the agent was the first touchpoint for the lead, focusing only on the subsequent 
+  stages of the sales or rental process.
+
+  This table provides insight into how agents are performing in managing offers, from submission to finalization, and helps evaluate their role in advancing 
+  deals to completion.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent_performance:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_agent
+      - datalake_visit_agent_performance.offer_flow_events.ts_event
+    description: Unique hash generated from the agent ID and reference date, used to identify agent performance records.
+  id_agent:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_agent
+    description: Unique identifier for the agent.
+  total_offer_submitted:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_offer
+    description: Total number of submitted offers.
+  total_offer_approved:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_offer
+    description: Total number of approved offers.
+  total_document_sent:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_offer
+    description: Number of documents sent for review.
+  total_credit_approved:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_offer
+    description: Number of approved credits for offers.
+  total_contract_signed:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_offer
+    description: Total number of signed contracts.
+  total_proposal_evaluation_started:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_offer
+    description: Total number of proposals that entered the evaluation phase.
+  dt_reference:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.ts_event
+    description: Reference date for evaluating agent performance.
+  year:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.year
+    description: Year corresponding to the reference date.
+  month:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.month
+    description: Month corresponding to the reference date.
+  day:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.day
+    description: Day corresponding to the reference date.

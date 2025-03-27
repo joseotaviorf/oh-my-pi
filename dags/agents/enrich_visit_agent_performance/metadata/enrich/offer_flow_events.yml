@@ -1,0 +1,84 @@
+---
+database_name: datalake_visit_agent_performance
+table_name: offer_flow_events
+description: |
+  The offer_flow_events table tracks events related to offers made by agents in the sales or rental process. Each row represents a specific event in the offer flow, 
+  such as submission, approval, contract signing, and more. This table is useful for analyzing the progression of offers and understanding agent interactions in the 
+  deal process.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_offer_event:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_agent
+      - datalake_rent_demand_events.rent_demand_events.id_offer
+      - datalake_rent_demand_events.rent_demand_events.id_event_type
+      - datalake_sale_offer_flows.sale_offer_flows.id_user_agent
+      - datalake_sale_offer_flows.sale_offer_flows.id_offer
+    description: Unique identifier for the specific offer event.
+  id_user_agent:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_agent
+      - datalake_sale_offer_flows.sale_offer_flows.id_user_agent
+    description: "Unique identifier for the agent's user in the Admin/EBDB system."
+  id_agent:
+    lineage:
+      - datalake_ebdb_user.user.id_agent
+    description: Unique identifier for the agent associated with the event.
+  id_offer:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_offer
+      - datalake_sale_offer_flows.sale_offer_flows.id_offer
+    description: Unique identifier for the offer related to this event.
+  id_lead:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+      - datalake_sale_offer_flows.sale_offer_flows.id_buyer
+    description: Unique identifier for the lead (potential buyer/tenant) associated with the offer.
+  id_event_type:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_event_type
+    description: Numeric identifier representing the type of event in the offer flow.
+  event_type:
+    description: Description of the event type (e.g., "OFFER_SUBMITTED", "OFFER_APPROVED", "CONTRACT_SIGNED").
+    categories:
+      OFFER_SUBMITTED: Indicates that an offer was submitted by or for the lead/buyer (id_event_type = 3).
+      OFFER_APPROVED: The offer has been reviewed and approved by the system or the property owner (id_event_type = 4).
+      PROPOSAL_EVALUATION_STARTED: The evaluation of the proposal has begun, usually involving background checks or financial assessments (id_event_type = 5).
+      DOCUMENT_SENT: The required documents have been sent to the tenant/buyer for verification or contract purposes (id_event_type = 7).
+      CREDIT_APPROVED: The lead has passed the credit check process (id_event_type = 8).
+      CONTRACT_SIGNED: The contract has been signed by all necessary parties, finalizing the deal (id_event_type = 9).
+  business_context:
+    description: The business area in which the offer event occurred.
+  has_direct_first_touchpoint:
+    lineage:
+      - datalake_rent_flows.rent_flows.first_touchpoint
+    description: Boolean indicating whether the offer's first interaction with the lead was direct (i.e., the agent had a direct first touchpoint). Defaults to FALSE if not explicitly set.
+  ts_event:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
+      - datalake_sale_offer_flows.sale_offer_flows.ts_accepted
+      - datalake_sale_offer_flows.sale_offer_flows.ts_signed
+    description: Timestamp of when the event occurred.
+  year:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
+      - datalake_sale_offer_flows.sale_offer_flows.ts_accepted
+      - datalake_sale_offer_flows.sale_offer_flows.ts_signed
+    description: Year in which the event took place.
+  month:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
+      - datalake_sale_offer_flows.sale_offer_flows.ts_accepted
+      - datalake_sale_offer_flows.sale_offer_flows.ts_signed
+    description: Month in which the event took place.
+  day:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+      - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
+      - datalake_sale_offer_flows.sale_offer_flows.ts_accepted
+      - datalake_sale_offer_flows.sale_offer_flows.ts_signed
+    description: Day on which the event took place.

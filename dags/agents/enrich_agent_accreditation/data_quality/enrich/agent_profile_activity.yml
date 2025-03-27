@@ -1,5 +1,5 @@
 ---
-table_name: datalake_agent_accreditation.business_context_activity
+table_name: datalake_agent_accreditation.agent_profile_activity
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id_business_context_activity:
@@ -10,7 +10,7 @@ column_level_validations:
   id_agent:
     is_complete:
       severity_level: Error
-  business_context:
+  agent_profile:
     is_complete:
       severity_level: Error
   total_active_days:

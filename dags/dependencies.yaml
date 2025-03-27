@@ -3343,6 +3343,19 @@ bietlejuice.enrich_visit:
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
   - bietlejuice.insider:load-clean-review
+bietlejuice.enrich_visit_agent_performance:
+  - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
+  - bietlejuice.enrich_agenda_allocation:load-enrich-agenda-hourly-allocations
+  - bietlejuice.enrich_agent_accreditation:load-enrich-agent-major-region-code
+  - bietlejuice.enrich_agent_accreditation:load-enrich-agent-profile-activity
+  - bietlejuice.enrich_agent_accreditation:load-enrich-business-context-activity
+  - bietlejuice.enrich_booking:load-enrich-booking
+  - bietlejuice.enrich_booking:load-enrich-booking-cancellation
+  - bietlejuice.enrich_ebdb_user:load-enrich-user
+  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+  - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows
+  - bietlejuice.enrich_tiers:load-enrich-ciq-first-listing
 bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-contact
   - bietlejuice.wololo:load-clean-prospect

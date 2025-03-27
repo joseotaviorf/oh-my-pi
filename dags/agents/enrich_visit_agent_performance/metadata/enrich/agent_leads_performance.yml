@@ -1,0 +1,84 @@
+---
+database_name: datalake_visit_agent_performance
+table_name: agent_leads_performance
+description: |
+  The agent_leads_performance table focuses on conversion metrics of leads in the sales and rental funnels. 
+  It consolidates data about the lead's journey, from visit bookings to contract signing, allowing the evaluation of an agent's effectiveness in managing and converting leads.
+  This table is useful for tracking the performance of agents over time, analyzing their contribution to the progression of leads within the sales and rental funnels.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent_performance:
+    lineage:
+      - datalake_agent_accreditation.business_context_activity.id_agent
+      - datalake_quintoandar.aux_date.date
+    description: Unique hash generated from the agent ID and reference date, used to identify agent performance records.
+  id_agent:
+    lineage:
+      - datalake_agent_accreditation.business_context_activity.id_agent
+    description: Unique identifier for the agent.
+  total_leads:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_visitor
+      - datalake_visit_agent_performance.offer_flow_events.id_lead
+    description: Total distinct leads that interacted with the agent.
+  total_leads_with_three_or_more_confirmed_visits:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_visitor
+    description: Number of leads who had at least three confirmed visits with the same agent.
+  total_lead_to_visit_booking:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_visitor
+    description: Number of leads who progressed to the visit booking stage.
+  total_lead_to_visit_booking_by_agent:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_visitor
+    description: Number of leads who had visits booked directly by the agent.
+  total_lead_to_visit_completed:
+    lineage:
+      - datalake_visit_agent_performance.agent_schedules.id_visitor
+    description: Number of leads who completed visits.
+  total_lead_to_offer_submitted:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_lead
+    description: Number of leads who progressed to submitting an offer.
+  total_lead_to_offer_approved:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_lead
+    description: Number of leads whose offers were approved.
+  total_lead_to_document_sent:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_lead
+    description: Number of leads whose documents were sent.
+  total_lead_to_credit_approved:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_lead
+    description: Number of leads with approved credit.
+  total_lead_to_contract_signed:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_lead
+    description: Number of leads who signed a purchase or rental contract.
+  total_lead_to_proposal_evaluation_started:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_lead
+    description: Number of leads whose proposals entered evaluation.
+  total_leads_to_contract_signed_cohort_7_days:
+    lineage:
+      - datalake_visit_agent_performance.offer_flow_events.id_lead
+    description: Number of leads who signed a contract within 7 days after the first visit booking.
+  dt_reference:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+    description: Reference date for evaluating agent performance.
+  year:
+    lineage:
+      - datalake_quintoandar.aux_date.year
+    description: Year corresponding to the reference date.
+  month:
+    lineage:
+      - datalake_quintoandar.aux_date.month
+    description: Month corresponding to the reference date.
+  day:
+    lineage:
+      - datalake_quintoandar.aux_date.day
+    description: Day corresponding to the reference date.

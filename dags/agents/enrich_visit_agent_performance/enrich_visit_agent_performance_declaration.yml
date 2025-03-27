@@ -1,0 +1,57 @@
+---
+dag:
+  name: enrich_visit_agent_performance
+  schedule_start_date: 2020, 7, 1
+  owner: Data Agents
+  documentation:
+    dag_purpose: 
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  inner_dependencies:
+    agent_leads_performance:
+      - agent_schedules
+      - offer_flow_events
+    agent_performance_daily_summary:
+      - agent_leads_performance
+      - agent_schedules_performance
+      - offer_flow_performance
+    agent_schedules_performance:
+      - agent_schedules
+    offer_flow_performance:
+      - offer_flow_events
+  extra_query_template_params:
+      load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+      load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  tables_customization:
+    agent_leads_performance:
+      merge_on: [id_agent_performance]
+      z_order_by: [id_agent, dt_reference]
+    agent_performance_daily_summary:
+      merge_on: [id_agent_performance]
+      z_order_by: [id_agent, dt_reference]
+    agent_schedules_performance:
+      merge_on: [id_agent_performance]
+      z_order_by: [id_agent, dt_reference]
+    agent_schedules:
+      merge_on: [id_agent_schedule]
+      z_order_by: [id_agent, ts_created]
+    offer_flow_events:
+      merge_on: [id_offer_event]
+      z_order_by: [id_user_agent, ts_event]
+    offer_flow_performance:
+      merge_on: [id_agent_performance]
+      z_order_by: [id_agent, dt_reference]
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

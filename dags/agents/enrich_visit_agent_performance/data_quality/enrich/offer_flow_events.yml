@@ -1,0 +1,45 @@
+---
+table_name: datalake_visit_agent_performance.offer_flow_events
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_offer_event:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_user_agent:
+    is_complete:
+      severity_level: Error  
+  id_agent:
+    is_complete:
+      severity_level: Error  
+  id_offer:
+    is_complete:
+      severity_level: Error
+  id_lead:
+    is_complete:
+      severity_level: Error
+  id_event_type:
+    is_complete:
+      severity_level: Error
+  event_type:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+  has_direct_first_touchpoint:
+    is_complete:
+      severity_level: Error
+  ts_event:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

@@ -1,0 +1,66 @@
+---
+database_name: datalake_visit_agent_performance
+table_name: agent_schedules
+description: |
+  The agent_schedules table contains information about visit bookings managed by agents, including details on cancellations, booking status, and confirmed consecutive visits. 
+  It also indicates whether the agent was responsible for scheduling the visit and whether there was a direct first touchpoint in the rental flow.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent_schedule:
+    lineage:
+      - datalake_booking.booking.id_agent
+      - datalake_booking.booking.id
+    description: Unique identifier for the agent's schedule, generated using a hash combining id_agent and id_booking.
+  id_agent:
+    lineage:
+      - datalake_booking.booking.id_agent
+    description: Unique identifier of the agent responsible for the visit.
+  id_booking:
+    lineage:
+      - datalake_booking.booking.id
+    description: Unique identifier for the visit booking.
+  id_visit:
+    lineage:
+      - datalake_booking.booking.id_visit
+    description: Unique identifier of the visit associated with the booking.
+  id_lead:
+    lineage:
+      - datalake_booking.booking.id_visitor
+    description: Identifier of the lead (visitor) who made the booking.
+  is_booking_cancellation_by_agent:
+    description: Indicates whether the booking was canceled by the agent (TRUE if canceled by the agent, FALSE otherwise).
+  is_visit_cancellation_by_agent:
+    description: Indicates whether the visit was canceled directly by the agent (TRUE if yes, FALSE otherwise).
+  is_visit_booking_by_agent:
+    description: Indicates whether the agent was responsible for scheduling the visit (TRUE if yes, FALSE otherwise).
+  is_booking_stalled:
+    description: Indicates whether the booking was stalled, meaning it was neither confirmed nor canceled (TRUE for stalled bookings, FALSE otherwise).
+  is_visit_completed:
+    lineage:
+      - datalake_booking.booking.is_visit_completed
+    description: Indicates whether the visit was completed (TRUE if yes, FALSE otherwise).
+  has_three_or_more_confirmed_visits_same_agent:
+    description: Indicates whether the lead had at least three confirmed visits with the same agent within a 28-day period (TRUE if yes, FALSE otherwise).
+  has_direct_first_touchpoint:
+    description: Indicates whether the lead's first touchpoint in the rental flow was direct (TRUE for direct contact, FALSE otherwise).
+  ts_updated:
+    lineage:
+      - datalake_booking.booking.ts_updated
+    description: Timestamp of the last update to the booking.
+  ts_created:
+    lineage:
+      - datalake_booking.booking.ts_created
+    description: Timestamp of the booking creation.
+  year:
+    lineage:
+      - datalake_booking.booking.ts_created
+    description: Year when the booking was created.
+  month:
+    lineage:
+      - datalake_booking.booking.ts_created
+    description: Month when the booking was created.
+  day:
+    lineage:
+      - datalake_booking.booking.ts_created
+    description: Day when the booking was created.

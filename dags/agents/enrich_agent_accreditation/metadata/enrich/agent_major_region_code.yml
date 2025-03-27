@@ -5,13 +5,15 @@ description: |
   Stores the dominant region code for an agent during specific time periods, based on the number of associated regions. 
   The majority region code is determined by comparing the number of regions linked to each region code and selecting the one with the highest coverage. 
   This dataset allows tracking how an agent's primary area of operation changes over time.
+
+  Note: While the dataset defines intervals in which an agent is associated with a dominant region code, 
+  the region data does not account for the agent's activation and deactivation periods.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id_major_region_code:
     lineage:
       - datalake_ebdb_clean.agent_region_data_aud.id_agent_data
-      - datalake_region.region.region_code
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Unique identifier for the agent’s majority region code record, generated using an XXHASH64 function based on agent ID, region code, and start date.
   id_agent:
@@ -24,11 +26,11 @@ columns:
     description: Represents the region code with the highest number of associated regions for the agent during a specific period.
   total_active_days:
     description: Total number of days during which this region code was the agent’s majority region.
-  dt_started:
+  ts_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: The earliest date when this region code was the majority for the agent.
-  dt_ended:
+  ts_ended:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
     description: The latest date when this region code was the majority for the agent.

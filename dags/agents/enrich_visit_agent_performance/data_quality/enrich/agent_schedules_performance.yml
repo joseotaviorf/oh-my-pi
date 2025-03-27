@@ -1,0 +1,45 @@
+---
+table_name: datalake_visit_agent_performance.agent_schedules_performance
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_agent_performance:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_agent:
+    is_complete:
+      severity_level: Error
+  total_visit_booked:
+    is_complete:
+      severity_level: Error
+  total_visit_booking_by_agent:
+    is_complete:
+      severity_level: Error
+  total_visit_completed:
+    is_complete:
+      severity_level: Error
+  total_booking_stalled:
+    is_complete:
+      severity_level: Error
+  total_booking_cancellation_by_agent:
+    is_complete:
+      severity_level: Error
+  total_visit_cancellation_by_agent:
+    is_complete:
+      severity_level: Error
+  total_booking_no_show_by_agent:
+    is_complete:
+      severity_level: Error
+  dt_reference:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

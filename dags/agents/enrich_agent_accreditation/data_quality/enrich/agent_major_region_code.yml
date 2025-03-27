@@ -13,6 +13,6 @@ column_level_validations:
   major_region_code:
     is_complete:
       severity_level: Error
-  dt_started:
+  ts_started:
     is_complete:
       severity_level: Error
