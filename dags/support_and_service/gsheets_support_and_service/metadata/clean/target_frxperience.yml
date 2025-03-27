@@ -1,0 +1,27 @@
+database_name: datalake_gsheets_clean
+table_name: target_frxperience
+columns:
+  birdie_opportunity:
+    lineage:
+      - datalake_gsheets_raw.target_frxperience.birdie_opportunity
+  top_offender:
+    lineage:
+      - datalake_gsheets_raw.target_frxperience.top_offender
+  client_type:
+    lineage:
+      - datalake_gsheets_raw.target_frxperience.client_type
+  metric_name:
+    lineage:
+      - datalake_gsheets_raw.target_frxperience.metric_name
+  target:
+    lineage:
+      - datalake_gsheets_raw.target_frxperience.value
+  metric_type:
+    lineage:
+      - datalake_gsheets_raw.target_frxperience.metric_type
+  quarter:
+    lineage:
+      - datalake_gsheets_raw.target_frxperience.quarter
+  dt_target:
+    lineage:
+      - datalake_gsheets_raw.target_frxperience.date_ref
