@@ -98,6 +98,26 @@ all_events AS (
   FROM
     comm
 ),
+cm_status AS (
+  SELECT
+    id_contract,
+    action_type,
+    LEAD(action_type) OVER(PARTITION BY id_contract ORDER BY ts_updated) AS next_action_type,
+    ts_updated AS ts_status_started,
+    LEAD(ts_updated) OVER(PARTITION BY id_contract ORDER BY ts_updated) AS ts_status_ended
+  FROM
+    datalake_condominium_payments_clean.condo_monitoring_actions_aud
+),
+cm_active_ts AS (
+  SELECT
+    id_contract,
+    ts_status_started,
+    ts_status_ended
+  FROM
+    cm_status
+  WHERE
+    action_type = 'ACTIVATED'
+),
 events AS (
   SELECT
     e.id_contract,
@@ -110,6 +130,7 @@ events AS (
     e.source,
     e.event_name,
     ROW_NUMBER() OVER(PARTITION BY e.id_contract, DATE(e.ts_event) ORDER BY e.ts_event) AS event_number,
+    cm_active.id_contract IS NOT NULL AS was_condo_monitoring_active,
     DATE_FORMAT(e.ts_event, "yyyyMMdd") AS dt_event,
     e.ts_event
   FROM
@@ -129,6 +150,11 @@ events AS (
   LEFT JOIN
     datalake_ebdb_clean.user AS u_tenant
       ON c.id_user = u_tenant.id
+  LEFT JOIN
+    cm_active_ts AS cm_active
+      ON e.id_contract = cm_active.id_contract
+      AND e.ts_event >= cm_active.ts_status_started
+      AND e.ts_event < COALESCE(cm_active.ts_status_ended, NOW())
 )
 SELECT
   BIGINT(CONCAT(id_contract, dt_event, '00', event_number)) AS id_condo_monitoring_event,
@@ -141,6 +167,7 @@ SELECT
   uuid_tenant,
   source,
   event_name,
+  was_condo_monitoring_active,
   ts_event
 FROM
   events
