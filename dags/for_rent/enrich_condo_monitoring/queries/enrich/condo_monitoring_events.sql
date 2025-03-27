@@ -9,7 +9,7 @@ WITH cm_actions AS (
 non_payment_report AS (
   SELECT
     npr.id_contract,
-    'NON PAYMENT REPORT' AS event_name,
+    'NON_PAYMENT_REPORT' AS event_name,
     npr.ts_updated AS ts_event
   FROM
     datalake_condominium_payments_clean.non_payment_report AS npr
@@ -18,10 +18,10 @@ non_payment_report AS (
       ON npr.id_contract = cma.id_contract
       AND npr.expense_type = 'P'
 ),
-elegibility AS (
+eligibility AS (
   SELECT
     id_contract,
-    IF(eligibility, 'ELEGIBLE', NULL) AS event_name,
+    IF(eligibility, 'ELIGIBLE', NULL) AS event_name,
     ts_updated AS ts_event
   FROM
     datalake_condominium_payments_clean.condo_monitoring_eligibility_aud
@@ -47,7 +47,7 @@ comm AS(
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice, status ORDER BY ts_sent) = 1
 ),
-events AS (
+all_events AS (
   SELECT
     id_contract,
     NULL AS id_invoice,
@@ -58,25 +58,25 @@ events AS (
   FROM
     cm_actions
   UNION ALL
-    SELECT
-      id_contract,
-      NULL AS id_invoice,
-      NULL AS id_communication,
-      "NON_PAYMENT_REPORT" AS source,
-      event_name,
-      ts_event
-    FROM
-      non_payment_report
+  SELECT
+    id_contract,
+    NULL AS id_invoice,
+    NULL AS id_communication,
+    "NON_PAYMENT_REPORT" AS source,
+    event_name,
+    ts_event
+  FROM
+    non_payment_report
   UNION ALL
   SELECT
     id_contract,
     NULL AS id_invoice,
     NULL AS id_communication,
-    "ELEGIBILITY" AS source,
+    "ELIGIBILITY" AS source,
     event_name,
     ts_event
   FROM
-    elegibility
+    eligibility
   UNION ALL
   SELECT
     id_contract,
@@ -97,33 +97,50 @@ events AS (
     ts_event
   FROM
     comm
+),
+events AS (
+  SELECT
+    e.id_contract,
+    e.id_invoice,
+    e.id_communication,
+    lc.id_house_listing,
+    lc.id_house,
+    u_owner.uuid_person AS uuid_owner,
+    u_tenant.uuid_person AS uuid_tenant,
+    e.source,
+    e.event_name,
+    ROW_NUMBER() OVER(PARTITION BY e.id_contract, DATE(e.ts_event) ORDER BY e.ts_event) AS event_number,
+    DATE_FORMAT(e.ts_event, "yyyyMMdd") AS dt_event,
+    e.ts_event
+  FROM
+    all_events AS e
+  LEFT JOIN
+    datalake_listing_contracts.listing_contracts AS lc
+      ON e.id_contract = lc.id_contract
+  LEFT JOIN
+    datalake_ebdb_clean.house AS h
+      ON lc.id_house = h.id
+  LEFT JOIN
+    datalake_ebdb_clean.user AS u_owner
+      ON h.id_user = u_owner.id
+  LEFT JOIN
+    datalake_ebdb_clean.contract AS c
+      ON e.id_contract = c.id
+  LEFT JOIN
+    datalake_ebdb_clean.user AS u_tenant
+      ON c.id_user = u_tenant.id
 )
-
 SELECT
-  e.id_contract,
-  e.id_invoice,
-  e.id_communication,
-  lc.id_house_listing,
-  lc.id_house,
-  u_owner.uuid_person AS uuid_owner,
-  u_tenant.uuid_person AS uuid_tenant,
-  e.source,
-  e.event_name,
-  e.ts_event
+  BIGINT(CONCAT(id_contract, dt_event, '00', event_number)) AS id_condo_monitoring_event,
+  id_contract,
+  id_invoice,
+  id_communication,
+  id_house_listing,
+  id_house,
+  uuid_owner,
+  uuid_tenant,
+  source,
+  event_name,
+  ts_event
 FROM
-  events AS e
-LEFT JOIN
-  datalake_listing_contracts.listing_contracts AS lc
-    ON e.id_contract = lc.id_contract
-LEFT JOIN
-  datalake_ebdb_clean.house AS h
-    ON lc.id_house = h.id
-LEFT JOIN
-  datalake_ebdb_clean.user AS u_owner
-    ON h.id_user = u_owner.id
-LEFT JOIN
-  datalake_ebdb_clean.contract AS c
-    ON e.id_contract = c.id
-LEFT JOIN
-  datalake_ebdb_clean.user AS u_tenant
-    ON c.id_user = u_tenant.id
+  events
