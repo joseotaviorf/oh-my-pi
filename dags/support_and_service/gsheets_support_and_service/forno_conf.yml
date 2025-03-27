@@ -165,8 +165,3 @@ sheets_info:
     clean_table_name: manual_kpis_polygon
     sheet_context: support_and_service
 
-  target_frxperience:
-    sheet_id: 15VVj5Wm2IkFzvGFRrAec4jg_DXgPxC5tXpR5FXGCPMU
-    sheet_name: FRXperience targets
-    clean_table_name: target_frxperience
-    sheet_context: support_and_service
