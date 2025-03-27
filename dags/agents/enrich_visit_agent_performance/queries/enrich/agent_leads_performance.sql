@@ -22,7 +22,6 @@ WITH all_leads AS (
 SELECT /*+ RANGE_JOIN(ac, 1500) */ 
     XXHASH64(ac.id_agent, ad.date) AS id_agent_performance,
     ac.id_agent,
-    -- SIZE(ARRAY_DISTINCT(FILTER(ARRAY(ags.id_lead, ofe.id_lead), x -> x IS NOT NULL))) AS total_leads,
     COALESCE(COUNT(DISTINCT al.id_lead), 0) AS total_leads,
     COALESCE(COUNT(DISTINCT ags.id_lead) FILTER (WHERE ags.has_three_or_more_confirmed_visits_same_agent IS TRUE), 0) AS total_leads_with_three_or_more_confirmed_visits,
     COALESCE(COUNT(DISTINCT ags.id_lead), 0) AS total_lead_to_visit_booking,

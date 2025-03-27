@@ -21,7 +21,8 @@ WITH booking AS (
             ON bc.id_booking = b.id
     WHERE
         b.id_agent IS NOT NULL
-        AND DATE(b.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND b.ts_created IS NOT NULL
+        AND DATE(COALESCE(b.ts_updated, b.ts_created)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 consecutive_confirmed_visits AS (
     SELECT
@@ -58,7 +59,7 @@ SELECT
     b.is_booking_stalled,
     b.is_visit_completed,
     cv.total_consecutive_confirmed_visits >= 3 AS has_three_or_more_confirmed_visits_same_agent,
-    rf.has_direct_first_touchpoint,
+    COALESCE(rf.has_direct_first_touchpoint, FALSE) AS has_direct_first_touchpoint,
     b.ts_updated,
     b.ts_created,
     YEAR(b.ts_created) AS year,

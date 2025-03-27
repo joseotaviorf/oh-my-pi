@@ -10,12 +10,6 @@ column_level_validations:
   id_agent:
     is_complete:
       severity_level: Error  
-  total_hours_available_by_contract:
-    is_complete:
-      severity_level: Error
-  total_hours_allocation_available_by_schedule:
-    is_complete:
-      severity_level: Error
   total_offer_submitted:
     is_complete:
       severity_level: Error

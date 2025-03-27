@@ -13,7 +13,7 @@ column_level_validations:
   total_leads:
     is_complete:
       severity_level: Error
-  has_three_or_more_confirmed_visits_same_agent:
+  total_leads_with_three_or_more_confirmed_visits:
     is_complete:
       severity_level: Error
   total_lead_to_visit_booking:

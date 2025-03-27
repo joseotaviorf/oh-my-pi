@@ -91,7 +91,7 @@ SELECT
     ue.id_event_type,
     ue.event_type,
     ue.business_context,
-    rf.has_direct_first_touchpoint,
+    COALESCE(rf.has_direct_first_touchpoint, FALSE) AS has_direct_first_touchpoint,
     ue.ts_event,
     ue.year,
     ue.month,
@@ -104,3 +104,5 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_user.user AS u
         ON u.id = ue.id_user_agent
+WHERE
+    ue.ts_event IS NOT NULL
