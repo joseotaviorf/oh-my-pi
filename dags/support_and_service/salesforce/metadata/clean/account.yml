@@ -180,10 +180,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.account.Site
     description: Site location of the account.
-  system_mod_stamp:
-    lineage:
-      - datalake_salesforce_raw.account.SystemModstamp
-    description: System modification timestamp.
   source_system_identifier:
     lineage:
       - datalake_salesforce_raw.account.SourceSystemIdentifier
@@ -212,6 +208,10 @@ columns:
     lineage:
       - datalake_salesforce_raw.account.IsPriorityRecord
     description: Flag indicating if the account is a priority record.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.account.SystemModstamp
+    description: System modification timestamp.
   ts_created:
     lineage:
       - datalake_salesforce_raw.account.CreatedDate

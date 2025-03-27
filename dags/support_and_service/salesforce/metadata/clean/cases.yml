@@ -1,5 +1,5 @@
 database_name: datalake_salesforce_clean
-table_name: case
+table_name: cases
 description: Clean table for ingesting cases data from the Sales Force tool.
 domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
@@ -76,7 +76,7 @@ columns:
     lineage:
       - datalake_salesforce_raw.case.ServiceContractId
     description: Service contract identification key.
-  zendesk_id:
+  id_zendesk:
     lineage:
       - datalake_salesforce_raw.case.ZendeskId
     description: Zendesk case identification key.
@@ -164,6 +164,10 @@ columns:
     lineage:
       - datalake_salesforce_raw.case.IsEscalated
     description: Flag indicating if the case is escalated.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.case.SystemModstamp
+    description: Date of modification in the system.
   ts_created:
     lineage:
       - datalake_salesforce_raw.case.CreatedDate

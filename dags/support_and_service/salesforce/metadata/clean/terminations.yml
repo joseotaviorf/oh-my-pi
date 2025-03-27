@@ -137,10 +137,14 @@ columns:
     lineage:
       - datalake_salesforce_raw.terminations.RepairsContestedByTenant__c
     description: Identifies if the tenant contested the repairs.
-  success_contract_iq:
+  success_contact_iq:
     lineage:
       - datalake_salesforce_raw.terminations.SuccesContactIQ__c
     description: Success status of contract IQ process.
+  success_contact_pp:
+    lineage:
+      - datalake_salesforce_raw.terminations.SuccesContactPP__c
+    description: Success status of contract PP process.
   termination_in_first_year:
     lineage:
       - datalake_salesforce_raw.terminations.TerminationInFirstYear__c
@@ -165,7 +169,7 @@ columns:
     lineage:
       - datalake_salesforce_raw.terminations.LastModifiedDate
     description: Timestamp of the last modification.
-  system_mod_stamp:
+  ts_system_mod:
     lineage:
       - datalake_salesforce_raw.terminations.SystemModstamp
     description: System modification timestamp.

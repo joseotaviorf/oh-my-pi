@@ -56,7 +56,7 @@ columns:
     lineage:
       - datalake_salesforce_raw.checklist.LastModifiedDate
     description: Timestamp of the last modification of the checklist.
-  system_mod_stamp:
+  ts_system_mod:
     lineage:
       - datalake_salesforce_raw.checklist.SystemModstamp
     description: System modification timestamp.

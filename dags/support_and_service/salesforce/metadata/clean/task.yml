@@ -124,10 +124,6 @@ columns:
     lineage:
       - datalake_salesforce_raw.task.CaseAccount
     description: Account associated with the case.
-  answer:
-    lineage:
-      - datalake_salesforce_raw.task.Answer
-    description: Response associated with the task.
   observation:
     lineage:
       - datalake_salesforce_raw.task.Observation
@@ -136,6 +132,10 @@ columns:
     lineage:
       - datalake_salesforce_raw.task.DelayMessage
     description: Message related to task delay.
+  is_answer:
+    lineage:
+      - datalake_salesforce_raw.task.Answer
+    description: Response associated with the task.
   is_high_priority:
     lineage:
       - datalake_salesforce_raw.task.IsHighPriority
@@ -192,3 +192,7 @@ columns:
     lineage:
       - datalake_salesforce_raw.task.RecurrenceEndDateOnly
     description: End date of the recurrence.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.task.SystemModstamp
+    description: System modification timestamp.

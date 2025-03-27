@@ -261,7 +261,7 @@ def schema_define():
                         ]
                     )
             },
-       'case':
+       'cases':
             {
                 'schema':
                     StructType(

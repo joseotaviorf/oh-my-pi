@@ -36,7 +36,7 @@ columns:
     lineage:
       - datalake_salesforce_raw.contract.IsDeleted
     description: Indicates whether the contract record is deleted.
-  system_mod_stamp:
+  ts_system_mod:
     lineage:
       - datalake_salesforce_raw.contract.SystemModstamp
     description: System modification timestamp.
