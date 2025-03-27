@@ -15,34 +15,20 @@ workflow:
   tables_customization:
     ContaCorrente:
       clean_table_name: account
-      get_table_metrics:
-        count: '*'
     OperacaoContaCorrente:
       clean_table_name: account_transaction
-      get_table_metrics:
-        count: '*'
     Banco:
       clean_table_name: bank
-      get_table_metrics:
-        count: '*'
     BankAccountValidation:
       clean_table_name: bank_account_validation
-      get_table_metrics:
-        count: '*'
     BypassTerm:
       clean_table_name: bypass_term
       clean_primary_keys: ["id"]
-      get_table_metrics:
-        count: '*'
     BypassTerm_AUD:
       clean_table_name: bypass_term_aud
       clean_primary_keys: ["id", "rev"]
-      get_table_metrics:
-        count: '*'
     FinancialData:
       clean_table_name: financial_data
-      get_table_metrics:
-        count: '*'
 cluster:
   type: custom_cluster
   custom_configurations:
