@@ -1,0 +1,48 @@
+database_name: dw_rent
+table_name: fact_contracts
+description: Table with the metrics related to the contracts in QuintoAndar and also with the SKs that are related to it.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  sk_contract:
+    lineage:
+      - datalake_ebdb_contract.contract.id
+    description: Key of the contract, which must be unique.
+  sk_proposal:
+    lineage:
+      - datalake_ebdb_contract.contract.id_proposal
+    description: Key of the proposal related to the contract.
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+    description: Key of the house listing related to the contract.
+  sk_house:
+    lineage:
+      - datalake_ebdb_contract.contract.id_house
+    description: Key of the house related to the contract.
+  country_code:
+    lineage:
+      - datalake_ebdb_contract.contract.country_code
+    description: Country code of the contract. Also, this column is a partition of this table.
+  total_condo_monitoring_invite_sent:
+    description: Number of invites sent to the user to activate the Condo Monitoring.
+  days_to_activate_condo_monitoring:
+    description: Number of days to activate the Condo Monitoring for the first time after the first invite.
+  total_non_payment_report:
+    description: Number of non payment reports sent by the user.
+  total_non_payment_report_before_first_invite:
+    description: Number of non payment reports sent by the user before the first invite for the Condo Monitoring.
+  total_non_payment_report_after_first_invite:
+    description: Number of non payment reports sent by the user after the first invite for the Condo Monitoring.
+  total_non_payment_report_before_first_activation:
+    description: Number of non payment reports sent by the user before the first activation on Condo Monitoring.
+  total_non_payment_report_after_first_activation:
+    description: Number of non payment reports sent by the user after the first activation on Condo Monitoring.
+  total_non_payment_report_while_active:
+    description: Number of non payment reports sent by the user while the Condo Monitoring is active for the respective contract.
+  total_non_payment_report_while_inactive:
+    description:
+      Number of non payment reports sent by the user while the Condo Monitoring is inactive for the respective contract.
+      If the contract is not eligible for the Condo Monitoring, the count of the non payment reports will be considered as well.
+  ts_load:
+    description: Timestamp in which the register was loaded in database.

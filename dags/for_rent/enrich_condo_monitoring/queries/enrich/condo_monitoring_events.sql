@@ -121,8 +121,8 @@ events AS (
     e.id_contract,
     e.id_invoice,
     e.id_communication,
-    lc.id_house_listing,
-    lc.id_house,
+    hl.id_house_listing,
+    hl.id_house,
     u_owner.uuid_person AS uuid_owner,
     u_tenant.uuid_person AS uuid_tenant,
     e.source,
@@ -134,11 +134,11 @@ events AS (
   FROM
     all_events AS e
   LEFT JOIN
-    datalake_listing_contracts.listing_contracts AS lc
-      ON e.id_contract = lc.id_contract
+    datalake_ebdb_listing.house_listing AS hl
+      ON e.id_contract = hl.id_contract
   LEFT JOIN
     datalake_ebdb_clean.house AS h
-      ON lc.id_house = h.id
+      ON hl.id_house = h.id
   LEFT JOIN
     datalake_ebdb_clean.user AS u_owner
       ON h.id_user = u_owner.id

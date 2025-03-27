@@ -236,11 +236,15 @@ bietlejuice.dw_condo_monitoring:
   - bietlejuice.enrich_condo_monitoring:load-enrich-condo-monitoring-events
   - bietlejuice.enrich_condo_monitoring:load-enrich-invoice
 bietlejuice.dw_contract:
+  - bietlejuice.condominium_payments:load-clean-non-payment-report
   - bietlejuice.enrich_b2b:load-enrich-house-listing
+  - bietlejuice.enrich_condo_monitoring:load-enrich-communication
+  - bietlejuice.enrich_condo_monitoring:load-enrich-condo-monitoring-events
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-b2b
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_ebdb_contract:load-enrich-ongoing-contracts
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_terminator:load-enrich-termination
 bietlejuice.dw_credit_analysis:
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report
@@ -1403,7 +1407,7 @@ bietlejuice.enrich_condo_monitoring:
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_user:load-clean-user
-  - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.jaiminho:load-clean-user-notifications
 bietlejuice.enrich_consolidated_growth_metrics:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns

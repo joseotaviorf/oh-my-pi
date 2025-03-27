@@ -38,11 +38,11 @@ columns:
     description: ID of the communication sent to the user.
   id_house_listing:
     lineage:
-      - datalake_listing_contracts.listing_contracts.id_house_listing
+      - datalake_ebdb_listing.house_listing.id_house_listing
     description: ID of the house listing associated to the contract.
   id_house:
     lineage:
-      - datalake_listing_contracts.listing_contracts.id_house
+      - datalake_ebdb_listing.house_listing.id_house
     description: ID of the house associated to the contract.
   uuid_owner:
     lineage:
