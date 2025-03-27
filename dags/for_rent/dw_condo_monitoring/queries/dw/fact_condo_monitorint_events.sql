@@ -18,6 +18,7 @@ event_numbered AS (
 )
 
 SELECT
+  cme.id_condo_monitoring_event AS sk_condo_monitoring_event,
   cme.id_contract AS sk_contract,
   COALESCE(cme.id_invoice, -1) AS sk_invoice,
   COALESCE(cme.id_communication, -1) AS sk_communication,

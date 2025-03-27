@@ -4,6 +4,12 @@ description: Fact table containing the events from Condo Monitoring.
 domain: For Rent
 owner: kleber.inoue@quintoandar.com.br
 columns:
+  sk_condo_monitoring_event:
+    lineage:
+      - datalake_condo_monitoring.condo_monitoring_events.id_condo_monitoring_event
+    description:
+      Key of the event in this table. It's not related to any product.
+      It's the concatenation of the id_contract, with the event date in yyyyMMdd format, followed by two zero (00) and then the number of the event of the contract in the day.
   sk_contract:
     lineage:
       - datalake_condo_monitoring.condo_monitoring_events.id_contract
