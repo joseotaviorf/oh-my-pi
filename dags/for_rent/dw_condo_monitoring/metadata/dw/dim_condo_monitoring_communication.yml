@@ -7,7 +7,7 @@ columns:
   sk_communication:
     lineage:
       - datalake_condo_monitoring.communication.id_communication
-    description: key of smartprice
+    description: Key of the communication.
   communication_type:
     lineage:
       - datalake_condo_monitoring.communication.communication_type
@@ -23,6 +23,10 @@ columns:
     lineage:
       - datalake_condo_monitoring.communication.entity_name
     description: Entity name of the communication in Jaiminho.
+  channel:
+    lineage:
+      - datalake_condo_monitoring.communication.channel
+    description: Channel of the communication that was sent to the user.
   was_delivered:
     lineage:
       - datalake_condo_monitoring.communication.was_delivered

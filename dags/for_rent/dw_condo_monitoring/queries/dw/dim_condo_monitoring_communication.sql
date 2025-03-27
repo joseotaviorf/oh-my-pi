@@ -3,6 +3,7 @@ SELECT
   communication_type,
   status,
   entity_name,
+  channel,
   was_delivered,
   was_comm_sent_on_time,
   ts_sent,

@@ -38,6 +38,10 @@ columns:
     lineage:
       - datalake_jaiminho_clean.user_notifications.entity_name
     description: Entity name of the notification.
+  channel:
+    lineage:
+      - datalake_jaiminho_clean.user_notifications.channel
+    description: Channel of the notification that was sent to the user.
   was_delivered:
     description: Boolean flag to check if the notification was delivered.
   ts_sent:

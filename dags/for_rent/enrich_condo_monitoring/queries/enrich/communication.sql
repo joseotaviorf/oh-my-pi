@@ -14,6 +14,7 @@ jaiminho AS (
     un.status,
     un.entity_name,
     un.status IN ('read', 'delivered') AS was_delivered,
+    un.channel,
     un.ts_sent,
     DATE(REGEXP_EXTRACT(un.id_entity, r'(\d{{4}}-\d{{2}}-\d{{2}})')) AS dt_due,
     un.year,
@@ -42,6 +43,7 @@ jaiminho AS (
     j.communication_type,
     j.status,
     j.entity_name,
+    j.channel,
     j.was_delivered,
     CASE
       WHEN j.communication_type = 'INVITE' THEN NULL

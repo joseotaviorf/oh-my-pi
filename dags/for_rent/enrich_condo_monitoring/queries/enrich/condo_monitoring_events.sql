@@ -44,8 +44,6 @@ comm AS(
     ts_sent AS ts_event
   FROM
     datalake_condo_monitoring.communication
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice, status ORDER BY ts_sent) = 1
 ),
 all_events AS (
   SELECT
