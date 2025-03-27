@@ -6,15 +6,6 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: payment_snapshot
-  inner_dependencies:
-    quintocred_aging_occurrence:
-      - quintocred_ifrs_occurrence
-    quintocred_aging_recurring_payment_no_renewal:
-      - quintocred_ifrs_recurring_payment
-    quintocred_aging_recurring_payment_renewal:
-      - quintocred_ifrs_recurring_payment
-    quintocred_bad_debt:
-      - quintocred_ifrs_recurring_payment
   default_partitions: ["year", "month", "day"]
   default_extraction_type: incremental
   has_load_to_redshift_task: false
@@ -29,22 +20,6 @@ workflow:
       custom_schema: payment_snapshot
     dim_contract_snapshot:
       custom_schema: public_snapshot
-    quintocred_ifrs_occurrence:
-      custom_schema: fintech_auditing
-    quintocred_ifrs_recurring_payment:
-      custom_schema: fintech_auditing
-    quintocred_aging_occurrence:
-      custom_schema: fintech_auditing
-    quintocred_aging_recurring_payment_no_renewal:
-      custom_schema: fintech_auditing
-    quintocred_aging_recurring_payment_renewal:
-      custom_schema: fintech_auditing
-    quintocred_payment_full:
-      custom_schema: fintech_auditing
-    quintocred_bad_debt:
-      custom_schema: fintech_auditing
-      extraction_type: full
-      partitions: []
 cluster:
   type: databricks_12_2_med_general_photon_cluster
   access_control_list:
