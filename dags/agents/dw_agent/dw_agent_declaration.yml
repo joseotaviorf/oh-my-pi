@@ -16,7 +16,7 @@ workflow:
       partitions: [year, month, day]
       extraction_type: incremental
       merge_on: [sk_agent_performance]
-      z_order_by: [sk_agent, business_context]
+      z_order_by: [sk_agent, sk_agent_performance]
 cluster:
   type: databricks_13_3_med_general_2_workers_cluster
   databricks_conn_id: databricks_new
