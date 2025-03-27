@@ -30,7 +30,8 @@ workflow:
       z_order_by: [id_agent, dt_reference]
     agent_performance_daily_summary:
       merge_on: [id_agent_performance]
-      z_order_by: [id_agent, dt_reference]
+      z_order_by: [id_agent, business_context]
+      partitions: [year, month, day]
     agent_schedules_performance:
       merge_on: [id_agent_performance]
       z_order_by: [id_agent, dt_reference]
