@@ -1,25 +1,20 @@
 WITH
 terminated_employees AS (
   SELECT
-    wr.PeriodOfServiceId AS id_period_of_service,
-    a.AssignmentNumber AS assignment_number,
-    a.AssignmentStatusType AS assignment_status_type,
-    a.AssignmentStatusTypeCode AS assignment_status_type_code,
-    a.ActionCode AS action_code,
-    a.ReasonCode AS reason_code,
-    a.EffectiveStartDate AS dt_effective_start,
-    a.EffectiveEndDate AS dt_effective_end,
-    wr.TerminationDate AS dt_termination
+    id_period_of_service,
+    assignment_status_type,
+    assignment_status_type_code,
+    action_code,
+    reason_code,
+    dt_effective_start,
+    dt_effective_end
   FROM
-    datalake_hr_system_clean.workers AS w
-  LATERAL VIEW
-    EXPLODE(w.work_relationships) AS wr
-  LATERAL VIEW
-    EXPLODE(wr.assignments) AS a
+    datalake_hr_system.assignments
   WHERE
-    wr.WorkerType <> 'P'
-    AND a.AssignmentStatusType = 'INACTIVE'
-    AND w.dt_effective >= REPLACE('{load_start_date}', '-', '')
+    assignment_status_type = 'INACTIVE'
+    AND assignment_type <> 'P'
+    AND dt_effective_start <= DATE('{load_start_date}')
+    AND dt_effective_end >= DATE('{load_start_date}')
   QUALIFY
     DENSE_RANK() OVER (PARTITION BY id_period_of_service ORDER BY dt_effective_start DESC) = 1
 ),
