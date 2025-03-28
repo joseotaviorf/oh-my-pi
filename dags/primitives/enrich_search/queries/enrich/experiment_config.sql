@@ -107,11 +107,11 @@ FROM VALUES
             'filters', NULL
         )
     ),
-    -- Important exp from another team
+    -- Important experience from another team
     (
         "ab_beakman_wpp_alert",
         named_struct(
-            'begin_date', DATE('2025-03-10'),
+            'begin_date', DATE('2025-03-18'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
