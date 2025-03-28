@@ -124,7 +124,7 @@ def clean_result(result, matched_value):
   if not result:
         return [{"type": "NOT_FOUND", "score": 0.0, "matched_value": matched_value}]
   return [
-      {"type": r.entity_type, "score": r.score, "matched_value": matched_value}
+      {"type": r.entity_type, "score": r.score, "matched_value": matched_value if len(matched_value) < 1500 else "SAMPLE_TOO_BIG"}
       for r in result
   ]
 
@@ -224,7 +224,11 @@ def get_sample(date_filter) -> DataFrame:
           database_name,
           table_name,
           column_name,
-          sample,
+          CASE
+            WHEN length(sample[0]) > 1000 THEN slice(sample,1, round(size(sample)/2))
+            WHEN length(sample[0]) > 4000 THEN slice(sample,1, 2)
+            ELSE sample
+          END as sample,
           ARRAY_AGG(column_name) AS list_column_name,
           {year} AS year,
           {month} AS month,
