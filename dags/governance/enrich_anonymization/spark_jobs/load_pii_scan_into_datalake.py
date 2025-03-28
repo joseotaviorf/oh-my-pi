@@ -286,7 +286,7 @@ def main():
 
 
     rdd = df.rdd.mapPartitions(partial(process_partition, batch_analyzer=batch_analyzer))
-    df_rebuilt = spark.createDataFrame(data=rdd, schema=schema)
+    df_rebuilt = spark.createDataFrame(data=rdd, schema=schema).cache()
 
     df_explode_sample = (
         df_rebuilt
