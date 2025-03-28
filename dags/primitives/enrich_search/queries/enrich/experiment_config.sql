@@ -111,7 +111,37 @@ FROM VALUES
     (
         "ab_beakman_wpp_alert",
         named_struct(
-            'begin_date', DATE('2025-03-18'),
+            'begin_date', DATE('2025-03-10'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL
+        )
+    ),
+    -- HUE VS HSE for Rent
+    (
+        "AB_TEST_RECS_HUE_ITEM_RENT",
+        named_struct(
+            'begin_date', DATE('2025-03-26'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL
+        )
+    ),
+    -- HUE VS HSE for Sale
+    (
+        "AB_TEST_RECS_HUE_ITEM_SALE",
+        named_struct(
+            'begin_date', DATE('2025-03-26'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
