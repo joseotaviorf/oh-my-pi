@@ -221,7 +221,7 @@ SELECT DISTINCT
   CASE
     WHEN UPPER(a.advisory) LIKE "%PASCH%" AND a.id_creditor NOT IN (3,5) THEN "PASCHOALOTTO"
     ELSE a.advisory
-  END AS advisory
+  END AS advisory,
   a.agreement_type,
   a.down_payment,
   a.agreement_in_delay,
