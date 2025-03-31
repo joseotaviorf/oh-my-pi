@@ -37,31 +37,29 @@ if __name__ == "__main__":
     table_name = "management_hierarchy"
 
     managers_query = """
-        WITH assignments AS (
-            SELECT DISTINCT
-                id_assignment,
-                id_period_of_service,
-                id_person
-            FROM
-                datalake_hr_system.assignments
-        )
-        SELECT DISTINCT
+        SELECT
             managers.id_period_of_service,
             managers.id_assignment,
             managers.id_manager_assignment,
-            assignments.id_period_of_service AS id_manager_period_of_service
+            ei.id_period_of_service AS id_manager_period_of_service,
+            ROW_NUMBER() OVER (PARTITION BY managers.id_period_of_service ORDER BY
+                CASE
+                    WHEN managers.dt_effective_end = DATE '4712-12-31' AND managers.dt_effective_start <= CURRENT_DATE THEN 1
+                    WHEN managers.dt_effective_end < DATE '4712-12-31' THEN 2
+                    ELSE 3
+                END,
+                managers.ts_last_update DESC
+            ) as priority_rank
         FROM
             datalake_hr_system.managers
         LEFT JOIN
-            assignments
-                ON assignments.id_assignment = managers.id_manager_assignment
+            datalake_hr_system.employee_ids AS ei
+                ON ei.id_assignment = managers.id_manager_assignment
         WHERE
-            managers.dt_effective_start <= current_date
+            managers.dt_effective_start <= CURRENT_DATE
             AND managers.manager_type = 'LINE_MANAGER'
             AND managers.id_manager_assignment <> '300000008488092'
-        QUALIFY
-            dt_effective_start = MAX(managers.dt_effective_start)
-                OVER (PARTITION BY managers.id_period_of_service)
+        QUALIFY priority_rank = 1
     """
 
     logger.info(
