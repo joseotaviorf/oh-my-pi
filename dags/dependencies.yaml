@@ -313,17 +313,6 @@ bietlejuice.dw_crm_inspections:
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts
-bietlejuice.dw_customer_satisfaction:
-  - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
-  - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
-  - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-  - bietlejuice.enrich_tracksale:load-enrich-answer
-  - bietlejuice.enrich_tracksale:load-enrich-answer-cities
-  - bietlejuice.enrich_tracksale:load-enrich-answer-justifications
-  - bietlejuice.enrich_tracksale:load-enrich-answer-tags
-  - bietlejuice.enrich_tracksale:load-enrich-campaign
-  - bietlejuice.enrich_tracksale:load-enrich-customer-conversions
-  - bietlejuice.enrich_tracksale:load-enrich-dispatch-attributes
 bietlejuice.dw_customer_support:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.bigfone:load-clean-ivr-closed-history
@@ -3227,9 +3216,6 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.hub_services:load-clean-lead
   - bietlejuice.hub_services:load-clean-visitor
 bietlejuice.enrich_tracksale:
-  - bietlejuice.ebdb_user:load-clean-user
-  - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
-  - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.tracksale:load-clean-answer
   - bietlejuice.tracksale:load-clean-dispatch
 bietlejuice.enrich_tracksale_dispatches:
