@@ -40,3 +40,16 @@ columns:
     description:
       Boolean that indicates if the customer is identified through the
       id_customer, if the id_customer exists then it is True.
+  status:
+    lineage:
+      - datalake_tracksale.dispatch.status
+    description: Dispatch tracking information.
+  id_campaign:
+    lineage:
+      - datalake_tracksale.dispatch.id_campaign
+    description: Key of NPS campaign, which is a definition of a certain customer
+      experience survey.
+  ts_dispatch_created:
+    lineage:
+      - datalake_tracksale.dispatch.ts_created
+    description: Timestamp in which the NPS survey was dispatched to the customers.

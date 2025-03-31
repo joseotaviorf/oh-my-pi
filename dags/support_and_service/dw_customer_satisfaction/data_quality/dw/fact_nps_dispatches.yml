@@ -1,0 +1,74 @@
+---
+table_name: dw_customer_satisfaction.fact_nps_dispatches
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than_or_equal_to: 10241257
+    severity_level: Error
+column_level_validations:
+  sk_nps_dispatch:
+    is_complete:
+      severity_level: Error
+  sk_nps_dispatch_lot:
+    is_complete:
+      severity_level: Error
+  sk_nps_campaign:
+    is_complete:
+      severity_level: Error
+  sk_nps_customer:
+    is_complete:
+      severity_level: Error
+  sk_user:
+    is_complete:
+      severity_level: Error
+  sk_personal_document:
+    is_complete:
+      severity_level: Error
+  sk_nps_answer:
+    is_complete:
+      severity_level: Error
+  sk_house_listing:
+    is_complete:
+      severity_level: Error
+  sk_booking:
+    is_complete:
+      severity_level: Error
+  sk_tta:
+    is_complete:
+      severity_level: Error
+  sk_offer:
+    is_complete:
+      severity_level: Error
+  sk_contract:
+    is_complete:
+      severity_level: Error
+  sk_created_date:
+    is_complete:
+      severity_level: Error
+  sk_sent_date:
+    is_complete:
+      severity_level: Error
+  sk_answered_date:
+    is_complete:
+      severity_level: Error
+  city:
+    is_complete:
+      severity_level: Error
+  is_survey_opened:
+    is_complete:
+      severity_level: Error
+  is_pending_survey:
+    is_complete:
+      severity_level: Error
+  is_answered:
+    is_complete:
+      severity_level: Error
+  has_comment:
+    is_complete:
+      severity_level: Error
+  is_customer_identified:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error
