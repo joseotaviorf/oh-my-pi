@@ -1,0 +1,28 @@
+dag:
+  name: metric_agents__performance
+  schedule_start_date: 2025,03,27
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      This flow generates performance metrics for agents in both Sales and Rentals business contexts. 
+      It tracks key activities such as agent availability, visit bookings, offer submissions, and contract signings. 
+      The metrics include averages for active days, booking performance, cancellations, document submissions, and lead 
+      conversions, providing insights into agent productivity and effectiveness. The flow captures data for both the Sales 
+      and Rentals pipelines, allowing for detailed performance tracking of agents across different stages of the customer journey, 
+      from lead generation to contract finalization.
+workflow:
+  type: query
+  layer: metric
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+cluster:
+  type: databricks_12_2_med_io-memory_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,0 +1,210 @@
+database_name: metric_agents
+table_name: weekly_business_context_input_metrics
+description: |
+  This table presents weekly performance metrics that assess agents' effectiveness in both sales and rental processes. 
+  It includes key indicators that measure agent performance across various business stages such as schedule engagement, booking efficiency, 
+  visit cancellations, lead conversion, and the progress from offer submission to contract signing. By focusing on weekly aggregated data, 
+  these metrics help evaluate agents' productivity, identify potential inefficiencies, and support decision-making in the sales and rental processes.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  business_context:
+    lineage:
+      - dw_agent.fact_visit_agent_performance.is_rent_agent
+    description: Indicates the type of business context, either "RENT" or "SALE".
+    dimension: True
+  ratio_schedule_engagement:
+    description: Proportion of total hours available by contract compared to the total hours allocated per schedule, aggregated over the week.
+    metric:
+      name: Ratio Schedule Engagement
+      description: Weekly ratio of total hours available per contract to total hours allocated per schedule.
+      acronym: ""
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_schedule_occupancy:
+    description: Proportion of booked visits to the total available hours per schedule, multiplied by 2.
+    metric:
+      name: Ratio Schedule Occupancy
+      description: Weekly ratio of total booked visits to the total available hours allocated per schedule, multiplied by 2.
+      acronym: Schedule Occupancy
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_stalled_bookings:
+    description: Proportion of stalled bookings to total booked visits, aggregated over the week.
+    metric:
+      name: Ratio Stalled Bookings
+      description: Weekly ratio of stalled bookings to total booked visits.
+      acronym: ""
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_bookings_by_agent:
+    description: Proportion of visits booked by the agent to total booked visits.
+    metric:
+      name: Ratio Bookings by Agent
+      description: Weekly ratio of visits booked by the agent to total booked visits.
+      acronym: VBBA/VB
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_no_show_bookings:
+    description: Proportion of no-show bookings by the agent to total booked visits, aggregated over the week.
+    metric:
+      name: Ratio No-Show Bookings
+      description: Weekly ratio of no-show bookings by the agent to total booked visits.
+      acronym: No Show Bookings
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_visit_cancellations_by_agent:
+    description: Proportion of visit cancellations by the agent to total booked visits.
+    metric:
+      name: Ratio Visit Cancellations by Agent
+      description: Weekly ratio of visit cancellations by the agent to total booked visits.
+      acronym: ""
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_booking_cancellations_by_agent:
+    description: Proportion of booking cancellations by the agent to total booked visits.
+    metric:
+      name: Ratio Booking Cancellations by Agent
+      description: Weekly ratio of booking cancellations by the agent to total booked visits.
+      acronym: ""
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_leads_to_completed_visits:
+    description: Proportion of completed visits to total leads, aggregated over the week.
+    metric:
+      name: Ratio Leads to Completed Visits
+      description: Weekly ratio of completed visits to total leads.
+      acronym: ld2vc
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_leads_to_offers_submitted:
+    description: Proportion of offers submitted to total leads.
+    metric:
+      name: Ratio Leads to Offers Submitted
+      description: Weekly ratio of offers submitted to total leads.
+      acronym: ld2os
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_booked_to_completed_visits:
+    description: Proportion of completed visits to total booked visits.
+    metric:
+      name: Ratio Booked to Completed Visits
+      description: Weekly ratio of completed visits to total booked visits.
+      acronym: vb2vc
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_completed_visits_to_offers_submitted:
+    description: Proportion of offers submitted to completed visits.
+    metric:
+      name: Ratio Completed Visits to Offers
+      description: Weekly ratio of offers submitted to completed visits.
+      acronym: vc2os
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_offers_submitted_to_approved:
+    description: Proportion of approved offers to total offers submitted.
+    metric:
+      name: Ratio Offers Submitted to Approved
+      description: Weekly ratio of approved offers to total offers submitted.
+      acronym: os2oa
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_offers_approved_to_documents_sent:
+    description: Proportion of documents sent to total approved offers.
+    metric:
+      name: Ratio Offers Approved to Documents Sent
+      description: Weekly ratio of documents sent to total approved offers.
+      acronym: oa2ds
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_documents_sent_to_credit_approved:
+    description: Proportion of credit approvals to total documents sent.
+    metric:
+      name: Ratio Documents Sent to Credit Approved
+      description: Weekly ratio of credit approvals to total documents sent.
+      acronym: ds2ca
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_credit_approved_to_contract_signed:
+    description: Proportion of contract signings to total credit approvals.
+    metric:
+      name: Ratio Credit Approved to Contract Signed
+      description: Weekly ratio of contract signings to total credit approvals.
+      acronym: ca2cs
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  ratio_leads_3plus_confirmed_visits_same_agent:
+    description: Proportion of leads with three or more confirmed visits to total leads.
+    metric:
+      name: Ratio Leads with 3+ Confirmed Visits Same Agent
+      description: Weekly ratio of leads with three or more confirmed visits to total leads.
+      acronym: ld3vcs
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+  dt_week_start:
+    lineage:
+      - dw_agent.fact_visit_agent_performance.dt_reference
+    description: Start date of the week for performance tracking.
+    dimension: True
+  year:
+    lineage:
+      - dw_agent.fact_visit_agent_performance.dt_reference
+    description: Year corresponding to the reference date.
+    dimension: True
+  month:
+    lineage:
+      - dw_agent.fact_visit_agent_performance.dt_reference
+    description: Month for aggregating weekly data.
+    dimension: True
+  day:
+    lineage:
+      - dw_agent.fact_visit_agent_performance.dt_reference
+    description: Day for aggregating weekly data.
+    dimension: True

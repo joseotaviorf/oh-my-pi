@@ -3390,6 +3390,8 @@ bietlejuice.enrich_zendesk:
   - bietlejuice.zendesk:load-clean-ticket-fields
   - bietlejuice.zendesk:load-clean-ticket-metrics
   - bietlejuice.zendesk:load-clean-tickets
+bietlejuice.metric_agents__performance:
+  - bietlejuice.dw_agent:load-dw-agent-fact-visit-agent-performance
 bietlejuice.metric_fintech__atta:
   - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta
   - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow

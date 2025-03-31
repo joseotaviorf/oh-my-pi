@@ -1,0 +1,343 @@
+database_name: metric_agents
+table_name: weekly_business_context_output_metrics
+description: |
+  This table presents weekly aggregated metrics to evaluate agent performance in both sales and rental processes. 
+  It includes key indicators such as agent's activity days, visit bookings, offer submissions, and lead conversions. 
+  The data focuses on evaluating agent productivity, engagement, and success in progressing leads through different stages, 
+  such as booking, offers, documents sent, and contracts signed, with a weekly granularity.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  business_context:
+    lineage:
+      - dw_agent.fact_visit_agent_performance.is_rent_agent
+    description: Indicates the type of business context, either "RENT" or "SALE".
+    dimension: True
+  average_hours_available_by_contract:
+    description: Average total hours available for scheduling by contract.
+    metric:
+      name: Average Hours Available by Contract
+      description: Weekly average of total available hours per contract.
+      acronym: ""
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  average_hours_allocation_available_by_schedule:
+    description: Average total hours allocated per schedule for the agent's availability.
+    metric:
+      name: Average Hours Allocation Available by Schedule
+      description: Weekly average of total allocated hours by schedule for agent availability.
+      acronym: ""
+      is_additive: False
+      business_stage: Demand
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_supply_first_listing:
+    description: Total supply of first listings by agents.
+    metric:
+      name: Total Supply First Listing
+      description: Weekly total of first listings by agents.
+      acronym: ""
+      is_additive: False
+      business_stage: Supply
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_visit_booked:
+    description: Total number of visits booked.
+    metric:
+      name: Total Visit Booked
+      description: Weekly total of visits booked by agents.
+      acronym: VB
+      is_additive: False
+      business_stage: Booking/Visit
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_visit_booking_by_agent:
+    description: Total number of visits booked by agents.
+    metric:
+      name: Total Visit Booking by Agent
+      description: Weekly total of visits booked by agents.
+      acronym: VBBA
+      is_additive: False
+      business_stage: Booking/Visit
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_visit_completed:
+    description: Total number of visits completed.
+    metric:
+      name: Total Visit Completed
+      description: Weekly total of completed visits.
+      acronym: VC
+      is_additive: False
+      business_stage: Booking/Visit
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_booking_stalled:
+    description: Total number of stalled bookings.
+    metric:
+      name: Total Booking Stalled
+      description: Weekly total of stalled bookings.
+      acronym: ""
+      is_additive: False
+      business_stage: Booking/Visit
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_booking_cancellation_by_agent:
+    description: Total number of booking cancellations by agents.
+    metric:
+      name: Total Booking Cancellation by Agent
+      description: Weekly total of booking cancellations by agents.
+      acronym: ""
+      is_additive: False
+      business_stage: Booking/Visit
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_visit_cancellation_by_agent:
+    description: Total number of visit cancellations by agents.
+    metric:
+      name: Total Visit Cancellation by Agent
+      description: Weekly total of visit cancellations by agents.
+      acronym: ""
+      is_additive: False
+      business_stage: Booking/Visit
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_booking_no_show_by_agent:
+    description: Total number of no-show bookings by agents.
+    metric:
+      name: Total Booking No-Show by Agent
+      description: Weekly total of no-show bookings by agents.
+      acronym: ""
+      is_additive: False
+      business_stage: Booking/Visit
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_offer_submitted:
+    description: Total number of offers submitted.
+    metric:
+      name: Total Offer Submitted
+      description: Weekly total of offers submitted.
+      acronym: OS
+      is_additive: False
+      business_stage: Sale/Rent Offer Flow
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_offer_approved:
+    description: Total number of offers approved.
+    metric:
+      name: Total Offer Approved
+      description: Weekly total of offers approved.
+      acronym: OA
+      is_additive: False
+      business_stage: Sale/Rent Offer Flow
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_document_sent:
+    description: Total number of documents sent.
+    metric:
+      name: Total Document Sent
+      description: Weekly total of documents sent.
+      acronym: DS
+      is_additive: False
+      business_stage: Sale/Rent Offer Flow
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_credit_approved:
+    description: Total number of credits approved.
+    metric:
+      name: Total Credit Approved
+      description: Weekly total of credits approved.
+      acronym: CA
+      is_additive: False
+      business_stage: Sale/Rent Offer Flow
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_contract_signed:
+    description: Total number of contracts signed.
+    metric:
+      name: Total Contract Signed
+      description: Weekly total of contracts signed.
+      acronym: CS
+      is_additive: False
+      business_stage: Sale/Rent Offer Flow
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_proposal_evaluation_started:
+    description: Total number of proposal evaluations started.
+    metric:
+      name: Total Proposal Evaluation Started
+      description: Weekly total of proposal evaluations started.
+      acronym: ""
+      is_additive: False
+      business_stage: Sale/Rent Offer Flow
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_leads:
+    description: Total number of leads.
+    metric:
+      name: Total Leads
+      description: Weekly total of leads.
+      acronym: LD
+      is_additive: False
+      business_stage: Lead Conversion
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_leads_3plus_confirmed_visits_same_agent:
+    description: Total number of leads with three or more confirmed visits by the same agent.
+    metric:
+      name: Total Leads with 3+ Confirmed Visits Same Agent
+      description: Weekly total of leads with three or more confirmed visits by the same agent.
+      acronym: LD3VC
+      is_additive: False
+      business_stage: Lead Conversion
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_lead_to_visit_booking:
+    description: Total number of leads converted to visit bookings.
+    metric:
+      name: Total Lead to Visit Booking
+      description: Weekly total of leads converted to visit bookings.
+      acronym: LD2VB
+      is_additive: False
+      business_stage: Lead Conversion
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_lead_to_visit_booking_by_agent:
+    description: Total number of leads converted to visit bookings by the agent.
+    metric:
+      name: Total Lead to Visit Booking by Agent
+      description: Weekly total of leads converted to visit bookings by the agent.
+      acronym: LD2VBBA
+      is_additive: False
+      business_stage: Lead Conversion
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_lead_to_visit_completed:
+    description: Total number of leads converted to completed visits.
+    metric:
+      name: Total Lead to Visit Completed
+      description: Weekly total of leads converted to completed visits.
+      acronym: LD2VC
+      is_additive: False
+      business_stage: Lead Conversion
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_lead_to_offer_submitted:
+    description: Total number of leads converted to offer submissions.
+    metric:
+      name: Total Lead to Offer Submitted
+      description: Weekly total of leads converted to offer submissions.
+      acronym: LD2OS
+      is_additive: False
+      business_stage: Lead Conversion
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_lead_to_offer_submitted_by_agent:
+    description: Total number of leads converted to offer submissions by the agent.
+    metric:
+      name: Total Lead to Offer Submitted by Agent
+      description: Weekly total of leads converted to offer submissions by the agent.
+      acronym: LD2OSBA
+      is_additive: False
+      business_stage: Lead Conversion
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_lead_to_offer_approved:
+    description: Total number of leads converted to offer approvals.
+    metric:
+      name: Total Lead to Offer Approved
+      description: Weekly total of leads converted to offer approvals.
+      acronym: LD2OA
+      is_additive: False
+      business_stage: Lead Conversion
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_lead_to_credit_approved:
+    description: Total number of leads converted to credit approvals.
+    metric:
+      name: Total Lead to Credit Approved
+      description: Weekly total of leads converted to credit approvals.
+      acronym: LD2CA
+      is_additive: False
+      business_stage: Lead Conversion
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_lead_to_contract_signed:
+    description: Total number of leads converted to contract signings.
+    metric:
+      name: Total Lead to Contract Signed
+      description: Weekly total of leads converted to contract signings.
+      acronym: LD2CS
+      is_additive: False
+      business_stage: Lead Conversion
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_lead_to_proposal_evaluation_started:
+    description: Total number of leads that have started proposal evaluation.
+    metric:
+      name: Total Lead to Proposal Evaluation Started
+      description: Weekly total of leads that have started proposal evaluation.
+      acronym: LD2PES
+      is_additive: False
+      business_stage: Proposal Evaluation
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  total_leads_to_contract_signed_cohort_7_days:
+    description: Total number of leads converted to contract signings within a 7-day cohort.
+    metric:
+      name: Total Leads to Contract Signed Cohort 7 Days
+      description: Weekly total of leads converted to contract signings within a 7-day cohort.
+      acronym: LD2CS7D
+      is_additive: False
+      business_stage: Contract Signing
+      hierarchy: User analysis
+      approved_by: soares.jessica@quintoandar.com.br
+      link_to_metric: ""
+  dt_week_start:
+    lineage:
+      - dw_agent.fact_visit_agent_performance.dt_reference
+    description: Start date of the week for performance tracking.
+    dimension: True
+  year:
+    lineage:
+      - dw_agent.fact_visit_agent_performance.dt_reference
+    description: Year for aggregating weekly data.
+    dimension: True
+  month:
+    lineage:
+      - dw_agent.fact_visit_agent_performance.dt_reference
+    description: Month for aggregating weekly data.
+    dimension: True
+  day:
+    lineage:
+      - dw_agent.fact_visit_agent_performance.dt_reference
+    description: Day for aggregating weekly data.
+    dimension: True

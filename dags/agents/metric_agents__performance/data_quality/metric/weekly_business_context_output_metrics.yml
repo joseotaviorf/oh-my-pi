@@ -1,0 +1,10 @@
+---
+table_name: metric_agents.weekly_business_context_output_metrics
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  business_context:
+    is_complete:
+      severity_level: Error
+  dt_reference:
+    is_complete:
+      severity_level: Error
