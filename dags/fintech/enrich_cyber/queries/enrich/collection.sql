@@ -45,7 +45,11 @@ SELECT
   u.user_type AS operator_type,
   CASE
     WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name)) LIKE "PASCH%" THEN "PASCHOALOTTO"
+    WHEN UPPER(l.id_user) LIKE "PASCH%" THEN "PASCHOALOTTO"
     WHEN UPPER(l.id_user) LIKE "PSC%" THEN "PASCHOALOTTO"
+    WHEN UPPER(l.id_user) LIKE "%TRC%" THEN "TRC"
+    WHEN UPPER(l.id_user) LIKE "%GRB%" THEN "GRB"
+    WHEN UPPER(l.id_user) LIKE "%MEETC%" THEN "MEETCALL"
     ELSE UPPER(COALESCE(agg.agency_name, ag.agency_name))
   END AS operator_agency,
   UPPER(l.action) AS action,

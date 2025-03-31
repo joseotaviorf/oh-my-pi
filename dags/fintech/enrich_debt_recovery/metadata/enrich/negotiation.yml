@@ -83,6 +83,14 @@ columns:
     description: "Indicates if the negotiation is a renegotiation"
     lineage:
       - datalake_trato_feito_clean.accounting_installment.id
+  consultancy:
+    description: "Consultancy/advisory ID that created the negotiation"
+    lineage:
+      - datalake_trato_feito_clean.negotiation.consultancy
+  consultancy_name:
+    description: "Consultancy/advisory name that created the negotiation"
+    lineage:
+      - datalake_trato_feito_clean.negotiation.consultancy
   dt_expected_end:
     description: "Installment due date"
     lineage:

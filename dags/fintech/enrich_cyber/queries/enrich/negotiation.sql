@@ -196,10 +196,13 @@ SELECT
     COALESCE(u.id_agency, a.id_agency) AS id_agency,
     COALESCE(c.creditor, a.creditor) AS creditor,
     CASE
-      WHEN a.id_user = "MIGRACAO" THEN "MIGRACAO"
       WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "PASCH%" THEN "PASCHOALOTTO"
+      WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%TRC%" THEN "TRC"
+      WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%GRB%" THEN "GRB"
+      WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "%MEETC%" THEN "MEETCALL"
       WHEN UPPER(a.id_user) LIKE "PSC%" THEN "PASCHOALOTTO"
-      WHEN UPPER(a.id_user) LIKE "%SERASA%" THEN "SERASA DIGITAL"
+      WHEN UPPER(a.id_user) LIKE "%SERASA%" THEN "SERASA"
+      WHEN COALESCE(u.id_agency, a.id_agency) = "QUINTO" THEN "COBRANÇA_INTERNA_QA"
       ELSE UPPER(COALESCE(agg.agency_name, ag.agency_name))
     END AS advisory,
     a.frequency,

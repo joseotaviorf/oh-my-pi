@@ -80,7 +80,17 @@ SELECT
     n.id_debtor_external AS id_contract,
     CONCAT(d.origin, "_", d.type) AS debtor,
     c.name AS collector,
-    n.consultancy,
+    consultancy,
+    CASE
+        WHEN LOWER(n.consultancy) LIKE '%serasa%' THEN 'SERASA'
+        WHEN n.consultancy = '009' OR LOWER(n.consultancy) = 'quinto' THEN 'COBRANÇA_INTERNA_QA'
+        WHEN n.consultancy IN ('010','G010') THEN 'PASCHOALOTTO'
+        WHEN n.consultancy IN ('015','G015') THEN 'PORTAL_QUINTOANDAR'
+        WHEN n.consultancy IN ('017','G017') THEN 'TRC'
+        WHEN n.consultancy IN ('018','G018') THEN 'GRB'
+        WHEN n.consultancy IN ('019','G019') THEN 'MEETCALL'
+        ELSE UPPER(n.consultancy)
+    END AS consultancy_name,
     n.status,
     i.promisse_payment_method,
     i.qt_installments,
