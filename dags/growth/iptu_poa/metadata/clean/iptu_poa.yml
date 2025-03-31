@@ -1,0 +1,152 @@
+database_name: datalake_iptu_poa_clean
+table_name: iptu_poa
+description:
+  Table extracted from the Porto Alegre City website (https://dadosabertos.poa.br/dataset/iptu). It contains the
+  "Imposto sobre a Propriedade Predial e Territorial Urbana (IPTU)" information, including address, complement and
+  value
+domain: Growth
+owner: data-growth@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.nme_endloc_cep
+      - datalake_iptu_poa_raw.iptu_poa.num_endloc_endereco
+      - datalake_iptu_poa_raw.iptu_poa.complemento
+      - datalake_iptu_poa_raw.iptu_poa.desc_endloc_tipo_unidade
+      - datalake_iptu_poa_raw.iptu_poa.num_endloc_unidade
+      - datalake_iptu_poa_raw.iptu_poa.pavimento
+      - datalake_iptu_poa_raw.iptu_poa.nivel
+    description: |
+      "Synthetic ID created to distinguish the houses within the POA IPTU source. 
+      This ID is the hash of zipcode, number, complement, unit_type, unit, floor, and level_type fields."
+  iptu_year:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.ano_exercicio
+    description: |
+      "IPTU year."
+  address_neighborhood:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.nme_endloc_bairro_cdl
+    description: |
+      "The neighborhood of the property address."
+  address_street_name:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.nme_endloc_logradouro
+    description: |
+      "Street name linked to the transaction's zip code."
+  address_zipcode:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.nme_endloc_cep
+    description: |
+      "Zip code of the property address."
+  address_number:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.num_endloc_endereco
+    description: |
+      "Unit number of the property."
+  unit_type:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.des_endloc_tipo_unidade
+    description: |
+      "Type of the unit. Eg: apartment."
+  unit:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.num_endloc_unidade
+    description: |
+      "Unit number of the property."
+  floor:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.pavimento
+    description: |
+      "Floor of the property."
+  level_type:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.nivel
+    description: |
+      "Level type of the property. Eg: basement."
+  address_complement:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.complemento
+    description: |
+      "Complement of the property address."
+  property_use_description:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.des_uso
+    description: |
+      "Description of the property use. Eg: residential."
+  property_purpose_description:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.des_finalidade
+    description: |
+      "Description of the property purpose. Eg: apartment."
+  house_registry_number:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.des_identificacao
+    description: |
+      "Registration number of that property in a specific house register office."
+  house_registry_zone:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.des_zona
+    description: |
+      "Zone of the house register."
+  main_frontage_area_m2:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.mtr_testada_principal
+    description: |
+      "Main frontage area in square meters."
+  land_area_m2:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.mtr_area_real
+    description: |
+      "Land area in square meters."
+  built_area_m2:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.mtr_area_construida_total
+    description: |
+      "Built area in square meters."
+  taxable_area_m2:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.mtr_area_corrigida
+    description: |
+      "Taxable area in square meters."
+  taxable_land_value:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.vlr_venal_terreno
+    description: |
+      "Taxable land value."
+  taxable_built_value:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.vlr_venal_construcoes
+    description: |
+      "Taxable built value."
+  taxable_property_value:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.vlr_venal_imovel
+    description: |
+      "Taxable property value."
+  tax_rate:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.vlr_aliquota
+    description: |
+      "Tax rate."
+  iptu_value:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.vlr_imposto
+    description: |
+      "IPTU value."
+  tcrs_value:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.vlr_tcl
+    description: |
+      "TCRS value."
+  dt_load:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.dt_load
+    description: |
+      "Date the IPTU POA data was loaded."
+  year:
+    lineage:
+      - datalake_iptu_poa_raw.iptu_poa.year
+    description: |
+      "IPTU Transaction year.
+      It is a partition column."

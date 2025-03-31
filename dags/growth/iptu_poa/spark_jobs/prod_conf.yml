@@ -1,0 +1,1 @@
+base_s3_ingestion_path: "5a-datalake-prod/raw/atlas_static/transactional/iptu_poa_crawler/responses/"
