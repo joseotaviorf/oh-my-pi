@@ -51,6 +51,6 @@ SELECT
   e.ts_end
 FROM
   events AS e
-LEFT JOIN
+INNER JOIN
   datalake_company.company_sks AS cs
     ON e.id_hubspot = cs.id_hubspot

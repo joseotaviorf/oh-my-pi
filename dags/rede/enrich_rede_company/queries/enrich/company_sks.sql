@@ -74,6 +74,7 @@ SELECT
   cp.uuid_revenue_share,
   ccn.identification_number AS cnpj,
   ccr.identification_number AS creci,
+  cm.extracted_3p_tag,
   cp.is_company_asp,
   cp.is_company_ciq,
   cp.is_company_legal_person_rental_guarantee,
@@ -97,5 +98,9 @@ LEFT JOIN
   company_creci AS ccr
     ON c.id = ccr.id_company
 LEFT JOIN
+  datalake_hubspot.company AS hc
+    ON c.uuid_company = hc.uuid_company
+LEFT JOIN
   datalake_hubspot.company_members AS cm
     ON ccn.identification_number = cm.cnpj
+      OR hc.id_company = cm.id_company

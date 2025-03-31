@@ -36,7 +36,7 @@ LEFT JOIN
     ON cs.id_address = a.id
 INNER JOIN
   datalake_hubspot.company_members AS cm
-    ON cs.cnpj = cm.cnpj
+    ON cs.id_hubspot = cm.id_company
 LEFT JOIN
   datalake_hubspot.membership_updates AS mu
     ON cm.id_company = mu.id_hubspot

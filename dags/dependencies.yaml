@@ -2560,6 +2560,7 @@ bietlejuice.enrich_rede_company:
   - bietlejuice.company:load-clean-company-document
   - bietlejuice.company:load-clean-company-product
   - bietlejuice.company:load-clean-document
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-members
 bietlejuice.enrich_rede_company_event:
   - bietlejuice.ebdb_listing:load-clean-listing-business-context

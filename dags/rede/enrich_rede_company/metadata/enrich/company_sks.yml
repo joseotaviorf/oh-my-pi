@@ -45,6 +45,10 @@ columns:
     description: Current CRECI of the company from document entity.
     lineage:
       - datalake_company_clean.document.identification_number
+  extracted_3p_tag:
+    description: Tag extracted from the Hubspot system.
+    lineage:
+      - datalake_hubspot.company_members.extracted_3p_tag
   is_company_asp:
     description: Flag to indicate if the company is a ASP.
     lineage:
