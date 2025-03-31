@@ -476,6 +476,7 @@ LEFT JOIN
   AND v.id_visitor = br.id_reviewer
 LEFT JOIN datalake_company.company_sks AS cs_demand
   ON (dm.id_company_demand IS NOT NULL AND dm.id_company_demand = cs_demand.id_hubspot)
+  OR (dm.id_company_demand IS NULL AND dm.partner_3p_demand = cs_demand.extracted_3p_tag)
 LEFT JOIN
     datalake_company.company_sks AS cs_supply
         ON (
@@ -485,4 +486,8 @@ LEFT JOIN
           hl.uuid_company IS NULL
           AND hl.id_company_hubspot IS NOT NULL
           AND hl.id_company_hubspot = cs_supply.id_hubspot
+        ) OR (
+           hl.uuid_company IS NULL
+           AND hl.id_company_hubspot IS NULL
+           AND hl.partner_3p_supply = cs_supply.extracted_3p_tag
         )

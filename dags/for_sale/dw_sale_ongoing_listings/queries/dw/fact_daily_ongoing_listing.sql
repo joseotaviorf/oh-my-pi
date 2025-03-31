@@ -153,6 +153,10 @@ LEFT JOIN
             rhh.uuid_company IS NULL
             AND rhh.id_company_hubspot IS NOT NULL
             AND rhh.id_company_hubspot = cs_supply.id_hubspot
+        ) OR (
+             rhh.uuid_company IS NULL
+             AND rhh.id_company_hubspot IS NULL
+             AND rhh.partner_3p_supply = cs_supply.extracted_3p_tag
         )
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY dol.sk_sale_listing, dol.sk_snapshot_date ORDER BY slpc.ts_price_started DESC, rhh.ts_status_started DESC) = 1

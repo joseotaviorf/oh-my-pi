@@ -54,6 +54,7 @@ LEFT JOIN
 LEFT JOIN
     datalake_company.company_sks AS csk
     ON (lrc.uuid_company IS NOT NULL AND csk.uuid_company = lrc.uuid_company)
+    OR (lsc.id_company_hubspot IS NULL AND csk.extracted_3p_tag = COALESCE(NULLIF(l3p.cnpj, 'Não informado'), 'Unknown'))
 LEFT JOIN
     datalake_rede_lead_acquisition.lead_3p_acquisition AS la
         ON la.id_lead_3p = lrc.id_lead_3p

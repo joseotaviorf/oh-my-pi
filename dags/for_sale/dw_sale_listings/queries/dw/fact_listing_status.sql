@@ -25,4 +25,8 @@ LEFT JOIN
       sls.uuid_company IS NULL
       AND sls.id_company_hubspot IS NOT NULL
       AND sls.id_company_hubspot = cs_supply.id_hubspot
+    ) OR (
+       sls.uuid_company IS NULL
+       AND sls.id_company_hubspot IS NULL
+       AND sls.partner_3p_supply = cs_supply.extracted_3p_tag
     )

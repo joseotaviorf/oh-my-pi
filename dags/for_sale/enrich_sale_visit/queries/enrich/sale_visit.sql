@@ -95,6 +95,8 @@ LEFT JOIN
     datalake_company.company_sks AS cs_demand
         ON (b.id_company_demand IS NOT NULL
         AND b.id_company_demand = cs_demand.id_hubspot)
+        OR (b.id_company_demand IS NULL
+        AND b.partner_3p_demand = cs_demand.extracted_3p_tag)
 LEFT JOIN
     datalake_company.company_sks AS cs_supply
         ON (
@@ -104,6 +106,10 @@ LEFT JOIN
           b.uuid_company_supply IS NULL
           AND b.id_company_supply IS NOT NULL
           AND b.id_company_supply = cs_supply.id_hubspot
+        ) OR (
+           b.uuid_company_supply IS NULL
+           AND b.id_company_supply IS NULL
+           AND b.partner_3p_supply = cs_supply.extracted_3p_tag
         )
 LEFT JOIN 
   status_log AS vsl

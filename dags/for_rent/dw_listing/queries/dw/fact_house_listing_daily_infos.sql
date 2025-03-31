@@ -60,6 +60,10 @@ LEFT JOIN
       hldi.uuid_company IS NULL
       AND hldi.id_company_hubspot IS NOT NULL
       AND hldi.id_company_hubspot = cs.id_hubspot
+    ) OR (
+       hldi.uuid_company IS NULL
+       AND hldi.id_company_hubspot IS NULL
+       AND hldi.partner_3p_supply = cs.extracted_3p_tag
     ))
 LEFT JOIN
   dw_listing.fact_house_listing_daily_available_hours AS avh

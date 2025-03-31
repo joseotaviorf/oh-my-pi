@@ -61,4 +61,8 @@ LEFT JOIN
             rde.uuid_company IS NULL
             AND rde.id_company_hubspot IS NOT NULL
             AND rde.id_company_hubspot = cs_supply.id_hubspot
+        ) OR (
+             rde.uuid_company IS NULL
+             AND rde.id_company_hubspot IS NULL
+             AND rde.partner_3p_supply = cs_supply.extracted_3p_tag
         )
