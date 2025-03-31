@@ -5,6 +5,6 @@ column_level_validations:
   business_context:
     is_complete:
       severity_level: Error
-  dt_reference:
+  dt_week_start:
     is_complete:
       severity_level: Error
