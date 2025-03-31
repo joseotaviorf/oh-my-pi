@@ -11,7 +11,6 @@ dag:
     - Data availability depends on the manual extraction process.
 
     For further details, please check the documentation: [https://docs.google.com/document/d/1sH4u3mLCCuGCyWZI3rLD0p5NwzOD1a7Iu7Krvq1jTGs/edit?tab=t.x1oy5mitopa]
-  schedule_interval: 0 2 * * *
   owner: Data People
 cluster:
   type: databricks_13_3_high_memory_people_cluster

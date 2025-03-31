@@ -281,13 +281,13 @@ LEFT JOIN
 WHERE
   ei.id_person IS NULL
   AND (
-    DATE(a.dt_effective_start) BETWEEN DATE_SUB(DATE('{load_start_date}'), 365)
+    DATE(a.dt_effective_start) BETWEEN DATE_SUB(DATE('{load_start_date}'), 60)
     AND DATE('{load_end_date}')
-    OR DATE(adff.dt_effective_start) BETWEEN DATE_SUB(DATE('{load_start_date}'), 365)
+    OR DATE(adff.dt_effective_start) BETWEEN DATE_SUB(DATE('{load_start_date}'), 60)
     AND DATE('{load_end_date}')
-    OR DATE(a.ts_last_update) BETWEEN DATE_SUB(DATE('{load_start_date}'), 365)
+    OR DATE(a.ts_last_update) BETWEEN DATE_SUB(DATE('{load_start_date}'), 60)
     AND DATE('{load_end_date}')
-    OR DATE(adff.ts_last_update) BETWEEN DATE_SUB(DATE('{load_start_date}'), 365)
+    OR DATE(adff.ts_last_update) BETWEEN DATE_SUB(DATE('{load_start_date}'), 60)
     AND DATE('{load_end_date}')
   )
 QUALIFY
