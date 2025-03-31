@@ -1,0 +1,107 @@
+---
+database_name: datalake_grb_clean
+table_name: logs
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: The 'tab_ocorrencia' table contains data on various occurrences related to customer interactions, including details such as the actions taken, results, and additional comments. This data can be utilized to track communication history, customer satisfaction levels, and assess the effectiveness of different contact channels. It enables the organization to analyze trends in customer interactions, identify areas for process improvement, and evaluate the performance of customer service representatives.
+columns:
+  id_occurrence:
+    description: "Unique identifier of the occurrence"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.id_ocorrencia
+  id_operator_cyber:
+    description: "Cyber operator login"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.id_operador_cyber
+  id_operator_grb:
+    description: "GRB operator login"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.id_operador_assessoria
+  id_contract:
+    description: "Unique identifier of the contract. It is the same ID of Retsuko (id_contract_external) and Cyber"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.id_contrato
+  phone_contacted:
+    description: "Phone number contacted (null if the contact was through another channel)"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.telefone_acionado
+  email_contacted:
+    description: "Email contacted (null if the contact was through another channel)"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.email_acionado
+  action:
+    description: "Standardized tabulation code"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.acao
+  result:
+    description: "Description explaining the meaning of the occurrence code"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.resultado
+  complement:
+    description: "Additional details about the occurrence tabulation"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.complemento
+  talk_time:
+    description: "Call duration in seconds"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.tempo_falado
+  survey_sent:
+    description: "True or False indicating whether a satisfaction survey was sent"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.envio_pesquisa
+  survey_score:
+    description: "Satisfaction survey score for the occurrence"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.nota_pesquisa
+  channel:
+    description: "Channel used: WhatsApp, Dialer, SMS, Email, Push (app), Chatbot or others"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.canal
+  contact_type:
+    description: "Active or Receptive contact"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.tipo_contato
+  triggered:
+    description: "Any contact attempt with the client, whether successful or not"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.acionamento
+  alo:
+    description: "Interaction occurred, regardless of client confirmation or channel"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.alo
+  cpc:
+    description: "Client confirmed identity"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.cpc
+  agreement:
+    description: "Agreement generated (payment slip issued)"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.acordo
+  vacancy_agreement:
+    description: "Client indicated intent to vacate the property"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.acordo_desocupacao
+  dt_due_promisse:
+    description: "Due date associated with the client's promise to pay or vacate"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.data_vencimento
+  ts_occurrence_start:
+    description: "Date and time when the contact started"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.data_hora_ocorrencia_inicio
+  ts_occurrence_end:
+    description: "Date and time when the contact ended"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.data_hora_ocorrencia_fim
+  year:
+    description: "Year based on table_partition field"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.year
+  month:
+    description: "Month based on table_partition field"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.month
+  day:
+    description: "Day based on table_partition field"
+    lineage:
+      - datalake_grb_raw.tab_ocorrencia.day

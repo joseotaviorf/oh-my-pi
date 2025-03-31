@@ -6,3 +6,4 @@ class DatabaseTypeEnum(Enum):
     MONGO = "mongo"
     MYSQL = "mysql"
     ORACLE = "oracle"
+    SQLSERVER = "sqlserver"

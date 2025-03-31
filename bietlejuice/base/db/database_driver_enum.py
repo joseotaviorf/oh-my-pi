@@ -11,6 +11,7 @@ class DatabaseDriverEnum(Enum):
     MYSQL = "com.mysql.jdbc.Driver"
     REDSHIFT = "com.amazon.redshift.jdbc42.Driver"
     ORACLE = "oracle.jdbc.driver.OracleDriver"
+    SQLSERVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
 
     @classmethod
     def get_available_enum_values(cls):

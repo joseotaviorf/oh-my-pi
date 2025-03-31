@@ -1,0 +1,65 @@
+---
+database_name: datalake_grb_clean
+table_name: login_time
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: This table contains data related to the work hours of employees in the organization. It includes details such as the total time spent on breaks, logged-in time, talking time, and time without assistance. This data can be used to analyze work patterns, identify potential productivity issues, and evaluate the effectiveness of training programs. It can also help in tracking individual employee performance and identifying areas for improvement.
+columns:
+  id_operator_cyber:
+    description: Cyber operator login
+    lineage:
+      - datalake_grb_raw.tab_tempos.id_operador_cyber
+  id_operator_grb:
+    description: GRB operator login
+    lineage:
+      - datalake_grb_raw.tab_tempos.id_operador_assessoria
+  total_pause_time:
+    description: Total time the operator spent on pause
+    lineage:
+      - datalake_grb_raw.tab_tempos.tempo_total_pausa
+  total_logged_time:
+    description: Total time the operator was logged into the system
+    lineage:
+      - datalake_grb_raw.tab_tempos.tempo_total_logado
+  total_talk_time:
+    description: Total time the operator spent on calls
+    lineage:
+      - datalake_grb_raw.tab_tempos.tempo_total_falado
+  total_idle_time:
+    description: Total time the operator was logged in without handling contacts
+    lineage:
+      - datalake_grb_raw.tab_tempos.tempo_total_sem_atendimento
+  email_operator:
+    description: Email address associated with the operator
+    lineage:
+      - datalake_grb_raw.tab_tempos.email_operador
+  dt_reference:
+    description: Date of the login time record
+    lineage:
+      - datalake_grb_raw.tab_tempos.data
+  ts_login:
+    description: Timestamp of the earliest login time of the day
+    lineage:
+      - datalake_grb_raw.tab_tempos.hora_login
+  ts_logout:
+    description: Timestamp of the latest logout time of the day
+    lineage:
+      - datalake_grb_raw.tab_tempos.hora_logout
+  ts_ingestion:
+    description: Ingestion timestamp of the record
+    lineage:
+      - datalake_grb_raw.tab_tempos.ts_ingestion
+  year:
+    description: Partition column representing the year of the event
+    lineage:
+      - datalake_grb_raw.tab_tempos.year
+  month:
+    description: Partition column representing the month of the event
+    lineage:
+      - datalake_grb_raw.tab_tempos.month
+  day:
+    description: Partition column representing the day of the event
+    lineage:
+      - datalake_grb_raw.tab_tempos.day
+  ts_load:
+    description: Timestamp of data load execution
