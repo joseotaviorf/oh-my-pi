@@ -1,0 +1,81 @@
+database_name: dw_customer_support
+table_name: fact_task_metrics
+description:
+  Fact table that describes all contacts that happen in the front office. Each contact is made of
+  one or many interactions between the customer and an analyst. Time metrics for each interaction are
+  also present in this table
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  sk_contact:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_contact
+    description: Identifier for the contact record.
+  sk_task:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_task
+    description: Identifier for the task.
+  sk_first_department:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_first_department
+    description: Identifier for the first department handling the contact.
+  sk_last_department:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_last_department
+    description: Identifier for the last department handling the contact.
+  sk_session:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_session
+    description: Session identifier for the contact.
+  sk_ticket:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_ticket
+    description: Ticket associated with the contact.
+  sk_user:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.sk_user
+    description: User associated with the contact.
+  direction:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.direction
+    description: Direction of the contact (e.g., inbound or outbound).
+  channel:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.channel
+    description: Communication channel of the contact.
+  origin:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.origin
+    description: Origin of the contact.
+  total_talk_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time
+    description: Aggregated total talk time..
+  total_queue_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_queue_time
+    description: Aggregated total queue time.
+  total_wrap_up_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_wrap_up_time
+    description: Aggregated total wrap-up time.
+  total_waiting_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_waiting_time
+    description: Aggregated total waiting time.
+  total_handling_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_handling_time
+    description: Aggregated total handling time.
+  total_ring_time:
+    lineage:
+      - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_ring_time
+    description: Aggregated total ring time.
+  is_contact_answered:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.is_contact_answered
+    description: Indicator if the contact was answered.
+  ts_task_created:
+    lineage:
+      - dw_customer_support.fact_customer_contacts.ts_task_created
+    description: Timestamp when the task was created.

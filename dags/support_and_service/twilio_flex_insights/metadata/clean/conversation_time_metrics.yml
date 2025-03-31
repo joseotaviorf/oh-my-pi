@@ -25,6 +25,9 @@ columns:
   total_waiting_time:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.total_waiting_time
+  total_ring_time:
+    lineage:
+      - datalake_twilio_flex_insights_raw.conversation_time_metrics.ring_time
   first_reply_time:
     lineage:
       - datalake_twilio_flex_insights_raw.conversation_time_metrics.first_reply_time

@@ -14,6 +14,8 @@ workflow:
   inner_dependencies:
     fact_tickets:
       - fact_customer_contacts
+    fact_task_metrics:
+      - fact_customer_contacts
   tables_customization:
     fact_user_blocks:
       partitions: [year, month, day]
@@ -69,6 +71,8 @@ workflow:
     fact_ticket_events:
       partitions: [year, month, day]
       extraction_type: incremental
+    fact_task_metrics:
+      z_order_by: [sk_task, sk_ticket, sk_user]
 
 cluster:
   type: custom_cluster
