@@ -163,7 +163,7 @@ LEFT JOIN
     ON m.id_manager_assignment = am.id_assignment
 LEFT JOIN
   subordinates AS s
-   ON a.id_assignment = s.id_manager_assignment
+   ON a.id_period_of_service = s.id_manager_assignment
 LEFT JOIN
   promotions AS p
     ON p.id_period_of_service = wr.id_period_of_service
