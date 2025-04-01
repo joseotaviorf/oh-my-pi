@@ -28,13 +28,24 @@ SELECT
 FROM 
   dw_velo.quintocred_ifrs_recurring_payment AS m
 ),
+max_month_to_charge AS (
+  SELECT 
+    sk_propose,
+    max(month_start) as max_month_to_charge
+  FROM 
+    dw_charging_payment_quintocred.fact_propose_timeline
+WHERE 
+  month_chargeble = true
+GROUP BY 1
+),
 step_1 AS (
-SELECT *,
+SELECT s.*,
+  COALESCE(f.max_month_to_charge, dt_contract_ended) AS max_month_to_charge,
   CASE 
     WHEN NOT(is_contract_active) 
       AND open_amount > 0 
       AND is_delinquency_renovacao 
-      THEN CAST(12*(year(dt_contract_ended) - year(dt_due)) + (month(dt_contract_ended) - month(dt_due) +1) AS DOUBLE) / 12
+      THEN CAST(12*(year(COALESCE(f.max_month_to_charge,dt_contract_ended)) - year(dt_due)) + (month(COALESCE(f.max_month_to_charge,dt_contract_ended)) - month(dt_due) +1) AS DOUBLE) / 12
     WHEN is_contract_active 
       AND open_amount > 0 
       AND is_delinquency_renovacao 
@@ -45,7 +56,7 @@ SELECT *,
     WHEN NOT(is_contract_active) 
       AND open_amount > 0 
       AND is_delinquency_renovacao 
-      THEN CAST(12*(year(dt_contract_ended) - year(dt_due)) + (month(dt_contract_ended) - month(dt_due) +1) AS DOUBLE)
+      THEN CAST(12*(year(COALESCE(f.max_month_to_charge,dt_contract_ended)) - year(dt_due)) + (month(COALESCE(f.max_month_to_charge,dt_contract_ended)) - month(dt_due) +1) AS DOUBLE)
     WHEN is_contract_active 
       AND open_amount > 0 
       AND is_delinquency_renovacao 
@@ -67,7 +78,10 @@ SELECT *,
     ELSE 'PENDING'
   END AS payment_classification
 FROM 
-  selected_base
+  selected_base s
+LEFT JOIN
+  max_month_to_charge as f 
+ON s.sk_propose = f.sk_propose
 ),
 step_2 AS (
 SELECT *,

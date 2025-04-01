@@ -21,6 +21,8 @@ workflow:
     fact_renewal:
       - fact_payment_full
       - fact_renewal_base
+    fact_bad_debt:
+      - fact_propose_timeline
 cluster:
   type: custom_cluster
   custom_configurations:

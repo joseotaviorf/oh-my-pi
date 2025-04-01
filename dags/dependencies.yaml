@@ -517,6 +517,7 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries
 bietlejuice.dw_fintech_snapshot_quintocred:
   - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-payment-full
+  - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-propose-timeline
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-occurrence
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-recurring-payment-no-renewal
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-recurring-payment-renewal
@@ -1368,8 +1369,8 @@ bietlejuice.enrich_buyer_prospect:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
 bietlejuice.enrich_cdp_personas:
   - bietlejuice.ebdb_contract:load-clean-contract-aud
-  - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ciq:
