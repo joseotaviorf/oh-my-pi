@@ -1,0 +1,50 @@
+database_name: datalake_rental_transact
+table_name: offer_topic_message
+description: Enrich table for the offers topic messages from Rental Transact database.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  id_topic_message:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.id
+    description: Offer topic message ID.
+  uuid_offer_topic_message:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.uuid_offer_topic_message
+    description: Offer topic message UUID.
+  id_offer_topic:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.id_offer_topic
+    description: Offer topic ID.
+  id_firestore:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.id_firestore
+    description: Firestore ID.
+  iteration:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.iteration
+    description: Offer topic iteration number.
+  max_topic_iteration:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.iteration
+    description: Last topic iteration number of this offer.
+  actor_role:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.actor_role
+    description: Role of the actor responsible for the iteration.
+  proposed_rent_value:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.proposed_rent_value
+    description: Proposed rent value on this iteration.
+  comment:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.comment
+    description: Iteration comment.
+  ts_created:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.ts_created
+    description: Timestamp of when the message was created.
+  ts_updated:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.ts_updated
+    description: Timestamp of when the message was updated.
