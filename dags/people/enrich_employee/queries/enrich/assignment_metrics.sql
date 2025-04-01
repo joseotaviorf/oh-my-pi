@@ -1,43 +1,4 @@
 WITH
-managers_step_1 AS (
-  SELECT DISTINCT
-    id_period_of_service,
-    id_assignment,
-    id_manager_assignment,
-    CASE
-      WHEN dt_effective_start <= DATE('{load_start_date}')
-        THEN 'current'
-      WHEN dt_effective_start > DATE('{load_start_date}')
-        THEN 'future'
-    END AS effective_state
-  FROM
-    datalake_hr_system.managers
-  WHERE
-    dt_effective_start <= DATE('{load_start_date}')
-    AND manager_type = 'LINE_MANAGER'
-  QUALIFY
-    DENSE_RANK() OVER (PARTITION BY id_assignment, effective_state ORDER BY dt_effective_start DESC) = 1
-),
-managers_periods_with_current_state AS (
-  SELECT DISTINCT
-    id_period_of_service
-  FROM
-    managers_step_1
-  WHERE
-    effective_state = 'current'
-),
-managers_effective_state AS (
-  SELECT
-    m.*
-  FROM
-    managers_step_1 AS m
-  LEFT JOIN
-    managers_periods_with_current_state AS p
-      ON m.id_period_of_service = p.id_period_of_service
-  WHERE
-    m.effective_state = 'current'
-    OR (m.effective_state = 'future' AND p.id_period_of_service IS NULL)
-),
 promotions_step_1 AS (
   SELECT
     id_period_of_service,
@@ -156,8 +117,9 @@ LEFT JOIN
   datalake_hr_system.assignment_effective_status AS a
     ON wr.id_period_of_service = a.id_period_of_service
 LEFT JOIN
-  managers_effective_state AS m
+  datalake_hr_system.management_hierarchy AS m
     ON wr.id_period_of_service = m.id_period_of_service
+      AND is_direct_manager
 LEFT JOIN
   datalake_hr_system.assignment_effective_status AS am
     ON m.id_manager_assignment = am.id_assignment
