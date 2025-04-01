@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     termination_id AS id_termination,
     job_transfer AS is_job_transfer,
@@ -20,7 +20,5 @@ SELECT
     year,
     month,
     day
-FROM 
+FROM
     datalake_terminator_raw.termination_characteristics
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

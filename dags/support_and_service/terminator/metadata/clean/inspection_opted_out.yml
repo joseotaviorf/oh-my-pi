@@ -1,42 +1,42 @@
-database_name: datalake_terminator_test_clean
+database_name: datalake_terminator_clean
 table_name: inspection_opted_out
 description: Clean table that aims to store inspection opt out information.
-domain: Support and Service
+domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_inspection_opted_out:
     lineage:
-      - datalake_terminator_test_raw.inspection_opted_out.id
+      - datalake_terminator_raw.inspection_opted_out.id
     description: Unique identification key of the inspection opted out
   id_termination:
     lineage:
-      - datalake_terminator_test_raw.inspection_opted_out.termination_id
+      - datalake_terminator_raw.inspection_opted_out.termination_id
     description: Identification key of termination.
   is_exit_inspection_opt_out:
     lineage:
-      - datalake_terminator_test_raw.inspection_opted_out.exit_inspection_opt_out
+      - datalake_terminator_raw.inspection_opted_out.exit_inspection_opt_out
     description: Boolean information indicating whether it was exit inspection opt out.
   reason:
     lineage:
-      - datalake_terminator_test_raw.inspection_opted_out.reason
+      - datalake_terminator_raw.inspection_opted_out.reason
     description: Reason for inspection opted out.
   reason_details:
     lineage:
-      - datalake_terminator_test_raw.inspection_opted_out.reason_details
+      - datalake_terminator_raw.inspection_opted_out.reason_details
     description: Details of the reason why inspection opted out.
   dt_opt_out:
     lineage:
-      - datalake_terminator_test_raw.inspection_opted_out.date_opt_out
+      - datalake_terminator_raw.inspection_opted_out.date_opt_out
     description: Inspection opted out date.
   year:
     lineage:
-      - datalake_terminator_test_raw.inspection_opted_out.year
+      - datalake_terminator_raw.inspection_opted_out.year
     description: Year when the data was loaded.
   month:
     lineage:
-      - datalake_terminator_test_raw.inspection_opted_out.month
+      - datalake_terminator_raw.inspection_opted_out.month
     description: Month when the data was loaded.
   day:
     lineage:
-      - datalake_terminator_test_raw.inspection_opted_out.day
+      - datalake_terminator_raw.inspection_opted_out.day
     description: Day when the data was loaded.

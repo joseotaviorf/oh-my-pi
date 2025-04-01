@@ -9,5 +9,5 @@ SELECT
     is_included_condominium,
     created_at AS ts_created,
     updated_at AS ts_updated
-FROM 
+FROM
     datalake_terminator_raw.utility_bill

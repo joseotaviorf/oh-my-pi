@@ -9,4 +9,4 @@ SELECT
     month,
     day
 FROM
-    datalake_terminator_test_raw.inspection_opted_out
+    datalake_terminator_raw.inspection_opted_out
