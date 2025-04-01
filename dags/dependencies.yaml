@@ -2599,6 +2599,7 @@ bietlejuice.enrich_region:
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.gsheets_for_rent:done-clean-auxiliary-region
 bietlejuice.enrich_rent_demand_events:
+  - bietlejuice.ebdb_visit:load-clean-visit-status-log
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_listing:load-enrich-house

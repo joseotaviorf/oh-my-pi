@@ -511,6 +511,162 @@ rent_demand_events AS (
       AND DATE(ct.ts_created) < COALESCE(DATE(hbh.ts_ended), NOW())
   WHERE
     ct.ts_created IS NOT NULL
+  UNION ALL
+  SELECT --visits_requested
+    bk.id AS id_event,
+    vsl.id_schedule AS id_booking,
+    rf.id_offer,
+    rf.id_proposal,
+    rf.id_contract,
+    11 AS id_event_type,
+    bk.id_visitor AS id_client,
+    bk.id_house,
+    rf.id_agent,
+    bk.id_rent_flow,
+    vsl.ts_created AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
+    hbh.id_user AS id_owner_on_event,
+    rf.uuid_company,
+    rf.id_company_hubspot,
+    rf.partner_3p_supply,
+    rf.country_code,
+    YEAR(vsl.ts_created) AS year,
+    MONTH(vsl.ts_created) AS month,
+    DAY(vsl.ts_created) AS day
+  FROM
+    datalake_ebdb_clean.visit_status_log AS vsl
+  LEFT JOIN
+    datalake_booking.booking AS bk 
+      ON vsl.id_schedule = bk.id
+  LEFT JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_booking = bk.id
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON bk.id_house = hbh.id_house
+      AND DATE(bk.ts_created) >= DATE(hbh.ts_started)
+      AND DATE(bk.ts_created) < COALESCE(DATE(hbh.ts_ended), NOW())
+  WHERE
+    vsl.event_type = 'VISIT_REQUESTED'
+  UNION ALL
+  SELECT --visits_scheduled
+    bk.id AS id_event,
+    vsl.id_schedule AS id_booking,
+    rf.id_offer,
+    rf.id_proposal,
+    rf.id_contract,
+    12 AS id_event_type,
+    bk.id_visitor AS id_client,
+    bk.id_house,
+    rf.id_agent,
+    bk.id_rent_flow,
+    vsl.ts_created AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
+    hbh.id_user AS id_owner_on_event,
+    rf.uuid_company,
+    rf.id_company_hubspot,
+    rf.partner_3p_supply,
+    rf.country_code,
+    YEAR(vsl.ts_created) AS year,
+    MONTH(vsl.ts_created) AS month,
+    DAY(vsl.ts_created) AS day
+  FROM
+    datalake_ebdb_clean.visit_status_log AS vsl
+  LEFT JOIN
+    datalake_booking.booking AS bk 
+      ON vsl.id_schedule = bk.id
+  LEFT JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_booking = bk.id
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON bk.id_house = hbh.id_house
+      AND DATE(bk.ts_created) >= DATE(hbh.ts_started)
+      AND DATE(bk.ts_created) < COALESCE(DATE(hbh.ts_ended), NOW())
+  WHERE
+    vsl.event_type = 'VISIT_SCHEDULED'
+  UNION ALL
+  SELECT --visits_rescheduled
+    bk.id AS id_event,
+    vsl.id_schedule AS id_booking,
+    rf.id_offer,
+    rf.id_proposal,
+    rf.id_contract,
+    13 AS id_event_type,
+    bk.id_visitor AS id_client,
+    bk.id_house,
+    rf.id_agent,
+    bk.id_rent_flow,
+    vsl.ts_created AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
+    hbh.id_user AS id_owner_on_event,
+    rf.uuid_company,
+    rf.id_company_hubspot,
+    rf.partner_3p_supply,
+    rf.country_code,
+    YEAR(vsl.ts_created) AS year,
+    MONTH(vsl.ts_created) AS month,
+    DAY(vsl.ts_created) AS day
+  FROM
+    datalake_ebdb_clean.visit_status_log AS vsl
+  LEFT JOIN
+    datalake_booking.booking AS bk 
+      ON vsl.id_schedule = bk.id
+  LEFT JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_booking = bk.id
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON bk.id_house = hbh.id_house
+      AND DATE(bk.ts_created) >= DATE(hbh.ts_started)
+      AND DATE(bk.ts_created) < COALESCE(DATE(hbh.ts_ended), NOW())
+  WHERE
+    vsl.event_type = 'VISIT_RESCHEDULED'
+  UNION ALL
+  SELECT --visits_done
+    bk.id AS id_event,
+    vsl.id_schedule AS id_booking,
+    rf.id_offer,
+    rf.id_proposal,
+    rf.id_contract,
+    14 AS id_event_type,
+    bk.id_visitor AS id_client,
+    bk.id_house,
+    rf.id_agent,
+    bk.id_rent_flow,
+    vsl.ts_created AS ts_event,
+    rf.id_house_listing,
+    rf.id_region,
+    rf.id_user,
+    hbh.id_user AS id_owner_on_event,
+    rf.uuid_company,
+    rf.id_company_hubspot,
+    rf.partner_3p_supply,
+    rf.country_code,
+    YEAR(vsl.ts_created) AS year,
+    MONTH(vsl.ts_created) AS month,
+    DAY(vsl.ts_created) AS day
+  FROM
+    datalake_ebdb_clean.visit_status_log AS vsl
+  LEFT JOIN
+    datalake_booking.booking AS bk 
+      ON vsl.id_schedule = bk.id
+  LEFT JOIN
+    rent_flow_house_listing AS rf
+      ON rf.id_booking = bk.id
+  LEFT JOIN
+    datalake_pro_owners.house_b2b_history AS hbh
+      ON bk.id_house = hbh.id_house
+      AND DATE(bk.ts_created) >= DATE(hbh.ts_started)
+      AND DATE(bk.ts_created) < COALESCE(DATE(hbh.ts_ended), NOW())
+  WHERE
+    vsl.event_type = 'VISIT_DONE'
 ),
 termination_period AS (
   /** We need to understand if a demand event happened during a contract termination process.

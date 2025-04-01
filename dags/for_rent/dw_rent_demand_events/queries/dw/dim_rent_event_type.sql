@@ -67,3 +67,31 @@ SELECT
       'CC' AS abbreviation,
       'CONTRACT' AS stage,
       NOW() AS ts_load
+  UNION ALL
+  SELECT
+      11 AS sk_event_type,
+      'VISIT_REQUESTED' AS event_name,
+      'VR' AS abbreviation,
+      'VISIT' AS stage,
+      NOW() AS ts_load
+  UNION ALL
+  SELECT
+      12 AS sk_event_type,
+      'VISIT_SCHEDULED' AS event_name,
+      'VS' AS abbreviation,
+      'VISIT' AS stage,
+      NOW() AS ts_load
+  UNION ALL
+  SELECT
+      13 AS sk_event_type,
+      'VISIT_RESCHEDULED' AS event_name,
+      'VRS' AS abbreviation,
+      'VISIT' AS stage,
+      NOW() AS ts_load
+  UNION ALL
+  SELECT
+      14 AS sk_event_type,
+      'VISIT_DONE' AS event_name,
+      'VD' AS abbreviation,
+      'VISIT' AS stage,
+      NOW() AS ts_load
