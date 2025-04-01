@@ -4,6 +4,9 @@ columns:
   id_user:
     lineage:
       - datalake_ebdb_raw.usuario_aud.id
+  uuid_person:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.personUUID
   id_country:
     lineage:
       - datalake_ebdb_raw.usuario_aud.country_id
@@ -238,3 +241,6 @@ columns:
   mod_is_instant_login:
     lineage:
       - datalake_ebdb_raw.usuario_aud.instantlogin_mod
+  mod_uuid_person:
+    lineage:
+      - datalake_ebdb_raw.usuario_aud.personUUID_MOD

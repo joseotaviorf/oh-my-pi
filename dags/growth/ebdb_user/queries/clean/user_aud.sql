@@ -1,5 +1,6 @@
 SELECT
     id AS id_user,
+    personUUID AS uuid_person,
     country_id AS id_country,
     REV AS rev,
     rEVTYPE AS rev_type,
@@ -79,6 +80,7 @@ SELECT
     loginRenewal AS ts_login_renewal,
     loginRenewal_MOD AS mod_ts_login_renewal,
     instantLogin AS is_instant_login,
-    instantLogin_MOD AS mod_is_instant_login
+    instantLogin_MOD AS mod_is_instant_login,
+    personUUID_MOD AS mod_uuid_person
 FROM
     datalake_ebdb_raw.`Usuario_aud`
