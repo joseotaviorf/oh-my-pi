@@ -20,10 +20,6 @@ workflow:
     - call
     - email
     - chat
-    unified_tickets:
-    - call
-    - chat
-    - email
     tickets:
     - chats
     - calls

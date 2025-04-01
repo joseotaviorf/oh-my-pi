@@ -20,7 +20,7 @@ columns:
       String/varchar column (surrogate key) that indicates the analyst. For descriptive information such as
       name, email, agent_organization, it is necessary to do a JOIN with the dw_customer_support.dim_analyst table.
     lineage:
-      - datalake_customer_support.unified_tickets.id_last_agent
+      - datalake_customer_support.tickets.last_analyst_email
   sk_reference_date:
     description:
       Column of type bigint (surrogate key) that represents the reference date on which the indicator metrics were calculated.

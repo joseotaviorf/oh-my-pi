@@ -152,10 +152,10 @@ sessions_and_tickets AS (
     id_ticket,
     ticket_origin
   FROM
-    datalake_customer_support.unified_tickets
+    datalake_customer_support.tickets
   WHERE
     front_or_back = 'front'
-    AND ticket_origin IN ('call inapp', 'whatsapp', 'chat5a')
+    AND ticket_origin IN ('call in app', 'whatsapp', 'chat in app')
 ),
 sessions_with_recontact AS (
   SELECT DISTINCT

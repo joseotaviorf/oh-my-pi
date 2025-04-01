@@ -1894,7 +1894,6 @@ bietlejuice.enrich_golden_set:
 bietlejuice.enrich_google_search_console:
   - bietlejuice.google_search_console:load-clean-report-by-page-and-query
 bietlejuice.enrich_greenseer:
-  - bietlejuice.enrich_customer_support:load-enrich-unified-tickets
   - bietlejuice.greenseer:load-clean-session
   - bietlejuice.journey_flow:load-clean-journey-flow
   - bietlejuice.sauron:load-clean-session
@@ -3219,16 +3218,15 @@ bietlejuice.enrich_tracksale:
   - bietlejuice.tracksale:load-clean-answer
   - bietlejuice.tracksale:load-clean-dispatch
 bietlejuice.enrich_tracksale_dispatches:
-  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
   - bietlejuice.ebdb_contract:load-clean-contract-person
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-pro-owner
   - bietlejuice.enrich_b2b:load-enrich-house-listing
-  - bietlejuice.enrich_customer_support:load-enrich-unified-tickets
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.enrich_trino_detractor:
   - bietlejuice.enrich_trino:load-enrich-trino-detractor-queries
   - bietlejuice.superset_internal:load-clean-ab-user

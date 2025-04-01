@@ -124,7 +124,7 @@ SELECT
   END AS is_retained_session_with_fallback,
   IFNULL(w.is_churn_chat, False) is_churn_chat,
   nop.user_response IS NOT NULL AND nop.n_options IS NOT NULL AND nop.user_response = n_options + 1 AS is_other_option,
-  IF(gs.ticket_origin = 'call inapp', True, False) AS is_call_in_app_session,
+  IF(gs.ticket_origin = 'call in app', True, False) AS is_call_in_app_session,
   gs.has_exceeded_session_timeout,
   gs.has_journey_flow_response,
   gs.has_fallback,

@@ -45,7 +45,7 @@ contracts AS (
 status_send AS (
   SELECT
     c.id_contract,
-    ut.id_ticket,
+    t.id_ticket,
     c.ndays_termination2today,
     c.termination_type,
     dp.department,
@@ -53,37 +53,37 @@ status_send AS (
     c.dt_started,
     c.ts_termination_finished,
     c.dt_recap,
-    ut.ts_started,
-    ut.ts_solved,
+    t.ts_created AS ts_started,
+    t.ts_solved,
     CASE
       WHEN (dp.department IN ('Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão por Inadimplência [OFF][POS][BACK]', 'Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
         OR (c.termination_type = 'termination'
-        AND ut.id_ticket IS NOT NULL
-        AND ut.ts_solved IS NULL
-        AND dp.sk_department IS NOT NULL) THEN 1
+        AND t.id_ticket IS NOT NULL
+        AND t.ts_solved IS NULL
+        AND dp.department IS NOT NULL) THEN 1
       ELSE 0
     END AS flg_not_send,
     CASE
       WHEN (dp.department IN ('Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão por Inadimplência [OFF][POS][BACK]', 'Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions')) THEN 0
       WHEN c.termination_type = 'recap_termination'
-        AND ut.id_ticket IS NOT NULL
-        AND ut.ts_started < c.dt_recap + INTERVAL '2' day
+        AND t.id_ticket IS NOT NULL
+        AND t.ts_created < c.dt_recap + INTERVAL '2' day
         AND dp.department IN ('Offboarding [OFF] [POS] [BACK]', 'Atendimento Escalado [OFF] [POS] [BACK]', 'Proteção QuintoAndar [OFF] [POS] [BACK]')
-        AND (ut.ts_solved >= c.dt_recap + INTERVAL '2' day OR ut.ts_solved IS NULL) THEN 1
+        AND (t.ts_solved >= c.dt_recap + INTERVAL '2' day OR t.ts_solved IS NULL) THEN 1
       ELSE 0
     END AS flg_recap_send
   FROM
     contracts AS c
   LEFT JOIN
-    datalake_customer_support.unified_tickets AS ut
-      ON c.id_contract = ut.id_contract
-      AND ut.id_contract IS NOT NULL
+    datalake_customer_support.tickets AS t
+      ON c.id_contract = t.id_contract
+      AND t.id_contract IS NOT NULL
   LEFT JOIN
-    dw_customer_support.dim_department AS dp
-      ON ut.id_main_department = dp.sk_department
-      AND (dp.department IN ('Offboarding [OFF] [POS] [BACK]', 'Atendimento Escalado [OFF] [POS] [BACK]','Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão por Inadimplência [OFF][POS][BACK]', 'Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
+    datalake_gsheets_clean.department_control AS dp
+      ON t.last_queue = dp.department
+      AND (dp.department IN ('Offboarding [OFF] [POS] [BACK]', 'Atendimento Escalado [OFF] [POS] [BACK]','Proteção QuintoAndar [OFF] [POS] [BACK]','Rescisão - Despejo [OFF][POS][BACK]', 'Rescisão por Inadimplência [OFF] [POS] [BACK]', 'Notificação Extrajudicial [CE] [POS] [BACK]','Dados Bancários [CE] [POS] [BACK]','CX ReclameAqui Adquiridas [CE] [POS] [BACK]')
         OR dp.team IN ('Casos Especiais','Ouvidoria','ReclameAqui','Evictions'))
   WHERE
     c.termination_type IS NOT NULL  --('termination', 'recap_termination')
