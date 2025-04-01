@@ -48,3 +48,9 @@ columns:
     lineage:
       - datalake_rental_transact_clean.offer_topic_message.ts_updated
     description: Timestamp of when the message was updated.
+  year:
+    description: Year of the offer topic message creation. It's also a table partition.
+  month:
+    description: Month of the offer topic message creation. It's also a table partition.
+  day:
+    description: Day of the offer topic message creation. It's also a table partition.

@@ -9,6 +9,9 @@ SELECT
     proposed_rent_value,
     comment,
     ts_created,
-    ts_updated
+    ts_updated,
+    YEAR(ts_created) AS year,
+    MONTH(ts_created) AS month,
+    DAY(ts_created) AS day
 FROM
     datalake_rental_transact_clean.offer_topic_message
