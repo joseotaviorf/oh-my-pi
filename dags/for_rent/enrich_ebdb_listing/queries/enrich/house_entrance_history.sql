@@ -2,11 +2,15 @@ WITH occupant_aud AS (
     SELECT
         aud.id_house,
         aud.id_occupant,
+        ot.name AS occupant_type,
         LAG(id_occupant) OVER(PARTITION BY aud.id_house ORDER BY aud.rev) AS previous_id_occupant,
         aud.rev,
         FROM_UNIXTIME(ure.ts_revision/1000) AS ts_updated
     FROM
         datalake_ebdb_clean.access_type_aud AS aud
+    JOIN
+        datalake_ebdb_clean.occupant_type AS ot
+            ON aud.id_occupant = ot.id
     JOIN
         datalake_ebdb_clean.user_revision_entity AS ure
             ON aud.rev = ure.id
@@ -17,6 +21,7 @@ scd_occupant AS (
   SELECT
       id_house,
       id_occupant,
+      occupant_type,
       rev,
       ts_updated AS ts_occupant_started,
       LEAD(ts_updated) OVER(PARTITION BY id_house ORDER BY rev) AS ts_occupant_ended
@@ -161,6 +166,7 @@ event_bus AS (
 SELECT
     eb.id_house,
     so.id_occupant,
+    so.occupant_type,
     COALESCE(ch.country_code, 'Undefined') AS country_code,
     sd.doorman_type,
     sea.entry_access_type,

@@ -407,15 +407,12 @@ house_listing_stranded_date AS (
 house_entrance_history AS (
   SELECT
         hl.id_house_listing,
-        ot.name,
+        heh.occupant_type,
         hl.version,
         MAX(heh.ts_entrance_started) OVER(PARTITION BY hl.id_house_listing) = heh.ts_entrance_started AS is_last_status_in_listing,
         heh.ts_entrance_started
   FROM
     datalake_ebdb_listing.house_entrance_history AS heh
-  LEFT JOIN
-    datalake_ebdb_clean.occupant_type AS ot
-      ON ot.id = heh.id_occupant
   JOIN
     house_listing AS hl
       ON heh.id_house = hl.id_house
@@ -468,7 +465,7 @@ SELECT
     hl.last_iorent_type,
     COUNT(c.id) OVER (PARTITION BY c.id_house) AS nr_renting,
     hl_c.order_renting,
-    heh.name AS who_is_living,
+    heh.occupant_type AS who_is_living,
     IF(hled.id_house_listing IS NOT NULL, TRUE, FALSE) AS is_early_relisting,
     hled.is_early_demand,
     hl.is_last_version,

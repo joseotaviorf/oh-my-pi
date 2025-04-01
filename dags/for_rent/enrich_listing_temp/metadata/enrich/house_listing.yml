@@ -173,5 +173,5 @@ columns:
     description: "Listing version."
   who_is_living:
     lineage:
-    - datalake_ebdb_listing.house_entrance_history.name
+    - datalake_ebdb_listing.house_entrance_history.occupant_type
     description: "Who is living in the house."

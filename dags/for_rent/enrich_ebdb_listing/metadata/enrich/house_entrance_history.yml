@@ -20,6 +20,10 @@ columns:
       '2': Tenant
       '3': Owner
       '4': Empty
+  occupant_type:
+    lineage:
+      - datalake_ebdb_clean.occupant_type.name
+    description: Who is occupying the house
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code

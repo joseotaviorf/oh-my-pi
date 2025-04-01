@@ -13,11 +13,11 @@ workflow:
     agents_with_keys:
     - house_listing
     house_listing:
-    - house_status_version_order
+    - house_listing_early_demand
+    - listing_business_context
+    - house_entrance_history
     - lbc_status_version_order
     - house_listing_status
-    - listing_business_context_status_history
-    - business_context_history
     - house_listing_category
     - house_listing_special_conditions
     house_listing_category:
