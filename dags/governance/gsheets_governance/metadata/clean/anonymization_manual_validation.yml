@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: anonymization_manual_validation
+owner: augusto.torres@quintoandar.com.br
+domain: Data Ops & Governance
+description: Information about anonymization manual validation.
+columns:
+  id_entity:
+    lineage:
+      - datalake_gsheets_raw.anonymization_manual_validation.id_entity
+    description: Id entity, field composed by database_name, table_name and column_name.
+  manual_eval:
+    lineage:
+      - datalake_gsheets_raw.anonymization_manual_validation.manual_eval
+    description: Manual result. Used to anonymize columns.
+  ts_ingested:
+    lineage:
+      - datalake_gsheets_raw.anonymization_manual_validation.ts_ingested
+    description: Timestamp represent the manual eval ingestion time.

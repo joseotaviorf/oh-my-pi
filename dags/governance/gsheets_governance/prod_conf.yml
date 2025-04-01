@@ -4,7 +4,7 @@ sheets_info:
     sheet_name: cost_center_people
     clean_table_name: cost_center_person
     sheet_context: governance
-  
+
   de_para_cc_diretoria:
     sheet_id: 1YGHjMziKwVv5qApGvDz2MZA_Mgik8mdA_mHixN7KWBg
     sheet_name: de_para_cc_diretoria
@@ -33,4 +33,10 @@ sheets_info:
     sheet_id: 1Z-Bry2V17FRSFsrLWkhWAyvnYL53lKmBx_ItLLYCKjU
     sheet_name: Scan_DW
     clean_table_name: scan_dw_evaluation
+    sheet_context: governance
+
+  anonymization_manual_validation:
+    sheet_id: 16G1XRsGEUdGmGe0nUiDHYt74FK0i2O3SWz6CP4aOdNw
+    sheet_name: Validated
+    clean_table_name: anonymization_manual_validation
     sheet_context: governance
