@@ -1866,6 +1866,9 @@ bietlejuice.enrich_ebdb_user:
   - bietlejuice.enrich_ebdb_country:load-enrich-user
 bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.ebdb_contract:load-clean-work-contract
+  - bietlejuice.enrich_hubspot_crm:load-enrich-company-history
+  - bietlejuice.enrich_rede_company:load-enrich-company-sks
+  - bietlejuice.gsheets_rede:done-clean-work-contract-matches
   - bietlejuice.hubspot:load-clean-company
 bietlejuice.enrich_emlio:
   - bietlejuice.emlio:load-clean-emlio-logs

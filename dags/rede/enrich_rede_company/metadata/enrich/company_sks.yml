@@ -49,6 +49,18 @@ columns:
     description: Tag extracted from the Hubspot system.
     lineage:
       - datalake_hubspot.company_members.extracted_3p_tag
+  company_name:
+    description: Name of the company in Company entity.
+    lineage:
+      - datalake_company_clean.company.name
+  trade_name:
+    description: Trade name of the company in Company entity, as known as "Nome Fantasia".
+    lineage:
+      - datalake_company_clean.company.trade_name
+  hubspot_company_name:
+    description: Name of the company in Hubspot system.
+    lineage:
+      - datalake_hubspot.company_members.company_name
   is_company_asp:
     description: Flag to indicate if the company is a ASP.
     lineage:

@@ -13,6 +13,9 @@ columns:
     description: ID of the company hubspot.
     lineage:
       - datalake_hubspot_clean.company.id_company
+      - datalake_company.company_sks.id_hubspot
+      - datalake_hubspot.company_history.id_company
+      - datalake_gsheets_clean.work_contract_matches.id_hubspot
   id_hub_teams:
     description: ID of the business unit team.
     lineage:
