@@ -1,0 +1,25 @@
+dag:
+  name: enrich_cdp_personas
+  schedule_start_date: 2025, 3, 31
+  owner: Data CDP
+  documentation:
+    dag_purpose: |
+      This DAG creates enriched tables containing the CDP personas definition that
+      comes from historical data.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: full
+  tables_customization:
+    tenant:
+      z_order_by: [id_user]
+    owner:
+      z_order_by: [id_user]
+cluster:
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

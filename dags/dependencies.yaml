@@ -1366,6 +1366,12 @@ bietlejuice.enrich_buyer_prospect:
   - bietlejuice.enrich_prospect_status:load-enrich-buyer-prospect-status
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
+bietlejuice.enrich_cdp_personas:
+  - bietlejuice.ebdb_contract:load-clean-contract-aud
+  - bietlejuice.ebdb_house:load-clean-house-aud
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_ciq:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking

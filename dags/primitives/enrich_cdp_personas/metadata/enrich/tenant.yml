@@ -1,0 +1,34 @@
+---
+database_name: datalake_cdp_personas
+table_name: tenant
+description:
+  This table consolidates all tenants (the main contract user) from QuintoAndar, in a historical view.
+  Also, it groups tenants based on active periods -- if an user had more than one contract active 
+  in the same time, it will be considered as one segmentation, with the initial timestamp indicating
+  the contract that started earlier, and the end timestamp related to the contract that finished later.
+  If an user appears more than once, it indicates that this user was active in a ForRent contract for
+  a while, stopped being a tenant (e.g. went through a contract termination) and later rented with us again.
+domain: Primitives
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_user:
+    description: The user id of the tenant.
+      It may not be unique, as an user may be tenant in our platform in different periods.
+    lineage:
+      - datalake_ebdb_clean.contract_aud.id_user
+  uuid_person:
+    description: The UUID Person of the user.
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+  is_active:
+    description: Boolean flag indicating if the user is active or not as a tenant (e.g. has as active contract).
+  ts_first_event:
+    description: Timestamp of the first user event while as an active tenant. 
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+  ts_last_event:
+    description: Timestamp of the last user event while as an active tenant.
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+  ts_load:
+    description: Timestamp indicating when the data was loaded in the data lake.

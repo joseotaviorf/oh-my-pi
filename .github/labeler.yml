@@ -38,6 +38,8 @@ data-ingestion:
   - "**/dags/platform/**"
 data-rede:
   - "**/dags/rede/**"
+data-primitives:
+  - "**/dags/primitives/**"
 data-services-support:
   - "**/dags/support_and_service/**"
 data-fintech:
