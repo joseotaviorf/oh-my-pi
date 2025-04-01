@@ -122,8 +122,8 @@ columns:
       Bigint column that represents the number of tickets that were transferred considering that the
       first service was provided by the analyst and the team is not “Inside Sales”.
     lineage:
-      - datalake_customer_support.received_demand.status
-      - datalake_customer_support.received_demand.is_first_department_interaction
+      - dw_customer_support.fact_customer_contacts.status
+      - dw_customer_support.fact_customer_contacts.is_first_department_interaction
       - datalake_gsheets_clean.department_control.team
       - datalake_customer_support.tickets.id_ticket
   tickets_in_backlog:

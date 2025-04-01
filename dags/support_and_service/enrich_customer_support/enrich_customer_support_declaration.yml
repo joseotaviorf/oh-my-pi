@@ -16,10 +16,6 @@ workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
-    received_demand:
-    - call
-    - email
-    - chat
     tickets:
     - chats
     - calls

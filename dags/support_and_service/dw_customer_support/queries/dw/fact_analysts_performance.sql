@@ -31,7 +31,6 @@ WITH recontact_data AS (
     AND rt.group_name <> 'FullService [BACK]'
 
   UNION ALL
-
   SELECT
     rt.id_ticket AS id_ticket,
     MD5(rt.agent_email) AS id_agent,
@@ -66,10 +65,10 @@ WITH recontact_data AS (
     IF(DATE(t.ts_solved) = DATE('{load_start_date}'), TRUE, FALSE) AS is_productive_ticket,
     CASE
       WHEN ROW_NUMBER() OVER(PARTITION BY MD5(
-        COALESCE(CONCAT(rd.id_call, 'call'),
-        CONCAT(rd.id_session, 'chat'),
-        CONCAT(rd.id_ticket, 'email'))
-      ), rd.department ORDER BY rd.ts_created) = 1 THEN TRUE
+        COALESCE(CONCAT(rd.sk_call, 'call'),
+        CONCAT(rd.sk_session, 'chat'),
+        CONCAT(rd.sk_ticket, 'email'))
+      ), rd.sk_department ORDER BY COALESCE(rd.ts_task_created, rd.ts_task_created)) = 1 THEN TRUE
       ELSE FALSE
     END AS is_first_department_interaction,
     bmt.is_backlog_in_time,
@@ -81,8 +80,8 @@ WITH recontact_data AS (
   FROM
     datalake_customer_support.tickets t
   LEFT JOIN
-    datalake_customer_support.received_demand AS rd
-      ON t.id_ticket = rd.id_ticket
+    dw_customer_support.fact_customer_contacts AS rd
+      ON CAST(t.id_ticket AS BIGINT) = rd.sk_ticket
   LEFT JOIN
     datalake_customer_demand.backlog_metrics_tasks AS bmt
       ON t.id_ticket = bmt.id_task
@@ -102,9 +101,7 @@ WITH recontact_data AS (
 		AND DATE(t.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   QUALIFY
 		ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) = 1
-
   UNION ALL
-
   SELECT
     t.id_ticket,
     MD5(t.last_analyst_email) AS id_agent,
@@ -147,9 +144,7 @@ WITH recontact_data AS (
     AND t.last_analyst_email IS NOT NULL
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY zes.id_ticket ORDER BY zes.ts_first_response DESC) = 1
-
   UNION ALL
-
   SELECT
     ro.id_ticket,
     ro.id_agent,
@@ -189,7 +184,7 @@ SELECT
   COUNT_IF(wa.is_recontact_ticket = TRUE) AS total_tickets_recontact,
   COUNT_IF(wa.is_received_demand = TRUE) AS total_received_demand,
   COUNT_IF(wa.is_productive_ticket = TRUE) AS total_productivity,
-  COUNT( DISTINCT
+  COUNT(DISTINCT
     CASE
       WHEN
         wa.first_csat_score IS NOT NULL
@@ -197,7 +192,7 @@ SELECT
       ELSE NULL
     END
   ) AS tickets_with_csat_score,
-  COUNT( DISTINCT
+  COUNT(DISTINCT
     CASE
       WHEN
         wa.first_csat_score IN (4,5)
@@ -205,7 +200,7 @@ SELECT
       ELSE NULL
     END
   ) AS tickets_csat_satisfied,
-  COUNT( DISTINCT
+  COUNT(DISTINCT
     CASE
       WHEN
         wa.first_csat_score = 3
@@ -213,7 +208,7 @@ SELECT
       ELSE NULL
     END
   ) AS tickets_csat_neutral,
-  COUNT( DISTINCT
+  COUNT(DISTINCT
     CASE
       WHEN
         wa.first_csat_score IN (1,2)
@@ -221,7 +216,7 @@ SELECT
       ELSE NULL
     END
   ) AS tickets_csat_dissatisfied,
-  COUNT( DISTINCT
+  COUNT(DISTINCT
     CASE
       WHEN
         wa.resolution_survey IS NOT NULL
@@ -229,7 +224,7 @@ SELECT
         THEN wa.id_ticket
     END
   ) AS tickets_with_resolution_answered,
-  COUNT( DISTINCT
+  COUNT(DISTINCT
     CASE
       WHEN
         wa.resolution_survey = True
@@ -237,9 +232,9 @@ SELECT
         THEN wa.id_ticket
     END
   ) AS tickets_with_resolution,
-  COUNT( DISTINCT
+  COUNT(DISTINCT
     CASE
-      WHEN wa.status = 'TRANSFERRED'
+      WHEN wa.status = 'transferred'
         AND wa.is_first_department_interaction = True
         AND wa.team <> 'Inside Sales'
         THEN wa.id_ticket

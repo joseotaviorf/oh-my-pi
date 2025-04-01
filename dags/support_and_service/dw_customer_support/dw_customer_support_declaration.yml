@@ -16,6 +16,8 @@ workflow:
       - fact_customer_contacts
     fact_task_metrics:
       - fact_customer_contacts
+    fact_analysts_performance:
+      - fact_customer_contacts
   tables_customization:
     fact_user_blocks:
       partitions: [year, month, day]
