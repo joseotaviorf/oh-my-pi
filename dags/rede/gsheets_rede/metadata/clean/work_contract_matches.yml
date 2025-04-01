@@ -1,0 +1,15 @@
+---
+database_name: datalake_gsheets_clean
+table_name: work_contract_matches
+description: Support table for Work Contract when the contract name not match with ectracted_3p_tag and company name from Hubspot or company_name and trade_name from Company entities.
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_hubspot:
+    description: ID Hubspot associated with the contract.
+    lineage:
+      - datalake_gsheets_raw.work_contract_matches.id_hubspot
+  3p_partner:
+    description: Name of the third-party partner associated with the contract.
+    lineage:
+      - datalake_gsheets_raw.work_contract_matches.3p_partner

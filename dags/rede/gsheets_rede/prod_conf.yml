@@ -16,3 +16,9 @@ sheets_info:
     sheet_name: rede_5a_revenue_share_conditions
     clean_table_name: rede_5a_revenue_share_conditions
     sheet_context: rede
+  
+  work_contract_matches:
+    sheet_id: 1MNK5jMJlvBnxaGeF4XE5tA4iX1gxUC_OuKhnALELpic
+    sheet_name: work_contract
+    clean_table_name: work_contract_matches
+    sheet_context: rede
