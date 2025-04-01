@@ -185,6 +185,7 @@ SELECT
     calc_smartgtwrf_base_consultada_3 AS smartgtwrf_base_third_proponent,
     calc_smartgtwrf_base_consultada_4 AS smartgtwrf_base_fourth_proponent,
     `smartgtwrf_5andar.result.message` AS smartgtwrf_message,
+    `quintoandarargonautv4_5andar.result.message` AS argonaut_result,
     prop_tipo_documento AS proposal_document_type,
     rgr_backgroundcheck_cad_localizado AS located_registration_bigid,
     rgr_backgroundcheck_sist_responde	AS sistem_reponse_bigig,

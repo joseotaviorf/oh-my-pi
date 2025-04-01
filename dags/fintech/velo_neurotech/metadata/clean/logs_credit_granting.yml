@@ -554,6 +554,9 @@ columns:
   smartgtwrf_base_fourth_proponent:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.calc_smartgtwrf_base_consultada_4
+  argonaut_result:
+    lineage:
+      - datalake_velo_neurotech_raw.`quintoandarargonautv4_5andar.result.message` 
   proposal_document_type:
     lineage:
       - datalake_velo_neurotech_raw.logs_credit_granting.prop_tipo_documento
