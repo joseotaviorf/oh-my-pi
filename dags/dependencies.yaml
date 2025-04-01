@@ -3601,11 +3601,8 @@ bietlejuice.reverse_rent_listings_report_access:
 bietlejuice.reverse_rent_listings_report_load:
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-daily-infos
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
-  - bietlejuice.dw_supply:load-dw-growth-fact-supply-events
-  - bietlejuice.enrich_ebdb_agents:load-enrich-ciq-users
+  - bietlejuice.enrich_ebdb_listing:load-enrich-lbc-status-version-order
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance
   - bietlejuice.dw_operator_performance:load-dw-operator-performance-fact-operator-performance
