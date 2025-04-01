@@ -22,9 +22,8 @@ SELECT
     COALESCE(sa_sale_agreement_created_date.sk_secretariat_user_version, -1) AS sk_secretariat_on_sale_agreement_created,
     COALESCE(sa_sale_agreement_signed_date.sk_secretariat_user_version, -1) AS sk_secretariat_on_sale_agreement_signed,
     COALESCE(sa_last_secretariat.sk_secretariat_user_version, -1) AS sk_last_secretariat,
-    COALESCE(bpt.sk_buyer_prospect_type, -1) AS sk_buyer_prospect_type,
+    COALESCE(bpt.id_buyer_prospect_type, -1) AS sk_buyer_prospect_type,
     COALESCE(dsps_listing.sk_sale_price_segment, -1) AS sk_listing_price_segment,
-    COALESCE(dsps_bp.sk_sale_price_segment, -1) AS sk_buyer_prospect_price_segment,
     COALESCE(CAST(REPLACE(SUBSTRING(eso.ts_offer_submitted,1, 10),'-','') AS BIGINT), -1) AS sk_offer_submitted_date,
     COALESCE(CAST(REPLACE(SUBSTRING(eso.dt_offer_accepted,1, 10),'-','') AS BIGINT), -1) AS sk_offer_accepted_date,
     COALESCE(CAST(REPLACE(SUBSTRING(eso.dt_offer_dismissed,1, 10),'-','') AS BIGINT), -1) AS sk_offer_dismissed_date,
@@ -104,11 +103,8 @@ LEFT JOIN
     datalake_buyer_prospect.buyer_prospect_type AS bpt
         ON eso.id_buyer = bpt.id_prospect
         AND r.city_group = bpt.city_group
-        AND COALESCE(eso.ts_booking_created, eso.ts_offer_submitted) >= bpt.ts_activation 
-        AND COALESCE(eso.ts_booking_created, eso.ts_offer_submitted) < COALESCE(bpt.ts_activation_end, NOW())
+        AND eso.ts_offer_submitted >= bpt.ts_activation 
+        AND eso.ts_offer_submitted < COALESCE(bpt.ts_activation_end, NOW())
 LEFT JOIN
     dw_sale.dim_sale_price_segment AS dsps_listing
         ON slpc.price_segment = dsps_listing.price_segment
-LEFT JOIN
-    dw_sale.dim_sale_price_segment AS dsps_bp
-        ON bpt.price_segment = dsps_bp.price_segment

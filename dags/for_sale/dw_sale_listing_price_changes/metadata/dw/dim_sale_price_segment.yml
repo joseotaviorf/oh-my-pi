@@ -14,8 +14,12 @@ columns:
     lineage:
     - datalake_sale_listings.sale_listing_price_changes.price_segment
     categories:
-      High Ticket: If the listing is equal or greater than 1 Million BRL
-      Low Ticket: If the listing is less than 1 Million BRL
+      High Ticket: "If the listing is categorized as High Ticket, using the
+        the rules for the city groups: 
+          - RMSP, RJ, and BH: BRL 1MM
+          - Porto Alegre: BRL 600K
+          - Campinas: BRL 800K"
+      Low Ticket: If the listing is categorized as Low Ticket.
   price_segment_short:
     description: 'Short ticket segmentation'
     lineage:

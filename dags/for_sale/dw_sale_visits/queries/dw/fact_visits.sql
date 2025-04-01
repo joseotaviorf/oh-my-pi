@@ -1,5 +1,5 @@
 SELECT
-    COALESCE(id_booking, -1) AS sk_booking,
+    COALESCE(sv.id_booking, -1) AS sk_booking,
     COALESCE(id_sale_flow, -1) AS sk_sale_flow,
     COALESCE(sv.id_house, -1) AS sk_house,
     COALESCE(sv.id_region, -1) AS sk_region,
@@ -19,11 +19,10 @@ SELECT
     COALESCE(sa_last_secretariat.sk_secretariat_user_version, -1) AS sk_last_secretariat,
     COALESCE(id_visit, -1) AS sk_visit,
     visit_code AS sk_visit_code,
-    COALESCE(id_offer, -1) AS sk_offer,
+    COALESCE(sv.id_offer, -1) AS sk_offer,
     COALESCE(id_buyer_booking_review, -1) AS sk_buyer_booking_review,
-    COALESCE(bpt.sk_buyer_prospect_type, -1) AS sk_buyer_prospect_type,
+    COALESCE(bpt.id_buyer_prospect_type, -1) AS sk_buyer_prospect_type,
     COALESCE(dsps_listing.sk_sale_price_segment, -1) AS sk_listing_price_segment,
-    COALESCE(dsps_bp.sk_sale_price_segment, -1) AS sk_buyer_prospect_price_segment,
     COALESCE(BIGINT(DATE_FORMAT(ts_booking_created, 'yyyyMMdd')), -1) AS sk_booking_created_date,
     COALESCE(BIGINT(DATE_FORMAT(ts_visit, 'yyyyMMdd')), -1) AS sk_visit_date,
     COALESCE(BIGINT(DATE_FORMAT(ts_visit_canceled, 'yyyyMMdd')), -1) AS sk_visit_canceled_date,
@@ -79,6 +78,3 @@ LEFT JOIN
 LEFT JOIN
     dw_sale.dim_sale_price_segment AS dsps_listing
         ON slpc.price_segment = dsps_listing.price_segment
-LEFT JOIN
-    dw_sale.dim_sale_price_segment AS dsps_bp
-        ON bpt.price_segment = dsps_bp.price_segment

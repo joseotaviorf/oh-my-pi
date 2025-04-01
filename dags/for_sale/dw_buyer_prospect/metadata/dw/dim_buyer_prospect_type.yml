@@ -8,7 +8,7 @@ columns:
   sk_buyer_prospect_type:
     description: 'Surrogate key for buyer prospect type'
     lineage:
-    - datalake_buyer_prospect.buyer_prospect_type.sk_buyer_prospect_type
+    - datalake_buyer_prospect.buyer_prospect_type.id_buyer_prospect_type
   buyer_prospect_type:
     description: 'Buyer prospect type'
     categories:
@@ -23,5 +23,25 @@ columns:
       'Recovery Buyer Prospect': '#N/A'
     lineage:
     - datalake_buyer_prospect.buyer_prospect_type.bp_type
+  city_group:
+    description: 'City group from where the buyer prospect is'
+    lineage:
+    - datalake_buyer_prospect.buyer_prospect_type.city_group
+  price_segment:
+    description: 'Price segment from the buyer prospect'
+    lineage:
+    - datalake_buyer_prospect.buyer_prospect_type.price_segment
+  price_segment_short:
+    description: 'Short description of the price segment'
+    lineage:
+    - datalake_buyer_prospect.buyer_prospect_type.price_segment
+  ts_activation:
+    description: 'Timestamp of when the record was activated'
+    lineage:
+    - datalake_buyer_prospect.buyer_prospect_type.ts_activation
+  ts_activation_end:
+    description: 'Timestamp of when the record was deactivated'
+    lineage:
+    - datalake_buyer_prospect.buyer_prospect_type.ts_activation_end
   ts_load:
     description: 'Timestamp of when the record was loaded'

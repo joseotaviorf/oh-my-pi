@@ -18,7 +18,6 @@ WITH bookings AS (
         fv.sk_last_secretariat,
         fv.sk_buyer_prospect_type,
         fv.sk_listing_price_segment,
-        fv.sk_buyer_prospect_price_segment,
         fv.ts_booking_created,
         fv.ts_visit_completed,
         fv.ts_visit_canceled
@@ -59,7 +58,6 @@ offers AS (
         fo.sk_last_secretariat,
         fo.sk_buyer_prospect_type,
         fo.sk_listing_price_segment,
-        fo.sk_buyer_prospect_price_segment,
         fo.ts_offer_submitted,
         fo.ts_offer_accepted,
         fo.ts_sale_agreement_created,
@@ -95,7 +93,6 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
-        sk_buyer_prospect_price_segment,
         ts_booking_created AS ts_event
     FROM
         bookings
@@ -121,7 +118,6 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
-        sk_buyer_prospect_price_segment,
         ts_visit_completed AS ts_event
     FROM
         bookings
@@ -147,7 +143,6 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
-        sk_buyer_prospect_price_segment,
         ts_offer_submitted AS ts_event
     FROM
         offers
@@ -173,7 +168,6 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
-        sk_buyer_prospect_price_segment,
         ts_offer_accepted AS ts_event
     FROM
         offers
@@ -199,7 +193,6 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
-        sk_buyer_prospect_price_segment,
         ts_sale_agreement_created AS ts_event
     FROM
         offers
@@ -225,7 +218,6 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
-        sk_buyer_prospect_price_segment,
         ts_sale_agreement_signed AS ts_event
     FROM
         offers
@@ -251,7 +243,6 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
-        sk_buyer_prospect_price_segment,
         ts_visit_canceled AS ts_event
     FROM
         bookings
@@ -277,7 +268,6 @@ events AS (
         sk_last_secretariat,
         sk_buyer_prospect_type,
         sk_listing_price_segment,
-        sk_buyer_prospect_price_segment,
         ts_offer_dismissed AS ts_event
     FROM
         offers
@@ -305,7 +295,6 @@ SELECT
     COALESCE(e.sk_last_secretariat, -1) AS sk_last_secretariat,
     COALESCE(e.sk_buyer_prospect_type, -1) AS sk_buyer_prospect_type,
     COALESCE(e.sk_listing_price_segment, -1) AS sk_listing_price_segment,
-    COALESCE(e.sk_buyer_prospect_price_segment, -1) AS sk_buyer_prospect_price_segment,
     YEAR(e.ts_event) AS year,
     MONTH(e.ts_event) AS month,
     DAY(e.ts_event) AS day,
@@ -335,7 +324,6 @@ SELECT
     sk_last_secretariat,
     sk_buyer_prospect_type,
     sk_listing_price_segment,
-    sk_buyer_prospect_price_segment,
     year,
     month,
     day,

@@ -6,24 +6,45 @@ domain: for_sale
 description: Table with categorization of buyer prospects of High Ticket and if is new prospect or recovery.
   prospect
 columns:
+  id_buyer_prospect_type:
+    description: 'Id of the buyer prospect type.'
+    lineage:
+    - datalake_demand_flows.buyer_prospect_status.id_buyer_prospect
+    - datalake_demand_flows.conversion_events.id_offer
+    - datalake_demand_flows.conversion_events.id_booking
+    - datalake_demand_flows.buyer_prospect_status.ts_activation
   id_prospect:
     description: 'Id of the prospect, or buyer.'
     lineage:
     - datalake_demand_flows.buyer_prospect_status.id_buyer_prospect
+  id_offer:
+    description: 'Id of the offer that activated the prospect.'
+    lineage:
+    - datalake_demand_flows.conversion_events.id_offer
+  id_house:
+    description: 'Id of the house of the offer or visit that activated the prospect.'
+    lineage:
+    - datalake_demand_flows.conversion_events.id_house
+  id_booking:
+    description: 'Id of the booking that activated the prospect.'
+    lineage:
+    - datalake_demand_flows.conversion_events.id_booking
   id_region:
-    description: 'Id of the region of the prospect'
+    description: 'Id of the region of the house of the offer or visit that activated the prospect.'
     lineage:
     - datalake_ebdb_clean.house.id_region
-  id_first_booking:
-    description: 'Id of the first booking of the prospect.'
+  id_demand_prospect_conversion_event:
+    description: 'Id of the demand prospect conversion event.'
     lineage:
-    - datalake_booking.booking.id_booking
-  id_house_first_booking:
-    description: 'Id of the house of the first booking of the prospect.'
+    - datalake_demand_flows.buyer_prospect_status.id_demand_prospect_conversion_event
+  prospect_event_name:
+    description: 'Name of the event that activated the prospect.'
     lineage:
-    - datalake_booking.booking.id_house
-  sk_buyer_prospect_type:
-    description: 'Surrogate key of the buyer prospect.'
+    - datalake_demand_flows.buyer_prospect_status.event_name
+  status_trigger_event_name:
+    description: 'Trigger of the event.'
+    lineage:
+    - datalake_demand_flows.buyer_prospect_status.status_trigger_event_name
   bp_type:
     description: 'Buyer prospect type, if is new prospect or recovery prospect.'
     categories:
@@ -36,12 +57,16 @@ columns:
     lineage:
     - datalake_demand_flows.buyer_prospect_status.city_group
   price_segment:
-    description: 'Segmentation of the ticket of the first visit of the prospect.'
+    description: 'Segmentation of the ticket of the first visit or offer of the prospect.'
     categories:
       "High Ticket": "High Ticket"
       "Low Ticket": "Low Ticket"
     lineage:
     - datalake_sale_listings.sale_listing_price_changes.price_segment
+  price_change_number:
+    description: 'Change number of the price of the first visit or offer of the prospect.'
+    lineage:
+    - datalake_sale_listings.sale_listing_price_changes.price_change_number
   ts_activation:
     description: 'Date of activation of the prospect.'
     lineage:
@@ -50,9 +75,5 @@ columns:
     description: 'Date of end of activation of the prospect.'
     lineage:
     - datalake_demand_flows.buyer_prospect_status.ts_activation_end
-  ts_first_booking:
-    description: 'Timestamp of the first booking of the prospect.'
-    lineage:
-    - datalake_booking.booking.ts_created
   ts_load:
     description: 'Timestamp of the load of the data.'
