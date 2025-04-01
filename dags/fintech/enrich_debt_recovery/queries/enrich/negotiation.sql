@@ -83,12 +83,12 @@ SELECT
     consultancy,
     CASE
         WHEN LOWER(n.consultancy) LIKE '%serasa%' THEN 'SERASA'
-        WHEN n.consultancy = '009' OR LOWER(n.consultancy) = 'quinto' THEN 'COBRANÇA_INTERNA_QA'
-        WHEN n.consultancy IN ('010','G010') THEN 'PASCHOALOTTO'
-        WHEN n.consultancy IN ('015','G015') THEN 'PORTAL_QUINTOANDAR'
-        WHEN n.consultancy IN ('017','G017') THEN 'TRC'
-        WHEN n.consultancy IN ('018','G018') THEN 'GRB'
-        WHEN n.consultancy IN ('019','G019') THEN 'MEETCALL'
+        WHEN UPPER(n.consultancy) = '009' OR LOWER(n.consultancy) = 'quinto' THEN 'COBRANÇA_INTERNA_QA'
+        WHEN UPPER(n.consultancy) IN ('010','G010') THEN 'PASCHOALOTTO'
+        WHEN UPPER(n.consultancy) IN ('015','G015') THEN 'PORTAL_QUINTOANDAR'
+        WHEN UPPER(n.consultancy) IN ('017','G017', 'QA_TRC') THEN 'TRC'
+        WHEN UPPER(n.consultancy) IN ('018','G018', 'QA_GRB') THEN 'GRB'
+        WHEN UPPER(n.consultancy) IN ('019','G019', 'QA_MEETC') THEN 'MEETCALL'
         ELSE UPPER(n.consultancy)
     END AS consultancy_name,
     n.status,

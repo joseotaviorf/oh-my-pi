@@ -16,7 +16,7 @@ trato_feito_negotiation AS (
       WHEN n.debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
       WHEN n.debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
     END AS creditor,
-    n.consultancy AS advisory,
+    n.consultancy_name AS advisory,
     CASE
       WHEN n.consultancy IS NOT NULL THEN "Assessoria"
       WHEN n.collector = "5A-collector" THEN "Portal Auto Negociação"
