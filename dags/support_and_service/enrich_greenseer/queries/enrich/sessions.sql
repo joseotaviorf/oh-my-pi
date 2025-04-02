@@ -156,6 +156,8 @@ sessions_and_tickets AS (
   WHERE
     front_or_back = 'front'
     AND ticket_origin IN ('call in app', 'whatsapp', 'chat in app')
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_updated DESC) = 1
 ),
 sessions_with_recontact AS (
   SELECT DISTINCT
