@@ -6,73 +6,45 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_taxonomy:
     lineage:
-      - datalake_customer_support.call.step_tag
-      - datalake_customer_support.call.customer_type_tag
-      - datalake_customer_support.call.client_type
-      - datalake_customer_support.call.request_type
-      - datalake_customer_support.call.contact_motivation_tag
-      - datalake_customer_support.call.contact_theme_tag
-      - datalake_customer_support.call.contact_theme_detail_tag
-      - datalake_customer_support.chat.step_tag
-      - datalake_customer_support.chat.customer_type_tag
-      - datalake_customer_support.chat.client_type
-      - datalake_customer_support.chat.request_type
-      - datalake_customer_support.chat.contact_motivation_tag
-      - datalake_customer_support.chat.contact_theme_tag
-      - datalake_customer_support.chat.contact_theme_detail_tag
-      - datalake_customer_support.email.step_tag
-      - datalake_customer_support.email.customer_type_tag
-      - datalake_customer_support.email.client_type
-      - datalake_customer_support.email.request_type
-      - datalake_customer_support.email.contact_motivation_tag
-      - datalake_customer_support.email.contact_theme_tag
-      - datalake_customer_support.email.contact_theme_detail_tag
+      - datalake_customer_support.tickets.step_tag
+      - datalake_customer_support.tickets.customer_type_tag
+      - datalake_customer_support.tickets.client_type
+      - datalake_customer_support.tickets.request_type
+      - datalake_customer_support.tickets.contact_motivation_tag
+      - datalake_customer_support.tickets.contact_theme_tag
+      - datalake_customer_support.tickets.contact_theme_detail_tag
     description: Key generated as a MD5 from all taxonomies fields.
   customer_type:
     lineage:
-      - datalake_customer_support.call.client_type
-      - datalake_customer_support.chat.client_type
-      - datalake_customer_support.email.client_type
+      - datalake_customer_support.tickets.client_type
     description:
       Client type Note - This field does not belong to the taxonomy defined
       on Central Ops.
   step_tag:
     lineage:
-      - datalake_customer_support.call.step_tag
-      - datalake_customer_support.chat.step_tag
-      - datalake_customer_support.email.step_tag
+      - datalake_customer_support.tickets.step_tag
     description: Classification of the user journey step.
   customer_type_tag:
     lineage:
-      - datalake_customer_support.call.customer_type_tag
-      - datalake_customer_support.chat.customer_type_tag
-      - datalake_customer_support.email.customer_type_tag
+      - datalake_customer_support.tickets.customer_type_tag
     description: Classification of the user.
   request_type:
     lineage:
-      - datalake_customer_support.call.request_type
-      - datalake_customer_support.chat.request_type
-      - datalake_customer_support.email.request_type
+      - datalake_customer_support.tickets.request_type
     description:
       Classification of the user request. Note - This field does not belong
       to the taxonomy defined on Central Ops.
   motivation:
     lineage:
-      - datalake_customer_support.call.contact_motivation_tag
-      - datalake_customer_support.chat.contact_motivation_tag
-      - datalake_customer_support.email.contact_motivation_tag
+      - datalake_customer_support.tickets.contact_motivation_tag
     description: Classification of the user motivation (e.g. doubt).
   theme:
     lineage:
-      - datalake_customer_support.call.contact_theme_tag
-      - datalake_customer_support.chat.contact_theme_tag
-      - datalake_customer_support.email.contact_theme_tag
+      - datalake_customer_support.tickets.contact_theme_tag
     description: Theme.
   theme_detail:
     lineage:
-      - datalake_customer_support.call.contact_theme_detail_tag
-      - datalake_customer_support.chat.contact_theme_detail_tag
-      - datalake_customer_support.email.contact_theme_detail_tag
+      - datalake_customer_support.tickets.contact_theme_detail_tag
     description: Detailed theme.
   journey:
     lineage:

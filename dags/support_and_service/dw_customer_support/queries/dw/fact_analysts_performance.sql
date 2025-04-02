@@ -29,7 +29,6 @@ WITH recontact_data AS (
     AND COALESCE(DATE(rt.ts_solved_local),DATE(rt.ts_closed_local)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND rt.tags NOT LIKE '%closed_by_merge%'
     AND rt.group_name <> 'FullService [BACK]'
-
   UNION ALL
   SELECT
     rt.id_ticket AS id_ticket,
