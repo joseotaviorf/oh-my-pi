@@ -32,7 +32,7 @@ base_churn AS (
         AND g.ts_started < t.ts_created - INTERVAL 3 HOUR
   WHERE
     t.channel = 'call'
-    MAKE_DATE(g.year, g.month, g.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    AND MAKE_DATE(g.year, g.month, g.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 assistances AS (
   SELECT
