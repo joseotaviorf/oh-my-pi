@@ -92,6 +92,14 @@ columns:
       "DECLINED_BY_PP": The person who declined the relisting was the owner.
       "DECLINED_BY_CX/ENG": The person who declined the relisting and opted-out wasn't the owner.
       "AUTO_DECLINED": If the is_early_relisting flag is False and we don't have any information who did the opt-out, the value will be Auto-declined.
+  is_spoc:
+    description: Boolean information indicating whether the termination is part of the spoc control group.
+    lineage:
+      - datalake_terminator_clean.termination.is_spoc
+  is_spoc_control_group:
+    description: Boolean information indicating whether the termination is part of the spoc control group.
+    lineage:
+      - datalake_terminator_clean.termination.is_spoc_control_group
   is_relisting:
     description: Boolean information that indicates whether the house is already being relisting.
     lineage:
@@ -149,6 +157,10 @@ columns:
     description: Numerical information that indicates the number of installments for the termination fee.
     lineage:
       - datalake_terminator_clean.termination_fee.tenant_payment_method
+  spoc_wave:
+    description: Information of type int that indicates in which wave of the spoc the termination entered.
+    lineage:
+      - datalake_terminator_clean.termination.spoc_wave
   dt_termination:
     description: Date when the property became or will become vacant.
     lineage:

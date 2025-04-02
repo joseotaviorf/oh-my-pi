@@ -80,6 +80,18 @@ columns:
     lineage:
       - datalake_terminator_raw.termination.inspection_date_offset_in_days
     description: tenant's preferred date for exit inspection represented as compensation in days from the vacancy date.
+  spoc_wave:
+    lineage:
+      - datalake_terminator_raw.termination.wave
+    description: Information of type int that indicates in which wave of the spoc the termination entered.
+  is_spoc:
+    lineage:
+      - datalake_terminator_raw.termination.is_spoc
+    description: Boolean information indicating whether the termination is part of the spoc.
+  is_spoc_control_group:
+    lineage:
+      - datalake_terminator_raw.termination.is_spoc_control_group
+    description: Boolean information indicating whether the termination is part of the spoc control group.
   has_exit_inspection:
     lineage:
       - datalake_terminator_raw.termination.exit_inspection_required

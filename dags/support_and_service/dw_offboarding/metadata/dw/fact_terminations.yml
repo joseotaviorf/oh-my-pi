@@ -89,6 +89,18 @@ columns:
     description: Total repairs absorbed in the contestation analysis.
   total_tentant_repair_ac:
     description: Total repairs are the tenant's responsibility in the contestation analysis.
+  spoc_wave:
+    description: Information of type int that indicates in which wave of the spoc the termination entered.
+    lineage:
+      - datalake_terminator.termination.spoc_wave
+  is_spoc_contract:
+    description: Boolean information indicating whether the termination is part of the spoc control group.
+    lineage:
+      - datalake_terminator.termination.is_spoc
+  is_spoc_control_group:
+    description: Boolean information indicating whether the termination is part of the spoc control group.
+    lineage:
+      - datalake_terminator.termination.is_spoc_control_group
   is_relisting:
     description: Boolean information that indicates whether the house is already being relisting.
     lineage:
@@ -125,8 +137,6 @@ columns:
     lineage:
       - datalake_terminator.termination.is_early_relisting_enabled
     description: Boolean flag indicating if the house's owner opted-in/out of the early relisting.
-  is_spoc_contract:
-    description: Boolean flag indicating if the id_contract and the id_termination has an analyst responsable for
   ts_termination_request:
     description: Date in timestamp format that indicates when the termination request occurred.
     lineage:

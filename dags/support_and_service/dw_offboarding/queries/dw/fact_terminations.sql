@@ -67,7 +67,7 @@ contract_repair_metrics AS (
         repair_metrics
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY id_inspection DESC) = 1
-), 
+),
 spoc_contracts AS (
     SELECT
         id_contract,
@@ -75,9 +75,9 @@ spoc_contracts AS (
         id_worker_twilio,
         id_analyst,
         true AS is_spoc_contract
-    FROM 
-        datalake_hefesto.spoc_offboarding_contracts 
-    QUALIFY 
+    FROM
+        datalake_hefesto.spoc_offboarding_contracts
+    QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_contract, id_termination ORDER BY ts_updated DESC) = 1
 )
 SELECT
@@ -105,10 +105,12 @@ SELECT
     crm.repairs_exempted_ac,
     crm.repairs_absorbed_ac,
     crm.total_tentant_repair_ac,
-    CASE 
-      WHEN sc.is_spoc_contract IS NULL THEN false
-      ELSE true
+    t.spoc_wave,
+    CASE
+      WHEN COALESCE(t.is_spoc, sc.is_spoc_contract) IS NULL THEN false
+      ELSE COALESCE(t.is_spoc, sc.is_spoc_contract)
     END AS is_spoc_contract,
+    t.is_spoc_control_group,
     t.is_relisting,
     t.has_automatically_closed_task,
     t.is_contract_b2b,
@@ -137,5 +139,5 @@ LEFT JOIN
 LEFT JOIN spoc_contracts AS sc
     ON t.id_contract = sc.id_contract
     AND t.id_termination = sc.id_termination
-WHERE 
+WHERE
   DATE(t.ts_termination_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
