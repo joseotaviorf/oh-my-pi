@@ -6,10 +6,10 @@ import requests
 import time
 
 from argparse import ArgumentParser
+from bs4 import BeautifulSoup
 from datetime import date, datetime
 from functools import reduce
 from typing import Dict, List, Optional
-from urllib.parse import urljoin
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
@@ -21,7 +21,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 
 import pyspark.sql.functions as F
 from pyspark.sql import DataFrame
-from pyspark.sql.types import IntegerType, StringType
+from pyspark.sql.types import IntegerType
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -35,56 +35,45 @@ spark_client = SparkClient()
 
 
 def extract_urls(
-  base_url:str,
-  blocklist_urls:List[str],
-  request_response:str,
-  source_download_page_url:str,
-  source_format:str,
-  year_interval:List[str],
+  base_url: str,
+  blocklist_urls: List[str],
+  request_response: str,
+  year_interval: List[str],
   ) -> Optional[List[str]]:
   """
   Extract URLs from the response content that match the specified format.
 
   Args:
       base_url (str): The base URL for joining relative paths.
-      blocklist_urls (List[str]): List of forbidden URLs to be removed.
+      blocklist_urls (List[str]): List of URLs to be removed.
       request_response (str): Response text from the request.
-      source_download_page_url (str): URL of the page to scrape for file links.
-      source_format (str): The file format to search for (e.g., 'xlsx').
       year_interval (List[int]): List of years to extract from the URL.
 
   Returns:
       Optional[List[str]]: List of full URLs matching the format.
   """
   try:
-    pattern = r'<a\s+(?:[^>]*?\s+)?href="([^"]*itbi.*?[\.|\-]{source_format})"'.format(source_format=source_format)
-    year_pattern = re.compile(r'(\d{4})')
+    soup = BeautifulSoup(request_response.text, 'html.parser')
 
-    urls = re.findall(pattern, request_response.text, re.IGNORECASE)
-    full_urls = [urljoin(base_url, url) if url.startswith('/') else url for url in urls]
+    excel_links = [
+      (base_url + a['href']) if not a['href'].startswith('https') else a['href']
+      for strong in soup.find_all('strong')
+      if any(year in strong.text for year in year_interval)
+      for a in strong.find_all('a', href=True)
+      if a.get('target') == '_blank' and 'Excel/xlsx' in a.text
+      and ((base_url + a['href']) if not a['href'].startswith('https') else a['href']) not in blocklist_urls
+    ]
 
-    filtered_urls = []
-    for url in full_urls:
-      match = year_pattern.search(url)
-      if match:
-        year = match.group(1)
-        if year in year_interval and url not in blocklist_urls:
-          filtered_urls.append(url)
-      else:
-        filtered_urls.append(url)
-    logger.info(f"m=extract_urls, msg=Extracted {len(filtered_urls)} URLs for {source_download_page_url}.")
-    return filtered_urls
+    return excel_links
   except Exception as e:
     logger.error(f"m=extract_urls, msg=Error extracting URLs: {e}")
     return None
 
-
 def scrap_files_url(
-  base_url:str,
-  blocklist_urls:List[str],
-  source_download_page_url:str,
-  source_format:str,
-  year_interval:List[str],
+  base_url: str,
+  blocklist_urls: List[str],
+  source_download_page_url: str,
+  year_interval: List[str],
   ) -> Optional[List[str]]:
   """
   Scrapes file URLs from the provided download page, filtering blacklisted URLs.
@@ -93,7 +82,6 @@ def scrap_files_url(
     base_url (str): Base URL for relative paths.
     blocklist_urls (List[str]): List of URLs to be removed.
     source_download_page_url (str): URL of the page to scrape for file links.
-    source_format (str): Format of files to extract (e.g., 'xlsx').
     year_interval (List[int]): List of years to extract from the URL.
 
   Returns:
@@ -107,8 +95,6 @@ def scrap_files_url(
       base_url=base_url,
       blocklist_urls=blocklist_urls,
       request_response=response,
-      source_download_page_url=source_download_page_url,
-      source_format=source_format,
       year_interval=year_interval,
     )
 
@@ -156,7 +142,7 @@ def rename_columns(
 
 def extract_sheets(
   url: str,
-) -> Dict[str, pd.DataFrame]:
+  ) -> Dict[str, pd.DataFrame]:
   """
   Extracts sheets from an Excel file at the provided URL.
   Args:
@@ -188,7 +174,7 @@ def process_url(
   columns_rename_mapped: Dict[str,str],
   problematic_columns_rename_mapped: Dict[str, Dict[str, str]],
   url: str,
-) -> List[DataFrame]:
+  ) -> List[DataFrame]:
   """
   Downloads and processes data from a single URL into a list of Spark DataFrames.
 
@@ -259,9 +245,8 @@ def get_data(
   columns_rename_mapped: Dict[str, str],
   problematic_columns_rename_mapped: Dict[str, Dict[str, str]],
   source_download_page_url: str,
-  source_format: str,
   year_interval: List[str],
-) -> DataFrame:
+  ) -> DataFrame:
   """
   Downloads and processes data from a specified source page and format.
 
@@ -271,7 +256,6 @@ def get_data(
       columns_rename_mapped (dict): Mapping for renaming columns.
       problematic_columns_rename_mapped (dict): Mapping for problematic column renaming.
       source_download_page_url (str): URL of the page to download data from.
-      source_format (str): Format of the files to be downloaded.
       year_interval (list): List of years to be downloaded.
 
   Returns:
@@ -282,7 +266,6 @@ def get_data(
     base_url=base_url,
     blocklist_urls=blocklist_urls,
     source_download_page_url=source_download_page_url,
-    source_format=source_format,
     year_interval=year_interval
   )
 
@@ -380,13 +363,14 @@ def main():
       schema,
       raw_table_name,
       partition_cols,
-      execution_date,
+      load_start_date,
+      load_end_date,
   ) = parse_arguments()
 
   logger.info(
       f"""
       m=main, environment={environment}, datalake_bucket={datalake_bucket}, schema={schema},
-        execution_date={execution_date}
+        load_start_date={load_start_date}, load_end_date={load_end_date}
         msg=Starting Spark job...
       """
   )
@@ -396,19 +380,20 @@ def main():
   base_url = config_service.get_config("base_url")
   site_download_page_url = config_service.get_config("site_download_page_url")
   source_download_page_url = f"{base_url}{site_download_page_url}"
-  source_format = config_service.get_config("source_format")
   blocklist_urls = config_service.get_config("blocklist_urls")
   columns_rename_mapped = config_service.get_config("columns_to_rename")
   problematic_columns_rename_mapped = config_service.get_config("problematic_columns_to_rename")
-  diff_year = int(config_service.get_config("diff_year"))
-  dt_execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
-  year_interval = [str(year) for year in range(dt_execution_date.year - diff_year, dt_execution_date.year + 1)]
 
+  load_start_year = datetime.strptime(load_start_date, "%Y-%m-%d").year
+  load_end_year = datetime.strptime(load_end_date, "%Y-%m-%d").year
+
+  year_interval = [str(year) for year in range(load_start_year, load_end_year + 1)]
 
   logger.info(
       f"""
-      m=main, environment={environment}, datalake_bucket={datalake_bucket}, schema={schema}, execution_date={execution_date}
-      msg=Configuration table, table_name={raw_table_name}, source_format={source_format}
+      m=main, environment={environment}, datalake_bucket={datalake_bucket}, schema={schema},
+      year_interval={year_interval}
+      msg=Configuration table, table_name={raw_table_name},
       """
   )
 
@@ -418,14 +403,14 @@ def main():
     columns_rename_mapped=columns_rename_mapped,
     problematic_columns_rename_mapped=problematic_columns_rename_mapped,
     source_download_page_url=source_download_page_url,
-    source_format=source_format,
     year_interval=year_interval,
     )
 
   if df_itbi_sp_source:
     logger.info(
         f"""
-        m=main, environment={environment}, datalake_bucket={datalake_bucket}, schema={schema}, execution_date={execution_date}
+        m=main, environment={environment}, datalake_bucket={datalake_bucket}, schema={schema},
+        year_interval={year_interval}
         msg=Dataframe imported with sucess.
         """
     )
@@ -448,7 +433,8 @@ def parse_arguments():
   parser.add_argument("schema", help="Custom Schema to save table"),
   parser.add_argument("table_name", help="Name of the table to store data into")
   parser.add_argument("partitions", help="Partition columns name")
-  parser.add_argument("execution_date", help="DAG execution_date")
+  parser.add_argument("load_start_date", help="Processing start date")
+  parser.add_argument("load_end_date", help="Processing end date")
 
   args = parser.parse_args()
 
@@ -457,7 +443,8 @@ def parse_arguments():
   schema: str = args.schema
   raw_table_name: str = args.table_name
   partition_cols: List[str] = ast.literal_eval(args.partitions)
-  execution_date: str = args.execution_date
+  load_start_date: str = args.load_start_date
+  load_end_date: str = args.load_end_date
 
   return (
       env,
@@ -465,7 +452,8 @@ def parse_arguments():
       schema,
       raw_table_name,
       partition_cols,
-      execution_date,
+      load_start_date,
+      load_end_date,
   )
 
 if __name__ == "__main__":

@@ -39,4 +39,4 @@ SELECT
 FROM
   datalake_itbi_raw.itbi_sp
 WHERE
-  year BETWEEN YEAR(DATE('{load_start_date}')) - 1 AND YEAR(DATE('{load_end_date}'))
+  year BETWEEN YEAR(DATE('{load_start_date}')) AND YEAR(DATE('{load_end_date}'))
