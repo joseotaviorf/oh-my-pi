@@ -46,6 +46,8 @@ rent_flows_touchpoint AS (
         COALESCE(rf.first_touchpoint = "DIRECT", FALSE) AS has_direct_first_touchpoint
     FROM
         datalake_rent_flows.rent_flows AS rf
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY rf.id_booking ORDER BY rf.ts_updated DESC) = 1
 )
 SELECT
     XXHASH64(b.id_agent, b.id) AS id_agent_schedule,
