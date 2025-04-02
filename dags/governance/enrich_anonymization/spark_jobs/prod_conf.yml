@@ -101,3 +101,5 @@ recognizers:
       - Aniversario
       - Birth Date
     supported_entity: "BIRTH_DATE"
+skip_list:
+  - datalake_amplitude_clean.events

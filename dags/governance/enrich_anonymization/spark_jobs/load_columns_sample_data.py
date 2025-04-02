@@ -7,6 +7,7 @@ from pyspark.sql import DataFrame, Row
 from pyspark.errors import AnalysisException
 
 from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.services import ConfigurationService
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkDataFrameService
 from bietlejuice.loaders.delta_loader import DeltaLoader
@@ -171,6 +172,9 @@ if __name__ == "__main__":
     partition_cols = ast.literal_eval(args.partitions)
     merge_on = ast.literal_eval(args.merge_on)
 
+    config_service = ConfigurationService(args.source)
+    skip_list = config_service.get_config("skip_list")
+
     spark_client = SparkClient()
 
     df_tables_to_sample = get_columns_to_sample(spark_client, load_start_date, load_end_date)
@@ -178,18 +182,19 @@ if __name__ == "__main__":
     list_tables_to_sample = df_tables_to_sample.collect()
     for table in list_tables_to_sample:
         entity_id = f"{table.database_name}.{table.table_name}"
-        try:
-            df_sample = get_sample_data(spark_client, table, execution_date, partition_cols)
-            load_table(df_sample, env, datalake_bucket, source, table_name, merge_on)
-        except AnalysisException as exc:
-            error_class = exc.getErrorClass()
+        if entity_id not in skip_list:
+            try:
+                df_sample = get_sample_data(spark_client, table, execution_date, partition_cols)
+                load_table(df_sample, env, datalake_bucket, source, table_name, merge_on)
+            except AnalysisException as exc:
+                error_class = exc.getErrorClass()
 
-            if error_class in [DELTA_TABLE_NOT_FOUND, TABLE_OR_VIEW_NOT_FOUND]:
-                logging.warning(f"Table {entity_id} not found.")
-            elif error_class in [INSUFFICIENT_PERMISSIONS]:
-                logging.warning(f"Insufficient permission to read table {entity_id}.")
-            else:
-                logging.warning(f"Not handled error. Table: {entity_id}. Error: {error_class}")
+                if error_class in [DELTA_TABLE_NOT_FOUND, TABLE_OR_VIEW_NOT_FOUND]:
+                    logging.warning(f"Table {entity_id} not found.")
+                elif error_class in [INSUFFICIENT_PERMISSIONS]:
+                    logging.warning(f"Insufficient permission to read table {entity_id}.")
+                else:
+                    logging.warning(f"Not handled error. Table: {entity_id}. Error: {error_class}")
 
-        except Exception as exc:
-            logging.warning(f"Exception. Table: {entity_id}. Error: {type(exc)}")
+            except Exception as exc:
+                logging.warning(f"Exception. Table: {entity_id}. Error: {type(exc)}")
