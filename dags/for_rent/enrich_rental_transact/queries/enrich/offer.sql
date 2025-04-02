@@ -36,7 +36,8 @@ negotiation_rental_transact AS (
           o_aud.id AS id_offer,
           otma.actor_role,
           MAX(otma.rev) AS max_rev,
-          MIN(otma.rev) AS min_rev
+          MIN(otma.rev) AS min_rev,
+          COUNT(DISTINCT ota.id) AS qtd_topics_negotiated
         FROM 
           datalake_rental_transact_clean.offer_aud AS o_aud
         JOIN
@@ -49,6 +50,7 @@ negotiation_rental_transact AS (
     )
     SELECT
         o.id AS id_offer,
+        offer_min_aud.qtd_topics_negotiated,
         MIN(
             IF(
                 offer_min_aud.actor_role = 'DEMAND'
@@ -80,7 +82,28 @@ negotiation_rental_transact AS (
                 otma.proposed_rent_value,
                 NULL
             )
-        ) AS last_rent_offered_by_owner
+        ) AS last_rent_offered_by_owner,
+        MIN(
+            IF(
+                offer_min_aud.min_rev IS NOT NULL,
+                otma.ts_created,
+                NULL
+            )
+        ) AS ts_first_iteration,
+        MAX(
+            IF(
+                offer_max_aud.max_rev IS NOT NULL,
+                otma.ts_created,
+                NULL
+            )
+        ) AS ts_last_iteration,
+        MAX(
+            IF(
+                offer_max_aud.max_rev IS NOT NULL,
+                otma.proposed_rent_value,
+                NULL
+            )
+        ) AS last_proposed_rent_value
     FROM 
         datalake_rental_transact_clean.offer AS o
     JOIN
@@ -97,7 +120,7 @@ negotiation_rental_transact AS (
         offer_min_max_aud AS offer_min_aud
             ON offer_min_aud.id_offer = ota.id_offer
             AND offer_min_aud.min_rev = otma.rev
-    GROUP BY 1
+    GROUP BY 1, 2
 )
 SELECT
     o.id AS id_offer,
@@ -118,10 +141,14 @@ SELECT
     o.type,
     ri.number_of_cohabitants,
     ri.introduction AS tenant_description,
+    negotiation.qtd_topics_negotiated,
     negotiation.first_rent_offered_by_tenant,
     negotiation.first_rent_offered_by_owner,
     negotiation.last_rent_offered_by_tenant,
     negotiation.last_rent_offered_by_owner,
+    negotiation.last_proposed_rent_value,
+    negotiation.ts_first_iteration,
+    negotiation.ts_last_iteration,
     o.ts_created,
     o.ts_updated,
     o.ts_expiration,

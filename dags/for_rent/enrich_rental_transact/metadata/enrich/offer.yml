@@ -80,6 +80,8 @@ columns:
     lineage:
       - datalake_rental_transact_clean.resident_info.introduction
     description: Tenant description manually filled by the tenant.
+  qtd_topics_negotiated:
+    description: Number of topics negotiated.
   first_rent_offered_by_tenant:
     lineage:
       - datalake_rental_transact_clean.offer_topic_message_aud.proposed_rent_value
@@ -96,6 +98,18 @@ columns:
     lineage:
       - datalake_rental_transact_clean.offer_topic_message_aud.proposed_rent_value
     description: Last rent value proposed by the owner.
+  last_proposed_rent_value:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message_aud.proposed_rent_value
+    description: Last rent value proposed by any actor.
+  ts_first_iteration:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message_aud.ts_created
+    description: Timestamp of the first negotiation iteration.
+  ts_last_iteration:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message_aud.ts_created
+    description: Timestamp of the last negotiation iteration.
   ts_created:
     lineage:
       - datalake_rental_transact_clean.offer.ts_created
