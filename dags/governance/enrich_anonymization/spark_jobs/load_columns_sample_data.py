@@ -153,25 +153,27 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str)
     parser.add_argument("datalake_bucket", type=str)
-    parser.add_argument("source", type=str)
+    parser.add_argument("schema", type=str)
     parser.add_argument("table_name", type=str)
     parser.add_argument("load_start_date", type=str)
     parser.add_argument("load_end_date", type=str)
     parser.add_argument("partitions", type=str)
+    parser.add_argument("source", type=str)
     parser.add_argument("merge_on", type=str)
 
     args = parser.parse_args()
     env = args.env
     datalake_bucket = args.datalake_bucket
-    source = args.source
+    schema = args.schema
     table_name = args.table_name
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
     execution_date = datetime.strptime(load_start_date, "%Y-%m-%d")
     partition_cols = ast.literal_eval(args.partitions)
+    source = args.source
     merge_on = ast.literal_eval(args.merge_on)
 
-    config_service = ConfigurationService(args.source)
+    config_service = ConfigurationService(source)
     skip_list = config_service.get_config("skip_list")
 
     spark_client = SparkClient()
@@ -184,7 +186,7 @@ if __name__ == "__main__":
         if entity_id not in skip_list:
             try:
                 df_sample = get_sample_data(spark_client, table, execution_date, partition_cols)
-                load_table(df_sample, env, datalake_bucket, source, table_name, merge_on)
+                load_table(df_sample, env, datalake_bucket, schema, table_name, merge_on)
             except AnalysisException as exc:
                 error_class = exc.getErrorClass()
 

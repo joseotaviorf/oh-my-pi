@@ -20,6 +20,7 @@ workflow:
         - "{load_start_date}" # load_start_date
         - "{load_end_date}"
         - "{partitions}"
+        - "{dag_name}"
         - '["id_entity"]'
     pii_scan_results:
       load_spark_job: load_pii_scan_into_datalake
