@@ -531,7 +531,7 @@ rent_demand_events AS (
     rf.uuid_company,
     rf.id_company_hubspot,
     rf.partner_3p_supply,
-    rf.country_code,
+    COALESCE(rf.country_code, 'BR') AS country_code,
     YEAR(vsl.ts_created) AS year,
     MONTH(vsl.ts_created) AS month,
     DAY(vsl.ts_created) AS day
@@ -570,7 +570,7 @@ rent_demand_events AS (
     rf.uuid_company,
     rf.id_company_hubspot,
     rf.partner_3p_supply,
-    rf.country_code,
+    COALESCE(rf.country_code, 'BR') AS country_code,
     YEAR(vsl.ts_created) AS year,
     MONTH(vsl.ts_created) AS month,
     DAY(vsl.ts_created) AS day
@@ -609,7 +609,7 @@ rent_demand_events AS (
     rf.uuid_company,
     rf.id_company_hubspot,
     rf.partner_3p_supply,
-    rf.country_code,
+    COALESCE(rf.country_code, 'BR') AS country_code,
     YEAR(vsl.ts_created) AS year,
     MONTH(vsl.ts_created) AS month,
     DAY(vsl.ts_created) AS day
@@ -648,7 +648,7 @@ rent_demand_events AS (
     rf.uuid_company,
     rf.id_company_hubspot,
     rf.partner_3p_supply,
-    rf.country_code,
+    COALESCE(rf.country_code, 'BR') AS country_code,
     YEAR(vsl.ts_created) AS year,
     MONTH(vsl.ts_created) AS month,
     DAY(vsl.ts_created) AS day
