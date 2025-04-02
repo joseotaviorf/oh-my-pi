@@ -130,30 +130,3 @@ SELECT
     NOW() AS ts_load
 FROM 
     datalake_accounting_funnel.kill_queue_invoice_issuance
-
-UNION ALL 
-
-SELECT
-    id_retsuko_bank_settlement AS sk_accounting_funnel,
-    id_business_entity,
-    id_finance_entity,
-    id_finance_entity_entry,
-    version,
-    source_name,
-    'bank' AS accounting_type,
-    revenue_name AS accounting_name,
-    accrual_year_month,
-    status,
-    source_amount,
-    sap_amount,
-    account_number,
-    is_completeness_compliance,
-    is_correctness_compliance,
-    is_temporality_compliance,
-    is_compliance,
-    dt_source_trigger,
-    dt_sap_created,
-    dt_sap_reference,
-    NOW() AS ts_load
-FROM 
-    datalake_accounting_funnel.retsuko_bank_settlement
