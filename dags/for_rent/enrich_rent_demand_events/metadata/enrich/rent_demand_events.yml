@@ -11,6 +11,7 @@ columns:
       - datalake_ebdb_contract.contract.id
       - datalake_offer.offer.id_offer_context
       - datalake_proposal.proposal.id
+      - datalake_ebdb_clean.visit_status_log.id_visit
     description: "Id of the event (which could be the id of a booking, offer, proposal or contract)."
   id_booking:
     lineage:
@@ -117,6 +118,7 @@ columns:
       - datalake_proposal.proposal.ts_tenant_auto_first_doc_sent
       - datalake_proposal.proposal.ts_tenant_first_doc_sent
       - datalake_proposal.proposal.ts_credit_approved_last
+      - datalake_ebdb_clean.visit_status_log.ts_created
     description: "Timestamp of when the event happened."
   country_code:
     lineage:

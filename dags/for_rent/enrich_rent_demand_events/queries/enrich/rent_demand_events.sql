@@ -513,7 +513,7 @@ rent_demand_events AS (
     ct.ts_created IS NOT NULL
   UNION ALL
   SELECT --visits_requested
-    bk.id AS id_event,
+    vsl.id_visit AS id_event,
     vsl.id_schedule AS id_booking,
     rf.id_offer,
     rf.id_proposal,
@@ -552,7 +552,7 @@ rent_demand_events AS (
     vsl.event_type = 'VISIT_REQUESTED'
   UNION ALL
   SELECT --visits_scheduled
-    bk.id AS id_event,
+    vsl.id_visit AS id_event,
     vsl.id_schedule AS id_booking,
     rf.id_offer,
     rf.id_proposal,
@@ -591,7 +591,7 @@ rent_demand_events AS (
     vsl.event_type = 'VISIT_SCHEDULED'
   UNION ALL
   SELECT --visits_rescheduled
-    bk.id AS id_event,
+    vsl.id_visit AS id_event,
     vsl.id_schedule AS id_booking,
     rf.id_offer,
     rf.id_proposal,
@@ -630,7 +630,7 @@ rent_demand_events AS (
     vsl.event_type = 'VISIT_RESCHEDULED'
   UNION ALL
   SELECT --visits_done
-    bk.id AS id_event,
+    vsl.id_visit AS id_event,
     vsl.id_schedule AS id_booking,
     rf.id_offer,
     rf.id_proposal,
