@@ -69,6 +69,7 @@ workflow:
     document_generation: {}
     document_generation_aud: {}
     rollout_cyber_contract: {}
+    blocklist: {}
     comms: {}
 cluster:
   type: custom_cluster

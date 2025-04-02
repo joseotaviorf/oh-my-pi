@@ -1,0 +1,39 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: blocklist
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Defines the contract blocked/paused from collection.
+columns:
+  id:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.blocklist.id
+  id_external:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.blocklist.external_id
+  id_debtor_external:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.blocklist.debtor_external_id
+  id_debtor:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.blocklist.debtor_id
+  reason:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.blocklist.reason
+  is_blocked:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.blocklist.blocked
+  ts_created:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.blocklist.created_at
+  ts_updated:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.blocklist.updated_at

@@ -26,3 +26,6 @@ columns:
   ts_updated:
     lineage:
       - datalake_trato_feito_hourly_raw.payment.updated_at
+  ts_started_processing:
+    lineage:
+      - datalake_trato_feito_raw.payment.started_processing_at

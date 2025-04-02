@@ -15,6 +15,7 @@ SELECT
     payment_method,
     is_tenant_first_invoice,
     previously_negotiated,
+    write_off AS is_write_off,
     accrual_year_month,
     paid_amount,
     due_amount,
@@ -24,5 +25,6 @@ SELECT
     creation_date AS ts_creation,
     created_at AS ts_created,
     updated_at AS ts_updated,
-    last_received_at AS ts_last_received
+    last_received_at AS ts_last_received,
+    write_off_at AS ts_write_off
 FROM datalake_trato_feito_raw.bill
