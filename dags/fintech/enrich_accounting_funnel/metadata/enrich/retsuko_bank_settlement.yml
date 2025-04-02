@@ -1,0 +1,84 @@
+---
+database_name: datalake_accounting_funnel
+table_name: retsuko_bank_settlement
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_retsuko_bank_settlement:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.'BK' || '-' || r.id_invoice || '-' || '1' || '-' || '5'
+      || '-' || '1'
+  id_business_entity:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.r.id_contract
+  id_finance_entity:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.r.id_invoice
+  id_finance_entity_entry:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.NULL
+  version:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.version
+  source_name:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.source_name
+  revenue_name:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.NULL
+  accrual_year_month:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.accrual_year_month
+  status:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.CASE WHEN NOT l.hash IS NULL THEN 'SUCCESS' WHEN l.hash
+      IS NULL AND NOT g.id_feature IS NULL THEN 'SG FAILURE' WHEN l.hash IS NULL AND
+      g.id_feature IS NULL THEN 'SB FAILURE' END
+  source_amount:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.source_amount
+  sap_amount:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.sap_amount
+  account_number:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.account_number
+  is_completeness_compliance:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.CASE WHEN NOT l.hash IS NULL THEN TRUE ELSE FALSE END
+  is_correctness_compliance:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.CASE WHEN ABS(r.source_amount) - ABS(l.sap_amount) = 0
+      OR (r.source_amount = 0 AND l.sap_amount IS NULL) THEN TRUE ELSE FALSE END
+  is_temporality_compliance:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.CASE WHEN l.dt_sap_reference BETWEEN r.dt_source_trigger
+      AND DATE_ADD(r.dt_source_trigger, 3, '') THEN TRUE ELSE FALSE END
+  dt_source_trigger:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.dt_source_trigger
+  dt_sap_created:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.dt_sap_created
+  dt_sap_reference:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.dt_sap_reference
