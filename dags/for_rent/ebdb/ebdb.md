@@ -34,7 +34,6 @@ Produces the following output tables:
     `photographer_job`
     `photographer_job_aud`
     `polygon_region`
-    `processed_message`
     `suspected_unavailability_listings`
     `suspected_unavailability_listings_aud`
 
