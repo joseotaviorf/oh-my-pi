@@ -151,6 +151,21 @@ FROM VALUES
             ),
             'filters', NULL
         )
+    ),
+    -- Listing recs pricing experiment
+    (
+        "ab_beakman_listing_recs_vs_pricing_experiment",
+        named_struct(
+            'begin_date', DATE('2025-02-27'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL
+        )
     )
     -- Add new experiment here
 
