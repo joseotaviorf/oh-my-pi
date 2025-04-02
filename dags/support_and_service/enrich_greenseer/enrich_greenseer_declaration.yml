@@ -12,6 +12,7 @@ workflow:
     sessions:
       partitions: [year, month, day]
       extraction_type: incremental
+      merge_on: [id_session]
       z_order_by: [id_session, id_ticket, id_user, id_contract, id_pipeline, id_content]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"
