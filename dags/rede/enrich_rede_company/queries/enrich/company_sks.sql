@@ -62,6 +62,19 @@ company_creci AS (
         AND d.status = 'ACTIVE'
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY cd.id_company ORDER BY cd.ts_updated DESC) = 1
+),
+company_members AS (
+  SELECT
+    cm.id_company,
+    hc.uuid_company,
+    cm.cnpj,
+    cm.company_name,
+    cm.extracted_3p_tag
+  FROM
+    datalake_hubspot.company_members AS cm
+  LEFT JOIN
+    datalake_hubspot.company AS hc
+      ON cm.id_company = hc.id_company
 )
 SELECT
   XXHASH64(c.id) AS sk_company,
@@ -101,9 +114,6 @@ LEFT JOIN
   company_creci AS ccr
     ON c.id = ccr.id_company
 LEFT JOIN
-  datalake_hubspot.company AS hc
-    ON c.uuid_company = hc.uuid_company
-LEFT JOIN
-  datalake_hubspot.company_members AS cm
-    ON ccn.identification_number = cm.cnpj
-      OR hc.id_company = cm.id_company
+  company_members AS cm
+    ON c.uuid_company = cm.uuid_company
+      OR (cm.uuid_company IS NULL AND ccn.identification_number = cm.cnpj)
