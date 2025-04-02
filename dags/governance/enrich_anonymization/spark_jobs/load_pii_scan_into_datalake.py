@@ -121,18 +121,18 @@ def build_batch_analyzer(registry) -> BatchAnalyzerEngine:
     return batch_analyzer
 
 def clean_result(result, matched_value):
-  if not result:
-        return [{"type": "NOT_FOUND", "score": 0.0, "matched_value": matched_value}]
-  return [
-      {"type": r.entity_type, "score": r.score, "matched_value": matched_value if len(matched_value) < 1500 else "SAMPLE_TOO_BIG"}
-      for r in result
-  ]
+    if not result:
+        return [{"type": "NOT_FOUND" if matched_value != "SAMPLE_TOO_BIG" else "SAMPLE_TOO_BIG", "score": 0.0, "matched_value": matched_value}]
+    return [
+        {"type": r.entity_type if matched_value != "SAMPLE_TOO_BIG" else "SAMPLE_TOO_BIG", "score": r.score, "matched_value": matched_value}
+        for r in result
+    ]
 
 def process_partition(iter_of_rows, batch_analyzer):
     rows_list = list(iter_of_rows)
 
     df_dict = {
-      row["id_entity"] : row["sample"]
+      row["id_entity"] : row["sample"] if row["len_sample"] < 4000 else ["SAMPLE_TOO_BIG"]
       for row in rows_list
     }
     df_dict_columns = {
@@ -224,11 +224,8 @@ def get_sample(date_filter) -> DataFrame:
           database_name,
           table_name,
           column_name,
-          CASE
-            WHEN length(sample[0]) > 1000 THEN slice(sample,1, round(size(sample)/2))
-            WHEN length(sample[0]) > 4000 THEN slice(sample,1, 2)
-            ELSE sample
-          END as sample,
+          sample,
+          length(to_json(sample)) AS len_sample,
           ARRAY_AGG(column_name) AS list_column_name,
           {year} AS year,
           {month} AS month,
@@ -266,6 +263,7 @@ def main():
         StructField("table_name", StringType(), True),
         StructField("column_name", StringType(), True),
         StructField("sample", ArrayType(StringType()), True),
+        StructField("len_sample", IntegerType(), True),
         StructField("list_column_name", ArrayType(StringType()), True),
         StructField("year", IntegerType(), True),
         StructField("month", IntegerType(), True),
