@@ -1,0 +1,63 @@
+dag:
+  name: reverse_minority_report_ss
+  schedule_start_date: 2023,11,28
+  owner: Data SS
+  dag_documentation:
+    dag_purpose: This DAG is responsible for sending data from S&S models to Minority Report
+
+workflow:
+  type: load_access
+  layer: reverse
+  load_spark_job: load_reverse_minority_report_ss
+  spark_job_arguments:
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ ds }}"
+    - "['kb0-consumer.quintoandar.com.br:9092','kb1-consumer.quintoandar.com.br:9092','kb2-consumer.quintoandar.com.br:9092']" # kafka servers
+    - "ProfileEvents" # kafka topic
+  tables_customization:
+    bic_ss:
+      extra_spark_job_arguments:
+        - "userId"
+        - "id_user"
+        - "CUSTOMER_DATA"
+    inspector_performance:
+      extra_spark_job_arguments:
+        - "agentIdr"
+        - "id_inspector"
+        - "INSPECTORS_PERFORMANCE"
+    inside_sales_whitelist:
+      extra_spark_job_arguments:
+        - "phoneNumber"
+        - "phone_number"
+        - "CUSTOMER_PHONE_NUMBER_WHITELIST"
+    pp_multi_assistants_whitelist:
+      extra_spark_job_arguments:
+        - "phoneNumber"
+        - "phone_number"
+        - "CUSTOMER_PHONE_NUMBER_WHITELIST"
+    bpo_performance:
+      extra_spark_job_arguments:
+        - "csatKey"
+        - "key_csat"
+        - "BPO_PERFORMANCE"
+
+cluster:
+  type: custom_cluster
+  custom_libraries:
+  - pypi:
+      package: "kafka-python==2.0.3"
+  custom_configurations:
+    autotermination_minutes: 20
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+      first_on_demand: 1
+      spot_bid_price_percent: 100
+      zone_id: us-east-1d
+      availability: SPOT_WITH_FALLBACK
+      ebs_volume_size: 200
+    spark_conf:
+      spark.driver.maxResultSize: "0"

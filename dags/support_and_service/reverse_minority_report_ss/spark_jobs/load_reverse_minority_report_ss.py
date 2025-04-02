@@ -251,6 +251,8 @@ def send_messages_worker(q, producer, kafka_topic):
     """
     Worker function that continuously retrieves messages from the queue and sends them to Kafka.
     """
+    logger.info(f"m=Sending messages to servers {kafka_servers}")
+    logger.info(f"m=topic {kafka_topic}")
     while True:
         try:
             message = q.get(block=False)
@@ -270,36 +272,40 @@ def send_messages_worker(q, producer, kafka_topic):
 
 def monitor_queue(q, total):
     """
-    Simple function to monitors the queue progress and log how empty it is.
+    Simple function to monitor the queue progress and log how empty it is.
     """
     threshold = 5
-    while True:
-        processed = total - q.qsize()
-        percent = (processed / total) * 100
-        if percent >= threshold:
-            logger.info(f" {percent:.0f}% of messages sent")
-            threshold += 5
-        if q.empty():
-            break
-        time.sleep(0.1)
+    if total > 0:
+        while True:
+            processed = total - q.qsize()
+            percent = (processed / total) * 100
+            if percent >= threshold:
+                logger.info(f" {percent:.0f}% of messages sent")
+                threshold += 5
+            if q.empty():
+                break
+            time.sleep(0.1)
+    else:
+        logger.info('m=empty queue!')
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     logger = QuintoAndarLogger("reverse_etl_minority_report")
 
     parser.add_argument("dag_name")
-    parser.add_argument("kafka_servers")
-    parser.add_argument("kafka_topic")
-    parser.add_argument("api_type")
-    parser.add_argument("key_name")
-    parser.add_argument("key_value")
     parser.add_argument("table_name")
     parser.add_argument("execution_date")
+    parser.add_argument("kafka_servers")
+    parser.add_argument("kafka_topic")
+    parser.add_argument("key_name")
+    parser.add_argument("key_value")
+    parser.add_argument("api_type")
+    
 
     args = parser.parse_args()
 
     dag_name = args.dag_name
-    kafka_servers = json.loads(args.kafka_servers)
+    kafka_servers = ast.literal_eval(args.kafka_servers)
     kafka_topic = args.kafka_topic
     api_type = args.api_type
     key_name = args.key_name
