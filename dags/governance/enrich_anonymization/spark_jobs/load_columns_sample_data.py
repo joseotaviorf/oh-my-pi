@@ -133,7 +133,6 @@ def get_columns_to_sample(spark_client: SparkClient, load_start_date: str, load_
             layer,
             database_name,
             table_name
-        LIMIT 10
     """.format(load_start_date=load_start_date, load_end_date=load_end_date)
     return spark_client.get_records(sql)
 
