@@ -16,9 +16,6 @@ column_level_validations:
   has_direct_first_touchpoint:
     is_complete:
       severity_level: Error
-  ts_updated:
-    is_complete:
-      severity_level: Error
   ts_created:
     is_complete:
       severity_level: Error

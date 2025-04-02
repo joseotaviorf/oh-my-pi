@@ -8,7 +8,5 @@ column_level_validations:
     is_unique:
       severity_level: Error
   cnpj:
-    is_complete:
-      severity_level: Error
     is_unique:
       severity_level: Error

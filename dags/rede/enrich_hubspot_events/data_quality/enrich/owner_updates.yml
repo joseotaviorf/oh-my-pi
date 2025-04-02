@@ -14,6 +14,3 @@ column_level_validations:
   id_hubspot:
     is_complete:
       severity_level: Error
-  uuid_person:
-    is_complete:
-      severity_level: Error

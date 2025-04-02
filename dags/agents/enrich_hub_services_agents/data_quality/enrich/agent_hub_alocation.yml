@@ -9,7 +9,4 @@ column_level_validations:
   id_member_profile:
     is_complete:
       severity_level: Error
-  id_user:
-    is_complete:
-      severity_level: Error
 

@@ -9,8 +9,6 @@ column_level_validations:
   id_user:
     is_complete:
       severity_level: Error
-    is_unique:
-      severity_level: Error
   id_owner:
     is_complete:
       severity_level: Error
