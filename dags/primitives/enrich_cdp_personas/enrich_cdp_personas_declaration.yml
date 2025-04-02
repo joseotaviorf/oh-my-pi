@@ -10,10 +10,16 @@ workflow:
   type: query_delta
   layer: enrich
   default_extraction_type: full
+  inner_dependencies:
+    persona:
+      - tenant
+      - owner
   tables_customization:
     tenant:
       z_order_by: [id_user]
     owner:
+      z_order_by: [id_user]
+    persona:
       z_order_by: [id_user]
 cluster:
   type: databricks_13_3_med_general_cluster

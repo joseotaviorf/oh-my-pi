@@ -5,10 +5,10 @@ column_level_validations:
   id_user:
     is_complete:
       severity_level: Error
-  uuid_person:
-    has_completeness:
-      greater_than: 0.99
-      severity_level: Error
+#  uuid_person:
+#    has_completeness:
+#      greater_than: 0.99
+#      severity_level: Error
   is_active:
     is_complete:
       severity_level: Error

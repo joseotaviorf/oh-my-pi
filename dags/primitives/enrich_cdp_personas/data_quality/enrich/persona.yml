@@ -1,5 +1,5 @@
 ---
-table_name: datalake_cdp_personas.owner
+table_name: datalake_cdp_personas.persona
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   id_user:
