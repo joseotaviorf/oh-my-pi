@@ -46,7 +46,7 @@ cte_pix_payment_date AS (
         datalake_rental_guarantee_platform_clean.payment
     WHERE
         billing_type = 'PIX'
-        AND gateway = 'PIXAR'
+        AND gateway IN ('PIXAR', 'CHECKOUT_V2') 
 )
 SELECT DISTINCT
     p.id AS id_payment,
@@ -123,7 +123,7 @@ LEFT JOIN
     cte_pix_payment_date AS ppd
     ON ppd.id_payment = p.id
     AND p.billing_type = 'PIX'
-    AND p.gateway = 'PIXAR'
+    AND p.gateway IN ('PIXAR', 'CHECKOUT_V2') 
 
 
 UNION ALL

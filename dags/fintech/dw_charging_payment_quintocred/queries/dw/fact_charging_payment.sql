@@ -56,7 +56,7 @@ base_payment AS (
   WHERE 
     p.sk_payment > 0
     AND billing.desc_lvl_1 NOT IN ( 'ANNUAL_CREDIT_CARD' )
-    AND gateway.desc_lvl_1 NOT IN ( 'PIXAR' )
+    AND gateway.desc_lvl_1 NOT IN ( 'PIXAR' , 'CHECKOUT_V2' )
 
   UNION ALL
 
@@ -112,7 +112,7 @@ base_payment AS (
     ON pr.sk_propose_values = pv.sk_propose_values
   WHERE 
     p.sk_payment > 0
-    AND ( billing.desc_lvl_1 IN ( 'ANNUAL_CREDIT_CARD' ) OR gateway.desc_lvl_1 IN ( 'PIXAR' ) )
+    AND ( billing.desc_lvl_1 IN ( 'ANNUAL_CREDIT_CARD' ) OR gateway.desc_lvl_1 IN ( 'PIXAR', 'CHECKOUT_V2' ) )
 
   UNION ALL
 
