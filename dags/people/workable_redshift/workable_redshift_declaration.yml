@@ -101,6 +101,10 @@ workflow:
       date_filter_column: updated_at
       extraction_type: incremental
       merge_on: ["id"]
+    questions:
+      date_filter_column: updated_at
+      extraction_type: incremental
+      merge_on: ["id"]
     requisitions:
       extraction_type: full
     stages:

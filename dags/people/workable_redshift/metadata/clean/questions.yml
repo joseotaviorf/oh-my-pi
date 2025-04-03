@@ -1,0 +1,69 @@
+---
+database_name: datalake_workable_redshift_clean
+table_name: questions
+owner: gabriel.berger@quintoandar.com.br
+domain: people
+description: 'Stores information regarding job application forms questions.'
+columns:
+  id:
+    description: 'Question unique identifier.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.id
+  id_job:
+    description: 'Unique identifier of the Job. Each question is attached to a form, which is attached to a job.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.job_id
+  job_title:
+    description: 'The title of the job.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.job_title
+  question_type:
+    description: 'Type of the question.'
+    categories: 
+      BooleanQuestion: 'Question of the boolean type.'
+      MultipleChoiceQuestion: 'Question of the Multiple Choice type.'
+      FreeTextQuestion: 'Question of the Free Text type.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.type
+  body:
+    description: 'The text of the question'
+    lineage:
+    - datalake_workable_redshift_raw.questions.body
+  position:
+    description: 'The order in which the given question is being displayed in the application form of the job.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.position
+  is_enabled:
+    description: 'A boolean flag indicating whether the question is enabled or not.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.enabled
+  has_automatic_rejection_enabled:
+    description: 'A boolean flag indicating whether candidates answering NO are auto-disqualified. Only applies to questions of type BooleanQuestion.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.rejecting
+  is_required:
+    description: 'A boolean flag indicating whether the question is required or not.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.required
+  ts_created:
+    description: 'Records the moment the question was registered in the system.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.question_created_at
+  ts_updated:
+    description: 'Records the last moment the question was changed.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.updated_at
+  ts_load:
+    description: 'Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing.'
+  year:
+    description: 'Year of the update of the question record. It is a partition of the table.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.year
+  month:
+    description: 'Month of the update of the question record. It is a partition of the table.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.month
+  day:
+    description: 'Day of the update of the question record. It is a partition of the table.'
+    lineage:
+    - datalake_workable_redshift_raw.questions.day
