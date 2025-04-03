@@ -121,6 +121,7 @@ rent_demand_events AS (
     bk.id_house,
     rf.id_agent,
     bk.id_rent_flow,
+    NULL AS id_schedule,
     bk.ts_created AS ts_event,
     rf.id_house_listing,
     rf.id_region,
@@ -158,6 +159,7 @@ rent_demand_events AS (
     bk.id_house,
     rf.id_agent,
     bk.id_rent_flow,
+    NULL AS id_schedule,
     bk.ts_booking_utc AS ts_event,
     rf.id_house_listing,
     rf.id_region,
@@ -200,6 +202,7 @@ rent_demand_events AS (
     off.id_house,
     rf.id_agent,
     off.id_rent_flow,
+    NULL AS id_schedule,
     off.ts_first_sent AS ts_event,
     rf.id_house_listing,
     rf.id_region,
@@ -240,6 +243,7 @@ rent_demand_events AS (
     off.id_house,
     rf.id_agent,
     off.id_rent_flow,
+    NULL AS id_schedule,
     off.ts_analyzed AS ts_event,
     rf.id_house_listing,
     rf.id_region,
@@ -277,6 +281,7 @@ rent_demand_events AS (
     off.id_house,
     rf.id_agent,
     off.id_rent_flow,
+    NULL AS id_schedule,
     pp.ts_credit_evaluation_first_init AS ts_event,
     rf.id_house_listing,
     rf.id_region,
@@ -316,6 +321,7 @@ rent_demand_events AS (
     off.id_house,
     rf.id_agent,
     off.id_rent_flow,
+    NULL AS id_schedule,
     pp.ts_first_credit_evaluation_positive AS ts_event,
     rf.id_house_listing,
     rf.id_region,
@@ -355,6 +361,7 @@ rent_demand_events AS (
     COALESCE(off.id_house, rf.id_house) AS id_house,
     rf.id_agent,
     COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
+    NULL AS id_schedule,
     COALESCE(pp.ts_tenant_auto_first_doc_sent, pp.ts_tenant_first_doc_sent) AS ts_event,
     rf.id_house_listing,
     rf.id_region,
@@ -399,6 +406,7 @@ rent_demand_events AS (
     COALESCE(off.id_house, rf.id_house) AS id_house,
     rf.id_agent,
     COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
+    NULL AS id_schedule,
     pp.ts_credit_approved_last AS ts_event,
     rf.id_house_listing,
     rf.id_region,
@@ -438,6 +446,7 @@ rent_demand_events AS (
     ct.id_house,
     rf.id_agent,
     COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
+    NULL AS id_schedule,
     ct.ts_signed AS ts_event,
     rf.id_house_listing,
     rf.id_region,
@@ -481,6 +490,7 @@ rent_demand_events AS (
     ct.id_house,
     rf.id_agent,
     COALESCE(off.id_rent_flow, rf.id_rent_flow) AS id_rent_flow,
+    NULL AS id_schedule,
     ct.ts_created AS ts_event,
     rf.id_house_listing,
     rf.id_region,
@@ -514,157 +524,129 @@ rent_demand_events AS (
   UNION ALL
   SELECT --visits_requested
     vsl.id_visit AS id_event,
-    vsl.id_schedule AS id_booking,
-    rf.id_offer,
-    rf.id_proposal,
-    rf.id_contract,
+    NULL AS id_booking,
+    NULL AS id_offer,
+    NULL AS id_proposal,
+    NULL AS id_contract,
     11 AS id_event_type,
-    bk.id_visitor AS id_client,
-    bk.id_house,
-    rf.id_agent,
-    bk.id_rent_flow,
+    v.id_visitor AS id_client,
+    v.id_house,
+    v.id_agent AS id_agent,
+    NULL AS id_rent_flow,
+    vsl.id_schedule,
     vsl.ts_created AS ts_event,
-    rf.id_house_listing,
-    rf.id_region,
-    rf.id_user,
-    hbh.id_user AS id_owner_on_event,
-    rf.uuid_company,
-    rf.id_company_hubspot,
-    rf.partner_3p_supply,
-    COALESCE(rf.country_code, 'BR') AS country_code,
+    NULL AS id_house_listing,
+    NULL AS id_region,
+    NULL AS id_user,
+    NULL AS id_owner_on_event,
+    NULL AS uuid_company,
+    NULL AS id_company_hubspot,
+    NULL AS partner_3p_supply,
+    'BR' AS country_code,
     YEAR(vsl.ts_created) AS year,
     MONTH(vsl.ts_created) AS month,
     DAY(vsl.ts_created) AS day
   FROM
     datalake_ebdb_clean.visit_status_log AS vsl
   LEFT JOIN
-    datalake_booking.booking AS bk 
-      ON vsl.id_schedule = bk.id
-  LEFT JOIN
-    rent_flow_house_listing AS rf
-      ON rf.id_booking = bk.id
-  LEFT JOIN
-    datalake_pro_owners.house_b2b_history AS hbh
-      ON bk.id_house = hbh.id_house
-      AND DATE(bk.ts_created) >= DATE(hbh.ts_started)
-      AND DATE(bk.ts_created) < COALESCE(DATE(hbh.ts_ended), NOW())
+    datalake_ebdb_clean.visit AS v
+      ON v.id = vsl.id_visit
   WHERE
     vsl.event_type = 'VISIT_REQUESTED'
   UNION ALL
   SELECT --visits_scheduled
     vsl.id_visit AS id_event,
-    vsl.id_schedule AS id_booking,
-    rf.id_offer,
-    rf.id_proposal,
-    rf.id_contract,
+    NULL AS id_booking,
+    NULL AS id_offer,
+    NULL AS id_proposal,
+    NULL AS id_contract,
     12 AS id_event_type,
-    bk.id_visitor AS id_client,
-    bk.id_house,
-    rf.id_agent,
-    bk.id_rent_flow,
+    v.id_visitor AS id_client,
+    v.id_house,
+    v.id_agent AS id_agent,
+    NULL AS id_rent_flow,
+    vsl.id_schedule,
     vsl.ts_created AS ts_event,
-    rf.id_house_listing,
-    rf.id_region,
-    rf.id_user,
-    hbh.id_user AS id_owner_on_event,
-    rf.uuid_company,
-    rf.id_company_hubspot,
-    rf.partner_3p_supply,
-    COALESCE(rf.country_code, 'BR') AS country_code,
+    NULL AS id_house_listing,
+    NULL AS id_region,
+    NULL AS id_user,
+    NULL AS id_owner_on_event,
+    NULL AS uuid_company,
+    NULL AS id_company_hubspot,
+    NULL AS partner_3p_supply,
+    'BR' AS country_code,
     YEAR(vsl.ts_created) AS year,
     MONTH(vsl.ts_created) AS month,
     DAY(vsl.ts_created) AS day
   FROM
     datalake_ebdb_clean.visit_status_log AS vsl
   LEFT JOIN
-    datalake_booking.booking AS bk 
-      ON vsl.id_schedule = bk.id
-  LEFT JOIN
-    rent_flow_house_listing AS rf
-      ON rf.id_booking = bk.id
-  LEFT JOIN
-    datalake_pro_owners.house_b2b_history AS hbh
-      ON bk.id_house = hbh.id_house
-      AND DATE(bk.ts_created) >= DATE(hbh.ts_started)
-      AND DATE(bk.ts_created) < COALESCE(DATE(hbh.ts_ended), NOW())
+    datalake_ebdb_clean.visit AS v
+      ON v.id = vsl.id_visit
   WHERE
     vsl.event_type = 'VISIT_SCHEDULED'
   UNION ALL
   SELECT --visits_rescheduled
     vsl.id_visit AS id_event,
-    vsl.id_schedule AS id_booking,
-    rf.id_offer,
-    rf.id_proposal,
-    rf.id_contract,
+    NULL AS id_booking,
+    NULL AS id_offer,
+    NULL AS id_proposal,
+    NULL AS id_contract,
     13 AS id_event_type,
-    bk.id_visitor AS id_client,
-    bk.id_house,
-    rf.id_agent,
-    bk.id_rent_flow,
+    v.id_visitor AS id_client,
+    v.id_house,
+    v.id_agent AS id_agent,
+    NULL AS id_rent_flow,
+    vsl.id_schedule,
     vsl.ts_created AS ts_event,
-    rf.id_house_listing,
-    rf.id_region,
-    rf.id_user,
-    hbh.id_user AS id_owner_on_event,
-    rf.uuid_company,
-    rf.id_company_hubspot,
-    rf.partner_3p_supply,
-    COALESCE(rf.country_code, 'BR') AS country_code,
+    NULL AS id_house_listing,
+    NULL AS id_region,
+    NULL AS id_user,
+    NULL AS id_owner_on_event,
+    NULL AS uuid_company,
+    NULL AS id_company_hubspot,
+    NULL AS partner_3p_supply,
+    'BR' AS country_code,
     YEAR(vsl.ts_created) AS year,
     MONTH(vsl.ts_created) AS month,
     DAY(vsl.ts_created) AS day
   FROM
     datalake_ebdb_clean.visit_status_log AS vsl
   LEFT JOIN
-    datalake_booking.booking AS bk 
-      ON vsl.id_schedule = bk.id
-  LEFT JOIN
-    rent_flow_house_listing AS rf
-      ON rf.id_booking = bk.id
-  LEFT JOIN
-    datalake_pro_owners.house_b2b_history AS hbh
-      ON bk.id_house = hbh.id_house
-      AND DATE(bk.ts_created) >= DATE(hbh.ts_started)
-      AND DATE(bk.ts_created) < COALESCE(DATE(hbh.ts_ended), NOW())
+    datalake_ebdb_clean.visit AS v
+      ON v.id = vsl.id_visit
   WHERE
     vsl.event_type = 'VISIT_RESCHEDULED'
   UNION ALL
   SELECT --visits_done
     vsl.id_visit AS id_event,
-    vsl.id_schedule AS id_booking,
-    rf.id_offer,
-    rf.id_proposal,
-    rf.id_contract,
+    NULL AS id_booking,
+    NULL AS id_offer,
+    NULL AS id_proposal,
+    NULL AS id_contract,
     14 AS id_event_type,
-    bk.id_visitor AS id_client,
-    bk.id_house,
-    rf.id_agent,
-    bk.id_rent_flow,
+    v.id_visitor AS id_client,
+    v.id_house,
+    v.id_agent AS id_agent,
+    NULL AS id_rent_flow,
+    vsl.id_schedule,
     vsl.ts_created AS ts_event,
-    rf.id_house_listing,
-    rf.id_region,
-    rf.id_user,
-    hbh.id_user AS id_owner_on_event,
-    rf.uuid_company,
-    rf.id_company_hubspot,
-    rf.partner_3p_supply,
-    COALESCE(rf.country_code, 'BR') AS country_code,
+    NULL AS id_house_listing,
+    NULL AS id_region,
+    NULL AS id_user,
+    NULL AS id_owner_on_event,
+    NULL AS uuid_company,
+    NULL AS id_company_hubspot,
+    NULL AS partner_3p_supply,
+    'BR' AS country_code,
     YEAR(vsl.ts_created) AS year,
     MONTH(vsl.ts_created) AS month,
     DAY(vsl.ts_created) AS day
   FROM
     datalake_ebdb_clean.visit_status_log AS vsl
   LEFT JOIN
-    datalake_booking.booking AS bk 
-      ON vsl.id_schedule = bk.id
-  LEFT JOIN
-    rent_flow_house_listing AS rf
-      ON rf.id_booking = bk.id
-  LEFT JOIN
-    datalake_pro_owners.house_b2b_history AS hbh
-      ON bk.id_house = hbh.id_house
-      AND DATE(bk.ts_created) >= DATE(hbh.ts_started)
-      AND DATE(bk.ts_created) < COALESCE(DATE(hbh.ts_ended), NOW())
+    datalake_ebdb_clean.visit AS v
+      ON v.id = vsl.id_visit
   WHERE
     vsl.event_type = 'VISIT_DONE'
 ),
@@ -704,6 +686,7 @@ SELECT DISTINCT
   rde.id_house,
   rde.id_agent,
   rde.id_rent_flow,
+  rde.id_schedule,
   rde.id_house_listing,
   rde.id_region,
   rde.id_user AS id_owner,
