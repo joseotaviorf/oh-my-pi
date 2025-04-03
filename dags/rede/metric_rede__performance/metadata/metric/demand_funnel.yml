@@ -1,0 +1,140 @@
+---
+database_name: metric_rede
+table_name: demand_funnel
+description: Daily table that contains the aggregated value about demand events Funnel from Rede QuintoAndar Operation.
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_demand_funnel:
+    lineage:
+      - dw_sale.fact_sale_demand_event.ts_event
+      - dw_public.dim_company_rede_partners.hubspot_company_name
+      - dw_public.fact_company_events.event_update
+      - dw_public.dim_company_rede_partners.company_performance_cluster
+      - dw_public.dim_person.id_user_email
+      - dw_public.dim_person.city_name
+      - dw_sale.dim_listing.is_high_ticket
+    description: Unique key of the metric table.
+    dimension: True
+  dt_date:
+    lineage:
+      - dw_sale.fact_sale_demand_event.ts_event
+    description: Date of competence (YYYY-MM-DD).
+    dimension: True
+  dt_week:
+    lineage:
+      - dw_sale.fact_sale_demand_event.ts_event
+    description: First working day of week of the competence (YYYY-MM-DD).
+    dimension: True
+  company_name:
+    lineage:
+      - dw_public.dim_company_rede_partners.company_name
+    description: Name of the Rede Company related to the demand event (1p if the demand is from QuintoAndar).
+    dimension: True
+  company_hubspot_name:
+    lineage:
+      - dw_public.dim_company_rede_partners.company_hubspot_name
+    description: Hubspot name (extracted_3p_tag) of the Rede Company related to the demand event (1p if the demand is from QuintoAndar).
+    dimension: True
+  company_ops_cluster:
+    lineage:
+      - dw_public.fact_company_events.event_update
+    description: Ops cluster classification of the Rede Company related to the demand event (1p if the demand is from QuintoAndar).
+    dimension: True
+  company_performance_cluster:
+    lineage:
+      - dw_public.dim_company_rede_partners.event_update
+    description: Performance cluster classification of the Rede Company related to the demand event (1p if the demand is from QuintoAndar).
+    dimension: True
+  account_manager_user:
+    lineage:
+      - dw_public.dim_person.id_user_email
+    description: ID of the Account Manager responsible by the Rede Company.
+    dimension: True
+  city_name:
+    lineage:
+      - dw_public.dim_region.city_name
+    description: City of the listing related to the Demand Event.
+    dimension: True
+  is_high_ticket:
+    lineage:
+      - dw_sale.dim_listing.is_high_ticket
+    description: Yes if the listing price is equal or higher than R$ 1.000.000,00.
+    dimension: True
+  visits_booked:
+    description: Total number of visits that have been booked.
+    metric:
+      name: Visits Booked
+      description: The total count of visits scheduled by customers.
+      acronym: VB
+      approved_by: isadora.tessler@quintoandar.com.br
+  visits_confirmed:
+    description: Total number of visits that have been confirmed.
+    metric:
+      name: Visits Confirmed
+      description: The total count of visits that have been confirmed after booking.
+      acronym: VC
+      approved_by: isadora.tessler@quintoandar.com.br
+  offers_sent:
+    description: Total number of offers sent to customers.
+    metric:
+      name: Offers Sent
+      description: The total count of offers that have been formally sent to customers.
+      acronym: OS
+      approved_by: isadora.tessler@quintoandar.com.br
+  offers_accepted:
+    description: Total number of offers accepted by customers.
+    metric:
+      name: Offers Accepted
+      description: The total count of offers that have been accepted by customers.
+      acronym: OA
+      approved_by: isadora.tessler@quintoandar.com.br
+  signed_contract:
+    description: Total number of contracts that have been signed.
+    metric:
+      name: Signed Contract
+      description: The total count of contracts that have been officially signed by customers.
+      acronym: CCV
+      approved_by: isadora.tessler@quintoandar.com.br
+  vb2vc:
+    description: Ratio of visits confirmed to visits booked.
+    metric:
+      name: Visits Booked to Visits Confirmed
+      description: The percentage of booked visits that were successfully confirmed.
+      acronym: VB2VC
+      approved_by: isadora.tessler@quintoandar.com.br
+  vb2os:
+    description: Ratio of offers sent to visits booked.
+    metric:
+      name: Visits Booked to Offers Sent
+      description: The percentage of booked visits that resulted in offers being sent.
+      acronym: VB2OS
+      approved_by: isadora.tessler@quintoandar.com.br
+  os2oa:
+    description: Ratio of offers accepted to offers sent.
+    metric:
+      name: Offers Sent to Offers Accepted
+      description: The percentage of sent offers that were accepted by customers.
+      acronym: OS2OA
+      approved_by: isadora.tessler@quintoandar.com.br
+  oa2ccv:
+    description: Ratio of signed contracts to offers accepted.
+    metric:
+      name: Offers Accepted to Signed Contract
+      description: The percentage of accepted offers that resulted in signed contracts.
+      acronym: OA2CCV
+      approved_by: isadora.tessler@quintoandar.com.br
+  os2ccv:
+    description: Ratio of signed contracts to offers sent.
+    metric:
+      name: Offers Sent to Signed Contract
+      description: The percentage of sent offers that resulted in signed contracts.
+      acronym: OS2CCV
+      approved_by: isadora.tessler@quintoandar.com.br
+  vb2ccv:
+    description: Ratio of signed contracts to visits booked.
+    metric:
+      name: Visits Booked to Signed Contract
+      description: The percentage of booked visits that resulted in signed contracts.
+      acronym: VB2CCV
+      approved_by: isadora.tessler@quintoandar.com.br

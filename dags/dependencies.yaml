@@ -3401,6 +3401,18 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-prospect-events
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-top-of-funnel-events
   - bietlejuice.dw_region:load-dw-public-dim-region
+bietlejuice.metric_rede__performance:
+  - bietlejuice.dw_company:load-dw-public-dim-company-rede-partners
+  - bietlejuice.dw_company:load-dw-public-fact-company-events
+  - bietlejuice.dw_person:load-dw-public-dim-person
+  - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p
+  - bietlejuice.dw_rede_supply:load-dw-rede-fact-lead-3p-flows
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type
+  - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event
+  - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
+  - bietlejuice.dw_sale_ongoing_listings:load-dw-sale-fact-daily-ongoing-listing
 bietlejuice.metric_rent__bookings:
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_region:load-dw-public-dim-region

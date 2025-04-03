@@ -1,0 +1,27 @@
+---
+table_name: metric_rede.supply_funnel
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_supply_funnel:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  dt_date:
+    is_complete:
+      severity_level: Error
+  company_name:
+    is_complete:
+      severity_level: Error
+  hubspot_company_name:
+    is_complete:
+      severity_level: Error
+  company_performance_cluster:
+    is_complete:
+      severity_level: Error
+  account_manager_user:
+    is_complete:
+      severity_level: Error
+  city_name:
+    is_complete:
+      severity_level: Error
