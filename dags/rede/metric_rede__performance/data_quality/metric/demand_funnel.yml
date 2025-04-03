@@ -2,7 +2,7 @@
 table_name: metric_rede.demand_funnel
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
-  sk_supply_funnel:
+  sk_demand_funnel:
     is_complete:
       severity_level: Error
     is_unique:
