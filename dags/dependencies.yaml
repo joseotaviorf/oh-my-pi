@@ -179,10 +179,6 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
-  - bietlejuice.paschoalotto:load-clean-agreement-detail
-  - bietlejuice.paschoalotto:load-clean-contract
-  - bietlejuice.paschoalotto:load-clean-debt
-  - bietlejuice.paschoalotto:load-clean-user
   - bietlejuice.trato_feito:load-clean-accounting-installment
   - bietlejuice.trato_feito:load-clean-client
   - bietlejuice.trato_feito:load-clean-contract
@@ -206,10 +202,6 @@ bietlejuice.dw_collection_recovery_quintocred:
   - bietlejuice.enrich_velo:load-enrich-junk
   - bietlejuice.enrich_velo:load-enrich-occurrence
   - bietlejuice.enrich_velo:load-enrich-payment-contracts
-  - bietlejuice.paschoalotto:load-clean-agreement-detail
-  - bietlejuice.paschoalotto:load-clean-contract
-  - bietlejuice.paschoalotto:load-clean-debt
-  - bietlejuice.paschoalotto:load-clean-user
   - bietlejuice.person:load-clean-person
   - bietlejuice.recupera:load-clean-complementary-records
   - bietlejuice.recupera:load-clean-complementary-records-written-down
@@ -661,9 +653,7 @@ bietlejuice.dw_operator_performance:
   - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-negotiation
   - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-negotiation-installment
   - bietlejuice.iaf:load-clean-employee
-  - bietlejuice.paschoalotto:load-clean-user
   - bietlejuice.recupera:load-clean-operators
-  - bietlejuice.webhelp:load-clean-login
 bietlejuice.dw_person:
   - bietlejuice.enrich_person:load-enrich-person-sks
   - bietlejuice.person:load-clean-contact-info

@@ -145,12 +145,26 @@ bietlejuice.dw_collection_recovery_quintoandar:
     - bietlejuice.recupera:load-clean-complementary-records-written-down
     - bietlejuice.recupera:load-clean-creditor-pending
     - bietlejuice.recupera:load-clean-operators
+    - bietlejuice.paschoalotto:load-clean-agreement-detail
+    - bietlejuice.paschoalotto:load-clean-contract
+    - bietlejuice.paschoalotto:load-clean-debt
+    - bietlejuice.paschoalotto:load-clean-user
+bietlejuice.dw_collection_recovery_quintocred:
+  remove:
+    - bietlejuice.paschoalotto:load-clean-agreement-detail
+    - bietlejuice.paschoalotto:load-clean-contract
+    - bietlejuice.paschoalotto:load-clean-debt
+    - bietlejuice.paschoalotto:load-clean-user
 bietlejuice.dw_offboarding:
   add:
     - bietlejuice.enrich_inspections:load-enrich-repair-request
 bietlejuice.dw_offer:
   remove:
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
+bietlejuice.dw_operator_performance:
+  remove:
+    - bietlejuice.paschoalotto:load-clean-user
+    - bietlejuice.webhelp:load-clean-login
 bietlejuice.dw_photo_jobs:
   remove:
     - bietlejuice.ebdb_visit:load-clean-booking
