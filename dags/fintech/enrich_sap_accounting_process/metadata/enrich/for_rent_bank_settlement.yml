@@ -1,0 +1,83 @@
+---
+database_name: datalake_sap_accounting_process
+table_name: for_rent_bank_settlement
+owner: ae-finance-fintech@quintoandar.com.br
+domain: for_rent
+description: null
+columns:
+  id_business_entity:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.r.id_contract
+  id_finance_entity:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.r.id_invoice
+  company_use:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.company_use
+  version:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.version
+  billing_source:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.billing_source
+  payment_source:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.payment_source
+  bank_source:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.bank_source
+  accrual_year_month:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.accrual_year_month
+  billing_source_amount:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.billing_source_amount
+  payment_source_amount:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.payment_source_amount
+  bank_amount:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.bank_amount
+  sap_amount:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.sap_amount
+  account_number:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.account_number
+  is_completeness_compliance:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.CASE WHEN NOT l.hash IS NULL THEN TRUE ELSE FALSE END
+  dt_billing_source:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.dt_billing_source
+  dt_payment_source:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.dt_payment_source
+  dt_bank_paid:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.dt_bank_paid
+  dt_sap_created:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.dt_sap_created
+  dt_sap_reference:
+    description: ''
+    lineage:
+    - .payments_in_retsuko.dt_sap_reference
