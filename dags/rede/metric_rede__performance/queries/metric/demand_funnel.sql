@@ -13,7 +13,7 @@ SELECT
   DATE(de.ts_event) AS dt_date,
   DATE(DATE_TRUNC('WEEK', de.ts_event)) AS dt_week,
   COALESCE(dc.company_name, '1P') AS company_name,
-  COALESCE(dc.hubspot_company_name, '1P') AS company_hubspot_name,
+  COALESCE(dc.hubspot_company_name, '1P') AS hubspot_company_name,
   COALESCE(cec.event_update, 'Unknown') AS company_ops_cluster,
   COALESCE(dc.company_performance_cluster, 'Unknown') AS company_performance_cluster,
   COALESCE(dp.id_user_email, 'Unknown') AS account_manager_user,

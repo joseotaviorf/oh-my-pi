@@ -31,9 +31,9 @@ columns:
       - dw_public.dim_company_rede_partners.company_name
     description: Name of the Rede Company related to the demand event (1p if the demand is from QuintoAndar).
     dimension: True
-  company_hubspot_name:
+  hubspot_company_name:
     lineage:
-      - dw_public.dim_company_rede_partners.company_hubspot_name
+      - dw_public.dim_company_rede_partners.hubspot_company_name
     description: Hubspot name (extracted_3p_tag) of the Rede Company related to the demand event (1p if the demand is from QuintoAndar).
     dimension: True
   company_ops_cluster:
