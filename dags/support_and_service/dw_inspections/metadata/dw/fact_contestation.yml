@@ -17,6 +17,10 @@ columns:
     lineage:
       - datalake_inspection_services_clean.contestation.id_reviewer
     description: Creator of the contestation
+  cost:
+    lineage:
+      - datalake_inspection_services_clean.contestation.cost
+    description: Indicates the contestation amount.
   has_media:
     lineage:
       - datalake_inspection_services_clean.contestation.has_media
@@ -25,6 +29,10 @@ columns:
     description: Indicates that the contestation was made by the tenant
   is_contested_by_owner:
     description: Indicates that the contestation was made by the owner
+  is_tenant_budget_approval_contestation:
+    description: Indicates whether it is a dispute at the budget approval stage made by the tenant.
+  is_owner_budget_approval_contestation:
+    description: Indicates whether it is a dispute at the budget approval stage made by the owner.
   ts_created:
     lineage:
       - datalake_inspection_services_clean.contestation.ts_created

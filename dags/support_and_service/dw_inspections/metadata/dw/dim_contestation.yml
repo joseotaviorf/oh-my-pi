@@ -21,6 +21,14 @@ columns:
       DISAGREE: ""
       SAME: ""
       REPAIR_NEGOTIATED: ""
+  origin:
+    lineage:
+      - datalake_inspection_services_clean.contestation.origin
+    description: Indicates which feature originated the contestation, for example, the value 'BUGET_APPROVAL' indicates whether the contestation came from the budget approval feature.
+  type:
+    lineage:
+      - datalake_inspection_services_clean.contestation.type
+    description: Indicates the type of contestation, for example cost or liability.
   ts_updated:
     lineage:
       - datalake_inspection_services_clean.contestation.ts_updated

@@ -2,6 +2,8 @@ SELECT
     c.id_contestation AS sk_contestation,
     c.comment,
     c.reason,
+    c.origin,
+    c.type,
     c.ts_updated,
     NOW() AS ts_load,
     c.year,
