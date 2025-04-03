@@ -50,7 +50,7 @@ negotiation_rental_transact AS (
     )
     SELECT
         o.id AS id_offer,
-        offer_min_aud.qtd_topics_negotiated,
+        MAX(offer_min_aud.qtd_topics_negotiated) AS qtd_topics_negotiated,
         MIN(
             IF(
                 offer_min_aud.actor_role = 'DEMAND'
@@ -120,7 +120,7 @@ negotiation_rental_transact AS (
         offer_min_max_aud AS offer_min_aud
             ON offer_min_aud.id_offer = ota.id_offer
             AND offer_min_aud.min_rev = otma.rev
-    GROUP BY 1, 2
+    GROUP BY 1
 )
 SELECT
     o.id AS id_offer,
