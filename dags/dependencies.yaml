@@ -1776,6 +1776,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.enrich_company:load-enrich-company
   - bietlejuice.enrich_ebdb_country:load-enrich-house
   - bietlejuice.enrich_ebdb_country:load-enrich-user
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
 bietlejuice.enrich_ebdb_photo_jobs:
   - bietlejuice.ebdb:load-clean-photographer-job

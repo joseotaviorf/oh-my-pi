@@ -1,0 +1,21 @@
+---
+table_name: datalake_ebdb_listing.lbc_status_version_order
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_house_rev:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  rev:
+    is_complete:
+      severity_level: Error
+  listing_version:
+    is_complete:
+      severity_level: Error
+  ts_state_started:
+    is_complete:
+      severity_level: Error

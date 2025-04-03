@@ -5,6 +5,12 @@ description: Information related to ForRent listings. Each line represent a stat
 domain: For Rent
 owner: jonas.fiorini@quintoandar.com.br
 columns:
+  id_house_rev:
+    lineage:
+      - datalake_ebdb_listing.business_context_history.id_house
+      - datalake_ebdb_listing.business_context_history.rev
+      - datalake_ebdb_listing.house_status_version_order.rev
+    description: "Id of the house state in time. It's the unique identifier for this table."
   id_house:
     lineage:
       - datalake_ebdb_listing.business_context_history.id_house

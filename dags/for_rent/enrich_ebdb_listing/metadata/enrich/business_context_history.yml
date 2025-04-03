@@ -12,7 +12,7 @@ columns:
     description: Id of the house
   id_user_modified_by:
     lineage:
-    - datalake_ebdb_clean.user_revision_entity.id_user
+    - datalake_ebdb_user.user_revision_entity.id_user
     description: Id of the user that made the modification.
   rev:
     lineage:
@@ -45,6 +45,10 @@ columns:
     description: Reason of the house suspension (a change on this columns not necessarily
       represents a status change)
   ts_state_started:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Timestamp when this status and suspension reason started
   ts_state_ended:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Timestamp when this status and suspension reason ended

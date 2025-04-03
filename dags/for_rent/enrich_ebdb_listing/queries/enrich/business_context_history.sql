@@ -9,14 +9,14 @@ WITH lbc_aud AS (
       i.status_reason,
       LAG(i.suspension_reason) OVER(PARTITION BY i.id_house, i.business_context ORDER BY i.rev) AS previous_suspension_reason, -- previous suspension_reason ordered by the datetime that happened
       i.suspension_reason,
-      FROM_UNIXTIME(CAST(rev.ts_revision AS BIGINT)/1000) AS revision_time, 
+      rev.ts_revision AS revision_time,
       i.rev
-    FROM 
+    FROM
         datalake_ebdb_clean.listing_business_context_aud AS i
-    INNER JOIN 
-        datalake_ebdb_clean.user_revision_entity AS rev
+    INNER JOIN
+        datalake_ebdb_user.user_revision_entity AS rev
           ON rev.id = i.rev
-      
+
 ),
 lbc_history AS (
     SELECT
@@ -29,25 +29,25 @@ lbc_history AS (
         status_reason,
         suspension_reason,
         ROW_NUMBER() OVER(PARTITION BY id_house, business_context ORDER BY rev) AS event_order
-    FROM 
+    FROM
           lbc_aud
-    WHERE 
+    WHERE
           (
-            status <> previous_status 
+            status <> previous_status
             OR previous_status IS NULL
-          ) 
+          )
         OR (
-             suspension_reason <> previous_suspension_reason 
-             OR (previous_suspension_reason IS NULL AND suspension_reason IS NOT NULL) 
+             suspension_reason <> previous_suspension_reason
+             OR (previous_suspension_reason IS NULL AND suspension_reason IS NOT NULL)
              OR (suspension_reason IS NULL AND previous_suspension_reason IS NOT NULL)
            )
         OR (
-             status_reason <> previous_status_reason 
-             OR (previous_status_reason IS NULL AND status_reason IS NOT NULL) 
+             status_reason <> previous_status_reason
+             OR (previous_status_reason IS NULL AND status_reason IS NOT NULL)
              OR (status_reason IS NULL AND previous_status_reason IS NOT NULL)
            )
 )
-SELECT 
+SELECT
     lbch.id_house,
     lbch.id_user_modified_by,
     lbch.rev,
@@ -58,9 +58,9 @@ SELECT
     lbch.suspension_reason,
     lbch.revision_time AS ts_state_started,
     lbch2.revision_time AS ts_state_ended
-FROM 
+FROM
     lbc_history AS lbch
-LEFT JOIN 
+LEFT JOIN
     lbc_history AS lbch2
         ON lbch2.id_house = lbch.id_house
         AND lbch2.business_context = lbch.business_context

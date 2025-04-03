@@ -543,6 +543,7 @@ relisting_offer AS (
       v.status_reason LIKE 'RELISTING_%'
 )
 SELECT
+    CONCAT(v.id_house, v.rev) AS id_house_rev,
     v.id_house,
     v.country_code,
     v.status,
