@@ -25,6 +25,8 @@ WITH event_type_adjustment AS (
     country_code
   FROM
     dw_rent.fact_rent_demand_events
+  WHERE
+    sk_rent_flow > 0
 )
 /** Events that weren't converted receives sk_convertion_event and sk_conversion_event_type as 0.
   sk_conversion_date, days_to_conversion and weeks_to_conversion will be -1.
