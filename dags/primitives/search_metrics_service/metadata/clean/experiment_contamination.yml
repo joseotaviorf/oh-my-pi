@@ -1,0 +1,22 @@
+---
+database_name: datalake_search
+table_name: experiment_contamination
+owner: pedro.nogueira@quintoandar.com.br
+domain: primitives
+
+columns:
+  exp_name:
+    lineage:
+      - datalake_search.experiment_contamination.business_context
+  execution_date:
+    lineage:
+      - datalake_search.experiment_contamination.execution_date
+  user_contamination_percentage:
+    lineage:
+      - datalake_search.experiment_contamination.user_contamination_percentage
+  abs_contaminated_users:
+    lineage:
+      - datalake_search.experiment_contamination.abs_contaminated_users
+  abs_users:
+    lineage:
+      - datalake_search.experiment_contamination.abs_users
