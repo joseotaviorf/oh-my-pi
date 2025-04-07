@@ -1,0 +1,100 @@
+database_name: datalake_meetcall_clean
+table_name: login
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: This table contains information about customer interaction records performed by Meetcall operators. It includes contact metadata, action taken, outcomes, and timestamps related to the occurrences. This data supports operational analysis, performance monitoring, and business decision-making across customer service and collection strategies.
+columns:
+  id_occurrence:
+    description: Unique identifier of the occurrence
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.id_ocorrencia
+  id_operator_cyber:
+    description: Cyber operator login
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.id_operador_cyber
+  id_operator_grb:
+    description: GRB operator login
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.id_operador_assessoria
+  id_contract:
+    description: Contract identifier associated with the occurrence
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.id_contrato
+  phone_contacted:
+    description: Phone number contacted during the interaction
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.telefone_acionado
+  email_contacted:
+    description: Email contacted during the interaction
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.email_acionado
+  assessment_tag:
+    description: Label or tag defined by the assessment team
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.tabulacao_assessoria
+  action:
+    description: Action taken by the operator
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.acao
+  result:
+    description: Result of the action performed
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.resultado
+  complement:
+    description: Additional comments or notes about the occurrence
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.complemento
+  survey_sent:
+    description: Indicates whether a satisfaction survey was sent
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.envio_pesquisa
+  survey_score:
+    description: Score given by the customer in the satisfaction survey
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.nota_pesquisa
+  channel:
+    description: Communication channel used in the interaction
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.canal
+  contact_type:
+    description: Type of contact made during the occurrence
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.tipo_contato
+  triggered:
+    description: Whether the contact was actively triggered by the system
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.acionamento
+  alo:
+    description: Indicates whether there was a voice connection (e.g., answered call)
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.alo
+  cpc:
+    description: Contact per contact indicator or result
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.cpc
+  talk_time:
+    description: Duration of the call in seconds
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.tempo_falado
+  ts_occurrence_start:
+    description: Timestamp when the occurrence started
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.data_hora_ocorrencia_inicio
+  ts_occurrence_end:
+    description: Timestamp when the occurrence ended
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.data_hora_ocorrencia_fim
+  year:
+    description: Partition column representing the year of the event
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.year
+  month:
+    description: Partition column representing the month of the event
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.month
+  day:
+    description: Partition column representing the day of the event
+    lineage:
+      - datalake_meetcall_raw.acoescobranca.day
+  ts_load:
+    description: Timestamp of data load execution

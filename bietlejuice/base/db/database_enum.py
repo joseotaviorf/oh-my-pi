@@ -81,3 +81,4 @@ class DatabaseEnum:
     WOLOLO = "WOLOLO"
     CYBER = "CYBER_DB"
     GRB = "GRB_DB"
+    MEETCALL = "MEETCALL_DB"

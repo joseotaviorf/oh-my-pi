@@ -1,0 +1,55 @@
+dag:
+  name: meetcall
+  schedule_start_date: 2025, 3, 25
+  schedule_interval: 0 6 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Ingestion of BPO (Business Process Outsourcing) MeetCall (collections business partner) system tables about collections.
+      Google drive folder that contains all details about the system: https://docs.google.com/spreadsheets/d/1NRX5Plqj8k9xa_MtYLPhVWXlLWbsbd-l/edit?gid=1098517241#gid=1098517241
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_meetcall_raw
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
+  default_extraction_type: full
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{extraction_type}"
+    - "{partitions}"
+  tables_customization:
+    acoescobranca:
+      clean_table_name: logs
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - "['data_hora_ocorrencia_inicio']"
+    dadosloginlogout:
+      clean_table_name: login_time
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - "['data_registro']"
+    dadosoperadores:
+      clean_table_name: operators
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - "[]"
+cluster:
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  custom_libraries:
+    - jar: "{artifacts_bucket}/jars/mssql-jdbc-12.8.1.jre8.jar"

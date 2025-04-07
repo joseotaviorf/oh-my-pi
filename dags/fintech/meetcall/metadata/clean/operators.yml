@@ -1,0 +1,44 @@
+database_name: datalake_meetcall_clean
+table_name: operators
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: This table contains the registration and identification information of Meetcall operators. It includes details such as names, emails, positions, leadership information, admission and termination dates, and PA type. The data is essential for mapping operator profiles, managing access controls, and supporting HR and operational analytics.
+columns:
+  id_operator_cyber:
+    description: Cyber operator login
+    lineage:
+      - datalake_meetcall_raw.dadosoperadores.id_operador_cyber
+  id_operator_grb:
+    description: GRB operator login
+    lineage:
+      - datalake_meetcall_raw.dadosoperadores.id_operador_assessoria
+  name:
+    description: Full name of the operator
+    lineage:
+      - datalake_meetcall_raw.dadosoperadores.nome
+  email:
+    description: Email address of the operator
+    lineage:
+      - datalake_meetcall_raw.dadosoperadores.email
+  position:
+    description: Job title or role of the operator
+    lineage:
+      - datalake_meetcall_raw.dadosoperadores.cargo
+  leadership_name:
+    description: Name of the operator's team leader or supervisor
+    lineage:
+      - datalake_meetcall_raw.dadosoperadores.nome_lideranca
+  pa_type:
+    description: Type of PA (Atendimento Position) assigned to the operator
+    lineage:
+      - datalake_meetcall_raw.dadosoperadores.tipo_pa
+  dt_admission:
+    description: Date when the operator was admitted to the company
+    lineage:
+      - datalake_meetcall_raw.dadosoperadores.data_admissao
+  dt_termination:
+    description: Date when the operator was terminated or left the company
+    lineage:
+      - datalake_meetcall_raw.dadosoperadores.data_desligamento
+  ts_load:
+    description: Timestamp of data load execution

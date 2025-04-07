@@ -1,0 +1,7 @@
+database_name: datalake_meetcall_clean
+table_name: login_time
+columns:
+  email_operator:
+    tags:
+      - PII
+      - Confidential
