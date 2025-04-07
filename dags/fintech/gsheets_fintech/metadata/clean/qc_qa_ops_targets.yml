@@ -94,3 +94,12 @@ columns:
   dt_reference:
     lineage:
       - datalake_gsheets_raw.qc_qa_ops_targets.dia
+  critical_error_total:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.critical_error_total
+  critical_error_simple:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.critical_error_simples
+  critical_error_rescission:
+    lineage:
+      - datalake_gsheets_raw.qc_qa_ops_targets.critical_error_rescisao

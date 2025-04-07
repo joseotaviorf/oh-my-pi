@@ -28,6 +28,9 @@ SELECT
     sla_docs_qc AS sla_docs_qc,
     conversao_renovacoes_qc AS renewal_conversion_qc,
     dsat_renovacoes_qc AS dsat_renewal_qc,
+    critical_error_total,
+    critical_error_simples AS critical_error_simple,
+    critical_error_rescisao AS critical_error_rescission,
     mes_de_referencia_tgt_semanal AS reference_month_weekly_target,
     dia AS dt_reference
 FROM
