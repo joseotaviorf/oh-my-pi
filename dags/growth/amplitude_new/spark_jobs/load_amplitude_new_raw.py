@@ -25,15 +25,8 @@ JOB_NAME = "load_amplitude_new_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def process_key(key, environment, source_path, datalake_bucket, execution_date):
+def process_key(key, environment, source_path, datalake_bucket, execution_date, partition_cols, table_name, transient_location, transient_data_schema, transient_expected_cols):
     try:
-        config_service = ConfigurationService(source_path)
-        partition_cols = config_service.get_config("raw_partition_cols")
-        table_name = config_service.get_config("table_name")
-        transient_location = config_service.get_config("transient_location")
-        transient_data_schema = config_service.get_config("transient_data_schema")
-        transient_expected_cols = config_service.get_config("transient_expected_cols")
-
         spark_client = SparkClient()
         dataframe_service = SparkDataFrameService()
 
@@ -87,11 +80,15 @@ if __name__ == "__main__":
     source = args.source
     execution_date = args.execution_date
     source_path = source.copy()
-    config_service = ConfigurationService(source)
-
+    config_service = ConfigurationService(source_path)
+    partition_cols = config_service.get_config("raw_partition_cols")
+    table_name = config_service.get_config("table_name")
+    transient_location = config_service.get_config("transient_location")
+    transient_data_schema = config_service.get_config("transient_data_schema")
+    transient_expected_cols = config_service.get_config("transient_expected_cols")
     dbutils = BaseDBUtils().get_dbutils()
     all_keys = json.loads(dbutils.secrets.get("quintoandar", APIEnum.AMPLITUDE) or "[]")
 
     # Process keys in parallel
     with ThreadPoolExecutor() as executor:
-        executor.map(lambda key: process_key(key, environment, source_path, datalake_bucket, execution_date), all_keys)
+        executor.map(lambda key: process_key(key, environment, source_path, datalake_bucket, execution_date, partition_cols, table_name, transient_location, transient_data_schema, transient_expected_cols), all_keys)

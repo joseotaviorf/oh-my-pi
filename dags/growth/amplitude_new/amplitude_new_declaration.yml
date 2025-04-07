@@ -13,7 +13,6 @@ workflow:
     - "{environment}"
     - "{bucket}"
     - "{dag_name}"
-    - "{execution_date}"
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
@@ -21,6 +20,8 @@ workflow:
     events:
       extraction_type: incremental
       partitions: ["id_app", "year", "month", "day"]
+      extra_spark_job_arguments:
+        - "{{ ds }}"
 cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new
