@@ -33,3 +33,5 @@ columns:
     lineage:
       - datalake_rental_transact_clean.offer_topic_message.ts_updated
     description: Timestamp of when the message was updated.
+  ts_load:
+    description: Timestamp of when this data was loaded.

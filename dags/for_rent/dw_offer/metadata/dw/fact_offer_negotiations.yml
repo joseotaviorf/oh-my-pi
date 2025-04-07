@@ -37,3 +37,5 @@ columns:
     description: House listing ID.
   is_last_topic_iteration:
     description: Boolean indicating if this is the last iteration of the negotiation so far.
+  ts_load:
+    description: Timestamp of when this data was loaded.

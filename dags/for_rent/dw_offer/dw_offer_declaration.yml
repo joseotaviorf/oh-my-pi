@@ -6,7 +6,9 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: rent
-  default_partitions: [country_code]
+  tables_customization:
+    dim_offer:
+      partitions: [country_code]
 cluster:
   type: custom_cluster
   custom_configurations:

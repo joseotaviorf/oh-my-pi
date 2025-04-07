@@ -7,7 +7,8 @@ SELECT
     o.id_owner AS sk_owner,
     o.id_house AS sk_house,
     hl.id_house_listing AS sk_house_listing,
-    IF(otm.iteration IS NULL OR otm.max_topic_iteration = otm.iteration, TRUE, FALSE) AS is_last_topic_iteration
+    IF(otm.iteration IS NULL OR otm.max_topic_iteration = otm.iteration, TRUE, FALSE) AS is_last_topic_iteration,
+    NOW() AS ts_load
 FROM
     datalake_rental_transact.offer AS o
 LEFT JOIN

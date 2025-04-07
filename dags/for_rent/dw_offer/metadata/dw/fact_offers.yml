@@ -61,3 +61,5 @@ columns:
     lineage:
       - datalake_rental_transact.offer.ts_last_iteration
     description: Timestamp of the last iteration of the negotiation.
+  ts_load:
+    description: Timestamp of when this data was loaded.

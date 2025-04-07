@@ -12,7 +12,8 @@ SELECT
   COALESCE(o.qtd_topics_negotiated, 0) AS qtd_topics_negotiated,
   o.original_rent - o.last_proposed_rent_value AS original_to_final_value_difference,
   o.ts_first_iteration,
-  o.ts_last_iteration
+  o.ts_last_iteration,
+  NOW() AS ts_load
 FROM
   datalake_rental_transact.offer AS o
 JOIN

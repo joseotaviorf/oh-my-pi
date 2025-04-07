@@ -5,6 +5,7 @@ SELECT
     actor_role,
     proposed_rent_value,
     ts_created,
-    ts_updated
+    ts_updated,
+    NOW() AS ts_load
 FROM
     datalake_rental_transact_clean.offer_topic_message
