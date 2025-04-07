@@ -73,8 +73,7 @@ spoc_contracts AS (
         id_contract,
         id_termination,
         id_worker_twilio,
-        id_analyst,
-        true AS is_spoc_contract
+        id_analyst
     FROM
         datalake_hefesto.spoc_offboarding_contracts
     QUALIFY
@@ -106,10 +105,7 @@ SELECT
     crm.repairs_absorbed_ac,
     crm.total_tentant_repair_ac,
     t.spoc_wave,
-    CASE
-      WHEN COALESCE(t.is_spoc, sc.is_spoc_contract) IS NULL THEN false
-      ELSE COALESCE(t.is_spoc, sc.is_spoc_contract)
-    END AS is_spoc_contract,
+    t.is_spoc AS is_spoc_contract,
     t.is_spoc_control_group,
     t.is_relisting,
     t.has_automatically_closed_task,
