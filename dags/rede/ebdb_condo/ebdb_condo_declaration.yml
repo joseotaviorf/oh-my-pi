@@ -29,9 +29,6 @@ workflow:
       clean_table_name: entrance_conditions
     CondoManager:
       clean_table_name: condo_manager
-    CondoManagerPhones:
-      raw_primary_keys: ["id", "phones"]
-      clean_table_name: condo_manager_phones
     CondoNamesHistory:
       raw_primary_keys: ["id"]
       clean_table_name: condo_names_history
