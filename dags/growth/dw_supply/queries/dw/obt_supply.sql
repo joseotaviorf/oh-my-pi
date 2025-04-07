@@ -1,5 +1,5 @@
 WITH descartes AS (
-    SELECT 
+    SELECT
         fse.sk_supply,
         fse.sk_date,
         ROW_NUMBER() OVER (PARTITION BY fse.sk_supply, fse.nm_business_context ORDER BY fse.ts_event DESC) AS discard_order,
@@ -11,16 +11,16 @@ WITH descartes AS (
         dsof.nm_agent,
         dsof.nm_partner,
         dsof.nm_assigned_partner
-    FROM 
+    FROM
         dw_growth.fact_supply_events AS fse
-    LEFT JOIN 
-        dw_growth.dim_supply_discards AS dsd 
+    LEFT JOIN
+        dw_growth.dim_supply_discards AS dsd
             ON fse.sk_discard = dsd.sk_discard
-    LEFT JOIN 
+    LEFT JOIN
         dw_growth.dim_funnel_step AS dfs
             ON dfs.sk_funnel_step = fse.sk_funnel_step
-    LEFT JOIN 
-        dw_growth.dim_supply_operation_flow AS dsof 
+    LEFT JOIN
+        dw_growth.dim_supply_operation_flow AS dsof
             ON fse.sk_ops = dsof.sk_ops
     WHERE dfs.tp_business_event = 'drop'
     QUALIFY discard_order = 1
@@ -124,6 +124,7 @@ base AS (
             WHEN dsupa.tp_origin = 'app' THEN 'referrals'
             WHEN dsupa.tp_origin = 'whatsapp' THEN 'test'
             WHEN dsupa.tp_origin IN ('facebookleads', 'ownerpwa', 'landingproowners', 'landing', 'facebook', 'i24', 'ios') THEN 'ownerlanding'
+            WHEN dsupa.tp_origin = 'home' THEN 'homelanding'
             WHEN dsupa.tp_origin = 'humancrawler' THEN 'crawler'
             WHEN dsupa.tp_origin = 'supplyprocessor' THEN 'rede'
             WHEN dsupa.tp_origin = 'consultantpwa' THEN 'ciq'
@@ -139,7 +140,7 @@ base AS (
             WHEN dsupc.tp_origin = 'portfolio_manager' THEN 'ciq'
             WHEN dsof.nm_agent IS NULL AND dsupc.tp_origin = 'prime' THEN 'account_manager_pp_multi'
             WHEN dsof.nm_agent IS NULL AND dsupc.tp_origin = 'referral' THEN 'agent_indicacao_completa'
-            ELSE dsof.nm_agent 
+            ELSE dsof.nm_agent
         END AS operation_channel,
         CASE
             WHEN dfs.cd_funnel_step = 'lead' THEN 1
@@ -154,52 +155,52 @@ base AS (
         ac.affiliate_objective,
         pp_m.is_pp_multi_active
     FROM
-        dw_growth.fact_supply_events AS fse 
+        dw_growth.fact_supply_events AS fse
     LEFT JOIN
         dw_growth.dim_acquisition_lead AS dal
             ON fse.sk_acquisition_lead = dal.sk_acquisition_lead
-    LEFT JOIN 
+    LEFT JOIN
         dw_growth.dim_affiliate_tracking AS dat
             ON (fse.sk_user_affiliate = dat.sk_user_affiliate)
             AND (fse.ts_first_event_date >= dat.ts_started)
             AND (fse.ts_first_event_date < COALESCE(dat.ts_ended, CAST('2099-12-31' AS TIMESTAMP)))
-    LEFT JOIN 
+    LEFT JOIN
         dw_growth.dim_funnel_step AS dfs
             ON fse.sk_funnel_step = dfs.sk_funnel_step
-    LEFT JOIN 
+    LEFT JOIN
         dw_growth.dim_media_setup AS dms
             ON fse.sk_media_setup = dms.sk_media_setup
-    LEFT JOIN 
+    LEFT JOIN
         descartes AS dsd
             ON fse.sk_supply = dsd.sk_supply
             AND fse.nm_business_context = dsd.nm_business_context
-    LEFT JOIN 
-        dw_growth.dim_supply_operation_flow AS dsof 
+    LEFT JOIN
+        dw_growth.dim_supply_operation_flow AS dsof
             ON fse.sk_ops = dsof.sk_ops
-    LEFT JOIN 
+    LEFT JOIN
         dw_growth.dim_supply_recovery_flow AS dsrf
             ON fse.sk_recovery = dsrf.sk_recovery
-    LEFT JOIN 
+    LEFT JOIN
         dw_growth.dim_supply_user_path dsupa
             ON fse.sk_acquisition_user_path = dsupa.sk_user_path
             AND (dsupa.id_level = 1)
-    LEFT JOIN 
+    LEFT JOIN
         dw_growth.dim_supply_user_path dsupc
             ON fse.sk_conversion_user_path = dsupc.sk_user_path
-    LEFT JOIN 
+    LEFT JOIN
         dw_public.dim_date dd
             ON CAST(fse.sk_date AS INTEGER) = dd.sk_date
-    LEFT JOIN 
+    LEFT JOIN
         dw_public.dim_date ddd
             ON CAST(dsd.sk_date AS INTEGER) = ddd.sk_date
-    LEFT JOIN 
+    LEFT JOIN
         dw_public.dim_region dr
             ON fse.sk_region = dr.sk_region
-    LEFT JOIN 
+    LEFT JOIN
         datalake_growth_taxonomy.affiliates_classification AS ac
             ON dat.sk_user_affiliate = ac.sk_user_affiliate
     LEFT JOIN
-        pp_multi AS pp_m 
+        pp_multi AS pp_m
             ON pp_m.id_owner = fse.sk_owner
             AND dd.date = dt_houses_owned
             AND fse.nm_business_context = 'RENT'
@@ -215,17 +216,17 @@ report_origin AS (
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel = 'ciq' THEN 'CIQ'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel = 'capta_ai' THEN 'Capta Aí'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel IN ('asp', 'account_manager_pp_multi') THEN 'PP Multi'
-            WHEN obt.funnel_order > 2 AND 
-                obt.acquisition_origin IN ('ownerlanding', 'ownerpropertyregistration')
-                AND obt.conversion_origin = 'ownerpwa' 
+            WHEN obt.funnel_order > 2 AND
+                obt.acquisition_origin IN ('homelanding','ownerlanding', 'ownerpropertyregistration')
+                AND obt.conversion_origin = 'ownerpwa'
                 AND (LOWER(obt.medium) = 'seo non-branded' OR LOWER(obt.behavior_type) = 'organic') AND is_pp_multi_active = TRUE
             THEN 'PP Multi'
             WHEN obt.funnel_order > 2 AND obt.conversion_origin = 'operations' AND obt.operation_channel = 'is_expert' THEN 'IS Expert'
-            WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
-            WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
-            WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
-            WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
-            WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerlanding' THEN 'Owner PWA - Not Mapped'
+            WHEN obt.funnel_order > 2 AND obt.acquisition_origin IN ('homelanding','ownerlanding') AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
+            WHEN obt.funnel_order > 2 AND obt.acquisition_origin IN ('homelanding','ownerlanding') AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
+            WHEN obt.funnel_order > 2 AND obt.acquisition_origin IN ('homelanding','ownerlanding') AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
+            WHEN obt.funnel_order > 2 AND obt.acquisition_origin IN ('homelanding','ownerlanding') AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
+            WHEN obt.funnel_order > 2 AND obt.acquisition_origin IN ('homelanding','ownerlanding') THEN 'Owner PWA - Not Mapped'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
@@ -244,16 +245,16 @@ report_origin AS (
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel = 'ciq' THEN 'CIQ'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel = 'capta_ai' THEN 'Capta Aí'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel IN ('asp', 'account_manager_pp_multi') THEN 'PP Multi'
-            WHEN obt.funnel_order < 3 AND 
-                obt.acquisition_origin IN ('ownerlanding', 'ownerpropertyregistration', 'ownerpwa') 
+            WHEN obt.funnel_order < 3 AND
+                obt.acquisition_origin IN ('homelanding','ownerlanding', 'ownerpropertyregistration', 'ownerpwa')
                 AND (LOWER(obt.medium) = 'seo non-branded' OR LOWER(obt.behavior_type) = 'organic') AND is_pp_multi_active = TRUE
             THEN 'PP Multi'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'operations' AND obt.operation_channel = 'is_expert' THEN 'IS Expert'
-            WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
-            WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
-            WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
-            WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
-            WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerlanding' THEN 'Owner PWA - Not Mapped'
+            WHEN obt.funnel_order < 3 AND obt.acquisition_origin IN ('homelanding','ownerlanding') AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
+            WHEN obt.funnel_order < 3 AND obt.acquisition_origin IN ('homelanding','ownerlanding') AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
+            WHEN obt.funnel_order < 3 AND obt.acquisition_origin IN ('homelanding','ownerlanding') AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
+            WHEN obt.funnel_order < 3 AND obt.acquisition_origin IN ('homelanding','ownerlanding') AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
+            WHEN obt.funnel_order < 3 AND obt.acquisition_origin IN ('homelanding','ownerlanding') THEN 'Owner PWA - Not Mapped'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.medium) = 'seo non-branded' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.source) = 'braze' THEN 'Owner PWA - CRM/Notification'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
@@ -285,19 +286,19 @@ report_origin AS (
             WHEN olc.id_lead IS NOT NULL THEN 'started prospecting'
             ELSE 'new lead'
         END AS status
-    FROM 
+    FROM
         base AS obt
-    LEFT JOIN 
+    LEFT JOIN
         dw_growth.fact_supply_events AS opp
             ON opp.sk_supply = obt.sk_supply
             AND opp.nm_business_context = obt.nm_business_context
             AND opp.sk_funnel_step = 7 -- only opportunity events
-    LEFT JOIN 
+    LEFT JOIN
         status AS olc
             ON olc.id_lead = obt.sk_lead
 )
 
-SELECT 
+SELECT
     obt.*,
     CASE
         WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Novos Afiliados' THEN 'Indica Aí - General_Novo Afiliado'
@@ -330,7 +331,7 @@ SELECT
         WHEN full_conversion_origin = 'operations' THEN 'Outbound'
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'is_expert' THEN 'IS Expert'
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel IN ('asp','prime', 'account_manager_pp_multi') THEN 'PP Multi'
-        WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'capta_ai' THEN 'Capta Aí'         
+        WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'capta_ai' THEN 'Capta Aí'
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'is_inbound' THEN 'Inbound'
         WHEN full_conversion_origin = 'ownerpwa' THEN 'FSS'
         WHEN full_conversion_origin = 'rede' THEN 'Rede'
@@ -349,7 +350,7 @@ SELECT
         WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'AAVs BH' THEN 'Very low'
         WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Outros AAVs' THEN 'Very low'
         WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Novos Afiliados' THEN 'Average'
-        WHEN company_report_origin = 'Indica Aí - General' THEN 'Average'    
+        WHEN company_report_origin = 'Indica Aí - General' THEN 'Average'
         ELSE 'sem_cluster'
     END AS planning_conversion_cluster,
     CASE
@@ -376,12 +377,12 @@ SELECT
         WHEN acquisition_origin = 'operations' AND operation_channel = 'is_inbound' THEN 'IS'
         WHEN acquisition_origin = 'rede' THEN 'Rede'
         WHEN acquisition_origin = 'ciq' THEN 'CIQ'
-        ELSE 'Not Mapped' 
+        ELSE 'Not Mapped'
     END AS planning_conversion,
     NOW() AS ts_load
 FROM
     report_origin AS obt
-LEFT JOIN 
-    dw_datamarts.affiliates_clusters AS ac 
+LEFT JOIN
+    dw_datamarts.affiliates_clusters AS ac
         ON (ac.sk_user = obt.sk_user_affiliate)
         AND (ac.year_month = obt.year_month)
