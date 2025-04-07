@@ -1,0 +1,31 @@
+dag:
+  name: amplitude_new
+  owner: Data Growth
+  schedule_interval: 0 3 * * *
+  documentation:
+    dag_purpose: |
+      This DAG ingests data from Amplitude
+workflow:
+  type: custom_ingestion
+  layer: raw
+  load_spark_job: load_amplitude_new_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{execution_date}"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  tables_customization:
+    events:
+      extraction_type: incremental
+      partitions: ["id_app", "year", "month", "day"]
+cluster:
+  type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
