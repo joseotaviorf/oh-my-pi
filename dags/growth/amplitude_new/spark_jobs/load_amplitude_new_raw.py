@@ -79,8 +79,7 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     execution_date = args.execution_date
-    source_path = source.copy()
-    config_service = ConfigurationService(source_path)
+    config_service = ConfigurationService(source)
     partition_cols = config_service.get_config("raw_partition_cols")
     table_name = config_service.get_config("table_name")
     transient_location = config_service.get_config("transient_location")
