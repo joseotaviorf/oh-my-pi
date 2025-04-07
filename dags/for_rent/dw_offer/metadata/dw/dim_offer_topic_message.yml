@@ -1,0 +1,35 @@
+database_name: dw_rent
+table_name: dim_offer_topic_message
+description: Dimension table with offer topic message data from Rental Transact database.
+              Each offer topic message represents a iteration of the negotiation.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  sk_offer_topic_message:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.id
+    description: Offer topic message ID.
+  comment:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.comment
+    description: Negotiation message.
+  iteration:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.iteration
+    description: Iteration number of the negotiation.
+  actor_role:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.actor_role
+    description: Actor role on the negotiation of who is sending the message.
+  proposed_rent_value:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.proposed_rent_value
+    description: Iteration proposed rent value when applied.
+  ts_created:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.ts_created
+    description: Timestamp of when the message was created.
+  ts_updated:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic_message.ts_updated
+    description: Timestamp of when the message was updated.

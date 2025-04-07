@@ -645,10 +645,15 @@ bietlejuice.dw_offboarding:
 bietlejuice.dw_offer:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal
   - bietlejuice.enrich_ebdb_proposal:load-enrich-pre-proposal-aud
   - bietlejuice.enrich_offer:load-enrich-offer
+  - bietlejuice.enrich_rental_transact:load-enrich-offer
+  - bietlejuice.enrich_rental_transact:load-enrich-offer-topic-message
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
+  - bietlejuice.rental_transact:load-clean-offer-topic
+  - bietlejuice.rental_transact:load-clean-offer-topic-message
 bietlejuice.dw_operator_performance:
   - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-negotiation
   - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-negotiation-installment

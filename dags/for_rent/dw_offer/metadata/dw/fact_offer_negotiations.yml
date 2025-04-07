@@ -1,0 +1,39 @@
+database_name: dw_rent
+table_name: fact_offer_negotiations
+description: Fact table with offer negotiation data from Rental Transact database.
+            Each line is a message (iteration) of the offer negotiation.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  pk_offer_negotiations:
+    description: Offer negotiation's primary key.
+  sk_offer:
+    lineage:
+      - datalake_rental_transact.offer.id_offer
+    description: Offer ID.
+  sk_offer_topic:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic.id
+    description: Offer topic ID. Each offer topic represents something being negotiated (price or house modifications).
+  sk_offer_topic_message:
+    lineage:
+      - datalake_rental_transact.offer_topic_message.id_topic_message
+    description: Offer topic message ID. Each message represents a negotiation iteration.
+  sk_client:
+    lineage:
+      - datalake_rental_transact.offer.id_tenant
+    description: Tenant prospect ID.
+  sk_owner:
+    lineage:
+      - datalake_rental_transact.offer.id_owner
+    description: House owner ID.
+  sk_house:
+    lineage:
+      - datalake_rental_transact.offer.id_house
+    description: House ID.
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+    description: House listing ID.
+  is_last_topic_iteration:
+    description: Boolean indicating if this is the last iteration of the negotiation so far.

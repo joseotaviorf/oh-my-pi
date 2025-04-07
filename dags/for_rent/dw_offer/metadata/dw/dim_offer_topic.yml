@@ -1,0 +1,34 @@
+database_name: dw_rent
+table_name: dim_offer_topic
+description: Dimension table with offer topic data from Rental Transact database.
+              Each offer topic represents something being negotiated (price or house modifications) 
+              and each line represents a unique offer topic.
+domain: For Rent
+owner: jonas.fiorini@quintoandar.com.br
+columns:
+  sk_offer_topic:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic.id
+    description: Offer topic ID.
+  status:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic.status
+    description: Offer topic status.
+  type:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic.type
+    description: Offer topic type.
+    categories:
+      PRICE: Price negotiation.
+      REMOVE: Negotiation regarding the removal of something from the house.
+      ADD: Negotiation regarding the addition of something from the house.
+      REPAIR: Negotiation regarding the repair of something on the house.
+      MODIFY: Negotiation regarding some house modification.
+  ts_created:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic.ts_created
+    description: Timestamp of when the topic was created.
+  ts_updated:
+    lineage:
+      - datalake_rental_transact_clean.offer_topic.ts_updated
+    description: Timestamp of when the topic was updated.
