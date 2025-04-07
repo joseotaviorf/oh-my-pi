@@ -28,6 +28,9 @@ workflow:
     search_experiments:
       partitions:
       - exp_name
+    search_contamination:
+      partitions:
+        - date
 
 cluster:
   type: databricks_12_2_med_memory_photon_cluster

@@ -5,4 +5,4 @@ select
     abs_contaminated_users,
     abs_users
 from
-  datalake_search_metrics_service_raw.experiment_contamination
+  datalake_search_metrics_service_raw.search_contamination
