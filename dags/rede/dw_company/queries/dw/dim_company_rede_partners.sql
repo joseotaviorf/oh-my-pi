@@ -20,6 +20,7 @@ SELECT
   COALESCE(cm.crm, 'Unknown') AS hubspot_crm,
   COALESCE(cm.member_category, 'Unknown') AS hubspot_member_category,
   cm.sale_lead_status AS hubspot_status,
+  cm.sale_lead_status = 'Membro' AS is_active_company_rede_partner,
   cm.is_flagged_as_leadgen AS is_flagged_as_leadgen_in_hubspot,
   MAX(CASE WHEN mu.hubspot_status = 'Membro' THEN mu.ts_start ELSE NULL END) AS ts_membership_start,
   MAX(CASE WHEN mu.hubspot_status = 'Membro' THEN mu.ts_end ELSE NULL END) AS ts_membership_end,

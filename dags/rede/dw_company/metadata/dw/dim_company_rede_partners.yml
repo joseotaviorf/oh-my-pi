@@ -88,8 +88,12 @@ columns:
     lineage: 
       - datalake_hubspot.company_members.sale_lead_status
     description: Company's status registered in Hubspot. Through this column we identify whether a real estate agency is a member or not. This column was previously identified as sale_lead_status.
-  is_flagged_as_leadgen:
+  is_active_company_rede_partner:
     lineage: 
+        - datalake_hubspot.company_members.sale_lead_status
+    description: Flag indicating whether the company is an active Rede Partner (True if sale_lead_status = 'Membro'), used to obtain the total active Rede Brokers.
+  is_flagged_as_leadgen:
+    lineage:
       - datalake_hubspot.company_members.is_flagged_as_leadgen
     description: Flag indicating whether the company is flagged as leadgen in Hubspot.
   ts_membership_start:
