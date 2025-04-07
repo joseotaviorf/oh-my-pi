@@ -11,7 +11,7 @@ Search Monitoring writes data to a standardized bucket in s3, from which data wi
 
 ### Execution Interval
 
-This DAG is triggered once a day.
+This DAG is triggered once per day.
 
 More information about run time [here]({chart_url}{dag_id}).
 

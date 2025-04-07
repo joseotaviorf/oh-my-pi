@@ -71,7 +71,7 @@ def get_df_raw(table_name, source_root_path, date_to_ingest):
     if table_name == 'search_metrics':
         df = spark_client.conn.read.option("mergeSchema", "true").parquet(f"{source_root_path}/metrics").filter(col('date') >= dt_start)
     elif table_name == 'search_contamination':
-        df = spark_client.conn.read.option("mergeSchema", "true").parquet(f"{source_root_path}/metrics").filter(
+        df = spark_client.conn.read.option("mergeSchema", "true").parquet(f"{source_root_path}/contamination").filter(
             col('date') >= dt_start)
     elif table_name == 'search_experiments':
         list_experiments = (
