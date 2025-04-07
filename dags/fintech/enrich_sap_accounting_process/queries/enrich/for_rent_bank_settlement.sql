@@ -2,7 +2,10 @@ WITH payments_in_retsuko AS (
     SELECT
         c.id_external AS id_contract,
         i.id_external AS id_invoice,
-        i.payment_company_use_number AS company_use,
+        CAST(CASE 
+            WHEN INSTR(i.payment_company_use_number, '|') > 0 THEN SUBSTRING_INDEX(i.payment_company_use_number, '|', -1)
+            ELSE i.payment_company_use_number
+        END AS STRING) AS company_use,
         i.paid_amount AS billing_source_amount,
         i.accrual_year_month,
         DATE(i.ts_paid) AS dt_billing_source,
@@ -11,7 +14,7 @@ WITH payments_in_retsuko AS (
         se.id_finance_entity,
         se.version,
         se.status,
-        'seu barriga' AS billing_source,
+        'Seu Barriga' AS billing_source,
         se.ts_created,
         se.ts_synced
     FROM 
@@ -28,8 +31,7 @@ WITH payments_in_retsuko AS (
     WHERE
         i.payment_company_use_number IS NOT NULL
         AND TRIM(i.payment_company_use_number) != ''
-        AND lower(i.reason) NOT IN ('negotiation-5a', 'negotiation-recupera')
-        AND lower(i.paid_via) IN ('cnab', 'checkout-boleto')
+        AND lower(i.paid_via) IN ('cnab', 'checkout-boleto', 'cyber-boleto', 'cyber-pix', 'collector-5A')
         AND i.due_amount <= 0
         AND i.payment_status != 'canceled'
         AND i.status = 'paid'
@@ -96,26 +98,41 @@ francesinha AS (
 
 payments_vans_checkout AS (
     SELECT 
-        id_related_document AS id_invoice,
-        paid_amount AS payment_source_amount,
-        'Vans' AS payment_source,
-        dt_paid AS dt_payment_source
-    FROM 
-        datalake_vans_clean.boleto
-    WHERE
-        requested_by = 'seubarriga'
-
-    UNION ALL
-
-    SELECT 
         id_finance_entity AS id_invoice,
         paid_amount AS payment_source_amount,
-        'Checkout' AS payment_source,
+        'Checkout Boleto' AS payment_source,
         DATE(ts_paid) AS dt_payment_source
     FROM 
         datalake_checkout_clean.boleto
     WHERE
         id_requester = 5
+
+    UNION
+
+    SELECT
+        fni.id_invoice_extra AS id_invoice,
+        b.paid_amount AS payment_source_amount,
+        'Checkout Bolecode' AS payment_source,
+        b.dt_credit AS dt_payment_source
+    FROM 
+        datalake_checkout_clean.bolecode AS b
+    INNER JOIN 
+        dw_collection_recovery_quintoandar.fact_negotiation_installment AS fni 
+            ON fni.our_number = b.our_number
+    WHERE 
+        b.dt_credit >= current_date - 180
+    
+    UNION 
+
+    SELECT 
+        id_related_document AS id_invoice,
+        paid_amount AS payment_source_amount,
+        'Vans Boleto' AS payment_source,
+        dt_paid AS dt_payment_source
+    FROM 
+        datalake_vans_clean.boleto
+    WHERE
+        requested_by = 'seubarriga'
 ),
 
 payments_in_gateway AS (
@@ -159,7 +176,7 @@ payments_in_ledger AS (
 SELECT 
     r.id_contract AS id_business_entity,
     r.id_invoice AS id_finance_entity,
-    f.company_use,
+    r.company_use,
     r.version,
     r.billing_source,
     pcv.payment_source,
@@ -180,10 +197,10 @@ FROM
     payments_in_retsuko AS r
 LEFT JOIN 
     payments_vans_checkout AS pcv
-        ON pcv.id_invoice = r.id_invoice
+        ON r.id_invoice = pcv.id_invoice
 LEFT JOIN 
     francesinha AS f
-        ON f.company_use = r.company_use
+        ON r.company_use = CAST(f.company_use AS STRING)
 LEFT JOIN 
     payments_in_gateway AS g
         ON r.id_sap_gateway_feature = g.id_feature

@@ -2937,7 +2937,9 @@ bietlejuice.enrich_sap:
   - bietlejuice.sap:load-clean-journal-entry-lines
   - bietlejuice.sap_4hana:load-clean-journal-entries
 bietlejuice.enrich_sap_accounting_process:
+  - bietlejuice.checkout:load-clean-bolecode
   - bietlejuice.checkout:load-clean-boleto
+  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment
   - bietlejuice.enrich_accounting_funnel:load-enrich-erp-gateway-stages-status
   - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges
