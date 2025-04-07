@@ -48,7 +48,7 @@ revisions_with_role AS (
             WHEN u.id_affiliates IS NOT NULL THEN 'Affiliate'
             WHEN ure.id_user IS NULL THEN 'System'
             WHEN u.admin_type = 'Admin' THEN 'Admin'
-            WHEN u.id = 5979377 THEN 'Supply Processor'
+            WHEN u.id IN (5979377, 13162050) THEN 'Supply Processor'
             WHEN u.id IN (9808622, 7212349) THEN 'Migration'
             WHEN u.email LIKE '%@quintoandar%' THEN 'Other Internal'
             ELSE 'Other External'
