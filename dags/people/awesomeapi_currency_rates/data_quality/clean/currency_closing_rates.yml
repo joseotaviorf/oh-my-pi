@@ -1,0 +1,37 @@
+---
+table_name: datalake_awesomeapi_currency_rates_clean.currency_closing_rates
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+
+column_level_validations:
+  currency_pair:
+    is_complete:
+      severity_level: Error
+  currency_from:
+    is_complete:
+      severity_level: Error
+  currency_to:
+    is_complete:
+      severity_level: Error
+  bid_price:
+    is_complete:
+      severity_level: Error
+  ask_price:
+    is_complete:
+      severity_level: Error
+  high_rate:
+    is_complete:
+      severity_level: Warning
+  low_rate:
+    is_complete:
+      severity_level: Warning
+  ts_recorded_at:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error
