@@ -10,7 +10,7 @@ from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkDataFrameService, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.consumers.db_consumers import OracleSparkConsumer
+from bietlejuice.consumers.db_consumers import OracleConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.pipeline import FullTableLoaderPipeline, IncrementalTableLoaderPipeline
 from bietlejuice.services.messaging_services.gchat_service import GChatService
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
     conn_config = _get_conn_config(dbutils, DatabaseEnum.CYBER)
 
-    oracle_consumer = OracleSparkConsumer(conn_config, spark_client)
+    oracle_consumer = OracleConsumer(conn_config, spark_client)
 
     oracle_table_name = table_name.upper()
     if extraction_type == "incremental" and date_filter_columns:

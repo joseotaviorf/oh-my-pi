@@ -9,9 +9,9 @@ from bietlejuice.consumers.db_consumers.db_consumer import DBConsumer
 logger = QuintoAndarLogger("OracleConsumer")
 
 
-class OracleSparkConsumer(DBConsumer):
+class OracleConsumer(DBConsumer):
     """
-    OracleSparkConsumer fetches data from an Oracle database via Spark
+    OracleConsumer fetches data from an Oracle database via Spark
     and returns it as a Spark DataFrame.
     :param conn_config: A dict with the connection configuration values. It must
                         contain the keys: host, port, dbtype, service_name, user, pwd, and schema.

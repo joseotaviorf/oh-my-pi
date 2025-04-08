@@ -1,7 +1,7 @@
 dag:
   name: cyber
   schedule_start_date: 2024, 8, 1
-  schedule_interval: 0 6 * * *
+  schedule_interval: 10 7 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: |
@@ -12,7 +12,7 @@ workflow:
   type: custom_ingestion
   load_spark_job: load_cyber_raw
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
   default_extraction_type: full
   spark_job_arguments:
