@@ -1,77 +1,30 @@
-WITH member_profile AS (
+WITH secretariat_allocation AS (
     SELECT
-        mp.id,
+        u.id_main_user AS id_secretariat_user,
+        u_parent.id_main_user AS id_supervisor_user,
         mp.id_business_unit,
-        mp.id_user,
         mp.profile,
-        mp.is_active,
-        ts_created AS ts_allocation_started,
-        LEAD(mp.ts_created) OVER(PARTITION BY mp.id ORDER BY mp.ts_created) AS ts_allocation_ended
-    FROM
-        datalake_hub_services_clean.member_profile_aud AS mp
-    WHERE
-        (mp.mod_id_business_unit OR mp.mod_active)
-        AND mp.profile LIKE '%SECRETARIAT%'
-    QUALIFY
-        is_active
-),
-secretariat_allocation AS (
-    SELECT
-        secretariat_info.id_external AS id_secretariat_user,
-        bu.id AS id_business_unit,
+        u.name AS secretariat_name,
+        u.email AS secretariat_email,
+        u_parent.name AS supervisor_name,
+        u_parent.email AS supervisor_email,
         bu.hub_name AS allocation,
         bu.business_context,
-        ur_ag.profile,
-        ur_ag.ts_allocation_started,
-        ur_ag.ts_allocation_ended
+        mp.ts_relationship_started AS ts_allocation_started,
+        mp.ts_relationship_ended AS ts_allocation_ended
     FROM
-        member_profile AS ur_ag
+        datalake_hub_services.member_profile AS mp
+    LEFT JOIN 
+        datalake_hub_services.users AS u
+            ON u.id_user = mp.id_user
+    LEFT JOIN 
+        datalake_hub_services.users AS u_parent
+            ON u_parent.id_user = mp.id_parent_user
     LEFT JOIN
         datalake_hub_services_clean.business_unit AS bu
-            ON ur_ag.id_business_unit = bu.id
-    LEFT JOIN
-        datalake_hub_services_clean.users AS secretariat_info
-            ON ur_ag.id_user = secretariat_info.id
-    LEFT JOIN
-        datalake_hub_services_clean.member_profile AS mp
-            ON mp.id = ur_ag.id
-),
-first_allocation_by_user_in_hub_services AS (
-    SELECT
-        id_secretariat_user,
-        MIN(ts_allocation_started) AS ts_first_allocation
-    FROM
-        secretariat_allocation
-    GROUP BY 1
-),
-legacy_secretariat AS (
-    SELECT
-        id_user_5a AS id_secretariat_user,
-        NULL::BIGINT AS id_business_unit,
-        allocation,
-        'SALE' AS business_context,
-        NULL::STRING AS profile,
-        dt_started AS ts_allocation_started,
-        LEAST(
-            LEAD(sh.dt_started) OVER(PARTITION BY sh.id_user_5a ORDER BY sh.dt_started),
-            fa.ts_first_allocation
-        ) AS ts_allocation_ended
-    FROM
-        datalake_gsheets_clean.secretariat_hierarchy AS sh
-    LEFT JOIN
-        first_allocation_by_user_in_hub_services AS fa
-            ON sh.id_user_5a = fa.id_secretariat_user
+            ON mp.id_business_unit = bu.id
     WHERE
-        sh.dt_started < fa.ts_first_allocation
-),
-united_allocations AS (
-    SELECT *
-    FROM
-        legacy_secretariat
-    UNION ALL
-    SELECT *
-    FROM
-        secretariat_allocation
+        mp.profile LIKE '%SECRETARIAT%'
 ),
 /*
 On January 24th 2024, there was a major fix in Hub Services for secretariats.
@@ -81,7 +34,12 @@ Because of that, we're going to set every allocation before this date to "Unknow
 filtered_out_history AS (
     SELECT
         sa.id_secretariat_user,
+        sa.id_supervisor_user,
         sa.id_business_unit,
+        sa.secretariat_name,
+        sa.secretariat_email,
+        sa.supervisor_name,
+        sa.supervisor_email,
         sa.allocation,
         sa.profile,
         sa.business_context,
@@ -95,7 +53,12 @@ filtered_out_history AS (
     UNION ALL
     SELECT
         sa.id_secretariat_user,
+        NULL AS id_supervisor_user,
         NULL AS id_business_unit,
+        sa.secretariat_name,
+        sa.secretariat_email,
+        NULL AS supervisor_name,
+        NULL AS supervisor_email,
         'Unknown' AS allocation,
         'Unknown' AS profile,
         business_context,
@@ -105,28 +68,43 @@ filtered_out_history AS (
         secretariat_allocation AS sa
     WHERE
         sa.ts_allocation_started < '2024-01-24'
-    GROUP BY
-        sa.id_secretariat_user,
-        sa.business_context
+    GROUP BY ALL
 )
 SELECT
-    id_secretariat_user,
-    id_business_unit,
-    allocation,
+    foh.id_secretariat_user,
+    foh.id_supervisor_user,
+    foh.id_business_unit,
+    foh.secretariat_name,
+    foh.secretariat_email,
+    foh.supervisor_name,
+    foh.supervisor_email,
+    foh.allocation,
     CASE
-        WHEN allocation = 'Unknown' THEN 'Unknown'
-        WHEN allocation LIKE '%HUB%' THEN 'HUB'
-        WHEN allocation LIKE '%Growth%' THEN 'Growth'
-        WHEN allocation LIKE '%3P%' THEN '3P'
-        WHEN allocation LIKE '%CENTRAL%' THEN 'Central'
-        WHEN allocation LIKE '%Lite%' THEN 'NBP'
-        WHEN allocation LIKE '%BWA%' THEN 'BWA'
-        ELSE 'Other'
+        WHEN foh.allocation = "Unknown" THEN "Unknown"
+        WHEN foh.allocation LIKE "%HUB%" THEN "HUB"
+        WHEN foh.allocation LIKE "%Growth%" THEN "Growth"
+        WHEN foh.allocation LIKE "%3P%" THEN "3P"
+        WHEN foh.allocation LIKE "%CENTRAL%" THEN "Central"
+        WHEN foh.allocation LIKE "%Lite%" THEN "NBP"
+        WHEN foh.allocation LIKE "%BWA%" THEN "BWA"
+        WHEN foh.allocation = "Secretaria ForSale - Aquisição RMSP"
+            OR foh.allocation = "Secretaria ForSale - Aquisição BH"
+            OR foh.allocation = "Secretaria ForSale - Aquisição RJ"
+            OR foh.allocation = "Secretaria ForSale - Aquisição POA"
+            THEN "Aquisição ForSale"
+        WHEN foh.allocation = "Secretaria ForSale - Engajamento" THEN "Engajamento ForSale"
+        WHEN foh.allocation = "Secretaria ForRent - Aquisição" THEN "Aquisição ForRent"
+        WHEN foh.allocation = "Secretaria ForRent - Engajamento" THEN "Engajamento ForRent"
+        WHEN foh.allocation = "Secretaria ForSale - Férias/Afastamento"
+            OR foh.allocation = "Secretaria ForRent - Férias/Afastamento"
+            THEN "Férias/Afastamento"
+        WHEN foh.allocation = "SEC Desativado" THEN "Desativado"
+        ELSE "Other"
     END AS segment,
     profile,
-    business_context,
-    ROW_NUMBER() OVER(PARTITION BY id_secretariat_user ORDER BY ts_allocation_started) AS version,
-    ts_allocation_started,
-    ts_allocation_ended
+    foh.business_context,
+    ROW_NUMBER() OVER(PARTITION BY foh.id_secretariat_user ORDER BY foh.ts_allocation_started) AS version,
+    foh.ts_allocation_started,
+    foh.ts_allocation_ended
 FROM
-    filtered_out_history
+    filtered_out_history AS foh

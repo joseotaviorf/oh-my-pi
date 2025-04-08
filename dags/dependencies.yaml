@@ -1999,6 +1999,8 @@ bietlejuice.enrich_hub_services:
   - bietlejuice.ebdb_user:load-clean-user-aud
   - bietlejuice.ebdb_user:load-clean-user-merge
   - bietlejuice.enrich_ebdb_user:load-enrich-user
+  - bietlejuice.enrich_hub_services_agents:load-enrich-member-profile
+  - bietlejuice.enrich_hub_services_agents:load-enrich-users
   - bietlejuice.enrich_region:load-enrich-region
   - bietlejuice.gsheets_for_sale:done-clean-business-unit-region
   - bietlejuice.hub_services:load-clean-business-unit
