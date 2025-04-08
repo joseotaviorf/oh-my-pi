@@ -43,13 +43,17 @@ SELECT
   UPPER(l.id_user) AS id_operator,
   u.user_email AS operator_email,
   u.user_type AS operator_type,
+  COALESCE(agg.agency_name, ag.agency_name) AS agency_name,
   CASE
-    WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name)) LIKE "PASCH%" THEN "PASCHOALOTTO"
-    WHEN UPPER(l.id_user) LIKE "PASCH%" THEN "PASCHOALOTTO"
+    WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "PASCH%" THEN "PASCHOALOTTO"
     WHEN UPPER(l.id_user) LIKE "PSC%" THEN "PASCHOALOTTO"
-    WHEN UPPER(l.id_user) LIKE "%TRC%" THEN "TRC"
-    WHEN UPPER(l.id_user) LIKE "%GRB%" THEN "GRB"
-    WHEN UPPER(l.id_user) LIKE "%MEETC%" THEN "MEETCALL"
+    WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%TRC%" THEN "TRC"
+    WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%GRB%" THEN "GRB"
+    WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%MEETC%" THEN "MEETCALL"
+    WHEN UPPER(l.id_user) LIKE "%MTC%" THEN "MEETCALL"
+    WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%PORTAL%" THEN "PORTAL_QUINTOANDAR"
+    WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) = "WEBHELP" THEN "WEBHELP"
+    WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%WHELP%" THEN "WEBHELP"
     ELSE UPPER(COALESCE(agg.agency_name, ag.agency_name))
   END AS operator_agency,
   UPPER(l.action) AS action,
@@ -89,7 +93,7 @@ LEFT JOIN datalake_cyber_clean.contracts AS c
 LEFT JOIN datalake_cyber_clean.users AS u
   ON UPPER(l.id_user) = UPPER(u.id_user)
 LEFT JOIN datalake_cyber_clean.agency AS ag
-  ON u.id_agency = ag.id_agency
+  ON UPPER(COALESCE(u.id_agency, l.id_user)) = ag.id_agency
 LEFT JOIN get_agency_group_name AS agg
   ON ag.id_agency = agg.agency_group
 LEFT JOIN codes_descriptions AS cda

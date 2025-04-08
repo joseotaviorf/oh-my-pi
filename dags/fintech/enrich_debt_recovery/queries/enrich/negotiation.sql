@@ -80,7 +80,7 @@ SELECT
     n.id_debtor_external AS id_contract,
     CONCAT(d.origin, "_", d.type) AS debtor,
     c.name AS collector,
-    consultancy,
+    n.consultancy,
     CASE
         WHEN LOWER(n.consultancy) LIKE '%serasa%' THEN 'SERASA'
         WHEN UPPER(n.consultancy) = '009' OR LOWER(n.consultancy) = 'quinto' THEN 'COBRANÇA_INTERNA_QA'

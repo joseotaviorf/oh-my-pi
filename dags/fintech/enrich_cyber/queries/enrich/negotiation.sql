@@ -218,6 +218,7 @@ SELECT
     CASE
       WHEN a.id_campaign IS NOT NULL OR UPPER(a.agreement_type) LIKE '%CAM%' THEN "Boletagem"
       WHEN LOWER(ag.agency_type) = "portal" THEN "Portal Auto Negociação"
+      WHEN LOWER(a.id_user) = "portalqa" THEN "Portal Auto Negociação"
       WHEN ag.agency_type = "Cyber Credit" THEN "Operador Interno"
       WHEN a.id_user = "MIGRACAO" THEN "Migração"
       ELSE ag.agency_type
