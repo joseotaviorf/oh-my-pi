@@ -90,4 +90,5 @@ if __name__ == "__main__":
 
     # Process keys in parallel
     with ThreadPoolExecutor() as executor:
-        executor.map(lambda key: process_key(key, environment, source_path, datalake_bucket, execution_date, partition_cols, table_name, transient_location, transient_data_schema, transient_expected_cols), all_keys)
+        list(executor.map(lambda key: process_key(key, environment, source_path, datalake_bucket, execution_date, partition_cols, table_name, transient_location, transient_data_schema, transient_expected_cols), all_keys))
+        print(f"Processed {len(all_keys)} keys.")
