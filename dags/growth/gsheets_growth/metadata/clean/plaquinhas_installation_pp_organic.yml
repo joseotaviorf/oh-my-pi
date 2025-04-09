@@ -16,3 +16,6 @@ columns:
   business_context:
     lineage:
       - datalake_gsheets_raw.plaquinhas_installation_pp_organic.business_context
+  state:
+    lineage:
+      - datalake_gsheets_raw.plaquinhas_installation_pp_organic.state
