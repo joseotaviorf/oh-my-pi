@@ -511,6 +511,7 @@ table_block_list:
   - Device
   - Category
   - CategoryImovel
+  - ProcessedMessage
 
 view_allow_list: []
 
