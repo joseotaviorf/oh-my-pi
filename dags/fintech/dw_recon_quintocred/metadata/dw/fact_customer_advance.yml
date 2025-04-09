@@ -72,7 +72,7 @@ columns:
   expected_amount_to_be_appropriated:
       description: "Remaining amount to be appropriated based on the payment schedule"
       lineage:
-        - dw_velo.fact_velo_payment.expected_amount_to_be_appropriated
+        - datalake_rental_guarantee_platform_clean.expected_amount_to_be_appropriated
 
   has_activation:
       description: "Indicates whether the activation flag is set for the customer"
@@ -82,7 +82,7 @@ columns:
   has_payment_advance:
       description: "Indicates whether there is an advance payment made by the customer"
       lineage:
-        - dw_velo.fact_velo_payment.has_payment_advance
+        - datalake_rental_guarantee_platform_clean.has_payment_advance
 
   is_direct_billing:
       description: "Indicates whether the billing is direct (not mediated by a third party)"
@@ -112,7 +112,7 @@ columns:
   dt_paid_min:
       description: "Earliest payment date for the customer"
       lineage:
-        - dw_velo.fact_velo_payment.dt_paid_min
+        - datalake_rental_guarantee_platform_clean.dt_paid_min
 
   dt_paid_max:
       description: "Latest payment date for the customer"
@@ -127,7 +127,7 @@ columns:
   dt_month_ref_creation:
       description: "Reference date when the month was created in the system"
       lineage:
-        - dw_velo.fact_velo_payment.dt_month_ref_creation
+        - datalake_rental_guarantee_platform_clean.dt_month_ref_creation
 
   dt_contract_started:
       description: "Date when the contract or agreement with the customer started"

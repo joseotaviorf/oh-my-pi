@@ -4,7 +4,7 @@ dag:
   owner: Data Fintech
   documentation:
     dag_purpose: |
-      Creates DW Model for QuintoCred recon context.
+      Creates DW Model for storing all QuintoCred recon data
 workflow:
   type: query_delta
   layer: dw
