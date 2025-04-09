@@ -7,50 +7,31 @@ dag:
     dag_purpose: |
       This DAG creates the incremental tables for betopera, the integration with Insurance providers.
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
   dbutils_secret_key: BETOPERA_DB
   lineage_product_database_name: betopera
-  default_extraction_type: incremental
-  default_partitions: [year, month, day]
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   tables_customization:
-    certificate_aud:
-      date_filter_column: updated_at
-    certificate_request_aud:
-      date_filter_column: updated_at
-    certificate_request:
-      date_filter_column: updated_at
-    certificate:
-      date_filter_column: updated_at
-    endorsement_aud:
-      date_filter_column: updated_at
-    endorsement:
-      date_filter_column: updated_at
-    insurance_aud:
-      date_filter_column: updated_at
-    insurance:
-      date_filter_column: updated_at
-    payment_aud:
-      date_filter_column: updated_at
-    payment:
-      date_filter_column: updated_at
-    reminder:
-      date_filter_column: updated_at
-    reminder_aud:
-      date_filter_column: updated_at
+    certificate_aud: {}
+    certificate_request_aud: {}
+    certificate_request: {}
+    certificate: {}
+    endorsement_aud: {}
+    endorsement: {}
+    insurance_aud: {}
+    insurance: {}
+    payment_aud: {}
+    payment: {}
+    reminder: {}
+    reminder_aud: {}
     revinfo:
-      date_filter_column: revtstmp
-      unixtime_measure: milliseconds
       clean_table_name: rev_info
 cluster:
   type: databricks_13_3_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
