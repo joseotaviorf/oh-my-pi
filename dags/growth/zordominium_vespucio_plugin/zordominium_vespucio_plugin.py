@@ -37,6 +37,7 @@ databricks_bietlejuice_repo_path = config_service.get_config(
 )
 base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
+output_location = config_service.get_config("vespucio_output_path")
 
 VESPUCIO_PACKAGE_VERSION = config_service.get_config("vespucio_pipeline_version")
 VESPUCIO_WHEEL_FILE = (
@@ -44,6 +45,7 @@ VESPUCIO_WHEEL_FILE = (
 )
 
 CLUSTER_DESCRIPTION = config_service.get_config("databricks_13_3_med_general_cluster")
+CLUSTER_DESCRIPTION["spark_env_vars"]["OUTPUT_LOCATION"] = output_location
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
 CLUSTER_DESCRIPTION["spark_conf"][
