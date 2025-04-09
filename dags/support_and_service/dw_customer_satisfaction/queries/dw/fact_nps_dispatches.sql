@@ -20,7 +20,7 @@ WITH
     a.ts_answer_sent_local,
     a.ts_dispatch
   FROM
-    new_cc AS cc
+    datalake_tracksale.customer_conversions AS cc
   LEFT JOIN datalake_tracksale.answer AS a
     ON cc.id_answer = a.id
 ),
