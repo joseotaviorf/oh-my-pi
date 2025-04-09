@@ -1,0 +1,25 @@
+dag:
+  name: reverse_anonymization
+  schedule_start_date: 2025,4,3
+  owner: Data Governance
+workflow:
+  type: load_access
+  layer: reverse
+  load_spark_job: load_results_into_gsheet
+  spark_job_arguments:
+    - "Validation"
+    - "16G1XRsGEUdGmGe0nUiDHYt74FK0i2O3SWz6CP4aOdNw"
+    - "{load_start_date}"
+  tables_customization:
+    scan_entities_found: {}
+cluster:
+  type: databricks_13_3_min_general_cluster
+  access_control_list:
+    group_name: data-platform-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

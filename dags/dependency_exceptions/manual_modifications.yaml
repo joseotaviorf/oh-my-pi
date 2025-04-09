@@ -800,6 +800,12 @@ bietlejuice.reverse_dashboard_governance:
     - bietlejuice.enrich_superset:load-enrich-slices
     - bietlejuice.enrich_superset:load-enrich-dashboards
     - bietlejuice.enrich_superset:load-enrich-tables
+bietlejuice.reverse_anonymization:
+  remove:
+    - bietlejuice.composer:load-clean-dag
+    - bietlejuice.enrich_anonymization:load-enrich-columns-sample-data
+    - bietlejuice.enrich_anonymization:load-enrich-pii-scan-results
+    - bietlejuice.enrich_people_public:load-enrich-org-chart
 bietlejuice.reverse_ccv_price_report_load:
   # We will remove these dependencies because we will only run this DAG once a month. So we don't want to trigger it every time these tables below are updated.
   override: []
@@ -1015,3 +1021,5 @@ wonka.user_visit:
 wonka.house_visit:
   add:
     - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+
+

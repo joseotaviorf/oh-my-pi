@@ -23,6 +23,7 @@ dags_out_of_pattern:
         "quintoml.recs.house_user_embeddings.inference",
         "quintoml.search.maestro.inference",
         "quintoml.search.search_monitoring.inference",
+        "reverse_anonymization",
         "reverse_atento",
         "reverse_atento_test",
         "reverse_ccv_price_report_load",
