@@ -15,6 +15,7 @@ house_listing_consultant AS (
         hslc.id_house,
         hslc.id_user,
         hslc.consultant_type,
+        "SALE" AS business_context,
         hslc.is_last_ciq_on_listing,
         hslc.ts_enrollment_started,
         hslc.dt_consultant_started
@@ -25,6 +26,7 @@ house_listing_consultant AS (
         hrlc.id_house,
         hrlc.id_user,
         hrlc.consultant_type,
+        "RENT" AS business_context,
         hrlc.is_last_ciq_on_listing,
         hrlc.ts_enrollment_started,
         hrlc.dt_consultant_started
@@ -44,8 +46,10 @@ ciq_first_listing AS (
     JOIN
         datalake_ebdb_listing.listing_business_context AS lbc
             ON lbc.id_house = hlc.id_house
+            AND lbc.business_context = hlc.business_context
     WHERE
         hlc.is_last_ciq_on_listing = True
+        AND hlc.id_user IS NOT NULL
         AND hlc.consultant_type IN ('CIQ_FULL', 'CIQ_MANAGER')
 )
 SELECT

@@ -14,24 +14,9 @@ WITH filter_bimester AS (
 offer_signed AS (
     SELECT
         oa.id_user,
-        COUNT(DISTINCT oa.id_offer) AS total_offer_sent,
-        COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.is_contract_signed IS TRUE) AS total_offer_signed,
-        COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.is_contract_signed IS TRUE AND oa.has_tqc IS TRUE) AS total_offer_signed_with_tqc,
-        SUM(oa.sale_price_agreed) FILTER (WHERE oa.is_contract_signed IS TRUE) AS total_gross_merchandise_volume, 
-        fb.year,
-        fb.bimester
-    FROM
-        datalake_tiers.agent_offers AS oa
-    JOIN
-        filter_bimester AS fb
-            ON fb.bimester = oa.bimester
-            AND fb.year = oa.year
-    GROUP BY ALL
-),
-ciq_offer_signed AS (
-    SELECT
-        oa.id_user_ciq AS id_user,
-        COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.is_ciq_first_listing IS TRUE) AS total_offer_signed_with_ciq,
+        COUNT(DISTINCT oa.id_offer) AS total_offer_signed,
+        COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.has_tqc IS TRUE) AS total_offer_signed_with_tqc,
+        SUM(oa.sale_price_agreed) AS total_gross_merchandise_volume, 
         fb.year,
         fb.bimester
     FROM
@@ -42,6 +27,37 @@ ciq_offer_signed AS (
             AND fb.year = oa.year
     WHERE
         oa.is_contract_signed IS TRUE
+    GROUP BY ALL
+),
+offer_submitted AS (
+    SELECT
+        oa.id_user,
+        COUNT(DISTINCT oa.id_offer) AS total_offer_submitted,
+        COUNT(DISTINCT oa.id_buyer) AS total_buyer_with_offer_submitted,
+        fb.year,
+        fb.bimester
+    FROM
+        datalake_tiers.agent_offers AS oa
+    JOIN
+        filter_bimester AS fb
+            ON fb.date = DATE(oa.ts_offer_submitted)
+    GROUP BY ALL
+),
+ciq_offer_signed AS (
+    SELECT
+        oa.id_user_ciq AS id_user,
+        COUNT(DISTINCT oa.id_offer) AS total_offer_signed_with_ciq,
+        fb.year,
+        fb.bimester
+    FROM
+        datalake_tiers.agent_offers AS oa
+    JOIN
+        filter_bimester AS fb
+            ON fb.bimester = oa.bimester
+            AND fb.year = oa.year
+    WHERE
+        oa.is_contract_signed IS TRUE
+        AND oa.is_ciq_first_listing IS TRUE
     GROUP BY ALL
 ),
 ciq_first_listing AS (
@@ -119,8 +135,9 @@ SELECT
     mp.phone_number,
     mp.profile,
     mp.hub_name,
-    COALESCE(os.total_offer_sent, 0) AS total_offer_sent,
+    COALESCE(osu.total_offer_submitted, 0) AS total_offer_submitted,
     COALESCE(os.total_offer_signed, 0) AS total_regular_offer_signed,
+    COALESCE(osu.total_buyer_with_offer_submitted, 0) AS total_buyer_with_offer_submitted,
     (
         COALESCE(os.total_offer_signed, 0) 
         + COALESCE(cos.total_offer_signed_with_ciq, 0)
@@ -133,7 +150,7 @@ SELECT
     COALESCE(cos.total_offer_signed_with_ciq, 0) AS total_offer_signed_with_ciq,
     COALESCE(cql.total_first_listing, 0) AS total_first_listing,
     COALESCE(os.total_gross_merchandise_volume, 0) AS total_gross_merchandise_volume,
-    ROUND(COALESCE(os.total_offer_signed/ os.total_offer_sent, 0), 2) AS ratio_offer_sent_to_signed,
+    ROUND(COALESCE(os.total_offer_signed/ osu.total_buyer_with_offer_submitted, 0), 2) AS ratio_offer_submitted_to_signed,
     mp.year,
     mp.bimester
 FROM
@@ -146,6 +163,11 @@ LEFT JOIN
         ON os.id_user = mp.id_main_user
         AND os.bimester = mp.bimester
         AND os.year = mp.year
+LEFT JOIN
+    offer_submitted AS osu
+        ON osu.id_user = mp.id_main_user
+        AND osu.bimester = mp.bimester
+        AND osu.year = mp.year
 LEFT JOIN
     ciq_offer_signed AS cos
         ON cos.id_user = mp.id_main_user

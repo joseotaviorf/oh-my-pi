@@ -38,8 +38,12 @@ columns:
     description: Indicates whether the offer was signed and generated a purchase and sale agreement.
   ts_sale_agreement_signed:
     lineage:
-      - datalake_offer.sale_offer.ts_sale_agreement_signed
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
     description: Timestamp of sale agreement signature.
+  ts_offer_submitted:
+    lineage:
+      - datalake_offer.sale_offer.ts_offer_submitted
+    description: Timestamp of offer submission.
   ts_updated:
     lineage:
       - datalake_offer.sale_offer.dt_sale_agreement_signed

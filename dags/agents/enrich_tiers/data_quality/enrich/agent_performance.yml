@@ -12,7 +12,7 @@ column_level_validations:
   id_business_unit:
     is_complete:
       severity_level: Error
-  total_offer_sent:
+  total_offer_submitted:
     is_complete:
       severity_level: Error
     has_min_value:
@@ -60,7 +60,7 @@ column_level_validations:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
-  ratio_offer_sent_to_signed:
+  ratio_offer_submitted_to_signed:
     is_complete:
       severity_level: Error
     has_min_value:

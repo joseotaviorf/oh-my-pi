@@ -21,7 +21,7 @@ agent_performance AS (
             CAST(ap.total_offer_signed_with_tqc AS DOUBLE), "CCV_TQC",
             CAST(ap.total_offer_signed_with_ciq AS DOUBLE), "CCV_CIQ",
             CAST(ap.total_first_listing AS DOUBLE), "FIRST_LISTING",
-            ROUND(ratio_offer_sent_to_signed * 100, 0), "OS2CCV_BY",
+            ROUND(ratio_offer_submitted_to_signed * 100, 0), "OS2CCV_BY",
             CAST(ap.total_offer_signed_with_demand_supply_capture AS DOUBLE), "CCV_TQC_CIQ",
             CAST(ap.total_gross_merchandise_volume AS DOUBLE), "GMV"
         ) AS (performance_points, operation),

@@ -13,6 +13,7 @@ WITH filter_bimester AS (
 offer_agents AS (
     SELECT DISTINCT
         so.id_offer,
+        so.id_buyer,
         so.id_user_consultant AS id_user_negotiation_executive,
         u.id_agent AS id_agent_negotiation_executive,
         so.id_user_agent AS id_user_broker,
@@ -21,8 +22,9 @@ offer_agents AS (
         so.sale_price_agreed,
         os.id_offer IS NOT NULL AS has_broker_tqc,
         os2.id_offer IS NOT NULL AS has_negotiation_executive_tqc,
+        so.ts_offer_submitted,
         so.dt_sale_agreement_signed AS ts_sale_agreement_signed,
-        GREATEST(so.dt_sale_agreement_signed, os.ts_agent_lead_referral_updated, os2.ts_agent_lead_referral_updated) AS ts_updated
+        GREATEST(so.ts_offer_submitted, so.dt_sale_agreement_signed, os.ts_agent_lead_referral_updated, os2.ts_agent_lead_referral_updated) AS ts_updated
     FROM
         datalake_offer.sale_offer AS so
     LEFT JOIN
@@ -39,10 +41,12 @@ offer_agents AS (
     LEFT JOIN
         datalake_tiers.ciq_first_listing AS cfl 
             ON cfl.id_house = so.id_house
+            AND cfl.business_context = "SALE"
 ),
 union_offer_agents AS (
     SELECT
         oa.id_offer,
+        oa.id_buyer,
         oa.id_user_broker AS id_user,
         oa.id_agent_broker AS id_agent,
         oa.id_user_ciq,
@@ -50,6 +54,7 @@ union_offer_agents AS (
         oa.sale_price_agreed,
         oa.has_broker_tqc AS has_tqc,
         oa.id_user_ciq IS NOT NULL AS is_ciq_first_listing,
+        oa.ts_offer_submitted,
         oa.ts_sale_agreement_signed,
         oa.ts_updated
     FROM
@@ -59,6 +64,7 @@ union_offer_agents AS (
     UNION ALL
     SELECT
         oa.id_offer,
+        oa.id_buyer,
         oa.id_user_negotiation_executive AS id_user,
         oa.id_agent_negotiation_executive AS id_agent,
         oa.id_user_ciq,
@@ -66,6 +72,7 @@ union_offer_agents AS (
         oa.sale_price_agreed,
         oa.has_negotiation_executive_tqc AS has_tqc,
         oa.id_user_ciq IS NOT NULL AS is_ciq_first_listing,
+        oa.ts_offer_submitted,
         oa.ts_sale_agreement_signed,
         oa.ts_updated
     FROM
@@ -75,6 +82,7 @@ union_offer_agents AS (
 )
 SELECT
     uoa.id_offer,
+    uoa.id_buyer,
     uoa.id_user,
     uoa.id_agent,
     uoa.id_user_ciq,
@@ -84,6 +92,7 @@ SELECT
     uoa.is_ciq_first_listing,
     uoa.ts_sale_agreement_signed IS NOT NULL AS is_contract_signed,
     uoa.ts_sale_agreement_signed,
+    uoa.ts_offer_submitted,
     uoa.ts_updated,
     fb.year,
     fb.bimester

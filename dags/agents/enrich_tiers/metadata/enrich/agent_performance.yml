@@ -55,10 +55,12 @@ columns:
     lineage:
       - datalake_hub_services.business_unit.hub_name
     description: Business unit name.
-  total_offer_sent:
-    description: Total number of offers sent, in which the agent participated in one of the funnel stages
+  total_offer_submitted:
+    description: Total number of submitted offers, in which the agent participated in one of the funnel stages
   total_regular_offer_signed:
     description: Total number of signed offers, in which the agent was responsible for visiting or negotiating the offer
+  total_buyer_with_offer_submitted:
+    description: Total number of buyers with submitted offers, in which the agent participated in one of the funnel stages
   total_offer_signed_with_agent_intermediation:
     description: 
       Total number of signed offers, in which the agent participated in one of 
@@ -79,7 +81,7 @@ columns:
     description: 
       Gross merchandise volume (GMV) is the total sales value of all offers in which the 
       Agent participated in one of the funnel stages.
-  ratio_offer_sent_to_signed:
+  ratio_offer_submitted_to_signed:
     description: 
       Proportion between the total number of offers that converted into a 
       purchase and sale contract, by the total number of offers sent.
