@@ -4,6 +4,7 @@ from datetime import datetime
 from argparse import ArgumentParser
 
 from pyspark.sql import DataFrame, Row
+from pyspark.sql.types import StructType, StructField, StringType, ArrayType, TimestampType, IntegerType
 from pyspark.errors import AnalysisException
 
 from bietlejuice.clients.db_clients import SparkClient
@@ -86,6 +87,7 @@ def create_query_to_sample_data(table: Row, load_start_date: str):
             table_name,
             column_name,
             array_agg(column_value) AS sample,
+            'SUCCESS' as status,
             to_timestamp("{load_start_date}") as ts_ingested
         FROM
             sample
@@ -149,6 +151,67 @@ def get_sample_data(spark_client: SparkClient, table: Row, execution_date: datet
     )
 
 
+def create_table_schema():
+    df_schema = StructType(
+        [
+            StructField("id_entity", StringType(), nullable=True),
+            StructField("layer", StringType(), nullable=True),
+            StructField("database_name", StringType(), nullable=True),
+            StructField("table_name", StringType(), nullable=True),
+            StructField("column_name", StringType(), nullable=True),
+            StructField("sample", ArrayType(StringType(), containsNull=False), nullable=True),
+            StructField("status", StringType(), nullable=True),
+            StructField("error_class", StringType(), nullable=True),
+            StructField("error_message", StringType(), nullable=True),
+            StructField("ts_ingested", TimestampType(), nullable=True),
+            StructField("year", IntegerType(), nullable=True),
+            StructField("month", IntegerType(), nullable=True),
+            StructField("day", IntegerType(), nullable=True),
+        ]
+    )
+    return df_schema
+
+
+def create_sample_error_register(table: Row, error: Exception, load_start_date: str) -> list:
+    dict_table = table.asDict()
+
+    layer = dict_table["layer"]
+    database_name = dict_table["database_name"]
+    table_name = dict_table["table_name"]
+    columns = dict_table["table_columns"]
+
+    sample_error = []
+    for column in columns:
+        sample_error.append(
+            {
+                "id_entity": f"{database_name}.{table_name}.{column}",
+                "layer": layer,
+                "database_name": database_name,
+                "table_name": table_name,
+                "column_name": column,
+                "sample": [""],
+                "status": "FAIL",
+                "error_class": f"{error.__class__.__module__}.{error.__class__.__name__}",
+                "error_message": str(error)[:300], # get the first 300 caracter from the error.
+                "ts_ingested": datetime.strptime(load_start_date, "%Y-%m-%d")
+            }
+        )
+
+    return sample_error
+
+
+def get_df_error(spark_client: SparkClient, sample_error: list, execution_date: datetime, partition_cols: list):
+    schema = create_table_schema()
+    df_error = spark_client.create_dataframe(sample_error ,schema=schema)
+    return (
+        SparkDataFrameService()
+        .input(df_error)
+        .create_year_month_day_columns_from_date(execution_date)
+        .optimize_partitions_by_partition_columns(partition_cols)
+        .output()
+    )
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str)
@@ -180,22 +243,32 @@ if __name__ == "__main__":
 
     df_tables_to_sample = get_columns_to_sample(spark_client, load_start_date, load_end_date)
 
+    sample_error = []
     list_tables_to_sample = df_tables_to_sample.collect()
     for table in list_tables_to_sample:
+
         entity_id = f"{table.database_name}.{table.table_name}"
+        logging.info(f"Sampling data from table {entity_id}")
+
         if entity_id not in skip_list:
             try:
                 df_sample = get_sample_data(spark_client, table, execution_date, partition_cols)
                 load_table(df_sample, env, datalake_bucket, schema, table_name, merge_on)
+                logging.info(f"Table {entity_id} sample saved.")
             except AnalysisException as exc:
                 error_class = exc.getErrorClass()
-
                 if error_class in [DELTA_TABLE_NOT_FOUND, TABLE_OR_VIEW_NOT_FOUND]:
                     logging.warning(f"Table {entity_id} not found.")
                 elif error_class in [INSUFFICIENT_PERMISSIONS]:
                     logging.warning(f"Insufficient permission to read table {entity_id}.")
                 else:
                     logging.warning(f"Not handled error. Table: {entity_id}. Error: {error_class}")
-
+                sample_error += create_sample_error_register(table, exc, load_start_date)
             except Exception as exc:
                 logging.warning(f"Exception. Table: {entity_id}. Error: {type(exc)}")
+                sample_error += create_sample_error_register(table, exc, load_start_date)
+
+    logging.info("Loding tables with error to sample")
+    df_errors = get_df_error(spark_client, sample_error, execution_date, partition_cols)
+    load_table(df_errors, env, datalake_bucket, schema, table_name, merge_on)
+    logging.info("Loaded Errors")
