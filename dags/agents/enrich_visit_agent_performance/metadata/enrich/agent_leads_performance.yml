@@ -19,8 +19,7 @@ columns:
     description: Unique identifier for the agent.
   total_leads:
     lineage:
-      - datalake_visit_agent_performance.agent_schedules.id_visitor
-      - datalake_visit_agent_performance.offer_flow_events.id_lead
+      - datalake_demand_flows.prospect_daily_results.id_prospect
     description: Total distinct leads that interacted with the agent.
   total_leads_with_three_or_more_confirmed_visits:
     lineage:

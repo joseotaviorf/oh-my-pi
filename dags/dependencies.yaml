@@ -3376,6 +3376,7 @@ bietlejuice.enrich_visit_agent_performance:
   - bietlejuice.enrich_agent_accreditation:load-enrich-business-context-activity
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_booking:load-enrich-booking-cancellation
+  - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
