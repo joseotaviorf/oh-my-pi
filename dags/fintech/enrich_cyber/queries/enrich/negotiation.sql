@@ -194,6 +194,7 @@ SELECT
     a.id_user_authorized,
     a.id_campaign,
     COALESCE(u.id_agency, a.id_agency) AS id_agency,
+    ag.agency_type,
     COALESCE(c.creditor, a.creditor) AS creditor,
     CASE
       WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, a.id_user)) LIKE "PASCH%" THEN "PASCHOALOTTO"
@@ -216,11 +217,14 @@ SELECT
     a.exception,
     at.min_down_payment_percentage,
     CASE
-      WHEN a.id_campaign IS NOT NULL OR UPPER(a.agreement_type) LIKE '%CAM%' THEN "Boletagem"
-      WHEN LOWER(ag.agency_type) = "portal" THEN "Portal Auto Negociação"
-      WHEN LOWER(a.id_user) = "portalqa" THEN "Portal Auto Negociação"
-      WHEN ag.agency_type = "Cyber Credit" THEN "Operador Interno"
-      WHEN a.id_user = "MIGRACAO" THEN "Migração"
+      WHEN a.id_campaign IS NOT NULL OR UPPER(a.agreement_type) LIKE 'CAM%' THEN "Boletagem"
+      WHEN UPPER(at.agreement_type_description) LIKE '%SELFSERVICE%' THEN "Portal Auto Negociação"
+      WHEN UPPER(ag.agency_type) = "PORTAL" THEN "Portal Auto Negociação"
+      WHEN UPPER(a.id_user) = "PORTALQA" THEN "Portal Auto Negociação"
+      WHEN UPPER(ag.agency_type) = "CYBER CREDIT" THEN "Operador Interno"
+      WHEN UPPER(a.agreement_type) LIKE '%SERASA%' THEN "Serasa Digital"
+      WHEN UPPER(ag.agency_type) = "ASSESSORIA CONVENCIONAL" THEN "Assessoria"
+      WHEN UPPER(a.id_user) = "MIGRACAO" THEN "Migração"
       ELSE ag.agency_type
     END AS origin_agreement,
     a.status AS original_negotiation_status,
@@ -274,7 +278,7 @@ FROM union_promisses_agreements AS a
 LEFT JOIN datalake_cyber_clean.contracts AS c
   ON a.id_contract = c.id_contract
 LEFT JOIN datalake_cyber_clean.users AS u
-  ON a.id_user = UPPER(u.id_user)
+  ON UPPER(a.id_user) = UPPER(u.id_user)
 LEFT JOIN datalake_cyber_clean.agency AS ag
   ON COALESCE(u.id_agency, a.id_agency) = ag.id_agency
 LEFT JOIN get_agency_group_name AS agg

@@ -86,6 +86,7 @@ SELECT
         WHEN UPPER(n.consultancy) = '009' OR LOWER(n.consultancy) = 'quinto' THEN 'COBRANÇA_INTERNA_QA'
         WHEN UPPER(n.consultancy) IN ('010','G010') THEN 'PASCHOALOTTO'
         WHEN UPPER(n.consultancy) IN ('015','G015') THEN 'PORTAL_QUINTOANDAR'
+        WHEN UPPER(collector) = '5A-COLLECTOR' THEN 'PORTAL_QUINTOANDAR'
         WHEN UPPER(n.consultancy) IN ('017','G017', 'QA_TRC') THEN 'TRC'
         WHEN UPPER(n.consultancy) IN ('018','G018', 'QA_GRB') THEN 'GRB'
         WHEN UPPER(n.consultancy) IN ('019','G019', 'QA_MEETC') THEN 'MEETCALL'

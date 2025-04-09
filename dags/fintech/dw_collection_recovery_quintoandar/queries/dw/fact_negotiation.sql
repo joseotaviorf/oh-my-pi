@@ -18,9 +18,10 @@ trato_feito_negotiation AS (
     END AS creditor,
     n.consultancy_name AS advisory,
     CASE
-      WHEN n.consultancy IS NOT NULL THEN "Assessoria"
-      WHEN n.collector = "5A-collector" THEN "Portal Auto Negociação"
-      ELSE "Operador Interno"
+      WHEN n.consultancy_name = "PORTAL_QUINTOANDAR" THEN "Portal Auto Negociação"
+      WHEN n.consultancy_name IN ("PASCHOALOTTO", "MEETCALL", "TRC", "GRB") THEN "Assessoria"
+      WHEN n.consultancy_name = "SERASA" THEN "Serasa Digital"
+      WHEN n.consultancy_name = "COBRANÇA_INTERNA_QA" THEN "Operador Interno"
     END AS origin_agreement,
     n.promisse_payment_method,
     n.status,
@@ -67,10 +68,7 @@ cyber_negotiation AS (
     description_broken_agreement AS broken_reason,
     negotiation_status,
     exception,
-    CASE
-      WHEN origin_agreement LIKE "%Assessoria%" THEN "Assessoria"
-      ELSE origin_agreement
-    END AS origin_agreement,
+    origin_agreement,
     advisory,
     agreement_type,
     promisse_payment_method,
@@ -229,7 +227,7 @@ union_sources AS (
     COALESCE(rn.id_operator, cn.id_operator) AS id_operator,
     cn.id_manager_authorized,
     COALESCE(rn.id_campaign, cn.id_campaign) AS id_campaign,
-    COALESCE(tfn.source, cn.source, rn.source) AS source,
+    CONCAT_WS(" | ", tfn.source, cn.source, rn.source) AS source,
     COALESCE(tfn.creditor, cn.creditor, rn.creditor) AS creditor,
     COALESCE(rn.advisory, cn.advisory, tfn.advisory) AS advisory,
     COALESCE(rn.agreement_type, cn.agreement_type) AS agreement_type,
