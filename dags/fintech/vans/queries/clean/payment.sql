@@ -25,6 +25,7 @@ SELECT
     related_document_status,
     paid_amount,
     bank_payment_code,
-    type
+    type,
+    style
 FROM
     datalake_vans_raw.payment
