@@ -62,16 +62,14 @@ FROM VALUES
     ),
     -- demand balancer v2 policy v2
     (
-        "ab_beakman_search_services_demand_concentration_v2_policy_2_rent_experiment",
+        "ab_beakman_search_services_demand_concentration_v2_policy_3_rent_experiment",
         named_struct(
-            'begin_date', DATE('2025-02-17'),
+            'begin_date', DATE('2025-04-08'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
-                    '-1', 'baseline_contaminated',
                     '0', 'baseline',
-                    '1', 'treatment_1',
-                    '2', 'treatment_2'
+                    '1', 'treatment'
                 )
             ),
             'filters', "business_context = 'rent'"
@@ -92,22 +90,7 @@ FROM VALUES
             'filters', NULL
         )
     ),
-    -- Copilot entrypoint exp
-    (
-        "ab_beakman_native_cockpit_copilot_entry_point_experiment",
-        named_struct(
-            'begin_date', DATE('2025-03-11'),
-            'end_date', NULL,
-            'variants', to_json(
-                named_struct(
-                    'baseline', 'baseline',
-                    'treatment', 'treatment'
-                )
-            ),
-            'filters', NULL
-        )
-    ),
-    -- Important experience from another team
+    -- Important experience from a different team
     (
         "ab_beakman_wpp_alert",
         named_struct(
@@ -124,9 +107,9 @@ FROM VALUES
     ),
     -- HUE VS HSE for Rent
     (
-        "AB_TEST_RECS_HUE_ITEM_RENT",
+        "AB_TEST_RECS_HUE_ITEM_RENT_V2",
         named_struct(
-            'begin_date', DATE('2025-03-26'),
+            'begin_date', DATE('2025-04-09'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
@@ -134,14 +117,14 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', NULL
+            'filters', "business_context = 'rent'"
         )
     ),
     -- HUE VS HSE for Sale
     (
-        "AB_TEST_RECS_HUE_ITEM_SALE",
+        "AB_TEST_RECS_HUE_ITEM_SALE_V2",
         named_struct(
-            'begin_date', DATE('2025-03-26'),
+            'begin_date', DATE('2025-04-09'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
@@ -149,7 +132,7 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', NULL
+            'filters', "business_context = 'sale'"
         )
     ),
     -- Listing recs pricing experiment
