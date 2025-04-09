@@ -16,6 +16,9 @@ columns:
   id_status:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.id_status
+  cpf_cnpj:
+    lineage:
+    - datalake_gsheets_raw.quintocred_process_evictions.cpf_cnpj
   contract_number:
     lineage:
     - datalake_gsheets_raw.quintocred_process_evictions.numero_do_contrato

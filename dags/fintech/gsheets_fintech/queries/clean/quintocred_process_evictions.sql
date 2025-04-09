@@ -3,6 +3,7 @@ SELECT
     id_imob AS id_broker,
     parte_contraria_id AS id_opposing_party,
     id_status,
+    cpf_cnpj,
     numero_do_contrato AS contract_number,
     numero_do_processo AS process_number,
     parte_contraria_nome AS name_opposing_party,
