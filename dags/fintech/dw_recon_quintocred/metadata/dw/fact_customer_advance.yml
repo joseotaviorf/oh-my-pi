@@ -1,0 +1,145 @@
+database_name: dw_recon_quintocred
+table_name: fact_customer_advance
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: "Data from customer advance in QuintoCred recon context."
+columns:
+  sk_propose:
+    description: "QuintoCred's propose identification number (ID)"
+    lineage:
+      - datalake_neurotech_quintocred.credit_evaluation.id_propose
+
+  id_payment_min:
+      description: "Minimum payment ID associated with the transaction"
+      lineage:
+        - dw_velo.fact_velo_payment.id_payment_min
+
+  flow_type:
+      description: "Type of flow associated with the payment (e.g., subscription, one-time)"
+      lineage:
+        - datalake_rental_guarantee_platform_clean.bill_checkout.flow_type
+
+  gateway:
+      description: "Payment gateway used for the transaction (e.g., ASAAS, PIXAR)"
+      lineage:
+        - dw_velo.fact_velo_payment.gateway
+
+  activator_amount:
+      description: "Amount charged for the activation of a service or product"
+      lineage:
+        - dw_charging_payment_quintocred.fact_payment_full
+
+  monthly_guarantee:
+      description: "Monthly guarantee amount agreed upon in the contract"
+      lineage:
+        - dw_velo.fact_velo_payment.monthly_guarantee
+
+  annual_guarantee:
+      description: "Annual guarantee amount agreed upon in the contract"
+      lineage:
+        - dw_velo.fact_velo_payment.annual_guarantee
+
+  total_charged:
+      description: "Total amount charged to the customer"
+      lineage:
+        - dw_velo.fact_velo_payment.total_charged
+
+  total_paid:
+      description: "Total amount paid by the customer"
+      lineage:
+        - dw_velo.fact_velo_payment.total_paid
+
+  value_upfront_signatures:
+      description: "Amount paid upfront for the signature or agreement"
+      lineage:
+        - dw_velo.fact_velo_payment.value_upfront_signatures
+
+  expected_appropriated_months:
+      description: "Number of months expected to be appropriated based on the payment schedule"
+      lineage:
+        - dw_velo.fact_velo_payment.expected_appropriated_months
+
+  expected_appropriated_amount:
+      description: "Expected amount to be appropriated based on the payment schedule"
+      lineage:
+        - dw_velo.fact_velo_payment.expected_appropriated_amount
+
+  expected_months_to_be_appropriated:
+      description: "Remaining months for appropriation based on the payment schedule"
+      lineage:
+        - dw_velo.fact_velo_payment.expected_months_to_be_appropriated
+
+  expected_amount_to_be_appropriated:
+      description: "Remaining amount to be appropriated based on the payment schedule"
+      lineage:
+        - dw_velo.fact_velo_payment.expected_amount_to_be_appropriated
+
+  has_activation:
+      description: "Indicates whether the activation flag is set for the customer"
+      lineage:
+        - dw_velo.fact_velo_payment.flag_has_activation
+
+  has_payment_advance:
+      description: "Indicates whether there is an advance payment made by the customer"
+      lineage:
+        - dw_velo.fact_velo_payment.has_payment_advance
+
+  is_direct_billing:
+      description: "Indicates whether the billing is direct (not mediated by a third party)"
+      lineage:
+        - dw_velo.fact_velo_payment.is_direct_billing
+
+  mobs_in_between_due_dates:
+      description: "Number of months between the due dates for payments"
+      lineage:
+        - dw_velo.fact_velo_payment.mobs_in_between_due_dates
+
+  dt_due_min:
+      description: "Minimum due date for the payment"
+      lineage:
+        - dw_velo.fact_velo_payment.dt_due_min
+
+  dt_due_max:
+      description: "Maximum due date for the payment"
+      lineage:
+        - dw_velo.fact_velo_payment.dt_due_max
+
+  dt_month_last_day:
+      description: "Last day of the month for the specified date"
+      lineage:
+        - dw_velo.fact_velo_payment.dt_month_last_day
+
+  dt_paid_min:
+      description: "Earliest payment date for the customer"
+      lineage:
+        - dw_velo.fact_velo_payment.dt_paid_min
+
+  dt_paid_max:
+      description: "Latest payment date for the customer"
+      lineage:
+        - dw_velo.fact_velo_payment.dt_paid_max
+
+  dt_month_appropriation_start:
+      description: "Start date for the appropriation process in a given month"
+      lineage:
+        - dw_velo.fact_velo_payment.dt_month_appropriation_start
+
+  dt_month_ref_creation:
+      description: "Reference date when the month was created in the system"
+      lineage:
+        - dw_velo.fact_velo_payment.dt_month_ref_creation
+
+  dt_contract_started:
+      description: "Date when the contract or agreement with the customer started"
+      lineage:
+        - dw_velo.fact_velo_propose.dt_contract_started
+
+  dt_ended:
+      description: "Date when the contract or agreement with the customer ended"
+      lineage:
+        - dw_velo.fact_velo_propose.dt_ended
+
+  dt_created:
+      description: "Date when the record was created in the system"
+      lineage:
+        - dw_velo.fact_velo_payment.dt_created

@@ -1,0 +1,19 @@
+dag:
+  name: dw_recon_quintocred
+  schedule_start_date: 2025, 4, 8
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Creates DW Model for QuintoCred recon context.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: recon_quintocred
+cluster:
+  type: databricks_13_3_min_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
