@@ -1,0 +1,27 @@
+---
+database_name: datalake_docx_clean
+table_name: person_document
+domain: fintech
+description: This table stores any document submitted by a person.
+columns:
+  id:
+    lineage:
+    - datalake_docx_raw.person_document.id
+  id_person:
+    lineage:
+    - datalake_docx_raw.person_document.person_id
+  type:
+    lineage:
+    - datalake_docx_raw.person_document.type
+  country_code:
+    lineage:
+    - datalake_docx_raw.person_document.country_code
+  version:
+    lineage:
+    - datalake_docx_raw.person_document.version
+  ts_created:
+    lineage:
+    - datalake_docx_raw.person_document.created_at
+  ts_updated:
+    lineage:
+    - datalake_docx_raw.person_document.updated_at

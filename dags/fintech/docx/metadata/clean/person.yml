@@ -1,0 +1,38 @@
+---
+database_name: datalake_docx_clean
+table_name: person
+domain: fintech
+description: This table stores the data from users who authenticate in 5A plastform (users) or interact with our products (person).
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person.id
+  id_reference:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person.reference_id
+  person_uuid:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person.person_uuid
+  user_person_uuid:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person.user_person_uuid
+  reference_type:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person.reference_type
+  version:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person.version
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person.created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person.updated_at

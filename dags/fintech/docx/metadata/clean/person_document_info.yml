@@ -1,0 +1,51 @@
+---
+database_name: datalake_docx_clean
+table_name: person_document_info
+domain: fintech
+description: This table stores the details of any document submitted by a person. Each row represents a piece of document attached to a person.
+columns:
+  id:
+    lineage:
+    - datalake_docx_raw.person_document_info.id
+  id_person_document:
+    lineage:
+    - datalake_docx_raw.person_document_info.person_document_id
+  id_input_source:
+    lineage:
+    - datalake_docx_raw.person_document_info.input_source_id
+  input_source_type:
+    lineage:
+    - datalake_docx_raw.person_document_info.input_source_type
+  input_value_type:
+    lineage:
+    - datalake_docx_raw.person_document_info.input_value_type
+  validation_type:
+    lineage:
+    - datalake_docx_raw.person_document_info.validation_type
+  type:
+    lineage:
+    - datalake_docx_raw.person_document_info.type
+  version:
+    lineage:
+    - datalake_docx_raw.person_document_info.version
+  status:
+    lineage:
+    - datalake_docx_raw.person_document_info.status
+  input_value:
+    lineage:
+    - datalake_docx_raw.person_document_info.input_value
+  input_type:
+    lineage:
+    - datalake_docx_raw.person_document_info.input_type
+  validated_by:
+    lineage:
+    - datalake_docx_raw.person_document_info.validated_by
+  ts_last_validated:
+    lineage:
+    - datalake_docx_raw.person_document_info.last_validated_at
+  ts_created:
+    lineage:
+    - datalake_docx_raw.person_document_info.created_at
+  ts_updated:
+    lineage:
+    - datalake_docx_raw.person_document_info.updated_at
