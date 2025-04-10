@@ -45,31 +45,6 @@ WITH deduplicated_offer_events AS (
         month,
         day
     FROM
-        datalake_amplitude_clean.170135_offer_submitted_events
-    WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND  DATE('{load_end_date}')
-    UNION
-    SELECT
-        id_user,
-        id_app,
-        ep_id_house AS id_house,
-        ep_id_firestore AS id_firestore,
-        country AS user_country,
-        user_properties,
-        up_app_type AS app_type,
-        version_name,
-        up_utm_source AS utm_source,
-        up_utm_medium AS utm_medium,
-        up_utm_campaign AS utm_campaign,
-        up_utm_content AS utm_content,
-        up_utm_term AS utm_term,
-        up_entrance_uri AS entrance_uri,
-        dt_event,
-        ts_event,
-        year,
-        month,
-        day
-    FROM
         datalake_amplitude_clean.183049_offer_submitted_events
     WHERE
         MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

@@ -27,14 +27,6 @@ WITH conversions AS (
         id_amplitude,
         id_user
     FROM
-        datalake_amplitude_clean.170135_offer_submitted_events
-    WHERE 
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    UNION
-    SELECT
-        id_amplitude,
-        id_user
-    FROM
         datalake_amplitude_clean.183049_offer_submitted_events
     WHERE 
         MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
