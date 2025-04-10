@@ -9,7 +9,7 @@ WITH payments_in_retsuko AS (
         i.paid_amount AS billing_source_amount,
         i.accrual_year_month,
         DATE(i.ts_paid) AS dt_billing_source,
-        dd.next_brz_fintech_business_day,
+        dd.next_brz_fintech_business_day AS dt_billing_source_trigger,
         se.id_sap_gateway_feature,
         se.id_finance_entity,
         se.version,
@@ -46,7 +46,7 @@ francesinha AS (
         CAST(SUBSTRING(UPPER(our_number), 1, LENGTH(our_number) - 1) AS INTEGER) AS company_use,
         dt_credit AS dt_bank_paid,
         SUM(net_amount) AS bank_amount,
-        '45268-8' AS bank_source
+        '45268-8' AS bank_account_number
     FROM
         datalake_nexxera.cnab_charges_recupera
     WHERE
@@ -68,7 +68,7 @@ francesinha AS (
       ) ELSE regexp_replace(ext.origin_complement, '^0+', '') END AS company_use,
         DATE(ext.date_accounting) AS dt_bank_paid,
         ext.amount_value AS bank_amount,
-        '45268-8' AS bank_source
+        '45268-8' AS bank_account_number
     FROM 
         datalake_itau_statements_clean.statement_879200452685 ext 
     WHERE 
@@ -83,7 +83,7 @@ francesinha AS (
         UPPER(REPLACE(REGEXP_REPLACE(document_number, '^0000', ''), 'C!', '')) AS company_use,
         dt_credit AS dt_bank_paid,
         SUM(net_amount) AS bank_amount,
-        '39221-6' AS bank_source
+        '39221-6' AS bank_account_number
     FROM
         datalake_nexxera.cnab_charges
     WHERE
@@ -151,7 +151,7 @@ payments_in_ledger AS (
     SELECT
         hash,
         id_finance_entity,
-        account_number,
+        account_number AS sap_account_number,
         account_name,
         debit_credit AS sap_amount,
         dt_reference AS dt_sap_reference,
@@ -171,39 +171,69 @@ payments_in_ledger AS (
             '11057X',
             '11307X'
         )
+),
+
+create_compliance_columns AS (
+    SELECT 
+        r.id_contract AS id_business_entity,
+        r.id_invoice AS id_finance_entity,
+        r.company_use,
+        r.version,
+        r.billing_source,
+        pcv.payment_source,
+        f.bank_account_number,
+        l.sap_account_number,
+        r.accrual_year_month,
+        r.billing_source_amount,
+        pcv.payment_source_amount,
+        f.bank_amount,
+        l.sap_amount,
+        IF(l.hash IS NOT NULL, TRUE, FALSE) AS is_completeness_compliance,
+        IF((ABS(r.billing_source_amount) - ABS(l.sap_amount) = 0), TRUE, FALSE) AS is_correctness_compliance,
+        IF((l.dt_sap_reference BETWEEN r.dt_billing_source AND DATE_ADD(r.dt_billing_source_trigger, 3)), TRUE, FALSE) AS is_temporality_compliance,
+        r.dt_billing_source_trigger,
+        pcv.dt_payment_source,
+        f.dt_bank_paid,
+        l.dt_sap_created,
+        l.dt_sap_reference
+    FROM
+        payments_in_retsuko AS r
+    LEFT JOIN 
+        payments_vans_checkout AS pcv
+            ON r.id_invoice = pcv.id_invoice
+    LEFT JOIN 
+        francesinha AS f
+            ON r.company_use = CAST(f.company_use AS STRING)
+    LEFT JOIN 
+        payments_in_gateway AS g
+            ON r.id_sap_gateway_feature = g.id_feature
+    LEFT JOIN 
+        payments_in_ledger AS l 
+            ON g.hash = l.hash
 )
 
-SELECT 
-    r.id_contract AS id_business_entity,
-    r.id_invoice AS id_finance_entity,
-    r.company_use,
-    r.version,
-    r.billing_source,
-    pcv.payment_source,
-    f.bank_source,
-    r.accrual_year_month,
-    r.billing_source_amount,
-    pcv.payment_source_amount,
-    f.bank_amount,
-    l.sap_amount,
-    l.account_number,
-    IF(l.hash IS NOT NULL, TRUE, FALSE) AS is_completeness_compliance,
-    r.dt_billing_source,
-    pcv.dt_payment_source,
-    f.dt_bank_paid,
-    l.dt_sap_created,
-    l.dt_sap_reference
-FROM
-    payments_in_retsuko AS r
-LEFT JOIN 
-    payments_vans_checkout AS pcv
-        ON r.id_invoice = pcv.id_invoice
-LEFT JOIN 
-    francesinha AS f
-        ON r.company_use = CAST(f.company_use AS STRING)
-LEFT JOIN 
-    payments_in_gateway AS g
-        ON r.id_sap_gateway_feature = g.id_feature
-LEFT JOIN 
-    payments_in_ledger AS l 
-        ON g.hash = l.hash
+SELECT
+    id_business_entity,
+    id_finance_entity,
+    company_use,
+    version,
+    billing_source,
+    payment_source,
+    bank_account_number,
+    sap_account_number,
+    accrual_year_month,
+    billing_source_amount,
+    payment_source_amount,
+    bank_amount,
+    sap_amount,
+    is_completeness_compliance,
+    is_correctness_compliance,
+    is_temporality_compliance,
+    IF(is_completeness_compliance = TRUE AND is_correctness_compliance = TRUE AND is_temporality_compliance = TRUE, TRUE, FALSE) AS is_compliance,
+    dt_billing_source_trigger,
+    dt_payment_source,
+    dt_bank_paid,
+    dt_sap_created,
+    dt_sap_reference
+FROM 
+    create_compliance_columns

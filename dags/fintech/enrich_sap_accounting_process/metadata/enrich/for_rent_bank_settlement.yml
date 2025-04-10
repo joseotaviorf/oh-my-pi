@@ -8,76 +8,89 @@ columns:
   id_business_entity:
     description: ''
     lineage:
-    - .payments_in_retsuko.r.id_contract
+    - .create_compliance_columns.id_business_entity
   id_finance_entity:
     description: ''
     lineage:
-    - .payments_in_retsuko.r.id_invoice
+    - .create_compliance_columns.id_finance_entity
   company_use:
     description: ''
     lineage:
-    - .payments_in_retsuko.company_use
+    - .create_compliance_columns.company_use
   version:
     description: ''
     lineage:
-    - .payments_in_retsuko.version
+    - .create_compliance_columns.version
   billing_source:
     description: ''
     lineage:
-    - .payments_in_retsuko.billing_source
+    - .create_compliance_columns.billing_source
   payment_source:
     description: ''
     lineage:
-    - .payments_in_retsuko.payment_source
-  bank_source:
+    - .create_compliance_columns.payment_source
+  bank_account_number:
     description: ''
     lineage:
-    - .payments_in_retsuko.bank_source
+    - .create_compliance_columns.bank_account_number
+  sap_account_number:
+    description: ''
+    lineage:
+    - .create_compliance_columns.sap_account_number
   accrual_year_month:
     description: ''
     lineage:
-    - .payments_in_retsuko.accrual_year_month
+    - .create_compliance_columns.accrual_year_month
   billing_source_amount:
     description: ''
     lineage:
-    - .payments_in_retsuko.billing_source_amount
+    - .create_compliance_columns.billing_source_amount
   payment_source_amount:
     description: ''
     lineage:
-    - .payments_in_retsuko.payment_source_amount
+    - .create_compliance_columns.payment_source_amount
   bank_amount:
     description: ''
     lineage:
-    - .payments_in_retsuko.bank_amount
+    - .create_compliance_columns.bank_amount
   sap_amount:
     description: ''
     lineage:
-    - .payments_in_retsuko.sap_amount
-  account_number:
-    description: ''
-    lineage:
-    - .payments_in_retsuko.account_number
+    - .create_compliance_columns.sap_amount
   is_completeness_compliance:
     description: ''
     lineage:
-    - .payments_in_retsuko.CASE WHEN NOT l.hash IS NULL THEN TRUE ELSE FALSE END
-  dt_billing_source:
+    - .create_compliance_columns.is_completeness_compliance
+  is_correctness_compliance:
     description: ''
     lineage:
-    - .payments_in_retsuko.dt_billing_source
+    - .create_compliance_columns.is_correctness_compliance
+  is_temporality_compliance:
+    description: ''
+    lineage:
+    - .create_compliance_columns.is_temporality_compliance
+  is_compliance:
+    description: ''
+    lineage:
+    - .create_compliance_columns.CASE WHEN is_completeness_compliance = TRUE AND is_correctness_compliance
+      = TRUE AND is_temporality_compliance = TRUE THEN TRUE ELSE FALSE END
+  dt_billing_source_trigger:
+    description: ''
+    lineage:
+    - .create_compliance_columns.dt_billing_source_trigger
   dt_payment_source:
     description: ''
     lineage:
-    - .payments_in_retsuko.dt_payment_source
+    - .create_compliance_columns.dt_payment_source
   dt_bank_paid:
     description: ''
     lineage:
-    - .payments_in_retsuko.dt_bank_paid
+    - .create_compliance_columns.dt_bank_paid
   dt_sap_created:
     description: ''
     lineage:
-    - .payments_in_retsuko.dt_sap_created
+    - .create_compliance_columns.dt_sap_created
   dt_sap_reference:
     description: ''
     lineage:
-    - .payments_in_retsuko.dt_sap_reference
+    - .create_compliance_columns.dt_sap_reference
