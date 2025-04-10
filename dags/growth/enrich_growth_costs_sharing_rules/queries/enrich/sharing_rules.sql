@@ -489,4 +489,16 @@ SELECT
     utm_campaign_modified
 FROM 
     datalake_growth_costs_sharing_rules.s050s
+UNION ALL 
+SELECT
+    id_date,
+    id_rule,
+    country_code, 
+    city_group,
+    share,
+    funnel_side,
+    business_context,
+    utm_campaign_modified
+FROM 
+    datalake_growth_costs_sharing_rules.s051s    
  

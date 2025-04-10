@@ -643,6 +643,7 @@ bietlejuice.dw_losses:
 bietlejuice.dw_media_platform_metrics:
   - bietlejuice.enrich_growth_manual_media_platform_metrics:load-enrich-manual-costs
   - bietlejuice.enrich_growth_media_platform_metrics:load-enrich-consolidated-metrics
+  - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
 bietlejuice.dw_media_sharing_rules:
   - bietlejuice.enrich_growth_costs_sharing_rules:load-enrich-sharing-rules
 bietlejuice.dw_neurotech_quintocred:

@@ -31,8 +31,9 @@ automated_costs AS (
     id_ad AS sk_ad, 
     id_region AS sk_region,
     BIGINT(DATE_FORMAT(dt_cost, 'yyyyMMdd')) AS sk_cost_date,
-    NULL AS bk_sharing_rules,
-    naming_convention_sufix,
+    CASE WHEN ms.funnel_side = 'Supply' AND ms.campaign_business_context = 'Hybrid'
+      THEN MD5(CONCAT(CAST(sk_cost_date AS STRING), '_', 's051s', LOWER(ms.funnel_side))) ELSE NULL END AS bk_sharing_rules,
+    ms.naming_convention_sufix,
     origin,
     country_code,
     utm_campaign,
@@ -48,7 +49,10 @@ automated_costs AS (
     day,
     NOW() AS ts_load
   FROM 
-    datalake_growth_media_platform.consolidated_metrics
+    datalake_growth_media_platform.consolidated_metrics cs
+    LEFT JOIN 
+      datalake_growth_taxonomy.media_setup ms 
+        ON ms.naming_convention_sufix = cs.naming_convention_sufix
   WHERE 
       dt_cost::DATE BETWEEN '{load_start_date}'::DATE AND '{load_end_date}'::DATE
 )
