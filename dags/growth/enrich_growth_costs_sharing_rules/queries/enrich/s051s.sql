@@ -5,8 +5,8 @@ SELECT
   fse.sk_date AS id_date,
   '{id_rule}' AS id_rule,
   'supply' AS funnel_side, 
-  NULL AS country_code,
-  NULL AS city_group,
+  NULL::STRING AS country_code,
+  NULL::STRING AS city_group,
   SUBSTRING(dal.nm_campaign, INSTR(dal.nm_campaign, '.') + 1) AS utm_campaign_modified,
   fse.nm_business_context AS business_context,
   COUNT(DISTINCT fse.sk_supply)
