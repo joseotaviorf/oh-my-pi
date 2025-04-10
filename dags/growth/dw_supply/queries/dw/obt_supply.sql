@@ -113,7 +113,7 @@ base AS (
             WHEN dsupc.tp_origin = 'consultantpwa' THEN 'ciq'
             WHEN dsupc.tp_origin = 'supplyprocessor' THEN 'rede'
             WHEN dsof.nm_agent IS NOT NULL THEN 'operations'
-            WHEN dsupc.tp_origin IN ('full_self_service', 'referral', 'ios') THEN 'ownerpwa'
+            WHEN dsupc.tp_origin IN ('home', 'full_self_service', 'referral', 'ios') THEN 'ownerpwa'
             WHEN dsupc.tp_origin IN ('prime','owner_conversion') THEN 'operations'
             ELSE concat('notmapped-',dsupc.tp_origin)
         END AS conversion_origin,
