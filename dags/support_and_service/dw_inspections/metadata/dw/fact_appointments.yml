@@ -27,6 +27,14 @@ columns:
     description: Inspector identification key linked to the appointment.
     lineage:
       - datalake_inspections.appointment_inspection.id_inspector
+  sk_user_who_created:
+    description: Identification key of the user who created the schedule.
+    lineage:
+      - datalake_inspections.appointment_inspection.id_user_who_created
+  sk_user_who_canceled:
+    description: Identification key of the user who canceled the appointment.
+    lineage:
+      - datalake_inspections.appointment_inspection.id_user_who_canceled
   sk_appointment_component:
     description: Unique identification key for the combination of descriptive data.
     lineage:
@@ -56,6 +64,10 @@ columns:
     description: Boolean information indicating whether this is the first appointment for the contract.
     lineage:
       - datalake_inspections.appointment_inspection.is_first_schedule
+  is_first_schedule_auto:
+    description: Boolean information indicating whether the appointment is the first automatic appointment made.
+    lineage:
+      - datalake_inspections.appointment_inspection.is_first_schedule_auto
   is_d0_canceled:
     description: Boolean information indicating whether the appointment was cancelled on the same day.
     lineage:

@@ -8,6 +8,41 @@ WITH booking_status AS (
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY bsc.id_booking, bsc.status ORDER BY bsc.id DESC) = 1
 ),
+status_log AS (
+  SELECT
+    id_schedule,
+    id_author_user
+  FROM
+    datalake_ebdb_clean.visit_status_log
+  WHERE
+    event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
+    AND ts_created >= '2024-08-01'
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_schedule ORDER BY ts_created) = 1
+),
+first_booking_author_sc AS (
+    SELECT DISTINCT
+        bsc.id_booking,
+        FIRST_VALUE(id_user) OVER (
+          PARTITION BY bsc.id_booking ORDER BY id
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        ) AS id_user_creation
+    FROM
+        datalake_ebdb_clean.booking_status_change AS bsc
+),
+first_booking_author AS (
+    SELECT DISTINCT
+        b.id AS id_booking,
+        COALESCE(sl.id_author_user, b.id_attendant, fbasc.id_user_creation) AS id_user_who_created
+    FROM
+        datalake_ebdb_clean.booking AS b
+    LEFT JOIN
+        status_log AS sl
+            ON b.id = sl.id_schedule
+    LEFT JOIN
+        first_booking_author_sc AS fbasc
+            ON b.id = fbasc.id_booking
+),
 min_canceled_date AS (
     SELECT
         b_aud.id AS id_booking,
@@ -23,6 +58,7 @@ min_canceled_date AS (
 canceled_date AS (
     SELECT
         mcd.id_booking,
+        ure.id_user AS id_user_who_canceled,
         -- TODO [ODS] check if milliseconds is really needed for this column
         CAST(FROM_UNIXTIME(ure.ts_revision/1000) AS TIMESTAMP)
           + (ure.ts_revision % 1000) * INTERVAL 1 MILLISECONDS
@@ -41,12 +77,36 @@ appointment_history AS (
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_appointment ORDER BY ts_updated DESC) = 1
 ),
+creation_users AS (
+    SELECT
+        id_appointment,
+        id_updated_by_reference AS id_user_who_created
+    FROM
+        datalake_schedules_clean.appointment_history
+    WHERE
+        status = 'WAITING_CONFIRMATION'
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_appointment ORDER BY ts_updated ASC) = 1
+),
+canceled_users AS (
+    SELECT
+        id_appointment,
+        id_updated_by_reference AS id_user_who_canceled
+    FROM
+        datalake_schedules_clean.appointment_history
+    WHERE
+        status = 'CANCELED'
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY id_appointment ORDER BY ts_updated ASC) = 1
+),
 inspection_appointment_data AS (
     SELECT
         a.id_appointment AS id_is_appointment,
         a.id_external_appointment AS id_main_appointment,
         a.id_inspection,
         a.id_inspector,
+        creation_users.id_user_who_created,
+        canceled_users.id_user_who_canceled,
         s.type,
         a.status,
         ah.category_name AS status_made_by,
@@ -79,6 +139,12 @@ inspection_appointment_data AS (
     LEFT JOIN
         appointment_history AS ah
           ON b.id_schedule = ah.id_appointment
+    LEFT JOIN
+        creation_users
+            ON a.id_appointment = creation_users.id_appointment
+    LEFT JOIN
+        canceled_users
+            ON a.id_appointment = canceled_users.id_appointment
     WHERE
         DATE(a.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
 ),
@@ -88,6 +154,8 @@ main_appointment_data AS (
         b.id AS id_main_appointment,
         MD5(CONCAT(i.id, 'PWA')) AS id_inspection,
         b.id_agent AS id_inspector,
+        fba.id_user_who_created,
+        cd.id_user_who_canceled,
         CASE
             WHEN LOWER(b.type) IN ('vistoria', 'vistoriaquarteirizada') THEN 'INSPECTION'
         END AS type,
@@ -137,6 +205,9 @@ main_appointment_data AS (
     LEFT JOIN
         canceled_date AS cd
           ON b.id = cd.id_booking
+    LEFT JOIN
+        first_booking_author AS fba
+            ON b.id = fba.id_booking
     WHERE
         b.type IN ('Vistoria', 'VistoriaQuarteirizada')
         AND DATE(b.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
@@ -147,6 +218,8 @@ coalesce_appointment_sources AS (
         COALESCE(iad.id_main_appointment, md.id_main_appointment) AS id_main_appointment,
         COALESCE(iad.id_inspection, md.id_inspection) AS id_inspection,
         COALESCE(iad.id_inspector, md.id_inspector) AS id_inspector,
+        COALESCE(md.id_user_who_created, iad.id_user_who_created) AS id_user_who_created,
+        COALESCE(md.id_user_who_canceled, iad.id_user_who_canceled) AS id_user_who_canceled,
         COALESCE(iad.type, md.type) AS type,
         COALESCE(iad.status, md.status) AS status,
         iad.status_made_by,
@@ -192,6 +265,8 @@ SELECT
     cas.id_main_appointment,
     cas.id_inspection,
     cas.id_inspector,
+    cas.id_user_who_created,
+    cas.id_user_who_canceled,
     cas.type,
     cas.status,
     cas.status_made_by,
@@ -207,6 +282,11 @@ SELECT
         WHEN FIRST(i.id_inspection) OVER (PARTITION BY i.id_contract, i.inspection_type ORDER BY i.ts_updated) == cas.id_inspection THEN TRUE
         ELSE FALSE
     END AS is_first_schedule,
+    CASE
+        -- This 194233 value, is the system user id to identify if it was an automatic schedule.
+        WHEN cas.id_user_who_created = 194233 THEN TRUE
+        ELSE FALSE
+    END AS is_first_schedule_auto,
     CASE
         WHEN DATE(cas.ts_first_appointment_cancelled_utc) = DATE(TO_UTC_TIMESTAMP(cas.ts_appointment_inspected_local_tz, 'UTC')) THEN TRUE
         ELSE FALSE

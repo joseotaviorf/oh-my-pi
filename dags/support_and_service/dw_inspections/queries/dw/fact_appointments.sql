@@ -4,6 +4,8 @@ SELECT
     COALESCE(id_main_appointment, -1) AS sk_main_appointment,
     COALESCE(id_inspection, -1) AS sk_inspection,
     COALESCE(id_inspector, -1) AS sk_inspector,
+    COALESCE(id_user_who_created, -1) AS sk_user_who_created,
+    COALESCE(id_user_who_canceled, -1) AS sk_user_who_canceled,
     MD5(
       COALESCE(type, 'N/A') ||
       COALESCE(status, 'N/A')  ||
@@ -17,6 +19,7 @@ SELECT
     is_fixed_agent,
     is_confirmed,
     is_first_schedule,
+    is_first_schedule_auto,
     is_d0_canceled,
     is_d1_canceled,
     is_not_canceled_by_inspector,

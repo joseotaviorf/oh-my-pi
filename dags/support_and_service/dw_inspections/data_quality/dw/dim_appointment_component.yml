@@ -11,16 +11,3 @@ column_level_validations:
         - INSPECTION
         - INSPECTION_EXTERNALLY_MANAGED
       severity_level: Error
-  status:
-    is_contained_in:
-      values:
-        - DONE
-        - WAITING_CONFIRMATION
-        - SCHEDULED
-        - CANCELLED
-      severity_level: Error
-  source:
-    is_contained_in:
-      values:
-        - PWA
-        - IS

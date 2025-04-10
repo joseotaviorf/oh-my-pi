@@ -29,6 +29,18 @@ columns:
     lineage:
       - datalake_inspection_services_clean.appointment.id_inspector
     description: Inspector identification key in IS.
+  id_user_who_created:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.id_author_user
+      - datalake_ebdb_clean.booking.id_attendant
+      - datalake_ebdb_clean.booking_status_change.id_user
+      - datalake_schedules_clean.appointment_history.id_updated_by_reference
+    description: Identification key of the user who created the schedule.
+  id_user_who_canceled:
+    lineage:
+      - datalake_schedules_clean.appointment_history.id_updated_by_reference
+      - datalake_ebdb_clean.user_revision_entity.id_user
+    description: Identification key of the user who canceled the appointment.
   type:
     lineage:
       - datalake_schedules_clean.appointment.type
@@ -78,6 +90,8 @@ columns:
     description: Boolean information indicating whether the appointment was confirmed.
   is_first_schedule:
     description: Boolean information indicating whether this is the first appointment for the contract.
+  is_first_schedule_auto:
+    description: Boolean information indicating whether the appointment is the first automatic appointment made.
   is_d0_canceled:
     description: Boolean information indicating whether the appointment was cancelled on the same day.
   is_d1_canceled:
