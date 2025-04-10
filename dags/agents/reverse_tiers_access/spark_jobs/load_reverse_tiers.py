@@ -113,8 +113,16 @@ if __name__ == "__main__":
             )
         else:
             raise HTTPException(
-                f"m=__main__, message=UNSUCCESSFULL S3 put_object for table {table_to_send}, status={status}"
+                f"m=__main__, message=UNSUCCESSFULL S3 put_object for table {table_to_send}, status={status}, destination_path={destination_path}, file_name={file_name}"
             )
 
-    except AnalysisException:
-        __send_warning_message(table_to_send)
+    except AnalysisException as e:
+        error_msg = str(e)
+        if "DELTA_PATH_DOES_NOT_EXIST" in error_msg:
+            __send_warning_message(table_to_send)
+        elif "DELTA_INVALID_FORMAT" in error_msg:
+            raise AnalysisException(
+                f"Incompatible Delta format detected at '{datalake_path}'. e={error_msg}"
+            ) from e
+        else:
+            raise

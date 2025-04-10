@@ -28,10 +28,11 @@ workflow:
     function_params:
       range_of_days: [1, 15]
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_13_3_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
+    spark_version: 14.3.x-scala2.12
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
