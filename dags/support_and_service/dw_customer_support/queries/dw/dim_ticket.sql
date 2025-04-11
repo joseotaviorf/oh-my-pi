@@ -4,13 +4,13 @@ SELECT
   COALESCE(CAST(id_contract AS BIGINT), -1) AS sk_contract,
   MD5(
     CONCAT(
-      COALESCE(step_tag, ''),
-      COALESCE(customer_type_tag, ''),
-      COALESCE(client_type, ''),
-      COALESCE(request_type, ''),
-      COALESCE(contact_motivation_tag, ''),
-      COALESCE(contact_theme_tag, ''),
-      COALESCE(contact_theme_detail_tag, '')
+      COALESCE(step_tag, 'step_tag'),
+      COALESCE(customer_type_tag, 'customer_type_tag'),
+      COALESCE(client_type, 'client_type'),
+      COALESCE(request_type, 'request_type'),
+      COALESCE(contact_motivation_tag, 'contact_motivation_tag'),
+      COALESCE(contact_theme_tag, 'contact_theme_tag'),
+      COALESCE(contact_theme_detail_tag, 'contact_theme_detail_tag')
     )
   ) AS sk_taxonomy,
   status,

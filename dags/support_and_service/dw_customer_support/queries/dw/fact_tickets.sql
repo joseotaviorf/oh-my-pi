@@ -143,15 +143,15 @@ SELECT
   MD5(COALESCE(t.last_analyst_email, "NULL")) AS sk_last_analyst,
   MD5(
     CONCAT(
-      COALESCE(t.step_tag, ''),
-      COALESCE(t.customer_type_tag, ''),
-      COALESCE(t.client_type, ''),
-      COALESCE(t.request_type, ''),
-      COALESCE(t.contact_motivation_tag, ''),
-      COALESCE(t.contact_theme_tag, ''),
-      COALESCE(t.contact_theme_detail_tag, '')
+      COALESCE(t.step_tag, 'step_tag'),
+      COALESCE(t.customer_type_tag, 'customer_type_tag'),
+      COALESCE(t.client_type, 'client_type'),
+      COALESCE(t.request_type, 'request_type'),
+      COALESCE(t.contact_motivation_tag, 'contact_motivation_tag'),
+      COALESCE(t.contact_theme_tag, 'contact_theme_tag'),
+      COALESCE(t.contact_theme_detail_tag, 'contact_theme_detail_tag')
     )
-  ) AS sk_taxonomy,
+  ) AS sk_taxonomy, 
   t.channel, -- TODO: dim_channel
   t.direction, -- TODO: dim_channel
   t.ticket_origin, -- TODO: dim_channel
