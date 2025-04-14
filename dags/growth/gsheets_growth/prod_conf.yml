@@ -1,5 +1,4 @@
 sheets_info:
-
   affiliates_active_segmentation:
     sheet_id: 1ghRFPWXEYMTJSsMuY_k38HmELWRuzjt1PkfKTe_wR4s
     sheet_name: ativos
@@ -22,6 +21,12 @@ sheets_info:
     sheet_id: 1dK5zcAgTcFg8KaNU3FEiZbHJOBw1DuTwdFhiqGZBETE
     sheet_name: affiliate_type_targets
     clean_table_name: affiliate_type_targets
+    sheet_context: growth
+
+  affiliate_volumetry_cluster:
+    sheet_id: 1ZCQRTe-7OCKH56XSbfUdb7A_fDncK9eivRimO9nPot4
+    sheet_name: affiliate_volumetry_cluster
+    clean_table_name: affiliate_volumetry_cluster
     sheet_context: growth
 
   base_supply_souce_for_rent:
@@ -71,7 +76,7 @@ sheets_info:
     sheet_name: aquisition_channel
     clean_table_name: demand_taxonomy_management_aggregation
     sheet_context: growth
-    
+
   dict_taxonomy_supply:
     sheet_id: 1xhbRZ_W4GIy78LlT_yBlYV-WN7LikLFM7I2wRgMogg4
     sheet_name: mapped
@@ -137,7 +142,7 @@ sheets_info:
     sheet_name: rateio_manual
     clean_table_name: marketing_manual_costs
     sheet_context: growth
-  
+
   marketing_manual_costs_name_convetion:
     sheet_id: 14G3BRxBoIgutpNL7l_0xdeoJ0rnLWAc5A4ww4ZqfQvs
     sheet_name: rateio_name_convention

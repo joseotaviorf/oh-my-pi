@@ -1,0 +1,12 @@
+database_name: datalake_gsheets_clean
+table_name: affiliate_volumetry_cluster
+columns:
+  sk_user:
+    lineage:
+      - datalake_gsheets_raw.affiliate_volumetry_cluster.sk_user
+  affiliate_volumetry:
+    lineage:
+      - datalake_gsheets_raw.affiliate_volumetry_cluster.affiliate_volumetry
+  start_date:
+    lineage:
+      - datalake_gsheets_raw.affiliate_volumetry_cluster.start_date

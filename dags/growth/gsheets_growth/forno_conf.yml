@@ -23,6 +23,12 @@ sheets_info:
     clean_table_name: affiliate_type_targets
     sheet_context: growth
 
+  affiliate_volumetry_cluster:
+    sheet_id: 1ZCQRTe-7OCKH56XSbfUdb7A_fDncK9eivRimO9nPot4
+    sheet_name: affiliate_volumetry_cluster
+    clean_table_name: affiliate_volumetry_cluster
+    sheet_context: growth
+
   base_supply_souce_for_rent:
     sheet_id: 1Gxp4StsJFhnqI5ogSHzlTaSPiDJF6kmQMXPSjK3dBUM
     sheet_name: Base_Supply_Souce_For_Rent
@@ -136,13 +142,13 @@ sheets_info:
     sheet_name: rateio_manual
     clean_table_name: marketing_manual_costs
     sheet_context: growth
-  
+
   marketing_manual_costs_name_convetion:
     sheet_id: 14G3BRxBoIgutpNL7l_0xdeoJ0rnLWAc5A4ww4ZqfQvs
     sheet_name: rateio_name_convention
     clean_table_name: marketing_manual_costs_name_convetion
     sheet_context: growth
-    
+
   marketing_offline_manual_costs:
     sheet_id: 1gneeE6l30lv4om6FBEUe23YGfbMCCNe8IwpbCRL6vXQ
     sheet_name: offline_manual_costs
@@ -238,7 +244,7 @@ sheets_info:
     sheet_name: rental_ntp_source_targets
     clean_table_name: rental_tenant_prospects_budget_2024
     sheet_context: growth
-  
+
   rental_tenant_prospects_budget_2025:
     sheet_id: 1NOInKDMOZRFHlvAjDxXSr6TcJMxD25Mo1g58yAoNh_w
     sheet_name: targets
