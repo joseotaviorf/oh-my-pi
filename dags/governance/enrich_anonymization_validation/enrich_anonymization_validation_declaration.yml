@@ -1,0 +1,22 @@
+dag:
+  name: enrich_anonymization_validation
+  owner: Data Governance
+  schedule_start_date: 2025, 3, 12
+  documentation:
+    dag_purpose: This DAG get all validation about anonymization.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_partitions: [year, month, day]
+  has_hive_sync: false
+cluster:
+  type: databricks_13_3_med_memory_2_workers_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_version: 14.3.x-scala2.12
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      spark.sql.execution.arrow.pyspark.enabled: True
+      spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: True

@@ -1190,6 +1190,8 @@ bietlejuice.enrich_amplitude_user:
   - bietlejuice.amplitude:load-clean-events
 bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+bietlejuice.enrich_anonymization_validation:
+  - bietlejuice.gsheets_governance:load-clean-anonymization-manual-validation
 bietlejuice.enrich_app_installed:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
