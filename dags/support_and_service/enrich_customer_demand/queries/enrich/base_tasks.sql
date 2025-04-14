@@ -54,15 +54,15 @@ ticket_tasks AS (
       MD5(agent_email) AS id_agent,
       MD5(
         CONCAT(
-          COALESCE(step_tag, ''),
-          COALESCE(customer_type_tag, ''),
-          COALESCE(client_type, ''),
-          COALESCE(request_type, ''),
-          COALESCE(contact_motivation_tag, ''),
-          COALESCE(contact_theme_tag, ''),
-          COALESCE(contact_theme_detail_tag, '')
+          COALESCE(step_tag, 'step_tag'),
+          COALESCE(customer_type_tag, 'customer_type_tag'),
+          COALESCE(client_type, 'client_type'),
+          COALESCE(request_type, 'request_type'),
+          COALESCE(contact_motivation_tag, 'contact_motivation_tag'),
+          COALESCE(contact_theme_tag, 'contact_theme_tag'),
+          COALESCE(contact_theme_detail_tag, 'contact_theme_detail_tag')
         )
-      ) AS id_taxonomy,
+      ) AS id_taxonomy, 
       MD5(department) AS id_main_department,
       MAX(id_user) AS id_user,
       MD5(MAX(tags)) AS id_tags,
