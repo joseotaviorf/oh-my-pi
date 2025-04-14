@@ -1,0 +1,34 @@
+dag:
+  name: iptu_bh
+  owner: Data Growth
+  schedule_start_date: 2025, 03, 24
+  documentation:
+    dag_purpose: |
+      This DAG imports "Imposto sobre a Propriedade Predial e Territorial Urbana (IPTU)" information
+      from the public website (https://cnd.pbh.gov.br/CNDOnline/emissaoCertidoesImobiliaria.xhtml) of São Paulo city.
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_iptu_bh_raw
+  default_extraction_type: incremental
+  default_partitions: [year]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  spark_job_arguments:
+  - "{environment}"  # env
+  - "{bucket}"       # datalake_bucket
+  - "{table_name}"   # "table_name"
+  - "{partitions}"   # partition_cols
+  - "{{ ds }}"       # execution_date
+  tables_customization:
+    iptu_bh: {}
+
+cluster:
+  type: databricks_13_3_med_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

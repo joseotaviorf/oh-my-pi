@@ -1,0 +1,5 @@
+database_name: datalake_iptu_bh_raw
+table_name: iptu_bh
+description: IPTU - Belo Horizonte
+domain: Growth
+owner: data-growth@quintoandar.com.br / andre.melo@quintoandar.com.br

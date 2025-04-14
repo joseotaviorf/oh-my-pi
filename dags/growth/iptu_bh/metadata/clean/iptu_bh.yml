@@ -1,0 +1,220 @@
+database_name: datalake_iptu_bh_clean
+table_name: iptu_bh
+description:
+  Table extracted from the Belo Horizonte City website (https://cnd.pbh.gov.br/CNDOnline/emissaoCertidoesImobiliaria.xhtml).
+  It contains the "Imposto sobre a Propriedade Predial e Territorial Urbana (IPTU)" information, including address,
+  complement and value
+domain: Growth
+owner: data-growth@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.dados_cadastrais_gerais.indice_cadastral
+    description: |
+      "Unique identifier for the house. Represents the IPTU number."
+  iptu_year:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.dados_cadastrais_gerais.exercicio
+    description: |
+      "IPTU year."
+  iptu_status:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.dados_cadastrais_gerais.situacao_atual
+    description: |
+      "Status of the IPTU."
+  address:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.dados_cadastrais_gerais.endereco_do_imovel
+    description: |
+      "Address of the property."
+  mailing_address:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.dados_cadastrais_gerais.endereco_de_correspondencia
+    description: |
+      "Mailing address of the property."
+  house_registry_number:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.dados_cadastrais_gerais.matricula
+    description: |
+      "Registration number of that property in a specific house register office."
+  house_registry_name:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.dados_cadastrais_gerais.cartorio
+    description: |
+      "Name of the house register office."
+  property_purpose_description:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.dados_do_imovel.patrimonio
+    description: |
+      "Purpose of the property."
+  property_use_description:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.dados_do_imovel.tipo_uso
+    description: |
+      "Usage type of the property."
+  waste_collection_frequency:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.dados_do_imovel.frequencia_coleta
+    description: |
+      "Frequency of waste collection."
+  land_area_m2:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.caracteristicas_do_imovel.area_do_terreno
+    description: |
+      "Total area of the land in square meters."
+  ideal_land_fraction:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.caracteristicas_do_imovel.fracao_ideal
+    description: |
+      "Ideal fraction of the land."
+  ideal_land_fraction_m2:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.caracteristicas_do_imovel.area_do_terreno_fracionada
+    description: |
+      "Ideal fraction of the land in square meters."
+  built_area_m2:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.caracteristicas_do_imovel.area_construida
+    description: |
+      "Total built area in square meters."
+  construction_year:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.caracteristicas_do_imovel.ano_de_construcao
+    description: |
+      "Year of construction."
+  land_related_improvements:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.fatores_ligados_ao_terreno.melhorias
+    description: |
+      "Improvements related to the land. Eg: pavement, sidewalk, school, etc."
+  building_exemption:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.fatores_de_imunidade_e_isencao.construcao
+    description: |
+      "The building has exemption."
+  land_exemption:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.fatores_de_imunidade_e_isencao.terreno
+    description: |
+      "The land has exemption."
+  zone_exemption:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.fatores_de_imunidade_e_isencao.zona_uso
+    description: |
+      "The zone has exemption."
+  property_exemption:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.fatores_de_imunidade_e_isencao.patrimonio
+    description: |
+      "The property has exemption."
+  immunity:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.fatores_de_imunidade_e_isencao.imunidade
+    description: |
+      "The property has immunity."
+  transport_fee_exemption:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.fatores_de_imunidade_e_isencao.taxa_de_aparelho
+    description: |
+      "The property has exemption from transport fee."
+  street_lighting_fee_exemption:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.fatores_de_imunidade_e_isencao.taxa_de_iluminacao
+    description: |
+      "The property has exemption from street lighting fee."
+  waste_collection_fee_exemption:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.fatores_de_imunidade_e_isencao.taxa_de_coleta
+    description: |
+      "The property has exemption from waste collection fee."
+  tax_exemption:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.fatores_de_imunidade_e_isencao.imposto
+    description: |
+      "The property has taxes exemption."
+  full_exemption:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.fatores_de_imunidade_e_isencao.isencao_total
+    description: |
+      "The property has full exemption."
+  iptu_payment_status:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.estado_lancamento
+    description: |
+      "Status of the IPTU payment."
+  land_value_m2:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.valor_m2_terreno
+    description: |
+      "Land value per square meter."
+  taxable_land_value:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.valor_venal_terreno
+    description: |
+      "Taxable land value."
+  built_value_m2:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.valor_m2_construcao
+    description: |
+      "Built value per square meter."
+  taxable_built_value:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.valor_venal_construcao
+    description: |
+      "Taxable built value."
+  taxable_property_value:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.venal_total
+    description: |
+      "Taxable property value."
+  transport_fee_value:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.valor_aparelhos_de_transporte
+    description: |
+      "Transport fee value."
+  tcrs_value:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.valor_coleta_de_residuos_solidos
+    description: |
+      "TCRS value."
+  fire_fee_value:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.valor_taxa_de_incendio
+    description: |
+      "Fire fee value."
+  street_lighting_fee_value:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.valor_da_taxa_de_iluminacao
+    description: |
+      "Street lighting fee value."
+  special_discount:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.desconto_especial
+    description: |
+      "Special discount."
+  iptu_value:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.elementos_do_lancamento.valor_imposto
+    description: |
+      "IPTU value."
+  unities:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.unidades
+    description: |
+      "List of unities of the property."
+  building_features:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.caracteristicas_construtivas
+    description: |
+      "List of building features."
+  dt_load:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.dt_load
+    description: |
+      "Date the IPTU BH data was loaded."
+  year:
+    lineage:
+      - datalake_iptu_bh_raw.iptu_bh.year
+    description: |
+      "IPTU Transaction year.
+      It is a partition column."
