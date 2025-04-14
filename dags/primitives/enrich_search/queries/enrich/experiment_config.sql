@@ -92,9 +92,9 @@ FROM VALUES
     ),
     -- Important experience from a different team
     (
-        "ab_beakman_wpp_alert",
+        "ab_beakman_wpp_alert_v2",
         named_struct(
-            'begin_date', DATE('2025-03-18'),
+            'begin_date', DATE('2025-04-06'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
@@ -151,5 +151,7 @@ FROM VALUES
         )
     )
     -- Add new experiment here
+
+
 
 AS experiment_config(experiment_name, config)
