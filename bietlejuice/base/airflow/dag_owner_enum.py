@@ -16,7 +16,7 @@ class DAGOwnerEnum:
     DATA_INTERNATIONAL = "Data International"
     DATA_PEOPLE = "Data People"
     DATA_PLATFORM = "Data Platform"
-    DATA_INGESTION = "Data Ingestion"
+    DATA_LIFE_CYCLE = "Data Life Cycle"
     DATA_PRIMITIVES = "Data Primitives"
     DATA_REDE = "Data Rede"
     DATA_SS = "Data SS"

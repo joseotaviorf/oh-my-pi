@@ -1,6 +1,6 @@
 dag:
   name: enrich_table_dependency_tree
-  owner: Data Ingestion
+  owner: Data Life Cycle
   documentation:
     dag_purpose: 'Create a dependency tree, mapping each table in bietlejuice to its dependents'
 workflow:

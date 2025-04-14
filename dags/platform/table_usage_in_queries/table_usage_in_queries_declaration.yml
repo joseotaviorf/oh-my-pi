@@ -1,6 +1,6 @@
 dag:
   name: table_usage_in_queries
-  owner: Data Ingestion
+  owner: Data Life Cycle
   schedule_interval: 0 0 * * *
   documentation:
     dag_purpose: |

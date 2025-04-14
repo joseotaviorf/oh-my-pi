@@ -44,7 +44,7 @@ opsgenie_callback = OpsgenieCallback()
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
-        "owner": DAGOwnerEnum.DATA_INGESTION,
+        "owner": DAGOwnerEnum.DATA_LIFE_CYCLE,
         "wait_for_downstream": False,
         "depends_on_past": False,
         "on_failure_callback": opsgenie_callback.task_failure_alert,

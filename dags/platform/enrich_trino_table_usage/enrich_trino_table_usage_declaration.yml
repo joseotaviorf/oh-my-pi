@@ -1,6 +1,6 @@
 dag:
   name: enrich_trino_table_usage
-  owner: Data Ingestion
+  owner: Data Life Cycle
   documentation:
     dag_purpose: |
       Dag responsible for gathering and processing information related to the use of tables in Trino by counting downstream usages.

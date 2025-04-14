@@ -1,7 +1,7 @@
 dag:
   name: gsheets_platform
   schedule_interval: 0 0 * * *
-  owner: Data Ingestion
+  owner: Data Life Cycle
 workflow:
   type: gsheets
   layer: raw

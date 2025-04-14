@@ -51,7 +51,7 @@ def build_operator(dep_name, dag):
 opsgenie_callback = OpsgenieCallback()
 dag = DAG(
     dag_id=DAG_ID,
-    default_args={"owner": DAGOwnerEnum.DATA_INGESTION, "on_failure_callback": opsgenie_callback.task_failure_alert,},
+    default_args={"owner": DAGOwnerEnum.DATA_LIFE_CYCLE, "on_failure_callback": opsgenie_callback.task_failure_alert,},
     start_date=START_DATE,
     schedule_interval=None,
     

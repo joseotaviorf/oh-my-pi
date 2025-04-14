@@ -12,7 +12,7 @@ QUERY_PATH = DAGPackagesPathService.get_dag_path(SOURCE) + "/queries/raw/"
 dag_declaration = {
     "dag": {
         "name": SOURCE,
-        "owner": "Data Ingestion",
+        "owner": "Data Life Cycle",
         "schedule_interval": "0 5-18/1 * * *",
         "documentation": {
             "dag_purpose": "Dumps the Airflow database into S3. To know more about airflow's tables"

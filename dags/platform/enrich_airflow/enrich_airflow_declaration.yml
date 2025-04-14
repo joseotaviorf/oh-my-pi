@@ -1,6 +1,6 @@
 dag:
   name: enrich_airflow
-  owner: Data Ingestion
+  owner: Data Life Cycle
   schedule_interval: 30 5-18/1 * * *
   documentation: 
     dag_purpose: |

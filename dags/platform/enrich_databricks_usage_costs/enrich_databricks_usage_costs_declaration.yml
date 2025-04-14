@@ -1,6 +1,6 @@
 dag:
   name: enrich_databricks_usage_costs
-  owner: Data Ingestion
+  owner: Data Life Cycle
   documentation:
     dag_purpose: |
       Dag responsible for gathering and processing information related to the use/cost of the environment.
