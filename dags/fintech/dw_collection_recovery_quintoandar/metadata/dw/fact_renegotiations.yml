@@ -1,0 +1,35 @@
+database_name: dw_collection_recovery_quintoandar
+table_name: fact_renegotiations
+description: This table contains the anchor invoice for each invoice within a contract's renegotiation hierarchy. The anchor represents the earliest or latest invoice in the renegotiation chain depending on the selected mode, used for tracking lineage and depth of renegotiations.
+domain: Fintech
+owner: ae-finance-fintech@quintoandar.com.br
+columns:
+  sk_contract:
+    lineage:
+      - datalake_retsuko.invoice.id_contract_external
+    description: Surrogate key representing the contract associated with the invoice.
+  sk_invoice:
+    lineage:
+      - datalake_retsuko.invoice.id_external
+    description: Surrogate key representing the current invoice being evaluated in the renegotiation structure.
+  sk_anchor_invoice:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_negotiation.sk_negotiation
+      - datalake_retsuko.invoice.id_external (root parent invoice)
+    description: Anchor invoice selected based on the oldest or latest due date among the root invoices in the renegotiation hierarchy.
+  renegotiation_level:
+    lineage:
+      - derived via fintech_collections_renegotiation UDF traversal
+    description: Depth level of renegotiation. Level 0 means no parent; Level N means N steps from the anchor invoice.
+  sk_negotiation_parent:
+    lineage:
+      - fact_negotiation_installment.sk_negotiation (as parent)
+    description: Surrogate key of the negotiation that originated this invoice (if applicable).
+  sk_negotiation_child:
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_negotiation.sk_negotiation (as child)
+    description: Surrogate key of the negotiation that generated a new invoice from a previous one.
+  dt_due_adjusted_anchor:
+    lineage:
+      - datalake_retsuko.invoice.dt_due_adjusted (of anchor invoice)
+    description: Due date of the anchor invoice, used to track the start of the renegotiation chain.
