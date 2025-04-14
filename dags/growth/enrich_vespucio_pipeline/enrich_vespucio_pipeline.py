@@ -528,6 +528,15 @@ plugin_tasks = [
         ],
     ),
     create_task(
+        entry_point="plugins_zordominium",
+        parameters=[
+            f"--operation=both", 
+            f"--env={ENV}", 
+            f"--stage_db=zordominium_vespucio_plugin", 
+            f"--remove_old_condos=False"
+        ],
+    ),
+    create_task(
         entry_point="plugins_rede_house_enrichment_consolidate",
         parameters=[
             f"--sqs_queue_url={config_service.get_config('sqs_url_house_enrichment')}",
