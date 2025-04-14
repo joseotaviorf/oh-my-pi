@@ -47,6 +47,9 @@ columns:
   filter_contamination:
     lineage:
       - datalake_search.search_experiments.filter_contamination
+  filter_pre_existing_users:
+    lineage:
+      - datalake_search.search_experiments.filter_pre_existing_users
   filter_is_stable:
     lineage:
       - datalake_search.search_experiments.filter_is_stable

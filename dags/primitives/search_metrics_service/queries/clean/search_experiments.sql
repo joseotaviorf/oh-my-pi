@@ -13,6 +13,7 @@ select
     is_last_date,
     total_days,
     filter_contamination,
+    filter_pre_existing_users,
     filter_is_stable,
     baseline_observations,
     baseline_conversions,
