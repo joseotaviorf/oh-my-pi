@@ -77,18 +77,32 @@ columns:
       - datalake_terminator.termination.fee_number_of_installments
   total_tentant_repair_ar:
     description: Total repairs with tenant's responsibility in repair analysis.
+    lineage:
+      - datalake_terminator.termination.total_tentant_repair_ar
   repairs_added_by_owner_review:
     description: Total repairs added by owner for review.
+    lineage:
+      - datalake_terminator.termination.repairs_added_by_owner_review
   repairs_exempted_by_owner_review:
     description: Total repairs exempted by the owner in the review.
+    lineage:
+      - datalake_terminator.termination.repairs_exempted_by_owner_review
   total_tentant_repair_review:
     description: Total repairs under tenant's responsibility under review.
+    lineage:
+      - datalake_terminator.termination.total_tentant_repair_review
   repairs_exempted_ac:
     description: Total repairs exempted in the contestation analysis.
+    lineage:
+      - datalake_terminator.termination.repairs_exempted_ac
   repairs_absorbed_ac:
     description: Total repairs absorbed in the contestation analysis.
+    lineage:
+      - datalake_terminator.termination.repairs_absorbed_ac
   total_tentant_repair_ac:
     description: Total repairs are the tenant's responsibility in the contestation analysis.
+    lineage:
+      - datalake_terminator.termination.total_tentant_repair_ac
   spoc_wave:
     description: Information of type int that indicates in which wave of the spoc the termination entered.
     lineage:

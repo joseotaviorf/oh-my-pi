@@ -157,6 +157,20 @@ columns:
     description: Numerical information that indicates the number of installments for the termination fee.
     lineage:
       - datalake_terminator_clean.termination_fee.tenant_payment_method
+  total_tentant_repair_ar:
+    description: Total repairs with tenant's responsibility in repair analysis.
+  repairs_added_by_owner_review:
+    description: Total repairs added by owner for review.
+  repairs_exempted_by_owner_review:
+    description: Total repairs exempted by the owner in the review.
+  total_tentant_repair_review:
+    description: Total repairs under tenant's responsibility under review.
+  repairs_exempted_ac:
+    description: Total repairs exempted in the contestation analysis.
+  repairs_absorbed_ac:
+    description: Total repairs absorbed in the contestation analysis.
+  total_tentant_repair_ac:
+    description: Total repairs are the tenant's responsibility in the contestation analysis.
   spoc_wave:
     description: Information of type int that indicates in which wave of the spoc the termination entered.
     lineage:

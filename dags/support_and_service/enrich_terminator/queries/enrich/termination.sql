@@ -64,6 +64,59 @@ terminations_modified AS (
         1, ts_updated
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
+),
+repair_metrics AS (
+    SELECT
+        id_contract,
+        COUNT(CASE
+          WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
+        END) AS total_tentant_repair_ar,
+        COUNT(CASE
+          WHEN requester_type = 'OWNER' THEN 1
+        END) AS repairs_added_by_owner_review,
+        COUNT(CASE
+          WHEN is_exempted_by_owner = true THEN 1
+        END) AS repairs_exempted_by_owner_review,
+        COUNT(CASE
+          WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
+        END) +
+          COUNT(CASE
+            WHEN requester_type = 'OWNER' THEN 1
+          END) -
+            COUNT(CASE
+              WHEN is_exempted_by_owner = true THEN 1
+            END) AS total_tentant_repair_review,
+        COUNT(CASE
+          WHEN is_finished = true AND is_exempted = true THEN 1
+        END) AS repairs_exempted_ac,
+        COUNT(
+          CASE
+            WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1
+        END) AS repairs_absorbed_ac,
+        COUNT(
+          CASE
+            WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
+        END) +
+            COUNT(CASE
+              WHEN requester_type = 'OWNER' THEN 1
+            END) -
+              COUNT(CASE
+                WHEN is_exempted_by_owner = true THEN 1
+              END) -
+                COUNT(
+                  CASE
+                    WHEN is_finished = true AND is_exempted = true THEN 1
+                END) -
+                  COUNT(CASE
+                    WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1
+                  END) AS total_tentant_repair_ac
+    FROM
+        datalake_inspections.repair_request
+    WHERE
+        comment IS NOT NULL
+        AND responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
+    GROUP BY
+          ALL
 )
 SELECT
     t.id AS id_termination,
@@ -103,6 +156,13 @@ SELECT
     ln.fee_discount_value,
     ln.fee_final_amount,
     ln.fee_number_of_installments,
+    rm.total_tentant_repair_ar,
+    rm.repairs_added_by_owner_review,
+    rm.repairs_exempted_by_owner_review,
+    rm.total_tentant_repair_review,
+    rm.repairs_exempted_ac,
+    rm.repairs_absorbed_ac,
+    rm.total_tentant_repair_ac,
     t.spoc_wave,
     t.dt_termination,
     tm.dt_last_updated AS dt_last_rescheduled,
@@ -145,6 +205,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_terminator_clean.negotiation neg
         ON t.id = neg.id_termination
+LEFT JOIN
+    repair_metrics AS rm
+        ON t.id_contract = rm.id_contract
 WHERE
     DATE(t.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY
