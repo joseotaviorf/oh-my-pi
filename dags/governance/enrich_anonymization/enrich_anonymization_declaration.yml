@@ -8,6 +8,7 @@ workflow:
   type: query_delta
   layer: enrich
   default_partitions: [year, month, day]
+  execution_timeout_hours: 20
   has_hive_sync: false
   tables_customization:
     columns_sample_data:
