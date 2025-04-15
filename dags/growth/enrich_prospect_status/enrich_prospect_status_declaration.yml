@@ -2,7 +2,7 @@
 dag:
   name: enrich_prospect_status
   schedule_start_date: 2023, 9, 25
-  owner: Data ForSale
+  owner: Data Growth
   documentation:
     dag_purpose: |
       This DAG enriches tables related to the process of demand conversion in Growth context.
@@ -21,7 +21,7 @@ workflow:
     tenant_prospect_status:
       - conversion_events
 cluster:
-  type: databricks_12_2_med_io-memory_photon_cluster
+  type: databricks_13_3_med_memory_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
