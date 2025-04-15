@@ -234,6 +234,7 @@ def get_sample(date_filter) -> DataFrame:
           datalake_anonymization.columns_sample_data
         WHERE
           ts_ingested = MAKE_DATE({year}, {month}, {day})
+          and status = 'SUCCESS'
         GROUP BY ALL
       """
     return spark.sql(query)
