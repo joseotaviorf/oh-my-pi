@@ -1267,9 +1267,6 @@ bietlejuice.enrich_big_agent:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
-bietlejuice.enrich_bigfone:
-  - bietlejuice.bigfone:load-clean-event
-  - bietlejuice.bigfone:load-clean-scheduled-call-task
 bietlejuice.enrich_bigfone_events:
   - bietlejuice.bigfone:load-clean-event
 bietlejuice.enrich_bigfone_twilio:
