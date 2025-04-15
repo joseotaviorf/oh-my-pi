@@ -15,8 +15,7 @@ columns:
     - datalake_sale_listings.sale_listing_price_changes.price_segment
     categories:
       High Ticket: "If the listing is categorized as High Ticket, using the
-        the rules for the city groups: 
-          - RMSP, RJ, and BH: BRL 1MM
+        the rule sale_price bigger than BRL 1MM
           - Porto Alegre: BRL 600K
           - Campinas: BRL 800K"
       Low Ticket: If the listing is categorized as Low Ticket.

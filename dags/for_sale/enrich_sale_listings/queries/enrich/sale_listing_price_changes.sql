@@ -198,10 +198,7 @@ SELECT
     pc.id_region,
     COALESCE(pc.status, sls.status_history, 'PUBLISHED') AS status_history, 
     CASE
-        WHEN pc.city_group IN ('RMSP', 'Belo Horizonte', 'Rio de Janeiro') 
-            AND pc.sale_price >= 1000000 THEN 'High Ticket'
-        WHEN pc.city_group = 'Porto Alegre' AND pc.sale_price >= 600000 THEN 'High Ticket'
-        WHEN pc.city_group = 'Campinas' AND pc.sale_price >= 800000 THEN 'High Ticket'
+        WHEN pc.sale_price >= 1000000 THEN 'High Ticket'
         ELSE 'Low Ticket'
     END price_segment,
     pc.sale_price,
