@@ -40,7 +40,7 @@ offer_submitted AS (
         datalake_tiers.agent_offers AS oa
     JOIN
         filter_bimester AS fb
-            ON fb.date = DATE(oa.ts_offer_submitted)
+            ON DATE(oa.ts_offer_submitted) BETWEEN fb.bimester_start AND fb.bimester_end
     GROUP BY ALL
 ),
 ciq_offer_signed AS (
