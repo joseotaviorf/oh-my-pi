@@ -2,7 +2,13 @@ WITH francesinha AS (
     SELECT
         UPPER(REPLACE(company_use, '|', '!')) AS company_use,
         our_number,
-        bank_account,
+        CASE 
+            WHEN bank_account = 426887 THEN 426887
+            WHEN bank_account = 79952 THEN 79952
+            WHEN bank_account = 433065 THEN 433065
+            WHEN bank_account = 502307 THEN 502307
+            WHEN bank_account = 502331 THEN 502331
+        END AS bank_account,
         dt_paid,
         occurrence_code AS last_occurrence_code,
         IF(occurrence_code = '00', paid_amount, 0.00) AS paid_amount

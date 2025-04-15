@@ -1087,7 +1087,6 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
-  - bietlejuice.enrich_nexxera:load-enrich-cnab-payments
   - bietlejuice.enrich_retsuko:load-enrich-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
@@ -1238,6 +1237,9 @@ bietlejuice.enrich_b2b:
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
 bietlejuice.enrich_bank_conciliation:
+  - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
+  - bietlejuice.enrich_accounting_funnel:load-enrich-payment-platforms
+  - bietlejuice.enrich_nexxera:load-enrich-cnab-payments
   - bietlejuice.enrich_sap:load-enrich-ledger
   - bietlejuice.itau_statements:load-clean-statement-879200494588
   - bietlejuice.nexxera:load-clean-cnab-charges-recupera-velo-2

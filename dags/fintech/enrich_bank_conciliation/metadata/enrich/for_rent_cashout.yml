@@ -1,0 +1,66 @@
+---
+database_name: datalake_bank_conciliation
+table_name: for_rent_cashout
+owner: ae-finance-fintech@quintoandar.com.br
+domain: for_rent
+description: null
+columns:
+  id_company_use:
+    description: ''
+    lineage:
+    - .cap_sap.cs.company_use
+  bank_account_number:
+    description: ''
+    lineage:
+    - .cap_sap.f.bank_account
+  sap_account_number:
+    description: ''
+    lineage:
+    - .cap_sap.sap.account_number
+  last_occurrence_code:
+    description: ''
+    lineage:
+    - .cap_sap.last_occurrence_code
+  bank_paid_amount:
+    description: ''
+    lineage:
+    - .cap_sap.f.paid_amount
+  cap_paid_amount:
+    description: ''
+    lineage:
+    - .cap_sap.cap.paid_amount
+  sap_paid_amount:
+    description: ''
+    lineage:
+    - .cap_sap.sap.paid_amount
+  is_vans_compliance:
+    description: ''
+    lineage:
+    - .cap_sap.CASE WHEN payment_status = 'chargeback' AND sap.paid_amount = 0 THEN
+      TRUE WHEN ABS(f.paid_amount) = ABS(cap.paid_amount) THEN TRUE ELSE FALSE END
+  is_reconcilied:
+    description: ''
+    lineage:
+    - .cap_sap.CASE WHEN (ABS(f.paid_amount) = ABS(sap.paid_amount)) THEN TRUE WHEN
+      last_occurrence_code = 'DV' AND (sap.paid_amount = 0 OR sap.paid_amount IS NULL)
+      THEN TRUE ELSE FALSE END
+  dt_bank_paid:
+    description: ''
+    lineage:
+    - .cap_sap.f.dt_paid
+  dt_cap_paid:
+    description: ''
+    lineage:
+    - .cap_sap.cap.dt_paid
+  dt_sap_paid:
+    description: ''
+    lineage:
+    - .cap_sap.sap.dt_paid
+  dt_sap_tax:
+    description: ''
+    lineage:
+    - .cap_sap.sap.dt_tax
+  dt_paid:
+    description: ''
+    lineage:
+    - .cap_sap.dt_paid
