@@ -110,7 +110,7 @@ SELECT
   wr.StartDate AS dt_work_relationship_started,
   wr.LegalEmployerSeniorityDate AS dt_legal_seniority,
   wr.EnterpriseSeniorityDate AS dt_enterprise_seniority,
-  wr.TerminationDate AS dt_terminated,
+  wr.TerminationDate AS dt_work_relationship_ended,
   wr.NotificationDate AS dt_notification,
   wr.LastWorkingDate AS dt_last_worked,
   wr.ProjectedTerminationDate AS dt_projected_termination,

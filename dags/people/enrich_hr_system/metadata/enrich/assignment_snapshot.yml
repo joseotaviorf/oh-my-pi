@@ -460,7 +460,7 @@ columns:
     description: "Seniority date relative to the enterprise."
     lineage:
       - datalake_hr_system_clean.workers.wr.EnterpriseSeniorityDate
-  dt_terminated:
+  dt_work_relationship_ended:
     description: "Date when the work relationship was terminated."
     lineage:
       - datalake_hr_system_clean.workers.wr.TerminationDate
