@@ -14,7 +14,7 @@ SELECT
     externalUser AS user_external,
     body AS message,
     attributes AS message_attributes,
-    createdAt AS ts_created,
+    CAST(createdAt AS TIMESTAMP) AS ts_created,
     year,
     month,
     day,

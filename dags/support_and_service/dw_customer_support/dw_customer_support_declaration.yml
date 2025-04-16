@@ -75,6 +75,9 @@ workflow:
       extraction_type: incremental
     fact_task_metrics:
       z_order_by: [sk_task, sk_ticket, sk_user]
+    fact_chat_messages:
+      merge_on: [sk_conversation, sk_message]
+      z_order_by: [ts_created, sk_user_sender, sk_user_receiver]
 
 cluster:
   type: custom_cluster
