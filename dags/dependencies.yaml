@@ -729,13 +729,20 @@ bietlejuice.dw_quintocred_ifrs:
   - bietlejuice.rental_guarantee_platform:load-clean-sap
 bietlejuice.dw_recon_quintocred:
   - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-payment-full
+  - bietlejuice.dw_velo:load-dw-velo-bridge-velo-propose-person
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-person
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
   - bietlejuice.dw_velo:load-dw-velo-fact-velo-payment
   - bietlejuice.dw_velo:load-dw-velo-fact-velo-propose
   - bietlejuice.rental_guarantee_platform:load-clean-bill-checkout
   - bietlejuice.rental_guarantee_platform:load-clean-bill-payment
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-entry
+  - bietlejuice.robin_hood:load-clean-accounting-entry
+  - bietlejuice.robin_hood:load-clean-accounting-entry-balance
+  - bietlejuice.robin_hood:load-clean-payment-request
 bietlejuice.dw_rede_company:
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.enrich_company:load-enrich-company

@@ -130,6 +130,9 @@ bietlejuice.dw_fintech_snapshot_quintocred:
     - bietlejuice.dw_fintech_snapshot:load-dw-charging-payment-quintocred-fact-payment-full
     - bietlejuice.dw_fintech_snapshot:load-dw-velo-quintocred-aging-recurring-payment-no-renewal
     - bietlejuice.dw_fintech_snapshot:load-dw-velo-quintocred-aging-recurring-payment-renewal
+bietlejuice.dw_recon_quintocred:
+  remove:
+    - bietlejuice.dw_fintech_snapshot_quintocred:load-dw-fintech-snapshot-quintocred-quintocred-ifrs-occurrence
 bietlejuice.dw_losses:
   add:
     - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-renegotiations

@@ -1,0 +1,110 @@
+database_name: dw_recon_quintocred
+table_name: fact_payable_guarantees
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: "Data from payable guarantees in QuintoCred recon context."
+columns:
+  sk_delinquency:
+      description: "Delinquency identification number (ID)"
+      lineage:
+        - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.sk_delinquency
+
+  sk_propose:
+      description: "QuintoCred's propose identification number (ID)"
+      lineage:
+        - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.sk_propose
+
+  id_payment_request:
+      description: "Payment request ID associated with the transaction"
+      lineage:
+        - datalake_robin_hood_clean.id_payment_request
+
+  customer_name:
+      description: "Customer's full name"
+      lineage:
+        - dw_velo.dim_velo_propose_person.customer_name
+
+  customer_document:
+      description: "Customer's document (e.g., CPF, CNPJ)"
+      lineage:
+        - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.customer_document
+
+  robin_hood_payment_status:
+      description: "Status of the Robin Hood payment"
+      lineage:
+        - datalake_robin_hood_clean.robin_hood_payment_status
+
+  category:
+      description: "Category of the payment or transaction"
+      lineage:
+        - dw_velo.fact_velo_propose.category
+
+  check_rh_payment:
+      description: "Indicator if Robin Hood payment was checked"
+      lineage:
+        - dw_velo.fact_velo_propose.check_rh_payment
+
+  original_amount:
+      description: "Original amount of the payment or transaction"
+      lineage:
+        - dw_velo.fact_velo_propose.original_amount
+
+  paid_amount:
+      description: "Amount that has been paid"
+      lineage:
+        - dw_velo.fact_velo_propose.paid_amount
+
+  is_debt_forgiveness:
+      description: "Indicates if the debt is forgiven"
+      lineage:
+        - dw_velo.fact_velo_propose.is_debt_forgiveness
+
+  is_broker_active:
+      description: "Indicates if the broker is active"
+      lineage:
+        - dw_velo.fact_velo_propose.is_broker_active
+
+  available_in_guarantee_amount:
+      description: "Amount available in guarantee for the transaction"
+      lineage:
+        - dw_velo.dim_velo_propose_values.amount_available_in_guarantee
+
+  maximum_guaranteed_amount:
+      description: "Maximum amount guaranteed for the transaction"
+      lineage:
+        - dw_velo.dim_velo_propose_values.amount_maximum_guaranteed
+
+  reference_month_closing:
+      description: "Closing date of the reference month"
+      lineage:
+        - dw_velo.fact_velo_propose.reference_month_closing
+
+  dt_scheduled_payment:
+      description: "Scheduled date for the payment"
+      lineage:
+        - datalake_robin_hood_clean.dt_scheduled_payment
+
+  dt_transfer:
+      description: "Transfer date of the payment"
+      lineage:
+        - datalake_robin_hood_clean.dt_transfer
+
+  dt_document_due:
+      description: "Due date of the document associated with the payment"
+      lineage:
+        - dw_velo.fact_velo_propose.dt_document_due
+
+  dt_delinquency_creation:
+      description: "Creation date of the delinquency record"
+      lineage:
+        - dw_velo.fact_velo_propose.dt_delinquency_creation
+
+  dt_closing:
+      description: "Closing date of the transaction"
+      lineage:
+        - dw_velo.fact_velo_propose.dt_closing
+
+  ts_snapshot:
+      description: "Timestamp of the data snapshot"
+      lineage:
+        - dw_velo.fact_velo_propose.ts_snapshot
