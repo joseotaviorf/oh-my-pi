@@ -123,7 +123,7 @@ SELECT
   id_termination,
   id_contract,
   id_ticket,
-  resolution,
+  squad,
   has_mediation_ticket,
   has_ac_repairs,
   is_ticket_opened_via_terminator,
@@ -138,9 +138,9 @@ WHERE
   AND (
     (
       has_mediation_ticket IS TRUE
-      AND resolution <> 'both_agreed'
+      AND squad <> 'both_agreed'
     ) OR (
       has_mediation_ticket IS FALSE
-      AND resolution IS NULL
+      AND squad IS NULL
     )
   )
