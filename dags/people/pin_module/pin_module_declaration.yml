@@ -47,6 +47,7 @@ workflow:
   tables_customization:
     fnd_lookup_values:
       clean_table_name: lookup_value
+      run_optimize: false
       custom_schema: pin_core
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
