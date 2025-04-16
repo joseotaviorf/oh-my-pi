@@ -1,5 +1,5 @@
 SELECT
-    ra.id_inspection AS sk_inspection,
+    isa.id_inspection AS sk_inspection,
     ra.id_assessment AS sk_assessment,
     ra.id_previous_assessment AS sk_previous_assessment,
     ra.total_cost,
@@ -50,21 +50,21 @@ SELECT
     CASE WHEN ra.approval_type = 'BUDGET_APPROVAL' THEN ra.dt_owner_limit_revision END AS ts_owner_limit_revision_budget_approval,
     CASE WHEN ra.approval_type = 'BUDGET_APPROVAL' THEN ra.dt_tenant_limit_revision END AS ts_tenant_limit_revision_budget_approval,
     NOW() AS ts_load,
-    ra.year,
-    ra.month,
-    ra.day
+    isa.year,
+    isa.month,
+    isa.day
 FROM
-    datalake_inspections.report_approvals AS ra
+    datalake_amplitude_inspections.inspection_stages_access AS isa
 LEFT JOIN
     datalake_inspections.repair_request AS rr
-      ON ra.id_inspection = rr.id_inspection
+      ON isa.id_inspection = rr.id_inspection
 LEFT JOIN
-    datalake_amplitude_inspections.inspection_stages_access AS isa
-        ON ra.id_inspection = isa.id_inspection
+    datalake_inspections.report_approvals AS ra
+        ON isa.id_inspection = ra.id_inspection
 LEFT JOIN
     datalake_inspections.inspection_status_change AS isc
-        ON ra.id_inspection = isc.id_inspection
+        ON isa.id_inspection = isc.id_inspection
 WHERE
-    MAKE_DATE(ra.year, ra.month, ra.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    MAKE_DATE(isa.year, isa.month, isa.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 GROUP BY
     ALL

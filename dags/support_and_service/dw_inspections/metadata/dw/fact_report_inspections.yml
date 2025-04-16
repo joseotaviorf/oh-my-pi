@@ -2,14 +2,14 @@
 database_name: dw_inspections
 table_name: fact_report_inspections
 description: |
-  Transactional fact table that aims to gather information from the inspection stages.
-  Each line of this table represents an inspection report with approval dates and summarized metrics.
+  Transactional fact table that aims to collect information from inspection steps.
+  Each row in this table represents an inspection report with approval data and summary metrics.
 domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_inspection:
     lineage:
-      - datalake_inspections.report_approvals.id_inspection
+      - datalake_amplitude_inspections.inspection_stages_access.id_inspection
     description: Inspection unique identifier (number)
   sk_assessment:
     lineage:
@@ -197,13 +197,13 @@ columns:
     description: Date and time when the data was loaded.
   year:
     lineage:
-      - datalake_inspections.report_approvals.day
+      - datalake_amplitude_inspections.inspection_stages_access.day
     description: Year of update date
   month:
     lineage:
-      - datalake_inspections.report_approvals.day
+      - datalake_amplitude_inspections.inspection_stages_access.day
     description: Month of update date
   day:
     lineage:
-      - datalake_inspections.report_approvals.day
+      - datalake_amplitude_inspections.inspection_stages_access.day
     description: Day of update date
