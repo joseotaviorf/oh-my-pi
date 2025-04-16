@@ -21,6 +21,10 @@ columns:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Tipo_entrada
+  contract_category_at_registration:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Categoria_entrada
   action_type:
     description: ""
     lineage:
@@ -57,14 +61,14 @@ columns:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Status_passagem
+  is_reincident:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Reincidente
   procedure:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Procedimento
-  termination_reason:
-    description: ""
-    lineage:
-      - datalake_gsheets_raw.evictions_base.Motivo_encerramento
   consolidated_reason:
     description: ""
     lineage:
@@ -93,58 +97,98 @@ columns:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Dias_Inad_Registro
+  ldt_stock:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_Estoque
+  stock_range:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Faixa_Estoque
+  ldt_resolution:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_Resolucao_Faixas
+  resolution_range:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.Faixa_Resolucao
+  real_ldt_resolution:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_Resolucao_Real
+  ldt_arbitral_distribution:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_Distribuicao_arbitral
+  ldt_arbitral_award:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_Sentenca_arbitral
+  ldt_judiciary_distribution:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_Distribuicao_judicial
+  ldt_judicial_summons_decision:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_Decisao_citacao_judicial
+  ldt_coercive_decision:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_Decisao_coercitivo
+  ldt_coercive_order_issuance_decision:
+    description: ""
+    lineage:
+      - datalake_gsheets_raw.evictions_base.LDT_Decisao_emissao_coercitivo
   dt_registered:
     description: ""
     lineage:
-      - datalake_gsheets_raw.evictions_base.Data_registrado
-  dt_distribution_protocol:
+      - datalake_gsheets_raw.evictions_base.Pre_cadastro_arbitral
+  dt_arbitral_distribution:
     description: ""
     lineage:
-      - datalake_gsheets_raw.evictions_base.Data_distribuicao_protocolo
-  arbitral_citation:
+      - datalake_gsheets_raw.evictions_base.distribuicao_arbitral
+  dt_arbitral_citation:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Citacao_Arbitral
-  chamber_contestation:
+  dt_arbitral_contestation:
     description: ""
     lineage:
-      - datalake_gsheets_raw.evictions_base.Contestacao_Camara
-  arbitral_sentence:
+      - datalake_gsheets_raw.evictions_base.Contestacao_arbitral
+  dt_arbitral_sentence:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Sentenca_Arbitral
-  res_judicata:
+  dt_judiciary_pre_registration:
     description: ""
     lineage:
-      - datalake_gsheets_raw.evictions_base.Transito_em_Julgado
-  cs_pre_registration:
+      - datalake_gsheets_raw.evictions_base.Pre_Cadastro_judicial
+  dt_judiciary_distribution:
     description: ""
     lineage:
-      - datalake_gsheets_raw.evictions_base.Pre_Cadastro_CS
-  cs_distribution:
+      - datalake_gsheets_raw.evictions_base.Distribuicao_judicial
+  dt_judicial_summons:
     description: ""
     lineage:
-      - datalake_gsheets_raw.evictions_base.Distribuicao_CS
-  cs_waiting_for_sentence:
+      - datalake_gsheets_raw.evictions_base.citacao_judicial
+  dt_judicial_summons_decision:
     description: ""
     lineage:
-      - datalake_gsheets_raw.evictions_base.Aguardando_sentenca_CS
-  cs_impeachment:
+      - datalake_gsheets_raw.evictions_base.decisao_citacao_judicial
+  dt_judicial_defense:
     description: ""
     lineage:
-      - datalake_gsheets_raw.evictions_base.Impugnacao_CS
-  order_issuance:
+      - datalake_gsheets_raw.evictions_base.contestacao_judicial
+  dt_coercive_decision:
     description: ""
     lineage:
-      - datalake_gsheets_raw.evictions_base.Expedicao_mandado
-  cs_intimation:
+      - datalake_gsheets_raw.evictions_base.decisao_coercitivo
+  dt_coercive_issuance:
     description: ""
     lineage:
-      - datalake_gsheets_raw.evictions_base.Intimacao_CS
-  coercive_issuance:
-    description: ""
-    lineage:
-      - datalake_gsheets_raw.evictions_base.Emissao_coercitivo
+      - datalake_gsheets_raw.evictions_base.emissao_coercitivo
   dt_finalizing:
     description: ""
     lineage:
@@ -161,22 +205,6 @@ columns:
     description: ""
     lineage:
       - datalake_gsheets_raw.evictions_base.Data_encerramento_elaw
-  ldt_stock:
-    description: ""
-    lineage:
-      - datalake_gsheets_raw.evictions_base.LDT_Estoque
-  stock_range:
-    description: ""
-    lineage:
-      - datalake_gsheets_raw.evictions_base.Faixa_Estoque
-  ldt_resolution:
-    description: ""
-    lineage:
-      - datalake_gsheets_raw.evictions_base.LDT_Resolucao
-  resolution_range:
-    description: ""
-    lineage:
-      - datalake_gsheets_raw.evictions_base.Faixa_Resolucao
   dt_asset_attachment:
     description: ""
     lineage:
