@@ -1,0 +1,57 @@
+---
+database_name: datalake_gsheets_raw
+table_name: hubspot_acquisition_funnel_hunting
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+description: This table contains the acquisition funnel data from HubSpot for hunting, it includes information about the company, account manager, stage of the funnel, and various timestamps related to the acquisition process. This table only provides data up to January 2025, before the process is fully automated via Hubspot.
+columns:
+  company_name:
+    description: Name of the company in Hubspot.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.company_name
+  id_company:
+    description: Unique identifier for the company in Hubspot.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.id_company
+  account_manager_user:
+    description: Name of the account manager responsible for the company in Hubspot.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.account_manager_user
+  cleaned_stage:
+    description: The stage of the acquisition funnel after data cleaning.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.cleaned_stage
+  city:
+    description: City where the company is located.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.city
+  days_in_stage:
+    description: The number of days the company has been in the current stage.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.days_in_stage
+  dt_stage_started:
+    description: The date when the stage was stated in Hubspot.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.dt_stage_started
+  dt_stage_ended:
+    description: The date when the stage ended in Hubspot.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.dt_stage_ended
+  dt_first_contract:
+    description: The date when the first contract was signed.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.dt_first_contract
+  dt_nutrition:
+    description: The date when the nutrition process started.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.dt_nutrition
+  aux_order:
+    description: Auxiliary order number for the acquisition funnel.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.aux_order
+  stage:
+    description: The stage of the acquisition funnel.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_hunting.stage
+  ts_load:
+    description: Timestamp of when the gsheets data was loaded into the table.

@@ -1,0 +1,57 @@
+---
+database_name: datalake_gsheets_raw
+table_name: hubspot_acquisition_funnel_onboarding
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+description: This table contains the acquisition funnel data from HubSpot for onboarding, it includes information about the company, account manager, stage of the funnel, and various timestamps related to the acquisition process. This table only provides data up to January 2025, before the process is fully automated via Hubspot.
+columns:
+  company_name:
+    description: Name of the company in the Hubspot.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.company_name
+  id_company:
+    description: Unique identifier for the company in Hubspot.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.id_company
+  cleaned_stage:
+    description: The stage of the acquisition funnel after data cleaning.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.cleaned_stage
+  current_stage:
+    description: The current stage of the acquisition funnel.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.current_stage
+  account_manager_user:
+    description: The user responsible for managing the account in Hubspot.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.account_manager_user
+  dt_stage_started:
+    description: The date when the stage was stated in Hubspot.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.dt_stage_started
+  dt_stage_ended:
+    description: The date when the stage ended in Hubspot.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.dt_stage_ended
+  days_in_stage:
+    description: The number of days the company has been in the current stage.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.days_in_stage
+  aux_order:
+    description: Auxiliary order number for the acquisition funnel.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.aux_order
+  dt_contract:
+    description: The date when the contract was signed.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.dt_contract
+  stage:
+    description: The stage of the acquisition funnel.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.stage
+  is_flagged_as_leadgen:
+    description: Indicates if the company is flagged as lead generation.
+    lineage:
+      - datalake_gsheets_raw.hubspot_acquisition_funnel_onboarding.is_flagged_as_leadgen
+  ts_load:
+    description: Timestamp of when the gsheets data was loaded into the table.
