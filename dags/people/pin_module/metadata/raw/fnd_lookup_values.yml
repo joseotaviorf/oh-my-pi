@@ -1,0 +1,56 @@
+---
+database_name: datalake_pin_core_raw
+table_name: fnd_lookup_values
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  Stores information about lookup types used in Oracle applications. We receive the data filtered by LOOKUP_TYPE = HRA_EVAL_STEP_STATUS and HRA_PARTICIPATION_STATUS.
+  For more information, access the [Oracle HCM Documentation](https://docs.oracle.com/en/cloud/saas/applications-common/25a/oedma/fndlookupvalues-5634.html).
+
+columns:
+  row_id:
+    description: "Unique identifier for the row within the lookup table."
+  lookup_type:
+    description: "Specifies the category or classification of the lookup. Used to group related lookup codes."
+  language:
+    description: "Indicates the code of the language into which the contents of the translatable columns are translated."
+  lookup_code:
+    description: "Internal code that uniquely identifies a specific lookup value within a lookup type."
+  meaning:
+    description: "User-friendly label or interpretation of the lookup code."
+  description:
+    description: "Additional explanation or context for the meaning of the lookup code."
+  enabled_flag:
+    description: "Indicates whether the lookup value is currently enabled (Y) or disabled (N)."
+  start_date_active:
+    description: "Date from which the lookup value becomes active and available for use."
+  end_date_active:
+    description: "Date after which the lookup value is no longer active or valid."
+  created_by:
+    description: "Who column: indicates the user who created the row."
+  creation_date:
+    description: "Who column: indicates the date and time of the creation of the row."
+  last_updated_by:
+    description: "Who column: indicates the user who last updated the row."
+  last_update_login:
+    description: "Who column: indicates the session login associated to the user who last updated the row."
+  last_update_date:
+    description: "Who column: indicates the date and time of the last update of the row."
+  source_lang:
+    description: "Language in which the original version of the translatable columns was defined."
+  view_application_id:
+    description: "Identifier of the application that uses this lookup value in its UI components."
+  change_since_last_refresh:
+    description: "Indicates whether the record has changed since the last data extraction or refresh."
+  set_id:
+    description: "Identifies a set of reference data shared across business units and other entities. Also known as Reference Data Sets, they are used to filter reference data in transactional UIs."
+  source:
+    description: "Indicates the origin filename of the processed file. This helps to trace the source of the data ingested from the SFTP."
+  ts_load:
+    description: "Records the timestamp when the data was loaded into the system. Useful for tracking the data ingestion time and auditing purposes."
+  year:
+    description: "Represents the year component extracted from the 'last_update_date' column. Useful for partitioning and filtering."
+  month:
+    description: "Represents the month component extracted from the 'last_update_date' column. Useful for partitioning and filtering."
+  day:
+    description: "Represents the day component extracted from the 'last_update_date' column. Useful for partitioning and filtering."
