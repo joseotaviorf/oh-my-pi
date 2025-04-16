@@ -11,18 +11,20 @@ WITH
     cc.customer_email,
     cc.customer_phone,
     cc.is_customer_identified,
-    cc.status,
-    cc.id_campaign,
+    d.status,
+    d.id_campaign,
     a.nps_answer,
     a.nps_comment,
     ROUND(a.seconds_spent_answering/60.0,2) AS minutes_spent_answering,
-    cc.ts_dispatch_created AS ts_created,
+    d.ts_created,
     a.ts_answer_sent_local,
     a.ts_dispatch
   FROM
     datalake_tracksale.customer_conversions AS cc
   LEFT JOIN datalake_tracksale.answer AS a
     ON cc.id_answer = a.id
+  LEFT JOIN datalake_tracksale.dispatch AS d
+    ON cc.id_dispatch_lot = d.id
 ),
 answer_keys AS (
   SELECT

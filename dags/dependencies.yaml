@@ -316,6 +316,7 @@ bietlejuice.dw_customer_satisfaction:
   - bietlejuice.enrich_tracksale:load-enrich-answer-tags
   - bietlejuice.enrich_tracksale:load-enrich-campaign
   - bietlejuice.enrich_tracksale:load-enrich-customer-conversions
+  - bietlejuice.enrich_tracksale:load-enrich-dispatch
   - bietlejuice.enrich_tracksale:load-enrich-dispatch-attributes
 bietlejuice.dw_customer_support:
   - bietlejuice.amplitude:load-clean-events
