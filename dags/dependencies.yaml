@@ -653,6 +653,7 @@ bietlejuice.dw_offboarding:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing
   - bietlejuice.enrich_hefesto:load-enrich-spoc-offboarding-contracts
   - bietlejuice.enrich_inspections:load-enrich-repair-request
+  - bietlejuice.enrich_offboarding:load-enrich-mediations
   - bietlejuice.enrich_terminator:load-enrich-termination
 bietlejuice.dw_offer:
   - bietlejuice.ebdb_user:load-clean-user
@@ -2373,6 +2374,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_nps_answer_drivers:load-enrich-answer-drivers
   - bietlejuice.enrich_support_users:load-enrich-analysts
+  - bietlejuice.enrich_terminator:load-enrich-termination
   - bietlejuice.enrich_tracksale:load-enrich-answer
   - bietlejuice.enrich_tracksale:load-enrich-campaign
   - bietlejuice.enrich_tracksale:load-enrich-customer-conversions
@@ -2389,6 +2391,7 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.terminator:load-clean-termination-aud
   - bietlejuice.terminator:load-clean-termination-fee
   - bietlejuice.terminator:load-clean-termination-fee-negotiation
+  - bietlejuice.terminator:load-clean-termination-task
   - bietlejuice.terminator:load-clean-termination-workflow
   - bietlejuice.terminator:load-clean-utility-bill
 bietlejuice.enrich_offer:

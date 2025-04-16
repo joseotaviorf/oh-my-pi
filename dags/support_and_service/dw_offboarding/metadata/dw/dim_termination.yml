@@ -9,6 +9,10 @@ columns:
     description: Unique termination identification key.
     lineage:
       - datalake_terminator.termination.id_termination
+  sk_mediation_ticket:
+  lineage:
+    - datalake_offboarding.mediations.id_ticket
+  description: Mediation ticket linked to the termination, if it exists.
   cancellation_info:
     description: Data with json structure that indicates detailed information about canceling termination.
     lineage:
@@ -37,6 +41,10 @@ columns:
     description: Json type data that indicates the termination rescheduling history.
     lineage:
       - datalake_terminator.termination.rescheduling_history
+  mediation_squad:
+    lineage:
+      - datalake_offboarding.mediations.squad
+    description: Based on ticket tags indicating agreement or disagreement.
   workflow_current_step:
     description: Termination workflow step.
     lineage:
@@ -61,6 +69,26 @@ columns:
       "DECLINED_BY_PP": The person who declined the relisting was the owner.
       "DECLINED_BY_CX/ENG": The person who declined the relisting and opted-out wasn't the owner.
       "AUTO_DECLINED": If the is_early_relisting flag is False and we don't have any information who did the opt-out, the value will be Auto-declined.
+  has_mediation:
+    lineage:
+      - datalake_offboarding.mediations.id_termination
+    description: Flag indicating whether a mediation record exists for the termination.
+  has_mediation_ticket:
+    lineage:
+      - datalake_offboarding.mediations.has_mediation_ticket
+    description: Flag indicating the presence of a mediation ticket.
+  has_ac_repairs:
+    lineage:
+      - datalake_offboarding.mediations.has_ac_repairs
+    description: Flag indicating if absorbed repairs are associated with the termination.
+  is_ticket_opened_via_terminator:
+    lineage:
+      - datalake_offboarding.mediations.is_ticket_opened_via_terminator
+    description: Indicator if the mediation ticket was initiated via the terminator system.
+  dt_inspection:
+    lineage:
+      - datalake_offboarding.mediations.dt_inspection
+    description: Date when the inspection for the termination occurred.
   ts_load:
     description: This timestamp indicates when this data was loaded into dw_offboarding.
   year:

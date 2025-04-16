@@ -1,0 +1,54 @@
+database_name: datalake_offboarding
+table_name: mediations
+description: Table that consolidates all terminations in mediation
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_termination:
+    lineage:
+      - datalake_offboarding.contract_termination.id_termination
+    description: Unique identifier for the termination.
+  id_contract:
+    lineage:
+      - datalake_offboarding.contract_termination.id_contract
+    description: Contract identifier associated with the termination.
+  id_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+      - datalake_terminator_clean.termination_task.id_external
+    description: Ticket identifier from mediation processes.
+  squad:
+    lineage:
+      - datalake_zendesk.tickets_current.tags
+    description: Computed from ticket tags indicating agreement or disagreement.
+  has_mediation_ticket:
+    lineage:
+      - datalake_zendesk.tickets_current.id_ticket
+      - datalake_terminator_clean.termination_task.id_external
+    description: Flag indicating if a mediation ticket exists for the contract.
+  has_ac_repairs:
+    lineage:
+      - datalake_terminator.termination.repairs_absorbed_ac
+      - datalake_terminator.termination.total_tentant_repair_ac
+    description: Flag indicating whether absorption of repairs occurred.
+  is_ticket_opened_via_terminator:
+    lineage:
+      - datalake_terminator_clean.termination_task.id_external
+    description: Indicates if the mediation ticket was opened via the Terminator system.
+  dt_inspection:
+    lineage:
+      - datalake_inspections.inspection_booking.ts_synced
+      - datalake_offboarding.contract_termination.ts_created
+    description: Date of inspection.
+  ts_termination_request:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_created
+    description: Timestamp when the termination request was initiated.
+  ts_termination_finished:
+    lineage:
+      - datalake_offboarding.contract_termination.ts_termination_finished
+    description: Timestamp when the termination process was completed.
+  ts_termination_updated:
+    ineage:
+      - datalake_offboarding.contract_termination.ts_termination_updated
+    description: Timestamp when the termination process was updated.

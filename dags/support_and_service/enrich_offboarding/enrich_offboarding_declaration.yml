@@ -27,6 +27,14 @@ workflow:
       - nps
     tickets:
       - ongoing
+    mediations:
+      - contract_termination
+  tables_customization:
+    contract_termination:
+      z_order_by: ["ts_updated", "id_termination"]
+    mediations:
+      merge_on: ["id_termination"]
+      z_order_by: ["ts_termination_updated", "id_termination"]
 cluster:
   type: custom_cluster
   custom_configurations:
