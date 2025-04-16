@@ -23,12 +23,23 @@ columns:
       - datalake_hr_system_clean.salaries.currency_code
   qnt_promotions:
     description: "Total number of promotions the assignment has received."
+    lineage:
+      - datalake_hr_system_clean.salaries.action_code
   qnt_movimentations:
     description: "Total number of salary changes (excluding collective wage adjustments) for the assignment."
+    lineage:
+      - datalake_hr_system_clean.salaries.action_code
+      - datalake_hr_system_clean.salaries.action_reason_code
   current_salary_amount:
     description: "Current salary amount for the assignment."
     lineage:
       - datalake_hr_system_clean.salaries.salary_amount
+  current_salary_amount_brl:
+    description: "Current salary amount for the assignment, converted to Brazilian Real (BRL)."
+    lineage:
+      - datalake_hr_system_clean.salaries.salary_amount
+      - datalake_hr_system_clean.salaries.currency_code
+      - datalake_awesomeapi_currency_rates_clean.currency_closing_rates.bid_price
   first_salary_amount:
     description: "First recorded salary amount for the assignment."
     lineage:
@@ -37,6 +48,7 @@ columns:
     description: "Previous salary amount before the current one, excluding collective wage adjustments."
     lineage:
       - datalake_hr_system_clean.salaries.salary_amount
+      - datalake_hr_system_clean.salaries.action_reason_code
   salary_reference:
     description: "Salary range midpoint reference for the current salary."
     lineage:
@@ -45,10 +57,12 @@ columns:
     description: "Amount of the most recent salary increase (excluding collective wage adjustments)."
     lineage:
       - datalake_hr_system_clean.salaries.adjustment_amount
+      - datalake_hr_system_clean.salaries.action_reason_code
   pct_last_salary_increase:
     description: "Percentage of the most recent salary increase (excluding collective wage adjustments)."
     lineage:
       - datalake_hr_system_clean.salaries.adjustment_percentage
+      - datalake_hr_system_clean.salaries.action_reason_code
   range_salary_movement:
     description: "Difference between the current salary and the first recorded salary for the assignment."
     lineage:
@@ -57,16 +71,21 @@ columns:
     description: "Salary amount during the first promotion."
     lineage:
       - datalake_hr_system_clean.salaries.salary_amount
+      - datalake_hr_system_clean.salaries.action_code
   nominal_increase_first_promotion:
     description: "Nominal salary increase amount during the first promotion."
     lineage:
       - datalake_hr_system_clean.salaries.adjustment_amount
+      - datalake_hr_system_clean.salaries.action_code
   pct_increase_first_promotion:
     description: "Percentage increase in salary during the first promotion."
     lineage:
       - datalake_hr_system_clean.salaries.adjustment_percentage
+      - datalake_hr_system_clean.salaries.action_code
   average_time_between_movimentations:
     description: "Average time (in months) between promotions or salary changes for the assignment."
+    lineage:
+      - datalake_hr_system_clean.salaries.dt_from
   dt_first_promotion:
     description: "Date of the first promotion for the assignment."
     lineage:

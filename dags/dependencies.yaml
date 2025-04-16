@@ -2013,6 +2013,7 @@ bietlejuice.enrich_house_feature_inference:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
   - bietlejuice.enrich_ebdb_country:load-enrich-house
 bietlejuice.enrich_hr_system:
+  - bietlejuice.awesomeapi_currency_rates:load-clean-currency-closing-rates
   - bietlejuice.hr_system:load-clean-salaries
   - bietlejuice.hr_system:load-clean-workers
 bietlejuice.enrich_hr_system_custom:
