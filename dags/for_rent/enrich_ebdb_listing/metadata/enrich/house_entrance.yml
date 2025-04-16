@@ -1,0 +1,72 @@
+---
+database_name: datalake_ebdb_listing
+table_name: house_entrance
+description: Information related to house's entry.
+  Every line represents a current entry information for each house.
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.entry_access.id_house
+    description: ID of the house.
+  key_type:
+    lineage:
+      - datalake_ebdb_clean.key_type.name
+    description: Type of the house's key.
+  occupant_type:
+    lineage:
+      - datalake_ebdb_clean.occupant_type.name
+    description: Who is occupying the house
+  restriction_type:
+    lineage:
+      - datalake_ebdb_clean.restriction_type.name
+    description: Type of the house's restriction.
+  authorization_type:
+    lineage:
+      - datalake_ebdb_clean.access_authorization_type.name
+    description: Authorization of the house's access from old model (temporary)
+  key_location:
+    lineage:
+      - datalake_ebdb_clean.entry_access.access_type
+      - datalake_ebdb_clean.key_holder.holder_role
+    description: Location of the houses's key.
+  access_model:
+    lineage:
+      - datalake_ebdb_clean.entry_access.access_model
+    description: Model of the houses's access.
+    categories:
+      ASSISTED: Assisted access. Keys with tenant, for example.
+      AUTHORIZED: Authorized access. Keys in a lock box, for example.
+      AUTONOMOUS: Autonomous access. Keys with agent, for example.
+  access_code:
+    lineage:
+      - datalake_ebdb_clean.entry_access.access_code
+    description: Code of house's access.
+  access_details:
+    lineage:
+      - datalake_ebdb_clean.entry_access.access_details.
+    description: Details of house's access.
+  location:
+    lineage:
+      - datalake_ebdb_clean.entry_access.location
+    description: Location info of house's key.
+  holder_type:
+    lineage:
+      - datalake_ebdb_clean.key_holder.holder_type
+    description: Type of key holder.
+    categories:
+      EXTERNAL: The key is with a external tenant or external responsible.
+      USER: The key is with agent, tenant, owner or inspector.
+  holder_identifier:
+    lineage:
+      - datalake_ebdb_clean.key_holder.holder_identifier
+    description: ID of key holder.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.entry_access.ts_created
+    description: Timestamp that indicates when the entry record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.entry_access.ts_updated
+    description: Timestamp that indicates when the entry record was updated.
