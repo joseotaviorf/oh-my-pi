@@ -24,6 +24,21 @@ WITH get_docpilot_annotations AS (
         >"
       )
     ) AS input_answer,
+    FROM_JSON(
+      task.data,
+      'STRUCT<
+      document_1: STRING,
+      document_2: STRING,
+      document_3: STRING,
+      document_4: STRING,
+      document_5: STRING,
+      document_6: STRING,
+      document_7: STRING,
+      document_8: STRING,
+      document_9: STRING,
+      document_10: STRING
+    >'
+    ) AS extracted_data,
     task_completion.ts_updated
   FROM
     datalake_quinturk_clean.project
@@ -44,6 +59,16 @@ extract_input_value AS (
     proponent_name,
     total_annotations,
     lead_time,
+    extracted_data.document_1 AS document_1_path,
+    extracted_data.document_2 AS document_2_path,
+    extracted_data.document_3 AS document_3_path,
+    extracted_data.document_4 AS document_4_path,
+    extracted_data.document_5 AS document_5_path,
+    extracted_data.document_6 AS document_6_path,
+    extracted_data.document_7 AS document_7_path,
+    extracted_data.document_8 AS document_8_path,
+    extracted_data.document_9 AS document_9_path,
+    extracted_data.document_10 AS document_10_path,
     REGEXP_REPLACE(
       GET_JSON_OBJECT(TO_JSON(input_answer), "$.from_name"), '[A-Za-z_]+$', ""
     ) AS document_name,
@@ -73,6 +98,18 @@ get_input_value AS (
     total_annotations,
     lead_time,
     document_name,
+    CASE
+      WHEN document_name = 'document_1' THEN document_1_path
+      WHEN document_name = 'document_2' THEN document_2_path
+      WHEN document_name = 'document_3' THEN document_3_path
+      WHEN document_name = 'document_4' THEN document_4_path
+      WHEN document_name = 'document_5' THEN document_5_path
+      WHEN document_name = 'document_6' THEN document_6_path
+      WHEN document_name = 'document_7' THEN document_7_path
+      WHEN document_name = 'document_8' THEN document_8_path
+      WHEN document_name = 'document_9' THEN document_9_path
+      WHEN document_name = 'document_10' THEN document_10_path
+    END AS document_path,
     CASE
       WHEN
         field_type = 'type'
@@ -147,6 +184,7 @@ get_documents_annotation AS (
     proponent_name,
     lead_time,
     document_name,
+    document_path,
     MAX(document_type) AS document_type,
     SPLIT(MAX(net_income), ';') AS net_income,
     SPLIT(MAX(gross_income), ';') AS gross_income,
@@ -173,6 +211,7 @@ get_documents_annotation AS (
     proponent_name,
     lead_time,
     document_name,
+    document_path,
     is_fraud,
     ts_updated
 ),
@@ -186,6 +225,7 @@ get_payslip_data AS (
     proponent_name,
     lead_time,
     document_name,
+    document_path,
     document_type,
     get_documents_annotation.net_income[0] AS net_income,
     get_documents_annotation.gross_income[0] AS gross_income,
@@ -217,6 +257,7 @@ get_bank_statement_data AS (
     proponent_name,
     lead_time,
     document_name,
+    document_path,
     document_type,
     get_documents_annotation.net_income[0] AS net_income,
     get_documents_annotation.gross_income[0] AS gross_income,
@@ -248,6 +289,7 @@ union_documents AS (
     proponent_name,
     lead_time,
     document_name,
+    document_path,
     document_type,
     CASE
       WHEN net_income LIKE '%,%' THEN REGEXP_REPLACE(
@@ -293,6 +335,7 @@ union_documents AS (
     proponent_name,
     lead_time,
     document_name,
+    document_path,
     document_type,
     CASE
       WHEN net_income LIKE '%,%' THEN REGEXP_REPLACE(
@@ -338,6 +381,7 @@ SELECT
   LOWER(proponent_name) AS proponent_name,
   lead_time,
   document_name,
+  document_path,
   document_type,
   CAST(net_income AS DECIMAL(10, 2)) AS net_income,
   CAST(gross_income AS DECIMAL(10, 2)) AS gross_income,

@@ -43,14 +43,26 @@ columns:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
     description: "The number of documents with errors."
+  file_path:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The file path of the processed document."
   number_of_processed_documents:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
     description: "The number of documents submitted."
   error_type:
     lineage:
-      - datalake_docpilot_clean.income_extraction.extracted_data
+      - datalake_docpilot_clean.income_extraction.errors
     description: "The type of error found."
+  error_file_path:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.errors
+    description: "The file path of a document with error."
+  detected_layout:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.errors
+    description: "The layout detected when Docpilot does not support the file layout."
   bank_statement_type:
     lineage:
       - datalake_docpilot_clean.income_extraction.extracted_data
@@ -101,6 +113,18 @@ columns:
     lineage:
       - datalake_ebdb_user.user.id
     description: "Based on the existance of a user ID, it indicates if the user is the main user responsible to submit the income document."
+  dt_document_date:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The payslip date"
+  dt_document_start_date:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The bank statement start date"
+  dt_document_end_date:
+    lineage:
+      - datalake_docpilot_clean.income_extraction.extracted_data
+    description: "The bank statement start date"
   ts_created:
     lineage:
       - datalake_docpilot_clean.income_extraction.ts_created

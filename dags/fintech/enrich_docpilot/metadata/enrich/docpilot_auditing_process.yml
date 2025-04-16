@@ -20,6 +20,10 @@ columns:
     lineage:
       - datalake_quinturk_clean.task_completion.id_completed_by
     description: "ID of the analyst who completed the assigned task"
+  document_path:
+    lineage:
+      - datalake_quinturk_clean.task.data
+    description: "File path of the submitted document."
   proponent_cpf:
     lineage:
       - datalake_quinturk_clean.task.proponent_cpf
