@@ -12,6 +12,18 @@ columns:
     lineage:
       - datalake_gsheets_raw.anonymization_manual_validation.manual_eval
     description: Manual result. Used to anonymize columns.
+    requester:
+      lineage:
+        - datalake_gsheets_raw.anonymization_manual_validation.id_entity.requester
+      description: Case is a RAE, Record of Anonymization Exceptions, this column indicate the email of who request the exception
+    aproved_by:
+      lineage:
+        - datalake_gsheets_raw.anonymization_manual_validation.id_entity.aproved_by
+      description: Who validated the field as a PII, if is a RAE, Record of Anonymization Exceptions, case indicate who aproove the exception.
+    justification:
+      lineage:
+        - datalake_gsheets_raw.anonymization_manual_validation.id_entity.justification
+      description: Indicate why this columns is a exception in the Anonymization proccess.
   ts_ingested:
     lineage:
       - datalake_gsheets_raw.anonymization_manual_validation.ts_ingested
