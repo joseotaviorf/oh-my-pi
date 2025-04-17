@@ -3016,6 +3016,13 @@ bietlejuice.enrich_search:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
+bietlejuice.enrich_base_metrics_service:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
 bietlejuice.enrich_search_session_event:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.ebdb_location:load-clean-region

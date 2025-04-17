@@ -1,0 +1,53 @@
+dag:
+  name: enrich_base_metrics_service
+  schedule_start_date: 2024, 1, 1
+  owner: Data Primitives
+workflow:
+  type: query
+  layer: enrich
+  custom_schema: search
+  default_extraction_type: full
+  extra_query_template_params:
+    "days_past": 14
+    "days_past_21": 21
+    "days_past_30": 30
+    "start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    "end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  inner_dependencies:
+    search_impressions:
+    - experiment_config
+    global_metrics:
+    - experiment_config
+    - search_impressions
+  tables_customization:
+    search_impressions:
+      partitions:
+      - year
+      - month
+      - day
+    global_metrics:
+      partitions:
+      - year
+      - month
+      - day
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    autotermination_minutes: 20
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    spark_version: 12.2.x-scala2.12
+    num_workers: 3
+    spark_conf:
+      spark.metrics.namespace: "data_products.enrich_base_metrics_service"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    aws_attributes:
+      ebs_volume_size: 200
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  access_control_list:
+    group_name: data-products
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new

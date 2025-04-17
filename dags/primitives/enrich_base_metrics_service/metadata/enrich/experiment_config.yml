@@ -1,0 +1,11 @@
+database_name: datalake_search
+table_name: experiment_config
+owner: pedro.nogueira@quintoandar.com.br
+domain: primitives
+description: |
+  This table has the configuration of the experiments.
+columns:
+  experiment_name:
+    description: The name of the experiment.
+  config:
+    description: The config json of the experiment.
