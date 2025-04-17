@@ -14,6 +14,12 @@ workflow:
     scan_entities_found: {}
 cluster:
   type: databricks_13_3_min_general_cluster
+  custom_libraries:
+    - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.7.0-py2.py3-none-any.whl"
+    - pypi:
+        package: "google-auth==2.23.0"
+    - pypi:
+        package: "google-api-python-client==2.55.0"
   access_control_list:
     group_name: data-platform-engineers
     permission_level: CAN_MANAGE
