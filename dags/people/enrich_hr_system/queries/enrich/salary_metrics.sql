@@ -124,7 +124,7 @@ SELECT
     WHERE
       cs.salary_desc_order = 1
   ) AS current_salary_amount,
-  current_salary_amount * IF(cs.currency_code <> 'BRL', er.conversion_rate, 1) AS current_salary_amount_brl,
+  current_salary_amount * IF(cs.currency_code <> 'BRL', MAX(er.conversion_rate), 1) AS current_salary_amount_brl,
   MAX(cs.salary_amount) FILTER (
     WHERE
       cs.salary_asc_order = 1
@@ -176,4 +176,4 @@ LEFT JOIN
   exchange_rates AS er
     ON er.currency_from = cs.currency_code
 GROUP BY
-  cs.id_assignment
+  cs.id_assignment, cs.currency_code
