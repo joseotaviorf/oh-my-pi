@@ -130,3 +130,57 @@ SELECT
     NOW() AS ts_load
 FROM 
     datalake_accounting_funnel.kill_queue_invoice_issuance
+
+UNION ALL 
+
+SELECT
+    CONCAT('BANK-QC-',id_finance_entity) AS sk_accounting_funnel,
+    id_business_entity,
+    id_finance_entity,
+    id_external_payment AS id_finance_entity_entry,
+    'quintocred' AS version,
+    billing_source AS source_name,
+    'quintocred-bank' AS accounting_type,
+    bank_account_number AS accounting_name,
+    CAST(NULL AS INTEGER) AS accrual_year_month,
+    CAST(NULL AS STRING) AS status,
+    bank_amount AS source_amount,
+    sap_amount,
+    sap_account_number AS account_number,
+    is_completeness_compliance,
+    is_correctness_compliance,
+    is_temporality_compliance,
+    is_compliance,
+    dt_trigger AS dt_source_trigger,
+    dt_sap_created,
+    dt_sap_reference,
+    NOW() AS ts_load    
+FROM 
+    datalake_sap_accounting_process.quintocred_bank_settlement
+
+UNION ALL 
+
+SELECT
+    CONCAT('BANK-QA-FR-',id_finance_entity) AS sk_accounting_funnel,
+    id_business_entity,
+    id_finance_entity,
+    company_use AS id_finance_entity_entry,
+    version,
+    billing_source AS source_name,
+    'quintoandar-bank' AS accounting_type,
+    'for-rent' AS accounting_name,
+    accrual_year_month,
+    CAST(NULL AS STRING) AS status,
+    bank_amount AS source_amount,
+    sap_amount,
+    sap_account_number AS account_number,
+    is_completeness_compliance,
+    is_correctness_compliance,
+    is_temporality_compliance,
+    is_compliance,
+    dt_billing_trigger AS dt_source_trigger,
+    dt_sap_created,
+    dt_sap_reference,
+    NOW() AS ts_load    
+FROM 
+    datalake_sap_accounting_process.for_rent_bank_settlement
