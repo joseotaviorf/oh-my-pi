@@ -89,7 +89,7 @@ ae_managers AS (
 )
 SELECT
     id_entity,
-    line_owner,
+    domain,
     aem.work_email AS email,
     CASE WHEN
         LENGTH(TO_JSON(sample)) > 1000 THEN ARRAY('SAMPLE_TOO_LARGE')
@@ -111,4 +111,4 @@ FROM
     joined_data AS jd
 LEFT JOIN
     ae_managers AS aem
-        ON jd.line_owner = aem.line
+        ON jd.domain = aem.line
