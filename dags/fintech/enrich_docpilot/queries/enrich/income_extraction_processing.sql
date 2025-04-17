@@ -98,8 +98,7 @@ join_document_erros AS (
     ON (
     ed.id_external = er.id_external
     AND (ed.file_path = er.file_path OR
-    er.file_path IS NULL OR ed.file_path IS NULL
-    )
+    er.file_path IS NULL OR ed.file_path IS NULL)
     )
 ),
 explode_net_income AS (
@@ -198,7 +197,11 @@ transform_income_data AS (
     )
     LEFT JOIN get_incomes AS gi
       ON gi.id_external = jd.id_external
-      AND (gi.date = jd.document_start_date OR gi.date = jd.document_date)
+      AND (
+        gi.date = jd.document_start_date OR
+        gi.date = jd.document_date OR
+        gi.date = jd.document_date OR
+        jd.document_date IS NULL)
     LEFT JOIN avg_incomes AS av
       ON av.id_external = jd.id_external
 ),
