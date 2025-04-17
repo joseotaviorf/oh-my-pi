@@ -29,6 +29,10 @@ columns:
     description: ''
     lineage:
     - .create_compliance_columns.payment_source
+  bank_source:
+    description: ''
+    lineage:
+    - .create_compliance_columns.bank_source
   bank_account_number:
     description: ''
     lineage:
@@ -41,10 +45,10 @@ columns:
     description: ''
     lineage:
     - .create_compliance_columns.accrual_year_month
-  billing_source_amount:
+  billing_amount:
     description: ''
     lineage:
-    - .create_compliance_columns.billing_source_amount
+    - .create_compliance_columns.billing_amount
   payment_source_amount:
     description: ''
     lineage:
@@ -74,10 +78,10 @@ columns:
     lineage:
     - .create_compliance_columns.CASE WHEN is_completeness_compliance = TRUE AND is_correctness_compliance
       = TRUE AND is_temporality_compliance = TRUE THEN TRUE ELSE FALSE END
-  dt_billing_source_trigger:
+  dt_billing_trigger:
     description: ''
     lineage:
-    - .create_compliance_columns.dt_billing_source_trigger
+    - .create_compliance_columns.dt_billing_trigger
   dt_payment_source:
     description: ''
     lineage:

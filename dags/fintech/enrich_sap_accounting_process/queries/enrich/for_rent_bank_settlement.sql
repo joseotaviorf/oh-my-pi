@@ -6,10 +6,10 @@ WITH payments_in_retsuko AS (
             WHEN INSTR(i.payment_company_use_number, '|') > 0 THEN SUBSTRING_INDEX(i.payment_company_use_number, '|', -1)
             ELSE i.payment_company_use_number
         END AS STRING) AS company_use,
-        i.paid_amount AS billing_source_amount,
+        i.paid_amount AS billing_amount,
         i.accrual_year_month,
         DATE(i.ts_paid) AS dt_billing_source,
-        dd.next_brz_fintech_business_day AS dt_billing_source_trigger,
+        dd.next_brz_fintech_business_day AS dt_billing_trigger,
         se.id_sap_gateway_feature,
         se.id_finance_entity,
         se.version,
@@ -36,7 +36,7 @@ WITH payments_in_retsuko AS (
         AND i.payment_status != 'canceled'
         AND i.status = 'paid'
         AND i.country_code = 'BR'
-        AND i.ts_paid >= current_date - 180
+        AND i.ts_paid >= CURRENT_DATE - 180
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY i.id_external, i.payment_company_use_number ORDER BY i.ts_created DESC) = 1  
 ),
@@ -45,8 +45,9 @@ francesinha AS (
     SELECT
         CAST(SUBSTRING(UPPER(our_number), 1, LENGTH(our_number) - 1) AS INTEGER) AS company_use,
         dt_credit AS dt_bank_paid,
-        SUM(net_amount) AS bank_amount,
-        '45268-8' AS bank_account_number
+        '45268-8' AS bank_account_number,
+        'Nexxera CNAB Recupera' AS bank_source,
+        SUM(net_amount) AS bank_amount
     FROM
         datalake_nexxera.cnab_charges_recupera
     WHERE
@@ -56,7 +57,7 @@ francesinha AS (
         AND TRIM(our_number) != ''
         AND dt_credit >= current_date - 180
     GROUP BY
-        1,2
+        1,2,3,4
 
     UNION
 
@@ -67,8 +68,9 @@ francesinha AS (
         ''
       ) ELSE regexp_replace(ext.origin_complement, '^0+', '') END AS company_use,
         DATE(ext.date_accounting) AS dt_bank_paid,
-        ext.amount_value AS bank_amount,
-        '45268-8' AS bank_account_number
+        '45268-8' AS bank_account_number,
+        'Itaú API' AS bank_source,
+        ext.amount_value AS bank_amount
     FROM 
         datalake_itau_statements_clean.statement_879200452685 ext 
     WHERE 
@@ -82,8 +84,9 @@ francesinha AS (
     SELECT
         UPPER(REPLACE(REGEXP_REPLACE(document_number, '^0000', ''), 'C!', '')) AS company_use,
         dt_credit AS dt_bank_paid,
-        SUM(net_amount) AS bank_amount,
-        '39221-6' AS bank_account_number
+        '39221-6' AS bank_account_number,
+        'Nexxera CNAB' AS bank_source,
+        SUM(net_amount) AS bank_amount
     FROM
         datalake_nexxera.cnab_charges
     WHERE
@@ -93,7 +96,7 @@ francesinha AS (
         AND TRIM(document_number) != ''
         AND dt_credit >= current_date - 180
     GROUP BY
-        1,2
+        1,2,3,4
 ), 
 
 payments_vans_checkout AS (
@@ -181,17 +184,18 @@ create_compliance_columns AS (
         r.version,
         r.billing_source,
         pcv.payment_source,
+        f.bank_source,
         f.bank_account_number,
         l.sap_account_number,
         r.accrual_year_month,
-        r.billing_source_amount,
+        r.billing_amount,
         pcv.payment_source_amount,
         f.bank_amount,
         l.sap_amount,
         IF(l.hash IS NOT NULL, TRUE, FALSE) AS is_completeness_compliance,
-        IF((ABS(r.billing_source_amount) - ABS(l.sap_amount) = 0), TRUE, FALSE) AS is_correctness_compliance,
-        IF((l.dt_sap_reference BETWEEN r.dt_billing_source AND DATE_ADD(r.dt_billing_source_trigger, 3)), TRUE, FALSE) AS is_temporality_compliance,
-        r.dt_billing_source_trigger,
+        IF((ABS(r.billing_amount) - ABS(l.sap_amount) = 0), TRUE, FALSE) AS is_correctness_compliance,
+        IF((l.dt_sap_reference BETWEEN r.dt_billing_source AND DATE_ADD(r.dt_billing_trigger, 3)), TRUE, FALSE) AS is_temporality_compliance,
+        r.dt_billing_trigger,
         pcv.dt_payment_source,
         f.dt_bank_paid,
         l.dt_sap_created,
@@ -219,10 +223,11 @@ SELECT
     version,
     billing_source,
     payment_source,
+    bank_source,
     bank_account_number,
     sap_account_number,
     accrual_year_month,
-    billing_source_amount,
+    billing_amount,
     payment_source_amount,
     bank_amount,
     sap_amount,
@@ -230,7 +235,7 @@ SELECT
     is_correctness_compliance,
     is_temporality_compliance,
     IF(is_completeness_compliance = TRUE AND is_correctness_compliance = TRUE AND is_temporality_compliance = TRUE, TRUE, FALSE) AS is_compliance,
-    dt_billing_source_trigger,
+    dt_billing_trigger,
     dt_payment_source,
     dt_bank_paid,
     dt_sap_created,

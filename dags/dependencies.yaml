@@ -1258,6 +1258,13 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
+bietlejuice.enrich_base_metrics_service:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
 bietlejuice.enrich_betopera:
   - bietlejuice.betopera:load-clean-certificate
   - bietlejuice.betopera:load-clean-certificate-request
@@ -2976,6 +2983,7 @@ bietlejuice.enrich_sap:
 bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.checkout:load-clean-bolecode
   - bietlejuice.checkout:load-clean-boleto
+  - bietlejuice.checkout:load-clean-pix
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment
   - bietlejuice.enrich_accounting_funnel:load-enrich-erp-gateway-stages-status
   - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
@@ -2983,8 +2991,20 @@ bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.itau_statements:load-clean-statement-879200452685
+  - bietlejuice.itau_statements:load-clean-statement-879200494588
+  - bietlejuice.nexxera:load-clean-cnab-charges-recupera-velo-2
+  - bietlejuice.pixar:load-clean-charge
+  - bietlejuice.rental_guarantee_platform:load-clean-agreement-payment
+  - bietlejuice.rental_guarantee_platform:load-clean-bill
+  - bietlejuice.rental_guarantee_platform:load-clean-billing-report
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-accounting
+  - bietlejuice.rental_guarantee_platform:load-clean-payment
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-sap-entity
+  - bietlejuice.trato_feito:load-clean-installment
+  - bietlejuice.trato_feito:load-clean-negotiation
+  - bietlejuice.trato_feito:load-clean-payment
   - bietlejuice.vans:load-clean-boleto
 bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.bigfone:load-clean-event
@@ -3016,13 +3036,6 @@ bietlejuice.enrich_search:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
-bietlejuice.enrich_base_metrics_service:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
-  - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
-  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
-  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
 bietlejuice.enrich_search_session_event:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.ebdb_location:load-clean-region

@@ -1,0 +1,104 @@
+---
+database_name: datalake_sap_accounting_process
+table_name: quintocred_bank_settlement
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_business_entity:
+    description: ''
+    lineage:
+    - .bank.id_business_entity
+  id_finance_entity:
+    description: ''
+    lineage:
+    - .bank.COALESCE(id_finance_entity, origin_complement)
+  id_external_payment:
+    description: ''
+    lineage:
+    - .bank.COALESCE(id_external_payment, our_number)
+  id_sap_transaction:
+    description: ''
+    lineage:
+    - .bank.id_sap_transaction
+  company_use:
+    description: ''
+    lineage:
+    - .bank.company_use
+  billing_source:
+    description: ''
+    lineage:
+    - .bank.billing_source
+  payment_source:
+    description: ''
+    lineage:
+    - .bank.payment_source
+  bank_source:
+    description: ''
+    lineage:
+    - .bank.COALESCE(ts.bank_source, b.bank_source)
+  bank_account_number:
+    description: ''
+    lineage:
+    - .bank.COALESCE(ts.bank_account_number, b.bank_account_number)
+  sap_account_number:
+    description: ''
+    lineage:
+    - .bank.sap_account_number
+  billing_amount:
+    description: ''
+    lineage:
+    - .bank.billing_amount
+  payment_amount:
+    description: ''
+    lineage:
+    - .bank.payment_amount
+  bank_amount:
+    description: ''
+    lineage:
+    - .bank.COALESCE(ts.bank_amount, b.bank_amount)
+  sap_amount:
+    description: ''
+    lineage:
+    - .bank.sap_amount
+  is_completeness_compliance:
+    description: ''
+    lineage:
+    - .bank.is_completeness_compliance
+  is_correctness_compliance:
+    description: ''
+    lineage:
+    - .bank.is_correctness_compliance
+  is_temporality_compliance:
+    description: ''
+    lineage:
+    - .bank.is_temporality_compliance
+  is_compliance:
+    description: ''
+    lineage:
+    - .bank.CASE WHEN is_completeness_compliance = TRUE AND is_correctness_compliance
+      = TRUE AND is_temporality_compliance = TRUE THEN TRUE ELSE FALSE END
+  dt_trigger:
+    description: ''
+    lineage:
+    - .bank.COALESCE(ts.dt_billing, b.dt_bank_paid)
+  dt_billing:
+    description: ''
+    lineage:
+    - .bank.dt_billing
+  dt_payment_platform:
+    description: ''
+    lineage:
+    - .bank.dt_payment_platform
+  dt_bank_paid:
+    description: ''
+    lineage:
+    - .bank.COALESCE(ts.dt_bank_paid, b.dt_bank_paid)
+  dt_sap_created:
+    description: ''
+    lineage:
+    - .bank.dt_sap_created
+  dt_sap_reference:
+    description: ''
+    lineage:
+    - .bank.dt_sap_reference
