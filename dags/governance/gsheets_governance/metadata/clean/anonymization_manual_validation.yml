@@ -12,6 +12,17 @@ columns:
     lineage:
       - datalake_gsheets_raw.anonymization_manual_validation.manual_eval
     description: Manual result. Used to anonymize columns.
+    categories:
+      "Telefone": PII data, indicate the column is a telefone number.
+      "Email": PII data, indicate the column is an user email.
+      "Endereço/CEP": PII data, indicate the column is an user address.
+      "Nome": PII data, indicate the column is an user name.
+      "CPF/RG/CNPJ": PII data, indicate the column is an brazilian document.
+      "Other": PII data, indicate the column have a pii data but not classified yet.
+      "Entidade de classe": PII data, indicate the column is and job class, like creci.
+      "Dados bancários": PII data, indicate colunns have bank information.
+      "RAE": PII data, RAE is Record of Anonymization Exceptions, indicate the column is an exception and must be desnonymizate.
+      "N/A": Indicate the column is not a PII data.
     requester:
       lineage:
         - datalake_gsheets_raw.anonymization_manual_validation.id_entity.requester
