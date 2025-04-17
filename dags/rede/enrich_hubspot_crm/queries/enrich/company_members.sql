@@ -1,62 +1,47 @@
-WITH current_members AS (
+WITH merged_companies_aux AS (
   SELECT
-    c.cnpj
+    ids_merged_companies
   FROM
-    datalake_hubspot.company AS c
-  WHERE
-    c.sale_lead_status = 'Membro'
+    datalake_hubspot.company_history
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_company ORDER BY ts_updated DESC) = 1
+),
+merged_companies AS (
+  SELECT
+    EXPLODE(ids_merged_companies) AS id_merged_company
+  FROM
+    merged_companies_aux
 )
 SELECT
-  cm.id_company,
-  cm.id_hubspot_owner,
-  cm.cnpj,
-  cm.company_cluster,
-  cm.name AS company_name,
-  cm.cluster_performance AS company_cluster_performance,
-  cm.crm,
-  cm.extracted_3p_tag,
-  cm.member_category,
-  cm.sale_lead_status,
-  cm.is_flagged_as_leadgen,
-  cm.ts_created,
-  cm.ts_updated,
-  cm.year,
-  cm.month,
-  cm.day
+  ch.id_company,
+  ch.id_hubspot_owner,
+  ch.cnpj,
+  ch.company_cluster,
+  ch.name AS company_name,
+  ch.cluster_performance AS company_cluster_performance,
+  ch.crm,
+  ch.extracted_3p_tag,
+  ch.member_category,
+  ch.sale_lead_status,
+  ch.is_flagged_as_leadgen,
+  ch.ts_created,
+  ch.ts_updated,
+  ch.year,
+  ch.month,
+  ch.day
 FROM
-  datalake_hubspot.company AS cm
-WHERE
-  cm.sale_lead_status = 'Membro'
-QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY cm.cnpj ORDER BY cm.ts_updated DESC) = 1
-
-UNION ALL
-
-SELECT
-  co.id_company,
-  co.id_hubspot_owner,
-  co.cnpj,
-  co.company_cluster,
-  co.name AS company_name,
-  co.cluster_performance AS company_cluster_performance,
-  co.crm,
-  co.extracted_3p_tag,
-  co.member_category,
-  co.sale_lead_status,
-  co.is_flagged_as_leadgen,
-  co.ts_created,
-  co.ts_updated,
-  co.year,
-  co.month,
-  co.day
-FROM
-  datalake_hubspot.company AS co
+  datalake_hubspot.company_history AS ch
 LEFT JOIN
-  current_members AS cm
-    ON co.cnpj = cm.cnpj
+  merged_companies AS mc
+    ON ch.id_company = mc.id_merged_company
 WHERE
-  (co.has_been_rent_member OR co.has_been_sale_member)
-    AND co.sale_lead_status != 'Membro'
-    AND cm.cnpj IS NULL
+    COALESCE(
+      ARRAY_CONTAINS(sale_lead_status_history.value, 'Membro')
+        OR ARRAY_CONTAINS(sale_lead_status_history.value, 'Parceiro'),
+      FALSE
+    )
+    AND NOT(ch.is_archived)
+    AND mc.id_merged_company IS NULL
 QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY co.cnpj ORDER BY co.ts_updated DESC) = 1
+  ROW_NUMBER() OVER(PARTITION BY ch.id_company ORDER BY ch.ts_updated DESC) = 1
+    AND ROW_NUMBER() OVER(PARTITION BY ch.cnpj ORDER BY ch.ts_updated DESC) = 1

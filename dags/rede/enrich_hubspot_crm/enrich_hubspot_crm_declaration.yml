@@ -15,7 +15,7 @@ workflow:
     company_contact:
     - contact
     company_members:
-    - company
+    - company_history
     company_status:
     - company
     contact:
