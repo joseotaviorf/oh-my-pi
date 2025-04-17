@@ -981,8 +981,8 @@ quintoml.recs.house_user_embeddings_quintoml.inference:
 
 quintoml.search.search_monitoring.inference:
   add:
-    - bietlejuice.enrich_search:load-enrich-global-metrics
-    - bietlejuice.enrich_search:load-enrich-search-impressions
+    - bietlejuice.enrich_base_metrics_service:load-enrich-global-metrics
+    - bietlejuice.enrich_base_metrics_service:load-enrich-search-impressions
 
 wonka.house_demand_balancer_predictions:
   add:

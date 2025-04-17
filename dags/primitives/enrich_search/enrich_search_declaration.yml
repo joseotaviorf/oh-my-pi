@@ -13,23 +13,11 @@ workflow:
     "start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     "end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   inner_dependencies:
-    search_impressions:
-    - experiment_config
-    amplitude_user_device:
-    - global_metrics
     item_interaction:
     - amplitude_user_device
     item_interaction_sale:
     - amplitude_user_device
-    global_metrics:
-    - experiment_config
-    - search_impressions
   tables_customization:
-    search_impressions:
-      partitions:
-      - year
-      - month
-      - day
     item_interaction:
       partitions:
       - year
@@ -42,11 +30,6 @@ workflow:
       - month
       - day
       - interaction_type
-    global_metrics:
-      partitions:
-      - year
-      - month
-      - day
 
 cluster:
   type: custom_cluster
