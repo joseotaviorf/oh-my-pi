@@ -5,6 +5,7 @@ dag:
 workflow:
   type: load_access
   layer: reverse
+  custom_schema: anonymization
   load_spark_job: load_results_into_gsheet
   spark_job_arguments:
     - "Validation"
