@@ -406,12 +406,12 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-  - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
   - bietlejuice.ebdb_location:load-clean-map-region
+  - bietlejuice.ebdb_location:load-clean-polygon-region
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.ebdb_visit:load-clean-house-visit-status-aud
   - bietlejuice.ebdb_visit:load-clean-house-weekly-schedule-aud
@@ -3131,8 +3131,8 @@ bietlejuice.enrich_supply_leads:
   - bietlejuice.bob:load-clean-house-draft
   - bietlejuice.bob:load-clean-submission-progress
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p
-  - bietlejuice.ebdb:load-clean-polygon-region
   - bietlejuice.ebdb_lead:load-clean-lead
+  - bietlejuice.ebdb_location:load-clean-polygon-region
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data
   - bietlejuice.rene_descartes:load-clean-address

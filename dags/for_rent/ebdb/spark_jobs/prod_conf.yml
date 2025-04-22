@@ -512,8 +512,8 @@ table_block_list:
   - Category
   - CategoryImovel
   - ProcessedMessage
+  - PoligonoRegiao
 
 view_allow_list: []
 
-block_list:
-  - PoligonoRegiao
+block_list: []

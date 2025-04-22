@@ -81,7 +81,7 @@ bietlejuice.dw_datamarts_for_sale:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
     - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
     - bietlejuice.ebdb_location:load-clean-map-region
-    - bietlejuice.ebdb:load-clean-polygon-region
+    - bietlejuice.ebdb_location:load-clean-polygon-region
   remove:
     - bietlejuice.dw_agents_availability:load-dw-agent-fact-agent-daily-allocations
     - bietlejuice.dw_booking:load-dw-public-dim-tenant-booking-review
@@ -604,7 +604,7 @@ bietlejuice.enrich_sale_closing_flows:
 bietlejuice.enrich_sale_crawlers_listings:
   remove:
     - bietlejuice.ebdb_location:load-clean-map-region
-    - bietlejuice.ebdb:load-clean-polygon-region
+    - bietlejuice.ebdb_location:load-clean-polygon-region
     - bietlejuice.enrich_region:load-enrich-region
     - bietlejuice.listings.em_casa:load-clean-em-casa
     - bietlejuice.listings.loft:load-clean-loft

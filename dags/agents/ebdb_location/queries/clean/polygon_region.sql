@@ -1,6 +1,6 @@
 SELECT
     id,
-    poligono AS polygon,
+    STRING(ST_GEOMFROMWKB(UNBASE64(poligono.wkb))) AS polygon,
     regiao_id AS id_region,
     atualizadoEm AS ts_updated,
     criadoEm AS ts_created

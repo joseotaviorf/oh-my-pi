@@ -33,7 +33,6 @@ Produces the following output tables:
     `ownerlead`
     `photographer_job`
     `photographer_job_aud`
-    `polygon_region`
     `suspected_unavailability_listings`
     `suspected_unavailability_listings_aud`
 

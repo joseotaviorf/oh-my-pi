@@ -45,4 +45,3 @@ metadata_files_out_of_pattern:
 queries_without_metadata_files:
   - for_rent/regions_polygon/queries/enrich_for_looker/regions_polygon.sql
   - for_rent/property_tax/queries/raw/tax_report.sql
-  - for_rent/ebdb/queries/raw/poligonoregiao.sql
