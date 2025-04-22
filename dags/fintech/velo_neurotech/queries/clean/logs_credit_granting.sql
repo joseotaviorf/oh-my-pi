@@ -114,7 +114,7 @@ SELECT
     calc_dti_maximo AS dti_max,
     calc_dti_real AS dti_real,
     calc_dti_presumido AS dti_presumed,
-    CAST(calc_dti_apurado AS DECIMAL(32,2)) AS dti_calculated,
+    CAST(REPLACE(calc_dti_apurado, '%', '') AS DECIMAL(32,2)) AS dti_calculated,
     CAST(calc_renda_apurada AS DECIMAL(32,2)) AS calculated_income,
     CAST(calc_bigidbgc_score AS DECIMAL(32,2)) AS score_bigid,
     CAST(calc_bigidbgc_score1 AS DECIMAL(32,2)) AS score_bigid_first_proponent,
