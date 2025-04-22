@@ -72,9 +72,9 @@ joined_data AS (
     datalake_anonymization.columns_sample_data AS smp
       ON sc.id_entity = smp.id_entity
   WHERE
-     sc.year = {year}
+    sc.year = {year}
     AND sc.month = {month}
-    AND sc.day = {month}
+    AND sc.day = {day}
     AND ti.owner IS NOT NULL
 ),
 ae_managers AS (
