@@ -74,8 +74,8 @@ class BietlejuiceDependencyHelper:
         """
         Clean the DW task in order to retrieve the table name being loaded
         """
-        if "fact" in task or "dim" in task:
-            match = re.search("(fact|dim)(.*)", task)
+        if "fact-" in task or "dim-" in task:
+            match = re.search("(fact-|dim-)(.*)", task)
             return (match.group(1) + match.group(2)).replace("-", "_")
 
         dag_context = dag_name.replace(f"{layer}_", "")
