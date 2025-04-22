@@ -68,7 +68,7 @@ def _get_payloads_from_datalake(spark_client:SparkClient, execution_date:str) ->
     query = f"""
     SELECT
         id_entity,
-        line_owner,
+        domain,
         email AS email_owner,
         sample,
         sample_summary,
