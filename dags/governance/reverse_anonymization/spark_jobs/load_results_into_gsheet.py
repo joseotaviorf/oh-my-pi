@@ -106,6 +106,10 @@ def __get_auth(dbutils, credentials_scope, credentials_key):
 
 def main():
     parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("sheet_name")
+    parser.add_argument("sheet_id")
+    parser.add_argument("execution_date")
+
     args = parser.parse_args()
 
     sheet_name = args.sheet_name
@@ -114,8 +118,17 @@ def main():
 
     logger.info(f"m=main, message=Starting job. sheet_name={sheet_name}, sheet_id={sheet_id}, execution_date= {execution_date}")
 
-    header = ["id_entity", "line", "owner_email", "sample_results_json", "sample_summary", "col_summary", "initial_eval",
-              "final_check", "is_pii"]
+    header = [
+        "id_entity",
+        "line",
+        "owner_email",
+        "sample_results_json",
+        "sample_summary",
+        "col_summary",
+        "initial_eval",
+        "final_check",
+        "is_pii"
+    ]
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
@@ -146,4 +159,4 @@ def main():
     gsheets_producer.write(sheet_name, sheet_id, payload)
 
 if __name__ == "__main__":
-  main()
+    main()
