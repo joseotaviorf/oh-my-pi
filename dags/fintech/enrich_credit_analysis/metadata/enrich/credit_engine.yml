@@ -2,20 +2,20 @@ database_name: datalake_credit_analysis
 table_name: credit_engine
 owner: isabella.santos@quintoandar.com.br
 domain: Fintech
-description: "Enrich table with credit engine analysis state data. The analysis machine is composed by state groups, which are composed by analysis sates. The analysis state is the smallest unit of the analysis machine. The credit engine lives in Sorting Hat micro service."
+description: "Enrich table with credit engine analysis state data. The analysis machine is composed by state groups, which are composed by analysis sates. The analysis state is the smallest unit of the analysis machine. The data in this table refers to any rule applied to a checklist, tenant or proposal (subject). The credit engine lives in Sorting Hat micro service."
 columns:
   id_analysis_state:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.id
-    description: Incremental column identifier of the analysis state. Each ID is unique."
+    description: Incremental column identifier of the analysis state. Each ID is unique.
   id_machine:
     lineage:
       - datalake_sorting_hat_clean.analysis_machine.id
-    description: Incremental column identifier of the credit machine"
+    description: Incremental column identifier of the credit machine.
   id_analysis_request:
     lineage:
       - datalake_sorting_hat_clean.analysis_request.id
-    description: "Foreign key which associates the analysis machine to an analysis request. It is the analysis request ID"
+    description: Foreign key which associates the analysis machine to an analysis request. It is the analysis request ID
   id_proposal:
     lineage:
       - datalake_sorting_hat_clean.analysis_request.id_external
@@ -27,11 +27,19 @@ columns:
   subject_type:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.subject_type
-    description: "This column represents the type of the subject the machine is related to. In this table only records with subject type CHECKLIST_ITEM_TYPE are considered, aiming to filter only the items related to credit engine checklist."
+    description: "This column represents the type of the subject the machine is related to. In this table only records with subject type CHECKLIST_ITEM_TYPE, PROPOSAL or TENANT are considered."
   policy_type:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.id_subject
-    description: "Policy name."
+    description: "Policy name rule applied to the checklist item."
+  category:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Integer indicating the credit analysis category."
+  machine_version:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_machine.machine_version
+    description: "Version of the machine."
   machine_status:
     lineage:
       - datalake_sorting_hat_clean.analysis_machine.status
@@ -39,15 +47,11 @@ columns:
     categories:
       CREATED: "When the machine is created"
       FINISHED: "When the machine analysis is finished"
-      RETRY: "When the machine analysis is going to be retried for any reason"
+      RETRY: "When the machine analysis is going to be retried for any reason. Example: when there is a syncronization failure between docpilot and docx and the analysis will be manually performed by the credit desk."
   machine_type:
     lineage:
       - datalake_sorting_hat_clean.analysis_machine.type
     description: "This column identifies the machine type, such as TENANT_RENT_DOCUMENTATION_COMPLETED_ANALYSIS for tenant documentation analysis "
-  is_current_machine:
-    lineage:
-      - datalake_sorting_hat_clean.analysis_machine.is_current_machine
-    description: "Identifies if the machine is the current one"
   group_type:
     lineage:
       - datalake_sorting_hat_clean.analysis_state_group.group_type
@@ -55,7 +59,7 @@ columns:
   group_name:
     lineage:
       - datalake_sorting_hat_clean.analysis_state_group.group_name
-    description: "This column represents the name of the group processed by the machine. Since the subject type is POLICY, the group name is the policy name."
+    description: "This column represents the name of the group processed by the machine."
   state_group_result:
     lineage:
       - datalake_sorting_hat_clean.analysis_state_group.result
@@ -64,6 +68,46 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input
     description: "Input used in the analysis state"
+  documentation_analysis_type:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "The documentation policy applied to the proposal."
+    categorues:
+      LIGHT_APPROVAL: When the income document is optional
+      FLEX: When an income document may be requested
+      FULL: When the full documentation is necessary
+  package_value:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Total package value of the proposal."
+  total_verified_income:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Total verified income of the proposal. This value is the sum of the verified income from DocX."
+  total_compromised_income:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Total compromised income of the proposal."
+  number_of_resend_requests:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Total number of resend requests."
+  active_contracts:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Total number of active contracts."
+  tenant_age:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Result of the LEGAL_AGE rule applied to a tenant."
+  score:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Credit score."
+  income_value_verified_state_result:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Result of the rule INCOME_VALUE_VERIFIED."
   analysis_state_status:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.status
@@ -71,6 +115,26 @@ columns:
     categories:
       FINISHED: "When the analysis state has been run with success the status is finished"
       RETRY: "When the analysis state has been run with error the status is retry"
+  is_current_machine:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_machine.is_current_machine
+    description: "Identifies if the machine is the current one"
+  is_there_empty_verified_income:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Identifies if there is any empty verified income."
+  is_currently_pep:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Identifies if the tenant is currently a politically exposed person."
+  is_income_sufficient_for_renting:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Identifies if the calculated income is sufficient to cover the package value."
+  is_there_any_fraud_suspicion:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Identifies if there is any proponent with a possible fraud suspicious."
   ts_updated:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.ts_updated
