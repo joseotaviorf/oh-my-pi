@@ -3873,3 +3873,5 @@ wonka.user_embeddings_main:
   - quintoml.recs.house_user_embeddings.inference:batch-predict
 wonka.user_visit:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+wonka.user_search_profile_clustering:
+  - wonka.user_bc_h3_7_city_agg_search_filters:load-user_bc_h3_7_city_agg_search_filters

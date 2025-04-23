@@ -63,7 +63,9 @@ dags_out_of_pattern:
         "wonka.house_user_rent_flows",
         "wonka.house_agg_rent_flows",
         "wonka.house_visit",
-        "wonka.user_visit"
+        "wonka.user_visit",
+        "wonka.user_search_profile_clustering",
+        "wonka.user_bc_h3_7_city_agg_search_filters"
     ]
 databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice
 databricks_bucket: databricks.s3.forno.data.quintoandar.com.br
