@@ -333,6 +333,8 @@ SELECT
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel IN ('asp','prime', 'account_manager_pp_multi') THEN 'PP Multi'
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'capta_ai' THEN 'Capta Aí'
         WHEN full_conversion_origin = 'ownerpwa' AND operation_channel = 'is_inbound' THEN 'Inbound'
+        WHEN acquisition_origin IN ('homelanding','ownerlanding', 'ownerpropertyregistration', 'ownerpwa')
+                AND (LOWER(medium) = 'seo non-branded' OR LOWER(behavior_type) = 'organic') AND is_pp_multi_active = TRUE THEN 'PP Multi'
         WHEN full_conversion_origin = 'ownerpwa' THEN 'FSS'
         WHEN full_conversion_origin = 'rede' THEN 'Rede'
         WHEN full_conversion_origin = 'ciq' THEN 'CIQ'
