@@ -1,0 +1,12 @@
+database_name: datalake_insider_test_clean
+table_name: user_revision_entity
+columns:
+  id:
+    lineage:
+      - datalake_insider_test_raw.user_revision_entity.id
+  id_user:
+    lineage:
+      - datalake_insider_test_raw.user_revision_entity.user_id
+  ts_revised:
+    lineage:
+      - datalake_insider_test_raw.user_revision_entity.timestamp
