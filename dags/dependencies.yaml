@@ -3601,8 +3601,49 @@ bietlejuice.reverse_atlas_pricing_report_access:
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-engagement
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-listing-price-history
   - bietlejuice.enrich_atlas_pricing_report:load-enrich-new-pricing-report-region
+bietlejuice.reverse_birdie:
+  - bietlejuice.dw_agent:load-dw-public-dim-agent
+  - bietlejuice.dw_atta:load-dw-atta-dim-franchise-atta
+  - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-answer
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-campaign
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-fact-nps-answer-justifications
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-fact-nps-dispatches
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-chatbot
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
+  - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-sessions-chatbot
+  - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
+  - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
+  - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-dim-answer
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-answer
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
+  - bietlejuice.dw_user:load-dw-public-dim-user
+  - bietlejuice.dw_visit:load-dw-visit-dim-business-context
+  - bietlejuice.dw_visit:load-dw-visit-dim-business-model
+  - bietlejuice.dw_visit:load-dw-visit-dim-entrance-type
+  - bietlejuice.dw_visit:load-dw-visit-fact-visit-schedules
+  - bietlejuice.dw_visit:load-dw-visit-fact-visits
+  - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
+  - bietlejuice.enrich_customer_support:load-enrich-email
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys
+  - bietlejuice.help_center_api:load-clean-call-in-app-eligibility
+  - bietlejuice.insider:load-clean-feature
+  - bietlejuice.insider:load-clean-review
+  - bietlejuice.insider:load-clean-review-feature
+  - bietlejuice.insider:load-clean-template
+  - bietlejuice.insider:load-clean-template-feature
 bietlejuice.reverse_birdie_access:
-  - bietlejuice.reverse_birdie:load-reverse-dummy-nps-answer
+  - bietlejuice.reverse_birdie:load-reverse-dsat-bot
+  - bietlejuice.reverse_birdie:load-reverse-dsat-customer-relationship
+  - bietlejuice.reverse_birdie:load-reverse-dsat-visitas
+  - bietlejuice.reverse_birdie:load-reverse-end-of-process
 bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
   - bietlejuice.enrich_superset:load-enrich-dashboards
