@@ -29,7 +29,7 @@ workflow:
   tables_customization:
     agent_major_region_code:
       merge_on: [id_major_region_code]
-      z_order_by: [id_agent, dt_started]
+      z_order_by: [id_agent, ts_started]
     agent_profile_activity:
       merge_on: [id_agent_profile_activity]
       z_order_by: [id_agent, dt_started]
