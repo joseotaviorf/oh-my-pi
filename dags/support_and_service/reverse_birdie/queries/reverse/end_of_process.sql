@@ -89,45 +89,7 @@ franchise_last_pre_analysis AS (
         aux_franchise
     WHERE 
         update_order = 1
-),
-post_specialist AS (
-  with offer AS (
-    SELECT 
-        fo.sk_offer,
-        date(dsa.ts_sale_agreement_signed) AS ts_sale_agreement_signed,
-        fo.sk_buyer,
-        fo.sk_owner,
-        financing_bank,
-        payment_method,
-        dsa.CREDIT_MODEL,
-        CLOSING_STATUS,
-        HOUSE_DILLIGENCE_STATUS,
-        SELLER_DILLIGENCE_STATUS,
-        REPORT_DILLIGENCE_STATUS,
-        BANK_ANALYSIS_STATUS,
-        PAYMENT_STATUS,
-        CREDIT_STATUS,
-        dsa.HAS_USED_FGTS_IN_PAYMENT,
-        HAS_SELLER_DEBT_PAYMENTS,
-        fo.last_price_offered_by_buyer as sale_price,
-        dsa.IS_3P_SUPPLY,
-        dsa.IS_3P_DEMAND,
-        dsa.payment_model,
-        ts_house_registry_ended,
-        dim.city_group,
-        duser.email AS email_especialist,
-        dsa.ccv_model,
-        dsa.is_ccv_canceled
-    FROM 
-        dw_sale.fact_offers AS fo
-    JOIN dw_sale.dim_sale_agreement AS dsa 
-        ON fo.sk_offer = dsa.sk_offer 
-    LEFT JOIN dw_public.dim_region AS dim
-        ON fo.sk_region=dim.sk_region
-    LEFT JOIN dw_public.dim_user AS duser 
-        ON fo.sk_user_consultant=duser.id
-),
-  tickets AS (
+), tickets AS (
   SELECT DISTINCT
     em.id_ticket,
     em.id_user,
@@ -167,7 +129,7 @@ post_specialist AS (
 'WH - Híbridos [SALE] [POS] [FRONT]',
 'WH - Consórcio [SALE][POS][FRONT]'
     )
-)
+), post_specialist AS (
   SELECT DISTINCT
     offer.sk_offer,
     id_user,

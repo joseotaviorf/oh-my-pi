@@ -35,7 +35,7 @@ franchise_last_pre_analysis AS (
 ) SELECT 
   'RC' as csat_campanha,
   zes.response_uuid AS feedback_id,
-  date_format(zes.ts_first_response, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') AS posted_at,
+  date_format(ftc.ts_last_response, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') AS posted_at,
   ft.sk_ticket AS ticket_id,
   ft.sk_user as author_id,
   da.email AS agent_email,

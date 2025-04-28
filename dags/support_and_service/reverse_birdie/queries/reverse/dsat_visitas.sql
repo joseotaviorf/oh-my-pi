@@ -452,7 +452,7 @@ where
     LEFT JOIN contract_count
       ON contract_count.id_user = contract.id_user
     WHERE review_status = 'DONE'
-    and DATE(ts_review_date) >= DATE('2025-03-10')
+    and DATE(ts_review_date) >= DATE('{load_start_date}')
     GROUP BY 1,2,3,4,5,6,7,8,10
 ),
 final_2 AS (
@@ -507,6 +507,10 @@ SELECT
                 ELSE customer_type
             END
         ELSE ''
-    END AS account_id
+    END AS account_id,
+  year(posted_at) AS year,
+  month(posted_at) AS month,
+  day(posted_at) AS day,
+  NOW() AS ts_load
 FROM 
   final_3

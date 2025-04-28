@@ -77,7 +77,7 @@ final as (
     tkt.rating,
       CASE WHEN rating = 5 OR rating = 4 THEN 'promoter'
           WHEN rating = 3 THEN 'passive'
-          WHEN rating = 2 OR rating = 1 THEN 'detractor' ELSE  CAST(rating AS STRING) -- Convertendo para varchar
+          WHEN rating = 2 OR rating = 1 THEN 'detractor' ELSE  CAST(rating AS STRING)
     END AS csat_score_category,
     dd.department AS department,
     COALESCE(CASE WHEN contract_count.id_user is null then null
@@ -136,6 +136,10 @@ SELECT
                   ELSE customer_type
               END
           ELSE ''
-      END AS account_id
+      END AS account_id,
+  year(posted_at) AS year,
+  month(posted_at) AS month,
+  day(posted_at) AS day,
+  NOW() AS ts_load
 FROM 
   final
