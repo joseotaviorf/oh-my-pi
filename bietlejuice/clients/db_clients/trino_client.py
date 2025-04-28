@@ -1,3 +1,4 @@
+from typing import List, Optional
 import trino
 from quintoandar_logger import QuintoAndarLogger
 from trino import constants
@@ -22,6 +23,8 @@ class TrinoClient(DBClient):
         user: str,
         password: str,
         catalog: str = "hive",
+        source: str = "bietlejuice",
+        client_tags: Optional[List[str]] = None,
         **conn_params: dict,
     ):
         """
@@ -37,6 +40,8 @@ class TrinoClient(DBClient):
             "auth": trino.auth.BasicAuthentication(user, password),
             "catalog": catalog,
             "http_scheme": constants.HTTPS,
+            "source": source,
+            "client_tags": client_tags or [],
         }
 
         conn_params.update(params)

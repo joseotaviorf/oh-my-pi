@@ -35,6 +35,7 @@ def get_trino_client() -> TrinoClient:
         user=trino_credentials["user"],
         password=trino_credentials["pwd"],
         catalog=DELTA_CATALOG,
+        client_tags=["pipeline"]
     )
 
 

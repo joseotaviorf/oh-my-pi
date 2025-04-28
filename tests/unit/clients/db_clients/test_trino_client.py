@@ -9,7 +9,11 @@ class TestTrinoClient:
     def test_conn(self):
         # arrange
         mocked_trino_client = TrinoClient(
-            host="host", port=443, user="jose.silva", password="pwd"
+            host="host",
+            port=443,
+            user="jose.silva",
+            password="pwd",
+            source="bietlejuice",
         )
 
         # act
@@ -19,6 +23,7 @@ class TestTrinoClient:
         assert isinstance(conn, Connection)
         assert conn.catalog == "hive"
         assert conn.http_scheme == constants.HTTPS
+        assert conn.source == "bietlejuice"
 
     def test_get_records(self, mocked_trino_client):
         # arrange
