@@ -3,7 +3,7 @@ dag:
   owner: Data Fintech
   schedule_interval: 0 0 * * *
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
   tables_customization:
@@ -42,7 +42,7 @@ cluster:
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
