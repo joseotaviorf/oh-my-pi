@@ -16,6 +16,7 @@ dags_out_of_pattern:
         "dw_rent_demand_events_snapshot",
         "dw_satisfaction_rating",
         "dw_velo",
+        "enrich_anonymization",
         "enrich_house_feature_inference",
         "enrich_hr_system_custom",
         "enrich_lost_listings",
@@ -65,7 +66,7 @@ dags_out_of_pattern:
         "wonka.house_visit",
         "wonka.user_visit",
         "wonka.user_search_profile_clustering",
-        "wonka.user_bc_h3_7_city_agg_search_filters"
+        "wonka.user_bc_h3_7_city_agg_search_filters",
     ]
 databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
 databricks_bucket: 5a-databricks

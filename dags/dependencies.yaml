@@ -1199,6 +1199,9 @@ bietlejuice.enrich_amplitude_user:
   - bietlejuice.amplitude:load-clean-events
 bietlejuice.enrich_amplitude_visit:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+bietlejuice.enrich_anonymization:
+  - bietlejuice.documentation_metrics:load-clean-columns-documentation
+  - bietlejuice.enrich_anonymization_validation:load-enrich-manual-validation
 bietlejuice.enrich_anonymization_validation:
   - bietlejuice.gsheets_governance:load-clean-anonymization-manual-validation
 bietlejuice.enrich_app_installed:
@@ -3565,6 +3568,11 @@ bietlejuice.metric_ss__tickets:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
+bietlejuice.reverse_anonymization:
+  - bietlejuice.composer:load-clean-dag
+  - bietlejuice.enrich_anonymization:load-enrich-columns-sample-data
+  - bietlejuice.enrich_anonymization:load-enrich-pii-scan-results
+  - bietlejuice.enrich_people_public:load-enrich-org-chart
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
@@ -3912,7 +3920,7 @@ wonka.house_visit:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
 wonka.user_embeddings_main:
   - quintoml.recs.house_user_embeddings.inference:batch-predict
-wonka.user_visit:
-  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
 wonka.user_search_profile_clustering:
   - wonka.user_bc_h3_7_city_agg_search_filters:load-user_bc_h3_7_city_agg_search_filters
+wonka.user_visit:
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
