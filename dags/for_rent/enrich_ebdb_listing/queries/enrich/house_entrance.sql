@@ -7,16 +7,16 @@ WITH old_entry_model AS (
         authorization.name AS authorization_type
     FROM
         datalake_ebdb_clean.access_type AS at
-    JOIN
+    LEFT JOIN
         datalake_ebdb_clean.key_type AS key
             ON at.id_type = key.id
-    JOIN
+    LEFT JOIN
         datalake_ebdb_clean.occupant_type AS occupant
             ON at.id_occupant = occupant.id
-    JOIN
+    LEFT JOIN
         datalake_ebdb_clean.restriction_type AS restriction
             ON at.id_restriction = restriction.id
-    JOIN
+    LEFT JOIN
         datalake_ebdb_clean.access_authorization_type AS authorization
             ON at.id_authorization = authorization.id
     WHERE

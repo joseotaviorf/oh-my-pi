@@ -378,32 +378,9 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.sale_price
     description: 'Sale price of the house'
-  access_type:
-    lineage:
-      - datalake_ebdb_clean.entry_access.access_type
-    description: 'Type of entry access of the house'
-    categories:
-      LOCK_BOX: "There's a lock box"
-      FRONT_DOOR: "Front door"
-      PASSWORD: "Access through password"
-      BIOMETRY: "Access through biometry"
-      LOCKER: "Access through a locker"
-      KEY_HOLDER: "Someone holds the key"
-  holder_role:
-    lineage:
-      - datalake_ebdb_clean.key_holder.holder_role
-    description: 'Role of the house key holder'
-    categories:
-      OWNER: 'The key is with the owner'
-      TENANT: 'The key is with the tenant'
-      INSPECTOR: 'The key is with the inspector'
-      PHOTOGRAPHER: 'The key is with the photographer'
-      AGENT: 'The key is with the agent'
-      EXTERNAL_RESPONSIBLE: 'The key is with an external responsible'
-      PARTNER: 'The key is with the partner'
   occupant_type:
     lineage:
-      - datalake_ebdb_clean.occupant_type.name
+      - datalake_ebdb_listing.house_entrance.occupant_type
     description: 'Occupant type of the house'
     categories:
       Empty: 'The house is empty'
@@ -411,7 +388,7 @@ columns:
       Tenant: 'A tenant lives in the house'
   key_type:
     lineage:
-      - datalake_ebdb_clean.key_type.name
+      - datalake_ebdb_listing.house_entrance.key_type
     description: 'Key type of the house'
     categories:
       Common: 'Common key'
@@ -420,7 +397,7 @@ columns:
       Biometry: 'Biometry'
   key_location:
     lineage:
-      - datalake_ebdb_clean.access_authorization_type.name
+      - datalake_ebdb_listing.house_entrance.authorization_type
     description: 'Key location'
     categories:
       OwnerPresent: 'Owner present at the house for the booking'
@@ -430,9 +407,26 @@ columns:
       KeysWithAgent: 'Keys with agent'
       KeysLocker: 'Keys in locker'
       Password: 'Password'
+  key_location_unified:
+    lineage:
+      - datalake_ebdb_listing.house_entrance.key_location
+    description: 'Key location unified: This field combines the access_type with the holder_role of the new entry model. If the access_type is KEY_HOLDER the holder_role field is used to identify who has the key.'
+    categories:
+      LOCK_BOX: "There's a lock box"
+      FRONT_DOOR: "Front door"
+      PASSWORD: "Access through password"
+      BIOMETRY: "Access through biometry"
+      LOCKER: "Access through a locker"
+      OWNER: 'The key is with the owner'
+      TENANT: 'The key is with the tenant'
+      INSPECTOR: 'The key is with the inspector'
+      PHOTOGRAPHER: 'The key is with the photographer'
+      AGENT: 'The key is with the agent'
+      EXTERNAL_RESPONSIBLE: 'The key is with an external responsible'
+      PARTNER: 'The key is with the partner'
   visit_restriction:
     lineage:
-      - datalake_ebdb_clean.restriction_type.name
+      - datalake_ebdb_listing.house_entrance.restriction_type
     description: 'If there is any visit restriction'
     categories:
       Restriction: 'There is a visit restriction'

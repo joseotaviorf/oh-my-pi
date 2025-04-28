@@ -119,32 +119,6 @@ smart_price AS (
       ON l.id = p.id_listing_business_context
   GROUP BY
     1
-),
-entry_access AS (
-    SELECT
-        h.id AS id_house,
-        ea.id AS id_entry_access,
-        ea.access_type
-    FROM
-        datalake_ebdb_clean.house AS h
-    LEFT JOIN
-        datalake_ebdb_clean.entry_access AS ea
-            ON ea.id_house = h.id
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY ea.id_house ORDER BY ea.ts_updated DESC) = 1
-),
-key_entry_access AS (
-    SELECT
-        ea.id_house,
-        ea.access_type,
-        kh.holder_role
-    FROM
-        entry_access AS ea
-    LEFT JOIN
-        datalake_ebdb_clean.key_holder AS kh
-            ON kh.id_entry_access = ea.id_entry_access
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY kh.id_entry_access ORDER BY kh.ts_updated DESC) = 1
 )
 SELECT
   h.id,
@@ -239,12 +213,11 @@ SELECT
   h.land_area,
   h.predicted_price,
   h.sale_price,
-  kea.access_type,
-  kea.holder_role,
-  o_type.name AS occupant_type,
-  k_type.name AS key_type,
-  a_a_type.name AS key_location,
-  r_type.name AS visit_restriction,
+  entrance.key_location AS key_location_unified,
+  entrance.occupant_type,
+  entrance.key_type,
+  entrance.authorization_type AS key_location,
+  entrance.restriction_type AS visit_restriction,
   hrs.registration_abandoned_reason AS registration_abandoned_reason,
   CASE
     WHEN h.status <> 'despublicado' THEN NULL
@@ -317,7 +290,7 @@ SELECT
   END AS is_casa_mineira_migration,
   COALESCE(li.is_sale_primary_market, FALSE) AS is_sale_primary_market,
   COALESCE(li.has_sale_great_price_tag, FALSE) AS has_sale_great_price_tag,
-  COALESCE(r_type.name = 'Restriction', FALSE) AS has_visit_restriction,
+  COALESCE(entrance.restriction_type = 'Restriction', FALSE) AS has_visit_restriction,
   h.has_requested_professional_photos,
   h.has_owner_incomplete_listing_notification,
   h.has_admin_incomplete_listing_notification,
@@ -367,26 +340,8 @@ LEFT JOIN
   datalake_ebdb_clean.local
     ON local.id = h.id_closest_station
 LEFT JOIN
-  datalake_ebdb_clean.access_type AS a_type
-    ON a_type.id_house = h.id
--- who lives in the house
-LEFT JOIN
-  datalake_ebdb_clean.occupant_type AS o_type
-    ON a_type.id_occupant = o_type.id
--- key types (e.g., password, biometric, etc.)
-LEFT JOIN
-  datalake_ebdb_clean.key_type AS k_type
-    ON a_type.id_type = k_type.id
--- where is the key (e.g., owner, lockbox, etc.)
-LEFT JOIN
-  datalake_ebdb_clean.access_authorization_type AS a_a_type
-    ON a_type.id_authorization = a_a_type.id
-LEFT JOIN
-  datalake_ebdb_clean.restriction_type AS r_type
-    ON a_type.id_restriction = r_type.id
-LEFT JOIN
-  key_entry_access AS kea
-    ON kea.id_house = h.id
+  datalake_ebdb_listing.house_entrance AS entrance
+    ON entrance.id_house = h.id
 -- abandoned reason
 LEFT JOIN
   datalake_ebdb_clean.house_registration_status AS hrs

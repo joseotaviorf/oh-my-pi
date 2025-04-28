@@ -12,6 +12,8 @@ workflow:
   inner_dependencies:
     agents_with_keys:
     - house_listing
+    house:
+    - house_entrance
     house_listing:
     - house_listing_early_demand
     - listing_business_context
