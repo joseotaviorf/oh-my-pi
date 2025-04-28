@@ -9,28 +9,30 @@ dag:
       is a manager for follow ups. In other words, the purpose of it is to store and manage Follow Ups (A.K.A. reviews).
 
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
+  source_schema: public
+  source_database: insider
   lineage_product_database_name: insider
   dbutils_secret_key: INSIDER_DB
   tables_customization:
     feature:
-      extraction_type: full
+      raw_primary_keys: ["id"]
     resource:
-      extraction_type: full
+      raw_primary_keys: ["id"]
     review_aud:
-      extraction_type: full
+      raw_primary_keys: ["id", "rev"]
     review_feature:
-      extraction_type: full
+      raw_primary_keys: ["id"]
     review:
-      extraction_type: full
+      raw_primary_keys: ["id"]
     template_feature:
-      extraction_type: full
+      raw_primary_keys: ["id"]
     template:
-      extraction_type: full
+      raw_primary_keys: ["id"]
     user_revision_entity:
-      extraction_type: full
+      raw_primary_keys: ["id"]
 
 cluster:
   type: custom_cluster
