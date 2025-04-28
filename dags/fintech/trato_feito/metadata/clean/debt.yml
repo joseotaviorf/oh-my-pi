@@ -29,12 +29,18 @@ columns:
   discount_amount:
     lineage:
       - datalake_trato_feito_raw.debt.discount_amount
+  is_write_off:
+    lineage:
+      - datalake_trato_feito_raw.debt.write_off
   dt_due:
     lineage:
       - datalake_trato_feito_raw.debt.due_date
   dt_offset:
     lineage:
       - datalake_trato_feito_raw.debt.offset_at
+  dt_write_off:
+    lineage;
+      - datalake_trato_feito_raw.debt.write_off_at
   ts_created:
     lineage:
       - datalake_trato_feito_raw.debt.created_at
