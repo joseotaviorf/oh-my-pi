@@ -155,6 +155,8 @@ columns:
     lineage:
       - datalake_customer_support.calls.is_reservation_answered
     description: Indicates if the interaction was answered.
+  is_spoc_task:
+    description: True if the task was originated by SPOC
   is_first_interaction:
     description: Indicates if this is the first interaction in the contact.
   is_last_interaction:

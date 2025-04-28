@@ -82,6 +82,7 @@ twilio_demand AS (
     NULL AS is_per_team_task,
     is_call_answered AS is_contact_answered,
     is_reservation_answered AS is_interaction_answered,
+    NULL AS is_spoc_task,
     ts_task_created,
     ts_reservation_created,
     ts_reservation_ended,
@@ -100,7 +101,7 @@ twilio_demand AS (
     NULL AS id_reservation,
     id_user,
     queue_name,
-    'inbound' AS direction,
+    direction,
     'chat' AS channel,
     origin,
     CASE
@@ -125,6 +126,7 @@ twilio_demand AS (
       WHEN task_completion_reason = 'Task TTL Exceeded or Max assignment count exceeded' THEN FALSE
       ELSE TRUE
     END AS is_interaction_answered,
+    is_spoc_task,
     ts_created AS ts_task_created,
     NULL AS ts_reservation_created,
     NULL AS ts_reservation_ended,
@@ -177,6 +179,7 @@ twilio_contacts AS (
     d.is_per_team_task,
     d.is_contact_answered,
     d.is_interaction_answered,
+    d.is_spoc_task,
     d.ts_task_created,
     COALESCE(d.ts_reservation_created, crt.ts_reservation_created) AS ts_reservation_created,
     d.ts_reservation_ended,
@@ -263,6 +266,7 @@ front_contacts AS (
     is_per_team_task,
     is_contact_answered,
     is_interaction_answered,
+    is_spoc_task,
     ts_task_created,
     ts_reservation_created,
     ts_reservation_ended
@@ -305,6 +309,7 @@ front_contacts AS (
     NULL AS is_per_team_task,
     TRUE AS is_contact_answered,
     TRUE AS is_interaction_answered,
+    NULL AS is_spoc_task,
     t.ts_created AS ts_task_created,
     NULL AS ts_reservation_created,
     NULL AS ts_reservation_ended
@@ -361,6 +366,7 @@ SELECT DISTINCT
   is_per_team_task,
   is_contact_answered,
   is_interaction_answered,
+  is_spoc_task,
   ts_task_created,
   ts_reservation_created,
   ts_reservation_ended,

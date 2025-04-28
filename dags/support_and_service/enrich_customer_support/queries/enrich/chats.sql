@@ -33,7 +33,8 @@ sauron_sessions AS (
     id AS id_session,
     user_data:["user_id"] AS id_user,
     user_data:["user_phone"] AS user_phone,
-    user_data:["user_email"] AS user_email
+    user_data:["user_email"] AS user_email,
+    created_by
   FROM
     datalake_sauron_clean.session
   WHERE
@@ -64,6 +65,7 @@ tasks AS (
     seconds_to_first_response,
     is_forwarded,
     is_per_team_task,
+    is_spoc_task,
     ts_created,
     ts_updated,
     task_attributes
@@ -71,7 +73,6 @@ tasks AS (
     datalake_quinto_messenger_clean.task
   WHERE
     MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" - INTERVAL 30 DAY AND "{load_end_date}"
-    AND is_spoc_task IS FALSE
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
 )
@@ -90,6 +91,11 @@ SELECT
     WHEN ias.id_session IS NOT NULL THEN 'in app'
     WHEN ws.id_session IS NOT NULL THEN 'whatsapp'
   END AS origin,
+  CASE
+    WHEN t.is_spoc_task IS TRUE AND ss.created_by = 'human_support' THEN 'inbound'
+    WHEN t.is_spoc_task IS TRUE AND ss.created_by = 'user' THEN 'outbound'
+    ELSE 'inbound'
+  END AS direction,
   t.worker_email,
   t.channel_type,
   t.task_status,
@@ -99,6 +105,7 @@ SELECT
   t.seconds_to_first_response,
   t.is_forwarded,
   t.is_per_team_task,
+  t.is_spoc_task,
   t.ts_created,
   t.ts_updated AS ts_ended,
   t.task_attributes,

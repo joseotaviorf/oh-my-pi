@@ -52,6 +52,8 @@ columns:
       - datalake_quinto_messenger_clean.chat.id_session
       - datalake_quinto_messenger_clean.channel.id_session
     description: Origin of the task communication, either 'in app' or 'whatsapp'.
+  direction:
+    description: If the task was originated from the customer (outbound) or by an analyst (inbound).
   worker_email:
     lineage:
       - datalake_quinto_messenger_clean.task.worker_email
@@ -88,6 +90,10 @@ columns:
     lineage:
       - datalake_quinto_messenger_clean.task.conversation_attributes
     description: Indicates if the task is assigned per team based on conversation attributes.
+  is_spoc_task:
+    lineage:
+      - datalake_quinto_messenger_clean.task.is_spoc_task
+    description: Indicates if the task is part of a SPOC
   ts_created:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
