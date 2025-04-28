@@ -16,7 +16,7 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_start_date') }}"
 cluster:
-  type: databricks_12_2_med_2xlarge_general_cluster
+  type: databricks_13_3_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
