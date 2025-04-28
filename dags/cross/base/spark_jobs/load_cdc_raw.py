@@ -1,3 +1,4 @@
+import json
 from argparse import ArgumentParser
 
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
@@ -7,7 +8,9 @@ from bietlejuice.base.cdc.primary_key_identifiers.raw_primary_key_identifier imp
 from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import (
     CdcSchemaFinderFactory,
 )
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from quintoandar_logger import QuintoAndarLogger
 
@@ -36,6 +39,14 @@ def parse_arguments():
     parser.add_argument("end_date")
     parser.add_argument("primary_keys", help="Comma separated list of primary keys")
     parser.add_argument("dbutils_secret_key")
+    parser.add_argument(
+        "-tp",
+        "--table-privileges",
+        type=lambda arg: None if not arg else arg,
+        help="json string mapping each principal to a list of permissions for the table",
+        required=False,
+        default=None,
+    )
 
     return parser.parse_args()
 
@@ -101,6 +112,11 @@ def main():
     start_date = args.start_date
     end_date = args.end_date
     dbutils_secret_key = args.dbutils_secret_key
+    if args.table_privileges is not None:
+        table_privileges_dict = json.loads(args.table_privileges)
+    else:
+        table_privileges_dict = None
+    
     if args.primary_keys:
         primary_keys = [key.strip() for key in args.primary_keys.split(",")]
     else:
@@ -146,6 +162,12 @@ def main():
     transactional_df = dml_processor(transactional_df, primary_keys)
 
     full_raw_table_name = f"datalake_{schema}_raw.{table_name}"
+    if table_privileges_dict is not None:
+        table_privileges = TablePrivileges.from_input_dict(
+            table_privileges_dict, full_raw_table_name
+        )
+    else:
+        table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
 
     loader = DeltaLoader(spark)
     loader.load_table(
@@ -158,6 +180,12 @@ def main():
     SparkTablePropertyHelper.set_property(
         full_raw_table_name, "primary_keys", ",".join(primary_keys), spark
     )
+    
+    if (
+        table_privileges
+        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+    ):
+        table_privileges.apply()
 
 
 if __name__ == "__main__":

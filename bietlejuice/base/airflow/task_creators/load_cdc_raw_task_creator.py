@@ -1,3 +1,4 @@
+import json
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
@@ -51,6 +52,8 @@ class LoadCDCRawTaskCreator(BaseTaskCreator):
             self.dag_execution_context.load_end_date,
             primary_keys,
             dbutils_secret_key,
+            "--table-privileges",
+            json.dumps(table_attributes.table_privileges),
         ]
 
     def create_task(

@@ -4,10 +4,12 @@ from argparse import ArgumentParser, Namespace
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import PostgresConsumer
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
@@ -41,6 +43,14 @@ def parse_arguments() -> Namespace:
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
     parser.add_argument("dbutils_secret_scope")
+    parser.add_argument(
+        "-tp",
+        "--table-privileges",
+        type=lambda arg: None if not arg else arg,
+        help="json string mapping each principal to a list of permissions for the table",
+        required=False,
+        default=None,
+    )
 
     return parser.parse_args()
 
@@ -76,6 +86,10 @@ def main():
     read_from_sql = True if args.read_from_sql.lower() == "true" else False
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
+    if args.table_privileges is not None:
+        table_privileges_dict = json.loads(args.table_privileges)
+    else:
+        table_privileges_dict = None
 
     logger.info(
         f"""
@@ -97,6 +111,14 @@ def main():
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    
+    full_raw_table_name = f"{database_name}.{table_name}"
+    if table_privileges_dict is not None:
+        table_privileges = TablePrivileges.from_input_dict(
+            table_privileges_dict, full_raw_table_name
+        )
+    else:
+        table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
 
     spark_metastore_service = SparkMetastoreService(spark_client)
 
@@ -139,6 +161,12 @@ def main():
         FullTableLoaderPipeline(
             database_name, table_name.lower(), database_location, LayerEnum.RAW, None
         ).load_and_register(df, format_options, **load_options)
+
+    if (
+        table_privileges
+        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+    ):
+        table_privileges.apply()
 
 
 if __name__ == "__main__":

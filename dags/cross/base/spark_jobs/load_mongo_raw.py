@@ -4,8 +4,10 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient, MongoClient
 from bietlejuice.consumers.db_consumers import MongoConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -136,6 +138,14 @@ def parse_arguments() -> Namespace:
         help="S3 load options for spark dataframe, in JSON format",
     )
     parser.add_argument("dbutils_secret_scope")
+    parser.add_argument(
+        "-tp",
+        "--table-privileges",
+        type=lambda arg: None if not arg else arg,
+        help="json string mapping each principal to a list of permissions for the table",
+        required=False,
+        default=None,
+    )
 
     return parser.parse_args()
 
@@ -166,6 +176,10 @@ if __name__ == "__main__":
     dbutils_secret_scope = args.dbutils_secret_scope
     execution_date = args.execution_date
     load_options = json.loads(args.load_options) if args.load_options else {}
+    if args.table_privileges is not None:
+        table_privileges_dict = json.loads(args.table_privileges)
+    else:
+        table_privileges_dict = None
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
 
@@ -198,6 +212,14 @@ if __name__ == "__main__":
 
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    
+    full_raw_table_name = f"{databricks_database_name}.{table_name}"
+    if table_privileges_dict is not None:
+        table_privileges = TablePrivileges.from_input_dict(
+            table_privileges_dict, full_raw_table_name
+        )
+    else:
+        table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
 
     _extract_table_from_database(
         table_name=table_name,
@@ -207,3 +229,9 @@ if __name__ == "__main__":
         execution_date=execution_date,
         **load_options,
     )
+    
+    if (
+        table_privileges
+        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+    ):
+        table_privileges.apply()

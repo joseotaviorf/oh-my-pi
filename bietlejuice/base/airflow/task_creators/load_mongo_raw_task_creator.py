@@ -56,4 +56,6 @@ class LoadMongoRawTaskCreator(BaseTaskCreator):
             self.dag_execution_context.execution_date,
             load_options,
             dbutils_secret_scope,
+            "--table-privileges",
+            json.dumps(table_attributes.table_privileges),
         ]

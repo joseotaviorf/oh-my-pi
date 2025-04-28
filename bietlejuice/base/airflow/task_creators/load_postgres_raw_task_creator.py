@@ -66,4 +66,6 @@ class LoadPostgresRawTaskCreator(BaseTaskCreator):
             self.dag_execution_context.load_start_date,
             self.dag_execution_context.load_end_date,
             dbutils_secret_scope,
+            "--table-privileges",
+            json.dumps(table_attributes.table_privileges),
         ]

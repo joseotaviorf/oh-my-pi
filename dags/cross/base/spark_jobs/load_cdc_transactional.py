@@ -1,6 +1,7 @@
 import logging
 import json
 from argparse import ArgumentParser
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.spark.base_spark import BaseDBUtils
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
@@ -19,6 +20,7 @@ from bietlejuice.base.cdc.schema_treatment.schema_changes_notifier import (
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 
 
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from datetime import datetime
 from pyspark.sql.functions import col, to_timestamp, lit, struct
@@ -50,6 +52,14 @@ def parse_arguments():
         dest="database_column_alias",
         required=False,
         default="{}",
+    )
+    parser.add_argument(
+        "-tp",
+        "--table-privileges",
+        type=lambda arg: None if not arg else arg,
+        help="json string mapping each principal to a list of permissions for the table",
+        required=False,
+        default=None,
     )
 
     return parser.parse_args()
@@ -210,7 +220,17 @@ def main():
     dbutils_secret_key = args.dbutils_secret_key
     transactional_datatype_overrides = json.loads(args.transactional_datatype_overrides)
     database_column_alias = json.loads(args.database_column_alias)
+    if args.table_privileges is not None:
+        table_privileges_dict = json.loads(args.table_privileges)
+    else:
+        table_privileges_dict = None
     full_table_name = f"datalake_{schema}_transactional.{table_name}"
+    if table_privileges_dict is not None:
+        table_privileges = TablePrivileges.from_input_dict(
+            table_privileges_dict, full_table_name
+        )
+    else:
+        table_privileges = TablePrivileges.from_environment_default(full_table_name)
     schema_finder = CdcSchemaFinderFactory(
         dbutils_secret_key=dbutils_secret_key
     ).get_cdc_schema_finder(DatabaseTypeEnum(database_type))
@@ -297,6 +317,12 @@ def main():
     load_df_into_transactional(
         transactional_df, datalake_bucket, schema, table_name.lower(), partitions
     )
+    
+    if (
+        table_privileges
+        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
+    ):
+        table_privileges.apply()
 
 
 if __name__ == "__main__":

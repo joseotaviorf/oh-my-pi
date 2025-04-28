@@ -64,6 +64,8 @@ class LoadCDCTransactionalTaskCreator(BaseTaskCreator):
             json.dumps(transactional_datatype_overrides),
             "--database-column-alias",
             json.dumps(database_column_alias),
+            "--table-privileges",
+            json.dumps(table_attributes.table_privileges),
         ]
         return parameters
 
