@@ -7,6 +7,12 @@ columns:
   id_related_document:
     lineage:
       - datalake_vans_raw.payment.related_document_id
+  unique_company_use:
+    lineage:
+      - datalake_vans_raw.payment.unique_company_use
+  unique_payment_identifier:
+    lineage:
+      - datalake_vans_raw.payment.unique_payment_identifier
   due_amount:
     lineage:
       - datalake_vans_raw.payment.due_amount

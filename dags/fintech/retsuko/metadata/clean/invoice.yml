@@ -27,6 +27,10 @@ columns:
     description: "External ID that indicates the Charge in Checkout product"
     lineage:
       - datalake_retsuko_raw.invoice.checkout_charge_id
+  id_idempotency:
+    description: ""
+    lineage: 
+      - datalake_retsuko_raw.invoice.idempotency_id
   status:
     lineage:
       - datalake_retsuko_raw.invoice.status
@@ -120,6 +124,14 @@ columns:
     description: "Date that the payment was credited in our bank account, in CNAB cases, after two business day in general"
     lineage:
       - datalake_retsuko_raw.invoice.payment_credit_date
+  ts_payment_chargeback:
+    description: ""
+    lineage: 
+      - datalake_retsuko_raw.invoice.payment_chargeback_at
+  ts_payment_refunded:
+    description: ""
+    lineage: 
+      - datalake_retsuko_raw.invoice.payment_refunded_at
   ts_canceled:
     lineage:
       - datalake_retsuko_raw.invoice.canceled_at

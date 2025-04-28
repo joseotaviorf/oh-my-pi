@@ -2,6 +2,8 @@ SELECT
     id,
     related_document_id AS id_related_document,
     bank_payment_id AS id_bank_payment,
+    unique_company_use,
+    unique_payment_identifier,
     due_amount,
     due_date AS dt_dued,
     timestamp(issue_date_time) AS ts_issued,
