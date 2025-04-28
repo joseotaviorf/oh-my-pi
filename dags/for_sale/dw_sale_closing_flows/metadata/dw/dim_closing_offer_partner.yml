@@ -8,6 +8,10 @@ columns:
     description: The unique identifier for the offer.
     lineage:
       - dw_sale.fact_offers.sk_offer
+  sk_pre_analysis:
+    description: The unique identifier for the pre-analysis.
+    lineage:
+      - dw_atta.fact_pre_analysis_proposal_flow.sk_pre_analysis
   business_unit:
     description: The business unit related to the offer.
     lineage:

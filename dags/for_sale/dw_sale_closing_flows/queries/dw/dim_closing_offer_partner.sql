@@ -77,71 +77,72 @@ dim_financed_proposal AS (
         AND fpp.sk_offer != '-1'
     GROUP BY ALL
 )
-SELECT
- fo.sk_offer,
- ca.partner_name,
- ca.franchise_name,
- ca.consultant_name,
- ca.partner_type,
- CASE
-    WHEN ca.first_pre_analysis IS NOT NULL AND ca.partner_type IN ('EXTERNAL', 'FRANCHISE')
-    THEN 'PARTNER'
-    ELSE 'INTERNAL'
- END AS partner_type_group,
-CASE
-    WHEN ca.first_credit_approved_date IS NOT NULL
-    THEN 'Approved'
-    ELSE ca.last_credit_analysis_status
- END AS last_credit_analysis_status,
- ca.financing_bank,
- ca.financing_value,
- ca.proposal_status,
- ca.proposal_situation,
- CASE
-    WHEN fo.ts_offer_dismissed IS NOT NULL AND fo.ts_offer_rescued IS NULL OR dsa.ts_sale_agreement_cancelled IS NOT NULL
-    THEN TRUE ELSE FALSE
- END AS is_ccv_canceled,
- CASE
-    WHEN do.payment_method IN ('FINANCED_USING_FGTS','FINANCED')
-    THEN TRUE
-    ELSE FALSE
- END AS is_offer_financed,
- CASE
-    WHEN fo.ts_offer_dismissed IS NOT NULL AND fo.ts_offer_rescued IS NULL
-    THEN TRUE
-    ELSE FALSE
- END AS is_offer_canceled,
- CASE
-    WHEN fo.ts_offer_accepted IS NOT NULL
-    THEN TRUE
-    ELSE FALSE
- END AS is_offer_accepted,
- CASE
-    WHEN ca.proposal_approved > 0
-    THEN TRUE
-    ELSE FALSE
- END AS is_credit_approved,
- CASE
-    WHEN ca.last_credit_ended IS NOT NULL
-    THEN TRUE
-    ELSE FALSE
- END AS is_credit_ended,
- CASE
-    WHEN COALESCE(ca.last_credit_ended, ca.credit_ended_isolve) IS NOT NULL
-    THEN TRUE
-    ELSE FALSE
- END AS is_credit_ended_general,
- CASE
-    WHEN fo.sk_sale_agreement_signed_date > 0
-    THEN TRUE
-    ELSE FALSE
- END AS is_ccv_signed,
- CASE
-    WHEN ca.last_financing_ended IS NOT NULL
-    THEN TRUE
-    ELSE FALSE
- END AS is_financing_ended,
- NOW() AS ts_load
+SELECT DISTINCT
+    fo.sk_offer,
+    ca.sk_pre_analysis,
+    ca.partner_name,
+    ca.franchise_name,
+    ca.consultant_name,
+    ca.partner_type,
+    CASE
+        WHEN ca.first_pre_analysis IS NOT NULL AND ca.partner_type IN ('EXTERNAL', 'FRANCHISE')
+        THEN 'PARTNER'
+        ELSE 'INTERNAL'
+    END AS partner_type_group,
+    CASE
+        WHEN ca.first_credit_approved_date IS NOT NULL
+        THEN 'Approved'
+        ELSE ca.last_credit_analysis_status
+    END AS last_credit_analysis_status,
+    ca.financing_bank,
+    ca.financing_value,
+    ca.proposal_status,
+    ca.proposal_situation,
+    CASE
+        WHEN fo.ts_offer_dismissed IS NOT NULL AND fo.ts_offer_rescued IS NULL OR dsa.ts_sale_agreement_cancelled IS NOT NULL
+        THEN TRUE ELSE FALSE
+    END AS is_ccv_canceled,
+    CASE
+        WHEN do.payment_method IN ('FINANCED_USING_FGTS','FINANCED')
+        THEN TRUE
+        ELSE FALSE
+    END AS is_offer_financed,
+    CASE
+        WHEN fo.ts_offer_dismissed IS NOT NULL AND fo.ts_offer_rescued IS NULL
+        THEN TRUE
+        ELSE FALSE
+    END AS is_offer_canceled,
+    CASE
+        WHEN fo.ts_offer_accepted IS NOT NULL
+        THEN TRUE
+        ELSE FALSE
+    END AS is_offer_accepted,
+    CASE
+        WHEN ca.proposal_approved > 0
+        THEN TRUE
+        ELSE FALSE
+    END AS is_credit_approved,
+    CASE
+        WHEN ca.last_credit_ended IS NOT NULL
+        THEN TRUE
+        ELSE FALSE
+    END AS is_credit_ended,
+    CASE
+        WHEN COALESCE(ca.last_credit_ended, ca.credit_ended_isolve) IS NOT NULL
+        THEN TRUE
+        ELSE FALSE
+    END AS is_credit_ended_general,
+    CASE
+        WHEN fo.sk_sale_agreement_signed_date > 0
+        THEN TRUE
+        ELSE FALSE
+    END AS is_ccv_signed,
+    CASE
+        WHEN ca.last_financing_ended IS NOT NULL
+        THEN TRUE
+        ELSE FALSE
+    END AS is_financing_ended,
+    NOW() AS ts_load
 FROM
     dw_sale.fact_offers AS fo
 LEFT JOIN
