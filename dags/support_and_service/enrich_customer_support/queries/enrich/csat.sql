@@ -16,8 +16,8 @@ WITH csat_zendesk AS (
   FROM
     datalake_zendesk_clean.tickets
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 30 DAY AND '{load_end_date}'
-    AND ts_updated >= '{load_start_date}' - INTERVAL 30 DAY
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 1 YEAR AND '{load_end_date}'
+    AND ts_updated >= '{load_start_date}' - INTERVAL 1 YEAR
   UNION ALL
   SELECT
     id_ticket,
@@ -29,8 +29,8 @@ WITH csat_zendesk AS (
   FROM
     datalake_survicate.zendesk_email_surveys
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 30 DAY AND '{load_end_date}'
-    AND ts_first_response >= '{load_start_date}' - INTERVAL 30 DAY
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' - INTERVAL 1 YEAR AND '{load_end_date}'
+    AND ts_first_response >= '{load_start_date}' - INTERVAL 1 YEAR
     AND id_ticket IS NOT NULL
     AND COALESCE(CAST(user_comment AS STRING), CAST(csat_score AS STRING), CAST(is_solved AS STRING)) IS NOT NULL
 )
@@ -66,7 +66,7 @@ LEFT JOIN
     ON t.id_twilio = e.id_task
     OR t.id_twilio = e.id_call
 WHERE
-  MAKE_DATE(e.year, e.month, e.day) BETWEEN '{load_start_date}' - INTERVAL 30 DAY AND '{load_end_date}'
+  MAKE_DATE(e.year, e.month, e.day) BETWEEN '{load_start_date}' - INTERVAL 1 YEAR AND '{load_end_date}'
   AND e.csat_2 is not null
 UNION ALL
 SELECT DISTINCT
@@ -89,5 +89,5 @@ LEFT JOIN
     ON ss.id = sa.id_survey
 WHERE
   sa.id IS NOT NULL
-  AND DATE(c.ts_attended) BETWEEN '{load_start_date}' - INTERVAL 30 DAY AND '{load_end_date}'
+  AND DATE(c.ts_attended) BETWEEN '{load_start_date}' - INTERVAL 1 YEAR AND '{load_end_date}'
   AND sa.rating IS NOT NULL
