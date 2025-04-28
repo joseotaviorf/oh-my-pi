@@ -571,7 +571,8 @@ ticket_metrics AS (
           'Offboarding pré saída [OFF] [POS] [BACK]',
           'Proteção QuintoAndar [OFF] [POS] [BACK]',
           'Rescisão - Despejo [OFF][POS][BACK]',
-          'Rescisão 1 [OFF] [POS] [BACK]'
+          'Rescisão 1 [OFF] [POS] [BACK]',
+          'Welcome Onboarding [BACK] [POS]'
         )
         AND t.ticket_origin != 'call outbound' THEN TRUE
       WHEN t.channel IN ('email', 'whatsapp')
@@ -585,7 +586,8 @@ ticket_metrics AS (
           'Offboarding pré saída [OFF] [POS] [BACK]',
           'Proteção QuintoAndar [OFF] [POS] [BACK]',
           'Rescisão - Despejo [OFF][POS][BACK]',
-          'Rescisão 1 [OFF] [POS] [BACK]'
+          'Rescisão 1 [OFF] [POS] [BACK]',
+          'Welcome Onboarding [BACK] [POS]'
         )
         AND NOT (
           t.last_queue = 'ReclameAqui [CE] [POS] [BACK]'
