@@ -7,6 +7,6 @@ description: str()
 columns: map(include("column"), key=str(min=1, max=280))
 ---
 column:
-  description: str(min=0, required=True)
+  description: str(min=10)
   lineage: list(str(min=1, max=280), required=False)
   categories: map(str(), key=str(), required=False)

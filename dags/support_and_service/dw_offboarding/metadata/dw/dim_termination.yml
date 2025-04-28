@@ -10,9 +10,9 @@ columns:
     lineage:
       - datalake_terminator.termination.id_termination
   sk_mediation_ticket:
-  lineage:
-    - datalake_offboarding.mediations.id_ticket
-  description: Mediation ticket linked to the termination, if it exists.
+    lineage:
+      - datalake_offboarding.mediations.id_ticket
+    description: Mediation ticket linked to the termination, if it exists.
   cancellation_info:
     description: Data with json structure that indicates detailed information about canceling termination.
     lineage:
