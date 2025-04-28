@@ -20,7 +20,7 @@ regions AS (
     SELECT
         r.id AS id_neighborhood,
         r.name AS neighborhood,
-        ST_PolygonFromText(REPLACE(REGEXP_REPLACE(pr.polygon, "POLYGON\\(\\(|\\)\\)", ""), " ", ","), ",") AS geometry
+        ST_GeomFromText(polygon) AS geometry
     FROM
         datalake_ebdb_clean.polygon_region AS pr
     JOIN
