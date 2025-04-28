@@ -1,0 +1,57 @@
+---
+database_name: datalake_gsheets_clean
+table_name: notary_office_nps
+owner: leonardo.soares@quintoandar.com.br
+domain: For Sale
+description: Table with data about NPS from Notary Office
+columns:
+  sk_offer:
+    description: 'Surrogate key for the offer'
+    lineage:
+    - datalake_gsheets_raw.notary_office_nps.sk_offer
+  metric_group:
+    description: 'Metric group of the NPS'
+    lineage:
+    - datalake_gsheets_raw.notary_office_nps.metric_group
+  payment_method:
+    description: 'Payment method used in the offer'
+    lineage:
+    - datalake_gsheets_raw.notary_office_nps.payment_method
+  score_category:
+    description: 'Score category of the NPS'
+    lineage:
+    - datalake_gsheets_raw.notary_office_nps.score_category
+  comment:
+    description: 'Comment from the notary office'
+    lineage:
+    - datalake_gsheets_raw.notary_office_nps.comment
+  support_partners_notary:
+    description: 'Support partners notary office'
+    lineage:
+    - datalake_gsheets_raw.notary_office_nps.apoio_parceiros_cartorio
+  support_name:
+    description: Suppot name of the notary office'
+    lineage:
+    - datalake_gsheets_raw.notary_office_nps.apoio_name
+  support_followed_with_partner:
+    description: ''
+    lineage:
+    - "datalake_gsheets_raw.notary_office_nps.apoio_seguiu_com_parceiro"
+  score:
+    description: 'Score of the NPS'
+    lineage:
+    - datalake_gsheets_raw.notary_office_nps.score
+  dt_offer_shared:
+    description: 'Date of the offer shared'
+    lineage:
+    - datalake_gsheets_raw.notary_office_nps.dt_offer_compartilhada
+  ts_answered:
+    description: 'Timestamp when the NPS was answered'
+    lineage:
+    - datalake_gsheets_raw.notary_office_nps.ts_answered
+  ts_sale_agreement_signed:
+    description: 'Timestamp when the sale agreement was signed'
+    lineage:
+    - datalake_gsheets_raw.notary_office_nps.ts_sale_agreement_signed
+  ts_load:
+    description: 'Timestamp when the data was loaded'

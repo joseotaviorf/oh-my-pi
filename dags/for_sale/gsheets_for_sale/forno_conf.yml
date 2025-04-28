@@ -257,3 +257,9 @@ sheets_info:
     sheet_name: ipo_roadmap
     clean_table_name: ipo_roadmap
     sheet_context: for_sale
+
+  notary_office_nps:
+    sheet_id: 1YqjKLgf17qRNVdoJbI_-KGMIY7uHGF4cbmYLKaBhn14
+    sheet_name: q_nps
+    clean_table_name: notary_office_nps
+    sheet_context: for_sale
