@@ -1,8 +1,0 @@
----
-database_name: datalake_gsheets_hcm_db_raw
-description:
-  Table containing data extracted from Oracle HCM related to fnd lookup
-  values.
-domain: people
-owner: isabella.araujo@quintoandar.com.br
-table_name: fnd_lookup_values
