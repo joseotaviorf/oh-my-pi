@@ -123,6 +123,7 @@ SELECT
   date_format(posted_at, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') AS posted_at,
   rating,
   csat_score_category,
+  text,
   department,
   CASE WHEN customer_type = 'Inquilino' THEN 'tenant'
             WHEN customer_type = 'Proprietario' THEN 'landlord'
