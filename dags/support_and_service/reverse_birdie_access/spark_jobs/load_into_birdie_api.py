@@ -20,6 +20,20 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 def create_results_payload(database_name, table_name, execution_date):
+    search_mapping = {
+                        'dsat_bot': 'csat',
+                        'dsat_visitas': 'csat',
+                        'dsat_customer_relationship':'csat',
+                        'dsat_novas_pesquisas':'csat',
+                        'dsat_diligencia': 'csat',
+                        'nps_onboarding': 'nps',
+                        'nps_ongoing':'nps',
+                        'nps_offboarding':'nps',
+                        'nps_lost': 'nps',
+                        'nps_pp_multi': 'nps',
+                        'nps_novas_pesquisas':'nps',
+                        'nps_end_of_process': 'nps',
+                    }
     df = spark.sql(
             f"""
                 SELECT 
@@ -30,43 +44,41 @@ def create_results_payload(database_name, table_name, execution_date):
                     year={execution_date.year} 
                     AND month={execution_date.month} 
                     AND day={execution_date.day}
+                LIMIT 20
             """
         )
-    nps_df = df.withColumn("ts_answer", date_format("ts_answer", "yyyy-MM-dd"))
-    nps_df = nps_df.fillna("")
-    nps_content = {
-        row['sk_nps_answer']: {"uuid_person": row['uuid_person'], 
-                            "score": row['score'], 
-                            "campaign_name": row['campaign_name'],
-                            "comment": row['comment'], 
-                            "score_category": row['score_category'], 
-                            "ts_answer": row['ts_answer'],
-                            "sk_user": row['sk_user']
-                            } 
-        for row in nps_df.collect()}
-
+    if search_mapping[table_name] == 'csat':
+        campaign_title = "csat_campanha"
+    else:
+        campaign_title = "nome_campanha"
+        
+    for col in df.columns:
+        if dict(df.dtypes)[col] == 'int':
+            df = df.fillna({col: np.NaN })
+        else:
+            df = df.fillna({col: ""})
+    
+    nps_content = {row['feedback_id']: {k: v for k, v in row.asDict().items()} for row in df.collect()}
     results_list = []
     for key, value in nps_content.items():
         result_dict = {}
-        result_dict["posted_at"] = value['ts_answer'] + "T00:00:00Z"
-        result_dict["text"] = value['comment']
-        result_dict["language"] = 'en'
+        result_dict["posted_at"] = value['posted_at']
+        result_dict["text"] = value['text']
+        result_dict["language"] = 'pt-BR'
         result_dict["kind"] = {
-            "name": "nps",
-            "fields": {
-                "author_id": value['uuid_person'],
-                "author_name": str(value['sk_user']),
+                "name": search_mapping[table_name],
+                "fields": {
+                "author_id": str(value['author_id']),
+                "author_name": str(value['author_id']),
                 "account_id": "Quinto Andar",
-                "title": value['campaign_name'],
-                "rating": value['score']
-            }
-        }
-        result_dict["additional_fields"] = {
-            "classification": value['score_category']
-        }
+                "title": value[f'{campaign_title}'],
+                "rating": value['rating']
+                    }
+                }
+        result_dict["additional_fields"] = {k: str(v) for k, v in value.items()}
         results_json = {    
-            key: result_dict
-        }
+                key: result_dict
+                }
         results_list.append(results_json)
     return results_list
 
@@ -103,10 +115,10 @@ def send_payload(api_url, endpoint, headers, results_list):
     errors_dispatches = []
 
     for x in results_list:
-        for sk_nps_answer in x.keys():
-            data = x[sk_nps_answer]
+        for feedback_id in x.keys():
+            data = x[feedback_id]
             response = requests.put(
-                f'{api_url}/{endpoint}/{sk_nps_answer}',
+                f'{api_url}/{endpoint}/{feedback_id}',
                 headers=headers,
                 data=json.dumps(data)
                 )
@@ -117,7 +129,7 @@ def send_payload(api_url, endpoint, headers, results_list):
                 time.sleep(1)
                 break
             else:
-                logger.error(f"m=Error sending batch. Retrying... Batch_index={successful_dispatches}, status_code={response.status_code}")
+                logger.error(f"m=Error sending batch. Retrying... Batch_index={successful_dispatches}, status_code={response.status_code}. Message={response.text}")
                 errors_dispatches.append(x)
 
     if successful_dispatches != total_dispatches:
@@ -125,10 +137,10 @@ def send_payload(api_url, endpoint, headers, results_list):
         logger.info(f"Starting retry process for {len(errors_dispatches)} records")
         retry_success = 0
         for x in errors_dispatches:
-            for sk_nps_answer in x.keys():
-                data = x[sk_nps_answer]
+            for feedback_id in x.keys():
+                data = x[feedback_id]
                 response = requests.put(
-                    f'{api_url}/{endpoint}/{sk_nps_answer}',
+                    f'{api_url}/{endpoint}/{feedback_id}',
                     headers=headers,
                     data=json.dumps(data)
                     )
@@ -136,7 +148,8 @@ def send_payload(api_url, endpoint, headers, results_list):
                 logger.info(f"m=Batch sent successfully. Retry number={retry_success}, total retry size={errors_dispatches}")
                 retry_success += 1
             else:
-                logger.error(f"m=Error sending retry records. Sk_nps_answer={sk_nps_answer}, Batch_index={retry_success}, status_code={response.status_code}")
+                logger.error(f"m=Error sending retry records.feedback_id={feedback_id}, Batch_index={retry_success}, status_code={response.status_code}. Message={response.text}")
+                
     else:
         logger.info(f"m=All data sent successfully. Total_dispatches={total_dispatches}") 
 
