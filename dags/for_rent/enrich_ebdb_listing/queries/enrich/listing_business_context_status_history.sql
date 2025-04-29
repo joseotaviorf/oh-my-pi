@@ -14,7 +14,7 @@ WITH lbc_aud AS (
     FROM
         datalake_ebdb_clean.listing_business_context_aud AS i
     INNER JOIN
-        datalake_ebdb_clean.user_revision_entity AS rev
+        datalake_ebdb_user.user_revision_entity AS rev
           ON rev.id = i.rev
 
 ),
