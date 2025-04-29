@@ -20,7 +20,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
 
-JOB_NAME = "load_google_search_console_raw"
+JOB_NAME = "load_google_search_console_classified_raw"
 
 SCOPES = [
     "https://www.googleapis.com/auth/webmasters.readonly",
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     search_console = googleapiclient.discovery.build(
         API_SERVICE_NAME, API_VERSION, credentials=creds
-    )
+        )
 
     spark_client = SparkClient()
 

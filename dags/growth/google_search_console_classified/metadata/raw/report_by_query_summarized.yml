@@ -1,0 +1,31 @@
+---
+database_name: datalake_google_search_console_classified_raw
+table_name: report_by_query_summarized
+owner: marcio.gomes@quintoandar.com.br
+domain: Growth
+description: This table contains the raw informations about the Google Search Console tool in the query granularity only.
+columns:
+  keys:
+    tags:
+      - Confidential
+  clicks:
+    tags:
+      - Confidential
+  impressions:
+    tags:
+      - Confidential
+  ctr:
+    tags:
+      - Confidential
+  position:
+    tags:
+      - Confidential
+  site_url:
+    tags:
+      - Confidential
+  type:
+    tags:
+      - Confidential
+  date:
+    tags:
+      - Confidential

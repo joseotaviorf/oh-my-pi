@@ -1,0 +1,67 @@
+---
+database_name: datalake_google_search_console_classified_clean
+table_name: report_by_google_news
+owner: data.growth@quintoandar.com.br
+domain: Growth
+description: This table contains the clean informations about the Google Search Console tool in the page granularity.
+columns:
+  site_url:
+    description: Main URL that are being queried.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.site_url
+  type:
+    description: Extraction type.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.type
+  page:
+    description: Full page address.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.keys
+  country:
+    description: country where the search was made.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.keys
+  device:
+    description: device type where the search was made.
+    categories:
+      DESKTOP: desktop
+      MOBILE: mobile
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.keys
+  clicks:
+    description: Times it was clicked on SERP page organically
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.clicks
+  impressions:
+    description: Times it was showed on SERP page
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.impressions
+  ctr:
+    description: Click Through Rate - times it was clicked over times it was showed
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.ctr
+  position:
+    description: Relative ranking of the position of the link on Google.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.position
+  posimp:
+    description: Position multiplied by the impressions.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.position
+      - datalake_google_search_console_classified_raw.report_by_google_news.impressions
+  dt_created:
+    description: Extraction date.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.date
+  year:
+    description: Extraction year.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.date
+  month:
+    description: Extraction month.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.date
+  day:
+    description: Extraction day.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_google_news.date

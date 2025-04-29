@@ -1,0 +1,56 @@
+---
+database_name: datalake_google_search_console_classified_clean
+table_name: report_by_query_summarized
+owner: marcio.gomes@quintoandar.com.br
+domain: Growth
+description: This table contains the clean informations about the Google Search Console tool in the query granularity only.
+columns:
+  site_url:
+    description: Main URL that are being queried.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.site_url
+  type:
+    description: Extraction type.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.type
+  query:
+    description: search words performed on Google.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.keys
+  clicks:
+    description: Times it was clicked on SERP page organically
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.clicks
+  impressions:
+    description: Times it was showed on SERP page
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.impressions
+  ctr:
+    description: Click Through Rate - times it was clicked over times it was showed
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.ctr
+  position:
+    description: Relative ranking of the position of the link on Google.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.position
+  posimp:
+    description: Position multiplied by the impressions.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.position
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.impressions
+  dt_created:
+    description: Extraction date.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.date
+  year:
+    description: Extraction year.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.date
+  month:
+    description: Extraction month.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.date
+  day:
+    description: Extraction day.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_query_summarized.date

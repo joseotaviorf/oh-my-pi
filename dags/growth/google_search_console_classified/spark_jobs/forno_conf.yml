@@ -1,0 +1,71 @@
+---
+raw_partition_cols: [date]
+site_url_list:
+  - sc-domain:imovelweb.com.br
+  - sc-domain:casamineira.com.br
+  - sc-domain:wimoveis.com.br
+  - sc-domain:inmuebles24.com
+  - sc-domain:vivanuncios.com.mx
+  - sc-domain:zonaprop.com.ar
+  - sc-domain:plusvalia.com
+  - sc-domain:compreoalquile.com
+  - sc-domain:adondevivir.com
+  - sc-domain:urbania.pe
+by_query_summarized:
+  aggregation_type: AUTO
+  dimensions:
+    - QUERY
+    - DATE
+  type_list:
+    - WEB
+  filters: []
+by_page:
+  aggregation_type: AUTO
+  dimensions:
+    - PAGE
+    - COUNTRY
+    - DEVICE
+    - DATE
+  type_list:
+    - WEB
+  filters: []
+by_query:
+  aggregation_type: AUTO
+  dimensions:
+    - QUERY
+    - COUNTRY
+    - DEVICE
+    - DATE
+  type_list:
+    - WEB
+  filters: []
+by_page_and_query:
+  aggregation_type: AUTO
+  dimensions:
+    - PAGE
+    - QUERY
+    - COUNTRY
+    - DEVICE
+    - DATE
+  type_list:
+    - WEB
+  filters: []
+by_discover:
+  aggregation_type: AUTO
+  dimensions:
+    - PAGE
+    - COUNTRY
+    - DATE
+  type_list:
+    - DISCOVER
+  filters: []
+by_google_news:
+  aggregation_type: AUTO
+  dimensions:
+    - PAGE
+    - COUNTRY
+    - DEVICE
+    - DATE
+  type_list:
+    - GOOGLE_NEWS
+  filters: []
