@@ -7,9 +7,7 @@ WITH ticket_events AS (
         OR REGEXP_LIKE(te.tags,'acao_backlog_full_prestador_interno')
         OR REGEXP_LIKE(te.tags,'macro_ro_refluxo_tarefa_acionar_parceiro')
     ) - INTERVAL 3 HOUR AS ts_reflux,
-    MIN(te.ts_event) FILTER (
-      WHERE sk_group IN ('11373011255565','10567436267277')
-    ) - INTERVAL 3 HOUR AS ts_first_open
+    MIN(te.ts_event) - INTERVAL 3 HOUR AS ts_first_open
   FROM
     dw_customer_support.fact_ticket_events AS te
   WHERE
