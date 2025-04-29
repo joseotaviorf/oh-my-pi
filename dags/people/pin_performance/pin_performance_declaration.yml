@@ -27,10 +27,7 @@ workflow:
   layer: raw
   custom_schema: pin_core
   type: custom_ingestion
-  default_partitions:
-    - year
-    - month
-    - day
+  default_partitions: ["year", "month", "day"]
   bucket_config_name: people_bucket
   has_hive_sync: false
   load_spark_job: load_pin_performance_raw
