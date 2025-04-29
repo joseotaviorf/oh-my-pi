@@ -252,6 +252,9 @@ bietlejuice.enrich_app_installed:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
+bietlejuice.enrich_aud_test:
+  add:
+    - bietlejuice.ebdb_user:load-clean-user-pro-owner
 bietlejuice.enrich_booking:
   remove:
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
