@@ -1,0 +1,20 @@
+dag:
+  name: reverse_neighborhood_price_range_access
+  owner: Data Growth
+workflow:
+  type: access
+  layer: reverse
+  custom_schema: reverse_demand_score
+  load_spark_job: load_into_s3
+  spark_job_arguments:
+  - "{dag_name}"
+  - "reverse_neighborhood_price_range"   # Database name
+  - "{table_name}"
+  tables_customization:
+    neighborhood_price_range: {}
+cluster:
+  type: databricks_13_3_min_general_2_workers_cluster
+  databricks_conn_id: databricks_new
+  access_control_list:
+    group_name: software-engineers
+    permission_level: CAN_MANAGE

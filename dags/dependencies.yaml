@@ -3733,6 +3733,12 @@ bietlejuice.reverse_nazare:
   - bietlejuice.gsheets_fintech:done-clean-negotiation-executive-bonus
   - bietlejuice.gsheets_for_sale:done-clean-sale-payments-tiers
   - bietlejuice.gsheets_rede:done-clean-forbrokers-3p-partner-conditions
+bietlejuice.reverse_neighborhood_price_range_access:
+  - bietlejuice.reverse_neighborhood_price_range_load:load-reverse-neighborhood-price-range
+bietlejuice.reverse_neighborhood_price_range_load:
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context
+  - bietlejuice.ebdb_location:load-clean-region
 bietlejuice.reverse_nexxera:
   - bietlejuice.enrich_nexxera:load-enrich-dtw-filter
 bietlejuice.reverse_rent_listings_report_access:

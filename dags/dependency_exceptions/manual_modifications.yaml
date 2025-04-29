@@ -1029,3 +1029,8 @@ wonka.house_visit:
 wonka.user_search_profile_clustering:
   add:
     - wonka.user_bc_h3_7_city_agg_search_filters:load-user_bc_h3_7_city_agg_search_filters
+
+bietlejuice.reverse_neighborhood_price_range_access:
+  add:
+    - bietlejuice.reverse_neighborhood_price_range_load:load-reverse-neighborhood-price-range
+

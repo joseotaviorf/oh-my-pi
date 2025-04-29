@@ -67,6 +67,8 @@ dags_out_of_pattern:
         "wonka.user_visit",
         "wonka.user_search_profile_clustering",
         "wonka.user_bc_h3_7_city_agg_search_filters",
+        "reverse_neighborhood_price_range_load",
+        "reverse_neighborhood_price_range_access",
     ]
 databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice
 databricks_bucket: databricks.s3.forno.data.quintoandar.com.br

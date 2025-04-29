@@ -1,0 +1,22 @@
+dag:
+  name: reverse_neighborhood_price_range_load
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for loading the reverse neighborhood price range data into the reverse neighborhood price range table.
+workflow:
+  type: load
+  layer: reverse
+  custom_schema: neighborhood_price_range
+  default_extraction_type: full
+  short_circuit_customization:
+    function: CHECK_IS_SPECIFIC_DAY_OF_MONTH
+    execution_date: "{{ macros.ds_add(ds, 1) }}"
+    function_params:
+      day: 17
+cluster:
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  access_control_list:
+    group_name: software-engineers
+    permission_level: CAN_MANAGE
