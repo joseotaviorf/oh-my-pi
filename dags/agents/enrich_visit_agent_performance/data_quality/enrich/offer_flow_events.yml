@@ -9,10 +9,7 @@ column_level_validations:
       severity_level: Error
   id_user_agent:
     is_complete:
-      severity_level: Error  
-  id_agent:
-    is_complete:
-      severity_level: Error  
+      severity_level: Error
   id_offer:
     is_complete:
       severity_level: Error

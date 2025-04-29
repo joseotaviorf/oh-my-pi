@@ -41,7 +41,7 @@ consecutive_confirmed_visits AS (
         b.is_visit_completed IS TRUE
 ),
 rent_flows_touchpoint AS (
-    SELECT DISTINCT
+    SELECT
         rf.id_booking,
         COALESCE(rf.first_touchpoint = "DIRECT", FALSE) AS has_direct_first_touchpoint
     FROM

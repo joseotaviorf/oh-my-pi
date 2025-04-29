@@ -15,5 +15,6 @@ FROM
     datalake_visit_agent_performance.offer_flow_events AS ofe
 WHERE
     ofe.has_direct_first_touchpoint IS FALSE
+    AND ofe.id_agent IS NOT NULL
     AND DATE(ofe.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 GROUP BY ALL

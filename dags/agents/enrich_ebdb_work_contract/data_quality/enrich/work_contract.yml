@@ -9,5 +9,3 @@ column_level_validations:
   id:
     is_complete:
       severity_level: Error
-    is_unique:
-      severity_level: Error

@@ -84,7 +84,7 @@ columns:
   ratio_offer_submitted_to_signed:
     description: 
       Proportion between the total number of offers that converted into a 
-      purchase and sale contract, by the total number of offers sent.
+      purchase and sale contract, by the total number of buyers with offer submited.
   year:
     lineage:
       - datalake_quintoandar.aux_date.year

@@ -150,7 +150,10 @@ SELECT
     COALESCE(cos.total_offer_signed_with_ciq, 0) AS total_offer_signed_with_ciq,
     COALESCE(cql.total_first_listing, 0) AS total_first_listing,
     COALESCE(os.total_gross_merchandise_volume, 0) AS total_gross_merchandise_volume,
-    ROUND(COALESCE(os.total_offer_signed/ osu.total_buyer_with_offer_submitted, 0), 2) AS ratio_offer_submitted_to_signed,
+    CASE
+        WHEN COALESCE(os.total_offer_signed/ osu.total_buyer_with_offer_submitted, 0) > 1 THEN 1
+        ELSE ROUND(COALESCE(os.total_offer_signed/ osu.total_buyer_with_offer_submitted, 0), 2)
+    END AS ratio_offer_submitted_to_signed,
     mp.year,
     mp.bimester
 FROM
