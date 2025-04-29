@@ -24,14 +24,6 @@ workflow:
         - "sk_agent" #key_join_tables_fact
         - "sk_analyst" #key_join_tables_dim
         - "email" #analyst_key_column
-    fintech: #dummy_task
-      extra_spark_job_arguments:
-        - "fintech" #context
-        - "dw_operator_performance.fact_operator_performance" #results_table_path
-        - "dw_operator_performance.dim_operator" #agent_table_path
-        - "sk_operator" #key_join_tables_fact
-        - "sk_operator" #key_join_tables_dim
-        - "email" #analyst_key_column
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
   databricks_conn_id: databricks_new
