@@ -15,25 +15,34 @@ get_agency_group_name AS (
   LEFT JOIN datalake_cyber_clean.agency AS a
     ON ag.id_agency = a.id_agency
 ),
+get_last_agency_contract_distribution AS (
+  SELECT
+    id_contract,
+    SPLIT(id_contract,r'\.')[0] AS id_contract_external,
+    IF(DATE_DIFF(ts_distribution, ts_redistribution) = 0, new_agency, agency) AS id_agency,
+    creditor,
+    ts_distribution,
+    ts_redistribution
+  FROM datalake_cyber_clean.history_contract_distribution
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract_external, ts_distribution ORDER BY ts_redistribution DESC) = 1
+),
 get_agency_name AS (
   SELECT
-    COALESCE(c.id_contract_external, SPLIT(hr.id_contract,r'\.')[0]) AS id_contract,
+    COALESCE(c.id_contract_external, hr.id_contract_external) AS id_contract,
     hr.creditor,
-    hr.agency AS agency_group,
-    COALESCE(ag.id_agency, hr.agency) AS id_agency,
+    hr.id_agency AS agency_group,
+    COALESCE(ag.id_agency, hr.id_agency) AS id_agency,
     COALESCE(agg.agency_name, ag.agency_name) AS agency_name,
-    hr.new_debt_amount,
     hr.ts_distribution,
-    LAG(COALESCE(agg.agency_name, ag.agency_name)) OVER(PARTITION BY COALESCE(c.id_contract_external, SPLIT(hr.id_contract,r'\.')[0]) ORDER BY hr.ts_distribution) AS previous_agency,
-    LEAD(hr.ts_distribution) OVER(PARTITION BY COALESCE(c.id_contract_external, SPLIT(hr.id_contract,r'\.')[0]) ORDER BY hr.ts_distribution) AS ts_redistribution
-  FROM datalake_cyber_clean.history_contract_distribution AS hr
+    LAG(COALESCE(agg.agency_name, ag.agency_name)) OVER(PARTITION BY COALESCE(c.id_contract_external, hr.id_contract_external) ORDER BY hr.ts_distribution) AS previous_agency,
+    LEAD(hr.ts_distribution) OVER(PARTITION BY COALESCE(c.id_contract_external, hr.id_contract_external) ORDER BY hr.ts_distribution) AS ts_redistribution
+  FROM get_last_agency_contract_distribution AS hr
   LEFT JOIN datalake_cyber_clean.contracts AS c
     ON hr.id_contract = c.id_contract
   LEFT JOIN datalake_cyber_clean.agency AS ag
-    ON hr.agency = ag.id_agency
+    ON hr.id_agency = ag.id_agency
   LEFT JOIN get_agency_group_name AS agg
     ON ag.id_agency = agg.agency_group
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY COALESCE(c.id_contract_external, SPLIT(hr.id_contract,r'\.')[0]), hr.ts_distribution ORDER BY hr.ts_redistribution DESC) = 1
 ),
 capture_changes AS (
   SELECT
