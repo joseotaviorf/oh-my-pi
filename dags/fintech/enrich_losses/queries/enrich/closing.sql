@@ -219,6 +219,7 @@ SELECT
       COALESCE(user,'tenant') AS user,
       'SNAPSHOT' as origin_factor,
       DATE(ts_created) AS dt_created,
+      DATE(ts_canceled) AS dt_canceled,
       closing_day AS dt_closing,
       contract_signature_date as dt_contract_signature,
       dt_annulment,

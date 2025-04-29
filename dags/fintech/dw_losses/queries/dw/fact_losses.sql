@@ -46,6 +46,7 @@ losses_base AS (
       fp.dt_closing,
       DATE(DATEADD(DAY, -1, DATE_TRUNC('month', fp.dt_closing))) AS dt_closing_previous,
       fc.dt_created AS dt_invoice_created,
+      fc.dt_canceled AS dt_invoice_canceled,
       fc.dt_due,
       fp.dt_due_general_accrual,
       fp.dt_due_adjs AS dt_due_invoice_adjusted,

@@ -24,6 +24,9 @@ SELECT
     due_amount,
     invoice_competence_renegotiated,
     payment_status,
+    closing_month_status,
+    invoice_type,
+    guarantee_type,
     pd_range_rule_a,
     pd_range_rule_b,
     pd_range_rule_c,
@@ -37,8 +40,14 @@ SELECT
     is_write_off,
     is_contract_write_off,
     has_repair_offboarding_bill_item,
+    dt_created,
+    dt_paid,
+    dt_due,
     dt_write_off,
+    dt_contract_signature,
+    dt_annulment,
     dt_closing,
+    dt_snapshot,
     NOW() AS ts_load
 FROM
     datalake_losses.delay

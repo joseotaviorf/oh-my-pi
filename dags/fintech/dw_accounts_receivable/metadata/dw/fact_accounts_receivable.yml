@@ -1,42 +1,103 @@
----
-database_name: dw_accounts_receivable
+database_name: dw_losses
 table_name: fact_accounts_receivable
 owner: bianca.martins@quintoandar.com.br
 domain: fintech
-description: Analytical used to create metric AR90 (accounts receivables).
+description: Analytical table used to create the AR90 (accounts receivables) metric.
 columns:
   sk_invoice:
-    description: "ID Invoice from Retsuko"
+    description: "Unique identifier of the invoice from Retsuko system."
     lineage:
-      - dw_losses.fact_losses.sk_invoice
+      - dw_losses.fact_delay.sk_invoice
+  sk_contract:
+    description: "Unique identifier of the contract associated with the invoice."
+    lineage:
+      - dw_losses.fact_delay.sk_contract
   closing_month_status:
-    description: "Contract status of the closing month"
+    description: "Contract status at the closing month snapshot."
     lineage:
-      - dw_losses.fact_losses.contract_closing_month_status
+      - dw_losses.fact_delay.closing_month_status
+  current_invoice_status:
+    description: "Current status of the invoice in the Retsuko system."
+    lineage:
+      - datalake_retsuko.invoice.status
+  payment_status:
+    description: "Payment status associated with the overdue portfolio timeline or delay."
+    lineage:
+      - dw_losses.fact_delay.payment_status
+  invoice_type:
+    description: "Type of the invoice (e.g., rent, repair, early termination fee)."
+    lineage:
+      - dw_losses.fact_delay.invoice_type
+  invoice_account_type:
+    description: "User type (owner or tenant) related to the invoice account."
+    lineage:
+      - dw_losses.fact_delay.user
+  is_invoice_due:
+    description: "Flag indicating whether the invoice was due before its closing."
+    lineage:
+      - calculated field
+  is_agreement_invoice:
+    description: "Flag indicating if the invoice comes from a renegotiation agreement."
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.sk_origin_negotiation
+  is_canceled_invoice:
+    description: "Flag indicating whether the invoice was canceled and resolved in the next month."
+    lineage:
+      - datalake_retsuko.invoice.status
+      - datalake_retsuko.invoice.ts_canceled
   provisional_group:
-    description: "Provisional group based on risk type of the deal and type of guarantee (paid or free)"
+    description: "Grouping of invoices based on risk type and guarantee type (historical rules)."
     lineage:
-      - dw_losses.fact_losses.provisional_group
-  delay_contaminated_range:
-    description: "Delay Contamined Range calculated based on dt_promisse and dt_due_invoice_anchor"
+      - calculated field based on risk_type and guarantee_type
+  delay_contamined_range:
+    description: "Range of delay calculated using the promise date and anchor invoice due date."
     lineage:
-      - dw_losses.fact_losses.delay_contaminated_range
-  due_amount:
-    description: "Invoice Due amount from PDD"
+      - dw_losses.fact_delay.delay_contamined_range
+  day_resolution:
+    description: "Day of the month when the invoice was resolved or paid."
     lineage:
-      - dw_losses.fact_losses.due_amount
-  recovered_amount:
-    description: "Invoice recovered amount"
-    lineage:
-      - dw_losses.fact_losses.due_amount
-      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.net_recovered_amount
-  dt_invoice_paid:
-    description: "Invoice payment date"
-    lineage:
-      - dw_losses.datalake_retsuko.invoice.ts_paid
-      - dw_losses.datalake_retsuko.invoice.ts_canceled
+      - datalake_retsuko.invoice.ts_paid
       - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_paid
-  dt_month:
-    description: "First day of the closing month"
+  invoice_amount:
+    description: "Original due amount of the invoice"
     lineage:
-      - dw_losses.fact_losses.dt_closing
+      - dw_losses.fact_delay.due_amount
+  net_recovered:
+    description: "Net recovered amount from the invoice considering different recovery paths."
+    lineage:
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.net_recovered_amount
+      - dw_losses.fact_delay.due_amount
+  dt_contract_signature:
+    description: "Contract signature date associated with the invoice."
+    lineage:
+      - dw_losses.fact_delay.dt_contract_signature
+  dt_annulment:
+    description: "Date when the contract was annulled, if applicable."
+    lineage:
+      - dw_losses.fact_delay.dt_annulment
+  dt_created:
+    description: "Invoice creation date in the delay fact table."
+    lineage:
+      - dw_losses.fact_delay.dt_created
+  dt_due:
+    description: "Invoice due date registered at the time of creation."
+    lineage:
+      - dw_losses.fact_delay.dt_due
+  dt_due_adjs:
+    description: "Adjusted invoice due date considering BRZ Fintech business days."
+    lineage:
+      - dw_public.dim_date
+      - dw_losses.fact_delay.dt_due
+  dt_paid_retsuko:
+    description: "Invoice payment or cancellation date coming from Retsuko."
+    lineage:
+      - datalake_retsuko.invoice.ts_paid
+      - datalake_retsuko.invoice.ts_canceled
+  dt_month_recovery:
+    description: "First day of the recovery month (month after closing)."
+    lineage:
+      - dw_losses.fact_delay.dt_closing
+  dt_closing:
+    description: "Invoice closing date (snapshot date)"
+    lineage:
+      - dw_losses.fact_delay.dt_closing
