@@ -11,7 +11,7 @@ columns:
     description: Agent ID
   id_user:
     lineage:
-      - datalake_ebdb_user.user.id
+      - datalake_ebdb_clean.partner_agent.id_user
     description: User ID
   id_partner:
     lineage:

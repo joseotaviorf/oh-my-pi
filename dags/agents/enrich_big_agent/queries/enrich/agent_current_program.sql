@@ -1,13 +1,10 @@
 WITH agent_current_program AS (
     SELECT 
         a.id AS id_agent,
-        u.id AS id_user,
-        -- agents.details has id_partner, but it is less completed than ebdb.
-        -- Almost the same volume, but a bit less. So ebdb still the better 
-        -- source here.
+        pa.id_user AS id_user,
         pa.id_partner AS id_partner,
         p.name AS consultant_type,
-        ROW_NUMBER() OVER(PARTITION BY u.id ORDER BY e.ts_updated DESC) = 1 AS is_last_enrollment,
+        ROW_NUMBER() OVER(PARTITION BY COALESCE(pa.id_user, a.id) ORDER BY e.ts_updated DESC) = 1 AS is_last_enrollment,
         a.ts_updated AS ts_agent_updated,
         e.ts_updated AS ts_enrollment_updated
     FROM
@@ -18,13 +15,9 @@ WITH agent_current_program AS (
     LEFT JOIN 
         datalake_big_agent_clean.program AS p
             ON e.id_program = p.id
-    JOIN
-        datalake_ebdb_user.user AS u
-            ON u.id = GET_JSON_OBJECT(a.details, '$.userExternalId')
     LEFT JOIN
         datalake_ebdb_clean.partner_agent AS pa
-            ON u.id = pa.id_user
-        
+            ON GET_JSON_OBJECT(a.details, '$.partnerExternalId') = pa.id_partner        
 )
 SELECT
     id_agent,
