@@ -1,0 +1,98 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: evaluation_item
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores details of individual items within a performance evaluation.
+columns:
+  id_eval_item:
+    description: Unique identifier for the evaluation item. Primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.eval_item_id
+  id_eval_section:
+    description: Identifier of the section this item belongs to.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.eval_section_id
+  id_reference_item:
+    description: Identifier referencing the item in Profile Management or Goal Management, depending on the section item type.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.reference_item_id
+  id_business_group:
+    description: Foreign key referencing the business group's organizational units.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.business_group_id
+  id_evaluation:
+    description: Unique identifier of the performance evaluation. Foreign key.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.evaluation_id
+  id_performance_rating_model:
+    description: Identifier of the performance rating model used for this item.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.perf_rating_model_id
+  item_description:
+    description: Textual description of the evaluation item.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.description
+  owned_by:
+    description: Indicates the party responsible for this evaluation item.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.owned_by
+  created_by:
+    description: User (email or system username) who created this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.created_by
+  updated_by:
+    description: User (email or system username) who last updated this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.last_updated_by
+  is_mandatory:
+    description: Indicates if this item is required and cannot be deleted or modified by the user.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.mandatory_flag
+    categories:
+      true: Item is mandatory.
+      false: Item is not mandatory.
+  is_critical:
+    description: Indicates if this item is marked as critical by the user.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.critical_flag
+    categories:
+      true: Item is critical.
+      false: Item is not critical.
+  is_not_rated:
+    description: Indicates if this item is excluded from rating.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.not_rated_flag
+    categories:
+      true: Item is not rated.
+      false: Item is rated.
+  is_added_in_task:
+    description: Identifier of the specific task during which this item was added to the evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.added_in_task
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.object_version_number
+  ts_created:
+    description: Timestamp of when this record was created.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.creation_date
+  ts_updated:
+    description: Timestamp of when this record was last updated.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.year
+  month:
+    description: Month extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.month
+  day:
+    description: Day extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_items.day

@@ -1,0 +1,196 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: evaluation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores the primary data for Performance Documents.
+columns:
+  id_evaluation:
+    description: Unique identifier of the performance document. Primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.evaluation_id
+  id_business_group:
+    description: Foreign key referencing the business group's organizational units.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.business_group_id
+  id_template_definition:
+    description: Foreign key referencing the performance template definition.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.template_defn_id
+  id_template_period:
+    description: Foreign key referencing the performance template periods.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.tmpl_period_id
+  id_review_period:
+    description: Foreign key referencing the review period used for this document.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.review_period_id
+  id_person:
+    description: Unique identifier of the worker being evaluated.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.worker_id
+  id_manager:
+    description: Unique identifier of the manager evaluating the worker.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.manager_id
+  id_assignment:
+    description: Foreign key identifying the worker's assignment under evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.assignment_id
+  id_manager_assignment:
+    description: Foreign key identifying the manager's assignment.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.manager_assignment_id
+  id_person_action_performed_by:
+    description: Unique identifier of the person who performed the last action on the evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.action_performed_by
+  id_person_locked_performance:
+    description: Unique identifier of the person who locked the document for changes.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.locked_by_user_id
+  template_type_code:
+    description: Code defining the type of performance document template used.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.template_type_code
+  language_code:
+    description: Code defining the language of the performance document.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.language_code
+  status_code:
+    description: Current status of the performance document.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.status_code
+  previous_status_code:
+    description: Previous status of the performance document.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.prev_status_code
+  created_by:
+    description: User who created this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.created_by
+  updated_by:
+    description: User who last updated this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.updated_by
+  action_code:
+    description: Code representing the last action performed on the evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.action_code
+  action_reason:
+    description: Reason for the last action performed on the evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.action_reason
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.object_version_number
+  min_total_participants:
+    description: Minimum number of participants required for this evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.total_min_participants
+  max_total_participants:
+    description: Maximum number of participants allowed for this evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.total_max_participants
+  is_calculated_ratings_used:
+    description: Indicates whether calculated ratings are used for section ratings.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.use_calc_ratings_flag
+    categories:
+      true: Calculated ratings are used.
+      false: Calculated ratings are not used.
+  is_rating_calculation_enabled:
+    description: Indicates whether ratings should be automatically calculated.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.calculation_ratings_flag
+    categories:
+      true: Ratings calculation is enabled.
+      false: Ratings calculation is disabled.
+  is_worker_allowed_to_see_manager_participants:
+    description: Indicates whether the worker can view participants added by the manager.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.wrk_see_mgr_pcpn_flag
+    categories:
+      true: Worker can see manager's participants.
+      false: Worker cannot see manager's participants.
+  is_participant_allowed_to_see_calculated_rating:
+    description: Indicates whether calculated ratings are visible to participants.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.show_pcpn_calc_rating_flag
+    categories:
+      true: Calculated ratings are visible to participants.
+      false: Calculated ratings are not visible to participants.
+  is_manager_calculated_rating_shown:
+    description: Indicates whether calculated ratings are visible to the manager.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.show_mgr_calc_rating_flag
+    categories:
+      true: Calculated ratings are visible to the manager.
+      false: Calculated ratings are not visible to the manager.
+  is_worker_calculated_rating_shown:
+    description: Indicates whether calculated ratings are visible to the worker.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.show_wkr_calc_rating_flag
+    categories:
+      true: Calculated ratings are visible to the worker.
+      false: Calculated ratings are not visible to the worker.
+  is_matrix_manager_allowed_to_see_calculated_rating:
+    description: Indicates whether calculated ratings are visible to matrix managers.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.show_mm_calc_rating_flag
+    categories:
+      true: Calculated ratings are visible to matrix managers.
+      false: Calculated ratings are not visible to matrix managers.
+  is_feedback_required_for_participants:
+    description: Indicates whether feedback from participants is mandatory.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.pcpn_feedback_req_flag
+    categories:
+      true: Participant feedback is required.
+      false: Participant feedback is not required.
+  is_worker_connections_used:
+    description: Indicates whether worker connections are used for participant selection.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.use_wrk_connections_flag
+    categories:
+      true: Worker connections are used.
+      false: Worker connections are not used.
+  dt_performance_document_started:
+    description: Start date of this performance document.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.start_date
+  dt_performance_document_ended:
+    description: End date of this performance document.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.end_date
+  dt_evaluation_occurred:
+    description: Date on which the evaluation takes place.
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.evaluation_date
+  ts_created:
+    description: "Indicates the date and time when the row was created."
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.creation_date
+  ts_updated:
+    description: "Indicates the date and time of the last update to the row."
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.last_update_date
+  ts_action_performed:
+    description: "Timestamp indicating when an action was performed on the evaluation."
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.action_performed_date
+  ts_load:
+    description: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing."
+  year:
+    description: "Year used for partitioning. Calculated from the ts_updated column."
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.year
+  month:
+    description: "Month used for partitioning. Calculated from the ts_updated column."
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.month
+  day:
+    description: "Day used for partitioning. Calculated from the ts_updated column."
+    lineage:
+      - datalake_pin_performance_raw.hra_evaluations.day

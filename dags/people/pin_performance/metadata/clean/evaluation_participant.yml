@@ -1,0 +1,142 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: evaluation_participant
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores information about individuals participating in the performance review process.
+columns:
+  id_eval_participant:
+    description: Unique identifier for the evaluation participant. Primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.eval_participant_id
+  id_business_group:
+    description: Foreign key referencing the business group's organizational units.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.business_group_id
+  id_evaluation:
+    description: Unique identifier of the performance evaluation. Foreign key.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.evaluation_id
+  id_person:
+    description: Global identifier of the person participating in the review.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.person_id
+  id_eval_role:
+    description: Identifier indicating the participant's role type in the evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.eval_role_id
+  id_questionnaire:
+    description: Identifier of the questionnaire assigned to the participant.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.questionnaire_id
+  id_added_by_person:
+    description: Identifier of the person who added this participant to the evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.added_by_person_id
+  id_notified_by_person:
+    description: Identifier of the person who sent the notification request to the participant.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.notified_by_person_id
+  action_performed_by:
+    description: Identifier of the person who performed the last action related to this participant.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.action_performed_by
+  role_type_code:
+    description: Code identifying the participant's role type (e.g., MANAGER, WORKER, PARTICIPANT).
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.role_type_code
+  participation_status_code:
+    description: Code indicating the participant's current status in the evaluation process.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.participation_status_code
+  added_by_role:
+    description: Role type code of the person who added this participant.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.added_by_role
+  notified_by_role:
+    description: Role type of the person who sent the notification to the participant.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.notified_by_role
+  created_by:
+    description: User (email or system username) who created this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.created_by
+  updated_by:
+    description: User (email or system username) who last updated this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.last_updated_by
+  action_code:
+    description: Code for the action performed on the participant.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.action_code
+  action_reason:
+    description: Reason for the action performed on the participant.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.action_reason
+  is_notified:
+    description: Indicates whether the participant has been notified.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.notified_flag
+    categories:
+      true: Participant has been notified.
+      false: Participant has not been notified.
+  is_feedback_started:
+    description: Indicates whether the participant has begun providing feedback.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.fdback_started_flag
+    categories:
+      true: Participant has started feedback.
+      false: Participant has not started feedback.
+  is_locked_out:
+    description: Indicates whether the participant is currently locked out from providing feedback.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.locked_out_flag
+    categories:
+      true: Participant is locked out.
+      false: Participant is not locked out.
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.object_version_number
+  dt_due:
+    description: Date by which the participant is expected to provide feedback.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.due_date
+  dt_lockout:
+    description: Date when the participant was locked out.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.locked_out_date
+  ts_status_updated:
+    description: Timestamp of the last status update for this participant.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.status_update_date
+  ts_feedback_completed:
+    description: Timestamp when the participant finished providing feedback.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.fdback_completion_date
+  ts_created:
+    description: Timestamp of when this record was created.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.creation_date
+  ts_updated:
+    description: Timestamp of when this record was last updated.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.last_update_date
+  ts_action_performed:
+    description: Timestamp when the last action was performed related to this participant.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.action_performed_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.year
+  month:
+    description: Month extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.month
+  day:
+    description: Day extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_participants.day

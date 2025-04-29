@@ -1,0 +1,59 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: template_definition_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores translations for performance template definitions, including translated names and language information.
+columns:
+  id_template_definition:
+    description: Foreign key referencing the unique identifier of the template definition. Part of the primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.template_defn_id
+  id_business_group:
+    description: Foreign key referencing the business group where the template was defined.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.business_group_id
+  language_code:
+    description: Code of the language for the translated template name in this record. Part of the primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.language
+  source_language_code:
+    description: Code of the original language used for the template name.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.source_lang
+  translated_template_name:
+    description: Translated name of the performance template.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.name
+  created_by:
+    description: User (email or system username) who created this translation record.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.created_by
+  updated_by:
+    description: User (email or system username) who last updated this translation record.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.updated_by
+  ts_created:
+    description: Timestamp indicating when this record was created.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.creation_date
+  ts_updated:
+    description: Timestamp indicating when this record was last updated.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.NOW()
+  year:
+    description: Year extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.year
+  month:
+    description: Month extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.month
+  day:
+    description: Day extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_tl.day

@@ -1,0 +1,121 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: evaluation_step
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores the various steps involved in the performance evaluation process.
+columns:
+  id_evaluation_step:
+    description: Unique identifier for the evaluation step. Primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.eval_step_id
+  id_business_group:
+    description: Foreign key referencing the business group's organizational units.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.business_group_id
+  id_evaluation:
+    description: Unique identifier of the performance evaluation. Foreign key.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.evaluation_id
+  id_evaluation_participant:
+    description: Identifier of the participant associated with this step in the evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.eval_participant_id
+  id_parent_step:
+    description: Identifier of the preceding step, if any.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.parent_step_id
+  id_person_performed_step_update:
+    description: Identifier of the person who last updated this step.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.step_upd_action_performed_by
+  id_person_completed_step:
+    description: Identifier of the person who completed this step.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.step_completed_by
+  id_person_responsible_for_action:
+    description: Identifier of the person responsible for taking action on this step.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.action_performed_by
+  step_code:
+    description: Code identifying the specific step in the evaluation process.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.step_code
+  step_status:
+    description: Current status of this step in the evaluation process.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.step_status
+  step_sub_status:
+    description: More detailed status information for the step.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.step_sub_status
+  action_reason:
+    description: Reason for the last action performed on this step.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.action_reason
+  update_action_code:
+    description: Code for the last update action performed on this evaluation step.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.step_upd_action_code
+  created_by:
+    description: User (email or system username) who created this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.created_by
+  updated_by:
+    description: User (email or system username) who last updated this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.updated_by
+  step_sequence_number:
+    description: Numerical order in which this step occurs in the evaluation process.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.sequence_number
+  days_before_critical_alert:
+    description: Number of days before the due date to send a critical alert for this step.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.critical_alert_days
+  days_before_standard_alert:
+    description: Number of days before the due date to send a standard alert for this step.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.standard_alert_days
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.object_version_number
+  dt_due:
+    description: Date by which this step is expected to be completed.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.due_date
+  ts_created:
+    description: Timestamp of when this record was created.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.creation_date
+  ts_updated:
+    description: Timestamp of when this record was last updated.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.last_update_date
+  ts_step_completed:
+    description: Timestamp indicating when this step was completed.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.step_completion_date
+  ts_action_performed:
+    description: Timestamp of the last action performed on this step.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.action_performed_date
+  ts_step_action_performed:
+    description: Timestamp when the last action was performed on the evaluation step.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.step_upd_action_performed_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.year
+  month:
+    description: Month extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.month
+  day:
+    description: Day extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_steps.day

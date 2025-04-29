@@ -1,0 +1,63 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: template_period_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores translations for performance template periods, including translated customary and short names, along with language information.
+columns:
+  id_template_period:
+    description: Foreign key referencing the unique identifier of the template period. Part of the primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.tmpl_period_id
+  id_business_group:
+    description: Foreign key referencing the business group or enterprise context.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.business_group_id
+  language_code:
+    description: Code representing the language of the translated content. Part of the primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.language
+  source_language_code:
+    description: Code representing the original language of the content.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.source_lang
+  translated_customary_name:
+    description: Translated customary name of the template period.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.customary_name
+  translated_short_name:
+    description: Translated short name of the template period.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.short_name
+  created_by:
+    description: User (system username or email) who created this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.created_by
+  updated_by:
+    description: User (system username or email) who last updated this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.updated_by
+  ts_created:
+    description: Timestamp indicating when this record was created.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.creation_date
+  ts_updated:
+    description: Timestamp indicating when this record was last updated.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.NOW()
+  year:
+    description: Year extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.year
+  month:
+    description: Month extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.month
+  day:
+    description: Day extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_periods_tl.day

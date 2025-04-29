@@ -1,0 +1,73 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: evaluation_role
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores the different roles involved in the performance evaluation process.
+columns:
+  id_evaluation_role:
+    description: Unique identifier for the evaluation role. Primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.eval_role_id
+  id_business_group:
+    description: Foreign key referencing the business group's organizational units.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.business_group_id
+  id_evaluation:
+    description: Foreign key referencing the performance evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.evaluation_id
+  id_template_role:
+    description: Foreign key referencing the role defined in the evaluation template.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.tmpl_role_id
+  role_type:
+    description: Type of role within the evaluation (e.g., MANAGER, WORKER, PARTICIPANT).
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.role_type_code
+    categories:
+      MANAGER: Role of the employee's manager.
+      WORKER: Role of the employee being evaluated.
+      PARTICIPANT: Role of another individual providing feedback.
+  created_by:
+    description: User (email or system username) who created this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.created_by
+  updated_by:
+    description: User (email or system username) who last updated this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.updated_by
+  min_participants:
+    description: Minimum number of participants required for this role. Copied from the template setup.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.minimum_num_pcpns
+  max_participants:
+    description: Maximum number of participants allowed for this role.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.maximum_num_pcpns
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.object_version_number
+  ts_created:
+    description: Timestamp of when this record was created.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.creation_date
+  ts_updated:
+    description: Timestamp of when this record was last updated.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.year
+  month:
+    description: Month extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.month
+  day:
+    description: Day extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_roles.day

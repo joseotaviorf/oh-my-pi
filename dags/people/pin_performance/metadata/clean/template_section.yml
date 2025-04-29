@@ -1,0 +1,182 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: template_section
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores the sections that constitute a performance evaluation template, including configuration for calculation rules, content types, rating methods, and visibility settings.
+columns:
+  id_section:
+    description: Unique identifier for the section within the template. Primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.section_id
+  id_section_rating_model:
+    description: Identifier of the rating model used for the overall section rating.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.section_rating_model_id
+  id_content_type:
+    description: Identifier of the type of content (e.g., competencies, goals) included in this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.content_type_id
+  id_performance_rating_model:
+    description: Identifier of the performance rating model, used if different from the section rating model.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.perf_rating_model_id
+  id_reference_section:
+    description: Identifier referencing a predefined section in a profile management system.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.reference_section_id
+  section_type:
+    description: Type of section, determining its behavior and purpose in the template (e.g., Competencies, Objectives, Summary).
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.section_type_code
+    categories:
+      Competencies: Section for evaluating employee skills and abilities.
+      Objectives: Section for tracking and rating employee goals.
+      Summary: Section for providing an overall evaluation summary.
+  description:
+    description: Textual description outlining the purpose or content of the section.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.description
+  calculation_rule:
+    description: Code defining how overall ratings for this section are calculated.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.calculation_rule_code
+  rating_type:
+    description: Type of rating scale or method applied to individual items within this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.rating_type_code
+  item_calculation:
+    description: Code defining how ratings for individual items within this section are calculated.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.item_calculation_code
+  mapping_method:
+    description: Method used to translate calculated scores into predefined rating levels.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.mapping_method_code
+    categories:
+      Nearest: Maps to the closest rating level.
+      Lowest: Maps to the lowest rating level within the calculated range.
+      Highest: Maps to the highest rating level within the calculated range.
+  calculation_mapping_code:
+    description: Defines the specific mapping logic between calculated results and rating levels.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.calc_mapping_code
+  rounding_rule:
+    description: Rule applied for rounding calculated rating values.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.rounding_rule_code
+    categories:
+      Standard: Standard mathematical rounding.
+      Up: Always round up.
+      Down: Always round down.
+  created_by:
+    description: User who created this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.created_by
+  updated_by:
+    description: User who last updated this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.updated_by
+  is_section_rated:
+    description: Indicates if this section can be rated, either manually or through calculations.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.rate_section_flag
+    categories:
+      true: Section can be rated.
+      false: Section cannot be rated.
+  is_section_weighted:
+    description: Indicates if this section's rating contributes to the overall evaluation with a specific weight.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.weight_section_flag
+    categories:
+      true: Section has weight.
+      false: Section has no weight.
+  is_items_enabled:
+    description: Indicates if this section contains individual items (e.g., goals, competencies).
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.enable_items_flag
+    categories:
+      true: Section contains items.
+      false: Section does not contain items.
+  is_content_profile:
+    description: Indicates if the content of this section is derived from a profile library.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.content_profile_flag
+    categories:
+      true: Content is from a profile.
+      false: Content is not from a profile.
+  is_target_performance_rating_shown:
+    description: Indicates if the target performance rating is displayed for this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.show_target_perf_rtg
+    categories:
+      true: Target performance rating is shown.
+      false: Target performance rating is not shown.
+  is_target_proficiency_level_shown:
+    description: Indicates if the target proficiency level is displayed for this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.show_target_prof_level
+    categories:
+      true: Target proficiency level is shown.
+      false: Target proficiency level is not shown.
+  is_mandatory_shown:
+    description: Indicates if a mandatory indicator is displayed for items within this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.show_mandatory
+    categories:
+      true: Mandatory indicator is shown.
+      false: Mandatory indicator is not shown.
+  is_measurement_shown:
+    description: Indicates if the measurement field is visible within this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.show_measurement
+    categories:
+      true: Measurement field is shown.
+      false: Measurement field is not shown.
+  is_reminder_date_shown:
+    description: Indicates if the reminder date field is visible within this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.show_reminder_date
+    categories:
+      true: Reminder date field is shown.
+      false: Reminder date field is not shown.
+  is_status_shown:
+    description: Indicates if the status field is displayed within this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.show_status
+    categories:
+      true: Status field is shown.
+      false: Status field is not shown.
+  is_manager_reason_required:
+    description: Indicates if a manager must provide a reason when overriding ratings in this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.enable_mgr_reason_flag
+    categories:
+      true: Manager reason is required.
+      false: Manager reason is not required.
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.object_version_number
+  ts_created:
+    description: Timestamp indicating when this record was created.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.creation_date
+  ts_updated:
+    description: Timestamp indicating when this record was last updated.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.last_update_date
+  ts_load:
+    description: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing."
+  year:
+    description: "Year partition for the ingestion date."
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.year
+  month:
+    description: "Month partition for the ingestion date."
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.month
+  day:
+    description: "Day partition for the ingestion date."
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.day

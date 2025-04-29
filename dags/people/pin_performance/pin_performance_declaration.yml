@@ -1,0 +1,129 @@
+---
+dag:
+  name: pin_performance
+  schedule_interval: 0 3 * * *
+  owner: Data People
+  dag_documentation:
+    dag_purpose: >
+      This DAG ingests encrypted data from the Oracle HCM system, made
+      available via an SFTP server through Oracle Integration Cloud (OIC).
+
+      It downloads, decrypts, parses, and loads the files into both the `incoming` and `raw` layers of the Data Lake.
+cluster:
+  type: databricks_13_3_med_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  custom_libraries:
+    - pypi:
+        package: paramiko==2.12.0
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+workflow:
+  layer: raw
+  custom_schema: pin_core
+  type: custom_ingestion
+  default_partitions:
+    - year
+    - month
+    - day
+  bucket_config_name: people_bucket
+  has_hive_sync: false
+  load_spark_job: load_pin_performance_raw
+  default_extraction_type: full
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ ds }}"
+    - "{partitions}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, load_start_date) }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, load_end_date) }}"
+  default_table_privileges:
+    people-team:
+      - ALL PRIVILEGES
+  tables_customization:
+    hra_eval_items:
+      clean_table_name: evaluation_item
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_eval_participants:
+      clean_table_name: evaluation_participant
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_eval_ratings:
+      clean_table_name: evaluation_rating
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_eval_roles:
+      clean_table_name: evaluation_role
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_eval_sections:
+      clean_table_name: evaluation_section
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_eval_steps:
+      clean_table_name: evaluation_step
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_evaluations:
+      clean_table_name: evaluation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_pf_task_roles_b:
+      clean_table_name: task_role_base
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_pf_task_roles_tl:
+      clean_table_name: task_role_translation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_role_defns_tl:
+      clean_table_name: role_definition_translation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_tmpl_defns_b:
+      clean_table_name: template_definition_base
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_tmpl_defns_tl:
+      clean_table_name: template_definition_translation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_tmpl_periods_tl:
+      clean_table_name: template_period_translation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_tmpl_roles:
+      clean_table_name: template_role
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date
+    hra_tmpl_sections:
+      clean_table_name: template_section
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date

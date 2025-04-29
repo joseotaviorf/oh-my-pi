@@ -1,0 +1,121 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: evaluation_section
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores details about sections within a performance evaluation document, including type, rating models, calculation rules, and display settings.
+columns:
+  id_eval_section:
+    description: Unique identifier for the evaluation section. Primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.eval_section_id
+  id_business_group:
+    description: Foreign key referencing the business group.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.business_group_id
+  id_template_section:
+    description: Foreign key linking this evaluation section to its definition in the template.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.tmpl_section_id
+  id_content_type:
+    description: Foreign key defining the type of content (e.g., text, rating scale) within this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.content_type_id
+  id_evaluation:
+    description: Foreign key linking this section to a specific performance evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.evaluation_id
+  id_section_rating_model:
+    description: Foreign key defining the rating model used for this section's overall rating.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.section_rating_model_id
+  id_performance_rating_model:
+    description: Foreign key defining the rating model for individual performance ratings within this section, if different from the section rating model.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.perf_rating_model_id
+  id_reference_section:
+    description: Foreign key referencing a section in Profile Management, used for reuse or mapping purposes.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.reference_section_id
+  section_type_code:
+    description: Code indicating the type of section (e.g., competency, goal, summary).
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.section_type_code
+    categories:
+      competency: Section focused on evaluating employee competencies.
+      goal: Section focused on tracking progress towards goals.
+      summary: Section providing an overall summary of the evaluation.
+  calculation_rule_code:
+    description: Code defining the rule used to calculate the overall rating for this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.calculation_rule_code
+  rating_type_code:
+    description: Code specifying the type of rating applied to individual items within this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.rating_type_code
+  item_calculation_code:
+    description: Code defining the method used to calculate ratings for individual items within this section.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.item_calculation_code
+  created_by:
+    description: User who created this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.created_by
+  updated_by:
+    description: User who last updated this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.updated_by
+  rounding_rule:
+    description: Code defining the rounding rule for calculated ratings (e.g., Standard, Up, Down).
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.rounding_rule_code
+    categories:
+      Standard: Standard rounding to the nearest whole number.
+      Up: Round up to the next whole number.
+      Down: Round down to the previous whole number.
+  mapping_method:
+    description: Code specifying how calculated ratings are mapped to rating levels (e.g., Nearest, Lowest, Highest).
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.mapping_method_code
+    categories:
+      Nearest: Map to the closest available rating level.
+      Lowest: Map to the lowest available rating level within the range.
+      Highest: Map to the highest available rating level within the range.
+  code_mapping_calculation:
+    description: Code defining how numeric scores are mapped to rating levels within the rating model.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.calc_mapping_code
+  sequence_number:
+    description: Number determining the order in which this section appears in the performance document.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.sequence_number
+  decimal_places_number:
+    description: Number of decimal places to be used for displaying calculated ratings.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.decimal_places
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.object_version_number
+  ts_created:
+    description: Timestamp indicating when this record was created.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.creation_date
+  ts_updated:
+    description: Timestamp indicating when this record was last updated.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.year
+  month:
+    description: Month extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.month
+  day:
+    description: Day extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_sections.day

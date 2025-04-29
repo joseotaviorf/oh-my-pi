@@ -1,0 +1,76 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: evaluation_rating
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores ratings for evaluation items and sections within performance reviews.
+columns:
+  id_eval_rating:
+    description: Unique identifier for the performance rating. Primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.eval_rating_id
+  id_business_group:
+    description: Foreign key referencing the business group's organizational units.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.business_group_id
+  id_evaluation:
+    description: Foreign key referencing the performance evaluation.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.evaluation_id
+  id_reference:
+    description: Primary key of the rated entity (evaluation item or section).
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.reference_id
+  id_performance_rating:
+    description: Identifier of the performance rating level assigned.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.performance_rating_id
+  id_eval_participant:
+    description: Identifier of the participant (other than employee or manager) providing the rating.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.eval_participant_id
+  reference_type:
+    description: Type of entity being rated.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.reference_type
+    categories:
+      SECTION: Rating for an evaluation section.
+      ITEM: Rating for an evaluation item.
+  role_type:
+    description: Code indicating the role type of the rater.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.role_type_code
+  created_by:
+    description: User (email or system username) who created this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.created_by
+  updated_by:
+    description: User (email or system username) who last updated this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.updated_by
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.object_version_number
+  ts_created:
+    description: Timestamp of when this record was created.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.creation_date
+  ts_updated:
+    description: Timestamp of when this record was last updated.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.year
+  month:
+    description: Month extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.month
+  day:
+    description: Day extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.day

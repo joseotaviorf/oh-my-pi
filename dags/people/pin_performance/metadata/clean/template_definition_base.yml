@@ -1,0 +1,127 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: template_definition_base
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores the configuration and structure of performance evaluation templates, defining rules and flows for evaluations.
+columns:
+  id_template_definition:
+    description: Unique identifier for the performance template definition. Primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.template_defn_id
+  id_business_group:
+    description: Foreign key referencing the business group that owns this template.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.business_group_id
+  id_document_type:
+    description: Foreign key referencing the type of performance document (e.g., annual review).
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.doc_type_id
+  id_process_flow:
+    description: Identifier of the process flow used in this template definition.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.process_flow_id
+  id_ess_request:
+    description: Identifier of the ESS job request for template generation.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.ess_request_id
+  status_code:
+    description: Current status of the performance template.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.status_code
+  template_type_code:
+    description: Code identifying the type of performance template.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.template_type_code
+  created_by:
+    description: User (email or system username) who created this template definition.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.created_by
+  updated_by:
+    description: User (email or system username) who last updated this template definition.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.updated_by
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.object_version_number
+  min_total_participants:
+    description: Minimum number of participants required in a performance document based on this template.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.total_min_participants
+  max_total_participants:
+    description: Maximum number of participants allowed in a performance document based on this template.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.total_max_participants
+  is_calculated_ratings_used:
+    description: Indicates if section ratings should be automatically calculated from item ratings.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.use_calc_ratings_flag
+    categories:
+      true: Calculated ratings are used.
+      false: Calculated ratings are not used.
+  is_ratings_calculation_enabled:
+    description: Indicates whether the system should automatically calculate performance ratings.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.calculate_ratings_flag
+    categories:
+      true: Ratings calculation is enabled.
+      false: Ratings calculation is disabled.
+  is_manager_selection_allowed:
+    description: Indicates if workers can select their evaluating manager when starting a review.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.select_mgr_allowed_flag
+    categories:
+      true: Workers can select their manager.
+      false: Workers cannot select their manager.
+  is_worker_allowed_to_see_manager_participants:
+    description: Indicates if workers can view the participants added by their manager.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.wrk_see_mgr_pcpn_flag
+    categories:
+      true: Workers can see manager's participants.
+      false: Workers cannot see manager's participants.
+  is_participant_allowed_to_see_calculated_rating:
+    description: Indicates if calculated ratings are visible to feedback participants.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.show_pcpn_calc_rating_flag
+    categories:
+      true: Participants can see calculated ratings.
+      false: Participants cannot see calculated ratings.
+  is_matrix_manager_allowed_to_see_calculated_rating:
+    description: Indicates if matrix managers can view the calculated ratings.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.show_mm_calc_rating_flag
+    categories:
+      true: Matrix managers can see calculated ratings.
+      false: Matrix managers cannot see calculated ratings.
+  dt_started:
+    description: Date when this performance template became effective.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.date_from
+  dt_ended:
+    description: Date when this performance template is no longer valid.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.date_to
+  ts_created:
+    description: Timestamp indicating when this record was created.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.creation_date
+  ts_updated:
+    description: Timestamp indicating when this record was last updated.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.year
+  month:
+    description: Month extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.month
+  day:
+    description: Day extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_defns_b.day

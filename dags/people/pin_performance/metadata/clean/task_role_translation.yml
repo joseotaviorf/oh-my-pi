@@ -1,0 +1,61 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: task_role_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores translations for the names of tasks within the performance process flow, specific to different roles.
+columns:
+  id_process_task_role:
+    description: Foreign key referencing the unique identifier of the process task role. Part of the primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.process_task_role_id
+  language_code:
+    description: Code of the language used for the translated content in this record. Part of the primary key.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.language
+  source_language_code:
+    description: Code of the original language in which the task names were created.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.source_lang
+  translated_manager_task_name:
+    description: Translated name of the task as it appears for the Manager role.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.mgr_task_name
+  translated_worker_task_name:
+    description: Translated name of the task as it appears for the Worker role.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.wkr_task_name
+  created_by:
+    description: User (email or system username) who created this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.created_by
+  updated_by:
+    description: User (email or system username) who last updated this record.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.updated_by
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.object_version_number
+  ts_created:
+    description: Timestamp indicating when this record was created.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.creation_date
+  ts_updated:
+    description: Timestamp indicating when this record was last updated.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.year
+  month:
+    description: Month extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.month
+  day:
+    description: Day extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+      - datalake_pin_performance_raw.hra_pf_task_roles_tl.day
