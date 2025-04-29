@@ -810,6 +810,11 @@ bietlejuice.enrich_anonymization:
   add:
     - bietlejuice.documentation_metrics:load-clean-columns-documentation
     - bietlejuice.enrich_anonymization_validation:load-enrich-manual-validation
+bietlejuice.enrich_anonymization_validation:
+  add:
+    - bietlejuice.gsheets_governance:done-clean-anonymization-manual-validation
+  remove:
+    - bietlejuice.gsheets_governance:load-clean-anonymization-manual-validation
 bietlejuice.reverse_ccv_price_report_load:
   # We will remove these dependencies because we will only run this DAG once a month. So we don't want to trigger it every time these tables below are updated.
   override: []

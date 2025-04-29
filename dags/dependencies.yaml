@@ -1203,7 +1203,7 @@ bietlejuice.enrich_anonymization:
   - bietlejuice.documentation_metrics:load-clean-columns-documentation
   - bietlejuice.enrich_anonymization_validation:load-enrich-manual-validation
 bietlejuice.enrich_anonymization_validation:
-  - bietlejuice.gsheets_governance:load-clean-anonymization-manual-validation
+  - bietlejuice.gsheets_governance:done-clean-anonymization-manual-validation
 bietlejuice.enrich_app_installed:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
