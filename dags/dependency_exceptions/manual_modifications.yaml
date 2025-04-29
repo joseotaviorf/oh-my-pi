@@ -331,14 +331,6 @@ bietlejuice.enrich_customer_demand:
     - bietlejuice.ebdb_user:load-clean-user
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
-bietlejuice.enrich_customer_support:
-  add:
-    - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
-    - bietlejuice.enrich_quinto_messenger:load-enrich-channel-event
-  remove:
-    - bietlejuice.quinto_messenger:load-clean-task
-    - bietlejuice.quinto_messenger:load-clean-task-event
-    - bietlejuice.sauron:load-clean-bot-outgoing-messages
 bietlejuice.enrich_ebdb_photo_jobs:
   add:
     - bietlejuice.ebdb_location:load-clean-map-region

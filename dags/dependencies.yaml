@@ -343,6 +343,11 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_zendesk:load-enrich-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
+  - bietlejuice.internal_chat:load-clean-internal-chat-messages
+  - bietlejuice.quinto_messenger:load-clean-channel
+  - bietlejuice.quinto_messenger:load-clean-channel-event
+  - bietlejuice.quinto_messenger:load-clean-chat
+  - bietlejuice.quinto_messenger:load-clean-task
   - bietlejuice.quinto_messenger:load-clean-task-event
   - bietlejuice.reclameaqui:load-clean-tickets
   - bietlejuice.sauron:load-clean-session
@@ -1562,8 +1567,6 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.chat_fup:load-clean-chats-chat
   - bietlejuice.chat_fup:load-clean-surveys-answer
   - bietlejuice.chat_fup:load-clean-surveys-survey
-  - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
-  - bietlejuice.enrich_quinto_messenger:load-enrich-channel-event
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.greenseer:load-clean-session
@@ -1573,6 +1576,8 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.gsheets_support_and_service:done-clean-taxonomy-sla
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-chat
+  - bietlejuice.quinto_messenger:load-clean-task
+  - bietlejuice.quinto_messenger:load-clean-task-event
   - bietlejuice.sauron:load-clean-session
   - bietlejuice.zendesk:load-clean-tickets
 bietlejuice.enrich_cyber:
