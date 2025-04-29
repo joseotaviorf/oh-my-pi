@@ -15,10 +15,10 @@ bietlejuice.dw_accounting_funnel:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-quintocred-bank-settlement
 bietlejuice.dw_accounts_receivable:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline
-  - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_losses:load-dw-losses-fact-delay
   - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
 bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliate-costs
   - bietlejuice.robin_hood:load-clean-tax
@@ -535,6 +535,7 @@ bietlejuice.dw_fintech_snapshot_quintocred:
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-recurring-payment-renewal
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-occurrence
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment
+  - bietlejuice.rental_guarantee_platform:load-clean-company-plan
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
 bietlejuice.dw_fintech_snapshot_second_business_day:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline
@@ -748,6 +749,8 @@ bietlejuice.dw_recon_quintocred:
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
   - bietlejuice.dw_velo:load-dw-velo-fact-velo-payment
   - bietlejuice.dw_velo:load-dw-velo-fact-velo-propose
+  - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history
+  - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-metrics
   - bietlejuice.rental_guarantee_platform:load-clean-bill-checkout
   - bietlejuice.rental_guarantee_platform:load-clean-bill-payment
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
@@ -755,6 +758,10 @@ bietlejuice.dw_recon_quintocred:
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance
   - bietlejuice.robin_hood:load-clean-payment-request
+bietlejuice.dw_recon_quintocred_snapshot:
+  - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-customer-advance
+  - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-payable-guarantees
+  - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-receivable-guarantees
 bietlejuice.dw_rede_company:
   - bietlejuice.ebdb_location:load-clean-state
   - bietlejuice.enrich_company:load-enrich-company

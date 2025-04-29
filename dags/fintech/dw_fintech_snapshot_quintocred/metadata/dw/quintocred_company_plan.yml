@@ -1,0 +1,80 @@
+---
+database_name: dw_fintech_snapshot_quintocred
+table_name: quintocred_company_plan
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    description: "Unique identifier (ID) for the company plan record"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.id
+
+  id_plan:
+    description: "Identifier (ID) of the associated plan"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.id_plan
+
+  id_company:
+    description: "Identifier (ID) of the company linked to the plan"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.id_company
+
+  pricing:
+    description: "Pricing value associated with the company plan"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.pricing
+
+  coverage:
+    description: "Coverage value defined in the company plan"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.coverage
+
+  damage:
+    description: "Damage coverage value in the company plan"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.damage
+
+  commission:
+    description: "Commission value associated with the company plan"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.commission
+
+  version:
+    description: "Version number of the company plan"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.version
+
+  is_active:
+    description: "Flag indicating whether the company plan is active"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.is_active
+
+  ts_created:
+    description: "Timestamp when the company plan record was created"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.ts_created
+
+  ts_updated:
+    description: "Timestamp when the company plan record was last updated"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.ts_updated
+
+  ts_snapshot:
+    description: "Timestamp when the snapshot of the data was taken"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.NOW()
+
+  year:
+    description: "Year when the snapshot was taken"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.YEAR(CURRENT_DATE)
+
+  month:
+    description: "Month when the snapshot was taken"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.MONTH(CURRENT_DATE)
+
+  day:
+    description: "Day of the month when the snapshot was taken"
+    lineage:
+      - datalake_rental_guarantee_platform_clean.company_plan.DAY(CURRENT_DATE)

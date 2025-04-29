@@ -1,0 +1,225 @@
+database_name: dw_recon_quintocred
+table_name: fact_receivable_guarantees
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: "Data from receivavle guarantees in QuintoCred recon context."
+columns:
+  sk_propose:
+    description: "QuintoCred's propose identification number (ID)"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.sk_propose
+
+  sk_propose_20:
+    description: "Identification number (ID) of the propose with 20 digits"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.sk_propose_20
+
+  sk_delinquency:
+    description: "Delinquency identification number (ID)"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.sk_delinquency
+
+  sk_transaction:
+    description: "Transaction identification number (ID)"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.sk_transaction
+
+  sk_ticket:
+    description: "Ticket identification number (ID)"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.sk_ticket
+
+  id_payment_request:
+    description: "Identification number (ID) of the payment request"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.id_payment_request
+
+  id_rh_delinquency:
+    description: "Identification number (ID) related to RH delinquency"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.id_delin_rh
+
+  origin_table:
+    description: "Origin table where the data is sourced from"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.origin_table
+
+  customer_document:
+    description: "Document (CPF/CNPJ) of the customer"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.client_cpf_cnpj
+
+  bill_item:
+    description: "Bill item related to the transaction"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.bill_item
+
+  provisional_group:
+    description: "Provisional group identification for grouping payments"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.provisional_group
+
+  status_rh_payment:
+    description: "Payment status of the RH"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.rh_status_pagamento
+
+  description:
+    description: "Description of the related data"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.f2.description
+
+  due_amount:
+    description: "Amount due for payment"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.due_amount
+
+  paid_amount:
+    description: "Amount that has been paid"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.paid_amount
+
+  open_amount:
+    description: "Amount that is still open and needs to be paid"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.open_amount
+
+  discount_amount:
+    description: "Discount amount applied"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.discount
+
+  due_amount_delinquency:
+    description: "Amount due related to the delinquency"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.delinquency_due_amount
+
+  due_amount_adjusted:
+    description: "Adjusted due amount"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.due_amount_ajustado
+
+  open_amount_adjusted:
+    description: "Adjusted open amount"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.open_amount_ajustado_2
+
+  package_amount:
+    description: "Amount related to the package"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.valor_pacote
+
+  paid_amount_real_estate:
+    description: "Amount paid to the real estate"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.valor_pago_para_imobiliaria
+
+  check_rh_payment:
+    description: "Indicator for RH payment check"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.check_rh_payment
+
+  total_amount_guaranteed:
+    description: "Total amount guaranteed"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.valor_total_garantido
+
+  balance_guarantee:
+    description: "Balance of the guarantee"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.saldo_garantia
+
+  is_property_damage:
+    description: "Flag indicating if there is property damage"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.is_danos_imovel
+
+  is_delinquency_renewal:
+    description: "Flag indicating if the delinquency is a renewal"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.is_delinquency_renovacao
+
+  is_debt_forgiveness:
+    description: "Flag indicating if there is debt forgiveness"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.is_perdao_divida
+
+  is_contract_active:
+    description: "Flag indicating if the contract is active"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.is_contract_active
+
+  is_archived_delinquency:
+    description: "Flag indicating if the delinquency is archived"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.is_archived_delinquency
+
+  has_tickets:
+    description: "Flag indicating if there are associated tickets"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.has_tickets
+
+  has_rh_payment:
+    description: "Flag indicating if RH payment exists"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.has_rh_payment
+
+  days_late:
+    description: "Number of days the payment is late"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.dias_atraso
+
+  dt_register:
+    description: "Date when the record was registered"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.dt_register
+
+  dt_due:
+    description: "Due date for the payment"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.dt_due
+
+  dt_paid:
+    description: "Date when the payment was made"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.dt_paid
+
+  dt_register_adjusted:
+    description: "Adjusted registration date"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.dt_register_ajustada
+
+  dt_contract_started:
+    description: "Start date of the contract"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.dt_contract_started
+
+  dt_contract_ended:
+    description: "End date of the contract"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.dt_contract_ended
+
+  dt_model_ended:
+    description: "Model end date"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.model_dt_ended
+
+  dt_rh_payment:
+    description: "Date when RH payment was made"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.rh_dt_pagamento
+
+  dt_rh_payment_programmed:
+    description: "Scheduled date for RH payment"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.rh_dt_pagamento_programado
+
+  dt_closing:
+    description: "Date when the process was closed"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.dt_closing
+
+  ts_snapshot:
+    description: "Timestamp of the snapshot"
+    lineage:
+      - dw_fintech_snapshot_quintocred.quintocred_ifrs_occurrence.ts_snapshot

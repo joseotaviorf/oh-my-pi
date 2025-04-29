@@ -297,7 +297,8 @@ SELECT
   a.data_vencimento AS dt_document_due,
   DATE(gs.dt_register) AS dt_delinquency_creation, 
   gs.dt_closing,
-  gs.ts_snapshot
+  gs.ts_snapshot,
+  NOW() AS ts_load
 FROM 
   garantias_saldo gs 
 LEFT JOIN 

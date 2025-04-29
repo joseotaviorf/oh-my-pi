@@ -1,0 +1,134 @@
+---
+database_name: dw_recon_quintocred_snapshot
+table_name: fact_customer_advance
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+columns:
+  sk_propose:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.sk_propose
+  id_payment_min:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.id_payment_min
+  flow_type:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.flow_type
+  gateway:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.gateway
+  activator_amount:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.activator_amount
+  monthly_guarantee:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.monthly_guarantee
+  annual_guarantee:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.annual_guarantee
+  total_charged:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.total_charged
+  total_paid:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.total_paid
+  value_upfront_signatures:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.value_upfront_signatures
+  expected_appropriated_months:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.expected_appropriated_months
+  expected_appropriated_amount:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.expected_appropriated_amount
+  expected_months_to_be_appropriated:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.expected_months_to_be_appropriated
+  expected_amount_to_be_appropriated:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.expected_amount_to_be_appropriated
+  has_activation:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.has_activation
+  has_payment_advance:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.has_payment_advance
+  is_direct_billing:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.is_direct_billing
+  mobs_in_between_due_dates:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.mobs_in_between_due_dates
+  dt_due_min:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.dt_due_min
+  dt_due_max:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.dt_due_max
+  dt_month_last_day:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.dt_month_last_day
+  dt_paid_min:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.dt_paid_min
+  dt_paid_max:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.dt_paid_max
+  dt_month_appropriation_start:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.dt_month_appropriation_start
+  dt_month_ref_creation:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.dt_month_ref_creation
+  dt_contract_started:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.dt_contract_started
+  dt_ended:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.dt_ended
+  dt_created:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.dt_created
+  ts_snapshot:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.NOW()
+  year:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.YEAR(CURRENT_DATE)
+  month:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.MONTH(CURRENT_DATE)
+  day:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_customer_advance.DAY(CURRENT_DATE)
