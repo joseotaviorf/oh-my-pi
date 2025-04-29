@@ -7,8 +7,10 @@ WITH lbc_aud AS (
       i.status,
       LAG(i.status_reason) OVER(PARTITION BY i.id_house, i.business_context ORDER BY i.rev) AS previous_status_reason,
       i.status_reason,
-      FROM_UNIXTIME(CAST(rev.ts_revision AS BIGINT)/1000) AS revision_time,
-      i.rev
+      rev.ts_revision AS revision_time,
+      i.rev,
+      i.ts_first_publication,
+      i.ts_last_publication
     FROM
         datalake_ebdb_clean.listing_business_context_aud AS i
     INNER JOIN
@@ -24,7 +26,10 @@ lbc_history AS (
         revision_time,
         status,
         status_reason,
-        ROW_NUMBER() OVER(PARTITION BY id_house, business_context ORDER BY rev) AS event_order
+        ts_first_publication,
+        ts_last_publication,
+        ROW_NUMBER() OVER(PARTITION BY id_house, business_context ORDER BY rev) AS event_order,
+        ROW_NUMBER() OVER(PARTITION BY id_house, business_context, DATE(revision_time) ORDER BY rev DESC) = 1 AS is_last_state_of_day
     FROM
           lbc_aud
     WHERE
@@ -44,6 +49,9 @@ SELECT
     COALESCE(NULLIF(lbch.business_context, ''), 'Undefined') AS business_context,
     lbch.status,
     lbch.status_reason,
+    lbch.is_last_state_of_day,
+    lbch.ts_first_publication,
+    lbch.ts_last_publication,
     lbch.revision_time AS ts_state_started,
     lbch2.revision_time AS ts_state_ended
 FROM
