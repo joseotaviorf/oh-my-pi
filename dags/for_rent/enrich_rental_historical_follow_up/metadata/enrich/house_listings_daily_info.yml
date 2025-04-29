@@ -110,16 +110,46 @@ columns:
     lineage:
     - datalake_ebdb_pricing.listing_prediction_changes.calculator_min_price
     description: Calculator column. Tells the minimum price estimated by the calculator output.
+  p_20:
+    lineage:
+    - datalake_ebdb_pricing.listing_prediction_changes.calculator_p20_price
+    description: Calculator column. Tells the estimated price related to the 20% percentile of the calculator's output.
+  p_30:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p30_price
+    description: Calculator column. Tells the estimated price related to the 30% percentile of the calculator's output.
+  p_40:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p40_price
+    description: Calculator column. Tells the estimated price related to the 40% percentile of the calculator's output.
+  p_50:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_price
+    description: Calculator column. Tells the estimated price related to the 50% percentile of the calculator's output.
+  p_60:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p60_price
+    description: Calculator column. Tells the estimated price related to the 60% percentile of the calculator's output.
+  p_70:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p70_price
+    description: Calculator column. Tells the estimated price related to the 70% percentile of the calculator's output.
+  p_80:
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p80_price
+    description: Calculator column. Tells the estimated price related to the 80% percentile of the calculator's output.
   p_90:
     lineage:
-    - datalake_ebdb_pricing.listing_prediction_changes.calculator_max_price
-    description: alculator column. Tells the estimated price related to the 90% percentile of the calculator's output.
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_max_price
+    description: Calculator column. Tells the estimated price related to the 90% percentile of the calculator's output.
   certainty:
     lineage:
     - datalake_ebdb_pricing.listing_prediction_changes.calculator_certainty
     description: Calculator column. Tells the certainty level of the prediction calculated by the calculator. It is strongly related to the intensity of the QuintoAndar performance with the listing region.
   listing_page_views:
-    description: Number of page views of the house listing.
+    description: Number of views of the house listing page.
+  search_results_page_views:
+    description: Number of views of the search results page.
   visits_booked:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_event
@@ -150,6 +180,14 @@ columns:
       - datalake_visit.visit_status_events.id_schedule
       - datalake_visit.visit_status_events.event_type
     description: Number of visits done of the house listing, coming from the new visit modeling.
+  offers_sent:
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_event
+    description: Number of offers sent to the house listing.
+  rent_flows:
+    lineage:
+      - datalake_rent_flows.rent_flows.id_rent_flow
+    description: Number of rent flows of the house listing.
   status_change_reason:
     lineage:
     - datalake_ebdb_listing.house_listing_status.status_change_reason

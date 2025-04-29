@@ -86,7 +86,11 @@ columns:
   page_views:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
-    description: Number of page views of the house listing in the referenced date.
+    description: Number of views of the house listing page in the referenced date.
+  search_results_page_views:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+    description: Number of views of the search results page in the referenced date.
   visits_booked:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
@@ -111,6 +115,14 @@ columns:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.visits_done
     description: Number of visits done, coming from the new visit modeling, of the house listing in the referenced date.
+  offers_sent:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+    description: Number of offers sent to the house listing in the referenced date.
+  rent_flows:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.rent_flows
+    description: Number of rent flows of the house listing in the referenced date.
   country_code:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.country_code

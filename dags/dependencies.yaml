@@ -2700,13 +2700,13 @@ bietlejuice.enrich_rental_guarantee:
   - bietlejuice.rental_guarantee:load-clean-charge
   - bietlejuice.rental_guarantee:load-clean-guarantee
 bietlejuice.enrich_rental_historical_follow_up:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.ebdb_condo:load-clean-access-authorization-type
   - bietlejuice.ebdb_condo:load-clean-access-type-aud
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_house_properties:load-clean-key-type
   - bietlejuice.ebdb_house_properties:load-clean-occupant-type
-  - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events
   - bietlejuice.enrich_b2b:load-enrich-house-listing
   - bietlejuice.enrich_big_agent:load-enrich-house-consultant-history
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
@@ -2723,6 +2723,7 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_pro_owners:load-enrich-house-b2b-history
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
   - bietlejuice.enrich_visit:load-enrich-visit-status-events
 bietlejuice.enrich_rental_transact:
   - bietlejuice.ebdb_house:load-clean-house

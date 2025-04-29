@@ -90,21 +90,36 @@ previous_listing_early_demand AS (
 lpv AS (
     SELECT
         COUNT(*) AS listing_page_viewed,
-        hl.id_house_listing,
+        lpve.ep_house_id AS id_house,
         dbase.dt_day
     FROM
-        datalake_amplitude_page_viewed_events.schedule_search_listing_events AS le
+        datalake_amplitude_clean.170698_listing_page_viewed_events AS lpve
     JOIN
         daily_base AS dbase
-            ON dbase.dt_day = DATE(le.ts_event)
-    JOIN
-        datalake_ebdb_listing.house_listing AS hl
-            ON hl.id_house = le.ep_house_id
-            AND le.ts_event >= hl.ts_listing_version_start
-            AND le.ts_event < COALESCE(hl.ts_listing_version_end, '2100-01-01')
+            ON dbase.year = lpve.year
+            AND dbase.month = lpve.month
+            AND dbase.day = lpve.day
     WHERE
-        UPPER(le.business_context) = 'RENT'
-        AND le.tof_event_type = 'listing_page_viewed'
+        lpve.ep_house_id IS NOT NULL
+        AND UPPER(lpve.business_context) = 'RENT'
+    GROUP BY
+        2, 3
+),
+srpv AS (
+    SELECT
+        COUNT(*) AS search_results_page_viewed,
+        srpv.ep_house_id AS id_house,
+        dbase.dt_day
+    FROM
+        datalake_amplitude_clean.170698_search_results_page_viewed_events AS srpv
+    JOIN
+        daily_base AS dbase
+            ON dbase.year = srpv.year
+            AND dbase.month = srpv.month
+            AND dbase.day = srpv.day
+    WHERE
+        srpv.ep_house_id IS NOT NULL
+        AND UPPER(srpv.business_context) = 'RENT'
     GROUP BY
         2, 3
 ),
@@ -148,6 +163,37 @@ visits_new_modeling AS (
     GROUP BY
         5, 6
 ),
+offers AS (
+    SELECT
+    COUNT(DISTINCT rde.id_event) AS offers_sent,
+    rde.id_house_listing,
+    dbase.dt_day
+    FROM
+        datalake_rent_demand_events.rent_demand_events AS rde
+    JOIN
+        daily_base AS dbase
+            ON dbase.dt_day = DATE(rde.ts_event)
+    WHERE
+        rde.country_code = 'BR'
+        AND rde.id_event_type = 3
+    GROUP BY
+        2, 3
+),
+rent_flow AS (
+    SELECT
+        COUNT(DISTINCT rf.id_rent_flow) AS rent_flows,
+        rf.id_house,
+        dbase.dt_day
+    FROM
+        datalake_rent_flows.rent_flows AS rf
+    JOIN
+        daily_base AS dbase
+            ON dbase.dt_day = DATE(rf.ts_created)
+    WHERE
+        rf.country_code = 'BR'
+    GROUP BY
+        2, 3
+),
 listings_states_per_day AS (
     SELECT /*+ RANGE_JOIN(heh, 1180) */
         CONCAT(COALESCE(pled.id_house_listing, hl.id_house_listing), DATE_FORMAT(dbase.dt_day, 'yMMdd')) AS id_house_listing_day,
@@ -173,15 +219,25 @@ listings_states_per_day AS (
         heh.key_location,
         lpc.price AS rent,
         pred.calculator_min_price AS p_10,
+        pred.calculator_p20_price AS p_20,
+        pred.calculator_p30_price AS p_30,
+        pred.calculator_p40_price AS p_40,
+        pred.calculator_price AS p_50,
+        pred.calculator_p60_price AS p_60,
+        pred.calculator_p70_price AS p_70,
+        pred.calculator_p80_price AS p_80,
         pred.calculator_max_price AS p_90,
         pred.calculator_certainty AS certainty,
         lpv.listing_page_viewed AS listing_page_views,
+        srpv.search_results_page_viewed AS search_results_page_views,
         vom.visits_booked,
         vom.visits_completed,
         vnm.visits_requested,
         vnm.visits_rescheduled,
         vnm.visits_confirmed,
         vnm.visits_done,
+        offers.offers_sent,
+        rf.rent_flows,
         hls.status_history,
         hls.status_change_reason,
         hl.listing_category,
@@ -278,8 +334,12 @@ listings_states_per_day AS (
             AND pred.business_context = 'RENT'
     LEFT JOIN
         lpv
-            ON COALESCE(pled.id_house_listing, hl.id_house_listing) = lpv.id_house_listing
+            ON COALESCE(pled.id_house, hl.id_house) = lpv.id_house
             AND dbase.dt_day = lpv.dt_day
+    LEFT JOIN
+        srpv
+            ON COALESCE(pled.id_house, hl.id_house) = srpv.id_house
+            AND dbase.dt_day = srpv.dt_day
     LEFT JOIN
         visits_old_modeling AS vom
             ON COALESCE(pled.id_house_listing, hl.id_house_listing) = vom.id_house_listing
@@ -288,6 +348,14 @@ listings_states_per_day AS (
         visits_new_modeling AS vnm
             ON COALESCE(pled.id_house_listing, hl.id_house_listing) = vnm.id_house_listing
             AND dbase.dt_day = vnm.dt_day
+    LEFT JOIN
+        offers
+            ON COALESCE(pled.id_house_listing, hl.id_house_listing) = offers.id_house_listing
+            AND dbase.dt_day = offers.dt_day
+    LEFT JOIN
+        rent_flow AS rf
+            ON COALESCE(pled.id_house, hl.id_house) = rf.id_house
+            AND dbase.dt_day = rf.dt_day
     /*
     This table is used for For_Rent and
     should be similar to fact_house_listing_status, so
@@ -321,15 +389,25 @@ SELECT
     key_location,
     rent,
     p_10,
+    p_20,
+    p_30,
+    p_40,
+    p_50,
+    p_60,
+    p_70,
+    p_80,
     p_90,
     certainty,
     listing_page_views,
+    search_results_page_views,
     visits_booked,
     visits_completed,
     visits_requested,
     visits_rescheduled,
     visits_confirmed,
     visits_done,
+    offers_sent,
+    rent_flows,
     status_history,
     status_change_reason,
     listing_category,
