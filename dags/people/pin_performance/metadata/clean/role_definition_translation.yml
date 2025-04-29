@@ -1,0 +1,64 @@
+database_name: datalake_pin_performance_clean
+table_name: role_definition_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  Stores translated names for performance evaluation roles.
+  This table supports multilingual views for role definitions used in evaluation templates.
+  The corresponding table in the raw layer is hra_role_defns_tl.
+
+columns:
+  id_role:
+    description: "Foreign key referencing the Role Definition and part of the composite primary key."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.role_id
+  id_business_group:
+    description: "Foreign key to HR_ALL_ORGANIZATION_UNITS."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.business_group_id
+  language:
+    description: "Indicates the code of the language into which the contents of the translatable columns are translated."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.language
+  source_language:
+    description: "Indicates the code of the language in which the contents of the translatable columns were originally created."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.source_lang
+  name:
+    description: "Translated name of the evaluation role."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.name
+  created_by:
+    description: "User who created the row. This can be an email or system username."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.created_by
+  updated_by:
+    description: "User who last updated the row. This can be an email or system username."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.last_updated_by
+  object_version_number:
+    description: "Used to implement optimistic locking. This number is incremented every time the row is updated. The system compares this number at the start and end of a transaction to detect concurrent modifications."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.object_version_number
+  ts_created:
+    description: "Timestamp indicating when the row was created."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.creation_date
+  ts_updated:
+    description: "Timestamp indicating when the row was last updated."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.last_update_date
+  ts_load:
+    description: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing."
+  year:
+    description: "Year used for partitioning. Derived from the ts_updated timestamp."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.year
+  month:
+    description: "Month used for partitioning. Derived from the ts_updated timestamp."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.month
+  day:
+    description: "Day used for partitioning. Derived from the ts_updated timestamp."
+    lineage:
+      - datalake_pin_performance_raw.hra_role_defns_tl.day
