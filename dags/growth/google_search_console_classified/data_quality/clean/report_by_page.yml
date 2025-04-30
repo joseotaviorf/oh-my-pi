@@ -1,0 +1,32 @@
+---
+table_name: datalake_google_search_console_classified_clean.report_by_page
+alert_channel: "#alerts-data-quality"
+column_level_validations:
+  site_url:
+    is_complete:
+  type:
+    is_complete:
+  page:
+    is_complete:
+  country:
+    is_complete:
+  device:
+    is_complete:
+  clicks:
+    is_complete:
+  impressions:
+    is_complete:
+  ctr:
+    is_complete:
+  position:
+    is_complete:
+  posimp:
+    is_complete:
+  dt_created:
+    is_complete:
+  year:
+    is_complete:
+  month:
+    is_complete:
+  day:
+    is_complete:

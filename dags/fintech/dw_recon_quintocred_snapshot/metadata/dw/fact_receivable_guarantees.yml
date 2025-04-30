@@ -1,0 +1,194 @@
+---
+database_name: dw_recon_quintocred_snapshot
+table_name: fact_receivable_guarantees
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+columns:
+  sk_propose:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.sk_propose
+  sk_propose_20:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.sk_propose_20
+  sk_delinquency:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.sk_delinquency
+  sk_transaction:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.sk_transaction
+  sk_ticket:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.sk_ticket
+  id_payment_request:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.id_payment_request
+  id_rh_delinquency:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.id_rh_delinquency
+  origin_table:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.origin_table
+  customer_document:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.customer_document
+  bill_item:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.bill_item
+  provisional_group:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.provisional_group
+  status_rh_payment:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.status_rh_payment
+  description:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.description
+  due_amount:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.due_amount
+  paid_amount:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.paid_amount
+  open_amount:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.open_amount
+  discount_amount:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.discount_amount
+  due_amount_delinquency:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.due_amount_delinquency
+  due_amount_adjusted:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.due_amount_adjusted
+  open_amount_adjusted:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.open_amount_adjusted
+  package_amount:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.package_amount
+  paid_amount_real_estate:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.paid_amount_real_estate
+  check_rh_payment:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.check_rh_payment
+  total_amount_guaranteed:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.total_amount_guaranteed
+  balance_guarantee:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.balance_guarantee
+  is_property_damage:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.is_property_damage
+  is_delinquency_renewal:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.is_delinquency_renewal
+  is_debt_forgiveness:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.is_debt_forgiveness
+  is_contract_active:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.is_contract_active
+  is_archived_delinquency:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.is_archived_delinquency
+  has_tickets:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.has_tickets
+  has_rh_payment:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.has_rh_payment
+  days_late:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.days_late
+  dt_register:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.dt_register
+  dt_due:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.dt_due
+  dt_paid:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.dt_paid
+  dt_register_adjusted:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.dt_register_adjusted
+  dt_contract_started:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.dt_contract_started
+  dt_contract_ended:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.dt_contract_ended
+  dt_model_ended:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.dt_model_ended
+  dt_rh_payment:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.dt_rh_payment
+  dt_rh_payment_programmed:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.dt_rh_payment_programmed
+  dt_closing:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.dt_closing
+  ts_snapshot:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.NOW()
+  year:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.YEAR(CURRENT_DATE)
+  month:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.MONTH(CURRENT_DATE)
+  day:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_receivable_guarantees.DAY(CURRENT_DATE)

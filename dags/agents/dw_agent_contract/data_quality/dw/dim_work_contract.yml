@@ -7,5 +7,5 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   sk_work_contract:
-    is_unique:
+    is_complete:
       severity_level: Error

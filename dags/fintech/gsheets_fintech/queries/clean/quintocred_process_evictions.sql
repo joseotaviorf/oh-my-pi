@@ -113,7 +113,7 @@ SELECT
     TO_DATE(ag_retorno_imob_data, 'yyyy-MM-dd') AS dt_broker_return,
     TO_DATE(em_analise_data, 'yyyy-MM-dd') AS dt_analysis,
     TO_DATE(exoneracao_data, 'yyyy-MM-dd') AS dt_dismissal,
-    CAST(NULL AS DATE) AS dt_finalized,
+    TO_DATE(data_finalizacao, 'yyyy-MM-dd') AS dt_finalized,
     TO_DATE(citacao_neg_data, 'yyyy-MM-dd') AS dt_negative_citation,
     TO_DATE(data_registrado, 'yyyy-MM-dd') AS dt_register,
     TO_DATE(distribuicao, 'yyyy-MM-dd') AS dt_distribution,

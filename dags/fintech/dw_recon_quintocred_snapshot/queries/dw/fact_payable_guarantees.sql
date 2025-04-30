@@ -1,0 +1,27 @@
+SELECT 
+  sk_delinquency,
+  sk_propose,
+  id_payment_request,
+  customer_name,
+  customer_document, 
+  robin_hood_payment_status,
+  category, 
+  check_rh_payment,
+  is_debt_forgiveness,
+  is_broker_active,
+  original_amount,
+  paid_amount,
+  available_in_guarantee_amount,
+  maximum_guaranteed_amount,
+  reference_month_closing,
+  dt_scheduled_payment, 
+  dt_transfer, 
+  dt_document_due,
+  dt_delinquency_creation, 
+  dt_closing,
+  NOW() AS ts_snapshot,
+  YEAR(CURRENT_DATE()) AS year,
+  MONTH(CURRENT_DATE()) AS month,
+  DAY(CURRENT_DATE()) AS day
+FROM 
+  dw_recon_quintocred.fact_payable_guarantees 

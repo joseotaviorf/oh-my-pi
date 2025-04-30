@@ -46,7 +46,7 @@ if __name__ == "__main__":
     logger.info(
         f"""
             m={JOB_NAME}, environment={args.env}, source={args.source}, table_name=report_{args.report_type},
-            load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, report_type={args.report_type}, 
+            load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, report_type={args.report_type},
             msg=print spark jobs args
         """
     )

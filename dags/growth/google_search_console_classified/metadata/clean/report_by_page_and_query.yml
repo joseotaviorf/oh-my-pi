@@ -1,0 +1,71 @@
+---
+database_name: datalake_google_search_console_classified_clean
+table_name: report_by_page_and_query
+owner: henrique.miamoto@quintoandar.com.br
+domain: Growth
+description: This table contains the clean informations about the Google Search Console tool in the page/query granularity.
+columns:
+  site_url:
+    description: Main URL that are being queried.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.site_url
+  type:
+    description: Extraction type.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.type
+  page:
+    description: Full page address.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.keys
+  query:
+    description: search words performed on Google.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.keys
+  country:
+    description: country where the search was made.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.keys
+  device:
+    description: device type where the search was made.
+    categories:
+      DESKTOP: desktop
+      MOBILE: mobile
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.keys
+  clicks:
+    description: Times it was clicked on SERP page organically
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.clicks
+  impressions:
+    description: Times it was showed on SERP page
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.impressions
+  ctr:
+    description: Click Through Rate - times it was clicked over times it was showed
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.ctr
+  position:
+    description: Relative ranking of the position of the link on Google.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.position
+  posimp:
+    description: Position multiplied by the impressions.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.position
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.impressions
+  dt_created:
+    description: Extraction date.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.date
+  year:
+    description: Extraction year.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.date
+  month:
+    description: Extraction month.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.date
+  day:
+    description: Extraction day.
+    lineage:
+      - datalake_google_search_console_classified_raw.report_by_page_and_query.date

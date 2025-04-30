@@ -1,0 +1,45 @@
+---
+database_name: dw_public
+table_name: dim_kodak_photos
+description: This table stores detailed information about photos related to Kodak. 
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_kodak_photo:
+    description: Unique identifier for the photo in Kodak service.
+    lineage:
+      - datalake_kodak_clean.photo.id
+  id_external_domain:
+    description: Unique identifier for the photo in the related external domain.
+    lineage:
+      - datalake_kodak_clean.photo.id_external_domain
+  external_domain:
+    description: Name of the external domain where the photo is stored, can be ATLAS, HOUSE ou LEAD 3P.
+    lineage:
+      - datalake_kodak_clean.photo.external_domain
+  description:
+    description: Description of the photo registered in Kodak service.
+    lineage:
+      - datalake_kodak_clean.photo.metadata
+  mime_type:
+    description: MIME type of the photo, indicating the format of the file.
+    lineage:
+      - datalake_kodak_clean.photo.metadata
+  order:
+    description: Order of the photo in the list of photos related to a specific entity.
+    lineage:
+      - datalake_kodak_clean.photo.metadata
+  path:
+    description: Path to the photo in the Kodak service.
+    lineage:
+      - datalake_kodak_clean.photo.path
+  source_name:
+    description: Name of the source from which the photo was obtained.
+    lineage:
+      - datalake_kodak_clean.photo.metadata
+  source_url:
+    description: URL of the source from which the photo was obtained.
+    lineage:
+      - datalake_kodak_clean.photo.metadata
+  ts_load:
+    description: Timestamp when the record was loaded into the data warehouse.

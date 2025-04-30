@@ -1,0 +1,102 @@
+---
+database_name: dw_recon_quintocred_snapshot
+table_name: fact_payable_guarantees
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+columns:
+  sk_delinquency:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.sk_delinquency
+  sk_propose:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.sk_propose
+  id_payment_request:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.id_payment_request
+  customer_name:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.customer_name
+  customer_document:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.customer_document
+  robin_hood_payment_status:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.robin_hood_payment_status
+  category:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.category
+  check_rh_payment:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.check_rh_payment
+  is_debt_forgiveness:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.is_debt_forgiveness
+  is_broker_active:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.is_broker_active
+  original_amount:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.original_amount
+  paid_amount:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.paid_amount
+  available_in_guarantee_amount:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.available_in_guarantee_amount
+  maximum_guaranteed_amount:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.maximum_guaranteed_amount
+  reference_month_closing:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.reference_month_closing
+  dt_scheduled_payment:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.dt_scheduled_payment
+  dt_transfer:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.dt_transfer
+  dt_document_due:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.dt_document_due
+  dt_delinquency_creation:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.dt_delinquency_creation
+  dt_closing:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.dt_closing
+  ts_snapshot:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.NOW()
+  year:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.YEAR(CURRENT_DATE)
+  month:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.MONTH(CURRENT_DATE)
+  day:
+    description: ''
+    lineage:
+    - dw_recon_quintocred.fact_payable_guarantees.DAY(CURRENT_DATE)

@@ -252,6 +252,9 @@ bietlejuice.enrich_app_installed:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
+bietlejuice.enrich_aud_test:
+  add:
+    - bietlejuice.ebdb_user:load-clean-user-pro-owner
 bietlejuice.enrich_booking:
   remove:
     - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel
@@ -331,14 +334,6 @@ bietlejuice.enrich_customer_demand:
     - bietlejuice.ebdb_user:load-clean-user
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
-bietlejuice.enrich_customer_support:
-  add:
-    - bietlejuice.enrich_bigfone_twilio:load-enrich-call-ivr-paths
-    - bietlejuice.enrich_quinto_messenger:load-enrich-channel-event
-  remove:
-    - bietlejuice.quinto_messenger:load-clean-task
-    - bietlejuice.quinto_messenger:load-clean-task-event
-    - bietlejuice.sauron:load-clean-bot-outgoing-messages
 bietlejuice.enrich_ebdb_photo_jobs:
   add:
     - bietlejuice.ebdb_location:load-clean-map-region
@@ -1034,3 +1029,8 @@ wonka.house_visit:
 wonka.user_search_profile_clustering:
   add:
     - wonka.user_bc_h3_7_city_agg_search_filters:load-user_bc_h3_7_city_agg_search_filters
+
+bietlejuice.reverse_neighborhood_price_range_access:
+  add:
+    - bietlejuice.reverse_neighborhood_price_range_load:load-reverse-neighborhood-price-range
+

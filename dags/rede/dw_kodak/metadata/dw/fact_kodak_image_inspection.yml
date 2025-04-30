@@ -1,0 +1,185 @@
+---
+database_name: dw_public
+table_name: fact_kodak_image_inspection
+description: This table stores detailed information about photo inspections related to Kodak. 
+domain: Rede
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_image_inspection:
+    description: Unique identifier for the inspection record.
+    lineage:
+      - datalake_kodak_clean.image_inspection.id
+  sk_kodak_photo:
+    description: Unique identifier for the photo being inspected.
+    lineage:
+      - datalake_kodak_clean.image_inspection.id_photo
+  id_duplicate:
+    description: Identifier for duplicate photos, if any.
+    lineage:
+      - datalake_kodak_clean.image_inspection.id_duplicate
+  id_group:
+    description: Identifier for the group of photos related to the inspection. Foreign key for datalake_kodak_clean.image_inspection_group table.
+    lineage:
+      - datalake_kodak_clean.image_inspection.id_group
+  id_house:
+    description: Identifier for the house associated with the photo. Foreign key for house tables.
+    lineage:
+      - datalake_ebdb_clean.house.id
+  id_lead_3p:
+    description: Identifier for the 3p lead related to the inspection. Foreign key for lead_3p tables.
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.id
+  deduplication_hash:
+    description: Hash value used to detect duplicate photos.
+    lineage:
+      - datalake_kodak_clean.image_inspection.deduplication_hash
+  house_place:
+    description: Specific place within the house where the photo was taken.
+    lineage:
+      - datalake_kodak_clean.image_inspection.house_place
+  room_type:
+    description: Type of room in the house where the photo was taken.
+    lineage:
+      - datalake_kodak_clean.image_inspection.room_type
+  status:
+    description: Current status of the photo inspection.
+    lineage:
+      - datalake_kodak_clean.image_inspection.status
+  url:
+    description: URL where the photo is stored.
+    lineage:
+      - datalake_kodak_clean.image_inspection.url
+  brightness:
+    description: Brightness level of the photo.
+    lineage:
+      - datalake_kodak_clean.image_inspection.brightness
+  condition:
+    description: Overall condition assessment of the photo.
+    lineage:
+      - datalake_kodak_clean.image_inspection.condition
+  framing:
+    description: Framing quality score of the photo.
+    lineage:
+      - datalake_kodak_clean.image_inspection.framing
+  framing_score:
+    description: Overall score for the framing of the photo.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.framing_score
+  height:
+    description: Height of the photo in pixels.
+    lineage:
+      - datalake_kodak_clean.image_inspection.height
+  ordination:
+    description: Order or ranking of the photo among others.
+    lineage:
+      - datalake_kodak_clean.image_inspection.ordination
+  ratio:
+    description: Aspect ratio of the photo.
+    lineage:
+      - datalake_kodak_clean.image_inspection.ratio
+  sharpness:
+    description: Sharpness score of the photo.
+    lineage:
+      - datalake_kodak_clean.image_inspection.sharpness
+  width:
+    description: Width of the photo in pixels.
+    lineage:
+      - datalake_kodak_clean.image_inspection.width
+  is_approved:
+    description: Indicates whether the photo is approved. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.is_approved
+  has_bonus_sharpness:
+    description: Indicates if the photo has a bonus for sharpness. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_sharpness
+  has_fault_aspect_ratio:
+    description: Indicates if the photo has aspect ratio issues. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_fault_aspect_ratio
+  has_fault_brightness:
+    description: Indicates if the photo has brightness issues. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_fault_brightness
+  has_fault_sharpness:
+    description: Indicates if the photo has sharpness issues. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_fault_sharpness
+  has_red_flag_aspect_ratio:
+    description: Indicates if the photo aspect ratio is flagged. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_aspect_ratio
+  has_red_flag_casamineira:
+    description: Indicates if the photo is flagged for issues related to 'casamineira'. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_casamineira
+  has_red_flag_compliance:
+    description: Indicates if the photo has compliance issues. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_compliance
+  has_red_flag_duplicate_image:
+    description: Indicates if the photo is flagged as a duplicate image. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_duplicate_image
+  has_red_flag_media_modification:
+    description: Indicates if the photo has been modified. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_media_modification
+  has_red_flag_not_property:
+    description: Indicates if the photo does not belong to the property. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_not_property
+  has_red_flag_sharpness:
+    description: Indicates if the photo sharpness is flagged. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_sharpness
+  has_red_flag_size:
+    description: Indicates if the photo size is flagged. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_size
+  has_red_flag_watermark:
+    description: Indicates if the photo has a watermark. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_watermark
+  has_restb_amenity_balcony:
+    description: Indicates if the photo has a balcony amenity. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak.image_inspection_amenities.has_balcony
+  has_restb_amenity_gym:
+    description: Indicates if the photo has a gym amenity. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak.image_inspection_amenities.has_gym
+  has_restb_amenity_pool:
+    description: Indicates if the photo has a pool amenity. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak.image_inspection_amenities.has_pool
+  has_restb_amenity_sauna:
+    description: Indicates if the photo has a sauna amenity. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak.image_inspection_amenities.has_sauna
+  has_restb_amenity_sports_court:
+    description: Indicates if the photo has a sports court amenity. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak.image_inspection_amenities.has_sports_court
+  has_restb_amenity_toy_library:
+    description: Indicates if the photo has a toy library amenity. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak.image_inspection_amenities.has_toy_library
+  has_restb_amenity_unobstructed_view:
+    description: Indicates if the photo has an unobstructed view amenity. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak.image_inspection_amenities.has_unobstructed_view
+  has_restb_amenity_walk_in_closet:
+    description: Indicates if the photo has a walk-in closet amenity. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak.image_inspection_amenities.has_walk_in_closet
+  ts_created:
+    description: Timestamp when the inspection record was created.
+    lineage:
+      - datalake_kodak_clean.image_inspection.ts_created
+  ts_updated:
+    description: Timestamp when the inspection record was last updated.
+    lineage:
+      - datalake_kodak_clean.image_inspection.ts_updated
+  ts_load:
+    description: Timestamp when the record was loaded into the data warehouse.

@@ -22,13 +22,23 @@ columns:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.status_reason
     description: Listing status reason
+  is_last_state_of_day:
+    description: Boolean flag indicating whether it's the house's last state of the day
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.ts_first_publication
+    description: Timestamp of the house's first publication
+  ts_last_publication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.ts_last_publication
+    description: Timestamp of the house's last publication
   ts_state_started:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Timestamp of the state change
   ts_state_ended:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
     description: Timestamp of the next state change (null if it is the one currently in effect)
   country_code:
     lineage:
