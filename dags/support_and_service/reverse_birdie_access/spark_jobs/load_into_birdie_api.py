@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 from typing import Tuple
 from argparse import ArgumentParser
+import numpy as np
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
