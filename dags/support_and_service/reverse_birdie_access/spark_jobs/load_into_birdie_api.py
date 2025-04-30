@@ -26,13 +26,13 @@ def create_results_payload(database_name, table_name, execution_date):
                         'dsat_customer_relationship':'csat',
                         'dsat_novas_pesquisas':'csat',
                         'dsat_diligencia': 'csat',
-                        'nps_onboarding': 'nps',
-                        'nps_ongoing':'nps',
-                        'nps_offboarding':'nps',
-                        'nps_lost': 'nps',
-                        'nps_pp_multi': 'nps',
-                        'nps_novas_pesquisas':'nps',
-                        'nps_end_of_process': 'nps',
+                        'onboarding': 'nps',
+                        'ongoing':'nps',
+                        'offboarding':'nps',
+                        'lost': 'nps',
+                        'pp_multi': 'nps',
+                        'novas_pesquisas':'nps',
+                        'end_of_process': 'nps'
                     }
     df = spark.sql(
             f"""
