@@ -95,6 +95,6 @@ FROM
   sequenced_changes
 WHERE
   rn != 0
-  AND (id_user != COALESCE(prev_id_user, -1)
-    OR id_account_manager != COALESCE(prev_id_account_manager, -1)
+  AND (COALESCE(id_user, -1) != COALESCE(prev_id_user, -1)
+    OR COALESCE(id_account_manager, -1) != COALESCE(prev_id_account_manager, -1)
     OR is_active != prev_is_active)
