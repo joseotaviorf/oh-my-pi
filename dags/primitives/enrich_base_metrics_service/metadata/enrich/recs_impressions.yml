@@ -1,0 +1,37 @@
+database_name: datalake_search
+table_name: recs_impressions
+owner: pedro.nogueira@quintoandar.com.br
+domain: primitives
+description: |
+  Table with ids, dimensions, metrics and timestamps related to user and house global metrics datasets.
+columns:
+  recset_id:
+    description: The id os the recommendation shown
+  id_user:
+    description: The id of the user
+  id_session:
+    description: The id of the session
+  id_amplitude:
+    description: Amplitude id
+  id_device:
+    description: The id of the device
+  id_house:
+    description: The id of the house
+  position:
+    description: The position in which the house was shown on the carrousel
+  business_context:
+    description: The business context.
+  platform:
+    description: The platform (web or app)
+  showcase:
+    description: The showcase or carrousel type where the recommendations was shown
+  user_properties:
+    description: The user properties for the recommendation event. Holds the info related to which AB test the user was on
+  ts_recommendation:
+    description: The timestamp of the recommendations event
+  year:
+    description: The year of the recommendations event
+  month:
+    description: The month of the recommendations event
+  day:
+    description: The day of the recommendations event

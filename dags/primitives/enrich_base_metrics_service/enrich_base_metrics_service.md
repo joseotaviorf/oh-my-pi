@@ -17,6 +17,7 @@ More information about run time [here]({chart_url}{dag_id}).
 
 This pipeline produces the following output table on enrich layer:
 - `search_impressions`
+- `recs_impressions`
 - `global_metrics`
 - `experiment_config`
 - `house_publication_dates`
