@@ -3544,11 +3544,11 @@ bietlejuice.metric_rent__listings:
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
 bietlejuice.metric_rent__nps:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-campaign
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-fact-nps-dispatches
   - bietlejuice.dw_retention:load-dw-retention-dim-nps-answer
   - bietlejuice.dw_retention:load-dw-retention-fact-contract-termination
   - bietlejuice.dw_retention:load-dw-retention-fact-nps
-  - bietlejuice.dw_tracksale:load-dw-tracksale-dim-nps-campaign
-  - bietlejuice.dw_tracksale:load-dw-tracksale-fact-nps-dispatches
 bietlejuice.metric_rent__retention:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_house:load-dw-rent-dim-house-status
