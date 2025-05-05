@@ -264,3 +264,4 @@ WHERE
   rank_cte = 1
   AND DATE(ts_started) >= DATE('{load_start_date}') - INTERVAL 1 YEAR
   AND refined_direction = 'INBOUND'
+  AND da.agent_organization IN ("atento", "atn")
