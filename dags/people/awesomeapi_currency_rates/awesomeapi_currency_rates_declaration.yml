@@ -1,10 +1,10 @@
 dag:
   name: awesomeapi_currency_rates
-  dag_documentation:
+  owner: Data People
+  schedule_interval: 0 3 * * *
+  documentation:
     dag_purpose: |
       This DAG aims to ingest exchange rate data from the Awesome API.
-  schedule_interval: 0 3 * * *
-  owner: Data People
 
 cluster:
   type: databricks_13_3_min_memory_people_cluster
