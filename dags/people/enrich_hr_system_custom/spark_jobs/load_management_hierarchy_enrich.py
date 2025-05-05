@@ -47,7 +47,8 @@ if __name__ == "__main__":
                     WHEN managers.dt_effective_end = DATE '4712-12-31' AND managers.dt_effective_start <= CURRENT_DATE THEN 1
                     WHEN managers.dt_effective_end < DATE '4712-12-31' THEN 2
                     ELSE 3
-                END,
+                END ASC,
+                managers.dt_effective_start DESC,
                 managers.ts_last_update DESC
             ) as priority_rank
         FROM
