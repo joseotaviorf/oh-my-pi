@@ -1,0 +1,21 @@
+database_name: datalake_search
+table_name: rent_flow_past_30_days
+owner: pedro.nogueira@quintoandar.com.br
+domain: primitives
+description: |
+  This is intermediate table to help process datasets and metrics
+columns:
+  id_user:
+    description: The id of the user.
+  id_house:
+    description: The id of the house.
+  ts_visit_completed:
+    description: The timestamp in which a visit was completed.
+  ts_offer:
+    description: The timestamp in which an offer was made. Contemplates direct and submitted offers.
+  ts_contract_signed:
+    description: The timestamp in which a contract was signed.
+  ts_direct_offer:
+    description: The timestamp in which a direct offer was made.
+  ts_offer_submitted:
+    description: The timestamp in which a submitted offer was made.

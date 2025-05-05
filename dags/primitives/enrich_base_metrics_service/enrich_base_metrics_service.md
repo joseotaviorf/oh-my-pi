@@ -19,6 +19,9 @@ This pipeline produces the following output table on enrich layer:
 - `search_impressions`
 - `global_metrics`
 - `experiment_config`
+- `house_publication_dates`
+- `rent_flow_past_30_days`
+- `sale_flow_past_30_days`
 
 ### Responsible Data Team
 ​
