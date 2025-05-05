@@ -8,9 +8,9 @@ SELECT
   COUNT(IF(fnd.score between 7 and 8, fnd.sk_nps_answer, NULL)) AS neutrals_repairs_needed,
   100 * (COUNT(IF(fnd.score > 8, sk_nps_answer, NULL)) - COUNT(IF(fnd.score < 7, sk_nps_answer, NULL))) / COUNT(sk_nps_answer) AS nps_repairs_needed
 FROM
-  dw_tracksale.fact_nps_dispatches AS fnd
+  dw_customer_satisfaction.fact_nps_dispatches AS fnd
 JOIN
-  dw_tracksale.dim_nps_campaign AS dnc
+  dw_customer_satisfaction.dim_nps_campaign AS dnc
     ON fnd.sk_nps_campaign = dnc.sk_nps_campaign
 JOIN
   dw_rent.dim_contract AS dc
@@ -40,9 +40,9 @@ SELECT
   COUNT(IF(fnd.score between 7 and 8, fnd.sk_nps_answer, NULL)) AS neutrals_repairs_needed,
   100 * (COUNT(IF(fnd.score > 8, sk_nps_answer, NULL)) - COUNT(IF(fnd.score < 7, sk_nps_answer, NULL))) / COUNT(sk_nps_answer) AS nps_repairs_needed
 FROM
-  dw_tracksale.fact_nps_dispatches AS fnd
+  dw_customer_satisfaction.fact_nps_dispatches AS fnd
 JOIN
-  dw_tracksale.dim_nps_campaign AS dnc
+  dw_customer_satisfaction.dim_nps_campaign AS dnc
     ON fnd.sk_nps_campaign = dnc.sk_nps_campaign
 JOIN
   dw_rent.dim_contract AS dc

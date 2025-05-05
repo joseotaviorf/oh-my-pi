@@ -1,6 +1,7 @@
 import json
 import requests
 import argparse
+from datetime import datetime
 from tenacity import retry, stop_after_attempt
 from pyspark.sql.functions import current_timestamp, lit
 from pyspark.sql import DataFrame
@@ -16,6 +17,7 @@ JOB_NAME = "load_awesomeapi_currency_rates_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 DATABRICKS_SCOPE = "people"
 API_URL = "https://economia.awesomeapi.com.br/json/daily"
+WEEKEND_DAYS = ["Saturday", "Sunday", "Monday"]
 
 @retry(stop=stop_after_attempt(1))
 def get_exchange_rates(currency, start_date, end_date):
@@ -105,4 +107,8 @@ if __name__ == "__main__":
 
     except Exception as e:
         logger.exception(f"m={JOB_NAME}, msg=Job failed: {e}")
-        raise
+        execution_day = datetime.strptime(args.execution_date, "%Y-%m-%d").strftime("%A")
+        if isinstance(e, ValueError) and "No exchange rate data found" in str(e) and execution_day in WEEKEND_DAYS:
+            logger.info(f"m={JOB_NAME}, msg=DAG failed due to no API data on {execution_day}, but it's a weekend/Monday, so marking as success.")
+        else:
+            raise

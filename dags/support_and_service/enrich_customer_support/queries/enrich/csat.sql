@@ -16,8 +16,7 @@ WITH csat_zendesk AS (
   FROM
     datalake_zendesk_clean.tickets
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) - INTERVAL 1 YEAR AND CAST('{load_end_date}' AS DATE)
-    AND ts_updated >= CAST('{load_start_date}' AS DATE) - INTERVAL 1 YEAR
+    year >= YEAR(DATE('{load_start_date}') - INTERVAL 3 YEAR) 
   UNION ALL
   SELECT
     id_ticket,
@@ -29,8 +28,7 @@ WITH csat_zendesk AS (
   FROM
     datalake_survicate.zendesk_email_surveys
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN CAST('{load_start_date}' AS DATE) - INTERVAL 1 YEAR AND CAST('{load_end_date}' AS DATE)
-    AND ts_first_response >= CAST('{load_start_date}' AS DATE) - INTERVAL 1 YEAR
+    year >= YEAR(DATE('{load_start_date}') - INTERVAL 3 YEAR) 
     AND id_ticket IS NOT NULL
     AND COALESCE(CAST(user_comment AS STRING), CAST(csat_score AS STRING), CAST(is_solved AS STRING)) IS NOT NULL
 )
@@ -66,7 +64,17 @@ LEFT JOIN
     ON t.id_twilio = e.id_task
     OR t.id_twilio = e.id_call
 WHERE
-  MAKE_DATE(e.year, e.month, e.day) BETWEEN CAST('{load_start_date}' AS DATE) - INTERVAL 1 YEAR AND CAST('{load_end_date}' AS DATE)
+  (
+    e.year > YEAR(DATE('{load_start_date}') - INTERVAL 1 YEAR)
+    OR (
+      e.year = YEAR(DATE('{load_start_date}') - INTERVAL 1 YEAR)
+      AND e.month > MONTH(DATE('{load_start_date}') - INTERVAL 1 YEAR)
+    ) OR (
+      e.year = YEAR(DATE('{load_start_date}') - INTERVAL 1 YEAR)
+      AND e.month = MONTH(DATE('{load_start_date}') - INTERVAL 1 YEAR)
+      AND e.day >= DAY(DATE('{load_start_date}') - INTERVAL 1 YEAR)
+    )
+  )
   AND e.csat_2 is not null
 UNION ALL
 SELECT DISTINCT
@@ -88,6 +96,6 @@ LEFT JOIN
   datalake_chat_fup_clean.surveys_answer AS sa
     ON ss.id = sa.id_survey
 WHERE
-  sa.id IS NOT NULL
-  AND DATE(c.ts_attended) BETWEEN CAST('{load_start_date}' AS DATE) - INTERVAL 1 YEAR AND CAST('{load_end_date}' AS DATE)
+  DATE(c.ts_attended) BETWEEN DATE('{load_start_date}') - INTERVAL 1 YEAR AND DATE('{load_end_date}')
+  AND sa.id IS NOT NULL
   AND sa.rating IS NOT NULL

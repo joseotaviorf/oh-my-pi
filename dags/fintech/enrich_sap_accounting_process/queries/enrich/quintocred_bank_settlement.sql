@@ -2,7 +2,7 @@ WITH rental_guarantee_pix AS (
     SELECT
         id_propose AS id_business_entity,
         IF(gateway = 'CHECKOUT_V2', id_charge, unicid) AS id_finance_entity,
-        -- unicid,
+        LEFT(unicid, 30) AS unicid,
         CAST(NULL AS STRING) AS id_bank_payment,
         NULL AS billing_type,
         NULL AS source_system,
@@ -15,14 +15,14 @@ WITH rental_guarantee_pix AS (
         status = 'SUCCESS'
         AND billing_type = 'PIX'
         AND ts_created >= CURRENT_DATE - 180
-    GROUP BY 1,2,3,4,5,6,7
+    GROUP BY 1,2,3,4,5,6,7,8
 
     UNION ALL 
 
     SELECT DISTINCT
         d.id_propose AS id_business_entity,
         ap.id_bank_payment AS id_finance_entity,
-        -- da.id_agreement_payment AS unicid,
+        da.id_agreement_payment AS unicid,
         ap.id_bank_payment,
         billing_type,
         source_system,
@@ -45,7 +45,7 @@ WITH rental_guarantee_pix AS (
     SELECT
         i.id_company AS id_business_entity,
         i.id AS id_finance_entity,
-        -- CAST(NULL AS STRING) AS unicid,
+        CAST(NULL AS STRING) AS unicid,
         b.id AS id_bank_payment,
         NULL AS billing_type,
         NULL AS source_system,
@@ -137,6 +137,7 @@ bank AS (
     WHERE 
         operation = 'C'
         AND literal_complete NOT LIKE 'GETNET%'
+        AND origin_complement IS NOT NULL
 
     UNION ALL
 
@@ -205,7 +206,7 @@ SELECT
     IF((COALESCE(ABS(b.bank_amount), ABS(rgp.total_amount)) - ABS(l.debit_credit) = 0), TRUE, FALSE) AS is_correctness_compliance,
     IF((l.dt_reference BETWEEN rgp.dt_billing AND DATE_ADD(rgp.dt_billing, 3)), TRUE, FALSE) AS is_temporality_compliance,
     rgp.dt_billing,
-    p.dt_paid AS dt_payment_platform,
+    p.dt_paid AS dt_payment_source,
     b.dt_bank_paid,
     l.dt_created AS dt_sap_created,
     l.dt_reference AS dt_sap_reference
@@ -225,7 +226,7 @@ LEFT JOIN
 LEFT JOIN 
     ledger AS l 
         ON CASE
-                WHEN rgp.billing_source = 'Rental Guarantee Platform - Payment' THEN LEFT(LOWER(rgp.id_finance_entity),30) = LOWER(l.id_external_payment)
+                WHEN rgp.billing_source = 'Rental Guarantee Platform - Payment' THEN LOWER(rgp.unicid) = LOWER(l.id_external_payment)
                 ELSE p.id_bank_payment = l.id_external_payment AND rgp.dt_billing = l.dt_reference
                 --rgp.unicid = l.id_external_payment AND rgp.dt_billing_source_trigger = l.dt_reference
             END
@@ -246,14 +247,13 @@ SELECT
     payment_amount,
     COALESCE(ts.bank_amount, b.bank_amount) AS bank_amount,
     sap_amount,
-    is_completeness_compliance,
-    is_correctness_compliance,
-    is_temporality_compliance,
+    COALESCE(is_completeness_compliance, FALSE) AS is_completeness_compliance,
+    COALESCE(is_correctness_compliance, FALSE) AS is_correctness_compliance,
+    COALESCE(is_temporality_compliance, FALSE) AS is_temporality_compliance,
     IF(is_completeness_compliance = TRUE AND is_correctness_compliance = TRUE AND is_temporality_compliance = TRUE, TRUE, FALSE) AS is_compliance,
-    COALESCE(ts.dt_billing, b.dt_bank_paid) AS dt_trigger,
+    b.dt_bank_paid,
     dt_billing,
-    dt_payment_platform,
-    COALESCE(ts.dt_bank_paid, b.dt_bank_paid) AS dt_bank_paid,
+    dt_payment_source,
     dt_sap_created,
     dt_sap_reference
 FROM 
@@ -262,4 +262,4 @@ LEFT JOIN
     the_straw AS ts
     ON b.bank_info = ts.bank_info
 WHERE 
-    DATE(b.dt_bank_paid) >= CURRENT_DATE - 180
+    b.dt_bank_paid >= CURRENT_DATE - 180

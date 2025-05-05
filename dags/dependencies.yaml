@@ -11,8 +11,6 @@ bietlejuice.dw_accounting_funnel:
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-provision-creation
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-revenue-accounting
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-reversion-creation
-  - bietlejuice.enrich_sap_accounting_process:load-enrich-for-rent-bank-settlement
-  - bietlejuice.enrich_sap_accounting_process:load-enrich-quintocred-bank-settlement
 bietlejuice.dw_accounts_receivable:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
@@ -1102,8 +1100,6 @@ bietlejuice.dw_visit:
   - bietlejuice.enrich_visit:load-enrich-visit-status-events
   - bietlejuice.enrich_visit:load-enrich-visits
 bietlejuice.enrich_accounting_funnel:
-  - bietlejuice.checkout:load-clean-bolecode
-  - bietlejuice.checkout:load-clean-boleto
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry
@@ -1118,16 +1114,12 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow
-  - bietlejuice.enrich_nexxera:load-enrich-cnab-charges
-  - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
   - bietlejuice.enrich_retsuko:load-enrich-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry
-  - bietlejuice.enrich_sap:load-enrich-ledger
   - bietlejuice.enrich_sap:load-enrich-ledger-new-template
   - bietlejuice.gsheets_fintech:done-clean-cod-locale
-  - bietlejuice.itau_statements:load-clean-statement-879200452685
   - bietlejuice.kill_queue:load-clean-reservation
   - bietlejuice.monopoly:load-clean-accounting-entry
   - bietlejuice.monopoly:load-clean-sale
@@ -1275,10 +1267,16 @@ bietlejuice.enrich_b2b:
   - bietlejuice.enrich_lead:load-enrich-lead
   - bietlejuice.enrich_lead:load-enrich-reprocessed-lead
 bietlejuice.enrich_bank_conciliation:
+  - bietlejuice.checkout:load-clean-bolecode
+  - bietlejuice.checkout:load-clean-boleto
   - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
   - bietlejuice.enrich_accounting_funnel:load-enrich-payment-platforms
+  - bietlejuice.enrich_nexxera:load-enrich-cnab-charges
+  - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
   - bietlejuice.enrich_nexxera:load-enrich-cnab-payments
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_sap:load-enrich-ledger
+  - bietlejuice.itau_statements:load-clean-statement-879200452685
   - bietlejuice.itau_statements:load-clean-statement-879200494588
   - bietlejuice.nexxera:load-clean-cnab-charges-recupera-velo-2
   - bietlejuice.pixar:load-clean-charge
@@ -1287,6 +1285,7 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
+  - bietlejuice.vans:load-clean-boleto
 bietlejuice.enrich_base_metrics_service:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
@@ -3544,11 +3543,11 @@ bietlejuice.metric_rent__listings:
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows
 bietlejuice.metric_rent__nps:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-campaign
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-fact-nps-dispatches
   - bietlejuice.dw_retention:load-dw-retention-dim-nps-answer
   - bietlejuice.dw_retention:load-dw-retention-fact-contract-termination
   - bietlejuice.dw_retention:load-dw-retention-fact-nps
-  - bietlejuice.dw_tracksale:load-dw-tracksale-dim-nps-campaign
-  - bietlejuice.dw_tracksale:load-dw-tracksale-fact-nps-dispatches
 bietlejuice.metric_rent__retention:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_house:load-dw-rent-dim-house-status
@@ -3636,6 +3635,7 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_agent:load-dw-public-dim-agent
   - bietlejuice.dw_atta:load-dw-atta-dim-franchise-atta
   - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow
+  - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-answer
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-campaign
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-fact-nps-answer-justifications
@@ -3655,6 +3655,8 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-answer
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
   - bietlejuice.dw_user:load-dw-public-dim-user
+  - bietlejuice.dw_velo_zendesk:load-dw-velo-dim-velo-ticket-users
+  - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history
   - bietlejuice.dw_visit:load-dw-visit-dim-business-context
   - bietlejuice.dw_visit:load-dw-visit-dim-business-model
   - bietlejuice.dw_visit:load-dw-visit-dim-entrance-type
@@ -3663,6 +3665,10 @@ bietlejuice.reverse_birdie:
   - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_survicate:load-enrich-inspections-surveys
+  - bietlejuice.enrich_survicate:load-enrich-response-content
+  - bietlejuice.enrich_survicate:load-enrich-survey-questions
+  - bietlejuice.enrich_survicate:load-enrich-survey-responses
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys
   - bietlejuice.help_center_api:load-clean-call-in-app-eligibility
   - bietlejuice.insider:load-clean-feature

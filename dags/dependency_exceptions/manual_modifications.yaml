@@ -88,9 +88,9 @@ bietlejuice.dw_datamarts_for_sale:
     - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
     - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
     - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
-    - bietlejuice.dw_tracksale:load-dw-tracksale-dim-nps-answer
-    - bietlejuice.dw_tracksale:load-dw-tracksale-dim-nps-campaign
-    - bietlejuice.dw_tracksale:load-dw-tracksale-fact-nps-dispatches
+    - bietlejuice.dw_customer_satisfaction:load-dw-tracksale-dim-nps-answer
+    - bietlejuice.dw_customer_satisfaction:load-dw-tracksale-dim-nps-campaign
+    - bietlejuice.dw_customer_satisfaction:load-dw-tracksale-fact-nps-dispatches
     - bietlejuice.ebdb_condo:load-clean-amenities
     - bietlejuice.ebdb_condo:load-clean-condo-amenities
     - bietlejuice.ebdb_condo:load-clean-info-condo-amenities

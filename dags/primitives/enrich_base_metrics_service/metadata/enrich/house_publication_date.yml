@@ -1,0 +1,13 @@
+database_name: datalake_search
+table_name: house_publication_dates
+owner: pedro.nogueira@quintoandar.com.br
+domain: primitives
+description: |
+  This table holds the publication date for each id house
+columns:
+  id_house:
+    description: The id of house
+  business_context:
+    description: the business context of the house.
+  ts_house_published:
+    description: The timestamp in which the house was published

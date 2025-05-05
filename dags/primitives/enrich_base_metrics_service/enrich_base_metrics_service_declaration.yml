@@ -14,12 +14,25 @@ workflow:
     "start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
     "end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   inner_dependencies:
+    recs_impressions:
+    - experiment_config
     search_impressions:
     - experiment_config
+    - house_publication_dates
+    - rent_flow_past_30_days
+    - sale_flow_past_30_days
     global_metrics:
     - experiment_config
     - search_impressions
+    experiment_config_processed:
+    - experiment_config
   tables_customization:
+    recs_impressions:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
     search_impressions:
       partitions:
       - year

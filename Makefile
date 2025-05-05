@@ -280,6 +280,14 @@ validate-dag-declaration-files:
 	@echo ""
 	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/validate_dag_declaration_files.py -l $(level)
 
+## validates if the DAGs are using our current standards, such as using DAG Builder or CDC.
+validate-dags-up-to-standard:
+	@echo ""
+	@echo "Validating DAG declaration files"
+	@echo "=========="
+	@echo ""
+	@PYTHONPATH=. python3 scripts/dag_standard_validation/validate_dags_following_current_standards.py
+
 .PHONY: validate-metadata-files-content
 validate-metadata-files-content:
 	@echo ""

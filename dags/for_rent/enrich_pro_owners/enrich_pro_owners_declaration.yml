@@ -8,7 +8,7 @@ dag:
       extract metrics about owners and houses like quantity of house, owner classification, owner account manager
       and their changes in time. So, the grain in these tables is a owner, ts_change and a metric that was observed.
       Basically, a SCD type 2.
-  owner: Data Agents
+  owner: Data ForRent
 workflow:
   type: query_delta
   layer: enrich
