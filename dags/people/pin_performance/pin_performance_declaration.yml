@@ -25,7 +25,7 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
 workflow:
   layer: raw
-  custom_schema: pin_core
+  custom_schema: pin_performance
   type: custom_ingestion
   default_partitions: ["year", "month", "day"]
   bucket_config_name: people_bucket
