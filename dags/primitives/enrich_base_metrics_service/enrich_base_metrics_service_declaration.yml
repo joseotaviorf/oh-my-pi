@@ -24,6 +24,8 @@ workflow:
     global_metrics:
     - experiment_config
     - search_impressions
+    experiment_config_processed:
+    - experiment_config
   tables_customization:
     recs_impressions:
       extraction_type: incremental
