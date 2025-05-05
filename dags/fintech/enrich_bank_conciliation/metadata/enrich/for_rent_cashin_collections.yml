@@ -1,0 +1,52 @@
+---
+database_name: datalake_bank_conciliation
+table_name: for_rent_cashin_collections
+owner: ae-finance-fintech@quintoandar.com.br
+domain: for_rent
+description: null
+columns:
+  id_our_number:
+    description: ''
+    lineage:
+    - .df.id_our_number
+  bank_amount:
+    description: ''
+    lineage:
+    - .df.bank_amount
+  checkout_amount:
+    description: ''
+    lineage:
+    - .df.checkout_amount
+  sap_amount:
+    description: ''
+    lineage:
+    - .df.sap_amount
+  status_bank:
+    description: ''
+    lineage:
+    - .df.status_bank
+  status_checkout:
+    description: ''
+    lineage:
+    - .df.status_checkout
+  status_sap:
+    description: ''
+    lineage:
+    - .df.status_sap
+  is_reconciled:
+    description: ''
+    lineage:
+    - .df.CASE WHEN status_bank = 'ok' AND status_sap = 'ok' THEN TRUE ELSE FALSE
+      END
+  dt_bank_paid:
+    description: ''
+    lineage:
+    - .df.dt_bank_paid
+  dt_checkout_paid:
+    description: ''
+    lineage:
+    - .df.dt_checkout_paid
+  dt_sap_paid:
+    description: ''
+    lineage:
+    - .df.dt_sap_paid

@@ -1,0 +1,64 @@
+---
+database_name: datalake_bank_conciliation
+table_name: for_rent_cashin
+owner: ae-finance-fintech@quintoandar.com.br
+domain: for_rent
+description: null
+columns:
+  id_company_use:
+    description: ''
+    lineage:
+    - .df.id_company_use
+  bank_amount:
+    description: ''
+    lineage:
+    - .df.bank_amount
+  retsuko_amount:
+    description: ''
+    lineage:
+    - .df.retsuko_amount
+  vans_checkout_amount:
+    description: ''
+    lineage:
+    - .df.vans_checkout_amount
+  sap_amount:
+    description: ''
+    lineage:
+    - .df.sap_amount
+  status_bank:
+    description: ''
+    lineage:
+    - .df.status_bank
+  status_retsuko:
+    description: ''
+    lineage:
+    - .df.status_retsuko
+  status_vans_checkout:
+    description: ''
+    lineage:
+    - .df.status_vans_checkout
+  status_sap:
+    description: ''
+    lineage:
+    - .df.status_sap
+  is_reconciled:
+    description: ''
+    lineage:
+    - .df.CASE WHEN status_bank = 'ok' AND status_vans_checkout = 'ok' AND status_retsuko
+      = 'ok' AND status_sap = 'ok' THEN TRUE ELSE FALSE END
+  dt_bank_paid:
+    description: ''
+    lineage:
+    - .df.dt_bank_paid
+  dt_retsuko_paid:
+    description: ''
+    lineage:
+    - .df.dt_retsuko_paid
+  dt_vans_checkout_paid:
+    description: ''
+    lineage:
+    - .df.dt_vans_checkout_paid
+  dt_sap_paid:
+    description: ''
+    lineage:
+    - .df.dt_sap_paid

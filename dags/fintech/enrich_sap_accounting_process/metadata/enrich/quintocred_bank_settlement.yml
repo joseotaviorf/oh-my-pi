@@ -78,10 +78,10 @@ columns:
     lineage:
     - .bank.CASE WHEN is_completeness_compliance = TRUE AND is_correctness_compliance
       = TRUE AND is_temporality_compliance = TRUE THEN TRUE ELSE FALSE END
-  dt_trigger:
+  dt_bank_paid:
     description: ''
     lineage:
-    - .bank.COALESCE(ts.dt_billing, b.dt_bank_paid)
+    - .bank.dt_bank_paid
   dt_billing:
     description: ''
     lineage:
@@ -90,10 +90,6 @@ columns:
     description: ''
     lineage:
     - .bank.dt_payment_platform
-  dt_bank_paid:
-    description: ''
-    lineage:
-    - .bank.COALESCE(ts.dt_bank_paid, b.dt_bank_paid)
   dt_sap_created:
     description: ''
     lineage:

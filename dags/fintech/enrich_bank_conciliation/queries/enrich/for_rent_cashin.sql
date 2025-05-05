@@ -140,7 +140,7 @@ vans_checkout_union AS (
 
 pre_vans_checkout AS (
     SELECT
-        UPPER(REGEXP_REPLACE(vc.company_use, '^0000', '')) AS company_use,
+        REPLACE(UPPER(REGEXP_REPLACE(vc.company_use, '^0000', '')), 'C!', '') AS company_use,
         vc.id_invoice,
         DATE(dd.next_brz_fintech_business_day) AS dt_paid,
         vc.paid_amount
@@ -150,7 +150,7 @@ pre_vans_checkout AS (
         dw_public.dim_date dd
             ON vc.ts_paid = dd.date
     WHERE
-        UPPER(vc.company_use) NOT LIKE 'BY%'
+        UPPER(vc.company_use) NOT LIKE 'B%'
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY our_number, paid_amount ORDER BY CASE WHEN id_invoice IS NOT NULL THEN company_use ELSE our_number END DESC) = 1
 ),
