@@ -3635,6 +3635,7 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_agent:load-dw-public-dim-agent
   - bietlejuice.dw_atta:load-dw-atta-dim-franchise-atta
   - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow
+  - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-answer
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-campaign
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-fact-nps-answer-justifications
@@ -3647,6 +3648,7 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-sessions-chatbot
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
   - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
@@ -3654,6 +3656,8 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-answer
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
   - bietlejuice.dw_user:load-dw-public-dim-user
+  - bietlejuice.dw_velo_zendesk:load-dw-velo-dim-velo-ticket-users
+  - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history
   - bietlejuice.dw_visit:load-dw-visit-dim-business-context
   - bietlejuice.dw_visit:load-dw-visit-dim-business-model
   - bietlejuice.dw_visit:load-dw-visit-dim-entrance-type
@@ -3662,6 +3666,11 @@ bietlejuice.reverse_birdie:
   - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists
+  - bietlejuice.enrich_survicate:load-enrich-inspections-surveys
+  - bietlejuice.enrich_survicate:load-enrich-response-content
+  - bietlejuice.enrich_survicate:load-enrich-survey-questions
+  - bietlejuice.enrich_survicate:load-enrich-survey-responses
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys
   - bietlejuice.help_center_api:load-clean-call-in-app-eligibility
   - bietlejuice.insider:load-clean-feature
@@ -3669,6 +3678,7 @@ bietlejuice.reverse_birdie:
   - bietlejuice.insider:load-clean-review-feature
   - bietlejuice.insider:load-clean-template
   - bietlejuice.insider:load-clean-template-feature
+  - bietlejuice.jaiminho:load-clean-user-notifications
 bietlejuice.reverse_birdie_access:
   - bietlejuice.reverse_birdie:load-reverse-dsat-bot
   - bietlejuice.reverse_birdie:load-reverse-dsat-customer-relationship
