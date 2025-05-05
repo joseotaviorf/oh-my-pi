@@ -1,0 +1,19 @@
+---
+database_name: datalake_ebdb_clean
+table_name: conservation_room
+columns:
+  id_conservation_room:
+    lineage:
+      - datalake_ebdb_raw.conservationroom.id
+  id_assessment:
+    lineage:
+      - datalake_ebdb_raw.conservationroom.assessmentId
+  room_type:
+    lineage:
+      - datalake_ebdb_raw.conservationroom.roomType
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.conservationroom.criadoEm
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.conservationroom.atualizadoEm
