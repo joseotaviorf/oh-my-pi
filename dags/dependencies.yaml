@@ -3648,7 +3648,6 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-sessions-chatbot
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
   - bietlejuice.dw_region:load-dw-public-dim-region
-  - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
   - bietlejuice.dw_sale_offers:load-dw-sale-dim-sale-agreement
   - bietlejuice.dw_sale_offers:load-dw-sale-fact-offers
@@ -3666,7 +3665,6 @@ bietlejuice.reverse_birdie:
   - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
-  - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists
   - bietlejuice.enrich_survicate:load-enrich-inspections-surveys
   - bietlejuice.enrich_survicate:load-enrich-response-content
   - bietlejuice.enrich_survicate:load-enrich-survey-questions
@@ -3678,7 +3676,6 @@ bietlejuice.reverse_birdie:
   - bietlejuice.insider:load-clean-review-feature
   - bietlejuice.insider:load-clean-template
   - bietlejuice.insider:load-clean-template-feature
-  - bietlejuice.jaiminho:load-clean-user-notifications
 bietlejuice.reverse_birdie_access:
   - bietlejuice.reverse_birdie:load-reverse-dsat-bot
   - bietlejuice.reverse_birdie:load-reverse-dsat-customer-relationship
