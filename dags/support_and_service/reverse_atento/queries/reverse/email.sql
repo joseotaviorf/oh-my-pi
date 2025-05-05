@@ -15,6 +15,10 @@ WITH email_base AS (
         ELSE 0
     END AS is_created_by_agent,
     da.email AS agent_email,
+    CASE 
+      WHEN dt.tags LIKE '%email_solicitacao_de_documentos%' THEN 'DOC_ASK'
+      ELSE ft.direction -- Use a coluna direction original como fallback
+    END AS refined_direction,
     da.agent_organization AS cost_center,
     dc.team AS team,
     ft.replies,
@@ -129,8 +133,10 @@ SELECT
   YEAR(CURRENT_DATE) AS year,
   MONTH(CURRENT_DATE) AS month,
   DAY(CURRENT_DATE) AS day,
-  NOW() AS ts_load
-FROM email_base
+  NOW() AS ts_load,
+  refined_direction
+FROM
+  email_base
 WHERE
   front_or_back = 'front'
   AND has_exclude_tags = 0
