@@ -3,8 +3,8 @@ table_name: owner_category
 description: Historical daily enriched table for rent context.
   Each row is presented with the category of the owner, which can have less or more than 5 houses and can be classified as PP Multi.
   Each change in this table about the owner results in a new category.
-domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
 columns:
   id_owner_category:
     description: Id of the owner with it's category version. It's the concatenation of id_owner + 0 + owner_category.

@@ -5,8 +5,8 @@ description: Enrich table that cointains the weekly amount of houses,
   but only for owners with 5 or more houses (just considering rent and not b2b houses).
   Each row is the amount of houses for each owner at the end 
   of each week at the time of the snapshot (stored in the [year, month, day] keys).
-domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+domain: For Rent
+owner: ddata-for-rent@quintoandar.com.br
 columns:
   id_owner:
     lineage:
