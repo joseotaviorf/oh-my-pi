@@ -82,7 +82,10 @@ messages_with_users AS (
     MAX(
       CASE
         WHEN COALESCE(ss.user_data:['user_id'], td.user_sender) = 'system' THEN -1
-        ELSE COALESCE(u1.id, u2.id, td.user_sender, -1)
+        WHEN STARTSWITH(COALESCE(u1.id, u2.id, td.user_sender), '55')
+          AND LENGTH(COALESCE(u1.id, u2.id, td.user_sender)) = 12 THEN -1
+        WHEN CONTAINS(COALESCE(u1.id, u2.id, td.user_sender), '@') THEN -1
+        ELSE COALESCE(u1.id, u2.id, TRY_CAST(td.user_sender AS BIGINT), -1)
       END
     ) AS sk_user_sender,
     td.origin,
