@@ -78,10 +78,10 @@ columns:
     lineage:
     - .create_compliance_columns.CASE WHEN is_completeness_compliance = TRUE AND is_correctness_compliance
       = TRUE AND is_temporality_compliance = TRUE THEN TRUE ELSE FALSE END
-  dt_billing_trigger:
+  dt_billing:
     description: ''
     lineage:
-    - .create_compliance_columns.dt_billing_trigger
+    - .create_compliance_columns.dt_billing
   dt_payment_source:
     description: ''
     lineage:

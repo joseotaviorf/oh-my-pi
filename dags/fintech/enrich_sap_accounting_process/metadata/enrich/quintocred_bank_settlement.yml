@@ -64,15 +64,15 @@ columns:
   is_completeness_compliance:
     description: ''
     lineage:
-    - .bank.is_completeness_compliance
+    - .bank.COALESCE(is_completeness_compliance, FALSE)
   is_correctness_compliance:
     description: ''
     lineage:
-    - .bank.is_correctness_compliance
+    - .bank.COALESCE(is_correctness_compliance, FALSE)
   is_temporality_compliance:
     description: ''
     lineage:
-    - .bank.is_temporality_compliance
+    - .bank.COALESCE(is_temporality_compliance, FALSE)
   is_compliance:
     description: ''
     lineage:
@@ -86,10 +86,10 @@ columns:
     description: ''
     lineage:
     - .bank.dt_billing
-  dt_payment_platform:
+  dt_payment_source:
     description: ''
     lineage:
-    - .bank.dt_payment_platform
+    - .bank.dt_payment_source
   dt_sap_created:
     description: ''
     lineage:

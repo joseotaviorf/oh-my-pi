@@ -206,7 +206,7 @@ SELECT
     IF((COALESCE(ABS(b.bank_amount), ABS(rgp.total_amount)) - ABS(l.debit_credit) = 0), TRUE, FALSE) AS is_correctness_compliance,
     IF((l.dt_reference BETWEEN rgp.dt_billing AND DATE_ADD(rgp.dt_billing, 3)), TRUE, FALSE) AS is_temporality_compliance,
     rgp.dt_billing,
-    p.dt_paid AS dt_payment_platform,
+    p.dt_paid AS dt_payment_source,
     b.dt_bank_paid,
     l.dt_created AS dt_sap_created,
     l.dt_reference AS dt_sap_reference
@@ -247,13 +247,13 @@ SELECT
     payment_amount,
     COALESCE(ts.bank_amount, b.bank_amount) AS bank_amount,
     sap_amount,
-    is_completeness_compliance,
-    is_correctness_compliance,
-    is_temporality_compliance,
+    COALESCE(is_completeness_compliance, FALSE) AS is_completeness_compliance,
+    COALESCE(is_correctness_compliance, FALSE) AS is_correctness_compliance,
+    COALESCE(is_temporality_compliance, FALSE) AS is_temporality_compliance,
     IF(is_completeness_compliance = TRUE AND is_correctness_compliance = TRUE AND is_temporality_compliance = TRUE, TRUE, FALSE) AS is_compliance,
     b.dt_bank_paid,
     dt_billing,
-    dt_payment_platform,
+    dt_payment_source,
     dt_sap_created,
     dt_sap_reference
 FROM 

@@ -11,8 +11,6 @@ bietlejuice.dw_accounting_funnel:
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-provision-creation
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-revenue-accounting
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-reversion-creation
-  - bietlejuice.enrich_sap_accounting_process:load-enrich-for-rent-bank-settlement
-  - bietlejuice.enrich_sap_accounting_process:load-enrich-quintocred-bank-settlement
 bietlejuice.dw_accounts_receivable:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
