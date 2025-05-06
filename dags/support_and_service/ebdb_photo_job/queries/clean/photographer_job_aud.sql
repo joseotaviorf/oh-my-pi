@@ -53,4 +53,4 @@ select
   dataagendamento as ts_scheduled,
   dataagendamento_mod as mod_ts_scheduled,
   dataaceitofotografo as ts_photographer_accepted
-from datalake_ebdb_raw.JobFotografo_AUD
+from datalake_ebdb_raw.jobfotografo_aud

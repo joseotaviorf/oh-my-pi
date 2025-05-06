@@ -35,6 +35,14 @@ workflow:
       clean_table_name: image_aud
       raw_primary_keys: [id, REV]
       clean_primary_keys: [id_image, rev]
+    JobFotografo_AUD:
+      clean_table_name: jobfotografo_aud
+      raw_primary_keys: [id, REV]
+      clean_primary_keys: [id_photographer_job, REV]
+    JobFotografo:
+      clean_table_name: jobfotografo
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
 cluster:
   type: custom_cluster
   custom_configurations:
@@ -42,7 +50,7 @@ cluster:
     node_type_id: r5a.2xlarge
     num_workers: 3
     spark_version: 12.2.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
