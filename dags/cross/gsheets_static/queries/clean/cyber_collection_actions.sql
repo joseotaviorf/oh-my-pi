@@ -1,9 +1,9 @@
 SELECT
-    action_code,
+    NULLIF(TRIM(action_code), "") AS action_code,
     action,
-    result_code,
+    NULLIF(TRIM(result_code), "") AS result_code,
     result,
-    complement_code,
+    NULLIF(TRIM(complement_code), "") AS complement_code,
     complement,
     esforco,
     alo,
