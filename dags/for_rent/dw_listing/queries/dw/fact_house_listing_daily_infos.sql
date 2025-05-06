@@ -35,7 +35,6 @@ SELECT
   COALESCE(hldi.visits_confirmed, 0) AS visits_confirmed,
   COALESCE(hldi.visits_done, 0) AS visits_done,
   COALESCE(hldi.offers_sent, 0) AS offers_sent,
-  COALESCE(hldi.rent_flows, 0) AS rent_flows,
   hldi.country_code,
   hldi.year,
   hldi.month,

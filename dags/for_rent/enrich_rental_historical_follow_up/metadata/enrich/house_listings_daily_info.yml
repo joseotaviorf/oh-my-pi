@@ -184,10 +184,6 @@ columns:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_event
     description: Number of offers sent to the house listing.
-  rent_flows:
-    lineage:
-      - datalake_rent_flows.rent_flows.id_rent_flow
-    description: Number of rent flows of the house listing.
   status_change_reason:
     lineage:
     - datalake_ebdb_listing.house_listing_status.status_change_reason

@@ -2737,7 +2737,6 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_pro_owners:load-enrich-house-b2b-history
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
   - bietlejuice.enrich_visit:load-enrich-visit-status-events
 bietlejuice.enrich_rental_transact:
   - bietlejuice.ebdb_house:load-clean-house
