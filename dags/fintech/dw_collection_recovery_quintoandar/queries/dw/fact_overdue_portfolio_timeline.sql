@@ -205,7 +205,7 @@ FROM add_all_dimensions AS a
 LEFT JOIN get_last_valid_partner AS g
   ON a.id_contract = g.id_contract
     AND a.id_invoice = g.id_invoice
-LEFT JOIN queue_timeline AS q
+LEFT JOIN datalake_cyber.queue_timeline AS q
   ON a.id_contract = q.id_contract_external
     AND a.dt_reference = q.dt_reference
 WHERE
