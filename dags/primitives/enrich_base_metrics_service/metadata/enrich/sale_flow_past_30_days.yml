@@ -15,3 +15,7 @@ columns:
     description: The timestamp in which an offer was made. Contemplates direct and submitted offers.
   ts_contract_signed:
     description: The timestamp in which a contract was signed.
+  ts_offer_approved:
+    description: The timestamp in which an offer was accepted.
+  ts_sale_flow_latest_event:
+    description: The latest event in the sale flow.
