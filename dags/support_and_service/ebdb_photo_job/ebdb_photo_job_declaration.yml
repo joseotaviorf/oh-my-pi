@@ -36,11 +36,11 @@ workflow:
       raw_primary_keys: [id, REV]
       clean_primary_keys: [id_image, rev]
     JobFotografo_AUD:
-      clean_table_name: jobfotografo_aud
+      clean_table_name: photographer_job_aud
       raw_primary_keys: [id, REV]
       clean_primary_keys: [id_photographer_job, REV]
     JobFotografo:
-      clean_table_name: jobfotografo
+      clean_table_name: photographer_job
       raw_primary_keys: [id]
       clean_primary_keys: [id]
 cluster:
