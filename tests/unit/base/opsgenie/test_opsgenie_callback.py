@@ -1,5 +1,18 @@
 import pytest
+import datetime
 from unittest.mock import patch, MagicMock
+
+FAKE_TIME = datetime.datetime(2025, 5, 5, 12, 0, 0)
+
+
+@pytest.fixture
+def patch_datetime_now(monkeypatch):
+    class fake_datetime(datetime.datetime):
+        @classmethod
+        def now(cls):
+            return FAKE_TIME
+
+    monkeypatch.setattr(datetime, "datetime", fake_datetime)
 
 
 def get_mock_variable(key):
@@ -8,16 +21,21 @@ def get_mock_variable(key):
     return "test_api_key"
 
 
-mock_variable = MagicMock()
-mock_variable.get.side_effect = get_mock_variable
-
-with patch.dict("sys.modules", {"airflow.models": MagicMock(Variable=mock_variable)}):
-    from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+@pytest.fixture
+def mock_airflow_variables():
+    mock_variable = MagicMock()
+    mock_variable.get.side_effect = get_mock_variable
+    return mock_variable
 
 
 @pytest.fixture
-def mock_airflow_variables():
-    yield mock_variable.get
+def opsgenie_callback(mock_airflow_variables, patch_datetime_now):
+    with patch.dict(
+        "sys.modules", {"airflow.models": MagicMock(Variable=mock_airflow_variables)}
+    ):
+        from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+
+        yield OpsgenieCallback()
 
 
 @pytest.fixture
@@ -30,15 +48,15 @@ def mock_requests_post():
         yield mock_post
 
 
-def test_task_failure_alert(mock_airflow_variables, mock_requests_post):
-    callback = OpsgenieCallback()
-
+def test_task_failure_alert(
+    mock_airflow_variables, mock_requests_post, opsgenie_callback
+):
     mock_context = {"task_instance": MagicMock(task_id="test_task", dag_id="test_dag")}
 
-    callback.task_failure_alert(mock_context)
+    opsgenie_callback.task_failure_alert(mock_context)
 
-    mock_airflow_variables.assert_any_call("environment")
-    mock_airflow_variables.assert_any_call("OPSGENIE_ONCALL_APIKEY")
+    mock_airflow_variables.get.assert_any_call("environment")
+    mock_airflow_variables.get.assert_any_call("OPSGENIE_ONCALL_APIKEY")
 
     # Ensure the request was made to Opsgenie
     mock_requests_post.assert_called_once()
@@ -49,4 +67,12 @@ def test_task_failure_alert(mock_airflow_variables, mock_requests_post):
         in args[0]
     )
     assert kwargs["headers"] == {"Content-Type": "application/json"}
-    assert "incident" in kwargs["json"]
+    assert kwargs["json"]["incident"] == {
+        "resource_name": "labels {workflow_name=test_dag}",
+        "state": "open",
+        "started_at": datetime.datetime.timestamp(FAKE_TIME),
+        "summary": "DAG: test_dag - Task: test_task",
+        "description": f"DAG: test_dag - Task: test_task Started At: 2025-05-05 12:00:00 . Prometheus: https://prometheus.apps.core-prd.habitat.zone/",
+        "metric": {"labels": {"task_name": "test_task", "state": "failed"}},
+        "resource": {"labels": {"workflow_name": "test_dag"}},
+    }

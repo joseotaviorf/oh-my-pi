@@ -38,6 +38,7 @@ dags_not_using_builder:
   - platform/migration_assets/migration_assets.py
   - platform/services_integration_validations/services_integration_validations.py
   - platform/skip_list_cleaner/skip_list_cleaner.py
+  - platform/sla_monitoring/sla_monitoring.py
   - primitives/enrich_recommendations/enrich_recommendations.py
   - support_and_service/chattermill/chattermill.py
 
