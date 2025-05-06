@@ -65,6 +65,7 @@ SELECT
     cp.discount_amount,
     cp.total_amount,
     cp.dt_due,
+    DATE(IF(cp.status IN ("canceled", "expired"), COALESCE(cp.ts_expired, cp.ts_updated), NULL)) AS dt_canceled,
     cp.ts_paid_diff as ts_paid_difference,
     cp.ts_expired,
     cp.ts_created,

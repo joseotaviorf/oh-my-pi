@@ -94,7 +94,7 @@ split_fees_between_installments AS (
       DATE(c.ts_due_boletagem) AS dt_due_boleto,
       DATE(c.ts_boletagem_sent) AS dt_processing_boleto,
       CASE
-        WHEN ai.status = "Quebrado" THEN DATE(ai.ts_due_installment)
+        WHEN ai.status = "Quebrado" THEN DATE(COALESCE(a.ts_agreement_breach, a.ts_canceled, a.ts_status_update))
         WHEN c.campaign_status = "Vencida" THEN DATE(c.ts_due_boletagem)
         ELSE NULL
       END AS dt_cancelation
@@ -182,7 +182,8 @@ split_fees_between_installments AS (
       ON ai.id_agreement = f.id_agreement
   )
   SELECT
-    CAST(id_agreement_installment AS STRING) AS id_agreement_installment,
+    CAST(id_agreement_installment AS STRING) AS id_agreement_installment_cyber,
+    CAST(id_agreement_installment AS BIGINT) + 1 AS id_agreement_installment,
     CAST(id_negotiation AS STRING) AS id_negotiation,
     id_contract,
     id_contract_external,

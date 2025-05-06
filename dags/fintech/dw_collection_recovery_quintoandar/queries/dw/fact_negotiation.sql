@@ -274,8 +274,7 @@ union_sources AS (
     COALESCE(tfn.dt_cancellation, cn.dt_cancellation, rn.dt_cancellation) AS dt_cancellation,
     COALESCE(i.dt_down_payment, tfn.dt_down_payment, cn.dt_down_payment, rn.dt_down_payment) AS dt_down_payment,
     COALESCE(tfn.dt_paid_all, cn.dt_paid_all, rn.dt_paid_all) AS dt_paid_all_installments,
-    COALESCE(tfn.dt_expected_end, cn.dt_expected_end, rn.dt_expected_end) AS dt_expected_ending,
-    COALESCE(tfn.dt_ending, cn.dt_ending) AS dt_ending
+    COALESCE(tfn.dt_expected_end, cn.dt_expected_end, rn.dt_expected_end) AS dt_expected_ending
   FROM trato_feito_negotiation AS tfn
   FULL OUTER JOIN cyber_negotiation AS cn
     ON tfn.id_negotiation = cn.id_negotiation
@@ -354,7 +353,7 @@ calculations AS (
     u.total_debt_amount,
     CASE
       WHEN u.total_discount_amount = 0
-         AND LOWER(source) NOT IN ("Trato Feito - Cyber", "Cyber")
+         AND (source LIKE "%Recupera%" OR source LIKE "%Migração%")
          AND u.negotiated_amount < u.total_debt_amount
         THEN u.total_debt_amount - u.negotiated_amount
       ELSE u.total_discount_amount
@@ -371,11 +370,10 @@ calculations AS (
     u.dt_due_invoice_anchor,
     u.dt_promisse,
     u.dt_due_promisse,
-    u.dt_cancellation,
+    DATE(IF(u.negotiation_status != "finished", u.dt_cancellation, NULL)) AS dt_cancellation,
     u.dt_down_payment,
     u.dt_paid_all_installments,
-    u.dt_expected_ending,
-    u.dt_ending
+    u.dt_expected_ending
   FROM union_sources AS u
   LEFT JOIN paschoalotto_operator AS po
     ON
@@ -452,7 +450,7 @@ calculate_discounts AS (
     dt_down_payment,
     dt_paid_all_installments,
     dt_expected_ending,
-    dt_ending
+    COALESCE(dt_paid_all_installments, dt_cancellation) AS dt_ending
   FROM calculations
 )
 SELECT
