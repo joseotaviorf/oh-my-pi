@@ -1,0 +1,25 @@
+SELECT
+  business_group_id AS id_business_group,
+  person_id AS id_person,
+  person_name_id AS id_person_name,
+  char_set_context AS character_encoding,
+  created_by,
+  last_updated_by AS updated_by,
+  UPPER(display_name) AS display_name,
+  UPPER(first_name) AS first_name,
+  UPPER(full_name) AS full_name,
+  UPPER(last_name) AS last_name,
+  UPPER(list_name) AS list_name,
+  UPPER(name_type) AS name_type,
+  legislation_code,
+  CAST(object_version_number AS INT) AS object_version_number,
+  TO_DATE(effective_end_date) AS dt_effective_ended,
+  TO_DATE(effective_start_date) AS dt_effective_started,
+  TO_TIMESTAMP(creation_date) AS ts_created,
+  TO_TIMESTAMP(last_update_date) AS ts_updated,
+  NOW() AS ts_load,
+  year,
+  month,
+  day
+FROM
+  datalake_pin_core_raw.per_person_names_f

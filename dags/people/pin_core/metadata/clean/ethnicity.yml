@@ -1,0 +1,67 @@
+---
+database_name: datalake_pin_core_clean
+table_name: ethnicity
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores ethnicity data for individuals, specific to different legal contexts. A person may have multiple ethnicity records under the same legal code.
+columns:
+  id_person:
+    description: Identifier of the person for whom the ethnicity is recorded.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.person_id
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.business_group_id
+  id_ethnicity:
+    description: System-generated unique identifier for the ethnicity record. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.ethnicity_id
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.last_updated_by
+  ethnicity_code:
+    description: Code representing the ethnicity, valid for the specified legal code.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.ethnicity
+  legislation_code:
+    description: Legal code associated with this ethnicity record.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.legislation_code
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.object_version_number
+  is_primary:
+    description: Flag indicating if this is the primary ethnicity for the person within the given legal code (Yes/No).
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.primary_flag
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_ethnicities.day

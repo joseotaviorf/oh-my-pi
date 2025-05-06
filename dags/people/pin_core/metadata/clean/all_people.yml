@@ -1,0 +1,83 @@
+---
+database_name: datalake_pin_core_clean
+table_name: all_people
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores core personal data that is consistent across different legal contexts or requires a global value independent of legal codes. Data includes date effectivity, but core attributes may remain constant over time. Static values are duplicated across new date-effective instances for the same person.
+columns:
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.business_group_id
+  id_person:
+    description: System-generated unique identifier for a person. Primary key component.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.person_id
+  id_mailing_address:
+    description: Identifier of the preferred mailing address for the person.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.mailing_address_id
+  id_primary_email:
+    description: Identifier of the person's primary email address.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.primary_email_id
+  id_primary_phone:
+    description: Identifier of the person's primary phone number.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.primary_phone_id
+  id_primary_nid:
+    description: Identifier of the person's primary national identification number.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.primary_nid_id
+  person_number:
+    description: Unique identifier assigned to a person, independent of their role (e.g., employee, contractor).
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.person_number
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.last_updated_by
+  object_version_number:
+    description: Counter used for optimistic locking to manage concurrent updates. Increments with each update.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.object_version_number
+  dt_started:
+    description: The earliest effective start date recorded for this person, indicating the system creation date for this individual.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.start_date
+  dt_effective_started:
+    description: Start date of the period for which this record is valid.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.effective_start_date
+  dt_effective_ended:
+    description: End date of the period for which this record is valid.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.effective_end_date
+  ts_created:
+    description: Timestamp indicating when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.creation_date
+  ts_updated:
+    description: Timestamp indicating when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.last_update_date
+  ts_load:
+    description: Timestamp recording when the data was loaded into this table. Reflects the time of data ingestion or reprocessing.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_all_people_f.day

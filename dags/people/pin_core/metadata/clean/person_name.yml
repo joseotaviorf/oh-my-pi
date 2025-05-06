@@ -1,0 +1,100 @@
+---
+database_name: datalake_pin_core_clean
+table_name: person_name
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores core and legislation-specific name components for individuals, including names in different character sets. Tracks changes over time with date effectivity.
+columns:
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.business_group_id
+  id_person:
+    description: Identifier of the person to whom this name record belongs.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.person_id
+  id_person_name:
+    description: System-generated unique identifier for the person's name record. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.person_name_id
+  character_encoding:
+    description: Specifies the character set used to store the name details.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.char_set_context
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.last_updated_by
+  display_name:
+    description: Formatted name for on-screen display, typically starting with the first name. Formatting may vary by legal code.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.display_name
+  first_name:
+    description: The person's given name.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.first_name
+  full_name:
+    description: System-constructed full name, suitable for formal use.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.full_name
+  last_name:
+    description: The person's surname or family name.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.last_name
+  list_name:
+    description: Formatted name for alphabetical lists, often starting with the last name. Formatting may vary by legal code.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.list_name
+  name_type:
+    description: Indicates if the name is globally applicable or specific to a legal context.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.name_type
+    categories:
+      Global: Name applicable in any context.
+      PT: Portugal.
+      BR: Brazil.
+      AR: Argentine.
+  legislation_code:
+    description: Legal code associated with this name data.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.legislation_code
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.object_version_number
+  dt_effective_ended:
+    description: End date of the period for which this name record is valid.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.effective_end_date
+  dt_effective_started:
+    description: Start date of the period for which this name record is valid.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.effective_start_date
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_person_names_f.day

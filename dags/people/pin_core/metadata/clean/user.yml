@@ -1,0 +1,96 @@
+---
+database_name: datalake_pin_core_clean
+table_name: user
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores one record per Fusion system user, generally mapping to a single LDAP user unless the user is deleted in LDAP.
+columns:
+  id_user:
+    description: Unique identifier for the user. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_users.user_id
+  id_person:
+    description: Identifier of the associated person in HCM, if available.
+    lineage:
+      - datalake_pin_core_raw.per_users.person_id
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_users.business_group_id
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_users.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_users.last_updated_by
+  multitenancy_username:
+    description: Username displayed to the user.
+    lineage:
+      - datalake_pin_core_raw.per_users.multitenancy_username
+  username:
+    description: The user's current principal username.
+    lineage:
+      - datalake_pin_core_raw.per_users.username
+  user_data_checksum:
+    description: Checksum of the user's data.
+    lineage:
+      - datalake_pin_core_raw.per_users.user_data_checksum
+  user_distinguished_name:
+    description: The user's current distinguished name.
+    lineage:
+      - datalake_pin_core_raw.per_users.user_distinguished_name
+  user_guid:
+    description: The user's current globally unique identifier.
+    lineage:
+      - datalake_pin_core_raw.per_users.user_guid
+  is_active:
+    description: Flag indicating if the user record is active. Set to 'N' if the user is deleted in LDAP (not for suspension).
+    lineage:
+      - datalake_pin_core_raw.per_users.active_flag
+    categories:
+      true: User record is active.
+      false: User record is inactive (deleted in LDAP).
+  is_suspended:
+    description: Indicates if the user is suspended, typically due to termination. Suspended users can be reactivated.
+    lineage:
+      - datalake_pin_core_raw.per_users.suspended
+    categories:
+      true: User is suspended.
+      false: User is not suspended.
+  has_credentials_email_sent:
+    description: Flag indicating if the user's login credentials (username/password) have been sent.
+    lineage:
+      - datalake_pin_core_raw.per_users.credentials_email_sent
+    categories:
+      true: Credentials email sent.
+      false: Credentials email not sent.
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_users.object_version_number
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_users.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_users.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_users.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_users.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_users.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_users.day

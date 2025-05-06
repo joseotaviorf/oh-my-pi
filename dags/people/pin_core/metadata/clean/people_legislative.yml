@@ -1,0 +1,83 @@
+---
+database_name: datalake_pin_core_clean
+table_name: people_legislative
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores core personal data specific to different legal contexts, including information from Person Descriptive Flexfield (DDF) segments. Allows multiple records per legal code for a single person.
+columns:
+  id_person:
+    description: Identifier of the person for whom the data is recorded.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.person_id
+  id_person_legislative:
+    description: System-generated unique identifier for the person's legislative data record. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.person_legislative_id
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.business_group_id
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.last_updated_by
+  legislation_code:
+    description: Legal code applicable to this personal data.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.legislation_code
+  marital_status:
+    description: Marital status of the person, as defined by the applicable legal code.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.marital_status
+  sex:
+    description: Sex of the person, as defined by the applicable legal code.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.sex
+  highest_education_level:
+    description: Highest level of education attained by the person, specific to the legal code.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.highest_education_level
+  dt_marital_status:
+    description: Date when the current marital status became effective.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.marital_status_date
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.object_version_number
+  dt_effective_ended:
+    description: End date of the period for which this legislative person data is valid.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.effective_end_date
+  dt_effective_started:
+    description: Start date of the period for which this legislative person data is valid.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.effective_start_date
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_people_legislative_f.day

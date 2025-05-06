@@ -1,0 +1,83 @@
+---
+database_name: datalake_pin_core_clean
+table_name: assignment_representative
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Denormalized table containing the active and current mapping between workers and their representatives.
+columns:
+  id_representative_assignment:
+    description: System-generated unique identifier for the representative assignment. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.representative_assignment_id
+  id_representative:
+    description: Foreign key referencing the representative record.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.representative_id
+  id_representative_person:
+    description: Foreign key referencing the person ID of the worker's representative.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.representative_person_id
+  id_responsibility:
+    description: Foreign key referencing the area of responsibility record.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.responsibility_id
+  id_worker_assignment:
+    description: Foreign key referencing the assignment ID of the worker.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.worker_assignment_id
+  id_worker_person:
+    description: Foreign key referencing the person ID of the worker.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.worker_person_id
+  responsibility_type:
+    description: Type of responsibility associated with this record.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.responsibility_type
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.last_updated_by
+  has_approval_responsibility:
+    description: Indicates if this responsibility is included in the approvals process.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.approvals_flag
+  has_checklist_responsibility:
+    description: Indicates if this responsibility is included in the checklist process.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.checklists_flag
+  has_inclusion_in_work_contacts:
+    description: Indicates whether this record should be considered in work contacts evaluation.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.work_contacts_flag
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.last_update_date
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.object_version_number
+  ts_load:
+    description: Timestamp indicating when the data was loaded into the table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_asg_representatives.day

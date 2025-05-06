@@ -1,0 +1,127 @@
+---
+database_name: datalake_pin_core_clean
+table_name: job
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Defines roles that employees can hold within the enterprise, independent of specific organizational units.
+columns:
+  id_action_occurrence:
+    description: Foreign key referencing the action occurrence.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.action_occurrence_id
+  id_job:
+    description: System-generated unique identifier for the job. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.job_id
+  id_grade_ladder:
+    description: Identifier of the grade ladder associated with this job.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.grade_ladder_id
+  id_job_family:
+    description: Foreign key referencing the job family.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.job_family_id
+  id_set:
+    description: Identifier of a reference data set shared across business units, used for filtering reference data.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.set_id
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.business_group_id
+  job_code:
+    description: Unique code identifying the job.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.job_code
+  category_code:
+    description: Code for the extensible flexfield category.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.category_code
+  active_status:
+    description: Indicates whether the job is currently active.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.active_status
+    categories:
+      A: Job is active.
+      I: Job is inactive.
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.last_updated_by
+  contribution_level:
+    description: Level of contribution associated with the job.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.attribute1
+  work_arrangement:
+    description: Type of work arrangement for the job.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.attribute3
+  weekly_hours:
+    description: Standard weekly working hours for the job.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.attribute4
+  approval_authority:
+    description: Numerical level indicating approval authority across different jobs.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.approval_authority
+  has_medical_checkup_requirement:
+    description: Indicates if a medical checkup is required for this job (Yes/No).
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.med_checkup_req
+    categories:
+      true: Medical checkup is required.
+      false: Medical checkup is not required.
+  is_full_part_time:
+    description: Indicates if the job is full-time or part-time.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.full_part_time
+    categories:
+      F: Full-time job.
+      P: Part-time job.
+  is_benchmark_job:
+    description: Indicates if this job serves as a benchmark for comparison (Yes/No).
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.benchmark_job_flag
+    categories:
+      Y: Benchmark job.
+      N: Not a benchmark job.
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.object_version_number
+  dt_effective_ended:
+    description: End date of the period for which this job definition is valid.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.effective_end_date
+  dt_effective_started:
+    description: Start date of the period for which this job definition is valid.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.effective_start_date
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_jobs_f.day

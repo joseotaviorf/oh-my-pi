@@ -18,7 +18,6 @@ columns:
     description: "Identifies a set of reference data shared across business units and other entities."
     lineage:
       - datalake_pin_core_raw.fnd_lookup_values.set_id
-
   id_view_application:
     description: "Identifier of the application that uses this lookup value in its UI components."
     lineage:

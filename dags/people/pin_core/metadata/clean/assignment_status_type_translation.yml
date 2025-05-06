@@ -1,0 +1,67 @@
+---
+database_name: datalake_pin_core_clean
+table_name: assignment_status_type_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Holds translated definitions of user statuses for a specific assignment or set of employment/placement terms. This table is maintained as is.
+columns:
+  id_assignment_status_type:
+    description: Foreign key referencing the assignment status type.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.assignment_status_type_id
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.business_group_id
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.last_updated_by
+  language:
+    description: Code of the language for the translated content in this record.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.language
+  source_language:
+    description: Code of the original language of the translatable content.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.source_lang
+  seed_data_source:
+    description: Source of the initial data record. 'BULK_SEED_DATA_SCRIPT' indicates bulk loading; otherwise, it's the seed data file name.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.seed_data_source
+  user_status:
+    description: Translated name of the user-defined status.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.user_status
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.object_version_number
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_status_types_tl.day
