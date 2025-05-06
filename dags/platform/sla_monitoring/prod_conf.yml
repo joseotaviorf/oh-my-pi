@@ -39,7 +39,6 @@ expected_times_to_finish:
   bietlejuice.cyber_complement: '11:35'
   bietlejuice.cypress_reports: 07:26
   bietlejuice.dag_inventory: 01:52
-  bietlejuice.databricks_jobs_deletion: '24:29'
   bietlejuice.databricks_usage: '11:22'
   bietlejuice.demand_balancer_service: '15:16'
   bietlejuice.demand_contact_submission: 04:18
