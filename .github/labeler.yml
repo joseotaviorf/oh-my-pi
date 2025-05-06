@@ -16,6 +16,8 @@ tests:
 ## Line labels
 data-bedrock:
   - "**/dags/bedrock/**"
+data-conversational-xp:
+  - "**/dags/conversational_xp/**"
 data-for-rent:
   - "**/dags/for_rent/**"
 data-for-sale:

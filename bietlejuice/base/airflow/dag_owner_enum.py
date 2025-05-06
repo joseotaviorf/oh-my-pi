@@ -8,6 +8,7 @@ class DAGOwnerEnum:
     DATA_AVAILABILITY = "Data Availability"
     DATA_BEDROCK = "Data Bedrock"
     DATA_CDP = "Data CDP"
+    DATA_CONVERSATIONAL_XP = "Data Conversational XP"
     DATA_FINTECH = "Data Fintech"
     DATA_FOR_RENT = "Data ForRent"
     DATA_FOR_SALE = "Data ForSale"

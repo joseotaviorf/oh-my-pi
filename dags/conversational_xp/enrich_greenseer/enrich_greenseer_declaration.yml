@@ -1,7 +1,7 @@
 dag:
   name: enrich_greenseer
   schedule_start_date: 2020, 7, 1
-  owner: Data SS
+  owner: Data Conversational XP
   documentation:
     dag_purpose: |
       Extract relevant fields from greenseer memory json and add relevant business rules to reduce the analysis.
