@@ -404,7 +404,7 @@ select
     END AS text,
     COALESCE(ticket_id, '') AS ticket_id,
     CASE 
-        WHEN REGEXP_LIKE(COALESCE(tkt.agent_email, csat.email_agent), '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$') 
+        WHEN REGEXP_LIKE(COALESCE(tkt.agent_email, csat.email_agent), '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{{2,}}$') 
         THEN COALESCE(tkt.agent_email, csat.email_agent) 
         ELSE '' 
     END AS agent_email,
