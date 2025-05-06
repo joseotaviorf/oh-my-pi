@@ -14,6 +14,8 @@ workflow:
       - debt_negotiation_mapping
     contracts:
       - queue_decision_tree
+    queue_timeline:
+      - contracts
 cluster:
   type: databricks_13_3_med_general_cluster
   databricks_conn_id: databricks_new
