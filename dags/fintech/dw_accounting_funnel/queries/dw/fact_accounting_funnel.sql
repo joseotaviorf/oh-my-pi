@@ -156,7 +156,7 @@ SELECT
     dt_sap_reference,
     NOW() AS ts_load    
 FROM 
-    quintocred_bank_settlement
+    datalake_sap_accounting_process.quintocred_bank_settlement
 
 UNION ALL 
 
@@ -183,4 +183,4 @@ SELECT
     dt_sap_reference,
     NOW() AS ts_load    
 FROM 
-    for_rent_bank_settlement
+    datalake_sap_accounting_process.for_rent_bank_settlement
