@@ -1,0 +1,29 @@
+database_name: datalake_search
+table_name: recs_impressions_processed
+owner: pedro.nogueira@quintoandar.com.br
+domain: primitives
+description: |
+  Table with ids, dimensions, metrics and timestamps related to recommendations.
+columns:
+  ids:
+    description: A json with all relevant ids for recommendations analysis. Ex. id_user, id_house, id_recset, id_amplitude, ...
+  dimensions:
+    description: A json with all relevant dimensions for recommendations analysis. Ex. business_context, city, ...
+  variants:
+    description: A json mapping `experiment_name` to `variant` the user was on that recommendation.
+  metrics:
+    description: A json with all relevant metrics for recommendations analysis. Ex. clicks, offer, visit_completed
+  timestamps:
+    description: A json with all relevant timestamps
+  ts_event:
+    description: The timestamp of the recommendation event.
+  date:
+    description: The date of the recommendation event.
+  year:
+    description: The year of the recommendation event.
+  month:
+    description: The month of the recommendation event.
+  day:
+    description: The day of the recommendation event.
+  week:
+    description: The week of the recommendation event.
