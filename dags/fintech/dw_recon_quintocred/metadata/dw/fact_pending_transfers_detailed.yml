@@ -1,0 +1,186 @@
+database_name: dw_recon_quintocred
+table_name: fact_pending_transfers_detailed
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: "Data from pending transfers in QuintoCred recon context."
+columns:
+  sk_propose:
+    description: "QuintoCred's propose identification number (ID)"
+    lineage:
+      - dw_velo.fact_velo_propose.sk_propose
+
+  sk_propose_rh:
+    description: "Reference to the propose ID used for RH reconciliation"
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry
+
+  our_number:
+    description: "Bank slip identifier (Nosso Número) used for payment tracking"
+    lineage:
+      - datalake_robin_hood_clean.payment_request.id
+
+  tenant_name:
+    description: "Name of the tenant or client associated with the transaction"
+    lineage:
+      - dw_velo.fact_velo_payment
+
+  gateway:
+    description: "Payment gateway used for processing the transaction"
+    lineage:
+      - dw_velo.fact_velo_payment
+
+  billing_type:
+    description: "Billing type that categorizes the nature of the charge"
+    lineage:
+      - dw_velo.fact_velo_payment
+
+  status_payment:
+    description: "Current status of the payment"
+    lineage:
+      - dw_velo.fact_velo_payment
+
+  type_rh:
+    description: "Type of RH (resource handling) process involved"
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.type
+
+  payment_status_rh:
+    description: "Payment status from RH's perspective"
+    lineage:
+      - datalake_robin_hood_clean.payment_request.status
+
+  source_bill_item:
+    description: "Source of the billing item related to the transaction"
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.source_bill_item
+
+  holder_name:
+    description: "Name of the payment holder"
+    lineage:
+      - datalake_vans_clean.payment.payee_name
+
+  holder_document:
+    description: "Document number of the payment holder"
+    lineage:
+      - datalake_vans_clean.payment.payee_document
+
+  holder_bank:
+    description: "Bank institution of the payment holder"
+    lineage:
+      - datalake_vans_clean.payment.payee_bank_code
+
+  holder_agency:
+    description: "Bank agency number of the payment holder"
+    lineage:
+      - ddatalake_vans_clean.payment.payee_agency
+
+  holder_account:
+    description: "Bank account number of the payment holder"
+    lineage:
+      - datalake_vans_clean.payment.payee_account
+
+  type_account:
+    description: "Type of bank account"
+    lineage:
+      - datalake_vans_clean.payment.has_payee_savings_acc
+
+  your_number:
+    description: "Custom transaction identifier used internally"
+    lineage:
+      - datalake_vans_clean.payment.company_use
+
+  status:
+    description: "General status of the billing occurrence or transaction"
+    lineage:
+      - datalake_vans_clean.payment.status
+
+  occurrence_code:
+    description: "Code indicating the type of financial occurrence or event"
+    lineage:
+      - datalake_vans_clean.payment.occurrence_code
+
+  payment_type:
+    description: "Type of payment method used"
+    lineage:
+      - ddatalake_vans_clean.payment.style
+
+  paying_bank:
+    description: "Bank from which the payment was made"
+    lineage:
+      - datalake_vans_clean.bank.name
+
+  paying_agency:
+    description: "Agency number of the bank from which the payment was made"
+    lineage:
+      - datalake_vans_clean.bank_payment.agency
+
+  paying_account:
+    description: "Account number from which the payment was made"
+    lineage:
+      - datalake_vans_clean.bank_payment.account
+
+  paying_digit:
+    description: "Digit verifier of the paying account"
+    lineage:
+      - datalake_vans_clean.bank_payment.account_digit
+
+  activator_amount:
+    description: "Amount activated or credited in the transaction"
+    lineage:
+      - dw_velo.dim_velo_propose_values.activator_amount
+
+  monthly_guarantee:
+    description: "Monthly guarantee amount associated with the transaction"
+    lineage:
+      - dw_velo.dim_velo_propose_values.monthly_guarantee
+
+  payment_value:
+    description: "Total value billed for payment"
+    lineage:
+      - dw_velo.fact_velo_payment.due_amount
+
+  paid_value_rh:
+    description: "Value that was effectively paid, according to RH"
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.due_amount
+
+  days_contract_life:
+    description: "Number of days the contract has been active"
+    lineage:
+      - dw_velo.fact_velo_propose.dt_ended_official
+      - dw_velo.fact_velo_propose.dt_contract_started
+
+  dt_contract_started:
+    description: "Start date of the contract"
+    lineage:
+      - dw_velo.fact_velo_propose.dt_contract_started
+
+  dt_ended_official:
+    description: "Official end date of the contract"
+    lineage:
+      - dw_velo.fact_velo_propose.dt_ended_official
+
+  dt_due_payment:
+    description: "Due date for the payment"
+    lineage:
+      - dw_velo.fact_velo_payment.dt_due
+
+  dt_paid_payment:
+    description: "Date the payment was actually made"
+    lineage:
+      - dw_velo.fact_velo_payment.dt_paid
+
+  dt_created_rh:
+    description: "Date the record was created in RH"
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.ts_created
+
+  dt_due_rh:
+    description: "Due date from RH perspective"
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.ts_created.dt_due
+
+  dt_paid_rh:
+    description: "Date payment was confirmed by RH"
+    lineage:
+      - datalake_robin_hood_clean.payment_request.dt_paid

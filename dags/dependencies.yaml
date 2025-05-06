@@ -759,6 +759,9 @@ bietlejuice.dw_recon_quintocred:
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance
   - bietlejuice.robin_hood:load-clean-payment-request
+  - bietlejuice.vans:load-clean-bank
+  - bietlejuice.vans:load-clean-bank-payment
+  - bietlejuice.vans:load-clean-payment
 bietlejuice.dw_recon_quintocred_snapshot:
   - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-customer-advance
   - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-payable-guarantees
