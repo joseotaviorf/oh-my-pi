@@ -92,11 +92,6 @@ if __name__ == "__main__":
         + config_service.get_config("datalake_bucket")
         + config_service.get_config("checkpoints_path_suffix")
     )
-    load_path = (
-        config_service.get_config("path_prefix")
-        + config_service.get_config("datalake_bucket")
-        + config_service.get_config("load_path_suffix")
-    )
     kafka_columns = config_service.get_config("kafka_columns")
     max_records_per_file = config_service.get_config("max_records_per_file")
 
@@ -148,7 +143,6 @@ if __name__ == "__main__":
         .option("maxRecordsPerFile", max_records_per_file)
         .option("checkpointLocation", checkpoints_path)
         .outputMode("append")
-        .option("path", load_path)
         .toTable(database_name + "." + table_name)
     )
 
