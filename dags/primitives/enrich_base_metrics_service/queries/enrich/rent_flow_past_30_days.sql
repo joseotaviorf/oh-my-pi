@@ -4,6 +4,7 @@
 SELECT
     id_tenant_prospect as id_user,
     id_house,
+    MIN(ts_booking_created) AS ts_visit_booked,
     MIN(ts_visit_completed) AS ts_visit_completed,
     MIN(coalesce(ts_direct_offer_submitted, ts_offer_submitted)) AS ts_offer,
     MIN(ts_contract_signed) AS ts_contract_signed,
@@ -11,6 +12,7 @@ SELECT
     MIN(ts_offer_submitted) AS ts_offer_submitted,
     MIN(ts_offer_approved) AS ts_offer_approved,
     GREATEST(
+        MIN(ts_booking_created),
         MIN(ts_visit_completed),
         MIN(ts_direct_offer_submitted),
         MIN(ts_offer_submitted),
@@ -25,6 +27,8 @@ WHERE
     -- This clause is more correct than filtering by ts_rent_flow_event
     AND
             (
+             ts_booking_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+             OR
              ts_visit_completed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
              OR
              ts_direct_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')

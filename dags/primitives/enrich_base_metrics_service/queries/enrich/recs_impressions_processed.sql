@@ -114,6 +114,8 @@ SELECT
             'offer', CASE WHEN COALESCE(rent_flow.ts_offer, sale_flow.ts_offer) >= recs_impressions.ts_recommendation THEN 1 ELSE 0 END,
             'direct_offer', CASE WHEN rent_flow.ts_direct_offer >= recs_impressions.ts_recommendation THEN 1 ELSE 0 END,
             'offer_submitted', CASE WHEN rent_flow.ts_offer_submitted >= recs_impressions.ts_recommendation THEN 1 ELSE 0 END,
+            'offer_approved', CASE WHEN COALESCE(rent_flow.ts_offer_approved, sale_flow.ts_offer_approved) >= recs_impressions.ts_recommendation THEN 1 ELSE 0 END,
+            'visit_booked', CASE WHEN COALESCE(rent_flow.ts_visit_booked, sale_flow.ts_visit_booked) >= recs_impressions.ts_recommendation THEN 1 ELSE 0 END,
             'visit_completed', CASE WHEN COALESCE(rent_flow.ts_visit_completed, sale_flow.ts_visit_completed) >= recs_impressions.ts_recommendation THEN 1 ELSE 0 END,
             'contract_signed', CASE WHEN COALESCE(rent_flow.ts_contract_signed, sale_flow.ts_contract_signed) >= recs_impressions.ts_recommendation THEN 1 ELSE 0 END
         )
@@ -127,6 +129,8 @@ SELECT
             'ts_offer', COALESCE(rent_flow.ts_offer, sale_flow.ts_offer),
             'ts_direct_offer', rent_flow.ts_direct_offer,
             'ts_offer_submitted', rent_flow.ts_offer_submitted,
+            'ts_offer_approved', COALESCE(rent_flow.ts_offer_approved, sale_flow.ts_offer_approved),
+            'ts_visit_booked', COALESCE(rent_flow.ts_visit_booked, sale_flow.ts_visit_booked),
             'ts_visit_completed', COALESCE(rent_flow.ts_visit_completed, sale_flow.ts_visit_completed),
             'ts_contract_signed', COALESCE(rent_flow.ts_contract_signed, sale_flow.ts_contract_signed)
         )
@@ -151,9 +155,9 @@ LEFT JOIN clicks
 LEFT JOIN datalake_search.rent_flow_past_30_days AS rent_flow
     ON recs_impressions.id_house = rent_flow.id_house
     AND recs_impressions.id_user = rent_flow.id_user
-    AND recs_impressions.business_context = 'rent'
+    AND recs_impressions.business_context = 'RENT'
 LEFT JOIN datalake_search.sale_flow_past_30_days AS sale_flow
     ON recs_impressions.id_house = sale_flow.id_house
     AND recs_impressions.id_user = sale_flow.id_user
-    AND recs_impressions.business_context = 'sale'
+    AND recs_impressions.business_context = 'SALE'
 WHERE recs_impressions.ts_recommendation BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
