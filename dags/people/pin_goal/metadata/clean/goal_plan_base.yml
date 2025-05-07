@@ -1,0 +1,152 @@
+---
+database_name: datalake_pin_goal_clean
+table_name: goal_plan_base
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores the base information for goal plans.
+columns:
+  id_business_group:
+    description: Foreign key referencing the business groups table.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.business_group_id
+  id_goal_plan_ext:
+    description: Unique identifier for the goal plan. Requires a migration script for existing data.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.goal_plan_ext_id
+  id_goal_plan:
+    description: System-generated unique identifier for this goal plan record.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.goal_plan_id
+  id_mass_request:
+    description: Foreign key referencing the goal mass requests table.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.mass_request_id
+  id_review_period:
+    description: Foreign key referencing the review periods table.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.review_period_id
+  goal_access_level_code:
+    description: Access level for goals within this plan (e.g., view-only). See lookup `hrg_access_levels`.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.goal_access_level_code
+  goal_plan_type_code:
+    description: Type of goal plan.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.goal_plan_type_code
+  request_ui_context_code:
+    description: Context of the goal plan creation (e.g., UI or file upload).
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.request_ui_context_code
+  evaluation_type:
+    description: Type of evaluation to be used in performance templates.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.evaluation_type
+  created_by:
+    description: User who created this record.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.created_by
+  updated_by:
+    description: User who last updated this record.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.last_updated_by
+  is_private_goal_allowed_when_max_goal_is_reached:
+    description: Indicates if employees can add private goals when the maximum number of goals is reached.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.allow_pvt_goal_max_goal_flag
+    categories:
+      true: Private goals allowed when max reached.
+      false: Private goals not allowed when max reached.
+  is_goal_auto_associated:
+    description: Indicates if this goal plan can be considered for automatic goal assignment.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.auto_associate_goal_flag
+    categories:
+      true: Eligible for auto goal assignment.
+      false: Not eligible for auto goal assignment.
+  is_created_by_system:
+    description: Indicates if the goal plan was created by the system.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.created_by_system
+    categories:
+      true: Created by the system.
+      false: Not created by the system.
+  is_weighting_enabled:
+    description: Indicates if weighting can be specified for goals in this plan.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.enable_weighting_flag
+    categories:
+      true: Weighting is enabled.
+      false: Weighting is disabled.
+  is_goal_weight_enforced:
+    description: Indicates if the total weight of goals in this plan must equal 100.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.enforce_goal_weight_flag
+    categories:
+      true: Goal weight enforcement is active.
+      false: Goal weight enforcement is inactive.
+  is_active_goal_plan:
+    description: Indicates if the goal plan is currently active.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.goal_plan_active_flag
+    categories:
+      true: Goal plan is active.
+      false: Goal plan is inactive.
+  is_included_in_performance_document:
+    description: Indicates if goals from this plan should be added to performance documents.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.include_in_perfdoc_flag
+    categories:
+      true: Included in performance document.
+      false: Not included in performance document.
+  is_primary_goal_plan:
+    description: Indicates if this goal plan is designated as the primary plan.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.primary_goal_plan_flag
+    categories:
+      true: This is the primary goal plan.
+      false: This is not the primary goal plan.
+  is_max_goals_enforced:
+    description: Indicates if the maximum number of goals in this plan is enforced.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.enforce_max_goals_in_gp_flag
+    categories:
+      true: Maximum number of goals is enforced.
+      false: Maximum number of goals is not enforced.
+  max_goals_in_goal_plan:
+    description: Maximum allowed number of goals in this goal plan.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.max_goals_num_in_goal_plan
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.object_version_number
+  dt_started:
+    description: Start date of the goal plan.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.start_date
+  dt_ended:
+    description: End date of the goal plan.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.end_date
+  ts_created:
+    description: Timestamp of when this record was created.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.creation_date
+  ts_updated:
+    description: Timestamp of when this record was last updated.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_plans_b.day
