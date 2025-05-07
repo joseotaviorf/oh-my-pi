@@ -16,7 +16,7 @@ workflow:
   - "{schema}"
   - "{partitions}"
   - "{{ ds }}"
-
+  execution_timeout_hours: 5
   default_extraction_type: incremental
   tables_customization:
     emlio_logs:
@@ -31,7 +31,7 @@ workflow:
         - day
 
 cluster:
-  type: databricks_13_3_med_io-general_cluster
+  type: databricks_12_2_max_io-general_cluster
   access_control_list:
     group_name: mlops
     permission_level: CAN_MANAGE
