@@ -70,7 +70,7 @@ SELECT
   pl.dt_ended,
   pl.month_chargeble,
   pl.monthly_guarantee_renewal AS monthly_timeline_renewal,
-  pl.monthly_guarantee_renewal_corrected AS monthly_timeline_renewal_corrected,
+  pl.monthly_guarantee_official AS monthly_timeline_renewal_corrected,
   pl.monthly_guarantee_propose_aud AS monthly_timeline_propose_aud,
   pl.monthly_value_propose,
   pl.month_start AS month_propose_life,

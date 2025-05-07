@@ -430,6 +430,11 @@ SELECT
   month_chargeble,
   monthly_guarantee_renewal,
   monthly_guarantee_renewal_corrected,
+  CASE 
+    WHEN is_corrected_robot = true AND monthly_guarantee_renewal_corrected = 0 THEN monthly_guarantee_renewal
+    WHEN is_corrected_robot = true AND monthly_guarantee_renewal_corrected > 0 THEN monthly_guarantee_renewal_corrected
+    ELSE monthly_guarantee_renewal
+  END AS monthly_guarantee_official,
   monthly_guarantee_propose_aud,
   monthly_value_propose,
   first_monthly_value_mod,
