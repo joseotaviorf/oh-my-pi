@@ -3,7 +3,7 @@ dag:
   schedule_start_date: 2020, 8, 29
   owner: MLOps
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_partitions: [id_service, service_version, year, month, day]
   default_extraction_type: incremental
