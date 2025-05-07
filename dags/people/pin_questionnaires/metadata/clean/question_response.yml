@@ -1,0 +1,73 @@
+---
+database_name: datalake_pin_questionnaires_clean
+table_name: question_response
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Contains a participant's response to a specific question within a questionnaire. This may reference the selected answer, a rating level, or entered text. For multi-part questions, it may also reference a sub-question.
+columns:
+  id_business_group:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.business_group_id
+  id_questionnaire_question:
+    description: Identifier of the questionnaire question.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.qstnr_question_id
+  id_questionnaire_response:
+    description: Identifier of the overall questionnaire response.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.qstnr_response_id
+  id_question_response:
+    description: Unique identifier for the question response. System-generated primary key.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.qstn_response_id
+  id_question_answer:
+    description: Identifier of the specific answer provided for the question.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.qstn_answer_id
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.last_updated_by
+  free_text_answer_unlimited:
+    description: The answer for free text questions (unlimited length).
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.answer_clob
+  free_text_answer:
+    description: The answer for free text questions (limited length).
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.answer_text
+  multiple_choice_answer_list:
+    description: List of identifiers for answers selected for multiple-choice questions.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.answer_list
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.object_version_number
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.creation_date
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstn_responses.day
