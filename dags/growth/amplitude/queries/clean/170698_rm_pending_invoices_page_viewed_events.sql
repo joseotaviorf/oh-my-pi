@@ -39,7 +39,7 @@ SELECT
   uuid,
   version_name,
   sample_rate,
-  CAST(GET_JSON_OBJECT(event_properties, '$.contract_ids') AS STRING) AS ep_id_contracts,
+  BIGINT(GET_JSON_OBJECT(event_properties, '$.contractId')) AS ep_id_contract,
   CAST(GET_JSON_OBJECT(event_properties, '$.invoice_ids') AS STRING) AS ep_id_invoices,
   ts_client_event,
   ts_client_uploaded,
