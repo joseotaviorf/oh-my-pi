@@ -1,7 +1,7 @@
 SELECT 
     id_amplitude,
     ids_amplitude_attributed,
-    CAST((GET_JSON_OBJECT(event_properties, '$.house_id')) AS BIGINT) AS id_house,
+    CAST(GET_JSON_OBJECT(event_properties, '$.house_id') AS BIGINT) AS id_house,
     id_user,
     id_device,
     id_event,
@@ -17,9 +17,8 @@ SELECT
     GET_JSON_OBJECT(user_properties, '$.ab_beakman_owner_house_setup') AS up_ab_beakman_owner_house_setup,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_rent_toggle') AS up_rc_beakman_owners_listing_performance_rent_toggle,
     GET_JSON_OBJECT(user_properties, '$.rc_beakman_owners_listing_performance_sale_toggle') AS up_rc_beakman_owners_listing_performance_sale_toggle,
-    GET_JSON_OBJECT(event_properties, '$.house_business_contexts') AS ep_business_context,
-    GET_JSON_OBJECT(event_properties, '$.ad_improvements_button_available') AS ep_ad_improvements_button_available,
-    GET_JSON_OBJECT(event_properties, '$.ad_performance_button_available') AS ep_ad_performance_button_available,
+    GET_JSON_OBJECT(event_properties, '$.business_contexts') AS ep_business_context,
+    GET_JSON_OBJECT(event_properties, '$.content_business_context') AS ep_content_business_context,
     city,
     country,
     data,
@@ -57,7 +56,7 @@ SELECT
     month,
     day
 FROM 
-    datalake_amplitude_clean_staging.183047_property_page_viewed_events  
+    datalake_amplitude_clean_staging.183047_property_performance_hub_price_card_button_clicked_events
 WHERE 
     year={} 
     AND month={} 
