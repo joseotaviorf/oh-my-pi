@@ -1,0 +1,72 @@
+dag:
+  name: pin_hr_review
+  schedule_interval: 0 3 * * *
+  owner: Data People
+  dag_documentation:
+    dag_purpose: |
+      This DAG ingests encrypted data from the Oracle HCM system, made available via an SFTP server through Oracle Integration Cloud (OIC).
+      It downloads, decrypts, parses, and loads the files into both the `incoming` and `raw` layers of the Data Lake.
+cluster:
+  type: databricks_13_3_min_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  custom_libraries:
+    - pypi:
+        package: paramiko==2.12.0
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+workflow:
+  layer: raw
+  type: custom_ingestion
+  default_partitions: ["year", "month", "day"]
+  bucket_config_name: people_bucket
+  has_hive_sync: false
+  load_spark_job: load_pin_hr_review_raw
+  default_extraction_type: full
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ ds }}"
+    - "{partitions}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, load_start_date) }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, load_end_date) }}"
+  default_table_privileges:
+    people-team:
+      - ALL PRIVILEGES
+  tables_customization:
+    hrr_dashboard_tmpls_b:
+      clean_table_name: dashboard_template_base
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_hr_review
+          date_column_to_partition: last_update_date
+    hrr_meetings:
+      clean_table_name: meeting
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_hr_review
+          date_column_to_partition: last_update_date
+    hrr_meeting_facilitators:
+      clean_table_name: meeting_facilitator
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_hr_review
+          date_column_to_partition: last_update_date
+    hrr_meeting_participants:
+      clean_table_name: meeting_participant
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_hr_review
+          date_column_to_partition: last_update_date
+    hrr_meeting_talentpools:
+      clean_table_name: meeting_talent_pool
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_hr_review
+          date_column_to_partition: last_update_date

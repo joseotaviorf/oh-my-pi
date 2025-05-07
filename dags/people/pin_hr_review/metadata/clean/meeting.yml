@@ -1,0 +1,99 @@
+---
+database_name: datalake_pin_hr_review_clean
+table_name: meeting
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores information about talent review meetings.
+columns:
+  id_business_group:
+    description: Foreign key to the organization unit.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.business_group_id
+  id_meeting:
+    description: Unique identifier for the talent review meeting. Primary key.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.meeting_id
+  id_meeting_organization:
+    description: Organization unit under review in the meeting.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.meeting_organization_id
+  id_meeting_leader:
+    description: Person at the top of the organization being reviewed.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.meeting_leader_id
+  id_dashboard_template:
+    description: Foreign key to the dashboard template used for this meeting.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.dashboard_tmpl_id
+  id_request:
+    description: Identifier of the job that created or last updated this record.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.request_id
+  id_pref_review_qualifier:
+    description: Foreign key to the preferred review qualifier.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.pref_review_qualifier_id
+  meeting_status_code:
+    description: Status of the talent review meeting.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.meeting_status_code
+  meeting_title:
+    description: Brief description to distinguish this talent review meeting.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.meeting_title
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.last_updated_by
+  meeting_instructions:
+    description: Instructions for the talent review meeting participants.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.meeting_instructions
+  is_matrix_management_included:
+    description: Indicates if matrix management relationships are included in the review.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.include_matrix_mgmt
+    categories:
+      true: Matrix management included.
+      false: Matrix management not included.
+  is_potential_assessment_used:
+    description: Indicates if potential assessment is used in this meeting.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.use_pot_assess_flag
+    categories:
+      true: Potential assessment is used.
+      false: Potential assessment is not used.
+  object_version_number:
+    description: Used to implement optimistic locking. Incremented on each update.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.object_version_number
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.creation_date
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.last_update_date
+  ts_data_submit:
+    description: Deadline for participants to enter data into source systems.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.data_submit_date
+  ts_meeting:
+    description: Date when the actual talent review meeting will take place.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.meeting_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meetings.day

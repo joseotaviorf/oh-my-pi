@@ -1,0 +1,59 @@
+---
+database_name: datalake_pin_hr_review_clean
+table_name: dashboard_template_base
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Templates for Talent Review Dashboards.
+columns:
+  id_meeting_facilitator:
+    description: System-generated unique identifier for the meeting facilitator. Primary key.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.meeting_facilitator_id
+  id_enterprise:
+    description: Foreign key referencing the organization unit.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.enterprise_id
+  id_meeting:
+    description: Foreign key referencing the talent review meeting.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.meeting_id
+  id_facilitator_person:
+    description: Identifier of the person acting as the meeting facilitator.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.facilitator_person_id
+  created_by:
+    description: User who created this record.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.created_by
+  updated_by:
+    description: User who last updated this record.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.last_updated_by
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.object_version_number
+  ts_created:
+    description: Timestamp of when this record was created.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.creation_date
+  ts_updated:
+    description: Timestamp of when this record was last updated.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.day
