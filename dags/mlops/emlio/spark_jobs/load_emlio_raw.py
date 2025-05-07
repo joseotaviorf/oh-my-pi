@@ -83,7 +83,7 @@ if __name__ == "__main__":
         """
     )
 
-    config_service = ConfigurationService(source)
+    config_service = ConfigurationService("emlio")
     kafka_brokers = config_service.get_config("kafka_brokers")
     kafka_topic = config_service.get_config("kafka_topic")
     load_format = config_service.get_config("load_format")
