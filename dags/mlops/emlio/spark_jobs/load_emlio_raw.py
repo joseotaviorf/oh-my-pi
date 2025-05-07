@@ -62,14 +62,14 @@ if __name__ == "__main__":
 
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
-    parser.add_argument("source")
+    parser.add_argument("schema")
     parser.add_argument("partition_cols")
     parser.add_argument("execution_date")
     args = parser.parse_args()
 
     environment = args.env
     datalake_bucket = args.datalake_bucket
-    source = args.source
+    schema = args.schema
     partition_cols = json.loads(args.partition_cols)
     execution_date = args.execution_date
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
     logger.info(
         f"""
-            m={JOB_NAME}, environment={environment}, source={source},
+            m={JOB_NAME}, environment={environment}, schema={schema},
             datalake_bucket={datalake_bucket}, partition_cols={partition_cols},
             msg=Starting spark job..."
         """
@@ -92,6 +92,11 @@ if __name__ == "__main__":
         + config_service.get_config("datalake_bucket")
         + config_service.get_config("checkpoints_path_suffix")
     )
+    load_path = (
+        config_service.get_config("path_prefix")
+        + config_service.get_config("datalake_bucket")
+        + config_service.get_config("load_path_suffix")
+    )
     kafka_columns = config_service.get_config("kafka_columns")
     max_records_per_file = config_service.get_config("max_records_per_file")
 
@@ -99,7 +104,7 @@ if __name__ == "__main__":
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     datalake_info = DatalakeMetastoreService.get_db_info(
-        environment, source, datalake_bucket
+        environment, schema, datalake_bucket
     )
 
     format_options = SparkTableStorageFormat.DEFAULT_RAW
@@ -143,6 +148,7 @@ if __name__ == "__main__":
         .option("maxRecordsPerFile", max_records_per_file)
         .option("checkpointLocation", checkpoints_path)
         .outputMode("append")
+        .option("path", load_path)
         .toTable(database_name + "." + table_name)
     )
 
