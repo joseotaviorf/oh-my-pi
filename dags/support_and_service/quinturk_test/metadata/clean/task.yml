@@ -1,0 +1,54 @@
+database_name: datalake_quinturk_test_clean
+table_name: task
+columns:
+  id:
+    lineage:
+      - datalake_quinturk_test_raw.task.id
+  id_project:
+    lineage:
+      - datalake_quinturk_test_raw.task.project_id
+  id_updated_by:
+    lineage:
+      - datalake_quinturk_test_raw.task.updated_by_id
+  id_file_upload:
+    lineage:
+      - datalake_quinturk_test_raw.task.file_upload_id
+  id_inner:
+    lineage:
+      - datalake_quinturk_test_raw.task.inner_id
+  id_proposal:
+    lineage:
+      - datalake_quinturk_test_raw.task.data.id_proposal
+  total_annotations:
+    lineage:
+      - datalake_quinturk_test_raw.task.total_annotations
+  cancelled_annotations:
+    lineage:
+      - datalake_quinturk_test_raw.task.cancelled_annotations
+  total_predictions:
+    lineage:
+      - datalake_quinturk_test_raw.task.total_predictions
+  overlap:
+    lineage:
+      - datalake_quinturk_test_raw.task.overlap
+  data:
+    lineage:
+      - datalake_quinturk_test_raw.task.data
+  proponent_cpf:
+    lineage:
+      - datalake_quinturk_test_raw.task.data.cpf
+  proponent_name:
+    lineage:
+      - datalake_quinturk_test_raw.task.data.name
+  meta:
+    lineage:
+      - datalake_quinturk_test_raw.task.meta
+  is_labeled:
+    lineage:
+      - datalake_quinturk_test_raw.task.is_labeled
+  ts_created:
+    lineage:
+      - datalake_quinturk_test_raw.task.created_at
+  ts_updated:
+    lineage:
+      - datalake_quinturk_test_raw.task.updated_at
