@@ -34,7 +34,6 @@ workflow:
     - experiment_config
   tables_customization:
     recs_impressions:
-      extraction_type: incremental
       partitions:
         - year
         - month
