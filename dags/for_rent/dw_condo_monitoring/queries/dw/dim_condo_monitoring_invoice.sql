@@ -1,5 +1,8 @@
 SELECT
   id_invoice AS sk_invoice,
+  issuer_cnpj,
+  issuer_name,
+  barcode,
   status,
   communications_sent,
   communication_funnel_step_reached,

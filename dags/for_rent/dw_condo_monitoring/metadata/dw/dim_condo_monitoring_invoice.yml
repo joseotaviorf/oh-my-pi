@@ -8,6 +8,18 @@ columns:
     lineage:
       - datalake_condo_monitoring.invoice.id_invoice
     description: Key of the invoice.
+  issuer_cnpj:
+    lineage:
+      - datalake_condo_monitoring.invoice.issuer_cnpj
+    description: CNPJ of the issuer related to the invoice.
+  issuer_name:
+    lineage:
+      - datalake_condo_monitoring.invoice.issuer_name
+    description: Issuer name of the issuer related to the invoice.
+  barcode:
+    lineage:
+      - datalake_condo_monitoring.invoice.barcode
+    description: barcode of the invoice.
   status:
     lineage:
       - datalake_condo_monitoring.invoice.status
