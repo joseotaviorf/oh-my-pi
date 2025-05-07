@@ -139,7 +139,7 @@ union_promisses_agreements AS (
     a.payment_method,
     i.promisse_payment_method,
     a.exception,
-    a.status,
+    COALESCE(a.status, IF(c.campaign_status = "Vencida", "Cancelado", NULL)) AS status,
     a.description_broken_agreement,
     COALESCE(i.number_of_installments, a.number_of_installments, c.total_installments) AS number_of_installments,
     i.paid_installments,
