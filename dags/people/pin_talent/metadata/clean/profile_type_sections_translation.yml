@@ -1,0 +1,69 @@
+---
+database_name: datalake_pin_talent_clean
+table_name: profile_type_sections_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores translations for profile section details, including name and description, supporting multiple languages.
+columns:
+  id_business_group:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.business_group_id
+  id_section:
+    description: Identifier for the profile type section.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.section_id
+  language:
+    description: Code of the language for the translated content.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.language
+  source_language:
+    description: Code of the original language of the content.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.source_lang
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.last_updated_by
+  section_name:
+    description: Name of the section as it appears on talent profiles.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.name
+  section_description:
+    description: Description of the section.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.description
+  seed_data_source:
+    description: Source of the initial data for this record.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.seed_data_source
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.object_version_number
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.creation_date
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_typ_sections_tl.day

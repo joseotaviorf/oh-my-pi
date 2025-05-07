@@ -1,0 +1,73 @@
+---
+database_name: datalake_pin_talent_clean
+table_name: rating_model_base
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Defines groupings of rating levels used to evaluate competencies, identified by a code and specifying the number of levels.
+columns:
+  id_business_group:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.business_group_id
+  id_rating_model:
+    description: Unique identifier for the rating model. Primary key.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.rating_model_id
+  id_module:
+    description: Module that owns this rating model.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.module_id
+  rating_model_code:
+    description: Code identifying the rating model.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.rating_model_code
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.updated_by
+  seed_data_source:
+    description: Source of the initial data for this record.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.seed_data_source
+  rating_level_count:
+    description: Number of rating levels in this model.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.rating_level_count
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.object_version_number
+  dt_started:
+    description: Start date when this rating model is valid.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.date_from
+  dt_ended:
+    description: End date when this rating model is no longer valid.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.date_to
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.creation_date
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_models_b.day

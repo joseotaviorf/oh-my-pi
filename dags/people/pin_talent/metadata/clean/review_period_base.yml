@@ -1,0 +1,66 @@
+---
+database_name: datalake_pin_talent_clean
+table_name: review_period_base
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores core details for review periods, including start and end dates, and status.
+columns:
+  id_business_group:
+    description: Foreign key referencing the business groups table.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.business_group_id
+  id_review_period:
+    description: System-generated unique identifier for the review period. Primary key.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.review_period_id
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.updated_by
+  status_code:
+    description: Status code for the review period.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.status_code
+    categories:
+      A: Review period is currently active.
+      I: Review period is currently inactive.
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.object_version_number
+  dt_started:
+    description: Start date of the review period.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.start_date
+  dt_ended:
+    description: End date of the review period.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.end_date
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.creation_date
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_review_periods_b.day

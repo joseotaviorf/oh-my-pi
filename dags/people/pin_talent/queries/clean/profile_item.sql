@@ -1,0 +1,28 @@
+SELECT
+  business_group_id AS id_business_group,
+  content_type_id AS id_content_type,
+  profile_id AS id_profile,
+  profile_item_id AS id_profile_item,
+  qualifier_id1 AS id_qualifier,
+  rating_level_id1 AS id_rating_level,
+  rating_model_id1 AS id_rating_model,
+  section_id AS id_section,
+  content_item_id AS id_content_item,
+  created_by,
+  last_updated_by AS updated_by,
+  item_text30_1 AS comments,
+  source_key1 AS alternative_source_key_1,
+  source_key2 AS alternative_source_key_2,
+  CAST(object_version_number AS INT) AS object_version_number,
+  CAST(item_decimal_1 AS DECIMAL) AS decimal_field,
+  CAST(item_number_1 AS INT) AS number_field,
+  TO_TIMESTAMP(creation_date) AS ts_created,
+  TO_TIMESTAMP(last_update_date) AS ts_updated,
+  TO_TIMESTAMP(date_from) AS ts_started,
+  TO_TIMESTAMP(date_to) AS ts_ended,
+  NOW() AS ts_load,
+  year,
+  month,
+  day
+FROM
+  datalake_pin_talent_raw.hrt_profile_items
