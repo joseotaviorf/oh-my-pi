@@ -3679,6 +3679,11 @@ bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_superset:load-enrich-dashboards
   - bietlejuice.enrich_superset:load-enrich-slices
   - bietlejuice.enrich_superset:load-enrich-tables
+bietlejuice.reverse_demand_classifieds_ranking:
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house
+bietlejuice.reverse_demand_classifieds_ranking_access:
+  - bietlejuice.reverse_demand_classifieds_ranking:load-reverse-house-classified-ranking-score
 bietlejuice.reverse_demand_score:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing

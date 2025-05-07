@@ -30,6 +30,7 @@ dags_out_of_pattern:
         "reverse_ccv_price_report_load",
         "reverse_dashboard_governance",
         "reverse_demand_score",
+        "reverse_demand_classifieds_ranking",
         "reverse_dsat_report_load",
         "reverse_sale_listings_report_load",
         "reverse_rent_listings_report_load",
