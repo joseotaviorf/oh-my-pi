@@ -7,7 +7,46 @@ WITH ticket_events AS (
         OR REGEXP_LIKE(te.tags,'acao_backlog_full_prestador_interno')
         OR REGEXP_LIKE(te.tags,'macro_ro_refluxo_tarefa_acionar_parceiro')
     ) - INTERVAL 3 HOUR AS ts_reflux,
-    MIN(te.ts_event) - INTERVAL 3 HOUR AS ts_first_open
+    MIN(te.ts_event) FILTER (WHERE sk_group <> '18592339863437') - INTERVAL 3 HOUR AS ts_first_open,
+    MIN(te.ts_event) FILTER (
+      WHERE REGEXP_LIKE(tags,'macro_ro_iq_ps_iq_manual')
+        OR REGEXP_LIKE(tags,'macro_ro_pp_ps_iq_manual')
+        OR REGEXP_LIKE(tags,'testes_ro_especializacao_ps_iq')
+        OR REGEXP_LIKE(tags,'pp_escolheu_prestador_iq_aprovar_orcamento')
+        OR REGEXP_LIKE(tags,'iq_pp_escolheu_prestador_iq_aprovar_orcamento')
+        OR REGEXP_LIKE(tags,'macro_ro_triagem_pp_definido_psiq')
+        OR REGEXP_LIKE(tags,'macro_ro_triagem_iq_definido_psiq')
+        OR REGEXP_LIKE(tags,'tag_Squad_reparos_reparacao_piloto_ps_iq')
+        OR REGEXP_LIKE(tags,'tag_squad_reparos_reparacao_piloto_ps_iq')
+        OR REGEXP_LIKE(tags,'tag_squad_reparos_reparacao_piloto_jornada_ps_iq_pp')
+        OR REGEXP_LIKE(tags,'tag_squad_reparos_reparacao_piloto_jornada_ps_iq_iq')
+    ) AS ts_ps_iq,
+    MIN(te.ts_event) FILTER (
+      WHERE REGEXP_LIKE(tags,'macro_ro_definicao_prestador_proprio')
+        OR REGEXP_LIKE(tags,'definição_prestador_proprio')
+        OR REGEXP_LIKE(tags,'macro_ro_definicao_prestador_proprio')
+        OR REGEXP_LIKE(tags,'testes_ro_especializacao_ps_pp')
+        OR REGEXP_LIKE(tags,'pp_autosserviço_prestadorpp')
+        OR REGEXP_LIKE(tags,'iq_pp_autosserviço_prestadorpp')
+        OR REGEXP_LIKE(tags,'macro_ro_triagem_iq_definido_pspp')
+        OR REGEXP_LIKE(tags,'macro_ro_triagem_pp_definido_pspp')
+        OR REGEXP_LIKE(tags,'tag_squad_reparos_reparacao_piloto_ps_pp')
+        OR REGEXP_LIKE(tags,'tag_Squad_reparos_reparacao_piloto_ps_pp')
+        OR REGEXP_LIKE(tags,'tag_squad_reparos_reparacao_piloto_jornada_ps_pp_pp')
+        OR REGEXP_LIKE(tags,'tag_squad_reparos_reparacao_piloto_jornada_ps_pp_iq')
+    ) AS ts_ps_pp,
+    MIN(te.ts_event) FILTER (
+      WHERE REGEXP_LIKE(tags,'comum_iniciar_compulsoria')
+        OR REGEXP_LIKE(tags,'mediação_início_compulsória')
+        OR REGEXP_LIKE(tags,'macro_ro_inicio_compulsoria')
+        OR REGEXP_LIKE(tags,'macro_ro_compulsoria_iq_inicio_compulsoria')
+        OR REGEXP_LIKE(tags,'macro_ro_compulsoria_pp_inicio_compulsoria')
+        OR REGEXP_LIKE(tags,'execução_compulsória')
+        OR REGEXP_LIKE(tags,'macro_ro_aprovado_compulsória')
+        OR REGEXP_LIKE(tags,'testes_ro_especializacao_compulsoria_iq')
+        OR REGEXP_LIKE(tags,'aprovação_compulsória_contestação')
+        OR REGEXP_LIKE(tags,'compul')
+     ) AS ts_compulsory
   FROM
     dw_customer_support.fact_ticket_events AS te
   WHERE
@@ -71,6 +110,9 @@ SELECT
   rt.ts_last_assigned_local,
   te.ts_reflux,
   te.ts_first_open,
+  te.ts_ps_iq,
+  te.ts_ps_pp,
+  te.ts_compulsory,
   sf.ts_help_request,
   rt.ts_latest_customer_comment,
   rt.ts_latest_analyst_comment,
