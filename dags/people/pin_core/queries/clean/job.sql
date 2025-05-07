@@ -15,7 +15,6 @@ SELECT
   attribute4 AS weekly_hours,
   approval_authority,
   med_checkup_req = 'Y' AS has_medical_checkup_requirement,
-  full_part_time = 'Y' AS is_full_part_time,
   benchmark_job_flag = 'Y' AS is_benchmark_job,
   CAST(object_version_number AS INT) AS object_version_number,
   TO_DATE(effective_end_date) AS dt_effective_ended,

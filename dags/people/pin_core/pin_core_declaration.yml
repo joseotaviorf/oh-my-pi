@@ -55,11 +55,6 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
-    hr_all_organization_units_f:
-      clean_table_name: organization_unit
-      extra_spark_job_arguments:
-        - raw_custom_schema: pin_core
-          date_column_to_partition: last_update_date
     hr_organization_units_f_tl:
       clean_table_name: organization_unit_translation
       extra_spark_job_arguments:

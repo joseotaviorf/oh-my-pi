@@ -75,13 +75,6 @@ columns:
     categories:
       true: Medical checkup is required.
       false: Medical checkup is not required.
-  is_full_part_time:
-    description: Indicates if the job is full-time or part-time.
-    lineage:
-      - datalake_pin_core_raw.per_jobs_f.full_part_time
-    categories:
-      F: Full-time job.
-      P: Part-time job.
   is_benchmark_job:
     description: Indicates if this job serves as a benchmark for comparison (Yes/No).
     lineage:
