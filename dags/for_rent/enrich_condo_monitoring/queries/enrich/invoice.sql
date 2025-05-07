@@ -2,7 +2,7 @@ WITH
 communication_sent AS (
   SELECT
     id_invoice,
-    ARRAY_AGG(DISTINCT communication_type) FILTER (WHERE was_delivered) AS communications_sent
+    ARRAY_AGG(DISTINCT communication_type) AS communications_sent
   FROM
     datalake_condo_monitoring.communication
   GROUP BY ALL
@@ -31,8 +31,24 @@ SELECT
       OR c.communications_sent IS NULL THEN "COMMUNICATION_NOT_FOUND"
   END AS communication_funnel_step_reached,
   i.value,
-  IF(ip.ts_paid >= DATE_ADD(i.dt_due, -1) OR ip.id_invoice IS NULL, TRUE, FALSE) AS was_reminder_comm_required,
-  IF(ip.ts_paid >= DATE_ADD(i.dt_due, 3) OR ip.id_invoice IS NULL, TRUE, FALSE) AS was_warning_comm_required,
+  IF(
+    ip.ts_paid >= DATE_ADD(i.dt_due, -1)
+    OR (
+      ip.id_invoice IS NULL
+      AND CURRENT_DATE() >= DATE_ADD(i.dt_due, -1)
+    ),
+    TRUE,
+    FALSE
+  ) AS was_reminder_comm_required,
+  IF(
+    ip.ts_paid >= DATE_ADD(i.dt_due, 3)
+    OR (
+      ip.id_invoice IS NULL
+      AND CURRENT_DATE() >= DATE_ADD(i.dt_due, 3)
+    ),
+    TRUE,
+    FALSE
+  ) AS was_warning_comm_required,
   i.dt_due,
   i.ts_created AS ts_issued,
   ip.ts_paid
