@@ -1,0 +1,27 @@
+---
+database_name: datalake_gsheets_people_clean
+table_name: transgender_people_list
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: null
+columns:
+  employee_registration_name:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.transgender_people_list.nome_de_registro
+  employee_email:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.transgender_people_list.email
+  employee_social_name:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.transgender_people_list.nome_social
+  has_to_change:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.transgender_people_list.alterar
+  ts_load:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.transgender_people_list.ts_load

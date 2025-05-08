@@ -1,0 +1,23 @@
+---
+database_name: datalake_gsheets_people_clean
+table_name: dismissal_reason
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: null
+columns:
+  variable_name:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.dismissal_reason.variavel
+  original_value:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.dismissal_reason.valor_original
+  final_value:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.dismissal_reason.valor_final
+  ts_load:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.dismissal_reason.ts_load

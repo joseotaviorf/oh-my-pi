@@ -1,0 +1,23 @@
+SELECT
+    email AS employee_personal_email,
+    name AS employee_name,
+    registration AS employee_registration,
+    company_grade,
+    current_leadership_time,
+    career_talk_frequency,
+    healthy_leadership_relation,
+    healthy_team_relation,
+    my_work_was_recognized AS work_was_recognized,
+    applied_knowledge,
+    had_onboarding_support,
+    high_stress_level,
+    stress_influence,
+    had_available_channels,
+    felt_comfortable_with_my_leadership,
+    comments_about_leadership_support,
+    compliments_about_company,
+    improvements_to_company,
+    people_team_contact,
+    to_timestamp(timestamp, 'dd/MM/yyyy HH:mm:ss') AS ts_fill_forms,
+    ts_load
+FROM datalake_gsheets_people_raw.dismissal_forms_invonluntary

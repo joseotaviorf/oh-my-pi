@@ -1,4 +1,34 @@
 sheets_info:
+  dismissal_forms_bp:
+    clean_table_name: dismissal_forms_bp
+    sheet_context: people
+    sheet_id: 1Wd6j6o3dU38CYOjZnS6etanfmap31D-ANCHOsa8l55U
+    sheet_name: "(DL) preenchimento_PePa"
+
+  dismissal_forms_invonluntary:
+    clean_table_name: dismissal_forms_invonluntary
+    sheet_context: people
+    sheet_id: 1Wd6j6o3dU38CYOjZnS6etanfmap31D-ANCHOsa8l55U
+    sheet_name: "(DL) preenchimento_inv"
+
+  dismissal_forms_manager:
+    clean_table_name: dismissal_forms_manager
+    sheet_context: people
+    sheet_id: 1Wd6j6o3dU38CYOjZnS6etanfmap31D-ANCHOsa8l55U
+    sheet_name: db_final
+
+  dismissal_forms_voluntary:
+    clean_table_name: dismissal_forms_voluntary
+    sheet_context: people
+    sheet_id: 1Wd6j6o3dU38CYOjZnS6etanfmap31D-ANCHOsa8l55U
+    sheet_name: "(DL) db_employee"
+
+  dismissal_reason:
+    clean_table_name: dismissal_reason
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: dismissal_reason
+
   edc_roles:
     clean_table_name: edc_roles
     sheet_context: people
@@ -10,3 +40,33 @@ sheets_info:
     sheet_context: people
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: layoffs
+
+  legacy_company:
+    clean_table_name: legacy_company
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: legacy_company
+
+  legacy_registration:
+    clean_table_name: legacy_registration
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: legacy_registration
+
+  quinto_andar_companies:
+    clean_table_name: quinto_andar_companies
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: quinto_andar_companies
+
+  pre_full_merge_dismissals:
+    clean_table_name: pre_full_merge_dismissals
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: pre_fm_dismissals
+
+  pre_full_merge_dismissals_salaries:
+    clean_table_name: pre_full_merge_dismissals_salaries
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: pre_fm_dismissals_salaries

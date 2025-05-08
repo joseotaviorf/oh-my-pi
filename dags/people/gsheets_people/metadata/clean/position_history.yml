@@ -1,0 +1,43 @@
+---
+database_name: datalake_gsheets_people_clean
+table_name: position_history
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: null
+columns:
+  id_employee:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.position_history.id_colaborador
+  employee_name:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.position_history.nome
+  employee_registration:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.position_history.matricula
+  employee_email:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.position_history.email
+  old_position:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.position_history.cargo_antigo
+  new_position:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.position_history.cargo_novo
+  change_type:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.position_history.tipo_alteracao
+  dt_change:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.position_history.data
+  ts_load:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.position_history.ts_load

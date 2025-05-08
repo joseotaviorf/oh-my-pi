@@ -1,0 +1,35 @@
+---
+database_name: datalake_gsheets_people_clean
+table_name: nominal_fix
+owner: leonardo.soares@quintoandar.com.br
+domain: people
+description: null
+columns:
+  employee_email:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.nominal_fix.email
+  employee_sub_board:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.nominal_fix.sub_diretoria_a
+  employee_board:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.nominal_fix.diretoria_a
+  employee_vice_presidency:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.nominal_fix.vice_presidencia_a
+  employee_vertical:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.nominal_fix.vertical_a
+  hrbp:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.nominal_fix.hrbp_a
+  ts_load:
+    description: ''
+    lineage:
+    - datalake_gsheets_people_raw.nominal_fix.ts_load
