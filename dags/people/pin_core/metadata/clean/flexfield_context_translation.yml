@@ -1,0 +1,91 @@
+---
+database_name: datalake_pin_core_clean
+table_name: flexfield_context_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores translated information for flexfield contexts.
+columns:
+  id_application:
+    description: Identifier of the application.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.application_id
+  id_enterprise:
+    description: Identifier of the enterprise.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.enterprise_id
+  id_sandbox:
+    description: Identifier of the sandbox environment.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.sandbox_id
+  context_code:
+    description: Code identifying the flexfield context.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.context_code
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.last_updated_by
+  descriptive_flexfield_code:
+    description: Code identifying the descriptive flexfield.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.descriptive_flexfield_code
+  language:
+    description: Code of the language for the translated content in this record.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.language
+  source_language:
+    description: Code of the original language of the translatable content.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.source_lang
+  name:
+    description: Name of the flexfield context.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.name
+  description:
+    description: Description of the flexfield context.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.description
+  seed_data_source:
+    description: Source file of the initial data for this record.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.seed_data_source
+  instruction_help_text:
+    description: Instructional text or help message for the flexfield context.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.instruction_help_text
+  is_oracle_seed_set_1:
+    description: For internal Oracle use only. Indicates the Edition-Based Redefinition (EBR) context for SET1 (Y or N).
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.ora_seed_set1
+  is_oracle_seed_set_2:
+    description: For internal Oracle use only. Indicates the Edition-Based Redefinition (EBR) context for SET2 (Y or N).
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.ora_seed_set2
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.fnd_df_contexts_tl.day

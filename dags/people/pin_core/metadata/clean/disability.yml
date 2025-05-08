@@ -1,0 +1,83 @@
+---
+database_name: datalake_pin_core_clean
+table_name: disability
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores disability information for individuals.
+columns:
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.business_group_id
+  id_person:
+    description: Foreign key referencing the person.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.person_id
+  id_disability:
+    description: System-generated unique identifier for the disability record. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.disability_id
+  disability_code:
+    description: User-defined code to identify a disability record, unique in combination with the effective start date.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.disability_code
+  category:
+    description: Category of the person's disability.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.category
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.created_by
+  last_updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.last_updated_by
+  quota_fte:
+    description: Full-Time Equivalent (FTE) value for the disability quota.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.quota_fte
+  status:
+    description: Current status of the person's disability (e.g., Temporary).
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.status
+  legislation_code:
+    description: Legal code applicable to this disability information.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.legislation_code
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.object_version_number
+  dt_effective_ended:
+    description: End date of the period for which this disability record is valid.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.effective_end_date
+  dt_effective_started:
+    description: Start date of the period for which this disability record is valid.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.effective_start_date
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_disabilities_f.day

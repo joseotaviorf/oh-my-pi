@@ -1,0 +1,71 @@
+---
+database_name: datalake_pin_talent_clean
+table_name: rating_level_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Provides translations for rating level descriptions, short descriptions, and review descriptions in multiple languages.
+columns:
+  id_business_group:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.business_group_id
+  id_rating_level:
+    description: Unique identifier of the rating level.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.rating_level_id
+  language:
+    description: Code of the language for the translated content.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.language
+  source_language:
+    description: Code of the original language of the content.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.source_lang
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.last_updated_by
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.CAST(object_version_number AS INT)
+  rating_description:
+    description: Description of the rating level.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.rating_description
+  rating_short_description:
+    description: Short description of the rating level.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.rating_short_descr
+  review_rating_description:
+    description: Description of the rating level for review purposes.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.review_rating_descr
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.TO_TIMESTAMP(creation_date)
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.TO_TIMESTAMP(last_update_date)
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.NOW()
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_rating_levels_tl.day

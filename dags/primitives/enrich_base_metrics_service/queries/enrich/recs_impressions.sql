@@ -36,9 +36,7 @@ FROM
             month,
             day
         FROM datalake_amplitude_clean_staging.170698_recset_impression_events
-        WHERE
-        -- This runs in a daily manner
-        MAKE_DATE(year, month, day) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
+        WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
         AND get_json_object(user_properties, '$.country') = 'BR'
         AND id_user IS NOT NULL
         -- This carroussel only has user favourited items. We don't want to include it in our metrics
@@ -68,9 +66,7 @@ recs_impressions AS (
     from_json(get_json_object(event_properties, '$.viewed_house_list'), 'array<string>') AS imp_viewed_houses,
     ts_event
     FROM datalake_amplitude_clean_staging.170698_recset_impression_events
-    WHERE
-    -- This runs in a daily manner
-    MAKE_DATE(year, month, day) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
+    WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     AND get_json_object(user_properties, '$.country') = 'BR'
     AND id_user IS NOT NULL
 
@@ -83,9 +79,7 @@ UNION ALL
     from_json(get_json_object(event_properties, '$.viewed_house_list'), 'array<string>') AS imp_viewed_houses,
     ts_event
     FROM datalake_amplitude_clean_staging.170698_recset_viewed_events
-    WHERE
-    -- This runs in a daily manner
-    MAKE_DATE(year, month, day) BETWEEN DATE('{start_date}') AND DATE('{end_date}')
+    WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     AND get_json_object(user_properties, '$.country') = 'BR'
     AND id_user IS NOT NULL
 )

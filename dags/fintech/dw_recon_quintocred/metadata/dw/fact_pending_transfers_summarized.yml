@@ -1,0 +1,36 @@
+database_name: dw_recon_quintocred
+table_name: fact_pending_transfers_summarized
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: "Data from pending transfers in QuintoCred recon context."
+columns:
+  sk_propose:
+    description: "QuintoCred's propose identification number (ID)"
+    lineage:
+      - dw_velo.fact_velo_propose.sk_propose
+
+  dt_contract_started:
+    description: "Start date of the contract"
+    lineage:
+      - dw_velo.fact_velo_propose.dt_contract_started
+
+  activator_amount:
+    description: "Amount activated or credited in the transaction"
+    lineage:
+      - dw_velo.dim_velo_propose_values.activator_amount
+
+  due_amount:
+    description: "Total amount due for payment"
+    lineage:
+      - dw_velo.dim_velo_propose_values.activator_amount
+
+  paid_amount:
+    description: "Total amount that has been paid"
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry.due_amount
+
+  open_amount:
+    description: "Amount still to be paid"
+    lineage:
+      - dw_velo.dim_velo_propose_values.activator_amount
+      - datalake_robin_hood_clean.accounting_entry.due_amount

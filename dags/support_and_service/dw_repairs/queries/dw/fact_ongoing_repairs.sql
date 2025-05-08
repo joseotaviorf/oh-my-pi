@@ -53,14 +53,7 @@ repair_request_budget AS (
         OR REGEXP_LIKE(te.tags,'alteração_aprovada')
         OR REGEXP_LIKE(te.tags,'alteração_benfeitoria')
     ) - INTERVAL 3 HOUR AS ts_resolution_contestation,
-    MIN(te.ts_event) FILTER (
-      WHERE sk_group IN
-        (
-          '11373011255565',
-          '10567436267277',
-          '32017711499661'
-        )
-    ) - INTERVAL 3 HOUR AS ts_first_open,
+    MIN(te.ts_event) FILTER (WHERE sk_group <> '18592339863437') - INTERVAL 3 HOUR AS ts_first_open,
     MIN(
       CASE
         WHEN

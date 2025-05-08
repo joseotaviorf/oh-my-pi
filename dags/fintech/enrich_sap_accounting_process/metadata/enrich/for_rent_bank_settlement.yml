@@ -2,7 +2,7 @@
 database_name: datalake_sap_accounting_process
 table_name: for_rent_bank_settlement
 owner: ae-finance-fintech@quintoandar.com.br
-domain: for_rent
+domain: fintech
 description: null
 columns:
   id_business_entity:

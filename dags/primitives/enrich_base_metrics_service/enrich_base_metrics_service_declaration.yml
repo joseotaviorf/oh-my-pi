@@ -16,8 +16,14 @@ workflow:
   inner_dependencies:
     recs_impressions:
     - experiment_config
+    recs_impressions_processed:
+    - experiment_config_processed
+    - recs_impressions
+    - house_publication_dates
+    - rent_flow_past_30_days
+    - sale_flow_past_30_days
     search_impressions:
-    - experiment_config
+    - experiment_config_processed
     - house_publication_dates
     - rent_flow_past_30_days
     - sale_flow_past_30_days
@@ -28,7 +34,6 @@ workflow:
     - experiment_config
   tables_customization:
     recs_impressions:
-      extraction_type: incremental
       partitions:
         - year
         - month

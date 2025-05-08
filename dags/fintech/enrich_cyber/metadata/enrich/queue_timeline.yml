@@ -1,0 +1,39 @@
+---
+database_name: datalake_cyber
+table_name: queue_timeline
+owner: juliana.hocihara@quintoandar.com.br
+domain: fintech
+description: Table responsible for creating a timeline for each contract, showing its position in the three existing queues (segmentation, agreement and eviction)
+columns:
+  id_contract_external:
+    description: "Contract ID"
+    lineage:
+      - datalake_cyber.contracts.id_contract_external
+  segmentation_queue:
+    description: "Segmentation queue ID"
+    lineage:
+      - datalake_cyber.contracts.segmentation_queue
+  segmentation_queue_description:
+    description: "Segmentation queue description"
+    lineage:
+      - datalake_cyber.contracts.segementation_queue_description
+  agreement_queue:
+    description: "Agreement queue ID"
+    lineage:
+      - datalake_cyber.contracts.agreement_queue
+  agreement_queue_description:
+    description: "Agreement queue description"
+    lineage:
+      - datalake_cyber.contracts.agreement_queue_description
+  eviction_queue:
+    description: "Eviction queue ID"
+    lineage:
+      - datalake_cyber.contracts.eviction_queue
+  eviction_queue_description:
+    description: "Eviction queue description"
+    lineage:
+      - datalake_cyber.contracts.eviction_queue_description
+  dt_reference:
+    description: "Reference date for the timeline"
+    lineage:
+      - datalake_cyber.contracts.date

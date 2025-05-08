@@ -1,0 +1,78 @@
+---
+database_name: datalake_pin_core_clean
+table_name: email_address
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores email addresses of various types for individuals.
+columns:
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.business_group_id
+  id_person:
+    description: Identifier of the person associated with this email address.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.person_id
+  id_email_address:
+    description: System-generated unique identifier for the email address record. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.email_address_id
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.last_updated_by
+  email_address:
+    description: The email address itself. Not mandatory to allow initial record creation even without an email.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.email_address
+  email_type:
+    description: Category of the email address.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.email_type
+    categories:
+      W1: Email address used for professional purposes.
+      H1: Email address used for personal communication.
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.object_version_number
+  has_mastered_in_ldap:
+    description: Flag indicating if the email address is managed in LDAP.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.mastered_in_ldap_flag
+  dt_started:
+    description: Date from which this email address is valid.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.date_from
+  dt_ended:
+    description: Date until which this email address is valid.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.date_to
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_email_addresses.day

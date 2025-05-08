@@ -171,6 +171,12 @@ SELECT
     a.type_ssn,
     a.recovery_method,
     a.debtor_type,
+    q.segmentation_queue AS segmentation_queue_timeline,
+    q.segmentation_queue_description AS segmentation_queue_description_timeline,
+    q.agreement_queue AS agreement_queue_timeline,
+    q.agreement_queue_description AS agreement_queue_description_timeline,
+    q.eviction_queue AS eviction_queue_timeline,
+    q.eviction_queue_description AS eviction_queue_description_timeline,
     a.delay_contamined_at_closure,
     a.delay_contamined_range,
     a.delay_contract_range,
@@ -199,6 +205,9 @@ FROM add_all_dimensions AS a
 LEFT JOIN get_last_valid_partner AS g
   ON a.id_contract = g.id_contract
     AND a.id_invoice = g.id_invoice
+LEFT JOIN datalake_cyber.queue_timeline AS q
+  ON a.id_contract = q.id_contract_external
+    AND a.dt_reference = q.dt_reference
 WHERE
   sk_origin_negotiation IS NULL
   OR (sk_origin_negotiation IS NOT NULL

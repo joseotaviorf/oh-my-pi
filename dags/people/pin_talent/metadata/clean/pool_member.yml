@@ -1,0 +1,76 @@
+---
+database_name: datalake_pin_talent_clean
+table_name: pool_member
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Contains core information about members within talent pools, detailing their participation, relevant identifiers, status, and timestamps.
+columns:
+  id_pool:
+    description: Identifier of the talent pool.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.pool_id
+  id_pool_member:
+    description: Unique identifier for the pool member.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.pool_member_id
+  id_enterprise:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.enterprise_id
+  id_member:
+    description: Identifier of the member (e.g., person ID).
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.member_id
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.updated_by
+  pool_member_type:
+    description: Type of pool member.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.pool_member_type
+  source_code:
+    description: Source from where the record was created or updated.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.source_code
+  status:
+    description: Status of the pool member (e.g., active, inactive).
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.status
+    categories:
+      active: Member is currently active in the pool.
+      inactive: Member is currently inactive in the pool.
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.object_version_number
+  dt_member_since:
+    description: Date when the member was added to the pool.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.member_since
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.creation_date
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_pool_members.day

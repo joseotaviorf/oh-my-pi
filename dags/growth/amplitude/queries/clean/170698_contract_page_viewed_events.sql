@@ -37,7 +37,7 @@ SELECT
     sample_rate,
     event_properties,
     user_properties,
-    BIGINT(GET_JSON_OBJECT(event_properties, '$.contract_id')) AS ep_id_contract,
+    BIGINT(GET_JSON_OBJECT(event_properties, '$.contractId')) AS ep_id_contract,
     STRING(GET_JSON_OBJECT(user_properties, '$.platform')) AS up_platform,
     STRING(GET_JSON_OBJECT(user_properties, '$.active_contracts')) AS up_active_contracts,
     STRING(GET_JSON_OBJECT(user_properties, '$.ab_postcontract_dynamic_home')) AS up_ab_postcontract_dynamic_home,

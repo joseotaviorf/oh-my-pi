@@ -1,0 +1,73 @@
+---
+database_name: datalake_pin_goal_clean
+table_name: goal_plan_to_assignment
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores the assignments of goal plans to workers.
+columns:
+  id_business_group:
+    description: Foreign key referencing the business groups table.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.business_group_id
+  id_assignment:
+    description: Foreign key referencing the worker's assignment details.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.assignment_id
+  id_goal_plan:
+    description: Foreign key referencing the goal plan details.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.goal_plan_id
+  id_review_period:
+    description: Identifier of the review period for this goal plan assignment.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.review_period_id
+  id_person:
+    description: Identifier of the person to whom this goal plan is assigned.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.person_id
+  status:
+    description: Current status of this goal plan assignment record.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.status
+  created_by:
+    description: User who created this record.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.created_by
+  updated_by:
+    description: User who last updated this record.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.last_updated_by
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.object_version_number
+  dt_goal_plan_started:
+    description: Start date of the assigned goal plan.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.goal_plan_start_date
+  dt_goal_plan_ended:
+    description: End date of the assigned goal plan.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.goal_plan_end_date
+  ts_created:
+    description: Timestamp of when this record was created.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.creation_date
+  ts_updated:
+    description: Timestamp of when this record was last updated.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goal_pln_assignments.day

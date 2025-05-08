@@ -1,0 +1,87 @@
+---
+database_name: datalake_pin_core_clean
+table_name: assignment_supervisor
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores the supervisors associated with a specific assignment, supporting different supervisory relationships. For example, a person might have a functional manager (direct line manager) and a project manager (leader for a specific project).
+columns:
+  id_action_occurrence:
+    description: Foreign key referencing the action occurrence.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.action_occurrence_id
+  id_assignment:
+    description: Unique identifier of an assignment. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.assignment_id
+  id_assignment_supervisor:
+    description: System-generated unique identifier for the assignment supervisor record. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.assignment_supervisor_id
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.business_group_id
+  id_person:
+    description: Identifier of the worker who has supervisors recorded in this table. Derived from the ASSIGNMENT_ID.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.person_id
+  id_manager_assignment:
+    description: Identifier of the supervisor's assignment. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.manager_assignment_id
+  id_manager:
+    description: Identifier of the supervisor. Foreign key. Derived from the manager's assignment record.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.manager_id
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.last_updated_by
+  manager_type:
+    description: Type of supervisor role within the organizational structure.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.manager_type
+  is_primary:
+    description: Indicates if this supervisor is the main supervisor (Yes/No).
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.primary_flag
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.object_version_number
+  dt_freeze_started:
+    description: Start date for deferred data freeze, defaults to the end of time.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.freeze_start_date
+  dt_freeze_ended:
+    description: End date for deferred data freeze, defaults to the beginning of time.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.freeze_until_date
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.day

@@ -119,10 +119,6 @@ columns:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
     description: Number of offers sent to the house listing in the referenced date.
-  rent_flows:
-    lineage:
-      - datalake_rental_historical_follow_up.house_listings_daily_info.rent_flows
-    description: Number of rent flows of the house listing in the referenced date.
   country_code:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.country_code

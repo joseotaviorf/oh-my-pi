@@ -1,0 +1,55 @@
+---
+database_name: datalake_pin_hr_review_clean
+table_name: meeting_talent_pool
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores the talent pools associated with talent review meetings.
+columns:
+  id_business_group:
+    description: Foreign key to the organization unit.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.business_group_id
+  id_meeting:
+    description: Foreign key to the talent review meeting.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.meeting_id
+  id_meeting_talent_pool:
+    description: System-generated unique identifier for the meeting talent pool. Primary key.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.meeting_talentpool_id
+  id_pool:
+    description: Identifier of the talent pool linked to the meeting.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.pool_id
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.last_updated_by
+  object_version_number:
+    description: Used to implement optimistic locking. Incremented on each update.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.object_version_number
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.creation_date
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_talentpools.day

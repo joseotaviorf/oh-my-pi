@@ -19,3 +19,7 @@ columns:
     description: The timestamp in which a direct offer was made.
   ts_offer_submitted:
     description: The timestamp in which a submitted offer was made.
+  ts_offer_approved:
+    description: The timestamp in which an offer was accepted.
+  ts_rent_flow_latest_event:
+    description: The latest event in the rent flow.

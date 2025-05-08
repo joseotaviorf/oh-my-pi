@@ -1,0 +1,4 @@
+# These are sample values just to test the functionality of the DAG
+expected_times_to_finish:
+  airflow.mediator: "12:00"
+  bietlejuice.skip_list_cleaner: "13:00"

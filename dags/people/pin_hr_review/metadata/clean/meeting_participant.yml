@@ -1,0 +1,57 @@
+---
+database_name: datalake_pin_hr_review_clean
+table_name: meeting_participant
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This meeting table includes the list of participants for the meeting.
+columns:
+  id_business_group:
+    description: Foreign key to hr_all_organization_units.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.business_group_id
+  id_participant_person:
+    description: Person identifier of the participant.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.participant_person_id
+  id_meeting:
+    description: Foreign key to hrr_meetings.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.meeting_id
+  data_submission_status_code:
+    description: Indicates the status of the participants' data submission for the meeting.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.data_submission_status_code
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.last_updated_by
+  object_version_number:
+    description: Used to implement optimistic locking. This number is incremented every time that the row is updated. The number is compared at the start and end of a transaction to detect whether another session has updated the row since it was queried.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.object_version_number
+  ts_created:
+    description: Timestamp of the creation of the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.creation_date
+  ts_updated:
+    description: Timestamp of the last update of the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.last_update_date
+  ts_load:
+    description: Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion produced using the now() function. This value changes if the data undergoes reprocessing.
+  year:
+    description: Represents the year component extracted from the 'ts_updated' column. Useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.year
+  month:
+    description: Represents the month component extracted from the 'ts_updated' column. Useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.month
+  day:
+    description: Represents the day component extracted from the 'ts_updated' column. Useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_participants.day

@@ -816,6 +816,9 @@ bietlejuice.reverse_ccv_price_report_load:
 bietlejuice.reverse_demand_score_access:
   add:
     - bietlejuice.reverse_demand_score:load-reverse-listing-demand-score
+bietlejuice.reverse_demand_classifieds_ranking_access:
+  add:
+    - bietlejuice.reverse_demand_classifieds_ranking:load-reverse-house-classified-ranking-score     
 bietlejuice.reverse_dsat_report_access:
   add:
     - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report

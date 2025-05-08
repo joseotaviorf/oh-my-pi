@@ -1,20 +1,22 @@
 WITH
-extract_array_credit_card_fee AS (
+extract_credit_card_payload AS (
   SELECT
     id,
+    GET_JSON_OBJECT(payload, "$.qtdParcelas") + 1 AS total_installments,
     GET_JSON_OBJECT(payload, "$.debts[*].debts_fee_amount") AS debt_array_string
   FROM datalake_trato_feito_clean.negotiation
 ),
-extract_total_credit_card_fee AS (
+extract_credit_card_data AS (
     SELECT
         id,
+        total_installments,
         ROUND(
             AGGREGATE(
                 SPLIT(REGEXP_REPLACE(debt_array_string, r"\[|\]",""), ","),
                 CAST(0 AS double),  -- Accumulator has to be of the same type as the input
                 (value, acc) -> value + acc)
         ,2) credit_card_fee_amount
-    FROM extract_array_credit_card_fee
+    FROM extract_credit_card_payload
 ),
 cte_recurrent AS (
     SELECT
@@ -94,7 +96,7 @@ SELECT
     END AS consultancy_name,
     n.status,
     i.promisse_payment_method,
-    i.qt_installments,
+    COALESCE(cc.total_installments, i.qt_installments) AS qt_installments,
     i.qt_installments_paid,
     i.total_expected_amount,
     i.down_payment_amount,
@@ -169,7 +171,7 @@ LEFT JOIN
         ON n.`id` = crn.id_negotiation
 LEFT JOIN installments AS i
     ON n.`id` = i.id_negotiation
-LEFT JOIN extract_total_credit_card_fee AS cc
+LEFT JOIN extract_credit_card_data AS cc
     ON cc.`id` = n.`id`
 LEFT JOIN datalake_trato_feito_clean.collector AS c
     ON n.id_collector = c.id

@@ -1,0 +1,83 @@
+---
+database_name: datalake_pin_core_clean
+table_name: person
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Core table serving as a non-date-tracked parent for all tables within the Person Model.
+columns:
+  id_person:
+    description: System-generated unique identifier for the person. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_persons.person_id
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_persons.business_group_id
+  category_code:
+    description: Code for the extensible flexfield category.
+    lineage:
+      - datalake_pin_core_raw.per_persons.category_code
+  correspondence_language:
+    description: Language preference for communication with the person.
+    lineage:
+      - datalake_pin_core_raw.per_persons.correspondence_language
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_persons.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_persons.last_updated_by
+  user_guid:
+    description: No longer in use.
+    lineage:
+      - datalake_pin_core_raw.per_persons.user_guid
+  country_of_birth:
+    description: Country where the person was born.
+    lineage:
+      - datalake_pin_core_raw.per_persons.country_of_birth
+  region_of_birth:
+    description: Region within the birth country.
+    lineage:
+      - datalake_pin_core_raw.per_persons.region_of_birth
+  town_of_birth:
+    description: City or town within the birth region.
+    lineage:
+      - datalake_pin_core_raw.per_persons.town_of_birth
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_persons.object_version_number
+  dt_of_birth:
+    description: Date when the person was born.
+    lineage:
+      - datalake_pin_core_raw.per_persons.date_of_birth
+  date_of_death:
+    description: Date when the person died.
+    lineage:
+      - datalake_pin_core_raw.per_persons.date_of_death
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_persons.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_persons.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_persons.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_persons.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_persons.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_persons.day

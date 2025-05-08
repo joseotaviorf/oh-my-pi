@@ -35,6 +35,9 @@ table_block_list:
   - ItemVistoria_Checklist_AUD
   - ConservationAssessment
   - ConservationItem
+  - ConservationItemFunctional
+  - ConservationItemStatus
+  - ConservationItemRoom
   - ContratoFull_AUD
   - UserPreferences_AUD
   - NotificacaoAgendamento
@@ -67,6 +70,8 @@ table_block_list:
   - Imovel_garantias
   - ContactSituation
   - OnboardingContaConsumo
+  - JobFotografo_AUD
+  - JobFotografo
   - JobFotografo_PreferenciaPeriodo_AUD
   - TenantServiceFeeHouse_AUD
   - ContractNegotiation_AUD

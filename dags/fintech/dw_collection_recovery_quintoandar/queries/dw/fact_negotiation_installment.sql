@@ -45,7 +45,7 @@ trato_feito_installment AS (
     DATE(i.ts_created) AS dt_creation,
     i.dt_due,
     DATE(i.ts_paid) AS dt_paid,
-    IF(i.status = "canceled", DATE(i.ts_updated), NULL) AS dt_canceled,
+    i.dt_canceled,
     n.source
   FROM
       datalake_debt_recovery.installment AS i
@@ -109,7 +109,7 @@ tf_all_fields_fix AS (
 ),
 cyber_installments AS (
   SELECT DISTINCT
-    CONCAT(CAST(id_negotiation AS BIGINT), LPAD(INT(installment_number), 3, '0')) AS id_negotiation_installment,
+    id_agreement_installment AS id_negotiation_installment,
     id_contract_external AS id_contract,
     CAST(id_negotiation AS BIGINT) AS id_negotiation_external,
     installment_number,
@@ -203,7 +203,7 @@ all_installments AS (
     COALESCE(tf.dt_due, ci.dt_due, ri.dt_due) AS dt_due,
     COALESCE(tf.dt_paid, ci.dt_paid, ri.dt_paid) AS dt_paid,
     COALESCE(tf.dt_canceled, ci.dt_canceled, ri.dt_canceled) AS dt_canceled,
-    COALESCE(tf.source, ci.source, ri.source) AS source
+    CONCAT_WS(" | ", tf.source, ci.source, ri.source) AS source
   FROM tf_all_fields_fix AS tf
   FULL OUTER JOIN cyber_installments AS ci
     ON tf.id_negotiation_installment = ci.id_negotiation_installment
@@ -233,6 +233,7 @@ SELECT DISTINCT
     CONCAT(COALESCE(i.id_contract, 0), CAST(i.id_negotiation_external AS STRING)) AS sk_negotiation,
     i.id_contract AS sk_contract,
     CAST(i.id_negotiation_external AS STRING) AS id_negotiation,
+    i.id_negotiation_installment AS id_installment,
     i.id_installment_trato_feito,
     CAST(i.id_invoice_extra AS BIGINT) AS id_invoice_extra,
     i.installment_number,
@@ -258,7 +259,7 @@ SELECT DISTINCT
     i.installment_lawyers_fee,
     i.main_amount + i.debts_fee_amount AS debt_amount,
     CASE
-        WHEN source IN ("Trato Feito - Recupera", "Trato Feito - Cyber (Migração)", "Recupera")
+        WHEN source LIKE "%Recupera%" OR source LIKE "%Migração%"
           THEN (i.main_amount + i.debts_fee_amount) - i.amount_to_pay
       ELSE i.discount_amount
     END AS discount_amount,
@@ -274,7 +275,7 @@ SELECT DISTINCT
       WHEN i.installment_status IN ('pending', 'registered') AND nx.paid_amount IS NOT NULL THEN nx.dt_paid -- Only use nexxera if others call it 'registered'
       ELSE COALESCE(DATE(ri.ts_paid), i.dt_paid)
     END AS dt_paid,
-    i.dt_canceled
+    IF(i.installment_status IN ('canceled','expired'), i.dt_canceled, NULL) AS dt_canceled
 FROM
     all_installments AS i
 LEFT JOIN
@@ -289,6 +290,7 @@ SELECT DISTINCT
     sk_negotiation,
     sk_contract,
     id_negotiation,
+    id_installment,
     id_installment_trato_feito,
     id_invoice_extra,
     installment_number,

@@ -1,0 +1,316 @@
+---
+database_name: datalake_pin_hr_review_clean
+table_name: dashboard_template_base
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Templates for Talent Review Dashboards.
+columns:
+  id_business_group:
+    description: Foreign key to HR_ALL_ORGANIZATION_UNITS.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.business_group_id
+  id_dashboard_template:
+    description: Primary Key of Dashboard Templates.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.dashboard_tmpl_id
+  id_set:
+    description: Identifies a set of reference data shared across business units.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.set_id
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.updated_by
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.object_version_number
+  is_age_overlay_visible:
+    description: Indicates if age analytics can be displayed.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.display_age
+    categories:
+      true: Age overlay is visible.
+      false: Age overlay is not visible.
+  is_detail_comments_visible:
+    description: Indicates if comments can be displayed in the detail section.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.display_comments
+    categories:
+      true: Detail comments are visible.
+      false: Detail comments are not visible.
+  is_ethnicity_visible:
+    description: Indicates if ethnicity analytics can be displayed.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.display_ethnicity
+    categories:
+      true: Ethnicity overlay is visible.
+      false: Ethnicity overlay is not visible.
+  is_gender_visible:
+    description: Indicates if gender analytics can be displayed.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.display_gender
+    categories:
+      true: Gender overlay is visible.
+      false: Gender overlay is not visible.
+  is_impact_of_loss_visible:
+    description: Indicates if Impact of Loss analytics can be displayed.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.display_impact_of_loss
+    categories:
+      true: Impact of Loss overlay is visible.
+      false: Impact of Loss overlay is not visible.
+  is_mobility_visible:
+    description: Indicates if mobility analytics can be displayed.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.display_mobility
+    categories:
+      true: Mobility overlay is visible.
+      false: Mobility overlay is not visible.
+  is_religious_affiliation_overlay_visible:
+    description: Indicates if religious affiliation analytics can be displayed.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.display_religious_affltn
+    categories:
+      true: Religious affiliation overlay is visible.
+      false: Religious affiliation overlay is not visible.
+  is_risk_of_loss_visible:
+    description: Indicates if Risk of Loss analytics can be displayed.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.display_risk_of_loss
+    categories:
+      true: Risk of Loss overlay is visible.
+      false: Risk of Loss overlay is not visible.
+  is_business_unit_filter_visible:
+    description: Indicates if Business Unit can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_businessunit
+    categories:
+      true: Business Unit filter is visible.
+      false: Business Unit filter is not visible.
+  is_competency_filter_enabled:
+    description: Indicates if Competency can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_competency
+    categories:
+      true: Competency filter is enabled.
+      false: Competency filter is disabled.
+  is_department_filter_enabled:
+    description: Indicates if Department can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_department
+    categories:
+      true: Department filter is enabled.
+      false: Department filter is disabled.
+  is_job_grade_filter_enabled:
+    description: Indicates if Job Grade can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_jobgrade
+    categories:
+      true: Job Grade filter is enabled.
+      false: Job Grade filter is disabled.
+  is_job_role_assignment_filter_enabled:
+    description: Indicates if Job Role/Assignment can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_jobrole_assgn
+    categories:
+      true: Job Role/Assignment filter is enabled.
+      false: Job Role/Assignment filter is disabled.
+  is_job_family_filter_enabled:
+    description: Indicates if Job Family can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_job_family
+    categories:
+      true: Job Family filter is enabled.
+      false: Job Family filter is disabled.
+  is_job_function_filter_enabled:
+    description: Indicates if Job Function can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_job_function
+    categories:
+      true: Job Function filter is enabled.
+      false: Job Function filter is disabled.
+  is_level_filter_enabled:
+    description: Indicates if Level can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_level
+    categories:
+      true: Level filter is enabled.
+      false: Level filter is disabled.
+  is_location_filter_enabled:
+    description: Indicates if Location can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_location
+    categories:
+      true: Location filter is enabled.
+      false: Location filter is disabled.
+  is_management_level_filter_enabled:
+    description: Indicates if Management Level can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_mgmt_level
+    categories:
+      true: Management Level filter is enabled.
+      false: Management Level filter is disabled.
+  is_organization_hierarchy_filter_enabled:
+    description: Indicates if Organization Hierarchy can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_org_hierarchy
+    categories:
+      true: Organization Hierarchy filter is enabled.
+      false: Organization Hierarchy filter is disabled.
+  is_proficiency_filter_enabled:
+    description: Indicates if Proficiency can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_proficiency
+    categories:
+      true: Proficiency filter is enabled.
+      false: Proficiency filter is disabled.
+  is_reviewer_participant_filter_enabled:
+    description: "Filter workers for those who are either a reviewer or participant in a talent review meeting."
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_revwr_partcpnt
+    categories:
+      true: Reviewer/Participant filter is enabled.
+      false: Reviewer/Participant filter is disabled.
+  participant_filter_enabled:
+    description: Filter workers who are reviewers or participants in a talent review.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_revwr_partcpnt
+    categories:
+      true: Reviewer/Participant filter is enabled.
+      false: Reviewer/Participant filter is disabled.
+  is_succession_plan_filter_enabled:
+    description: Indicates if Succession Plan can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_succession_plan
+    categories:
+      true: Succession Plan filter is enabled.
+      false: Succession Plan filter is disabled.
+  is_talent_pool_filter_enabled:
+    description: Indicates if Talent Pool can be a filter option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.filter_talent_pool
+    categories:
+      true: Talent Pool filter is enabled.
+      false: Talent Pool filter is disabled.
+  is_job_role_assignment_color_enabled:
+    description: Indicates if Job Role/Assignment can be a color option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.color_jobrole_assgn
+    categories:
+      true: Job Role/Assignment color is enabled.
+      false: Job Role/Assignment color is disabled.
+  is_location_color_enabled:
+    description: Indicates if Location can be a color option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.color_location
+    categories:
+      true: Location color is enabled.
+      false: Location color is disabled.
+  is_organization_hierarchy_color_enabled:
+    description: Indicates if Organization Hierarchy can be a color option.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.color_org_hierarchy
+    categories:
+      true: Organization Hierarchy color is enabled.
+      false: Organization Hierarchy color is disabled.
+  is_max_marker_allowed:
+    description: Maximum number of markers to display in the box chart.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.max_markers_allowed
+  is_comparison_used:
+    description: Indicates if dashboard users can use the Compare action.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.use_compare_flag
+    categories:
+      true: Compare action is enabled.
+      false: Compare action is disabled.
+  is_goal_creation_enabled:
+    description: Indicates if dashboard users can assign goals.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.create_goals_flag
+    categories:
+      true: Goal creation is enabled.
+      false: Goal creation is disabled.
+  is_holding_area_used:
+    description: Indicates if the dashboard can have a holding area.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.use_holding_area_flag
+    categories:
+      true: Holding area is enabled.
+      false: Holding area is disabled.
+  is_notes_used:
+    description: Indicates if dashboard users can create notes for participants.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.use_notes_flag
+    categories:
+      true: Notes are enabled.
+      false: Notes are disabled.
+  is_org_chart_used:
+    description: Indicates if dashboard users can use the Org chart action.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.use_orgchart_flag
+    categories:
+      true: Org chart is enabled.
+      false: Org chart is disabled.
+  is_potential_assessment_used:
+    description: Indicates if Potential Assessment will be used.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.use_pot_assess_flag
+    categories:
+      true: Potential Assessment is used.
+      false: Potential Assessment is not used.
+  is_task_usage_enabled:
+    description: Indicates if dashboard users can create tasks for participants.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.use_tasks_flag
+    categories:
+      true: Task creation is enabled.
+      false: Task creation is disabled.
+  is_matrix_management_included:
+    description: Indicates if matrix management will be used.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.include_matrix_mgmt
+    categories:
+      true: Matrix management is included.
+      false: Matrix management is not included.
+  is_succession_plan_inclusion_enabled:
+    description: Indicates if succession plans can be associated with meetings.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.include_succession_plans
+    categories:
+      true: Succession plan inclusion is enabled.
+      false: Succession plan inclusion is disabled.
+  is_talent_pool_inclusion_enabled:
+    description: Indicates if talent pools can be associated with meetings.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.include_talent_pools
+    categories:
+      true: Talent pool inclusion is enabled.
+      false: Talent pool inclusion is disabled.
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.creation_date
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_b.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_meeting_facilitators.day

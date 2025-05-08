@@ -13,8 +13,8 @@ workflow:
   load_spark_job: load_cyber_raw
   custom_schema: cyber
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -4), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 2), 'load_end_date') }}"
   default_extraction_type: full
   spark_job_arguments:
     - "{environment}"

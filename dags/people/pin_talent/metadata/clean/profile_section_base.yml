@@ -1,0 +1,63 @@
+---
+database_name: datalake_pin_talent_clean
+table_name: profile_section_base
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores section-level information for person and model profiles, linking profiles to specific sections and content types.
+columns:
+  id_business_group:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.business_group_id
+  id_content_type:
+    description: Foreign key referencing the content types table.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.content_type_id
+  id_profile:
+    description: Foreign key referencing the profiles table.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.profile_id
+  id_profile_section:
+    description: Unique identifier for the profile section.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.profile_section_id
+  id_section:
+    description: Foreign key referencing the sections table.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.section_id
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.updated_by
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.object_version_number
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.creation_date
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_sections_b.day

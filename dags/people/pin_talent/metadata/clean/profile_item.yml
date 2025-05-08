@@ -1,0 +1,105 @@
+---
+database_name: datalake_pin_talent_clean
+table_name: profile_item
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Contains individual elements of a talent profile, such as competencies and objectives, along with associated details like ratings, comments, and validity periods. It also includes flexible attributes.
+columns:
+  id_business_group:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.business_group_id
+  id_content_type:
+    description: Foreign key referencing the type of content for this item.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.content_type_id
+  id_profile:
+    description: Foreign key referencing the talent profile this item belongs to.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.profile_id
+  id_profile_item:
+    description: System-generated unique identifier for the profile item. Primary key.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.profile_item_id
+  id_qualifier:
+    description: Qualifier for this specific profile item instance.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.qualifier_id1
+  id_rating_level:
+    description: Rating level for this item, based on the selected rating model.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.rating_level_id1
+  id_rating_model:
+    description: Rating model used for this profile item.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.rating_model_id1
+  id_section:
+    description: Foreign key referencing the section this item belongs to in the profile type.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.section_id
+  id_content_item:
+    description: Foreign key referencing the specific content item (e.g., skill, competency).
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.content_item_id
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.updated_by
+  comments:
+    description: Comments related to this profile item.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.item_text30_1
+  alternative_source_key_1:
+    description: Alternative source key for integration purposes.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.source_key1
+  alternative_source_key_2:
+    description: Alternative source key for integration purposes.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.source_key2
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.object_version_number
+  decimal_field:
+    description: Decimal value associated with the profile item.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.item_decimal_1
+  number_field:
+    description: Numerical value associated with the profile item.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.item_number_1
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.creation_date
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.last_update_date
+  ts_started:
+    description: Start date for the validity of this profile item.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.date_from
+  ts_ended:
+    description: End date for the validity of this profile item.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.date_to
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.day

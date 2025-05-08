@@ -113,5 +113,8 @@ LEFT JOIN datalake_cyber_clean.logs_valid_result_code AS lvr
 LEFT JOIN map_type_occurrence AS mto
   ON mto.action_code = l.action
     AND mto.result_code = l.result
-    AND mto.complement_code = l.complement
+    AND (
+      (mto.complement_code IS NULL AND l.complement IS NULL)
+        OR mto.complement_code = l.complement
+    )
 QUALIFY ROW_NUMBER() OVER(PARTITION BY l.id_contract, l.contract_group, UPPER(l.id_user), l.action, l.result, l.complement, l.comment, l.ts_activity ORDER BY l.ts_activity) = 1

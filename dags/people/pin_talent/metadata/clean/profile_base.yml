@@ -1,0 +1,81 @@
+---
+database_name: datalake_pin_talent_clean
+table_name: profile_base
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores core information for both person and model profiles, including identifiers, status, usage type, and timestamps.
+columns:
+  id_business_group:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.business_group_id
+  id_person:
+    description: Foreign key referencing the person associated with the profile.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.person_id
+  id_profile:
+    description: System-generated unique identifier for the profile. Primary key.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.profile_id
+  id_profile_type:
+    description: Foreign key referencing the type of profile.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.profile_type_id
+  id_party:
+    description: Foreign key referencing the party.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.party_id
+  profile_code:
+    description: Unique code identifying the profile.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.profile_code
+  profile_status_code:
+    description: Status code indicating if the profile is active or inactive.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.profile_status_code
+    categories:
+      A: Profile is currently active.
+      I: Profile is currently inactive.
+  profile_usage_code:
+    description: Code indicating if the profile is used for a person or as a model.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.profile_usage_code
+    categories:
+      P: Profile associated with an individual.
+      M: Profile used as a template or model.
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.updated_by
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.object_version_number
+  ts_created:
+    description: Timestamp of when the row was created.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.creation_date
+  ts_updated:
+    description: Timestamp of when the row was last updated.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profiles_b.day

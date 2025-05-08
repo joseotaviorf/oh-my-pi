@@ -1,0 +1,80 @@
+---
+database_name: datalake_pin_questionnaires_clean
+table_name: questionnaire_response
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Contains participant's attempts at responding to a questionnaire. In some cases, a participant may have more than one attempt.
+columns:
+  id_business_group:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.business_group_id
+  id_questionnaire_participant:
+    description: Yes, identifier of the questionnaire participant.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.qstnr_participant_id
+  id_questionnaire_response:
+    description: Unique identifier for a questionnaire response. System-generated primary key.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.qstnr_response_id
+  status:
+    description: Yes, identifier of the status of the participant's response.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.status
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.last_updated_by
+  is_lastest_attempt:
+    description: Yes, identifies the latest submitted attempt by the participant.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.latest_attempt_flag
+    categories:
+      true: This is the latest attempt.
+      false: This is not the latest attempt.
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.object_version_number
+  total_score:
+    description: Total score for the questionnaire.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.total_score
+  attempt_number:
+    description: Identifies the attempt number of this response from the participant.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.attempt_num
+  questionnaire_version_number:
+    description: Identifies the questionnaire version number.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.qstnr_version_num
+  dt_submitted:
+    description: Identifies the date and time the participant submitted this response.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.submitted_date_time
+  ts_created:
+    description: Timestamp of the creation of the row.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.creation_date
+  ts_updated:
+    description: Timestamp of the last update of the row.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_responses.day

@@ -1,0 +1,43 @@
+dag:
+  name: emlio
+  schedule_start_date: 2023, 4, 3
+  schedule_interval: 30 0 * * *
+  owner: MLOps
+  documentation:
+    dag_purpose: Responsible for loading machine learning models inputs and associated outputs into our Data Lake.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_emlio_raw
+  spark_job_arguments:
+  - "{environment}"
+  - "{bucket}"
+  - "{schema}"
+  - "{partitions}"
+  - "{{ ds }}"
+  execution_timeout_hours: 5
+  default_extraction_type: incremental
+  tables_customization:
+    emlio_logs:
+      raw_partitions:
+        - year
+        - month
+        - day
+      clean_partitions:
+        - id_service
+        - year
+        - month
+        - day
+
+cluster:
+  type: databricks_12_2_max_io-general_cluster
+  access_control_list:
+    group_name: mlops
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

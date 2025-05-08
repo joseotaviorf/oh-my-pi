@@ -1,0 +1,36 @@
+database_name: datalake_greenseer_test_clean
+table_name: session
+columns:
+  id_session:
+    lineage:
+      - datalake_greenseer_test_raw.session.session_id
+  id_pipeline:
+    lineage:
+      - datalake_greenseer_test_raw.session.pipeline_id
+  language_code:
+    lineage:
+      - datalake_greenseer_test_raw.session.language_code
+  memory:
+    lineage:
+      - datalake_greenseer_test_raw.session.memory
+  current_state:
+    lineage:
+      - datalake_greenseer_test_raw.session.current_state
+  ts_started:
+    lineage:
+      - datalake_greenseer_test_raw.session.beginning_timestamp
+  ts_ended:
+    lineage:
+      - datalake_greenseer_test_raw.session.end_timestamp
+  ts_updated:
+    lineage:
+      - datalake_greenseer_test_raw.session.update_timestamp
+  year:
+    lineage:
+      - datalake_greenseer_test_raw.session.year
+  month:
+    lineage:
+      - datalake_greenseer_test_raw.session.month
+  day:
+    lineage:
+      - datalake_greenseer_test_raw.session.day

@@ -139,7 +139,7 @@ union_promisses_agreements AS (
     a.payment_method,
     i.promisse_payment_method,
     a.exception,
-    a.status,
+    COALESCE(a.status, IF(c.campaign_status = "Vencida", "Cancelado", NULL)) AS status,
     a.description_broken_agreement,
     COALESCE(i.number_of_installments, a.number_of_installments, c.total_installments) AS number_of_installments,
     i.paid_installments,
@@ -168,10 +168,8 @@ union_promisses_agreements AS (
     i.dt_paid_all,
     i.dt_expected_end,
     CASE
-      WHEN a.status = "Cancelado" THEN a.ts_status_update
+      WHEN a.status = "Cancelado" THEN DATE(COALESCE(a.ts_agreement_breach, a.ts_canceled, a.ts_status_update))
       WHEN c.campaign_status = "Vencida" THEN DATE(c.ts_due_boletagem)
-      WHEN a.ts_agreement_breach IS NOT NULL THEN DATE(a.ts_agreement_breach)
-      WHEN a.ts_canceled IS NOT NULL THEN DATE(a.ts_canceled)
     END AS dt_cancellation
   FROM datalake_cyber_clean.agreements AS a
   LEFT JOIN datalake_cyber_clean.contracts_agreements AS ca

@@ -1,0 +1,74 @@
+---
+database_name: datalake_pin_core_clean
+table_name: job_family
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Defines job families, which group related jobs that may not share all the same attributes. These groupings are useful for reporting purposes.
+columns:
+  id_business_group:
+    description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.business_group_id
+  id_action_occurrence:
+    description: Foreign key referencing the action occurrence.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.action_occurrence_id
+  id_job_family:
+    description: System-generated unique identifier for the job family. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.job_family_id
+  job_family_code:
+    description: Code identifying the job family.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.job_family_code
+  created_by:
+    description: User who created the record.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.created_by
+  updated_by:
+    description: User who last updated the record.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.last_updated_by
+  active_status:
+    description: Indicates whether the job family is currently active.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.active_status
+    categories:
+      A: Job family is active.
+      I: Job family is inactive.
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.object_version_number
+  dt_effective_ended:
+    description: End date of the period for which this job family definition is valid.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.effective_end_date
+  dt_effective_started:
+    description: Start date of the period for which this job family definition is valid.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.effective_start_date
+  ts_created:
+    description: Timestamp of when the record was created.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.creation_date
+  ts_updated:
+    description: Timestamp of when the record was last updated.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for data partitioning and filtering.
+    lineage:
+      - datalake_pin_core_raw.per_job_family_f.day

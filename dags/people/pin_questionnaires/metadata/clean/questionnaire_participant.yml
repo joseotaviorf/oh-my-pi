@@ -1,0 +1,65 @@
+---
+database_name: datalake_pin_questionnaires_clean
+table_name: questionnaire_participant
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: A list of participants who have responded to a questionnaire.
+columns:
+  id_business_group:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.business_group_id
+  id_participant:
+    description: Identifier of the participant.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.participant_id
+  id_questionnaire_participant:
+    description: Unique identifier for a questionnaire participant. System-generated primary key.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.qstnr_participant_id
+  id_questionnaire:
+    description: Identifier of the questionnaire.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.questionnaire_id
+  id_subject:
+    description: Identifier of the subject of the questionnaire.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.subject_id
+  id_subscriber:
+    description: Identifier of the subscriber (if applicable).
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.subscriber_id
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.last_updated_by
+  status:
+    description: Status of the questionnaire participant.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.status
+  ts_created:
+    description: Timestamp of the creation of the row.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.creation_date
+  ts_updated:
+    description: Timestamp of the last update of the row.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_questionnaires_raw.hrq_qstnr_participants.day
