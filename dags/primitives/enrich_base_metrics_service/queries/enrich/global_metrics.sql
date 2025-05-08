@@ -43,58 +43,6 @@ FROM
            day
 ),
 
------------------
--- Sale Flow
-
-sale_flow AS (
-    SELECT
-        id_buyer AS id_user,
-        id_house,
-        MIN(ts_first_visit_completed) AS ts_visit_completed,
-        MIN(ts_first_offer_submitted) AS ts_offer,
-        MIN(dt_sale_agreement_signed) AS ts_contract_signed
-    FROM datalake_sale_flows.sale_flow
-    WHERE
-        id_buyer IS NOT NULL
-        AND id_house IS NOT NULL
-        AND
-            (
-             ts_first_visit_completed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-             OR ts_first_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-             OR dt_sale_agreement_signed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-            )
-    GROUP BY
-        id_buyer,
-        id_house
-),
-
------------------
--- Rent Flow
-
-rent_flow AS (
-    SELECT
-        id_tenant_prospect as id_user,
-        id_house,
-        MIN(ts_visit_completed) AS ts_visit_completed,
-        MIN(coalesce(ts_direct_offer_submitted, ts_offer_submitted)) AS ts_offer,
-        MIN(ts_contract_signed) AS ts_contract_signed
-    FROM
-        datalake_rent_flows.rent_flows
-    WHERE
-        id_tenant_prospect IS NOT NULL
-        AND id_house IS NOT NULL
-        AND
-            (
-             ts_visit_completed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-             OR ts_direct_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-             OR ts_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-             OR ts_contract_signed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-            )
-    GROUP BY
-        id_tenant_prospect,
-        id_house
-),
-
 house_cities AS (
 SELECT id AS id_house,
        Last(city) AS city
@@ -130,8 +78,12 @@ global_user_metrics AS (
            to_json(
               named_struct(
                 'search', 1,
-                'global_offer', CASE WHEN COALESCE(rent_flow.ts_offer, sale_flow.ts_offer) >= all_users.date THEN 1 ELSE 0 END,
+                'global_visit_booked',CASE WHEN COALESCE(rent_flow.ts_visit_booked, sale_flow.ts_visit_booked) >= all_users.date THEN 1 ELSE 0 END,
                 'global_visit_completed', CASE WHEN COALESCE(rent_flow.ts_visit_completed, sale_flow.ts_visit_completed) >= all_users.date THEN 1 ELSE 0 END,
+                'global_offer', CASE WHEN COALESCE(rent_flow.ts_offer, sale_flow.ts_offer) >= all_users.date THEN 1 ELSE 0 END,
+                'global_direct_offer', CASE WHEN rent_flow.ts_direct_offer >= all_users.date THEN 1 ELSE 0 END,
+                'global_submitted_offer', CASE WHEN rent_flow.ts_offer_submitted >= all_users.date THEN 1 ELSE 0 END,
+                'global_offer_approved', CASE WHEN COALESCE(rent_flow.ts_offer_approved, sale_flow.ts_offer_approved) >= all_users.date THEN 1 ELSE 0 END,
                 'global_contract_signed', CASE WHEN COALESCE(rent_flow.ts_contract_signed, sale_flow.ts_contract_signed) >= all_users.date THEN 1 ELSE 0 END
               )
             ) AS metrics,
@@ -140,8 +92,12 @@ global_user_metrics AS (
            to_json(
               named_struct(
                   'ts_search', all_users.min_ts_search,
-                  'ts_global_offer', COALESCE(rent_flow.ts_offer, sale_flow.ts_offer),
+                  'ts_global_visit_booked', COALESCE(rent_flow.ts_visit_booked, sale_flow.ts_visit_booked),
                   'ts_global_visit_completed', COALESCE(rent_flow.ts_visit_completed, sale_flow.ts_visit_completed),
+                  'ts_global_offer', COALESCE(rent_flow.ts_offer, sale_flow.ts_offer),
+                  'ts_global_direct_offer', rent_flow.ts_direct_offer,
+                  'ts_global_submitted_offer', rent_flow.ts_offer_submitted,
+                  'ts_global_offer_approved', COALESCE(rent_flow.ts_offer_approved, sale_flow.ts_offer_approved),
                   'ts_global_contract_signed', COALESCE(rent_flow.ts_contract_signed, sale_flow.ts_contract_signed)
               )
            ) AS timestamps,
@@ -153,20 +109,14 @@ global_user_metrics AS (
            all_users.week
 
     FROM all_users
-    LEFT JOIN rent_flow ON all_users.id_user = rent_flow.id_user
+    LEFT JOIN datalake_search.rent_flow_past_30_days as rent_flow
+                        ON all_users.id_user = rent_flow.id_user
                         AND all_users.business_context = 'rent'
-                        AND (
-                          rent_flow.ts_offer >= all_users.date
-                          OR rent_flow.ts_visit_completed >= all_users.date
-                          OR rent_flow.ts_contract_signed >= all_users.date
-                        )
-    LEFT JOIN sale_flow ON all_users.id_user = sale_flow.id_user
+                        AND ts_rent_flow_latest_event >= all_users.date
+    LEFT JOIN datalake_search.sale_flow_past_30_days as sale_flow
+                        ON all_users.id_user = sale_flow.id_user
                         AND all_users.business_context = 'sale'
-                        AND (
-                          sale_flow.ts_offer >= all_users.date
-                          OR sale_flow.ts_visit_completed >= all_users.date
-                          OR sale_flow.ts_contract_signed >= all_users.date
-                        )
+                        AND ts_sale_flow_latest_event >= all_users.date
     LEFT JOIN house_cities ON COALESCE(rent_flow.id_house, sale_flow.id_house) = house_cities.id_house
 ),
 
@@ -292,8 +242,10 @@ global_house_metrics AS (
     to_json(
             named_struct(
                 'house_published', 1,
-                'global_offer', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_global_offer') >= houses_published.date THEN 1 ELSE 0 END,
+                'global_visit_booked', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_global_visit_booked') >= houses_published.date THEN 1 ELSE 0 END,
                 'global_visit_completed', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_global_visit_completed') >= houses_published.date THEN 1 ELSE 0 END,
+                'global_offer', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_global_offer') >= houses_published.date THEN 1 ELSE 0 END,
+                'global_offer_approved', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_global_offer_approved') >= houses_published.date THEN 1 ELSE 0 END,
                 'global_contract_signed', CASE WHEN get_json_object(global_user_metrics.timestamps, '$.ts_global_contract_signed') >= houses_published.date THEN 1 ELSE 0 END
             )
     ) AS metrics,
@@ -302,8 +254,10 @@ global_house_metrics AS (
     to_json(
             named_struct(
                 'ts_house_published', houses_published.ts_house_published,
-                'ts_global_offer', get_json_object(global_user_metrics.timestamps, '$.ts_global_offer') ,
+                'ts_global_visit_booked', get_json_object(global_user_metrics.timestamps, '$.ts_global_visit_booked'),
                 'ts_global_visit_completed', get_json_object(global_user_metrics.timestamps, '$.ts_global_visit_completed'),
+                'ts_global_offer', get_json_object(global_user_metrics.timestamps, '$.ts_global_offer') ,
+                'ts_global_offer_approved', get_json_object(global_user_metrics.timestamps, '$.ts_global_offer_approved') ,
                 'ts_global_contract_signed', get_json_object(global_user_metrics.timestamps, '$.ts_global_contract_signed')
             )
     ) AS timestamps,

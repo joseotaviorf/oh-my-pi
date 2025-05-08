@@ -195,47 +195,6 @@ clicks AS (
 ),
 
 -----------------
--- Rent Flow
-
-rent_flow AS (
-    SELECT
-        id_tenant_prospect as id_user,
-        id_house,
-        MIN(ts_visit_completed) AS ts_visit_completed,
-        MIN(coalesce(ts_direct_offer_submitted, ts_offer_submitted)) AS ts_offer,
-        MIN(ts_contract_signed) AS ts_contract_signed
-    FROM
-        datalake_rent_flows.rent_flows
-    WHERE
-        ts_rent_flow_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-        AND id_tenant_prospect IS NOT NULL
-        AND id_house IS NOT NULL
-    GROUP BY
-        id_tenant_prospect,
-        id_house
-),
-
------------------
--- Sale Flow
-
-sale_flow AS (
-    SELECT
-        id_buyer AS id_user,
-        id_house,
-        MIN(ts_first_visit_completed) AS ts_visit_completed,
-        MIN(ts_first_offer_submitted) AS ts_offer,
-        MIN(dt_sale_agreement_signed) AS ts_contract_signed
-    FROM datalake_sale_flows.sale_flow
-    WHERE
-        ts_first_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-        AND id_buyer IS NOT NULL
-        AND id_house IS NOT NULL
-    GROUP BY
-        id_buyer,
-        id_house
-),
-
------------------
 --Granularity Search  House
 
 -----------------
@@ -461,8 +420,12 @@ SELECT
         named_struct(
             'search', 1,
             'click', COALESCE(clicks.click, 0),
-            'offer', CASE WHEN COALESCE(rent_flow.ts_offer, sale_flow.ts_offer) >= searches.ts_event THEN 1 ELSE 0 END,
+            'visit_booked', CASE WHEN COALESCE(rent_flow.ts_visit_booked, sale_flow.ts_visit_booked) >= searches.ts_event THEN 1 ELSE 0 END,
             'visit_completed', CASE WHEN COALESCE(rent_flow.ts_visit_completed, sale_flow.ts_visit_completed) >= searches.ts_event THEN 1 ELSE 0 END,
+            'offer', CASE WHEN COALESCE(rent_flow.ts_offer, sale_flow.ts_offer) >= searches.ts_event THEN 1 ELSE 0 END,
+            'direct_offer', CASE WHEN rent_flow.ts_direct_offer >= searches.ts_event THEN 1 ELSE 0 END,
+            'offer_submitted', CASE WHEN rent_flow.ts_offer_submitted >= searches.ts_event THEN 1 ELSE 0 END,
+            'offer_approved', CASE WHEN COALESCE(rent_flow.ts_offer_approved, sale_flow.ts_offer_approved) >= searches.ts_event THEN 1 ELSE 0 END,
             'contract_signed', CASE WHEN COALESCE(rent_flow.ts_contract_signed, sale_flow.ts_contract_signed) >= searches.ts_event THEN 1 ELSE 0 END,
             'relevant_search',
             MAX(
@@ -481,8 +444,12 @@ SELECT
         named_struct(
             'ts_search', searches.ts_event,
             'ts_house_published', exploded_houses.ts_house_published,
-            'ts_offer', COALESCE(rent_flow.ts_offer, sale_flow.ts_offer),
+            'ts_visit_booked', COALESCE(rent_flow.ts_visit_booked, sale_flow.ts_visit_booked),
             'ts_visit_completed', COALESCE(rent_flow.ts_visit_completed, sale_flow.ts_visit_completed),
+            'ts_offer', COALESCE(rent_flow.ts_offer, sale_flow.ts_offer),
+            'ts_direct_offer', rent_flow.ts_direct_offer,
+            'ts_offer_submitted', rent_flow.ts_offer_submitted,
+            'ts_offer_approved', COALESCE(rent_flow.ts_offer_approved, sale_flow.ts_offer_approved),
             'ts_contract_signed', COALESCE(rent_flow.ts_contract_signed, sale_flow.ts_contract_signed)
         )
     ) AS timestamps,
@@ -502,11 +469,11 @@ LEFT JOIN exploded_houses
 LEFT JOIN clicks
     ON searches.id_search = clicks.id_search
     AND exploded_houses.id_house = clicks.id_house
-LEFT JOIN rent_flow
+LEFT JOIN datalake_search.rent_flow_past_30_days as rent_flow
     ON exploded_houses.id_house = rent_flow.id_house
     AND searches.id_user = rent_flow.id_user
     AND searches.business_context = 'rent'
-LEFT JOIN sale_flow
+LEFT JOIN datalake_search.sale_flow_past_30_days as sale_flow
     ON exploded_houses.id_house = sale_flow.id_house
     AND searches.id_user = sale_flow.id_user
     AND searches.business_context = 'sale'

@@ -7,14 +7,14 @@ SELECT
     MIN(ts_first_booking_created) AS ts_visit_booked,
     MIN(ts_first_visit_completed) AS ts_visit_completed,
     MIN(ts_first_offer_submitted) AS ts_offer,
-    MIN(dt_sale_agreement_signed) AS ts_contract_signed,
     MIN(dt_first_offer_accepted) as ts_offer_approved,
+    MIN(dt_sale_agreement_signed) AS ts_contract_signed,
     GREATEST(
         MIN(ts_first_booking_created),
         MIN(ts_first_visit_completed),
         MIN(ts_first_offer_submitted),
+        MIN(dt_first_offer_accepted),
         MIN(dt_sale_agreement_signed),
-        MIN(dt_first_offer_accepted)
     ) AS ts_sale_flow_latest_event
 FROM datalake_sale_flows.sale_flow
 WHERE
@@ -29,9 +29,9 @@ WHERE
          OR
          ts_first_offer_submitted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
          OR
-         dt_sale_agreement_signed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
-         OR
          dt_first_offer_accepted BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+         OR
+         dt_sale_agreement_signed BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
          )
 GROUP BY
     id_buyer,
