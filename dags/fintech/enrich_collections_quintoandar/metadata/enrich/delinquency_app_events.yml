@@ -13,6 +13,12 @@ columns:
       - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.id_amplitude
       - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.id_amplitude
       - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.id_amplitude
+      - datalake_amplitude_clean.170698_overdue_invoices_page_viewed_events.id_amplitude
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_total_button_clicked_events.id_amplitude
+      - datalake_amplitude_clean.170698_pending_invoices_pay_total_cta_clicked_events.id_amplitude
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_button_clicked_events.id_amplitude
+      - datalake_amplitude_clean.170698_pending_invoices_payment_option_clicked_events.id_amplitude
+      - datalake_amplitude_clean.170698_pi_negotiation_payment_option_clicked_events.id_amplitude
   id_session:
     description: Unique session identifier for the user's app interaction.
     lineage:
@@ -21,15 +27,26 @@ columns:
       - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.id_session
       - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.id_session
       - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.id_session
+      - datalake_amplitude_clean.170698_overdue_invoices_page_viewed_events.id_session
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_total_button_clicked_events.id_session
+      - datalake_amplitude_clean.170698_pending_invoices_pay_total_cta_clicked_events.id_session
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_button_clicked_events.id_session
+      - datalake_amplitude_clean.170698_pending_invoices_payment_option_clicked_events.id_session
+      - datalake_amplitude_clean.170698_pi_negotiation_payment_option_clicked_events.id_session
   id_contract:
     description: Identifier of the contract associated with the event.
     lineage:
-      - datalake_ebdb_contract.contract_person.id_contract
-      - datalake_amplitude_clean.170698_contract_page_viewed_events.ep_id_contract
-      - datalake_amplitude_clean.170698_pending_invoices_page_viewed_events.ep_id_contract
-      - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.ep_id_contract
-      - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.ep_id_contract
-      - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.ep_id_contract
+      - datalake_amplitude_clean.170698_contract_page_viewed_events.id_contract
+      - datalake_amplitude_clean.170698_pending_invoices_page_viewed_events.id_contract
+      - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.id_contract
+      - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.id_contract
+      - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.id_contract
+      - datalake_amplitude_clean.170698_overdue_invoices_page_viewed_events.id_contract
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_total_button_clicked_events.id_contract
+      - datalake_amplitude_clean.170698_pending_invoices_pay_total_cta_clicked_events.id_contract
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_button_clicked_events.id_contract
+      - datalake_amplitude_clean.170698_pending_invoices_payment_option_clicked_events.id_contract
+      - datalake_amplitude_clean.170698_pi_negotiation_payment_option_clicked_events.id_contract
   id_user:
     description: Unique user identifier
     lineage:
@@ -38,29 +55,54 @@ columns:
       - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.id_user
       - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.id_user
       - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.id_user
+      - datalake_amplitude_clean.170698_overdue_invoices_page_viewed_events.id_user
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_total_button_clicked_events.id_user
+      - datalake_amplitude_clean.170698_pending_invoices_pay_total_cta_clicked_events.id_user
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_button_clicked_events.id_user
+      - datalake_amplitude_clean.170698_pending_invoices_payment_option_clicked_events.id_user
+      - datalake_amplitude_clean.170698_pi_negotiation_payment_option_clicked_events.id_user
   id_invoice:
     description: Identifier of the invoice associated with the event, if applicable.
     lineage:
+      - datalake_amplitude_clean.170698_contract_page_viewed_events.ep_id_invoice
       - datalake_amplitude_clean.170698_pending_invoices_page_viewed_events.ep_id_invoice
       - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.ep_id_invoice
       - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.ep_id_invoice
       - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.ep_id_invoice
-  device_brand:
-    description: Brand of the device used during the event.
+      - datalake_amplitude_clean.170698_overdue_invoices_page_viewed_events.ep_id_invoice
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_total_button_clicked_events.ep_id_invoice
+      - datalake_amplitude_clean.170698_pending_invoices_pay_total_cta_clicked_events.ep_id_invoice
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_button_clicked_events.ep_id_invoice
+      - datalake_amplitude_clean.170698_pending_invoices_payment_option_clicked_events.ep_id_invoice
+      - datalake_amplitude_clean.170698_pi_negotiation_payment_option_clicked_events.ep_id_invoice
+  device_family:
+    description: Family group of the device used during the event.
     lineage:
-      - datalake_amplitude_clean.170698_contract_page_viewed_events.device_brand
-      - datalake_amplitude_clean.170698_pending_invoices_page_viewed_events.device_brand
-      - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.device_brand
-      - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.device_brand
-      - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.device_brand
+      - datalake_amplitude_clean.170698_contract_page_viewed_events.device_family
+      - datalake_amplitude_clean.170698_pending_invoices_page_viewed_events.device_family
+      - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.device_family
+      - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.device_family
+      - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.device_family
+      - datalake_amplitude_clean.170698_overdue_invoices_page_viewed_events.device_family
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_total_button_clicked_events.device_family
+      - datalake_amplitude_clean.170698_pending_invoices_pay_total_cta_clicked_events.device_family
+      - datalake_amplitude_clean.170698_overdue_invoices_invoice_pay_button_clicked_events.device_family
+      - datalake_amplitude_clean.170698_pending_invoices_payment_option_clicked_events.device_family
+      - datalake_amplitude_clean.170698_pi_negotiation_payment_option_clicked_events.device_family
   event_name:
     description: Type of event recorded in the app.
     categories:
       contract_page_viewed: ""
       pending_invoices_page_viewed: ""
+      overdue_invoices_page_viewed: ""
       rm_pending_invoices_page_viewed: ""
       pending_invoices_invoice_pay_button_clicked: ""
+      overdue_invoices_invoice_pay_total_button_clicked: ""
       rm_invoice_payment_option_clicked: ""
+      pending_invoices_pay_total_cta_clicked: ""
+      overdue_invoices_invoice_pay_button_clicked: ""
+      pending_invoices_payment_option_clicked: ""
+      pi_negotiation_payment_option_clicke: ""
   funnel_step:
     description: Step in the user's journey related to app engagement.
     categories:
@@ -77,3 +119,13 @@ columns:
       - datalake_amplitude_clean.170698_rm_pending_invoices_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.ts_event
       - datalake_amplitude_clean.170698_rm_invoice_payment_option_clicked_events.ts_event
+  level:
+    description: Level of navigation in the app.
+  is_active:
+    description: Flag indicating if the event is currently active or if it was disabled.
+  year:
+    description: Year of the reference date.
+  month:
+    description: Month of the reference date.
+  day:
+    description: Day of the reference date.
