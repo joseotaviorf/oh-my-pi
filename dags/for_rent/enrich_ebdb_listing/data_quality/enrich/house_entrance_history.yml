@@ -1,0 +1,13 @@
+---
+table_name: datalake_ebdb_listing.house_entrance_history
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  ts_entrance_started:
+    is_complete:
+      severity_level: Error

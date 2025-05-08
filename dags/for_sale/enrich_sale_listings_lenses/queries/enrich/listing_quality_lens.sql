@@ -6,7 +6,7 @@ WITH amenities_history AS (
     ts_change
   FROM
     datalake_ebdb_amenities.amenity_change_history AS h
-  LEFT JOIN 
+  LEFT JOIN
     datalake_ebdb_amenities.amenity AS a
       USING(id_amenity, is_condo_amenity)
 ),
@@ -22,7 +22,7 @@ amenities AS (
       ROW_NUMBER() OVER (PARTITION BY id_house, code, DATE(ts_change) ORDER BY ts_change DESC) = 1
 ),
 amenities_pivoted AS (
-    SELECT 
+    SELECT
         id_house,
         dt_change,
         is_penthouse,
@@ -43,12 +43,12 @@ amenities_pivoted AS (
         has_condo_sports_court,
         has_condo_party_hall,
         has_condo_sauna
-    FROM 
+    FROM
         amenities
     PIVOT (
-        MAX(has_feature) 
-    FOR 
-        code 
+        MAX(has_feature)
+    FOR
+        code
     IN (
       "ACADEMIA_CONDO" AS has_condo_gym,
       "APARTAMENTO_COBERTURA" AS is_penthouse,
@@ -72,7 +72,7 @@ amenities_pivoted AS (
   )
 ),
 house_aud AS (
-    SELECT 
+    SELECT
         h_aud.id_house,
         h_aud.sale_price AS price,
         h_aud.bedrooms,
@@ -85,9 +85,9 @@ house_aud AS (
         h_aud.type,
         h_aud.doorman_type,
         h_aud.iptu_type,
-        h_aud.has_elevator, 
-        CASE 
-            WHEN lbc.ts_first_publication >= r.ts_revision THEN 'UNPUBLISHED' 
+        h_aud.has_elevator,
+        CASE
+            WHEN lbc.ts_first_publication >= r.ts_revision THEN 'UNPUBLISHED'
             ELSE 'PUBLISHED'
         END AS status_threshold,
         ROW_NUMBER() OVER (PARTITION BY h_aud.id_house, IF(lbc.ts_first_publication >= r.ts_revision, 'UNPUBLISHED', 'PUBLISHED') ORDER BY h_aud.rev DESC) AS threshold,
@@ -107,18 +107,18 @@ house_aud AS (
         r.ts_revision
     FROM
         datalake_ebdb_clean.house_aud AS h_aud
-    INNER JOIN 
-        datalake_ebdb_user.user_revision_entity AS r 
+    INNER JOIN
+        datalake_ebdb_user.user_revision_entity AS r
             ON h_aud.rev = r.id
-    INNER JOIN 
+    INNER JOIN
         datalake_ebdb_clean.listing_business_context AS lbc
             ON lbc.id_house = h_aud.id_house
-    WHERE 
+    WHERE
         lbc.business_context = 'SALE'
 ),
 house_changes AS (
     SELECT
-        id_house, 
+        id_house,
         price,
         bedrooms,
         bathrooms,
@@ -132,17 +132,17 @@ house_changes AS (
         iptu_type,
         has_elevator,
         dt_change
-    FROM 
+    FROM
         house_aud
-    WHERE 
-        ((status_threshold = 'UNPUBLISHED' AND threshold = 1) 
-          OR (status_threshold = 'PUBLISHED' 
-              AND (has_price_changed = TRUE 
+    WHERE
+        ((status_threshold = 'UNPUBLISHED' AND threshold = 1)
+          OR (status_threshold = 'PUBLISHED'
+              AND (has_price_changed = TRUE
                    OR has_bedrooms_changed = TRUE
                    OR has_bathrooms_changed = TRUE
-                   OR has_total_area_changed = TRUE 
+                   OR has_total_area_changed = TRUE
                    OR has_floor_changed = TRUE
-                   OR has_condo_changed = TRUE 
+                   OR has_condo_changed = TRUE
                    OR has_iptu_changed = TRUE
                    OR has_parking_slots_changed = TRUE
                    OR has_type_changed = TRUE
@@ -153,15 +153,15 @@ house_changes AS (
         ROW_NUMBER() OVER (PARTITION BY id_house, dt_change ORDER BY ts_revision DESC) = 1
 ),
 visits AS (
-    SELECT 
+    SELECT
         id,
         id_house,
         ts_visit_fup
     FROM
         datalake_booking.booking
-    WHERE 
+    WHERE
         ts_visit_fup IS NOT NULL
-    QUALIFY 
+    QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_house, ts_visit_fup ORDER BY id DESC) = 1
 ),
 review_visits AS (
@@ -171,23 +171,23 @@ review_visits AS (
         DATE(DATE_TRUNC('DAY', v.ts_visit_fup)) AS dt_visit
     FROM
         visits AS v
-    INNER JOIN 
-        datalake_booking.booking_review AS r 
+    INNER JOIN
+        datalake_booking.booking_review AS r
             ON v.id = r.id_booking
-    WHERE 
+    WHERE
         r.is_listing_accurate IS NOT NULL
     GROUP BY
         1, 3
 ),
 listing_accurate_by_review_changes AS (
-    SELECT 
+    SELECT
         id_house,
         is_listing_accurate,
         dt_visit AS dt_change
-    FROM 
+    FROM
         review_visits
     QUALIFY
-        is_listing_accurate IS DISTINCT FROM LAG(is_listing_accurate) OVER (PARTITION BY id_house ORDER BY dt_visit) 
+        is_listing_accurate IS DISTINCT FROM LAG(is_listing_accurate) OVER (PARTITION BY id_house ORDER BY dt_visit)
 ),
 key_location_changes AS (
     SELECT
@@ -197,8 +197,8 @@ key_location_changes AS (
     FROM
         datalake_ebdb_listing.house_entrance_history
     WHERE
-        is_last_status_of_day 
-    QUALIFY 
+        is_last_status_of_day
+    QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_house, DATE(ts_entrance_started) ORDER BY ts_entrance_started DESC) = 1
 ),
 all_information AS (
@@ -237,10 +237,10 @@ all_information AS (
         NULL AS has_condo_sauna,
         NULL AS has_balcony,
         NULL AS has_ceiling_fan
-    FROM 
+    FROM
         house_changes
-    UNION ALL 
-    SELECT  
+    UNION ALL
+    SELECT
         id_house,
         dt_change,
         NULL AS price,
@@ -275,10 +275,10 @@ all_information AS (
         NULL AS has_condo_sauna,
         NULL AS has_balcony,
         NULL AS has_ceiling_fan
-    FROM 
+    FROM
         key_location_changes
-    UNION ALL 
-    SELECT  
+    UNION ALL
+    SELECT
         id_house,
         dt_condition_started AS dt_change,
         NULL AS price,
@@ -313,10 +313,10 @@ all_information AS (
         NULL AS has_condo_sauna,
         NULL AS has_balcony,
         NULL AS has_ceiling_fan
-    FROM 
+    FROM
         datalake_ebdb_house.maintenance_condition_history
     UNION ALL
-    SELECT 
+    SELECT
         id_house,
         dt_change,
         NULL AS price,
@@ -351,10 +351,10 @@ all_information AS (
         NULL AS has_condo_sauna,
         NULL AS has_balcony,
         NULL AS has_ceiling_fan
-    FROM 
+    FROM
         listing_accurate_by_review_changes
-    UNION ALL 
-    SELECT 
+    UNION ALL
+    SELECT
         id_house,
         dt_change,
         NULL AS price,
@@ -389,21 +389,21 @@ all_information AS (
         has_condo_sauna,
         has_balcony,
         has_ceiling_fan
-    FROM 
+    FROM
         amenities_pivoted
 ),
 grouping_events_by_day AS (
-    SELECT 
+    SELECT
         id_house,
         dt_change,
         MAX(price) AS price,
         MAX(bedrooms) AS bedrooms,
         MAX(bathrooms) AS bathrooms,
-        MAX(total_area) AS total_area, 
+        MAX(total_area) AS total_area,
         MAX(floor) AS floor,
-        MAX(condo) AS condo, 
+        MAX(condo) AS condo,
         MAX(house_condition) AS house_condition,
-        MAX(iptu) AS iptu, 
+        MAX(iptu) AS iptu,
         MAX(parking_slots) AS parking_slots,
         MAX(type) AS type,
         MAX(doorman_type) AS doorman_type,
@@ -434,7 +434,7 @@ grouping_events_by_day AS (
         1, 2
 ),
 dataset AS (
-    SELECT 
+    SELECT
         id_house,
         LAST_VALUE(price, TRUE) OVER (PARTITION BY id_house ORDER BY dt_change) AS price,
         LAST_VALUE(bedrooms, TRUE) OVER (PARTITION BY id_house ORDER BY dt_change) AS bedrooms,
@@ -451,7 +451,7 @@ dataset AS (
         LAST_VALUE(key_location_type, TRUE) OVER (PARTITION BY id_house ORDER BY dt_change) AS key_location_type,
         IF(
             DATEDIFF(dt_change, LAG(dt_change) OVER (PARTITION BY id_house ORDER BY dt_change)) <= 120,
-            LAST_VALUE(is_listing_accurate, TRUE) OVER (PARTITION BY id_house ORDER BY dt_change), 
+            LAST_VALUE(is_listing_accurate, TRUE) OVER (PARTITION BY id_house ORDER BY dt_change),
             NULL
         ) AS is_listing_accurate,
         LAST_VALUE(is_penthouse, TRUE) OVER (PARTITION BY id_house ORDER BY dt_change) AS is_penthouse,
@@ -481,7 +481,7 @@ dataset AS (
             USING(id_house)
 ),
 returning_booleans AS (
-    SELECT 
+    SELECT
         id_house,
         price,
         bedrooms,
@@ -497,104 +497,104 @@ returning_booleans AS (
         iptu_type,
         IF(key_location_type = 'NULL', NULL, key_location_type) AS key_location_type,
         is_listing_accurate,
-        CASE 
-            WHEN is_penthouse = 'TRUE' THEN TRUE 
-            WHEN is_penthouse = 'FALSE' THEN FALSE 
-            WHEN is_penthouse = 'NULL' THEN NULL 
+        CASE
+            WHEN is_penthouse = 'TRUE' THEN TRUE
+            WHEN is_penthouse = 'FALSE' THEN FALSE
+            WHEN is_penthouse = 'NULL' THEN NULL
         END AS is_penthouse,
-        CASE 
-            WHEN has_elevator = 'TRUE' THEN TRUE 
-            WHEN has_elevator = 'FALSE' THEN FALSE 
-            WHEN has_elevator = 'NULL' THEN NULL 
+        CASE
+            WHEN has_elevator = 'TRUE' THEN TRUE
+            WHEN has_elevator = 'FALSE' THEN FALSE
+            WHEN has_elevator = 'NULL' THEN NULL
         END AS has_elevator,
-        CASE 
-            WHEN has_condo_gym = 'TRUE' THEN TRUE 
-            WHEN has_condo_gym = 'FALSE' THEN FALSE 
-            WHEN has_condo_gym = 'NULL' THEN NULL 
+        CASE
+            WHEN has_condo_gym = 'TRUE' THEN TRUE
+            WHEN has_condo_gym = 'FALSE' THEN FALSE
+            WHEN has_condo_gym = 'NULL' THEN NULL
         END AS has_condo_gym,
-        CASE 
-            WHEN has_kitchen_cupboard = 'TRUE' THEN TRUE 
-            WHEN has_kitchen_cupboard = 'FALSE' THEN FALSE 
-            WHEN has_kitchen_cupboard = 'NULL' THEN NULL 
+        CASE
+            WHEN has_kitchen_cupboard = 'TRUE' THEN TRUE
+            WHEN has_kitchen_cupboard = 'FALSE' THEN FALSE
+            WHEN has_kitchen_cupboard = 'NULL' THEN NULL
         END AS has_kitchen_cupboard,
-        CASE 
-            WHEN has_bathroom_cabinet = 'TRUE' THEN TRUE 
-            WHEN has_bathroom_cabinet = 'FALSE' THEN FALSE 
-            WHEN has_bathroom_cabinet = 'NULL' THEN NULL 
+        CASE
+            WHEN has_bathroom_cabinet = 'TRUE' THEN TRUE
+            WHEN has_bathroom_cabinet = 'FALSE' THEN FALSE
+            WHEN has_bathroom_cabinet = 'NULL' THEN NULL
         END AS has_bathroom_cabinet,
-        CASE 
-            WHEN has_air_conditioning = 'TRUE' THEN TRUE 
-            WHEN has_air_conditioning = 'FALSE' THEN FALSE 
-            WHEN has_air_conditioning = 'NULL' THEN NULL 
+        CASE
+            WHEN has_air_conditioning = 'TRUE' THEN TRUE
+            WHEN has_air_conditioning = 'FALSE' THEN FALSE
+            WHEN has_air_conditioning = 'NULL' THEN NULL
         END AS has_air_conditioning,
-        CASE 
-            WHEN has_condo_toy_library = 'TRUE' THEN TRUE 
-            WHEN has_condo_toy_library = 'FALSE' THEN FALSE 
-            WHEN has_condo_toy_library = 'NULL' THEN NULL 
+        CASE
+            WHEN has_condo_toy_library = 'TRUE' THEN TRUE
+            WHEN has_condo_toy_library = 'FALSE' THEN FALSE
+            WHEN has_condo_toy_library = 'NULL' THEN NULL
         END AS has_condo_toy_library,
-        CASE 
-            WHEN has_condo_grill = 'TRUE' THEN TRUE 
-            WHEN has_condo_grill = 'FALSE' THEN FALSE 
-            WHEN has_condo_grill = 'NULL' THEN NULL 
+        CASE
+            WHEN has_condo_grill = 'TRUE' THEN TRUE
+            WHEN has_condo_grill = 'FALSE' THEN FALSE
+            WHEN has_condo_grill = 'NULL' THEN NULL
         END AS has_condo_grill,
-        CASE 
-            WHEN has_gas_shower = 'TRUE' THEN TRUE 
-            WHEN has_gas_shower = 'FALSE' THEN FALSE 
-            WHEN has_gas_shower = 'NULL' THEN NULL 
+        CASE
+            WHEN has_gas_shower = 'TRUE' THEN TRUE
+            WHEN has_gas_shower = 'FALSE' THEN FALSE
+            WHEN has_gas_shower = 'NULL' THEN NULL
         END AS has_gas_shower,
-        CASE 
-            WHEN has_natural_light = 'TRUE' THEN TRUE 
-            WHEN has_natural_light = 'FALSE' THEN FALSE 
-            WHEN has_natural_light = 'NULL' THEN NULL 
+        CASE
+            WHEN has_natural_light = 'TRUE' THEN TRUE
+            WHEN has_natural_light = 'FALSE' THEN FALSE
+            WHEN has_natural_light = 'NULL' THEN NULL
         END AS has_natural_light,
-        CASE 
-            WHEN has_condo_pool = 'TRUE' THEN TRUE 
-            WHEN has_condo_pool = 'FALSE' THEN FALSE 
-            WHEN has_condo_pool = 'NULL' THEN NULL 
+        CASE
+            WHEN has_condo_pool = 'TRUE' THEN TRUE
+            WHEN has_condo_pool = 'FALSE' THEN FALSE
+            WHEN has_condo_pool = 'NULL' THEN NULL
         END AS has_condo_pool,
-        CASE 
-            WHEN has_private_pool = 'TRUE' THEN TRUE 
-            WHEN has_private_pool = 'FALSE' THEN FALSE 
-            WHEN has_private_pool = 'NULL' THEN NULL 
+        CASE
+            WHEN has_private_pool = 'TRUE' THEN TRUE
+            WHEN has_private_pool = 'FALSE' THEN FALSE
+            WHEN has_private_pool = 'NULL' THEN NULL
         END AS has_private_pool,
-        CASE 
-            WHEN has_condo_playground = 'TRUE' THEN TRUE 
-            WHEN has_condo_playground = 'FALSE' THEN FALSE 
-            WHEN has_condo_playground = 'NULL' THEN NULL 
+        CASE
+            WHEN has_condo_playground = 'TRUE' THEN TRUE
+            WHEN has_condo_playground = 'FALSE' THEN FALSE
+            WHEN has_condo_playground = 'NULL' THEN NULL
         END AS has_condo_playground,
-        CASE 
-            WHEN has_condo_sports_court = 'TRUE' THEN TRUE 
-            WHEN has_condo_sports_court = 'FALSE' THEN FALSE 
-            WHEN has_condo_sports_court = 'NULL' THEN NULL 
+        CASE
+            WHEN has_condo_sports_court = 'TRUE' THEN TRUE
+            WHEN has_condo_sports_court = 'FALSE' THEN FALSE
+            WHEN has_condo_sports_court = 'NULL' THEN NULL
         END AS has_condo_sports_court,
-        CASE 
-            WHEN has_condo_party_hall = 'TRUE' THEN TRUE 
-            WHEN has_condo_party_hall = 'FALSE' THEN FALSE 
-            WHEN has_condo_party_hall = 'NULL' THEN NULL 
+        CASE
+            WHEN has_condo_party_hall = 'TRUE' THEN TRUE
+            WHEN has_condo_party_hall = 'FALSE' THEN FALSE
+            WHEN has_condo_party_hall = 'NULL' THEN NULL
         END AS has_condo_party_hall,
-        CASE 
-            WHEN has_condo_sauna = 'TRUE' THEN TRUE 
-            WHEN has_condo_sauna = 'FALSE' THEN FALSE 
-            WHEN has_condo_sauna = 'NULL' THEN NULL 
+        CASE
+            WHEN has_condo_sauna = 'TRUE' THEN TRUE
+            WHEN has_condo_sauna = 'FALSE' THEN FALSE
+            WHEN has_condo_sauna = 'NULL' THEN NULL
         END AS has_condo_sauna,
-        CASE 
-            WHEN has_balcony = 'TRUE' THEN TRUE 
-            WHEN has_balcony = 'FALSE' THEN FALSE 
-            WHEN has_balcony = 'NULL' THEN NULL 
+        CASE
+            WHEN has_balcony = 'TRUE' THEN TRUE
+            WHEN has_balcony = 'FALSE' THEN FALSE
+            WHEN has_balcony = 'NULL' THEN NULL
         END AS has_balcony,
-        CASE 
-            WHEN has_ceiling_fan = 'TRUE' THEN TRUE 
-            WHEN has_ceiling_fan = 'FALSE' THEN FALSE 
-            WHEN has_ceiling_fan = 'NULL' THEN NULL 
+        CASE
+            WHEN has_ceiling_fan = 'TRUE' THEN TRUE
+            WHEN has_ceiling_fan = 'FALSE' THEN FALSE
+            WHEN has_ceiling_fan = 'NULL' THEN NULL
         END AS has_ceiling_fan,
         date
-    FROM 
+    FROM
         dataset
-    QUALIFY  
+    QUALIFY
         COUNT(*) OVER (PARTITION BY id_house) = 1 OR date >= dt_first_publication
 ),
 business_logic AS (
-    SELECT 
+    SELECT
         id_house,
         IF(price < 120000 OR price > 20000000 OR price IS NULL, -10000, 0) AS price_score,
         IF(bedrooms = 0 OR bedrooms IS NULL, -10000, 0) AS bedrooms_score,
@@ -606,7 +606,7 @@ business_logic AS (
         IF(iptu IS NULL OR (iptu <= 0 AND iptu_type IN ('NaoInformado','Normal')), -50, 0) AS iptu_score,
         IF(parking_slots IS NULL, -400, 0) AS parking_slots_score,
         IF(type IS NULL, -300, 0) AS type_score,
-        IF(doorman_type IS NULL AND type IN ('Apartamento', 'CasaCondominio', 'StudioOuKitchenette'), -200, 0) AS doorman_type_score,    
+        IF(doorman_type IS NULL AND type IN ('Apartamento', 'CasaCondominio', 'StudioOuKitchenette'), -200, 0) AS doorman_type_score,
         IF(key_location_type IS NULL OR key_location_type = 'None', -400, 0) AS key_location_score,
         IF(is_listing_accurate IS FALSE, -1000, 0) AS listing_accuracy_score,
         IF(is_penthouse IS NULL, -50, 0) AS penthouse_score,
@@ -632,7 +632,7 @@ business_logic AS (
         returning_booleans
 ),
 score AS (
-    SELECT 
+    SELECT
         id_house,
         price_score,
         bedrooms_score,
@@ -665,7 +665,7 @@ score AS (
         sauna_score,
         balcony_score,
         ceiling_fan_score,
-        ARRAY( 
+        ARRAY(
             price_score,
             bedrooms_score,
             bathrooms_score,
@@ -703,7 +703,7 @@ score AS (
     business_logic
 ),
 create_completeness AS (
-  SELECT 
+  SELECT
     id_house,
     price_score,
     bedrooms_score,
@@ -744,9 +744,9 @@ create_completeness AS (
     score
 ),
 create_tiers AS (
-    SELECT 
+    SELECT
         id_house,
-        CASE 
+        CASE
             WHEN price_score < 0 THEN 'Q1'
             WHEN bedrooms_score < 0 THEN 'Q1'
             WHEN total_area_score < 0 THEN 'Q1'
@@ -756,23 +756,23 @@ create_tiers AS (
             WHEN listing_quality_score BETWEEN -1500 AND -500 THEN 'Q3'
             WHEN listing_quality_score < -1500 THEN 'Q2'
         END AS tier,
-        CASE 
-            WHEN listing_quality_score = 0 THEN 'Everything looks Great. '      
+        CASE
+            WHEN listing_quality_score = 0 THEN 'Everything looks Great. '
             WHEN condo_score < 0 OR total_area_score < 0 OR price_score < 0 OR bedrooms_score < 0 THEN 'Critical information is incorrect'
             WHEN component_completeness <= 0.80 THEN  'Could be better. Needs increase amenities information'
             WHEN component_completeness > 0.8 THEN 'Good completeness of information'
         END AS tier_disclaimer,
-        CASE 
-            WHEN listing_quality_score = 0 THEN 'Everything looks Great. 100% of amenities are enriched and no critical information was identified as incorrect.' 
-            WHEN condo_score < 0 OR total_area_score < 0 OR price_score < 0 OR bedrooms_score < 0 
-                THEN 'Critical information is incorrect: (' || IF(condo_score != 0, ' condo price,', '') || '' 
-                                                            || IF(total_area_score != 0, ' total area, ', '') || '' 
-                                                            || IF(price_score != 0, ' sale price,', '') || '' 
-                                                            || IF(bedrooms_score != 0, ' number of bedroom,', '') 
+        CASE
+            WHEN listing_quality_score = 0 THEN 'Everything looks Great. 100% of amenities are enriched and no critical information was identified as incorrect.'
+            WHEN condo_score < 0 OR total_area_score < 0 OR price_score < 0 OR bedrooms_score < 0
+                THEN 'Critical information is incorrect: (' || IF(condo_score != 0, ' condo price,', '') || ''
+                                                            || IF(total_area_score != 0, ' total area, ', '') || ''
+                                                            || IF(price_score != 0, ' sale price,', '') || ''
+                                                            || IF(bedrooms_score != 0, ' number of bedroom,', '')
                                                             || '). The percentage of amenities enriched is '
                                                             || CAST(ROUND(component_completeness * 100.0, 2) AS STRING) || '%'
-            WHEN component_completeness <= 0.80 THEN 'The property has good completeness of information. Currently, ' || CAST(ROUND(component_completeness * 100.0, 2) AS STRING) || '%  of its amenities are enriched and no critical information was identified as incorrect.' 
-            WHEN component_completeness > 0.8 THEN 'The property could have more amenities enriched. Currently, ' || CAST(ROUND(component_completeness * 100.0, 2) AS STRING) || '% of its amenities are enriched and no critical information was identified as incorrect.' 
+            WHEN component_completeness <= 0.80 THEN 'The property has good completeness of information. Currently, ' || CAST(ROUND(component_completeness * 100.0, 2) AS STRING) || '%  of its amenities are enriched and no critical information was identified as incorrect.'
+            WHEN component_completeness > 0.8 THEN 'The property could have more amenities enriched. Currently, ' || CAST(ROUND(component_completeness * 100.0, 2) AS STRING) || '% of its amenities are enriched and no critical information was identified as incorrect.'
         END AS tier_drill_down,
         listing_quality_score,
         component_completeness,
@@ -812,7 +812,7 @@ create_tiers AS (
         create_completeness
 ),
 grouping_tiers AS (
-    SELECT 
+    SELECT
         id_house,
         tier,
         tier_disclaimer,
@@ -853,13 +853,13 @@ grouping_tiers AS (
         ts_tier_started
     FROM
         create_tiers
-    QUALIFY 
-        tier IS DISTINCT FROM LAG(tier) OVER (PARTITION BY id_house ORDER BY ts_tier_started) 
+    QUALIFY
+        tier IS DISTINCT FROM LAG(tier) OVER (PARTITION BY id_house ORDER BY ts_tier_started)
 ),
 tier_status AS (
     SELECT
         id_house,
-        tier, 
+        tier,
         CASE
             WHEN tier = 'Q5' THEN 'Great Accuracy'
             WHEN tier = 'Q4' THEN 'Good Accuracy'

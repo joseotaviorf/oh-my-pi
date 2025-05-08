@@ -1,20 +1,22 @@
 ---
 database_name: datalake_ebdb_listing
 table_name: house_entrance_history
-description: Information related to changes in the house's entry condition.
-  Every line represents a house's entry condition and the period such condition was active.
+description: Since we have a new entry model, we need to create an unified model between old and new entry models. This approach avoids data loss and facilitates field migration.
+  Every line represents an event of unified entry model with enrichments.
 domain: For Rent
-owner: gustavo.alencar@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
+  id:
+    description: Primary key of model (id_house + ts_entrance_started)
   id_house:
     lineage:
       - datalake_ebdb_clean.access_type_aud.id_house
-      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_clean.entry_access_tracking.id_house
     description: ID of the house.
   id_occupant:
     lineage:
       - datalake_ebdb_clean.access_type_aud.id_occupant
-    description: ID to represent who is occupying the house.
+    description: ID to represent who is occupying the house. This field come from the old model.
     categories:
       '1': None
       '2': Tenant
@@ -23,43 +25,97 @@ columns:
   occupant_type:
     lineage:
       - datalake_ebdb_clean.occupant_type.name
-    description: Who is occupying the house
+    description: Who is occupying the house. This field come from the old model.
+  restriction_type:
+    lineage:
+      - datalake_ebdb_clean.restriction_type.name
+    description: Type of house's restriction during the period. This field come from the old model.
+  key_type:
+    lineage:
+      - datalake_ebdb_clean.key_type.name
+    description: Type of the house's key during the period. This field come from the old model.
+  entry_model_details:
+    lineage:
+      - datalake_ebdb_clean.access_type_aud.additional_info
+      - datalake_ebdb_clean.entry_access_tracking.entry_access_details
+    description: Additional info about from the unified entry model. This field has already been migrated
+  key_location_unified:
+    lineage:
+      - datalake_ebdb_clean.access_authorization_type.name
+      - datalake_ebdb_clean.entry_access_tracking.key_holder_role
+      - datalake_ebdb_clean.entry_access_tracking.entry_access_type
+    description: Location of the houses's key. This field has already been migrated.
+  key_location:
+    lineage:
+      - datalake_ebdb_clean.access_authorization_type.name
+    description: Location of the houses's key. This field come from old model and will be used until the migration communication.
+  doorman_type:
+    lineage:
+      - datalake_ebdb_clean.house_aud.doorman_type
+    description: Last type of doorman of the house before the current event of entry model.
+  entry_model_channel:
+    lineage:
+      - datalake_ebdb_clean.entry_access_tracking.channel
+    description: Entry channel from new entry model.
+  actor_role:
+    lineage:
+      - datalake_ebdb_clean.entry_access_tracking.actor_role
+    description: Entry actor role from new entry model.
+  event_type:
+    lineage:
+      - datalake_ebdb_clean.entry_access_tracking.event_type
+    description: Event type from new entry model.
+  entry_access_model:
+    lineage:
+      - datalake_ebdb_clean.entry_access_tracking.entry_access_model
+    description: Access model from new entry model.
+  key_holder_type:
+    lineage:
+      - datalake_ebdb_clean.entry_access_tracking.key_holder_type
+    description: Type of key holder from new entry model.
+  key_holder_identifier:
+    lineage:
+      - datalake_ebdb_clean.entry_access_tracking.key_holder_identifier
+    description: ID of key holder from new entry model.
+  key_holder_business_context:
+    lineage:
+      - datalake_ebdb_clean.entry_access_tracking.key_holder_business_context
+    description: Business context of key holder from new entry model.
+  actor_user_type:
+    lineage:
+      - datalake_ebdb_clean.entry_access_tracking.actor_user_type
+    description: Type of actor from new entry model.
+  entry_model_source:
+    description: Source of unified entry model.
+    categories:
+      OLD_MODEL: When the event (id_house + ts_entrance_started) comes from old model (access_type_aud)
+      NEW_MODEL: When the event (id_house + ts_entrance_started) comes from new model (entry_access_tracking)
+      NEW_AND_OLD_MODEL: When the event (id_house + ts_entrance_started) comes from both models (access_type_aud and entry_access_tracking)
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
     description: Country code of the house.
-  rev:
+  has_opted_keys_with_agent:
     lineage:
-      - datalake_ebdb_clean.access_type_aud.rev
-      - datalake_ebdb_clean.house_aud.rev
-    description: ID of the revision.
-  doorman_type:
-    lineage:
-      - datalake_ebdb_clean.house_aud.doorman_type
-    description: Type of doorman of the house during the period.
-  entry_access_type:
-    lineage:
-      - datalake_ebdb_clean.entry_access_tracking.entry_access_type
-    description: Type of the entry access of the house during the period.
-  key_holder_role:
-    lineage:
-      - datalake_ebdb_clean.entry_access_tracking.key_holder_role
-    description: Role of the house's key holder during the period.
-  key_location:
-    lineage:
-      - datalake_ebdb_clean.access_authorization_type.name
-    description: Location of the houses's key during the period.
-  key_type:
-    lineage:
-      - datalake_ebdb_clean.key_type.name
-    description: Type of the house's key during the period.
+      - datalake_ebdb_clean.access_type_aud.has_opted_keys_with_agent
+    description: True if the house entrance is keys with agent. This field come from the old model.
+  mod_authorization:
+    description: True if the key_location field was modified relative to the previous event
+  mod_occupant:
+    description: True if the occupant_type field was modified relative to the previous event
+  mod_type:
+    description: True if the key_type field was modified relative to the previous event
+  mod_has_opted_keys_with_agent:
+    description: True if the has_opted_keys_with_agent field was modified relative to the previous event
   is_last_status_of_day:
     description: Flag to indicate if the entry condition status is the last one of the day.
   ts_entrance_started:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.entry_access_tracking.ts_updated
     description: Timestamp of when the entry condition started.
   ts_entrance_ended:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.entry_access_tracking.ts_updated
     description: Timestamp of when the entry condition ended.
