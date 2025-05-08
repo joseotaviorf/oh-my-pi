@@ -20,6 +20,8 @@ SELECT
     GET_JSON_OBJECT(event_properties, '$.house_business_contexts') AS ep_business_context,
     GET_JSON_OBJECT(event_properties, '$.ad_improvements_button_available') AS ep_ad_improvements_button_available,
     GET_JSON_OBJECT(event_properties, '$.ad_performance_button_available') AS ep_ad_performance_button_available,
+    GET_JSON_OBJECT(event_properties, '$.rent_listing_status') AS ep_rent_listing_status,
+    GET_JSON_OBJECT(event_properties, '$.sale_listing_status') AS ep_sale_listing_status,
     city,
     country,
     data,
