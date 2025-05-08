@@ -26,7 +26,7 @@ WITH extract_quinturk_task_data AS (
     >'
     ) AS extracted_data
   FROM
-    datalake_quinturk_raw.task
+    datalake_quinturk_test_raw.task
 )
 SELECT
   id,

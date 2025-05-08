@@ -37,4 +37,4 @@ SELECT
     month,
     day
 FROM
-    datalake_quinturk_raw.project
+    datalake_quinturk_test_raw.project

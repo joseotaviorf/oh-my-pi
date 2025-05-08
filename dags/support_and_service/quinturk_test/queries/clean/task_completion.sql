@@ -29,7 +29,7 @@ WITH extract_quinturk_task_completion_result AS (
     >>'
     ) AS extracted_result
   FROM
-    datalake_quinturk_raw.task_completion
+    datalake_quinturk_test_raw.task_completion
 )
 SELECT
   id,
