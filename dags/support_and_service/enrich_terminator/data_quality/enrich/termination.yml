@@ -1,16 +1,16 @@
 ---
-table_name: dw_offboarding.fact_terminations
+table_name: datalake_terminator.termination
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
-  sk_termination:
+  id_termination:
     is_complete:
       severity_level: Error
     is_unique:
       severity_level: Error
-  sk_contract:
+  id_contract:
     is_complete:
       severity_level: Error
-  sk_house:
+  id_house:
     is_complete:
       severity_level: Error
   total_tentant_repair_ar:
