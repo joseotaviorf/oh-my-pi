@@ -1,0 +1,38 @@
+table_name: datalake_similarity_score.similar_houses
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  ids_similar:
+    is_complete:
+      severity_level: Error
+  qty_similar:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 5
+      severity_level: Error
+  days_published:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

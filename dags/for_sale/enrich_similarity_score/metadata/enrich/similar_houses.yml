@@ -1,0 +1,55 @@
+database_name: datalake_similarity_score
+table_name: similar_houses
+owner: bruna.prates@quintoandar.com.br
+domain: For Sale
+description: Enrich table that contains a "base" house and its daily list of similar houses. A "base" house will only appear
+    if it has been published for, at least, one day. The similar houses list is generated based in specific rules applied in
+    the SQL code. For now, it only includes For Rent houses. Each row of this table is a "base" house and its list of similar houses in a specific business context and
+    on a specific date.
+columns:
+    id:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.id_house
+        - datalake_ebdb_listing.listing_business_context_status_history.business_context
+        - datalake_rental_historical_follow_up.house_listings_daily_info.year
+        - datalake_rental_historical_follow_up.house_listings_daily_info.month
+        - datalake_rental_historical_follow_up.house_listings_daily_info.day
+      description: Unique key of this table, generated from a hash function applied to the concatenation of the fields
+        id_house, business_context, year, month and day.
+    id_house:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.id_house
+      description: ID of the "base" house, i.e., the one that will have a list of similar houses associated with it.
+    ids_similar:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.id_house
+      description: List of house IDs similar to the "base" house (id_house).
+    similar_rule:
+      description: Similarity rule applied to generate the list of similar houses.
+    qty_similar:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.id_house
+      description: Number of similar houses in the list.
+    days_published:
+      lineage:
+        - datalake_ebdb_listing.listing_business_context_status_history.ts_last_publication
+        - datalake_rental_historical_follow_up.house_listings_daily_info.dt_day
+      description: Number of days the "base" house has been published.
+    business_context:
+      lineage:
+        - datalake_ebdb_listing.listing_business_context_status_history.business_context
+      description: Business context of the "base" house.
+      categories:
+        RENT: The "base" house is published in the rental context.
+    year:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.year
+      description: Year in which the list of similar houses was generated for the "base" house. It's also a partition of this table.
+    month:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.month
+      description: Month in which the list of similar houses was generated for the "base" house. It's also a partition of this table.
+    day:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.day
+      description: Day in which the list of similar houses was generated for the "base" house. It's also a partition of this table.

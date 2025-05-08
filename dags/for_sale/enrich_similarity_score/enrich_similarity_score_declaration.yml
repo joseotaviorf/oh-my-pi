@@ -1,0 +1,22 @@
+dag:
+  name: enrich_similarity_score
+  schedule_start_date: 2025, 5, 1
+  owner: Data ForSale
+  documentation:
+    dag_purpose: This DAG creates enriched tables for house score, calculated based on the similarity between houses.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [ "year", "month", "day" ]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+cluster:
+  type: databricks_13_3_min_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
