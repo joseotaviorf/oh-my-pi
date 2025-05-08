@@ -69,8 +69,8 @@ overdue_invoices_events AS (
   ),
   explode_overdue_invoices_events AS (
   SELECT
-    CAST(contract_invoice.id_contract AS BIGINT),
-    CAST(contract_invoice.id_invoice AS BIGINT),
+    CAST(contract_invoice.id_contract AS BIGINT) AS id_contract,
+    CAST(contract_invoice.id_invoice AS BIGINT) AS id_invoice,
     id_amplitude,
     id_session,
     id_user,
