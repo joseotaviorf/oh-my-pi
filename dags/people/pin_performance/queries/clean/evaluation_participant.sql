@@ -19,7 +19,7 @@ SELECT
     notified_flag = 'Y' AS is_notified,
     fdback_started_flag = 'Y' AS is_feedback_started,
     locked_out_flag = 'Y' AS is_locked_out,
-    CAST(object_version_number AS INT) AS object_version_number,,
+    CAST(object_version_number AS INT) AS object_version_number,
     CAST(due_date AS DATE) AS dt_due,
     CAST(locked_out_date AS DATE) AS dt_lockout,
     CAST(status_update_date AS TIMESTAMP) AS ts_status_updated,
