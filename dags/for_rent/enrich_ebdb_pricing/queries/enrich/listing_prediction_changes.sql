@@ -74,6 +74,8 @@ calculator_changes AS (
     INNER JOIN
         datalake_ebdb_user.user_revision_entity AS r
             ON hpp_aud.rev = r.id
+    WHERE
+        DATE(r.ts_revision) >= DATE('2022-04-01') -- removing very old predictions, where the certainty field was not filled in
 )
 SELECT
     cc.id_house,
