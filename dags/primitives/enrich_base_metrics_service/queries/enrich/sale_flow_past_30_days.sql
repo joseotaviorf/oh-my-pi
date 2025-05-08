@@ -1,4 +1,4 @@
------------------
+----------------
 -- Sale Flow
 
 SELECT
@@ -14,7 +14,7 @@ SELECT
         MIN(ts_first_visit_completed),
         MIN(ts_first_offer_submitted),
         MIN(dt_first_offer_accepted),
-        MIN(dt_sale_agreement_signed),
+        MIN(dt_sale_agreement_signed)
     ) AS ts_sale_flow_latest_event
 FROM datalake_sale_flows.sale_flow
 WHERE

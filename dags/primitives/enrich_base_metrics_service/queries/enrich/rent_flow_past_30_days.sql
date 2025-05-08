@@ -1,4 +1,4 @@
------------------
+----------------
 -- Rent Flow
 
 SELECT
@@ -16,8 +16,8 @@ SELECT
         MIN(ts_visit_completed),
         MIN(ts_direct_offer_submitted),
         MIN(ts_offer_submitted),
-        MIN(ts_offer_approved)
-        MIN(ts_contract_signed),
+        MIN(ts_offer_approved),
+        MIN(ts_contract_signed)
     ) AS ts_rent_flow_latest_event
 FROM
     datalake_rent_flows.rent_flows
