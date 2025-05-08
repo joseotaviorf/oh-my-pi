@@ -104,27 +104,27 @@ columns:
     categories:
       Flow: customers that are new in the Portfolio. The day the flow contracts enters the portfolio is the first day of the overdue (i.e first business day after the due date).
       Stock: customers that were already in the portfolio in the last month. Important to notice that the cut off date to this reference is the first day of the month.
-  segmentation_queue_timeline:
+  segmentation_queue:
     lineage:
       - datalake_cyber.queue_timeline.segmentation_queue
     description: "ID of the segmentation queue the contract was distributed at the reference date"
-  segmentation_queue_description_timeline:
+  segmentation_queue_description:
     lineage:
       - datalake_cyber.queue_timeline.segmentation_queue_description
     description: "Description of the segmentation queue the contract was distributed at the reference date"
-  agreement_queue_timeline:
+  agreement_queue:
     lineage:
       - datalake_cyber.queue_timeline.agreement_queue
     description: "ID of the agreement queue the contract was distributed at the reference date"
-  agreement_queue_description_timeline:
+  agreement_queue_description:
     lineage:
       - datalake_cyber.queue_timeline.agreement_queue_description
     description: "Description of the agreement queue the contract was distributed at the reference date"
-  eviction_queue_timeline:
+  eviction_queue:
     lineage:
       - datalake_cyber.queue_timeline.eviction_queue
     description: "ID of the eviction queue the contract was distributed at the reference date"
-  eviction_queue_description_timeline:
+  eviction_queue_description:
     lineage:
       - datalake_cyber.queue_timeline.eviction_queue_description
     description: "Description of the eviction queue the contract was distributed at the reference date"

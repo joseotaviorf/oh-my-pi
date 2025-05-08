@@ -107,8 +107,13 @@ SELECT
     o.is_last_business_days,
     o.is_write_off,
     o.is_contract_write_off,
-    rc.distributor AS segmentation_queue,
     COALESCE(cad.advisory, rc.partner, LAG(rc.partner) IGNORE NULLS OVER(PARTITION BY o.id_contract ORDER BY o.dt_reference)) AS advisory,
+    q.segmentation_queue,
+    q.segmentation_queue_description,
+    q.agreement_queue,
+    q.agreement_queue_description,
+    q.eviction_queue ,
+    q.eviction_queue_description,
     MAX(o.dt_invoice_paid) OVER(PARTITION BY o.id_contract, o.id_invoice) AS max_dt_invoice_paid, -- get the dt_paid of invoice, since dt_invoice_paid is only filled in when dt_reference >= dt_paid
     o.dt_invoice_paid,
     o.dt_invoice_due,
@@ -137,9 +142,13 @@ LEFT JOIN
       ON o.id_invoice = n.id_invoice
       AND o.id_contract = n.id_contract
 LEFT JOIN
-  negotiation_installment AS ni
-    ON o.id_invoice = ni.id_invoice
-    AND o.id_contract = ni.id_contract
+    negotiation_installment AS ni
+      ON o.id_invoice = ni.id_invoice
+      AND o.id_contract = ni.id_contract
+LEFT JOIN
+    datalake_cyber.queue_timeline AS q
+      ON o.id_contract = q.id_contract_external
+      AND o.dt_reference = q.dt_reference
 ),
 get_last_valid_partner AS (
   -- Get the last valid partner per invoice, to freeze the partner after the invoice payment date
@@ -147,7 +156,12 @@ get_last_valid_partner AS (
     id_contract,
     id_invoice,
     advisory,
-    segmentation_queue
+    segmentation_queue,
+    segmentation_queue_description,
+    agreement_queue,
+    agreement_queue_description,
+    eviction_queue,
+    eviction_queue_description
   FROM add_all_dimensions
   WHERE dt_reference BETWEEN DATE_ADD(max_dt_invoice_paid,-1) AND max_dt_invoice_paid
   AND (advisory IS NULL OR advisory NOT IN ("DBAIXAS", "DCARGA")) -- ignore DBAIXAS, because it references to the paid invoices, and we want the last valid partner before the invoice payment.
@@ -171,12 +185,6 @@ SELECT
     a.type_ssn,
     a.recovery_method,
     a.debtor_type,
-    q.segmentation_queue AS segmentation_queue_timeline,
-    q.segmentation_queue_description AS segmentation_queue_description_timeline,
-    q.agreement_queue AS agreement_queue_timeline,
-    q.agreement_queue_description AS agreement_queue_description_timeline,
-    q.eviction_queue AS eviction_queue_timeline,
-    q.eviction_queue_description AS eviction_queue_description_timeline,
     a.delay_contamined_at_closure,
     a.delay_contamined_range,
     a.delay_contract_range,
@@ -190,8 +198,13 @@ SELECT
     a.is_last_business_days,
     a.is_write_off,
     a.is_contract_write_off,
-    IF(a.dt_reference >= a.dt_invoice_paid, g.segmentation_queue, a.segmentation_queue) AS segmentation_queue,
     IF(a.dt_reference >= a.dt_invoice_paid, g.advisory, a.advisory) AS advisory,
+    IF(a.dt_reference >= a.dt_invoice_paid, g.segmentation_queue, a.segmentation_queue) AS segmentation_queue,
+    IF(a.dt_reference >= a.dt_invoice_paid, g.segmentation_queue_description, a.segmentation_queue_description) AS segmentation_queue_description,
+    IF(a.dt_reference >= a.dt_invoice_paid, g.agreement_queue, a.agreement_queue) AS agreement_queue,
+    IF(a.dt_reference >= a.dt_invoice_paid, g.agreement_queue_description, a.agreement_queue_description) AS agreement_queue_description,
+    IF(a.dt_reference >= a.dt_invoice_paid, g.eviction_queue, a.eviction_queue) AS eviction_queue,
+    IF(a.dt_reference >= a.dt_invoice_paid, g.eviction_queue_description, a.eviction_queue_description) AS eviction_queue_description,
     IF(ROW_NUMBER() OVER(PARTITION BY a.id_contract, a.id_invoice, a.dt_month_start ORDER BY a.dt_reference DESC) = 1, TRUE, FALSE) AS is_most_recent_record_month,
     a.dt_invoice_paid,
     a.dt_invoice_due,
