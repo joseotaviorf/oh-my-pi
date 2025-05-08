@@ -129,7 +129,7 @@ SELECT
     dt_sap_reference,
     NOW() AS ts_load
 FROM 
-    datalake_accounting_funnel.kill_queue_invoice_issuance
+    datalake_sap_accounting_process.for_rent_reservation_issuance
 
 UNION ALL 
 

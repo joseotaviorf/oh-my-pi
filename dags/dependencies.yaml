@@ -6,12 +6,12 @@ bietlejuice.amplitude_supply:
 bietlejuice.demand_balancer_service:
   - quintoml.search.maestro.inference:batch-predict
 bietlejuice.dw_accounting_funnel:
-  - bietlejuice.enrich_accounting_funnel:load-enrich-kill-queue-invoice-issuance
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-invoice-issuance
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-provision-creation
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-revenue-accounting
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-reversion-creation
   - bietlejuice.enrich_sap_accounting_process:load-enrich-for-rent-bank-settlement
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-for-rent-reservation-issuance
   - bietlejuice.enrich_sap_accounting_process:load-enrich-quintocred-bank-settlement
 bietlejuice.dw_accounts_receivable:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline
@@ -1113,7 +1113,6 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry
   - bietlejuice.enrich_sap:load-enrich-ledger-new-template
   - bietlejuice.gsheets_fintech:done-clean-cod-locale
-  - bietlejuice.kill_queue:load-clean-reservation
   - bietlejuice.monopoly:load-clean-accounting-entry
   - bietlejuice.monopoly:load-clean-sale
   - bietlejuice.monopoly:load-clean-sale-revision
@@ -3012,6 +3011,7 @@ bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.itau_statements:load-clean-statement-879200452685
   - bietlejuice.itau_statements:load-clean-statement-879200494588
+  - bietlejuice.kill_queue:load-clean-reservation
   - bietlejuice.nexxera:load-clean-cnab-charges-recupera-velo-2
   - bietlejuice.pixar:load-clean-charge
   - bietlejuice.rental_guarantee_platform:load-clean-agreement-payment
@@ -3022,6 +3022,8 @@ bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.rental_guarantee_platform:load-clean-payment
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-sap-entity
+  - bietlejuice.sap_gateway:load-clean-feature
+  - bietlejuice.sap_gateway:load-clean-sync-sap-job
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
