@@ -52,6 +52,9 @@ SELECT
   was_cancelled,
   ts_created,
   ts_updated,
+  op_cdc,
+  ts_cdc_transaction,
+  ts_database_transaction
   year,
   month,
   day
