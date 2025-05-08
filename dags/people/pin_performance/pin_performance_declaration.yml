@@ -44,7 +44,7 @@ workflow:
     - "{load_end_date}"
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, ds, load_start_date) }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, load_end_date) }}"
+    load_end_date: "{{ get_date_param(dag_run, tomorrow_ds, load_end_date) }}"
   default_table_privileges:
     people-team:
       - ALL PRIVILEGES
