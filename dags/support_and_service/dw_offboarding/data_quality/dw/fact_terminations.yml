@@ -13,30 +13,6 @@ column_level_validations:
   sk_house:
     is_complete:
       severity_level: Error
-  total_tentant_repair_ar:
-    greater_than_or_equal_to: 0
-    severity_level: Error
-  repairs_added_by_owner_review:
-    greater_than_or_equal_to: 0
-    severity_level: Error
-  repairs_exempted_by_owner_review:
-    greater_than_or_equal_to: 0
-    severity_level: Error
-  total_tentant_repair_review:
-    greater_than_or_equal_to: 0
-    severity_level: Error
-  repairs_exempted_ac:
-    greater_than_or_equal_to: 0
-    severity_level: Error
-  repairs_absorbed_ac:
-    greater_than_or_equal_to: 0
-    severity_level: Error
-  total_tentant_repair_ac:
-    greater_than_or_equal_to: 0
-    severity_level: Error
-  ts_termination_request:
-    is_complete:
-      severity_level: Error
   ts_termination_updated:
     is_complete:
       severity_level: Error
