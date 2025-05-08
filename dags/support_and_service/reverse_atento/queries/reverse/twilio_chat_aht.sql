@@ -13,7 +13,7 @@ SELECT
   DAY(CURRENT_DATE) AS day,
   NOW() AS ts_load
 FROM
-  datalake_quinto_messenger.chat_aht ca
+  datalake_customer_support.chat_aht ca
 LEFT JOIN
   datalake_gsheets_clean.department_control dc
     ON ca.department_name = dc.department

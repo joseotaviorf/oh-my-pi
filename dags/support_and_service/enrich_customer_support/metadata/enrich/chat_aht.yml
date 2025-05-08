@@ -1,4 +1,4 @@
-database_name: datalake_quinto_messenger
+database_name: datalake_customer_support
 table_name: chat_aht
 description: Enrichment table that aims to calculate metrics related to twilio chat tasks.
 domain: Support and Services

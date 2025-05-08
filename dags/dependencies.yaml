@@ -335,7 +335,6 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_greenseer:load-enrich-sessions
   - bietlejuice.enrich_offer:load-enrich-sale-offer
-  - bietlejuice.enrich_quinto_messenger:load-enrich-message
   - bietlejuice.enrich_repairs:load-enrich-ongoing-repair-tickets
   - bietlejuice.enrich_satisfaction_rating:load-enrich-chat-fup-surveys
   - bietlejuice.enrich_support_users:load-enrich-analysts
@@ -1573,6 +1572,7 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.chat_fup:load-clean-chats-chat
   - bietlejuice.chat_fup:load-clean-surveys-answer
   - bietlejuice.chat_fup:load-clean-surveys-survey
+  - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.greenseer:load-clean-session
@@ -2550,14 +2550,6 @@ bietlejuice.enrich_prospect_status:
 bietlejuice.enrich_public_date:
   - bietlejuice.google_calendar:load-clean-brazillian-holidays
   - bietlejuice.google_calendar:load-clean-mexican-holidays
-bietlejuice.enrich_quinto_messenger:
-  - bietlejuice.enrich_support_users:load-enrich-analysts
-  - bietlejuice.internal_chat:load-clean-internal-chat-messages
-  - bietlejuice.quinto_messenger:load-clean-channel
-  - bietlejuice.quinto_messenger:load-clean-channel-event
-  - bietlejuice.quinto_messenger:load-clean-chat
-  - bietlejuice.quinto_messenger:load-clean-task
-  - bietlejuice.quinto_messenger:load-clean-task-event
 bietlejuice.enrich_recommendations:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -3286,7 +3278,6 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.enrich_customer_support:load-enrich-ivr-interactions
   - bietlejuice.enrich_ebdb_user:load-enrich-user
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
-  - bietlejuice.enrich_quinto_messenger:load-enrich-tasks
   - bietlejuice.enrich_tqc_referral:load-enrich-unified-lead-referral-flow
   - bietlejuice.hmb_ada:load-clean-backoffices
   - bietlejuice.hub_services:load-clean-lead
@@ -3602,7 +3593,7 @@ bietlejuice.reverse_atento:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
   - bietlejuice.enrich_customer_support:load-enrich-calls
-  - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
+  - bietlejuice.enrich_customer_support:load-enrich-chat-aht
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.quinto_messenger:load-clean-channel
@@ -3859,9 +3850,9 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
   - bietlejuice.enrich_customer_support:load-enrich-calls
+  - bietlejuice.enrich_customer_support:load-enrich-chat-aht
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks
-  - bietlejuice.enrich_quinto_messenger:load-enrich-chat-aht
   - bietlejuice.enrich_repairs:load-enrich-repair-tickets
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.gsheets_support_and_service:done-clean-department-control

@@ -114,10 +114,6 @@ columns:
     lineage:
       - datalake_customer_support.chats.customer_email
     description: Customer email associated with the contact.
-  average_reply_time:
-    lineage:
-      - datalake_quinto_messenger.message.reply_time
-    description: Average reply time for the contact.
   total_talk_time:
     lineage:
       - datalake_twilio_flex_insights_clean.conversation_time_metrics.total_talk_time

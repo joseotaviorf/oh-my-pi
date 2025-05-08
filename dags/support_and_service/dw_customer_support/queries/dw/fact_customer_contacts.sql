@@ -12,18 +12,6 @@ WITH time_metrics AS (
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_segment ORDER BY dt_created DESC) = 1
 ),
-average_reply_time AS (
-  SELECT
-    id_task,
-    msg_sender AS agent_email,
-    AVG(reply_time) AS average_reply_time
-  FROM
-    datalake_quinto_messenger.message
-  WHERE
-    msg_sender LIKE "%@%.com%"
-    AND ts_created >= DATE('{load_start_date}') - INTERVAL 2 YEAR
-  GROUP BY 1, 2
-),
 chat_reservation_timestamp AS (
   SELECT
     id_task,
@@ -166,7 +154,6 @@ twilio_contacts AS (
     d.quinto_andar_phone_number,
     d.customer_phone_number,
     d.customer_email,
-    art.average_reply_time,
     tm.total_talk_time,
     tm.total_queue_time,
     tm.total_wrap_up_time,
@@ -190,11 +177,6 @@ twilio_contacts AS (
     time_metrics AS tm
       ON tm.id_task = d.id_task
       OR tm.id_reservation = d.id_reservation
-  LEFT JOIN
-    average_reply_time AS art
-      ON art.id_task = d.id_task
-      AND art.agent_email = d.worker_email
-      AND d.channel = 'chat'
   LEFT JOIN
     datalake_customer_support.tickets AS t1
       ON t1.id_twilio = d.id_call
@@ -235,7 +217,6 @@ front_contacts AS (
     quinto_andar_phone_number,
     customer_phone_number,
     customer_email,
-    average_reply_time,
     total_talk_time,
     total_queue_time,
     total_wrap_up_time,
@@ -296,7 +277,6 @@ front_contacts AS (
     NULL AS quinto_andar_phone_number,
     NULL AS customer_phone_number,
     ce.email AS customer_email,
-    NULL AS average_reply_time,
     NULL AS total_talk_time,
     NULL AS total_queue_time,
     NULL AS total_wrap_up_time,
@@ -353,7 +333,6 @@ SELECT DISTINCT
   quinto_andar_phone_number,
   customer_phone_number,
   customer_email,
-  average_reply_time,
   total_talk_time,
   total_queue_time,
   total_wrap_up_time,

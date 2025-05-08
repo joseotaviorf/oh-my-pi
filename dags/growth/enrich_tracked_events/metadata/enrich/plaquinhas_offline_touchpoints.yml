@@ -27,27 +27,27 @@ columns:
     description: Year of the contact.
     lineage:
       - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_quinto_messenger.tasks.ts_created
+      - datalake_customer_support.chats.ts_created
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
       - datalake_bigfone_twilio.call_flex_events.ts_created_local
   month:
     description: Month of the contact.
     lineage:
       - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_quinto_messenger.tasks.ts_created
+      - datalake_customer_support.chats.ts_created
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
       - datalake_bigfone_twilio.call_flex_events.ts_created_local
   day:
     description: Day of the contact.
     lineage:
       - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_quinto_messenger.tasks.ts_created
+      - datalake_customer_support.chats.ts_created
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
       - datalake_bigfone_twilio.call_flex_events.ts_created_local
   ts_event:
     description: Timestamp of the contact.
     lineage:
       - datalake_gsheets_clean.users_cx_plaquinhas.data_hora
-      - datalake_quinto_messenger.tasks.ts_created
+      - datalake_customer_support.chats.ts_created
       - datalake_bigfone_twilio.call_ivr_events.ts_created_local
       - datalake_bigfone_twilio.call_flex_events.ts_created_local

@@ -5,10 +5,10 @@ WITH legacy_chat_flow AS (
     'Chat' AS contact_channel,
     qmt.ts_created AS ts_event
   FROM
-    datalake_quinto_messenger.tasks AS qmt
+    datalake_customer_support.chats AS qmt
   INNER JOIN
     datalake_ebdb_user.user AS user
-      ON qmt.from_phone_number = user.main_phone
+      ON qmt.customer_phone_number = user.main_phone
   WHERE
     LOWER(qmt.queue_name) LIKE '%plaquinhas%'
     AND  user.id > 0
