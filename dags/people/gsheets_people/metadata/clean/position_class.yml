@@ -1,7 +1,6 @@
----
 database_name: datalake_gsheets_people_clean
 table_name: position_class
-owner: leonardo.soares@quintoandar.com.br
+owner: gabriel.berger@quintoandar.com.br
 domain: people
 description: null
 columns:

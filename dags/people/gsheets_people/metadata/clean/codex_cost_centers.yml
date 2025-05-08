@@ -1,0 +1,82 @@
+database_name: datalake_gsheets_people_clean
+table_name: codex_cost_centers
+owner: gabriel.berger@quintoandar.com.br
+domain: people
+description: 'Table containing information regarding the cost centers, including owners and business divisions.'
+columns:
+  id_cost_center_legacy:
+    description: 'Legacy unique identifier of the cost center (BEFORE the 2024-2025 review of the cost centers ids).'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.`CC Legacy`
+  id_cost_center_current:
+    description: 'Current unique identifier of the cost center (AFTER the 2024-2025 review of the cost centers ids).'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.`CC Code`
+  id_sort:
+    description: 'Unique identifier used to sort the cost centers in a specific order defined by the FP&A team.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.Sort
+  id_team:
+    description: 'Unique identifier of the cost centers team'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.`Team Code`
+  cost_center_full_name:
+    description: 'Full name of the cost center (includes its id at the beggining)'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.`CC Full Name`
+  cost_center_name_no_code:
+    description: 'Name of the cost center without its id at the beggining'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.`CC Name`
+  business:
+    description: 'Business unit to which the cost center belongs.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.Business
+  product:
+    description: 'Primary product associated with this cost center.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.Product
+  brand:
+    description: 'Brand to which the cost center belongs.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.Brand
+  team:
+    description: 'Team to which the cost center belongs.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.`Team Name`
+  structure:
+    description: 'Structure to which the cost center belongs.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.`Structure Name`
+  chaper:
+    description: 'Chapter to which the cost center belongs.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.`P&T Chapter`
+  line:
+    description: 'Line to which the cost center belongs.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.`P&T Line`
+  owner_fep_email:
+    description: 'Email of the FP&A member responsible for the cost center.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.`F&P Owner`
+  owner_l1_email:
+    description: 'Email of the second highest manager (L1) in the hierarchy responsible for the cost center.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.L1
+  owner_l2_email:
+    description: 'Email of the third highest manager (L2) in the hierarchy responsible for the cost center.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.L2
+  owner_l3_email:
+    description: 'Email of the fourth highest manager (L3) in the hierarchy responsible for the cost center.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.L3
+  cost_center_status:
+    description: 'Status of the cost center, indicating if it is active (Active) or inactive (End)'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.`Status`
+  ts_load:
+    description: 'Timestamp of when the record was loaded.'
+    lineage:
+    - datalake_gsheets_people_raw.codex_cost_centers.ts_load
