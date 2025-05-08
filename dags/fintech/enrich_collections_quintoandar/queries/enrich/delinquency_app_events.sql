@@ -23,7 +23,7 @@ pending_invoices_events AS (
     id_amplitude,
     id_session,
     id_user,
-    FROM_JSON(ep_id_contracts, 'array<bigint>') AS id_contract,
+    ARRAY(ep_id_contract) AS id_contract,
     FROM_JSON(ep_id_invoices, 'array<string>') AS id_invoice,
     device_brand,
     "rm_pending_invoices_page_viewed" AS event_name,
