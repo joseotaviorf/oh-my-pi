@@ -3,7 +3,7 @@ dag:
   schedule_start_date: 2024, 1, 1
   owner: Data Primitives
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   custom_schema: search
   default_extraction_type: full
@@ -38,6 +38,11 @@ workflow:
         - year
         - month
         - day
+    recs_impressions_processed:
+      partitions:
+      - year
+      - month
+      - day
     search_impressions:
       partitions:
       - year
