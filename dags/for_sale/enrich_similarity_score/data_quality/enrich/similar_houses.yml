@@ -9,9 +9,6 @@ column_level_validations:
   id_house:
     is_complete:
       severity_level: Error
-  ids_similar:
-    is_complete:
-      severity_level: Error
   qty_similar:
     is_complete:
       severity_level: Error
