@@ -13,7 +13,7 @@ columns:
     description: "The message identifier in the external system"
     lineage:
     - datalake_copilot_service_raw.session.external_id
-  id_session:
+  id_sauron_session:
     description: "The session identifier in the external system"
     lineage:
     - datalake_copilot_service_raw.session.external_reference
