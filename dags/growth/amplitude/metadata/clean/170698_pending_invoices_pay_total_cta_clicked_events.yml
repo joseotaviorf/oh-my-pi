@@ -74,6 +74,9 @@ columns:
   event_properties:
     lineage:
       - datalake_amplitude_clean_staging.170698_pending_invoices_pay_total_cta_clicked_events
+  ep_id_contract:
+    lineage:
+      - datalake_amplitude_clean_staging.170698_pending_invoices_pay_total_cta_clicked_events.event_properties
   is_attribution_event:
     lineage:
       - datalake_amplitude_clean_staging.170698_pending_invoices_pay_total_cta_clicked_events.is_attribution_event

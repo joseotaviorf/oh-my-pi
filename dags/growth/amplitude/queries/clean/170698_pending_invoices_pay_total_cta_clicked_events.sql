@@ -24,6 +24,7 @@ SELECT
     dma,
     event_type,
     event_properties,
+    CAST(GET_JSON_OBJECT(event_properties, '$.contract_id') AS STRING) AS ep_id_contract,
     ip_address,
     location_lat,
     location_lng,
