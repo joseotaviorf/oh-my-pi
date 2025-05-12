@@ -452,6 +452,52 @@ def schema_define():
                         ]
                     )
             },
+       'purchase_sale_contract':
+            {
+                'schema':
+                    StructType(
+                        [
+                            StructField("Id",StringType()),
+                            StructField("OwnerId",StringType()),
+                            StructField("IsDeleted",StringType()),
+                            StructField("Name",StringType()),
+                            StructField("CreatedDate",StringType()),
+                            StructField("CreatedById",StringType()),
+                            StructField("LastModifiedDate",StringType()),
+                            StructField("LastModifiedById",StringType()),
+                            StructField("SystemModstamp",StringType()),
+                            StructField("LastActivityDate",StringType()),
+                            StructField("LastViewedDate",StringType()),
+                            StructField("LastReferencedDate",StringType()),
+                            StructField("DiligenceClassification__c",StringType()),
+                            StructField("DiligenceStatus__c",StringType()),
+                            StructField("IsDownPaymentPaid__c",StringType()),
+                            StructField("PaymentMethod__c",StringType()),
+                            StructField("Stage__c",StringType()),
+                            StructField("BYPaysEntireDeposit__c",StringType()),
+                            StructField("Buyer__c",StringType()),
+                            StructField("CCVSignedAt__c",StringType()),
+                            StructField("ClauseIdentifiers__c",StringType()),
+                            StructField("SubscriptionSchedulingDate__c",StringType()),
+                            StructField("ExternalId__c",StringType()),
+                            StructField("IsDiligenceAccepted__c",StringType()),
+                            StructField("OfferId__c",StringType()),
+                            StructField("SalesFlowUrl__c",StringType()),
+                            StructField("Seller__c",StringType()),
+                            StructField("ZendeskUrl__c",StringType()),
+                            StructField("AgentEmail__c",StringType()),
+                            StructField("HasDownPaymentExtension__c",StringType()),
+                            StructField("PaidViaTed__c",StringType()),
+                            StructField("SignalBrokerage__c",StringType()),
+                            StructField("DownPaymentDeadline__c",StringType()),
+                            StructField("CRNStatus__c",StringType()),
+                            StructField("KeysReceived__c",StringType()),
+                            StructField("FS_BY_KeyDeliveryDate__c",StringType()),
+                            StructField("FS_SL_KeyDeliveryDate__c",StringType()),
+                            StructField("KeyDeliveryDate__c",StringType()),
+                            ]
+                    )
+            },
     }
 
 def get_next_page_data(query, headers, instance_url, table_name, is_done, next_url):
@@ -465,8 +511,6 @@ def get_next_page_data(query, headers, instance_url, table_name, is_done, next_u
 
     response = requests.get(api_endpoint, headers=headers)
     response_json = response.json()
-
-    print(response_json)
 
     is_done = response_json['done']
     next_url = response_json.get('nextRecordsUrl', None)

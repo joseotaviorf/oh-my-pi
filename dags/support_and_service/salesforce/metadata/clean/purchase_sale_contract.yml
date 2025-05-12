@@ -1,0 +1,206 @@
+---
+database_name: datalake_salesforce_clean
+table_name: purchase_sale_contract
+owner: leonardo.soares@quintoandar.com.br
+domain: support_and_service
+description: Table with data about purchase sale contracts
+columns:
+  id:
+    description: 'Identifier of the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.Id
+  id_owner:
+    description: 'Identifier of the seller of the house'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.OwnerId
+  id_created_by:
+    description: 'Identifier of the user who created the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.CreatedById
+  id_last_modified_by:
+    description: 'Identifier of the user who last modified the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.LastModifiedById
+  id_external:
+    description: 'External identifier of the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.ExternalId__c
+  id_offer:
+    description: 'Identifier of the offer associated with the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.OfferId__c
+  name:
+    description: 'Name of the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.Name
+  diligence_classification:
+    description: 'Diligence classification'
+    categories:
+      "NOT STARTED": Not started, difficulty is not defined
+      "NO APPOINTMENT": No appointment, difficulty is not defined
+      "LOW RISK": Low risk, difficulty is low
+      "MODERATE RISK": Medium risk, difficulty is medium
+      "HIGH RISK": High risk, difficulty is high
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.DiligenceClassification__c
+  diligence_status:
+    description: 'Status of the diligence'
+    categories:
+      "NOT STARTED": Not started
+      "PROCESSING": Diligence in progress
+      "REPORT_AVAILABLE": Diligence report available
+      "REPORT_SENT_SELLER": Diligence report sent to the seller
+      "REPORT_SENT_BUYER": Diligence report sent to the buyer
+      "PENDING": Diligence is pending
+      "CANCELED": Diligence canceled
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.DiligenceStatus__c
+  payment_method:
+    description: 'The payment method used in the purchase sale contract'
+    categories:
+      "CASH": Cash
+      "CASH USING FGTS": Cash using FGTS
+      "FINANCED": Financed
+      "FINANCED USING FGTS": Financed using FGTS
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.PaymentMethod__c
+  stage:
+    description: 'Stage of the purchase sale contract'
+    categories:
+      "ONBOARDING": Onboardin
+      "PAYMENT_OF_THE_DEPOSIT": Payment of the deposit
+      "DILIGENCE": Diligence
+      "CRN": CRN (Notary Office)
+      "ITBI": ITBI (Property Transfer Tax)
+      "BALANCE_PAYMENT": Balance payment
+      "CRI": CRI (Real Estate Credit Certificate)
+      "KEY_DELIVERY": Key delivery
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.Stage__c
+  buyer:
+    description: 'Identifier of the buyer of the house'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.Buyer__c
+  clause_identifiers:
+    description: 'Specifies the clauses that are part of the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.ClauseIdentifiers__c
+  sales_flow_url:
+    description: 'URL of the sales flow'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.SalesFlowUrl__c
+  seller:
+    description: 'Seller of the house'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.Seller__c
+  zendesk_url:
+    description: 'Zendesk URL of the case'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.ZendeskUrl__c
+  agent_email:
+    description: 'Email of the agent responsible for the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.AgentEmail__c
+  crn_status:
+    description: 'Notary office status'
+    categories:
+      "DRAFT_IN_PREPARATION": Draft in preparation
+      "DRAFT_SENT_UNDER_APPROVAL": Draft sent under approval
+      "DRAFT_APPROVED": Draft approved
+      "AWAITING_DD_ACCEPTANCE": Awaiting DD acceptance
+      "SIGNATURE_SCHEDULED": Signature scheduled
+      "DEED_SIGNED": Deed signed
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.CRNStatus__c
+  is_deleted:
+    description: 'Flag indicating if the purchase sale contract is deleted'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.IsDeleted
+  is_down_payment_paid:
+    description: 'Flag indicating if the down payment is paid'
+    lineage:
+    - "datalake_salesforce_raw.purchase_sale_contract.IsDownPaymentPaid__c"
+  is_buyer_pays_entire_deposit:
+    description: 'Flag indicating if the buyer pays the entire deposit'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.BYPaysEntireDeposit__c
+  is_diligence_accepted:
+    description: 'Flag indicating if the diligence is accepted'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.IsDiligenceAccepted__c
+  has_down_payment_extension:
+    description: 'Flag indicating if there is a down payment extension'
+    lineage:
+    - "datalake_salesforce_raw.purchase_sale_contract.HasDownPaymentExtension__c"
+  is_paid_via_ted:
+    description: 'Flag indicating if the payment is made via TED'
+    lineage:
+    - "datalake_salesforce_raw.purchase_sale_contract.PaidViaTed__c"
+  is_seller_pays_part_deposit:
+    description: 'Flag indicating if the seller pays part of the deposit'
+    lineage:
+    - "datalake_salesforce_raw.purchase_sale_contract.SignalBrokerage__c"
+  is_key_received:
+    description: 'Flag indicating if the key is received'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.KeysReceived__c
+  dt_down_payment_deadline:
+    description: 'Date of the down payment deadline'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.DownPaymentDeadline__c 
+  dt_key_delivery_buyer:
+    description: 'Date of key delivery to the buyer'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.FS_BY_KeyDeliveryDate__c
+  dt_key_delivery_seller:
+    description: 'Date of key delivery from the seller'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.FS_SL_KeyDeliveryDate__c
+  dt_key_delivery:
+    description: 'Date of key delivery'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.KeyDeliveryDate__c
+  dt_updated:
+    description: 'Date when the purchase sale contract was last updated'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.dt_updated
+  ts_created:
+    description: 'Date and time when the purchase sale contract was created'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.CreatedDate
+  ts_last_modified:
+    description: 'Date and time when the purchase sale contract was last modified'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.LastModifiedDate
+  ts_system_mod:
+    description: 'Date and time when the purchase sale contract was last modified in the system'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.SystemModstamp
+  ts_last_activity:
+    description: 'Date and time of the last activity on the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.LastActivityDate
+  ts_last_viewed:
+    description: 'Date and time when the purchase sale contract was last viewed'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.LastViewedDate
+  ts_last_referenced:
+    description: 'Date and time when the purchase sale contract was last referenced'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.LastReferencedDate
+  ts_ccv_signed:
+    description: 'Date and time when the CCV was signed'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.CCVSignedAt__c
+  year:
+    description: 'Year of the last modification of the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.year
+  month:
+    description: 'Month of the last modification of the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.month
+  day:
+    description: 'Day of the last modification of the purchase sale contract'
+    lineage:
+    - datalake_salesforce_raw.purchase_sale_contract.day
