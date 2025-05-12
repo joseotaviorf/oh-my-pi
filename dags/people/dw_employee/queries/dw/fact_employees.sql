@@ -124,20 +124,6 @@ WITH
                 ) + 1
                 ELSE NULL
             END AS period,
-            CASE
-                WHEN qnt_movimentations > 1 THEN ROUND(
-                    AVG(
-                        FLOOR(
-                            DATEDIFF (month, previous_change_date, change_date)
-                        ) + 1
-                    ) OVER (
-                        PARTITION BY
-                            id_person
-                    ),
-                    1
-                )
-                ELSE 0
-            END AS average_time_between_movimentations,
             MAX(
                 CASE
                     WHEN change_date = last_change_date THEN change_date
@@ -167,41 +153,6 @@ WITH
             ) AS pct_last_increase,
             MAX(
                 CASE
-                    WHEN change_date = last_change_date THEN salary
-                    ELSE 0
-                END
-            ) OVER (
-                PARTITION BY
-                    id_person
-            ) AS last_salary,
-            MAX(
-                CASE
-                    WHEN change_date = first_change_date THEN salary
-                    ELSE 0
-                END
-            ) OVER (
-                PARTITION BY
-                    id_person
-            ) AS first_salary,
-            MAX(
-                CASE
-                    WHEN change_date = last_change_date THEN salary
-                    ELSE 0
-                END
-            ) OVER (
-                PARTITION BY
-                    id_person
-            ) - MAX(
-                CASE
-                    WHEN change_date = first_change_date THEN salary
-                    ELSE 0
-                END
-            ) OVER (
-                PARTITION BY
-                    id_person
-            ) AS range_salary_movement,
-            MAX(
-                CASE
                     WHEN order = 1 THEN change_date
                     ELSE NULL
                 END
@@ -215,28 +166,6 @@ WITH
     cte_movements_for_employee AS (
         SELECT
             *,
-            CASE
-                WHEN qnt_movimentations > 1 THEN FLOOR(DATEDIFF (month, start_date, dt_first_promotion)) + 1
-                ELSE NULL
-            END AS months_to_first_promotion,
-            MAX(
-                CASE
-                    WHEN change_date = dt_first_promotion THEN nominal_increase
-                    ELSE 0
-                END
-            ) OVER (
-                PARTITION BY
-                    id_person
-            ) AS nominal_increase_first_promotion,
-            MAX(
-                CASE
-                    WHEN change_date = dt_first_promotion THEN salary
-                    ELSE 0
-                END
-            ) OVER (
-                PARTITION BY
-                    id_person
-            ) AS first_promotion_salary,
             MAX(
                 CASE
                     WHEN change_date = dt_first_promotion THEN percentage_increase
@@ -253,13 +182,7 @@ WITH
         SELECT DISTINCT
             id_person,
             qnt_movimentations,
-            average_time_between_movimentations,
-            first_salary,
-            range_salary_movement,
-            first_promotion_salary,
-            nominal_increase_first_promotion,
             pct_increase_first_promotion,
-            months_to_first_promotion,
             dt_first_promotion
         FROM
             cte_movements_for_employee
@@ -292,21 +215,12 @@ SELECT
     am.assignment_age_months,
     am.qnt_directly_led,
     am.qnt_undirectly_led,
-    am.qnt_promotions,
     am.salary,
     am.target_plr,
     am.salary_reference,
     se.qnt_movimentations,
-    se.average_time_between_movimentations,
     am.last_increase AS last_salary_increase,
     am.pct_last_increase AS pct_last_salary_increase,
-    se.first_salary,
-    am.last_salary,
-    se.range_salary_movement,
-    se.first_promotion_salary,
-    se.nominal_increase_first_promotion AS nominal_salary_increase_first_promotion,
-    se.pct_increase_first_promotion AS pct_salary_increase_first_promotion,
-    se.months_to_first_promotion,
     NOW() AS ts_load
 FROM
     datalake_hr_system.assignment_metrics AS am

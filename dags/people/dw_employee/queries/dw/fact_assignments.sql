@@ -27,16 +27,8 @@ SELECT
   am.target_plr,
   am.salary_reference,
   am.qnt_movimentations,
-  am.average_time_between_movimentations,
   am.last_increase AS last_salary_increase,
   am.pct_last_increase AS pct_last_salary_increase,
-  am.first_salary,
-  am.last_salary,
-  am.range_salary_movement,
-  am.first_promotion_salary,
-  am.nominal_increase_first_promotion AS nominal_salary_increase_first_promotion,
-  am.pct_increase_first_promotion AS pct_salary_increase_first_promotion,
-  am.months_to_first_promotion,
   NOW() AS ts_load
 FROM
   datalake_hr_system.assignment_metrics AS am
