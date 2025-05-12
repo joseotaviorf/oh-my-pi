@@ -8,4 +8,5 @@ SELECT
   content,
   extra,
   created_at AS ts_created
-FROM datalake_copilot_service_raw.message
+FROM
+  datalake_copilot_service_raw.message
