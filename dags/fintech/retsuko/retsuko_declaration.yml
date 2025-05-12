@@ -41,8 +41,16 @@ workflow:
       get_table_metrics:
         count: external_id
         max: retsuko_updated_at
+    entry_partitioned:
+      get_table_metrics:
+        count: external_id
+        max: retsuko_updated_at
     file: {}
     invoice:
+      get_table_metrics:
+        count: external_id
+        max: retsuko_updated_at
+    invoice_partitioned:
       get_table_metrics:
         count: external_id
         max: retsuko_updated_at
