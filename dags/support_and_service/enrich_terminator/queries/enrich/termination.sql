@@ -93,30 +93,18 @@ repair_metrics AS (
           CASE
             WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1
         END) AS repairs_absorbed_ac,
-        COUNT(
-          CASE
-            WHEN exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE') THEN 1
-        END) +
-            COUNT(CASE
-              WHEN requester_type = 'OWNER' THEN 1
-            END) -
-              COUNT(CASE
-                WHEN is_exempted_by_owner = true THEN 1
-              END) -
-                COUNT(
-                  CASE
-                    WHEN is_finished = true AND is_exempted = true THEN 1
-                END) -
-                  COUNT(CASE
-                    WHEN responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false THEN 1
-                  END) AS total_tentant_repair_ac
+        COUNT_IF(
+          (exempted_on_ar = false AND requester_type IN ('ADMIN','INSPECTIONS_SERVICE')) OR (requester_type = 'OWNER')
+        ) - COUNT_IF(
+          (is_exempted_by_owner = true) OR (is_finished = true AND is_exempted = true) OR (responsibility = 'ABSORBED_BY_COMPANY' AND is_exempted_by_owner = false)
+        ) AS total_tentant_repair_ac
     FROM
         datalake_inspections.repair_request
     WHERE
         comment IS NOT NULL
         AND responsibility IN ('TENANT', 'OWNER', 'ABSORBED_BY_COMPANY', 'EXEMPTED')
     GROUP BY
-          ALL
+          1
 )
 SELECT
     t.id AS id_termination,

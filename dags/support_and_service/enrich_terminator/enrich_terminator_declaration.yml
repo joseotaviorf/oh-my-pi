@@ -16,10 +16,10 @@ workflow:
       merge_on: ["id_termination"]
 
 cluster:
-  type: databricks_12_2_med_compute_cluster
+  type: databricks_13_3_med_memory_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
