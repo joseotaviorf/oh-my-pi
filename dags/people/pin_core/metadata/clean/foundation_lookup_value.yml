@@ -1,6 +1,6 @@
 ---
 database_name: datalake_pin_core_clean
-table_name: lookup_value
+table_name: foundation_lookup_value
 owner: isabella.araujo@quintoandar.com.br
 domain: people
 description: >

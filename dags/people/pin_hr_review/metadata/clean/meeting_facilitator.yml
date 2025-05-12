@@ -1,6 +1,6 @@
 ---
 database_name: datalake_pin_hr_review_clean
-table_name: dashboard_template_base
+table_name: meeting_facilitator
 owner: isabella.araujo@quintoandar.com.br
 domain: people
 description: Templates for Talent Review Dashboards.
