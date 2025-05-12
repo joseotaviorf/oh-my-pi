@@ -4,103 +4,55 @@ dag:
   schedule_interval: 0 0 * * *
   owner: Data Agents
   documentation:
-    dag_purpose: This DAG imports the tables from [HubServices](https://github.com/quintoandar/hubs), a service that centralizes hub data.
+    dag_purpose: |
+      This DAG imports the tables from [HubServices](https://github.com/quintoandar/hubs), a service that centralizes hub data.
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
-  dbutils_secret_key: HUB_SERVICES_DB
+  dbutils_secret_key: HUBS_DB
   lineage_product_database_name: hubservices
-  default_extraction_type: incremental
-  default_partitions: [year, month, day]
+  source_schema: public
+  source_database: hubs
+  custom_schema: hub_services
   tables_customization:
-    business_unit:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    business_unit_aud:
-      date_filter_column: updated_at
-    business_unit_region:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    business_unit_region_aud:
-      date_filter_column: updated_at
-    lead:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    lead_aud:
-      date_filter_column: updated_at
-    member_profile:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    member_profile_aud:
-      date_filter_column: updated_at
-    observation:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    observation_aud:
-      date_filter_column: updated_at
-    region:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    region_aud:
-      date_filter_column: updated_at
-    reminder:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    reminder_aud:
-      date_filter_column: updated_at
-    reminder_type:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    reminder_type_aud:
-      date_filter_column: updated_at
-    responsible:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    responsible_aud:
-      date_filter_column: updated_at
-    revinfo:
+    business_unit: {}
+    business_unit_aud: {}
+    business_unit_region: {}
+    business_unit_region_aud: {}
+    lead: {}
+    lead_aud: {}
+    member_profile: {}
+    member_profile_aud: {}
+    observation: {}
+    observation_aud: {}
+    region: {}
+    region_aud: {}
+    reminder: {}
+    reminder_aud: {}
+    reminder_type: {}
+    reminder_type_aud: {}
+    responsible: {}
+    responsible_aud: {}
+    revinfo: 
       clean_table_name: rev_info
-      date_filter_column: timestamp
-      unixtime_measure: milliseconds
-    users:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    users_aud:
-      date_filter_column: updated_at
-    visitor:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    visitor_aud:
-      date_filter_column: updated_at
-    visitor_event:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    visitor_event_aud:
-      date_filter_column: updated_at
-    visitor_prospection:
-      date_filter_column: updated_at
-      raw_extraction_type: incremental
-      clean_extraction_type: full
-    visitor_prospection_aud:
-      date_filter_column: updated_at
+    users: {}
+    users_aud: {}
+    visitor: {}
+    visitor_aud: {}
+    visitor_event: {}
+    visitor_event_aud: {}
+    visitor_prospection: {}
+    visitor_prospection_aud: {}
 cluster:
-  type: databricks_12_2_med_general_cluster
-  databricks_conn_id: databricks_new
+  type: custom_cluster
   custom_configurations:
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

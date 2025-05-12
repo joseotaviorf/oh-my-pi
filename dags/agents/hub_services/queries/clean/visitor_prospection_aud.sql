@@ -35,7 +35,3 @@ SELECT
     day
 FROM 
     datalake_hub_services_raw.visitor_prospection_aud
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
