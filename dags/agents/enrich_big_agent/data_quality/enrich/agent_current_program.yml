@@ -6,11 +6,14 @@ table_level_validations:
     greater_than: 18000
     severity_level: Error
 column_level_validations:
-  id_user:
-    is_complete:
-      severity_level: Error
-    is_unique:
-      severity_level: Error
+  # id_user:
+  #   is_complete:
+  #     severity_level: Error
+  #   is_unique:
+  #     severity_level: Error
+  # --------------------------------
+  # 2024-05-08 : Waiting for correction of null column in product.
+  # --------------------------------
   id_agent:
     is_complete:
       severity_level: Error
