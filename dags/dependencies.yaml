@@ -342,6 +342,7 @@ bietlejuice.dw_customer_support:
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys
   - bietlejuice.enrich_zendesk:load-enrich-tickets
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
+  - bietlejuice.gsheets_support_and_service:done-clean-agents-control
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.internal_chat:load-clean-internal-chat-messages
   - bietlejuice.quinto_messenger:load-clean-channel

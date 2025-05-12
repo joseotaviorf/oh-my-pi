@@ -1,4 +1,10 @@
 sheets_info:
+  agents_control:
+    sheet_id: 1wIwrWi0xlY4TAZnE6JlGm6B0UyezOPxfF5s0_pn-i9E
+    sheet_name: Agents Control
+    clean_table_name: agents_control
+    sheet_context: support_and_service
+
   agendamento_vistoria_entrada:
     sheet_id: 1LHcKqdrbTWNvRBT7TGVEbKhIrtqaqSxVVaeKsIcJZus
     sheet_name: agendamento_entrada
