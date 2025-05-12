@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 
 from pyspark.sql.functions import col, current_timestamp, greatest
 
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatabaseEnum,DatalakeMetastoreService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.pipeline import LayerEnum
@@ -69,7 +70,6 @@ if __name__ == "__main__":
     parser.add_argument("partitions", help="partition columns")
     parser.add_argument("date_filter_columns", help="partition columns")
 
-
     args = parser.parse_args()
 
     environment = args.environment
@@ -81,6 +81,7 @@ if __name__ == "__main__":
     extraction_type = args.extraction_type
     partitions = ast.literal_eval(args.partitions)
     date_filter_columns = ast.literal_eval(args.date_filter_columns)
+
 
     logger.info(
         f"""
@@ -95,6 +96,9 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     base_dbutils = BaseDBUtils()
     dbutils = base_dbutils.get_dbutils()
+
+
+
 
     conn_config = _get_conn_config(dbutils, DatabaseEnum.GRB)
 
@@ -138,6 +142,10 @@ if __name__ == "__main__":
         database_location = db_info["db_raw_path"]
         spark_metastore_service.create_database(database_name)
 
+
+        table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{table_name}")
+
+
         if extraction_type == "incremental":
             IncrementalTableLoaderPipeline(
                 database_name=database_name,
@@ -146,6 +154,7 @@ if __name__ == "__main__":
                 layer=LayerEnum.RAW,
                 query=None,
                 partitions=partitions,
+                table_privileges=table_privileges,
             ).load_and_register(df, format_options)
         else:
             FullTableLoaderPipeline(
@@ -153,5 +162,6 @@ if __name__ == "__main__":
                 table_name=table_name,
                 database_location=database_location,
                 layer=LayerEnum.RAW,
-                query=None
+                query=None,
+                table_privileges=table_privileges,
             ).load_and_register(df, format_options)

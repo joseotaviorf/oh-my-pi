@@ -6,6 +6,7 @@ SELECT
     tempo_total_falado AS total_talk_time,
     tempo_total_sem_atendimento AS total_idle_time,
     email_operador AS email_operator,
+    celula AS portfolio,
     data AS dt_reference,
     hora_login AS ts_login,
     hora_logout AS ts_logout,
