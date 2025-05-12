@@ -1,78 +1,24 @@
 WITH
-filtered_schedule AS (
-  SELECT DISTINCT
+ranking AS (
+  SELECT
+    id_visit,
     id_schedule,
-    id_visit
+    event_type,
+    ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created ASC) AS ranking,
+    ts_created AS ts_event_created
   FROM
     datalake_ebdb_clean.visit_status_log
-  WHERE
-    DATE(ts_created) >= DATE('2024-11-01')
 ),
-schedule AS (
+reschedules AS (
   SELECT
-    vsl.id_visit,
-    vsl.id_schedule,
-    MAX(
-      CASE
-        WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.id_author_user
-      END
-    ) AS id_user_creator,
-    MAX(
-      CASE
-        WHEN vsl.event_type IN ('VISIT_CANCELED', 'VISIT_REQUEST_CANCELED') THEN vsl.id_author_user
-      END
-    ) AS id_user_cancelation,
-    MAX(
-      CASE
-        WHEN vsl.on_behalf_of = 'TENANT_LIVING' THEN vsl.ts_created
-      END
-    ) AS ts_event_tenant,
-    MIN(
-      CASE
-        WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.ts_created
-      END
-    ) AS ts_schedule_created,
-    MIN(
-      CASE
-        WHEN vsl.event_type = 'VISIT_REQUESTED' THEN vsl.ts_created
-      END
-    ) AS ts_schedule_requested,
-    MIN(
-      CASE
-        WHEN vsl.event_type = 'VISIT_RESCHEDULED' THEN vsl.ts_created
-      END
-    ) AS ts_schedule_rescheduled,
-    MIN(
-      CASE
-        WHEN vsl.event_type = 'VISIT_CONFIRMED' THEN vsl.ts_created
-      END
-    ) AS ts_schedule_confirmed,
-    MIN(
-      CASE
-        WHEN vsl.event_type = 'VISIT_DONE' THEN vsl.ts_created
-      END
-    ) AS ts_schedule_completed,
-    MIN(
-      CASE
-        WHEN vsl.event_type = 'VISIT_UNSUCCESSFUL' THEN vsl.ts_created
-      END
-    ) AS ts_schedule_unsuccessful,
-    MAX(
-      CASE
-        WHEN vsl.event_type IN ('VISIT_REQUEST_CANCELED', 'VISIT_CANCELED') THEN vsl.ts_created
-      END
-    ) AS ts_schedule_canceled,
-    CASE
-      WHEN MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') IS NOT NULL THEN 'RESCHEDULE'
-      ELSE 'REQUEST'
-    END AS schedule_origin,
-    LEAD(vsl.id_schedule) OVER(PARTITION BY vsl.id_visit ORDER BY MIN(vsl.ts_created)) AS id_succeed_schedule
+    ev1.id_schedule AS id_schedule,
+    ev2.id_schedule AS id_succeed_schedule
   FROM
-    datalake_ebdb_clean.visit_status_log AS vsl
-  JOIN
-    filtered_schedule AS fs
-      ON vsl.id_schedule = fs.id_schedule AND vsl.id_visit = fs.id_visit
-  GROUP BY 1, 2
+    ranking AS ev1
+  INNER JOIN ranking AS ev2
+    ON ev1.id_visit = ev2.id_visit
+    AND ev1.ranking = (ev2.ranking -1)
+    AND ev2.event_type = 'VISIT_RESCHEDULED'
 ),
 visit_model AS (
   SELECT
@@ -85,6 +31,24 @@ visit_model AS (
     datalake_ebdb_clean.visit_status_log AS vse
   WHERE
     vse.event_type IN ('VISIT_FITTED', 'VISIT_REGISTERED')
+),
+schedule_creator AS (
+  SELECT
+    id_schedule,
+    id_author_user AS id_user_creator
+  FROM
+    datalake_ebdb_clean.visit_status_log
+  WHERE
+    event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
+),
+schedule_cancelation AS (
+  SELECT
+    id_schedule,
+    id_author_user AS id_user_cancelation
+  FROM
+    datalake_ebdb_clean.visit_status_log
+  WHERE
+    event_type IN ('VISIT_CANCELED', 'VISIT_REQUEST_CANCELED')
 ),
 entrance_method AS (
   SELECT
@@ -110,8 +74,8 @@ entrance_method_treatment(
   FROM
     datalake_ebdb_listing.house AS l
   LEFT JOIN
-    entrance_method AS em
-      ON l.id = em.sk_house
+      entrance_method AS em
+    ON l.id = em.sk_house
   GROUP BY
     1,2,3
 ),
@@ -139,9 +103,8 @@ agent_contract_aud AS (
     ) AS previous_id_work_contract
   FROM
     datalake_ebdb_clean.agent_data_aud AS adaud
-  LEFT JOIN
-    datalake_ebdb_clean.user_revision_entity AS ure
-      ON ure.id = adaud.rev
+  LEFT JOIN datalake_ebdb_clean.user_revision_entity AS ure
+    ON ure.id = adaud.rev
   WHERE
     adaud.id_work_contract IS NOT NULL
 ),
@@ -163,21 +126,23 @@ agent_contract AS (
 ),
 schedule_aux AS (
   SELECT
-    s.id_schedule,
+    vse.id_schedule,
     u.id_agent,
     v.business_context,
     v.id_visitor,
     v.id_house,
     v.dt_visit,
-    s.ts_schedule_created AS ts_created
+    MIN(vse.ts_created) AS ts_created
   FROM
-    schedule AS s
-  INNER JOIN
-    datalake_ebdb_clean.visit AS v
-      ON s.id_visit = v.id
-  LEFT JOIN
-    datalake_ebdb_clean.user AS u
-      ON u.id = v.id_agent
+    datalake_ebdb_clean.visit_status_log AS vse
+  INNER JOIN datalake_ebdb_clean.visit AS v
+    ON vse.id_visit = v.id
+  LEFT JOIN datalake_ebdb_clean.user AS u
+    ON u.id = v.id_agent
+  WHERE
+    event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
+  GROUP BY
+    1,2,3,4,5,6
 ),
 booking_3p_demand_agent AS (
   SELECT
@@ -186,13 +151,13 @@ booking_3p_demand_agent AS (
     wc.3p_partner AS partner_3p_demand
   FROM
     agent_contract AS ac
+  INNER JOIN schedule_aux AS b
+    ON b.ts_created BETWEEN ac.ts_work_contract_start
+    AND COALESCE(ac.ts_work_contract_end, CURRENT_TIMESTAMP)
+    AND ac.id_agent = b.id_agent
   INNER JOIN
-    schedule_aux AS b
-      ON b.ts_created BETWEEN ac.ts_work_contract_start AND COALESCE(ac.ts_work_contract_end, CURRENT_TIMESTAMP)
-      AND ac.id_agent = b.id_agent
-  INNER JOIN
-    datalake_ebdb_work_contract.work_contract AS wc
-      ON wc.id = ac.id_work_contract
+      datalake_ebdb_work_contract.work_contract AS wc
+    ON wc.id = ac.id_work_contract
   WHERE
     is_3p_contract = TRUE
 ),
@@ -202,13 +167,12 @@ booking_hub_agent AS (
     wc.contract_name
   FROM
     agent_contract AS ac
-  INNER JOIN
-    schedule_aux AS b
-      ON b.ts_created BETWEEN ac.ts_work_contract_start AND COALESCE(ac.ts_work_contract_end, CURRENT_TIMESTAMP)
-      AND ac.id_agent = b.id_agent
-  LEFT JOIN
-    datalake_ebdb_clean.work_contract AS wc
-      ON wc.id = ac.id_work_contract
+  INNER JOIN schedule_aux AS b
+    ON b.ts_created BETWEEN ac.ts_work_contract_start
+    AND COALESCE(ac.ts_work_contract_end, CURRENT_DATE)
+    AND ac.id_agent = b.id_agent
+  LEFT JOIN datalake_ebdb_clean.work_contract AS wc
+    ON wc.id = ac.id_work_contract
   WHERE
     wc.contract_name LIKE 'HUB%'
     AND CAST(b.ts_created AS DATE) >= '2021-07-19'
@@ -231,9 +195,8 @@ booking_in_rented_house AS (
     ) AS is_house_rented
   FROM
     schedule_aux AS b
-  INNER JOIN
-    datalake_ebdb_contract.contract AS c
-      ON c.id_house = b.id_house
+  INNER JOIN datalake_ebdb_contract.contract AS c
+    ON c.id_house = b.id_house
   WHERE
     c.status in ('Ativo', 'Finalizado')
     AND b.dt_visit BETWEEN c.dt_started
@@ -254,9 +217,8 @@ fixed_agent_disabled AS (
     ) AS ts_fixed_agent_disabled
   FROM
     datalake_ebdb_clean.preferred_fixed_agent_aud AS pfa_aud
-  LEFT JOIN
-    datalake_ebdb_clean.user_revision_entity AS ure
-      ON ure.id = pfa_aud.rev
+  LEFT JOIN datalake_ebdb_clean.user_revision_entity AS ure
+    ON ure.id = pfa_aud.rev
   WHERE
     pfa_aud.mod_is_enabled = true
   GROUP BY
@@ -283,22 +245,17 @@ fixed_agent AS (
     pfa.business_context
   FROM
     datalake_ebdb_clean.user_visit_preferences AS uvp
-  INNER JOIN
-    preferred_fixed_agent AS pfa
-      ON pfa.id_user_visit_preferences = uvp.id
-  LEFT JOIN
-    fixed_agent_disabled AS fad
-      ON fad.id = pfa.id
-  INNER JOIN
-    schedule_aux AS b
-      ON b.id_visitor = uvp.id_user
-      AND b.business_context = pfa.business_context
-  INNER JOIN
-    datalake_ebdb_clean.house AS h
-      ON h.id = b.id_house
-  INNER JOIN
-    datalake_region.region AS r
-      ON r.id = h.id_region
+  INNER JOIN preferred_fixed_agent AS pfa
+    ON pfa.id_user_visit_preferences = uvp.id
+  LEFT JOIN fixed_agent_disabled AS fad
+    ON fad.id = pfa.id
+  INNER JOIN schedule_aux AS b
+    ON b.id_visitor = uvp.id_user
+    AND b.business_context = pfa.business_context
+  INNER JOIN datalake_ebdb_clean.house AS h
+    ON h.id = b.id_house
+  INNER JOIN datalake_region.region AS r
+    ON r.id = h.id_region
   WHERE
     b.ts_created BETWEEN pfa.ts_created
     AND IF(pfa.is_enabled = TRUE, NOW(), fad.ts_fixed_agent_disabled)
@@ -310,10 +267,10 @@ secretariat_on_visit_date AS (
     bsc.id_external_responsible AS id_user_secretariat_on_visit_date
   FROM
     schedule_aux AS b
-  INNER JOIN
-    datalake_hub_services.buyer_secretariat_changes AS bsc
-      ON b.id_visitor = bsc.id_external_lead
-      AND b.dt_visit BETWEEN bsc.ts_assigned AND COALESCE(bsc.ts_unassigned, GREATEST(CURRENT_DATE, b.dt_visit))
+  INNER JOIN datalake_hub_services.buyer_secretariat_changes AS bsc
+    ON b.id_visitor = bsc.id_external_lead
+    AND b.dt_visit BETWEEN bsc.ts_assigned
+    AND COALESCE(bsc.ts_unassigned, GREATEST(NOW(), b.dt_visit))
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY b.id_schedule ORDER BY bsc.ts_assigned DESC) = 1
 ),
@@ -323,10 +280,29 @@ last_secretariat as (
     bsc.id_external_responsible AS id_user_last_secretariat
   FROM
     schedule_aux AS b
-  INNER JOIN
-    datalake_hub_services.buyer_secretariat_changes AS bsc
-      ON b.id_visitor = bsc.id_external_lead
-      AND bsc.is_last_responsible
+  INNER JOIN datalake_hub_services.buyer_secretariat_changes AS bsc
+    ON b.id_visitor = bsc.id_external_lead
+    AND bsc.is_last_responsible
+),
+event_date AS (
+  SELECT
+    id_schedule,
+    CASE
+      WHEN MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') IS NOT NULL THEN 'RESCHEDULE'
+      ELSE 'REQUEST'
+    END AS schedule_origin,
+    MAX(vse.ts_created) FILTER (WHERE on_behalf_of = 'TENANT_LIVING') AS ts_event_tenant,
+    MIN(vse.ts_created) FILTER (WHERE event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')) AS ts_schedule_created,
+    MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS ts_schedule_requested,
+    MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_schedule_rescheduled,
+    MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS ts_schedule_confirmed,
+    MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_DONE') AS ts_schedule_completed,
+    MIN(vse.ts_created) FILTER (WHERE event_type = 'VISIT_UNSUCCESSFUL') AS ts_schedule_unsuccessful,
+    MAX(vse.ts_created) FILTER (WHERE event_type IN ('VISIT_REQUEST_CANCELED', 'VISIT_CANCELED')) AS ts_schedule_canceled
+  FROM
+    datalake_ebdb_clean.visit_status_log AS vse
+  GROUP BY
+    1
 ),
 buyer_review AS (
   SELECT
@@ -339,6 +315,16 @@ buyer_review AS (
     type = 'tenant_visit'
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_reviewed, id_reviewer ORDER BY dt_creation ASC) = 1
+),
+filtered_vsl AS(
+  SELECT
+    DISTINCT
+    id_schedule,
+    id_visit
+  FROM
+    datalake_ebdb_clean.visit_status_log
+  WHERE
+      ts_created >= '2024-11-01'
 ),
 filtered_visit AS (
   SELECT
@@ -361,22 +347,22 @@ filtered_visit AS (
   FROM
     datalake_ebdb_clean.visit AS v
   LEFT JOIN
-    datalake_ebdb_listing.house_listing AS hll
-      ON v.id_house = hll.id_house
-      AND DATE(v.ts_created) >= DATE(hll.ts_listing_version_start)
-      AND (DATE(v.ts_created) <= DATE(hll.ts_listing_version_end) OR hll.ts_listing_version_end IS NULL)
+      datalake_ebdb_listing.house_listing AS hll
+    ON v.id_house = hll.id_house
+    AND DATE(v.ts_created) >= DATE(hll.ts_listing_version_start)
+    AND (DATE(v.ts_created) <= DATE(hll.ts_listing_version_end) OR hll.ts_listing_version_end IS NULL)
   LEFT JOIN
-    datalake_ebdb_clean.country AS ct
-      ON ct.code = hll.country_code
+      datalake_ebdb_clean.country AS ct
+    ON ct.code = hll.country_code
 )
 SELECT DISTINCT
-  s.id_schedule,
-  s.id_visit,
+  vse.id_schedule,
+  vse.id_visit,
   v.id_visitor,
   h.id_user AS id_owner,
   v.id_house,
-  s.id_user_creator AS id_user_creation,
-  s.id_user_cancelation,
+  sc.id_user_creator AS id_user_creation,
+  scl.id_user_cancelation,
   v.id_agent AS id_user_agent,
   ua.id_agent,
   so.id_offer,
@@ -384,9 +370,9 @@ SELECT DISTINCT
   su.id_user_5a AS id_user_sale_attendence_5a,
   sovd.id_user_secretariat_on_visit_date,
   ls.id_user_last_secretariat,
-  COALESCE(cs_company.sk_company, cs_hubspot.sk_company, partner_3p_supply.sk_company) AS id_company_supply,
+  cs_supply.sk_company AS id_company_supply,
   COALESCE(NULLIF(cs_demand.sk_company, -1), dm.id_company_demand) AS id_company_demand,
-  s.id_succeed_schedule,
+  reschedules.id_succeed_schedule,
   CONCAT(v.id_visitor, '_', v.id_house) AS id_sale_flow,
   h.id_region,
   svh.id_business_unit,
@@ -409,7 +395,7 @@ SELECT DISTINCT
   END AS visit_model,
   bb.visit_fup,
   v.behavior,
-  s.schedule_origin,
+  evd.schedule_origin,
   bha.contract_name AS hub_agent_region,
   IF(bha.id_schedule IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
   brh.is_house_rented,
@@ -421,88 +407,87 @@ SELECT DISTINCT
   so.hours_booking_to_offer,
   so.hours_visit_to_offer,
   v.ts_visit,
-  s.ts_schedule_created,
-  s.ts_schedule_requested,
-  s.ts_schedule_rescheduled,
-  s.ts_schedule_confirmed,
-  s.ts_schedule_completed,
-  s.ts_schedule_unsuccessful,
-  s.ts_schedule_canceled,
+  evd.ts_schedule_created,
+  evd.ts_schedule_requested,
+  evd.ts_schedule_rescheduled,
+  evd.ts_schedule_confirmed,
+  evd.ts_schedule_completed,
+  evd.ts_schedule_unsuccessful,
+  evd.ts_schedule_canceled,
   v_cin.ts_checkin AS ts_visit_checkin,
   br.dt_creation AS ts_buyer_review_rating,
   NOW() AS ts_load
 FROM
-  schedule AS s
+  filtered_vsl AS vse
 INNER JOIN
-  filtered_visit AS v
-    ON s.id_visit = v.id
+    event_date AS evd
+  ON vse.id_schedule = evd.id_schedule
 INNER JOIN
-  datalake_ebdb_clean.house AS h
-    ON v.id_house = h.id
+    filtered_visit AS v
+  ON vse.id_visit = v.id
+INNER JOIN
+    datalake_ebdb_clean.house AS h
+  ON v.id_house = h.id
 --Precisamos para as análises a fup da booking, sendo esse o único join, tendo que ser retirado assim que criarem uma nova referência no produto.
 INNER JOIN
-  datalake_ebdb_clean.booking AS bb
-    ON s.id_schedule = bb.id
+    datalake_ebdb_clean.booking AS bb
+        ON vse.id_schedule = bb.id
+LEFT JOIN datalake_ebdb_listing.house AS hl
+  ON v.id_house = hl.id
+LEFT JOIN datalake_ebdb_clean.user AS ua
+  ON v.id_agent = ua.id
+LEFT JOIN datalake_sale_visit_hubs.sale_visit_hubs AS svh
+  ON svh.id_booking = vse.id_schedule
+LEFT JOIN reschedules
+  ON reschedules.id_schedule = vse.id_schedule
+LEFT JOIN visit_model AS vm
+  ON vse.id_visit = vm.id_visit
+INNER JOIN schedule_creator AS sc
+  ON vse.id_schedule = sc.id_schedule
+LEFT JOIN schedule_cancelation AS scl
+  ON vse.id_schedule = scl.id_schedule
+LEFT JOIN datalake_hub_services.secretariat_hierarchy AS su
+  ON su.id_user_5a = sc.id_user_creator
+LEFT JOIN entrance_method_treatment AS emt
+  ON v.id_house = emt.id_house
+  AND v.dt_visit >= emt.start_date
+  AND v.dt_visit < emt.end_date
+LEFT JOIN booking_3p_demand_agent AS dm
+  ON vse.id_schedule = dm.id_schedule
+LEFT JOIN fixed_agent AS fa
+  ON vse.id_schedule = fa.id_schedule
+LEFT JOIN secretariat_on_visit_date AS sovd
+  ON vse.id_schedule = sovd.id_schedule
+LEFT JOIN last_secretariat AS ls
+  ON vse.id_schedule = ls.id_schedule
+LEFT JOIN offer_after_booking AS so
+  ON vse.id_schedule = so.id_schedule
+LEFT JOIN booking_hub_agent AS bha
+  ON bha.id_schedule = vse.id_schedule
 LEFT JOIN
-  datalake_ebdb_listing.house AS hl
-    ON v.id_house = hl.id
+    booking_in_rented_house AS brh
+  ON vse.id_schedule = brh.id_schedule
 LEFT JOIN
-  datalake_ebdb_clean.user AS ua
-    ON v.id_agent = ua.id
+    datalake_ebdb_clean.visit_checkin AS v_cin
+  ON v_cin.id_visit = vse.id_visit
 LEFT JOIN
-  datalake_sale_visit_hubs.sale_visit_hubs AS svh
-    ON svh.id_booking = s.id_schedule
+    buyer_review AS br
+  ON v.code = br.id_reviewed
+  AND v.id_visitor = br.id_reviewer
+LEFT JOIN datalake_company.company_sks AS cs_demand
+  ON (dm.id_company_demand IS NOT NULL AND dm.id_company_demand = cs_demand.id_hubspot)
+  OR (dm.id_company_demand IS NULL AND dm.partner_3p_demand = cs_demand.extracted_3p_tag)
 LEFT JOIN
-  visit_model AS vm
-    ON s.id_visit = vm.id_visit
-LEFT JOIN
-  datalake_hub_services.secretariat_hierarchy AS su
-    ON su.id_user_5a = s.id_user_creator
-LEFT JOIN
-  entrance_method_treatment AS emt
-    ON v.id_house = emt.id_house
-    AND v.dt_visit >= emt.start_date
-    AND v.dt_visit < emt.end_date
-LEFT JOIN
-  booking_3p_demand_agent AS dm
-    ON s.id_schedule = dm.id_schedule
-LEFT JOIN
-  fixed_agent AS fa
-    ON s.id_schedule = fa.id_schedule
-LEFT JOIN
-  secretariat_on_visit_date AS sovd
-    ON s.id_schedule = sovd.id_schedule
-LEFT JOIN
-  last_secretariat AS ls
-    ON s.id_schedule = ls.id_schedule
-LEFT JOIN
-  offer_after_booking AS so
-    ON s.id_schedule = so.id_schedule
-LEFT JOIN
-  booking_hub_agent AS bha
-    ON bha.id_schedule = s.id_schedule
-LEFT JOIN
-  booking_in_rented_house AS brh
-    ON s.id_schedule = brh.id_schedule
-LEFT JOIN
-  datalake_ebdb_clean.visit_checkin AS v_cin
-    ON v_cin.id_visit = s.id_visit
-LEFT JOIN
-  buyer_review AS br
-    ON v.code = br.id_reviewed
-    AND v.id_visitor = br.id_reviewer
-LEFT JOIN
-  datalake_company.company_sks AS cs_demand
-    ON (dm.id_company_demand IS NOT NULL AND dm.id_company_demand = cs_demand.id_hubspot)
-    OR (dm.id_company_demand IS NULL AND dm.partner_3p_demand = cs_demand.extracted_3p_tag)
-LEFT JOIN
-  datalake_company.company_sks AS cs_company
-    ON hl.uuid_company = cs_company.id_hubspot
-LEFT JOIN
-  datalake_company.company_sks AS cs_hubspot
-    ON hl.id_company_hubspot = cs_hubspot.id_hubspot
-LEFT JOIN
-  datalake_company.company_sks AS partner_3p_supply
-    ON hl.partner_3p_supply = partner_3p_supply.extracted_3p_tag
-WHERE
-  s.id_user_creator IS NOT NULL
+    datalake_company.company_sks AS cs_supply
+        ON (
+          hl.uuid_company IS NOT NULL
+          AND hl.uuid_company = cs_supply.uuid_company
+        ) OR (
+          hl.uuid_company IS NULL
+          AND hl.id_company_hubspot IS NOT NULL
+          AND hl.id_company_hubspot = cs_supply.id_hubspot
+        ) OR (
+           hl.uuid_company IS NULL
+           AND hl.id_company_hubspot IS NULL
+           AND hl.partner_3p_supply = cs_supply.extracted_3p_tag
+        )
