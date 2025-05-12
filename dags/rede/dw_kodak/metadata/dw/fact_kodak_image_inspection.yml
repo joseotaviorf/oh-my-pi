@@ -49,6 +49,10 @@ columns:
     description: URL where the photo is stored.
     lineage:
       - datalake_kodak_clean.image_inspection.url
+  approval_score_threshold:
+    description: Threshold score for photo approval.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.approval_score_threshold
   brightness:
     description: Brightness level of the photo.
     lineage:
@@ -69,18 +73,38 @@ columns:
     description: Height of the photo in pixels.
     lineage:
       - datalake_kodak_clean.image_inspection.height
+  images_per_room:
+    description: Number of images taken per room.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.images_per_room
+  num_internal_photos:
+    description: Number of internal photos taken.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.num_internal_photos
   ordination:
     description: Order or ranking of the photo among others.
     lineage:
       - datalake_kodak_clean.image_inspection.ordination
+  property_condition:
+    description: Condition of the property as assessed from the photo.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.property_condition
   ratio:
     description: Aspect ratio of the photo.
     lineage:
       - datalake_kodak_clean.image_inspection.ratio
+  score:
+    description: Overall score for the photo based on inspection group criteria.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.score
   sharpness:
     description: Sharpness score of the photo.
     lineage:
       - datalake_kodak_clean.image_inspection.sharpness
+  total_faults:
+    description: Total number of faults identified in the photo.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.total_faults
   width:
     description: Width of the photo in pixels.
     lineage:
@@ -89,10 +113,30 @@ columns:
     description: Indicates whether the photo is approved. Can be true or false, or null if not applicable.
     lineage:
       - datalake_kodak_clean.image_inspection_group.is_approved
+  has_bonus_aspect_ratio:
+    description: Indicates if the photo has a bonus for aspect ratio. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_aspect_ratio
+  has_bonus_external:
+    description: Indicates if the photo has a bonus for external view. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_external
+  has_bonus_good_sharpness:
+    description: Indicates if the photo has a bonus for good sharpness. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_good_sharpness
+  has_bonus_images_per_room:
+    description: Indicates if the photo has a bonus for images per room. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_images_per_room
   has_bonus_sharpness:
     description: Indicates if the photo has a bonus for sharpness. Can be true or false, or null if not applicable.
     lineage:
       - datalake_kodak_clean.image_inspection_group.has_bonus_sharpness
+  has_bonus_view:
+    description: Indicates if the photo has a bonus for view. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_view
   has_fault_aspect_ratio:
     description: Indicates if the photo has aspect ratio issues. Can be true or false, or null if not applicable.
     lineage:
@@ -105,6 +149,10 @@ columns:
     description: Indicates if the photo has sharpness issues. Can be true or false, or null if not applicable.
     lineage:
       - datalake_kodak_clean.image_inspection_group.has_fault_sharpness
+  has_red_flags:
+    description: Indicates if the photo has any red flags. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flags
   has_red_flag_aspect_ratio:
     description: Indicates if the photo aspect ratio is flagged. Can be true or false, or null if not applicable.
     lineage:
@@ -121,6 +169,10 @@ columns:
     description: Indicates if the photo is flagged as a duplicate image. Can be true or false, or null if not applicable.
     lineage:
       - datalake_kodak_clean.image_inspection_group.has_red_flag_duplicate_image
+  has_red_flag_images_per_room:
+    description: Indicates if the photo has issues with the number of images per room. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_images_per_room
   has_red_flag_media_modification:
     description: Indicates if the photo has been modified. Can be true or false, or null if not applicable.
     lineage:
@@ -129,6 +181,14 @@ columns:
     description: Indicates if the photo does not belong to the property. Can be true or false, or null if not applicable.
     lineage:
       - datalake_kodak_clean.image_inspection_group.has_red_flag_not_property
+  has_red_flag_primary_risk:
+    description: Indicates if the photo has primary risk issues. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_primary_risk
+  has_red_flag_property_condition:
+    description: Indicates if the photo has property condition issues. Can be true or false, or null if not applicable.
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_property_condition
   has_red_flag_sharpness:
     description: Indicates if the photo sharpness is flagged. Can be true or false, or null if not applicable.
     lineage:
