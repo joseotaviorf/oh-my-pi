@@ -124,7 +124,7 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         )
         tables = [
             TableAttributes(self.dag_args, self.workflow_args, self.layer, table_name)
-            for table_name in query_table_names
+            for table_name in sorted(query_table_names)
         ]
         custom_table_names = self.workflow_args.get("tables_customization", {}).keys()
         for table_name in custom_table_names:
