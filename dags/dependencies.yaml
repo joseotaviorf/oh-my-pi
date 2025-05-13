@@ -381,8 +381,8 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.enrich_big_agent:load-enrich-program
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-last-contact
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-mailing
-  - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
   - bietlejuice.gsheets_growth:done-clean-affiliate-volumetry-cluster
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
 bietlejuice.dw_datamarts_for_rent:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_booking:load-dw-public-dim-booking
