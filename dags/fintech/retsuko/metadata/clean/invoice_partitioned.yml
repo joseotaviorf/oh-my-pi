@@ -1,0 +1,172 @@
+---
+database_name: datalake_retsuko_clean
+table_name: invoice_partitioned
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.id
+  id_external:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.external_id
+  id_original_invoice_external:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.original_invoice_external_id
+  id_account:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.account_id
+  id_contract:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.contract_id
+  id_checkout_order:
+    description: "External ID that indicates the Order in Checkout product"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.checkout_order_id
+  id_checkout_charge:
+    description: "External ID that indicates the Charge in Checkout product"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.checkout_charge_id
+  id_idempotency:
+    description: ""
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.idempotency_id
+  status:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.status
+  substatus:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.sub_status
+  payment_status:
+    description: "Status from invoice_partitioned payment. It's different from STATUS column. In a chargeback case, payment_status will be as chargeback and status column, will be field with canceled"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.payment_status
+  paid_via:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.paid_via
+  purpose:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.purpose
+  closing_mode:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.closing_mode
+  reason:
+    description: "Invoices that have the purpose field filled in with the value extras must have the reason field filled in to identify what that invoice_partitioned is about."
+    categories:
+      condominium-nonpayment: ""
+      damages-bills: ""
+      wrong-charges: ""
+      negotiation-recupera: ""
+      agreement: ""
+      pending-balance-correction: ""
+      non-specified: "reason not specified"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.reason
+  due_amount:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.due_amount
+  paid_amount:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.paid_amount
+  payment_paid_interest_amount:
+    lineage:
+      - datalake_retusko_raw.invoice_partitioned.payment_paid_interest_amount
+  payment_paid_fine_amount:
+    lineage:
+      - datalake_retusko_raw.invoice_partitioned.payment_paid_fine_amount
+  accrual_year_month:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.accrual_year_month
+  should_request_boleto:
+    description: "Boolean field that indicates if a bill creation request should be done"
+    lineage:
+      - datalake_retusko_raw.invoice_partitioned.should_request_boleto
+  sispag_file:
+    description: "File that Seu Barriga created with Vans to communicate with bank"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.sispag_file
+  payment_company_use_number:
+    description: "Company_use works as an ID to identifies the bill created in the bank"
+    lineage:
+      - datalake_retusko_raw.invoice_partitioned.payment_company_use_number
+  payment_bank_code:
+    description: "Paying Bank Code"
+    lineage:
+      - datalake_retusko_raw.invoice_partitioned.payment_bank_code
+  is_write_off:
+    description: "Boolean to indicate an uncollectible overdue credit, applicable under specific conditions related contract age. Read more at: https://docs.google.com/document/d/1mfqO6suQSHPNM-bBcQi0_iR_RC-xjRwlnHTBpQ66FGw/"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.write_off
+  ts_write_off:
+    description: "Timestamp when the invoice_partitioned was flagged as write-off"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.write_off_at
+  ts_paid:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.paid_date
+  ts_payment_confirmation:
+    description: "Date that we received bank payment confirmation - In CNAB cases, it's different from ts_paid"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.payment_confirmation_at
+  ts_payment_event:
+    description: "It's used in payment reversal cases. This date will be the information received data - not necessary the payment reversal date"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.payment_event_at
+  ts_payment_divergent_fixed:
+    description: "Date that the payment divergent was fixed"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.payment_divergent_fixed_at
+  ts_payment_processing:
+    description: "Data that the payment was processed"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.payment_processing_at
+  ts_payment_credit:
+    description: "Date that the payment was credited in our bank account, in CNAB cases, after two business day in general"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.payment_credit_date
+  ts_payment_chargeback:
+    description: ""
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.payment_chargeback_at
+  ts_payment_refunded:
+    description: ""
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.payment_refunded_at
+  ts_canceled:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.canceled_at
+  ts_sent:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.sent_at
+  ts_due:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.due_date
+  ts_created:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.created_at
+  ts_synced:
+    description: "Data that indicates when data was synced from SB to Retsuko"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.synced_at
+  ts_nf_requested:
+    description: "Indicates when Seu Barriga requested erp solution to issue the NFe"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.nf_requested_at
+  ts_retsuko_created:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.retsuko_created_at
+  ts_retsuko_updated:
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.retsuko_updated_at
+  year:
+    description: Year information
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.year
+  month:
+    description: Month information
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.month
+  day:
+    description: Day information
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.day
