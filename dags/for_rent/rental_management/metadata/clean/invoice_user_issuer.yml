@@ -1,0 +1,25 @@
+---
+database_name: datalake_rental_management_clean
+table_name: invoice_user_issuer
+columns:
+  id:
+    lineage:
+      - datalake_rental_management_raw.boleto_user_issuer.id
+  id_invoice_user:
+    lineage:
+      - datalake_rental_management_raw.boleto_user_issuer.boleto_user_id
+  id_invoice_issuer:
+    lineage:
+      - datalake_rental_management_raw.boleto_user_issuer.boleto_issuer_id
+  id_contract:
+    lineage:
+      - datalake_rental_management_raw.boleto_user_issuer.contract_id
+  dt_due:
+    lineage:
+      - datalake_rental_management_raw.boleto_user_issuer.due_date
+  ts_created:
+    lineage:
+      - datalake_rental_management_raw.boleto_user_issuer.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_management_raw.boleto_user_issuer.updated_at

@@ -1,0 +1,40 @@
+---
+database_name: datalake_rental_management_clean
+table_name: condo_monitoring_actions
+columns:
+  id:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.id
+  id_contract:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.contract_id
+  id_action_main_user:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.action_main_user_id
+  action_type:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.action_type
+  action_main_user_email:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.action_main_user_email
+  action_system:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.action_system
+  invoice_user_name:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.boleto_user_name
+  invoice_user_document:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.boleto_user_document
+  invoice_issuer_name:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.boleto_issuer_name
+  invoice_issuer_document:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.boleto_issuer_document
+  ts_created:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_management_raw.condo_monitoring_actions.updated_at

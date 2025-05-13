@@ -1,0 +1,25 @@
+---
+database_name: datalake_rental_management_clean
+table_name: invoice_user
+columns:
+  id:
+    lineage:
+      - datalake_rental_management_raw.boleto_user.id
+  id_external:
+    lineage:
+      - datalake_rental_management_raw.boleto_user.external_id
+  id_main_user:
+    lineage:
+      - datalake_rental_management_raw.boleto_user.main_user_id
+  request_status:
+    lineage:
+      - datalake_rental_management_raw.boleto_user.request_status
+  is_active:
+    lineage:
+      - datalake_rental_management_raw.boleto_user.active
+  ts_created:
+    lineage:
+      - datalake_rental_management_raw.boleto_user.created_at
+  ts_updated:
+    lineage:
+      - datalake_rental_management_raw.boleto_user.updated_at
