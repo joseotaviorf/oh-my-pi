@@ -749,6 +749,7 @@ bietlejuice.dw_recon_quintocred:
   - bietlejuice.dw_velo:load-dw-velo-bridge-velo-propose-person
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-company
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-person
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
   - bietlejuice.dw_velo:load-dw-velo-fact-velo-payment
@@ -759,6 +760,7 @@ bietlejuice.dw_recon_quintocred:
   - bietlejuice.rental_guarantee_platform:load-clean-bill-payment
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency-entry
+  - bietlejuice.rental_guarantee_platform:load-clean-renewal
   - bietlejuice.robin_hood:load-clean-accounting-entry
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance
   - bietlejuice.robin_hood:load-clean-payment-request
