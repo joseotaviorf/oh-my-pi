@@ -5,7 +5,7 @@ ssn_original_payment AS (
         id_invoice
     FROM datalake_collections_quintoandar.delinquency_app_events
     WHERE
-      funnel_step = 'Overdue Self Service Action'
+      funnel_step IN ('Overdue Self Service Action', 'Overdue Self Service Viewed')
       AND id_contract IS NOT NULL
       AND id_invoice IS NOT NULL
 ),
