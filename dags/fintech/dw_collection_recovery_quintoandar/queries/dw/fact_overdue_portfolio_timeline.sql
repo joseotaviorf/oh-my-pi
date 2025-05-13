@@ -5,7 +5,7 @@ ssn_original_payment AS (
         id_invoice
     FROM datalake_collections_quintoandar.delinquency_app_events
     WHERE
-      funnel_step = 'Self Service Negotiation'
+      funnel_step = 'Self Service Negotiation - Overdue Self Service Action'
       AND id_contract IS NOT NULL
       AND id_invoice IS NOT NULL
 ),
@@ -50,19 +50,19 @@ SELECT
     o.reason,
     o.paid_via,
     CASE
-        WHEN possn.id_invoice IS NOT NULL AND o.reason NOT IN ("negotiation-recupera", "agreement") AND o.payment_status = "paid" THEN TRUE
+        WHEN possn.id_invoice IS NOT NULL AND o.reason NOT IN ("negotiation-recupera", "negotiation-cyber", "agreement") AND o.payment_status = "paid" THEN TRUE
         WHEN n.is_ssn_boletao IS NOT NULL AND n.is_ssn_boletao IS TRUE AND o.payment_status = "written-down" THEN TRUE
         ELSE FALSE
     END AS is_ssn,
     CASE
-        WHEN possn.id_invoice IS NOT NULL AND o.reason NOT IN ("negotiation-recupera", "agreement") AND o.payment_status = "paid" THEN "POSSN (payment of original)"
+        WHEN possn.id_invoice IS NOT NULL AND o.reason NOT IN ("negotiation-recupera", "negotiation-cyber", "agreement") AND o.payment_status = "paid" THEN "POSSN (payment of original)"
         WHEN n.is_ssn_boletao IS NOT NULL AND n.is_ssn_boletao IS TRUE AND o.payment_status = "written-down" THEN "BOSSN (single debt negotiation)"
         ELSE NULL
     END AS type_ssn,
     CASE
       WHEN possn.id_invoice IS NOT NULL
         AND o.payment_status = "paid"
-        AND o.reason NOT IN ("negotiation-recupera", "agreement")
+        AND o.reason NOT IN ("negotiation-recupera", "negotiation-cyber", "agreement")
       THEN "Self Service Negotiation - Payment of original debt"
       WHEN
         n.is_ssn_boletao IS NOT NULL
@@ -72,19 +72,19 @@ SELECT
       WHEN possn.id_invoice IS NULL
         AND (n.is_ssn_boletao IS NULL OR n.is_ssn_boletao IS FALSE)
         AND o.payment_status = 'paid'
-        AND o.reason NOT IN ("negotiation-recupera", "agreement")
+        AND o.reason NOT IN ("negotiation-recupera", "negotiation-cyber", "agreement")
         AND o.invoice_type != "extra"
       THEN "Original debt"
       WHEN possn.id_invoice IS NULL
         AND (n.is_ssn_boletao IS NULL OR n.is_ssn_boletao IS FALSE)
         AND o.payment_status = 'written-down'
-        AND o.reason NOT IN ("negotiation-recupera", "agreement")
+        AND o.reason NOT IN ("negotiation-recupera", "negotiation-cyber", "agreement")
         AND o.invoice_type != "extra"
       THEN "Negotiation"
       WHEN possn.id_invoice IS NULL
         AND (n.is_ssn_boletao IS NULL OR n.is_ssn_boletao IS FALSE)
         AND o.payment_status = 'paid'
-        AND o.reason IN ("negotiation-recupera", "agreement")
+        AND o.reason IN ("negotiation-recupera", "negotiation-cyber", "agreement")
         AND o.invoice_type = "extra"
       THEN "Negotiation installments (extra)"
     END AS recovery_method,
