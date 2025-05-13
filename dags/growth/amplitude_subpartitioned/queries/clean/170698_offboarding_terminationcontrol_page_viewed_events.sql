@@ -59,7 +59,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_clean_staging.170698_offboarding_terminationcontrol_page_viewed_events
-WHERE AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
-    id_app = '170698' AND event_type = 'offboarding_terminationcontrol_page_viewed'    AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+    datalake_amplitude_new_clean.events
+WHERE
     id_app = '170698' AND event_type = 'offboarding_terminationcontrol_page_viewed'
+    AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
