@@ -1,0 +1,230 @@
+---
+database_name: datalake_pin_goal_clean
+table_name: goal
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Worker goals and their alignment details.
+columns:
+  id_assigned_by_person:
+    description: Foreign key to PER_ALL_PEOPLE_F, holding the ID of the person who assigns the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.assigned_by_person_id
+  id_assignment:
+    description: Foreign key to PER_ALL_ASSIGNMENTS_M, holding the worker's assignment.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.assignment_id
+  id_goal:
+    description: System-generated unique identifier for this entry.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.goal_id
+  id_person:
+    description: Person ID of the person to whom the goal is assigned.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.person_id
+  id_business_group:
+    description: Foreign key to PER_BUSINESS_GROUPS.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.business_group_id
+  id_reference_goal:
+    description: Foreign key to HRT_CONTENT_ITEMS_B, holding the ID of the goal in the library (source).
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.reference_goal_id
+  id_mass_request:
+    description: Foreign key to HRG_GOAL_MASS_REQUESTS.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.mass_request_id
+  id_person_requester:
+    description: Foreign key to PER_ALL_PEOPLE_F, holding the PersonId of the requester.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.requester_person_id
+  measure_calculation_rule_code:
+    description: Foreign key to HRG_CALCULATION_RULE_CODE, defining aggregation for sub-goals (AVG or SUM).
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.measure_calc_rule_code
+    categories:
+      AVG: Average of sub-goal values.
+      SUM: Sum of sub-goal values.
+  goal_access_level_code:
+    description: Propagates read-only status from the goal plan.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.goal_access_level_code
+  percent_complete_code:
+    description: Goal completion percentage code.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.percent_complete_code
+  goal_source_code:
+    description: Source of assignment.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.goal_source_code
+    categories:
+      ORA_HRG_HR_MGR: Goal assigned by an administrator.
+      HR: Goal assigned by Human Resources.
+      MANAGER: Goal assigned by a manager.
+      WORKER: Goal created by the employee.
+  goal_type_code:
+    description: Type of goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.goal_type_code
+    categories:
+      Development: Goal focused on employee development.
+      Performance: Goal related to job performance.
+      Both: Goal encompassing both development and performance.
+      Personal: Personal goal of the employee.
+  goal_version_type_code:
+    description: Lookup to handle frozen goals and mass assignment goals.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.goal_version_type_code
+  status_code:
+    description: Status of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.status_code
+  priority_code:
+    description: Priority of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.priority_code
+    categories:
+      High: Goal with high importance.
+      Medium: Goal with medium importance.
+      Low: Goal with low importance.
+  goal_name:
+    description: Name of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.goal_name
+  description:
+    description: Description of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.description
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.last_updated_by
+  modified_by:
+    description: Stores the person ID of the user who last modified the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.last_modified_by
+  request_context:
+    description: Goal creation context.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.request_context
+  goal_approval_state:
+    description: Goal Approval State included for Mass Goal Approval.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.goal_approval_state
+  description_of_minimum_achievement:
+    description: Description of minimum achievement of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.attribute1
+  description_of_target_achievement:
+    description: Description of target achievement of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.attribute2
+  description_of_maximum_achievement:
+    description: Description of maximum achievement of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.attribute3
+  expected_completion_period:
+    description: Expected period for completion of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.attribute5
+  goal_category:
+    description: Goal category.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.attribute_category
+    categories:
+      Project or Critical Process: Goal related to a specific project or process.
+      KPI: Key Performance Indicator.
+  mininum_value:
+    description: Minimum value of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.attribute_number1
+  target_value:
+    description: Target value of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.attribute_number2
+  maximum_value:
+    description: Maximum value of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.attribute_number3
+  result_value:
+    description: Result value of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.attribute_number4
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.object_version_number
+  is_goal_deletable:
+    description: Flag indicating if a manager can delete a worker's goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.allow_del_goal_flag
+    categories:
+      true: Manager can delete worker goal.
+      false: Manager cannot delete worker goal.
+  is_goal_published:
+    description: Flag indicating if an organization goal is published.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.published_flag
+    categories:
+      true: Organization goal is published.
+      false: Organization goal is not published.
+  is_goal_accessible_to_hierarchy:
+    description: Flag indicating if this goal can be accessed by the hierarchy.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.access_to_hierarchy_flag
+    categories:
+      true: Accessible to the hierarchy.
+      false: Not accessible to the hierarchy.
+  is_key_attribute_update_allowed:
+    description: Flag indicating if key attribute modification is allowed.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.allow_key_attr_update_flag
+    categories:
+      true: Key attribute update is allowed.
+      false: Key attribute update is not allowed.
+  is_goal_private:
+    description: Flag indicating whether this goal is accessible to others.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.private_flag
+    categories:
+      true: Goal is private.
+      false: Goal is not private.
+  dt_started:
+    description: Start date of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.start_date
+  dt_target_completion:
+    description: Target completion date of the goal.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.target_completion_date
+  ts_version:
+    description: Date of goal version creation.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.version_date
+  ts_modified:
+    description: Timestamp of the last goal modification.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.last_modified_date
+  ts_created:
+    description: Timestamp of the creation of the row.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.creation_date
+  ts_updated:
+    description: Timestamp of the last update of the row.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goals.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table. Reflects data ingestion or reprocessing time.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goals.ts_load
+  year:
+    description: Year extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goals.year
+  month:
+    description: Month extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goals.month
+  day:
+    description: Day extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_goal_raw.hrg_goals.day

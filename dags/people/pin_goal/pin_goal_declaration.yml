@@ -55,8 +55,18 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_goal
           date_column_to_partition: last_update_date
+    hrg_goal_plans_tl:
+      clean_table_name: goal_plan_translation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_goal
+          date_column_to_partition: last_update_date
     hrg_goal_pln_assignments:
       clean_table_name: goal_plan_to_assignment
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_goal
+          date_column_to_partition: last_update_date
+    hrg_goals:
+      clean_table_name: goal
       extra_spark_job_arguments:
         - raw_custom_schema: pin_goal
           date_column_to_partition: last_update_date

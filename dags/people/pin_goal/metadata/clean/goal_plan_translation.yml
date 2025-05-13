@@ -1,0 +1,63 @@
+---
+database_name: datalake_pin_goal_clean
+table_name: goal_plan_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Translation table of Goal Plan.
+columns:
+  id_goal_plan:
+    description: the system generated surrogate key for this entry.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.goal_plan_id
+  id_business_group:
+    description: foreign key to per_business_groups.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.business_group_id
+  language:
+    description: indicates the code of the language into which the contents of the translatable columns are translated.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.language
+  source_language:
+    description: indicates the code of the language in which the contents of the translatable columns were originally created.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.source_lang
+  goal_plan_name:
+    description: yes name of goal plan.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.goal_plan_name
+  created_by:
+    description: who column indicates the user who created the row.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.created_by
+  updated_by:
+    description: who column indicates the user who last updated the row.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.last_updated_by
+  object_version_number:
+    description: used to implement optimistic locking. this number is incremented every time that the row is updated. the number is compared at the start and end of a transaction to detect whether another session has updated the row since it was queried.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.object_version_number
+  ts_created:
+    description: who column indicates the date and time of the creation of the row.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.creation_date
+  ts_updated:
+    description: who column indicates the date and time of the last update of the row.
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.last_update_date
+  ts_load:
+    description: "records the moment the entry was added to the table. this indicates the precise date and time of data ingestion produced using the now() function. this value changes if the data undergoes reprocessing."
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.ts_load
+  year:
+    description: "represents the year component extracted from the 'ts_updated' column. useful for partitioning and filtering."
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.year
+  month:
+    description: "represents the month component extracted from the 'ts_updated' column. useful for partitioning and filtering."
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.month
+  day:
+    description: "represents the day component extracted from the 'ts_updated' column. useful for partitioning and filtering."
+    lineage:
+    - datalake_pin_goal_raw.hrg_goal_plans_tl.day
