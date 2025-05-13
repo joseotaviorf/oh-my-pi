@@ -11,7 +11,7 @@ WITH enrich_pt AS (
         ts_change DESC
     ) = 1
 )
-SELECT
+SELECT DISTINCT
   MD5(
     CONCAT(
       gsheets_pt.id,
@@ -42,9 +42,9 @@ SELECT
   NOW() AS ts_load
 FROM
   datalake_gsheets_people_clean.team_formation_product_tech AS gsheets_pt
-  LEFT JOIN 
-    enrich_pt 
-      ON gsheets_pt.email = enrich_pt.email
+LEFT JOIN 
+  enrich_pt 
+    ON gsheets_pt.email = enrich_pt.email
 WHERE
   gsheets_pt.id != enrich_pt.id_teams
   OR enrich_pt.id_teams IS NULL
