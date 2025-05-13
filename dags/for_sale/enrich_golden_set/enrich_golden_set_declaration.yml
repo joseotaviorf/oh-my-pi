@@ -2,7 +2,7 @@
 dag:
   name: enrich_golden_set
   schedule_start_date: 2022, 7, 14
-  owner: Data ForSale
+  owner: Data Growth
   documentation:
     dag_purpose:
       We want to validate the information we see in Vespúcio. To do this, Growth's Product and Technology teams and Rede QuintoAndar

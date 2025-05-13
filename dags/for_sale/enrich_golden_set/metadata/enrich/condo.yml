@@ -4,8 +4,8 @@ table_name: condo
 description: The purpose of this table is to validate the condo information we see in Vespúcio. To do this, Growth's Product and Technology teams and Rede QuintoAndar created a forms to collect condo data from employees, to gather correct information from these condos.
   With this data we will make a validation base for Vespúcio, comparing these condo raised in Gsheet with the information from Vespúcio.
   Where row line is a different registered condo.
-domain: For Sale
-owner: data-for-sale@quintoandar.com.br
+domain: Data Growth
+owner: andre.melo@quintoandar.com.br
 columns:
   id: 
     description: "Line identifier of each answer collected from the Golden Set."
