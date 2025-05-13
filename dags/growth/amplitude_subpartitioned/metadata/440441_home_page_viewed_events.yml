@@ -1,0 +1,88 @@
+database_name: datalake_amplitude_subpartitioned_clean
+table_name: 440441_home_page_viewed_events
+owner: eduardo.soares@quintoandar.com.br
+domain: Growth
+description:
+  This table contains home_page_viewed_events events from app 440441. It
+  tracks user interactions and includes relevant metadata and user properties.
+columns:
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_new_clean.events.id_amplitude
+    description: Column id_amplitude from Amplitude events
+  id_event:
+    lineage:
+      - datalake_amplitude_new_clean.events.id_event
+    description: Column id_event from Amplitude events
+  id_user:
+    lineage:
+      - datalake_amplitude_new_clean.events.id_user
+    description: Column id_user from Amplitude events
+  GET_JSON_OBJECT(user_properties:
+    lineage:
+      - datalake_amplitude_new_clean.events.GET_JSON_OBJECT(user_properties
+    description: Column GET_JSON_OBJECT(user_properties from Amplitude events
+  company_id:
+    lineage:
+      - datalake_amplitude_new_clean.events.company_id
+    description: Column company_id from Amplitude events
+  email:
+    lineage:
+      - datalake_amplitude_new_clean.events.email
+    description: Column email from Amplitude events
+  login_status:
+    lineage:
+      - datalake_amplitude_new_clean.events.login_status
+    description: Column login_status from Amplitude events
+  source:
+    lineage:
+      - datalake_amplitude_new_clean.events.source
+    description: Column source from Amplitude events
+  product:
+    lineage:
+      - datalake_amplitude_new_clean.events.product
+    description: Column product from Amplitude events
+  role:
+    lineage:
+      - datalake_amplitude_new_clean.events.role
+    description: Column role from Amplitude events
+  language:
+    lineage:
+      - datalake_amplitude_new_clean.events.language
+    description: Column language from Amplitude events
+  city:
+    lineage:
+      - datalake_amplitude_new_clean.events.city
+    description: Column city from Amplitude events
+  id_device:
+    lineage:
+      - datalake_amplitude_new_clean.events.id_device
+    description: Column id_device from Amplitude events
+  device_type:
+    lineage:
+      - datalake_amplitude_new_clean.events.device_type
+    description: Column device_type from Amplitude events
+  os_name:
+    lineage:
+      - datalake_amplitude_new_clean.events.os_name
+    description: Column os_name from Amplitude events
+  platform:
+    lineage:
+      - datalake_amplitude_new_clean.events.platform
+    description: Column platform from Amplitude events
+  ts_event:
+    lineage:
+      - datalake_amplitude_new_clean.events.ts_event
+    description: Column ts_event from Amplitude events
+  year:
+    lineage:
+      - datalake_amplitude_new_clean.events.year
+    description: Column year from Amplitude events
+  month:
+    lineage:
+      - datalake_amplitude_new_clean.events.month
+    description: Column month from Amplitude events
+  day:
+    lineage:
+      - datalake_amplitude_new_clean.events.day
+    description: Column day from Amplitude events

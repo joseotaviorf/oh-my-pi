@@ -1,0 +1,68 @@
+database_name: datalake_amplitude_subpartitioned_clean
+table_name: 183047_relisting_early_visits_confirmed_events
+owner: eduardo.soares@quintoandar.com.br
+domain: Growth
+description: This table contains relisting_early_visits_confirmed_events events from
+  app 183047. It tracks user interactions and includes relevant metadata and user
+  properties.
+columns:
+  id_amplitude:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_amplitude
+    description: Column id_amplitude from Amplitude events
+  id_user:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_user
+    description: Column id_user from Amplitude events
+  id_device:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_device
+    description: Column id_device from Amplitude events
+  BIGINT(GET_JSON_OBJECT(event_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.BIGINT(GET_JSON_OBJECT(event_properties
+    description: Column BIGINT(GET_JSON_OBJECT(event_properties from Amplitude events
+  id_house:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_house
+    description: Column id_house from Amplitude events
+  GET_JSON_OBJECT(user_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.GET_JSON_OBJECT(user_properties
+    description: Column GET_JSON_OBJECT(user_properties from Amplitude events
+  country_code:
+    lineage:
+    - datalake_amplitude_new_clean.events.country_code
+    description: Column country_code from Amplitude events
+  event_type:
+    lineage:
+    - datalake_amplitude_new_clean.events.event_type
+    description: Column event_type from Amplitude events
+  user_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.user_properties
+    description: Column user_properties from Amplitude events
+  event_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.event_properties
+    description: Column event_properties from Amplitude events
+  ts_event:
+    lineage:
+    - datalake_amplitude_new_clean.events.ts_event
+    description: Column ts_event from Amplitude events
+  ts_processed:
+    lineage:
+    - datalake_amplitude_new_clean.events.ts_processed
+    description: Column ts_processed from Amplitude events
+  year:
+    lineage:
+    - datalake_amplitude_new_clean.events.year
+    description: Column year from Amplitude events
+  month:
+    lineage:
+    - datalake_amplitude_new_clean.events.month
+    description: Column month from Amplitude events
+  day:
+    lineage:
+    - datalake_amplitude_new_clean.events.day
+    description: Column day from Amplitude events

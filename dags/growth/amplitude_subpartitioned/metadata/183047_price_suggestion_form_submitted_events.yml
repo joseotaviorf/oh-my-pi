@@ -1,0 +1,88 @@
+database_name: datalake_amplitude_subpartitioned_clean
+table_name: 183047_price_suggestion_form_submitted_events
+owner: eduardo.soares@quintoandar.com.br
+domain: Growth
+description: This table contains price_suggestion_form_submitted_events events from
+  app 183047. It tracks user interactions and includes relevant metadata and user
+  properties.
+columns:
+  '*':
+    lineage:
+    - datalake_amplitude_new_clean.events.*
+    description: Column * from Amplitude events
+  T(GET_JSON_OBJECT(event_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.T(GET_JSON_OBJECT(event_properties
+    description: Column T(GET_JSON_OBJECT(event_properties from Amplitude events
+  id_lead_ebdb:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_lead_ebdb
+    description: Column id_lead_ebdb from Amplitude events
+  T(GET_JSON_OBJECT(user_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.T(GET_JSON_OBJECT(user_properties
+    description: Column T(GET_JSON_OBJECT(user_properties from Amplitude events
+  initial_utm_campaign:
+    lineage:
+    - datalake_amplitude_new_clean.events.initial_utm_campaign
+    description: Column initial_utm_campaign from Amplitude events
+  initial_utm_medium:
+    lineage:
+    - datalake_amplitude_new_clean.events.initial_utm_medium
+    description: Column initial_utm_medium from Amplitude events
+  initial_utm_source:
+    lineage:
+    - datalake_amplitude_new_clean.events.initial_utm_source
+    description: Column initial_utm_source from Amplitude events
+  initial_utm_content:
+    lineage:
+    - datalake_amplitude_new_clean.events.initial_utm_content
+    description: Column initial_utm_content from Amplitude events
+  initial_utm_term:
+    lineage:
+    - datalake_amplitude_new_clean.events.initial_utm_term
+    description: Column initial_utm_term from Amplitude events
+  utm_campaign:
+    lineage:
+    - datalake_amplitude_new_clean.events.utm_campaign
+    description: Column utm_campaign from Amplitude events
+  utm_medium:
+    lineage:
+    - datalake_amplitude_new_clean.events.utm_medium
+    description: Column utm_medium from Amplitude events
+  utm_source:
+    lineage:
+    - datalake_amplitude_new_clean.events.utm_source
+    description: Column utm_source from Amplitude events
+  utm_content:
+    lineage:
+    - datalake_amplitude_new_clean.events.utm_content
+    description: Column utm_content from Amplitude events
+  utm_term:
+    lineage:
+    - datalake_amplitude_new_clean.events.utm_term
+    description: Column utm_term from Amplitude events
+  app_type:
+    lineage:
+    - datalake_amplitude_new_clean.events.app_type
+    description: Column app_type from Amplitude events
+  referring_domain:
+    lineage:
+    - datalake_amplitude_new_clean.events.referring_domain
+    description: Column referring_domain from Amplitude events
+  T(TRIM(GET_JSON_OBJECT(event_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.T(TRIM(GET_JSON_OBJECT(event_properties
+    description: Column T(TRIM(GET_JSON_OBJECT(event_properties from Amplitude events
+  formfield_lead_uuid:
+    lineage:
+    - datalake_amplitude_new_clean.events.formfield_lead_uuid
+    description: Column formfield_lead_uuid from Amplitude events
+  id_lead:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_lead
+    description: Column id_lead from Amplitude events
+  country_code:
+    lineage:
+    - datalake_amplitude_new_clean.events.country_code
+    description: Column country_code from Amplitude events

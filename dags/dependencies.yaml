@@ -1,6 +1,8 @@
 ---
 bietlejuice.amplitude:
   - bietlejuice.amplitude_supply:events-supply-to-datalake-raw
+bietlejuice.amplitude_subpartitioned:
+  - bietlejuice.amplitude_new:load-clean-events
 bietlejuice.amplitude_supply:
   - bietlejuice.amplitude_demand:events-demand-to-datalake-raw
 bietlejuice.demand_balancer_service:

@@ -1,0 +1,105 @@
+database_name: datalake_amplitude_new_clean
+table_name: 170698_offer_submitted_events
+owner: eduardo.soares@quintoandar.com.br
+domain: Growth
+description: |
+  This table contains events related to offer submissions in the QuintoAndar app (170698).
+  It tracks when users submit offers for properties, including all relevant metadata and user properties.
+columns:
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_new_clean.events.id_amplitude
+    description: Unique identifier for the event in Amplitude
+  ids_amplitude_attributed:
+    lineage:
+      - datalake_amplitude_new_clean.events.ids_amplitude_attributed
+    description: List of attributed Amplitude event IDs
+  id_app:
+    lineage:
+      - datalake_amplitude_new_clean.events.id_app
+    description: Application identifier (170698 for QuintoAndar app)
+  id_device:
+    lineage:
+      - datalake_amplitude_new_clean.events.id_device
+    description: Unique identifier for the device
+  id_event:
+    lineage:
+      - datalake_amplitude_new_clean.events.id_event
+    description: Unique identifier for the event
+  id_session:
+    lineage:
+      - datalake_amplitude_new_clean.events.id_session
+    description: Session identifier
+  id_user:
+    lineage:
+      - datalake_amplitude_new_clean.events.id_user
+    description: User identifier
+  event_type:
+    lineage:
+      - datalake_amplitude_new_clean.events.event_type
+    description: Type of event (offer_submitted)
+  event_properties:
+    lineage:
+      - datalake_amplitude_new_clean.events.event_properties
+    description: JSON containing event-specific properties
+  user_properties:
+    lineage:
+      - datalake_amplitude_new_clean.events.user_properties
+    description: JSON containing user-specific properties
+  ep_id_house:
+    lineage:
+      - datalake_amplitude_new_clean.events.event_properties.house_id
+    description: House ID from event properties
+  ep_id_firestore:
+    lineage:
+      - datalake_amplitude_new_clean.events.event_properties.offer_id
+      - datalake_amplitude_new_clean.events.event_properties.uri
+    description: Offer ID from event properties or extracted from URI
+  up_app_type:
+    lineage:
+      - datalake_amplitude_new_clean.events.user_properties.platform
+    description: Platform type from user properties
+  up_utm_source:
+    lineage:
+      - datalake_amplitude_new_clean.events.user_properties.utm_source
+    description: UTM source from user properties
+  up_utm_medium:
+    lineage:
+      - datalake_amplitude_new_clean.events.user_properties.utm_medium
+    description: UTM medium from user properties
+  up_utm_campaign:
+    lineage:
+      - datalake_amplitude_new_clean.events.user_properties.utm_campaign
+    description: UTM campaign from user properties
+  up_utm_content:
+    lineage:
+      - datalake_amplitude_new_clean.events.user_properties.utm_content
+    description: UTM content from user properties
+  up_utm_term:
+    lineage:
+      - datalake_amplitude_new_clean.events.user_properties.utm_term
+    description: UTM term from user properties
+  up_entrance_uri:
+    lineage:
+      - datalake_amplitude_new_clean.events.user_properties.entrance_uri
+    description: Entrance URI from user properties
+  dt_event:
+    lineage:
+      - datalake_amplitude_new_clean.events.ts_event
+    description: Date of the event
+  ts_event:
+    lineage:
+      - datalake_amplitude_new_clean.events.ts_event
+    description: Timestamp of the event
+  year:
+    lineage:
+      - datalake_amplitude_new_clean.events.year
+    description: Year of the event
+  month:
+    lineage:
+      - datalake_amplitude_new_clean.events.month
+    description: Month of the event
+  day:
+    lineage:
+      - datalake_amplitude_new_clean.events.day
+    description: Day of the event

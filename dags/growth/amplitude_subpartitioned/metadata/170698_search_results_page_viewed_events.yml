@@ -1,0 +1,71 @@
+database_name: datalake_amplitude_subpartitioned_clean
+table_name: 170698_search_results_page_viewed_events
+owner: eduardo.soares@quintoandar.com.br
+domain: Growth
+description: This table contains search_results_page_viewed_events events from app
+  170698. It tracks user interactions and includes relevant metadata and user properties.
+columns:
+  id_amplitude:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_amplitude
+    description: Column id_amplitude from Amplitude events
+  ids_amplitude_attributed:
+    lineage:
+    - datalake_amplitude_new_clean.events.ids_amplitude_attributed
+    description: Column ids_amplitude_attributed from Amplitude events
+  id_user:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_user
+    description: Column id_user from Amplitude events
+  id_device:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_device
+    description: Column id_device from Amplitude events
+  id_event:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_event
+    description: Column id_event from Amplitude events
+  id_app:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_app
+    description: Column id_app from Amplitude events
+  uuid:
+    lineage:
+    - datalake_amplitude_new_clean.events.uuid
+    description: Column uuid from Amplitude events
+  adid:
+    lineage:
+    - datalake_amplitude_new_clean.events.adid
+    description: Column adid from Amplitude events
+  id_session:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_session
+    description: Column id_session from Amplitude events
+  id_schema:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_schema
+    description: Column id_schema from Amplitude events
+  id_inserted:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_inserted
+    description: Column id_inserted from Amplitude events
+  idfa:
+    lineage:
+    - datalake_amplitude_new_clean.events.idfa
+    description: Column idfa from Amplitude events
+  ep_house_id:
+    lineage:
+    - datalake_amplitude_new_clean.events.ep_house_id
+    description: Column ep_house_id from Amplitude events
+  GET_JSON_OBJECT(event_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.GET_JSON_OBJECT(event_properties
+    description: Column GET_JSON_OBJECT(event_properties from Amplitude events
+  id_search:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_search
+    description: Column id_search from Amplitude events
+  TRANSFORM(:
+    lineage:
+    - datalake_amplitude_new_clean.events.TRANSFORM(
+    description: Column TRANSFORM( from Amplitude events

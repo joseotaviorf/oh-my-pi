@@ -1,4 +1,5 @@
 from typing import List, Tuple
+import math
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
@@ -22,6 +23,8 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
     :param cluster_args: A dictionary containing arguments that will be used for the cluster definition that the dag processes will make.
     """
 
+    MAX_TABLES_PER_CLUSTER = 25
+
     def __init__(self, dag_args, workflow_args, cluster_args, layer: LayerEnum):
         super().__init__(dag_args, workflow_args, cluster_args)
         self.layer = layer
@@ -40,18 +43,63 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         dag_execution_context = self._get_dag_execution_context(dag, bucket)
         self._initialize_task_creators(dag_execution_context)
 
-        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
+        tables = self._get_tables()
+        n_tables = len(tables)
+        # Tables with inner dependencies between them must be in the same cluster
+        if "inner_dependencies" in self.workflow_args:
+            n_clusters = 1
+        else:
+            n_clusters = math.ceil(n_tables / self.MAX_TABLES_PER_CLUSTER)
+        tables_per_cluster = math.ceil(n_tables / n_clusters)
+
+        cluster_tables = []
+        execute_job_cluster_local_id = 1
+        n_tables_so_far = 0
+
         dummy_terminate_job_cluster_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
 
+        for table in tables:
+            if n_tables_so_far != 0 and n_tables_so_far % tables_per_cluster == 0:
+                self._create_all_tasks_for_cluster(
+                    cluster_tables,
+                    execute_job_cluster_local_id,
+                    dummy_terminate_job_cluster_task,
+                )
+                cluster_tables = []
+                execute_job_cluster_local_id += 1
+            cluster_tables.append(table)
+            n_tables_so_far += 1
+
+        if len(cluster_tables) > 0:
+            self._create_all_tasks_for_cluster(
+                cluster_tables,
+                execute_job_cluster_local_id,
+                dummy_terminate_job_cluster_task,
+            )
+
+        return dag
+
+    def _create_all_tasks_for_cluster(
+        self,
+        cluster_tables: List[TableAttributes],
+        execute_job_cluster_local_id: int,
+        dummy_terminate_job_cluster_task,
+    ) -> None:
+        """Creates all the tasks for the workflow and sets their dependencies."""
+
+        execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task(
+            execute_job_cluster_local_id if execute_job_cluster_local_id > 1 else None
+        )
+        optimize_delta_tables = self.optimize_delta_table_task_creator.create_task(
+            cluster_tables, optimize_delta_table_local_id=execute_job_cluster_local_id
+        )
+
         table_first_tasks = {}
         table_last_tasks = {}
-        tables = self._get_tables()
-        optimize_delta_tables = self.optimize_delta_table_task_creator.create_task(
-            tables
-        )
-        for table in tables:
+
+        for table in cluster_tables:
             (
                 table_first_tasks[table.table_name],
                 table_last_tasks[table.table_name],
@@ -64,8 +112,6 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
             optimize_delta_tables,
             dummy_terminate_job_cluster_task,
         )
-
-        return dag
 
     def _get_tables(self) -> List[TableAttributes]:
         """Returns the table attributes for all the tables in the specified layer."""

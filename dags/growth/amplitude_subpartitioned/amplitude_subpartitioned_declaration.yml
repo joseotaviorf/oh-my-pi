@@ -1,0 +1,195 @@
+dag:
+  name: amplitude_subpartitioned
+  owner: Data Growth
+  schedule_interval: 0 3 * * *
+  documentation:
+    dag_purpose: |
+      This DAG ingests data from Amplitude and materializes it in a subpartitioned tables by id_app and event_type
+workflow:
+  type: query_delta
+  layer: clean
+  default_extraction_type: incremental
+  tables_customization:
+    # 170698 events - 47 tables
+    170698_apply_filters_events: {}
+    170698_chatcrpp_button_clicked_events: {}
+    170698_chat_pp_iq_channel_list_page_viewed_events: {}
+    170698_chat_screen_page_viewed_events: {}
+    170698_contract_page_viewed_events: {}
+    170698_copy_inspection_report_link_button_clicked_events: {}
+    170698_cxp_fine_invoice_button_clicked_events: {}
+    170698_cxp_fine_negotiate_button_clicked_events: {}
+    170698_cxp_flow_payments_page_viewed_events: {}
+    170698_cxp_main_page_off_inspection_button_clicked_events: {}
+    170698_cxp_main_page_payments_button_clicked_events: {}
+    170698_cxp_main_page_post_exit_inspection_button_clicked_events: {}
+    170698_cxp_main_page_post_exit_page_viewed_events: {}
+    170698_cxp_main_page_property_return_button_clicked_events: {}
+    170698_cxp_payments_page_payment_receipts_button_clicked_events: {}
+    170698_debug_visit_schedule_confirmed_events: {}
+    170698_evaluation_runevaluation_clicked_events: {}
+    170698_evaluation_timeout_viewed_events: {}
+    170698_feed_recommendation_page_viewed_events: {}
+    170698_fs_mortgage_progress_step_clicked_events: {}
+    170698_fs_mortgage_track_progress_button_clicked_events: {}
+    170698_fs_mortgage_track_status_viewed_events: {}
+    170698_help_center_article_recommendation_clicked_events: {}
+    170698_help_center_article_recommendation_viewed_events: {}
+    170698_help_center_faq_clicked_events: {}
+    170698_help_center_wait_call_viewed_events: {}
+    170698_inspection_review_home_page_viewed_events: {}
+    170698_listing_early_credit_clicked_events: {}
+    170698_listing_open_gallery_view_events: {}
+    170698_listing_page_viewed_events: {}
+    170698_listing_photosphere_opened_events: {}
+    170698_login_confirmation_viewed_events: {}
+    170698_mortgage_home_viewed_events: {}
+    170698_my_checkout_page_viewed_events: {}
+    170698_ntc_notification_clicked_events: {}
+    170698_offboarding_inspections_repairs_task_button_clicked_events: {}
+    170698_offboarding_keys_task_success_page_viewed_events: {}
+    170698_offboarding_repair_guidelines_entry_inspection_clicked_events: {}
+    170698_offboarding_repair_guidelines_negotiate_repairs_card_viewed_events:
+      {}
+    170698_offboarding_repairs_task_success_page_viewed_events: {}
+    170698_offboarding_terminationcontrol_inspection_page_viewed_events: {}
+    170698_offboarding_utilitybills_receipts_page_viewed_events: {}
+    170698_offer_accepted_new_events: {}
+    170698_owner_termination_management_page_viewed_events: {}
+    170698_pending_invoices_page_viewed_events: {}
+    170698_piloto_cw_message_sent_events: {}
+    170698_rm_invoice_page_viewed_events: {}
+    170698_rm_invoice_payment_option_clicked_events: {}
+    170698_rm_myrent_page_viewed_events: {}
+    170698_rm_pending_invoices_page_viewed_events: {}
+    170698_schedule_page_viewed_events: {}
+    170698_search_page_viewed_events: {}
+    170698_select_listing_visit_button_clicked_events: {}
+    170698_session_start_events: {}
+    170698_unavailable_listing_viewed_events: {}
+    170698_user_has_been_blocked_on_ivr_events: {}
+    170698_user_ivr_still_accessible_events: {}
+    170698_user_tried_to_call_again_after_blocked_events: {}
+    170698_visit_hoursalert_confirmed_events: {}
+    170698_visit_list_request_schedule_button_clicked_events: {}
+    170698_visit_schedule_confirmed_events: {}
+
+    # 183047 events - 52 tables
+    183047_ad_improvements_first_access_page_viewed_events: {}
+    183047_ad_improvements_intent_button_clicked_events: {}
+    183047_ad_improvements_page_viewed_events: {}
+    183047_ad_improvements_price_in_range_page_viewed_events: {}
+    183047_ad_improvements_price_recommendation_accepted_button_clicked_events:
+      {}
+    183047_ad_improvements_price_recommendation_page_viewed_events: {}
+    183047_ad_improvements_price_strategy_button_clicked_events: {}
+    183047_chatcrpp_accep_terms_button_clicked_events: {}
+    183047_chatcrpp_allchats_page_viewed_events: {}
+    183047_chatcrpp_blocked_message_alert_shown_events: {}
+    183047_chatcrpp_chat_conversation_started_events: {}
+    183047_chatcrpp_chat_page_viewed_events: {}
+    183047_chatcrpp_suspicious_message_sent_events: {}
+    183047_chatcrpp_warning_message_alert_shown_events: {}
+    183047_contract_page_viewed_events: {}
+    183047_faq_article_page_viewed_events: {}
+    183047_fs_mortgage_track_progress_button_clicked_events: {}
+    183047_fs_mortgage_track_progress_page_viewed_events: {}
+    183047_fs_mortgage_track_status_viewed_events: {}
+    183047_help_center_article_clicked_events: {}
+    183047_help_center_article_recommendation_clicked_events: {}
+    183047_help_center_article_recommendation_viewed_events: {}
+    183047_help_center_faq_clicked_events: {}
+    183047_help_center_page_viewed_events: {}
+    183047_help_center_question_mark_clicked_events: {}
+    183047_house_in_early_relisting_events: {}
+    183047_inspection_report_button_clicked_events: {}
+    183047_intro_page_viewed_events: {}
+    183047_landing_page_viewed_events: {}
+    183047_lead_form_submitted_events: {}
+    183047_listing_location_submitted_events: {}
+    183047_listing_terms_confirmed_events: {}
+    183047_mortgage_home_viewed_events: {}
+    183047_offer_accepted_new_events: {}
+    183047_offer_canceled_new_events: {}
+    183047_offer_submitted_new_events: {}
+    183047_price_report_landing_rent_page_viewed_events: {}
+    183047_price_report_landing_sale_page_viewed_events: {}
+    183047_price_suggestion_advertise_clicked_events: {}
+    183047_price_suggestion_form_submitted_events: {}
+    183047_price_suggestion_page_viewed_events: {}
+    183047_price_suggestion_sale_form_submitted_events: {}
+    183047_price_suggestion_sale_page_viewed_events: {}
+    183047_property_details_page_viewed_events: {}
+    183047_property_page_viewed_events: {}
+    183047_relisting_early_visits_confirmed_events: {}
+    183047_rent_pricing_new_listing_form_submitted_events: {}
+    183047_rent_pricing_new_listing_page_viewed_events: {}
+    183047_sale_calculator_edition_form_submitted_events: {}
+    183047_sale_calculator_page_viewed_events: {}
+    183047_sale_price_page_viewed_events: {}
+    183047_sale_pricing_existing_listing_form_submitted_events: {}
+    183047_sale_pricing_existing_listing_page_viewed_events: {}
+    183047_sale_pricing_new_listing_form_submitted_events: {}
+    183047_sale_pricing_new_listing_page_viewed_events: {}
+    183047_terms_page_viewed_events: {}
+
+    # 170135 events - 6 tables
+    170135_in_app_survey_answered_events: {}
+    170135_in_app_survey_dismissed_events: {}
+    170135_in_app_survey_displayed_events: {}
+    170135_in_app_survey_received_events: {}
+    170135_in_app_survey_viewed_events: {}
+    170135_offer_submitted_events: {}
+
+    # 183049 events - 1 table
+    183049_offer_submitted_events: {}
+
+    # 205027 events - 3 tables
+    205027_intro_page_viewed_events: {}
+    205027_referral_form_accepted_events: {}
+    205027_referral_form_discarded_events: {}
+
+    # 233592 events - 8 tables
+    233592_chatcrpp_accep_terms_button_clicked_events: {}
+    233592_chatcrpp_allchats_page_viewed_events: {}
+    233592_chatcrpp_blocked_message_alert_shown_events: {}
+    233592_chatcrpp_chat_conversation_started_events: {}
+    233592_chatcrpp_chat_page_viewed_events: {}
+    233592_chatcrpp_suspicious_message_sent_events: {}
+    233592_chatcrpp_warning_message_alert_shown_events: {}
+    233592_tts_helps_button_clicked_events: {}
+
+    # 440441 events - 1 table
+    440441_home_page_viewed_events: {}
+
+    # 525551 events - 3 tables
+    525551_listing_page_viewed_events: {}
+    525551_schedule_visit_at_5a_button_clicked_events: {}
+    525551_search_page_viewed_events: {}
+
+    # 155697 events - 1 table
+    155697_refer_lead_referred_events: {}
+
+    # 160023 events - 1 table
+    160023_affiliate_lead_referred_events: {}
+
+    # 203461 events - 1 table
+    203461_inspector_app_add_photo_clicked_events: {}
+
+    #170698_user_merge - 1 table
+    170698_user_merge: {}
+
+    #183047_user_merge - 1 table
+    183047_user_merge: {}
+
+    #205027_user_merge - 1 table
+    205027_user_merge: {}
+
+cluster:
+  type: databricks_12_2_med_2xlarge_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

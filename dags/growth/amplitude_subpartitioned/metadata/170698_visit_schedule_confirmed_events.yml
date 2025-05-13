@@ -1,0 +1,76 @@
+database_name: datalake_amplitude_subpartitioned_clean
+table_name: 170698_visit_schedule_confirmed_events
+owner: eduardo.soares@quintoandar.com.br
+domain: Growth
+description: This table contains visit_schedule_confirmed_events events from app 170698.
+  It tracks user interactions and includes relevant metadata and user properties.
+columns:
+  '*':
+    lineage:
+    - datalake_amplitude_new_clean.events.*
+    description: Column * from Amplitude events
+  get_json_object(user_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.get_json_object(user_properties
+    description: Column get_json_object(user_properties from Amplitude events
+  '''$.gclid'') as up_gclid':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.gclid') as up_gclid
+    description: Column '$.gclid') as up_gclid from Amplitude events
+  '''$.utm_source'') as up_utm_source':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.utm_source') as up_utm_source
+    description: Column '$.utm_source') as up_utm_source from Amplitude events
+  '''$.utm_medium'') as up_utm_medium':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.utm_medium') as up_utm_medium
+    description: Column '$.utm_medium') as up_utm_medium from Amplitude events
+  '''$.utm_campaign'') as up_utm_campaign':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.utm_campaign') as up_utm_campaign
+    description: Column '$.utm_campaign') as up_utm_campaign from Amplitude events
+  '''$.utm_content'') as up_utm_content':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.utm_content') as up_utm_content
+    description: Column '$.utm_content') as up_utm_content from Amplitude events
+  '''$.utm_term'') as up_utm_term':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.utm_term') as up_utm_term
+    description: Column '$.utm_term') as up_utm_term from Amplitude events
+  '''$.platform'') as up_platform':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.platform') as up_platform
+    description: Column '$.platform') as up_platform from Amplitude events
+  get_json_object(replace(user_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.get_json_object(replace(user_properties
+    description: Column get_json_object(replace(user_properties from Amplitude events
+  '''[adjust]''':
+    lineage:
+    - datalake_amplitude_new_clean.events.'[adjust]'
+    description: Column '[adjust]' from Amplitude events
+  '''(adjust)'')':
+    lineage:
+    - datalake_amplitude_new_clean.events.'(adjust)')
+    description: Column '(adjust)') from Amplitude events
+  '''$.(adjust) network'') as up_adjust_network':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.(adjust) network') as up_adjust_network
+    description: Column '$.(adjust) network') as up_adjust_network from Amplitude
+      events
+  '''$.entrance_uri'') as up_entrance_uri':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.entrance_uri') as up_entrance_uri
+    description: Column '$.entrance_uri') as up_entrance_uri from Amplitude events
+  get_json_object(event_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.get_json_object(event_properties
+    description: Column get_json_object(event_properties from Amplitude events
+  '''$.house_id'') as ep_house_id':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.house_id') as ep_house_id
+    description: Column '$.house_id') as ep_house_id from Amplitude events
+  '''$.visit_code'') as ep_visit_code':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.visit_code') as ep_visit_code
+    description: Column '$.visit_code') as ep_visit_code from Amplitude events

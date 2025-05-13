@@ -1,0 +1,28 @@
+---
+database_name: datalake_amplitude_subpartitioned_clean
+table_name: 205027_user_merge
+columns:
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_raw.205027_user_merge.amplitude_id
+  id_amplitude_merged:
+    lineage:
+      - datalake_amplitude_raw.205027_user_merge.merged_amplitude_id
+  id_app:
+    lineage:
+      - datalake_amplitude_raw.205027_user_merge.scope
+  ts_merge:
+    lineage:
+      - datalake_amplitude_raw.205027_user_merge.merge_time
+  ts_server_merge:
+    lineage:
+      - datalake_amplitude_raw.205027_user_merge.merge_server_time
+  year:
+    lineage:
+      - datalake_amplitude_raw.205027_user_merge.merge_time
+  month:
+    lineage:
+      - datalake_amplitude_raw.205027_user_merge.merge_time
+  day:
+    lineage:
+      - datalake_amplitude_raw.205027_user_merge.merge_time

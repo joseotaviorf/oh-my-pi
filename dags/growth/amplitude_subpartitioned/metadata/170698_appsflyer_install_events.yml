@@ -1,0 +1,296 @@
+database_name: datalake_amplitude_subpartitioned_clean
+table_name: 170698_appsflyer_install_events
+owner: eduardo.soares@quintoandar.com.br
+domain: Growth
+description: This table contains appsflyer_install_events events from app 170698.
+  It tracks user interactions and includes relevant metadata and user properties.
+columns:
+  id_amplitude:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_amplitude
+    description: Column id_amplitude from Amplitude events
+  ids_amplitude_attributed:
+    lineage:
+    - datalake_amplitude_new_clean.events.ids_amplitude_attributed
+    description: Column ids_amplitude_attributed from Amplitude events
+  id_app:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_app
+    description: Column id_app from Amplitude events
+  id_device:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_device
+    description: Column id_device from Amplitude events
+  id_event:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_event
+    description: Column id_event from Amplitude events
+  id_session:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_session
+    description: Column id_session from Amplitude events
+  id_inserted:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_inserted
+    description: Column id_inserted from Amplitude events
+  id_user:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_user
+    description: Column id_user from Amplitude events
+  id_schema:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_schema
+    description: Column id_schema from Amplitude events
+  REGEXP_EXTRACT(GET_JSON_OBJECT(event_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.REGEXP_EXTRACT(GET_JSON_OBJECT(event_properties
+    description: Column REGEXP_EXTRACT(GET_JSON_OBJECT(event_properties from Amplitude
+      events
+  '''$.uri'')':
+    lineage:
+    - datalake_amplitude_new_clean.events.'$.uri')
+    description: Column '$.uri') from Amplitude events
+  '''.imovel\/(\\d+?)\/''':
+    lineage:
+    - datalake_amplitude_new_clean.events.'.imovel\/(\\d+?)\/'
+    description: Column '.imovel\/(\\d+?)\/' from Amplitude events
+  id_house:
+    lineage:
+    - datalake_amplitude_new_clean.events.id_house
+    description: Column id_house from Amplitude events
+  idfa:
+    lineage:
+    - datalake_amplitude_new_clean.events.idfa
+    description: Column idfa from Amplitude events
+  adid:
+    lineage:
+    - datalake_amplitude_new_clean.events.adid
+    description: Column adid from Amplitude events
+  uuid:
+    lineage:
+    - datalake_amplitude_new_clean.events.uuid
+    description: Column uuid from Amplitude events
+  amplitude_event_type:
+    lineage:
+    - datalake_amplitude_new_clean.events.amplitude_event_type
+    description: Column amplitude_event_type from Amplitude events
+  city:
+    lineage:
+    - datalake_amplitude_new_clean.events.city
+    description: Column city from Amplitude events
+  country:
+    lineage:
+    - datalake_amplitude_new_clean.events.country
+    description: Column country from Amplitude events
+  data:
+    lineage:
+    - datalake_amplitude_new_clean.events.data
+    description: Column data from Amplitude events
+  device_brand:
+    lineage:
+    - datalake_amplitude_new_clean.events.device_brand
+    description: Column device_brand from Amplitude events
+  device_carrier:
+    lineage:
+    - datalake_amplitude_new_clean.events.device_carrier
+    description: Column device_carrier from Amplitude events
+  device_family:
+    lineage:
+    - datalake_amplitude_new_clean.events.device_family
+    description: Column device_family from Amplitude events
+  device_manufacturer:
+    lineage:
+    - datalake_amplitude_new_clean.events.device_manufacturer
+    description: Column device_manufacturer from Amplitude events
+  device_model:
+    lineage:
+    - datalake_amplitude_new_clean.events.device_model
+    description: Column device_model from Amplitude events
+  device_type:
+    lineage:
+    - datalake_amplitude_new_clean.events.device_type
+    description: Column device_type from Amplitude events
+  dma:
+    lineage:
+    - datalake_amplitude_new_clean.events.dma
+    description: Column dma from Amplitude events
+  event_type:
+    lineage:
+    - datalake_amplitude_new_clean.events.event_type
+    description: Column event_type from Amplitude events
+  event_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.event_properties
+    description: Column event_properties from Amplitude events
+  ip_address:
+    lineage:
+    - datalake_amplitude_new_clean.events.ip_address
+    description: Column ip_address from Amplitude events
+  location_lat:
+    lineage:
+    - datalake_amplitude_new_clean.events.location_lat
+    description: Column location_lat from Amplitude events
+  location_lng:
+    lineage:
+    - datalake_amplitude_new_clean.events.location_lng
+    description: Column location_lng from Amplitude events
+  os_name:
+    lineage:
+    - datalake_amplitude_new_clean.events.os_name
+    description: Column os_name from Amplitude events
+  os_version:
+    lineage:
+    - datalake_amplitude_new_clean.events.os_version
+    description: Column os_version from Amplitude events
+  platform:
+    lineage:
+    - datalake_amplitude_new_clean.events.platform
+    description: Column platform from Amplitude events
+  library:
+    lineage:
+    - datalake_amplitude_new_clean.events.library
+    description: Column library from Amplitude events
+  region:
+    lineage:
+    - datalake_amplitude_new_clean.events.region
+    description: Column region from Amplitude events
+  start_version:
+    lineage:
+    - datalake_amplitude_new_clean.events.start_version
+    description: Column start_version from Amplitude events
+  language:
+    lineage:
+    - datalake_amplitude_new_clean.events.language
+    description: Column language from Amplitude events
+  version_name:
+    lineage:
+    - datalake_amplitude_new_clean.events.version_name
+    description: Column version_name from Amplitude events
+  sample_rate:
+    lineage:
+    - datalake_amplitude_new_clean.events.sample_rate
+    description: Column sample_rate from Amplitude events
+  GET_JSON_OBJECT(user_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.GET_JSON_OBJECT(user_properties
+    description: Column GET_JSON_OBJECT(user_properties from Amplitude events
+  up_gclid:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_gclid
+    description: Column up_gclid from Amplitude events
+  up_utm_source:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_utm_source
+    description: Column up_utm_source from Amplitude events
+  up_utm_medium:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_utm_medium
+    description: Column up_utm_medium from Amplitude events
+  up_utm_campaign:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_utm_campaign
+    description: Column up_utm_campaign from Amplitude events
+  up_utm_content:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_utm_content
+    description: Column up_utm_content from Amplitude events
+  up_utm_term:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_utm_term
+    description: Column up_utm_term from Amplitude events
+  up_platform:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_platform
+    description: Column up_platform from Amplitude events
+  up_adjust_network:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_adjust_network
+    description: Column up_adjust_network from Amplitude events
+  up_adjust_campaign:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_adjust_campaign
+    description: Column up_adjust_campaign from Amplitude events
+  up_appsflyer_appsflyer_id:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_appsflyer_appsflyer_id
+    description: Column up_appsflyer_appsflyer_id from Amplitude events
+  up_appsflyer_campaign:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_appsflyer_campaign
+    description: Column up_appsflyer_campaign from Amplitude events
+  up_appsflyer_installed_at:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_appsflyer_installed_at
+    description: Column up_appsflyer_installed_at from Amplitude events
+  up_appsflyer_media_source:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_appsflyer_media_source
+    description: Column up_appsflyer_media_source from Amplitude events
+  up_appsflyer_network_name:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_appsflyer_network_name
+    description: Column up_appsflyer_network_name from Amplitude events
+  up_entrance_uri:
+    lineage:
+    - datalake_amplitude_new_clean.events.up_entrance_uri
+    description: Column up_entrance_uri from Amplitude events
+  GET_JSON_OBJECT(event_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.GET_JSON_OBJECT(event_properties
+    description: Column GET_JSON_OBJECT(event_properties from Amplitude events
+  ep_uri:
+    lineage:
+    - datalake_amplitude_new_clean.events.ep_uri
+    description: Column ep_uri from Amplitude events
+  is_paying:
+    lineage:
+    - datalake_amplitude_new_clean.events.is_paying
+    description: Column is_paying from Amplitude events
+  is_attribution_event:
+    lineage:
+    - datalake_amplitude_new_clean.events.is_attribution_event
+    description: Column is_attribution_event from Amplitude events
+  ts_event:
+    lineage:
+    - datalake_amplitude_new_clean.events.ts_event
+    description: Column ts_event from Amplitude events
+  ts_server_uploaded:
+    lineage:
+    - datalake_amplitude_new_clean.events.ts_server_uploaded
+    description: Column ts_server_uploaded from Amplitude events
+  ts_user_created:
+    lineage:
+    - datalake_amplitude_new_clean.events.ts_user_created
+    description: Column ts_user_created from Amplitude events
+  ts_client_event:
+    lineage:
+    - datalake_amplitude_new_clean.events.ts_client_event
+    description: Column ts_client_event from Amplitude events
+  ts_client_uploaded:
+    lineage:
+    - datalake_amplitude_new_clean.events.ts_client_uploaded
+    description: Column ts_client_uploaded from Amplitude events
+  ts_server_received:
+    lineage:
+    - datalake_amplitude_new_clean.events.ts_server_received
+    description: Column ts_server_received from Amplitude events
+  user_properties:
+    lineage:
+    - datalake_amplitude_new_clean.events.user_properties
+    description: Column user_properties from Amplitude events
+  ts_processed:
+    lineage:
+    - datalake_amplitude_new_clean.events.ts_processed
+    description: Column ts_processed from Amplitude events
+  year:
+    lineage:
+    - datalake_amplitude_new_clean.events.year
+    description: Column year from Amplitude events
+  month:
+    lineage:
+    - datalake_amplitude_new_clean.events.month
+    description: Column month from Amplitude events
+  day:
+    lineage:
+    - datalake_amplitude_new_clean.events.day
+    description: Column day from Amplitude events
