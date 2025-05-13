@@ -1,0 +1,25 @@
+dag:
+  name: reverse_kyc
+  schedule_start_date: 2025,05,08
+  owner: Data Life Cycle
+  documentation:
+    dag_purpose: |
+      This DAG is for KYC Compliance processes that aims to extract and send user data to BigDataCorp, which in turn will process informations from our users.
+workflow:
+  type: load_access
+  layer: reverse
+  load_spark_job: load_reverse_kyc
+  spark_job_arguments:
+    - "{dag_name}"
+    - "{table_name}"
+    - "{schema}"
+    - "{{ ds }}"
+    - "kyc-bigdatacorp-prod" # destination bucket name
+  custom_schema: kyc_bigdatacorp
+  tables_customization:
+    buyers: {}
+    landlords: {}
+    sellers: {}
+    tenants: {}
+cluster:
+  type: databricks_13_3_med_general_cluster

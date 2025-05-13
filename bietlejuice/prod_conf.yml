@@ -46,6 +46,7 @@ dags_out_of_pattern:
         "reverse_birdie",
         "reverse_birdie_access",
         "reverse_webhelp_test",
+        "reverse_kyc",
         "survicate_surveys",
         "survicate_survey_attributes",
         "wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition",

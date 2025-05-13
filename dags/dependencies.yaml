@@ -3706,6 +3706,15 @@ bietlejuice.reverse_dsat_report_load:
   - bietlejuice.enrich_survicate:load-enrich-response-content
   - bietlejuice.enrich_survicate:load-enrich-survey-questions
   - bietlejuice.enrich_survicate:load-enrich-survey-responses
+bietlejuice.reverse_kyc:
+  - bietlejuice.docx:load-clean-document
+  - bietlejuice.docx:load-clean-document-type
+  - bietlejuice.ebdb_contract:load-clean-contract
+  - bietlejuice.ebdb_contract:load-clean-contract-person
+  - bietlejuice.sales_flow:load-clean-buyer-data
+  - bietlejuice.sales_flow:load-clean-ccv
+  - bietlejuice.sales_flow:load-clean-sales-flow
+  - bietlejuice.sales_flow:load-clean-seller-data
 bietlejuice.reverse_minority_report_ss:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
