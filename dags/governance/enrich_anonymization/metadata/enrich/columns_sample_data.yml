@@ -23,6 +23,15 @@ columns:
     description: This column indicates the name of the column
   sample:
     description: This colum bring a sample data to this column
+  status:
+    description: Status of sampling process.
+    categories:
+      "Success": Represent the success sampling data.
+      "Fail": Represent the fail sampling data.
+  error_class:
+    description: Get the error class, indicate if it is a DataBricks error or a Spark error.
+  error_message:
+    description: The error message returned.
   ts_ingest:
     description: Indicate the ingestion time, the timestima this gable was updated
   year:

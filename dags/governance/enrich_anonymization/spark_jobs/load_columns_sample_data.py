@@ -22,6 +22,33 @@ JOB_NAME = "load_columns_sample_data"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 
 
+class NoDataFoundException(Exception):
+    """
+    No Data Found Exception
+    """
+    def __init__(self):
+        self.message = "No Data Found. Verify if this is a table in use or if is not a unused old column"
+        super().__init__(self.message)
+
+
+def create_table_schema() -> StructType:
+    df_schema = StructType(
+        [
+            StructField("id_entity", StringType(), nullable=True),
+            StructField("layer", StringType(), nullable=True),
+            StructField("database_name", StringType(), nullable=True),
+            StructField("table_name", StringType(), nullable=True),
+            StructField("column_name", StringType(), nullable=True),
+            StructField("sample", ArrayType(StringType(), containsNull=False), nullable=True),
+            StructField("status", StringType(), nullable=True),
+            StructField("error_class", StringType(), nullable=True),
+            StructField("error_message", StringType(), nullable=True),
+            StructField("ts_ingested", TimestampType(), nullable=True),
+        ]
+    )
+    return df_schema
+
+
 def load_table(
     dataframe: DataFrame,
     environment: str,
@@ -45,41 +72,30 @@ def load_table(
     )
 
 
-def create_query_to_sample_data(table: Row, load_start_date: str):
-    union_query_sample = ""
+def create_query_to_sample_data(column: Row, load_start_date: str) -> str:
+    dict_column = column.asDict()
 
-    dict_table = table.asDict()
-
-    layer = dict_table["layer"]
-    database_name = dict_table["database_name"]
-    table_name = dict_table["table_name"]
-    columns = dict_table["table_columns"]
-
-    for column in columns:
-        column_sample = f"""
-            (
-            SELECT
-                '{layer}' AS layer,
-                '{database_name}' AS database_name,
-                '{table_name}' AS table_name,
-                '{column}' AS column_name,
-                CAST({column} AS STRING) AS column_value
-            FROM
-                {database_name}.{table_name}
-            WHERE
-                {column} IS NOT NULL
-                OR CAST({column} AS STRING) != ''
-            LIMIT 10
-            )
-        """
-
-    if not union_query_sample:
-        union_query_sample = column_sample
-    else:
-        union_query_sample += f" UNION ALL {column_sample}"
+    layer = dict_column["layer"]
+    database_name = dict_column["database_name"]
+    table_name = dict_column["table_name"]
+    column = dict_column["column_name"]
 
     return f"""
-        WITH sample AS ({union_query_sample})
+        WITH sample AS (
+        SELECT
+            '{layer}' AS layer,
+            '{database_name}' AS database_name,
+            '{table_name}' AS table_name,
+            '{column}' AS column_name,
+            CAST({column} AS STRING) AS column_value
+        FROM
+            {database_name}.{table_name}
+        WHERE
+            {column} IS NOT NULL
+            OR CAST({column} AS STRING) != ''
+        LIMIT
+            10
+        )
         SELECT
             CONCAT(database_name, ".", table_name, ".", column_name) AS id_entity,
             layer,
@@ -88,128 +104,88 @@ def create_query_to_sample_data(table: Row, load_start_date: str):
             column_name,
             array_agg(column_value) AS sample,
             'SUCCESS' as status,
+            null as error_class,
+            null as error_message,
             to_timestamp("{load_start_date}") as ts_ingested
         FROM
-            sample
+        sample
         GROUP BY
-            layer,
-            database_name,
-            table_name,
-            column_name
-        """
+        layer,
+        database_name,
+        table_name,
+        column_name
+    """
 
 
-def get_columns_to_sample(spark_client: SparkClient, load_start_date: str, load_end_date: str):
-    sql = """
+def get_columns_to_sample(spark_client: SparkClient, load_start_date: str, load_end_date: str) -> DataFrame:
+    sql = f"""
         WITH columns_datalake AS (
-        SELECT
-            CONCAT(database_name, ".", table_name, ".", column_name) AS id_entity,
-            layer,
-            database_name,
-            table_name,
-            column_name
-        FROM
-            datalake_documentation_metrics_clean.columns_metastore
-        WHERE
-            MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
-            AND layer in ('dw', 'enrich', 'clean')
-        ),
-        columns_to_sample AS (
-        SELECT
-            id_entity
-        FROM
-            datalake_anonymization.columns_sample_data
+            SELECT
+                CONCAT(database_name, ".", table_name, ".", column_name) AS id_entity,
+                layer,
+                database_name,
+                table_name,
+                column_name
+            FROM
+                datalake_documentation_metrics_clean.columns_metastore
+            WHERE
+                MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+                AND layer in ('enrich')
+            ),
+            columns_to_sample AS (
+            SELECT
+                id_entity
+            FROM
+                datalake_anonymization.columns_sample_data
         )
         SELECT
             layer,
             database_name,
             table_name,
-            ARRAY_AGG(column_name) AS table_columns
+            column_name
         FROM
             columns_datalake AS cd
                 LEFT JOIN columns_to_sample AS cts
                     ON cd.id_entity = cts.id_entity
         WHERE
             cts.id_entity IS NULL
-        GROUP BY
-            layer,
-            database_name,
-            table_name
-    """.format(load_start_date=load_start_date, load_end_date=load_end_date)
+    """
     return spark_client.get_records(sql)
 
 
 def get_sample_data(spark_client: SparkClient, table: Row, execution_date: datetime, partition_cols: list):
     sql = create_query_to_sample_data(table, execution_date.strftime("%Y-%m-%d"))
-    sample_df = spark_client.get_records(sql)
-    return (
-        SparkDataFrameService()
-        .input(sample_df)
-        .create_year_month_day_columns_from_date(execution_date)
-        .optimize_partitions_by_partition_columns(partition_cols)
-        .output()
-    )
+    df_sample = spark_client.get_records(sql)
+
+    if df_sample.isEmpty():
+        raise NoDataFoundException()
+
+    return df_sample
 
 
-def create_table_schema():
-    df_schema = StructType(
-        [
-            StructField("id_entity", StringType(), nullable=True),
-            StructField("layer", StringType(), nullable=True),
-            StructField("database_name", StringType(), nullable=True),
-            StructField("table_name", StringType(), nullable=True),
-            StructField("column_name", StringType(), nullable=True),
-            StructField("sample", ArrayType(StringType(), containsNull=False), nullable=True),
-            StructField("status", StringType(), nullable=True),
-            StructField("error_class", StringType(), nullable=True),
-            StructField("error_message", StringType(), nullable=True),
-            StructField("ts_ingested", TimestampType(), nullable=True),
-            StructField("year", IntegerType(), nullable=True),
-            StructField("month", IntegerType(), nullable=True),
-            StructField("day", IntegerType(), nullable=True),
-        ]
-    )
-    return df_schema
+def create_sample_error_register(column: Row, error: Exception, load_start_date: str) -> list:
+    dict_column = column.asDict()
+
+    layer = dict_column["layer"]
+    database_name = dict_column["database_name"]
+    table_name = dict_column["table_name"]
+    column = dict_column["column_name"]
+
+    return {
+        "id_entity": f"{database_name}.{table_name}.{column}",
+        "layer": layer,
+        "database_name": database_name,
+        "table_name": table_name,
+        "column_name": column,
+        "status": "FAIL",
+        "error_class": f"{error.__class__.__module__}.{error.__class__.__name__}",
+        "error_message": str(error)[:300],  # get the first 300 caracter from the error.
+        "ts_ingested": datetime.strptime(load_start_date, "%Y-%m-%d")
+    }
 
 
-def create_sample_error_register(table: Row, error: Exception, load_start_date: str) -> list:
-    dict_table = table.asDict()
-
-    layer = dict_table["layer"]
-    database_name = dict_table["database_name"]
-    table_name = dict_table["table_name"]
-    columns = dict_table["table_columns"]
-
-    sample_error = []
-    for column in columns:
-        sample_error.append(
-            {
-                "id_entity": f"{database_name}.{table_name}.{column}",
-                "layer": layer,
-                "database_name": database_name,
-                "table_name": table_name,
-                "column_name": column,
-                "sample": [""],
-                "status": "FAIL",
-                "error_class": f"{error.__class__.__module__}.{error.__class__.__name__}",
-                "error_message": str(error)[:300], # get the first 300 caracter from the error.
-                "ts_ingested": datetime.strptime(load_start_date, "%Y-%m-%d")
-            }
-        )
-
-    return sample_error
-
-
-def get_df_error(spark_client: SparkClient, sample_error: list, execution_date: datetime, partition_cols: list):
-    schema = create_table_schema()
-    df_error = spark_client.create_dataframe(sample_error ,schema=schema)
-    return (
-        SparkDataFrameService()
-        .input(df_error)
-        .create_year_month_day_columns_from_date(execution_date)
-        .optimize_partitions_by_partition_columns(partition_cols)
-        .output()
-    )
+def get_df_error(spark_client: SparkClient, sample_error: list, schema: StructType):
+    return spark_client.create_dataframe(sample_error, schema=schema)
 
 
 if __name__ == "__main__":
@@ -243,32 +219,46 @@ if __name__ == "__main__":
 
     df_tables_to_sample = get_columns_to_sample(spark_client, load_start_date, load_end_date)
 
-    sample_error = []
-    list_tables_to_sample = df_tables_to_sample.collect()
-    for table in list_tables_to_sample:
+sample_error = []
+df_lake_sample = spark_client.create_dataframe([], create_table_schema())
 
-        entity_id = f"{table.database_name}.{table.table_name}"
-        logging.info(f"Sampling data from table {entity_id}")
+df_tables_to_sample = get_columns_to_sample(spark_client, load_start_date, load_end_date)
+list_tables_to_sample = df_tables_to_sample.collect()
 
-        if entity_id not in skip_list:
-            try:
-                df_sample = get_sample_data(spark_client, table, execution_date, partition_cols)
-                load_table(df_sample, env, datalake_bucket, schema, table_name, merge_on)
-                logging.info(f"Table {entity_id} sample saved.")
-            except AnalysisException as exc:
-                error_class = exc.getErrorClass()
-                if error_class in [DELTA_TABLE_NOT_FOUND, TABLE_OR_VIEW_NOT_FOUND]:
-                    logging.warning(f"Table {entity_id} not found.")
-                elif error_class in [INSUFFICIENT_PERMISSIONS]:
-                    logging.warning(f"Insufficient permission to read table {entity_id}.")
-                else:
-                    logging.warning(f"Not handled error. Table: {entity_id}. Error: {error_class}")
-                sample_error += create_sample_error_register(table, exc, load_start_date)
-            except Exception as exc:
-                logging.warning(f"Exception. Table: {entity_id}. Error: {type(exc)}")
-                sample_error += create_sample_error_register(table, exc, load_start_date)
+index = 0
+size = len(list_tables_to_sample)
+for column in list_tables_to_sample:
 
-    logging.info("Loding tables with error to sample")
-    df_errors = get_df_error(spark_client, sample_error, execution_date, partition_cols)
-    load_table(df_errors, env, datalake_bucket, schema, table_name, merge_on)
-    logging.info("Loaded Errors")
+    table_id = f"{column.database_name}.{column.table_name}"
+    entity_id = f"{table_id}.{column.column_name}"
+
+    if table_id not in skip_list:
+
+        try:
+            df_sample = get_sample_data(spark_client, column, execution_date, partition_cols)
+            df_lake_sample = df_lake_sample.union(df_sample)
+
+        except AnalysisException as exc:
+            error_class = exc.getErrorClass()
+            if error_class in [DELTA_TABLE_NOT_FOUND, TABLE_OR_VIEW_NOT_FOUND]:
+                logging.warning(f"Table {entity_id} not found.")
+            elif error_class in [INSUFFICIENT_PERMISSIONS]:
+                logging.warning(f"Insufficient permission to read table {entity_id}.")
+            else:
+                logging.warning(f"Not handled error. Table: {entity_id}. Error: {error_class}")
+            sample_error.append(create_sample_error_register(column, exc, load_start_date))
+
+        except Exception as exc:
+            logging.warning(f"Exception. Table: {entity_id}. Error: {type(exc)}")
+            sample_error.append(create_sample_error_register(column, exc, load_start_date))
+
+df_errors = get_df_error(spark_client, sample_error, create_table_schema())
+df_load_sample = df_lake_sample.union(df_errors)
+df_load_sample = (
+    SparkDataFrameService()
+    .input(df_load_sample)
+    .create_year_month_day_columns_from_date(execution_date)
+    .optimize_partitions_by_partition_columns(partition_cols)
+    .output()
+)
+load_table(df_load_sample, env, datalake_bucket, schema, table_name, merge_on)
