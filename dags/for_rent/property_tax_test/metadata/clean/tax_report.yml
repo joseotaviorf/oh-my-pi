@@ -1,0 +1,46 @@
+database_name: datalake_property_tax_test_clean
+table_name: tax_report
+description:
+  The table represents the yearly IPTU update of a house. PS. It contains
+  repeated ID due to incremental ingestion!
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_property_tax_test_raw.tax_report.id
+    description:
+      ID that identifies the record of the table itself. It's duplicated
+      because the ingestion is via incremental load. When there's an update of an
+      ID, we get it and the older data keeps in our datalake, causing a duplication.
+  id_contract_ebdb:
+    lineage:
+      - datalake_property_tax_test_raw.tax_report.contract_id
+    description: Contract ID of ebdb source.
+  id_house_ebdb:
+    lineage:
+      - datalake_property_tax_test_raw.tax_report.house_external_id
+    description: House ID of ebdb source.
+  status:
+    lineage:
+      - datalake_property_tax_test_raw.tax_report.status
+    description: Status of the update
+    categories:
+      tax-report.status/pending: Update status is pending
+      tax-report.status/finished: Update status is finished
+  last_year_amount:
+    lineage:
+      - datalake_property_tax_test_raw.tax_report.last_year_amount
+    description: Last year IPTU value
+  year:
+    lineage:
+      - datalake_property_tax_test_raw.tax_report.year
+    description: Partition column, year of the record updated date.
+  ts_created:
+    lineage:
+      - datalake_property_tax_test_raw.tax_report.created_at
+    description: Record creation date.
+  ts_updated:
+    lineage:
+      - datalake_property_tax_test_raw.tax_report.updated_at
+    description: Record updated date.
