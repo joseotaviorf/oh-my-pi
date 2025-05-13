@@ -1,0 +1,86 @@
+database_name: datalake_similarity_score
+table_name: similar_metrics_score
+owner: bruna.prates@quintoandar.com.br
+domain: For Sale
+description: Enrich table that contains a "base" house, its daily list of similar houses and the aggregated metrics of both
+      in a specific interval. A "base" house will only appear if it has been published for, at least, one day. For now, it
+      only includes For Rent houses. Each row of this table is a "base" house and its list of similar houses in a specific
+      business context and on a specific date.
+columns:
+    id:
+      lineage:
+        - datalake_similarity_score.similar_houses.id
+      description: Unique key of this table. It can be joined with datalake_similarity_score.similar_houses table.
+    id_house:
+      lineage:
+        - datalake_similarity_score.similar_houses.id_house
+      description: ID of the "base" house, i.e., the one that will have a list of similar houses associated with it.
+    ids_similar:
+      lineage:
+        - datalake_similarity_score.similar_houses.ids_similar
+      description: List of house IDs similar to the "base" house (id_house).
+    base_lpv:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+      description: Sum of listing page views of the "base" house for a specific range.
+    base_srpv:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+      description: Sum of search results page views of the "base" house for a specific range.
+    base_vb:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+      description: Sum of visits booked to the "base" house for a specific range.
+    base_os:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+      description: Sum of offers sent to the "base" house for a specific range.
+    similar_lpv:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+      description: Aggregation of listing page views of the similar houses for a specific range.
+    similar_srpv:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+      description: Aggregation of search results page views of the similar houses for a specific range.
+    similar_vb:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+      description: Aggregation of visits booked to the similar houses for a specific range.
+    similar_os:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+      description: Aggregation of offers sent to the similar houses for a specific range.
+    business_context:
+      lineage:
+        - datalake_similarity_score.similar_houses.business_context
+      description: Business context of the "base" house.
+      categories:
+        RENT: The "base" house is published in the rental context.
+    similar_metric_rule:
+      description: Aggregation rule applied to metrics of similar houses.
+    dt_agg_started:
+      lineage:
+        - datalake_similarity_score.similar_houses.year
+        - datalake_similarity_score.similar_houses.month
+        - datalake_similarity_score.similar_houses.day
+        - datalake_similarity_score.similar_houses.days_published
+      description: Start date of the interval in which metrics will be aggregated.
+    dt_agg_ended:
+      lineage:
+        - datalake_similarity_score.similar_houses.year
+        - datalake_similarity_score.similar_houses.month
+        - datalake_similarity_score.similar_houses.day
+      description: Ended date of the interval in which metrics will be aggregated
+    year:
+      lineage:
+        - datalake_similarity_score.similar_houses.year
+      description: Year in which the metrics were calculated for the "base" and similar houses. It's also a partition of this table.
+    month:
+      lineage:
+        - datalake_similarity_score.similar_houses.month
+      description: Month in which the metrics were calculated for the "base" and similar houses. It's also a partition of this table.
+    day:
+      lineage:
+        - datalake_similarity_score.similar_houses.day
+      description: Day in which the metrics were calculated for the "base" and similar houses. It's also a partition of this table.
