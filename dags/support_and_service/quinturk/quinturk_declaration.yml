@@ -8,24 +8,18 @@ dag:
       Retrieves data from the Quinturk database
 
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
+  source_database: quinturk
+  source_schema: public
+  custom_schema: quinturk
   database_type: postgres
   lineage_product_database_name: quinturk
   dbutils_secret_key: QUINTURK_DB
   tables_customization:
-    task:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      extraction_type: incremental
-    task_completion:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      extraction_type: incremental
-    project:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      extraction_type: incremental
+    task: {}
+    task_completion: {}
+    project: {}
 
 cluster:
   type: custom_cluster

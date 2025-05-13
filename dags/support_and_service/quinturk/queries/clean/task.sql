@@ -46,12 +46,11 @@ SELECT
   is_labeled,
   ts_created,
   ts_updated,
+  op_cdc,
+  ts_cdc_transaction,
+  ts_database_transaction,
   year,
   month,
   day
 FROM
   extract_quinturk_task_data
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

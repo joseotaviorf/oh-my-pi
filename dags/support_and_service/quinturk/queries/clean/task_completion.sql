@@ -52,12 +52,12 @@ SELECT
   was_cancelled,
   ts_created,
   ts_updated,
+  op_cdc,
+  ts_cdc_transaction,
+  ts_database_transaction,
   year,
   month,
   day
 FROM
   extract_quinturk_task_completion_result
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
+

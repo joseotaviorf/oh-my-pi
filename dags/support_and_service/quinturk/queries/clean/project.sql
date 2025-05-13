@@ -38,7 +38,3 @@ SELECT
     day
 FROM
     datalake_quinturk_raw.project
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
