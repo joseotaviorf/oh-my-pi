@@ -1,7 +1,7 @@
 dag:
   name: greenseer
   schedule_start_date: 2021, 2, 18
-  schedule_interval: 0 3 * * *
+  schedule_interval: 0 0 * * *
   owner: Data Conversational XP
   documentation:
     dag_purpose: |
@@ -13,19 +13,17 @@ dag:
       and routes the ticket to the best possible human agent.
 
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
+  source_schema: public
+  source_database: greenseer
   database_type: postgres
-  lineage_product_database_name: greenseer
   dbutils_secret_key: GREENSEER_DB
-  load_options:
-    max_records_per_file: 25000
+
   tables_customization:
     Session:
-      extraction_type: incremental
       clean_table_name: session
-      date_filter_column: update_timestamp
-      partitions: [year, month, day]
+
 
 cluster:
   type: databricks_13_3_med_general_cluster

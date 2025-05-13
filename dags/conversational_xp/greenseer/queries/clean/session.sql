@@ -12,7 +12,3 @@ SELECT
     day
 FROM
     datalake_greenseer_raw.session
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
