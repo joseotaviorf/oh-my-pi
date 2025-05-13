@@ -1,18 +1,13 @@
 database_name: datalake_sale_listings_lenses
 table_name: availability_lens
-description: 'An enrich table that has the purpose of showing the level of availability for a listings visit based on some factors that directly impact this aspect. 
-  With this, we can abstract a lot of analysis and understand exactly why the liquidity of a listing is low. 
+description: 'An enrich table that has the purpose of showing the level of availability for a listings visit based on some factors that directly impact this aspect.
+  With this, we can abstract a lot of analysis and understand exactly why the liquidity of a listing is low.
   For this table, factors such as location of the key, hours available for the visit, if the listing is on a rent contract, visits cancelled by the owner, etc. If any of these factors change and alter the tier of a listing, it will create a new row in the table.'
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:
     lineage: 
-      - datalake_sale_available_booking_hours.weekly_available_booking_hours.id_house
-      - datalake_ebdb_clean.access_type_aud.id_house
-      - datalake_ebdb_clean.booking.id_house
-      - datalake_ebdb_contract.contract.id_house
-      - datalake_ebdb_clean.listing_business_context_aud.id_house
       - datalake_ebdb_clean.listing_business_context.id_house
     description: >
       Column referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.
@@ -32,7 +27,7 @@ columns:
         When the listing has 'OwnerPresent' at the key location and furthermore, that same owner has previously had a visit cancelled, we penalize it by -10000 score points.
       "-2000": >
         When the listing has 'OwnerPresent' at the key location and beyond, but has no previously cancelled visit, we penalize it by -2000 score points.
-      "0": > 
+      "0": >
         If the location of the key is different from 'OwnerPresent.
   week_available_hours_score:
     description: >
@@ -40,20 +35,20 @@ columns:
     categories:
       "-100000": >
         If the listing has 0 hours available, we penalize it by -100000 score points.
-      "-10000": > 
+      "-10000": >
         If the listing has between 1 and 9 hours per week available for the visit, we penalize it by -1000 score points.
       "-1000": >
         If the listing has between 10 and 29 hours per week available for the visit, we penalize it by -1000 score points.
       "-500":
         If the listing has between 30 and 49 hours per week available for the visit, we penalize it by -500 score points.
-      "0": 
+      "0":
         If the listing has 50 or more hours available, we do not penalize.
   cancel_by_owner_score:
     description: >
       If the owner has canceled any visit, we understand that the availability of that listing may be affected by that behavior
-    categories: 
+    categories:
       "0":
-        If the owner has not canceled a visit, we do not penalize. 
+        If the owner has not canceled a visit, we do not penalize.
       "-3000":
         If the owner has any cancellation, we penalize him/her with -3000 score points.
   has_active_rental_contract_score:
@@ -72,7 +67,7 @@ columns:
         If there is no cancellation due to unauthorized entry, we do not take down the listing's score.
       "-5000": >
         If there is one or more than one cancellation due to unauthorized entry, we deduct -5000 from the listing's score.
-      "-10000": > 
+      "-10000": >
         If there is one or more than one cancellation due to unauthorized entry and no visits in the previous 45 days, we deduct -10000 from the listing's score.
   suspicious_listing_contact_score:
     description: >
@@ -85,10 +80,10 @@ columns:
   tier:
     description: >
       'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level". This score is based on all the elements that can alter the availability of a listing on the visit. That is, it takes into account factors such as key location, seller behavior, canceled visits, hours available for visits, and rental status.
-    categories: 
+    categories:
       A5: >
         Listings that have the Availability Score between -1500 and 0. Meaning that they have little or no penalties, indicating good availability for visits.
-      A4: > 
+      A4: >
         Listings that have the Availability Score between -2500 and -1500. Meaning that they have some penalties, indicating good availability for visits.
       A3: >
         Listings that have the Availability Score between -4000 and -2500. Meaning some limitations on the visit.

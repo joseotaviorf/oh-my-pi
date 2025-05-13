@@ -2886,8 +2886,6 @@ bietlejuice.enrich_sale_listings:
 bietlejuice.enrich_sale_listings_lenses:
   - bietlejuice.ebdb:load-clean-suspected-unavailability-listings
   - bietlejuice.ebdb:load-clean-suspected-unavailability-listings-aud
-  - bietlejuice.ebdb_condo:load-clean-access-authorization-type
-  - bietlejuice.ebdb_condo:load-clean-access-type-aud
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_house:load-clean-house-predicted-price
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
