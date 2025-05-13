@@ -19,6 +19,8 @@ workflow:
     documents: {}
     emailage_result: {}
     emailage_result_aud: {}
+    integration_report: {}
+    integration_report_aud: {}
     presumed_income_report: {}
     presumed_income_report_aud: {}
     request_tracker: {}
