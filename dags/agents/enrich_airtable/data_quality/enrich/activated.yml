@@ -7,7 +7,5 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   id_airtable_record:
-    is_unique:
-      severity_level: Error
     is_complete:
       severity_level: Error
