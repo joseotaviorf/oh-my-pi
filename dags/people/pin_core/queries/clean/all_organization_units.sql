@@ -1,0 +1,27 @@
+SELECT
+  legal_entity_id AS id_legal_entity,
+  establishment_id AS id_establishment,
+  action_occurrence_id AS id_action_occurrence,
+  business_group_id AS id_business_group,
+  module_id AS id_module,
+  organization_id AS id_organization,
+  organization_code,
+  created_by,
+  last_updated_by AS updated_by,
+  attribute3 AS directorate,
+  attribute5 AS business,
+  attribute6 AS product,
+  attribute8 AS vertical,
+  attribute9 AS vice_presidency,
+  attribute10 AS sub_directorate,
+  internal_external_flag AS organization_scope,
+  TO_TIMESTAMP(creation_date) AS ts_created,
+  TO_TIMESTAMP(last_update_date) AS ts_updated,
+  TO_TIMESTAMP(effective_start_date) AS ts_effective_started,
+  TO_TIMESTAMP(effective_end_date) AS ts_effective_ended,
+  NOW() AS ts_load,
+  year,
+  month,
+  day
+FROM
+  datalake_pin_core_raw.hr_all_organization_units_f

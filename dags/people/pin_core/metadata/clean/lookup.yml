@@ -1,0 +1,68 @@
+---
+database_name: datalake_pin_core_clean
+table_name: lookup
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores lookup codes and meanings.
+columns:
+  id_organization:
+    description: System-generated unique identifier for the organization. Primary key.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.organization_id
+  id_business_group:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.business_group_id
+  organization_code:
+    description: Code of the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.organization_code
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.last_updated_by
+  name:
+    description: Name of the lookup type.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.name
+  organization_scope:
+    description: Indicates if the organization is internal or external.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.internal_external_flag
+    categories:
+      EXT: External organization.
+      INT: Internal organization.
+  ts_created:
+    description: Timestamp of the creation of the row.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.creation_date
+  ts_updated:
+    description: Timestamp of the last update of the row.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.last_update_date
+  ts_effective_started:
+    description: Start date of the period for which this row is effective.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.effective_start_date
+  ts_effective_ended:
+    description: End date of the period for which this row is effective.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.effective_end_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.day

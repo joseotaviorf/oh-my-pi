@@ -1,0 +1,104 @@
+---
+database_name: datalake_pin_core_clean
+table_name: all_organization_units
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This is the master table which holds all organization identifiers.
+columns:
+  id_legal_entity:
+    description: Represents a legal entity. Foreign key to HR_ALL_ORGANIZATION_UNITS_F.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.legal_entity_id
+  id_establishment:
+    description: Foreign key to HRT_ESTABLISHMENTS_B.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.establishment_id
+  id_action_occurrence:
+    description: Foreign key to PER_ACTION_OCCURRENCES.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.action_occurrence_id
+  id_business_group:
+    description: Identifier of the enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.business_group_id
+  id_module:
+    description: Module that owns the row (from Seed Data Framework).
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.module_id
+  id_organization:
+    description: System-generated unique identifier for the organization. Primary key.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.organization_id
+  organization_code:
+    description: Code of the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.organization_code
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.last_updated_by
+  directorate:
+    description: Directorate of the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.attribute3
+  business:
+    description: Business unit of the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.attribute5
+  product:
+    description: Product associated with the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.attribute6
+  vertical:
+    description: Vertical associated with the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.attribute8
+  vice_presidency:
+    description: Vice Presidency associated with the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.attribute9
+  sub_directorate:
+    description: Sub-directorate of the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.attribute10
+  organization_scope:
+    description: Indicates if the organization is internal or external.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.internal_external_flag
+    categories:
+      EXT: External organization.
+      INT: Internal organization.
+  ts_created:
+    description: Timestamp of the creation of the row.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.creation_date
+  ts_updated:
+    description: Timestamp of the last update of the row.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.last_update_date
+  ts_effective_started:
+    description: Start date of the period for which this row is effective.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.effective_start_date
+  ts_effective_ended:
+    description: End date of the period for which this row is effective.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.effective_end_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_f.day

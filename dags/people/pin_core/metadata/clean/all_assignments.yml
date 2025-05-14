@@ -1,0 +1,321 @@
+---
+database_name: datalake_pin_core_clean
+table_name: all_assignments
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores comprehensive information about employee assignments and work terms.
+columns:
+  id_action_occurrence:
+    description: Foreign Key to PER_ACTION_OCCURRENCES, indicating the action performed.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.action_occurrence_id
+  id_assignment:
+    description: System-generated unique identifier for the assignment or work term. Primary key.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.assignment_id
+  id_business_group:
+    description: Identifier of the Enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.business_group_id
+  id_business_unit:
+    description: Identifier of the Business Unit, used for set-enabled tables and partitioning.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.business_unit_id
+  id_assignment_status_type:
+    description: Denormalized status of the assignment, derived from Assignment Status Type ID.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.assignment_status_type_id
+  id_source_assignment:
+    description: Identifier of the source assignment used to create this one.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.source_assignment_id
+  id_flex_number:
+    description: Represents ID Flex num for PeopleGroup KFF implementation.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.id_flex_num
+  id_legal_entity:
+    description: Identifier of the Legal Entity. May be null for Applicants.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.legal_entity_id
+  id_grade:
+    description: Foreign key to PER_GRADES_F, representing the employee's grade.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.grade_id
+  id_grade_ladder_pgm:
+    description: Identifier linking the assignment to a grade ladder for Benefits.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.grade_ladder_pgm_id
+  id_work_terms_assignment:
+    description: Foreign key to PER_ALL_ASSIGNMENTS_M for a work term.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.work_terms_assignment_id
+  id_union:
+    description: Identifier of the union to which the person belongs.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.union_id
+  id_organization:
+    description: Identifier of the Department (optional).
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.organization_id
+  id_job:
+    description: Foreign key to PER_JOBS_F, representing the employee's job.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.job_id
+  id_period_of_service:
+    description: Identifier of the Employment Level. Foreign key to PER_PERIODS_OF_SERVICE.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.period_of_service_id
+  id_person:
+    description: Identifier of the person holding the assignment or work terms. Foreign key to PER_PERSONS.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.person_id
+  id_parent_assignment:
+    description: Identifier linking two assignments (e.g., for temporary assignments or applicant to worker conversion).
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.parent_assignment_id
+  id_person_type:
+    description: Defines the worker class (e.g., Employee, Contractor). Defaults from person/org relationship.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.person_type_id
+  assignment_number:
+    description: Unique identifier for the assignment or work terms.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.assignment_number
+  hourly_salaried_code:
+    description: Indicates if the assignment is paid hourly or salaried.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.hourly_salaried_code
+    categories:
+      H: Hourly paid.
+      S: Salaried.
+  action_code:
+    description: Specifies the action performed on the record (e.g., HIRE, MANAGER CHANGE).
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.action_code
+  category_code:
+    description: Extensible Flexfield Category Code.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.category_code
+  reason_code:
+    description: Specifies the reason for the action performed on the record.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.reason_code
+  legislation_code:
+    description: Legislation code derived from the Legal Entity. May be null for Applicants.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.legislation_code
+  assignment_status_type:
+    description: Denormalized status of the assignment, derived from Assignment Status Type ID.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.assignment_status_type
+  assignment_type:
+    description: Identifies the type of record (e.g., employee, contingent worker, applicant).
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.assignment_type
+  proposed_worker_type:
+    description: Proposed worker type for applicants (EMP or CWK).
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.proposed_worker_type
+    categories:
+      EMP: Employee.
+      CWK: Contingent Worker.
+  system_person_type:
+    description: Derived from the person type ID for performance optimization.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.system_person_type
+  assignment_information_category:
+    description: Category of assignment information.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.asg_information_category
+  employee_category:
+    description: Based on EMPLOYEE_CATG lookup type (e.g., Blue collar, Civil Servant).
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.employee_category
+  employment_category:
+    description: User-defined category (e.g., Full-Time Permanent). Based on EMP_CAT lookup type.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.employment_category
+  assignment_name:
+    description: Describes the assignment or work terms (derived as [job name]   - [department name] by default).
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.assignment_name
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.last_updated_by
+  record_creator:
+    description: Module that created the record.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.record_creator
+  seniority_basis:
+    description: Seniority.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.seniority_basis
+  frequency:
+    description: Frequency of normal working hours. Sourced from 'Frequency' lookup type.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.frequency
+    categories:
+      M: Monthly.
+      W: Weekly.
+      D: Daily.
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.object_version_number
+  assignment_sequence:
+    description: Used when defaulting assignment number.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.assignment_sequence
+  effective_sequence:
+    description: Indicates the order of changes within a day (lowest is earliest).
+    lineage:
+    - datalake_pin_core_raw.per_all_assignments_m.effective_sequence
+  normal_hours:
+    description: Normal working hours.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.normal_hours
+  is_assignment_override_allowed:
+    description: 'Override Work Term related data. User-enterable for Work Terms, defaults to N for Assignments.'
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.allow_asg_override_flag
+    categories:
+      true: Override allowed.
+      false: Override not allowed.
+  is_auto_ended:
+    description: Determines whether to automatically end temporary assignments.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.auto_end_flag
+    categories:
+      true: Automatically end.
+      false: Do not automatically end.
+  is_included_in_grade_step_progression:
+    description: Identifies if person is included in grade step progression.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.gsp_eligibility_flag
+    categories:
+      true: Included in grade step progression.
+      false: Not included in grade step progression.
+  is_position_override:
+    description: Override Position related data.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.position_override_flag
+    categories:
+      true: Override allowed.
+      false: Override not allowed.
+  is_primary_assignment:
+    description: Indicates if this is the primary deployment.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.primary_assignment_flag
+    categories:
+      true: Primary deployment.
+      false: Not primary deployment.
+  is_primary:
+    description: 'Primary flag for the primary assignment associated with the primary Work Relationship and Work Terms.'
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.primary_flag
+    categories:
+      true: Primary.
+      false: Not primary.
+  is_primary_work_relation:
+    description: Indicates if attached to the primary Work Relationship.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.primary_work_relation_flag
+    categories:
+      true: Primary Work Relationship.
+      false: Not Primary Work Relationship.
+  is_primary_work_terms:
+    description: Indicates if attached to the primary set of Employment/Placement Terms.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.primary_work_terms_flag
+    categories:
+      true: Primary Work Terms.
+      false: Not Primary Work Terms.
+  is_labour_union_member:
+    description: Labour union member flag.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.labour_union_member_flag
+    categories:
+      true: Labour union member.
+      false: Not a labour union member.
+  is_manager:
+    description: Indicates if the employee in this assignment is a manager.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.manager_flag
+    categories:
+      true: Manager.
+      false: Not a manager.
+  is_permanent_position:
+    description: Indicates if the position is permanent or temporary.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.permanent_temporary_flag
+    categories:
+      true: Permanent.
+      false: Temporary.
+  is_effective_latest_change:
+    description: 'Indicates if this row is the latest change in the day.'
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.effective_latest_change
+    categories:
+      true: Latest change in the day.
+      false: Not the latest change in the day.
+  is_recommended_for_rehiring:
+    description: Indicates if person is recommended for re-hiring (Yes/No).
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.rehire_recommendation
+    categories:
+      yes: Recommended for re-hiring.
+      false: Not recommended for re-hiring.
+  is_working_at_home:
+    description: Work at home flag.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.work_at_home
+    categories:
+      true: Working at home.
+      false: Not working at home.
+  dt_effective_started:
+    description: Start date of the period for which this row is effective.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.effective_start_date
+  dt_effective_ended:
+    description: End date of the period for which this row is effective.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.effective_end_date
+  dt_freeze_started:
+    description: Start date for deferred data freeze (defaults to End of time).
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.freeze_start_date
+  dt_freeze_until:
+    description: End date for deferred data freeze (defaults to Start of Time).
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.freeze_until_date
+  dt_projected_started:
+    description: Tentative start date (applicants).
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.projected_start_date
+  ts_created:
+    description: Timestamp of the creation of the row.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.creation_date
+  ts_updated:
+    description: Timestamp of the last update of the row.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.per_all_assignments_m.day
