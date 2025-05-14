@@ -239,7 +239,7 @@ SELECT
   "pending_invoices_pay_total_cta_clicked" AS event_name,
   "Overdue Self Service Action" AS funnel_step,
   4 AS level,
-  "Triggers when user accesses the page to negotiate the total amount from pending invoices" AS event_description,
+  "Triggers when user accesses the page to negotiate the total amount from pending invoices (new flow)" AS event_description,
   TRUE AS is_active,
   year,
   month,
@@ -247,6 +247,29 @@ SELECT
   ts_event
 FROM
   datalake_amplitude_clean.170698_pending_invoices_pay_total_cta_clicked_events
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+
+UNION ALL
+
+SELECT
+  id_amplitude,
+  id_session,
+  id_user,
+  CAST(NULL AS BIGINT) AS id_contract,
+  CAST(NULL AS BIGINT) AS id_invoice,
+  device_family,
+  "pending_invoices_negotiation_cta_clicked" AS event_name,
+  "Overdue Self Service Action" AS funnel_step,
+  4 AS level,
+  "Triggers when user accesses the page to negotiate the total amount from pending invoices" AS event_description,
+  FALSE AS is_active,
+  year,
+  month,
+  day,
+  ts_event
+FROM
+  datalake_amplitude_clean.170698_pending_invoices_negotiation_cta_clicked_events
 WHERE
   MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 
