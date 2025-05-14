@@ -12,4 +12,5 @@ FROM
 WHERE
     amplitude_id IS NOT NULL
     AND merge_time IS NOT NULL
-    AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+    AND MAKE_DATE(YEAR(timestamp(merge_time/1000)),  MONTH(timestamp(merge_time/1000)), DAY(timestamp(merge_time/1000)))
+    BETWEEN '{load_start_date}' AND '{load_end_date}'
