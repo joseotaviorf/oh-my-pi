@@ -89,7 +89,8 @@ SELECT
     b.ts_nf_requested,
     b.ts_created,
     b.ts_synced,
-    b.ts_retsuko_updated
+    b.ts_retsuko_updated,
+    NOW() AS ts_load
 FROM base AS b
 LEFT JOIN contract_write_off AS cwo
     ON cwo.id_contract_external = b.id_contract_external
