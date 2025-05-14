@@ -1,7 +1,7 @@
 ---
 database_name: datalake_databricks
 table_name: unique_clusters
-description: Provides metrics about databricks Clusters using Overwatch data. One row per cluster.
+description: Provides metrics about databricks Clusters using system tables. One row per cluster.
 domain: Data Ops & Governance 
 owner: data-platform-team@quintoandar.com.br
 columns:

@@ -1,0 +1,4 @@
+account_id: "25523cd6-585f-4aff-b2bb-893221248471"
+workspaces:
+  "4531937035440038": "https://dbc-931ee6e0-6803.cloud.databricks.com/" # QuintoAndar
+  "6170817193817": "https://dbc-939a4590-9353.cloud.databricks.com/" # Prod

@@ -34,14 +34,6 @@ WITH granularity_ids AS (
         datalake_databricks_usage_clean.billable_usage AS dbu
     WHERE
         MAKE_DATE(dbu.year, dbu.month, dbu.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-),
-daily_cluster AS (
-    SELECT
-        *
-    FROM
-        datalake_databricks.daily_clusters
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_cluster ORDER BY dt_cluster_run DESC) = 1
 )
 SELECT
     gi.id_cluster,
@@ -58,8 +50,8 @@ SELECT
       WHEN LOWER(gi.cluster_name) LIKE "%wonka%" OR LOWER(gi.job_name) LIKE "wonka" AND gi.id_dag IS NULL THEN "wonka job"
       ELSE "adhoc execution"
     END AS execution_context,
-    dc.spark_version,
-    dc.runtime_engine,
+    uc.spark_version,
+    uc.runtime_engine,
     uc.init_scripts,
     uc.custom_tags,
     uc.driver_node_type,
@@ -72,10 +64,10 @@ SELECT
     ROUND(gi.dbus, 2) AS dbus,
     ROUND(gi.dbus * dcd.dbu_price, 2) AS price,
     COUNT(gi.ts_execution) OVER (PARTITION BY COALESCE(gi.id_dag, gi.id_job), date(gi.ts_execution)) AS daily_executions,
-    CAST(SPLIT_PART(dc.spark_version, '.', 1) AS INTEGER) AS spark_version_number,
+    CAST(SPLIT_PART(uc.spark_version, '.', 1) AS INTEGER) AS spark_version_number,
     IF(gi.id_dag IS NOT NULL AND id_job IS NOT NULL, TRUE, FALSE) AS is_dag_builder_migrated,
     DATE(gi.ts_execution) AS dt_execution,
-    MIN(DATE(gi.ts_execution)) OVER (PARTITION BY dc.spark_version) AS dt_spark_updated,
+    MIN(DATE(gi.ts_execution)) OVER (PARTITION BY uc.spark_version) AS dt_spark_updated,
     IF(gi.id_dag IS NOT NULL, MIN(gi.ts_execution) OVER (PARTITION BY gi.id_dag ORDER BY gi.ts_execution DESC), NULL) AS ts_bietlejuice_first_execution,
     IF(gi.id_dag IS NOT NULL, MAX(gi.ts_execution) OVER (PARTITION BY gi.id_dag ORDER BY gi.ts_execution DESC), NULL) AS ts_bietlejuice_last_execution,
     IF(gi.id_job IS NOT NULL, MIN(gi.ts_execution) OVER (PARTITION BY gi.id_job ORDER BY gi.ts_execution DESC), NULL) AS ts_job_first_execution,
@@ -89,9 +81,6 @@ FROM
 LEFT JOIN
   datalake_gsheets_clean.databricks_contract_details AS dcd
     ON gi.cluster_compute_type = dcd.cluster_compute_type
-LEFT JOIN
-  daily_cluster AS dc
-    ON gi.id_cluster = dc.id_cluster
 LEFT JOIN
   datalake_databricks.unique_clusters AS uc
     ON gi.id_cluster = uc.id_cluster

@@ -1,0 +1,37 @@
+---
+database_name: datalake_databricks
+table_name: instance_pools
+description: Lists all instance pools in the databricks workspace.
+domain: Data Ops & Governance 
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_instance_pool:
+    description: Databricks instance pool id
+  id_node_type:
+    description: The identifier of the node type associated with the instance pool.
+  instance_pool_name:
+    description: Databricks instance pool name
+  aws_attributes:
+    description: AWS attributes of the instance pool
+  default_tags:
+    description: Default tags of the instance pool
+  disk_spec:
+    description: Details of the disk specification
+  idle_instance_autotermination_minutes:
+    description: The number of minutes after which an idle instance is terminated.
+  state:
+    description: The state of the instance pool.
+  stats:
+    description: Metrics about the instance pool.
+  custom_tags:
+    description: Custom tags of the instance pool
+  max_capacity:
+    description: Maximum number of instances that can be created in the instance pool.
+  min_idle_instances:
+    description: Minimum number of idle instances that should be maintained in the instance pool.
+  preloaded_spark_versions:
+    description: List of preloaded Spark versions in the instance pool.
+  is_elastic_disk_enabled:
+    description: Whether elastic disk is enabled for the instance pool.
+  ts_load:
+    description: Timestamp of when the row was loaded in the table.

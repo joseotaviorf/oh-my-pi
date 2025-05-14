@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d")
 
-    proxy_path = "s3://5a-databricks/usage-data/billable-usage/csv/workspaceId=4531937035440038-usageMonth={}-{}.csv"
+    proxy_path = "s3://5a-databricks/usage-data/billable-usage/csv/workspaceId=*-usageMonth={}-{}.csv"
 
     logger.info(
         f"""m={JOB_NAME}, environment={environment}, datalake_bucket={datalake_bucket},

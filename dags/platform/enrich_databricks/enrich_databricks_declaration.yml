@@ -10,6 +10,14 @@ workflow:
   layer: enrich
   default_extraction_type: incremental
   tables_customization:
+    instance_pools:
+      load_spark_job: load_instance_pools
+      spark_job_arguments:
+      - "{environment}"
+      - "{bucket}"
+      - "{dag_name}"
+      - "{schema}"
+      - "{table_name}"
     daily_clusters:
       partitions: [ dt_cluster_run ]
     unique_clusters:
@@ -19,6 +27,8 @@ workflow:
     # daily_pool_idle_time:
     #   partitions: [ dt_cluster_run ]
   inner_dependencies:
+    unique_clusters:
+      - instance_pools
     daily_clusters:
       - unique_clusters
     # daily_pool_idle_time:

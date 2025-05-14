@@ -34,47 +34,47 @@ columns:
   spark_version:
     description: Spark version linked to the cluster.
     lineage:
-      - datalake_databricks.daily_clusters.spark_version
+      - datalake_databricks.unique_clusters.spark_version
   runtime_engine:
     description: One of STANDARD or PHOTON. When PHOTON.
     lineage:
-      - datalake_databricks.daily_clusters.spark_version
+      - datalake_databricks.unique_clusters.runtime_engine
   init_scripts:
     description: The initialization scripts used by the cluster.
     lineage:
-      - datalake_databricks.unique_clusters.spark_version
+      - datalake_databricks.unique_clusters.init_scripts
   custom_tags:
     description: The custom tags associated with the cluster.
     lineage:
-      - datalake_databricks.unique_clusters.spark_version
+      - datalake_databricks.unique_clusters.custom_tags
   driver_node_type:
     description: The node type of the driver node.
     lineage:
-      - datalake_databricks.unique_clusters.spark_version
+      - datalake_databricks.unique_clusters.driver_node_type
   node_type:
     description: The node type of the worker nodes.
     lineage:
-      - datalake_databricks.unique_clusters.spark_version
+      - datalake_databricks.unique_clusters.node_type
   num_workers:
     description: The number of workers in the cluster.
     lineage:
-      - datalake_databricks.unique_clusters.spark_version
+      - datalake_databricks.unique_clusters.num_workers
   autoscale:
     description: Autoscale configuration of the cluster.
     lineage:
-      - datalake_databricks.unique_clusters.spark_version
+      - datalake_databricks.unique_clusters.autoscale
   auto_termination_minutes:
     description: The number of minutes of inactivity before the cluster is automatically terminated.
     lineage:
-      - datalake_databricks.unique_clusters.spark_version
+      - datalake_databricks.unique_clusters.auto_termination_minutes
   is_elastic_disk_enabled:
     description: Indicates whether elastic disk is enabled for the cluster.
     lineage:
-      - datalake_databricks.unique_clusters.spark_version
+      - datalake_databricks.unique_clusters.is_elastic_disk_enabled
   is_automated:
     description: Indicates whether the cluster is automated.
     lineage:
-      - datalake_databricks.unique_clusters.spark_version
+      - datalake_databricks.unique_clusters.is_automated
   dbus:
     description: Cluster cost measured by the official databricks unit.
     lineage:
@@ -86,7 +86,7 @@ columns:
   spark_version_number:
     description: Numerical information that indicates which version of Spark is running.
     lineage:
-      - datalake_databricks.daily_clusters.spark_version
+      - datalake_databricks.unique_clusters.spark_version
   is_dag_builder_migrated:
     description: Boolean information that indicates whether the dag is linked to a job during execution.
   dt_execution:
