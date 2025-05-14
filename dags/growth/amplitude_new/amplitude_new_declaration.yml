@@ -19,7 +19,7 @@ workflow:
   tables_customization:
     events:
       extraction_type: incremental
-      partitions: ["id_app", "year", "month", "day"]
+      partitions: ["id_app", "event_type", "year", "month", "day"]
       extra_spark_job_arguments:
         - "{{ ds }}"
 cluster:
