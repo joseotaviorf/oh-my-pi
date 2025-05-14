@@ -4,7 +4,7 @@ sheets_info:
     sheet_name: aux_regiao
     clean_table_name: auxiliary_region
     sheet_context: for_rent
-  
+
   base_bandaids:
     sheet_id: 1CtK7QtPaai_mtuPKM4u2SWMT0gQ8wJoxNYCVaYW6w_E
     sheet_name: BA FR
@@ -39,6 +39,12 @@ sheets_info:
     sheet_id: 1Y6Z4CV1aDMey8vWnWqUZzpzPBz9os1shJ2anLtLT0Ds
     sheet_name: db_discounts_fr
     clean_table_name: listings_with_agreed_discounts
+    sheet_context: for_rent
+
+  nps_offboarding_contracts_dispatched:
+    sheet_id: 16AZZkvHnYMzMbuHIfwF10szg6z62Xy4HhQ3XpiqTHwU
+    sheet_name: "Lista de tickets e contratos no teste"
+    clean_table_name: nps_offboarding_contracts_dispatched
     sheet_context: for_rent
 
   ppmulti_goals_am:

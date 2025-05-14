@@ -1219,8 +1219,8 @@ bietlejuice.enrich_app_installed:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_arquivo_confidencial:
-  - bietlejuice.arquivo_confidencial:load-clean-rev-info
   - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
+  - bietlejuice.arquivo_confidencial:load-clean-rev-info
 bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
@@ -1408,9 +1408,9 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
 bietlejuice.enrich_bureaus:
+  - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
-  - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat:load-clean-screening-result-version
@@ -3309,6 +3309,7 @@ bietlejuice.enrich_tracksale_dispatches:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.gsheets_for_rent:done-clean-nps-offboarding-contracts-dispatched
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
 bietlejuice.enrich_trino_detractor:
   - bietlejuice.enrich_trino:load-enrich-trino-detractor-queries
@@ -3951,8 +3952,8 @@ wonka.house_listing_business_context:
 wonka.house_rent_offer:
   - bietlejuice.ebdb_offer:load-clean-offer
 wonka.house_rent_proposal:
-  - bietlejuice.arquivo_confidencial:load-clean-rev-info
   - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
+  - bietlejuice.arquivo_confidencial:load-clean-rev-info
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
 wonka.house_rent_search_page_viewed:
