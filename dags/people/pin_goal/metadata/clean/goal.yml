@@ -90,10 +90,6 @@ columns:
     description: Name of the goal.
     lineage:
     - datalake_pin_goal_raw.hrg_goals.goal_name
-  description:
-    description: Description of the goal.
-    lineage:
-    - datalake_pin_goal_raw.hrg_goals.description
   updated_by:
     description: User who last updated the row.
     lineage:

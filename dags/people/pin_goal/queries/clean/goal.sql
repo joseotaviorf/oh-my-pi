@@ -16,7 +16,6 @@ SELECT
   status_code,
   priority_code,
   goal_name,
-  description,
   last_updated_by AS updated_by,
   last_modified_by AS modified_by,
   request_context,
