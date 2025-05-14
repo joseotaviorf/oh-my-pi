@@ -1,0 +1,61 @@
+---
+database_name: datalake_pin_hr_review_clean
+table_name: dashboard_template_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores translations for talent review dashboard templates.
+columns:
+  id_business_group:
+    description: Foreign key to hr_all_organization_units.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl.business_group_id
+  id_dashboard_template:
+    description: Primary key of dashboard templates.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl.dashboard_tmpl_id
+  name:
+    description: Yes, dashboard template name.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl.name
+  language:
+    description: Indicates the code of the language for the translated content.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl.language
+  source_language:
+    description: Indicates the code of the original language of the content.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl.source_lang
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl.last_updated_by
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl.object_version_number
+  ts_created:
+    description: Timestamp of the creation of the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl._calibrated_creation_date
+  ts_updated:
+    description: Timestamp of the last update of the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl._calibrated_last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboard_tmpls_tl.day

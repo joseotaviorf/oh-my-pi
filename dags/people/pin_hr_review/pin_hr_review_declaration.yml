@@ -45,8 +45,18 @@ workflow:
     people-team:
       - ALL PRIVILEGES
   tables_customization:
+    hrr_dashboards:
+      clean_table_name: dashboard
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_hr_review
+          date_column_to_partition: last_update_date
     hrr_dashboard_tmpls_b:
       clean_table_name: dashboard_template_base
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_hr_review
+          date_column_to_partition: last_update_date
+    hrr_dashboard_tmpls_tl:
+      clean_table_name: dashboard_template_translation
       extra_spark_job_arguments:
         - raw_custom_schema: pin_hr_review
           date_column_to_partition: last_update_date

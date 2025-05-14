@@ -1,0 +1,121 @@
+---
+database_name: datalake_pin_hr_review_clean
+table_name: dashboards
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores data for talent review dashboards.
+columns:
+  id_dashboard:
+    description: Unique identifier for the dashboard.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.dashboard_id
+  id_business_group:
+    description: Identifier of the business group.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.business_group_id
+  id_meeting:
+    description: Identifier of the talent review meeting.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.meeting_id
+  id_person:
+    description: Identifier of the person displayed on the dashboard.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.person_id
+  id_assignment:
+    description: Identifier of the assignment displayed on the dashboard.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.assignment_id
+  id_talent_score_rating_level:
+    description: Identifier of the talent score rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.talent_score_rt_lvl_id
+  id_talent_score_rating_level_calibrated:
+    description: Identifier of the calibrated talent score rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.talent_scor_calb_rt_lvl_id
+  id_bu_leader_direct:
+    description: Identifier of the business unit leader's direct reports.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.bu_leader_direct_id
+  id_performance_rating_level:
+    description: Identifier of the performance rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.perf_rt_lvl_id
+  id_performance_rating_level_calibrated:
+    description: Identifier of the calibrated performance rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.perf_calib_rt_lvl_id
+  id_potential_rating_level:
+    description: Identifier of the potential rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.pot_rt_lvl_id
+  id_potential_rating_level_calibrated:
+    description: Identifier of the calibrated potential rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.pot_calib_rt_lvl_id
+  id_risk_loss_rating_level:
+    description: Identifier of the risk of loss rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.risk_loss_rt_lvl_id
+  id_risk_loss_rating_level_calibrated:
+    description: Identifier of the calibrated risk of loss rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.risk_loss_calib_rt_lvl_id
+  id_impact_loss_rating_level:
+    description: Identifier of the impact of loss rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.impact_loss_rt_lvl_id
+  id_impact_loss_rating_level_calibrated:
+    description: Identifier of the calibrated impact of loss rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.impact_loss_calb_rt_lvl_id
+  id_criticality_rating_level:
+    description: Identifier for criticality rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_value3
+  id_readiness_rating_level:
+    description: Identifier for readiness rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_value4
+  id_criticality_rating_level_calibrated:
+    description: Identifier of the calibrated criticality rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_calib_value3
+  id_readiness_rating_level_calibrated:
+    description: Identifier of the calibrated readiness rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_calib_value4
+  created_by:
+    description: User who created the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.created_by
+  updated_by:
+    description: User who last updated the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.last_updated_by
+  object_version_number:
+    description: Counter for optimistic locking, incremented on each update.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.object_version_number
+  ts_created:
+    description: Timestamp of the creation of the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.creation_date
+  ts_updated:
+    description: Timestamp of the last update of the row.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.last_update_date
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.day
