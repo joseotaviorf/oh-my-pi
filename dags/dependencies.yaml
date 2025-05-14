@@ -1440,6 +1440,9 @@ bietlejuice.enrich_ciq_comissioning:
   - bietlejuice.gsheets_agents:done-clean-sale-comission-for-strategic-region
 bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-info
 bietlejuice.enrich_collections_quintocred:
   - bietlejuice.enrich_velo:load-enrich-propose
   - bietlejuice.enrich_velo:load-enrich-propose-person
@@ -2190,6 +2193,7 @@ bietlejuice.enrich_invoice:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
+  - bietlejuice.enrich_collections_quintoandar:load-enrich-invoice-portfolio
 bietlejuice.enrich_jira:
   - bietlejuice.jira:load-clean-issues
 bietlejuice.enrich_kill_queue:
