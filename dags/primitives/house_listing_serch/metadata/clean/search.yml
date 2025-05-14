@@ -1,0 +1,31 @@
+---
+database_name: datalake_house_listing_search_clean
+table_name: message
+owner: brandell.ferreira@quintoandar.com.br
+domain: primitives
+description: "This table stores information about search requests that are done in the House Listing Search service"
+columns:
+  id:
+    description: "The long search record identifier"
+    lineage:
+    - datalake_house_listing_search_raw.search.id
+  id_search:
+    description: "The search identified used in the response"
+    lineage:
+    - datalake_house_listing_search_raw.search.search_id
+  id_user:
+    description: "The user identifier in external service"
+    lineage:
+    - datalake_house_listing_search_raw.search.user_od
+  search_criteria:
+    description: "The search request object used to retrieve the listings"
+    lineage:
+    - datalake_house_listing_search_raw.search.search_criteria
+  response:
+    description: "The response object sent by the service containing all listings"
+    lineage:
+    - datalake_house_listing_search_raw.search.response
+  ts_created:
+    description: "The date when search was performed"
+    lineage:
+    - datalake_house_listing_search_raw.search.created_at 

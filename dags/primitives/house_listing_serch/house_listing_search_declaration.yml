@@ -1,0 +1,23 @@
+dag:
+  name: house_listing_search
+  schedule_start_date: 2025, 05, 13
+  schedule_interval: 0 1 * * *
+  owner: Data Primitives
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for ingesting CDC generated data from the [house_listing_search](https://github.com/quintoandar/backend-services/tree/main/applications/house-listing-search) transactional database
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  tables_customization:
+    search: {}
+cluster:
+  type: databricks_12_2_min_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
