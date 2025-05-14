@@ -19,6 +19,8 @@ SELECT
     ServiceContractId AS id_service_contract,
     ZendeskId__c AS id_zendesk,
     LastModifiedById AS id_last_modified_by,
+    customerId__c AS id_customer,
+    PurchaseSaleContract__c AS id_purchase_sale_contract,
     SuppliedName AS supplied_name,
     SuppliedEmail AS supplied_email,
     SuppliedPhone AS supplied_phone,
@@ -52,6 +54,18 @@ SELECT
     serviceProviderPhone__c AS service_provider_phone,
     serviceProviderType__c AS service_provider_type,
     ContestationResponsabilityValid__c AS contestation_reponsability_valid,
+    AccountName__c AS account_name,
+    BYCurrentOnboardingContact__c AS buyer_current_onboarding_contact,
+    CRNStatus__c AS notary_office_status,
+    FlowSubType__c AS flow_sub_type,
+    ForSaleFlow__c AS for_sale_flow,
+    FS_CRI_HaveDemandNote__c AS fs_cri_have_demand_note,
+    FS_CRIStatus__c AS fs_cri_status,
+    FS_StatusCRI__c AS fs_status_cri,
+    FS_SubscriptionModelBuyer__c AS fs_subscription_model_buyer,
+    FS_SubscriptionModelSeller__c AS fs_subscription_model_seller,
+    PublicationOccurredOnProperty__c AS publication_occurred_on_property,
+    SLCurrentOnboardingContact__c AS seller_current_onboarding_contact,
     CAST(PastDueDateSimulation__c AS BOOLEAN) AS is_past_due_date_simulation,
     CAST(SimulationTenantBudgetTimeLimit__c AS BOOLEAN) AS is_simulation_iq_budget_time_limit,
     CAST(IsDeleted AS BOOLEAN) AS is_deleted,
@@ -74,6 +88,23 @@ SELECT
     CAST(CaseCreationStartMilestone__c AS BOOLEAN) AS is_case_creation_start_milestone,
     CAST(RequestedHelpTimeLimit__c AS BOOLEAN) AS is_requested_help_time_limit,
     CAST(LLBudgetApprovalTimeLimit__c AS BOOLEAN) AS is_ll_budget_approval_time_limit,
+    CAST(BYContactSuccess__c AS BOOLEAN) AS is_buyer_contact_success,
+    CASE
+        WHEN FS_BalancePaymentMade__c = 'Sim' THEN TRUE
+        WHEN FS_BalancePaymentMade__c = 'Não' THEN FALSE
+    END AS is_fs_balance_payment_made,
+    CASE
+        WHEN FS_KeysReceived__c = 'Sim' THEN TRUE
+        WHEN FS_KeysReceived__c = 'Não' THEN FALSE
+    END AS is_fs_keys_received,
+    CASE
+        WHEN FS_MilestoneFinish__c = 'Sim' THEN TRUE
+        WHEN FS_MilestoneFinish__c = 'Não' THEN FALSE
+    END AS is_fs_milestone_finish,
+    CASE
+        WHEN SLContactSuccess__c = 'Sim' THEN TRUE
+        WHEN SLContactSuccess__c = 'Não' THEN FALSE
+    END AS is_sl_contact_success,
     CAST(SystemModstamp AS TIMESTAMP) AS ts_system_mod,
     CAST(followUpExpectedResolutionDate__c AS TIMESTAMP) AS ts_follow_up_expected_resolution,
     CAST(followUpReassignDate__c AS TIMESTAMP) AS ts_follow_up_reassign,
@@ -85,6 +116,16 @@ SELECT
     CAST(LastReferencedDate AS TIMESTAMP) AS ts_last_referenced,
     CAST(CreatedDate AS TIMESTAMP) AS ts_created,
     CAST(LastModifiedDate AS TIMESTAMP) AS ts_last_modified,
+    CAST(FS_BY_KeyDeliveryDate__c AS DATE) AS dt_fs_buyer_key_delivery,
+    CAST(FS_BYNextContactDate__c AS DATE) AS dt_fs_buyer_next_contact,
+    CAST(FS_CCVSigned__c AS TIMESTAMP) AS ts_fs_ccv_signed,
+    CAST(FS_DDAcceptedDate__c AS DATE) AS dt_fs_dd_accepted_date,
+    CAST(FS_PDSL_SubscriptionSchedulingDate__c AS DATE) AS dt_fs_pds_subscription_scheduling,
+    CAST(FS_ReturnDate__c AS DATE) AS dt_fs_return_date,
+    CAST(FS_SL_KeyDeliveryDate__c AS DATE) AS dt_fs_seller_key_delivery,
+    CAST(FS_SLNextContactDate__c AS DATE) AS dt_fs_seller_next_contact,
+    CAST(KeyDeliveryDate__c AS DATE) AS dt_key_delivery,
+    CAST(MS_TT_Date_BudgetReviewIQCreatedDateTD__c AS TIMESTAMP) AS ts_ms_tt_budget_review_iq_created_td,
     year,
     month,
     day

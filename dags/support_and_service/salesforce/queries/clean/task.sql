@@ -7,6 +7,11 @@ SELECT
     RecurrenceActivityId AS id_recurrence_activity,
     CAST(ContractId__c AS INT) AS id_contract,
     LastModifiedById AS id_last_modified_by,
+    CallId__c AS id_call,
+    EntityId__c AS id_entity,
+    FS_OfferId__c AS id_fs_offer,
+    FS_PurchaseSaleContract__c AS id_fs_purchase_sale_contract,
+    RecordTypeId AS id_record_type,
     CAST(WhoCount AS INT) AS who_count,
     CAST(WhatCount AS INT) AS what_count,
     CAST(RecurrenceInterval AS INT) AS recurrence_interval,
@@ -32,6 +37,14 @@ SELECT
     Observation__c AS observation,
     DelayMessage__c AS delay_message,
     ResponsabilityContestingIsGood__c AS responsability_contesting_is_good,
+    CognitoLink__c AS cognito_link,
+    FS_ReasonDelay__c AS fs_reason_delay,
+    FS_Seller__c AS fs_seller,
+    SchedulingManagement__c AS scheduling_management,
+    Source__c AS source,
+    TaskAction__c AS task_action,
+    TaskManagement__c AS task_management,
+    CAST(SLA__c AS FLOAT) AS sla,
     CAST(Answer__c AS BOOLEAN) AS is_answer,
     CAST(IsHighPriority AS BOOLEAN) AS is_high_priority,
     CAST(IsDeleted AS BOOLEAN) AS is_deleted,
@@ -39,6 +52,23 @@ SELECT
     CAST(IsArchived AS BOOLEAN) AS is_archived,
     CAST(IsReminderSet AS BOOLEAN) AS is_reminder_set,
     CAST(IsRecurrence AS BOOLEAN) AS is_recurrence,
+    CASE
+        WHEN FS_KeysReceived__c = 'Sim' THEN TRUE
+        WHEN FS_KeysReceived__c = 'Não' THEN FALSE
+    END AS is_fs_keys_received,
+    CASE
+        WHEN GetResponse__c = 'Sim' THEN TRUE
+        WHEN GetResponse__c = 'Não' THEN FALSE
+    END AS has_got_response,
+    CASE
+        WHEN PaidViaTed__c = 'Sim' THEN TRUE
+        WHEN PaidViaTed__c = 'Não' THEN FALSE
+    END AS has_paid_via_ted,
+    CAST(QuestionResolvedInformedCustomer__c AS BOOLEAN) AS is_question_resolved,
+    CASE
+        WHEN WasDisagreement__c = 'Sim' THEN TRUE
+        WHEN WasDisagreement__c = 'Não' THEN FALSE
+    END AS has_disagreement,
     CAST(CompletedDateTime AS TIMESTAMP) AS ts_completed,
     CAST(ReminderDateTime AS TIMESTAMP) AS ts_reminder,
     CAST(ActivityDate AS TIMESTAMP) AS ts_activity,
@@ -50,6 +80,10 @@ SELECT
     CAST(CreatedDate AS TIMESTAMP) AS ts_created,
     CAST(LastModifiedDate AS TIMESTAMP) AS ts_last_modified,
     CAST(SystemModstamp AS TIMESTAMP) AS ts_system_mod,
+    CAST(KeyDeliveryDate__c AS TIMESTAMP) AS ts_key_delivery,
+    CAST(ReturnDateCustomer__c AS TIMESTAMP) AS ts_return_date_customer,
+    CAST(SchedulingDate__c AS TIMESTAMP) AS ts_scheduling,
+    CAST(TaskDueDateFormula__c AS TIMESTAMP) AS ts_task_due_date_formula,
     year,
     month,
     day
