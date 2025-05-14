@@ -1,0 +1,42 @@
+database_name: datalake_visit
+table_name: visit_cancellation_unified
+description: Information about cancelled visits.
+  Each row is an unique visit.
+domain: Data ForSale
+owner: guilherme.rocha@quintoandar.com.br
+columns:
+  id_visit:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.id_visit
+      - datalake_ebdb_clean.visit_cancellation_details.id_visit
+    description: Primary key of this table. The cancellation information is at visit granularity.
+  channel:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.channel
+      - datalake_ebdb_clean.visit_cancellation_details.channel
+    description: The channel through which the visit was cancelled.
+  on_behalf_of:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.on_behalf_of
+      - datalake_ebdb_clean.visit_cancellation_details.on_behalf_of
+    description: On whose behalf the visit was cancelled.
+    categories:
+      SUPPLY: Visit canceled on behalf of the owner.
+      TENANT_LIVING: Visit canceled on behalf of the tenant who is living in the house.
+      AGENT: Visit canceled on behalf of the agent.
+      DEMAND: Visit canceled on behalf of the prospect.
+  reason:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.reason
+      - datalake_ebdb_clean.visit_cancellation_details.reason
+    description: Reason why the visit was cancelled.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.ts_created
+      - datalake_ebdb_clean.visit_cancellation_details.ts_created
+    description: Timestamp of when the cancelled visits were created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.ts_updated
+      - datalake_ebdb_clean.visit_cancellation_details.ts_updated
+    description: Timestamp of when the cancelled visits were updated.
