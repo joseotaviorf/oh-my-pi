@@ -166,7 +166,7 @@ SELECT DISTINCT
     concat( nps.sk_offer,case when nps.metric_group ='sellerendofprocess' then '_seller' else '_buyer' end )as account_id,
     case when nps.metric_group ='sellerendofprocess' then 'seller' else 'buyer' end as customer_type,
     nps.score as rating,
-    nps.score_category AS csat_score_category,
+    nps.score_category AS score_category,
     CASE 
         WHEN 
             offer.financing_bank is NULL 
