@@ -1,0 +1,73 @@
+database_name: datalake_rental_management
+table_name: invoice_audd
+description: This table contains the audit information for Condo Monitoring's invoices.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.id
+      - datalake_rental_management_transactional.boleto.id
+    description: ID of the Condo Monitoring's invoice.
+  id_external:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.id_contract
+      - datalake_rental_management_transactional.boleto.external_id
+    description: ID of the contract.
+  id_invoice_user:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.id_action_main_user
+      - datalake_rental_management_transactional.boleto.boleto_user_id
+    description: Flag indicating whether the condo monitoring action is eligible.
+  id_contract:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.id_contract
+      - datalake_rental_management_transactional.boleto.contract_id
+    description: Timestamp of when the register was created.
+  value:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.value
+      - datalake_rental_management_transactional.boleto.value
+    description: Timestamp of when the register was created.
+  status:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.status
+      - datalake_rental_management_transactional.boleto.status
+    description: Timestamp of when the register was created.
+  raw_data:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.raw_data
+      - datalake_rental_management_transactional.boleto.raw_data
+    description: Timestamp of when the register was created.
+  dt_due:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.dt_due
+      - datalake_rental_management_transactional.boleto.due_date
+    description: Timestamp of when the register was created.
+  ts_created:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_created
+      - datalake_rental_management_transactional.boleto.created_at
+    description: Timestamp of when the register was created.
+  ts_updated:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_updated
+      - datalake_rental_management_transactional.boleto.ts_database_transaction
+    description: Timestamp of when the register was updated.
+  rev_type:
+    description: Type of revision.
+  year:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_updated
+      - datalake_rental_management_transactional.boleto.ts_database_transaction
+    description: Year of the revision.
+  month:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_updated
+      - datalake_rental_management_transactional.boleto.ts_database_transaction
+    description: Month of the revision.
+  day:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_updated
+      - datalake_rental_management_transactional.boleto.ts_database_transaction
+    description: Day of the revision.

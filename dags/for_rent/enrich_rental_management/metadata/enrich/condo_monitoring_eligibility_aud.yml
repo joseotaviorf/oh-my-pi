@@ -1,0 +1,48 @@
+database_name: datalake_rental_management
+table_name: condo_monitoring_eligibility_aud
+description: This table contains the audit information for condo monitoring actions.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.id
+      - datalake_rental_management_transactional.condo_monitoring_eligibility.id
+    description: ID related to the condo monitoring eligibility.
+  id_contract:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.id_contract
+      - datalake_rental_management_transactional.condo_monitoring_eligibility.contract_id
+    description: ID of the contract.
+  eligibility:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.id_action_main_user
+      - datalake_rental_management_transactional.condo_monitoring_eligibility.action_main_user_id
+    description: Flag indicating whether the condo monitoring action is eligible.
+  ts_created:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_created
+      - datalake_rental_management_transactional.condo_monitoring_eligibility.created_at
+    description: Timestamp of when the register was created.
+  ts_updated:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_updated
+      - datalake_rental_management_transactional.condo_monitoring_eligibility.ts_database_transaction
+    description: Timestamp of when the register was updated.
+  rev_type:
+    description: Type of revision.
+  year:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_updated
+      - datalake_rental_management_transactional.condo_monitoring_eligibility.ts_database_transaction
+    description: Year of the revision.
+  month:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_updated
+      - datalake_rental_management_transactional.condo_monitoring_eligibility.ts_database_transaction
+    description: Month of the revision.
+  day:
+    lineage:
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_updated
+      - datalake_rental_management_transactional.condo_monitoring_eligibility.ts_database_transaction
+    description: Day of the revision.

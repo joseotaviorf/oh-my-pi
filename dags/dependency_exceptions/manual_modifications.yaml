@@ -513,6 +513,11 @@ bietlejuice.enrich_rede_supply:
 bietlejuice.enrich_rental_historical_follow_up:
   add:
     - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
+bietlejuice.enrich_rental_management:
+  add:
+    - bietlejuice.rental_management:load-clean-invoice
+    - bietlejuice.rental_management:load-clean-condo-monitoring-actions
+    - bietlejuice.rental_management:load-clean-condo-monitoring-eligibility
 bietlejuice.enrich_repairs:
   remove:
     - bietlejuice.repairs:load-clean-repair-expense

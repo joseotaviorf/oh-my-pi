@@ -2726,6 +2726,10 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.enrich_pro_owners:load-enrich-house-b2b-history
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_visit:load-enrich-visit-status-events
+bietlejuice.enrich_rental_management:
+  - bietlejuice.rental_management:load-clean-invoice
+  - bietlejuice.rental_management:load-clean-condo-monitoring-actions
+  - bietlejuice.rental_management:load-clean-condo-monitoring-eligibility
 bietlejuice.enrich_rental_transact:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.rental_transact:load-clean-offer
