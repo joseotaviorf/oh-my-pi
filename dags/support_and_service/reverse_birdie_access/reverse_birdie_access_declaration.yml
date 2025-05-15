@@ -17,18 +17,22 @@ workflow:
     dsat_bot:
       extra_spark_job_arguments:
       - "feedbacks"
+      - "audience/accounts"
       - "https://api.birdie.ai/ingestion" #api_url
     dsat_customer_relationship:
       extra_spark_job_arguments:
       - "feedbacks"
+      - "audience/accounts"
       - "https://api.birdie.ai/ingestion" #api_url
     dsat_visitas:
       extra_spark_job_arguments:
       - "feedbacks"
+      - "audience/accounts"
       - "https://api.birdie.ai/ingestion" #api_url
     end_of_process:
       extra_spark_job_arguments:
       - "feedbacks"
+      - "audience/accounts"
       - "https://api.birdie.ai/ingestion" #api_url
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster

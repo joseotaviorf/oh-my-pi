@@ -13,14 +13,43 @@ from bietlejuice.services import ConfigurationService
 from pyspark.sql.functions import date_format
 from quintoandar_logger import QuintoAndarLogger
 
-
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_into_birdie_api"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-def create_results_payload(database_name, table_name, execution_date):
+def get_df(database_name, table_name, execution_date):
+    """
+    Get the dataframe based on the database, table name and execution date.
+    """
+    df = spark.sql(
+            f"""
+                SELECT 
+                    * 
+                FROM 
+                    {database_name}.{table_name} 
+                WHERE 
+                    year={execution_date.year} 
+                    AND month={execution_date.month} 
+                    AND day={execution_date.day}
+                LIMIT 20
+            """
+        )
+    
+    for col in df.columns:
+        if dict(df.dtypes)[col] == 'int':
+            df = df.fillna({col: np.NaN })
+        else:
+            df = df.fillna({col: ""})
+
+    return df
+
+
+def create_feedbacks_results_payload(df, table_name):
+    """
+    Create the payload to be sent to the API.
+    """
     search_mapping = {
                         'dsat_bot': 'csat',
                         'dsat_visitas': 'csat',
@@ -35,55 +64,39 @@ def create_results_payload(database_name, table_name, execution_date):
                         'novas_pesquisas':'nps',
                         'end_of_process': 'nps'
                     }
-    df = spark.sql(
-            f"""
-                SELECT 
-                    * 
-                FROM 
-                    {database_name}.{table_name} 
-                WHERE 
-                    year={execution_date.year} 
-                    AND month={execution_date.month} 
-                    AND day={execution_date.day}
-                LIMIT 20
-            """
-        )
+    
     if search_mapping[table_name] == 'csat':
         campaign_title = "csat_campanha"
     else:
         campaign_title = "nome_campanha"
-        
-    for col in df.columns:
-        if dict(df.dtypes)[col] == 'int':
-            df = df.fillna({col: np.NaN })
-        else:
-            df = df.fillna({col: ""})
     
+    # Create feedbacks
     nps_content = {row['feedback_id']: {k: v for k, v in row.asDict().items()} for row in df.collect()}
-    results_list = []
+    feedbacks_results_list = []
     for key, value in nps_content.items():
-        result_dict = {}
-        result_dict["posted_at"] = value['posted_at']
-        result_dict["text"] = value['text']
-        result_dict["language"] = 'pt-BR'
-        result_dict["kind"] = {
+        feedbacks_result_dict = {}
+        feedbacks_result_dict["posted_at"] = value['posted_at']
+        feedbacks_result_dict["text"] = value['text']
+        feedbacks_result_dict["language"] = 'pt-BR'
+        feedbacks_result_dict["kind"] = {
                 "name": search_mapping[table_name],
                 "fields": {
                 "author_id": str(value['author_id']),
                 "author_name": str(value['author_id']),
-                "account_id": "Quinto Andar",
+                "account_id": value['account_id'],
                 "title": value[f'{campaign_title}'],
                 "rating": value['rating']
                     }
                 }
-        result_dict["additional_fields"] = {k: str(v) for k, v in value.items()}
-        results_json = {    
-                key: result_dict
+        feedbacks_result_dict["additional_fields"] = {k: str(v) for k, v in value.items()}
+        feedbacks_results_json = {    
+                key: feedbacks_result_dict
                 }
-        results_list.append(results_json)
-    return results_list
+        feedbacks_results_list.append(feedbacks_results_json)
+        
+    return feedbacks_results_list
 
-def parse_arguments() -> Tuple[str, str, str, str, datetime, str, str]:
+def parse_arguments() -> Tuple[str, str, str, str, datetime, str, str, str]:
     """
     Parse the arguments passed to the job.
     Returns a tuple with the DAG name, database name, table name, event type, and execution date.
@@ -96,7 +109,8 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime, str, str]:
     parser.add_argument(
         "execution_date", help="Date of the execution in the format YYYY-MM-DD"
     )
-    parser.add_argument("endpoint", help="Endpoint to send the data to")
+    parser.add_argument("feedbacks_endpoint", help="Endpoint to send the feedback data to")
+    parser.add_argument("accounts_endpoint", help="Endpoint to send the accounts data to")
     parser.add_argument("api_url", help="URL to send the data to")
 
     args = parser.parse_args()
@@ -105,21 +119,22 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime, str, str]:
     database_name = args.database_name
     table_name = args.table_name
     execution_date = datetime.fromisoformat(args.execution_date)
-    endpoint = args.endpoint
+    feedbacks_endpoint = args.feedbacks_endpoint
+    accounts_endpoint = args.accounts_endpoint
     api_url = args.api_url
 
-    return dag_name, database_name, table_name, execution_date, endpoint, api_url
+    return dag_name, database_name, table_name, execution_date, feedbacks_endpoint, accounts_endpoint, api_url
 
-def send_payload(api_url, endpoint, headers, results_list):
-    total_dispatches = len(results_list)
+def send_feedbacks_payload(api_url, feedbacks_endpoint, headers, feedbacks_results_list):
+    total_dispatches = len(feedbacks_results_list)
     successful_dispatches = 0
     errors_dispatches = []
 
-    for x in results_list:
+    for x in feedbacks_results_list:
         for feedback_id in x.keys():
             data = x[feedback_id]
             response = requests.put(
-                f'{api_url}/{endpoint}/{feedback_id}',
+                f'{api_url}/{feedbacks_endpoint}/{feedback_id}',
                 headers=headers,
                 data=json.dumps(data)
                 )
@@ -141,7 +156,7 @@ def send_payload(api_url, endpoint, headers, results_list):
             for feedback_id in x.keys():
                 data = x[feedback_id]
                 response = requests.put(
-                    f'{api_url}/{endpoint}/{feedback_id}',
+                    f'{api_url}/{feedbacks_endpoint}/{feedback_id}',
                     headers=headers,
                     data=json.dumps(data)
                     )
@@ -154,8 +169,71 @@ def send_payload(api_url, endpoint, headers, results_list):
     else:
         logger.info(f"m=All data sent successfully. Total_dispatches={total_dispatches}") 
 
+def create_accounts_results_payload(df):
+    """
+    Create the payload to be sent to the API.
+    """
+    
+    # Create accounts payload
+    accounts_content = {row['account_id']: {k: v for k, v in row.asDict().items()} for row in df.collect()}
+    accounts_results_list = []
+    for key, value in accounts_content.items():
+        accounts_result_dict = {}
+        accounts_result_dict["batch_id"] = key
+        accounts_result_dict["additional_fields"] = {k: str(v) for k, v in value.items()}
+        accounts_results_json = {    
+                key: accounts_result_dict
+                }
+        accounts_results_list.append(accounts_results_json)
+        
+    return accounts_results_list
+
+def send_accounts_payload(api_url, accounts_endpoint, headers, accounts_results_list):
+    total_dispatches = len(accounts_results_list)
+    successful_dispatches = 0
+    errors_dispatches = []
+
+    for x in accounts_results_list:
+        for account_id in x.keys():
+            data = x[account_id]
+            response = requests.put(
+                f'{api_url}/{accounts_endpoint}/{account_id}',
+                headers=headers,
+                data=json.dumps(data)
+                )
+
+            if response.status_code == 201:
+                logger.info(f"m=Batch sent successfully. Dispatch number={successful_dispatches}, total size={total_dispatches}")
+                successful_dispatches += 1
+                time.sleep(1)
+                break
+            else:
+                logger.error(f"m=Error sending batch. Retrying... Batch_index={successful_dispatches}, status_code={response.status_code}. Message={response.text}")
+                errors_dispatches.append(x)
+
+    if successful_dispatches != total_dispatches:
+        logger.error(f"m=Mismatch in data sent. Expected={total_dispatches}, Sent={successful_dispatches}")
+        logger.info(f"Starting retry process for {len(errors_dispatches)} records")
+        retry_success = 0
+        for x in errors_dispatches:
+            for account_id in x.keys():
+                data = x[account_id]
+                response = requests.put(
+                    f'{api_url}/{accounts_endpoint}/{account_id}',
+                    headers=headers,
+                    data=json.dumps(data)
+                    )
+            if response.status_code == 201:
+                logger.info(f"m=Batch sent successfully. Retry number={retry_success}, total retry size={errors_dispatches}")
+                retry_success += 1
+            else:
+                logger.error(f"m=Error sending retry records. Account_id={account_id}, Batch_index={retry_success}, status_code={response.status_code}. Message={response.text}")
+                
+    else:
+        logger.info(f"m=All data sent successfully. Total_dispatches={total_dispatches}") 
+
 def main():
-    dag_name, database_name, table_name, execution_date, endpoint, api_url = (
+    dag_name, database_name, table_name, execution_date, feedbacks_endpoint, accounts_endpoint, api_url = (
         parse_arguments()
     )
 
@@ -169,9 +247,13 @@ def main():
       'Content-type': 'application/json', 
       'Authorization': api_key}
 
-    results_payload = create_results_payload(database_name, table_name, execution_date)
+    df = get_df(database_name, table_name, execution_date)
 
-    send_payload(api_url, endpoint, headers, results_payload)
+    feedbacks_results_payload = create_feedbacks_results_payload(df, table_name)
+    accounts_results_payload = create_accounts_results_payload(df)
+
+    send_feedbacks_payload(api_url, feedbacks_endpoint, headers, feedbacks_results_payload)
+    send_accounts_payload(api_url, accounts_endpoint, headers, accounts_results_payload)
 
 if __name__ == '__main__':
     main()
