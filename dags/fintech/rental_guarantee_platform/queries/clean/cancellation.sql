@@ -7,6 +7,7 @@ SELECT
     userupdate                  AS user_update,
     return_value,
     return_value_interest,
+    reason,
     active                      AS is_active,
     created_at                  AS ts_created,
     updated_at                  AS ts_updated,

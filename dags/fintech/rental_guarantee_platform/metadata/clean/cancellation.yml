@@ -27,6 +27,9 @@ columns:
   origin:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation.origin
+  reason:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.cancellation.reason
   is_active:
     lineage:
       - datalake_rental_guarantee_platform_raw.cancellation.active

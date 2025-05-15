@@ -8,3 +8,265 @@ columns:
   id_operation:
     lineage:
       - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.codigo_operacao
+  proposal_number:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_num_proposta
+  ts_operation:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.instante
+  bigdata_entities_employed_bureau:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdata_entidades_empregadas_bureau
+  bigdata_related_entities_bureau:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdata_entidades_relacionadas_bureau
+  bigdata_age_bureau:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdata_idade_bureau
+  bigdata_partners_list:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdata_lista_socios
+  bigdata_origin_charges_bureau:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdata_origens_cobrancas_bureau
+  bigdataboost_company_age:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdataboost_empresas_idade
+  bigdataboost_has_sanctions:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdataboost_empresas_possui_sancoes
+  bigdataboost_has_lawsuits:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_bigdataboost_processos_judiciais_reu
+  blocklist:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_blocklist
+  blocklist_pj:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_blocklist_pj
+  blocklist_return_message:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_blocklist_retorno
+  company_cnae:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cnae
+  is_company_approved:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_comp_aprov
+  company_partner_cpf:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cpf_socio_pj
+  company_partner_cpf_1:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cpf_socio_pj1
+  company_partner_cpf_2:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cpf_socio_pj2
+  company_partner_cpf_3:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cpf_socio_pj3
+  company_partner_cpf_4:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_cpf_socio_pj4
+  decision_status:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_decisao_status
+  dti_calculated:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_dti_apurado
+  dti_limit:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_dti_limite
+  dti_max:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_dti_maximo
+  calculated_presumed_revenue:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_faturamento_presumido_calculado
+  filter_pj:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_filtro_pj
+  fraud:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_fraude
+  min_age:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_idade_minima
+  pj_age:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_idade_pj
+  rating_age:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_idade_rating
+  minor_age:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_menor_idade
+  income_model_betas:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_modelo_renda_betas
+  model_total_income:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_modelo_renda_total
+  pep:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_pep
+  pf_score_quinto:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_quinto_cred_score_pf
+  activity_branch_accountant:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_ramo_atividade_contador
+  activity_branch_list:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_ramo_atividade_lista
+  activity_branch_permitted:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_ramo_atividade_permitida
+  pf_rating:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rating_pf
+  pj_rating:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rating_pj
+  matrix_rating_status_a:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rating_status_matriz_a
+  elected_presumed_income:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_renda_presumida_eleita
+  serasa_total_income:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_renda_serasa_total
+  federal_person_age:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rfpf_idade
+  federal_company_age:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rfpj_idade
+  federal_company_status:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_rfpj_situacao_cadastral
+  serasa_pj_presumed_revenue:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_pj_faturamento_presumido
+  serasa_pj_restriction_reason:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_pj_motivo_restricao
+  serasa_pj_score:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_pj_score
+  serasa_pj_has_restriction:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_pj_tem_restricao
+  serasa_score_csba_bureau:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_score_csba_bureau
+  serasa_score_hspn_bureau:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_serasa_score_hspn_bureau
+  has_lawsuit:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_tem_acao
+  has_occurrence:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_tem_ocorrencia
+  has_protest:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_tem_protesto
+  transunion_decl_rest_3_bureau:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_transunion_decl_rest_3_bureau
+  transunion_indic_seg_6_bureau:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_transunion_indic_seg_6_bureau
+  transunion_percent_schooling_04_bureau:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_transunion_percent_escol_04_bureau
+  transunion_employer_size_bureau:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_transunion_porte_empregador_bureau
+  transunion_number_addresses_bureau:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_transunion_qtd_endereco_bureau
+  lawsuit_amount:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_valor_acao
+  minimum_package_value:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_valor_minimo_pacote
+  occurrence_amount:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_valor_ocorrencia
+  protest_amount:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.calc_valor_protesto
+  eligible_pf:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.flx_elegibilidade_pf
+  eligible_pj:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.flx_elegibilidade_pj
+  main_proponent:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.flx_principal
+  proposal_city:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_cidade
+  proposal_cnpj:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_cnpj
+  proposal_cpfs:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_cpf_titular
+  proposal_company_email:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_email_empresa
+  proposal_main_email:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_email_titular
+  proposal_proposal_state:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_estado
+  proposal_company_phone:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_fone_empresa
+  proponent_phone:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_fone_titular
+  proposal_birth_date_proponents:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_nasc_titular
+  proposal_company_name:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_nome_empresa
+  proposal_name_real_state_company:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_nome_imob
+  proposal_property_type:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_tipo_imovel
+  proposal_rent_amount:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_valor_aluguel
+  proposal_condo_amount:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_valor_condominio
+  proposal_iptu_amount:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_valor_iptu
+  proposal_package_amount:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_valor_pacote
+  proposal_declared_income:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_renda_declarada
+  proposal_resubmission:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.prop_resubmissao
+  system_response_serasa_pj_hfp1:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.rgr_serasa_pj_hfp1_sistema_responde
+  system_response_serasa_pj_hpj8:
+    lineage:
+      - datalake_velo_neurotech_pj_raw.logs_pj_credit_granting.rgr_serasa_pj_hpj8_sistema_responde
+
