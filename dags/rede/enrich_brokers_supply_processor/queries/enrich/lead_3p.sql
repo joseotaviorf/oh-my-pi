@@ -8,7 +8,7 @@ WITH deduplicated_leads AS (
 lead_context AS (
     SELECT
         bcd.id_lead,
-        COALESCE(dl.uuid_company, SPLIT(f.file_name, '_dedup_')[0]) AS company,
+        dl.uuid_company,
         bcd.business_context,
         GET_JSON_OBJECT(dl.brokers, '$.createdAt')::TIMESTAMP AS ts_captured,
         -- Here, we want the date in which the batch was sent. In sale, that used to be when the lead was created. Later, rent leads were created
@@ -28,30 +28,43 @@ lead_context AS (
         datalake_brokers_supply_processor.file AS f
             ON bcd.id_file = f.id
 ),
-recurrency_aux AS (
+company_membership AS (
     SELECT
-        id_lead,
-        business_context,
-        ts_captured,
-        ts_batch_sent,
-        MIN(ts_batch_sent) OVER(PARTITION BY company, business_context) AS ts_first_batch
+        cs.uuid_company,
+        MAX(CASE WHEN ce.event_update = 'Membro' THEN ce.ts_start ELSE NULL END) AS ts_membership_start,
+        MIN(lc.ts_batch_sent) AS ts_first_batch
     FROM
-        lead_context
+        datalake_hubspot.company_events AS ce
+    LEFT JOIN
+        datalake_company.company_sks AS cs
+            ON cs.sk_company = ce.sk_company
+    LEFT JOIN
+        lead_context AS lc
+            ON cs.uuid_company = lc.uuid_company
+    WHERE
+        ce.event_type = 'Membership Update'
+            AND  lc.ts_batch_sent >= ce.ts_start
+    GROUP BY ALL
 ),
 recurrency AS (
     SELECT
-        id_lead,
-        business_context,
+        lc.id_lead,
+        lc.business_context,
+        lc.ts_captured,
+        lc.ts_batch_sent,
+        cm.ts_first_batch,
         CASE
-            WHEN ts_batch_sent IS NULL OR ts_first_batch IS NULL THEN 'N/A'
-            WHEN ts_batch_sent = ts_first_batch THEN 'FIRST_BATCH'
-            WHEN ts_batch_sent < ts_first_batch + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
-            WHEN ts_captured < ts_first_batch THEN 'COMPLEMENTARY'
+            WHEN lc.ts_batch_sent IS NULL OR cm.ts_first_batch IS NULL THEN 'N/A'
+            WHEN lc.ts_batch_sent = cm.ts_first_batch THEN 'FIRST_BATCH'
+            WHEN lc.ts_batch_sent < cm.ts_first_batch + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
+            WHEN lc.ts_captured < cm.ts_first_batch THEN 'COMPLEMENTARY'
             ELSE 'RECURRENT'
-        END AS recurrency_type,
-        ts_batch_sent
+        END AS recurrency_type
     FROM
-        recurrency_aux
+        lead_context AS lc
+    LEFT JOIN
+        company_membership AS cm
+            ON lc.uuid_company = cm.uuid_company
 ),
 houses AS (
     SELECT
