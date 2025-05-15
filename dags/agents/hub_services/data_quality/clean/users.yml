@@ -12,9 +12,9 @@ column_level_validations:
   name:
     is_complete:
       severity_level: Error
-  created_at:
+  ts_created:
     is_complete:
       severity_level: Error
-  updated_at:
+  ts_updated:
     is_complete:
       severity_level: Error
