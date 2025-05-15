@@ -1,11 +1,9 @@
 SELECT
-  legal_entity_id AS id_legal_entity,
-  establishment_id AS id_establishment,
-  action_occurrence_id AS id_action_occurrence,
   business_group_id AS id_business_group,
-  module_id AS id_module,
   organization_id AS id_organization,
   organization_code,
+  attribute1 AS cost_center_code,
+  name AS cost_center,
   created_by,
   last_updated_by AS updated_by,
   attribute3 AS directorate,
@@ -24,4 +22,4 @@ SELECT
   month,
   day
 FROM
-  datalake_pin_core_raw.hr_all_organization_units_f
+  datalake_pin_core_raw.hr_all_organization_units_vl
