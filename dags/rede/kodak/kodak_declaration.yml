@@ -4,53 +4,33 @@ dag:
   schedule_interval: 0 0 * * *
   owner: Data Rede
   documentation:
-    dag_purpose: |
-      This flow is intended to retrieve data related to images and videos used on our platforms.
+    dag_purpose: This flow is intended to retrieve data related to images and videos used on our platforms.
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
-  default_raw_extraction_type: incremental
-  default_clean_extraction_type: full
-  default_raw_partitions: [year, month, day]
-  default_clean_partitions: []
-  execution_timeout_hours: 3
+  custom_schema: kodak
+  source_database: kodak
+  source_schema: public
   tables_customization:
-    image_inspection:
-      date_filter_column: updated_at
-    image_analysis:
-      raw_extraction_type: full
-      raw_partitions: []
-    image_inspection_group:
-      date_filter_column: updated_at
-    image_inspection_group_result:
-      date_filter_column: updated_at
-    group_analysis:
-      raw_extraction_type: full
-      raw_partitions: []
-    photo:
-      raw_extraction_type: full
-      raw_partitions: []
-    photo_invalid_source:
-      date_filter_column: created_at
-      clean_extraction_type: incremental
-      clean_partitions: [year, month, day]
+    image_inspection: {}
+    image_analysis: {}
+    image_inspection_group: {}
+    image_inspection_group_result: {}
+    group_analysis: {}
+    photo: {}
+    photo_invalid_source: {}
     photosphere:
-      raw_extraction_type: full
-      raw_partitions: []
       clean_table_name: photo_sphere
     userrevisionentity:
-      raw_extraction_type: full
-      raw_partitions: []
       clean_table_name: user_revision_entity
-    video:
-      raw_extraction_type: full
-      raw_partitions: []
+    video: {}
     video_aud:
-      raw_extraction_type: full
-      raw_partitions: []
-    watermark_removal:
-      date_filter_column: updated_at
+      raw_primary_keys: ["id", "rev"]
+    watermark_removal: {}
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
 cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new
