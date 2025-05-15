@@ -39,6 +39,21 @@ Ex: change
 to
 ```'end_date', DATE('2024-06-01'),```
 
+LIST OF DEFAULT METRICS:
+- search_to_global_offer_14_days
+- search_to_global_visit_14_days
+- search_to_global_contract_14_days
+- search_to_global_offer_14_days_distinct_users
+- search_to_global_visit_14_days_distinct_users
+- house_published_to_global_offer_14_days
+- house_published_to_global_visit_14_days
+- house_published_to_global_contract_14_days
+
+Nondefault metrics:
+- search_ctr
+
+For full list of metrics, see the file: models/search/search-monitoring/search_monitoring/batch/metrics/metrics_dict.py
+
 */
 
 SELECT
@@ -57,7 +72,13 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', "business_context = 'sale'"
+            'filters', "business_context = 'sale'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', ["search_ctr"]
+                                                )
+                                )
         )
     ),
     -- demand balancer v2 policy v2
@@ -72,7 +93,12 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', "business_context = 'rent'"
+            'filters', "business_context = 'rent'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                )
+                                )
         )
     ),
     -- HUE vs listing-claw (LTR)
@@ -87,7 +113,12 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', NULL
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                )
+                                )
         )
     ),
     -- Important experience from a different team
@@ -102,7 +133,12 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', NULL
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                )
+                                )
         )
     ),
     -- HUE VS HSE for Rent
@@ -117,7 +153,12 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', "business_context = 'rent'"
+            'filters', "business_context = 'rent'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                )
+                                )
         )
     ),
     -- HUE VS HSE for Sale
@@ -132,7 +173,12 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', "business_context = 'sale'"
+            'filters', "business_context = 'sale'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                )
+                                )
         )
     ),
     -- Listing recs pricing experiment
@@ -147,7 +193,12 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', NULL
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                )
+                                )
         )
     )
     -- Add new experiment here
