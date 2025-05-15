@@ -61,6 +61,14 @@ columns:
     description: End date for deferred data freeze, defaults to the beginning of time.
     lineage:
       - datalake_pin_core_raw.per_assignment_supervisors_f.freeze_until_date
+  dt_effective_started:
+    description: Start date of the period for which this assignment record is valid.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.effective_start_date
+  dt_effective_ended:
+    description: End date of the period for which this assignment record is valid.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_supervisors_f.effective_end_date
   ts_created:
     description: Timestamp of when the record was created.
     lineage:
