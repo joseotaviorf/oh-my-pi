@@ -20,7 +20,7 @@ columns:
       Noturno: Doorman present only at night.
   key_location_history:
     lineage:
-      - datalake_ebdb_clean.access_authorization_type.name
+      - datalake_ebdb_listing.house_entrance_history.key_location
     description: Where the key is located in a certain week.
     categories:
       FrontDoor: Key is located at front door.
@@ -32,7 +32,7 @@ columns:
       Password: Password.
   key_type_history:
     lineage:
-      - datalake_ebdb_clean.key_type.name
+      - datalake_ebdb_listing.house_entrance_history.key_type
     description: What type of key is necessary to access the house in a certain week.
     categories:
       Biometry: Biometry
@@ -41,7 +41,7 @@ columns:
       Password: Password
   who_is_living_history:
     lineage:
-      - datalake_ebdb_clean.occupant_type.name
+      - datalake_ebdb_listing.house_entrance_history.occupant_type
     description: Who is living in this house listing in a certain week.
     categories:
       Tenant: 'The tenant is living in the house'
