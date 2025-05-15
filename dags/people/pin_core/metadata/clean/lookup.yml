@@ -3,20 +3,20 @@ database_name: datalake_pin_core_clean
 table_name: lookup
 owner: isabella.araujo@quintoandar.com.br
 domain: people
-description: Stores lookup codes and meanings.
+description: This table stores predefined values used to populate drop-down lists or control application behavior.
 columns:
-  id_organization:
-    description: System-generated unique identifier for the organization. Primary key.
+  id_application:
+    description: Identifier of the application that owns the lookup type.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.organization_id
-  id_business_group:
-    description: Identifier of the enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+      - datalake_pin_core_raw.hr_lookups.application_id
+  lookup_code:
+    description: Unique code identifying a lookup value within a lookup type.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.business_group_id
-  organization_code:
-    description: Code of the organization.
+      - datalake_pin_core_raw.hr_lookups.lookup_code
+  lookup_type:
+    description: Unique name identifying a set of related lookup values.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.organization_code
+      - datalake_pin_core_raw.hr_lookups.lookup_type
   created_by:
     description: User who created the row.
     lineage:
@@ -25,17 +25,37 @@ columns:
     description: User who last updated the row.
     lineage:
       - datalake_pin_core_raw.hr_lookups.last_updated_by
-  name:
-    description: Name of the lookup type.
+  lookup_description: 
+    description: Description of the lookup value.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.name
-  organization_scope:
-    description: Indicates if the organization is internal or external.
+      - datalake_pin_core_raw.hr_lookups.description
+  meaning: 
+    description: Short description or display name of the lookup value.
     lineage:
-      - datalake_pin_core_raw.hr_lookups.internal_external_flag
+      - datalake_pin_core_raw.hr_lookups.meaning
+  tag: 
+    description: Optional tag to categorize or group lookup values.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.tag
+  display_sequence: 
+    description: Number determining the display order of lookup values.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.display_sequence
+  is_enabled: 
+    description: Flag indicating if the lookup value is currently active.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.enabled_flag
     categories:
-      EXT: External organization.
-      INT: Internal organization.
+      true: Lookup value is active.
+      false: Lookup value is inactive.
+  dt_active_started:
+    description: Date and time when the lookup value becomes active.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.start_date_active
+  dt_active_ended:
+    description: Date and time when the lookup value becomes inactive.
+    lineage:
+      - datalake_pin_core_raw.hr_lookups.end_date_active
   ts_created:
     description: Timestamp of the creation of the row.
     lineage:
@@ -44,16 +64,8 @@ columns:
     description: Timestamp of the last update of the row.
     lineage:
       - datalake_pin_core_raw.hr_lookups.last_update_date
-  ts_effective_started:
-    description: Start date of the period for which this row is effective.
-    lineage:
-      - datalake_pin_core_raw.hr_lookups.effective_start_date
-  ts_effective_ended:
-    description: End date of the period for which this row is effective.
-    lineage:
-      - datalake_pin_core_raw.hr_lookups.effective_end_date
   ts_load:
-    description: Timestamp indicating when the data was loaded into this table.
+    description: Timestamp indicating when the record was loaded into the table.
   year:
     description: Year extracted from the 'ts_updated' column.
     lineage:
