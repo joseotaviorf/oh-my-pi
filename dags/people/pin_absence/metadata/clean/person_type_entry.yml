@@ -1,0 +1,95 @@
+---
+database_name: datalake_pin_absence_clean
+table_name: person_type_entry
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This table stores specific details related to different types of absences recorded for individuals. Each entry links an absence to its type and relevant contextual information.
+columns:
+  id_absence_type:
+    description: Foreign key referencing the 'anc_absence_types_b' table, specifying the category or nature of the absence (e.g., vacation, sick leave, maternity leave).
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.absence_type_id
+  id_assignment:
+    description: Foreign key linking to the 'per_all_assignments_m' table, identifying the specific work assignment of the person related to this absence type entry.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.assignment_id
+  id_person:
+    description: Foreign key representing the unique identifier of the person for whom this absence type entry is recorded.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.person_id
+  id_per_absence_entry:
+    description: Foreign key referencing the 'anc_per_abs_entries' table, linking this specific absence type entry to the overall absence record.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.per_absence_entry_id
+  id_per_abs_type_entry:
+    description: Primary key of this table, uniquely identifying each person absence type entry record.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.per_abs_type_entry_id
+  id_enterprise:
+    description: Foreign key linking to the 'hr_organization_units' table, indicating the enterprise or organizational unit associated with this absence type entry.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.enterprise_id
+  created_by:
+    description: Identifies the user who initially created this person absence type entry record.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.created_by
+  updated_by:
+    description: Identifies the user who last modified this person absence type entry record.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.last_updated_by
+  absence_status:
+    description: Indicates the current status of this specific absence type within the overall absence record (e.g., approved, pending, rejected).
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.absence_status
+  unit_of_measure:
+    description: Specifies the unit in which the absence duration for this type is measured (e.g., days, hours).
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.uom
+  leave_duration_days:
+    description: The duration of this specific leave type, expressed in days.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.leave_duration
+  object_version_number:
+    description: System-managed counter used for optimistic locking to prevent data loss from concurrent updates. This value increments each time the record is updated.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.object_version_number
+  dt_created:
+    description: The exact timestamp (date and time) when this person absence type entry record was created.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.creation_date
+  dt_updated:
+    description: The exact timestamp (date and time) when this person absence type entry record was last updated.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.last_update_date
+  dt_started:
+    description: The calendar date on which this specific absence type within the overall absence began.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.start_date
+  dt_ended:
+    description: The calendar date on which this specific absence type within the overall absence concluded.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.end_date
+  ts_started:
+    description: The exact timestamp (date and time) when this specific absence type within the overall absence began.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.start_datetime
+  ts_ended:
+    description: The exact timestamp (date and time) when this specific absence type within the overall absence concluded.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.end_datetime
+  ts_load:
+    description: The timestamp indicating when this specific record was loaded into the 'datalake_pin_absence_clean.person_type_entry' table.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.ts_load
+  year:
+    description: The year extracted from the 'dt_updated' column. Useful for filtering and partitioning data by year of last update.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.year
+  month:
+    description: The month extracted from the 'dt_updated' column (represented as a number from 1 to 12). Useful for filtering and partitioning data by month of last update.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.month
+  day:
+    description: The day of the month extracted from the 'dt_updated' column (represented as a number from 1 to 31). Useful for filtering data by specific day of last update.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_type_entries.day

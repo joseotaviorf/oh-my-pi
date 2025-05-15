@@ -1,0 +1,234 @@
+---
+database_name: datalake_pin_absence_clean
+table_name: person_entry
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This table contains detailed information about individual absence entries. It serves as a central repository for tracking and managing employee leaves and absences.
+columns:
+  id_absence_type:
+    description: Foreign key referencing the 'anc_absence_types_b' table, indicating the specific type of absence (e.g., vacation, sick leave).
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.absence_type_id
+  id_legal_entity:
+    description: Foreign key linking to the 'hro_legal_entities' table, identifying the legal entity associated with the absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.legal_entity_id
+  id_period_of_service:
+    description: Foreign key pointing to the 'per_periods_of_service' table, specifying the period of service for the employee related to this absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.period_of_service_id
+  id_person:
+    description: Foreign key referencing the 'per_all_people_f' table, uniquely identifying the employee who took the absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.person_id
+  id_per_absence_entry:
+    description: Primary key of this table, uniquely identifying each absence entry record.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.per_absence_entry_id
+  id_enterprise:
+    description: Foreign key linking to the 'hr_organization_units' table, indicating the enterprise or organizational unit of the employee.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.enterprise_id
+  id_legislative_data_group:
+    description: Foreign key referencing the 'fnd_ldgs_bs' table, specifying the legislative data group relevant to the absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.legislative_data_group_id
+  absence_pattern_code:
+    description: Code that categorizes the pattern of the absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.absence_pattern_cd
+  absence_status_code:
+    description: Code indicating the current status of the absence entry (e.g., submitted, approved, rejected).
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.absence_status_cd
+  approval_status_code:
+    description: Code detailing the approval status of the absence request.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.approval_status_cd
+  created_by:
+    description: Identifies the user who initially created this absence entry record.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.created_by
+  updated_by:
+    description: Identifies the user who last modified this absence entry record.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.last_updated_by
+  user_mode:
+    description: Specifies the user interface mode through which the absence was entered (e.g., employee self-service (emp), manager self-service (mgr), administrator (admin), approval workflow (approval)).
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.user_mode
+  approval_outcome:
+    description: Describes the final outcome of the absence approval process (e.g., approved, rejected, pending).
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.approval_outcome
+  abs_record_source:
+    description: Indicates the system or source from which the absence record originated.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.abs_record_source
+  comments:
+    description: Any free-text notes or comments related to the specific absence entry.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.comments
+  vacation_cash_out_request:
+    description: Numerical attribute used to store the value of any vacation cash-out requested as part of the absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.attribute_number2
+  period:
+    description: Textual attribute used to store information about a specific period related to the absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.attribute1
+  advance_13th_salary:
+    description: Textual attribute used to store details regarding any advance of the 13th salary associated with the absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.attribute2
+  medical_leave_code:
+    description: Textual attribute used to store a specific code related to a medical leave.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.attribute3
+  days_duration:
+    description: The total duration of the absence calculated in days.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.duration
+  object_version_number:
+    description: System-managed number used for optimistic locking to prevent data corruption from concurrent updates. This value increments with each update.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.object_version_number
+  is_overridden:
+    description: A boolean flag indicating whether the default absence timings have been manually adjusted or overridden.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.overridden
+    categories:
+      true: The default absence start and/or end times have been manually changed.
+      false: The default absence start and end times have not been manually changed.
+  is_absence_entry_basic:
+    description: A boolean flag that is 'Yes' if the absence entry is considered a basic or simplified type.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.absence_entry_basic_flag
+    categories:
+      true: The absence entry is a basic or simplified record.
+      false: The absence entry is not a basic or simplified record.
+  is_single_day:
+    description: A boolean flag indicating whether the absence spans only a single day.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.single_day_flag
+    categories:
+      true: The absence occurs on a single calendar day.
+      false: The absence spans more than one calendar day.
+  is_employee_shift:
+    description: A boolean flag indicating if the absence is specifically related to an employee's work shift.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.employee_shift_flag
+    categories:
+      true: The absence is directly linked to the employee's scheduled work shift.
+      false: The absence is not specifically related to the employee's work shift.
+  is_certification_auth:
+    description: A boolean flag indicating whether a certification or document is required and authorized for this absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.certification_auth_flag
+    categories:
+      true: A certification or document is required and has been authorized for this absence.
+      false: A certification or document is not required or has not been authorized for this absence.
+  is_initial_timely_notify:
+    description: A boolean flag indicating whether the initial notification of the absence was submitted within the required timeframe.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.initial_timely_notify_flag
+    categories:
+      true: The initial notification of the absence was submitted on time.
+      false: The initial notification of the absence was not submitted on time.
+  is_period_of_incap_to_work:
+    description: A boolean flag indicating if the absence is due to a period of incapacity to work (e.g., illness).
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.period_of_incap_to_work_flag
+    categories:
+      true: The absence is due to the employee's inability to work due to health reasons.
+      false: The absence is not related to a period of incapacity to work.
+  is_late_notify:
+    description: A boolean flag indicating whether the absence notification was submitted late.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.late_notify_flag
+    categories:
+      true: The notification of the absence was submitted after the required deadline.
+      false: The notification of the absence was submitted on time or early.
+  is_payroll_change:
+    description: A boolean flag indicating if this absence entry results in a change to the employee's payroll.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.payroll_chg_flag
+    categories:
+      true: This absence will trigger an adjustment in the employee's payroll.
+      false: This absence will not result in a change to the employee's payroll.
+  is_open_ended:
+    description: A boolean flag indicating whether the absence has a defined end date or is ongoing.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.open_ended_flag
+    categories:
+      true: The absence does not have a specific end date.
+      false: The absence has a determined end date.
+  is_ess_duration_update:
+    description: A flag indicating if the absence duration was automatically updated by the Employee Self-Service (ESS) Evaluate Absences process.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.ess_duration_update
+    categories:
+      true: The absence duration was updated by the ESS process.
+      false: The absence duration was not updated by the ESS process.
+  dt_period_started:
+    description: Date attribute storing the starting date of a relevant period associated with the absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.attribute1
+  dt_period_ended:
+    description: Date attribute storing the ending date of a relevant period associated with the absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.attribute1
+  dt_started:
+    description: The calendar date on which the absence began.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.start_date
+  dt_ended:
+    description: The calendar date on which the absence concluded.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.end_date
+  dt_submitted:
+    description: The date when the absence request was submitted.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.submitted_date
+  dt_notificated:
+    description: The date when the absence was officially notified or reported.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.notification_date
+  ts_created:
+    description: The exact timestamp (date and time) when this absence entry record was created.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.creation_date
+  ts_updated:
+    description: The exact timestamp (date and time) when this absence entry record was last updated.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.last_update_date
+  ts_approved:
+    description: The exact timestamp (date and time) when the absence request was approved.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.approval_datetime
+  ts_started:
+    description: The exact timestamp (date and time) when the absence began.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.start_datetime
+  ts_ended:
+    description: The exact timestamp (date and time) when the absence concluded.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.end_datetime
+  ts_submitted:
+    description: The exact timestamp (date and time) when the absence request or bid was submitted.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.submitted_datetime
+  ts_load:
+    description: The timestamp indicating when this specific record was loaded into the 'datalake_pin_absence_clean.person_entry' table.
+  year:
+    description: The year extracted from the 'ts_updated' column. This is useful for partitioning the data by year to improve query performance.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.year
+  month:
+    description: The month extracted from the 'ts_updated' column (represented as a number from 1 to 12). Useful for data partitioning and filtering by month.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.month
+  day:
+    description: The day of the month extracted from the 'ts_updated' column (represented as a number from 1 to 31). Useful for filtering data by specific days.
+    lineage:
+      - datalake_pin_absence_raw.anc_per_abs_entries.day

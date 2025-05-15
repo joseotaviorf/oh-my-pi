@@ -1,0 +1,69 @@
+---
+database_name: datalake_pin_absence_clean
+table_name: reason_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This table provides translations for absence reasons, supporting multilingual representation of absence descriptions.
+columns:
+  id_absence_reason:
+    description: Foreign key referencing the specific absence reason in the base table.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.absence_reason_id
+  id_enterprise:
+    description: Foreign key linking to the enterprise associated with this absence reason translation.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.enterprise_id
+  created_by:
+    description: Identifies the user who created this translation record.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.created_by
+  updated_by:
+    description: Identifies the user who last updated this translation record.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.last_updated_by
+  language:
+    description: The language code indicating the language of this translation (e.g., 'pt-BR' for Brazilian Portuguese, 'en' for English).
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.language
+  source_language:
+    description: The language code of the original text from which this translation was derived.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.source_lang
+  name:
+    description: The translated name or description of the absence reason in the specified language.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.name
+  object_version_number:
+    description: System-managed number for optimistic locking, ensuring data integrity during concurrent updates. This number increments with each update.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.object_version_number
+  dt_effective_started:
+    description: The start date of the period during which this translation is considered effective.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.effective_start_date
+  dt_effective_ended:
+    description: The end date of the period until which this translation is considered effective.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.effective_end_date
+  ts_created:
+    description: The timestamp (date and time) when this translation record was created.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.creation_date
+  ts_updated:
+    description: The timestamp (date and time) when this translation record was last updated.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.last_update_date
+  ts_load:
+    description: The timestamp indicating when this record was loaded into the 'datalake_pin_absence_clean.reason_translation' table.
+  year:
+    description: The year extracted from the 'ts_updated' column, useful for partitioning and filtering data based on the last update year.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.year
+  month:
+    description: The month extracted from the 'ts_updated' column (1-12), useful for partitioning and filtering data based on the last update month.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.month
+  day:
+    description: The day of the month extracted from the 'ts_updated' column (1-31), useful for filtering data based on the last update day.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f_tl.day

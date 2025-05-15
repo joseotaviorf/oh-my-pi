@@ -1,0 +1,81 @@
+---
+database_name: datalake_pin_absence_clean
+table_name: reason
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This base table stores core information about the different reasons for employee absences.
+columns:
+  id_absence_reason:
+    description: Primary key uniquely identifying each absence reason.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.absence_reason_id
+  id_enterprise:
+    description: Foreign key linking to the enterprise associated with this absence reason.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.enterprise_id
+  id_module:
+    description: Identifier of the module that owns this absence reason. This is relevant for seed data management within the application.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.module_id
+  legislation_code:
+    description: Code identifying the relevant legislation associated with this absence reason.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.legislation_code
+  management_type_code:
+    description: Code specifying the management type or category of this absence reason.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.management_type_cd
+  absence_reason_alternate_code:
+    description: An alternative code used to identify this absence reason, potentially for integration with other systems.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.anc_abs_reasons_f_altcd
+  status:
+    description: The current status of this absence reason (e.g., Active, Inactive).
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.status
+  base_name:
+    description: The fundamental or default name of this absence reason. Translations are stored in the 'reason_translation' table.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.base_name
+  created_by:
+    description: Identifies the user who initially created this absence reason record.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.created_by
+  updated_by:
+    description: Identifies the user who last updated this absence reason record.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.last_updated_by
+  object_version_number:
+    description: System-managed number used for optimistic locking to prevent data corruption during concurrent updates. This number increments with each update.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.object_version_number
+  ts_created:
+    description: The timestamp (date and time) when this absence reason record was created.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.creation_date
+  ts_updated:
+    description: The timestamp (date and time) when this absence reason record was last updated.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.last_update_date
+  dt_effective_started:
+    description: The start date of the period during which this absence reason is considered effective.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.effective_start_date
+  dt_effective_ended:
+    description: The end date of the period until which this absence reason is considered effective.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.effective_end_date
+  ts_load:
+    description: The timestamp indicating when this record was loaded into the 'datalake_pin_absence_clean.reason' table.
+  year:
+    description: The year extracted from the 'ts_updated' column, useful for partitioning and filtering data based on the last update year.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.year
+  month:
+    description: The month extracted from the 'ts_updated' column (1-12), useful for partitioning and filtering data based on the last update month.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.month
+  day:
+    description: The day of the month extracted from the 'ts_updated' column (1-31), useful for filtering data based on the last update day.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_reasons_f.day

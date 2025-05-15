@@ -1,0 +1,25 @@
+SELECT
+  absence_type_id AS id_absence_type,
+  assignment_id AS id_assignment,
+  person_id AS id_person,
+  per_absence_entry_id AS id_per_absence_entry,
+  per_abs_type_entry_id AS id_per_abs_type_entry,
+  enterprise_id AS id_enterprise,
+  created_by,
+  last_updated_by AS updated_by,
+  absence_status,
+  uom AS unit_of_measure,
+  CAST(leave_duration AS INT) AS leave_duration_days,
+  CAST(object_version_number AS INT) AS object_version_number,
+  TO_DATE(creation_date) AS dt_created,
+  TO_DATE(last_update_date) AS dt_updated,
+  TO_DATE(start_date) AS dt_started,
+  TO_DATE(end_date) AS dt_ended,
+  TO_TIMESTAMP(start_datetime) AS ts_started,
+  TO_TIMESTAMP(end_datetime) AS ts_ended,
+  NOW() AS ts_load,
+  year,
+  month,
+  day
+FROM
+  datalake_pin_absence_raw.anc_per_abs_type_entries

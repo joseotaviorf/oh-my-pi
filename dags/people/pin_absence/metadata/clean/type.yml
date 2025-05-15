@@ -1,0 +1,201 @@
+---
+database_name: datalake_pin_absence_clean
+table_name: type
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This base table stores comprehensive configuration data for different absence types.
+columns:
+  id_absence_type:
+    description: Primary key uniquely identifying each absence type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.absence_type_id
+  id_enterprise:
+    description: Foreign key linking to the specific enterprise to which this absence type belongs.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.enterprise_id
+  id_legislative_data_group:
+    description: Foreign key linking to the legislative data group relevant to this absence type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.legislative_data_group_id
+  id_absence_validation_formula:
+    description: Foreign key referencing the formula used to validate absence entries of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.absence_validation_formula_id
+  id_benefit_eligibility_profile:
+    description: Foreign key referencing the benefit eligibility profile associated with this absence type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.ben_elig_profile_id
+  absence_type_foreign_alternative_code:
+    description: An alternative code used to identify this absence type, potentially for external system integration.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.anc_absence_types_f_altcd
+  approval_routing_code:
+    description: Code defining the approval workflow or routing process for absences of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.approval_routing_cd
+  duration_unit_of_measure_code:
+    description: Code specifying the unit of measure for the duration of absences of this type (e.g., Days, Hours).
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.duration_uom_cd
+  legislation_code:
+    description: Code identifying the specific legislation applicable to this absence type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.legislation_code
+  linkage_reason_code:
+    description: Code specifying the reason for linking this absence type to other related absences or events.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.linkage_reason_cd
+  maximum_duration_rule_code:
+    description: Code defining the rule for the maximum permissible duration for this absence type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.max_duration_rule_cd
+  manager_allowed_updates_code:
+    description: Code indicating the level of updates managers are allowed to make to absences of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.mgr_allow_updates_cd
+  manager_lock_if_confirmed_code:
+    description: Code specifying whether absences of this type are locked for manager updates once confirmed.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.mgr_lock_if_confirm_cd
+  minimum_duration_rule_code:
+    description: Code defining the rule for the minimum permissible duration for this absence type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.min_duration_rule_cd
+  linkage_start_rule_code:
+    description: Code defining the rule for determining the start date when this absence type is linked to others.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.linkage_start_rule_cd
+  linkage_unit_of_measure_code:
+    description: Code specifying the unit of measure for the duration when this absence type is linked to others.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.linkage_uom_cd
+  management_type_code:
+    description: Code categorizing the overall management type of this absence.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.management_type_cd
+  pattern_code:
+    description: Code defining the pattern or recurrence of this absence type, if applicable.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.pattern_cd
+  agreement_flag:
+    description: Flag indicating if this absence type is subject to any specific agreements.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.agreement_flag
+  timecard_available_flag:
+    description: Flag indicating if this absence type is available for use in employee timecards.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.timecard_avail_flag
+  employee_allowed_updates_code:
+    description: Code indicating the level of updates employees are allowed to make to their absences of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.emp_allow_updates_cd
+  employee_lock_if_confirmed_code:
+    description: Code specifying whether absences of this type are locked for employee updates once confirmed.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.emp_lock_if_confirm_cd
+  administrator_allowed_updates_code:
+    description: Code indicating the level of updates administrators are allowed to make to absences of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.admin_allow_updates_cd
+  duration_calculation_basis:
+    description: Specifies the basis for calculating the duration of absences of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.dur_calc_basis
+  attach_type:
+    description: Code indicating the type of attachment allowed or required for this absence type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.attach_type
+  base_name:
+    description: The fundamental or default name of this absence type. Translations are stored in the 'type_translation' table.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.base_name
+  created_by:
+    description: Identifies the user who initially created this absence type record.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.created_by
+  updated_by:
+    description: Identifies the user who last updated this absence type record.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.last_updated_by
+  status:
+    description: The current status of this absence type (e.g., Active, Inactive).
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.status
+  has_linkage_rule_code:
+    description: Code indicating if a linkage rule is defined for this absence type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.linkage_rule_cd
+  has_open_ended_absence_evaluation:
+    description: Flag indicating whether open-ended absences of this type should be evaluated.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.incl_openend_abs_eval
+  is_timekeeper_available:
+    description: Flag indicating if this absence type is available for use by timekeepers.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.timekeeper_avail_flag
+  is_attachment_enabled_for_administrator:
+    description: Flag indicating if administrators can add attachments to absences of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.attach_admin_flag
+  is_attachment_enabled_for_employee:
+    description: Flag indicating if employees can add attachments to their absences of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.attach_emp_flag
+  is_attachment_enabled_for_manager:
+    description: Flag indicating if managers can add attachments to absences of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.attach_mgr_flag
+  is_bidding_enabled:
+    description: Flag indicating if this absence type is enabled for vacation bidding processes.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.bidding_enabled_flag
+  minimum_duration:
+    description: The minimum permissible duration for an absence of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.min_duration
+  maximum_duration:
+    description: The maximum permissible duration for an absence of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.max_duration
+  evaluation_extension_period:
+    description: The extension period used for evaluating open-ended absences of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.eval_extn_period
+  evaluation_period:
+    description: The standard period used for evaluating open-ended absences of this type.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.eval_period
+  object_version_number:
+    description: System-managed number for optimistic locking, incremented upon each update.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.object_version_number
+  ts_created:
+    description: The timestamp (date and time) when this absence type record was created.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.creation_date
+  ts_updated:
+    description: The timestamp (date and time) when this absence type record was last updated.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.last_update_date
+  dt_effective_started:
+    description: The date from which this absence type configuration is effective.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.effective_start_date
+  dt_effective_ended:
+    description: The date until which this absence type configuration is effective.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.effective_end_date
+  ts_load:
+    description: The timestamp indicating when this record was loaded into the 'datalake_pin_absence_clean.type' table.
+  year:
+    description: The year extracted from the 'ts_updated' column, useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.year
+  month:
+    description: The month extracted from the 'ts_updated' column (1-12), useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.month
+  day:
+    description: The day of the month extracted from the 'ts_updated' column (1-31), useful for partitioning and filtering.
+    lineage:
+      - datalake_pin_absence_raw.anc_absence_types_f.day
