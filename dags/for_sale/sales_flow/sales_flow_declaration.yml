@@ -90,6 +90,10 @@ workflow:
       clean_table_name: clause_message
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
+    clause_subject:
+      clean_table_name: clause_subject
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     closing_type:
       clean_table_name: closing_type
       raw_primary_keys: ["id"]
