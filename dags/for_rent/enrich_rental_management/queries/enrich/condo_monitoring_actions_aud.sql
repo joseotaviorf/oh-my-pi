@@ -47,8 +47,6 @@ ordered_cdc AS (
       (year = YEAR(DATE('{load_end_date}')) AND month < MONTH(DATE('{load_end_date}'))) OR
       (year = YEAR(DATE('{load_end_date}')) AND month = MONTH(DATE('{load_end_date}')) AND day <= DAY(DATE('{load_end_date}')))
     )
-    AND -- this will be removed, but for the first run we need this filter.
-      hour >= 23
 ),
 
 combined AS (
