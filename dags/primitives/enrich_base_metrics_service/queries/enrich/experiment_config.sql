@@ -76,7 +76,7 @@ FROM VALUES
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
-                                                    'experiment_metrics', ["search_ctr"]
+                                                    'experiment_metrics', array("search_ctr")
                                                 )
                                 )
         )
@@ -97,6 +97,7 @@ FROM VALUES
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
+                                                    'experiment_metrics', array()
                                                 )
                                 )
         )
@@ -117,6 +118,7 @@ FROM VALUES
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
+                                                    'experiment_metrics', array()
                                                 )
                                 )
         )
@@ -137,6 +139,7 @@ FROM VALUES
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
+                                                    'experiment_metrics', array()
                                                 )
                                 )
         )
@@ -157,6 +160,7 @@ FROM VALUES
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
+                                                    'experiment_metrics', array()
                                                 )
                                 )
         )
@@ -177,6 +181,7 @@ FROM VALUES
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
+                                                    'experiment_metrics', array()
                                                 )
                                 )
         )
@@ -197,6 +202,7 @@ FROM VALUES
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
+                                                    'experiment_metrics', array()
                                                 )
                                 )
         )
