@@ -5,10 +5,6 @@ owner: isabella.araujo@quintoandar.com.br
 domain: people
 description: This table stores predefined values used to populate drop-down lists or control application behavior.
 columns:
-  id_application:
-    description: Identifier of the application that owns the lookup type.
-    lineage:
-      - datalake_pin_core_raw.hr_lookups.application_id
   lookup_code:
     description: Unique code identifying a lookup value within a lookup type.
     lineage:

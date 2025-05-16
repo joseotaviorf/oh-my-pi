@@ -25,26 +25,6 @@ columns:
     description: Identifier of the assignment displayed on the dashboard.
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.assignment_id
-  id_talent_score_rating_level:
-    description: Identifier of the talent score rating level.
-    lineage:
-      - datalake_pin_hr_review_raw.hrr_dashboards.talent_score_rt_lvl_id
-  id_talent_score_rating_level_calibrated:
-    description: Identifier of the calibrated talent score rating level.
-    lineage:
-      - datalake_pin_hr_review_raw.hrr_dashboards.talent_scor_calb_rt_lvl_id
-  id_bu_leader_direct:
-    description: Identifier of the business unit leader's direct reports.
-    lineage:
-      - datalake_pin_hr_review_raw.hrr_dashboards.bu_leader_direct_id
-  id_performance_rating_level:
-    description: Identifier of the performance rating level.
-    lineage:
-      - datalake_pin_hr_review_raw.hrr_dashboards.perf_rt_lvl_id
-  id_performance_rating_level_calibrated:
-    description: Identifier of the calibrated performance rating level.
-    lineage:
-      - datalake_pin_hr_review_raw.hrr_dashboards.perf_calib_rt_lvl_id
   id_potential_rating_level:
     description: Identifier of the potential rating level.
     lineage:
@@ -61,14 +41,6 @@ columns:
     description: Identifier of the calibrated risk of loss rating level.
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.risk_loss_calib_rt_lvl_id
-  id_impact_loss_rating_level:
-    description: Identifier of the impact of loss rating level.
-    lineage:
-      - datalake_pin_hr_review_raw.hrr_dashboards.impact_loss_rt_lvl_id
-  id_impact_loss_rating_level_calibrated:
-    description: Identifier of the calibrated impact of loss rating level.
-    lineage:
-      - datalake_pin_hr_review_raw.hrr_dashboards.impact_loss_calb_rt_lvl_id
   id_criticality_rating_level:
     description: Identifier for criticality rating level.
     lineage:

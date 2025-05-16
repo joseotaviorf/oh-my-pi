@@ -1,5 +1,4 @@
 SELECT
-  application_id AS id_application,
   lookup_code,
   lookup_type,
   created_by,
