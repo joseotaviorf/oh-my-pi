@@ -2194,6 +2194,9 @@ bietlejuice.enrich_invoice:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
+bietlejuice.enrich_iptu:
+  - bietlejuice.iptu_bh:load-clean-iptu-bh
+  - bietlejuice.iptu_poa:load-clean-iptu-poa
 bietlejuice.enrich_jira:
   - bietlejuice.jira:load-clean-issues
 bietlejuice.enrich_kill_queue:

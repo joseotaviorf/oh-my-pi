@@ -1,0 +1,196 @@
+database_name: datalake_iptu
+table_name: iptu_poa
+description:
+  "This table contains the enriched data from the IPTU POA source. The data is enriched with information
+  from the POA IPTU source, which is a public database that provides information about properties in Porto
+  Alegre, Brazil. The data includes information about the property address, land area, built area, iptu value,
+  and other relevant information. Only some types of properties are included in this table, separating them into three
+  main categories: 'apartment', 'house', and 'unknown', where the 'unknown' category is used for properties that don't
+  have enough information to be classified as either an apartment or a house."
+domain: Growth
+owner: data-growth@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.id_house
+    description: |
+      "The synthetic ID created to distinguish the house within the POA IPTU source. This ID is a hash of the
+      address_zipcode, address_number, address_complement, unit_type, unit, floor, and level_type fields, and
+      it is created in the origin CLEAN table."
+  address_country_code:
+    description: |
+      "The country code of the property address, in this case, assumes the value 'BR' for Brazil."
+  address_state_code:
+    description: |
+      "The state code of the property address, in this case, assumes the value 'RS' for Rio Grande do Sul."
+  address_city:
+    description: |
+      "The city of the property address, in this case, assumes the value 'Porto Alegre'."
+  address_neighborhood:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.address_neighborhood
+    description: |
+      "The neighborhood of the property address."
+  address_street_name:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.address_street_name
+    description: |
+      "The street name linked to the transaction's zipcode."
+  address_number:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.address_number
+    description: |
+      "The number of the property address."
+  address_zipcode:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.address_zipcode
+    description: |
+      "The zipcode of the property address."
+  address_complement:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.address_complement
+    description: |
+      "The complement of the property address. It assumes NULL value if the house_type field is equal
+      to 'house' and has a unit_type value; if the house_type field is equal to 'house' and the complement
+      field doesn't have the 'casa' word; if the house_type field is equal to 'apartment' and the complement
+      field doesn't have any of these words: 'ap', 'apart', 'apartamento', 'apt', 'apto', 'bloc', 'bloco', 'torre',
+      otherwise, the complement field is kept as it is.""
+  address_reference:
+    description: |
+      "Assumes the value 'NULL' for all records."
+  address_latitude:
+    description: |
+      "Assumes the value 'NULL' for all records."
+  address_longitude:
+    description: |
+      "Assumes the value 'NULL' for all records."
+  unit_type:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.unit_type
+    description: |
+      "The type of unit for the property address. It can have NULL values."
+    categories:
+      ap: "apartamento"
+      ap/sl: "apartamento/sala"
+      box: "box"
+      casa: "casa"
+      conjunto: "conjunto"
+      deposito: "depósito"
+      garagem: "garagem"
+      interior: "interior"
+      lj: "loja"
+      qd/lt: "quadra/lote"
+      unidade: "unidade"
+      unidade privativa: "unidade privativa"
+  address_unit:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.unit
+    description: |
+      "The address unit, which is informing in case the house is an apartment, or a house with a unit identification."
+  address_building:
+    description: |
+      "Assumes the value 'NULL' for all records."
+  property_use_description:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.property_use_description
+    description: |
+      "Description of the property use."
+    categories:
+      exclusivamente residencial: "exclusivamente residencial"
+  property_purpose_description:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.property_purpose_description
+    description: |
+      "Description of the property purpose."
+    categories:
+      apart-hotel (flat): "apart-hotel (flat)"
+      apartamento: "apartamento"
+      apartamento de cobertura: "apartamento de cobertura"
+      residencia condom horiz aberto sem area uso comum: "residência condomínio horizontal aberto sem área uso comum"
+      residencia de frente com interiores: "residência de frente com interiores"
+      residencia de interior: "residência de interior"
+      residencia isolada: "residência isolada"
+      residencia nao padronizada cond horiz aberto c/ area uso comum: "residência não padronizada condomínio horizontal aberto c/ área uso comum"
+      residencia nao padroniz em condom horizontal fechado: "residência não padronizada em condomínio horizontal fechado"
+      residencia padronizada cond horiz aberto c/ area uso comum: "residência padronizada condomínio horizontal aberto c/ área uso comum"
+      residencia padronizada em cond horizontal fechado: "residência padronizada em condomínio horizontal fechado"
+  house_type:
+    description: |
+      "The house type classification based on the property_purpose_description and the unit_type fields."
+    categories:
+      apartment: |
+        "if the property_purpose_description is in these categories 'apartamento', 'apart-hotel (flat)',
+        'apartamento' and the unit_type is equal to 'casa' or is null."
+      house: |
+        "if the property_purpose_description is in these categories 'residência condomínio horizontal aberto sem área uso comum',
+        'residência de frente com interiores', 'residência de interior', 'residência isolada', 'residência não padronizada
+        condomínio horizontal aberto c/ área uso comum', 'residência não padronizada em condomínio horizontal fechado',
+        'residência padronizada condomínio horizontal aberto c/ área uso comum', 'residência padronizada em condomínio
+        horizontal fechado' and the unit_type is equal to 'casa' or is null."
+      unknown: |
+        "if the conditions for 'house" and "apartment" are not met."
+  floor:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.floor
+    description: |
+      "The property floor."
+  main_frontage_area_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.main_frontage_area_m2
+    description: |
+      "The main frontage area of the property in square meters."
+  land_area_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.land_area_m2
+    description: |
+      "The land area of the property in square meters."
+  built_area_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.built_area_m2
+    description: |
+      "The built area of the property in square meters."
+  taxable_area_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.taxable_area_m2
+    description: |
+      "The taxable area of the property in square meters."
+  taxable_land_value:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.taxable_land_value
+    description: |
+      "The taxable land value of the property in currency (land appraisal value)."
+  taxable_built_value:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.taxable_built_value
+    description: |
+      "The taxable built value of the property in currency (built appraisal value)."
+  taxable_property_value:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.taxable_property_value
+    description: |
+      "The taxable property value of the property in currency (house appraisal value)."
+  tax_rate:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.tax_rate
+    description: |
+      "The tax rate of the property."
+  iptu_value:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.iptu_value
+    description: |
+      "The value of the IPTU (Imposto sobre a Propriedade Predial e Territorial Urbana) in currency."
+  tcrs_value:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.tcrs_value
+    description: |
+      "The TCRS ('Taxa Coleta Resíduos Sólidos') value of the property in currency."
+  ts_load:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.dt_load
+    description: |
+      "The timestamp of when the IPTU POA data was ingested."
+  year:
+    lineage:
+      - datalake_iptu_clean.iptu_poa.year
+    description: |
+      "The year of the property registration. It is a partition column."

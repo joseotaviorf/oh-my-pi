@@ -1,0 +1,210 @@
+database_name: datalake_iptu
+table_name: iptu_bh
+description:
+  "This table contains the enriched data from the IPTU BH source. The data is enriched with information
+  from the BH IPTU source, which is a public database that provides information about properties in Belo Horizonte,
+  Brazil. The data includes information about the property address, land area, built area, iptu value, house_type,
+  and other relevant information. This table filters only the properties that are classified as common purpose use and
+  the use description is 'Proprio', which means that the property is for personal use, even though there are commercial
+  types of properties in this table, which can be seen in the house_type field."
+domain: Growth
+owner: data-growth@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.id_house
+    description: |
+      "Unique identier for the house. Represents the IPTU number."
+  address:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.address
+    description: |
+      "The address of the propertym which has all its fields concatenated by ' - '."
+  address_country_code:
+    description: |
+      "The country code of the property address, in this case, assumes the value 'BR' for Brazil."
+  address_state_code:
+    description: |
+      "The state code of the property address, in this case, assumes the value 'MG' for Minas Gerais."
+  address_city:
+    description: |
+      "The city of the property address, in this case, assumes the value 'Belo Horizonte'."
+  address_neighborhood:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.address
+    description: |
+      "The neighborhood of the property address."
+  address_street_name:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.address
+    description: |
+      "The street name linked to the transaction's zipcode."
+  address_number:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.address
+    description: |
+      "The number of the property address."
+  address_zipcode:
+    description: |
+      "The zipcode of the property address."
+  address_complement:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.address
+    description: |
+      "The complement of the property address. It assumes NULL value if the house_type field is equal to
+      'house' and the address_complement is equal to the address_neighborhood or the size of the address_complement
+      is equal to 1; otherwise, the address_complement field is kept as it is."
+  address_reference:
+    description: |
+      "Assumes the value 'NULL' for all records."
+  address_latitude:
+    description: |
+      "Assumes the value 'NULL' for all records."
+  address_longitude:
+    description: |
+      "Assumes the value 'NULL' for all records."
+  address_unit:
+    description: |
+      "Assumes the value 'NULL' for all records."
+  address_building:
+    description: |
+      "Assumes the value 'NULL' for all records."
+  property_use_description:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.property_use_description
+    description: |
+      "Description of the property use."
+    categories:
+      Proprio: |
+        "If the property use is 'Proprio'."
+  property_purpose_description:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.property_purpose_description
+    description: |
+      "Description of the property purpose."
+    categories:
+      Comum: |
+        "If the property purpose is 'Comum'."
+  house_type:
+    description: |
+      "The house type classification based on the address_complement field and address_neighborhood.
+      It classifies the property by following a hierarchical order, if the property is not commercial, then
+      it checks if it is a garage, and so on. The classification is as follows:"
+    categories:
+      commercial: |
+        "If the address_complement has the word 'comercial'."
+      garage: |
+        "If the address_complement has the word 'garage'."
+      store: |
+        "If the address_complement has the words 'loja' or 'slj'."
+      box: |
+        "If the address_complement has the word 'box'."
+      house: |
+        "If the address_complement has the word 'casa'; or the address_complement is equal to the address_neighborhood;
+        or the address_complement size is equal to 1; or the address_complement is null."
+      apartment: |
+        "If the address_complement has the words 'apt', 'ap', or 'apto'."
+      floor: |
+        "If the address_complement has the word 'andar'."
+      room: |
+        "If the address_complement has the word 'sala'."
+      block: |
+        "If the address_complement has the word 'quadra'."
+      suite: |
+        "If the address_complement has the word 'conj'."
+      floor level: |
+        "If the address_complement has the word 'pavmto'."
+      basement: |
+        "If the address_complement has the word 'subsl'."
+      unknown: |
+        "If none of the above categories are matched, it is classified as unknown."
+  land_area_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.land_area_m2
+    description: |
+      "The land area in square meters."
+  built_area_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.built_area_m2
+    description: |
+      "The built area in square meters."
+  land_value_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.land_value_m2
+    description: |
+      "The value of the land in currency."
+  built_value_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.built_value_m2
+    description: |
+      "The value of the built property in currency."
+  ideal_land_fraction_m2:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.ideal_land_fraction_m2
+    description: |
+      "The ideal land fraction in square meters."
+  ideal_land_fraction:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.ideal_land_fraction
+    description: |
+      "The ideal land fraction."
+  taxable_land_value:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.taxable_land_value
+    description: |
+      "The value of the taxable land in currency (land appraisal value)."
+  taxable_built_value:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.taxable_built_value
+    description: |
+      "The value of the taxable built property in currency (built appraisal value)."
+  taxable_property_value:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.taxable_property_value
+    description: |
+      "The value of the taxable property in currency (house appraisal value)."
+  transport_fee_value:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.transport_fee_value
+    description: |
+      "The value of the transport fee in currency."
+  fire_fee_value:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.fire_fee_value
+    description: |
+      "The value of the fire fee in currency."
+  street_lighting_fee_value:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.street_lighting_fee_value
+    description: |
+      "The value of the street lighting fee in currency."
+  special_discount:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.special_discount
+    description: |
+      "The value of the special discount in currency."
+  iptu_value:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.iptu_value
+    description: |
+      "The value of the IPTU (Imposto sobre a Propriedade Predial e Territorial Urbana) in currency."
+  tcrs_value:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.tcrs_value
+    description: |
+      "The value of the TCRS (Taxa Coleta de Resíduos Sólidos) in currency."
+  construction_year:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.construction_year
+    description: |
+      "The year when the property was constructed."
+  ts_load:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.dt_load
+    description: |
+      "The timestamp of when the IPTU BH data was ingested."
+  year:
+    lineage:
+      - datalake_iptu_clean.iptu_bh.year
+    description: |
+      "IPTU Transaction year. It is a partition column."

@@ -1,0 +1,29 @@
+dag:
+  name: enrich_iptu
+  owner: Data Growth
+  schedule_start_date: 2025, 05, 14
+  documentation:
+    dag_purpose: |
+      This DAG is responsible for preparing and enriching public IPTU data from the CLEAN layer,
+      including address normalization, entity classification (e.g., apartment vs. house), and
+      complement field treatment. It serves the enriched data for downstream consumption and analysis.
+workflow:
+  layer: enrich
+  type: query_delta
+  default_extraction_type: incremental
+  default_partitions: [year]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  tables_customization:
+    iptu_bh: {}
+    iptu_poa: {}
+
+cluster:
+  type: databricks_13_3_med_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
