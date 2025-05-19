@@ -1,0 +1,35 @@
+---
+database_name: datalake_docx_clean
+table_name: group
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: 'This table stores the data about a group (i.e group of tenants, owners, etc) and its activities.'
+columns:
+  id_group:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group.id
+  user_person_uuid:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group.user_person_uuid
+  type:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group.type
+  sub_type:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group.sub_type
+  is_active:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group.active
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group.created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group.updated_at

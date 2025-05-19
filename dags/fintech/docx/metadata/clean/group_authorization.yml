@@ -1,0 +1,67 @@
+---
+database_name: datalake_docx_clean
+table_name: group_authorization
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: 'This table stores all authorization details issued to a group.'
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.id
+  id_group:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.group_id
+  id_requestor:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.requestor_id
+  id_house:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.properties
+  type:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.type
+  status:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.status
+  requestor_type:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.requestor_type
+  rent_value:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.properties
+  package_value:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.properties
+  credit_result:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.properties
+  properties:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.properties
+  result:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.result
+  ts_created:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.created_at
+  ts_updated:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.updated_at
+  ts_expires:
+    description: ''
+    lineage:
+    - datalake_docx_raw.group_authorization.expires_at
