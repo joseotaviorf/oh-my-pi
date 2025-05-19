@@ -499,11 +499,6 @@ bietlejuice.enrich_recupera:
     - bietlejuice.recupera:load-clean-installment
     - bietlejuice.recupera:load-clean-installments-indicators
     - bietlejuice.recupera:load-clean-records-distributed-channels
-bietlejuice.enrich_rede_company_event:
-  add:
-    - bietlejuice.enrich_ebdb_work_contract:load-enrich-work-contract
-  remove:
-    - bietlejuice.enrich_hubspot:load-enrich-company
 bietlejuice.enrich_rede_lead_crawler:
   remove:
     - bietlejuice.growth_lab:load-clean-supply-recurrence

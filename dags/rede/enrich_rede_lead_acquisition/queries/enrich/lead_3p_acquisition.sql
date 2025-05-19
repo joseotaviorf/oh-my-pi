@@ -1,14 +1,14 @@
 WITH company_memberships AS (
-    SELECT
-        id_company,
-        business_context,
-        LAG(ts_event) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) IS NULL AS is_first_membership,
-        ts_event AS ts_membership_started,
-        LEAD(ts_event) OVER (PARTITION BY id_company, business_context ORDER BY ts_event) AS ts_next_membership_started
-    FROM
-        datalake_rede_company_event.company_event
-    WHERE
-        event = 'Membership Started'
+  SELECT
+    mu.id_hubspot AS id_company,
+    'SALE' AS business_context,
+    LAG(mu.ts_start) OVER (PARTITION BY mu.id_hubspot ORDER BY mu.ts_start) IS NULL AS is_first_membership,
+    mu.ts_start AS ts_membership_started,
+    LEAD(mu.ts_start) OVER (PARTITION BY mu.id_hubspot ORDER BY mu.ts_start) AS ts_next_membership_started
+  FROM
+    datalake_hubspot.membership_updates AS mu
+  WHERE
+    mu.hubspot_status = 'Membro'
 ),
 lead_publications AS (
     SELECT

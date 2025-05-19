@@ -1,7 +1,7 @@
 ---
 database_name: datalake_rede_lead_acquisition
 table_name: lead_3p_acquisition
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 domain: Rede
 description: Every row is a published lead + business context, and categorizes it as part of
   the HUNTING acquisition team or the FARMING acquisition team.
