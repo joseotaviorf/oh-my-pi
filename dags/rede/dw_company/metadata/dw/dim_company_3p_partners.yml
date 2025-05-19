@@ -1,5 +1,5 @@
 database_name: dw_public
-table_name: dim_company_rede_partners
+table_name: dim_company_3p_partners
 description: Table that describes all QuintoAndar's Rede Companies enriched HubSpot information.
 domain: Rede
 owner: vitor.musachio@quintoandar.com.br
@@ -75,7 +75,7 @@ columns:
   hubspot_company_name:
     lineage: 
       - datalake_hubspot.company_members.company_name
-    description: Company's name registered in Hubspot. This column was previously identified as extract_3p_tag.
+    description: Company's name registered in Hubspot.
   hubspot_crm:
     lineage: 
       - datalake_hubspot.company_members.hubspot_crm
@@ -88,6 +88,10 @@ columns:
     lineage: 
       - datalake_hubspot.company_members.sale_lead_status
     description: Company's status registered in Hubspot. Through this column we identify whether a real estate agency is a member or not. This column was previously identified as sale_lead_status.
+  hubspot_company_tag:
+    lineage:
+      - datalake_hubspot.company_members.extract_3p_tag
+    description: Company's tag name registered in Hubspot. This column was previously identified as extract_3p_tag.
   is_active_company_rede_partner:
     lineage: 
         - datalake_hubspot.company_members.sale_lead_status

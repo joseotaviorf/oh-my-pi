@@ -8,9 +8,9 @@ columns:
   sk_demand_funnel:
     lineage:
       - dw_sale.fact_sale_demand_event.ts_event
-      - dw_public.dim_company_rede_partners.hubspot_company_name
+      - dw_public.dim_company_3p_partners.hubspot_company_tag
       - dw_public.fact_company_events.event_update
-      - dw_public.dim_company_rede_partners.company_performance_cluster
+      - dw_public.dim_company_3p_partners.company_performance_cluster
       - dw_public.dim_person.id_user_email
       - dw_public.dim_person.city_name
       - dw_sale.dim_listing.is_high_ticket
@@ -28,12 +28,12 @@ columns:
     dimension: True
   company_name:
     lineage:
-      - dw_public.dim_company_rede_partners.company_name
+      - dw_public.dim_company_3p_partners.company_name
     description: Name of the Rede Company related to the supply event (1p if the supply is from QuintoAndar).
     dimension: True
-  hubspot_company_name:
+  hubspot_company_tag:
     lineage:
-      - dw_public.dim_company_rede_partners.hubspot_company_name
+      - dw_public.dim_company_3p_partners.hubspot_company_tag
     description: Hubspot name (extracted_3p_tag) of the Rede Company related to the supply event (1p if the supply is from QuintoAndar).
     dimension: True
   company_ops_cluster:
@@ -43,7 +43,7 @@ columns:
     dimension: True
   company_performance_cluster:
     lineage:
-      - dw_public.dim_company_rede_partners.event_update
+      - dw_public.dim_company_3p_partners.event_update
     description: Performance cluster classification of the Rede Company related to the supply event (1p if the supply is from QuintoAndar).
     dimension: True
   account_manager_user:

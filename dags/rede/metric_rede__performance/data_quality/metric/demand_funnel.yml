@@ -13,7 +13,7 @@ column_level_validations:
   company_name:
     is_complete:
       severity_level: Error
-  hubspot_company_name:
+  hubspot_company_tag:
     is_complete:
       severity_level: Error
   company_performance_cluster:

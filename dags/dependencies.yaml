@@ -3486,7 +3486,7 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-top-of-funnel-events
   - bietlejuice.dw_region:load-dw-public-dim-region
 bietlejuice.metric_rede__performance:
-  - bietlejuice.dw_company:load-dw-public-dim-company-rede-partners
+  - bietlejuice.dw_company:load-dw-public-dim-company-3p-partners
   - bietlejuice.dw_company:load-dw-public-fact-company-events
   - bietlejuice.dw_person:load-dw-public-dim-person
   - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p

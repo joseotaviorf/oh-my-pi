@@ -2,7 +2,7 @@ WITH ongoing_listings AS(
   SELECT
     dd.date,
     COALESCE(dc.company_name, '1P') AS company_name,
-    COALESCE(dc.hubspot_company_name, '1P') AS hubspot_company_name,
+    COALESCE(dc.hubspot_company_tag, '1P') AS hubspot_company_tag,
     COALESCE(cec.event_update, 'Unknown') AS company_ops_cluster,
     COALESCE(dc.company_performance_cluster, 'Unknown') AS company_performance_cluster,
     COALESCE(dp.id_user_email, 'Unknown') AS account_manager_user,
@@ -18,7 +18,7 @@ WITH ongoing_listings AS(
     dw_sale.dim_listing AS dl
       ON ol.sk_house = dl.sk_house
   LEFT JOIN
-    dw_public.dim_company_rede_partners AS dc
+    dw_public.dim_company_3p_partners AS dc
       ON dc.sk_company = ol.sk_company
   LEFT JOIN
     dw_public.fact_company_events AS cec
@@ -43,7 +43,7 @@ leads AS (
   SELECT
     DATE(dle.ts_created) AS dt_created,
     COALESCE(dc.company_name, '1P') AS company_name,
-    COALESCE(dc.hubspot_company_name, '1P') AS hubspot_company_name,
+    COALESCE(dc.hubspot_company_tag, '1P') AS hubspot_company_tag,
     COALESCE(cec.event_update, 'Unknown') AS company_ops_cluster,
     COALESCE(dc.company_performance_cluster, 'Unknown') AS company_performance_cluster,
     COALESCE(dp.id_user_email, 'Unknown') AS account_manager_user,
@@ -59,7 +59,7 @@ leads AS (
     dw_sale.dim_listing AS dl
       ON fl.sk_house = dl.sk_house
   LEFT JOIN
-    dw_public.dim_company_rede_partners AS dc
+    dw_public.dim_company_3p_partners AS dc
       ON dc.sk_company = fl.sk_company
   LEFT JOIN
     dw_public.fact_company_events AS cec
@@ -84,7 +84,7 @@ first_listing AS (
   SELECT
     DATE(dl.ts_first_publication) AS dt_first_publication,
     COALESCE(dc.company_name, '1P') AS company_name,
-    COALESCE(dc.hubspot_company_name, '1P') AS hubspot_company_name,
+    COALESCE(dc.hubspot_company_tag, '1P') AS hubspot_company_tag,
     COALESCE(cec.event_update, 'Unknown') AS company_ops_cluster,
     COALESCE(dc.company_performance_cluster, 'Unknown') AS company_performance_cluster,
     COALESCE(dp.id_user_email, 'Unknown') AS account_manager_user,
@@ -97,7 +97,7 @@ first_listing AS (
     dw_sale.fact_listings AS fl
       ON fl.sk_sale_listing = dl.sk_sale_listing
   LEFT JOIN
-    dw_public.dim_company_rede_partners AS dc
+    dw_public.dim_company_3p_partners AS dc
       ON dc.sk_company = fl.sk_company
   LEFT JOIN
     dw_public.fact_company_events AS cec
@@ -122,7 +122,7 @@ SELECT
   CRC32(
     CONCAT(
       CAST(DATE(de.ts_event) AS STRING),
-      '|', COALESCE(dc.hubspot_company_name, '1P'),
+      '|', COALESCE(dc.hubspot_company_tag, '1P'),
       '|', COALESCE(cec.event_update, 'Unknown'),
       '|', COALESCE(dc.company_performance_cluster, 'Unknown'),
       '|', COALESCE(dp.id_user_email, 'Unknown'),
@@ -133,7 +133,7 @@ SELECT
   DATE(de.ts_event) AS dt_date,
   DATE(DATE_TRUNC('WEEK', de.ts_event)) AS dt_week,
   COALESCE(dc.company_name, '1P') AS company_name,
-  COALESCE(dc.hubspot_company_name, '1P') AS hubspot_company_name,
+  COALESCE(dc.hubspot_company_tag, '1P') AS hubspot_company_tag,
   COALESCE(cec.event_update, 'Unknown') AS company_ops_cluster,
   COALESCE(dc.company_performance_cluster, 'Unknown') AS company_performance_cluster,
   COALESCE(dp.id_user_email, 'Unknown') AS account_manager_user,
@@ -164,7 +164,7 @@ LEFT JOIN
   dw_sale.dim_listing AS dl
     ON de.sk_house = dl.sk_house
 LEFT JOIN
-  dw_public.dim_company_rede_partners AS dc
+  dw_public.dim_company_3p_partners AS dc
     ON dc.sk_company = de.sk_company_supply
     AND de.sk_company_demand = '-1'
 LEFT JOIN
@@ -187,7 +187,7 @@ FULL OUTER JOIN
   ongoing_listings AS ol
     ON DATE(de.ts_event) = ol.date
     AND dc.company_name = ol.company_name
-    AND dc.hubspot_company_name = ol.hubspot_company_name
+    AND dc.hubspot_company_tag = ol.hubspot_company_tag
     AND cec.event_update = ol.company_ops_cluster
     AND dc.company_performance_cluster = ol.company_performance_cluster
     AND dp.id_user_email = ol.account_manager_user
@@ -197,7 +197,7 @@ FULL OUTER JOIN
   leads AS l
     ON DATE(de.ts_event) = l.dt_created
     AND dc.company_name = l.company_name
-    AND dc.hubspot_company_name = l.hubspot_company_name
+    AND dc.hubspot_company_tag = l.hubspot_company_tag
     AND cec.event_update = l.company_ops_cluster
     AND dc.company_performance_cluster = l.company_performance_cluster
     AND dp.id_user_email = l.account_manager_user
@@ -207,7 +207,7 @@ FULL OUTER JOIN
   first_listing AS fl
     ON DATE(de.ts_event) = fl.dt_first_publication
     AND dc.company_name = fl.company_name
-    AND dc.hubspot_company_name = fl.hubspot_company_name
+    AND dc.hubspot_company_tag = fl.hubspot_company_tag
     AND cec.event_update = fl.company_ops_cluster
     AND dc.company_performance_cluster = fl.company_performance_cluster
     AND dp.id_user_email = fl.account_manager_user

@@ -16,14 +16,17 @@ SELECT
   c.status AS company_status,
   c.trade_name AS company_trade_name,
   COALESCE(REGEXP_REPLACE(a.zip_code, '[^0-9]', ''), -1) AS company_zip_code,
-  COALESCE(cm.extracted_3p_tag, 'Unknown') AS hubspot_company_name,
+  COALESCE(cm.company_name, 'Unknown') AS hubspot_company_name,
   COALESCE(cm.crm, 'Unknown') AS hubspot_crm,
   COALESCE(cm.member_category, 'Unknown') AS hubspot_member_category,
   cm.sale_lead_status AS hubspot_status,
+  COALESCE(cm.extracted_3p_tag, 'Unknown') AS hubspot_company_tag,
   cm.sale_lead_status = 'Membro' AS is_active_company_rede_partner,
   cm.is_flagged_as_leadgen AS is_flagged_as_leadgen_in_hubspot,
   MAX(CASE WHEN mu.hubspot_status = 'Membro' THEN mu.ts_start ELSE NULL END) AS ts_membership_start,
-  MAX(CASE WHEN mu.hubspot_status = 'Membro' THEN mu.ts_end ELSE NULL END) AS ts_membership_end,
+  CASE
+    WHEN cm.sale_lead_status != 'Membro' THEN MAX(CASE WHEN mu.hubspot_status = 'Membro' THEN mu.ts_end ELSE NULL END)
+  END AS ts_membership_end,
   c.ts_created,
   c.ts_updated,
   NOW() AS ts_load
