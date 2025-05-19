@@ -945,7 +945,7 @@ wonka.house_rent_offer:
 
 wonka.house_rent_proposal:
   add:
-    - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
+    - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
     - bietlejuice.arquivo_confidencial:load-clean-rev-info
     - bietlejuice.sorting_hat:load-clean-proponent
     - bietlejuice.sorting_hat:load-clean-proposal

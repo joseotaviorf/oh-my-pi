@@ -1219,7 +1219,7 @@ bietlejuice.enrich_app_installed:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_arquivo_confidencial:
-  - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
+  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
 bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -1409,7 +1409,7 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.enrich_bureaus:
-  - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
+  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
   - bietlejuice.sorting_hat:load-clean-proponent
@@ -3960,7 +3960,7 @@ wonka.house_listing_business_context:
 wonka.house_rent_offer:
   - bietlejuice.ebdb_offer:load-clean-offer
 wonka.house_rent_proposal:
-  - bietlejuice.arquivo_confidencial:load-clean-integration-report-aud
+  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
