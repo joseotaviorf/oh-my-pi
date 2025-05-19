@@ -794,12 +794,21 @@ bietlejuice.reverse_atento_access:
     - bietlejuice.reverse_atento:load-reverse-tickets-transferred
     - bietlejuice.reverse_atento:load-reverse-tmr
     - bietlejuice.reverse_atento:load-reverse-twilio-chat-aht
+bietlejuice.reverse_birdie:
+  remove:
+  - bietlejuice.dw_chattermill:load-dw-chattermill-dim-answer-category
+  - bietlejuice.dw_chattermill:load-dw-chattermill-fact-answer-category
 bietlejuice.reverse_birdie_access:
   add:
     - bietlejuice.reverse_birdie:load-reverse-dsat-bot
     - bietlejuice.reverse_birdie:load-reverse-dsat-customer-relationship
     - bietlejuice.reverse_birdie:load-reverse-end-of-process
-    - bietlejuice.reverse_birdie:load-reverse-dsat-visitas
+    - bietlejuice.reverse_birdie:load-reverse-dsat-visits
+    - bietlejuice.reverse_birdie:load-reverse-new-surveys
+    - bietlejuice.reverse_birdie:load-reverse-lost
+    - bietlejuice.reverse_birdie:load-reverse-dsat-new-surveys
+    - bietlejuice.reverse_birdie:load-reverse-dsat-financing
+    - bietlejuice.reverse_birdie:load-reverse-dsat-diligence
 bietlejuice.reverse_dashboard_governance:
   add:
     - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata

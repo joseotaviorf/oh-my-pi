@@ -115,19 +115,19 @@ franchise_last_pre_analysis AS (
     tkt.channel = 'email' 
     AND tkt2.status IN ('closed', 'solved')
     AND de.department IN (
-     'WH - Financiamento Interno [SALE] [POS] FRONT]',
-'À Vista NM [SALE] [POS] [FRONT]',
-'Atendimento Reativo [SALE] [POS] [FRONT]',
-'Financiamento Externo [SALE] [POS] [FRONT]',
-'Financiamento Interno [SALE] [POS] [FRONT]',
-'Especialista N2 [SALE] [POS] [BACK]',
-'CRI Financiamento Interno [SALE] [POS] [FRONT]',
-'WH - À Vista [SALE] [POS] [FRONT]',
-'WH - Financiamento Externo [SALE] [POS] [FRONT]',
-'Closing Lab [RC]',
-'Incubadora-Front [EoP] [Forsale]',
-'WH - Híbridos [SALE] [POS] [FRONT]',
-'WH - Consórcio [SALE][POS][FRONT]'
+    'WH - Financiamento Interno [SALE] [POS] FRONT]',
+    'À Vista NM [SALE] [POS] [FRONT]',
+    'Atendimento Reativo [SALE] [POS] [FRONT]',
+    'Financiamento Externo [SALE] [POS] [FRONT]',
+    'Financiamento Interno [SALE] [POS] [FRONT]',
+    'Especialista N2 [SALE] [POS] [BACK]',
+    'CRI Financiamento Interno [SALE] [POS] [FRONT]',
+    'WH - À Vista [SALE] [POS] [FRONT]',
+    'WH - Financiamento Externo [SALE] [POS] [FRONT]',
+    'Closing Lab [RC]',
+    'Incubadora-Front [EoP] [Forsale]',
+    'WH - Híbridos [SALE] [POS] [FRONT]',
+    'WH - Consórcio [SALE][POS][FRONT]'
     )
 ), post_specialist AS (
   SELECT DISTINCT
