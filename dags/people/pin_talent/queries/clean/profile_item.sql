@@ -10,6 +10,7 @@ SELECT
   content_item_id AS id_content_item,
   created_by,
   last_updated_by AS updated_by,
+  source_type,
   item_text30_1 AS comments,
   source_key1 AS alternative_source_key_1,
   source_key2 AS alternative_source_key_2,

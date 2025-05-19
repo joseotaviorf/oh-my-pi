@@ -49,6 +49,15 @@ columns:
     description: User who last updated the row.
     lineage:
       - datalake_pin_talent_raw.hrt_profile_items.updated_by
+  source_type:
+    description: Source type of the profile item, indicating its origin.
+    lineage:
+      - datalake_pin_talent_raw.hrt_profile_items.source_type
+    categories:
+      HRA: Human Resources Application
+      HRTR: Human Resources Talent Review
+      HRRMGR: Human Resources Role Management
+      HRT: Human Resources Talent
   comments:
     description: Comments related to this profile item.
     lineage:
