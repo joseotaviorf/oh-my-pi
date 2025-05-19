@@ -1,22 +1,23 @@
 ---
 database_name: datalake_hr_system
 table_name: management_hierarchy
+description: "This table outlines the reporting structure within the organization, detailing the hierarchical relationships between employees and their managers. It specifies each employee's upward management chain and the degree of separation to each manager in that chain, based on historical assignment data."
 columns:
   id_assignment:
-    description: "id assignment of the employee"
+    description: "Unique identifier for the specific job assignment of the employee."
     lineage:
-      - datalake_hr_system.managers.id_assignment
+      - datalake_pin.managers_history.id_assignment
   id_period_of_service:
-    description: "id period of service of the employee"
+    description: "Unique identifier for the employee's distinct period of service associated with their job assignment."
     lineage:
-      - datalake_hr_system.managers.id_assignment
+      - datalake_pin.managers_history.id_period_of_service
   id_manager_assignment:
-    description: "id assignment of a person who is higher in hierarchy"
+    description: "Unique identifier for the period of service of a manager in the employee's upward reporting line, corresponding to their managerial assignment."
     lineage:
-      - datalake_hr_system.managers.id_manager_assignment
+      - datalake_pin.managers_history.id_manager_assignment
   id_manager_period_of_service:
-    description: "id period of service of a person who is higher in hierarchy"
+    description: "Id period of service of a person who is higher in hierarchy."
     lineage:
-      - datalake_hr_system.managers.id_period_of_service
+      - datalake_pin.managers_history.id_period_of_service
   separation_degree:
-    description: "distance between the employee and the manager"
+    description: "Indicates the number of hierarchical levels between the employee and the listed manager. For example, a value of '1' signifies a direct manager, '2' signifies the manager's manager, and so forth."
