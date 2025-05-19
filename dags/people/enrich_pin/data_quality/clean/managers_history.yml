@@ -1,0 +1,65 @@
+---
+table_name: datalake_pin.managers_history
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 14700
+    severity_level: Error
+column_level_validations:
+  id_assignment:
+      is_complete:
+        severity_level: Error
+  id_manager_assignment:
+      is_complete:
+        severity_level: Error
+  id_person:
+      is_complete:
+        severity_level: Error
+  id_manager:
+      is_complete:
+        severity_level: Error
+  id_period_of_service:
+      is_complete:
+        severity_level: Error
+  id_manager_period_of_service:
+      is_complete:
+        severity_level: Error
+  assignment_number:
+      is_complete:
+        severity_level: Error
+  manager_assignment_number:
+      is_complete:
+        severity_level: Error
+  employee_name:
+      is_complete:
+        severity_level: Error
+  manager_name:
+      is_complete:
+        severity_level: Error
+  created_by:
+      is_complete:
+        severity_level: Error
+  updated_by:
+      is_complete:
+        severity_level: Error
+  action_code:
+      is_complete:
+        severity_level: Error
+  reason_code:
+      is_complete:
+        severity_level: Error
+  dt_effective_started:
+      is_complete:
+        severity_level: Error
+  dt_effective_ended:
+      is_complete:
+        severity_level: Error
+  ts_created:
+      is_complete:
+        severity_level: Error
+  ts_updated:
+      is_complete:
+        severity_level: Error
+  ts_load:
+      is_complete:
+        severity_level: Error

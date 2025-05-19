@@ -2508,6 +2508,11 @@ bietlejuice.enrich_person:
   - bietlejuice.person:load-clean-person
   - bietlejuice.person:load-clean-preference-settings
   - bietlejuice.person:load-clean-right-to-be-forgotten
+bietlejuice.enrich_pin:
+  - bietlejuice.enrich_employee:load-enrich-employee-ids
+  - bietlejuice.pin_core:load-clean-all-assignments
+  - bietlejuice.pin_core:load-clean-assignment-supervisor
+  - bietlejuice.pin_core:load-clean-person-name
 bietlejuice.enrich_pixar:
   - bietlejuice.pixar:load-clean-account
   - bietlejuice.pixar:load-clean-charge

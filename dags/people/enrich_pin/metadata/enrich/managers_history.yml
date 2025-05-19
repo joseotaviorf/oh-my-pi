@@ -1,0 +1,81 @@
+---
+database_name: datalake_pin
+table_name: managers_history
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This table contains information about the reporting structure between employees and their line managers.
+columns:
+  id_assignment:
+    description: Foreign key referencing the assignment ID of the employee.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.id_assignment
+  id_manager_assignment:
+    description: Foreign key referencing the assignment ID of the line manager.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.id_manager_assignment
+  id_person:
+    description: Foreign key referencing the person ID of the employee.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.id_person
+  id_manager:
+    description: Foreign key referencing the person ID of the line manager.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.id_manager
+  id_period_of_service:
+    description: Foreign key referencing the period of service ID of the employee's assignment.
+    lineage:
+      - datalake_hr_system.employee_ids. id_period_of_service
+  id_manager_period_of_service:
+    description: Foreign key referencing the period of service ID of the line manager's assignment.
+    lineage:
+      - datalake_hr_system.employee_ids.id_period_of_service
+  assignment_number:
+    description: Unique code identifying the employee's assignment.
+    lineage:
+      - datalake_hr_system.employee_ids.assignment_number
+  manager_assignment_number:
+    description: Unique code identifying the line manager's assignment.
+    lineage:
+      - datalake_hr_system.employee_ids.assignment_number
+  employee_name:
+    description: Name of the employee.
+    lineage:
+      - datalake_pin_core_clean.person_name.display_name
+  manager_name:
+    description: Name of the line manager.
+    lineage:
+      - datalake_pin_core_clean.person_name.display_name
+  created_by:
+    description: User who created this record.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.created_by
+  updated_by:
+    description: User who last updated this record.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.updated_by
+  action_code:
+    description: Code indicating the action performed on this record.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.action_code
+  reason_code:
+    description: Code providing the reason for the action.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.reason_code
+  dt_effective_started:
+    description: Start date of the period for which this record is effective.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.dt_effective_started
+  dt_effective_ended:
+    description: End date of the period for which this record is effective.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.dt_effective_ended
+  ts_created:
+    description: Timestamp of the creation of this record.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.ts_created
+  ts_updated:
+    description: Timestamp of the last update to this record.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.ts_updated
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.
