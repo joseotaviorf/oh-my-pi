@@ -4,6 +4,7 @@ class DAGOwnerEnum:
     """
 
     DEFAULT_OWNER = "Data Engineering"
+    DATA_3P_PARTNERS = "Data 3P Partners"
     DATA_AGENTS = "Data Agents"
     DATA_AVAILABILITY = "Data Availability"
     DATA_BEDROCK = "Data Bedrock"
