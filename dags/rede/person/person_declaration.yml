@@ -1,7 +1,7 @@
 dag:
   name: person
   schedule_start_date: 2023, 1, 1
-  schedule_interval: 0 0 * * *
+  schedule_interval: 0 21 * * *
   owner: Data Rede
   documentation:
     dag_purpose: This DAG imports the tables from Person, a service that centralizes natural person data.
