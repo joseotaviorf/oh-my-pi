@@ -15,23 +15,23 @@ workflow:
     "end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
   inner_dependencies:
     recs_impressions:
-    - experiment_config
+      - experiment_config
     recs_impressions_processed:
-    - experiment_config_processed
-    - recs_impressions
-    - house_publication_dates
-    - rent_flow_past_30_days
-    - sale_flow_past_30_days
+      - experiment_config_processed
+      - recs_impressions
+      - house_publication_dates
+      - rent_flow_past_30_days
+      - sale_flow_past_30_days
     search_impressions:
-    - experiment_config_processed
-    - house_publication_dates
-    - rent_flow_past_30_days
-    - sale_flow_past_30_days
+      - experiment_config_processed
+      - house_publication_dates
+      - rent_flow_past_30_days
+      - sale_flow_past_30_days
     global_metrics:
-    - experiment_config
-    - search_impressions
+      - experiment_config
+      - search_impressions
     experiment_config_processed:
-    - experiment_config
+      - experiment_config
   tables_customization:
     recs_impressions:
       partitions:
@@ -40,26 +40,26 @@ workflow:
         - day
     recs_impressions_processed:
       partitions:
-      - year
-      - month
-      - day
+        - year
+        - month
+        - day
     search_impressions:
       partitions:
-      - year
-      - month
-      - day
+        - year
+        - month
+        - day
     global_metrics:
       partitions:
-      - year
-      - month
-      - day
+        - year
+        - month
+        - day
 
 cluster:
   type: custom_cluster
   custom_configurations:
     autotermination_minutes: 20
     driver_node_type_id: r5d.2xlarge
-    node_type_id: r5d.4xlarge
+    node_type_id: r5d.8xlarge
     runtime_engine: PHOTON
     spark_version: 12.2.x-scala2.12
     num_workers: 3
@@ -68,7 +68,7 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       ebs_volume_size: 200
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
   access_control_list:
     group_name: data-products
