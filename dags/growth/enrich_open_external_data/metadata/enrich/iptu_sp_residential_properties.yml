@@ -3,8 +3,8 @@ database_name: datalake_open_external_data
 table_name: iptu_sp_residential_properties
 description: |
   Table enriched with IPTU data from SP.
-domain: Rede
-owner: ae-rede@quintoandar.com.br
+domain: Growth
+owner: andre.melo@quintoandar.com.br
 columns:
   taxpayer_number:
     lineage:

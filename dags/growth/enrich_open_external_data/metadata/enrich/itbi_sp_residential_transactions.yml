@@ -6,8 +6,8 @@ description: |
   Only transaction nature of Compra e venda are considered, along with four different iptu standard description:
   COMERCIAL HORIZONTAL, COMERCIAL VERTICAL, RESIDENCIAL HORIZONTAL and RESIDENCIAL VERTICAL.
   This table is fully updated twice a month (15-30), since this is the period used to update the ITBI data.
-domain: Data Rede
-owner: ae-rede@quintoandar.com.br
+domain: Growth
+owner: andre.melo@quintoandar.com.br
 columns:
   id_itbi_transaction_source:
     description: Unique table key, created from the transaction extract file and the IPTU number.

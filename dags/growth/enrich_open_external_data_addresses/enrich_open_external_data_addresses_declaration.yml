@@ -1,6 +1,8 @@
 dag:
   name: enrich_open_external_data_addresses
-  owner: Data Rede
+  owner: Data Growth
+  documentation:
+      dag_purpose: 'This DAG is intended to generate the unique ITBI addresses to use QuintoAndars Geocoding solution.'
   schedule_start_date: 2020, 8, 29
   schedule_interval: 0 16 15,30 * *
 workflow:

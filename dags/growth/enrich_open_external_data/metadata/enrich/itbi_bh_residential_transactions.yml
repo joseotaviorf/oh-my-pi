@@ -4,8 +4,8 @@ description: |
   Table enriched with ITBI data from BH.
   Only Residencial transactions, starting from 2019 are considered.
   This table is fully updated twice a month (15-30), since this is the period used to update the ITBI data.
-domain: Data Rede
-owner: ae-rede@quintoandar.com.br
+domain: Growth
+owner: andre.melo@quintoandar.com.br
 columns:
   id_itbi_transaction_source:
     description: |

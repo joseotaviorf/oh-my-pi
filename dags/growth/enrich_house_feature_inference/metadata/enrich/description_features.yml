@@ -1,8 +1,8 @@
 ---
 database_name: datalake_house_feature_inference
 table_name: description_features
-owner: 'gustavo.miller@quintoandar.com.br'
-domain: Rede
+owner: andre.melo@quintoandar.com.br
+domain: Growth
 description: Infers features about the houses from the description.
 columns:
   id_house:

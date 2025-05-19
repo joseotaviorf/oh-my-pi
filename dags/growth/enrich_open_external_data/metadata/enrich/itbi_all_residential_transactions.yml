@@ -6,8 +6,8 @@ description: |
   This id_address_transaction is deduplicated in this table, to avoid cases where the same transaction appears
   into more than one source file.
   This table is fully updated twice a month (15-30), since this is the period used to update the ITBI data.
-domain: Data Rede
-owner: ae-rede@quintoandar.com.br
+domain: Growth
+owner: andre.melo@quintoandar.com.br
 columns:
   id_address_transaction:
     lineage:
