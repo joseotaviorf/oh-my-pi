@@ -33,7 +33,6 @@ def get_df(database_name, table_name, execution_date):
                     year={execution_date.year} 
                     AND month={execution_date.month} 
                     AND day={execution_date.day}
-                LIMIT 20
             """
         )
     
@@ -52,23 +51,24 @@ def create_feedbacks_results_payload(df, table_name):
     """
     search_mapping = {
                         'dsat_bot': 'csat',
-                        'dsat_visitas': 'csat',
+                        'dsat_visits': 'csat',
                         'dsat_customer_relationship':'csat',
-                        'dsat_novas_pesquisas':'csat',
-                        'dsat_diligencia': 'csat',
+                        'dsat_new_surveys':'csat',
+                        'dsat_financing': 'csat',
+                        'dsat_diligence': 'csat',
                         'onboarding': 'nps',
                         'ongoing':'nps',
                         'offboarding':'nps',
                         'lost': 'nps',
                         'pp_multi': 'nps',
-                        'novas_pesquisas':'nps',
+                        'new_surveys':'nps',
                         'end_of_process': 'nps'
                     }
     
     if search_mapping[table_name] == 'csat':
         campaign_title = "csat_campanha"
     else:
-        campaign_title = "nome_campanha"
+        campaign_title = "nps_campanha"
     
     # Create feedbacks
     nps_content = {row['feedback_id']: {k: v for k, v in row.asDict().items()} for row in df.collect()}

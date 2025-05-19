@@ -10,7 +10,7 @@ workflow:
   load_spark_job: load_into_birdie_api
   spark_job_arguments:
   - "{dag_name}" 
-  - "reverse_birdie" #database_name
+  - "reverse_birdie"
   - "{table_name}"
   - "{{ ds }}"
   tables_customization:
@@ -18,22 +18,27 @@ workflow:
       extra_spark_job_arguments:
       - "feedbacks"
       - "audience/accounts"
-      - "https://api.birdie.ai/ingestion" #api_url
+      - "https://api.birdie.ai/ingestion"
     dsat_customer_relationship:
       extra_spark_job_arguments:
       - "feedbacks"
       - "audience/accounts"
-      - "https://api.birdie.ai/ingestion" #api_url
-    dsat_visitas:
+      - "https://api.birdie.ai/ingestion"
+    dsat_visits:
       extra_spark_job_arguments:
       - "feedbacks"
       - "audience/accounts"
-      - "https://api.birdie.ai/ingestion" #api_url
+      - "https://api.birdie.ai/ingestion"
     end_of_process:
       extra_spark_job_arguments:
       - "feedbacks"
       - "audience/accounts"
-      - "https://api.birdie.ai/ingestion" #api_url
+      - "https://api.birdie.ai/ingestion" 
+    dsat_new_surveys:
+      extra_spark_job_arguments:
+      - "feedbacks"
+      - "audience/accounts"
+      - "https://api.birdie.ai/ingestion"
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
   databricks_conn_id: databricks_new
