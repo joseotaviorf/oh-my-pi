@@ -1,10 +1,8 @@
 database_name: dw_rede
 table_name: dim_file
-description: Files are sent from real estate agencies to Supply Processor containing
-  data that will be processed into one or more leads. This table has information about
-  the file, such as the name, status, or when it was sent.
+description: Files are sent from real estate agencies to Supply Processor containing data that will be processed into one or more leads. This table has information about the file, such as the name, status, or when it was sent.
 domain: Rede
-owner: gustavo.santos.dxt@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_file:
     lineage:

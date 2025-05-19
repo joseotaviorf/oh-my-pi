@@ -1,6 +1,8 @@
 dag:
   name: dw_rede_supply
   owner: Data Rede
+  documentation:
+    dag_purpose: This DAG creates the models for the supply side of Rede QuintoAndar, which is a marketplace.
 workflow:
   type: query_delta
   layer: dw

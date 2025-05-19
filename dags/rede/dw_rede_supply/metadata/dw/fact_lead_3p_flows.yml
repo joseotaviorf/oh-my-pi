@@ -1,13 +1,9 @@
 ---
 database_name: dw_rede
 table_name: fact_lead_3p_flows
-description: 'A Lead 3P is a property from a real estate agency in Rede QuintoAndar,
-  sent through Supply Processor. Each row of this table is a flow of a Lead 3P in a given context (SALE or RENT), with the dates
-  for the milestones in the funnel (lead, prospect, qualified, opportunity and first
-  listing). There are also foreign keys pointing to the context, company, file, lead, status,
-  and house (if it has been published). '
+description: A Lead 3P is a property from a real estate agency in Rede QuintoAndar, sent through Supply Processor. Each row of this table is a flow of a Lead 3P in a given context (SALE or RENT), with the dates for the milestones in the funnel (lead, prospect, qualified, opportunity and first listing). There are also foreign keys pointing to the context, company, file, lead, status, and house (if it has been published).
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_lead_3p_flow:
     lineage:

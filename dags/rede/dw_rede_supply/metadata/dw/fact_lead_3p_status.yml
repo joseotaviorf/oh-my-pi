@@ -3,7 +3,7 @@ database_name: dw_rede
 table_name: fact_lead_3p_status
 description: Each row in this table represents a change in the status of the lead 3P, in that given business context (SALE or RENT).
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_status_event:
     lineage:

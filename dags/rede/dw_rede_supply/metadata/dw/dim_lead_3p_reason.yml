@@ -1,9 +1,8 @@
 database_name: dw_rede
 table_name: dim_lead_3p_reason
-description: Dimension containing all possible reasons why a lead is not converted,
-  such as enrichment, ineligibility or discard. Each row is a reason.
+description: Dimension containing all possible reasons why a lead is not converted, such as enrichment, ineligibility or discard. Each row is a reason.
 domain: Rede
-owner: gustavo.santos.dxt@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_lead_3p_reason:
     lineage:

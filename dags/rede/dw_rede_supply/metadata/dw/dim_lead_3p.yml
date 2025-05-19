@@ -1,11 +1,9 @@
 ---
 database_name: dw_rede
 table_name: dim_lead_3p
-description: A Lead 3P is a property from a real estate agency in Rede QuintoAndar,
-  sent through Supply Processor. Each row of this table has descriptive data about
-  one unique lead.
+description: A Lead 3P is a property from a real estate agency in Rede QuintoAndar, sent through Supply Processor. Each row of this table has descriptive data about one unique lead.
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_lead_3p:
     lineage:

@@ -1,10 +1,8 @@
 database_name: dw_rede
 table_name: dim_lead_3p_status
-description: Junk dimension containing all possible combinations of status in a lead.
-  Each row is a combination of status, growth_status, is_waiting_for_enrichment, is_ineligible
-  and is_discarded.
+description: Junk dimension containing all possible combinations of status in a lead. Each row is a combination of status, growth_status, is_waiting_for_enrichment, is_ineligible and is_discarded.
 domain: Rede
-owner: gustavo.santos.dxt@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_lead_3p_status:
     lineage:

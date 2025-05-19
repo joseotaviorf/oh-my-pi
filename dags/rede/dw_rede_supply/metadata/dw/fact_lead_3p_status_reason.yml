@@ -1,10 +1,9 @@
 ---
 database_name: dw_rede
 table_name: fact_lead_3p_status_reason
-description: Each row in this table represents a reason why a certain lead is not
-  converted, associated with the lead in the given business context (SALE or RENT).
+description: Each row in this table represents a reason why a certain lead is not converted, associated with the lead in the given business context (SALE or RENT).
 domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_reason_event:
     description: Primary key of the table.
