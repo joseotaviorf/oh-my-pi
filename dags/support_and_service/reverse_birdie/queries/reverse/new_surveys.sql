@@ -397,8 +397,7 @@ final_ as (
       END AS text
 FROM final
 )
-select
-  nome_campanha AS nps_campanha,
+SELECT
   date_format(posted_at, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') AS posted_at,
   coalesce(date_format(ts_sale_agreement_signed, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\''), '') AS ts_sale_agreement_signed,
   feedback_id,
@@ -418,13 +417,27 @@ select
   payment_method,
   internal_vendors_flag,
   share_risco,
+  nome_campanha AS nps_campanha,
   MAX(city_group) AS city_group,
   country,
-  CASE WHEN text IS NULL THEN '' ELSE text 
-  END AS text,
+  CASE WHEN text IS NULL THEN '' ELSE text END AS text,
   year(posted_at) AS year,
   month(posted_at) AS month,
   day(posted_at) AS day,
   NOW() AS ts_load
-FROM final_
-GROUP BY 1,2,3,5,7,8,9,10,11,12,13,14,16,17
+from final_
+GROUP BY 
+  posted_at,
+  ts_sale_agreement_signed,
+  feedback_id,
+  sk_offer,
+  customer_type,
+  rating,
+  score_category,
+  financing_bank,
+  payment_method,
+  internal_vendors_flag,
+  share_risco,
+  nome_campanha,
+  country,
+  text

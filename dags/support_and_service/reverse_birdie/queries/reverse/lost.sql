@@ -74,7 +74,6 @@ SELECT
   case when nps.customer_type = 'IQ' then 'tenant' else 'landlord' end as customer_type,
   nps.score as rating, 
   nps.score_category,
-  --nps.comment,
   list.city_group,
  CAST(
     case 
