@@ -1,6 +1,6 @@
 ---
 database_name: datalake_house_listing_search_clean
-table_name: message
+table_name: search
 owner: brandell.ferreira@quintoandar.com.br
 domain: primitives
 description: "This table stores information about search requests that are done in the House Listing Search service"
