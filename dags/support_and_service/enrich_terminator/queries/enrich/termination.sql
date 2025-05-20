@@ -32,7 +32,7 @@ last_negociation AS (
         datalake_terminator_clean.termination_fee AS tf
             ON tf.id = tfn.id_termination_fee
     QUALIFY
-        RANK() OVER (PARTITION BY tfn.id_termination_fee ORDER BY tf.id DESC) = 1
+        ROW_NUMBER() OVER (PARTITION BY tf.id_termination ORDER BY tfn.ts_updated DESC) = 1
 ),
 contract_info AS (
     SELECT
@@ -55,15 +55,27 @@ contract_info AS (
             ON ctr.id_house = h.id
 ),
 terminations_modified AS (
-    SELECT
+    WITH changes AS (
+        SELECT
+            id,
+            dt_termination,
+            ts_updated,
+            LAG(dt_termination) OVER (
+                PARTITION BY id
+                ORDER BY rev
+            ) AS prev_dt_termination
+        FROM
+            datalake_terminator_clean.termination_aud
+        WHERE
+            rev_end IS NOT NULL
+    )
+    SELECT DISTINCT
         id,
-        LAST_VALUE(TO_DATE(ts_updated)) OVER (PARTITION BY id ORDER BY ts_updated ) AS dt_last_updated
+        TO_DATE(MAX(ts_updated) OVER (PARTITION BY id)) AS dt_last_updated
     FROM
-        datalake_terminator_clean.termination_aud
-    GROUP BY
-        1, ts_updated
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
+        changes
+    WHERE
+        dt_termination != COALESCE(prev_dt_termination, dt_termination)
 ),
 repair_metrics AS (
     SELECT
@@ -152,7 +164,7 @@ SELECT
     rm.repairs_absorbed_ac,
     rm.total_tentant_repair_ac,
     t.spoc_wave,
-    t.dt_termination,
+    t.dt_vacancy AS dt_termination,
     tm.dt_last_updated AS dt_last_rescheduled,
     t.ts_created AS ts_termination_request,
     t.ts_updated AS ts_termination_updated,

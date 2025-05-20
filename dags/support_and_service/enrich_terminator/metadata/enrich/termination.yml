@@ -178,7 +178,7 @@ columns:
   dt_termination:
     description: Date when the property became or will become vacant.
     lineage:
-      - datalake_terminator_clean.termination.dt_termination
+      - datalake_terminator_clean.termination.dt_vacancy
   dt_last_rescheduled:
     description: Date of last rescheduling of termination.
     lineage:
