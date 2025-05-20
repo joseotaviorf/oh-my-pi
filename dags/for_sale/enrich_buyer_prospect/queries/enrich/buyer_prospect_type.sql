@@ -33,7 +33,7 @@ WITH bp_status AS (
       ON bps.id_demand_prospect_conversion_event = ce.id_demand_prospect_conversion_event
   QUALIFY
     bps.ts_status_started = MIN(bps.ts_status_started) OVER (
-        PARTITION BY bps.id_buyer_prospect, bps.ts_status_ended
+        PARTITION BY bps.id_buyer_prospect, ts_activation_end
         ORDER BY bps.ts_status_started
       )
 )
