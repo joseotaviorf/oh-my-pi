@@ -12,7 +12,7 @@ column_level_validations:
     has_min_value:
       greater_than: 0
     has_max_value:
-      less_than: 8000
+      less_than: 9000
   city:
     is_complete:
       severity_level: Error
