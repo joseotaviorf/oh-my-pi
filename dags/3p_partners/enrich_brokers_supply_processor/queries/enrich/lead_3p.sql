@@ -28,22 +28,29 @@ lead_context AS (
         datalake_brokers_supply_processor.file AS f
             ON bcd.id_file = f.id
 ),
-company_membership AS (
+company_membership_start AS (
     SELECT
         cs.uuid_company,
-        MAX(CASE WHEN ce.event_update = 'Membro' THEN ce.ts_start ELSE NULL END) AS ts_membership_start,
-        MIN(lc.ts_batch_sent) AS ts_first_batch
+        MAX(CASE WHEN ce.event_update = 'Membro' THEN ce.ts_start ELSE NULL END) AS ts_membership_start
     FROM
         datalake_hubspot.company_events AS ce
     LEFT JOIN
         datalake_company.company_sks AS cs
             ON cs.sk_company = ce.sk_company
+    GROUP BY ALL
+),
+company_membership AS (
+    SELECT
+        cms.uuid_company,
+        cms.ts_membership_start,
+        MIN(lc.ts_batch_sent) AS ts_first_batch
+    FROM
+        company_membership_start AS cms
     LEFT JOIN
         lead_context AS lc
-            ON cs.uuid_company = lc.uuid_company
+            ON cms.uuid_company = lc.uuid_company
     WHERE
-        ce.event_type = 'Membership Update'
-            AND  lc.ts_batch_sent >= ce.ts_start
+        lc.ts_batch_sent >= cms.ts_membership_start
     GROUP BY ALL
 ),
 recurrency AS (
@@ -56,8 +63,8 @@ recurrency AS (
         CASE
             WHEN lc.ts_batch_sent IS NULL OR cm.ts_first_batch IS NULL THEN 'N/A'
             WHEN lc.ts_batch_sent = cm.ts_first_batch THEN 'FIRST_BATCH'
-            WHEN lc.ts_batch_sent < cm.ts_first_batch + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
-            WHEN lc.ts_captured < cm.ts_first_batch THEN 'COMPLEMENTARY'
+            WHEN lc.ts_batch_sent BETWEEN cm.ts_first_batch AND cm.ts_first_batch + INTERVAL 30 DAYS THEN 'FIRST_MONTH_BATCH'
+            WHEN lc.ts_batch_sent < cm.ts_first_batch THEN 'COMPLEMENTARY'
             ELSE 'RECURRENT'
         END AS recurrency_type
     FROM
