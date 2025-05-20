@@ -14,6 +14,8 @@ tests:
   - "/tests/**"
 
 ## Line labels
+data-3p-partners:
+  - "**/dags/3p_partners/**"
 data-bedrock:
   - "**/dags/bedrock/**"
 data-conversational-xp:
@@ -38,8 +40,6 @@ data-ingestion:
   - "**/bietlejuice/metastore_pipeline/**"
   - "**/bietlejuice/pipeline/**"
   - "**/dags/platform/**"
-data-rede:
-  - "**/dags/rede/**"
 data-primitives:
   - "**/dags/primitives/**"
 data-services-support:
