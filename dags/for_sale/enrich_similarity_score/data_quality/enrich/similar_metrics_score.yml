@@ -84,53 +84,48 @@ column_level_validations:
   score_lpv:
     is_complete:
       severity_level: Error
-    is_contained_in:
-      values:
-        - 1
-        - 2
-        - 3
-        - 4
-        - 5
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 5
+      severity_level: Error
   score_srpv:
     is_complete:
       severity_level: Error
-    is_contained_in:
-      values:
-        - 1
-        - 2
-        - 3
-        - 4
-        - 5
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 5
+      severity_level: Error
   score_vb:
     is_complete:
       severity_level: Error
-    is_contained_in:
-      values:
-        - 1
-        - 2
-        - 3
-        - 4
-        - 5
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 5
+      severity_level: Error
   score_os:
     is_complete:
       severity_level: Error
-    is_contained_in:
-      values:
-        - 1
-        - 2
-        - 3
-        - 4
-        - 5
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 5
+      severity_level: Error
   final_score:
     is_complete:
       severity_level: Error
-    is_contained_in:
-      values:
-        - 1
-        - 2
-        - 3
-        - 4
-        - 5
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 5
+      severity_level: Error
   dt_agg_started:
     is_complete:
       severity_level: Error
