@@ -18,7 +18,6 @@ bietlejuice.dw_accounting_funnel:
 bietlejuice.dw_accounts_receivable:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
-  - bietlejuice.dw_losses:load-dw-losses-fact-delay
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.enrich_retsuko:load-enrich-invoice
 bietlejuice.dw_affiliate_costs:
