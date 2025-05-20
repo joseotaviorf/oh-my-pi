@@ -33,8 +33,6 @@ WITH get_rent_houses AS (
         MAKE_DATE(hldi.year, hldi.month, hldi.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND hldi.status_history = 'PUBLISHED'
         AND DATEDIFF(DAY, DATE(sh.ts_last_publication), MAKE_DATE(hldi.year, hldi.month, hldi.day)) >= 1
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY hldi.id_house ORDER BY hldi.ts_status_started DESC, COALESCE(hldi.ts_status_ended, CURRENT_TIMESTAMP)) = 1
 ),
 get_rent_similar AS (
     SELECT

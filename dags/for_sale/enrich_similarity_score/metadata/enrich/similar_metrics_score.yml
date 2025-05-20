@@ -2,10 +2,10 @@ database_name: datalake_similarity_score
 table_name: similar_metrics_score
 owner: bruna.prates@quintoandar.com.br
 domain: For Sale
-description: Enrich table that contains a "base" house, its daily list of similar houses and the aggregated metrics of both
-      in a specific interval. A "base" house will only appear if it has been published for, at least, one day. For now, it
-      only includes For Rent houses. Each row of this table is a "base" house and its list of similar houses in a specific
-      business context and on a specific date.
+description: Enrich table that contains the daily view of a "base" house, its list of similar houses, the aggregated metrics
+      of both in a specific interval, the calculation of the score of each metric, the result and the final score. A "base"
+      house will only appear if it has been published for, at least, one day. For now, it only includes For Rent houses.
+      Each row of this table is a "base" house and its list of similar houses in a specific business context and on a specific date.
 columns:
     id:
       lineage:
@@ -51,6 +51,57 @@ columns:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
       description: Aggregation of offers sent to the similar houses for a specific range.
+    calculation_score_lpv:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+        - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+      description: The result of the calculation, according to score_calculation_rule, applied to listing page views metric.
+    calculation_score_srpv:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+        - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+      description: The result of the calculation, according to score_calculation_rule, applied to search results page views metric.
+    calculation_score_vb:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+        - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+      description: The result of the calculation, according to score_calculation_rule, applied to visits booked metric.
+    calculation_score_os:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+        - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+      description: The result of the calculation, according to score_calculation_rule, applied to offers sent metric.
+    score_lpv:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+        - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+      description: Score of the listing page views metric, which is classified as an integer between 1 (bad) and 5 (very good), according to the score_metric_rule.
+    score_srpv:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+        - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+      description: Score of the search results page views metric, which is classified as an integer between 1 (bad) and 5 (very good), according to the score_metric_rule.
+    score_vb:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+        - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+      description: Score of the visits booked metric, which is classified as an integer between 1 (bad) and 5 (very good), according to the score_metric_rule.
+    score_os:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+        - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+      description: Score of the offers sent metric, which is classified as an integer between 1 (bad) and 5 (very good), according to the score_metric_rule.
+    final_score:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+        - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+        - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+        - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+        - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+        - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+        - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+        - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+      description: The final score for the "base" house compared to its similar houses, which is classified as an integer between 1 (bad) and 5 (very good), according to the final_score_rule.
     business_context:
       lineage:
         - datalake_similarity_score.similar_houses.business_context
@@ -59,6 +110,12 @@ columns:
         RENT: The "base" house is published in the rental context.
     similar_metric_rule:
       description: Aggregation rule applied to metrics of similar houses.
+    score_calculation_rule:
+      description: Rule used to calculate the score for each of the metrics
+    score_metric_rule:
+      description: Rule used to classify the score of each of the metrics as an integer from 1 (bad) to 5 (very good).
+    final_score_rule:
+      description: Rule applied to the metrics' score to obtain the final score of the "base" house.
     dt_agg_started:
       lineage:
         - datalake_similarity_score.similar_houses.year

@@ -94,8 +94,44 @@ SELECT
     s.similar_srpv,
     s.similar_vb,
     s.similar_os,
+    ROUND((base_lpv + 1) / (similar_lpv + 1), 1) AS calculation_score_lpv,
+    ROUND((base_srpv + 1) / (similar_srpv + 1), 1) AS calculation_score_srpv,
+    ROUND((base_vb + 1) / (similar_vb + 1), 1) AS calculation_score_vb,
+    ROUND((base_os + 1) / (similar_os + 1), 1) AS calculation_score_os,
+    CASE
+        WHEN calculation_score_lpv >= 1.5 THEN 5
+        WHEN calculation_score_lpv >= 1.1 THEN 4
+        WHEN calculation_score_lpv <= 0.5 THEN 1
+        WHEN calculation_score_lpv <= 0.9 THEN 2
+        ELSE 3
+    END AS score_lpv,
+    CASE
+        WHEN calculation_score_srpv >= 1.5 THEN 5
+        WHEN calculation_score_srpv >= 1.1 THEN 4
+        WHEN calculation_score_srpv <= 0.5 THEN 1
+        WHEN calculation_score_srpv <= 0.9 THEN 2
+        ELSE 3
+    END AS score_srpv,
+    CASE
+        WHEN calculation_score_vb >= 1.5 THEN 5
+        WHEN calculation_score_vb >= 1.1 THEN 4
+        WHEN calculation_score_vb <= 0.5 THEN 1
+        WHEN calculation_score_vb <= 0.9 THEN 2
+        ELSE 3
+    END AS score_vb,
+    CASE
+        WHEN calculation_score_os >= 1.5 THEN 5
+        WHEN calculation_score_os >= 1.1 THEN 4
+        WHEN calculation_score_os <= 0.5 THEN 1
+        WHEN calculation_score_os <= 0.9 THEN 2
+        ELSE 3
+    END AS score_os,
+    ROUND((score_srpv * 2 + score_lpv * 3 + score_vb * 1 + score_os * 1) / 7) AS final_score,
     b.business_context,
     "Percentile at percentage 0.5" AS similar_metric_rule,
+    '(base_metric + 1)/(similar_metric + 1)' AS score_calculation_rule,
+    '5 IF calculation_score_* >= 1.5; 4 IF calculation_score_* >= 1.1; 1 IF calculation_score_* <= 0.5; 2 IF calculation_score_* <= 0.9; ELSE 3' AS score_metric_rule,
+    '(score_srpv*2 + score_lpv*3 + score_vb*1 + score_os*1) / 7 rounded' AS final_score_rule,
     b.dt_agg_started,
     b.dt_agg_ended,
     b.year,
