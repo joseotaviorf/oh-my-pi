@@ -94,6 +94,7 @@ if __name__ == "__main__":
             format_options,
             database_location,
             partitions=["year", "month", "day"],
+            force_recreate=False,
         )
     else:
         logger.warning(
