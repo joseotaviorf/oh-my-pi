@@ -2,44 +2,51 @@
 database_name: datalake_cdp_personas
 table_name: persona
 description:
-  This table consolidates personas from QuintoAndar (for now, tenant and owner), in a historical view.
-  Also, it groups owners based on active periods, with the initial timestamp indicating when the segmentation started
-  and the end timestamp related to when it finished.
+  This table consolidates personas from QuintoAndar (for now, tenant prospect, tenant and owner), in a historical view.
+  Also, it groups owners based on active periods (when applicable), with the initial timestamp indicating when the
+  segmentation started and the end timestamp related to when it finished.
   If an user appears more than once, it indicates that this user was active as a property owner/tenant for
-  a while, stopped being an owner/tenant and later came back to the platform.
+  a while, stopped being an owner/tenant and later came back to the platform. It does not apply for tenant prospect, as a 
+  rent flow "never dies".
 domain: Primitives
 owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_user:
-    description: The user id of the owner or tenant.
+    description: The user id of the persona.
       It may not be unique, as an user may be owner/tenant in our platform in different periods.
     lineage:
       - datalake_cdp_personas.tenant.id_user
+      - datalake_cdp_personas.tenant_prospect.id_user
       - datalake_cdp_personas.owner.id_user
   uuid_person:
     description: The UUID Person of the user.
     lineage:
       - datalake_cdp_personas.tenant.uuid_person
+      - datalake_cdp_personas.tenant_prospect.uuid_person
       - datalake_cdp_personas.owner.uuid_person
   persona:
     description: The persona type. 
     categories:
       TENANT: User is a tenant.
+      TENANT_PROSPECT: User is a tenant prospect.
       OWNER: User is an owner.
   is_active:
     description: Boolean flag indicating if the user is active or not as the persona.
     lineage:
       - datalake_cdp_personas.tenant.is_active
+      - datalake_cdp_personas.tenant_prospect.is_active
       - datalake_cdp_personas.owner.is_active
   ts_first_event:
     description: Timestamp of the first user event. 
     lineage:
       - datalake_cdp_personas.tenant.ts_first_event
+      - datalake_cdp_personas.tenant_prospect.ts_first_event
       - datalake_cdp_personas.owner.ts_first_event
   ts_last_event:
     description: Timestamp of the last user event.
     lineage:
       - datalake_cdp_personas.tenant.ts_last_event
+      - datalake_cdp_personas.tenant_prospect.ts_last_event
       - datalake_cdp_personas.owner.ts_last_event
   ts_load:
     description: Timestamp indicating when the data was loaded in the data lake.

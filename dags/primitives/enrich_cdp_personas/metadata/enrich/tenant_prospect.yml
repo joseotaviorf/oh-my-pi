@@ -1,0 +1,31 @@
+---
+database_name: datalake_cdp_personas
+table_name: tenant_prospect
+description:
+  This table consolidates all tenant prospects (users in the ForRent demand funnel) from QuintoAndar, in a historical view.
+  We don't group any user in active periods as a rent flow "never dies", so this table will consolidate the first and last
+  event of the tenant prospect on the ForRent demand funnel.
+domain: Primitives
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_user:
+    description: The user id of the tenant prospect.
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.id_tenant_prospect
+  uuid_person:
+    description: The UUID Person of the user.
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+  is_active:
+    description: Boolean flag indicating if the user is active or not as a tenant tenant prospect.
+      As a rent flow "never dies", it's always marked as null because we don't have a product view about it.
+  ts_first_event:
+    description: Timestamp of the first user event while as a tenant prospect. 
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+  ts_last_event:
+    description: Timestamp of the last user event while as a tenant prospect.
+    lineage:
+      - datalake_rent_demand_events.rent_demand_events.ts_event
+  ts_load:
+    description: Timestamp indicating when the data was loaded in the data lake.
