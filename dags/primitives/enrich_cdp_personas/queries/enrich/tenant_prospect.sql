@@ -1,7 +1,7 @@
 SELECT
     rde.id_tenant_prospect AS id_user,
     u.uuid_person,
-    NULL AS is_active,
+    CAST(NULL AS BOOLEAN) AS is_active,
     MIN(rde.ts_event) AS ts_first_event,
     MAX(rde.ts_event) AS ts_last_event,
     NOW() AS ts_load
