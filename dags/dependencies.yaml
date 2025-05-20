@@ -2497,6 +2497,27 @@ bietlejuice.enrich_opsgenie:
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
+bietlejuice.enrich_payments_platform:
+  - bietlejuice.checkout:load-clean-bolecode
+  - bietlejuice.checkout:load-clean-boleto
+  - bietlejuice.checkout:load-clean-boleto-webhook
+  - bietlejuice.checkout:load-clean-charge
+  - bietlejuice.checkout:load-clean-credit-card
+  - bietlejuice.checkout:load-clean-credit-card-capture-attempt
+  - bietlejuice.checkout:load-clean-order
+  - bietlejuice.checkout:load-clean-pix
+  - bietlejuice.checkout:load-clean-pix-webhook
+  - bietlejuice.checkout:load-clean-requester
+  - bietlejuice.vans:load-clean-boleto
+  - bietlejuice.vans:load-clean-boleto-file
+  - bietlejuice.vans:load-clean-file
+  - bietlejuice.wall_street:load-clean-charge
+  - bietlejuice.wall_street:load-clean-charge-aud
+  - bietlejuice.wall_street:load-clean-invoice
+  - bietlejuice.wall_street:load-clean-invoice-subscription-item
+  - bietlejuice.wall_street:load-clean-store
+  - bietlejuice.wall_street:load-clean-subscription
+  - bietlejuice.wall_street:load-clean-subscription-item
 bietlejuice.enrich_people_public:
   - bietlejuice.enrich_employee:load-enrich-employee-ids
   - bietlejuice.enrich_hr_system:load-enrich-assignments

@@ -1,0 +1,91 @@
+---
+dag:
+  name: enrich_payments_platform
+  schedule_start_date: 2023, 9, 10
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Enrich pipe for Payments Platform data.
+workflow:
+  type: query_delta
+  layer: enrich
+  tables_customization:
+    payment:
+      merge_on: ["id_business_key"]
+      z_order_by: ["id_business_key", "datasource"]
+      when_matched_update_condition: "target.id_payments IS NOT NULL"
+      when_not_matched_insert_condition: "target.id_payments IS NULL"
+      when_matched_operation: {
+        "id_charge": "source.id_charge",
+        "id_order": "source.id_order",
+        "id_contract": "source.id_contract",
+        "id_person": "source.id_person",
+        "id_invoice": "source.id_invoice",
+        "id_finance_entity": "source.id_finance_entity",
+        "id_requester": "source.id_requester",
+        "payment_status": "source.payment_status",
+        "successfull_method": "source.successfull_method",
+        "origin": "source.origin",
+        "datasource": "source.datasource",
+        "transaction_category": "source.transaction_category",
+        "requester_description": "source.requester_description",
+        "methods": "source.methods",
+        "status_reason": "source.status_reason",
+        "retry_reason": "source.retry_reason",
+        "installments": "source.installments",
+        "due_amount": "source.due_amount",
+        "installment_fee_amount": "source.installment_fee_amount",
+        "fine_amount": "source.fine_amount",
+        "method_created_to_paid_latency_seconds": "source.method_created_to_paid_latency_seconds",
+        "is_recurrence": "source.is_recurrence",
+        "has_retry": "source.has_retry",
+        "dt_due": "source.dt_due",
+        "ts_method_created": "source.ts_method_created",
+        "ts_method_paid": "source.ts_method_paid",
+        "ts_order_created": "source.ts_order_created",
+        "ts_charge_started_processing": "source.ts_charge_started_processing",
+        "ts_charge_paid": "source.ts_charge_paid",
+        "ts_charge_canceled": "source.ts_charge_canceled"
+      }
+      when_not_matched_operation: {
+        "id_payments": "source.id_payments",
+        "id_business_key": "source.id_business_key",
+        "id_charge": "source.id_charge",
+        "id_order": "source.id_order",
+        "id_contract": "source.id_contract",
+        "id_person": "source.id_person",
+        "id_invoice": "source.id_invoice",
+        "id_finance_entity": "source.id_finance_entity",
+        "id_requester": "source.id_requester",
+        "payment_status": "source.payment_status",
+        "successfull_method": "source.successfull_method",
+        "origin": "source.origin",
+        "datasource": "source.datasource",
+        "transaction_category": "source.transaction_category",
+        "requester_description": "source.requester_description",
+        "methods": "source.methods",
+        "status_reason": "source.status_reason",
+        "retry_reason": "source.retry_reason",
+        "installments": "source.installments",
+        "due_amount": "source.due_amount",
+        "installment_fee_amount": "source.installment_fee_amount",
+        "fine_amount": "source.fine_amount",
+        "method_created_to_paid_latency_seconds": "source.method_created_to_paid_latency_seconds",
+        "is_recurrence": "source.is_recurrence",
+        "has_retry": "source.has_retry",
+        "dt_due": "source.dt_due",
+        "ts_method_created": "source.ts_method_created",
+        "ts_method_paid": "source.ts_method_paid",
+        "ts_order_created": "source.ts_order_created",
+        "ts_charge_started_processing": "source.ts_charge_started_processing",
+        "ts_charge_paid": "source.ts_charge_paid",
+        "ts_charge_canceled": "source.ts_charge_canceled"
+      }
+cluster:
+  type: databricks_13_3_med_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"

@@ -1,0 +1,173 @@
+---
+database_name: datalake_payments_platform
+table_name: payment
+owner: ae-finance-fintech@quintoandar.com.br
+domain: platform
+columns:
+  id_payment:
+    description: Unique identifier for the payment record (generated using MONOTONICALLY_INCREASING_ID())
+  id_business_key:
+    description: Business key used to identify unique payment records across different sources
+    lineage:
+    - datalake_wall_street_clean.charge.id
+    - datalake_checkout_clean.charge.id
+    - datalake_vans_clean.boleto.id
+  id_charge:
+    description: Charge ID from either Wall Street or Checkout systems
+    lineage:
+    - datalake_wall_street_clean.charge.id
+    - datalake_checkout_clean.charge.id
+    - datalake_vans_clean.boleto.id
+  id_order:
+    description: Order ID from the Checkout system
+    lineage:
+    - datalake_checkout_clean.order.id
+  id_contract:
+    description: Business entity ID that represents the contract
+    lineage:
+    - datalake_wall_street_clean.charge.id_business_entity
+    - datalake_checkout_clean.order.id_business_entity
+  id_person:
+    description: Customer/User ID from either Wall Street or Checkout systems
+    lineage:
+    - datalake_wall_street_clean.charge.id_customer
+    - datalake_checkout_clean.order.id_user_external
+  id_invoice:
+    description: Invoice ID from Wall Street or finance entity ID from Checkout
+    lineage:
+    - datalake_wall_street_clean.invoice.id
+    - datalake_checkout_clean.order.id_finance_entity
+  id_finance_entity:
+    description: Finance entity ID that represents the payment
+    lineage:
+    - datalake_wall_street_clean.charge.id_finance_entity
+    - datalake_checkout_clean.order.id_finance_entity
+  id_requester:
+    description: ID of the system that requested the payment
+    lineage:
+    - datalake_checkout_clean.order.id_requester
+    - datalake_vans_clean.boleto.requested_by
+  id_last_payment_attempt_timeline:
+    description: ID of the last payment attempt timeline record
+  payment_status:
+    description: Current status of the payment
+    lineage:
+    - datalake_wall_street_clean.charge.charge_status
+    - datalake_checkout_clean.order.status
+    - datalake_vans_clean.boleto.status
+  successfull_method:
+    description: Payment method that was successfully used
+    lineage:
+    - datalake_checkout_clean.charge.payment_method
+    - datalake_vans_clean.boleto.status
+  origin:
+    description: Origin of the payment request
+  datasource:
+    description: Source system of the payment data
+  requester_description:
+    description: Name or description of the system that requested the payment
+    lineage:
+    - datalake_wall_street_clean.store.description
+    - datalake_checkout_clean.requester.name
+    - datalake_vans_clean.boleto.requested_by
+  methods:
+    description: Array of payment methods attempted
+    lineage:
+    - datalake_checkout_clean.charge.payment_method
+    - datalake_checkout_clean.charge.alternative_payment_methods
+    - datalake_vans_clean.boleto.status
+  status_reason:
+    description: Reason for the current payment status
+    lineage:
+    - datalake_wall_street_clean.charge.acquire_message
+    - datalake_checkout_clean.credit_card.cancellation_reason
+    - datalake_checkout_clean.boleto.write_down_reason
+    - datalake_checkout_clean.pix_webhook.error_message
+    - datalake_vans_clean.boleto.occurrence_reason
+  retry_reason:
+    description: Reason for payment retry if applicable
+  installments:
+    description: Number of installments for the payment
+    lineage:
+    - datalake_wall_street_clean.charge.installments
+    - datalake_checkout_clean.credit_card.installments
+  due_amount:
+    description: Total amount due for the payment
+    lineage:
+    - datalake_wall_street_clean.charge.amount
+    - datalake_checkout_clean.order.due_amount
+    - datalake_vans_clean.boleto.due_amount
+  installment_fee_amount:
+    description: Fee amount for installment payments
+    lineage:
+    - datalake_checkout_clean.credit_card.installment_fee_amount
+  fine_amount:
+    description: Fine amount applied to the payment
+    lineage:
+    - datalake_checkout_clean.credit_card.fine_amount
+    - datalake_vans_clean.boleto.fine_amount
+  method_created_to_paid_latency_seconds:
+    description: Time in seconds between payment method creation and payment completion
+    lineage:
+    - datalake_wall_street_clean.charge_aud.ts_updated
+    - datalake_wall_street_clean.charge.ts_paid
+    - datalake_checkout_clean.credit_card.ts_created
+    - datalake_checkout_clean.credit_card.ts_paid
+    - datalake_checkout_clean.boleto.ts_created
+    - datalake_checkout_clean.boleto.ts_paid
+    - datalake_checkout_clean.bolecode.ts_created
+    - datalake_checkout_clean.bolecode.ts_paid
+    - datalake_checkout_clean.pix.ts_created
+    - datalake_checkout_clean.pix.ts_paid
+  is_recurrence:
+    description: Flag indicating if the payment is part of a recurrence
+    lineage:
+    - datalake_wall_street_clean.store.id
+    - datalake_wall_street_clean.charge.id_store
+  has_retry:
+    description: Flag indicating if the payment has been retried
+  dt_due:
+    description: Due date for the payment
+    lineage:
+    - datalake_wall_street_clean.invoice.ts_due
+    - datalake_checkout_clean.order.dt_due
+    - datalake_vans_clean.boleto.dt_due
+  ts_method_created:
+    description: Timestamp when the payment method was created
+    lineage:
+    - datalake_wall_street_clean.charge_aud.ts_updated
+    - datalake_checkout_clean.credit_card.ts_created
+    - datalake_checkout_clean.boleto.ts_created
+    - datalake_checkout_clean.bolecode.ts_created
+    - datalake_checkout_clean.pix.ts_created
+    - datalake_vans_clean.boleto.ts_created
+  ts_method_paid:
+    description: Timestamp when the payment was completed
+    lineage:
+    - datalake_wall_street_clean.charge.ts_paid
+    - datalake_checkout_clean.credit_card.ts_paid
+    - datalake_checkout_clean.boleto.ts_paid
+    - datalake_checkout_clean.bolecode.ts_paid
+    - datalake_checkout_clean.pix.ts_paid
+    - datalake_vans_clean.boleto.dt_paid
+  ts_order_created:
+    description: Timestamp when the order was created
+    lineage:
+    - datalake_wall_street_clean.charge_aud.ts_updated
+    - datalake_checkout_clean.order.ts_created
+  ts_charge_started_processing:
+    description: Timestamp when the charge started processing
+    lineage:
+    - datalake_checkout_clean.charge.ts_started_processing
+  ts_charge_paid:
+    description: Timestamp when the charge was paid
+    lineage:
+    - datalake_wall_street_clean.charge.ts_paid
+    - datalake_checkout_clean.charge.ts_paid
+  ts_charge_canceled:
+    description: Timestamp when the charge was canceled
+    lineage:
+    - datalake_wall_street_clean.charge_aud.ts_updated
+    - datalake_checkout_clean.charge.ts_canceled
+  transaction_category:
+    description: Category of the payment transaction (hardcoded as 'PAYIN' for all payment types)
