@@ -28,7 +28,7 @@ columns:
     description: Country code.
   first_key_location:
     lineage:
-      - datalake_ebdb_clean.access_authorization_type.name
+      - datalake_ebdb_listing.house_entrance_history.key_location
     description: The first key location type of a house.
   house_key_location:
     lineage:
@@ -36,7 +36,7 @@ columns:
     description: The actual key location type of a house.
   last_key_location:
     lineage:
-      - datalake_ebdb_clean.access_authorization_type.name
+      - datalake_ebdb_listing.house_entrance_history.key_location
     description: The last key location type of a house.
   who_is_living:
     lineage:
@@ -60,7 +60,7 @@ columns:
     description: Flag to indicate if the key was delivered to another address.
   is_keys_with_agent_opt_in:
     lineage:
-      - datalake_ebdb_clean.access_type_aud.has_opted_keys_with_agent
+      - datalake_ebdb_listing.house_entrance_history.has_opted_keys_with_agent
     description: Flag to indicate if the key was with agent opt in.
   is_fss:
     description: Boolean indicating if the id_user is equal to id_user_registrant.
@@ -90,7 +90,7 @@ columns:
     description: Timestamp of when the status of the listings ended.
   ts_optin:
     lineage:
-      - datalake_ebdb_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
     description: Timestamp of when the owner has opted for keys with agent.
   ts_returned:
     lineage:

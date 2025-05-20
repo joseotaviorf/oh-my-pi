@@ -1,36 +1,29 @@
 WITH key_location_aud AS (
     SELECT
-        ata.id,
-        ata.id_house,
-        ata.rev AS key_location_rev,
-        aat.name AS access_type_name,
-        COALESCE(LAG(aat.name) OVER(PARTITION BY ata.id_house ORDER BY ata.rev), 'no information available') AS previous_access_type_name,
-        ata.additional_info AS comments,
-        ata.has_opted_keys_with_agent,
-        ata.mod_has_opted_keys_with_agent,
-        FROM_UNIXTIME(ure.ts_revision/1000) AS ts_revision,
-        ts_revision AS ts_revision_unix
+        id,
+        id_house,
+        key_location AS access_type_name,
+        mod_authorization,
+        entry_model_details AS comments,
+        has_opted_keys_with_agent,
+        mod_has_opted_keys_with_agent,
+        ts_entrance_started AS ts_revision,
+        1000*UNIX_TIMESTAMP(ts_entrance_started) AS ts_revision_unix
     FROM
-        datalake_ebdb_clean.access_type_aud ata
-    JOIN
-        datalake_ebdb_clean.access_authorization_type AS aat
-            ON ata.id_authorization = aat.id
-    JOIN
-        datalake_ebdb_clean.user_revision_entity AS ure
-            ON ata.rev = ure.id
+        datalake_ebdb_listing.house_entrance_history
 ),
 key_location_changes AS (
     SELECT
         id_house,
-        key_location_rev,
+        ts_revision,
         access_type_name,
-        MAX(key_location_rev) OVER(PARTITION BY id_house, DATE(ts_revision)) = key_location_rev AS is_last_status_of_day,
+        MAX(ts_revision) OVER(PARTITION BY id_house, DATE(ts_revision)) = ts_revision AS is_last_status_of_day,
         DATE(ts_revision) AS dt_key_location_started,
-        COALESCE(LEAD(DATE(ts_revision)) OVER(PARTITION BY id_house ORDER BY key_location_rev),'2100-01-01') AS dt_key_location_ended
+        COALESCE(LEAD(DATE(ts_revision)) OVER(PARTITION BY id_house ORDER BY ts_revision),'2100-01-01') AS dt_key_location_ended
     FROM
         key_location_aud
     WHERE
-        access_type_name <> previous_access_type_name
+        mod_authorization
 ),
 agent_aud AS (
     SELECT
@@ -55,7 +48,6 @@ merged_key_status AS (
         id,
         -1 AS id_agent,
         id_house,
-        key_location_rev AS rev,
         comments,
         'optin_context' AS query_context,
         CASE
@@ -71,10 +63,9 @@ merged_key_status AS (
         AND has_opted_keys_with_agent IS NOT NULL
     UNION
     SELECT
-        hakt.id,
+        MD5(CAST(hakt.id AS STRING)) AS id,
         hakt.id_agent,
         hakt.id_house,
-        hakt.rev,
         hakt.comments,
         'attributions_context' AS query_context,
         hakt.status,
@@ -88,11 +79,10 @@ merged_key_status AS (
 ),
 key_status_listings AS (
     SELECT
-        mks.id, 
+        mks.id,
         mks.id_agent,
         mks.id_house,
         dhl.id_house_listing,
-        mks.rev,
         mks.comments,
         mks.query_context,
         mks.status,
@@ -119,12 +109,12 @@ key_status_listings AS (
 -- keep closer listing
 keys_closer_listings AS (
     SELECT DISTINCT
-        FIRST_VALUE(id_agent, TRUE) OVER(PARTITION BY id_house_listing ORDER BY rev DESC) AS id_agent,
+        FIRST_VALUE(id_agent, TRUE) OVER(PARTITION BY id_house_listing ORDER BY ts_revision DESC) AS id_agent,
         id_house,  -- check if id_agent can be 0
         id_house_listing,
         comments,
         status,
-        ROW_NUMBER() OVER(PARTITION BY query_context, id, rev ORDER BY is_first_listing, min_diff_listing) AS row_n,
+        ROW_NUMBER() OVER(PARTITION BY query_context, id, ts_revision ORDER BY is_first_listing, min_diff_listing) AS row_n,
         ts_listing_version_start,
         ts_revision
     FROM
@@ -143,7 +133,7 @@ keys_attributions AS (
             CASE
                 WHEN status = 'OPT_IN' THEN TRUE
                 WHEN status = 'NO_OPT_IN' THEN FALSE
-            END 
+            END
         ) AS is_keys_with_agent_opt_in,
         MIN(IF(status = 'NOT_DELIVERED', ts_revision,NULL)) AS ts_attributed,
         MIN(IF(status = 'DELIVERED', ts_revision,NULL)) AS ts_delivered,
@@ -163,9 +153,9 @@ non_doorman_listing AS (
         hl.id_house_listing,
         hl.country_code,
         h.doorman_type,
-        FIRST_VALUE(klc.access_type_name) OVER (PARTITION BY hl.id_house_listing ORDER BY klc.key_location_rev) AS first_key_location,
+        FIRST_VALUE(klc.access_type_name) OVER (PARTITION BY hl.id_house_listing ORDER BY klc.ts_revision) AS first_key_location,
         h.key_location AS house_key_location,
-        LAST_VALUE(klc.access_type_name) OVER (PARTITION BY hl.id_house_listing ORDER BY klc.key_location_rev RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_key_location,
+        LAST_VALUE(klc.access_type_name) OVER (PARTITION BY hl.id_house_listing ORDER BY klc.ts_revision RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_key_location,
         h.occupant_type AS who_is_living,
         h.is_for_sale,
         IF(h.id_user = h.id_user_registrant, TRUE, FALSE) AS is_fss,
@@ -213,14 +203,14 @@ SELECT DISTINCT
     ka.is_keys_with_agent_opt_in,
     CASE
         WHEN ndl.is_keys_with_agent_eligible = TRUE THEN TRUE
-        WHEN ndl.house_key_location IN ('OwnerPresent','None') 
+        WHEN ndl.house_key_location IN ('OwnerPresent','None')
                 AND ndl.doorman_type IN ('NaoHaPorteiro', 'Noturno')
-                AND ndl.who_is_living = 'Empty' 
+                AND ndl.who_is_living = 'Empty'
                 AND ndl.is_for_sale = FALSE THEN TRUE
         ELSE FALSE
     END AS is_keys_with_agent_eligible,
     CASE
-        WHEN ndl.ts_contract_signed IS NOT NULL AND ka.has_keys_with_agent_delivered THEN (TO_UNIX_TIMESTAMP(ka.ts_returned) - TO_UNIX_TIMESTAMP(ndl.ts_contract_signed))/86400 <= 3 
+        WHEN ndl.ts_contract_signed IS NOT NULL AND ka.has_keys_with_agent_delivered THEN (TO_UNIX_TIMESTAMP(ka.ts_returned) - TO_UNIX_TIMESTAMP(ndl.ts_contract_signed))/86400 <= 3
     END AS is_returned_on_time,
     CAST(ka.ts_attributed AS TIMESTAMP) AS ts_attributed,
     CAST(ndl.ts_contract_signed AS TIMESTAMP) AS ts_contract_signed,
