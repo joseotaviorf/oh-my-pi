@@ -24,6 +24,15 @@ workflow:
     invoice_portfolio:
       extraction_type: full
       partitions: []
+    debt_negotiated:
+      extraction_type: full
+      partitions: []
+    installment:
+      extraction_type: full
+      partitions: []
+    negotiation:
+      extraction_type: full
+      partitions: []
 cluster:
   type: custom_cluster
   custom_configurations:
