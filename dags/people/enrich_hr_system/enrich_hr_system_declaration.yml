@@ -21,6 +21,8 @@ workflow:
   inner_dependencies:
     assignment_effective_status:
       - assignments
+    employee_ids:
+      - assignments
   default_extraction_type: full
   has_hive_sync: false
   bucket_config_name: people_bucket

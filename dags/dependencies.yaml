@@ -510,7 +510,6 @@ bietlejuice.dw_demand:
   - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results
   - bietlejuice.enrich_demand_conversion_events:load-enrich-top-of-funnel-results
 bietlejuice.dw_employee:
-  - bietlejuice.enrich_employee:load-enrich-employee-ids
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids
   - bietlejuice.enrich_hr_system:load-enrich-assignment-effective-status
   - bietlejuice.enrich_hr_system:load-enrich-assignments
@@ -1218,8 +1217,8 @@ bietlejuice.enrich_app_installed:
   - bietlejuice.amplitude:load-clean-events
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_arquivo_confidencial:
-  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
+  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
 bietlejuice.enrich_atlas_pricing_report:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
@@ -1408,9 +1407,9 @@ bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.enrich_bureaus:
-  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-presumed-income-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
+  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
   - bietlejuice.sorting_hat:load-clean-screening-result-version
@@ -1936,13 +1935,10 @@ bietlejuice.enrich_employee:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
   - bietlejuice.enrich_hr_system:load-enrich-disability
-  - bietlejuice.enrich_hr_system:load-enrich-employee-info
   - bietlejuice.enrich_hr_system:load-enrich-salary-metrics
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy
   - bietlejuice.hr_system:load-clean-salaries
-  - bietlejuice.hr_system:load-clean-workers
-  - bietlejuice.hr_system_custom:load-clean-workers-registration
 bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.batch_inference:load-clean-batch-inference
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues
@@ -2071,8 +2067,9 @@ bietlejuice.enrich_hr_system:
   - bietlejuice.awesomeapi_currency_rates:load-clean-currency-closing-rates
   - bietlejuice.hr_system:load-clean-salaries
   - bietlejuice.hr_system:load-clean-workers
+  - bietlejuice.hr_system_custom:load-clean-workers-registration
 bietlejuice.enrich_hr_system_custom:
-  - bietlejuice.enrich_hr_system:load-enrich-managers
+  - bietlejuice.enrich_pin:load-enrich-managers-history
 bietlejuice.enrich_hub_services:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.ebdb_user:load-clean-user-aud
@@ -2531,7 +2528,6 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.wall_street:load-clean-subscription
   - bietlejuice.wall_street:load-clean-subscription-item
 bietlejuice.enrich_people_public:
-  - bietlejuice.enrich_employee:load-enrich-employee-ids
   - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-managers
   - bietlejuice.gsheets_people:done-clean-position-class
@@ -2545,7 +2541,6 @@ bietlejuice.enrich_person:
   - bietlejuice.person:load-clean-preference-settings
   - bietlejuice.person:load-clean-right-to-be-forgotten
 bietlejuice.enrich_pin:
-  - bietlejuice.enrich_employee:load-enrich-employee-ids
   - bietlejuice.pin_core:load-clean-all-assignments
   - bietlejuice.pin_core:load-clean-assignment-supervisor
   - bietlejuice.pin_core:load-clean-person-name
@@ -2754,9 +2749,9 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_visit:load-enrich-visit-status-events
 bietlejuice.enrich_rental_management:
-  - bietlejuice.rental_management:load-clean-invoice
   - bietlejuice.rental_management:load-clean-condo-monitoring-actions
   - bietlejuice.rental_management:load-clean-condo-monitoring-eligibility
+  - bietlejuice.rental_management:load-clean-invoice
 bietlejuice.enrich_rental_transact:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.rental_transact:load-clean-offer
@@ -3474,7 +3469,6 @@ bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-rev-info
   - bietlejuice.wololo:load-clean-round
 bietlejuice.enrich_workable:
-  - bietlejuice.enrich_employee:load-enrich-employee-ids
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.hr_system:load-clean-organizations
@@ -3996,8 +3990,8 @@ wonka.house_listing_business_context:
 wonka.house_rent_offer:
   - bietlejuice.ebdb_offer:load-clean-offer
 wonka.house_rent_proposal:
-  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
+  - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
   - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-proposal
 wonka.house_rent_search_page_viewed:

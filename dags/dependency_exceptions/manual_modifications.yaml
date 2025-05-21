@@ -383,7 +383,7 @@ bietlejuice.enrich_health_metrics:
   override: []
 bietlejuice.enrich_hr_system_custom:
   add:
-    - bietlejuice.enrich_hr_system:load-enrich-managers
+    - bietlejuice.enrich_pin:load-enrich-managers-history
 bietlejuice.enrich_house_feature_inference:
   add:
     - bietlejuice.ebdb_house:load-clean-house

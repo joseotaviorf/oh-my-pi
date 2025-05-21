@@ -1,6 +1,7 @@
 dag:
   name: enrich_pin
   owner: Data People
+  schedule_start_date: 2025, 5, 20
   documentation:
     dag_purpose: This DAG brings enriched PIN data extracted from Oracle Integration Cloud. It will contain data such as Performance, Talent, position and leadership.
 workflow:
