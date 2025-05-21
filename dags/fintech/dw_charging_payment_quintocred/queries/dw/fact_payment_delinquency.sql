@@ -91,7 +91,8 @@ SELECT
   d.dt_paid AS dt_paid_delinquency,
   p.dt_created AS dt_created_payment,
   p.dt_due AS dt_due_payment,
-  p.dt_paid AS dt_paid_payment
+  p.dt_paid AS dt_paid_payment,
+  NOW() AS ts_load
 FROM
   base_payment p
 FULL OUTER JOIN 

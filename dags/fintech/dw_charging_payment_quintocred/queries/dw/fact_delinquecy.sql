@@ -159,7 +159,8 @@ SELECT
   is_active AS is_delinquency_active,
   is_overdue,
   dt_created,
-  dt_paid
+  dt_paid,
+  NOW() AS ts_load
 FROM 
   delinquency d
 LEFT JOIN 

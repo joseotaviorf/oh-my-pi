@@ -76,3 +76,5 @@ columns:
     description: ''
     lineage:
     - datalake_accounting_funnel.ledger
+  ts_load:
+    description: Timestamp of the load into datalake

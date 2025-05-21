@@ -80,7 +80,8 @@ SELECT
   DATE(p.dt_paid_payment) AS dt_paid_payment,
   p.dt_created_payment,
   p.dt_due_payment,
-  DATE(p.dt_paid_delinquency) AS dt_paid_delinquency
+  DATE(p.dt_paid_delinquency) AS dt_paid_delinquency,
+  NOW() AS ts_load
 FROM 
   dw_charging_payment_quintocred.fact_propose_timeline pl
 FULL OUTER JOIN 

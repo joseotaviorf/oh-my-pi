@@ -59,3 +59,5 @@ columns:
     description: ''
     lineage:
     - dw_velo.fact_velo_payment.dt_due
+  ts_load:
+    description: Timestamp of the load into datalake

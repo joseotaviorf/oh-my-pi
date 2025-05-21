@@ -444,3 +444,6 @@ dt_renewed:
   description: "Date when the renewal was completed"
   lineage:
     - dw_charging_payment_quintocred.fact_renewal_base.dt_renewed
+
+ts_load:
+  description: Timestamp of the load into datalake

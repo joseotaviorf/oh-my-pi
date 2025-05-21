@@ -55,3 +55,5 @@ columns:
     - datalake_rental_guarantee_platform_clean.bill.ts_created
   dt_due:
     description: ''
+  ts_load:
+    description: Timestamp of the load into datalake

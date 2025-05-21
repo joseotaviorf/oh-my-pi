@@ -65,3 +65,5 @@ columns:
     description: ''
     lineage:
     - dw_velo.fact_velo_propose.dt_contract_started
+  ts_load:
+    description: Timestamp of the load into datalake

@@ -296,3 +296,5 @@ columns:
     description: "SAP nf creation date"
     lineage:
       - dw_charging_payment_quintocred.fact_accounting_funnel.dt_sap_created
+  ts_load:
+    description: Timestamp of the load into datalake

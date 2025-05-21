@@ -264,7 +264,8 @@ SELECT
   DATE( dt_due ) < current_date() is_overdue,
   dt_paid,
   dt_created,
-  DATE( dt_due ) AS dt_due
+  DATE( dt_due ) AS dt_due,
+  NOW() AS ts_load
 FROM 
   base_payment_ajustada d
 WHERE 

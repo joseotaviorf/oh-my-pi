@@ -77,3 +77,5 @@ columns:
     description: ''
     lineage:
     - datalake_rental_guarantee_platform_clean.delinquency.dt_paid
+  ts_load:
+    description: Timestamp of the load into datalake

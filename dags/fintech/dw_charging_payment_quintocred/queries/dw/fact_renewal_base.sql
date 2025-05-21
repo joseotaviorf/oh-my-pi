@@ -520,7 +520,8 @@ SELECT
   dt_paid_link_partial,  
   dt_expected_day_renewal,  
   dt_contract_started,  
-  dt_ended_append
+  dt_ended_append,
+  NOW() AS ts_load
 FROM 
   renewal m
 FULL OUTER JOIN 

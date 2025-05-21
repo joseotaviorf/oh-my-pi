@@ -450,7 +450,8 @@ SELECT
   is_direct_billing,
   dt_contract_started,
   dt_ended,
-  dt_cancellation_limit
+  dt_cancellation_limit,
+  NOW() AS ts_load
 FROM
   base_propose_timeline
 WHERE

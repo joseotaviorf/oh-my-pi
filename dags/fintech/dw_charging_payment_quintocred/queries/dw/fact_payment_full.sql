@@ -641,7 +641,8 @@ SELECT DISTINCT
   m.dt_due_payment,
   m.dt_paid_payment,
   m.dt_paid_delinquency,
-  m.dt_sap_created
+  m.dt_sap_created,
+  NOW() AS ts_load
 FROM
   motivo_expandido m
 LEFT JOIN

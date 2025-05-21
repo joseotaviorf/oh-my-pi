@@ -253,6 +253,7 @@ SELECT
   dt_contract_started, 
   dt_paid_payment,  
   dt_due_payment,  
-  dt_renewed
+  dt_renewed,
+  NOW() AS ts_load
 FROM 
   dictionary_bussiness

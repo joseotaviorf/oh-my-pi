@@ -78,7 +78,8 @@ SELECT
     DATE( dt_due ) < current_date() AS is_overdue,
     dt_paid,
     dt_boleto_created AS dt_created,
-    dt_ref_boleto AS dt_due
+    dt_ref_boleto AS dt_due,
+    NOW() AS ts_load
 FROM
     cobranca_billing
 WHERE

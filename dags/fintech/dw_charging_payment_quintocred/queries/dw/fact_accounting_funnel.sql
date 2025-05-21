@@ -291,6 +291,7 @@ SELECT
     accrual_year_month_sap,
     dt_source_trigger,
     dt_sap_reference,
-    dt_sap_created
+    dt_sap_created,
+    NOW() AS ts_load
 FROM
     accounting_funnel_qc_final

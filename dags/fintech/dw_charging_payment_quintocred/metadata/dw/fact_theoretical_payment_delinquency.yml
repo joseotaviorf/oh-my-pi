@@ -215,3 +215,5 @@ columns:
     description: ''
     lineage:
     - dw_charging_payment_quintocred.fact_propose_timeline.dt_paid_delinquency
+  ts_load:
+    description: Timestamp of the load into datalake

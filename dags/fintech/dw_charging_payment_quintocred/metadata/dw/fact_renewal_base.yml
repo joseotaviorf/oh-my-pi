@@ -434,3 +434,6 @@ dt_ended_append:
   description: "End date for the append process of the renewal"
   lineage:
     - dw_collection_recovery_quintocred.fact_proposal_signature_payment_timeline.dt_ended
+
+ts_load:
+  description: Timestamp of the load into datalake
