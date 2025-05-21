@@ -71,6 +71,7 @@ workflow:
     rollout_cyber_contract: {}
     blocklist: {}
     comms: {}
+    segmentation_features: {}
 cluster:
   type: custom_cluster
   custom_configurations:

@@ -1,0 +1,101 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: segmentation_features
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Segmentation features calculated for Trato Feito contracts, used for modeling and collections analysis.
+columns:
+  id:
+    description: Unique identifier of the record.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.id
+  id_customer:
+    description: Customer identifier.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.customer_id
+  id_debtor:
+    description: Debtor identifier.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.debtor_id
+  id_contract:
+    description: Contract identifier.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.contract_id
+  customer_document:
+    description: Customer document (CPF/CNPJ).
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.customer_document
+  contract_status:
+    description: Current status of the contract.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.contract_status
+  is_blocked:
+    description: Indicates whether the contract is blocked.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.is_blocked
+  is_evic_active:
+    description: Indicates whether there is an active eviction process.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.is_evic_active
+  delay_contaminated_original_invoices:
+    description: Average delay of contaminated original invoices.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.delay_contaminated_original_invoices
+  delay_contaminated_deal_invoices:
+    description: Average delay of contaminated renegotiated invoices.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.delay_contaminated_deal_invoices
+  delay_contaminated_contract:
+    description: Average delay of the contract considering all contaminated invoices.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.delay_contaminated_contract
+  number_of_invoices_not_negativable:
+    description: Number of non-negativable invoices.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.number_of_invoices_not_negativable
+  number_of_monthly_invoices:
+    description: Number of monthly invoices in the contract.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.number_of_monthly_invoices
+  number_of_deals_installments:
+    description: Number of renegotiation installments (deals).
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.number_of_deals_installments
+  number_of_invoices_type_other:
+    description: Number of invoices of other types.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.number_of_invoices_type_other
+  number_of_overdue_monthly_invoices:
+    description: Number of overdue monthly invoices.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.number_of_overdue_monthly_invoices
+  number_of_overdue_deals_installments:
+    description: Number of overdue renegotiation installments.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.number_of_overdue_deals_installments
+  number_of_overdue_invoices_type_other:
+    description: Number of overdue invoices of other types.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.number_of_overdue_invoices_type_other
+  number_of_contract_has_deal_flag:
+    description: Indicates whether the contract has or had any renegotiation.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.number_of_contract_has_deal_flag
+  dt_contract_start:
+    description: Contract start date.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.contract_start_date
+  dt_contract_end:
+    description: Contract end date.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.contract_end_date
+  ts_created:
+    description: Record creation timestamp.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.created_at
+  ts_updated:
+    description: Last update timestamp of the record.
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.updated_at
+  ts_load:
+    description: Load timestamp of the table.
