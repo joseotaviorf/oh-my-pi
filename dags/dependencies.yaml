@@ -3707,7 +3707,6 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-dim-answer
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-answer
-  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker
   - bietlejuice.dw_velo_zendesk:load-dw-velo-dim-velo-ticket-users
@@ -3726,7 +3725,6 @@ bietlejuice.reverse_birdie:
   - bietlejuice.enrich_survicate:load-enrich-response-content
   - bietlejuice.enrich_survicate:load-enrich-survey-questions
   - bietlejuice.enrich_survicate:load-enrich-survey-responses
-  - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys
   - bietlejuice.help_center_api:load-clean-call-in-app-eligibility
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review
