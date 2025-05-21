@@ -16,7 +16,7 @@ columns:
   id_user:
     description: "The user identifier in external service"
     lineage:
-    - datalake_house_listing_search_raw.search.user_od
+    - datalake_house_listing_search_raw.search.user_id
   search_criteria:
     description: "The search request object used to retrieve the listings"
     lineage:
