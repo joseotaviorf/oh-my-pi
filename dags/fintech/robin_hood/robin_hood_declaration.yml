@@ -5,10 +5,11 @@ dag:
   documentation:
     dag_purpose: "This DAG creates the full tables for Robin Hood, a digital wallet that has two main features: users financial data management and management of payment requests."
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
   custom_schema: robin_hood
+  source_database: robinhood
   dbutils_secret_key: ROBIN_HOOD_DB
   lineage_product_database_name: robin_hood
   tables_customization:
@@ -26,7 +27,7 @@ cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
