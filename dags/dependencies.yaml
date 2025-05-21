@@ -2543,7 +2543,32 @@ bietlejuice.enrich_person:
 bietlejuice.enrich_pin:
   - bietlejuice.pin_core:load-clean-all-assignments
   - bietlejuice.pin_core:load-clean-assignment-supervisor
+  - bietlejuice.pin_core:load-clean-foundation-lookup-value
   - bietlejuice.pin_core:load-clean-person-name
+  - bietlejuice.pin_performance:load-clean-evaluation
+  - bietlejuice.pin_performance:load-clean-evaluation-item
+  - bietlejuice.pin_performance:load-clean-evaluation-participant
+  - bietlejuice.pin_performance:load-clean-evaluation-rating
+  - bietlejuice.pin_performance:load-clean-evaluation-role
+  - bietlejuice.pin_performance:load-clean-evaluation-section
+  - bietlejuice.pin_performance:load-clean-evaluation-step
+  - bietlejuice.pin_performance:load-clean-role-definition-translation
+  - bietlejuice.pin_performance:load-clean-task-role-base
+  - bietlejuice.pin_performance:load-clean-task-role-translation
+  - bietlejuice.pin_performance:load-clean-template-definition-base
+  - bietlejuice.pin_performance:load-clean-template-definition-translation
+  - bietlejuice.pin_performance:load-clean-template-period-translation
+  - bietlejuice.pin_performance:load-clean-template-role
+  - bietlejuice.pin_performance:load-clean-template-section
+  - bietlejuice.pin_questionnaires:load-clean-question-response
+  - bietlejuice.pin_questionnaires:load-clean-questionnaire-participant
+  - bietlejuice.pin_questionnaires:load-clean-questionnaire-response
+  - bietlejuice.pin_talent:load-clean-rating-level-base
+  - bietlejuice.pin_talent:load-clean-rating-level-translation
+  - bietlejuice.pin_talent:load-clean-rating-model-base
+  - bietlejuice.pin_talent:load-clean-rating-model-translation
+  - bietlejuice.pin_talent:load-clean-review-period-base
+  - bietlejuice.pin_talent:load-clean-review-period-translation
 bietlejuice.enrich_pixar:
   - bietlejuice.pixar:load-clean-account
   - bietlejuice.pixar:load-clean-charge

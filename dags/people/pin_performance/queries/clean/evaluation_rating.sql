@@ -9,6 +9,7 @@ SELECT
     role_type_code AS role_type,
     created_by,
     last_updated_by AS updated_by,
+    CAST(calculated_rating AS INT) AS calculated_rating,
     CAST(object_version_number AS INT) AS object_version_number,
     CAST(creation_date AS TIMESTAMP) AS ts_created,
     CAST(last_update_date AS TIMESTAMP) AS ts_updated,

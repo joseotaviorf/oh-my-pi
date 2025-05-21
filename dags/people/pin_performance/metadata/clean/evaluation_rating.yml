@@ -48,6 +48,10 @@ columns:
     description: User (email or system username) who last updated this record.
     lineage:
       - datalake_pin_performance_raw.hra_eval_ratings.updated_by
+  calculated_rating:
+    description: Calculated rating value based on the rating scale.
+    lineage:
+      - datalake_pin_performance_raw.hra_eval_ratings.calculated_rating
   object_version_number:
     description: Counter for optimistic locking, incremented on each update to detect concurrent modifications.
     lineage:

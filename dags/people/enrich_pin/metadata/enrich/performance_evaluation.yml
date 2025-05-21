@@ -1,0 +1,202 @@
+---
+database_name: datalake_pin
+table_name: performance_evaluation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  Consolidated table containing detailed information about the latest employee performance evaluations
+  (where the 'Share Performance Document' step is not cancelled). Includes context, participants,
+  roles, steps, ratings, and relevant dates.
+columns:
+  id_person:
+    description: 'Identifier for the employee being evaluated.'
+    lineage:
+      - datalake_hr_system.employee_ids.id_person
+  id_evaluation:
+    description: 'Identifier for the performance evaluation instance (latest for the person).'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.id_evaluation
+  id_template_definition:
+    description: 'Identifier for the definition of the performance evaluation template used.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.id_template_definition
+  id_template_period:
+    description: 'Identifier for the period associated with the evaluation template.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.id_template_period
+  id_process_flow:
+    description: 'Identifier for the process flow associated with the evaluation template.'
+    lineage:
+      - datalake_pin_performance_clean.template_definition_base.id_process_flow
+  id_review_period:
+    description: 'Identifier for the review period in which the evaluation occurs.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.id_review_period
+  id_eval_participant:
+    description: 'Unique identifier for a participant in the evaluation process (e.g., evaluator, peer).'
+    lineage:
+      - datalake_pin_performance_clean.evaluation_participant.id_eval_participant
+  id_person_evaluator:
+    description: 'Unique identifier for the person acting as the evaluator.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation_participant.id_person
+  id_evaluation_role:
+    description: 'Identifier for the role of the evaluator in this specific evaluation.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation_participant.id_eval_role
+  id_evaluation_step:
+    description: 'Identifier for the specific step in the evaluation process assigned to the evaluator.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation_step.id_evaluation_step
+  id_person_completed_step:
+    description: 'Identifier of the person who completed the evaluator step.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation_step.id_person_completed_step
+  id_process_task_role:
+    description: 'Identifier for the process task role associated with the evaluator step.'
+    lineage:
+      - datalake_pin_performance_clean.task_role_base.id_process_task_role
+  person_number:
+    description: 'Unique personnel number of the employee being evaluated.'
+    lineage:
+      - datalake_hr_system.employee_ids.person_number
+  review_period_name:
+    description: 'Name of the review period.'
+    lineage:
+      - datalake_pin_talent_clean.review_period_translation.review_period_name
+  document_template_name:
+    description: 'Customary name of the performance document template.'
+    lineage:
+      - datalake_pin_performance_clean.template_period_translation.customary_name
+  document_status_code:
+    description: 'Status code of the performance evaluation document (latest evaluation, not cancelled).'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.status_code
+    categories:
+      COMP: "Completed"
+      AVAILABLE_FOR_REVIEW: "Available for Review"
+  review_period_status_code:
+    description: 'Status code of the review period.'
+    lineage:
+      - datalake_pin_talent_clean.review_period_base.status_code
+    categories:
+      A: "Active"
+      I: "Inactive"
+  evaluator_name:
+    description: 'Full name of the evaluator.'
+    lineage:
+      - datalake_hr_system.employee_ids.full_name
+  evaluator_role_code:
+    description: 'Code indicating the role type of the evaluator.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation_participant.role_type_code
+  evaluator_participation_status_code:
+    description: 'Code indicating the participation status of the evaluator.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation_participant.participation_status_code
+    categories:
+      COMP: "Completed"
+      AWAITING_REPLY: "Awaiting Reply"
+      INPROG: "In Progress"
+      REQUEST_NOT_SENT: "Request Not Sent"
+  evaluator_participation_status_meaning:
+    description: 'Textual meaning of the evaluator participation status code, from lookup HRA_PARTICIPATION_STATUS.'
+    lineage:
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
+  evaluator_step_code:
+    description: 'Code for the specific evaluation step for which the evaluator is responsible.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation_step.step_code
+    categories:
+      MNG_PCPN_FEEDBACK: "Manager Participant Feedback"
+      MGREVAL: "Manager Evaluation"
+      WSEVAL: "Worker Self-Evaluation"
+      SHRPDOC: "Share Performance Document"
+  evaluator_step_status_meaning:
+    description: 'Textual meaning of the evaluator step status, from lookup HRA_EVAL_STEP_STATUS.'
+    lineage:
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
+  evaluator_step_task_name:
+    description: >
+      Name of the task associated with the evaluator step.
+      If the evaluator role is 'PARTICIPANT', this is 'Participant Evaluation';
+      otherwise, it's the translated manager task name.
+    lineage:
+      - datalake_pin_performance_clean.task_role_translation.translated_manager_task_name
+      - datalake_pin_performance_clean.evaluation_participant.role_type_code
+  peer_role_name:
+    description: 'Name of the peer role in the evaluation.'
+    lineage:
+      - datalake_pin_performance_clean.role_definition_translation.name
+  open_feedback:
+    description: 'Free text answer provided in a questionnaire response, if applicable.'
+    lineage:
+      - datalake_pin_questionnaires_clean.question_response.free_text_answer_unlimited
+  impact_rating_description:
+    description: >
+      Textual description of the impact rating assigned.
+      Derived from sections typically named "Impacto" or "Impacto - CEO"
+      (the latter if template name contains "CEO" and evaluator is Manager).
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+  leadership_rating_description:
+    description: >
+      Textual description of the leadership rating assigned.
+      Derived from sections typically named "Liderança" or "Liderança - CEO"
+      (the latter if template name contains "CEO" and evaluator is Manager).
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+  behavior_rating_description:
+    description: >
+      Textual description of the behavior rating assigned.
+      Derived from sections typically named "Comportamento" or "Comportamento - CEO"
+      (the latter if template name contains "CEO" and evaluator is Manager).
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+  impact_calculated_rating:
+    description: >
+      Calculated numeric rating for impact.
+      Derived from sections typically named "Impacto" or "Impacto - CEO"
+      (the latter if template name contains "CEO" and evaluator is Manager).
+    lineage:
+      - datalake_pin_performance_clean.evaluation_rating.calculated_rating
+  leadership_calculated_rating:
+    description: >
+      Calculated numeric rating for leadership.
+      Derived from sections typically named "Liderança" or "Liderança - CEO"
+      (the latter if template name contains "CEO" and evaluator is Manager).
+    lineage:
+      - datalake_pin_performance_clean.evaluation_rating.calculated_rating
+  behavior_calculated_rating:
+    description: >
+      Calculated numeric rating for behavior.
+      Derived from sections typically named "Comportamento" or "Comportamento - CEO"
+      (the latter if template name contains "CEO" and evaluator is Manager).
+    lineage:
+      - datalake_pin_performance_clean.evaluation_rating.calculated_rating
+  task_role_sequence_number:
+    description: 'Sequence number of the task role in the process flow.'
+    lineage:
+      - datalake_pin_performance_clean.task_role_base.sequence_number
+  dt_performance_document_started:
+    description: 'Start date of the performance evaluation document.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.dt_performance_document_started
+  dt_performance_document_ended:
+    description: 'End date of the performance evaluation document.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.dt_performance_document_ended
+  dt_review_period_started:
+    description: 'Start date of the review period.'
+    lineage:
+      - datalake_pin_talent_clean.review_period_base.dt_started
+  dt_review_period_ended:
+    description: 'End date of the review period.'
+    lineage:
+      - datalake_pin_talent_clean.review_period_base.dt_ended
+  ts_evaluator_step_completed:
+    description: 'Timestamp indicating when the evaluator completed the assigned step.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation_step.ts_step_completed
+  ts_load:
+    description: 'Timestamp of when the data was loaded into this consolidated table (generation time).'

@@ -1,0 +1,90 @@
+---
+table_name: datalake_pin.performance_evaluation
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 45000
+    severity_level: Warning
+column_level_validations:
+  id_person:
+    is_complete:
+      severity_level: Error
+  id_evaluation:
+    is_complete:
+      severity_level: Error
+  id_template_definition:
+    is_complete:
+      severity_level: Warning
+  id_review_period:
+    is_complete:
+      severity_level: Warning
+  id_eval_participant:
+    is_complete:
+      severity_level: Warning
+  document_status_code:
+    is_contained_in:
+      values:
+        - COMP
+        - AVAILABLE_FOR_REVIEW
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  review_period_status_code:
+    is_contained_in:
+      values:
+        - A
+        - I
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  evaluator_role_code:
+    is_contained_in:
+      values:
+        - WORKER
+        - PARTICIPANT
+        - MANAGER
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  evaluator_participation_status_code:
+    is_contained_in:
+      values:
+        - COMP
+        - AWAITING_REPLY
+        - INPROG
+        - REQUEST_NOT_SENT
+      severity_level: Warning
+    is_complete:
+      severity_level: Warning
+  peer_role_name:
+    is_contained_in:
+      values:
+        - "Peers/Stakeholders"
+        - "Worker"
+        - "Manager"
+        - "Subordinates"
+      severity_level: Warning
+  impact_calculated_rating:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+    has_max_value:
+      less_than_or_equal_to: 120
+      severity_level: Warning
+  leadership_calculated_rating:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+    has_max_value:
+      less_than_or_equal_to: 120
+      severity_level: Warning
+  behavior_calculated_rating:
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+    has_max_value:
+      less_than_or_equal_to: 120
+      severity_level: Warning
+  ts_load:
+    is_complete:
+      severity_level: Error

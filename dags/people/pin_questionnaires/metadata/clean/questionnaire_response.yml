@@ -29,7 +29,7 @@ columns:
     description: User who last updated the row.
     lineage:
       - datalake_pin_questionnaires_raw.hrq_qstnr_responses.last_updated_by
-  is_lastest_attempt:
+  is_latest_attempt:
     description: Yes, identifies the latest submitted attempt by the participant.
     lineage:
       - datalake_pin_questionnaires_raw.hrq_qstnr_responses.latest_attempt_flag
