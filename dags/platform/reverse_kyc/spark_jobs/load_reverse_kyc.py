@@ -37,5 +37,16 @@ if __name__ == "__main__":
         logger.info("m=Empty Dataframe!")
     else:
         logger.info(f"m=Loading Dataframe into s3, s3_path={s3_path}")
-        df.write.mode("overwrite").option("header", True).csv(s3_path)
+        df.coalesce(1).write.mode("overwrite").option("header", True).csv(s3_path)
         logger.info(f"m=Dataframe succesfully loaded, s3_path={s3_path}")
+
+        logger.info(f"m=Renaming S3 file, s3_path={s3_path}")
+        files = dbutils.fs.ls(s3_path)
+        for f in files:
+            if f.name.startswith("part-") and f.name.endswith(".csv"):
+                source_path = f.path
+                dbutils.fs.cp(source_path, f"{s3_path}{table_name}.csv")
+                dbutils.fs.rm(source_path)
+                logger.info(
+                    f"m=Sucessfully renamed S3 file, s3_path={s3_path}{table_name}.csv"
+                )
