@@ -20,14 +20,14 @@ buyer_review AS (
         type = 'tenant_visit'
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_reviewed, id_reviewer ORDER BY dt_creation ASC) = 1
-), 
+),
 status_log AS (
-  SELECT 
+  SELECT
     id_schedule,
-    id_author_user 
-  FROM 
-    datalake_ebdb_clean.visit_status_log 
-  WHERE 
+    id_author_user
+  FROM
+    datalake_ebdb_clean.visit_status_log
+  WHERE
     event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
     AND ts_created >= '2024-08-01'
   QUALIFY
@@ -38,8 +38,8 @@ SELECT
     b.id_house,
     h.id_region,
     svh.id_business_unit,
-    cs_supply.sk_company AS sk_company_supply,
-    COALESCE(NULLIF(cs_demand.sk_company, -1), b.id_company_demand) AS sk_company_demand,
+    COALESCE(cs_company.sk_company, cs_hubspot.sk_company, p_3p_supply.sk_company) AS sk_company_supply,
+    COALESCE(NULLIF(COALESCE(cs_demand.sk_company, p_3p_demand.sk_company), -1), b.id_company_demand) AS sk_company_demand,
     b.id_agent,
     ua.id AS id_user_agent,
     svh.id_user_en AS id_user_en,
@@ -92,26 +92,21 @@ LEFT JOIN
     datalake_ebdb_clean.user AS ua
         ON ua.id_agent = b.id_agent
 LEFT JOIN
-    datalake_company.company_sks AS cs_demand
-        ON (b.id_company_demand IS NOT NULL
-        AND b.id_company_demand = cs_demand.id_hubspot)
-        OR (b.id_company_demand IS NULL
-        AND b.partner_3p_demand = cs_demand.extracted_3p_tag)
+  datalake_company.company_sks AS cs_demand
+    ON b.id_company_demand = cs_demand.id_hubspot
 LEFT JOIN
-    datalake_company.company_sks AS cs_supply
-        ON (
-          b.uuid_company_supply IS NOT NULL
-          AND b.uuid_company_supply = cs_supply.uuid_company
-        ) OR (
-          b.uuid_company_supply IS NULL
-          AND b.id_company_supply IS NOT NULL
-          AND b.id_company_supply = cs_supply.id_hubspot
-        ) OR (
-           b.uuid_company_supply IS NULL
-           AND b.id_company_supply IS NULL
-           AND b.partner_3p_supply = cs_supply.extracted_3p_tag
-        )
-LEFT JOIN 
+  datalake_company.company_sks AS p_3p_demand
+    ON b.partner_3p_demand = p_3p_demand.extracted_3p_tag
+LEFT JOIN
+  datalake_company.company_sks AS cs_company
+    ON b.uuid_company_supply = cs_company.uuid_company
+LEFT JOIN
+  datalake_company.company_sks AS cs_hubspot
+    ON b.id_company_supply = cs_hubspot.id_hubspot
+LEFT JOIN
+  datalake_company.company_sks AS p_3p_supply
+    ON b.partner_3p_supply = p_3p_supply.extracted_3p_tag
+LEFT JOIN
   status_log AS vsl
     ON b.id = vsl.id_schedule
 WHERE
