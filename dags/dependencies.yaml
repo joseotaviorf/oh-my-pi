@@ -1444,6 +1444,18 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
+  - bietlejuice.enrich_debt_recovery:load-enrich-installment
+  - bietlejuice.trato_feito:load-clean-debt
+  - bietlejuice.trato_feito:load-clean-client
+  - bietlejuice.trato_feito:load-clean-contract
+  - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
+  - bietlejuice.enrich_cyber:load-enrich-installment
+  - bietlejuice.enrich_cyber:load-enrich-negotiation
+  - bietlejuice.enrich_recupera:load-enrich-installment
+  - bietlejuice.enrich_recupera:load-enrich-negotiation
+  - bietlejuice.recupera:load-clean-complementary-records
+  - bietlejuice.recupera:load-clean-complementary-records-written-down
+  - bietlejuice.recupera:load-clean-creditor-pending
 bietlejuice.enrich_collections_quintocred:
   - bietlejuice.enrich_velo:load-enrich-propose
   - bietlejuice.enrich_velo:load-enrich-propose-person

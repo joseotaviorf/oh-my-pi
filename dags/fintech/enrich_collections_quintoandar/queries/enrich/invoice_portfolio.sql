@@ -20,6 +20,77 @@ base AS (
         AND c.country_code = 'BR'
         AND ii.invoice_user = 'tenant'
 ),
+negotiation_child AS (
+    SELECT
+        dn.id_invoice AS id_invoice,
+        dn.id_negotiation AS id_negotiation_child,
+        n.negotiation_status,
+        n.advisory AS agency,
+        n.origin_agreement,
+        n.dt_promisse
+    FROM
+        datalake_collections_quintoandar.debt_negotiated AS dn
+    LEFT JOIN
+        datalake_collections_quintoandar.negotiation AS n
+            ON dn.id_negotiation = n.id_negotiation
+                AND dn.id_contract = n.id_contract
+    WHERE
+        dt_down_payment IS NOT NULL
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY dn.id_invoice ORDER BY n.dt_promisse DESC) = 1
+),
+negotiation_parent AS (
+    SELECT
+        ni.id_invoice_extra AS id_invoice,
+        d.id_invoice AS id_invoice_parent,
+        ni.id_negotiation AS id_negotiation_parent,
+        ni.installment_number,
+        DATE(i.ts_due) AS dt_due_parent,
+        i.dt_due_adjusted AS dt_due_adjusted_parent,
+        n.dt_promisse
+    FROM
+        datalake_collections_quintoandar.installment AS ni
+    LEFT JOIN
+        datalake_collections_quintoandar.negotiation AS n
+            ON ni.id_negotiation = n.id_negotiation
+                AND ni.id_contract = n.id_contract
+    LEFT JOIN
+        datalake_collections_quintoandar.debt_negotiated AS d
+            ON d.id_negotiation = ni.id_negotiation
+                AND d.id_contract = ni.id_contract
+    LEFT JOIN
+        datalake_retsuko.invoice AS i
+            ON d.id_invoice = i.id_external
+                AND d.id_contract = i.id_contract_external
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY ni.id_invoice_extra ORDER BY DATE(i.ts_due), ni.id_invoice_extra) = 1
+),
+base_negotiation AS (
+    SELECT DISTINCT
+        i.id_contract_external AS id_contract,
+        i.id_external AS id_invoice,
+        parent.id_invoice_parent,
+        parent.id_negotiation_parent,
+        child.id_negotiation_child,
+        child.negotiation_status AS child_negotiation_status,
+        child.agency AS child_negotiation_agency,
+        child.origin_agreement,
+        parent.installment_number AS negotiation_installment_number,
+        DATE(i.ts_due) AS dt_due,
+        parent.dt_due_parent,
+        parent.dt_due_adjusted_parent,
+        parent.dt_promisse AS dt_created_negotiation_parent,
+        child.dt_promisse AS dt_created_negotiation_child
+    FROM
+        base AS i
+    LEFT JOIN
+        negotiation_parent AS parent
+            ON i.id_external = parent.id_invoice
+    LEFT JOIN
+        negotiation_child AS child
+            ON child.id_invoice  = i.id_external
+    WHERE
+        parent.id_negotiation_parent IS NOT NULL
+            OR child.id_negotiation_child IS NOT NULL
+),
 contract_write_off AS (
     SELECT DISTINCT
         id_contract_external
@@ -39,13 +110,33 @@ first_payment AS (
     WHERE
         LOWER(status) != 'canceled'
         AND LOWER(contract_status) != 'cancelado'
+),
+paid_by_ssn AS (
+    SELECT
+        id_contract,
+        id_invoice,
+        MAX(ts_event) AS ts_event
+    FROM datalake_collections_quintoandar.delinquency_app_events
+    WHERE
+      funnel_step = 'Overdue Self Service Action'
+      AND id_contract IS NOT NULL
+      AND id_invoice IS NOT NULL
+    GROUP BY 1,2
 )
 SELECT
     b.id_external AS id_invoice,
     b.id AS id_invoice_internal,
     b.id_original_invoice_external,
+    bn.id_invoice_parent AS id_invoice_anchor,
     b.id_contract_external AS id_contract,
     b.id_contract AS id_contract_internal,
+    bn.id_negotiation_parent,
+    bn.id_negotiation_child,
+    bn.negotiation_installment_number,
+    IF(bn.id_negotiation_parent IS NOT NULL, TRUE, FALSE) AS is_child_negotiation,
+    IF(bn.id_negotiation_child IS NOT NULL, TRUE, FALSE) AS has_child,
+    bn.child_negotiation_agency,
+    IF(ssn.id_invoice IS NOT NULL, TRUE, FALSE) AS has_app_action_event,
     b.id_account,
     b.id_audit,
     b.id_checkout_order,
@@ -58,11 +149,72 @@ SELECT
     b.contract_status,
     b.payment_status,
     b.substatus,
-    b.negotiation_status,
-    b.paid_via,
     b.purpose,
-    b.closing_mode,
     b.reason,
+    CASE
+        WHEN b.status = 'canceled' THEN 'Canceled'
+        WHEN b.status = 'paid'
+            AND ssn.id_invoice IS NOT NULL
+            AND bn.id_negotiation_parent IS NOT NULL
+            THEN 'Paid Installment in App'
+        WHEN b.status = 'paid'
+            AND ssn.id_invoice IS NOT NULL
+            AND bn.id_negotiation_parent IS NULL
+            THEN 'Paid in App'
+        WHEN b.status = 'paid'
+            AND ssn.id_invoice IS NULL
+            AND (bn.id_negotiation_parent IS NOT NULL
+                OR (purpose = 'extra'
+                    AND (reason LIKE '%negotiation%'
+                    OR reason LIKE '%agreement%')
+                ))
+            THEN 'Paid Installment outside App'
+         WHEN b.status = 'paid'
+            AND ssn.id_invoice IS NULL
+            AND bn.id_negotiation_parent IS NULL
+            THEN 'Paid outside App'
+        WHEN b.status = 'written-down'
+            AND bn.id_negotiation_child IS NULL
+            AND reason NOT LIKE '%negotiation%'
+            AND reason NOT LIKE '%agreement%'
+            THEN 'Manual Written Down'
+        WHEN b.status = 'written-down'
+            AND bn.id_negotiation_child IS NOT NULL
+            AND bn.origin_agreement = 'Portal Auto Negociação'
+            THEN 'Negotiation - SSN'
+        WHEN b.status = 'written-down'
+            AND bn.id_negotiation_child IS NOT NULL
+            AND bn.origin_agreement = 'Boletagem'
+            THEN 'Negotiation - Campaign'
+        WHEN b.status = 'written-down'
+            AND bn.id_negotiation_child IS NOT NULL
+            AND bn.origin_agreement = 'Serasa Digital'
+            THEN 'Negotiation - Serasa'
+        WHEN b.status = 'written-down'
+            AND bn.id_negotiation_child IS NOT NULL
+            AND bn.origin_agreement = 'Assessoria'
+            THEN 'Negotiation - Advisory'
+        WHEN b.status = 'written-down'
+            AND bn.id_negotiation_child IS NOT NULL
+            AND bn.origin_agreement = 'Operador Interno'
+            THEN 'Negotiation - Internal Operator'
+        WHEN b.status = 'written-down'
+            AND bn.id_negotiation_child IS NOT NULL
+            AND ssn.id_invoice IS NOT NULL
+            AND DATE_DIFF(DAY, ssn.ts_event, bn.dt_created_negotiation_child) BETWEEN 0 AND 10
+            THEN 'Negotiation - SSN (Estimated)'
+        WHEN b.status = 'written-down'
+            AND bn.id_negotiation_child IS NOT NULL
+            THEN 'Negotiation - Unclassified'
+        WHEN b.status = 'written-down'
+            AND bn.id_negotiation_child IS NULL
+                AND (reason LIKE '%negotiation%'
+                OR reason LIKE '%agreement%')
+            THEN 'Negotiation - Not Tracked'
+        ELSE 'UNKNOWN'
+    END AS recovery_channel,
+    b.paid_via,
+    b.closing_mode,
     b.country_code,
     b.due_amount,
     b.paid_amount,
@@ -73,7 +225,12 @@ SELECT
     IF(cwo.id_contract_external IS NOT NULL, TRUE, FALSE) AS is_contract_write_off,
     fp.is_first_payment,
     b.dt_due_adjusted,
+    bn.dt_due_parent AS dt_invoice_anchor,
+    bn.dt_due_adjusted_parent AS dt_adjusted_invoice_anchor,
     b.dt_contract_annulled,
+    bn.dt_created_negotiation_parent,
+    bn.dt_created_negotiation_child,
+    ssn.ts_event AS ts_app_action_event,
     b.ts_write_off,
     b.ts_paid,
     b.ts_payment_confirmation,
@@ -97,3 +254,9 @@ LEFT JOIN contract_write_off AS cwo
 LEFT JOIN first_payment AS fp
     ON fp.id_external = b.id_external
         AND fp.id_contract_external = b.id_contract_external
+LEFT JOIN base_negotiation AS bn
+    ON bn.id_invoice = b.id_external
+        AND bn.id_contract = b.id_contract_external
+LEFT JOIN paid_by_ssn AS ssn
+     ON ssn.id_invoice = b.id_external
+        AND ssn.id_contract = b.id_contract_external

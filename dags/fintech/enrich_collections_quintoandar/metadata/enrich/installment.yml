@@ -1,0 +1,179 @@
+---
+database_name: datalake_collections_quintoandar
+table_name: installment
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description:
+  Table that consolidates installment data from Trato Feito, Cyber, and
+  Recupera systems. It harmonizes fields and adjusts values for consistency, especially
+  for cases with all fees and discounts in the first installment of migrated negotiations.
+columns:
+  id_negotiation_installment:
+    description:
+      Unique identifier of the installment within the negotiation, composed
+      of negotiation ID and installment number.
+    lineage:
+      - datalake_cyber.installment.id_negotiation_installment
+      - datalake_debt_recovery.installment.id_negotiation_installment
+      - datalake_recupera.installment.id_negotiation_installment
+  id_negotiation:
+    description: External identifier of the negotiation linked to the installment.
+    lineage:
+      - datalake_cyber.installment.id_negotiation_external
+      - datalake_debt_recovery.installment.id_negotiation_external
+      - datalake_recupera.installment.id_negotiation_external
+  id_contract:
+    description: Identifier of the contract associated with the negotiation.
+    lineage:
+      - datalake_cyber.installment.id_contract
+      - datalake_debt_recovery.installment.id_contract
+      - datalake_recupera.installment.id_contract
+  id_installment_trato_feito:
+    description:
+      Internal identifier of the installment in the Trato Feito system
+      (null for Cyber and Recupera).
+    lineage:
+      - datalake_debt_recovery.installment.id_installment_trato_feito
+  installment_number:
+    description: Sequence number of the installment within the negotiation.
+    lineage:
+      - datalake_cyber.installment.installment_number
+      - datalake_debt_recovery.installment.installment_number
+      - datalake_recupera.installment.installment_number
+  our_number:
+    description: Bank identifier for the installment used in boleto issuance or tracking.
+    lineage:
+      - datalake_cyber.installment.our_number
+      - datalake_debt_recovery.installment.our_number
+      - datalake_recupera.installment.our_number
+  id_invoice_extra:
+    description: Identifier of the linked extra invoice in Trato Feito.
+    lineage:
+      - datalake_debt_recovery.installment.id_invoice_extra
+  creditor:
+    description:
+      Party responsible for receiving the payment (e.g., PP QuintoAndar,
+      IQ QuintoAndar).
+    lineage:
+      - datalake_cyber.installment.creditor
+      - datalake_debt_recovery.installment.creditor
+      - datalake_recupera.installment.creditor
+  installment_status:
+    description: Current status of the installment (e.g., paid, pending, canceled).
+    lineage:
+      - datalake_cyber.installment.installment_status
+      - datalake_debt_recovery.installment.installment_status
+      - datalake_recupera.installment.installment_status
+  payment_method:
+    description: Method used to pay the installment (e.g., credit card, boleto).
+    lineage:
+      - datalake_cyber.installment.payment_method
+      - datalake_debt_recovery.installment.payment_method
+      - datalake_recupera.installment.payment_method
+  main_amount:
+    description:
+      Original principal amount of the installment, excluding fees and
+      discounts.
+    lineage:
+      - datalake_cyber.installment.main_amount
+      - datalake_debt_recovery.installment.main_amount
+      - datalake_recupera.installment.main_amount
+  updated_balance:
+    description: Updated balance of the installment after adjustments or corrections.
+    lineage:
+      - datalake_cyber.installment.updated_balance
+      - datalake_recupera.installment.updated_balance
+  fine_amount:
+    description: Monetary penalty due to delayed payment.
+    lineage:
+      - datalake_cyber.installment.fine_amount
+      - datalake_debt_recovery.installment.fine_amount
+      - datalake_recupera.installment.fine_amount
+  interest_fee_amount:
+    description: Interest amount applied over the principal due to delays or financing.
+    lineage:
+      - datalake_cyber.installment.interest_fee_amount
+      - datalake_debt_recovery.installment.interest_fee_amount
+      - datalake_recupera.installment.interest_fee_amount
+  debts_fee_amount:
+    description:
+      Total amount of fees due to debt-related actions (e.g., penalties,
+      lawyer fees).
+    lineage:
+      - datalake_cyber.installment.debts_fee_amount
+      - datalake_debt_recovery.installment.debts_fee_amount
+      - datalake_recupera.installment.debts_fee_amount
+  credit_card_fee_amount:
+    description: Administrative fee for credit card payments (if applicable).
+    lineage:
+      - datalake_cyber.installment.credit_card_fee_amount
+      - datalake_debt_recovery.installment.credit_card_fee_amount
+      - datalake_recupera.installment.credit_card_fee_amount
+  discount_amount:
+    description: Total discount applied to the installment amount.
+    lineage:
+      - datalake_cyber.installment.discount_amount
+      - datalake_debt_recovery.installment.discount_amount
+      - datalake_recupera.installment.discount_amount
+  discount_to_original_amount:
+    description: Percentage discount relative to the original amount of the installment.
+    lineage:
+      - datalake_cyber.installment.discount_to_original_amount
+  installment_costs:
+    description:
+      Additional operational costs included in the installment (e.g., eviction
+      fees).
+    lineage:
+      - datalake_cyber.installment.installment_costs
+      - datalake_debt_recovery.installment.installment_costs
+  installment_lawyers_fee:
+    description: Legal fees associated with the installment.
+    lineage:
+      - datalake_cyber.installment.installment_lawyers_fee
+      - datalake_debt_recovery.installment.installment_lawyers_fee
+  amount_to_pay:
+    description:
+      Total amount to be paid by the debtor, including principal, interest,
+      and fees, after discounts.
+    lineage:
+      - datalake_cyber.installment.amount_to_pay
+      - datalake_debt_recovery.installment.amount_to_pay
+      - datalake_recupera.installment.amount_to_pay
+  paid_amount:
+    description: Actual amount paid by the debtor.
+    lineage:
+      - datalake_cyber.installment.paid_amount
+      - datalake_debt_recovery.installment.paid_amount
+      - datalake_recupera.installment.paid_amount
+  dt_creation:
+    description: Date of installment creation/formalization in the system.
+    lineage:
+      - datalake_cyber.installment.dt_creation
+      - datalake_debt_recovery.installment.dt_creation
+      - datalake_recupera.installment.dt_creation
+  dt_due:
+    description: Due date for payment of the installment.
+    lineage:
+      - datalake_cyber.installment.dt_due
+      - datalake_debt_recovery.installment.dt_due
+      - datalake_recupera.installment.dt_due
+  dt_paid:
+    description: Date when the installment was paid.
+    lineage:
+      - datalake_cyber.installment.dt_paid
+      - datalake_debt_recovery.installment.dt_paid
+      - datalake_recupera.installment.dt_paid
+  dt_canceled:
+    description: Date when the installment was canceled (if applicable).
+    lineage:
+      - datalake_cyber.installment.dt_canceled
+      - datalake_debt_recovery.installment.dt_canceled
+      - datalake_recupera.installment.dt_canceled
+  source:
+    description:
+      Origin of the installment data (e.g., Trato Feito - Cyber, Cyber,
+      Recupera).
+    lineage:
+      - datalake_cyber.installment.source
+      - datalake_debt_recovery.installment.source
+      - datalake_recupera.installment.source

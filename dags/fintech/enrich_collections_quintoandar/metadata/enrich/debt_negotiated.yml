@@ -1,0 +1,44 @@
+database_name: datalake_collections_quintoandar
+table_name: debt_negotiated
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description:
+  Table that maps invoices (debt) to their respective negotiations by consolidating
+  data from Trato Feito, Cyber, and Recupera sources. Deduplication is performed based
+  on negotiation priority and last update timestamps.
+columns:
+  id_contract:
+    description: Identifier of the contract related to the invoice and negotiation.
+    lineage:
+      - datalake_trato_feito_clean.debt.id_contract
+      - datalake_cyber.debt_negotiation_mapping.id_contract
+      - datalake_recupera_clean.creditor_pending.id_contract
+      - datalake_recupera_clean.complementary_records.id_contract
+      - datalake_recupera_clean.complementary_records_written_down.id_contract
+  id_invoice:
+    description: Unique identifier of the invoice (debt) linked to the negotiation.
+    lineage:
+      - datalake_trato_feito_clean.debt.id_external
+      - datalake_cyber.debt_negotiation_mapping.id_invoice
+      - datalake_recupera_clean.creditor_pending.id_installment
+      - datalake_recupera_clean.complementary_records.id_installment
+      - datalake_recupera_clean.complementary_records_written_down.id_installment
+  id_negotiation:
+    description: External identifier of the negotiation linked to the invoice.
+    lineage:
+      - datalake_debt_recovery.negotiation.id_negotiation_external
+      - datalake_trato_feito_clean.debt.id_negotiation
+      - datalake_cyber.debt_negotiation_mapping.id_negotiation
+      - datalake_recupera_clean.creditor_pending.installment_code
+      - datalake_recupera_clean.complementary_records.installment_code
+      - datalake_recupera_clean.complementary_records_written_down.installment_code
+  source:
+    description: Origin of the negotiation mapping (Trato Feito, Cyber, or Recupera).
+    lineage:
+      - datalake_trato_feito_clean.debt
+      - datalake_cyber.debt_negotiation_mapping
+      - datalake_recupera_clean.creditor_pending
+      - datalake_recupera_clean.complementary_records
+      - datalake_recupera_clean.complementary_records_written_down
+  ts_load:
+    description: Timestamp of when the record was loaded into the table.

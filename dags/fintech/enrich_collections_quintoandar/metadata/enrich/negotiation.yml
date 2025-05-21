@@ -1,0 +1,247 @@
+database_name: datalake_collections_quintoandar
+table_name: negotiation
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description:
+  Table that consolidates negotiation data from Trato Feito, Cyber, and
+  Recupera systems. It includes enriched fields such as total amounts, status, and
+  standardization flags to ensure unified business reporting.
+columns:
+  id_negotiation:
+    description: External identifier of the negotiation.
+    lineage:
+      - datalake_debt_recovery.negotiation.id_negotiation_external
+      - datalake_cyber.negotiation.id_negotiation
+      - datalake_recupera.negotiation.id_negotiation
+  id_debtor:
+    description: Identifier of the debtor (CPF/CNPJ).
+    lineage:
+      - datalake_trato_feito_clean.client.document
+      - datalake_cyber.negotiation.id_customer
+      - datalake_recupera.negotiation.customer_document
+  id_negotiation_trato_feito:
+    description: Internal identifier for Trato Feito negotiations.
+    lineage:
+      - datalake_debt_recovery.negotiation.id_negotiation
+  id_contract:
+    description: Identifier of the contract involved in the negotiation.
+    lineage:
+      - datalake_debt_recovery.negotiation.id_contract
+      - datalake_cyber.negotiation.id_contract
+      - datalake_recupera.negotiation.id_contract
+  id_operator:
+    description: Operator responsible for managing the negotiation.
+    lineage:
+      - datalake_cyber.negotiation.id_operator
+      - datalake_recupera.negotiation.id_operator
+  id_manager_authorized:
+    description: Manager who authorized the negotiation (Cyber only).
+    lineage:
+      - datalake_cyber.negotiation.id_user_authorized
+  id_campaign:
+    description: Marketing campaign identifier associated with the negotiation.
+    lineage:
+      - datalake_cyber.negotiation.id_campaign
+      - datalake_recupera.negotiation.campaign_code
+  source:
+    description: Origin system of the negotiation record.
+    lineage:
+      - datalake_debt_recovery.negotiation.collector
+      - datalake_cyber.negotiation.source
+      - datalake_recupera.negotiation.source
+  creditor:
+    description: Party that is the creditor in the negotiation.
+    lineage:
+      - datalake_debt_recovery.negotiation.debtor
+      - datalake_cyber.negotiation.creditor
+      - datalake_recupera.negotiation.id_creditor
+  advisory:
+    description: Name of the advisory or third-party agency involved.
+    lineage:
+      - datalake_debt_recovery.negotiation.consultancy_name
+      - datalake_cyber.negotiation.advisory
+      - datalake_recupera.negotiation.advisory
+  agreement_type:
+    description: Type of agreement defined in Cyber or Recupera.
+    lineage:
+      - datalake_cyber.negotiation.agreement_type
+      - datalake_recupera.negotiation.agreement_type
+  agreement_type_description:
+    description: Description of the agreement type (Cyber only).
+    lineage:
+      - datalake_cyber.negotiation.agreement_type_description
+  origin_agreement:
+    description: Channel or origin through which the agreement was made.
+    lineage:
+      - datalake_debt_recovery.negotiation.consultancy_name
+      - datalake_cyber.negotiation.origin_agreement
+      - datalake_recupera.negotiation.origin_agreement
+  campaign_status:
+    description: Status of the negotiation campaign (Cyber only).
+    lineage:
+      - datalake_cyber.negotiation.campaign_status
+  broken_reason:
+    description: Reason why the agreement was broken (Cyber only).
+    lineage:
+      - datalake_cyber.negotiation.description_broken_agreement
+  negotiation_status:
+    description: Current status of the negotiation.
+    lineage:
+      - datalake_debt_recovery.negotiation.status
+      - datalake_cyber.negotiation.negotiation_status
+      - datalake_recupera.negotiation.negotiation_status
+  promisse_payment_method:
+    description: Declared payment method to be used by the debtor.
+    lineage:
+      - datalake_debt_recovery.negotiation.promisse_payment_method
+      - datalake_cyber.negotiation.promisse_payment_method
+      - datalake_recupera.negotiation.promisse_payment_method
+  payment_method:
+    description: Actual payment method used (Cyber only).
+    lineage:
+      - datalake_cyber.negotiation.payment_method
+  is_not_standard_negotiation:
+    description:
+      Flag indicating if negotiation deviates from standard (e.g., multi-contract,
+      exceptions).
+    lineage:
+      - datalake_cyber.negotiation.exception
+      - datalake_recupera.negotiation.exception
+  not_standard_reason:
+    description: Explanation for why the negotiation is non-standard.
+    lineage:
+      - datalake_cyber.negotiation.exception
+      - datalake_recupera.negotiation.exception
+  is_renegotiation:
+    description: Indicates whether this negotiation is a renegotiation.
+    lineage:
+      - datalake_debt_recovery.negotiation.has_renegotiated
+  number_of_installments:
+    description: Total number of installments in the negotiation.
+    lineage:
+      - datalake_debt_recovery.negotiation.qt_installments
+      - datalake_cyber.negotiation.number_of_installments
+      - datalake_recupera.negotiation.number_of_installments
+  paid_installments:
+    description: Number of installments already paid.
+    lineage:
+      - datalake_debt_recovery.negotiation.qt_installments_paid
+      - datalake_cyber.negotiation.paid_installments
+      - datalake_recupera.negotiation.paid_installments
+  breached_installments:
+    description: Number of installments breached or not fulfilled.
+    lineage:
+      - datalake_debt_recovery.negotiation.breached_installment
+      - datalake_cyber.negotiation.breached_installments
+      - datalake_recupera.negotiation.breached_installments
+  original_debt_amount:
+    description: Debt amount before interest and fees.
+    lineage:
+      - datalake_debt_recovery.negotiation.negotiation_original_amount
+      - datalake_cyber.negotiation.original_amount
+      - datalake_recupera.negotiation.original_debt_amount
+  fine_fee_amount:
+    description: Amount charged as fine.
+    lineage:
+      - datalake_debt_recovery.negotiation.fine_fee_amount
+      - datalake_cyber.negotiation.fine_amount
+      - datalake_recupera.negotiation.fine_fee_amount
+  interest_fee_amount:
+    description: Amount charged as interest.
+    lineage:
+      - datalake_debt_recovery.negotiation.interest_fee_amount
+      - datalake_cyber.negotiation.total_interest_fees_amount
+      - datalake_recupera.negotiation.interest_fee_amount
+  credit_card_fee_amount:
+    description: Credit card administrative fee amount.
+    lineage:
+      - datalake_debt_recovery.negotiation.credit_card_fee_amount
+      - datalake_cyber.negotiation.credit_card_fee_amount
+      - datalake_recupera.negotiation.adm_fee_amount
+  installment_eviction_costs:
+    description: Costs associated with eviction procedures.
+    lineage:
+      - datalake_debt_recovery.negotiation.installment_costs
+      - datalake_cyber.negotiation.eviction_costs_amount
+  installment_lawyers_fee:
+    description: Honorarium or lawyer fees related to the negotiation.
+    lineage:
+      - datalake_debt_recovery.negotiation.installment_lawyers_fee
+      - datalake_cyber.negotiation.honorarium_amount
+  total_debt_amount:
+    description: Total amount of debt including interest, fees, and original amount.
+    lineage:
+      - datalake_debt_recovery.negotiation.total_debt_amount
+      - datalake_cyber.negotiation.debt_amount
+      - datalake_recupera.negotiation.expense_amount
+  total_discount_amount:
+    description: Total discount granted to the debtor.
+    lineage:
+      - datalake_debt_recovery.negotiation.negotiation_discount_amount
+      - datalake_cyber.negotiation.discount_amount
+      - datalake_recupera.negotiation.negotiated_amount
+  discount_to_original_amount:
+    description: Discount portion related to the original debt amount (Cyber only).
+    lineage:
+      - datalake_cyber.negotiation.discount_to_original_amount
+  discount_to_fees_amount:
+    description: Discount portion applied to fees and penalties (Cyber only).
+    lineage:
+      - datalake_cyber.negotiation.discount_to_fees_amount
+  discount_to_credit_fee_amount:
+    description: Remaining discount applied to credit card fees (Cyber only).
+    lineage:
+      - datalake_cyber.negotiation.discount_to_credit_fee_amount
+  negotiated_amount:
+    description: Total amount negotiated with the debtor.
+    lineage:
+      - datalake_debt_recovery.negotiation.total_expected_amount
+      - datalake_cyber.negotiation.negotiated_amount
+      - datalake_recupera.negotiation.negotiated_amount
+  down_payment_amount:
+    description: Initial payment amount defined in the negotiation.
+    lineage:
+      - datalake_debt_recovery.negotiation.down_payment_amount
+      - datalake_cyber.negotiation.down_payment_amount
+      - datalake_recupera.negotiation.down_payment_amount
+  paid_amount:
+    description: Amount already paid by the debtor.
+    lineage:
+      - datalake_debt_recovery.negotiation.paid_amount
+      - datalake_cyber.negotiation.total_paid_amount
+      - datalake_recupera.negotiation.total_amount_paid
+  dt_promisse:
+    description: Date when the promise to pay was made.
+    lineage:
+      - datalake_debt_recovery.negotiation.ts_created_at
+      - datalake_cyber.negotiation.dt_promisse
+      - datalake_recupera.negotiation.dt_promisse
+  dt_due_promisse:
+    description: Due date of the promised payment.
+    lineage:
+      - datalake_cyber.negotiation.dt_due_promisse
+      - datalake_recupera.negotiation.dt_due_promisse
+  dt_cancellation:
+    description: Date when the agreement was canceled.
+    lineage:
+      - datalake_debt_recovery.negotiation.ts_breach
+      - datalake_cyber.negotiation.dt_cancellation
+      - datalake_recupera.negotiation.dt_cancellation
+  dt_down_payment:
+    description: Date when the down payment was made.
+    lineage:
+      - datalake_debt_recovery.negotiation.ts_first_payment
+      - datalake_cyber.negotiation.dt_down_payment
+      - datalake_recupera.negotiation.dt_down_payment
+  dt_paid_all_installments:
+    description: Date when all installments were fully paid.
+    lineage:
+      - datalake_debt_recovery.negotiation.ts_paid_all
+      - datalake_cyber.negotiation.dt_paid_all
+      - datalake_recupera.negotiation.dt_paid_all
+  dt_expected_ending:
+    description: Expected date to finalize the agreement.
+    lineage:
+      - datalake_debt_recovery.negotiation.dt_expected_end
+      - datalake_cyber.negotiation.dt_expected_end
+      - datalake_recupera.negotiation.dt_negotiation_expected_end
