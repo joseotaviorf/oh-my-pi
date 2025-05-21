@@ -1,0 +1,31 @@
+---
+database_name: datalake_cdp_personas
+table_name: buyer_prospect
+description:
+  This table consolidates all buyer prospects (users in the ForSale demand funnel) from QuintoAndar, in a historical view.
+  We don't group any user in active periods as this concept doesn't exist in our product, so this table will consolidate the
+  first and last event of the buyer prospect on the ForSale demand funnel.
+domain: Primitives
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_user:
+    description: The user id of the buyer prospect.
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.id_buyer
+  uuid_person:
+    description: The UUID Person of the user.
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+  is_active:
+    description: Boolean flag indicating if the user is active or not as a buyer prospect.
+      As we don't have in our products the concept of when a user starts/ends being a buyer prospect, it's always marked as null.
+  ts_first_event:
+    description: Timestamp of the first user event while as a buyer prospect. 
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+  ts_last_event:
+    description: Timestamp of the last user event while as a buyer prospect.
+    lineage:
+      - datalake_sale_demand_events.sale_demand_events.ts_event
+  ts_load:
+    description: Timestamp indicating when the data was loaded in the data lake.

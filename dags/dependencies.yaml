@@ -1427,6 +1427,7 @@ bietlejuice.enrich_cdp_personas:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
+  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
 bietlejuice.enrich_ciq:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking

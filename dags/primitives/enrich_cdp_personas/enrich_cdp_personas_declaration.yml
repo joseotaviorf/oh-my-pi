@@ -12,10 +12,13 @@ workflow:
   default_extraction_type: full
   inner_dependencies:
     persona:
+      - buyer_prospect
       - tenant
       - tenant_prospect
       - owner
   tables_customization:
+    buyer_prospect:
+      z_order_by: [id_user]
     tenant:
       z_order_by: [id_user]
     tenant_prospect:

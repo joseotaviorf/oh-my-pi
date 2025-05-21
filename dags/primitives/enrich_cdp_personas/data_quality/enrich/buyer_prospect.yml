@@ -1,0 +1,12 @@
+---
+table_name: datalake_cdp_personas.buyer_prospect
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_user:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  ts_first_event:
+    is_complete:
+      severity_level: Error

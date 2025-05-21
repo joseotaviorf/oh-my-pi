@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.uuid_person
   is_active:
-    description: Boolean flag indicating if the user is active or not as a tenant tenant prospect.
+    description: Boolean flag indicating if the user is active or not as a tenant prospect.
       As a rent flow "never dies", it's always marked as null because we don't have a product view about it.
   ts_first_event:
     description: Timestamp of the first user event while as a tenant prospect. 
