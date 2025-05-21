@@ -206,8 +206,50 @@ FROM VALUES
                                                 )
                                 )
         )
-    )
+    ),
     -- Add new experiment here
+    -- HUE V1 vs V2 test - SALE
+    (
+        "AB_TEST_RECS_HUE_V2_SALE",
+        named_struct(
+            'begin_date', DATE('2025-05-15'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                )
+        )
+    ),
+     -- HUE V1 vs V2 test - RENT
+    (
+        "AB_TEST_RECS_HUE_V2_RENT",
+        named_struct(
+            'begin_date', DATE('2025-05-09'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                )
+        )
+    )
 
 
 
