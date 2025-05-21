@@ -15,7 +15,7 @@ workflow:
   tables_customization:
     accounting_entry: {}
     accounting_entry_balance:
-      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     accounting_entry_source: {}
     financial_data: {}
     payee: {}
