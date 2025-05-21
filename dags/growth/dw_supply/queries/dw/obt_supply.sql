@@ -354,7 +354,7 @@ SELECT
         WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Top Afiliados' THEN 'Very low'
         WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Afiliados Alto Volume' THEN 'Very low'
         WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Novos Afiliados' THEN 'Average'
-        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_campaign = 'Afiliados Risco Fraude' THEN 'Afiliados Risco Fraude'
+        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Afiliados Risco Fraude' THEN 'Afiliados Risco Fraude'
         WHEN company_report_origin = 'Indica Aí - General' THEN 'Average'
         ELSE 'sem_cluster'
     END AS planning_conversion_cluster,
