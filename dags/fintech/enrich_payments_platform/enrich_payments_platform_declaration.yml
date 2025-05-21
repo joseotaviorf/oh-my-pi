@@ -14,7 +14,6 @@ workflow:
       merge_on: ["id_business_key"]
       z_order_by: ["id_business_key", "datasource"]
       when_matched_update_condition: "target.id_payment IS NOT NULL"
-      when_not_matched_insert_condition: "target.id_payment IS NULL"
       when_matched_operation: {
         "id_charge": "source.id_charge",
         "id_order": "source.id_order",
