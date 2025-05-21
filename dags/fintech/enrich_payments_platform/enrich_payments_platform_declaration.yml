@@ -47,7 +47,6 @@ workflow:
         "ts_charge_canceled": "source.ts_charge_canceled"
       }
       when_not_matched_operation: {
-        "id_payment": "source.id_payment",
         "id_business_key": "source.id_business_key",
         "id_charge": "source.id_charge",
         "id_order": "source.id_order",

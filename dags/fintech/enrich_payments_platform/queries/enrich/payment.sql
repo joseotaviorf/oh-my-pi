@@ -372,7 +372,7 @@ cte_union AS (
         vans_boleto
 )
 SELECT
-    MONOTONICALLY_INCREASING_ID() AS id_payment,
+    -- id_payment BIGINT GENERATED ALWAYS AS IDENTITY (created directly on Databricks CREATE TABLE)
     id_business_key,
     id_charge,
     id_order,
