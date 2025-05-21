@@ -1,4 +1,5 @@
 SELECT
+    id,
     payment_request_id AS id_payment_request,
     accounting_entry_id AS id_accounting_entry
 FROM

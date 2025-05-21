@@ -14,7 +14,8 @@ workflow:
   lineage_product_database_name: robin_hood
   tables_customization:
     accounting_entry: {}
-    accounting_entry_balance: {}
+    accounting_entry_balance:
+      raw_primary_keys: ["id"]
     accounting_entry_source: {}
     financial_data: {}
     payee: {}
