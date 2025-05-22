@@ -44,6 +44,6 @@ cluster:
     autotermination_minutes: 20
     driver_node_type_id: m5a.xlarge
     node_type_id: m5a.xlarge
-    num_workers: 2
+    num_workers: 3
     spark_version: 13.3.x-scala2.12
   databricks_conn_id: databricks_new

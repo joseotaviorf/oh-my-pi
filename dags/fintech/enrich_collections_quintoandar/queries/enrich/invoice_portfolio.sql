@@ -24,7 +24,6 @@ negotiation_child AS (
     SELECT
         dn.id_invoice AS id_invoice,
         dn.id_negotiation AS id_negotiation_child,
-        n.negotiation_status,
         n.advisory AS agency,
         n.origin_agreement,
         n.dt_promisse
@@ -35,7 +34,8 @@ negotiation_child AS (
             ON dn.id_negotiation = n.id_negotiation
                 AND dn.id_contract = n.id_contract
     WHERE
-        dt_down_payment IS NOT NULL
+        n.dt_down_payment IS NOT NULL
+        AND n.negotiation_status IN ('offset', 'finished', 'broken-requested-by-client', 'broken')
     QUALIFY ROW_NUMBER() OVER(PARTITION BY dn.id_invoice ORDER BY n.dt_promisse DESC) = 1
 ),
 negotiation_parent AS (
@@ -70,7 +70,6 @@ base_negotiation AS (
         parent.id_invoice_parent,
         parent.id_negotiation_parent,
         child.id_negotiation_child,
-        child.negotiation_status AS child_negotiation_status,
         child.agency AS child_negotiation_agency,
         child.origin_agreement,
         parent.installment_number AS negotiation_installment_number,
@@ -126,7 +125,7 @@ paid_by_ssn AS (
 SELECT
     b.id_external AS id_invoice,
     b.id AS id_invoice_internal,
-    b.id_original_invoice_external,
+    b.id_original_invoice_external AS id_original_invoice,
     bn.id_invoice_parent AS id_invoice_anchor,
     b.id_contract_external AS id_contract,
     b.id_contract AS id_contract_internal,
@@ -153,6 +152,7 @@ SELECT
     b.reason,
     CASE
         WHEN b.status = 'canceled' THEN 'Canceled'
+        WHEN b.status = 'open' THEN NULL
         WHEN b.status = 'paid'
             AND ssn.id_invoice IS NOT NULL
             AND bn.id_negotiation_parent IS NOT NULL
@@ -175,8 +175,9 @@ SELECT
             THEN 'Paid outside App'
         WHEN b.status = 'written-down'
             AND bn.id_negotiation_child IS NULL
-            AND reason NOT LIKE '%negotiation%'
-            AND reason NOT LIKE '%agreement%'
+            AND (b.reason IS NULL
+                OR (b.reason NOT LIKE '%negotiation%'
+                  AND b.reason NOT LIKE '%agreement%'))
             THEN 'Manual Written Down'
         WHEN b.status = 'written-down'
             AND bn.id_negotiation_child IS NOT NULL
@@ -200,18 +201,13 @@ SELECT
             THEN 'Negotiation - Internal Operator'
         WHEN b.status = 'written-down'
             AND bn.id_negotiation_child IS NOT NULL
-            AND ssn.id_invoice IS NOT NULL
-            AND DATE_DIFF(DAY, ssn.ts_event, bn.dt_created_negotiation_child) BETWEEN 0 AND 10
-            THEN 'Negotiation - SSN (Estimated)'
-        WHEN b.status = 'written-down'
-            AND bn.id_negotiation_child IS NOT NULL
             THEN 'Negotiation - Unclassified'
         WHEN b.status = 'written-down'
             AND bn.id_negotiation_child IS NULL
-                AND (reason LIKE '%negotiation%'
-                OR reason LIKE '%agreement%')
+                AND (b.reason LIKE '%negotiation%'
+                OR b.reason LIKE '%agreement%')
             THEN 'Negotiation - Not Tracked'
-        ELSE 'UNKNOWN'
+        ELSE 'Unknown'
     END AS recovery_channel,
     b.paid_via,
     b.closing_mode,
@@ -223,7 +219,7 @@ SELECT
     b.accrual_year_month,
     IFNULL(b.is_write_off, FALSE) AS is_write_off,
     IF(cwo.id_contract_external IS NOT NULL, TRUE, FALSE) AS is_contract_write_off,
-    fp.is_first_payment,
+    IFNULL(fp.is_first_payment, FALSE) AS is_first_payment,
     b.dt_due_adjusted,
     bn.dt_due_parent AS dt_invoice_anchor,
     bn.dt_due_adjusted_parent AS dt_adjusted_invoice_anchor,

@@ -14,7 +14,7 @@ columns:
     description: Business key for the invoice, representing a globally unique identifier for integration with external systems.
     lineage:
       - datalake_retsuko.invoice.id_external
-  id_original_invoice_external:
+  id_original_invoice:
     description: External identifier for the original invoice before any adjustments.
     lineage:
       - datalake_retsuko.invoice.id_original_invoice_external

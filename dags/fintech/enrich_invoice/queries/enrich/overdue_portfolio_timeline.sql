@@ -121,6 +121,17 @@ tainted_delay AS (
 tainted_dataset as (
     SELECT
         it.*,
+        CASE
+            WHEN it.dt_paid BETWEEN it.dt_month_start AND it.dt_reference
+                AND it.dt_paid > it.dt_due_adjusted
+            THEN it.dt_paid
+        END AS dt_paid_timeline,
+        DATEDIFF(DAY, it.dt_due_adjusted,
+            CASE
+                WHEN it.dt_paid BETWEEN it.dt_month_start AND it.dt_reference
+                    AND it.dt_paid > it.dt_due_adjusted
+                THEN it.dt_paid
+        END) AS delay_invoice_at_payment,
         DATEDIFF(DAY, it.dt_due_adjusted, it.dt_reference) AS delay_invoice_at_reference,
         CASE
             WHEN it.dt_due_adjusted <= it.dt_month_end
@@ -190,11 +201,11 @@ tainted_dataset_range AS (
             ELSE "h. over 180"
         END AS delay_contract_range,
         CASE
-            WHEN delay_invoice_at_reference IS NULL THEN NULL
-            WHEN delay_invoice_at_reference < 7 THEN 0
-            WHEN delay_invoice_at_reference < 15 THEN 7
-            WHEN delay_invoice_at_reference < 30 THEN 15
-            WHEN delay_invoice_at_reference < 60 THEN 30
+            WHEN COALESCE(delay_invoice_at_payment, delay_invoice_at_reference) IS NULL THEN NULL
+            WHEN COALESCE(delay_invoice_at_payment, delay_invoice_at_reference) < 7 THEN 0
+            WHEN COALESCE(delay_invoice_at_payment, delay_invoice_at_reference) < 15 THEN 7
+            WHEN COALESCE(delay_invoice_at_payment, delay_invoice_at_reference) < 30 THEN 15
+            WHEN COALESCE(delay_invoice_at_payment, delay_invoice_at_reference) < 60 THEN 30
             ELSE 60
         END AS delay_first_payment_default
     FROM
@@ -247,11 +258,7 @@ SELECT
     IF(dt_reference = max_date_between_business_days, TRUE, FALSE) AS is_last_business_days,
     dt_contract_annulled,
     contract_due_date_min AS dt_contract_due_date_min,
-    CASE
-        WHEN dt_paid BETWEEN dt_month_start AND dt_reference
-            AND dt_paid > dt_due_adjusted
-        THEN dt_paid
-    END AS dt_invoice_paid,
+    dt_paid_timeline AS dt_invoice_paid,
     dt_due AS dt_invoice_due,
     dt_due_adjusted AS dt_invoice_due_adjust,
     CASE
@@ -259,6 +266,7 @@ SELECT
     END AS dt_write_off,
     dt_month_start,
     dt_month_end,
-    dt_reference AS dt_reference
+    dt_reference AS dt_reference,
+    NOW() AS ts_load
 FROM
     tainted_dataset_range
