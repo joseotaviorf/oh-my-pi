@@ -150,6 +150,8 @@ columns:
     description: Number of views of the house listing page.
   search_results_page_views:
     description: Number of views of the search results page.
+  favorites:
+    description: Number of times the house listing was favorited.
   visits_booked:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_event

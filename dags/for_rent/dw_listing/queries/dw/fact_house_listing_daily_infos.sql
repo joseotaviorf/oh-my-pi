@@ -28,6 +28,7 @@ SELECT
   COALESCE(avh.day_available_hours, 0) AS available_hours,
   COALESCE(hldi.listing_page_views, 0) AS page_views,
   COALESCE(hldi.search_results_page_views, 0) AS search_results_page_views,
+  COALESCE(hldi.favorites, 0) AS favorites,
   COALESCE(hldi.visits_booked, 0) AS visits_booked,
   COALESCE(hldi.visits_completed, 0) AS visits_completed,
   COALESCE(hldi.visits_requested, 0) AS visits_requested,

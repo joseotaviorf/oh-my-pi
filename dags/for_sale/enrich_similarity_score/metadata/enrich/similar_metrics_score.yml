@@ -27,6 +27,10 @@ columns:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
       description: Sum of search results page views of the "base" house for a specific range.
+    base_favorites:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.favorites
+      description: Sum of favorites of the "base" house for a specific range.
     base_vb:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
@@ -43,6 +47,10 @@ columns:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
       description: Aggregation of search results page views of the similar houses for a specific range.
+    similar_favorites:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.favorites
+      description: Aggregation of favorites of the similar houses for a specific range.
     similar_vb:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
@@ -54,52 +62,48 @@ columns:
     calculation_score_lpv:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
-        - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
       description: The result of the calculation, according to score_calculation_rule, applied to listing page views metric.
     calculation_score_srpv:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
-        - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
       description: The result of the calculation, according to score_calculation_rule, applied to search results page views metric.
+    calculation_score_favorites:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.favorites
+      description: The result of the calculation, according to score_calculation_rule, applied to favorites metric.
     calculation_score_vb:
       lineage:
-        - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
         - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
       description: The result of the calculation, according to score_calculation_rule, applied to visits booked metric.
     calculation_score_os:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
-        - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
       description: The result of the calculation, according to score_calculation_rule, applied to offers sent metric.
     score_lpv:
       lineage:
-        - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
         - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
       description: Score of the listing page views metric, which is classified as an integer between 1 (bad) and 5 (very good), according to the score_metric_rule.
     score_srpv:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
-        - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
       description: Score of the search results page views metric, which is classified as an integer between 1 (bad) and 5 (very good), according to the score_metric_rule.
+    score_favorites:
+      lineage:
+        - datalake_rental_historical_follow_up.house_listings_daily_info.favorites
+      description: Score of the favorites metric, which is classified as an integer between 1 (bad) and 5 (very good), according to the score_metric_rule.
     score_vb:
       lineage:
-        - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
         - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
       description: Score of the visits booked metric, which is classified as an integer between 1 (bad) and 5 (very good), according to the score_metric_rule.
     score_os:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
-        - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
       description: Score of the offers sent metric, which is classified as an integer between 1 (bad) and 5 (very good), according to the score_metric_rule.
     final_score:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
-        - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
-        - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
         - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
         - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
-        - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
-        - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
         - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
       description: The final score for the "base" house compared to its similar houses, which is classified as an integer between 1 (bad) and 5 (very good), according to the final_score_rule.
     business_context:

@@ -4,6 +4,7 @@ WITH get_metrics_base AS (
         sh.id_house,
         SUM(COALESCE(di.listing_page_views, 0)) AS base_lpv,
         SUM(COALESCE(di.search_results_page_views, 0)) AS base_srpv,
+        SUM(COALESCE(di.favorites, 0)) AS base_favorites,
         SUM(COALESCE(di.visits_booked, 0)) AS base_vb,
         SUM(COALESCE(di.offers_sent, 0)) AS base_os,
         sh.business_context,
@@ -45,6 +46,7 @@ get_metrics_similar_1 AS (
         es.id_similar,
         SUM(COALESCE(di.listing_page_views, 0)) AS sum_similar_lpv,
         SUM(COALESCE(di.search_results_page_views, 0)) AS sum_similar_srpv,
+        SUM(COALESCE(di.favorites, 0)) AS sum_similar_favorites,
         SUM(COALESCE(di.visits_booked, 0)) AS sum_similar_vb,
         SUM(COALESCE(di.offers_sent, 0)) AS sum_similar_os,
         es.business_context,
@@ -69,6 +71,7 @@ get_metrics_similar_2 AS (
         COLLECT_LIST(id_similar) AS ids_similar,
         PERCENTILE(sum_similar_lpv, 0.5) AS similar_lpv,
         PERCENTILE(sum_similar_srpv, 0.5) AS similar_srpv,
+        PERCENTILE(sum_similar_favorites, 0.5) AS similar_favorites,
         PERCENTILE(sum_similar_vb, 0.5) AS similar_vb,
         PERCENTILE(sum_similar_os, 0.5) AS similar_os,
         business_context,
@@ -88,14 +91,17 @@ SELECT
     s.ids_similar,
     b.base_lpv,
     b.base_srpv,
+    b.base_favorites,
     b.base_vb,
     b.base_os,
     s.similar_lpv,
     s.similar_srpv,
+    s.similar_favorites,
     s.similar_vb,
     s.similar_os,
     ROUND((base_lpv + 1) / (similar_lpv + 1), 1) AS calculation_score_lpv,
     ROUND((base_srpv + 1) / (similar_srpv + 1), 1) AS calculation_score_srpv,
+    ROUND((base_favorites + 1) / (similar_favorites + 1), 1) AS calculation_score_favorites,
     ROUND((base_vb + 1) / (similar_vb + 1), 1) AS calculation_score_vb,
     ROUND((base_os + 1) / (similar_os + 1), 1) AS calculation_score_os,
     CASE
@@ -112,6 +118,13 @@ SELECT
         WHEN calculation_score_srpv <= 0.9 THEN 2
         ELSE 3
     END AS score_srpv,
+    CASE
+        WHEN calculation_score_favorites >= 1.5 THEN 5
+        WHEN calculation_score_favorites >= 1.1 THEN 4
+        WHEN calculation_score_favorites <= 0.5 THEN 1
+        WHEN calculation_score_favorites <= 0.9 THEN 2
+        ELSE 3
+    END AS score_favorites,
     CASE
         WHEN calculation_score_vb >= 1.5 THEN 5
         WHEN calculation_score_vb >= 1.1 THEN 4

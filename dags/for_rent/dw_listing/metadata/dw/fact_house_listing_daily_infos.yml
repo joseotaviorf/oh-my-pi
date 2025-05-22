@@ -91,6 +91,10 @@ columns:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
     description: Number of views of the search results page in the referenced date.
+  favorites:
+    lineage:
+      - datalake_rental_historical_follow_up.house_listings_daily_info.favorites
+    description: Number of favorites in the referenced date.
   visits_booked:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked

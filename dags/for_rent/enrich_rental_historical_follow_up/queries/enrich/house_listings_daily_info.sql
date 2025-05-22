@@ -197,6 +197,29 @@ offers AS (
     GROUP BY
         2, 3
 ),
+favorite_set AS (
+    SELECT
+        COUNT(*) AS favorites,
+        hl.id_house_listing,
+        dbase.dt_day
+    FROM
+        datalake_amplitude_clean.170698_listing_favorite_set_events AS lfse
+    JOIN
+        daily_base AS dbase
+            ON dbase.year = lfse.year
+            AND dbase.month = lfse.month
+            AND dbase.day = lfse.day
+    JOIN
+        datalake_ebdb_listing.house_listing AS hl
+            ON hl.id_house = lfse.ep_house_id
+            AND lfse.ts_event >= hl.ts_listing_version_start
+            AND lfse.ts_event < COALESCE(hl.ts_listing_version_end, '2100-01-01')
+    WHERE
+        lfse.ep_house_id IS NOT NULL
+        AND UPPER(lfse.business_context) = 'RENT'
+    GROUP BY
+        2, 3
+),
 listings_states_per_day AS (
     SELECT /*+ RANGE_JOIN(heh, 1180) */
         CONCAT(COALESCE(pled.id_house_listing, hl.id_house_listing), DATE_FORMAT(dbase.dt_day, 'yMMdd')) AS id_house_listing_day,
@@ -233,6 +256,7 @@ listings_states_per_day AS (
         pred.calculator_certainty AS certainty,
         lpv.listing_page_viewed AS listing_page_views,
         srpv.search_results_page_viewed AS search_results_page_views,
+        f.favorites,
         vom.visits_booked,
         vom.visits_completed,
         vnm.visits_requested,
@@ -354,6 +378,10 @@ listings_states_per_day AS (
         offers
             ON COALESCE(pled.id_house_listing, hl.id_house_listing) = offers.id_house_listing
             AND dbase.dt_day = offers.dt_day
+    LEFT JOIN
+        favorite_set AS f
+            ON COALESCE(pled.id_house_listing, hl.id_house_listing) = f.id_house_listing
+            AND dbase.dt_day = f.dt_day
     /*
     This table is used for For_Rent and
     should be similar to fact_house_listing_status, so
@@ -398,6 +426,7 @@ SELECT
     certainty,
     listing_page_views,
     search_results_page_views,
+    favorites,
     visits_booked,
     visits_completed,
     visits_requested,
