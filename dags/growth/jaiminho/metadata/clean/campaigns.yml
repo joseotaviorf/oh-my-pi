@@ -1,0 +1,55 @@
+---
+database_name: datalake_jaiminho_clean
+table_name: campaigns
+description: This table consolidates campaigns comms data from Jaiminho.
+domain: Growth
+owner: conrado.fabri@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.id
+  id_user:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.userId
+  channel:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.channel
+  country:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.country
+  env:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.env
+  name:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.name
+  status:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.status
+  size:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.size
+  template:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.template
+  user_email:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.userEmail
+  ts_created:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.createdAt
+  ts_updated:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.updatedAt
+  ts_sent:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.sentAt
+  year:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.updatedAt
+  month:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.updatedAt
+  day:
+    lineage:
+      - datalake_jaiminho_raw.campaigns.updatedAt

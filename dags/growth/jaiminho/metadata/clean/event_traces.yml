@@ -1,0 +1,52 @@
+---
+database_name: datalake_jaiminho_clean
+table_name: event_traces
+description: This table consolidates event traces from communications sent by Jaiminho.
+domain: Growth
+owner: conrado.fabri@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.id
+  id_trace:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.traceId
+  id_entity:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.entityId
+  entity_name:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.entityName
+  destination:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.destination
+  status:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.status
+  channel:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.channel
+  error_name:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.errorName
+  error_info:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.errorInfo
+  is_error:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.isError
+  ts_created:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.createdAt
+  ts_updated:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.updatedAt
+  year:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.updatedAt
+  month:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.updatedAt
+  day:
+    lineage:
+      - datalake_jaiminho_raw.event_traces.updatedAt

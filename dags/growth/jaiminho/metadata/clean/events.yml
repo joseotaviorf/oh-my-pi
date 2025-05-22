@@ -1,0 +1,58 @@
+---
+database_name: datalake_jaiminho_clean
+table_name: events
+description: This table consolidates all records of communication events from Jaiminho DB.
+domain: Growth
+owner: conrado.fabri@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_jaiminho_raw.events.id
+  id_user:
+    lineage:
+      - datalake_jaiminho_raw.events.userId
+  id_callback:
+    lineage:
+      - datalake_jaiminho_raw.events.callbackId
+  reference_name:
+    lineage:
+      - datalake_jaiminho_raw.events.referenceName
+  reference_id:
+    lineage:
+      - datalake_jaiminho_raw.events.referenceId
+  type:
+    lineage:
+      - datalake_jaiminho_raw.events.type
+  status:
+    lineage:
+      - datalake_jaiminho_raw.events.status
+  callback_channel:
+    lineage:
+      - datalake_jaiminho_raw.events.callbackChannel
+  callback_trigger:
+    lineage:
+      - datalake_jaiminho_raw.events.callbackTrigger
+  tracing_context:
+    lineage:
+      - datalake_jaiminho_raw.events.tracingContext
+  extra_info:
+    lineage:
+      - datalake_jaiminho_raw.events.extraInfo
+  version:
+    lineage:
+      - datalake_jaiminho_raw.events.version
+  ts_created:
+    lineage:
+      - datalake_jaiminho_raw.events.createdAt
+  ts_updated:
+    lineage:
+      - datalake_jaiminho_raw.events.updatedAt
+  year:
+    lineage:
+      - datalake_jaiminho_raw.events.updatedAt
+  month:
+    lineage:
+      - datalake_jaiminho_raw.events.updatedAt
+  day:
+    lineage:
+      - datalake_jaiminho_raw.events.updatedAt

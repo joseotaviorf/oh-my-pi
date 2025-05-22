@@ -1,0 +1,43 @@
+---
+database_name: datalake_jaiminho_clean
+table_name: notifications_delivery
+description: This table consolidates all records of communications delivered from Jaiminho.
+domain: Growth
+owner: conrado.fabri@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.id
+  id_notification:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.notificationId
+  uid_message:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.messageUid
+  status:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.status
+  dispatcher:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.dispatcher
+  tracing_context:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.tracingContext
+  result:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.result
+  ts_created:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.createdAt
+  ts_updated:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.updatedAt
+  year:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.updatedAt
+  month:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.updatedAt
+  day:
+    lineage:
+      - datalake_jaiminho_raw.notifications_delivery.updatedAt
