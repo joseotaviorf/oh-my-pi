@@ -12,7 +12,7 @@ invoice_paid AS (
     id AS id_invoice,
     ts_updated AS ts_paid
   FROM
-    datalake_condominium_payments_clean.invoice_aud
+    datalake_rental_management.invoice_aud
   WHERE
     status = 'PAID'
 )
@@ -53,7 +53,7 @@ SELECT
   i.ts_created AS ts_issued,
   ip.ts_paid
 FROM
-  datalake_condominium_payments_clean.invoice AS i
+  datalake_rental_management_clean.invoice AS i
 LEFT JOIN
   communication_sent AS c
     ON i.id = c.id_invoice

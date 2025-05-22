@@ -7,29 +7,29 @@ owner: kleber.inoue@quintoandar.com.br
 columns:
   id_condo_monitoring_event:
     lineage:
-      - datalake_condominium_payments_clean.condo_monitoring_actions_aud.id_contract
+      - datalake_rental_management.condo_monitoring_actions_aud.id_contract
       - datalake_condominium_payments_clean.non_payment_report.id_contract
-      - datalake_condominium_payments_clean.condo_monitoring_eligibility_aud.id_contract
-      - datalake_condominium_payments_clean.invoice_aud.id_contract
+      - datalake_rental_management.condo_monitoring_eligibility_aud.id_contract
+      - datalake_rental_management.invoice_aud.id_contract
       - datalake_condo_monitoring.communication.id_contract
-      - datalake_condominium_payments_clean.condo_monitoring_actions_aud.ts_updated
+      - datalake_rental_management.condo_monitoring_actions_aud.ts_updated
       - datalake_condominium_payments_clean.non_payment_report.ts_updated
-      - datalake_condominium_payments_clean.condo_monitoring_eligibility_aud.ts_updated
-      - datalake_condominium_payments_clean.invoice_aud.ts_updated
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_updated
+      - datalake_rental_management.invoice_aud.ts_updated
       - datalake_condo_monitoring.communication.ts_sent
     description: Unique ID of the event.
       It's the concatenation of the id_contract, with the event date in yyyyMMdd format, followed by two zero (00) and then the number of the event of the contract in the day.
   id_contract:
     lineage:
-      - datalake_condominium_payments_clean.condo_monitoring_actions_aud.id_contract
+      - datalake_rental_management.condo_monitoring_actions_aud.id_contract
       - datalake_condominium_payments_clean.non_payment_report.id_contract
-      - datalake_condominium_payments_clean.condo_monitoring_eligibility_aud.id_contract
-      - datalake_condominium_payments_clean.invoice_aud.id_contract
+      - datalake_rental_management.condo_monitoring_eligibility_aud.id_contract
+      - datalake_rental_management.invoice_aud.id_contract
       - datalake_condo_monitoring.communication.id_contract
     description: ID of the contract.
   id_invoice:
     lineage:
-      - datalake_condominium_payments_clean.invoice_aud.id_invoice
+      - datalake_rental_management.invoice_aud.id_invoice
       - datalake_condo_monitoring.communication.id_invoice
     description: ID of the invoice.
   id_communication:
@@ -62,18 +62,18 @@ columns:
       COMMUNICATION: The event comes from the communications of the Condo Monitoring.
   event_name:
     lineage:
-      - datalake_condominium_payments_clean.condo_monitoring_actions_aud.action_type
-      - datalake_condominium_payments_clean.condo_monitoring_eligibility_aud.eligibility
-      - datalake_condominium_payments_clean.invoice_aud.status
+      - datalake_rental_management.condo_monitoring_actions_aud.action_type
+      - datalake_rental_management.condo_monitoring_eligibility_aud.eligibility
+      - datalake_rental_management.invoice_aud.status
       - datalake_condo_monitoring.communication.communication_type
     description: Name of the event that happened.
   was_condo_monitoring_active:
     description: Boolean column that indicates if the Condo Monitoring was active or not for the contract when the event happened.
   ts_event:
     lineage:
-      - datalake_condominium_payments_clean.condo_monitoring_actions_aud.ts_updated
+      - datalake_rental_management.condo_monitoring_actions_aud.ts_updated
       - datalake_condominium_payments_clean.non_payment_report.ts_updated
-      - datalake_condominium_payments_clean.condo_monitoring_eligibility_aud.ts_updated
-      - datalake_condominium_payments_clean.invoice_aud.ts_updated
+      - datalake_rental_management.condo_monitoring_eligibility_aud.ts_updated
+      - datalake_rental_management.invoice_aud.ts_updated
       - datalake_condo_monitoring.communication.ts_sent
     description: Timestamp of the event that happened.

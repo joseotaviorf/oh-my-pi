@@ -4,7 +4,7 @@ WITH cm_actions AS (
     action_type AS event_name,
     ts_updated AS ts_event
   FROM
-    datalake_condominium_payments_clean.condo_monitoring_actions_aud
+    datalake_rental_management.condo_monitoring_actions_aud
 ),
 non_payment_report AS (
   SELECT
@@ -24,7 +24,7 @@ eligibility AS (
     IF(eligibility, 'ELIGIBLE', NULL) AS event_name,
     ts_updated AS ts_event
   FROM
-    datalake_condominium_payments_clean.condo_monitoring_eligibility_aud
+    datalake_rental_management.condo_monitoring_eligibility_aud
 ),
 invoice AS (
   SELECT
@@ -33,7 +33,7 @@ invoice AS (
     status AS event_name,
     ts_updated AS ts_event
   FROM
-    datalake_condominium_payments_clean.invoice_aud
+    datalake_rental_management.invoice_aud
 ),
 comm AS(
   SELECT
@@ -104,7 +104,7 @@ cm_status AS (
     ts_updated AS ts_status_started,
     LEAD(ts_updated) OVER(PARTITION BY id_contract ORDER BY ts_updated) AS ts_status_ended
   FROM
-    datalake_condominium_payments_clean.condo_monitoring_actions_aud
+    datalake_rental_management.condo_monitoring_actions_aud
 ),
 cm_active_ts AS (
   SELECT

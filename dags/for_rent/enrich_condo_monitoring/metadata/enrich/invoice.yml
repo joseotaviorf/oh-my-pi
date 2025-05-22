@@ -6,15 +6,15 @@ owner: kleber.inoue@quintoandar.com.br
 columns:
   id_invoice:
     lineage:
-      - datalake_condominium_payments_clean.invoice.id
+      - datalake_rental_management_clean.invoice.id
     description: ID of the invoice.
   id_contract:
     lineage:
-      - datalake_condominium_payments_clean.invoice.id_contract
+      - datalake_rental_management_clean.invoice.id_contract
     description: ID of the contract related to the invoice.
   issuer_cnpj:
     lineage:
-      - datalake_condominium_payments_clean.invoice.raw_data
+      - datalake_rental_management_clean.invoice.raw_data
     description: CNPJ of the issuer of the invoice.
   status:
     lineage:
@@ -22,14 +22,15 @@ columns:
     description: Status of the invoice.
   issuer_name:
     lineage:
-      - datalake_condominium_payments_clean.invoice.raw_data
+      - datalake_rental_management_clean.invoice.raw_data
     description: Name of the issuer of the invoice.
   barcode:
     lineage:
-      - datalake_condominium_payments_clean.invoice.raw_data
+      - datalake_rental_management_clean.invoice.raw_data
     description: Barcode of the invoice.
   communications_sent:
-    lineage: -datalake_condo_monitoring.communication.communication_type
+    lineage:
+      - datalake_condo_monitoring.communication.communication_type
     description: Array column to indicate the communications sent to the user.
   communication_funnel_step_reached:
     description: Column to indicate the funnel step reached by the communication.
@@ -39,7 +40,7 @@ columns:
       COMMUNICATION_NOT_FOUND: No communication was found.
   value:
     lineage:
-      - datalake_condominium_payments_clean.invoice.id_contract
+      - datalake_rental_management_clean.invoice.id_contract
     description: Invoice's value.
   was_reminder_comm_required:
     description: Boolean flag to indicate if a reminder communication was required.
@@ -47,13 +48,13 @@ columns:
     description: Boolean flag to indicate if a warning communication was required.
   dt_due:
     lineage:
-      - datalake_condominium_payments_clean.invoice.dt_due
+      - datalake_rental_management_clean.invoice.dt_due
     description: Date due of the invoice.
   ts_issued:
     lineage:
-      - datalake_condominium_payments_clean.invoice.ts_created
+      - datalake_rental_management_clean.invoice.ts_created
     description: Timestamp of when the invoice was created/issued.
   ts_paid:
     lineage:
-      - datalake_condominium_payments_clean.invoice_aud.ts_updated
+      - datalake_rental_management.invoice_aud.ts_updated
     description: Timestamp of when the invoice was paid.

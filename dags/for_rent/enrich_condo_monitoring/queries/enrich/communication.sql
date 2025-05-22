@@ -59,5 +59,5 @@ jaiminho AS (
   FROM
     jaiminho AS j
   LEFT JOIN
-    datalake_condominium_payments_clean.invoice AS i
+    datalake_rental_management_clean.invoice AS i
       ON j.id_invoice = i.id
