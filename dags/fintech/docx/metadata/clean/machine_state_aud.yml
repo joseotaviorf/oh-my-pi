@@ -13,24 +13,6 @@ columns:
   id_context_external:
     lineage:
     - datalake_docx_raw.machine_state_aud.context_external_id
-  id_group:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.group_id
-  id_scope:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.scope_id
-  id_analysis_request:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.properties
-  id_credit_evaluation:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.properties
-  id_house:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.properties
-  id_city:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.properties
   rev:
     lineage:
     - datalake_docx_raw.machine_state_aud.rev
@@ -40,24 +22,6 @@ columns:
   rev_end:
     lineage:
     - datalake_docx_raw.machine_state_aud.revend
-  reason:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.properties
-  result:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.properties
-  guarantee_type:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.properties
-  informed_limit:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.properties
-  pre_approved_limit:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.properties
-  properties:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.properties
   status:
     lineage:
     - datalake_docx_raw.machine_state_aud.status
@@ -73,12 +37,6 @@ columns:
   version:
     lineage:
     - datalake_docx_raw.machine_state_aud.version
-  scope_type:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.scope_type
   is_active:
     lineage:
     - datalake_docx_raw.machine_state_aud.active
-  ts_expires:
-    lineage:
-    - datalake_docx_raw.machine_state_aud.expires_at
