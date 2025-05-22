@@ -113,7 +113,7 @@ base AS (
             WHEN dsupc.tp_origin = 'consultantpwa' THEN 'ciq'
             WHEN dsupc.tp_origin = 'supplyprocessor' THEN 'rede'
             WHEN dsof.nm_agent IS NOT NULL THEN 'operations'
-            WHEN dsupc.tp_origin IN ('home', 'full_self_service', 'referral', 'ios') THEN 'ownerpwa'
+            WHEN dsupc.tp_origin IN ('full_self_service', 'referral', 'ios') THEN 'ownerpwa'
             WHEN dsupc.tp_origin IN ('prime','owner_conversion') THEN 'operations'
             ELSE concat('notmapped-',dsupc.tp_origin)
         END AS conversion_origin,
@@ -129,7 +129,7 @@ base AS (
             WHEN dsupa.tp_origin = 'supplyprocessor' THEN 'rede'
             WHEN dsupa.tp_origin = 'consultantpwa' THEN 'ciq'
             WHEN dsupa.tp_origin IN ('inbound', 'ownerconversionpwa') THEN 'operations'
-            WHEN dsupa.tp_origin IN ('pricesuggestionsale', 'pricesuggestion') THEN dsupa.tp_origin
+            WHEN dsupa.tp_origin IN ('pricesuggestionsale', 'pricesuggestion', 'pricesuggestionhome') THEN dsupa.tp_origin
             WHEN dsupa.tp_origin IN ('ownerpropertyregistration', 'ownerhomeloggedin') THEN 'ownerpropertyregistration'
             ELSE concat('notmapped-',dsupa.tp_origin)
         END AS acquisition_origin,
@@ -232,7 +232,7 @@ report_origin AS (
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'ownerpropertyregistration' THEN 'Owner PWA - Not Mapped'
-            WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'pricesuggestion' THEN 'Price Calculator'
+            WHEN obt.funnel_order > 2 AND obt.acquisition_origin IN ('pricesuggestion','pricesuggestionhome') THEN 'Price Calculator'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'pricesuggestionsale' THEN 'Price Calculator - Sale'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'referrals' AND obt.affiliate_type_adjusted = 'agent' THEN 'Indica Aí - Agents'
             WHEN obt.funnel_order > 2 AND obt.acquisition_origin = 'referrals' AND obt.affiliate_type_adjusted IN ('doorman', 'B2B Partner') THEN 'Doorman/B2B'
@@ -260,7 +260,7 @@ report_origin AS (
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.behavior_type) = 'non organic' THEN 'Owner PWA - Paid'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerpropertyregistration' AND lower(obt.behavior_type) = 'organic' THEN 'Owner PWA - Organic'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'ownerpropertyregistration' THEN 'Owner PWA - Not Mapped'
-            WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'pricesuggestion' THEN 'Price Calculator'
+            WHEN obt.funnel_order < 3 AND obt.acquisition_origin IN ('pricesuggestion','pricesuggestionhome') THEN 'Price Calculator'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'pricesuggestionsale' THEN 'Price Calculator - Sale'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'referrals' AND obt.affiliate_type_adjusted = 'agent' THEN 'Indica Aí - Agents'
             WHEN obt.funnel_order < 3 AND obt.acquisition_origin = 'referrals' AND obt.affiliate_type_adjusted IN ('doorman', 'B2B Partner') THEN 'Doorman/B2B'
