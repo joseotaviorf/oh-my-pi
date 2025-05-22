@@ -2,7 +2,7 @@
 database_name: datalake_company
 table_name: company_sks
 description: Generates the surrogate keys for companies and cosolidates IDs and uuids from related entities.
-domain: Rede
+domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_company:
