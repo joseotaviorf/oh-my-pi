@@ -3852,7 +3852,7 @@ bietlejuice.reverse_sale_listings_report_access:
   - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-listing-visit-scheduled
   - bietlejuice.reverse_sale_listings_report_load:load-reverse-sale-ongoing-listings
 bietlejuice.reverse_sale_listings_report_load:
-  - bietlejuice.dw_rede_company:load-dw-rede-dim-company
+  - bietlejuice.dw_company:load-dw-public-dim-company-3p-partners
   - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p
   - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-context
   - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-reason

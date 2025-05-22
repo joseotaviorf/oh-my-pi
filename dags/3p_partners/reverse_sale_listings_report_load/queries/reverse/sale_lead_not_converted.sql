@@ -22,7 +22,7 @@ JOIN
     dw_public.dim_date AS dd
         ON flsr.sk_reason_started_date = dd.sk_date
 JOIN
-    dw_rede.dim_company AS dc
+    dw_public.dim_company_3p_partners AS dc
         ON dc.sk_company = flsr.sk_company
 JOIN
     dw_rede.dim_lead_3p AS dl

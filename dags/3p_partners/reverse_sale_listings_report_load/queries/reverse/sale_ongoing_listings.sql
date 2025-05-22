@@ -12,7 +12,7 @@ SELECT
 FROM
     dw_sale.fact_daily_ongoing_listing AS fdol
 JOIN
-    dw_rede.dim_company AS dc
+    dw_public.dim_company_3p_partners AS dc
         ON dc.sk_company = fdol.sk_company
 WHERE
     MAKE_DATE(fdol.year, fdol.month, fdol.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

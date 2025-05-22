@@ -12,7 +12,7 @@ SELECT
 FROM
     dw_sale.fact_visits AS fv
 JOIN
-    dw_rede.dim_company AS dc
+    dw_public.dim_company_3p_partners AS dc
       ON fv.sk_company_supply = dc.sk_company
 JOIN
     dw_public.dim_date AS dd

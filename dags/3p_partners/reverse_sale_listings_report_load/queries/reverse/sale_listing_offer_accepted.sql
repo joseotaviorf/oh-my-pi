@@ -15,7 +15,7 @@ JOIN
     dw_sale.dim_sale_event_type AS dset
         ON fsde.sk_event_type = dset.sk_event_type
 JOIN
-    dw_rede.dim_company AS dc
+    dw_public.dim_company_3p_partners AS dc
         ON fsde.sk_company_supply = dc.sk_company
 WHERE
     MAKE_DATE(fsde.year, fsde.month, fsde.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

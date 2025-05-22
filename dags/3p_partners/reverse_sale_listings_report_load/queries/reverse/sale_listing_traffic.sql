@@ -16,7 +16,7 @@ JOIN
     dw_public.dim_search_session_event_type AS dsset
         ON fsse.sk_event_type = dsset.sk_event_type
 JOIN
-    dw_rede.dim_company AS dc
+    dw_public.dim_company_3p_partners AS dc
         ON fsse.sk_company = dc.sk_company
 WHERE
     MAKE_DATE(fsse.year, fsse.month, fsse.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

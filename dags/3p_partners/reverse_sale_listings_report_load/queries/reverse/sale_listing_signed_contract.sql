@@ -16,7 +16,7 @@ JOIN
     dw_sale.dim_sale_event_type AS dset
         ON fsde.sk_event_type = dset.sk_event_type
 JOIN
-    dw_rede.dim_company AS dc
+    dw_public.dim_company_3p_partners AS dc
         ON fsde.sk_company_supply = dc.sk_company
 JOIN
     dw_sale.dim_sale_agreement AS dsa

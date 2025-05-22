@@ -46,8 +46,7 @@ LEFT JOIN
   demand_score AS ds
     ON dl.sk_house = ds.sk_house
 LEFT JOIN
-  dw_rede.dim_company AS dc
+  dw_public.dim_company_3p_partners AS dc
     ON fl.sk_company = dc.sk_company
 WHERE
   dl.status = 'PUBLISHED'
-  

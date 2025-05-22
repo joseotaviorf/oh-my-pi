@@ -22,7 +22,7 @@ SELECT
 FROM
     dw_sale.fact_listing_status AS fls
 JOIN
-    dw_rede.dim_company AS dc
+    dw_public.dim_company_3p_partners AS dc
         ON dc.sk_company = fls.sk_company
 WHERE
     status_history = 'PUBLISHED'
