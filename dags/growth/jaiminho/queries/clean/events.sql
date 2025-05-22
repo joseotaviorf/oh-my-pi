@@ -8,7 +8,6 @@ SELECT
     status,
     callbackChannel AS callback_channel,
     callbackTrigger AS callback_trigger,
-    tracingContext AS tracing_context,
     extraInfo AS extra_info,
     version,
     CAST(createdAt AS TIMESTAMP) AS ts_created,
