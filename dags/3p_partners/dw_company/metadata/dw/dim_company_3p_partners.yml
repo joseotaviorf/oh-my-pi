@@ -8,6 +8,10 @@ columns:
     lineage: 
       - datalake_company.company_sks.sk_company
     description: Surrogate key and unique identifier for the company in the data lakehouse.
+  sk_person_account_manager:
+    lineage: 
+      - datalake_person.person_sks.sk_person
+    description: Surrogate key identifier for the account manager in dw_public.dim_person.
   id_company:
     lineage: 
       - datalake_company.company_sks.id_company 
@@ -16,10 +20,6 @@ columns:
     lineage: 
       - datalake_hubspot.company_members.id_company
     description: Unique identifier for the company in HubSpot.
-  id_account_manager:
-    lineage: 
-      - datalake_hubspot.company_members.id_account_manager
-    description: Unique identifier for the account manager in HubSpot.
   uuid_company:
     lineage: 
       - datalake_company.company_sks.uuid_company

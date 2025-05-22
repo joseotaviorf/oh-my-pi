@@ -1,8 +1,8 @@
 SELECT
   cs.sk_company,
+  COALESCE(ps.sk_person, -1) AS sk_person_account_manager,
   cs.id_company,
   COALESCE(cm.id_company, -1) AS id_hubspot,
-  COALESCE(cm.id_hubspot_owner, -1) AS id_account_manager,
   cs.uuid_company,
   cs.cnpj AS cnpj,
   COALESCE(a.city, 'Unknown') AS company_city,
@@ -41,6 +41,12 @@ LEFT JOIN
 INNER JOIN
   datalake_hubspot.company_members AS cm
     ON cs.id_hubspot = cm.id_company
+LEFT JOIN
+  datalake_hubspot.owner AS ho
+    ON ho.id_owner = cm.id_hubspot_owner
+LEFT JOIN
+  datalake_person.person_sks AS ps
+    ON ps.uuid_person = ho.uuid_person
 LEFT JOIN
   datalake_hubspot.membership_updates AS mu
     ON cm.id_company = mu.id_hubspot

@@ -229,6 +229,8 @@ bietlejuice.dw_company:
   - bietlejuice.company:load-clean-company
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-members
   - bietlejuice.enrich_hubspot_events:load-enrich-membership-updates
+  - bietlejuice.enrich_hubspot_management:load-enrich-owner
+  - bietlejuice.enrich_person:load-enrich-person-sks
   - bietlejuice.enrich_rede_company:load-enrich-company-sks
 bietlejuice.dw_condo_monitoring:
   - bietlejuice.enrich_condo_monitoring:load-enrich-communication
