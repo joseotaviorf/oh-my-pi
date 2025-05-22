@@ -1,11 +1,11 @@
 WITH booking AS (
-    SELECT 
+    SELECT
         b.id,
         b.id_visit,
         b.id_visitor,
         b.id_agent,
         bc.cancelled_by = "Agent" AS is_booking_cancellation_by_agent,
-        vcd.on_behalf_of = "AGENT" AS is_visit_cancellation_by_agent,
+        vcu.on_behalf_of = "AGENT" AS is_visit_cancellation_by_agent,
         b.first_update_source = "Corretores" AS is_visit_booking_by_agent,
         b.status NOT IN ('Done', 'Realizado', 'Cancelado', 'Canceled') AS is_booking_stalled,
         b.is_visit_completed,
@@ -14,9 +14,9 @@ WITH booking AS (
     FROM
         datalake_booking.booking AS b
     LEFT JOIN
-        datalake_ebdb_clean.visit_cancellation_details AS vcd
-            ON vcd.id_visit = b.id_visit
-    LEFT JOIN 
+        datalake_visit.visit_cancellation_unified AS vcu
+            ON vcu.id_visit = b.id_visit
+    LEFT JOIN
         datalake_booking.booking_cancellation AS bc
             ON bc.id_booking = b.id
     WHERE
@@ -67,7 +67,7 @@ SELECT
     YEAR(b.ts_created) AS year,
     MONTH(b.ts_created) AS month,
     DAY(b.ts_created) AS day
-FROM 
+FROM
     booking AS b
 LEFT JOIN
     consecutive_confirmed_visits AS cv
