@@ -8,8 +8,8 @@ columns:
     description: Cyber operator login
     lineage:
       - datalake_meetcall_raw.dadosoperadores.id_operador_cyber
-  id_operator_grb:
-    description: GRB operator login
+  id_operator:
+    description: MeetCall operator login
     lineage:
       - datalake_meetcall_raw.dadosoperadores.id_operador_assessoria
   name:

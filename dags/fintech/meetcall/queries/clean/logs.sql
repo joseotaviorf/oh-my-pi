@@ -1,7 +1,7 @@
 SELECT
     id_ocorrencia AS id_occurrence,
     id_operador_cyber AS id_operator_cyber,
-    id_operador_assessoria AS id_operator_grb,
+    id_operador_assessoria AS id_operator,
     id_contrato AS id_contract,
     telefone_acionado AS phone_contacted,
     email_acionado AS email_contacted,

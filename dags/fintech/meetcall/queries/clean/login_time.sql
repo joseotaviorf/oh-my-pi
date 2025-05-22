@@ -1,8 +1,9 @@
 SELECT
     id_registro AS id_record,
     id_operador_cyber AS id_operator_cyber,
-    id_operador_assessoria AS id_operator_grb,
+    id_operador_assessoria AS id_operator,
     email_operador AS email_operator,
+    celula AS portfolio,
     tempo_total_pausa AS total_pause_time,
     tempo_total_logado AS total_logged_time,
     tempo_total_falado AS total_talk_time,

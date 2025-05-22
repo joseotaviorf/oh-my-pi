@@ -12,14 +12,18 @@ columns:
     description: Cyber operator login
     lineage:
       - datalake_meetcall_raw.dadosloginlogout.id_operador_cyber
-  id_operator_grb:
-    description: GRB operator login
+  id_operator:
+    description: MeetCall operator login
     lineage:
       - datalake_meetcall_raw.dadosloginlogout.id_operador_assessoria
   email_operator:
     description: Email address associated with the operator
     lineage:
       - datalake_meetcall_raw.dadosloginlogout.email_operador
+  portfolio:
+    description: Portfolio (cell) the operator was assigned to on the given day, representing the area of collection activity.
+    lineage:
+      - datalake_meetcall_raw.dadosloginlogout.celula
   total_pause_time:
     description: Total time the operator spent on pause
     lineage:

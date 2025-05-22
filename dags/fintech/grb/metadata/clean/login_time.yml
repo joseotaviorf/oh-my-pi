@@ -29,6 +29,10 @@ columns:
     description: Total time the operator was logged in without handling contacts
     lineage:
       - datalake_grb_raw.tab_tempos.tempo_total_sem_atendimento
+  portfolio:
+    description: Portfolio (cell) the operator was assigned to on the given day, representing the area of collection activity.
+    lineage:
+      - datalake_grb_raw.tab_tempos.celula
   email_operator:
     description: Email address associated with the operator
     lineage:
