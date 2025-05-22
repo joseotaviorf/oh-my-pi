@@ -1,0 +1,17 @@
+---
+table_name: datalake_pin.talent_review
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 8000
+    severity_level: Error
+column_level_validations:
+  assignment_number:
+    is_complete:
+      severity_level: Error
+  id_period_of_service:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

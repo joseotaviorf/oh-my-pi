@@ -1,0 +1,192 @@
+---
+database_name: datalake_pin
+table_name: talent_review
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  Consolidates data from talent review meetings, containing employee talent assessments.
+  Includes initial (pre-meeting) and calibrated (post-meeting) ratings for dimensions
+  such as risk of loss, criticality, readiness, and potential. Also details the
+  review committee meeting and timestamps for the creation and update of these initial
+  assessments.
+columns:
+  assignment_number:
+    description: Unique identifier for an employee's assignment.
+    lineage:
+      - datalake_hr_system.employee_ids.assignment_number
+  id_period_of_service:
+    description: Identifier for an employee's period of service relevant to the talent assessment.
+    lineage:
+      - datalake_hr_system.employee_ids.id_period_of_service
+  id_risk_loss_rating_level_calibrated:
+    description: Identifier for the calibrated risk of loss rating level.
+    lineage:
+      - datalake_pin_hr_review_clean.dashboard.id_risk_loss_rating_level_calibrated
+  id_criticality_rating_level_calibrated:
+    description: Identifier for the calibrated criticality rating level.
+    lineage:
+      - datalake_pin_hr_review_clean.dashboard.id_criticality_rating_level_calibrated
+  id_readiness_rating_level_calibrated:
+    description: Identifier for the calibrated readiness rating level.
+    lineage:
+      - datalake_pin_hr_review_clean.dashboard.id_readiness_rating_level_calibrated
+  id_potential_rating_level_calibrated:
+    description: Identifier for the calibrated potential rating level.
+    lineage:
+      - datalake_pin_hr_review_clean.dashboard.id_potential_rating_level_calibrated
+  id_risk_loss_rating_level_initial:
+    description: Identifier for the initial risk of loss rating level.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.id_rating_level
+  id_criticality_rating_level_initial:
+    description: Identifier for the initial criticality rating level.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.id_rating_level
+  id_readiness_rating_level_initial:
+    description: Identifier for the initial readiness rating level.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.id_rating_level
+  id_potential_rating_level_initial:
+    description: Identifier for the initial potential rating level.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.id_rating_level
+  committee_title:
+    description: Name or title of the talent review committee meeting where assessments were calibrated.
+    lineage:
+      - datalake_pin_hr_review_clean.meeting.meeting_title
+  initial_risk_of_loss:
+    description: Employee's risk of loss rating before calibration in the talent review meeting.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+    categories:
+      High: "High probability of the employee leaving the organization."
+      Medium: "Moderate probability of the employee leaving the organization."
+      Low: "Low probability of the employee leaving the organization."
+  calibrated_risk_of_loss:
+    description: Employee's risk of loss rating after calibration in the talent review meeting.
+    lineage:
+      - datalake_pin_hr_review_clean.dashboard.id_risk_loss_rating_level_calibrated
+    categories:
+      High: "High probability of the employee leaving the organization."
+      Medium: "Moderate probability of the employee leaving the organization."
+      Low: "Low probability of the employee leaving the organization."
+  initial_criticality:
+    description: Employee's or role's criticality rating before calibration in the talent review meeting.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+    categories:
+      No: "The employee or their role is not currently considered critical to the organization's immediate objectives or operations."
+      Yes: "The employee or their role is considered critical to the organization's immediate objectives, success, or continuity of operations."
+  calibrated_criticality:
+    description: Employee's or role's criticality rating after calibration in the talent review meeting.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+    categories:
+      No: "The employee or their role is not currently considered critical to the organization's immediate objectives or operations."
+      Yes: "The employee or their role is considered critical to the organization's immediate objectives, success, or continuity of operations."
+  initial_readiness:
+    description: Employee's readiness rating for promotion or new roles before calibration in the talent review meeting.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+    categories:
+      Unlikely to be promoted: "Low promotion prospect in the short to medium term."
+      Attention - needs development: "Requires skill development for advancement or improved current role performance."
+      Ready in 1 - 2 years: "Ready for next level or new responsibilities in 1-2 years."
+      Ready in 6 months - 1 years: "Ready for next level or new responsibilities in 6 months to 1 year."
+      Ready now: "Ready for immediate promotion or new responsibilities."
+  calibrated_readiness:
+    description: Employee's readiness rating for promotion or new roles after calibration in the talent review meeting.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+    categories:
+      Unlikely to be promoted: "Low promotion prospect in the short to medium term."
+      Attention - needs development: "Requires skill development for advancement or improved current role performance."
+      Ready in 1 - 2 years: "Ready for next level or new responsibilities in 1-2 years."
+      Ready in 6 months - 1 years: "Ready for next level or new responsibilities in 6 months to 1 year."
+      Ready now: "Ready for immediate promotion or new responsibilities."
+  initial_potential:
+    description: Employee's career potential rating before calibration in the talent review meeting.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+    categories:
+      Low: "Limited growth potential beyond the current role or requires significant development."
+      Medium: "Potential to grow and take on greater responsibilities, typically in adjacent roles or one level up."
+      High: "High potential to advance to senior leadership levels or multiple roles within the organization."
+  calibrated_potential:
+    description: Employee's career potential rating after calibration in the talent review meeting.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+    categories:
+      Low: "Limited growth potential beyond the current role or requires significant development."
+      Medium: "Potential to grow and take on greater responsibilities, typically in adjacent roles or one level up."
+      High: "High potential to advance to senior leadership levels or multiple roles within the organization."
+  initial_numeric_risk_of_loss:
+    description: "Numeric representation of the employee's initial risk of loss rating before calibration."
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  calibrated_numeric_risk_of_loss:
+    description: "Numeric representation of the employee's calibrated risk of loss rating."
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  initial_numeric_criticality:
+    description: "Numeric representation of the employee's initial criticality rating before calibration."
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  calibrated_numeric_criticality:
+    description: "Numeric representation of the employee's calibrated criticality rating."
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  initial_numeric_readiness:
+    description: "Numeric representation of the employee's initial readiness rating before calibration."
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  calibrated_numeric_readiness:
+    description: "Numeric representation of the employee's calibrated readiness rating."
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  initial_numeric_potential:
+    description: "Numeric representation of the employee's initial potential rating before calibration."
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  calibrated_numeric_potential:
+    description: "Numeric representation of the employee's calibrated potential rating."
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  dt_committee_meeting:
+    description: Date of the talent review committee meeting.
+    lineage:
+      - datalake_pin_hr_review_clean.meeting.ts_meeting
+  ts_initial_risk_of_loss_created:
+    description: Timestamp indicating when the initial risk of loss rating was first recorded.
+    lineage:
+      - datalake_pin_talent_clean.profile_item.ts_created
+  ts_initial_risk_of_loss_updated:
+    description: Timestamp indicating when the initial risk of loss rating was last updated.
+    lineage:
+      - datalake_pin_talent_clean.profile_item.ts_updated
+  ts_initial_criticality_created:
+    description: Timestamp indicating when the initial criticality rating was first recorded.
+    lineage:
+      - datalake_pin_talent_clean.profile_item.ts_created
+  ts_initial_criticality_updated:
+    description: Timestamp indicating when the initial criticality rating was last updated.
+    lineage:
+      - datalake_pin_talent_clean.profile_item.ts_updated
+  ts_initial_readiness_created:
+    description: Timestamp indicating when the initial readiness rating was first recorded.
+    lineage:
+      - datalake_pin_talent_clean.profile_item.ts_created
+  ts_initial_readiness_updated:
+    description: Timestamp indicating when the initial readiness rating was last updated.
+    lineage:
+      - datalake_pin_talent_clean.profile_item.ts_updated
+  ts_initial_potential_created:
+    description: Timestamp indicating when the initial potential rating was first recorded.
+    lineage:
+      - datalake_pin_talent_clean.profile_item.ts_created
+  ts_initial_potential_updated:
+    description: Timestamp indicating when the initial potential rating was last updated.
+    lineage:
+      - datalake_pin_talent_clean.profile_item.ts_updated
+  ts_load:
+    description: Timestamp indicating when the data was loaded into this table.

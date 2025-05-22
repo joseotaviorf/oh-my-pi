@@ -2550,6 +2550,8 @@ bietlejuice.enrich_pin:
   - bietlejuice.pin_core:load-clean-assignment-supervisor
   - bietlejuice.pin_core:load-clean-foundation-lookup-value
   - bietlejuice.pin_core:load-clean-person-name
+  - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation
+  - bietlejuice.pin_hr_review:load-clean-meeting
   - bietlejuice.pin_performance:load-clean-evaluation
   - bietlejuice.pin_performance:load-clean-evaluation-item
   - bietlejuice.pin_performance:load-clean-evaluation-participant
@@ -2568,6 +2570,9 @@ bietlejuice.enrich_pin:
   - bietlejuice.pin_questionnaires:load-clean-question-response
   - bietlejuice.pin_questionnaires:load-clean-questionnaire-participant
   - bietlejuice.pin_questionnaires:load-clean-questionnaire-response
+  - bietlejuice.pin_talent:load-clean-profile-base
+  - bietlejuice.pin_talent:load-clean-profile-item
+  - bietlejuice.pin_talent:load-clean-profile-type-sections-translation
   - bietlejuice.pin_talent:load-clean-rating-level-base
   - bietlejuice.pin_talent:load-clean-rating-level-translation
   - bietlejuice.pin_talent:load-clean-rating-model-base
