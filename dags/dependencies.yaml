@@ -1441,21 +1441,21 @@ bietlejuice.enrich_ciq_comissioning:
   - bietlejuice.gsheets_agents:done-clean-sale-comission-for-strategic-region
 bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-  - bietlejuice.enrich_retsuko:load-enrich-invoice
-  - bietlejuice.enrich_retsuko:load-enrich-invoice-info
-  - bietlejuice.enrich_debt_recovery:load-enrich-installment
-  - bietlejuice.trato_feito:load-clean-debt
-  - bietlejuice.trato_feito:load-clean-client
-  - bietlejuice.trato_feito:load-clean-contract
-  - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
   - bietlejuice.enrich_cyber:load-enrich-installment
   - bietlejuice.enrich_cyber:load-enrich-negotiation
+  - bietlejuice.enrich_debt_recovery:load-enrich-installment
+  - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
+  - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_recupera:load-enrich-installment
   - bietlejuice.enrich_recupera:load-enrich-negotiation
+  - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.recupera:load-clean-complementary-records
   - bietlejuice.recupera:load-clean-complementary-records-written-down
   - bietlejuice.recupera:load-clean-creditor-pending
+  - bietlejuice.trato_feito:load-clean-client
+  - bietlejuice.trato_feito:load-clean-contract
+  - bietlejuice.trato_feito:load-clean-debt
 bietlejuice.enrich_collections_quintocred:
   - bietlejuice.enrich_velo:load-enrich-propose
   - bietlejuice.enrich_velo:load-enrich-propose-person
@@ -2530,9 +2530,9 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.wall_street:load-clean-subscription-item
 bietlejuice.enrich_people_public:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
-  - bietlejuice.enrich_hr_system:load-enrich-managers
-  - bietlejuice.gsheets_people:done-clean-position-class
+  - bietlejuice.enrich_pin:load-enrich-managers-history
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
+  - bietlejuice.hr_system:load-clean-jobs
   - bietlejuice.hr_system:load-clean-organizations
 bietlejuice.enrich_person:
   - bietlejuice.company:load-clean-member-profile
