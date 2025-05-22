@@ -72,7 +72,7 @@ WITH dag_info AS (
         ON sc.id_entity = smp.id_entity
       LEFT JOIN datalake_anonymization_validation.manual_validation as mv
         ON sc.id_entity = mv.id_entity
-      LEFT JOIN
+      JOIN
         table_info AS ti
         ON ti.table_name = CONCAT(sc.database_name, ".", sc.table_name)
   WHERE
@@ -80,21 +80,20 @@ WITH dag_info AS (
     AND sc.month = {month}
     AND sc.day = {day}
     AND mv.id_entity IS NULL
-),
-ae_managers AS (
-    SELECT
-        oc.work_email,
-        oc.line
-    FROM
-        datalake_people_public.org_chart AS oc
-    WHERE
-        assignment_status_type = 'ACTIVE'
-        AND assignment_name LIKE '%GERENTE DE ENGENHARIA DE DADOS%'
 )
 SELECT
     id_entity,
     domain,
-    aem.work_email AS email,
+    CASE
+      WHEN domain IN ('For Rent', 'Support & Services') THEN 'carolina.cavalcante@quintoandar.com.br'
+      WHEN domain IN ('Data Engineering', 'Data Ingestion', 'Tech Platform Cyber Security', 'Tech Platform Dev Foundation', 'Data Platform') THEN 'mario.abreu@quintoandar.com.br'
+      WHEN domain IN ('Partners','Agents','Rede') THEN 'nailane.oliveira@quintoandar.com.br'
+      WHEN domain IN ('Data Governance') THEN 'peter.reichel@quintoandar.com.br'
+      WHEN domain IN ('Fintech Platform', 'Growth', 'Primitives' ) THEN 'tadeu.kanashiro@quintoandar.com.br'
+      WHEN domain IN ('For Sale', 'People') THEN 'thiago.bueno@quintoandar.com.br'
+      WHEN domain IN ('MLOps') THEN 'lucas.cardozo@quintoandar.com.br'
+      ELSE NULL
+    END as email,
     CASE WHEN
         LENGTH(TO_JSON(sample)) > 1000 THEN ARRAY('SAMPLE_TOO_LARGE')
         ELSE sample
@@ -113,6 +112,3 @@ SELECT
     jd.day
 FROM
     joined_data AS jd
-LEFT JOIN
-    ae_managers AS aem
-        ON jd.domain = aem.line
