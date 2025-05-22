@@ -1,4 +1,4 @@
-database_name: datalake_anonymiation_validation
+database_name: datalake_anonymization_validation
 table_name: manual_validation
 owner: augusto.torres@quintoandar.com.br
 domain: Data Ops & Governance

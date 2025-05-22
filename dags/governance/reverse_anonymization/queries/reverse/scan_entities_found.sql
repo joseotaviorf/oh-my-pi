@@ -1,43 +1,46 @@
-WITH table_info AS (
-SELECT
-    t.table AS table_name,
-    t.dag,
-    t.layer,
-    CASE
-        WHEN LOWER(d.owners) LIKE '%bedrock%' THEN 'BedRock'
+WITH dag_info AS (
+  SELECT
+      d.id_dag,
+      CASE
+        WHEN d.owners in ('Data ForRent', 'Data ForRent, airflow', 'airflow, Data ForRent', 'Data International', 'airflow, Data International', 'Data International, airflow') THEN 'For Rent'
+        WHEN d.owners IN ('Data SS', 'Data SS, airflow', 'airflow, Data SS') THEN 'Support & Services'
+        WHEN d.owners IN ('Data Engineering', 'Data Engineering, airflow', 'airflow, Data Engineering') THEN 'Data Engineering'
+        WHEN d.owners IN ('Data Ingestion', 'airflow, Data Ingestion', 'airflow, Data Ingestion', 'Data Life Cycle', 'Data Life Cycle, airflow', 'airflow, Data Life Cycle') THEN 'Data Ingestion'
+        WHEN d.owners IN ('Data Rede', 'Data Rede, airflow', 'Data Agents', 'airflow, Data Agents') THEN 'Partners'
+        WHEN d.owners IN ('Data Agents, airflow') THEN 'Agents'
+        WHEN d.owners IN ('airflow, Data Rede') THEN 'Rede'
+        WHEN d.owners IN ('Data Governance', 'Data Governance, airflow', 'airflow, Data Governance') THEN 'Data Governance'
         WHEN d.owners IN ('Data Fintech', 'Data Fintech, airflow', 'airflow, Data Fintech') THEN 'Fintech Platform'
-        WHEN d.owners IN ('Data ForRent', 'Data ForRent, airflow', 'airflow, Data ForRent') THEN 'For Rent'
-        WHEN d.owners IN ('Data ForSale', 'Data ForSale, airflow', 'airflow, Data ForSale') THEN 'For Sale'
         WHEN d.owners IN ('Data Growth', 'Data Growth, airflow', 'airflow, Data Growth') THEN 'Growth'
-        WHEN d.owners IN ('Data Rede','Data Rede, airflow', 'Data Agents', 'airflow, Data Agents') THEN 'Partners'
-        WHEN d.owners IN ('Data SS','Data SS, airflow') THEN 'Support & Services'
-        WHEN d.owners IN ('Data International', 'airflow, Data International', 'Data International, airflow') THEN 'For Rent'
-        WHEN d.owners IN ('airflow, Data People', 'Data People') THEN 'People'
-        WHEN d.owners IN ('Data Governance', 'Data Governance, airflow') THEN 'Data Governance'
-        WHEN d.owners IN ('Data Engineering', 'airflow, Data Engineering', 'Data Engineering, airflow') THEN 'Data Engineering'
-        WHEN d.owners IN ('Data Ingestion', 'airflow, Data Ingestion') THEN 'Data Ingestion'
+        WHEN d.owners IN ('Data Primitives') THEN 'Primitives'
+        WHEN d.owners IN ('Data ForSale','Data ForSale, airflow','airflow, Data ForSale') THEN 'For Sale'
+        WHEN d.owners IN ('Data People', 'airflow, Data People', 'Data People, airflow') THEN 'People'
+        WHEN d.owners IN ('MLOps', 'MLOps Team') THEN 'MLOps'
         ELSE d.owners
-    END AS owner,
-    CASE
-        WHEN d.owners IN ('Data Bedrock', 'Data Bedrock, airflow', 'airflow, Data Bedrock') THEN 'BedRock'
-        WHEN d.owners IN ('Data Fintech', 'Data Fintech, airflow', 'airflow, Data Fintech','Data Growth', 'Data Growth, airflow', 'airflow, Data Growth') THEN 'Fintech Platform'
-        WHEN d.owners IN ('Data ForRent', 'Data ForRent, airflow', 'airflow, Data ForRent','Data International', 'airflow, Data International', 'Data International, airflow','Data SS','Data SS, airflow') THEN 'For Rent'
-        WHEN d.owners IN ('Data ForSale', 'Data ForSale, airflow', 'airflow, Data ForSale', 'Data People', 'airflow, Data People', 'Data People, airflow') THEN 'For Sale'
-        WHEN d.owners IN ('Data Rede','Data Rede, airflow', 'Data Agents', 'airflow, Data Agents') THEN 'Partners'
-        ELSE d.owners
-    END AS owner_adjusted
-FROM
-    datalake_dag_inventory_clean.`table` AS t
-JOIN
-    datalake_composer_clean.dag AS d
-        on t.dag = d.id_dag
-WHERE
-   year = {year}
-  AND month = {month}
-  AND day = {day}
-  AND t.layer IN ('clean','enrich','dw')
-),
-joined_data AS (
+      END AS owner_adjusted
+  FROM
+      datalake_astro_clean.dag AS d
+  WHERE
+    year = 2025
+    AND month = 5
+    AND day = 20
+), table_info as (
+    SELECT
+      t.table AS table_name,
+      t.dag,
+      t.layer,
+      d.owner_adjusted
+  FROM
+      datalake_dag_inventory_clean.`table` AS t
+  JOIN
+      dag_info AS d
+          on t.dag = d.id_dag
+  WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}
+    AND t.layer IN ('clean','enrich','dw')
+), joined_data as (
   SELECT
     sc.id_entity,
     ti.owner_adjusted AS domain,
@@ -64,18 +67,19 @@ joined_data AS (
     sc.month,
     sc.day
   FROM
-    datalake_anonymization.pii_scan_results AS sc
-  LEFT JOIN
-    table_info AS ti
-      ON ti.table_name = CONCAT(sc.database_name, ".", sc.table_name)
-  LEFT JOIN
-    datalake_anonymization.columns_sample_data AS smp
-      ON sc.id_entity = smp.id_entity
+    datalake_anonymization.pii_scan_results as sc
+      LEFT JOIN datalake_anonymization.columns_sample_data as smp
+        ON sc.id_entity = smp.id_entity
+      LEFT JOIN datalake_anonymization_validation.manual_validation as mv
+        ON sc.id_entity = mv.id_entity
+      LEFT JOIN
+        table_info AS ti
+        ON ti.table_name = CONCAT(sc.database_name, ".", sc.table_name)
   WHERE
     sc.year = {year}
     AND sc.month = {month}
     AND sc.day = {day}
-    AND ti.owner IS NOT NULL
+    AND mv.id_entity IS NULL
 ),
 ae_managers AS (
     SELECT

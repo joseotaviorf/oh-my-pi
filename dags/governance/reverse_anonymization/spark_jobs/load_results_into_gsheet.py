@@ -148,7 +148,7 @@ def main():
     gsheet_current_data = gsheets_consumer.get_sheet_df(sheet_name, sheet_id, "pii_scan_results_validation")
     logger.info(f"m=main, message=Found {len(gsheet_current_data.collect())} rows on gsheets.")
 
-    gsheet_current_data_list = gsheet_current_data.filter("final_check != ''").rdd.map(lambda row: [str(x) for x in row]).collect()
+    gsheet_current_data_list = gsheet_current_data.filter("final_check == ''").rdd.map(lambda row: [str(x) for x in row]).collect()
 
     logger.info(f"m=main, message= {len(gsheet_current_data_list)} still need validation from owners. Keeping on gsheets.")
     logger.info(f"m=main, message= {len(new_data_scan)} new data to be written on gsheets.")
@@ -157,6 +157,7 @@ def main():
     payload.insert(0, header)
 
     gsheets_producer.write(sheet_name, sheet_id, payload)
+
 
 if __name__ == "__main__":
     main()

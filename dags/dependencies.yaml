@@ -3635,9 +3635,10 @@ bietlejuice.metric_ss__tickets:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
 bietlejuice.reverse_anonymization:
-  - bietlejuice.composer:load-clean-dag
+  - bietlejuice.astro:load-clean-dag
   - bietlejuice.enrich_anonymization:load-enrich-columns-sample-data
   - bietlejuice.enrich_anonymization:load-enrich-pii-scan-results
+  - bietlejuice.enrich_anonymization_validation:load-enrich-manual-validation
   - bietlejuice.enrich_people_public:load-enrich-org-chart
 bietlejuice.reverse_atento:
   - bietlejuice.bigfone:load-clean-call
