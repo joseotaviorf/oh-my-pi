@@ -29,7 +29,7 @@ workflow:
       clean_table_name: logs
       extraction_type: incremental
       partitions: [year, month, day]
-      merge_on: ["id_ocorrencia"]
+      merge_on: ["id_occurrence"]
       extra_spark_job_arguments:
         - "['data_hora_ocorrencia_inicio']"
     tab_tempos:
