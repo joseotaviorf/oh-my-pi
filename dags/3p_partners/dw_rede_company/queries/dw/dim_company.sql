@@ -50,7 +50,6 @@ SELECT
     COALESCE(c.responsible_supply_expert, 'Unknown') AS responsible_supply_expert,
     COALESCE(c.responsible_demand_expert, 'Unknown') AS responsible_demand_expert,
     COALESCE(c.responsible_operations_supply, 'Unknown') AS responsible_operations_supply,
-    COALESCE(o.first_name||' '|| o.last_name, 'Unknown') AS account_manager,
     CASE
         WHEN c.is_juridical_person THEN 'PJ'
         WHEN c.is_natural_person THEN 'PF'
@@ -92,9 +91,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_ebdb_clean.state AS s
         ON s.abbreviation = c.state
-LEFT JOIN
-    datalake_hubspot.owner AS o
-        ON c.id_hubspot_owner = o.id_owner
 WHERE
   c.has_been_sale_member
     OR c.has_been_rent_member
