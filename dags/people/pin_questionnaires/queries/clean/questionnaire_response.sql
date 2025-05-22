@@ -5,7 +5,7 @@ SELECT
   status,
   created_by,
   last_updated_by AS updated_by,
-  latest_attempt_flag = 'Y' AS is_lastest_attempt,
+  latest_attempt_flag = 'Y' AS is_latest_attempt,
   CAST(object_version_number AS INT) AS object_version_number,
   total_score,
   CAST(attempt_num AS INT) AS attempt_number,
