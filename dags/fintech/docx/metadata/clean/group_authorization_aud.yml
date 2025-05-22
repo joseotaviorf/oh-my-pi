@@ -1,0 +1,66 @@
+---
+database_name: datalake_docx_clean
+table_name: group_authorization_aud
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.id
+  id_group:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.group_id
+  id_requestor:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.requestor_id
+  id_house:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.properties
+  rev:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.rev
+  rev_type:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.revtype
+  rev_end:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.revend
+  type:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.type
+  status:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.status
+  requestor_type:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.requestor_type
+  rent_value:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.properties
+  package_value:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.properties
+  credit_result:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.result
+  properties:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.properties
+  result:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.result
+  mod_status:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.status_mod
+  mod_properties:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.properties_mod
+  mod_result:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.result_mod
+  mod_ts_expired:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.expires_at_mod
+  ts_expired:
+    lineage:
+    - datalake_docx_raw.group_authorization_aud.expires_at

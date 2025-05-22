@@ -1,0 +1,36 @@
+---
+database_name: datalake_docx_clean
+table_name: group_member_aud
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_docx_raw.group_member_aud.id
+  id_group:
+    lineage:
+    - datalake_docx_raw.group_member_aud.group_id
+  id_reference:
+    lineage:
+    - datalake_docx_raw.group_member_aud.reference_id
+  rev:
+    lineage:
+    - datalake_docx_raw.group_member_aud.rev
+  rev_type:
+    lineage:
+    - datalake_docx_raw.group_member_aud.revtype
+  rev_end:
+    lineage:
+    - datalake_docx_raw.group_member_aud.revend
+  reference_type:
+    lineage:
+    - datalake_docx_raw.group_member_aud.reference_type
+  mod_reference:
+    lineage:
+    - datalake_docx_raw.group_member_aud.reference_mod
+  role:
+    lineage:
+    - datalake_docx_raw.group_member_aud.role
+  mod_role:
+    lineage:
+    - datalake_docx_raw.group_member_aud.role_mod

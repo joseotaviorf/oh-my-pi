@@ -1,0 +1,63 @@
+---
+database_name: datalake_docx_clean
+table_name: person_document_info_aud
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+columns:
+  id:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.id
+  id_person_document:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.person_document_id
+  id_input_source:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.input_source_id
+  rev:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.rev
+  rev_type:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.revtype
+  rev_end:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.revend
+  input_source_type:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.input_source_type
+  input_value_type:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.input_value_type
+  validation_type:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.validation_type
+  type:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.type
+  status:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.status
+  input_value:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.input_value
+  input_type:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.input_type
+  validated_by:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.validated_by
+  mod_input:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.input_mod
+  mod_status:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.status_mod
+  mod_type:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.type_mod
+  mod_person_document:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.person_document_mod
+  ts_last_validated:
+    lineage:
+    - datalake_docx_raw.person_document_info_aud.last_validated_at

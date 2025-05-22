@@ -15,11 +15,15 @@ workflow:
     credit_evaluation:
       get_table_metrics:
         count: id
-    credit_evaluation_aud: {}
+    credit_evaluation_aud:
+      clean_table_name: credit_evaluation_aud
+      raw_primary_keys: ["id", "rev"]
     credit_evaluation_proponent:
       get_table_metrics:
         count: id
-    credit_evaluation_proponent_aud: {}
+    credit_evaluation_proponent_aud:
+      clean_table_name: credit_evaluation_proponent_aud
+      raw_primary_keys: ["id", "rev"]
     document: {}
     document_aud: {}
     document_context: {}
@@ -30,7 +34,22 @@ workflow:
     folder_reference_aud: {}
     folder_reference_type: {}
     folder_type: {}
+    group_authorization: {}
+    group_authorization_aud:
+      clean_table_name: group_authorization_aud
+      raw_primary_keys: ["id", "rev"]
+    group: {}
+    group_aud:
+      clean_table_name: group_aud
+      raw_primary_keys: ["id", "rev"]
+    group_member: {}
+    group_member_aud:
+      clean_table_name: group_member_aud
+      raw_primary_keys: ["id", "rev"]
     machine_state: {}
+    machine_state_aud:
+      clean_table_name: machine_state_aud
+      raw_primary_keys: ["id", "rev"]
     message: {}
     processed_message: {}
     revinfo:
@@ -41,6 +60,9 @@ workflow:
     person: {}
     person_document: {}
     person_document_info: {}
+    person_document_info_aud:
+      clean_table_name: person_document_info_aud
+      raw_primary_keys: ["id", "rev"]
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new
