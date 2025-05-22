@@ -8,7 +8,7 @@ dag:
       This is a temporary DAG to create tables similar to house_listing and dim_house_listing to be tested before replacing the original ones.
       This DAG is triggered by Mediator and loads the table via full load.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     dim_house_listing_house:

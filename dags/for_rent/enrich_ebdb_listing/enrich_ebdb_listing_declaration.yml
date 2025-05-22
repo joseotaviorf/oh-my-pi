@@ -7,7 +7,7 @@ dag:
       Creates enriched tables for the context `Listing` of EBDB.
       This DAG is triggered by Mediator and loads the table via full load.
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   inner_dependencies:
     agents_with_keys:

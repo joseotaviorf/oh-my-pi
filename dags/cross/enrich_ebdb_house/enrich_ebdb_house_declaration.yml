@@ -5,7 +5,7 @@ dag:
   documentation:
     dag_purpose: Creates enriched tables for the context `House` from ebdb. This DAG is responsible for creating enriched tables about the house domain with a direct dependency on the EBDB. As a home domain, these would be characteristics, conditions and statuses that are independent of the listing (they don't change after a publication/depublication).
 workflow:
-  type: query
+  type: query_delta
   layer: enrich
   default_partitions:
   - country_code
