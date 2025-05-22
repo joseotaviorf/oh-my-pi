@@ -10,4 +10,7 @@ FROM
 LEFT JOIN
     datalake_ebdb_clean.user AS u
         ON u.id = sde.id_buyer
+WHERE
+    sde.id_buyer IS NOT NULL
+    AND sk_event_type <> 6 -- SALE_AGREEMENT_SIGNED
 GROUP BY 1, 2, 3, 6
