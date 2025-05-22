@@ -43,7 +43,7 @@ columns:
     description: 'ID of the Rede company in HubSpot, if the house is 3P Supply.'
   uuid_company:
     lineage:
-      - datalake_company.company.uuid_company
+      - datalake_company.company_sks.uuid_company
     description: 'UUID of Rede company, if the house is 3P Supply.'
   house_short_id:
     lineage:
@@ -293,7 +293,7 @@ columns:
   partner_3p_supply:
     lineage:
       - datalake_hubspot.company.extracted_3p_tag
-      - datalake_company.company.company_name
+      - datalake_company_clean.company.company_name
       - datalake_ebdb_clean.house.internal_admin_info
     description: 'Short name of the real estate agency in Rede QuintoAndar, associated with this house.'
   photo_booking_historic:

@@ -443,7 +443,7 @@ company_domain_with_end AS (
         cdc.business_context,
         COALESCE(hc.extracted_3p_tag, hc.name, cc.company_name) AS partner_3p_supply,
         cdc.uuid_company IS NOT NULL AS is_3p_supply,
-        cdc.uuid_company IS NOT NULL AND (hc.state IS NOT DISTINCT FROM 'MG' OR cc.state_abbreviation IS NOT DISTINCT FROM 'MG') AS is_3p_supply_bh,
+        cdc.uuid_company IS NOT NULL AND (hc.state IS NOT DISTINCT FROM 'MG' OR ca.state IS NOT DISTINCT FROM 'MG') AS is_3p_supply_bh,
         cdc.ts_status_started,
         LEAD(cdc.ts_status_started) OVER (PARTITION BY cdc.id_house, cdc.business_context ORDER BY cdc.ts_status_started) AS ts_status_ended
     FROM
@@ -452,8 +452,14 @@ company_domain_with_end AS (
         datalake_hubspot.company AS hc
             ON hc.uuid_company = cdc.uuid_company
     LEFT JOIN
-        datalake_company.company AS cc
-            ON cc.uuid_company = cdc.uuid_company
+        datalake_company.company_sks AS cs
+            ON cs.uuid_company = cdc.uuid_company
+    LEFT JOIN
+        datalake_company_clean.company AS cc
+            ON cc.id = cs.id_company
+    LEFT JOIN
+        datalake_company_clean.address AS ca
+            ON ca.id = cs.id_address
 ),
 -- After may 2023, our only source is the company domain
 company_domain_with_forced_start_date AS (

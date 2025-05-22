@@ -16,18 +16,18 @@ columns:
     description: Natural key that represents the company lead, coming from HubSpot.
   uuid_company:
     lineage:
-    - datalake_company.company.uuid_company
+    - datalake_company_clean.company.uuid_company
     description: Unique identifier (UUID) of a company generated in the Company Database.
   company_name:
     lineage:
-    - datalake_company.company.company_name
+    - datalake_company_clean.company.company_name
     - datalake_hubspot.company.name
     - datalake_company.company_sks.extracted_3p_tag
     description: Name of the company. Prioritizes the company name in the Company
       Database, then the company name in HubSpot.
   trade_name:
     lineage:
-    - datalake_company.company.trade_name
+    - datalake_company_clean.company.trade_name
     description: Trade name of the company.
   hubspot_company_name:
     lineage:
@@ -42,12 +42,12 @@ columns:
   extracted_3p_tag:
     lineage:
     - datalake_hubspot.company.extracted_3p_tag
-    - datalake_company.company.trade_name
+    - datalake_company_clean.company.trade_name
     description: Represents the real estate agency. It is extracted from the tag column,
       like "[3P-<extracted_3p_tag>]"
   company_domain_status:
     lineage:
-    - datalake_company.company.status
+    - datalake_company_clean.company.status
     description: Status of the company in the Company domain.
   lead_status:
     lineage:
@@ -99,34 +99,33 @@ columns:
     description: 'Cluster assigned to the company by the Ops team'
   address:
     lineage:
-    - datalake_company.company.public_area
+    - datalake_company_clean.address.public_area
     - datalake_hubspot.company.address
     description: Address of the company.
   zip_code:
     lineage:
-    - datalake_company.company.zip_code
+    - datalake_company_clean.address.zip_code
     - datalake_hubspot.company.zip_code
     description: ZIP code of the company.
   city:
     lineage:
-    - datalake_company.company.city
+    - datalake_company_clean.address.city
     - datalake_hubspot.company.city
     description: City where the company is located.
   state_abbreviation:
     lineage:
     - datalake_hubspot.company.state
-    - datalake_company.company.state_abbreviation
     description: State abbreviation where the company is located.
   state:
     lineage:
     - datalake_ebdb_clean.state.name
-    - datalake_company.company.state
+    - datalake_company.address.state
     - datalake_hubspot.company.state
     description: State where the company is located.
   country:
     lineage:
     - datalake_hubspot.company.country
-    - datalake_company.company.country
+    - datalake_company.address.country
     description: Country where the company is located.
   country_code:
     lineage:
@@ -159,17 +158,17 @@ columns:
     description: Which CRM the Company uses.
   document:
     lineage:
-      - datalake_company.company.document
+      - datalake_company.company_sks.cnpj
+      - datalake_company.company_sks.creci
       - datalake_hubspot.company.document
     description: Document of the company.
   cnpj:
     lineage:
-    - datalake_company.company.cnpj
+    - datalake_company.company_sks.cnpj
     - datalake_hubspot.company.cnpj
     description: CNPJ of the Brasil company.
   rfc:
     lineage:
-      - datalake_company.company.rfc
       - datalake_hubspot.company.rfc
     description: RFC of the Mexico company.
   creci:
@@ -205,14 +204,6 @@ columns:
     lineage:
     - datalake_hubspot.company.person_type
     description: PJ (Juridical Person) or PF (Natural person).
-  is_for_sale:
-    lineage:
-    - datalake_hubspot.company.is_for_sale
-    description: Whether or not the company works with sale.
-  is_for_rent:
-    lineage:
-    - datalake_hubspot.company.is_for_rent
-    description: Whether or not the company works with rent.
   is_flagged_as_leadgen:
     lineage:
       - datalake_hubspot.company_history.is_flagged_as_leadgen
@@ -227,12 +218,12 @@ columns:
     description: Time when the company was archived in HubSpot.
   ts_created:
     lineage:
-    - datalake_company.company.ts_created
+    - datalake_company_clean.company.ts_created
     - datalake_hubspot.company.ts_created
     description: Time when the company lead was created in HubSpot or the Company database (first of them).
   ts_updated:
     lineage:
-    - datalake_company.company.ts_updated
+    - datalake_company_clean.company.ts_updated
     - datalake_hubspot.company.ts_updated
     description: Time when the row was last updated.
   is_partner:

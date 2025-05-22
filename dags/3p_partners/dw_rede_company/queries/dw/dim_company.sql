@@ -15,7 +15,7 @@ SELECT
     COALESCE(c.rent_lead_status, 'Unknown') AS rent_lead_status,
     CASE
         WHEN (
-            ce.state_abbreviation IS NOT DISTINCT FROM 'MG'
+            ca.state IS NOT DISTINCT FROM 'MG'
             OR c.state IS NOT DISTINCT FROM 'MG'
             OR COALESCE(UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%', FALSE)
         )
@@ -29,21 +29,21 @@ SELECT
     COALESCE(c.rent_member_category, 'Unknown') AS rent_member_category,
     COALESCE(c.company_cluster, 'Unknown') as company_cluster,
     COALESCE(c.member_type, 'Unknown') AS member_type,
-    COALESCE(ce.public_area, c.address, 'Unknown') AS address,
-    COALESCE(ce.zip_code, c.zip_code, 'Unknown') AS zip_code,
-    COALESCE(ce.city, TRIM(UPPER(c.city)), 'Unknown') AS city,
-    COALESCE(ce.state_abbreviation, c.state, 'Unknown') AS state_abbreviation,
-    COALESCE(ce.state, s.name, c.state, 'Unknown') AS state,
-    COALESCE(IF(ce.country = 'Brasil', 'Brazil', ce.country), c.country, 'Unknown') AS country,
+    COALESCE(ca.public_area, c.address, 'Unknown') AS address,
+    COALESCE(ca.zip_code, c.zip_code, 'Unknown') AS zip_code,
+    COALESCE(ca.city, TRIM(UPPER(c.city)), 'Unknown') AS city,
+    COALESCE(c.state, 'Unknown') AS state_abbreviation,
+    COALESCE(ca.state, s.name, c.state, 'Unknown') AS state,
+    COALESCE(IF(ca.country = 'Brasil', 'Brazil', ca.country), c.country, 'Unknown') AS country,
     COALESCE(c.country_code, 'Undefined') AS country_code,
     COALESCE(c.domain, 'Unknown') AS domain,
     COALESCE(c.e_mail, 'Unknown') AS e_mail,
     COALESCE(c.phone, 'Unknown') AS phone,
     COALESCE(c.partnership_type, 'Unknown') AS partnership_type,
     COALESCE(c.crm, 'Unknown') AS crm,
-    COALESCE(ce.document, c.document, 'Unknown') AS document,
-    COALESCE(ce.cnpj, c.cnpj, 'Unknown') AS cnpj,
-    COALESCE(ce.rfc, c.rfc, 'Unknown') AS rfc,
+    COALESCE(cs.cnpj, cs.creci, c.document, 'Unknown') AS document,
+    COALESCE(cs.cnpj, c.cnpj, 'Unknown') AS cnpj,
+    COALESCE(c.rfc, 'Unknown') AS rfc,
     COALESCE(c.creci, 'Unknown') AS creci,
     COALESCE(c.cluster_performance, 'Unknown') AS cluster_performance,
     COALESCE(c.responsible_secretary, 'Unknown') AS responsible_secretary,
@@ -63,17 +63,15 @@ SELECT
     COALESCE(c.sale_lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento'), FALSE) AS is_sale_partner,
     COALESCE(c.rent_lead_status IN ('Parceiro', 'Membro', 'Em processo tombamento'), FALSE) AS is_rent_partner,
     (
-      ce.state_abbreviation IS NOT DISTINCT FROM 'MG'
+      ca.state IS NOT DISTINCT FROM 'MG'
         OR c.state IS NOT DISTINCT FROM 'MG'
         OR COALESCE(UPPER(c.tag_real_estate_agency) LIKE '%[3PBH-%]%', FALSE)
     ) AS is_3p_bh,
     (
-      ce.state_abbreviation IS DISTINCT FROM 'MG'
+      ca.state IS DISTINCT FROM 'MG'
         AND c.state IS DISTINCT FROM 'MG'
         AND COALESCE(UPPER(c.tag_real_estate_agency) NOT LIKE '%[3PBH-%]%', TRUE)
     ) AS is_3p_5a,
-    COALESCE(c.is_for_sale, FALSE) OR COALESCE(ce.sale_listings_currently_owned, 0) > 0 AS is_for_sale,
-    COALESCE(c.is_for_rent, FALSE) OR COALESCE(ce.rent_listings_currently_owned, 0) > 0 AS is_for_rent,
     c.is_flagged_as_leadgen AS is_flagged_as_leadgen_in_hubspot,
     COALESCE(c.is_archived, FALSE) AS is_archived,
     c.ts_archived,
@@ -86,8 +84,11 @@ LEFT JOIN
     datalake_hubspot.company AS c
         ON c.id_company = cs.id_hubspot
 LEFT JOIN
-    datalake_company.company AS ce
-        ON ce.uuid_company = cs.uuid_company
+    datalake_company_clean.company AS ce
+        ON ce.id = cs.id_company
+LEFT JOIN
+    datalake_company_clean.address AS ca
+        ON ca.id = cs.id_address
 LEFT JOIN
     datalake_ebdb_clean.state AS s
         ON s.abbreviation = c.state

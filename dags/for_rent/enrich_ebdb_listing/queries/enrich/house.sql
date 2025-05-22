@@ -95,14 +95,20 @@ listing_ownership AS (
     hc.id_company AS id_hubspot,
     loa.uuid_company,
     COALESCE(hc.extracted_3p_tag, cc.company_name) AS partner_3p_supply,
-    cc.state_abbreviation IS NOT DISTINCT FROM 'MG' OR hc.state IS NOT DISTINCT FROM 'MG' AS is_3p_bh,
+    ca.state IS NOT DISTINCT FROM 'MG' OR hc.state IS NOT DISTINCT FROM 'MG' AS is_3p_bh,
     loa.is_sale_3p_supply,
     loa.is_rent_3p_supply
   FROM
     listing_ownership_aux AS loa
   LEFT JOIN
-    datalake_company.company AS cc
-      ON cc.uuid_company = loa.uuid_company
+    datalake_company.company_sks AS cs
+      ON cs.uuid_company = loa.uuid_company
+  LEFT JOIN  
+    datalake_company_clean.company AS cc
+      ON cc.id = cs.id_company
+  LEFT JOIN
+    datalake_company_clean.address AS ca
+      ON ca.id = cs.id_address
   LEFT JOIN
     datalake_hubspot.company AS hc
       ON hc.uuid_company = loa.uuid_company

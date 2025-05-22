@@ -30,7 +30,7 @@ columns:
         in that business context.
   integrator_trade_name:
     lineage:
-      - datalake_company.company.trade_name
+      - datalake_company_clean.company.trade_name
     description: 'Trade name of the company that integrated the lead.'
   freshness:
     description: 'Freshness of the lead, which is determined by the amount of days between when the lead was sent to Zap Imóveis, and when it was sent to

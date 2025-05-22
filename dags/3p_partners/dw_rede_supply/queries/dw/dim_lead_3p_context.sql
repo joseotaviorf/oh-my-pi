@@ -22,12 +22,12 @@ acquisition_teams_separated_aux AS (
 ),
 integrator_companies AS (
     SELECT DISTINCT
-        c.id_company AS id_company_integrator,
+        c.id AS id_company_integrator,
         c.trade_name AS integrator_trade_name
     FROM
         datalake_brokers_supply_processor.business_context_detail AS bcd
     JOIN
-        datalake_company.company AS c
+        datalake_company_clean.company AS c
             ON bcd.id_partner = c.uuid_company
     UNION ALL
     SELECT
