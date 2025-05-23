@@ -1,5 +1,5 @@
 ---
-table_name: datalake_pin.org_chart
+table_name: datalake_people_public.org_chart
 alert_channel: "#alerts-de-airflow-dags"
 
 table_level_validations:
