@@ -871,6 +871,9 @@ bietlejuice.reverse_robbyson_access:
 bietlejuice.reverse_tiers_access:
   add:
     - bietlejuice.reverse_tiers:load-reverse-tiers
+bietlejuice.reverse_anonymization:
+  remove:
+    - bietlejuice.astro:load-clean-dag
 bietlejuice.reverse_tracksale:
   remove:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
