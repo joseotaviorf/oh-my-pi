@@ -22,11 +22,13 @@ workflow:
       partitions: ["id_app", "event_type", "year", "month", "day"]
       extra_spark_job_arguments:
         - "{{ ds }}"
+      run_optimize: false
 cluster:
-  type: databricks_13_3_med_memory_cluster
+  type: databricks_13_3_low_mem_driver_high_mem_nodes
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      spark.driver.maxResultSize: "8g"

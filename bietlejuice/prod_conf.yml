@@ -962,6 +962,16 @@ databricks_12_2_med_mem_driver_high_mem_nodes:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_13_3_low_mem_driver_high_mem_nodes:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.4xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
 ### Notification Configs ###
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_PROD_WEBHOOK
