@@ -1256,8 +1256,6 @@ bietlejuice.enrich_atta:
   - bietlejuice.atta:load-clean-partner-info
   - bietlejuice.atta:load-clean-proposal
   - bietlejuice.atta:load-clean-track-step-detail
-bietlejuice.enrich_aud_test:
-  - bietlejuice.ebdb_user:load-clean-user-pro-owner
 bietlejuice.enrich_availability_check_events:
   - bietlejuice.amplitude:load-clean-events
 bietlejuice.enrich_b2b:
