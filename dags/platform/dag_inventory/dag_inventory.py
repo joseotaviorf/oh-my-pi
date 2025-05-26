@@ -94,6 +94,7 @@ task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
     relative_query_path=SOURCE,
     spark_jobs_path=base_spark_jobs_path,
     athena_query_result_location=athena_query_results_bucket,
+    execution_timeout_hours=4,
 )
 
 
