@@ -39,6 +39,26 @@ workflow:
       - "feedbacks"
       - "audience/accounts"
       - "https://api.birdie.ai/ingestion"
+    dsat_diligence:
+      extra_spark_job_arguments:
+      - "feedbacks"
+      - "audience/accounts"
+      - "https://api.birdie.ai/ingestion"
+    dsat_financing:
+      extra_spark_job_arguments:
+      - "feedbacks"
+      - "audience/accounts"
+      - "https://api.birdie.ai/ingestion"
+    lost:
+      extra_spark_job_arguments:
+      - "feedbacks"
+      - "audience/accounts"
+      - "https://api.birdie.ai/ingestion"
+    new_surveys:
+      extra_spark_job_arguments:
+      - "feedbacks"
+      - "audience/accounts"
+      - "https://api.birdie.ai/ingestion"
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
   databricks_conn_id: databricks_new
