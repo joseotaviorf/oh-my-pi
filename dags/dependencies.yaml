@@ -695,6 +695,14 @@ bietlejuice.dw_operator_performance:
   - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-negotiation-installment
   - bietlejuice.iaf:load-clean-employee
   - bietlejuice.recupera:load-clean-operators
+bietlejuice.dw_performance:
+  - bietlejuice.enrich_pin:load-enrich-talent-review
+  - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation
+  - bietlejuice.pin_hr_review:load-clean-meeting
+  - bietlejuice.pin_talent:load-clean-rating-level-base
+  - bietlejuice.pin_talent:load-clean-rating-level-translation
+  - bietlejuice.pin_talent:load-clean-rating-model-base
+  - bietlejuice.pin_talent:load-clean-rating-model-translation
 bietlejuice.dw_person:
   - bietlejuice.enrich_person:load-enrich-person-sks
   - bietlejuice.person:load-clean-contact-info

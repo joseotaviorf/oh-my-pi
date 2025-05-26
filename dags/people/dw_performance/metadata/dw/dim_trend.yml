@@ -1,0 +1,16 @@
+---
+database_name: dw_performance
+table_name: dim_trend
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "Dimension table that defines standardized descriptions for trend indicators (e.g., Not Applicable, Maintained, Decreased, Increased). It is used to provide consistent meaning to numeric trend flags that correspond to sk_trend values -1, 0, 1, and 2 respectively."
+columns:
+  sk_trend:
+    description: "Surrogate key for the trend dimension."
+  description:
+    description: "Textual description of the trend."
+    categories:
+      "Not Applicable": "Indicates that a trend comparison is not applicable or data is unavailable (corresponds to sk_trend = -1)."
+      "Decreased": "Indicates that the measured value has decreased over the period or in the comparison (corresponds to sk_trend = 1)."
+      "Maintained": "Indicates that the measured value has remained stable or unchanged over the period or in the comparison (corresponds to sk_trend = 0)."
+      "Increased":  "Indicates that the measured value has increased over the period or in the comparison (corresponds to sk_trend = 2)."

@@ -1,0 +1,14 @@
+---
+table_name: dw_performance.dim_rating_level
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+column_level_validations:
+  sk_rating_level:
+      has_completeness:
+        greater_than: 0.9
+        severity_level: Error
+      is_distinct:
+        severity_level: Error

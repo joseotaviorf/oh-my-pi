@@ -1,0 +1,41 @@
+---
+database_name: dw_performance
+table_name: dim_rating_level
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Dimension table that stores details about rating levels used in talent assessments. It consolidates information from rating_level_base, rating_level_translation, rating_model_base, and rating_model_translation. It provides standardized names for rating models (Risk of Loss, Criticality, Readiness, Potential) and includes descriptions and numeric values for each rating level, filtered for US language.
+columns:
+  sk_rating_level:
+    description: Surrogate key uniquely identifying a specific rating level.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.id_rating_level
+  rating_model_code:
+    description: Code associated with the rating model.
+    lineage:
+      - datalake_pin_talent_clean.rating_model_base.rating_model_code
+  rating_model_name:
+    description: Standardized name of the rating model.
+    lineage:
+      - datalake_pin_talent_clean.rating_model_translation.rating_model_name
+  rating_description:
+    description: Descriptive text for the specific rating level (e.g., 'High', 'Medium', 'Low').
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+  review_rating_description:
+    description: Specific description of the rating level as used in reviews.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.review_rating_description
+  numeric_rating:
+    description: Numeric value associated with the rating level, used for calculations or ordering.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  ts_created:
+    description: Timestamp indicating when the rating level translation (US language) was created.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.ts_created
+  ts_updated:
+    description: Timestamp indicating when the rating level translation (US language) was last updated.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.ts_updated
+  ts_load:
+    description: Timestamp indicating when the record was loaded into this dimension table.

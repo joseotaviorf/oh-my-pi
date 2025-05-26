@@ -87,6 +87,7 @@ grouped_initial_ratings AS (
 SELECT
   ei.assignment_number,
   ei.id_period_of_service,
+  hm.id_meeting,
   hrd.id_risk_loss_rating_level_calibrated,
   hrd.id_criticality_rating_level_calibrated,
   hrd.id_readiness_rating_level_calibrated,

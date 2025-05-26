@@ -1,0 +1,21 @@
+---
+database_name: dw_performance
+table_name: dim_committee_meeting
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Dimension that stores information about committee meetings, specifically those related to Talent Reviews. It includes meeting identifiers, associated dashboard template, meeting date, title, and the reference period extracted from the title.
+columns:
+  sk_meeting:
+    description: Surrogate key that uniquely identifies a committee meeting.
+    lineage:
+      - datalake_pin_hr_review_clean.meeting.id_meeting
+  committee_title:
+    description: Official title of the committee meeting.
+    lineage:
+      - datalake_pin_hr_review_clean.meeting.meeting_title
+  reference_period:
+    description: Reference period of the meeting (e.g., Q1, Q2, H1, H2), extracted from the committee title. If no standard period is found, it defaults to the meeting title.
+    lineage:
+      - datalake_pin_hr_review_clean.meeting.meeting_title
+  ts_load:
+    description: Timestamp indicating when the record was loaded into the dimension table.

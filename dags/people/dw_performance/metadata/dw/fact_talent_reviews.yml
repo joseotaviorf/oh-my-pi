@@ -1,0 +1,170 @@
+---
+database_name: dw_performance
+table_name: fact_talent_reviews
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: "Fact table storing detailed records of talent reviews for employees. It includes initial and calibrated ratings across dimensions like risk of loss, criticality, readiness, and potential. The table also captures changes in these ratings between review periods and during the calibration process, identifies regrettable loss scenarios, and includes various numeric values and timestamps related to the review process."
+columns:
+  sk_talent_review:
+    description: "Surrogate key for the talent review record."
+    lineage:
+      - datalake_pin.talent_review.id_period_of_service
+      - datalake_pin.talent_review.id_meeting
+  sk_employee:
+    description: "Surrogate key for the employee (person) being reviewed. Links to a relevant employee dimension."
+    lineage:
+      - datalake_pin.talent_review.id_period_of_service
+  sk_committee_meeting:
+    description: "Surrogate key for the committee meeting where the review took place. Links to dim_committee_meeting."
+    lineage:
+      - datalake_pin.talent_review.id_meeting
+  sk_committee_meeting_date:
+    description: "Surrogate key for the date of the committee meeting, in 'yyyyMMdd' format. Defaults to -1 if the date is NULL. Links to a date dimension."
+    lineage:
+      - datalake_pin.talent_review.dt_committee_meeting
+  sk_rating_level_risk_of_loss_calibrated:
+    description: "Surrogate key for the calibrated risk of loss rating level. Defaults to -1 if NULL. Links to dim_rating_level."
+    lineage:
+      - datalake_pin.talent_review.id_risk_loss_rating_level_calibrated
+  sk_rating_level_criticality_calibrated:
+    description: "Surrogate key for the calibrated criticality rating level. Defaults to -1 if NULL. Links to dim_rating_level."
+    lineage:
+      - datalake_pin.talent_review.id_criticality_rating_level_calibrated
+  sk_rating_level_readiness_calibrated:
+    description: "Surrogate key for the calibrated readiness rating level. Defaults to -1 if NULL. Links to dim_rating_level."
+    lineage:
+      - datalake_pin.talent_review.id_readiness_rating_level_calibrated
+  sk_rating_level_potential_calibrated:
+    description: "Surrogate key for the calibrated potential rating level. Defaults to -1 if NULL. Links to dim_rating_level."
+    lineage:
+      - datalake_pin.talent_review.id_potential_rating_level_calibrated
+  sk_rating_level_risk_of_loss_initial:
+    description: "Surrogate key for the initial risk of loss rating level. Defaults to -1 if NULL. Links to dim_rating_level."
+    lineage:
+      - datalake_pin.talent_review.id_risk_loss_rating_level_initial
+  sk_rating_level_criticality_initial:
+    description: "Surrogate key for the initial criticality rating level. Defaults to -1 if NULL. Links to dim_rating_level."
+    lineage:
+      - datalake_pin.talent_review.id_criticality_rating_level_initial
+  sk_rating_level_readiness_initial:
+    description: "Surrogate key for the initial readiness rating level. Defaults to -1 if NULL. Links to dim_rating_level."
+    lineage:
+      - datalake_pin.talent_review.id_readiness_rating_level_initial
+  sk_rating_level_potential_initial:
+    description: "Surrogate key for the initial potential rating level. Defaults to -1 if NULL. Links to dim_rating_level."
+    lineage:
+      - datalake_pin.talent_review.id_potential_rating_level_initial
+  sk_risk_of_loss_period_change:
+    description: "Foreign key to dim_trend, indicating change in calibrated risk of loss versus previous period."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_risk_of_loss
+  sk_criticality_period_change:
+    description: "Foreign key to dim_trend, indicating change in calibrated criticality versus previous period."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_criticality
+  sk_readiness_period_change:
+    description: "Foreign key to dim_trend, indicating change in calibrated readiness versus previous period."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_readiness
+  sk_potential_period_change:
+    description: "Foreign key to dim_trend, indicating change in calibrated potential versus previous period."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_potential
+  sk_risk_of_loss_calibration_change:
+    description: "Foreign key to dim_trend, indicating change in risk of loss from initial to calibrated assessment."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_risk_of_loss
+      - datalake_pin.talent_review.initial_numeric_risk_of_loss
+  sk_criticality_calibration_change:
+    description: "Foreign key to dim_trend, indicating change in criticality from initial to calibrated assessment."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_criticality
+      - datalake_pin.talent_review.initial_numeric_criticality
+  sk_readiness_calibration_change:
+    description: "Foreign key to dim_trend, indicating change in readiness from initial to calibrated assessment."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_readiness
+      - datalake_pin.talent_review.initial_numeric_readiness
+  sk_potential_calibration_change:
+    description: "Foreign key to dim_trend, indicating change in potential from initial to calibrated assessment."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_potential
+      - datalake_pin.talent_review.initial_numeric_potential
+  assignment_number:
+    description: "Employee's assignment number at the time of the review."
+    lineage:
+      - datalake_pin.talent_review.assignment_number
+  initial_risk_of_loss_value:
+    description: "Initial numeric value for risk of loss assessment."
+    lineage:
+      - datalake_pin.talent_review.initial_numeric_risk_of_loss
+  calibrated_risk_of_loss_value:
+    description: "Calibrated numeric value for risk of loss assessment after committee review."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_risk_of_loss
+  initial_criticality_value:
+    description: "Initial numeric value for criticality assessment."
+    lineage:
+      - datalake_pin.talent_review.initial_numeric_criticality
+  calibrated_criticality_value:
+    description: "Calibrated numeric value for criticality assessment after committee review."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_criticality
+  initial_readiness_value:
+    description: "Initial numeric value for readiness assessment."
+    lineage:
+      - datalake_pin.talent_review.initial_numeric_readiness
+  calibrated_readiness_value:
+    description: "Calibrated numeric value for readiness assessment after committee review."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_readiness
+  initial_potential_value:
+    description: "Initial numeric value for potential assessment."
+    lineage:
+      - datalake_pin.talent_review.initial_numeric_potential
+  calibrated_potential_value:
+    description: "Calibrated numeric value for potential assessment after committee review."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_potential
+  is_regrettable_loss:
+    description: "Indicates if the employee is considered a regrettable loss. An employee is flagged as regrettable loss if they are assessed as 'Critical' (corresponds to calibrated_numeric_criticality = 1) OR 'High Potential' (corresponds to calibrated_numeric_potential = 3)."
+    lineage:
+      - datalake_pin.talent_review.calibrated_numeric_criticality
+      - datalake_pin.talent_review.calibrated_numeric_potential
+    categories:
+      TRUE: Employee is considered a regrettable loss.
+      FALSE: Employee is not considered a regrettable loss.
+  ts_initial_risk_of_loss_created:
+    description: "Timestamp of creation for the initial risk of loss assessment."
+    lineage:
+      - datalake_pin.talent_review.ts_initial_risk_of_loss_created
+  ts_initial_risk_of_loss_updated:
+    description: "Timestamp of the last update for the initial risk of loss assessment."
+    lineage:
+      - datalake_pin.talent_review.ts_initial_risk_of_loss_updated
+  ts_initial_criticality_created:
+    description: "Timestamp of creation for the initial criticality assessment."
+    lineage:
+      - datalake_pin.talent_review.ts_initial_criticality_created
+  ts_initial_criticality_updated:
+    description: "Timestamp of the last update for the initial criticality assessment."
+    lineage:
+      - datalake_pin.talent_review.ts_initial_criticality_updated
+  ts_initial_readiness_created:
+    description: "Timestamp of creation for the initial readiness assessment."
+    lineage:
+      - datalake_pin.talent_review.ts_initial_readiness_created
+  ts_initial_readiness_updated:
+    description: "Timestamp of the last update for the initial readiness assessment."
+    lineage:
+      - datalake_pin.talent_review.ts_initial_readiness_updated
+  ts_initial_potential_created:
+    description: "Timestamp of creation for the initial potential assessment."
+    lineage:
+      - datalake_pin.talent_review.ts_initial_potential_created
+  ts_initial_potential_updated:
+    description: "Timestamp of the last update for the initial potential assessment."
+    lineage:
+      - datalake_pin.talent_review.ts_initial_potential_updated
+  ts_load:
+    description: "Timestamp indicating when the record was loaded into the fact table."

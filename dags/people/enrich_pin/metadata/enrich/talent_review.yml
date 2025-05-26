@@ -18,6 +18,10 @@ columns:
     description: Identifier for an employee's period of service relevant to the talent assessment.
     lineage:
       - datalake_hr_system.employee_ids.id_period_of_service
+  id_meeting:
+    description: Unique identifier for the talent review meeting.
+    lineage:
+      - datalake_pin_hr_review_clean.meeting.id_meeting
   id_risk_loss_rating_level_calibrated:
     description: Identifier for the calibrated risk of loss rating level.
     lineage:
