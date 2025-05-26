@@ -1,0 +1,77 @@
+---
+database_name: datalake_docx
+table_name: person_document_information
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: The table person_document_information consolidates data from multiple sources related to the submission of a document during the credit evaluation process by a person.
+columns:
+  id_person_document_info:
+    description: Identifier of the person document information from DocX.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.id
+  id_person:
+    description: Identifier of the person from DocX.
+    lineage:
+    - datalake_docx_clean.person.id
+  id_user:
+    description: The unique identifier for the user, derived from the input value when the input type is USER_ID. This column can be used in any join with the id_user from main.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.input_value
+  uuid_user_person:
+    description: The UUID of the user person, which is the user registered in QuintoAndar and responsible to submit the required documents.
+    lineage:
+    - datalake_docx_clean.person.user_person_uuid
+  uuid_person:
+    description: The UUID of the person, which is any person that is part of a group of proponents.
+    lineage:
+    - datalake_docx_clean.person.person_uuid
+  person_document_info_status:
+    description: The status of the person document information.
+    categories:
+      INFORMED: When the person fills the information
+      VALIDATED: When the information is checked by some bureau.
+      APPROVED: When the information was approved by some analysis engine.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.status
+  input_type:
+    description: The type of input value. This column should be used to identify which person document the user has filled in.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.input_type
+  income_nature:
+    description: The nature of the income informed by the user, derived from the input value when the input type is INCOME_NATURE.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.input_value
+  informed_income:
+    description: The income informed by the user, derived from the input value when the input type is INFORMED_INCOME.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.input_value
+  is_in_test_group:
+    description: A boolean flag indicating if the person is in the test group, derived from the input value when the input type is TEST_GROUP_FLAG. A user is part of the group test when the early credit criteria is satisfied and the app is up to date.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.input_value
+  is_early_credit_criteria_satisfied:
+    description:  A boolean flag indicating if the early credit criteria is satisfied, derived from the input value when the input type is 'EARLY_CREDIT_ELIGIBILITY_FLAG'. The early credit criteria is satisfied when the user has not completed an early credit analysis in the last 30 days.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.input_value
+  is_app_version_updated:
+    description:  A boolean flag indicating if the app version is updated, derived from the input value when the input type is 'APP_VERSION_ELIGIBILITY_FLAG'.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.input_value
+  is_feature_enabled:
+    description:  A boolean flag indicating if the credit passport feature is enabled, derived from the input value when the input type is 'FEATURE_ENABLED_FLAG'.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.input_value
+  is_going_to_reside:
+    description: A boolean flag indicating if the person is going to live in the property, derived from the input value when the input type is 'WILL_RESIDE'.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.input_value
+  ts_last_validated:
+    description: The timestamp when the document information was last validated.
+    lineage:
+    - datalake_docx_clean.person_document_info_aud.ts_last_validated
+  ts_updated:
+    description: The timestamp when the document information was last updated.
+    lineage:
+    - datalake_docx_clean.rev_info.ts_rev
+  version:
+    description: The version number of the document information.
