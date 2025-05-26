@@ -3776,12 +3776,16 @@ bietlejuice.reverse_dsat_report_load:
 bietlejuice.reverse_kyc:
   - bietlejuice.docx:load-clean-document
   - bietlejuice.docx:load-clean-document-type
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract-person
+  - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
+  - bietlejuice.dw_user:load-dw-rent-dim-owner-category
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_contract:load-clean-contract-person
   - bietlejuice.sales_flow:load-clean-buyer-data
   - bietlejuice.sales_flow:load-clean-ccv
   - bietlejuice.sales_flow:load-clean-sales-flow
   - bietlejuice.sales_flow:load-clean-seller-data
+  - bietlejuice.vans:load-clean-payment
 bietlejuice.reverse_minority_report_ss:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
