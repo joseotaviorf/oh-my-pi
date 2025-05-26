@@ -28,6 +28,7 @@ dags_not_using_builder:
   - growth/lifull_campaigns/lifull_campaigns.py
   - growth/olos_dialer/olos_dialer.py
   - growth/semrush/semrush.py
+  - growth/semrush_classified/semrush_classified.py
   - mlops/batch_inference/batch_inference.py
   - mlops/emlio/emlio.py
   - platform/astro/astro.py
