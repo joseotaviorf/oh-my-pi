@@ -2,7 +2,7 @@
 database_name: datalake_bank_conciliation
 table_name: for_rent_cashin
 owner: ae-finance-fintech@quintoandar.com.br
-domain: for_rent
+domain: Fintech
 description: null
 columns:
   id_company_use:

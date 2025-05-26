@@ -2,7 +2,7 @@
 database_name: datalake_bank_conciliation
 table_name: quintocred_cashin
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
 description: null
 columns:
   company_use:

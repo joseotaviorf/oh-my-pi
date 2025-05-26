@@ -2,51 +2,62 @@
 database_name: datalake_bank_conciliation
 table_name: for_rent_cashin_collections
 owner: ae-finance-fintech@quintoandar.com.br
-domain: for_rent
-description: null
+domain: Fintech
+description: Table containing bank reconciliation data for For Rent cash-in collections, comparing bank statements, checkout records, and SAP entries.
 columns:
   id_our_number:
-    description: ''
+    description: 'Unique identifier for the payment, derived from our_number in various source systems'
     lineage:
-    - .df.id_our_number
+    - datalake_nexxera.cnab_charges_recupera.our_number
+    - datalake_itau_statements_clean.statement_879200452685.origin_complement
+    - datalake_checkout_clean.boleto.our_number
+    - datalake_checkout_clean.bolecode.our_number
+    - datalake_trato_feito_clean.installment.id_external
   bank_amount:
-    description: ''
+    description: 'Amount received in bank statements from Nexxera and Itau'
     lineage:
-    - .df.bank_amount
+    - datalake_nexxera.cnab_charges_recupera.net_amount
+    - datalake_itau_statements_clean.statement_879200452685.amount_value
   checkout_amount:
-    description: ''
+    description: 'Amount recorded in checkout system from boleto and bolecode payments'
     lineage:
-    - .df.checkout_amount
+    - datalake_checkout_clean.boleto.paid_amount
+    - datalake_checkout_clean.bolecode.paid_amount
   sap_amount:
-    description: ''
+    description: 'Amount recorded in SAP system for financial entries'
     lineage:
-    - .df.sap_amount
+    - datalake_pas.ledger.debit_credit
   status_bank:
-    description: ''
+    description: 'Status indicating if the payment was recorded in bank statements (ok/not recorded)'
     lineage:
-    - .df.status_bank
+    - datalake_nexxera.cnab_charges_recupera
+    - datalake_itau_statements_clean.statement_879200452685
   status_checkout:
-    description: ''
+    description: 'Status comparing bank and checkout amounts and dates (ok/not recorded/recorded on wrong date or value)'
     lineage:
-    - .df.status_checkout
+    - datalake_checkout_clean.boleto
+    - datalake_checkout_clean.bolecode
   status_sap:
-    description: ''
+    description: 'Status comparing bank and SAP amounts and dates (ok/not recorded/recorded on wrong date or value)'
     lineage:
-    - .df.status_sap
+    - datalake_pas.ledger
   is_reconciled:
-    description: ''
+    description: 'Boolean flag indicating if the payment is fully reconciled between bank and SAP'
     lineage:
-    - .df.CASE WHEN status_bank = 'ok' AND status_sap = 'ok' THEN TRUE ELSE FALSE
-      END
+    - datalake_nexxera.cnab_charges_recupera
+    - datalake_itau_statements_clean.statement_879200452685
+    - datalake_pas.ledger
   dt_bank_paid:
-    description: ''
+    description: 'Date when the payment was received in bank statements'
     lineage:
-    - .df.dt_bank_paid
+    - datalake_nexxera.cnab_charges_recupera.dt_credit
+    - datalake_itau_statements_clean.statement_879200452685.date_accounting
   dt_checkout_paid:
-    description: ''
+    description: 'Date when the payment was recorded in checkout system'
     lineage:
-    - .df.dt_checkout_paid
+    - datalake_checkout_clean.boleto.ts_paid
+    - datalake_checkout_clean.bolecode.ts_paid
   dt_sap_paid:
-    description: ''
+    description: 'Date when the payment was recorded in SAP system'
     lineage:
-    - .df.dt_sap_paid
+    - datalake_pas.ledger.dt_tax

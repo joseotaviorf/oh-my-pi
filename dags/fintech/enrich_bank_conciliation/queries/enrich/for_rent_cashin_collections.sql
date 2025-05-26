@@ -34,6 +34,7 @@ WITH francesinha AS (
 sap AS (
     SELECT DISTINCT
         id_business_entity,
+        id_finance_entity,
         COALESCE(CAST(SPLIT_PART(id_external_payment, '|', 2) AS INTEGER), id_external_payment) AS our_number,
         dt_tax AS dt_paid,
         SUM(debit_credit) AS amount
@@ -53,11 +54,9 @@ sap AS (
         )
         AND id_finance_entity <> ''
         AND id_finance_entity IS NOT NULL
-        AND id_external_payment IS NOT NULL
-        AND TRIM(id_external_payment) != ''
         AND dt_tax >= current_date - 180
     GROUP BY
-        1,2,3
+        1,2,3,4
     HAVING
         SUM(debit_credit) != 0
 ),
@@ -115,6 +114,25 @@ checkout_union AS (
         AND COALESCE(dt_credit, DATE(ts_paid)) >= current_date - 180    
 ),
 
+trato_feito AS (
+    SELECT 
+        COALESCE(REGEXP_REPLACE(b.our_number , '^0+', '') , REGEXP_REPLACE(i.id_external, '^0+', '')) AS our_number,
+        b.id_external AS id_invoice,
+        i.total_amount AS amount,
+        DATE(p.dt_paid) AS dt_paid
+    FROM 
+        datalake_trato_feito_clean.installment i
+    LEFT JOIN 
+        datalake_trato_feito_clean.payment p 
+            ON p.id_installment = i.id
+    LEFT JOIN 
+        datalake_trato_feito_clean.accounting_installment aci 
+            ON aci.id_installment = i.id
+    LEFT JOIN 
+        datalake_trato_feito_clean.bill b 
+            ON b.id_external = aci.id_external
+),
+
 df_all AS (
     SELECT DISTINCT
         our_number
@@ -166,9 +184,12 @@ df AS (
     LEFT JOIN
         checkout_union vc
             ON vc.our_number = cs.our_number
+    LEFT JOIN 
+        trato_feito tf
+            ON tf.our_number = cs.our_number
     LEFT JOIN
         sap s
-            on cs.our_number = s.our_number
+            ON (cs.our_number = s.our_number) OR (tf.id_invoice = s.id_finance_entity)
     WHERE
         cs.our_number IS NOT NULL
     AND

@@ -1287,6 +1287,8 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.pixar:load-clean-charge
   - bietlejuice.rental_guarantee_platform:load-clean-bill
   - bietlejuice.rental_guarantee_platform:load-clean-billing-report
+  - bietlejuice.trato_feito:load-clean-accounting-installment
+  - bietlejuice.trato_feito:load-clean-bill
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
