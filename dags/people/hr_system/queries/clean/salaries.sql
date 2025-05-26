@@ -72,10 +72,8 @@ SELECT
     TO_TIMESTAMP(SUBSTR(REPLACE(CreationDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_created,
     TO_TIMESTAMP(SUBSTR(REPLACE(LastUpdateDate, 'T', ' '), 0, 19), 'yyyy-MM-dd HH:mm:ss') AS ts_last_update,
     ts_load,
-    year AS year,
-    month AS month,
-    day AS day
+    year,
+    month,
+    day
 FROM
     datalake_hr_system_raw.salaries
-WHERE
-    MAKE_DATE(YEAR, MONTH, DAY) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
