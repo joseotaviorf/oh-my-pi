@@ -358,6 +358,9 @@ bietlejuice.enrich_supply_leads:
     - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.enrich_static_files_ss:
   override: []
+bietlejuice.enrich_greenseer:
+  add:
+    - bietlejuice.enrich_customer_support:load-enrich-tickets
 bietlejuice.enrich_growth_costs_sharing_rules:
   remove:
     - bietlejuice.dw_supply:load-dw-growth-dim-acquisition-lead
