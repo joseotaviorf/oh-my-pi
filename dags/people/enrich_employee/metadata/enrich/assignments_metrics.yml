@@ -42,7 +42,7 @@ columns:
       the id_assignment"
     lineage:
       - datalake_hr_system.assignments.id_assignment
-      - datalake_hr_system.managers.id_manager_assignment
+      - datalake_pin.managers_history.id_manager_assignment
   sk_disability:
     description: "Unique identifier for the disability related to the assignment."
     lineage:
@@ -75,7 +75,7 @@ columns:
     description: "Indicates if the employee is a manager."
     lineage:
       - datalake_hr_system.assignments.career_track
-      - datalake_hr_system.managers.id_manager_assignment
+      - datalake_pin.managers_history.id_manager_assignment
   has_self_declared_disability:
     description: "Indicates if the worker has self-declared disability."
     lineage:
@@ -88,7 +88,7 @@ columns:
   qnt_directly_led:
     description: "Number of employees directly led by the employee."
     lineage:
-      - datalake_hr_system.managers.id_manager_assignment
+      - datalake_pin.managers_history.id_manager_assignment
   qnt_undirectly_led:
     description: "Number of employees undirectly led by the employee"
     lineage:
