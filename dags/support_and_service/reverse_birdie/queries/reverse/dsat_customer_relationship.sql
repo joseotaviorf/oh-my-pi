@@ -13,18 +13,17 @@ SELECT DISTINCT
     ELSE
       PARSE_URL(sr.response_url, 'QUERY', 't_id')
   END AS ticket_id,
-  ARRAY_AGG(CASE WHEN rc.answer_content IS NOT NULL THEN rc.answer_content END) FILTER(WHERE rc.id_question = '2729626')[0] AS pergunta_carinhas,
-  CASE
-    WHEN ARRAY_AGG(CASE WHEN rc.answer_content IS NOT NULL THEN rc.answer_content END) FILTER(WHERE rc.id_question = '2729626')[0] = 'Extremely happy' then 5
-    WHEN ARRAY_AGG(CASE WHEN rc.answer_content IS NOT NULL THEN rc.answer_content END) FILTER(WHERE rc.id_question = '2729626')[0] = 'Happy' then 4
-    WHEN ARRAY_AGG(CASE WHEN rc.answer_content IS NOT NULL THEN rc.answer_content END) FILTER(WHERE rc.id_question = '2729626')[0] = 'Neutral' then 3
-    WHEN ARRAY_AGG(CASE WHEN rc.answer_content IS NOT NULL THEN rc.answer_content END) FILTER(WHERE rc.id_question = '2729626')[0] = 'Unsatisfied' then 2
-    WHEN ARRAY_AGG(CASE WHEN rc.answer_content IS NOT NULL THEN rc.answer_content END) FILTER(WHERE rc.id_question = '2729626')[0] = 'Extremely unsatisfied' then 1
+  ARRAY_DISTINCT(ARRAY_AGG(CASE WHEN rc.id_question = '2729626' AND rc.answer_content IS NOT NULL THEN rc.answer_content END)) AS pergunta_carinhas,
+  CASE WHEN ARRAY_DISTINCT(ARRAY_AGG(CASE WHEN rc.id_question = '2729626' AND rc.answer_content IS NOT NULL THEN rc.answer_content END))[0] = 'Extremely happy' THEN 5
+    WHEN ARRAY_DISTINCT(ARRAY_AGG(CASE WHEN rc.id_question = '2729626' AND rc.answer_content IS NOT NULL THEN rc.answer_content END))[0] = 'Happy' THEN 4
+    WHEN ARRAY_DISTINCT(ARRAY_AGG(CASE WHEN rc.id_question = '2729626' AND rc.answer_content IS NOT NULL THEN rc.answer_content END))[0] = 'Neutral' THEN 3
+    WHEN ARRAY_DISTINCT(ARRAY_AGG(CASE WHEN rc.id_question = '2729626' AND rc.answer_content IS NOT NULL THEN rc.answer_content END))[0] = 'Unsatisfied' THEN 2
+    WHEN ARRAY_DISTINCT(ARRAY_AGG(CASE WHEN rc.id_question = '2729626' AND rc.answer_content IS NOT NULL THEN rc.answer_content END))[0] = 'Extremely unsatisfied' THEN 1
     ELSE NULL
   END AS csat_score,
-  ARRAY_JOIN(ARRAY_AGG(CASE WHEN rc.answer_content IS NOT NULL THEN rc.answer_content END) FILTER(WHERE rc.id_question = '2729629'),' | ') AS resolution,
-  ARRAY_JOIN(ARRAY_AGG(CASE WHEN rc.answer_content IS NOT NULL THEN rc.answer_content END) FILTER(WHERE rc.id_question = '2729630'),' | ') AS need_help,
-  ARRAY_JOIN(ARRAY_AGG(CASE WHEN rc.answer_content IS NOT NULL THEN rc.answer_content END) FILTER(WHERE rc.id_question = '2729628'),' | ') AS comment
+  ARRAY_JOIN(ARRAY_DISTINCT(ARRAY_AGG(CASE WHEN rc.id_question = '2729629' AND rc.answer_content IS NOT NULL THEN rc.answer_content END)), ' | ') AS resolution,
+  ARRAY_JOIN(ARRAY_DISTINCT(ARRAY_AGG(CASE WHEN rc.id_question = '2729630' AND rc.answer_content IS NOT NULL THEN rc.answer_content END)), ' | ') AS need_help,
+  ARRAY_JOIN(ARRAY_DISTINCT(ARRAY_AGG(CASE WHEN rc.id_question = '2729628' AND rc.answer_content IS NOT NULL THEN rc.answer_content END)),' | ') AS comment
   FROM
     datalake_survicate.response_content AS rc
   LEFT JOIN datalake_survicate.survey_responses AS sr
@@ -100,7 +99,7 @@ dados_offers AS (
     ON sa.sk_offer = fo.sk_offer
   LEFT JOIN dw_public.dim_region AS dr
     ON fo.sk_region = dr.sk_region
-)
+), main_table as (
 SELECT
   'RC' AS csat_campanha,
   csat.id_response AS feedback_id,
@@ -163,7 +162,6 @@ LEFT JOIN dw_sale.dim_sale_agreement AS a
   ON a.sk_offer = offer.sk_offer
 WHERE 
   DATE(csat.response_date) >= DATE('{load_start_date}')
-  AND csat.csat_score IS NOT NULL
   AND ticket_id not in ('82683066',
   '82497086',
   '82494776',
@@ -185,6 +183,7 @@ WHERE
   '79448132',
   '79479820',
   '79832975',
+  '79876465',
   '80480862',
   '80539921',
   '80549040',
@@ -195,3 +194,37 @@ WHERE
   '80571241',
   '80571390',
   '81886440')
+QUALIFY 
+  ROW_NUMBER() over(PARTITION BY id_ticket ORDER BY posted_at ASC) = 1)
+SELECT
+  csat_campanha,
+  feedback_id,
+  posted_at,
+  id_ticket,
+  author_id,
+  agent_email,
+  agent_company,
+  offer_id,
+  customer_type,
+  account_id,
+  payment_method,
+  internal_vendors_flag,
+  csat_score_category,
+  rating,
+  text,
+  is_corban,
+  city_group,
+  adjusted_franchise_name,
+  share_risco,
+  has_used_fgts_in_payment,
+  financing_bank,
+  resolution,
+  department,
+  year,
+  month,
+  day,
+  ts_load
+FROM 
+  main_table
+WHERE
+  rating IS NOT NULL
