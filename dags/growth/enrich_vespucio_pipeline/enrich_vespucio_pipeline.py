@@ -505,6 +505,8 @@ plugin_tasks = [
             f"--input_house_compounds={Tables.house_compounds}",
             f"--input_geocode_cache={Tables.geocode_step_cache}",
             f"--output_index_prefix=vespucio_prod",
+            "--number_of_shards=3",
+            "--number_of_replicas=2",
         ],
     ),
     create_task(
@@ -515,6 +517,8 @@ plugin_tasks = [
             f"--delete_old_indices",
             f"--input_listings={Tables.listings}",
             f"--output_index_prefix=vespucio_prod",
+            "--number_of_shards=3",
+            "--number_of_replicas=2",
         ],
     ),
     create_task(
@@ -525,14 +529,16 @@ plugin_tasks = [
             f"--delete_old_indices",
             f"--input_house_compounds={Tables.house_compounds}",
             f"--output_index_prefix=vespucio_prod_address_details",
+            "--number_of_shards=1",
+            "--number_of_replicas=2",
         ],
     ),
     create_task(
         entry_point="plugins_zordominium",
         parameters=[
-            f"--operation=both", 
-            f"--env={ENV}", 
-            f"--stage_db=zordominium_vespucio_plugin", 
+            f"--operation=both",
+            f"--env={ENV}",
+            f"--stage_db=zordominium_vespucio_plugin",
             f"--remove_old_condos=False"
         ],
     ),
