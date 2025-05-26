@@ -13,11 +13,14 @@ workflow:
   inner_dependencies:
     persona:
       - buyer_prospect
+      - partner_ciq
       - tenant
       - tenant_prospect
       - owner
   tables_customization:
     buyer_prospect:
+      z_order_by: [id_user]
+    partner_ciq:
       z_order_by: [id_user]
     tenant:
       z_order_by: [id_user]

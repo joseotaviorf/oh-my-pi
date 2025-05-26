@@ -1,0 +1,30 @@
+---
+database_name: datalake_cdp_personas
+table_name: partner_ciq
+description:
+  This table consolidates all CIQs (supply partners) from QuintoAndar, in a historical view.
+  We don't group any user in active/unactive periods as the historical data is not reliable.
+domain: Primitives
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_user:
+    description: The user id of the CIQ.
+    lineage:
+      - datalake_ebdb_clean.partner_agent.id_user
+  uuid_person:
+    description: The UUID Person of the user.
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+  is_active:
+    description: Boolean flag indicating if the user is active or not as a CIQ.
+      We don't group any user in active/unactive periods as the historical data is not reliable.
+  ts_first_event:
+    description: Timestamp of the first user event while as a CIQ. 
+    lineage:
+      - datalake_ebdb_clean.partner_agent.ts_created
+  ts_last_event:
+    description: Timestamp of the last user event while as a CIQ.
+    lineage:
+      - datalake_ebdb_clean.partner_agent.ts_updated
+  ts_load:
+    description: Timestamp indicating when the data was loaded in the data lake.
