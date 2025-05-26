@@ -1,0 +1,47 @@
+database_name: datalake_chatbot
+table_name: support_sessions
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+description:
+  This table presents session data from the chatbots along with retention attempt data
+  from the JourneyFlow service and customer support data from the Sauron service.
+  This table holds the last update of every chat session from the Chatbot. The goal of this table
+  is mainly to break down relevant information from the 'memory' column.
+columns:
+  id_session:
+    lineage:
+      - datalake_copilot_service_clean.session.id
+    description: Orchestrator session ID.
+  id_sauron_session:
+    lineage:
+      - datalake_copilot_service_clean.session.id_sauron_session
+    description: Sauron session ID.
+  id_ticket:
+    lineage:
+      - datalake_customer_support.tickets.id_ticket
+    description: Zendesk ticket IOD.
+  id_user:
+    lineage:
+      - datalake_copilot_service_clean.session.id_user
+    description: User identifier associated with the session.
+  is_escalation:
+    lineage:
+      - datalake_customer_support.tickets.id_session
+    description: Flag indicating whether the session was escalated to customer support.
+  session_time_sec:
+    lineage:
+      - datalake_copilot_service_clean.session.ts_created
+      - datalake_sauron_clean.session.ts_updated
+    description: Duration of the session in seconds.
+  ts_created:
+    lineage:
+      - datalake_copilot_service_clean.session.ts_created
+    description: Timestamp when the session was created.
+  ts_finished:
+    lineage:
+      - datalake_sauron_clean.session.ts_updated
+    description: Timestamp when the session finished (expired).
+  ts_previous_session:
+    lineage:
+      - datalake_copilot_service_clean.session.ts_created
+    description: Timestamp of the previous session for the same user.

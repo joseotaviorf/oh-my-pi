@@ -1,0 +1,27 @@
+dag:
+  name: enrich_chatbot
+  schedule_start_date: 2025, 5, 12
+  owner: Data Conversational XP
+  documentation:
+    dag_purpose: |
+      Support sessions and relevant chatbot data
+workflow:
+  type: query_delta
+  layer: enrich
+  tables_customization:
+    support_sessions:
+      merge_on: [id_session]
+      z_order_by: [id_session, ts_created]
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r7a.xlarge
+    node_type_id: r7a.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

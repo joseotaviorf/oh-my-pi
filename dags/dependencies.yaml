@@ -1441,6 +1441,10 @@ bietlejuice.enrich_cdp_personas:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
   - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
+bietlejuice.enrich_chatbot:
+  - bietlejuice.copilot_service:load-clean-message
+  - bietlejuice.copilot_service:load-clean-session
+  - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_ciq:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking
