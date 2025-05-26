@@ -123,27 +123,6 @@ FROM VALUES
                                 )
         )
     ),
-    -- Important experience from a different team
-    (
-        "ab_beakman_wpp_alert_v2",
-        named_struct(
-            'begin_date', DATE('2025-04-06'),
-            'end_date', NULL,
-            'variants', to_json(
-                named_struct(
-                    '0', 'baseline',
-                    '1', 'treatment'
-                )
-            ),
-            'filters', NULL,
-            'metrics', to_json(
-                                    named_struct(
-                                                    'default_metrics', true,
-                                                    'experiment_metrics', array()
-                                                )
-                                )
-        )
-    ),
     -- HUE VS HSE for Rent
     (
         "AB_TEST_RECS_HUE_ITEM_RENT_V2",
@@ -178,27 +157,6 @@ FROM VALUES
                 )
             ),
             'filters', "business_context = 'sale'",
-            'metrics', to_json(
-                                    named_struct(
-                                                    'default_metrics', true,
-                                                    'experiment_metrics', array()
-                                                )
-                                )
-        )
-    ),
-    -- Listing recs pricing experiment
-    (
-        "ab_beakman_listing_recs_vs_pricing_experiment",
-        named_struct(
-            'begin_date', DATE('2025-02-27'),
-            'end_date', NULL,
-            'variants', to_json(
-                named_struct(
-                    '0', 'baseline',
-                    '1', 'treatment'
-                )
-            ),
-            'filters', NULL,
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
