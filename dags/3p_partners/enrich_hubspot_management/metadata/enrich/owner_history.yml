@@ -17,6 +17,14 @@ columns:
     lineage:
       - datalake_hubspot_clean.owner.email
     description: Email of the owner.
+  first_name:
+    lineage:
+      - datalake_hubspot_clean.owner.first_name
+    description: First name of the owner.
+  last_name:
+    lineage:
+      - datalake_hubspot_clean.owner.last_name
+    description: Last name of the owner.
   teams:
     lineage:
       - datalake_hubspot_clean.owner.teams
