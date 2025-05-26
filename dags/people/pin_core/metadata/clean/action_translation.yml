@@ -1,0 +1,53 @@
+---
+database_name: datalake_pin_core_clean
+table_name: action_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This table holds the translated names and descriptions of defined actions for different languages.
+columns:
+  id_action:
+    description: Foreign key to PER_ACTIONS. Identifies the action being translated.
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.action_id
+  id_business_group:
+    description: Identifier of Enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.business_group_id
+  action_name:
+    description: Translated action name.
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.action_name
+  description:
+    description: Translated long description of the action.
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.description
+  language:
+    description: Indicates the code of the language into which the contents of the translatable columns are translated.
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.language
+  source_language:
+    description: Indicates the code of the language in which the contents of the translatable columns were originally created.
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.source_lang
+  created_by:
+    description: 'Who column: indicates the user who created the row.'
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.created_by
+  updated_by:
+    description: 'Who column: indicates the user who last updated the row.'
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.last_updated_by
+  object_version_number:
+    description: Used to implement optimistic locking. This number is incremented every time that the row is updated. The number is compared at the start and end of a transaction to detect whether another session has updated the row since it was queried.
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.object_version_number
+  ts_created:
+    description: 'Who column: indicates the date and time of the creation of the row.'
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.creation_date
+  ts_updated:
+    description: 'Who column: indicates the date and time of the last update of the row.'
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.last_update_date
+  ts_load:
+    description: Timestamp of when the record was loaded into the clean table.

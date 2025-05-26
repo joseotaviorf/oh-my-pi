@@ -1,0 +1,23 @@
+SELECT
+    organization_id AS id_organization,
+    action_occurrence_id AS id_action_occurrence,
+    business_group_id AS id_business_group,
+    set_id AS id_set,
+    legal_entity_id AS id_legal_entity,
+    establishment_id AS id_establishment,
+    organization_code,
+    legislation_code,
+    classification_code,
+    name,
+    status,
+    created_by,
+    last_updated_by AS updated_by,
+    internal_external_flag AS organization_type,
+    CAST(object_version_number AS INT) AS object_version_number,
+    TO_DATE(effective_start_date) AS dt_effective_started,
+    TO_DATE(effective_end_date) AS dt_effective_ended,
+    TO_TIMESTAMP(creation_date) AS ts_created,
+    TO_TIMESTAMP(last_update_date) AS ts_updated,
+    NOW() AS ts_load
+FROM
+    datalake_pin_core_raw.hr_organization_v

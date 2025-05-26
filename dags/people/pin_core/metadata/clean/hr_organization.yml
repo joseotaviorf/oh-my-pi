@@ -1,0 +1,91 @@
+---
+database_name: datalake_pin_core_clean
+table_name: hr_organization
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores information about organizational units, their classifications, hierarchy, status, and effective periods.
+columns:
+  id_organization:
+    description: Unique identifier for the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.organization_id
+  id_action_occurrence:
+    description: Foreign Key to PER_ACTION_OCCURRENCES, linking to the action that led to this organization state.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.action_occurrence_id
+  id_business_group:
+    description: Identifier of Enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.business_group_id
+  id_set:
+    description: Identifies a set of reference data shared across business units and other entities. Used to filter reference data in transactional UIs.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.set_id
+  id_legal_entity:
+    description: Identifier for the legal entity associated with the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.legal_entity_id
+  id_establishment:
+    description: Identifier for the establishment associated with the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.establishment_id
+  organization_code:
+    description: Unique code identifying the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.organization_code
+  legislation_code:
+    description: Legislation code derived from Legal Entity, indicating the legislative context.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.legislation_code
+  classification_code:
+    description: Foreign key to HR_ORG_CLASSIFICATIONS table, indicating the type of organization (e.g., Department, Division).
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.classification_code
+  name:
+    description: Name of the organization.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.name
+  status:
+    description: Indicates if an organization is active or inactive.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.status
+    categories:
+      'A': Organization is currently active.
+      'I': Organization is currently inactive.
+  created_by:
+    description: 'Who column: indicates the user who created the row.'
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.created_by
+  updated_by:
+    description: 'Who column: indicates the user who last updated the row.'
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.last_updated_by
+  organization_type:
+    description: Flag indicating if the organization is internal or external.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.internal_external_flag
+    categories:
+      'INT': Organization is internal to the company.
+      'EXT': Organization is external to the company.
+  object_version_number:
+    description: Used to implement optimistic locking. This number is incremented every time that the row is updated. The number is compared at the start and end of a transaction to detect whether another session has updated the row since it was queried.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.object_version_number
+  dt_effective_started:
+    description: 'Date Effective Entity: indicates the date at the beginning of the date range within which the row is effective.'
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.effective_start_date
+  dt_effective_ended:
+    description: 'Date Effective Entity: indicates the date at the end of the date range within which the row is effective.'
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.effective_end_date
+  ts_created:
+    description: 'Who column: indicates the date and time of the creation of the row.'
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.creation_date
+  ts_updated:
+    description: 'Who column: indicates the date and time of the last update of the row.'
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.last_update_date
+  ts_load:
+    description: Timestamp of when the record was loaded into the clean table.

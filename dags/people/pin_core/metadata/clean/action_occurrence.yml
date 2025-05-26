@@ -1,0 +1,109 @@
+---
+database_name: datalake_pin_core_clean
+table_name: action_occurrence
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores records of actions that have occurred, detailing the specific action, reason, associated entities, and relevant dates. This table effectively serves as a document of record for each action instance.
+columns:
+  id_action_occurrence:
+    description: Primary key. Uniquely identifies a document of record (an action occurrence).
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.action_occurrence_id
+  id_action:
+    description: Foreign key to PER_ACTIONS_B table, linking to the definition of the action.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.action_id
+  id_action_reason:
+    description: Foreign key to PER_ACTION_REASONS_B table, indicating the reason for the action.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.action_reason_id
+  id_reference_action_occurrence:
+    description: Reference to another action occurrence.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.ref_action_occurrence_id
+  id_business_unit:
+    description: Business Unit ID for Combined Employment and Position Change action.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.business_unit_id
+  id_entity:
+    description: Stores Surrogate key of the entity type (e.g., person, assignment) to which the action applies.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.entity_id
+  id_parent_entity_key:
+    description: Stores Surrogate key of the parent entity type.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.parent_entity_key_id
+  id_business_group:
+    description: Identifier of Enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.business_group_id
+  id_proposed_action:
+    description: Identifier for a proposed action.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.proposed_action_id
+  id_proposed_reason:
+    description: Identifier for the reason of a proposed action.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.proposed_reason_id
+  id_legal_entity:
+    description: Identifier for the legal entity associated with the action.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.legal_entity_id
+  action_type_code:
+    description: Denormalized information. Stores the Action Type code used in the creation of this row.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.action_type_code
+  category_code:
+    description: Category code for data with different categorizations.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.category_code
+  entity_type:
+    description: Entity Type stores the parent object of a transactional entity (e.g., PERSON, ASSIGNMENT).
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.entity_type
+  parent_entity_type:
+    description: Entity Type stores the parent object of a transactional entity.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.parent_entity_type
+  proposed_action_type:
+    description: Type of the proposed action.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.proposed_action_type
+  proposed_worker_type:
+    description: Proposed worker type associated with the action.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.proposed_worker_type
+  submitted_by:
+    description: Indicates the user who submitted the action.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.submitted_by
+  created_by:
+    description: 'Who column: indicates the user who created the row.'
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.created_by
+  updated_by:
+    description: 'Who column: indicates the user who last updated the row.'
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.last_updated_by
+  object_version_number:
+    description: Used to implement optimistic locking. This number is incremented every time that the row is updated. The number is compared at the start and end of a transaction to detect whether another session has updated the row since it was queried.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.object_version_number
+  dt_action_occurred:
+    description: Date of occurrence of the action.
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.action_date
+  dt_freeze_started:
+    description: Represents the Deferred data freeze until date (defaulted to Start of Time).
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.freeze_until_date
+  ts_created:
+    description: 'Who column: indicates the date and time of the creation of the row.'
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.creation_date
+  ts_updated:
+    description: 'Who column: indicates the date and time of the last update of the row.'
+    lineage:
+      - datalake_pin_core_raw.per_action_occurrences.last_update_date
+  ts_load:
+    description: Timestamp of when the record was loaded into the clean table.

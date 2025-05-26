@@ -1,0 +1,82 @@
+---
+database_name: datalake_pin_core_clean
+table_name: action_base
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores information about actions that can be performed within the system, including their types, codes, and validity periods.
+columns:
+  id_action:
+    description: System-generated primary key column.
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.action_id
+  id_business_group:
+    description: Identifier of Enterprise, used for multi-tenancy partitioning. Foreign key to HR_ORGANIZATION_UNITS.
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.business_group_id
+  id_action_type:
+    description: A grouping for the action, so that similar actions can be under one type.
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.action_type_id
+  id_module:
+    description: 'Seed Data Framework: indicates the module that owns the row. A module is an entry in Application Taxonomy such as a Logical Business Area. When the MODULE_ID column exists and the owner of the row is not specified, then the Seed Data Framework will not extract the row as seed data.'
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.module_id
+  action_code:
+    description: Uniquely identifies the action.
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.action_code
+  action_type_code:
+    description: Action Type Code for Seed Data
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.action_type_code
+  created_by:
+    description: 'Who column: indicates the user who created the row.'
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.created_by
+  updated_by:
+    description: 'Who column: indicates the user who last updated the row.'
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.last_updated_by
+  is_available_for_all_roles:
+    description: 'Indicates if this Action is available for all Roles. false means filtering based on the ACTION_ROLE_MAPPING table is needed.'
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.all_roles
+    categories:
+      'true': Available for all roles
+      'false': Not available for all roles
+  is_system_action:
+    description: 'Indicates if the action is a system action.'
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.is_system_action
+    categories:
+      'true': System action
+      'false': Not a system action
+  is_used_in_contract:
+    description: Signifies if this action is used for contract updates or not.
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.used_in_contract
+    categories:
+      'true': Used in contract updates
+      'false': Not used in contract updates
+  object_version_number:
+    description: Used to implement optimistic locking. This number is incremented every time that the row is updated. The number is compared at the start and end of a transaction to detect whether another session has updated the row since it was queried.
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.object_version_number
+  dt_started:
+    description: The date from which the Action is active.
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.start_date
+  dt_ended:
+    description: The date till when the action is active.
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.end_date
+  ts_created:
+    description: 'Who column: indicates the date and time of the creation of the row.'
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.creation_date
+  ts_updated:
+    description: 'Who column: indicates the date and time of the last update of the row.'
+    lineage:
+      - datalake_pin_core_raw.per_actions_b.last_update_date
+  ts_load:
+    description: Timestamp of when the record was loaded into the clean table.

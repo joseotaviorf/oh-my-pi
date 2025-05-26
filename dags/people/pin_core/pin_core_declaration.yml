@@ -70,8 +70,33 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    hr_organization_v:
+      clean_table_name: hr_organization
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     hr_organization_units_f_tl:
       clean_table_name: organization_unit_translation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    per_action_occurrences:
+      clean_table_name: action_occurrence
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    per_action_reasons_b:
+      clean_table_name: action_reason_base
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    per_actions_b:
+      clean_table_name: action_base
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
+    per_actions_tl:
+      clean_table_name: action_translation
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
