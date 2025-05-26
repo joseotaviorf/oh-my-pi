@@ -196,8 +196,6 @@ workflow:
     salaries:
       partitions: ["year", "month", "day"]
       extraction_type: full
-      merge_on: ["id_salary"]
-      z_order_by: ["id_salary"]
       extra_spark_job_arguments:
         - deduplication_key: "SalaryId"
           column_to_partition: "LastUpdateDate"
