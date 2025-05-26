@@ -14,6 +14,18 @@ columns:
   step:
     lineage:
       - datalake_sales_flow_raw.diligence.step
+  acceptance_model:
+    lineage:
+      - datalake_sales_flow_raw.diligence.acceptance_model
+  accepted_by:
+    lineage:
+      - datalake_sales_flow_raw.diligence.accepted_by
+  is_tacit_acceptance:
+    lineage:
+      - datalake_sales_flow_raw.diligence.is_tacit_acceptance
+  had_risk_reclassification:
+    lineage:
+      - datalake_sales_flow_raw.diligence.had_risk_reclassification
   ts_partner_started:
     lineage:
       - datalake_sales_flow_raw.diligence.partner_started_at
@@ -35,6 +47,9 @@ columns:
   ts_seller_sent:
     lineage:
       - datalake_sales_flow_raw.diligence.seller_sent_at
+  ts_acceptance_requested_by_buyer:
+    lineage:
+      - datalake_sales_flow_raw.diligence.acceptance_requested_by_buyer_at
   ts_created:
     lineage:
       - datalake_sales_flow_raw.diligence.created_at
