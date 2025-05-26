@@ -16,6 +16,7 @@ workflow:
   inner_dependencies:
     recs_impressions:
       - experiment_config
+      - global_metrics
     recs_impressions_processed:
       - experiment_config_processed
       - recs_impressions
