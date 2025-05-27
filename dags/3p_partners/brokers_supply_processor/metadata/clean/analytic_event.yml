@@ -1,7 +1,7 @@
 database_name: datalake_brokers_supply_processor_clean
 table_name: analytic_event
 owner: vitor.musachio@quintoandar.com.br
-domain: Rede
+domain: 3P Partners
 description: 'Tracking of Union CRM events'
 columns:
   id:

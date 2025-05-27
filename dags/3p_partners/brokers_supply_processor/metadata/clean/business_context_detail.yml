@@ -1,10 +1,9 @@
 ---
 database_name: datalake_brokers_supply_processor_clean
 table_name: business_context_detail
-owner: gustavo.miller@quintoandar.com.br
-domain: Rede
-description: 'In the product, each row represents a business context associated with a lead 3p. However, this table is INCREMENTAL,
-so each row represents a creation or an update, limited to the most recent per day. To have the same as the product, use datalake_brokers_supply_processor.'
+owner: vitor.musachio@quintoandar.com.br
+domain: 3P Partners
+description: 'In the product, each row represents a business context associated with a lead 3p. However, this table is INCREMENTAL, so each row represents a creation or an update, limited to the most recent per day. To have the same as the product, use datalake_brokers_supply_processor.'
 columns:
   id:
     description: 'Unique identifier of the business context details.'

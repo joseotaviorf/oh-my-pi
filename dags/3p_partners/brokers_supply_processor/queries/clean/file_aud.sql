@@ -23,7 +23,3 @@ SELECT
     day
 FROM
     datalake_brokers_supply_processor_raw.file_aud
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
