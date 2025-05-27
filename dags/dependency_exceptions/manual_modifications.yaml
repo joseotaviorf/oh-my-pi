@@ -471,7 +471,7 @@ bietlejuice.enrich_open_external_data_addresses:
   # We need to remove these dependencies because our IPTU/ITBI extraction routines run on the 15th and 30th of the month.
   # Therefore, if we keep these dependencies, this DAG would not update with the data from the other tables used.
   remove:
-    - bietlejuice.iptu:load-clean-iptu-sp
+    - bietlejuice.iptu_sp:load-clean-iptu-sp
     - bietlejuice.itbi_sp:load-clean-itbi-sp
     - bietlejuice.itbi_bh:load-clean-itbi-bh
 bietlejuice.enrich_pipeline:

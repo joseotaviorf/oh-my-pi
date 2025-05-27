@@ -1,12 +1,13 @@
 dag:
-  name: iptu
+  name: iptu_sp
   schedule_start_date: 2020, 12, 21
   schedule_interval: 0 11 15,30 1-4 *
-  owner: Data Rede
+  owner: Data Growth
   documentation:
     dag_purpose: This pipeline aims to extract IPTU data from the city of São Paulo. The data has been made available by the city hall and can be found here.
 workflow:
   layer: raw
+  custom_schema: iptu
   type: custom_ingestion
   load_spark_job: load_iptu_sp_raw
   spark_job_arguments:
@@ -19,13 +20,13 @@ workflow:
     iptu_sp:
       extra_spark_job_arguments:
         - "https://geosampa.prefeitura.sp.gov.br/PaginasPublicas/"
-        - "downloadArquivo.aspx?orig=DownloadCamadas&arq=12_Cadastro%5C%5CIPTU_INTER%5C%5CXLS_CSV%5C%5CIPTU_{ execution_date.year }&arqTipo=XLS_CSV"
+        - "downloadArquivo.aspx?orig=DownloadCamadas&arq=12_Cadastro%5C%5CIPTU_INTER%5C%5CXLS_CSV%5C%5CIPTU_{{ execution_date.year }}&arqTipo=XLS_CSV"
         - "/_SBC.aspx/pesquisaArquivos"
-        - "{'Content-Type': 'application/json; charset=UTF-8'}" 
-        - "{'pNomePasta': '12_Cadastro\\IPTU_INTER\\XLS_CSV'}"
+        - Content-Type: "application/json; charset=UTF-8"
+        - pNomePasta: "12_Cadastro\\IPTU_INTER\\XLS_CSV"
         - ".csv"
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_13_3_med_general_cluster
   custom_libraries:
     - pypi:
         package: openpyxl
