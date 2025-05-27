@@ -16,6 +16,7 @@ workflow:
   source_schema: condominium_payments
   custom_schema: condominium_payments_test
   tables_customization:
+    attachment: {}
     non_payment_report_invoice: {}
     non_payment_report: {}
 cluster:
