@@ -910,8 +910,8 @@ databricks_13_3_med_memory_people_cluster:
 
 databricks_13_3_high_memory_people_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r5a.2xlarge
-    node_type_id: r5a.2xlarge
+    driver_node_type_id: m5.4xlarge
+    node_type_id: r5a.xlarge
     num_workers: 3
     spark_version: 13.3.x-scala2.12
     aws_attributes:

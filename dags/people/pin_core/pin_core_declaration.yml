@@ -7,7 +7,7 @@ dag:
       This DAG ingests encrypted data from the Oracle HCM system, made available via an SFTP server through Oracle Integration Cloud (OIC).
       It downloads, decrypts, parses, and loads the files into both the `incoming` and `raw` layers of the Data Lake.
 cluster:
-  type: databricks_13_3_med_memory_people_cluster
+  type: databricks_13_3_high_memory_people_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
