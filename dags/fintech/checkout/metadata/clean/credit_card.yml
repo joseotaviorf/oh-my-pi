@@ -3,225 +3,169 @@ database_name: datalake_checkout_clean
 table_name: credit_card
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: null
 columns:
   id:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.id
   id_external:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.external_id
   id_business_entity:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.business_entity_id
   id_finance_entity:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.finance_entity_id
   id_requester:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.requester_id
   id_charge:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.charge_id
   payer_email:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.payer_email
   card_brand:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.card_brand
   requester_name:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.requester_name
   token:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.token
   interest_type:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.interest_type
   payer_zipcode:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.payer_zipcode
   fine_type:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.fine_type
   canceled_by_email:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.canceled_by_email
   payer_name:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.payer_name
   first_six_digits:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.first_six_digits
   acquire_name:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.acquire_name
   acquire_nsu:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.acquire_nsu
   payer_neighborhood:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.payer_neighborhood
   acquire_tid:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.acquire_tid
   fixed_cost_of_transaction:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.fixed_cost_of_transaction
   block_entity:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.block_entity
   status:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.status
   acquire_auth_code:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.acquire_auth_code
   payer_state:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.payer_state
   payer_street_address:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.payer_street_address
   cancellation_reason:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.cancellation_reason
   payer_city:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.payer_city
   payer_identifiable_document:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.payer_identifiable_document
   payer_person_type:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.payer_person_type
   convenience_fee_amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.convenience_fee_amount
   fine_amount_percentage:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.fine_amount_percentage
   refund_amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.refund_amount
   acquire_fee_amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.acquire_fee_amount
   paid_amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.paid_amount
   fine_paid_amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.fine_paid_amount
   max_installments:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.max_installments
   min_installments:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.min_installments
   installments:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.installments
   interest_amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.interest_amount
   interest_amount_percentage:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.interest_amount_percentage
   interest_paid_amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.interest_paid_amount
   installment_fee_amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.installment_fee_amount
   due_amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.due_amount
   fine_amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.fine_amount
   last_four_digits:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.last_four_digits
   code:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.code
   dt_last_date_to_pay:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.last_date_to_pay
   dt_due:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.due_date
   ts_created:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.created_at
   ts_fine_start:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.fine_start_at
   ts_updated:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.updated_at
   ts_interest_start:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.interest_start_at
   ts_paid:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.paid_at
   ts_canceled:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card.canceled_at

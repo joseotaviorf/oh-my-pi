@@ -3,33 +3,25 @@ database_name: datalake_checkout_clean
 table_name: credit_card_webhook
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: null
 columns:
   id:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card_webhook.id
   id_credit_card:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card_webhook.credit_card_id
   status:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card_webhook.status
   error_message:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card_webhook.error_message
   payload:
-    description: ''
     lineage:
     - datalake_checkout_raw.credit_card_webhook.payload
   ts_created:
-    description: ''
     lineage:
-    - datalake_checkout_raw.credit_card_webhook.TIMESTAMP(created_at)
+    - datalake_checkout_raw.credit_card_webhook.created_at
   ts_updated:
-    description: ''
     lineage:
-    - datalake_checkout_raw.credit_card_webhook.TIMESTAMP(updated_at)
+    - datalake_checkout_raw.credit_card_webhook.updated_at

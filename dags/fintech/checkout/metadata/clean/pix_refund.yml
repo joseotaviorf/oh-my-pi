@@ -3,41 +3,31 @@ database_name: datalake_checkout_clean
 table_name: pix_refund
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: null
 columns:
   id:
-    description: ''
     lineage:
     - datalake_checkout_raw.pix_refund.id
   id_pix:
-    description: ''
     lineage:
     - datalake_checkout_raw.pix_refund.pix_id
   id_bank_refund:
-    description: ''
     lineage:
     - datalake_checkout_raw.pix_refund.bank_refund_id
   id_bank_return:
-    description: ''
     lineage:
     - datalake_checkout_raw.pix_refund.bank_return_id
   refunded_amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.pix_refund.refunded_amount
   status:
-    description: ''
     lineage:
     - datalake_checkout_raw.pix_refund.status
   ts_started_processing:
-    description: ''
     lineage:
-    - datalake_checkout_raw.pix_refund.TIMESTAMP(started_processing_at)
+    - datalake_checkout_raw.pix_refund.started_processing_at
   ts_created:
-    description: ''
     lineage:
-    - datalake_checkout_raw.pix_refund.TIMESTAMP(refunded_at)
+    - datalake_checkout_raw.pix_refund.refunded_at
   ts_updated:
-    description: ''
     lineage:
-    - datalake_checkout_raw.pix_refund.TIMESTAMP(updated_at)
+    - datalake_checkout_raw.pix_refund.updated_at

@@ -3,37 +3,28 @@ database_name: datalake_checkout_clean
 table_name: webhook
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: null
 columns:
   id:
-    description: ''
     lineage:
     - datalake_checkout_raw.webhook.id
   amount:
-    description: ''
     lineage:
     - datalake_checkout_raw.webhook.amount
   success:
-    description: ''
     lineage:
     - datalake_checkout_raw.webhook.success
   payload:
-    description: ''
     lineage:
     - datalake_checkout_raw.webhook.payload
   psp_reference:
-    description: ''
     lineage:
     - datalake_checkout_raw.webhook.psp_reference
   event_code:
-    description: ''
     lineage:
     - datalake_checkout_raw.webhook.event_code
   merchant_account_code:
-    description: ''
     lineage:
     - datalake_checkout_raw.webhook.merchant_account_code
   dt_event:
-    description: ''
     lineage:
-    - datalake_checkout_raw.webhook.DATE(event_date)
+    - datalake_checkout_raw.webhook.event_date

@@ -3,41 +3,31 @@ database_name: datalake_checkout_clean
 table_name: payment_config
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: null
 columns:
   id:
-    description: ''
     lineage:
     - datalake_checkout_raw.payment_config.id
   id_requester:
-    description: ''
     lineage:
     - datalake_checkout_raw.payment_config.requester_id
   id_bank_account:
-    description: ''
     lineage:
     - datalake_checkout_raw.payment_config.bank_account_id
   status:
-    description: ''
     lineage:
     - datalake_checkout_raw.payment_config.status
   name:
-    description: ''
     lineage:
     - datalake_checkout_raw.payment_config.name
   payment_method:
-    description: ''
     lineage:
     - datalake_checkout_raw.payment_config.payment_method
   exhibition_name:
-    description: ''
     lineage:
     - datalake_checkout_raw.payment_config.exhibition_name
   document:
-    description: ''
     lineage:
     - datalake_checkout_raw.payment_config.document
   pix_key:
-    description: ''
     lineage:
     - datalake_checkout_raw.payment_config.pix_key

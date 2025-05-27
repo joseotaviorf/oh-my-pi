@@ -3,29 +3,22 @@ database_name: datalake_checkout_clean
 table_name: bank_account
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: null
 columns:
   id:
-    description: ''
     lineage:
     - datalake_checkout_raw.bank_account.id
   account:
-    description: ''
     lineage:
     - datalake_checkout_raw.bank_account.account
   agency:
-    description: ''
     lineage:
     - datalake_checkout_raw.bank_account.agency
   dac:
-    description: ''
     lineage:
     - datalake_checkout_raw.bank_account.dac
   ts_created:
-    description: ''
     lineage:
-    - datalake_checkout_raw.bank_account.TIMESTAMP(created_at)
+    - datalake_checkout_raw.bank_account.created_at
   ts_updated:
-    description: ''
     lineage:
-    - datalake_checkout_raw.bank_account.TIMESTAMP(updated_at)
+    - datalake_checkout_raw.bank_account.updated_at

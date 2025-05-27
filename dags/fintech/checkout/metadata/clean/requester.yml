@@ -3,21 +3,16 @@ database_name: datalake_checkout_clean
 table_name: requester
 owner: ae-finance-fintech@quintoandar.com.br
 domain: fintech
-description: null
 columns:
   id:
-    description: ''
     lineage:
     - datalake_checkout_raw.requester.id
   name:
-    description: ''
     lineage:
     - datalake_checkout_raw.requester.name
   ts_created:
-    description: ''
     lineage:
-    - datalake_checkout_raw.requester.TIMESTAMP(created_at)
+    - datalake_checkout_raw.requester.created_at
   ts_updated:
-    description: ''
     lineage:
-    - datalake_checkout_raw.requester.TIMESTAMP(updated_at)
+    - datalake_checkout_raw.requester.updated_at

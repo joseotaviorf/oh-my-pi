@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     charge_id AS id_charge,
     transaction_id AS id_transaction,
@@ -22,9 +22,10 @@ SELECT
     expiration_in_seconds,
     payer_solicitation,
     additional_info,
+    TIMESTAMP(registered_at) AS ts_registered,
     TIMESTAMP(started_processing_at) AS ts_started_processing,
-    TIMESTAMP(paid_at) AS ts_paid, 
+    TIMESTAMP(paid_at) AS ts_paid,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated
-FROM 
+FROM
     datalake_checkout_raw.pix
