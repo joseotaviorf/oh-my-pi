@@ -21,3 +21,4 @@ custom_cluster:
     spark.executor.heartbeatInterval: "100s"
     spark.executor.memory: "2g"
     spark.network.timeout: "600s"
+    spark.metrics.appStatusSource.enabled: "true"

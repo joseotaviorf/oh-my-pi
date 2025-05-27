@@ -22,3 +22,4 @@ custom_cluster:
     spark.executor.memory: "48g"
     spark.executor.memoryOverhead: "3g"
     spark.network.timeout: "600s"
+    spark.metrics.appStatusSource.enabled: "true"
