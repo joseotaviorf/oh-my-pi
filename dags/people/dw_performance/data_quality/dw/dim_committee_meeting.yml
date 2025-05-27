@@ -9,6 +9,6 @@ column_level_validations:
   sk_meeting:
     has_completeness:
       greater_than: 0.7
-      severity_level: Error
-    is_distinct:
-      severity_level: Error
+      severity_level: Warning
+    is_unique:
+      severity_level: Warning

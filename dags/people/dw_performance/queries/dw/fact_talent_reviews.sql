@@ -25,7 +25,7 @@ rating_change AS (
 )
 
 SELECT
-  MD5(tr.id_period_of_service, tr.id_meeting) AS sk_talent_review,
+  MD5(CONCAT(tr.id_period_of_service, tr.id_meeting)) AS sk_talent_review,
   tr.id_period_of_service AS sk_assignment,
   tr.id_meeting AS sk_committee_meeting,
   COALESCE(DATE_FORMAT(tr.dt_committee_meeting, 'yyyyMMdd'), -1) AS sk_committee_meeting_date,

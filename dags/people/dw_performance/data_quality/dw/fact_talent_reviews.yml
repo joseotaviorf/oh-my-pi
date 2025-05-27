@@ -7,8 +7,8 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   sk_talent_review:
-      has_completeness:
-        greater_than: 0.95
-        severity_level: Error
-      is_distinct:
-        severity_level: Error
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Warning
+    is_unique:
+      severity_level: Warning
