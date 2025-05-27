@@ -9,13 +9,7 @@ WITH rent_flow_house_listing AS (
   SELECT
     rf.id_rent_flow,
     rf.id_house,
-    COALESCE(
-      CAST(
-        rf.id_house ||
-        LPAD(
-        COALESCE(
-          CAST(COALESCE(hl_contract.version, hl.version) AS VARCHAR(3)),'1'),3,'0') AS BIGINT), CAST(-1 AS BIGINT)
-    ) AS id_house_listing,
+    COALESCE(hl_contract.id_house_listing, hl.id_house_listing) AS id_house_listing,
     h.id_user,
     rf.id_client,
     rf.id_user_agent AS id_agent,

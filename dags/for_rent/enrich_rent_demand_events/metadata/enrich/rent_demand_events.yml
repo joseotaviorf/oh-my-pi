@@ -81,8 +81,8 @@ columns:
     description: Schedule ID. Can be joined with id_booking.
   id_house_listing:
     lineage:
-      - datalake_ebdb_rent_flow.rent_flow.id_house
-    description: "Id of the house listing. The id is generated inside the query to assure the right contract to the listing."
+      - datalake_ebdb_listing.house_listing.id_house_listing
+    description: "Id of the house listing."
   id_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
