@@ -77,7 +77,7 @@ WITH get_data AS (
     END AS informed_income,
     pdi.ts_last_validated,
     rev.ts_rev AS ts_updated,
-    ROW_NUMBER() OVER (PARTITION BY pdi.id ORDER BY rev.ts_rev DESC) AS version
+    ROW_NUMBER() OVER (PARTITION BY pdi.id ORDER BY rev.ts_rev ASC) AS version
   FROM
     datalake_docx_clean.person_document_info_aud AS pdi
   INNER JOIN
