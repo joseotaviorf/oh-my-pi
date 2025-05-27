@@ -7,15 +7,15 @@ WITH rental_guarantee_pix AS (
         NULL AS billing_type,
         NULL AS source_system,
         'Rental Guarantee Platform - Payment' AS billing_source,
-        DATE(ts_updated) AS dt_billing,
+        MIN(DATE(ts_updated)) AS dt_billing,
         ROUND(SUM(value), 2) AS total_amount
     FROM 
         datalake_rental_guarantee_platform_clean.payment
     WHERE 
-        status = 'SUCCESS'
+        status IN ('SUCCESS', 'REFUNDED')
         AND billing_type = 'PIX'
         AND ts_created >= CURRENT_DATE - 180
-    GROUP BY 1,2,3,4,5,6,7,8
+    GROUP BY 1,2,3,4,5,6,7
 
     UNION ALL 
 
@@ -90,7 +90,7 @@ payments_pixar_checkout AS (
     FROM
         datalake_checkout_clean.pix
     WHERE 
-        status = 'PAID'
+        status IN ('PAID', 'REFUNDED')
 
     UNION ALL
 
@@ -204,7 +204,7 @@ SELECT
     CAST(l.debit_credit AS DECIMAL(14,2)) AS sap_amount,
     IF(l.id_transaction IS NOT NULL, TRUE, FALSE) AS is_completeness_compliance,
     IF((COALESCE(ABS(b.bank_amount), ABS(rgp.total_amount)) - ABS(l.debit_credit) = 0), TRUE, FALSE) AS is_correctness_compliance,
-    IF((l.dt_reference BETWEEN rgp.dt_billing AND DATE_ADD(rgp.dt_billing, 3)), TRUE, FALSE) AS is_temporality_compliance,
+    IF((l.dt_reference BETWEEN DATE_ADD(b.dt_bank_paid, -3) AND DATE_ADD(b.dt_bank_paid, 3)) OR (l.dt_reference BETWEEN DATE_ADD(rgp.dt_billing, -3) AND DATE_ADD(rgp.dt_billing, 3)), TRUE, FALSE) AS is_temporality_compliance,
     rgp.dt_billing,
     p.dt_paid AS dt_payment_source,
     b.dt_bank_paid,
@@ -227,7 +227,7 @@ LEFT JOIN
     ledger AS l 
         ON CASE
                 WHEN rgp.billing_source = 'Rental Guarantee Platform - Payment' THEN LOWER(rgp.unicid) = LOWER(l.id_external_payment)
-                ELSE p.id_bank_payment = l.id_external_payment AND rgp.dt_billing = l.dt_reference
+                ELSE p.id_bank_payment = l.id_external_payment AND rgp.dt_billing = l.dt_reference AND b.bank_amount = l.debit_credit
                 --rgp.unicid = l.id_external_payment AND rgp.dt_billing_source_trigger = l.dt_reference
             END
 )
