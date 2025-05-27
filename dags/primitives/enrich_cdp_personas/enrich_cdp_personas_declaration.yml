@@ -12,12 +12,15 @@ workflow:
   default_extraction_type: full
   inner_dependencies:
     persona:
+      - agent_inspector
       - buyer_prospect
       - partner_ciq
       - tenant
       - tenant_prospect
       - owner
   tables_customization:
+    agent_inspector:
+      z_order_by: [id_user]
     buyer_prospect:
       z_order_by: [id_user]
     partner_ciq:

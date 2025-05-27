@@ -1432,6 +1432,8 @@ bietlejuice.enrich_buyer_prospect:
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
 bietlejuice.enrich_cdp_personas:
+  - bietlejuice.ebdb_agent:load-clean-agent-data
+  - bietlejuice.ebdb_agent:load-clean-agent-data-types
   - bietlejuice.ebdb_contract:load-clean-contract-aud
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-aud

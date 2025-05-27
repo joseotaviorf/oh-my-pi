@@ -1,0 +1,30 @@
+---
+database_name: datalake_cdp_personas
+table_name: agent_inspector
+description:
+  This table consolidates all inspector agents from QuintoAndar in a historical view.
+domain: Primitives
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_user:
+    description: The user id of the inspector agent.
+    lineage:
+      - datalake_ebdb_clean.user.id
+  uuid_person:
+    description: The UUID Person of the user.
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+  is_active:
+    description: Boolean flag indicating if the user is active or not as an inspector agent.
+    lineage:
+      - datalake_ebdb_clean.agent_data.is_active
+  ts_first_event:
+    description: Timestamp of the first user event while as an inspector.
+    lineage:
+      - datalake_ebdb_clean.agent_data.ts_created
+  ts_last_event:
+    description: Timestamp of the last user event while as an inspector.
+    lineage:
+      - datalake_ebdb_clean.agent_data.ts_updated
+  ts_load:
+    description: Timestamp indicating when the data was loaded in the data lake.

@@ -52,3 +52,14 @@ SELECT
     NOW() AS ts_load
 FROM
     datalake_cdp_personas.partner_ciq
+UNION ALL
+SELECT
+    id_user,
+    uuid_person,
+    'AGENT_INSPECTOR' AS persona,
+    is_active,
+    ts_first_event,
+    ts_last_event,
+    NOW() AS ts_load
+FROM
+    datalake_cdp_personas.agent_inspector

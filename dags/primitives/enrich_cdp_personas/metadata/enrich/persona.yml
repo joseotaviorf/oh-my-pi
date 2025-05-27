@@ -16,6 +16,7 @@ columns:
     description: The user id of the persona.
       It may not be unique, as an user may be owner/tenant in our platform in different periods.
     lineage:
+      - datalake_cdp_personas.agent_inspector.id_user
       - datalake_cdp_personas.buyer_prospect.id_user
       - datalake_cdp_personas.partner_ciq.id_user
       - datalake_cdp_personas.tenant.id_user
@@ -24,6 +25,7 @@ columns:
   uuid_person:
     description: The UUID Person of the user.
     lineage:
+      - datalake_cdp_personas.agent_inspector.uuid_person
       - datalake_cdp_personas.buyer_prospect.uuid_person
       - datalake_cdp_personas.partner_ciq.uuid_person
       - datalake_cdp_personas.tenant.uuid_person
@@ -32,6 +34,7 @@ columns:
   persona:
     description: The persona type. 
     categories:
+      AGENT_INSPECTOR: User is an agent inspector.
       BUYER_PROSPECT: User is a buyer prospect.
       PARTNER_CIQ: User is a CIQ.
       TENANT: User is a tenant.
@@ -40,6 +43,7 @@ columns:
   is_active:
     description: Boolean flag indicating if the user is active or not as the persona.
     lineage:
+      - datalake_cdp_personas.agent_inspector.is_active
       - datalake_cdp_personas.buyer_prospect.is_active
       - datalake_cdp_personas.partner_ciq.is_active
       - datalake_cdp_personas.tenant.is_active
@@ -48,6 +52,7 @@ columns:
   ts_first_event:
     description: Timestamp of the first user event. 
     lineage:
+      - datalake_cdp_personas.agent_inspector.ts_first_event
       - datalake_cdp_personas.buyer_prospect.ts_first_event
       - datalake_cdp_personas.partner_ciq.ts_first_event
       - datalake_cdp_personas.tenant.ts_first_event
@@ -56,6 +61,7 @@ columns:
   ts_last_event:
     description: Timestamp of the last user event.
     lineage:
+      - datalake_cdp_personas.agent_inspector.ts_last_event
       - datalake_cdp_personas.buyer_prospect.ts_last_event
       - datalake_cdp_personas.partner_ciq.ts_last_event
       - datalake_cdp_personas.tenant.ts_last_event
