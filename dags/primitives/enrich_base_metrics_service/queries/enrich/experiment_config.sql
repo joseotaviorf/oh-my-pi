@@ -178,7 +178,7 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', NULL,
+            'filters', "business_context = 'sale'",
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
@@ -187,7 +187,7 @@ FROM VALUES
                                 )
         )
     ),
-     -- HUE V1 vs V2 test - RENT
+     -- HUE V1 vs V2 AB test - RENT
     (
         "AB_TEST_RECS_HUE_V2_RENT",
         named_struct(
@@ -199,7 +199,7 @@ FROM VALUES
                     '1', 'treatment'
                 )
             ),
-            'filters', NULL,
+            'filters', "business_context = 'rent'",
             'metrics', to_json(
                                     named_struct(
                                                     'default_metrics', true,
