@@ -89,3 +89,15 @@ columns:
       - datalake_pin_core_raw.hr_organization_v.last_update_date
   ts_load:
     description: Timestamp of when the record was loaded into the clean table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.hr_organization_v.day

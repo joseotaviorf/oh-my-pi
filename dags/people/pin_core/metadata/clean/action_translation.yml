@@ -51,3 +51,15 @@ columns:
       - datalake_pin_core_raw.per_actions_tl.last_update_date
   ts_load:
     description: Timestamp of when the record was loaded into the clean table.
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.per_actions_tl.day

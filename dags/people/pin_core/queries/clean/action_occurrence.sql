@@ -25,6 +25,9 @@ SELECT
     TO_DATE(freeze_until_date) AS dt_freeze_started,
     TO_TIMESTAMP(creation_date) AS ts_created,
     TO_TIMESTAMP(last_update_date) AS ts_updated,
-    NOW() AS ts_load
+    NOW() AS ts_load,
+    year,
+    month,
+    day
 FROM
     datalake_pin_core_raw.per_action_occurrences
