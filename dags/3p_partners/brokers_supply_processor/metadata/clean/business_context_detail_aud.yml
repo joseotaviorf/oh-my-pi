@@ -1,8 +1,8 @@
 ---
 database_name: datalake_brokers_supply_processor_clean
 table_name: business_context_detail_aud
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+owner: gustavo.miller@quintoandar.com.br
+domain: Rede
 description: 'Audit table of business_context_detail.'
 columns:
   id:
@@ -100,3 +100,4 @@ columns:
     description: Day in which the row was created.
     lineage:
       - datalake_brokers_supply_processor_raw.business_context_detail_aud.day
+

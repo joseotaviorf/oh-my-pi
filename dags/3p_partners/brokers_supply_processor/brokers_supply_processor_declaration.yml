@@ -2,40 +2,41 @@ dag:
   name: brokers_supply_processor
   schedule_start_date: 2021, 8, 10
   schedule_interval: 0 0 * * *
-  owner: Data 3P Partners
+  owner: Data Rede
   documentation:
-    dag_purpose: This DAG imports the tables from Supply Processor, a platform responsible for bringing and processing properties from other real estate agencies in 3P Partners.
+    dag_purpose: |
+      This DAG imports the tables from Supply Processor, a platform responsible for bringing and processing properties from other real estate agencies in Rede QuintoAndar.
 workflow:
-  type: cdc
+  type: database_pull_delta
   layer: raw
   database_type: postgres
-  custom_schema: brokers_supply_processor
-  source_database: brokers_supply_processor
-  source_schema: public
+  default_extraction_type: incremental
   default_partitions: [year, month, day]
   dbutils_secret_key: BROKERS_SUPPLY_PROCESSOR_DB
   tables_customization:
     analytic_event:
-      z_order_by: [id]
+      date_filter_column: updated_at
     business_context_detail:
+      date_filter_column: updated_at
       z_order_by: [id_partner]
     business_context_detail_aud:
-      raw_primary_keys: ["id", "rev"]
+      date_filter_column: created_at
     file:
+      date_filter_column: updated_at
       z_order_by: [id]
     file_aud:
-      raw_primary_keys: ["id", "rev"]
+      date_filter_column: created_at
     lead3p:
       clean_table_name: lead_3p
+      date_filter_column: updated_at
       z_order_by: [id, uuid_lead]
     lead3p_aud:
       clean_table_name: lead_3p_aud
-      raw_primary_keys: ["id", "rev"]
+      date_filter_column: created_at
     revinfo:
       clean_table_name: rev_info
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+      date_filter_column: revtstmp
+      unixtime_measure: milliseconds
 cluster:
   type: databricks_12_2_min_memory_cluster
   databricks_conn_id: databricks_new

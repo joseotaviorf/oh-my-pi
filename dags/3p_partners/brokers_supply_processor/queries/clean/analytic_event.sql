@@ -13,3 +13,7 @@ SELECT
     day
 FROM
     datalake_brokers_supply_processor_raw.analytic_event
+WHERE
+    year = {year}
+    AND month = {month}
+    AND day = {day}

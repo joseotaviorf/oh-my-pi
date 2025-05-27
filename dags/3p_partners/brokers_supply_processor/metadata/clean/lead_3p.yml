@@ -1,8 +1,6 @@
 ---
 database_name: datalake_brokers_supply_processor_clean
 table_name: lead_3p
-owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
 columns:
   id:
     lineage:
