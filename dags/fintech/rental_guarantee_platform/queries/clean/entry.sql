@@ -3,6 +3,8 @@ SELECT
     type,
     billing_report AS id_billing_report,
     propose,
+    status,
+    installment,
     amount,
     created_at  AS ts_created,
     updated_at  AS ts_updated,

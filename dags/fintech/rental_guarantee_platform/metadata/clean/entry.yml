@@ -14,6 +14,12 @@ columns:
   propose:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.propose
+  status:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.status
+  installment:
+    lineage:
+      - datalake_rental_guarantee_platform_raw.entry.installment
   amount:
     lineage:
       - datalake_rental_guarantee_platform_raw.entry.amount
