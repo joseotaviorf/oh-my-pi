@@ -36,7 +36,8 @@ cluster:
   - whl: "{artifacts_bucket}/sap-4hana-api-client-python/quintoandar_sap_4hana_api_client-0.1.0-py2.py3-none-any.whl"
   databricks_conn_id: databricks_new
   custom_configurations:
-    driver_node_type_id: r5.4xlarge
+    node_type_id: r5.2xlarge
+    driver_node_type_id: r5.large
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
