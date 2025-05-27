@@ -4,7 +4,7 @@ SELECT
     house_external_id AS id_house_ebdb,
     status,
     last_year_amount,
-    year,
+    year_tax_report,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

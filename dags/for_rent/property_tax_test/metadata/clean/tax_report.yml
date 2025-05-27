@@ -32,10 +32,10 @@ columns:
     lineage:
       - datalake_property_tax_test_raw.tax_report.last_year_amount
     description: Last year IPTU value
-  year:
+  year_tax_report:
     lineage:
-      - datalake_property_tax_test_raw.tax_report.year
-    description: Partition column, year of the record updated date.
+      - datalake_property_tax_test_raw.tax_report.year_tax_report
+    description: Year of the IPTU.
   ts_created:
     lineage:
       - datalake_property_tax_test_raw.tax_report.created_at

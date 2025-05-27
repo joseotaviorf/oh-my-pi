@@ -12,7 +12,9 @@ workflow:
   dbutils_secret_key: PROPERTY_TAX_DB
   source_schema: public
   tables_customization:
-    tax_report: {}
+    tax_report:
+      database_column_alias:
+        year: year_tax_report
     report_version: {}
     report_item: {}
 cluster:
