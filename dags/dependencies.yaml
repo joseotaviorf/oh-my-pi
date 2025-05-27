@@ -1023,6 +1023,7 @@ bietlejuice.dw_supply:
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
+  - bietlejuice.gsheets_growth:done-clean-affiliate-volumetry-cluster
 bietlejuice.dw_supply_outbound_contacts:
   - bietlejuice.enrich_supply_outbound_flows:load-enrich-supply-outbound-contacts
 bietlejuice.dw_table_snapshot:

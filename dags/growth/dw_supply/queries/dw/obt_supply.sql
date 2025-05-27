@@ -296,15 +296,23 @@ report_origin AS (
     LEFT JOIN
         status AS olc
             ON olc.id_lead = obt.sk_lead
+),
+affiliate_volumetry_cluster AS (
+    SELECT
+        sk_user,
+        affiliate_volumetry
+    FROM
+        datalake_gsheets_clean.affiliate_volumetry_cluster
+    QUALIFY 
+        ROW_NUMBER() OVER (PARTITION BY sk_user ORDER BY start_date DESC) = 1
 )
-
 SELECT
     obt.*,
     CASE
-        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Novos Afiliados' THEN 'Indica Aí - General_Novo Afiliado'
-        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Top Afiliados' THEN 'Indica Aí - Top Afiliados'
-        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Afiliados Alto Volume' THEN 'Indica Aí - General_Afiliados_Alto_Volume'
-        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Afiliados Risco Fraude' THEN 'Indica Aí - Afiliados Risco Fraude'
+        WHEN COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Novos Afiliados' THEN 'Indica Aí - General_Novo Afiliado'
+        WHEN COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Top Afiliados' THEN 'Indica Aí - Top Afiliados'
+        WHEN COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Afiliados Alto Volume' THEN 'Indica Aí - General_Afiliados_Alto_Volume'
+        WHEN  COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Afiliados Risco Fraude' THEN 'Indica Aí - Afiliados Risco Fraude'
         WHEN company_report_origin = 'Indica Aí - General' THEN 'Indica Aí - General_Baixo Volume'
         WHEN company_report_origin = 'Indica Aí - Agents' THEN 'Indica Aí - Agents_Baixo Volume'
         WHEN company_report_origin = 'Owner PWA - Paid' AND lower(medium) = 'web display' THEN 'Owner PWA - Paid_Display'
@@ -351,10 +359,10 @@ SELECT
         WHEN company_report_origin IN ('Backend','Other','Owner PWA - CRM/Notification','Owner PWA - Not Mapped','Owner PWA - Organic') THEN 'High'
         WHEN company_report_origin IN ('Indica Aí - Agents','Owner PWA - Paid','Price Calculator','Price Calculator - Sale') THEN 'Low'
         WHEN company_report_origin = 'Partners' THEN 'Very low'
-        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Top Afiliados' THEN 'Very low'
-        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Afiliados Alto Volume' THEN 'Very low'
-        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Novos Afiliados' THEN 'Average'
-        WHEN company_report_origin = 'Indica Aí - General' AND affiliate_volumetry = 'Afiliados Risco Fraude' THEN 'Afiliados Risco Fraude'
+        WHEN COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Top Afiliados' THEN 'Very low'
+        WHEN COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Afiliados Alto Volume' THEN 'Very low'
+        WHEN COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Novos Afiliados' THEN 'Average'
+        WHEN COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Afiliados Risco Fraude' THEN 'Afiliados Risco Fraude'
         WHEN company_report_origin = 'Indica Aí - General' THEN 'Average'
         ELSE 'sem_cluster'
     END AS planning_conversion_cluster,
@@ -391,3 +399,6 @@ LEFT JOIN
     dw_datamarts.affiliates_clusters AS ac
         ON (ac.sk_user = obt.sk_user_affiliate)
         AND (ac.year_month = obt.year_month)
+LEFT JOIN
+    affiliate_volumetry_cluster AS avc 
+        ON obt.sk_user_affiliate = avc.sk_user
