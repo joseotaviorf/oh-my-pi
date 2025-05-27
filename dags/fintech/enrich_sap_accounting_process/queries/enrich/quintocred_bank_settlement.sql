@@ -8,7 +8,8 @@ WITH rental_guarantee_pix AS (
         NULL AS source_system,
         'Rental Guarantee Platform - Payment' AS billing_source,
         MIN(DATE(ts_updated)) AS dt_billing,
-        ROUND(SUM(value), 2) AS total_amount
+        ROUND(SUM(value), 2) AS total_amount,
+        MIN(id) AS id
     FROM 
         datalake_rental_guarantee_platform_clean.payment
     WHERE 
@@ -28,7 +29,8 @@ WITH rental_guarantee_pix AS (
         source_system,
         'Rental Guarantee Platform - Delinquency' AS billing_source,
         ap.dt_paid AS dt_billing,
-        ap.paid_value AS total_amount
+        ap.paid_value AS total_amount,
+        ap.id_agreement AS id
     FROM 
         datalake_rental_guarantee_platform_clean.delinquency AS d
     LEFT JOIN 
@@ -51,7 +53,8 @@ WITH rental_guarantee_pix AS (
         NULL AS source_system,
         'Rental Guarantee Platform - Direct Billing' AS billing_source,
         DATE(ts_paid) AS dt_billing,
-        due_amount AS total_amount
+        due_amount AS total_amount,
+        CAST(NULL AS STRING) AS id
     FROM 
         datalake_rental_guarantee_platform_clean.billing_report i
     LEFT JOIN 
@@ -218,17 +221,36 @@ LEFT JOIN
 LEFT JOIN 
     bank AS b 
         ON CASE
-                WHEN rgp.billing_source = 'Rental Guarantee Platform - Payment' THEN b.our_number = p.id_bank_payment
-                WHEN rgp.billing_source = 'Rental Guarantee Platform - Delinquency' AND rgp.billing_type = 'BOLETO' THEN rgp.id_finance_entity = b.our_number
-                WHEN rgp.billing_source = 'Rental Guarantee Platform - Direct Billing' THEN rgp.id_finance_entity = b.origin_complement
-                ELSE rgp.id_bank_payment = b.origin_complement 
+                WHEN rgp.billing_source = 'Rental Guarantee Platform - Payment' THEN 
+                    b.our_number = p.id_bank_payment
+                WHEN rgp.billing_source = 'Rental Guarantee Platform - Delinquency' AND rgp.billing_type = 'BOLETO' THEN 
+                    rgp.id_finance_entity = b.our_number
+                WHEN rgp.billing_source = 'Rental Guarantee Platform - Direct Billing' THEN 
+                    rgp.id_finance_entity = b.origin_complement
+                ELSE 
+                    rgp.id_bank_payment = b.origin_complement 
             END
 LEFT JOIN 
     ledger AS l 
         ON CASE
-                WHEN rgp.billing_source = 'Rental Guarantee Platform - Payment' THEN LOWER(rgp.unicid) = LOWER(l.id_external_payment)
-                ELSE p.id_bank_payment = l.id_external_payment AND rgp.dt_billing = l.dt_reference AND b.bank_amount = l.debit_credit
-                --rgp.unicid = l.id_external_payment AND rgp.dt_billing_source_trigger = l.dt_reference
+                WHEN rgp.billing_source = 'Rental Guarantee Platform - Payment' THEN 
+                    LOWER(rgp.unicid) = LOWER(l.id_external_payment) OR
+                    rgp.id_business_entity = l.id_business_entity 
+                        AND rgp.id = l.id_finance_entity
+                WHEN rgp.billing_source = 'Rental Guarantee Platform - Direct Billing' THEN 
+                    p.id_bank_payment = l.id_external_payment 
+                        AND rgp.dt_billing = l.dt_reference 
+                        AND b.bank_amount = l.debit_credit OR 
+                    rgp.id_business_entity = l.id_business_entity 
+                        AND rgp.id_finance_entity = l.id_finance_entity
+                ELSE 
+                    p.id_bank_payment = l.id_external_payment 
+                        AND rgp.dt_billing = l.dt_reference 
+                        AND b.bank_amount = l.debit_credit OR
+                    rgp.id_business_entity = l.id_business_entity 
+                        AND rgp.id = l.id_finance_entity 
+                        AND rgp.dt_billing = l.dt_reference 
+                        AND b.bank_amount = l.debit_credit
             END
 )
 
