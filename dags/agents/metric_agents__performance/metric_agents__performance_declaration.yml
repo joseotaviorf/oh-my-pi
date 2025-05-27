@@ -16,7 +16,7 @@ workflow:
   default_extraction_type: incremental
   default_partitions: [year, month, day]
 cluster:
-  type: databricks_12_2_med_io-memory_cluster
+  type: databricks_12_2_min_io-memory_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
