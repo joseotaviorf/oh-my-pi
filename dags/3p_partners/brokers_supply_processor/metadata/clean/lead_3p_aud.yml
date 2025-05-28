@@ -1,6 +1,8 @@
 ---
 database_name: datalake_brokers_supply_processor_clean
 table_name: lead_3p_aud
+owner: vitor.musachio@quintoandar.com.br
+domain: Rede
 columns:
   id:
     lineage:
