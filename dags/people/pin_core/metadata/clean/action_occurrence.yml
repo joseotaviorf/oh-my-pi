@@ -21,10 +21,6 @@ columns:
     description: Reference to another action occurrence.
     lineage:
       - datalake_pin_core_raw.per_action_occurrences.ref_action_occurrence_id
-  id_business_unit:
-    description: Business Unit ID for Combined Employment and Position Change action.
-    lineage:
-      - datalake_pin_core_raw.per_action_occurrences.business_unit_id
   id_entity:
     description: Stores Surrogate key of the entity type (e.g., person, assignment) to which the action applies.
     lineage:

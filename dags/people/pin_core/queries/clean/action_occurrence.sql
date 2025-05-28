@@ -3,7 +3,6 @@ SELECT
     action_id AS id_action,
     action_reason_id AS id_action_reason,
     ref_action_occurrence_id AS id_reference_action_occurrence,
-    business_unit_id AS id_business_unit,
     entity_id AS id_entity,
     parent_entity_key_id AS id_parent_entity_key,
     business_group_id AS id_business_group,
