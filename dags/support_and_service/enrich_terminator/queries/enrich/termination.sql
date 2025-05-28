@@ -77,6 +77,18 @@ terminations_modified AS (
     WHERE
         dt_termination != COALESCE(prev_dt_termination, dt_termination)
 ),
+terminations_finished AS (
+    SELECT
+        id,
+        MIN(rev) AS min_rev,
+        MIN(ts_updated) AS ts_termination_finished
+    FROM
+        datalake_terminator_clean.termination_aud AS ta
+    WHERE
+        ta.status = 'DONE'
+    GROUP BY
+        1
+),
 repair_metrics AS (
     SELECT
         id_contract,
@@ -169,7 +181,10 @@ SELECT
     t.ts_created AS ts_termination_request,
     t.ts_updated AS ts_termination_updated,
     t.ts_canceled AS ts_termination_canceled,
-    IF(t.status = 'DONE', t.ts_updated, NULL) AS ts_termination_finished,
+    CASE
+        WHEN tf.ts_termination_finished <= '2020-07-07' THEN neg.ts_updated
+        WHEN tf.ts_termination_finished > '2020-07-07' THEN tf.ts_termination_finished
+    END AS ts_termination_finished,
     ln.ts_fee_negotiation_created,
     ln.ts_fee_negotiation_updated,
     cdr.ts_declined,
@@ -200,10 +215,14 @@ LEFT JOIN
     terminations_modified AS tm
         ON t.id = tm.id
 LEFT JOIN
+    terminations_finished AS tf
+        ON t.id = tf.id
+        AND t.status = 'DONE'
+LEFT JOIN
     datalake_ebdb_contract.contract_declined_relisting AS cdr
         ON t.id = cdr.id_termination
 LEFT JOIN
-    datalake_terminator_clean.negotiation neg
+    datalake_terminator_clean.negotiation AS neg
         ON t.id = neg.id_termination
 LEFT JOIN
     repair_metrics AS rm

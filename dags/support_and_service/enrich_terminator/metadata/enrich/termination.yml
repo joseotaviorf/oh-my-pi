@@ -198,7 +198,8 @@ columns:
   ts_termination_finished:
     description: Date in timestamp format that indicates when termination was completed.
     lineage:
-      - datalake_terminator_clean.termination.ts_updated
+      - datalake_terminator_clean.termination_aud.ts_updated
+      - datalake_terminator_clean.negotiation.ts_updated
   ts_fee_negotiation_created:
     description: Date in timestamp format that indicates when the trade opening for the termination fee was created.
     lineage:
