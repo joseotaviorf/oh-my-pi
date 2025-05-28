@@ -1,0 +1,17 @@
+---
+table_name: datalake_tiers.agent_prospects
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_agent:
+    is_complete:
+      severity_level: Error
+  ts_event:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  bimester:
+    is_complete:
+      severity_level: Error
+

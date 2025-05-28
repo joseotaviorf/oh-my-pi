@@ -1,0 +1,52 @@
+---
+database_name: datalake_tiers
+table_name: agent_prospects
+description: |
+  This table aims to map the prospects attended by agents, enriching this information with visit scheduling 
+  events and agent hub allocation data at the time of the visit. 
+  The granularity of the table is at the agent level and by the first purchase visit recorded for each buyer.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent:
+    lineage:
+      - datalake_sale_visit.sale_visit.id_agent
+    description: Agent unique identifier.
+  id_user:
+    lineage:
+      - datalake_hub_services.agent_hub_alocation.id_user
+    description: |
+      User unique identifier.
+      Attention: This ID refers to the user in main/admin/ebdb.
+  id_user_parent:
+    lineage:
+      - datalake_hub_services.agent_hub_alocation.id_user_negotiation_executive
+    description: |
+      User unique identifier to the parent member.
+      Attention: This ID refers to the user in main/admin/ebdb.
+  id_prospect:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_prospect
+    description: |
+      Prospect unique identifier.
+      Attention: This ID refers to the user in main/admin/ebdb.
+  business_context:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.business_context
+    description: Context in witch the interaction with the prospect happened.
+  event_name:
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.event_name
+    description: Name of the demand prospect conversion event.
+  ts_event:
+    lineage:
+      - datalake_sale_visit.sale_visit.ts_booking_created
+    description: Timestamp in witch the interaction with the prospect happened.
+  year:
+    lineage:
+      - datalake_sale_visit.sale_visit.year
+    description: Year of event happened.
+  bimester:
+    lineage:
+      - datalake_sale_visit.sale_visit.bimester
+    description: Bimester of event happened.

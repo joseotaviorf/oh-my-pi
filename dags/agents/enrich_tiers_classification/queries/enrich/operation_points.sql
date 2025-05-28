@@ -16,12 +16,14 @@ agent_performance AS (
         ap.profile,
         IF(ap.profile = "Broker", "SALE_AGENT", "NEGOTIATION_EXECUTIVE") AS program_code,
         STACK(
-            7,
+            9,
             CAST(ap.total_regular_offer_signed AS DOUBLE), "CCV",
             CAST(ap.total_offer_signed_with_tqc AS DOUBLE), "CCV_TQC",
             CAST(ap.total_offer_signed_with_ciq AS DOUBLE), "CCV_CIQ",
             CAST(ap.total_first_listing AS DOUBLE), "FIRST_LISTING",
-            ROUND(ratio_offer_submitted_to_signed * 100, 0), "OS2CCV_BY",
+            CAST(ap.total_offer_signed_with_tqc + ap.total_first_listing AS DOUBLE), "FIRST_LISTING_TQC",
+            ROUND(ratio_buyer_offer_submitted_to_signed * 100, 0), "OS2CCV_BY",
+            ROUND(ratio_prospect_to_offer_signed * 100, 0), "BP2CCV",
             CAST(ap.total_offer_signed_with_demand_supply_capture AS DOUBLE), "CCV_TQC_CIQ",
             CAST(ap.total_gross_merchandise_volume AS DOUBLE), "GMV"
         ) AS (performance_points, operation),

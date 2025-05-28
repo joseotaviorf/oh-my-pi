@@ -59,7 +59,8 @@ columns:
       - datalake_tiers.agent_performance.total_offer_signed_with_tqc
       - datalake_tiers.agent_performance.total_offer_signed_with_ciq
       - datalake_tiers.agent_performance.total_first_listing
-      - datalake_tiers.agent_performance.ratio_offer_submitted_to_signed
+      - datalake_tiers.agent_performance.ratio_buyer_offer_submitted_to_signed
+      - datalake_tiers.agent_performance.ratio_prospect_to_offer_signed
       - datalake_tiers.agent_performance.total_offer_signed_with_demand_supply_capture
       - datalake_tiers.agent_performance.total_gross_merchandise_volume
     description: 

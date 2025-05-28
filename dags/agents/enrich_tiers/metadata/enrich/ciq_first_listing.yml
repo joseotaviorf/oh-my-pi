@@ -21,12 +21,48 @@ columns:
     lineage:
       - datalake_ebdb_listing.listing_business_context.business_context
     description: Business context where the supply capture was carried out by CIQ
+  status:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.status
+    description: The status of the listing. 
   has_first_listing:
     description: Indicates that this property has already had its first publication made.
+  is_valid_first_listing:
+    description: >
+      Boolean flag that indicates whether the first listing is considered valid.
+      A listing is valid if:
+        - ts_first_listing exists,
+        - AND it was not unpublished within 14 days,
+        - OR a sale agreement was signed within that period.
+
+      Important note:
+        The First Listing is valid after 14 days from its publication date.
+        The day of ts_first_listing is included in the 14-day count — this means it is not 15 full days later, which is a common misconception.
   ts_first_listing:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
     description: Timestamp of when the opportunity became a first listing.
+  ts_first_unpublished:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp of the first time the listing was unpublished.
+  ts_sale_agreement_signed:
+    lineage:
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+    description: Timestamp representing the date the sale contract was signed, if it exists.
+  ts_valid_first_listing:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+      - datalake_offer.sale_offer.dt_sale_agreement_signed
+    description: >
+      Timestamp considered as the start of the valid first listing period.
+      It is calculated as:
+        - If a sale agreement (dt_sale_agreement_signed) was signed before 14 days after the first listing (ts_first_listing), then the sale date is used.
+        - Otherwise, the valid first listing date is considered to be exactly 14 days after the publication.
+      Important note:
+        The First Listing is valid after 14 days from its publication date.
+        Example: If it was published on the 1st of the month and remained published until the 15th, then the listing is considered valid on the 15th.
+        This means the day of ts_first_listing also counts in the calculation — it’s not 15 full days later.
   ts_updated:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing

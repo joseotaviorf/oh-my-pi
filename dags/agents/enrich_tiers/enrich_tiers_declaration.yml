@@ -13,6 +13,7 @@ workflow:
       - ciq_first_listing
     agent_performance:
       - agent_offers
+      - agent_prospects
       - ciq_first_listing
   default_extraction_type: incremental
   default_partitions: [year, bimester]

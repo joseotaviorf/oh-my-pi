@@ -11,22 +11,33 @@ WITH filter_bimester AS (
     WHERE
         ad.date BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
+offer_price_agreed AS (
+    SELECT DISTINCT
+        oa.id_offer,
+        oa.sale_price_agreed
+    FROM
+        datalake_tiers.agent_offers AS oa
+    JOIN
+        filter_bimester AS fb
+            ON DATE(oa.ts_sale_agreement_signed) BETWEEN fb.bimester_start AND fb.bimester_end
+    GROUP BY ALL
+),
 offer_signed AS (
     SELECT
         oa.id_user,
         COUNT(DISTINCT oa.id_offer) AS total_offer_signed,
         COUNT(DISTINCT oa.id_offer) FILTER (WHERE oa.has_tqc IS TRUE) AS total_offer_signed_with_tqc,
-        SUM(oa.sale_price_agreed) AS total_gross_merchandise_volume, 
+        SUM(opa.sale_price_agreed) AS total_gross_merchandise_volume, 
         fb.year,
         fb.bimester
     FROM
         datalake_tiers.agent_offers AS oa
     JOIN
         filter_bimester AS fb
-            ON fb.bimester = oa.bimester
-            AND fb.year = oa.year
-    WHERE
-        oa.is_contract_signed IS TRUE
+            ON DATE(oa.ts_sale_agreement_signed) BETWEEN fb.bimester_start AND fb.bimester_end
+    JOIN
+        offer_price_agreed AS opa
+            ON opa.id_offer = oa.id_offer
     GROUP BY ALL
 ),
 offer_submitted AS (
@@ -70,10 +81,10 @@ ciq_first_listing AS (
         datalake_tiers.ciq_first_listing AS cfl
     JOIN
         filter_bimester AS fb
-            ON fb.bimester = cfl.bimester
-            AND fb.year = cfl.year
+            ON DATE(cfl.ts_valid_first_listing) BETWEEN fb.bimester_start AND fb.bimester_end
     WHERE
         cfl.has_first_listing IS TRUE
+        AND cfl.is_valid_first_listing IS TRUE
     GROUP BY ALL
 ),
 member_profile AS (
@@ -122,6 +133,42 @@ user_with_multiple_roles AS (
         mp.is_active IS TRUE
     GROUP BY 1
     HAVING total_business_contexts > 1
+),
+agent_prospects AS (
+    SELECT
+        ap.id_user,
+        ap.id_user_parent,
+        ap.id_prospect,
+        ap.year,
+        ap.bimester
+    FROM
+        datalake_tiers.agent_prospects AS ap
+    JOIN
+        member_profile AS mp
+            ON mp.id_main_user = ap.id_user
+            AND mp.year = ap.year
+            AND mp.bimester = ap.bimester
+    WHERE
+        mp.profile = "Broker"
+),
+union_agent_prospects AS (
+    SELECT
+        ap.id_user,
+        COUNT(DISTINCT ap.id_prospect) AS total_prospect,
+        ap.year,
+        ap.bimester
+    FROM
+        agent_prospects AS ap
+    GROUP BY ALL
+    UNION ALL
+    SELECT
+        ap.id_user_parent AS id_user,
+        COUNT(DISTINCT ap.id_prospect) AS total_prospect,
+        ap.year,
+        ap.bimester
+    FROM
+        agent_prospects AS ap
+    GROUP BY ALL
 )
 SELECT 
     mp.id_agent,
@@ -138,6 +185,7 @@ SELECT
     COALESCE(osu.total_offer_submitted, 0) AS total_offer_submitted,
     COALESCE(os.total_offer_signed, 0) AS total_regular_offer_signed,
     COALESCE(osu.total_buyer_with_offer_submitted, 0) AS total_buyer_with_offer_submitted,
+    COALESCE(uap.total_prospect, 0) AS total_prospect,
     (
         COALESCE(os.total_offer_signed, 0) 
         + COALESCE(cos.total_offer_signed_with_ciq, 0)
@@ -153,7 +201,11 @@ SELECT
     CASE
         WHEN COALESCE(os.total_offer_signed/ osu.total_buyer_with_offer_submitted, 0) > 1 THEN 1
         ELSE ROUND(COALESCE(os.total_offer_signed/ osu.total_buyer_with_offer_submitted, 0), 2)
-    END AS ratio_offer_submitted_to_signed,
+    END AS ratio_buyer_offer_submitted_to_signed,
+    CASE
+        WHEN COALESCE(os.total_offer_signed/ uap.total_prospect, 0) > 1 THEN 1
+        ELSE ROUND(COALESCE(os.total_offer_signed/ uap.total_prospect, 0), 2)
+    END AS ratio_prospect_to_offer_signed,
     mp.year,
     mp.bimester
 FROM
@@ -181,6 +233,11 @@ LEFT JOIN
         ON cql.id_user = mp.id_main_user 
         AND cql.bimester = mp.bimester
         AND cql.year = mp.year
+LEFT JOIN
+    union_agent_prospects AS uap
+        ON uap.id_user = mp.id_main_user 
+        AND uap.bimester = mp.bimester
+        AND uap.year = mp.year
 WHERE
     NOT (uwmr.id_main_user IS NOT NULL AND mp.business_context = 'RENT')
 QUALIFY
