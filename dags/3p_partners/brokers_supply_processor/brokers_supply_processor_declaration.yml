@@ -18,7 +18,7 @@ workflow:
     analytic_event:
       z_order_by: [id]
     business_context_detail:
-      z_order_by: [id_partner]
+      z_order_by: [id]
     business_context_detail_aud:
       raw_primary_keys: ["id", "rev"]
     file:
@@ -27,7 +27,7 @@ workflow:
       raw_primary_keys: ["id", "rev"]
     lead3p:
       clean_table_name: lead_3p
-      z_order_by: [id, uuid_lead]
+      z_order_by: [id]
     lead3p_aud:
       clean_table_name: lead_3p_aud
       raw_primary_keys: ["id", "rev"]
