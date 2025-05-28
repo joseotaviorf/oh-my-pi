@@ -131,6 +131,18 @@ sheets_info:
     clean_table_name: sale_demand_cohort_budget_2024
     sheet_context: for_sale
 
+  sale_extra_cohorts_targets_2025:
+    sheet_id: 120C2A0Fob7eErnotF08lqvRsdvp04GZFR0FCdo6DQbk
+    sheet_name: sale_extra_cohorts_targets
+    clean_table_name: sale_extra_cohorts_targets_2025
+    sheet_context: for_sale
+
+  sale_extra_cohorts_budget_2025:
+    sheet_id: 1eUJ8zpS5LPSqW18rq8mRd_oeNp1IUsbVfINyrrwLCeg
+    sheet_name: sale_extra_cohorts_budget
+    clean_table_name: sale_extra_cohorts_budget_2025
+    sheet_context: for_sale
+
   sale_ongoing_listings_targets:
     sheet_id: 1w6mujHGpk5nvL_N6AWVwO6z8xRISLSq1Vu4p3U3SM9Y
     sheet_name: sale_ongoing_listings_targets
@@ -147,6 +159,24 @@ sheets_info:
     sheet_id: 12fdH_o4EQ1auA7ol3bRIAPBRcDuGcgh7k4-q2SuKeTo
     sheet_name: all
     clean_table_name: sale_payments_tiers
+    sheet_context: for_sale
+
+  sale_supply_budget_2024:
+    sheet_id: 1mfFaaBtlIe1yvLZZ6vahk8-mOFjsTpLmwao_Ft1jN-I
+    sheet_name: sale_supply_targets_2024
+    clean_table_name: sale_supply_budget_2024
+    sheet_context: for_sale
+  
+  sale_supply_budget_2025:
+    sheet_id: 1iyLvYShE0520O0DrU4rhxiJkGwrL3s4TPdhVqafuVHA
+    sheet_name: sale_supply_targets_2025
+    clean_table_name: sale_supply_budget_2025
+    sheet_context: for_sale
+  
+  sale_supply_budget_ticket_2025:
+    sheet_id: 17-HrwpAQsNehcFASPXp4wYXhFxrTGfIMCjRwkkJzA5U
+    sheet_name: sale_supply_budget_ticket_2025
+    clean_table_name: sale_supply_budget_ticket_2025
     sheet_context: for_sale
 
   sale_supply_targets:
@@ -167,18 +197,6 @@ sheets_info:
     clean_table_name: sale_supply_targets_2025
     sheet_context: for_sale
 
-  sale_supply_budget_2024:
-    sheet_id: 1mfFaaBtlIe1yvLZZ6vahk8-mOFjsTpLmwao_Ft1jN-I
-    sheet_name: sale_supply_targets_2024
-    clean_table_name: sale_supply_budget_2024
-    sheet_context: for_sale
-  
-  sale_supply_budget_2025:
-    sheet_id: 1iyLvYShE0520O0DrU4rhxiJkGwrL3s4TPdhVqafuVHA
-    sheet_name: sale_supply_targets_2025
-    clean_table_name: sale_supply_budget_2025
-    sheet_context: for_sale
-    
   sale_supply_targets_cohort_2024:
     sheet_id: 1XhxyBcF-cvvYTLpsDOt7B3q95Sx1qWxxlkXjMRr_VTg
     sheet_name: sale_supply_targets_cohort_2024
@@ -190,7 +208,13 @@ sheets_info:
     sheet_name: sale_supply_targets_cohort_2025
     clean_table_name: sale_supply_targets_cohort_2025
     sheet_context: for_sale
-    
+
+  sale_supply_targets_ticket_2025:
+    sheet_id: 1HDJMbYygUV57ZNMDPDr5CFJWY4k8AnztF77MjfeGo3g
+    sheet_name: sale_supply_targets_ticket_2025
+    clean_table_name: sale_supply_targets_ticket_2025
+    sheet_context: for_sale
+
   sale_tof_daily_targets:
     sheet_id: 1u6wcCnO1HPl30mq34iR9VoWcD2z6XWYW8erXpLnXXKo
     sheet_name: sale_tof_daily_targets

@@ -1,0 +1,36 @@
+database_name: datalake_gsheets_clean
+table_name: sale_supply_targets_ticket_2025
+columns:
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_ticket_2025.city_group
+  company_report_origin:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_ticket_2025.company_report_origin
+  date:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_ticket_2025.date
+  planning_cluster:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_ticket_2025.planning_cluster
+  planning_conversion:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_ticket_2025.planning_conversion
+  planning_operation:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_ticket_2025.planning_operation
+  range_tkt_adj:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_ticket_2025.range_tkt_adj
+  tkt_range:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_ticket_2025.tkt_range
+  volume_first_listings:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_ticket_2025.volume_first_listings
+  week:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_ticket_2025.week
+  year_month:
+    lineage:
+      - datalake_gsheets_raw.sale_supply_targets_ticket_2025.year_month
