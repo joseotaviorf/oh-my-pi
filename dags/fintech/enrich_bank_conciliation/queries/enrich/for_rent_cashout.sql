@@ -1,4 +1,13 @@
-WITH francesinha AS (
+WITH de_para_company_use AS (
+    SELECT DISTINCT
+        UPPER(REPLACE(reference_1, '|', '!')) AS company_use,
+        id_business_entity,
+        id_finance_entity
+    FROM 
+        datalake_accounting_funnel.payment_platforms
+),
+
+francesinha AS (
     SELECT
         UPPER(REPLACE(company_use, '|', '!')) AS company_use,
         our_number,
@@ -24,6 +33,8 @@ WITH francesinha AS (
 
 cap AS (
     SELECT
+        id_business_entity,
+        id_finance_entity,
         dt_paid,
         UPPER(REPLACE(reference_1, '|', '!')) AS company_use,
         payment_status,
@@ -40,18 +51,24 @@ cap AS (
     AND
         (CAST(SPLIT(reference_5, ':')[0] AS INT) IN (1, 2, 7, 10, 13) OR reference_5 IS NULL)
     GROUP BY
-        1, 2, 3, 4, 5, 6
+        1, 2, 3, 4, 5, 6, 7, 8
 ),
 
 sap AS (
-    SELECT
-        UPPER(id_external_payment) AS company_use,
-        account_number,
-        dt_reference AS dt_paid,
-        dt_tax,
-        ROUND(SUM(debit_credit), 2) AS paid_amount
+    SELECT DISTINCT
+        l.id_business_entity,
+        l.id_finance_entity,
+        dp.company_use,
+        l.account_number,
+        l.dt_reference AS dt_paid,
+        l.dt_tax,
+        ROUND(SUM(l.debit_credit), 2) AS paid_amount
     FROM
-        datalake_accounting_funnel.ledger
+        datalake_accounting_funnel.ledger AS l
+    LEFT JOIN 
+        de_para_company_use AS dp
+            ON l.id_business_entity = dp.id_business_entity
+            AND l.id_finance_entity = dp.id_finance_entity
     WHERE
         (
             dt_reference >= DATE('2024-01-01')
@@ -64,7 +81,7 @@ sap AS (
         )
 
     GROUP BY
-        1, 2, 3, 4
+        1, 2, 3, 4, 5, 6
 ),
 
 cap_sap AS (
