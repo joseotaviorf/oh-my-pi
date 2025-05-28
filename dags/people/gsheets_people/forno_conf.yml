@@ -1,57 +1,9 @@
 sheets_info:
-  company_snapshots:
-    clean_table_name: company_snapshots
-    sheet_context: people
-    sheet_id: 1VCeTMQFy5q8k5Iy9ZXRpgUHeHQDyT8167rcpCOUxbCg
-    sheet_name: company_snapshots
-
-  cost_center_hierarchy:
-    clean_table_name: cost_center_hierarchy
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: cost_center_hierarchy
-
-  cost_center_history:
-    clean_table_name: cost_center_history
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: cost_center_history
-
-  department_history:
-    clean_table_name: department_history
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: department_history
-
-  managers_history:
-    clean_table_name: managers_history
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: managers_history
-
   navent_convenia_like:
     clean_table_name: navent_convenia_like
     sheet_context: people
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: navent_convenia_like
-
-  navent_fix_names:
-    clean_table_name: navent_fix_names
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: navent_fix_names
-
-  nominal_fix:
-    clean_table_name: nominal_fix
-    sheet_context: people
-    sheet_id: 1oJG4O_D8Dadz0UthfMJGWAstj-tlQSpdh4vAq3U_xfE
-    sheet_name: correcoes_nominais
-
-  people_reference_column:
-    clean_table_name: people_reference_column
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: people_reference_column
 
   performance_review:
     clean_table_name: performance_review
@@ -59,44 +11,14 @@ sheets_info:
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: performance_review
 
-  position_class:
-    clean_table_name: position_class
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: position_class
-
-  position_history:
-    clean_table_name: position_history
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: position_history
-
   talent_review:
     clean_table_name: talent_review
     sheet_context: people
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: talent_review
 
-  targets_pwd:
-    clean_table_name: targets_pwd
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: targets_pwd
-
-  targets_turnover:
-    clean_table_name: targets_turnover
-    sheet_context: people
-    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
-    sheet_name: targets_turnover
-
   team_formation_product_tech:
     clean_table_name: team_formation_product_tech
     sheet_context: people
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: team_formation_tech_active
-
-  transgender_people_list:
-    clean_table_name: transgender_people_list
-    sheet_context: people
-    sheet_id: 1CpR7af2Z-I2gA3V9__5d1SF2jY9SVScWPi1yx4yw2jk
-    sheet_name: base
