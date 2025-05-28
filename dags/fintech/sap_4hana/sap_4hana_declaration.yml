@@ -37,7 +37,7 @@ cluster:
   databricks_conn_id: databricks_new
   custom_configurations:
     node_type_id: r5.2xlarge
-    driver_node_type_id: r5.large
+    driver_node_type_id: r5.2xlarge
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
