@@ -37,6 +37,18 @@ columns:
     description: Indicates whether there is an active eviction process.
     lineage:
       - datalake_trato_feito_raw.segmentation_features.is_evic_active
+  invoices:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.invoices
+  segment:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.segment
+  customer_document_value:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segmentation_features.customer_document_value
   delay_contaminated_original_invoices:
     description: Average delay of contaminated original invoices.
     lineage:
