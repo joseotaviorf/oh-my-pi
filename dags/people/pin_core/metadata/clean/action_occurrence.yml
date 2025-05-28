@@ -92,6 +92,10 @@ columns:
   dt_freeze_started:
     description: Represents the Deferred data freeze until date (defaulted to Start of Time).
     lineage:
+      - datalake_pin_core_raw.per_action_occurrences.freeze_start_date
+  dt_freeze_ended:
+    description: Represents the Deferred data freeze until date.
+    lineage:
       - datalake_pin_core_raw.per_action_occurrences.freeze_until_date
   ts_created:
     description: 'Who column: indicates the date and time of the creation of the row.'

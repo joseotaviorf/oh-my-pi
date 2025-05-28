@@ -21,7 +21,7 @@ SELECT
     CAST(object_version_number AS INT) AS object_version_number,
     TO_DATE(action_date) AS dt_action_occurred,
     TO_DATE(freeze_start_date) AS dt_freeze_started,
-    TO_DATE(freeze_until_date) AS dt_freeze_started,
+    TO_DATE(freeze_until_date) AS dt_freeze_ended,
     TO_TIMESTAMP(creation_date) AS ts_created,
     TO_TIMESTAMP(last_update_date) AS ts_updated,
     NOW() AS ts_load,
