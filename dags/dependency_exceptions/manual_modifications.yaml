@@ -1041,6 +1041,12 @@ wonka.house_visit:
   add:
     - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
 
+wonka.user_bc_h3_7_city_agg_search_filters:
+  add:
+    - bietlejuice.amplitude:load-clean-170698-search-results-page-viewed-events
+    - bietlejuice.amplitude:load-clean-170698-search-page-viewed-events
+    - wonka.house_main:load-house_main
+
 wonka.user_search_profile_clustering:
   add:
     - wonka.user_bc_h3_7_city_agg_search_filters:load-user_bc_h3_7_city_agg_search_filters
