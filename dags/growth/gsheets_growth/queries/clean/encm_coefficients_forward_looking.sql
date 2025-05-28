@@ -8,4 +8,4 @@ SELECT
     FLOAT(NULLIF(survival_curve,'')) AS survival_curve,
     DATE(NULLIF(date_start, '')) AS date_start, 
     DATE(NULLIF(date_end, '')) AS date_end
-FROM datalake_gsheets_raw.encm_coefficients
+FROM datalake_gsheets_raw.encm_coefficients_forward_looking

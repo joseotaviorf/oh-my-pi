@@ -1,0 +1,33 @@
+database_name: datalake_gsheets_clean
+table_name: encm_conversion_probability_forward_looking
+columns:
+  date_start:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.date_start
+  date_end:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.date_end
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.city_group
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.business_context
+  event_name:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.event_name
+  price_range:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.price_range
+  prob_conv:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.prob_conv
+  tm_conv:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.tm_conv
+  min_range:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.min_range
+  max_range:
+    lineage:
+      - datalake_gsheets_raw.encm_conversion_probability_forward_looking.max_range

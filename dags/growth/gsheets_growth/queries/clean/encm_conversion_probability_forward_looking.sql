@@ -9,4 +9,4 @@ SELECT
     FLOAT(NULLIF(max_range,'')) AS max_range,
     DATE(NULLIF(date_start, '')) AS date_start, 
     DATE(NULLIF(date_end, '')) AS date_end
-FROM datalake_gsheets_raw.encm_conversion_probability
+FROM datalake_gsheets_raw.encm_conversion_probability_forward_looking

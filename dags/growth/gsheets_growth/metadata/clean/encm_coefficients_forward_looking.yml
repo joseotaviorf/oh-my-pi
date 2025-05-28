@@ -1,0 +1,30 @@
+database_name: datalake_gsheets_clean
+table_name: encm_coefficients_forward_looking
+columns:
+  date_start:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients_forward_looking.date_start
+  date_end:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients_forward_looking.date_end
+  city_group:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients_forward_looking.city_group
+  business_context:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients_forward_looking.business_context
+  event_name:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients_forward_looking.event_name
+  coefficient:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients_forward_looking.coefficient
+  constant:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients_forward_looking.constant
+  gross_takerate:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients_forward_looking.gross_takerate
+  survival_curve:
+    lineage:
+      - datalake_gsheets_raw.encm_coefficients_forward_looking.survival_curve
