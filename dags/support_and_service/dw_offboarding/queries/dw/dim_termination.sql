@@ -52,7 +52,7 @@ SELECT
     t.fee_payment_option,
     t.checklist_item,
     t.decline_person,
-    m.id_termination IS NOT NULL AS has_mediation,
+    IF(((m.has_ac_repairs = TRUE) AND ((m.has_mediation_ticket = TRUE AND m.squad <> 'both_agreed') OR (m.has_mediation_ticket = FALSE AND m.squad IS NULL))), TRUE, FALSE) AS has_mediation,
     m.has_mediation_ticket,
     m.has_ac_repairs,
     m.is_ticket_opened_via_terminator,
@@ -61,7 +61,7 @@ SELECT
     t.year,
     t.month,
     t.day
-FROM  
+FROM
     terminations AS t
 LEFT JOIN
     mediations AS m

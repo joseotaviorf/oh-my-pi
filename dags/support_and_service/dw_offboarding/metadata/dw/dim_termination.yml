@@ -70,8 +70,6 @@ columns:
       "DECLINED_BY_CX/ENG": The person who declined the relisting and opted-out wasn't the owner.
       "AUTO_DECLINED": If the is_early_relisting flag is False and we don't have any information who did the opt-out, the value will be Auto-declined.
   has_mediation:
-    lineage:
-      - datalake_offboarding.mediations.id_termination
     description: Flag indicating whether a mediation record exists for the termination.
   has_mediation_ticket:
     lineage:

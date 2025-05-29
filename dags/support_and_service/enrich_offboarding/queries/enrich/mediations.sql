@@ -4,7 +4,7 @@ WITH terminations AS (
     ct.id_contract,
     t.repairs_absorbed_ac,
     t.total_tentant_repair_ac,
-    CASE 
+    CASE
       WHEN DATE(ib.ts_synced - INTERVAL 3 HOUR) > DATE(ct.ts_created) THEN DATE(ib.ts_synced - INTERVAL 3 HOUR)
       ELSE NULL
     END dt_inspection,
@@ -27,9 +27,9 @@ WITH terminations AS (
     ct.ts_updated >= '{load_start_date}'
     AND ct.status <> 'CANCELED'
     AND ec.country_code = 'BR'
-    AND ib.inspection_type IN ('offboarding', 'verification')
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY ct.id_contract ORDER BY ib.ts_synced DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY ct.id_contract ORDER BY CASE WHEN DATE(ib.ts_synced - INTERVAL '3' HOUR) > DATE(ct.ts_created)
+          THEN DATE(ib.ts_synced - INTERVAL '3' HOUR) ELSE NULL END DESC, ct.ts_created DESC) = 1
 ),
 mediations_via_ticket AS (
   SELECT DISTINCT
@@ -116,8 +116,6 @@ mediations AS (
   LEFT JOIN
     mediations_via_ticket AS mtk
       ON mtk.id_contract = t.id_contract
-  WHERE
-    t.dt_inspection IS NOT NULL
 )
 SELECT
   id_termination,
@@ -133,14 +131,3 @@ SELECT
   ts_termination_updated
 FROM
   mediations
-WHERE
-  has_ac_repairs IS TRUE
-  AND (
-    (
-      has_mediation_ticket IS TRUE
-      AND squad <> 'both_agreed'
-    ) OR (
-      has_mediation_ticket IS FALSE
-      AND squad IS NULL
-    )
-  )
