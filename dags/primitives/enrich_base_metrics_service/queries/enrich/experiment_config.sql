@@ -207,8 +207,27 @@ FROM VALUES
                                                 )
                                 )
         )
+    ),
+    -- Listing recs pricing experiment
+    (
+        "ab_beakman_listing_recs_vs_pricing_experiment",
+        named_struct(
+            'begin_date', DATE('2025-02-27'),
+            'end_date', DATE('2025-05-06'),
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                )
+        )
     )
-
-
 
 AS experiment_config(experiment_name, config)
