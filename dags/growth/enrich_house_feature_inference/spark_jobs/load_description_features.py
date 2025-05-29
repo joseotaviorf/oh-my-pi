@@ -63,7 +63,7 @@ def get_raw_descriptions_dataframe() -> DataFrame:
     """Returns a dataframe with all descriptions from house, or from lead_3p if it is a third party house"""
 
     return spark.sql("""
-        SELECT
+        SELECT DISTINCT
             h.id AS id_house,
             COALESCE(NULLIF(TRIM(l.house_description), ''), h.house_description) AS house_description,
             ch.country_code
