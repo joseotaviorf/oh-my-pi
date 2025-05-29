@@ -224,6 +224,14 @@ class DeltaLoader:
         self.spark.sql(command)
         logger.info(f"Vacuum successful for table {table_name}")
 
+    def vacuum_lite_table(self, table_name: str, retention_hours: int) -> None:
+        """Vacuum a Delta table in lite mode. Only available in Databricks Runtine 16.1 and above."""
+
+        command = f"VACUUM {table_name} LITE RETAIN {retention_hours} HOURS"
+        logger.info(f"Running vacuum lite with command {command}")
+        self.spark.sql(command)
+        logger.info(f"Vacuum lite successful for table {table_name}")
+
     def optimize_table(self, table_name: str, z_order_by: list = None) -> None:
         """Optimize a Delta table, optionally using ZORDER BY"""
 
