@@ -3,17 +3,18 @@ dag:
   schedule_start_date: 2020, 7, 20
   schedule_interval: 0 3 * * *
   owner: Data ForRent
+  documentation:
+    dag_purpose: This DAG brings [PropertyTax](https://github.com/quintoandar/property-tax) data, service responsible for updating municipal taxes for ongoing contracts.
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
   dbutils_secret_key: PROPERTY_TAX_DB
+  source_schema: public
   tables_customization:
     tax_report:
-      date_filter_column: updated_at
-      read_from_sql: true
-      extraction_type: incremental
-      partitions: ["year", "month", "day"]
+      database_column_alias:
+        year: year_tax_report
     report_version: {}
     report_item: {}
 cluster:
