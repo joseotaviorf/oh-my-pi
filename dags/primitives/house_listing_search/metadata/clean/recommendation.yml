@@ -1,0 +1,37 @@
+---
+database_name: datalake_house_listing_search_clean
+table_name: recommendation
+owner: brandell.ferreira@quintoandar.com.br
+domain: primitives
+description: "This table stores information about recommendation requests that are done in the House Listing Search service"
+columns:
+  id:
+    description: "The long recommendation record identifier"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation.id
+  id_recommendation:
+    description: "The recommendation identified used in the response"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation.recommendation_id
+  id_user:
+    description: "The user identifier in external service"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation.user_id
+  recommendation_criteria:
+    description: "The recommendation request object used to retrieve the listings"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation.recommendation_criteria
+  final_response:
+    description: "The final response object sent by the service containing all listings"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation.response
+  original_response_scores:
+    description: "The original response scores object sent by the service containing all listings"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation.original_recommendation_scores
+  active_experiments:
+    description: "The active experiments object sent by the service containing all experiments"
+  ts_created:
+    description: "The date when recommendation was performed"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation.created_at 

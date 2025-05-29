@@ -13,6 +13,7 @@ workflow:
   source_schema: public
   tables_customization:
     search: {}
+    recommendation: {}
 cluster:
   type: databricks_12_2_min_general_cluster
   databricks_conn_id: databricks_new
