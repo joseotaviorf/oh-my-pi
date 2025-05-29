@@ -131,3 +131,5 @@ SELECT
   ts_termination_updated
 FROM
   mediations
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY id_termination ORDER BY ts_termination_updated DESC) = 1
