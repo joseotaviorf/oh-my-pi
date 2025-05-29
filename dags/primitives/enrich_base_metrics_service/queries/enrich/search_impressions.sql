@@ -2,34 +2,10 @@
 Table with ids, dimensions, metrics and timestamps related to search.
 */
 
-
------------------
--- Experiments
-
-WITH experiments AS (
-    SELECT
-        experiment_name,
-        config.begin_date,
-        config.end_date,
-        regexp_replace(_variant_name, '"', '') AS variant_name,
-        regexp_replace(variants[_variant_name], '"', '') as variant_standard_name
-        FROM (
-            SELECT
-                *,
-                explode(map_keys(str_to_map(regexp_replace(config.variants, '\\{{|\\}}', '' )))) AS _variant_name,
-                str_to_map(regexp_replace(config.variants, '\\{{|\\}}', '' )) AS variants
-            FROM
-                datalake_search.experiment_config
-            WHERE
-                (DATE_SUB(DATE('{start_date}'), {days_past_30}) <= config.end_date OR config.end_date IS NULL)
-                AND DATE('{end_date}') >= config.begin_date
-        )
-),
-
 -----------------
 -- Union SPVS
 
-union_spvs AS (
+WITH union_spvs AS (
     SELECT
         event_properties,
         user_properties,
@@ -151,8 +127,7 @@ duplicate_experiment_searches AS
 
     FROM
         union_spvs
-    INNER JOIN
-        experiments
+    INNER JOIN datalake_search.experiment_config_processed AS experiments
         ON experiments.variant_name = get_json_object(union_spvs.user_properties, CONCAT('$.', experiments.experiment_name))
         AND (
             (ts_event >= experiments.begin_date)
@@ -270,67 +245,6 @@ houses_rank AS (
 ),
 
 -----------------
---House publication
-
-houses_catalog AS (
-    SELECT DISTINCT
-        CAST(
-            SUBSTRING(
-                CAST(sk_house_listing AS STRING), 1, 9
-            )
-            AS INTEGER
-        ) AS id_house,
-        'rent' AS business_context,
-        ts_status_start AS ts_house_published
-
-    FROM
-        dw_rent.fact_house_listing_status
-    WHERE
-        status_history IN ('publicado', 'PUBLISHED')
-        AND ts_status_start IS NOT NULL
-
-    UNION ALL
-
-    SELECT DISTINCT
-        CAST(
-            SUBSTRING(
-                CAST(sk_sale_listing AS STRING),
-                1, 9
-            )
-            AS INTEGER
-        )
-        AS id_house,
-        'sale' AS business_context,
-        ts_status_started AS ts_house_published
-    FROM
-        dw_sale.fact_listing_status
-    WHERE
-        status_history = 'PUBLISHED'
-        AND ts_status_started IS NOT NULL
-),
-
-house_published_repeated AS (
-  SELECT
-    id_house,
-    ts_house_published,
-    business_context,
-    LAG(ts_house_published) OVER (PARTITION BY id_house, business_context ORDER BY ts_house_published) AS ts_house_published_shift
-  FROM
-    houses_catalog
-),
-
-houses_published AS (
-SELECT
-  id_house,
-  business_context,
-  ts_house_published
-FROM
-  house_published_repeated
-WHERE
-  COALESCE(DATEDIFF(ts_house_published, ts_house_published_shift), 1000) > 84
-),
-
------------------
 --Houses Cities
 
 house_cities AS (
@@ -360,7 +274,7 @@ exploded_houses AS (
         CAST(DATEDIFF(FIRST(houses_rank.ts_search), MAX(houses_published.ts_house_published)) AS INT) AS listing_age
     FROM
         houses_rank
-    LEFT JOIN houses_published
+    LEFT JOIN datalake_search.house_publication_dates houses_published
         ON houses_rank.id_house = houses_published.id_house
         AND houses_rank.business_context = houses_published.business_context
         AND houses_published.ts_house_published <= houses_rank.ts_search
