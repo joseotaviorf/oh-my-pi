@@ -57,8 +57,7 @@ database_ingestion_without_cdc:
   - kodak
   - linhadireta
   - monopoly
-  - nazare_1
-  - nazare_2
+  - nazare
   - pixar
   - property_tax
   - quinturk

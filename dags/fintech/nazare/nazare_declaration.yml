@@ -1,0 +1,50 @@
+dag:
+  name: nazare
+  schedule_start_date: 2022, 8, 23
+  schedule_interval: 0 12 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG load tables from Nazare, the service that calculates the Revenue Share with external partners and executives.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  dbutils_secret_key: NAZARE_DB
+  lineage_product_database_name: nazare
+  tables_customization:
+    agent: {}
+    associate_executive_bonus: {}
+    associate_executive_bonus_revision:
+      transactional_datatype_overrides:
+        bonus_fee: decimal(38,20)
+    brokerage_fee_baseline: {}
+    brokerage_fee_baseline_revision:
+      transactional_datatype_overrides:
+        bonus_fee: decimal(38,20)
+    business_unit: {}
+    campaign:
+      transactional_datatype_overrides:
+        bonus_fee: decimal(38,20)
+    hub_bonus: {}
+    hub_bonus_revision:
+      transactional_datatype_overrides:
+        bonus_fee: decimal(38,20)
+    offer:
+      transactional_datatype_overrides:
+        brokerage: decimal(38,20)
+    offer_agent: {}
+    offer_partner: {}
+    partner: {}
+    revenue_share_by_participant: {}
+    revenue_share_file: {}
+    tier_bonus: {}
+    tier_bonus_revision:
+      transactional_datatype_overrides:
+        bonus_fee: decimal(38,20)
+        baseline_fee: decimal(38,20)
+    tier_partner: {}
+    supply_acquisition_share: {}
+cluster:
+  type: databricks_13_3_med_general_cluster

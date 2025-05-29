@@ -1405,10 +1405,10 @@ bietlejuice.enrich_braze_webhook_notification:
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-owners-events
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-tenants-events
 bietlejuice.enrich_brokerage:
-  - bietlejuice.nazare_1:load-clean-agent
-  - bietlejuice.nazare_2:load-clean-offer
-  - bietlejuice.nazare_2:load-clean-offer-agent
-  - bietlejuice.nazare_2:load-clean-revenue-share-by-participant
+  - bietlejuice.nazare:load-clean-agent
+  - bietlejuice.nazare:load-clean-offer
+  - bietlejuice.nazare:load-clean-offer-agent
+  - bietlejuice.nazare:load-clean-revenue-share-by-participant
 bietlejuice.enrich_brokers_supply_processor:
   - bietlejuice.brokers_supply_processor:load-clean-analytic-event
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail
