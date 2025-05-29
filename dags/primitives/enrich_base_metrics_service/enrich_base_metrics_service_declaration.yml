@@ -54,6 +54,13 @@ workflow:
         - year
         - month
         - day
+    rent_flow_past_30_days:
+      z_order_by: [id_user, id_house]
+    sale_flow_past_30_days:
+      z_order_by: [id_user, id_house]
+    house_publication_dates:
+      z_order_by: [id_house, business_context]
+
 
 cluster:
   type: custom_cluster
