@@ -48,7 +48,8 @@ eval_section_ratings AS (
         eval_r.role_type,
         tmpl_s.description AS section_description,
         eval_r.calculated_rating,
-        rtg_desc.rating_description
+        rtg_desc.rating_description,
+        rtg_desc.id_rating_level
     FROM
         datalake_pin_performance_clean.evaluation_section AS eval_s
     INNER JOIN
@@ -80,6 +81,9 @@ SELECT DISTINCT
     eval_step.id_evaluation_step,
     eval_step.id_person_completed_step,
     task_role.id_process_task_role,
+    impact_rtg.id_rating_level AS id_rating_level_impact,
+    leadership_rtg.id_rating_level AS id_rating_level_leadership,
+    behavior_rtg.id_rating_level AS id_rating_level_behavior,
     emp_main.person_number,
     rev_period_trans.review_period_name,
     tmpl_period_trans.customary_name AS document_template_name,

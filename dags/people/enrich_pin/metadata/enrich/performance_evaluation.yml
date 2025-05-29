@@ -56,6 +56,18 @@ columns:
     description: 'Identifier for the process task role associated with the evaluator step.'
     lineage:
       - datalake_pin_performance_clean.task_role_base.id_process_task_role
+  id_rating_level_behavior:
+    description: Identifier for the rating level assigned based on an individual's behavior.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.id_rating_level
+  id_rating_level_impact:
+    description: Identifier for the rating level assigned based on an individual's impact.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.id_rating_level
+  id_rating_level_leadership:
+    description: dentifier for the rating level assigned based on an individual's leadership capabilities.
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.id_rating_level
   person_number:
     description: 'Unique personnel number of the employee being evaluated.'
     lineage:

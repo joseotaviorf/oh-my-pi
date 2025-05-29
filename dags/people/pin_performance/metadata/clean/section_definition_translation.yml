@@ -1,0 +1,65 @@
+---
+database_name: datalake_pin_performance_clean
+table_name: section_definition_translation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Stores translated names and descriptions for various sections, likely related to Human Resources configurations.
+columns:
+  id_section_definition:
+    description: Unique identifier for the section definition being translated. Part of this table's composite primary key.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.section_def_id
+  id_business_group:
+    description: Identifier for the business group to which this section definition translation applies; part of the composite primary key. Foreign key to HR organization units.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.business_group_id
+  language:
+    description: Language code specifying the language of the translated 'name' and 'description' fields in this record; part of the composite primary key.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.language
+  source_language:
+    description: Language code of the original source from which the 'name' and 'description' fields were translated.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.source_lang
+  name:
+    description: Translated name of the section, corresponding to the specified 'language' code.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.name
+  description:
+    description: Translated descriptive text for the section, corresponding to the specified 'language' code.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.description
+  created_by:
+    description: Identifier of the user who created the original source record.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.created_by
+  updated_by:
+    description: Identifier of the user who last updated the original source record.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.last_updated_by
+  object_version_number:
+    description: Version number for the source record, used for optimistic locking. It increments with each update to ensure data integrity during concurrent modifications.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.CAST(object_version_number AS INT)
+  ts_created:
+    description: Timestamp indicating the creation date and time of the original source record.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.TO_TIMESTAMP(creation_date)
+  ts_updated:
+    description: Timestamp indicating the date and time of the last update to the original source record.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.TO_TIMESTAMP(last_update_date)
+  ts_load:
+    description: Timestamp marking the date and time this record was loaded into the clean table.
+  year:
+    description: Year extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.year
+  month:
+    description: Month extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.month
+  day:
+    description: Day extracted from the 'ts_updated' column, used for partitioning.
+    lineage:
+    - datalake_pin_performance_raw.hra_section_defns_tl.day

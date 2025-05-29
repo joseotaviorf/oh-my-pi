@@ -124,3 +124,8 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_performance
           date_column_to_partition: last_update_date
+    hra_section_defns_tl:
+      clean_table_name: section_definition_translation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_performance
+          date_column_to_partition: last_update_date

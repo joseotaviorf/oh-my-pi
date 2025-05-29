@@ -45,6 +45,11 @@ workflow:
     people-team:
       - ALL PRIVILEGES
   tables_customization:
+    hrt_content_items_tl:
+      clean_table_name: content_item_translation
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_talent
+          date_column_to_partition: last_update_date
     hrt_profile_items:
       clean_table_name: profile_item
       extra_spark_job_arguments:
