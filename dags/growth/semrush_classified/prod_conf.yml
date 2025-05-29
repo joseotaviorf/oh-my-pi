@@ -1,0 +1,32 @@
+---
+tables:
+  inmuebles24_organic_search_kw: inmuebles24.com
+  vivanuncios_organic_search_kw: vivanuncios.com.mx
+  lamudi_organic_search_kw: lamudi.com.mx
+  propiedades_organic_search_kw: propiedades.com
+  inmuebles_organic_search_kw: inmuebles.mercadolibre.com.mx
+  easyaviso_organic_search_kw: easyaviso.com
+  zzonaprop_organic_search_kw: zonaprop.com.ar
+  argenprop_organic_search_kw: argenprop.com
+  inmueblesmercadolibre_organic_search_kw: inmuebles.mercadolibre.com.ar
+  remax_organic_search_kw: remax.com.ar
+  properati_organic_search_kw: properati.com.ar
+  mudafy_organic_search_kw: mudafy.com.ar
+  urbania_organic_search_kw: urbania.pe
+  adondevivir_organic_search_kw: adondevivir.com
+  properatipe_organic_search_kw: properati.com.pe
+  infocasas_organic_search_kw: infocasas.com.pe
+  nexoinmobiliario_organic_search_kw: nexoinmobiliario.pe
+  plusvalia_organic_search_kw: plusvalia.com
+  properatiec_organic_search_kw: properati.com.ec
+  icasas_organic_search_kw: icasas.ec
+  inmueblesmercadolibreec_organic_search_kw: inmuebles.mercadolibre.com.ec
+  compreoalquile_organic_search_kw: compreoalquile.com
+  encuentra24_organic_search_kw: encuentra24.com
+  panama-real-estate_organic_search_kw: panama-real-estate.com
+  inmopanama_organic_search_kw: inmopanama.com
+  panamaequity_organic_search_kw: panamaequity.com
+clean_partition_cols:
+  - year
+  - month
+  - day

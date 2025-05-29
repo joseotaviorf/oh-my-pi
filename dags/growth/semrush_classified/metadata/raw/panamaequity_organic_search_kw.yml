@@ -1,0 +1,5 @@
+---
+database_name: datalake_semrush_classified_raw
+table_name: panamaequity_organic_search_kw
+owner: henrique.miamoto@quintoandar.com.br
+domain: Growth

@@ -1,0 +1,99 @@
+---
+database_name: datalake_semrush_classified_raw
+table_name: searches
+owner: henrique.miamoto@quintoandar.com.br
+domain: Growth
+description: This table contains information about the organic search keywords. Each row represents a keyword per month.
+columns:
+  keyword:
+    description: Keyword bringing users to the website via Google's top 100 organic search results.
+    lineage:
+      - datalake_semrush_classified_raw.searches._keyword
+  url:
+    description: The URL of the target page (Backlinks).
+    lineage:
+      - datalake_semrush_classified_raw.searches._url
+  trends:
+    description: The interest of searchers in a particular keyword during the last 12 months. This metric is based on changes in the number of queries per month.
+    lineage:
+      - datalake_semrush_classified_raw.searches._trends
+  position:
+    description: Position a URL gets with a particular keyword in Google's top 100 organic or paid search results.
+    lineage:
+      - datalake_semrush_classified_raw.searches._position
+  previous_position:
+    description: A position a domain gets with a particular keyword in Google's top 100 organic or paid search results.
+    lineage:
+      - datalake_semrush_classified_raw.searches._previous__position
+  position_difference:
+    description: The difference between the previous position a domain was earning with a particular keyword and its current position.
+    lineage:
+      - datalake_semrush_classified_raw.searches._position__difference
+  keyword_intents:
+    description: Keyword intents (0 - Commercial, 1 - Informational, 2 - Navigational, 3 - Transactional).
+    lineage:
+      - datalake_semrush_classified_raw.searches._intents
+  position_type:
+    description: The type of position (the regular organic position or the specific SERP Feature).
+    lineage:
+      - datalake_semrush_classified_raw.searches._position_type
+  serp_features_by_position:
+    description: SERP features in which a domain appears on SERP for a keyword. List of available SERP Features
+    lineage:
+      - datalake_semrush_classified_raw.searches._s_e_r_p__features_by__position
+  serp_features_by_keyword:
+    description: All SERP Features triggered by a keyword. List of available SERP Features
+    lineage:
+      - datalake_semrush_classified_raw.searches._s_e_r_p__features_by__keyword
+  search_volume:
+    description: The average number of times users have searched for a given keyword per month. We calculate this value over the last 12 months.
+    lineage:
+      - datalake_semrush_classified_raw.searches._search__volume
+  cpc:
+    description: Average price in US dollars advertisers pay for a user's click on an ad containing a particular keyword (Google AdWords).
+    lineage:
+      - datalake_semrush_classified_raw.searches._c_p_c
+  traffic:
+    description: The amount of estimated organic traffic driven to an analyzed domain with a given keyword over a specific period of time.
+    lineage:
+      - datalake_semrush_classified_raw.searches._traffic
+  share_of_traffic:
+    description: The share of traffic driven to the website with a particular keyword for a specified period.
+    lineage:
+      - datalake_semrush_classified_raw.searches._traffic_
+  traffic_cost_percentage:
+    description: The percentage of the domain's total traffic cost that is attributed to a particular keyword.
+    lineage:
+      - datalake_semrush_classified_raw.searches._traffic__cost_
+  competition:
+    description: Competitive density of advertisers using the given term for their ads. One (1) means the highest competition.
+    lineage:
+      - datalake_semrush_classified_raw.searches._competition
+  number_of_results:
+    description: The total number of organic results returned for a given keyword at the last date of collection.
+    lineage:
+      - datalake_semrush_classified_raw.searches._number_of__results
+  keyword_difficulty:
+    description: An estimate of how difficult it would be to rank well in organic search results for a particular keyword. The higher the percentage, the harder it
+    lineage:
+      - datalake_semrush_classified_raw.searches._keyword__difficulty
+  dt_report:
+    description: Extraction date
+    lineage:
+      - datalake_semrush_classified_raw.searches.date
+  ts_report:
+    description: Report Timestamp.
+    lineage:
+      - datalake_semrush_classified_raw.searches._timestamp
+  year:
+    description: Extraction year
+    lineage:
+      - datalake_semrush_classified_raw.searches.date
+  month:
+    description: Extraction month
+    lineage:
+      - datalake_semrush_classified_raw.searches.date
+  day:
+    description: Extraction day
+    lineage:
+      - datalake_semrush_classified_raw.searches.date
