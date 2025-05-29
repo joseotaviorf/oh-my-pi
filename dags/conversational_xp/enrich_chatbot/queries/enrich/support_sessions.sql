@@ -11,7 +11,7 @@ WITH orchestrator_sessions AS (
     datalake_copilot_service_clean.message AS m
       ON m.id_session = s.id
   WHERE
-    s.ts_created BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
+    s.ts_created >= DATE('{load_start_date}') - INTERVAL 3 MONTH
     AND m.channel = 'IN_APP_SUPPORT_CHAT'
 ),
 escalated_sessions AS (
