@@ -14,7 +14,7 @@ non_payment_report AS (
   FROM
     datalake_condominium_payments_clean.non_payment_report AS npr
   JOIN
-    datalake_condominium_payments_clean.condo_monitoring_actions AS cma
+    datalake_rental_management_clean.condo_monitoring_actions AS cma
       ON npr.id_contract = cma.id_contract
       AND npr.expense_type = 'P'
 ),
