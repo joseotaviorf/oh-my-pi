@@ -8,7 +8,7 @@ WITH get_metrics_base AS (
         SUM(COALESCE(di.visits_booked, 0)) AS base_vb,
         SUM(COALESCE(di.offers_sent, 0)) AS base_os,
         sh.business_context,
-        DATE_SUB(MAKE_DATE(sh.year, sh.month, sh.day), CAST(IF(sh.days_published < 15, sh.days_published, 15) AS INT)) AS dt_agg_started,
+        DATE_SUB(MAKE_DATE(sh.year, sh.month, sh.day), CAST(IF(sh.days_published < 15, sh.days_published, 15) AS INT) - 1) AS dt_agg_started,
         MAKE_DATE(sh.year, sh.month, sh.day) AS dt_agg_ended,
         sh.year,
         sh.month,
@@ -18,8 +18,7 @@ WITH get_metrics_base AS (
     LEFT JOIN
         datalake_rental_historical_follow_up.house_listings_daily_info AS di
             ON di.id_house = sh.id_house
-            AND di.dt_day > DATE_SUB(MAKE_DATE(sh.year, sh.month, sh.day), CAST(IF(sh.days_published < 15, sh.days_published, 15) AS INT))
-            AND di.dt_day <= MAKE_DATE(sh.year, sh.month, sh.day)
+            AND di.dt_day BETWEEN DATE_SUB(MAKE_DATE(sh.year, sh.month, sh.day), CAST(IF(sh.days_published < 15, sh.days_published, 15) AS INT) - 1) AND MAKE_DATE(sh.year, sh.month, sh.day)
     WHERE
         MAKE_DATE(sh.year, sh.month, sh.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
@@ -30,7 +29,7 @@ explode_similar AS (
         id_house,
         EXPLODE(ids_similar) AS id_similar,
         business_context,
-        DATE_SUB(MAKE_DATE(year, month, day), CAST(IF(days_published < 15, days_published, 15) AS INT)) AS dt_agg_started,
+        DATE_SUB(MAKE_DATE(year, month, day), CAST(IF(days_published < 15, days_published, 15) AS INT) - 1) AS dt_agg_started,
         MAKE_DATE(year, month, day) AS dt_agg_ended,
         year,
         month,
@@ -60,8 +59,7 @@ get_metrics_similar_1 AS (
     LEFT JOIN
         datalake_rental_historical_follow_up.house_listings_daily_info AS di
             ON di.id_house = es.id_similar
-            AND di.dt_day > es.dt_agg_started
-            AND di.dt_day <= es.dt_agg_ended
+            AND di.dt_day BETWEEN es.dt_agg_started AND es.dt_agg_ended
     GROUP BY
         ALL
 ),

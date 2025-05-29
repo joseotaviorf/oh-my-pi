@@ -10,11 +10,9 @@ WITH get_rent_houses AS (
         h.total_area,
         h.lat,
         h.lng,
-        DATEDIFF(DAY, DATE(sh.ts_last_publication), hldi.dt_day) AS days_published,
+        DATEDIFF(DAY, DATE(sh.ts_last_publication), hldi.dt_day) + 1 AS days_published,
         sh.business_context,
         sh.ts_last_publication,
-        hldi.ts_status_started,
-        hldi.ts_status_ended,
         hldi.year,
         hldi.month,
         hldi.day
@@ -32,7 +30,6 @@ WITH get_rent_houses AS (
     WHERE
         MAKE_DATE(hldi.year, hldi.month, hldi.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND hldi.status_history = 'PUBLISHED'
-        AND DATEDIFF(DAY, DATE(sh.ts_last_publication), MAKE_DATE(hldi.year, hldi.month, hldi.day)) >= 1
 ),
 get_rent_similar AS (
     SELECT
@@ -69,7 +66,7 @@ get_frst_distance AS (
         MD5(CONCAT(base_id_house, business_context, year, month, day)) AS id,
         base_id_house AS id_house,
         COLLECT_LIST(similar_id_house) AS ids_similar,
-        "status = PUBLISHED at least 1 day ago; similar publication time >= base publication time; similar price <= p_70; similar_price between base_price * 0.7 and base_price * 1.3; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 2" AS similar_rule,
+        "status = PUBLISHED; similar publication time >= base publication time; similar price <= p_70; similar_price between base_price * 0.7 and base_price * 1.3; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 2" AS similar_rule,
         days_published,
         business_context,
         year,
@@ -89,7 +86,7 @@ get_scnd_distance AS (
         MD5(CONCAT(s.base_id_house, s.business_context, s.year, s.month, s.day)) AS id,
         s.base_id_house AS id_house,
         COLLECT_LIST(s.similar_id_house) AS ids_similar,
-        "status = PUBLISHED at least 1 day ago; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= p_70; similar_price between base_price * 0.7 and base_price * 1.3; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 5" AS similar_rule,
+        "status = PUBLISHED; if base publication time < 15 then similar publication time >= base publication time, else similar publication time >= 15; similar price <= p_70; similar_price between base_price * 0.7 and base_price * 1.3; similar_area between base_area * 0.7 and base_area * 1.3; similar city, type and business context are the same as the base; similar is not the base; haversine_distance <= 5" AS similar_rule,
         s.days_published,
         s.business_context,
         s.year,
