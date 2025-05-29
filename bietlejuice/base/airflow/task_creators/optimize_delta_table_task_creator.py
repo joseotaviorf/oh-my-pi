@@ -52,6 +52,9 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         default_run_optimize = self.dag_execution_context.workflow_args.get(
             "run_optimize", True
         )
+        default_vacuum_lite = self.dag_execution_context.workflow_args.get(
+            "vacuum_lite", False
+        )
         return json.dumps(
             {
                 table.table_name: {
@@ -61,6 +64,9 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                     ),
                     "run_optimize": table.table_customization.get(
                         "run_optimize", default_run_optimize
+                    ),
+                    "vacuum_lite": table.table_customization.get(
+                        "vacuum_lite", default_vacuum_lite
                     ),
                     "z_order_by": table.table_customization.get("z_order_by", []),
                 }
