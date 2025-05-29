@@ -23,8 +23,9 @@ workflow:
       extra_spark_job_arguments:
         - "{{ ds }}"
       run_optimize: false
+      vacuum_lite: true
 cluster:
-  type: databricks_13_3_low_mem_driver_high_mem_nodes
+  type: databricks_16_2_high_mem_driver_high_mem_nodes
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
