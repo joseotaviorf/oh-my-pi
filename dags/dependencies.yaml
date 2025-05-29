@@ -1022,8 +1022,8 @@ bietlejuice.dw_supply:
   - bietlejuice.enrich_olos_dialer:load-enrich-outbound-contact-attempts
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking
-  - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
   - bietlejuice.gsheets_growth:done-clean-affiliate-volumetry-cluster
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow
 bietlejuice.dw_supply_outbound_contacts:
   - bietlejuice.enrich_supply_outbound_flows:load-enrich-supply-outbound-contacts
 bietlejuice.dw_table_snapshot:
@@ -4056,12 +4056,12 @@ wonka.house_user_rent_flows:
   - wonka.house_listing_business_context:load-house_listing_business_context
 wonka.house_visit:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+wonka.user_bc_h3_7_city_agg_search_filters:
+  - bietlejuice.amplitude:load-clean-170698-search-page-viewed-events
+  - bietlejuice.amplitude:load-clean-170698-search-results-page-viewed-events
+  - wonka.house_main:load-house_main
 wonka.user_embeddings_main:
   - quintoml.recs.house_user_embeddings.inference:batch-predict
-wonka.user_bc_h3_7_city_agg_search_filters:
-  - bietlejuice.amplitude:load-clean-170698-search-results-page-viewed-events
-  - bietlejuice.amplitude:load-clean-170698-search-page-viewed-events
-  - wonka.house_main:load-house_main
 wonka.user_search_profile_clustering:
   - wonka.user_bc_h3_7_city_agg_search_filters:load-user_bc_h3_7_city_agg_search_filters
 wonka.user_visit:

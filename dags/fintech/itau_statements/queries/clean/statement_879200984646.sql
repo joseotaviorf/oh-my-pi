@@ -1,0 +1,38 @@
+SELECT
+    id,
+    type,
+    operation,
+    reversal,
+    date_event,
+    date_accounting,
+    literal_code,
+    literal_shortened,
+    literal_complete,
+    literal_tip,
+    amount_value,
+    amount_currency,
+    literal_complementary,
+    counterpart_type,
+    counterpart_ispb,
+    counterpart_agency,
+    counterpart_account,
+    counterpart_digit,
+    counterpart_name,
+    counterpart_institution,
+    counterpart_document,
+    counterpart_person,
+    origin_identifier,
+    origin_type,
+    origin_operation,
+    origin_complement,
+    origin_channel,
+    counterpart_transfer_purpose,
+    year,
+    month,
+    day
+FROM
+    datalake_itau_statements_raw.statement_879200984646
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY date_event DESC) = 1
