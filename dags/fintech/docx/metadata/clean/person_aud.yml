@@ -1,0 +1,40 @@
+---
+database_name: datalake_docx_clean
+table_name: person_aud
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: This table stores the auditated data from users who authenticate in 5A plastform (users) or interact with our products (person).
+columns:
+  id:
+    lineage:
+    - datalake_docx_raw.person_aud.id
+  rev:
+    lineage:
+    - datalake_docx_raw.person_aud.rev
+  id_reference:
+    lineage:
+    - datalake_docx_raw.person_aud.reference_id
+  person_uuid:
+    lineage:
+    - datalake_docx_raw.person_aud.person_uuid
+  user_person_uuid:
+    lineage:
+    - datalake_docx_raw.person_aud.user_person_uuid
+  reference_type:
+    lineage:
+    - datalake_docx_raw.person_aud.reference_type
+  rev_type:
+    lineage:
+    - datalake_docx_raw.person_aud.revtype
+  rev_end:
+    lineage:
+    - datalake_docx_raw.person_aud.revend
+  mod_reference:
+    lineage:
+    - datalake_docx_raw.person_aud.reference_mod
+  mod_user_person_uuid:
+    lineage:
+    - datalake_docx_raw.person_aud.user_person_uuid_mod
+  mod_documents:
+    lineage:
+    - datalake_docx_raw.person_aud.documents_mod

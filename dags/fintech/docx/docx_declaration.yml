@@ -58,7 +58,13 @@ workflow:
     simulation_user: {}
     user_tenant_flow: {}
     person: {}
+    person_aud:
+      clean_table_name: person_aud
+      raw_primary_keys: ["id", "rev"]
     person_document: {}
+    person_document_aud:
+      clean_table_name: person_document_aud
+      raw_primary_keys: ["id", "rev"]
     person_document_info: {}
     person_document_info_aud:
       clean_table_name: person_document_info_aud

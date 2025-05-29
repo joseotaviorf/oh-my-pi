@@ -1,0 +1,51 @@
+---
+database_name: datalake_docx_clean
+table_name: person_document_aud
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: This auditated table stores any document submitted by a person, and any modification related to the document.
+columns:
+  id:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person_document_aud.id
+  rev:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person_document_aud.rev
+  id_person:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person_document_aud.person_id
+  rev_type:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person_document_aud.revtype
+  rev_end:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person_document_aud.revend
+  type:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person_document_aud.type
+  country_code:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person_document_aud.country_code
+  mod_country_code:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person_document_aud.country_code_mod
+  mod_type:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person_document_aud.type_mod
+  mod_info_list:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person_document_aud.info_list_mod
+  mod_person:
+    description: ''
+    lineage:
+    - datalake_docx_raw.person_document_aud.person_mod
