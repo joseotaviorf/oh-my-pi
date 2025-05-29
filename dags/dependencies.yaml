@@ -1101,9 +1101,9 @@ bietlejuice.dw_velo_zendesk:
   - bietlejuice.velo_zendesk:load-clean-users
 bietlejuice.dw_visit:
   - bietlejuice.ebdb_visit:load-clean-visit
-  - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
   - bietlejuice.enrich_sale_visit_hubs:load-enrich-sale-visit-hubs
+  - bietlejuice.enrich_visit:load-enrich-visit-cancellation-unified
   - bietlejuice.enrich_visit:load-enrich-visit-schedules
   - bietlejuice.enrich_visit:load-enrich-visit-status-events
   - bietlejuice.enrich_visit:load-enrich-visits
@@ -3740,7 +3740,6 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_visit:load-dw-visit-dim-entrance-type
   - bietlejuice.dw_visit:load-dw-visit-fact-visit-schedules
   - bietlejuice.dw_visit:load-dw-visit-fact-visits
-  - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_nps_quintocred:load-enrich-broker-contact-info
@@ -3749,6 +3748,7 @@ bietlejuice.reverse_birdie:
   - bietlejuice.enrich_survicate:load-enrich-response-content
   - bietlejuice.enrich_survicate:load-enrich-survey-questions
   - bietlejuice.enrich_survicate:load-enrich-survey-responses
+  - bietlejuice.enrich_visit:load-enrich-visit-cancellation-unified
   - bietlejuice.help_center_api:load-clean-call-in-app-eligibility
   - bietlejuice.insider:load-clean-feature
   - bietlejuice.insider:load-clean-review

@@ -7,6 +7,9 @@ dag:
 workflow:
     type: query_delta
     layer: enrich
+    inner_dependencies:
+      visits:
+      - visit_cancellation_unified
     execution_timeout_hours: 3
     tables_customization:
         visit_fitting:

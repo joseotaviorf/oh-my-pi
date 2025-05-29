@@ -93,7 +93,6 @@ SELECT
     lh.id_company_hubspot AS id_company_supply,
     lh.uuid_company AS uuid_company_supply,
     visit_demand.id_company_demand,
-    visit_cancellation.id AS id_cancellation_detail,
     -1 AS id_follow_up,
     -1 AS id_entrance_type,
     visit.code,
@@ -194,7 +193,7 @@ LEFT JOIN
     visit_3p_demand_agent AS visit_demand
         ON visit.id = visit_demand.id_visit
 LEFT JOIN
-    datalake_ebdb_clean.visit_cancellation_details AS visit_cancellation
+    datalake_visit.visit_cancellation_unified AS visit_cancellation
         ON visit.id = visit_cancellation.id_visit
 LEFT JOIN
     datalake_ebdb_clean.country AS ct

@@ -51,10 +51,6 @@ columns:
     description: Id for Sale Flow connection, junction of visitor with house
   id_fup_details:
     description: Id for visit's follow up
-  id_cancellation_detail:
-    lineage:
-      - datalake_ebdb_clean.visit_cancellation_details.id
-    description: Visit cancellation details id
   id_company_supply:
     lineage:
       - datalake_ebdb_listing.house_listing.id_company_hubspot

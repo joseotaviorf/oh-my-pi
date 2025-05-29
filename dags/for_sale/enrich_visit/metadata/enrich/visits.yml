@@ -45,10 +45,6 @@ columns:
     lineage:
       - datalake_ebdb_work_contract.work_contract.id_company_hubspot
     description: ID of the demand partner from Hubspot.
-  id_cancellation_detail:
-    lineage:
-      - datalake_ebdb_clean.visit_cancellation_details.id
-    description: Visit cancellation details ID
   id_follow_up:
     description: ID for visit's follow up
   id_entrance_type:
@@ -103,11 +99,11 @@ columns:
     description: What is the default timezone for this region.
   cancellation_reason:
     lineage:
-      - datalake_ebdb_clean.visit_cancellation_details.reason
+      - datalake_visit.visit_cancellation_unified.reason
     description: What the reason for the cancellation of this visit
   cancellation_on_behalf_of:
     lineage:
-      - datalake_ebdb_clean.visit_cancellation_details.on_behalf_of
+      - datalake_visit.visit_cancellation_unified.on_behalf_of
     description: In whose name that cancellation status.
   nbr_reschedule:
     description: Number of rescheduling.

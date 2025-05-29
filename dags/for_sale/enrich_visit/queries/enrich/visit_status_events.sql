@@ -44,7 +44,6 @@ visit AS(
     vsl.on_behalf_of,
     vsl.channel,
     vsl.ts_event_created,
-    vcd.id AS id_cancellation_detail,
     lh.id_company_hubspot AS id_company_supply,
     lh.uuid_company AS uuid_company_supply,
     lh.partner_3p_supply,
@@ -59,9 +58,6 @@ visit AS(
   INNER JOIN
     datalake_ebdb_listing.house lh
       ON lh.id = v.id_house
-  LEFT JOIN
-    datalake_ebdb_clean.visit_cancellation_details AS vcd
-      ON vsl.id_visit = vcd.id_visit
   LEFT JOIN
     datalake_ebdb_listing.house_listing AS hl
       ON v.id_house = hl.id_house
@@ -100,7 +96,6 @@ SELECT
   v.id_rent_flow,
   v.id_sale_flow,
   v.id_fup_details,
-  v.id_cancellation_detail,
   v.id_company_supply,
   v.uuid_company_supply,
   b3da.id_company_demand,

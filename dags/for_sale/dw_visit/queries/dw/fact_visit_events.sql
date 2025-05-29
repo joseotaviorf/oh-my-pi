@@ -47,9 +47,9 @@ INNER JOIN
   datalake_ebdb_listing.house AS lh
     ON vse.id_house = lh.id
 LEFT JOIN
-  datalake_ebdb_clean.visit_cancellation_details AS vcd
-  ON vse.id_cancellation_detail = vcd.id
+  datalake_visit.visit_cancellation_unified AS vcu
+  ON vse.id_visit = vcu.id_visit
 LEFT JOIN
   dw_visit.dim_cancellation_type AS dct
-  ON vcd.reason = dct.reason
-  AND vcd.on_behalf_of = dct.on_behalf_of
+  ON vcu.reason = dct.reason
+  AND vcu.on_behalf_of = dct.on_behalf_of

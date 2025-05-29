@@ -48,10 +48,6 @@ columns:
     description: Context type Id.
     lineage:
       - dw_visit.dim_business_context.sk_business_context
-  sk_cancellation_detail:
-    description: Id of cancellation of the visit. (If applicable)
-    lineage:
-        - datalake_visit.visits.id_cancellation_detail
   sk_visit_request_date:
     description: Requested date of the visit.
     lineage:
@@ -123,7 +119,7 @@ columns:
   ts_visit_canceled:
     description: Timestamp of the visit cancellation (if applicable).
     lineage:
-        - datalake_visit.visits.ts_visit_canceled  
+        - datalake_visit.visits.ts_visit_canceled
   nbr_reschedule:
     description: Number of reschedules.
     lineage:

@@ -146,7 +146,6 @@ select
       )
       )
      as review_original_type,
-  
     if(
       schedules.is_completed = 1,
       'Visit Completed',
@@ -336,8 +335,8 @@ FROM
   schedules as schedules
     LEFT JOIN dw_visit.fact_visits as visits on schedules.sk_visit = visits.sk_visit
     LEFT JOIN
-      datalake_ebdb_clean.visit_cancellation_details AS cancelation_details
-      on cancelation_details.id = visits.sk_cancellation_detail
+      datalake_visit.visit_cancellation_unified AS cancelation_details
+      on cancelation_details.id_visit = visits.sk_visit
     LEFT JOIN
       dw_public.dim_date as date_format
       on visits.sk_visit_date_local_tz = date_format.sk_date
@@ -402,11 +401,11 @@ where
   and dim_region.country_name = 'Brazil'
  ),
   contract_count AS (
-  SELECT  
-    id_user, 
-    COUNT(DISTINCT case when contract_role = 'tenant' then contract_role else contract_role end)  
+  SELECT
+    id_user,
+    COUNT(DISTINCT case when contract_role = 'tenant' then contract_role else contract_role end)
   FROM datalake_ebdb_contract.contract_person
-  GROUP BY 
+  GROUP BY
         1
   HAVING COUNT(DISTINCT case when contract_role = 'tenant' then contract_role else contract_role end)   = 1
 ), final as (
@@ -418,17 +417,17 @@ where
     agent_rating AS rating,
     CASE WHEN agent_rating = 5 or agent_rating = 4 THEN 'promoter'
         WHEN agent_rating = 3 THEN 'passive'
-        WHEN agent_rating = 2 or agent_rating = 1 THEN 'detractor' 
+        WHEN agent_rating = 2 or agent_rating = 1 THEN 'detractor'
         ELSE  '' END AS csat_score_category,
         TRIM(
-              CONCAT_WS(' ', 
-                  CASE 
+              CONCAT_WS(' ',
+                  CASE
                       WHEN agent_rating_comment IS NOT NULL AND agent_rating_comment <> '' THEN
-                          CASE 
+                          CASE
                               WHEN agent_rating IN (2, 1) THEN 'Motivo da minha insatisfação:'
                               WHEN agent_rating IN (3) THEN 'Motivo da minha nota:'
                               WHEN agent_rating IN (5, 4) THEN 'Motivo da minha satisfação:'
-                              ELSE '' 
+                              ELSE ''
                           END
                       ELSE ''
                   END,
@@ -443,7 +442,7 @@ where
         WHEN review_chosen_type = 'Visit Completed' AND business_context = 'SALE' THEN 'DSAT Visitas Completas - FS'
         ELSE '' END AS nome_campanha,
     MAX(case when contract_count.id_user is null then null
-        when contract_role = 'tenant' then contract_role 
+        when contract_role = 'tenant' then contract_role
         else contract_role end) AS customer_type,
     CONCAT(cast(id_booking as string), '_', cast(user_id as string)) AS account_id
     from post_visit_review pv
@@ -456,7 +455,7 @@ where
     GROUP BY 1,2,3,4,5,6,7,8,10
 ),
 final_2 AS (
-  select 
+  select
     posted_at,
     feedback_id,
     author_id,
@@ -467,7 +466,7 @@ final_2 AS (
     nome_campanha,
     COALESCE(final.customer_type, CASE WHEN tem_imovel = '1' THEN 'landlord' WHEN tem_imovel = '0' THEN 'tenant' ELSE NULL END) AS customer_type,
     account_id
-  from 
+  from
     final
   left join dw_public.dim_user d
     on final.author_id = d.sk_user
@@ -485,7 +484,7 @@ final_3 AS (
     CASE WHEN nome_campanha LIKE '%FS' AND customer_type = 'Inquilino' THEN 'buyer'
         WHEN nome_campanha LIKE '%FS' AND customer_type = 'Proprietario' THEN 'seller' ELSE customer_type END AS customer_type,
     account_id
-  FROM 
+  FROM
     final_2
 )
 SELECT
@@ -498,10 +497,10 @@ SELECT
   text,
   nome_campanha AS csat_campanha,
   customer_type,
-  account_id || 
-    CASE 
-        WHEN customer_type IS NOT NULL AND customer_type <> '' THEN '_' || 
-            CASE 
+  account_id ||
+    CASE
+        WHEN customer_type IS NOT NULL AND customer_type <> '' THEN '_' ||
+            CASE
                 WHEN customer_type = 'Inquilino' THEN 'tenant'
                 WHEN customer_type = 'Proprietario' THEN 'landlord'
                 ELSE customer_type
@@ -512,5 +511,5 @@ SELECT
   month(posted_at) AS month,
   day(posted_at) AS day,
   NOW() AS ts_load
-FROM 
+FROM
   final_3
