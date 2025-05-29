@@ -25,9 +25,11 @@ WITH record_selection AS (
             ELSE
                 GET_JSON_OBJECT(fields, '$.resolution.name')
         END AS resolution,
-        GET_JSON_OBJECT(fields, '$.customfield_11195.value') AS root_cause_resolution,
-        GET_JSON_OBJECT(fields, '$.customfield_11194.value') AS incident_category,
+        GET_JSON_OBJECT(fields, '$.customfield_11195.value') AS incident_category,
+        GET_JSON_OBJECT(fields, '$.customfield_11194.value') AS root_cause_resolution,
         GET_JSON_OBJECT(fields, '$.customfield_12078.value') AS incident_owner,
+        GET_JSON_OBJECT(fields, '$.customfield_21698.value') AS incident_status,
+        GET_JSON_OBJECT(fields, '$.customfield_12350.value') AS sla_affected,
         FROM_JSON(GET_JSON_OBJECT(fields, '$.labels'), 'array<string>') AS labels,
         FROM_JSON(
             GET_JSON_OBJECT(fields, '$.customfield_10115'),
@@ -119,6 +121,8 @@ SELECT
     root_cause_resolution,
     incident_category,
     incident_owner,
+    incident_status,
+    sla_affected,
     FILTER(cycles, c -> c.id = ARRAY_MAX(cycles.id))[0] AS last_cycle,
     labels,
     cycles,

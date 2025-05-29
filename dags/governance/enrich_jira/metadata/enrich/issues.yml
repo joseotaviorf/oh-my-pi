@@ -1,151 +1,159 @@
 ---
 database_name: datalake_jira
 table_name: issues
-description: Datailed information from the Issues created in Jira
+description: Detailed information from the Issues created in Jira
 domain: governance
 owner: giuseppe.giovanelli@quintoandar.com.br
 columns:
   id_issue:
     lineage:
       - datalake_jira_clean.issues.key
-    description: ""
+    description: Unique identifier of the issue in Jira
   id_parent_issue:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Identifier of the parent issue, if it's a sub-task
   id_project:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Internal Jira project ID related to the issue
   project_key:
     lineage:
       - datalake_jira_clean.project.key
-    description: "Project key from Jira, the root digits, used to identify the project"
+    description: Project key from Jira, the root digits, used to identify the project
   summary:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Short title or summary of the issue
   issue_description:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Detailed description of the issue
   project_name:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Name of the Jira project the issue belongs to
   issue_type:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Type of the issue (e.g., Bug, Task, Story)
   current_status:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Current status of the issue (e.g., To Do, In Progress, Done)
   current_status_category:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: High-level status category (e.g., To Do, In Progress, Done)
   assignee:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Person currently assigned to the issue
   reporter:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Person who created or reported the issue
   owner_person:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Person responsible for the issue resolution
   team_name:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Name of the team handling the issue
   priority:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Priority level assigned to the issue
   resolution:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Resolution status of the issue (e.g., Fixed, Won't Fix)
   root_cause_resolution:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Description of how the root cause was addressed
   incident_category:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Category of the incident reported in the issue
   incident_owner:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Person responsible for managing the incident
+  incident_status:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: Current status of the incident as recorded in the JIRA custom field.
+  sla_affected:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: Indicates whether the incident impacts the defined Service Level Agreement (SLA).
   last_cycle:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Most recent cycle information associated with the issue
   labels:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Tags or labels associated with the issue
   cycles:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Sprints or cycles the issue was part of
   tech_debt_category:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: "DPE Tech Debt custom field, used to identify the tech debt category"
+    description: DPE Tech Debt custom field, used to identify the tech debt category
   tech_debt_size:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: "DPE Tech Debt custom field, used to identify the tech debt size"
+    description: DPE Tech Debt custom field, used to identify the tech debt size
   tech_debt_urgency:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: "DPE Tech Debt custom field, used to identify the tech debt urgency"
+    description: DPE Tech Debt custom field, used to identify the tech debt urgency
   tech_debt_user_impact:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: "DPE Tech Debt custom field, used to identify the tech debt user impact"
+    description: DPE Tech Debt custom field, used to identify the tech debt user impact
   tech_debt_blockage:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: "DPE Tech Debt custom field, used to identify the tech debt blockage"
+    description: DPE Tech Debt custom field, used to identify the tech debt blockage
   tech_debt_uncertainty:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: "DPE Tech Debt custom field, used to identify the tech debt uncertainty"
+    description: DPE Tech Debt custom field, used to identify the tech debt uncertainty
   tech_debt_cumulativeness:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: "DPE Tech Debt custom field, used to identify the tech debt cumulativeness"
+    description: DPE Tech Debt custom field, used to identify the tech debt cumulativeness
   tech_debt_complexity:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: "DPE Tech Debt custom field, used to identify the tech debt complexity"
+    description: DPE Tech Debt custom field, used to identify the tech debt complexity
   story_points:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Number of story points assigned to the issue
   story_points_estimate:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Initial estimate of story points for the issue
   is_deleted:
-    description: "Flag to identify if the issue was deleted"
+    description: Flag to identify if the issue was deleted
   dt_deleted:
-    description: "Date when the issue was deleted"
+    description: Date when the issue was deleted
   dt_started:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Timestamp when work on the issue started
   ts_created:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Timestamp when the issue was created
   ts_resolved:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: ""
+    description: Timestamp when the issue was resolved
