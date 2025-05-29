@@ -25,6 +25,10 @@ columns:
     description: "The role of the message author (USER, AI, HARDCODED)"
     lineage:
     - datalake_copilot_service_raw.message.role
+  channel:
+    description: "The channel where the message was sent"
+    lineage:
+    - datalake_copilot_service_raw.message.channel
   input_type:
     description: "The message input type"
     lineage:

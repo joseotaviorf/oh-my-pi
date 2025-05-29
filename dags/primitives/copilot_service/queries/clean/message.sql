@@ -4,6 +4,7 @@ SELECT
   session_id AS id_session,
   message_index,
   role,
+  channel,
   input_type,
   content,
   extra,
