@@ -17,14 +17,7 @@ workflow:
     - "{{ ds }}"
   default_extraction_type: full
   tables_customization:
-    iptu_sp:
-      extra_spark_job_arguments:
-        - "https://geosampa.prefeitura.sp.gov.br/PaginasPublicas/"
-        - "downloadArquivo.aspx?orig=DownloadCamadas&arq=12_Cadastro%5C%5CIPTU_INTER%5C%5CXLS_CSV%5C%5CIPTU_{{ execution_date.year }}&arqTipo=XLS_CSV"
-        - "/_SBC.aspx/pesquisaArquivos"
-        - Content-Type: "application/json; charset=UTF-8"
-        - pNomePasta: "12_Cadastro\\IPTU_INTER\\XLS_CSV"
-        - ".csv"
+    iptu_sp: {}
 cluster:
   type: databricks_13_3_med_general_cluster
   custom_libraries:

@@ -15,7 +15,7 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
+from bietlejuice.pipeline import FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
@@ -61,7 +61,7 @@ def get_zip_files_content(url, year, format):
     response = requests.get(url.format(year=year))
     response.raise_for_status()
     return response.content
-    
+
 def process_zip_file(content, year, format):
     with zipfile.ZipFile(io.BytesIO(content), 'r') as zip_ref:
         zip_files = zip_ref.namelist()
@@ -69,7 +69,7 @@ def process_zip_file(content, year, format):
 
         if len(csv_files) == 0:
             raise Exception("No CSV files found in the ZIP.")
-        
+
         if len(csv_files) > 1:
             raise Exception(f"More than one CSV file found. Total CSV files: {len(csv_files)}. Processing only the first one.")
 
@@ -88,7 +88,7 @@ def get_data(url, year, format):
     return process_zip_file(zip_files, year, format)
 
 def load_dataframe_into_datalake(
-    df, table_name, is_incremental, environment, source, datalake_bucket
+    df, table_name, environment, source, datalake_bucket
 ):
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
@@ -100,32 +100,20 @@ def load_dataframe_into_datalake(
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(database_name)
 
-    partition_cols = ["year", "month"]
-
     if df.rdd.isEmpty():
         logger.info(f"m=__main__, msg={table_name}'s RDD is empty")
 
-    if is_incremental:
-        IncrementalTableLoaderPipeline(
-            database_name,
-            table_name,
-            database_location,
-            LayerEnum.RAW,
-            None,
-            partition_cols,
-        ).load_and_register(df, format_options)
-    else:
-        FullTableLoaderPipeline(
-            database_name,
-            table_name,
-            database_location,
-            LayerEnum.RAW,
-            None,
-            None,
-        ).load_and_register(df, format_options)
+    FullTableLoaderPipeline(
+        database_name,
+        table_name,
+        database_location,
+        LayerEnum.RAW,
+        None,
+        None,
+    ).load_and_register(df, format_options)
 
 
-def main(): 
+def main():
     (
         environment,
         datalake_bucket,
@@ -142,21 +130,19 @@ def main():
     )
 
     config_service = ConfigurationService(source)
-    iptu_configs = config_service.get_config("tables_customization")[IPTU_REGION]
 
     table_name = IPTU_REGION
-    source_url = iptu_configs["source"]["url"]
-    source_url_to_download = iptu_configs["source"]["download_url"]
-    source_years_path = iptu_configs["source"]["iptu_years_path"]
-    source_headers = ast.literal_eval(iptu_configs["source"]["headers"])
-    source_data = json.dumps(ast.literal_eval(iptu_configs["source"]["data"]))
-    source_format = iptu_configs["source"]["format"]
-    is_incremental = iptu_configs["is_incremental"]
+    source_url = config_service.get_config("url")
+    source_url_to_download = config_service.get_config("download_url")
+    source_years_path = config_service.get_config("iptu_years_path")
+    source_headers = ast.literal_eval(config_service.get_config("headers"))
+    source_data = json.dumps(ast.literal_eval(config_service.get_config("data")))
+    source_format = config_service.get_config("format")
 
     logger.info(
         f"""
         m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date}
-        msg=Configuration table, table_name={table_name}, source_format={source_format}, is_incremental={is_incremental}
+        msg=Configuration table, table_name={table_name}, source_format={source_format},
         """
     )
 
@@ -164,13 +150,13 @@ def main():
     last_ingested_year = spark.sql(f"SELECT MAX(year) AS year FROM datalake_iptu_raw.{table_name}").select("year").rdd.flatMap(lambda x: x).collect()[0]
 
     if last_iptu_available_year <= last_ingested_year:
-    
+
         logger.info(
             f"""
             msg= This year's IPTU has already been downloaded, we're leaving the spark job.
             """
         )
-    
+
         return None
 
     dataframe = get_data(url=source_url + source_url_to_download, year=last_iptu_available_year, format=source_format)
@@ -186,7 +172,6 @@ def main():
         load_dataframe_into_datalake(
             dataframe,
             table_name,
-            is_incremental,
             environment,
             source,
             datalake_bucket,
