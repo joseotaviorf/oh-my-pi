@@ -1,0 +1,14 @@
+database_name: datalake_search
+table_name: sale_outlier_users_past_30_days
+owner: pedro.nogueira@quintoandar.com.br
+domain: primitives
+description: |
+  This table contains the users that are outliers in the sale flow in the past 30 days.
+  These should be identified as outliers and removed from AB test metrics.
+columns:
+  id_user:
+    description: The id of the user.
+  total_bookings:
+    description: The total number of bookings in the past 30 days.
+  total_offers:
+    description: The total number of offers in the past 30 days.
