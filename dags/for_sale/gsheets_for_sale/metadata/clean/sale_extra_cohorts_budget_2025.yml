@@ -1,30 +1,30 @@
 database_name: datalake_gsheets_clean
-table_name: sale_extra_cohorts_targets_2025
+table_name: sale_extra_cohorts_budget_2025
 columns:
   bp2bp_w_ccv:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.bp2bp_w_ccv
+      - datalake_gsheets_raw.sale_extra_cohorts_budget_2025.bp2bp_w_ccv
   bp2bp_w_os:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.bp2bp_w_os
+      - datalake_gsheets_raw.sale_extra_cohorts_budget_2025.bp2bp_w_os
   bp_w_os2bp_w_ccv:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.bp_w_os2bp_w_ccv
+      - datalake_gsheets_raw.sale_extra_cohorts_budget_2025.bp_w_os2bp_w_ccv
   city_group:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.city_group
+      - datalake_gsheets_raw.sale_extra_cohorts_budget_2025.city_group
   is_ht:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.is_ht
+      - datalake_gsheets_raw.sale_extra_cohorts_budget_2025.is_ht
   is_tqc:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.is_tqc
+      - datalake_gsheets_raw.sale_extra_cohorts_budget_2025.is_tqc
   modelo:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.modelo
+      - datalake_gsheets_raw.sale_extra_cohorts_budget_2025.modelo
   month_conversion:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.month_conversion
+      - datalake_gsheets_raw.sale_extra_cohorts_budget_2025.month_conversion
   month_start:
     lineage:
-      - datalake_gsheets_raw.sale_extra_cohorts_targets_2025.month_start
+      - datalake_gsheets_raw.sale_extra_cohorts_budget_2025.month_start
