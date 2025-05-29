@@ -25,6 +25,10 @@ columns:
     description: Identifier referencing a predefined section in a profile management system.
     lineage:
       - datalake_pin_performance_raw.hra_tmpl_sections.reference_section_id
+  id_section_definition:
+    description: Identifier for the section definition, linking to a base definition of the section.
+    lineage:
+      - datalake_pin_performance_raw.hra_tmpl_sections.section_def_id
   section_type:
     description: Type of section, determining its behavior and purpose in the template (e.g., Competencies, Objectives, Summary).
     lineage:

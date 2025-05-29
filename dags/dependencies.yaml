@@ -696,6 +696,7 @@ bietlejuice.dw_operator_performance:
   - bietlejuice.iaf:load-clean-employee
   - bietlejuice.recupera:load-clean-operators
 bietlejuice.dw_performance:
+  - bietlejuice.enrich_pin:load-enrich-performance-calibration
   - bietlejuice.enrich_pin:load-enrich-talent-review
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation
   - bietlejuice.pin_hr_review:load-clean-meeting
@@ -2578,6 +2579,7 @@ bietlejuice.enrich_pin:
   - bietlejuice.pin_performance:load-clean-evaluation-section
   - bietlejuice.pin_performance:load-clean-evaluation-step
   - bietlejuice.pin_performance:load-clean-role-definition-translation
+  - bietlejuice.pin_performance:load-clean-section-definition-translation
   - bietlejuice.pin_performance:load-clean-task-role-base
   - bietlejuice.pin_performance:load-clean-task-role-translation
   - bietlejuice.pin_performance:load-clean-template-definition-base

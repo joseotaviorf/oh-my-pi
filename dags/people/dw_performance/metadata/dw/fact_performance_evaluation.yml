@@ -1,0 +1,131 @@
+---
+database_name: dw_performance
+table_name: fact_performance_evaluation
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Fact table that consolidates performance evaluations, including initial and calibrated ratings, and change indicators for both calibration and between evaluation periods. It is populated from the datalake_pin.performance_calibration table.
+columns:
+  sk_evaluation:
+    description: Unique identifier for the evaluation
+    lineage:
+      - datalake_pin.performance_calibration.id_evaluation
+  sk_assignment:
+    description: Unique identifier for the period of service (assignment). This refers to id_period_of_service.
+    lineage:
+      - datalake_pin.performance_calibration.id_period_of_service
+  sk_evaluation_date:
+    description: Date when the evaluation occurred, in YYYYMMDD format.
+    lineage:
+      - datalake_pin.performance_calibration.dt_evaluation_occurred
+  sk_leadership_initial:
+    description: Identifier for the Leadership assessment level BEFORE calibration (manager assessment). Links with dim_rating_level.sk_rating_level
+    lineage:
+      - datalake_pin.performance_calibration.id_rating_level_from_manager
+      - datalake_pin.performance_calibration.section_name
+  sk_impact_initial:
+    description: Identifier for the Impact assessment level BEFORE calibration (manager assessment). Links with dim_rating_level.sk_rating_level
+    lineage:
+      - datalake_pin.performance_calibration.id_rating_level_from_manager
+      - datalake_pin.performance_calibration.section_name
+  sk_behavior_initial:
+    description: Identifier for the Behavior assessment level BEFORE calibration (manager assessment). Links with dim_rating_level.sk_rating_level
+    lineage:
+      - datalake_pin.performance_calibration.id_rating_level_from_manager
+      - datalake_pin.performance_calibration.section_name
+  sk_leadership_calibrated:
+    description: Identifier for the Leadership assessment level AFTER calibration. Links with dim_rating_level.sk_rating_level
+    lineage:
+      - datalake_pin.performance_calibration.id_rating_level_from_calibration
+      - datalake_pin.performance_calibration.section_name
+  sk_impact_calibrated:
+    description: Identifier for the Impact assessment level AFTER calibration. Links with dim_rating_level.sk_rating_level
+    lineage:
+      - datalake_pin.performance_calibration.id_rating_level_from_calibration
+      - datalake_pin.performance_calibration.section_name
+  sk_behavior_calibrated:
+    description: Identifier for the Behavior assessment level AFTER calibration. Links with dim_rating_level.sk_rating_level
+    lineage:
+      - datalake_pin.performance_calibration.id_rating_level_from_calibration
+      - datalake_pin.performance_calibration.section_name
+  sk_leadership_calibration_change:
+    description: Indicator of change in Leadership assessment due to calibration. Links with dim_trend.sk_trend
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_calibration
+      - datalake_pin.performance_calibration.section_name
+  sk_impact_calibration_change:
+    description: Indicator of change in Impact assessment due to calibration. Links with dim_trend.sk_trend
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_calibration
+      - datalake_pin.performance_calibration.section_name
+  sk_behavior_calibration_change:
+    description: Indicator of change in Behavior assessment due to calibration. Links with dim_trend.sk_trend
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_calibration
+      - datalake_pin.performance_calibration.section_name
+  sk_leadership_period_change:
+    description: Indicator of change in Leadership assessment due to calibration. Links with dim_trend.sk_trend
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_manager
+      - datalake_pin.performance_calibration.section_name
+  sk_impact_period_change:
+    description: Indicator of change in calibrated Impact assessment compared to the previous period. Links with dim_trend.sk_trend
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_manager
+      - datalake_pin.performance_calibration.section_name
+  sk_behavior_period_change:
+    description: Indicator of change in calibrated Behavior assessment compared to the previous period. Links with dim_trend.sk_trend
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_manager
+      - datalake_pin.performance_calibration.section_name
+  assignment_number:
+    description: Registration number of the employee.
+    lineage:
+      - datalake_pin.performance_calibration.assignment_number
+  initial_leadership_value:
+    description: Numeric value of the Leadership assessment BEFORE calibration (manager assessment).
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_manager
+      - datalake_pin.performance_calibration.section_name
+  initial_impact_value:
+    description: Numeric value of the Impact assessment BEFORE calibration (manager assessment).
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_manager
+      - datalake_pin.performance_calibration.section_name
+  initial_behavior_value:
+    description: Numeric value of the Behavior assessment BEFORE calibration (manager assessment).
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_manager
+      - datalake_pin.performance_calibration.section_name
+  calibrated_leadership_value:
+    description: Numeric value of the Leadership assessment AFTER calibration.
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_calibration
+      - datalake_pin.performance_calibration.section_name
+  calibrated_impact_value:
+    description: Numeric value of the Impact assessment AFTER calibration.
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_calibration
+      - datalake_pin.performance_calibration.section_name
+  calibrated_behavior_value:
+    description: Numeric value of the Behavior assessment AFTER calibration.
+    lineage:
+      - datalake_pin.performance_calibration.numeric_rating_from_calibration
+      - datalake_pin.performance_calibration.section_name
+  is_last_cycle:
+    description: Boolean (TRUE/FALSE) indicating if this is the last recorded evaluation cycle for the respective period of service (assignment).
+    lineage:
+      - datalake_pin.performance_calibration.dt_performance_document_started
+  ts_load:
+    description: Timestamp of when the record was loaded into the fact table.
+  year:
+    description: Reference year of the performance document (e.g., for partitioning). Derived from dt_performance_document_started.
+    lineage:
+      - datalake_pin.performance_calibration.dt_performance_document_started
+  month:
+    description: Reference month of the performance document (e.g., for partitioning). Derived from dt_performance_document_started.
+    lineage:
+      - datalake_pin.performance_calibration.dt_performance_document_started
+  day:
+    description: Reference day of the performance document (e.g., for partitioning). Derived from dt_performance_document_started.
+    lineage:
+      - datalake_pin.performance_calibration.dt_performance_document_started

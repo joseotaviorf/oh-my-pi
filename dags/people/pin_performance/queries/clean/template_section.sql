@@ -4,6 +4,7 @@ SELECT
     content_type_id AS id_content_type,
     perf_rating_model_id AS id_performance_rating_model,
     reference_section_id AS id_reference_section,
+    section_def_id AS id_section_definition,
     section_type_code AS section_type,
     description,
     calculation_rule_code AS calculation_rule,

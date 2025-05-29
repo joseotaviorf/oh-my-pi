@@ -1,0 +1,97 @@
+---
+database_name: datalake_pin
+table_name: performance_calibration
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Table that stores the consolidated results of the performance calibration process. It contains evaluations from different perspectives (self-assessment, manager, calibration) for each section of an employee's performance review.
+columns:
+  id_assignment:
+    description: 'Unique identifier for the assignment of an employee.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.id_assignment
+  id_period_of_service:
+    description: 'Unique identifier for the period of service of an employee.'
+    lineage:
+      - datalake_hr_system.employee_ids.id_period_of_service
+  id_assignment:
+    description: 'Unique identifier for the assignment of an employee.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.id_assignment
+  id_evaluation:
+    description: 'Unique identifier for a specific performance evaluation. Primary key of the evaluation.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.id_evaluation
+  id_eval_section:
+    description: 'Unique identifier for a specific section within a performance evaluation.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.id_eval_section
+  id_rating_level_from_self:
+    description: 'Identifier of the rating level that the employee assigned to themselves for this section.'
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.id_rating_level
+  id_rating_level_from_manager:
+    description: 'Identifier of the rating level that the manager assigned to the employee for this section.'
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.id_rating_level
+  id_rating_level_from_calibration:
+    description: 'Identifier of the final rating level defined for the employee in this section after the calibration process.'
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.id_rating_level
+  assignment_number:
+    description: 'Unique identifier for the period of service of an employee.'
+    lineage:
+      - datalake_hr_system.employee_ids.assignment_number
+  section_name:
+    description: 'Name of the performance review section being evaluated.'
+    lineage:
+      - datalake_pin_performance_clean.section_definition_translation.name
+  rating_description_from_self:
+    description: 'Textual description corresponding to the rating level that the employee assigned to themselves.'
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+  rating_description_from_manager:
+    description: 'Textual description corresponding to the rating level that the manager assigned to the employee.'
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+  rating_description_from_calibration:
+    description: 'Textual description corresponding to the final rating level defined in the calibration process.'
+    lineage:
+      - datalake_pin_talent_clean.rating_level_translation.rating_description
+  numeric_rating_from_self:
+    description: 'Numeric value of the rating assigned by the employee for this section.'
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  numeric_rating_from_manager: 
+    description: 'Numeric value of the rating assigned by the manager for this section.'
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  numeric_rating_from_calibration:
+    description: 'Numeric value of the rating assigned by calibration process for this section.'
+    lineage:
+      - datalake_pin_talent_clean.rating_level_base.numeric_rating
+  dt_evaluation_occurred:
+    description: 'Date when the performance evaluation occurred.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.dt_evaluation_occurred
+  dt_performance_document_started:
+    description: 'Date when the performance document was started.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.dt_performance_document_started
+  dt_performance_document_ended:
+    description: 'Date when the performance document was completed.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.dt_performance_document_ended
+  ts_load:
+    description: 'Timestamp of when the record was loaded or last updated in this table.'
+  year:
+    description: 'Year when the performance document was started.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.dt_performance_document_started
+  month:
+    description: 'Month when the performance document was started.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.dt_performance_document_started
+  day:
+    description: 'Day when the performance document was started.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.dt_performance_document_started
