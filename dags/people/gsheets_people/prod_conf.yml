@@ -1,4 +1,16 @@
 sheets_info:
+  codex_cost_centers:
+    clean_table_name: codex_cost_centers
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: codex_cost_centers
+
+  codex_cost_informations:
+    clean_table_name: codex_cost_informations
+    sheet_context: people
+    sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
+    sheet_name: codex_cost_informations
+
   navent_convenia_like:
     clean_table_name: navent_convenia_like
     sheet_context: people
