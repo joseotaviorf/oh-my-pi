@@ -11,11 +11,13 @@ workflow:
   layer: raw
   database_type: postgres
   source_schema: public
+  execution_timeout_hours: 3
   tables_customization:
     search: {}
     recommendation: {}
+
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_med_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
