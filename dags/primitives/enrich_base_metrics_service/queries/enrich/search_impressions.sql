@@ -322,7 +322,7 @@ SELECT
             'page_number', exploded_houses.page_number,
             'page_position', exploded_houses.page_position,
             'listing_age', exploded_houses.listing_age,
-            'has_copilot_session', CASE WHEN searches.copilot_session_id IS NOT NULL THEN 1 ELSE 0 END
+            'is_outlier_user', CASE WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1 ELSE 0 END
         )
     ) AS dimensions,
 
@@ -390,5 +390,11 @@ LEFT JOIN datalake_search.rent_flow_past_30_days as rent_flow
 LEFT JOIN datalake_search.sale_flow_past_30_days as sale_flow
     ON exploded_houses.id_house = sale_flow.id_house
     AND searches.id_user = sale_flow.id_user
+    AND searches.business_context = 'sale'
+LEFT JOIN datalake_search.rent_outlier_users_past_30_days as rent_outlier_users
+    ON searches.id_user = rent_outlier_users.id_user
+    AND searches.business_context = 'rent'
+LEFT JOIN datalake_search.sale_outlier_users_past_30_days as sale_outlier_users
+    ON searches.id_user = sale_outlier_users.id_user
     AND searches.business_context = 'sale'
 WHERE searches.ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')

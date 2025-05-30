@@ -12,6 +12,7 @@ Table with all user global metrics (visits, offers, contracts)
 WITH all_users AS (
 SELECT id_user,
        business_context,
+       is_outlier_user,
        variants,
        date,
        week,
@@ -23,6 +24,7 @@ FROM
   (
   SELECT get_json_object(ids, '$.id_user') AS id_user,
          get_json_object(dimensions, '$.business_context') AS business_context,
+         get_json_object(dimensions, '$.is_outlier_user') AS is_outlier_user,
          get_json_object(timestamps, '$.ts_search') AS ts_search,
          variants,
          date,
@@ -35,6 +37,7 @@ FROM
   )
   group by id_user,
            business_context,
+           is_outlier_user,
            variants,
            date,
            week,
@@ -68,7 +71,8 @@ global_user_metrics AS (
            to_json(
               named_struct(
                 'business_context', all_users.business_context,
-                'city', house_cities.city
+                'city', house_cities.city,
+                'is_outlier_user', all_users.is_outlier_user
               )
             ) AS dimensions,
 
@@ -231,7 +235,8 @@ global_house_metrics AS (
     to_json(
             named_struct(
                 'business_context', houses_published.business_context,
-                'city', house_cities.city
+                'city', house_cities.city,
+                'is_outlier_user', get_json_object(global_user_metrics.dimensions, '$.is_outlier_user')
             )
     ) AS dimensions,
 

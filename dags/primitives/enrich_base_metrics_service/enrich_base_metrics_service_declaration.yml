@@ -27,13 +27,16 @@ workflow:
       - house_publication_dates
       - rent_flow_past_30_days
       - sale_flow_past_30_days
+      - rent_outlier_users_past_30_days
+      - sale_outlier_users_past_30_days
     search_impressions:
       - experiment_config_processed
       - house_publication_dates
       - rent_flow_past_30_days
       - sale_flow_past_30_days
+      - rent_outlier_users_past_30_days
+      - sale_outlier_users_past_30_days
     global_metrics:
-      - experiment_config
       - search_impressions
     experiment_config_processed:
       - experiment_config

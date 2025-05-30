@@ -98,8 +98,8 @@ SELECT
             'platform', recs_impressions.platform,
             'position', recs_impressions.position,
             'showcase', recs_impressions.showcase,
-            'listing_age', CAST(DATEDIFF(recs_impressions.ts_recommendation, recs_house_published.ts_house_published) AS INT)
-
+            'listing_age', CAST(DATEDIFF(recs_impressions.ts_recommendation, recs_house_published.ts_house_published) AS INT),
+            'is_outlier_user', CASE WHEN COALESCE(rent_outlier_users.id_user, sale_outlier_users.id_user) IS NOT NULL THEN 1 ELSE 0 END
         )
     ) AS dimensions,
 
@@ -152,6 +152,7 @@ LEFT JOIN experiment_recs
 LEFT JOIN clicks
     ON recs_impressions.recset_id_fix = clicks.recset_id_fix
     AND recs_impressions.id_house = clicks.id_house
+
 LEFT JOIN datalake_search.rent_flow_past_30_days AS rent_flow
     ON recs_impressions.id_house = rent_flow.id_house
     AND recs_impressions.id_user = rent_flow.id_user
@@ -160,4 +161,12 @@ LEFT JOIN datalake_search.sale_flow_past_30_days AS sale_flow
     ON recs_impressions.id_house = sale_flow.id_house
     AND recs_impressions.id_user = sale_flow.id_user
     AND recs_impressions.business_context = 'SALE'
+
+LEFT JOIN datalake_search.rent_outlier_users_past_30_days as rent_outlier_users
+    ON recs_impressions.id_user = rent_outlier_users.id_user
+    AND recs_impressions.business_context = 'RENT'
+LEFT JOIN datalake_search.sale_outlier_users_past_30_days as sale_outlier_users
+    ON recs_impressions.id_user = sale_outlier_users.id_user
+    AND recs_impressions.business_context = 'SALE'
+
 WHERE recs_impressions.ts_recommendation BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
