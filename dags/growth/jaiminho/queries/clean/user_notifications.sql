@@ -11,6 +11,7 @@ SELECT
 	destination,
 	payload:bodyTemplate AS template,
 	payload:country AS country_code,
+	payload:metadata AS metadata,
 	ccost AS cost_center,
 	scope,
 	CAST(sentAt AS TIMESTAMP) AS ts_sent,

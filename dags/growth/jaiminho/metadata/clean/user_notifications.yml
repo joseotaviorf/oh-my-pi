@@ -38,6 +38,9 @@ columns:
   country_code:
     lineage:
       - datalake_jaiminho_raw.user_notifications.country
+  metadata:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications.metadata
   cost_center:
     lineage:
       - datalake_jaiminho_raw.user_notifications.ccost
