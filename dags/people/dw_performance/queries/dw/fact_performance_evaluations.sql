@@ -91,7 +91,6 @@ GROUP BY
     pc.id_period_of_service,
     pc.dt_evaluation_occurred,
     pc.dt_performance_document_started,
-    pc.cycle,
     pc.assignment_number,
     lc.dif_calibration,
     ic.dif_calibration,
