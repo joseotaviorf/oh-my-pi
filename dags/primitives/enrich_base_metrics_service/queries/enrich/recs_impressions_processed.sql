@@ -9,20 +9,31 @@ Table with ids, dimensions, metrics and timestamps related to recommendations.
 WITH duplicate_experiment_recs AS
 (
     SELECT
-        recset_id,
-        recset_id_fix,
-        experiments.experiment_name,
-        experiments.variant_standard_name,
-        CONCAT('"', experiments.experiment_name, '":"', variant_standard_name, '"') AS variants
+    DISTINCT recset_id,
+             recset_id_fix,
+             experiment_name,
+             variant_standard_name,
+             variants
+    FROM
+        (
+        SELECT
+            recset_id,
+            recset_id_fix,
+            experiments.experiment_name,
+            experiments.variant_standard_name,
+            CONCAT('"', experiments.experiment_name, '":"', variant_standard_name, '"') AS variants
 
-    FROM datalake_search.recs_impressions
-    INNER JOIN
-        datalake_search.experiment_config_processed AS experiments
-        ON experiments.variant_name = get_json_object(recs_impressions.user_properties, CONCAT('$.', experiments.experiment_name))
-        AND (
-            (ts_recommendation >= experiments.begin_date)
-            AND (experiments.end_date IS NULL OR ts_recommendation <= experiments.end_date)
+        FROM datalake_search.recs_impressions
+        INNER JOIN
+            datalake_search.experiment_config_processed AS experiments
+            ON experiments.variant_name = get_json_object(recs_impressions.user_properties, CONCAT('$.', experiments.experiment_name))
+            AND (
+                (ts_recommendation >= experiments.begin_date)
+                AND (experiments.end_date IS NULL OR ts_recommendation <= experiments.end_date)
+            )
+        WHERE MAKE_DATE(recs_impressions.year, recs_impressions.month, recs_impressions.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
         )
+
 ),
 
 experiment_recs AS (
@@ -66,6 +77,7 @@ LEFT JOIN datalake_search.house_publication_dates
   AND house_publication_dates.business_context = recs_impressions.business_context
   AND house_publication_dates.ts_house_published <= recs_impressions.ts_recommendation
 LEFT JOIN wonka.house_main ON house_main.id = recs_impressions.id_house
+WHERE MAKE_DATE(recs_impressions.year, recs_impressions.month, recs_impressions.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
   GROUP BY recs_impressions.id_house,
            recs_impressions.business_context,
            recs_impressions.recset_id,
@@ -169,4 +181,4 @@ LEFT JOIN datalake_search.sale_outlier_users_past_30_days as sale_outlier_users
     ON recs_impressions.id_user = sale_outlier_users.id_user
     AND recs_impressions.business_context = 'SALE'
 
-WHERE recs_impressions.ts_recommendation BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+WHERE MAKE_DATE(recs_impressions.year, recs_impressions.month, recs_impressions.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
