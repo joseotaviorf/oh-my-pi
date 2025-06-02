@@ -1836,7 +1836,6 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.company:load-clean-company-product
   - bietlejuice.company:load-clean-product
   - bietlejuice.ebdb:load-clean-house-listing-relation
-  - bietlejuice.ebdb:load-clean-house-visit-information
   - bietlejuice.ebdb_administration:load-clean-property-fee
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned-aud
@@ -1872,6 +1871,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
   - bietlejuice.ebdb_visit:load-clean-entry-access
   - bietlejuice.ebdb_visit:load-clean-entry-access-tracking
+  - bietlejuice.ebdb_visit:load-clean-house-visit-information
   - bietlejuice.ebdb_visit:load-clean-key-holder
   - bietlejuice.enrich_company:load-enrich-company-sks
   - bietlejuice.enrich_ebdb_country:load-enrich-house

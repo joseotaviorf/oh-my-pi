@@ -1,9 +1,0 @@
-database_name: datalake_ebdb_clean
-table_name: house_visit_information
-columns:
-  id_house:
-    lineage:
-      - datalake_ebdb_raw.imovel_informacoesvisita.imovel_id
-  visit_information:
-    lineage:
-      - datalake_ebdb_raw.imovel_informacoesvisita.informacoesvisita

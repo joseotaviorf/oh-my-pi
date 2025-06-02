@@ -32,6 +32,8 @@ table_block_list:
   - ItemVistoria_AUD
   - ItemVistoria_Checklist
   - Imovel_Etapas_AUD
+  - Imovel_informacoesVisita_AUD
+  - Imovel_informacoesVisita
   - ItemVistoria_Checklist_AUD
   - ConservationAssessment
   - ConservationItem

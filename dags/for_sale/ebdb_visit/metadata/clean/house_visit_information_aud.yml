@@ -1,0 +1,21 @@
+database_name: datalake_ebdb_clean
+table_name: house_visit_information_aud
+columns:
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.imovel_informacoesvisita_aud.imovel_id
+    description: "ID of house"
+  visit_information:
+    lineage:
+      - datalake_ebdb_raw.imovel_informacoesvisita_aud.informacoesvisita
+    description: "Information about visiting the house"
+  rev:
+    lineage:
+      - datalake_ebdb_raw.imovel_informacoesvisita_aud.rev
+    description: "Revision number"
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.imovel_informacoesvisita_aud.revtype
+    description: "Revision type"
+  ts_load:
+    descrition: "Records the moment the entry was added to the table. This indicates the precise date and time of data ingestion, produced using the NOW() function. This value changes if the data undergoes reprocessing."

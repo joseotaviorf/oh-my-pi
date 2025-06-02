@@ -46,6 +46,8 @@ table_block_list:
   - UserDocument_AUD
   - ContaConsumo_AUD
   - Imovel_Etapas
+  - Imovel_informacoesVisita_AUD
+  - Imovel_informacoesVisita
   - HouseBuilding_AUD
   - FluxoLocacao_DadosAgente_AUD
   - ListingInfo_AUD
