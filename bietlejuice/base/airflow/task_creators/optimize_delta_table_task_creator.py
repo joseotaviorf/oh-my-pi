@@ -52,6 +52,9 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         default_run_optimize = self.dag_execution_context.workflow_args.get(
             "run_optimize", True
         )
+        default_run_vacuum = self.dag_execution_context.workflow_args.get(
+            "run_vacuum", True
+        )
         default_vacuum_lite = self.dag_execution_context.workflow_args.get(
             "vacuum_lite", False
         )
@@ -64,6 +67,9 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                     ),
                     "run_optimize": table.table_customization.get(
                         "run_optimize", default_run_optimize
+                    ),
+                    "run_vacuum": table.table_customization.get(
+                        "run_vacuum", default_run_vacuum
                     ),
                     "vacuum_lite": table.table_customization.get(
                         "vacuum_lite", default_vacuum_lite

@@ -59,14 +59,15 @@ def run_job(
     if table_configs.get("run_optimize", True):
         loader.optimize_table(full_table_name, table_configs.get("z_order_by", []))
 
-    if table_configs.get("vacuum_lite", False):
-        loader.vacuum_lite_table(
-            full_table_name, table_configs.get("vacuum_retention_hours", 7 * 24)
-        )
-    else:
-       loader.vacuum_table(
-            full_table_name, table_configs.get("vacuum_retention_hours", 7 * 24)
-        )
+    if table_configs.get("run_vacuum", True):
+        if table_configs.get("vacuum_lite", False):
+            loader.vacuum_lite_table(
+                full_table_name, table_configs.get("vacuum_retention_hours", 7 * 24)
+            )
+        else:
+            loader.vacuum_table(
+                full_table_name, table_configs.get("vacuum_retention_hours", 7 * 24)
+            )
 
 
 def get_full_table_name(schema: str, layer: LayerEnum, table_name: str) -> str:
