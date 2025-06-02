@@ -1,0 +1,35 @@
+database_name: dw_recon_quintocred_snapshot
+table_name: fact_pending_transfers_summarized
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: "Data from pending transfers in QuintoCred recon context."
+columns:
+  sk_propose:
+    description: "QuintoCred's propose identification number (ID)"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_summarized
+
+  dt_contract_started:
+    description: "Start date of the contract"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_summarized
+
+  activator_amount:
+    description: "Amount activated or credited in the transaction"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_summarized
+
+  due_amount:
+    description: "Total amount due for payment"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_summarized
+
+  paid_amount:
+    description: "Total amount that has been paid"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_summarized
+
+  open_amount:
+    description: "Amount still to be paid"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_summarized

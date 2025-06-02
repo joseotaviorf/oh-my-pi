@@ -1,0 +1,124 @@
+database_name: dw_recon_quintocred_snapshot
+table_name: fact_annual_revenue
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+columns:
+  sk_propose:
+    description: "QuintoCred's propose identification number (ID)"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  match_status:
+    description: "Classification of value alignment across billing, proposal, and renewal data"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  client_name:
+    description: "Full name of the client"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  cpf_cnpj:
+    description: "Client's CPF (individual) or CNPJ (company) identifier"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  billing_method:
+    description: "Method used to bill the customer"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  months_billing_direto:
+    description: "Number of months billed via the 'BILLING DIRETO' method"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  months_quintocred_cobra:
+    description: "Number of months billed via the 'QUINTOCRED COBRA' method"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  total_months_of_service:
+    description: "Total number of chargeable service months in the timeline"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  expected_revenue_renewal:
+    description: "Total expected revenue based on renewal values"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  months_before_renewal:
+    description: "Number of service months before the contract renewal date"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  monthly_guarantee_before_renewal:
+    description: "Monthly guarantee value before renewal"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  months_after_renewal:
+    description: "Number of service months after the contract renewal date"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  monthly_guarantee_after_renewal:
+    description: "Monthly guarantee value after renewal"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  expected_revenue_aud:
+    description: "Expected revenue based on audited proposal timeline"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  monthly_guarantee_before_aud:
+    description: "Audited guarantee value before the latest change "
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  monthly_guarantee_after_aud:
+    description: "Audited guarantee value after the latest change"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  value_payment:
+    description: "Value effectively paid by the customer"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  delinquency_monthly_value:
+    description: "Monthly value recorded due to delinquency"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  dt_month_renewal:
+    description: "Date representing the renewal month"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  dt_month_update_aud:
+    description: "Date of the latest audited monthly update"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  dt_contract_started:
+    description: "Contract start date"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  dt_ended:
+    description: "Contract end date"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  dt_month_closing:
+    description: "Reference month for closing calculations"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue
+
+  dt_snapshot:
+    description: "Snapshot date when the data was extracted"
+    lineage:
+      - dw_recon_quintocred.fact_annual_revenue

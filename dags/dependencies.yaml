@@ -777,8 +777,12 @@ bietlejuice.dw_recon_quintocred:
   - bietlejuice.vans:load-clean-bank-payment
   - bietlejuice.vans:load-clean-payment
 bietlejuice.dw_recon_quintocred_snapshot:
+  - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-annual-revenue
   - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-customer-advance
+  - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-monthly-revenue
   - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-payable-guarantees
+  - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-pending-transfers-detailed
+  - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-pending-transfers-summarized
   - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-receivable-guarantees
 bietlejuice.dw_rede_company:
   - bietlejuice.company:load-clean-address

@@ -1,0 +1,185 @@
+database_name: dw_recon_quintocred_snapshot
+table_name: fact_pending_transfers_detailed
+owner: guilherme.sacramento@quintoandar.com.br
+domain: fintech
+description: "Data from pending transfers in QuintoCred recon context."
+columns:
+  sk_propose:
+    description: "QuintoCred's propose identification number (ID)"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  sk_propose_rh:
+    description: "Reference to the propose ID used for RH reconciliation"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  our_number:
+    description: "Bank slip identifier (Nosso Número) used for payment tracking"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  tenant_name:
+    description: "Name of the tenant or client associated with the transaction"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  gateway:
+    description: "Payment gateway used for processing the transaction"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  billing_type:
+    description: "Billing type that categorizes the nature of the charge"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  status_payment:
+    description: "Current status of the payment"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  type_rh:
+    description: "Type of RH (resource handling) process involved"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  payment_status_rh:
+    description: "Payment status from RH's perspective"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  source_bill_item:
+    description: "Source of the billing item related to the transaction"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  holder_name:
+    description: "Name of the payment holder"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  holder_document:
+    description: "Document number of the payment holder"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  holder_bank:
+    description: "Bank institution of the payment holder"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  holder_agency:
+    description: "Bank agency number of the payment holder"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  holder_account:
+    description: "Bank account number of the payment holder"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  type_account:
+    description: "Type of bank account"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  your_number:
+    description: "Custom transaction identifier used internally"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  status:
+    description: "General status of the billing occurrence or transaction"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  occurrence_code:
+    description: "Code indicating the type of financial occurrence or event"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  payment_type:
+    description: "Type of payment method used"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  paying_bank:
+    description: "Bank from which the payment was made"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  paying_agency:
+    description: "Agency number of the bank from which the payment was made"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  paying_account:
+    description: "Account number from which the payment was made"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  paying_digit:
+    description: "Digit verifier of the paying account"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  activator_amount:
+    description: "Amount activated or credited in the transaction"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  monthly_guarantee:
+    description: "Monthly guarantee amount associated with the transaction"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  payment_value:
+    description: "Total value billed for payment"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  paid_value_rh:
+    description: "Value that was effectively paid, according to RH"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+      
+  days_contract_life:
+    description: "Number of days the contract has been active"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  dt_contract_started:
+    description: "Start date of the contract"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  dt_ended_official:
+    description: "Official end date of the contract"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  dt_due_payment:
+    description: "Due date for the payment"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  dt_paid_payment:
+    description: "Date the payment was actually made"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  dt_created_rh:
+    description: "Date the record was created in RH"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  dt_due_rh:
+    description: "Due date from RH perspective"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
+
+  dt_paid_rh:
+    description: "Date payment was confirmed by RH"
+    lineage:
+      - dw_recon_quintocred.fact_pending_transfers_detailed
