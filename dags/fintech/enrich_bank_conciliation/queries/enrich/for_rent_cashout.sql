@@ -1,4 +1,14 @@
-WITH francesinha AS (
+WITH de_para_company_use AS (
+    SELECT DISTINCT  
+          hash,
+          get_json_object(sap_payload, '$.U_ExternalPaymentId') AS external_payment_id 
+    FROM
+            datalake_sap_gateway_clean.sync_sap_job 
+    WHERE
+            erp_solution = 'S4'
+),
+
+francesinha AS (
     SELECT
         UPPER(REPLACE(company_use, '|', '!')) AS company_use,
         our_number,
@@ -44,14 +54,17 @@ cap AS (
 ),
 
 sap AS (
-    SELECT
-        UPPER(id_external_payment) AS company_use,
-        account_number,
-        dt_reference AS dt_paid,
-        dt_tax,
-        ROUND(SUM(debit_credit), 2) AS paid_amount
+    SELECT DISTINCT
+        COALESCE(UPPER(l.id_external_payment), UPPER(dp.external_payment_id))  AS company_use,
+        l.account_number,
+        l.dt_reference AS dt_paid,
+        l.dt_tax,
+        ROUND(SUM(l.debit_credit), 2) AS paid_amount
     FROM
-        datalake_accounting_funnel.ledger
+        datalake_accounting_funnel.ledger AS l
+    LEFT JOIN 
+        de_para_company_use AS dp
+            ON l.hash = dp.hash
     WHERE
         (
             dt_reference >= DATE('2024-01-01')
