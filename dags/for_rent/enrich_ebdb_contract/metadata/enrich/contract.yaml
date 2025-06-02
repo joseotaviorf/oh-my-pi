@@ -111,7 +111,7 @@ columns:
       "null": If the responsible of paying the IPTU is null.
   condo_monitoring_status:
     lineage:
-      - datalake_condominium_payments_clean.condo_monitoring_actions.action_type
+      - datalake_rental_management_clean.condo_monitoring_actions.action_type
     description: Status of the contract in the Condo Monitoring.
   rental_guarantee_installment:
     lineage:

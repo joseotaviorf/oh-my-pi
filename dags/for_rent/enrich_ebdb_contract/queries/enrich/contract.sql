@@ -180,7 +180,7 @@ last_status_condo_monitoring AS (
     id_contract,
     action_type
   FROM
-    datalake_condominium_payments_clean.condo_monitoring_actions
+    datalake_rental_management_clean.condo_monitoring_actions
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY ts_updated DESC) = 1
 )
@@ -288,7 +288,7 @@ LEFT JOIN
   contract_anomaly AS ca
     ON ca.id_contract = c.id
 LEFT JOIN
-  datalake_condominium_payments_clean.condo_monitoring_eligibility AS cme
+  datalake_rental_management_clean.condo_monitoring_eligibility AS cme
     ON c.id = cme.id_contract
 LEFT JOIN
   last_status_condo_monitoring AS lscm
