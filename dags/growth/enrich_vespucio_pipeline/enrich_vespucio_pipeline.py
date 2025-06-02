@@ -622,7 +622,7 @@ zordominium_tasks = [
     create_task(
         entry_point="plugins_condo_by_region",
         parameters=[
-            f"--input_official_condos={Tables.zordominium_compounds}",
+            f"--input_condos={Tables.zordominium_compounds}",
             f"--input_listings={Tables.listings}",
             f"--output_database=condos_by_region_plugin",
             "--operation=all",
