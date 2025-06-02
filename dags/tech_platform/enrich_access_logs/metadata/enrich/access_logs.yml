@@ -28,6 +28,10 @@ columns:
     lineage:
       - datalake_access_logs_clean.istio.x_forwarded_for
     description: Request forwarded for IPs
+  request_real_ip:
+    lineage:
+      - datalake_access_logs_clean.opa.request_real_ip
+    description: Request real IP
   request_method:
     lineage:  
       - datalake_access_logs_clean.opa.request_method
@@ -80,6 +84,14 @@ columns:
     lineage:
       - datalake_access_logs_clean.opa.principal_user_email
     description: Principal user email 
+  id_main_principal_user:
+    lineage:
+      - datalake_access_logs_clean.opa.id_main_principal_user
+    description: Principal user main ID
+  uuid_person_principal_user:
+    lineage:
+      - datalake_access_logs_clean.opa.uuid_person_principal_user
+    description: Principal user person UUID
   principal_user_idp:
     lineage:
       - data_access_logs_clean.opa.principal_user_idp
