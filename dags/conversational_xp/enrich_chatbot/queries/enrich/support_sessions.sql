@@ -17,7 +17,9 @@ WITH orchestrator_sessions AS (
 escalated_sessions AS (
   SELECT DISTINCT
     cs.id_ticket,
-    cs.id_session
+    cs.id_session,
+    cs.first_queue,
+    cs.last_queue
   FROM
     datalake_customer_support.tickets AS cs
   INNER JOIN
@@ -29,12 +31,14 @@ escalated_sessions AS (
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY cs.id_session ORDER BY cs.ts_updated DESC) = 1
 ),
-sessions AS (
+support_sessions AS (
   SELECT
     bs.id_session,
     bs.id_sauron_session,
     es.id_ticket,
     bs.id_user,
+    es.first_queue,
+    es.last_queue,
     es.id_session IS NOT NULL AS is_escalation,
     bs.ts_created,
     ss.ts_updated AS ts_finished
@@ -49,14 +53,16 @@ sessions AS (
       ON es.id_session = bs.id_sauron_session
 )
 SELECT
-  s.id_session,
-  s.id_sauron_session,
-  s.id_ticket,
-  s.id_user,
-  s.is_escalation,
-  TIMESTAMPDIFF(SECOND, s.ts_created, s.ts_finished) AS session_time_sec,
-  s.ts_created,
-  s.ts_finished,
-  LAG(s.ts_created) OVER(PARTITION BY s.id_user ORDER BY s.ts_created) AS ts_previous_session
+  id_session,
+  id_sauron_session,
+  id_ticket,
+  id_user,
+  first_queue,
+  last_queue,
+  is_escalation,
+  TIMESTAMPDIFF(SECOND, ts_created, ts_finished) AS session_time_sec,
+  ts_created,
+  ts_finished,
+  LAG(ts_created) OVER(PARTITION BY id_user ORDER BY ts_created) AS ts_previous_session
 FROM
-  sessions AS s
+  support_sessions
