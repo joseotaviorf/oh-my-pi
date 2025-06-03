@@ -23,7 +23,7 @@ workflow:
   tables_customization:
     Session:
       clean_table_name: session
-
+      z_order_by: [ts_started, id_session]
 
 cluster:
   type: databricks_13_3_med_general_cluster

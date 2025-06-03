@@ -10,7 +10,7 @@ WITH greenseer_uniques AS (
   FROM
     datalake_greenseer_clean.session
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    ts_started BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
 ),
@@ -127,6 +127,8 @@ sauron_uniques AS (
     ts_first_message
   FROM
     datalake_sauron_clean.session
+  WHERE
+    ts_created BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
 ),
@@ -154,7 +156,8 @@ sessions_and_tickets AS (
   FROM
     datalake_customer_support.tickets
   WHERE
-    front_or_back = 'front'
+    ts_created BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
+    AND front_or_back = 'front'
     AND ticket_origin IN ('call in app', 'whatsapp', 'chat in app')
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_updated DESC) = 1
