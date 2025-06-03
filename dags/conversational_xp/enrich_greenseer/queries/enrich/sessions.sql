@@ -127,8 +127,6 @@ sauron_uniques AS (
     ts_first_message
   FROM
     datalake_sauron_clean.session
-  WHERE
-    ts_created BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
 ),
@@ -156,8 +154,7 @@ sessions_and_tickets AS (
   FROM
     datalake_customer_support.tickets
   WHERE
-    ts_created BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
-    AND front_or_back = 'front'
+    front_or_back = 'front'
     AND ticket_origin IN ('call in app', 'whatsapp', 'chat in app')
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_updated DESC) = 1

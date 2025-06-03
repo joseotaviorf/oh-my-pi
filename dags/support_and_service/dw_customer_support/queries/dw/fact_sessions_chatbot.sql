@@ -32,7 +32,7 @@ base_churn AS (
         AND g.ts_started < t.ts_created - INTERVAL 3 HOUR
   WHERE
     t.channel = 'call'
-    g.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
+    AND g.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
 ),
 assistances AS (
   SELECT
@@ -83,7 +83,7 @@ options_response AS (
   FROM
     datalake_greenseer.sessions
   WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    ts_started BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
     AND response_key IS NOT NULL
 ),
 normalize_options AS (

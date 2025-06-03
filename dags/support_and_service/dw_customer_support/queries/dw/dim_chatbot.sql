@@ -67,7 +67,7 @@ SELECT
 FROM
   datalake_greenseer.sessions
 WHERE
-  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  ts_started BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
 
