@@ -72,6 +72,10 @@ columns:
     lineage:
       - datalake_terminator_raw.termination.tenant_pending_tasks
     description: List of tasks or actions pending on the tenant's side.
+  team:
+    lineage:
+      - datalake_terminator_raw.termination.team
+    description: Name of the team responsible for the termination.
   category:
     lineage:
       - datalake_terminator_raw.termination.category

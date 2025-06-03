@@ -40,6 +40,10 @@ columns:
       TENANT: Requested by the tenant.
       QUINTOANDAR: Requested by Quinto Andar.
       LANDLORD: Requested by the landlord.
+  team:
+    lineage:
+      - datalake_offboarding.contract_termination.team
+    description: Name of the team responsible for the termination.
   dt_ended_termination:
     lineage:
       - datalake_offboarding.contract_termination.dt_ended_termination
