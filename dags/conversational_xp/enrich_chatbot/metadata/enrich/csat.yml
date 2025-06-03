@@ -1,0 +1,29 @@
+database_name: datalake_chatbot
+table_name: csat
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+description:
+  This table contains Customer Satisfaction (CSAT) data collected from chatbot interactions.
+  It stores feedback ratings and comments provided by users after their chatbot sessions,
+  enabling analysis of customer satisfaction levels and service quality metrics.
+columns:
+  id_session:
+    lineage:
+      - datalake_chat_fup_clean.rating.id_origin
+    description: Session ID.
+  id_user:
+    lineage:
+      - datalake_chat_fup_clean.rating.id_user
+    description: User identifier who provided the CSAT answer.
+  agent:
+    lineage:
+      - datalake_sauron_clean.session.agent
+    description: Agent assigned to the session
+  rating:
+    lineage:
+      - datalake_chat_fup_clean.rating.rating
+    description: Customer satisfaction rating score (1-5 scale).
+  ts_created:
+    lineage:
+      - datalake_chat_fup_clean.rating.ts_created
+    description: Timestamp when the CSAT answer was submitted.
