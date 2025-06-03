@@ -619,17 +619,17 @@ zordominium_tasks = [
             f"--remove_old_condos=False"
         ],
     ),
-    create_task(
-        entry_point="plugins_condo_by_region",
-        parameters=[
-            f"--input_condos={Tables.zordominium_compounds}",
-            f"--input_listings={Tables.listings}",
-            f"--output_database=condos_by_region_plugin",
-            "--operation=all",
-            "--redis_host=redis.zordominium.quintoandar.com.br",
-            "--redis_port=6379"
-        ],
-    ),
+    # create_task(
+    #     entry_point="plugins_condo_by_region",
+    #     parameters=[
+    #         f"--input_condos={Tables.zordominium_compounds}",
+    #         f"--input_listings={Tables.listings}",
+    #         f"--output_database=condos_by_region_plugin",
+    #         "--operation=all",
+    #         "--redis_host=redis.zordominium.quintoandar.com.br",
+    #         "--redis_port=6379"
+    #     ],
+    # ),
 ]
 
 classifieds_tasks = [
