@@ -16,7 +16,6 @@ WITH bookings AS (
   FROM
     datalake_sale_visit.sale_visit AS esv
 ),
-
 offers AS (
   SELECT
     eso.id_offer,
@@ -38,7 +37,6 @@ offers AS (
   FROM
     datalake_offer.sale_offer AS eso
 ),
-
 events AS (
     SELECT -- Visit Booked
         DATE(ts_booking_created) AS dt_event,
@@ -208,7 +206,6 @@ events AS (
     WHERE
         dt_offer_dismissed IS NOT NULL
 )
-
 SELECT
   sk_event_type,
   sk_company_supply,
@@ -222,7 +219,8 @@ SELECT
   id_offer,
   id_region,
   id_seller,
+  event_name,
   dt_event,
   ts_event
-FROM 
+FROM
   events

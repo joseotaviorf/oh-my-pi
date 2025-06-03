@@ -6,88 +6,106 @@ description: 'Transactional table that registers a row for each key event in
 domain: For Sale
 owner: ae-for-sale@quintoandar.com.br
 columns:
+  sk_event_type:
+    description: Key of the type of event (number from 1 to 8). Can be joined with dw_sale.dim_sale_event_type.
+    categories:
+      1: The key has a value of 1, indicating that it's a booked visit event.
+      2: The key has a value of 2, indicating that it's a completed visit event.
+      3: The key has a value of 3, indicating that it's an offer submitted event.
+      4: The key has a value of 4, indicating that it's an offer accepted event.
+      5: The key has a value of 5, indicating that it's a sale agreement created event.
+      6: The key has a value of 6, indicating that it's a sale agreement signed event.
+      7: The key has a value of 7, indicating that it's a visit cancelled event.
+      8: The key has a value of 8, indicating that it's an offer rejected event.
+  sk_company_supply:
+    lineage:
+      - datalake_sale_visit.sale_visit.sk_company_supply
+      - datalake_offer.sale_offer.sk_company_supply
+    description: Key of the listing's origin company in Rede Supply, if that is the
+      case. It can be joined with dw_rede.dim_company.
+  sk_company_demand:
+    lineage:
+      - datalake_sale_visit.sale_visit.sk_company_demand
+      - datalake_offer.sale_offer.sk_company_demand
+    description: Key of the agents's company in Rede Demand at the start of the funnel,
+      if that is the case. It can be joined with dw_rede.dim_company.
   id_sale_flow:
     description: ID of sale flow. The sale flow is defined by the tuple buyer / house. It can be started
       when the buyer makes a booking, offer ou talk to agent event in some house.
-  sk_event_type:
-    description: Key of the type of event. Can be joined with dw_sale.dim_sale_event_type.
-  event_name:
-    description: Event name.
-  id_booking:
-    lineage:
-    - datalake_sale_visit.sale_visit.id_booking
-    - datalake_offer.sale_offer.id_booking
-    description: Key of the associated booking.
-  id_offer:
-    lineage:
-    - datalake_offer.sale_offer.id_offer
-    description: Key of the associated offer.
-  id_house:
-    lineage:
-    - datalake_sale_visit.sale_visit.id_house
-    - datalake_offer.sale_offer.id_house
-    description: Key of the associated house.
-  id_region:
-    lineage:
-    - datalake_sale_visit.sale_visit.id_region
-    - datalake_offer.sale_offer.id_region
-    description: Key of the associated house's region.
-  id_buyer:
-    lineage:
-    - datalake_sale_visit.sale_visit.id_buyer
-    - datalake_offer.sale_offer.id_buyer
-    description: Key of the buyer's user. Can be joined with dw_public.dim_user.
-  id_seller:
-    lineage:
-    - datalake_sale_visit.sale_visit.id_seller
-    - datalake_offer.sale_offer.id_seller
-    description: Key of the seller's user. Can be joined with dw_public.dim_user.
   id_agent:
     lineage:
-    - datalake_sale_visit.sale_visit.id_agent
-    - datalake_offer.sale_offer.id_agent
+      - datalake_sale_visit.sale_visit.id_agent
+      - datalake_offer.sale_offer.id_agent
     description: 'Key of the agent. Can be joined with dw_public.dim_agent. Note:
       this is NOT the key of the user, so it cannot be joined with the primary key
       of dim_user. However, it can be joined with dw_public.dim_user.dados_agente_id.
       However, that is not recommended, since dim_user is much bigger than dim_agent,
       reducing performance.'
+  id_booking:
+    lineage:
+      - datalake_sale_visit.sale_visit.id_booking
+      - datalake_offer.sale_offer.id_booking
+    description: Key of the associated booking.
   id_business_unit:
     lineage:
-    - datalake_sale_visit.sale_visit.id_business_unit
-    - datalake_offer.sale_offer.id_business_unit
+      - datalake_sale_visit.sale_visit.id_business_unit
+      - datalake_offer.sale_offer.id_business_unit
     description: Key of the agent's business context at the start of the funnel. There
       are no associated dimensions yet, but it can be joined with datalake_hub_services_clean.business_unit.
-  sk_company_supply:
+  id_buyer:
     lineage:
-    - datalake_sale_visit.sale_visit.sk_company_supply
-    - datalake_offer.sale_offer.sk_company_supply
-    description: Key of the listing's origin company in Rede Supply, if that is the
-      case. It can be joined with dw_rede.dim_company.
-  sk_company_demand:
+      - datalake_sale_visit.sale_visit.id_buyer
+      - datalake_offer.sale_offer.id_buyer
+    description: Key of the buyer's user. Can be joined with dw_public.dim_user.
+  id_house:
     lineage:
-    - datalake_sale_visit.sale_visit.sk_company_demand
-    - datalake_offer.sale_offer.sk_company_demand
-    description: Key of the agents's company in Rede Demand at the start of the funnel,
-      if that is the case. It can be joined with dw_rede.dim_company.
+      - datalake_sale_visit.sale_visit.id_house
+      - datalake_offer.sale_offer.id_house
+    description: Key of the associated house.
+  id_offer:
+    lineage:
+      - datalake_offer.sale_offer.id_offer
+    description: Key of the associated offer.
+  id_region:
+    lineage:
+      - datalake_sale_visit.sale_visit.id_region
+      - datalake_offer.sale_offer.id_region
+    description: Key of the associated house's region.
+  id_seller:
+    lineage:
+      - datalake_sale_visit.sale_visit.id_seller
+      - datalake_offer.sale_offer.id_seller
+    description: Key of the seller's user. Can be joined with dw_public.dim_user.
+  event_name:
+    description: Name of the event.
+    categories:
+      VISIT_BOOKED: The event is a booked visit.
+      VISIT_COMPLETED: The event is a completed visit.
+      OFFER_SUBMITTED: The event is an offer submitted.
+      OFFER_ACCEPTED: The event is an offer accepted.
+      SALE_AGREEMENT_CREATED: The event is a sale agreement created.
+      SALE_AGREEMENT_SIGNED: The event is a sale agreement signed.
+      VISIT_CANCELLED: The event is a visit cancelled.
+      OFFER_REJECTED: The event is an offer rejected.
   dt_event:
     lineage:
-    - datalake_sale_visit.sale_visit.ts_booking_created
-    - datalake_sale_visit.sale_visit.ts_visit_canceled
-    - datalake_sale_visit.sale_visit.ts_visit_completed
-    - datalake_offer.sale_offer.ts_offer_submitted
-    - datalake_offer.sale_offer.ts_offer_accepted
-    - datalake_offer.sale_offer.ts_sale_agreement_created
-    - datalake_offer.sale_offer.ts_sale_agreement_signed
-    - datalake_offer.sale_offer.ts_offer_dismissed
+      - datalake_sale_visit.sale_visit.ts_booking_created
+      - datalake_sale_visit.sale_visit.ts_visit_canceled
+      - datalake_sale_visit.sale_visit.ts_visit_completed
+      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_offer.sale_offer.ts_offer_accepted
+      - datalake_offer.sale_offer.ts_sale_agreement_created
+      - datalake_offer.sale_offer.ts_sale_agreement_signed
+      - datalake_offer.sale_offer.ts_offer_dismissed
     description: Date of when the event happened.
   ts_event:
     lineage:
-    - datalake_sale_visit.sale_visit.ts_booking_created
-    - datalake_sale_visit.sale_visit.ts_visit_canceled
-    - datalake_sale_visit.sale_visit.ts_visit_completed
-    - datalake_offer.sale_offer.ts_offer_submitted
-    - datalake_offer.sale_offer.ts_offer_accepted
-    - datalake_offer.sale_offer.ts_sale_agreement_created
-    - datalake_offer.sale_offer.ts_sale_agreement_signed
-    - datalake_offer.sale_offer.ts_offer_dismissed
+      - datalake_sale_visit.sale_visit.ts_booking_created
+      - datalake_sale_visit.sale_visit.ts_visit_canceled
+      - datalake_sale_visit.sale_visit.ts_visit_completed
+      - datalake_offer.sale_offer.ts_offer_submitted
+      - datalake_offer.sale_offer.ts_offer_accepted
+      - datalake_offer.sale_offer.ts_sale_agreement_created
+      - datalake_offer.sale_offer.ts_sale_agreement_signed
+      - datalake_offer.sale_offer.ts_offer_dismissed
     description: Timestamp of when the event happened, in UTC.
