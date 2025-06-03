@@ -50,6 +50,7 @@ adjusting_owners_base AS (
     datalake_ebdb_clean.house AS h
       ON h.id = o.id_house
       AND h.id_user = o.id_user
+      AND h.status <> 'excluido'
 ),
 finding_gaps AS (
 SELECT
@@ -57,10 +58,12 @@ SELECT
   id_user,
   SUM(
     CASE 
-      WHEN ts_first_user_event > MAX(ts_last_user_event) OVER (
+      WHEN ts_first_user_event > COALESCE(
+          MAX(COALESCE(ts_last_user_event, NOW() + INTERVAL '1 years')) OVER (
         PARTITION BY id_user 
         ORDER BY ts_first_user_event 
         ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ), NOW() + INTERVAL '1 years'
       ) THEN 1 
       ELSE 0 
     END

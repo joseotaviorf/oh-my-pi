@@ -3,7 +3,10 @@ SELECT
     u.uuid_person,
     IF(pa.status = 'ACTIVE', TRUE, FALSE) AS is_active,
     pa.ts_created AS ts_first_event,
-    pa.ts_updated AS ts_last_event,
+    CASE
+        WHEN pa.status = 'ACTIVE' THEN CAST(NULL AS TIMESTAMP)
+        ELSE pa.ts_updated
+    END AS ts_last_event,   -- As the partner source table is not updated frequently and is not event-based
     NOW() AS ts_load
 FROM
     datalake_ebdb_clean.partner AS p

@@ -3,7 +3,10 @@ SELECT
   u.uuid_person,
   ad.is_active,
   ad.ts_created AS ts_first_event,
-  ad.ts_updated AS ts_last_event,
+  CASE
+    WHEN ad.is_active = TRUE THEN CAST(NULL AS TIMESTAMP)
+    ELSE ad.ts_updated
+  END AS ts_last_event, -- As the agent source table is not updated frequently and is not event-based
   NOW() AS ts_load
 FROM
     datalake_ebdb_clean.agent_data AS ad

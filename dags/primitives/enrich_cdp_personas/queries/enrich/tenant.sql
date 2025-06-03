@@ -44,19 +44,22 @@ finding_gaps AS (
     t.id_contract,
     SUM(
       CASE
-        WHEN ts_first_active_event > LAG(ts_last_active_event) OVER (
-          PARTITION BY t.id_user
-          ORDER BY
-            ts_first_active_event
-        ) THEN 1
-       ELSE 0
+        WHEN ts_first_active_event > COALESCE(
+          MAX(COALESCE(ts_last_active_event, NOW() + INTERVAL '1 years')) OVER (
+            PARTITION BY id_user
+            ORDER BY ts_first_active_event
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+          ), NOW() + INTERVAL '1 years'
+        )
+        THEN 1
+        ELSE 0
       END
     ) OVER (
-      PARTITION BY t.id_user ORDER BY ts_first_active_event
+      PARTITION BY id_user
+      ORDER BY ts_first_active_event
     ) AS id_group,
     ts_first_active_event,
     ts_last_active_event
-    --IF(c.status = 'Ativo', NULL, ts_last_active_event) AS ts_last_active_event  -- check if it's necessary
   FROM
     tenants_base AS t
 ),
