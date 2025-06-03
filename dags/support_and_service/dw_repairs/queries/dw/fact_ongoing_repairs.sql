@@ -71,13 +71,15 @@ repair_request_budget AS (
           OR regexp_like(tags,'tag_squad_reparos_reparacao_piloto_jornada_ps_iq_iq')
         )
         AND sk_group IN
-        (
-          '18592339863437',
-          '10567436267277',
-          '11373011255565',
-          '10054637827597',
-          '32017711499661'
-        )
+          (
+            '18592339863437', --Autosserviço Reparos [BACK]
+            '10567436267277', --FullService [BACK]
+            '11373011255565', --Reparos [BACK]
+            '10054637827597', --Triagem Reparos [Back]
+            '32017711499661', --ReparAção (Piloto Urgente) 
+            '36385276117261', --ReparAção Comum [BACK]
+            '36464344850701'  --Reparos PP Multi [BACK]
+          )
       THEN ts_event
     END) AS ts_ps_iq,
     MIN(
@@ -99,11 +101,13 @@ repair_request_budget AS (
         )
         AND sk_group IN
           (
-            '18592339863437',
-            '10567436267277',
-            '11373011255565',
-            '10054637827597',
-            '32017711499661'
+            '18592339863437', --Autosserviço Reparos [BACK]
+            '10567436267277', --FullService [BACK]
+            '11373011255565', --Reparos [BACK]
+            '10054637827597', --Triagem Reparos [Back]
+            '32017711499661', --ReparAção (Piloto Urgente) 
+            '36385276117261', --ReparAção Comum [BACK]
+            '36464344850701'  --Reparos PP Multi [BACK]
           )
             THEN ts_event
         END) AS ts_ps_pp,
@@ -124,11 +128,13 @@ repair_request_budget AS (
         )
         AND sk_group IN
           (
-            '18592339863437',
-            '10567436267277',
-            '11373011255565',
-            '10054637827597',
-            '32017711499661'
+            '18592339863437', --Autosserviço Reparos [BACK]
+            '10567436267277', --FullService [BACK]
+            '11373011255565', --Reparos [BACK]
+            '10054637827597', --Triagem Reparos [Back]
+            '32017711499661', --ReparAção (Piloto Urgente) 
+            '36385276117261', --ReparAção Comum [BACK]
+            '36464344850701'  --Reparos PP Multi [BACK]
           )
         THEN ts_event
       END) AS ts_compulsory,
@@ -207,7 +213,9 @@ tickets_whatsapp AS (
         'Triagem Reparos [Back]',
         'Autosserviço Reparos [BACK]',
         'FullService [BACK]',
-        'ReparAção (Piloto Urgente)'
+        'ReparAção (Piloto Urgente)',
+        'ReparAção Comum [BACK]',
+        'Reparos PP Multi [BACK]'
       )
     AND tc.channel = 'whatsapp'
     AND tc.custom_fields['Ticket do contato'] IS NOT NULL

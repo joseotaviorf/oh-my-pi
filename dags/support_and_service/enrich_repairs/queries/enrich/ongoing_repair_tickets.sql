@@ -81,7 +81,9 @@ WITH ticket_history_base AS (
       'Reparos [BACK]',
       'Triagem Reparos [Back]',
       'FullService [BACK]',
-      'ReparAção (Piloto Urgente)')
+      'ReparAção (Piloto Urgente)',
+      'Reparos PP Multi [BACK]',
+      'ReparAção Comum [BACK]')
     AND tc.channel NOT IN ('call')
     AND tc.status NOT IN ('deleted')
     AND tc.tags NOT LIKE '%caso_ticket_agregador%'
@@ -313,7 +315,9 @@ WHERE
       'Triagem Reparos [Back]',
       'FullService [BACK]',
       'Autosserviço Reparos [BACK]',
-      'ReparAção (Piloto Urgente)'
+      'ReparAção (Piloto Urgente)',
+      'Reparos PP Multi [BACK]',  
+      'ReparAção Comum [BACK]'
     )
   AND tc.ts_created >= CURRENT_DATE - INTERVAL 3 YEAR
   AND tc.channel NOT IN ('call', 'whatsapp')

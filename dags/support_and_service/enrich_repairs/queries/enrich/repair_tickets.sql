@@ -77,7 +77,6 @@ WITH ticket_history_base AS (
     tc.year >= YEAR(CURRENT_DATE - INTERVAL 1 YEAR)
     AND tc.group_name IN (
       'FullService [Back]',
-      'Prestadores Parceiros [SO]',
       'Reparos [BACK]',
       'Triagem Reparos [Back]',
       'FullService [BACK]',
