@@ -1,6 +1,6 @@
 SELECT
     BIGINT(`id`) AS id_offer,
-    BIGINT(external_id) AS id_external,
+    external_id AS id_external,
     BIGINT(business_unit_id) AS id_business_unit,
     BIGINT(house_id) AS id_house,
     category,
