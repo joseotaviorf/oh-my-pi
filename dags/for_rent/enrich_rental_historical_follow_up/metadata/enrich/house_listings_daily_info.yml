@@ -6,32 +6,35 @@ description: Enriched table for store the last status of the day of the last hou
 domain: For Rent
 owner: data-for-rent@quintoandar.com.br
 columns:
+  id_house_listing_day:
+    description: The primary key created by a concatenation of id_house_listing and
+      day. We should have only one listing status per day in this table.
   id_house_listing:
     lineage:
-    - datalake_ebdb_listing.house_listing.id_house_listing
+      - datalake_ebdb_listing.house_listing.id_house_listing
     description: The Id that identifies a version of a house's publication.
   id_house:
     lineage:
-    - datalake_ebdb_listing.house_listing.id_house
+      - datalake_ebdb_listing.house_listing.id_house
     description: The Id of the house.
   id_country:
     lineage:
-    - datalake_ebdb_listing.house.id_country
+      - datalake_ebdb_listing.house.id_country
     description: The Id of the country related to the house.
   id_contract:
     lineage:
-    - datalake_ebdb_listing.house_listing.id_contract
+      - datalake_ebdb_listing.house_listing.id_contract
     description: The Id of the contract associated to the listing in a specific
       day. Due to early demand, we can have more than one contract associated to the same house.
       This will happen when the contract was active during the reference date (dt_day column).
   id_owner:
     lineage:
-    - datalake_ebdb_listing.house.id_user
+      - datalake_ebdb_listing.house.id_user
     description: The landlord's/owner's ID user.
       day.
   id_occupant:
     lineage:
-    - datalake_ebdb_listing.house_entrance_history.id_occupant
+      - datalake_ebdb_listing.house_entrance_history.id_occupant
     description: The Id of the occupant of the house.
     categories:
       '1': None
@@ -40,19 +43,19 @@ columns:
       '4': Empty
   id_partner:
     lineage:
-    - datalake_pro_owners.house_b2b_history.id_partner
+      - datalake_pro_owners.house_b2b_history.id_partner
     description: ID of the real estate partner company that is related to the lead/property, if we acquired from them.
   id_partner_big_agent:
     lineage:
-    - datalake_big_agent.house_consultant_history.id_partner
+      - datalake_big_agent.house_consultant_history.id_partner
     description: ID of the agent.
   id_region:
     lineage:
-    - datalake_ebdb_listing.house.id_region
+      - datalake_ebdb_listing.house.id_region
     description: The Id of the region related to the house.
   id_house_status:
     lineage:
-    - datalake_ebdb_listing.house_status.id_house_status
+      - datalake_ebdb_listing.house_status.id_house_status
     description: The Id of the status and status_reason related to the house.
   id_price_change:
     lineage:
@@ -72,15 +75,15 @@ columns:
     description: Short name of the Rede company.
   country_code:
     lineage:
-    - datalake_ebdb_listing.house.country_code
+      - datalake_ebdb_listing.house.country_code
     description: Country code of the house.
   rental_administrator:
     lineage:
-    - datalake_ebdb_listing.rent_listing.rental_administrator
+      - datalake_ebdb_listing.rent_listing.rental_administrator
     description: Type of administration of the property.
   consultant_type:
     lineage:
-    - datalake_big_agent.house_consultant_history.consultant_type
+      - datalake_big_agent.house_consultant_history.consultant_type
     description: Type of consultant, from Big Agent service.
     categories:
       ASP: House has an ASP manager assigned(similar to CIQ Manager).
@@ -88,31 +91,27 @@ columns:
       CIQ_MANAGER: House has a CIQ manager assigned.
   doorman_type:
     lineage:
-    - datalake_ebdb_listing.house_entrance_history.doorman_type
+      - datalake_ebdb_listing.house_entrance_history.doorman_type
     description: Type of doorman of the house.
   first_key_location:
     lineage:
-    - datalake_ebdb_listing.agents_with_keys.first_key_location
+      - datalake_ebdb_listing.agents_with_keys.first_key_location
     description: Where the listing's key was first placed.
   key_location:
     lineage:
-    - datalake_ebdb_listing.house_entrance_history.key_location
+      - datalake_ebdb_listing.house_entrance_history.key_location
     description: Declared location of this house's key for this listing.
-  listing_category:
-    lineage:
-    - datalake_ebdb_listing.house_listing.listing_category
-    description: Which is this listing category.
   rent:
     lineage:
-    - datalake_ebdb_pricing.listing_price_change.price
+      - datalake_ebdb_pricing.listing_price_change.price
     description: Rent value of the house.
   p_10:
     lineage:
-    - datalake_ebdb_pricing.listing_prediction_changes.calculator_min_price
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_min_price
     description: Calculator column. Tells the minimum price estimated by the calculator output.
   p_20:
     lineage:
-    - datalake_ebdb_pricing.listing_prediction_changes.calculator_p20_price
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p20_price
     description: Calculator column. Tells the estimated price related to the 20% percentile of the calculator's output.
   p_30:
     lineage:
@@ -144,7 +143,7 @@ columns:
     description: Calculator column. Tells the estimated price related to the 90% percentile of the calculator's output.
   certainty:
     lineage:
-    - datalake_ebdb_pricing.listing_prediction_changes.calculator_certainty
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_certainty
     description: Calculator column. Tells the certainty level of the prediction calculated by the calculator. It is strongly related to the intensity of the QuintoAndar performance with the listing region.
   listing_page_views:
     description: Number of views of the house listing page.
@@ -186,44 +185,42 @@ columns:
     lineage:
       - datalake_rent_demand_events.rent_demand_events.id_event
     description: Number of offers sent to the house listing.
-  status_change_reason:
+  days_published:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.status_change_reason
-    description: The reason to a status change in this day.
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_last_publication
+      - datalake_quintoandar.aux_date.date
+    description: Number of days the listing has been published. It starts counting from the day of publication.
   status_history:
     lineage:
-    - datalake_ebdb_listing.house_listing_status.status_history
+      - datalake_ebdb_listing.house_listing_status.status_history
     description: The status of this listing in this day.
+  status_change_reason:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.status_change_reason
+    description: The reason to a status change in this day.
+  listing_category:
+    lineage:
+      - datalake_ebdb_listing.house_listing.listing_category
+    description: Which is this listing category.
   is_exclusive:
     lineage:
-    - datalake_ebdb_listing.house_listing.is_exclusive
+      - datalake_ebdb_listing.house_listing.is_exclusive
     description: Boolean that indicates the house exclusivity.
-  ts_status_started:
-    lineage:
-    - datalake_ebdb_listing.house_listing_status.ts_status_started
-    description: The timestamp of when the listing status started.
-  ts_status_ended:
-    lineage:
-    - datalake_ebdb_listing.house_listing_status.ts_status_ended
-    description: The timestamp of when the listing status ended.
-  id_house_listing_day:
-    description: The primary key created by a concatenation of id_house_listing and
-      day. We should have only one listing status per day in this table.
   is_for_rent:
     description: Boolean that indicates if this house is for rent.
   is_for_sale:
     description: Boolean that indicates if this house is for sale.
   is_rent_3p_supply:
     lineage:
-    - datalake_ebdb_listing.house.is_rent_3p_supply
+      - datalake_ebdb_listing.house.is_rent_3p_supply
     description: Boolean that indicates if house is from Rede QuintoAndar, in the context of ForRent.
   is_sale_3p_supply:
     lineage:
-    - datalake_ebdb_listing.house.is_sale_3p_supply
+      - datalake_ebdb_listing.house.is_sale_3p_supply
     description: Boolean that indicates house is from Rede QuintoAndar, in the context of ForSale.
   is_b2b:
     lineage:
-    - datalake_b2b.house_listing.is_b2b
+      - datalake_b2b.house_listing.is_b2b
     description: Boolean that indicates if house is B2B.
   is_month_start:
     description: Boolean that indicates if the day is a month start.
@@ -235,6 +232,22 @@ columns:
     description: Boolean that indicates if the day is a week end.
   dt_day:
     description: The day (date) when the status was observed.
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_first_publication
+    description: The timestamp of when the listing was first published.
+  ts_last_publication:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_last_publication
+    description: The timestamp of when the listing was last published.
+  ts_status_started:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.ts_status_started
+    description: The timestamp of when the listing status started.
+  ts_status_ended:
+    lineage:
+      - datalake_ebdb_listing.house_listing_status.ts_status_ended
+    description: The timestamp of when the listing status ended.
   year:
     description: The year when this status was observed. Also, it's a partition of this table.
   month:

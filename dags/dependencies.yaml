@@ -2797,6 +2797,7 @@ bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-status
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context
+  - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context-status-history
   - bietlejuice.enrich_ebdb_listing:load-enrich-rent-listing
   - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-prediction-changes
   - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-price-change

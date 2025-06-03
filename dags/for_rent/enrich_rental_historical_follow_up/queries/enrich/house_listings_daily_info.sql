@@ -264,6 +264,7 @@ listings_states_per_day AS (
         vnm.visits_confirmed,
         vnm.visits_done,
         offers.offers_sent,
+        DATEDIFF(DAY, DATE(lbcsh.ts_last_publication), dbase.dt_day) + 1 AS days_published,
         hls.status_history,
         hls.status_change_reason,
         hl.listing_category,
@@ -285,6 +286,8 @@ listings_states_per_day AS (
         IF(dbase.dt_week_started = dbase.dt_day, TRUE, FALSE) AS is_week_start,
         IF(dbase.dt_week_ended = dbase.dt_day, TRUE, FALSE) AS is_week_end,
         dbase.dt_day,
+        lbcsh.ts_first_publication,
+        lbcsh.ts_last_publication,
         hls.ts_status_started,
         hls.ts_status_ended,
         dbase.year,
@@ -351,6 +354,13 @@ listings_states_per_day AS (
         datalake_ebdb_listing.house_status AS hs
             ON hls.status_history <=> hs.house_status
             AND hls.status_change_reason <=> hs.status_reason
+    LEFT JOIN
+        datalake_ebdb_listing.listing_business_context_status_history AS lbcsh
+            ON COALESCE(pled.id_house, hl.id_house) = lbcsh.id_house
+            AND lbcsh.business_context = 'RENT'
+            AND dbase.dt_day >= DATE(lbcsh.ts_state_started)
+            AND dbase.dt_day < COALESCE(DATE(lbcsh.ts_state_ended), '2100-01-01')
+            AND lbcsh.is_last_state_of_day
     LEFT JOIN
         datalake_ebdb_pricing.listing_prediction_changes AS pred
             ON COALESCE(pled.id_house, hl.id_house) = pred.id_house
@@ -434,6 +444,7 @@ SELECT
     visits_confirmed,
     visits_done,
     offers_sent,
+    days_published,
     status_history,
     status_change_reason,
     listing_category,
@@ -448,6 +459,8 @@ SELECT
     is_week_start,
     is_week_end,
     dt_day,
+    ts_first_publication,
+    ts_last_publication,
     ts_status_started,
     ts_status_ended,
     year,
