@@ -1,7 +1,6 @@
 dag:
   name: amplitude_subpartitioned
   owner: Data Growth
-  schedule_interval: 0 3 * * *
   documentation:
     dag_purpose: |
       This DAG ingests data from Amplitude and materializes it in a subpartitioned tables by id_app and event_type
