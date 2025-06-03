@@ -1,5 +1,6 @@
 SELECT 
     id,
+    doc_entry,
     status,
     amount,
     user_type,

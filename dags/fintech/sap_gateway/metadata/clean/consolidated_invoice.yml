@@ -9,6 +9,10 @@ columns:
     description: ''
     lineage:
     - datalake_sap_gateway_raw.consolidated_invoice.id
+  doc_entry:
+    description: ''
+    lineage:
+    - datalake_sap_gateway_raw.consolidated_invoice.doc_entry
   status:
     description: ''
     lineage:
