@@ -1,0 +1,151 @@
+---
+database_name: datalake_docx
+table_name: credit_evaluation_events
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: The table credit_evaluation_events extracts specific events timestamps related to the credit evaluation process.
+columns:
+  id_credit_evaluation:
+    description: The unique identifier for the credit evaluation. It can be used in any join with the credit evaluation ID from DocX.
+    lineage:
+    -  datalake_docx_clean.credit_evaluation.id
+  id_group:
+    description: The identifier for the group associated with the credit evaluation (credit passport group). The value can be null if the credit evaluation was submitted to a proposal.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.id_group
+  id_proposal:
+    description: The identifier for the proposal associated with the credit evaluation. The value can be null if the credit evaluation was submitted before the submission of an offer.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.id_group
+  id_city:
+    description: The identifier for the city in which the group submitted the credit evaluation.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.id_city
+  id_house:
+    description: The identifier for the house in which the group submitted the credit evaluation.
+    lineage:
+    - datalake_docx_clean.machine_state.id_house
+  id_user:
+    description: The unique identifier for the user. This column can be used in any join with the id_user from main.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.id_user
+  group_authorization_status:
+    description: The status of the authorization.
+    categories:
+      ISSUED: When the authorization is issued
+      REVOKED: When the authorization is revoked and is no longer valid.
+    lineage:
+    - datalake_docx_clean.group_authorization.status
+  event_name:
+    description: The name of the event.
+    categories:
+      PRE_EVALUATION_STARTED: Indicates the beginnning of the credit pre evaluation through credit passport.
+      EVALUATION_STARTED: Indicates the beginnning of the credit evaluation, which happens after the offer approval.
+      PRE_APPROVED: Indicates the moment when the credit evaluation was pre approved with or without a paid guarantee.
+      PRE_REJECTED: Indicates that the credit evaluation was pre rejected.
+      EVALUATION_POSITIVE: Indicates if the credit evaluation received a positive response and the tenant can move forward to the next step, which if the documentation submission.
+      EVALUATION_NEGATIVE: Indicates if the credit evaluation received a negative response and the tenant can not move forward to the next step without redoing the credit evaluation.
+      BYPASSED: Indicates that the credit engine could not reach a decision and the credit pre-evaluation may be decided by the credit desk.
+      CREDIT_ANALYSIS_APPROVED: Indicates that the credit analysis was approved after the documentation analysis. In case of a paid guarantee, the Tenant can move forward to the guarantee payment. If the Tenant received a free guarantee, the contract will be automatically created.
+      DOCS_ANALYSIS: Indicates that the documentation submitted by the Tenant is under analysis. The documentation analysis can be performed automatically by the credit engine or manually by an analyst.
+      DOCS_RESEND: Indicates that the analyst requested documentation resubmission.
+      STAND_BY: Indicates that the analyst put the proposal in stand by. StandBy status is used when the Tenant has more than one proposal, and the credit desk and closing team need to control which proposal should continue to the contract creation.
+    lineage:
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  credit_evaluation_source:
+    description: This column indicates the credit evaluation origin.
+    categories:
+      NORMAL_FLOW: When the credit evaluation was submitted after offer approval through the default flow.
+      POS_OFFER_PASSPORT_FLOW: When the credit evaluation was submitted after offer approval through the credit passport.
+      PRE_OFFER_PASSPORT_FLOW: When the credit evaluation was submitted before sending an offer through the credit passport.
+  event_order:
+    description: This column can be used to rank the event according to the order that it has happened.
+  is_value_within_pre_approved_limit:
+    description: Indicates if the value submitted by the user is within the pre approved limit.
+    lineage:
+    - datalake_docx_clean.group_authorization.ts_created
+    - datalake_docx_clean.group_authorization.credit_result
+  ts_pre_evaluation_started:
+    description:  The timestamp when the pre-evaluation started, filtered by input_source_type = 'PERSON_UUID' and status = 'PRE_EVALUATION_STARTED'.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  ts_pre_rejected:
+    description: The timestamp when the pre-evaluation was rejected, filtered by input_source_type = 'ANALYSIS_REQUEST' and status = 'PRE_REJECTED'.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  ts_pre_approved:
+    description: The timestamp when the pre-evaluation was approved, filtered by input_source_type = 'ANALYSIS_REQUEST' and status 'PRE_APPROVED' or 'PRE_APPROVED_WITH_GUARANTEE'.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  ts_bypassed:
+    description: The timestamp when the pre-evaluation was bypassed, filtered by input_source_type = 'ANALYSIS_REQUEST' and status = 'BYPASSED'.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  ts_sufficient_credit_limit:
+    description: The timestamp when the group was marked as 'VALUE_WITHIN_PRE_APPROVED_LIMIT' in the group authorization process.
+    lineage:
+    - datalake_docx_clean.group_authorization.ts_created
+    - datalake_docx_clean.group_authorization.credit_result
+  ts_credit_evaluation_created:
+    description: The timestamp creation of the credit evaluation.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.ts_created
+  ts_evaluation_started:
+    description: The timestamp when the proposal credit evaluation started.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  ts_evaluation_positive:
+    description: The timestamp when the proposal received a positive credit evaluation, which means that the Tenant may move forward to the next step with a free or paid guarantee.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  ts_credit_analysis_approved:
+    description: The timestamp when the credit analysis was approved before the documentation analysis.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  ts_evaluation_negative:
+    description: The timestamp when the proposal received a negative response to the credit evaluation.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  ts_docs_analysis:
+    description: The timestamp when the docs analysis started.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  ts_docs_resend:
+    description: The timestamp when the analyst requested documentation resubmission.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  ts_stand_by:
+    description: The timestamp when the analyst pur the proposal in StandBy.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
+  ts_group_authorization_created:
+    description: The timestamp when the authorization was created.
+    lineage:
+    - datalake_docx_clean.group_authorization.ts_created
+  ts_machine_state_created:
+    description: The timestamp when the machine state event was created.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created

@@ -1733,10 +1733,13 @@ bietlejuice.enrich_documentation_metrics:
 bietlejuice.enrich_docx:
   - bietlejuice.docx:load-clean-credit-evaluation
   - bietlejuice.docx:load-clean-document
+  - bietlejuice.docx:load-clean-group-authorization
+  - bietlejuice.docx:load-clean-machine-state
   - bietlejuice.docx:load-clean-person
   - bietlejuice.docx:load-clean-person-document
   - bietlejuice.docx:load-clean-person-document-info-aud
   - bietlejuice.docx:load-clean-rev-info
+  - bietlejuice.sorting_hat:load-clean-proposal
 bietlejuice.enrich_ebdb_affiliates_cost:
   - bietlejuice.ebdb_finance:load-clean-account-transaction
   - bietlejuice.ebdb_house:load-clean-house
