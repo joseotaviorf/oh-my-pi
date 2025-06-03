@@ -1,0 +1,34 @@
+---
+database_name: datalake_journey_flow_test_clean
+table_name: journey_content
+columns:
+  country_language:
+    lineage:
+      - datalake_journey_flow_test_raw.t_journey_content.country_language
+  version:
+    lineage:
+      - datalake_journey_flow_test_raw.t_journey_content.version
+  status:
+    lineage:
+      - datalake_journey_flow_test_raw.t_journey_content.status
+  content:
+    lineage:
+      - datalake_journey_flow_test_raw.t_journey_content.content
+  created_by_user:
+    lineage:
+      - datalake_journey_flow_test_raw.t_journey_content.created_by_user
+  updated_by_user:
+    lineage:
+      - datalake_journey_flow_test_raw.t_journey_content.updated_by_user
+  approved_by_user:
+    lineage:
+      - datalake_journey_flow_test_raw.t_journey_content.approved_by_user
+  ts_created:
+    lineage:
+      - datalake_journey_flow_test_raw.t_journey_content.created_at
+  ts_updated:
+    lineage:
+      - datalake_journey_flow_test_raw.t_journey_content.updated_at
+  ts_approved:
+    lineage:
+      - datalake_journey_flow_test_raw.t_journey_content.approved_at
