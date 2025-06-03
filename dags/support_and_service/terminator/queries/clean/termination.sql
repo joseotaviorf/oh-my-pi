@@ -15,7 +15,6 @@ SELECT
     rescheduling_history,
     utility_bill_info,
     last_condominium_responsible,
-    team,
     tenant_pending_tasks,
     category,
     inspection_date_offset_in_days,

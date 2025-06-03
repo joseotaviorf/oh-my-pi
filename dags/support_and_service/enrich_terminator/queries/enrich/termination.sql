@@ -139,7 +139,6 @@ SELECT
     ci.id_region,
     tw.id_current_assignee AS id_workflow_assignee,
     tt.id_external AS id_zendesk_task,
-    t.team,
     t.cancellation_info,
     t.category,
     t.requested_by,

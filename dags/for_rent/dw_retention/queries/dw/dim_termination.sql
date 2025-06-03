@@ -7,7 +7,6 @@ SELECT
     send_utility_bills_receipt,
     attachment_type_list,
     requested_by,
-    team,
     dt_ended_termination,
     dt_termination,
     ts_termination_finished,
