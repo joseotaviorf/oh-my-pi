@@ -1,11 +1,11 @@
+---
 dag:
-  name: dw_invoice_entries
-  schedule_start_date: 2020,08,29
+  name: enrich_sap_gateway
+  schedule_start_date: 2025, 6, 3
   owner: Data Fintech
 workflow:
   type: query_delta
-  layer: dw
-  custom_schema: payment
+  layer: enrich
 cluster:
   type: databricks_12_2_med_io-memory_cluster
   databricks_conn_id: databricks_new

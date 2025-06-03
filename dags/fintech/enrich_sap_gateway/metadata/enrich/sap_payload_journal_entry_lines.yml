@@ -1,0 +1,79 @@
+---
+database_name: datalake_sap_gateway
+table_name: sap_payload_journal_entry_lines
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing SAP payload journal entry lines information"
+columns:
+  id_sync_sap_job:
+    description: "Identification number of the sync SAP job"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.id_sync_sap_job
+  id_feature:
+    description: "Identification number of the feature"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.id_feature
+  id_consolidated:
+    description: "Identification number of the consolidated record"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.id_consolidated
+  hash:
+    description: "Hash value of the record"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.hash
+  id_business_entity:
+    description: "Identification number of the business entity"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.Reference1
+  id_finance_entity:
+    description: "Identification number of the finance entity"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.Reference2
+  id_finance_entity_entry:
+    description: "Identification number of the finance entity entry"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.U_FinanceEntityEntryID
+  bplid:
+    description: "Business Partner Location ID"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.BPLID
+  costing_code:
+    description: "Costing code"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.CostingCode
+  costing_code_2:
+    description: "Secondary costing code"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.CostingCode2
+  shortname:
+    description: "Short name identifier"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.ShortName
+  s4hana_shortname:
+    description: "S4HANA short name mapping"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.ShortName
+  accounting_rule:
+    description: "Accounting rule"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.U_AccountingRule
+  accounting_type:
+    description: "Accounting type"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.U_AccountingType
+  user_type:
+    description: "User type"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.U_UserType
+  credit:
+    description: "Credit amount"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.Credit
+  debit:
+    description: "Debit amount"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.Debit
+  accrual_year_month:
+    description: "Accrual year and month"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload_journal_entry_lines.AdditionalReference 

@@ -1,0 +1,59 @@
+---
+database_name: datalake_sap_gateway
+table_name: sap_payload
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+description: "Table containing SAP payload information from sync jobs"
+columns:
+  id_sync_sap_job:
+    description: "Identification number of the sync job"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.id_sync_sap_job
+  id_feature:
+    description: "Identification number of the feature"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.id_feature
+  id_consolidated:
+    description: "Identification number of the consolidated record"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.id_consolidated
+  hash:
+    description: "Hash of the record"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.hash
+  id_business_entity:
+    description: "Identification number of the business entity"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload.Reference
+  id_finance_entity:
+    description: "Identification number of the finance entity"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload.Reference2
+  id_external_payment:
+    description: "External ID of the payment"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload.U_ExternalPaymentId
+  memo:
+    description: "Memo description"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload.Memo
+  source_client:
+    description: "Source client description"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload.U_SourceClient
+  accrual_year_month:
+    description: "Accrual year and month"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload.Reference3
+  ts_due:
+    description: "Due timestamp"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload.DueDate
+  ts_tax:
+    description: "Tax timestamp"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload.TaxDate
+  ts_reference:
+    description: "Reference timestamp"
+    lineage:
+      - datalake_sap_gateway_clean.sync_sap_job.sap_payload.ReferenceDate
