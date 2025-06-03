@@ -1,0 +1,76 @@
+---
+database_name: datalake_schedules_test_clean
+table_name: appointment_history
+description: Update history of a schedule and its person responsible
+domain: Cross
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.id
+    description: Unique ID of the schedule updated.
+  id_appointment:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.appointment_id
+    description: Unique ID of the schedule.
+  id_updated_by_reference:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.updated_by_reference_id
+    description: Refers to the user responsible for changing the appointment status (number)
+  updated_by_reference_name:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.updated_by_reference_name
+    description: Refers to the user responsible for changing the appointment status (descriptive)
+  version:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.version
+  status:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.status
+    description: Schedule status
+  category_name:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.category_name
+    description: Persona referring to the reason for the status change in the appointment (Enum)
+    categories:
+      AGENT: Broker
+      INSPECTOR: Inspector
+      INTERNAL: Internal
+      OTHER: Other
+      OWNER: Owner
+      TENANT: Tenant
+  category_description:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.category_description
+    description: Persona referring to the reason for the status change in the appointment
+  reason_name:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.reason_name
+    description: The reason for the status change the appointment (Enum)
+  reason_description:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.reason_description
+    description: The reason for the status change the appointment
+  is_visitor_can_see:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.visitor_can_see
+  ts_created:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.created_at
+    description: Creation date.
+  ts_updated:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.updated_at
+    description: Updated date.
+  year:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_schedules_test_raw.appointment_history.day
+    description: Day of update date.

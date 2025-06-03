@@ -1,0 +1,129 @@
+---
+database_name: datalake_schedules_test_clean
+table_name: appointment
+description: Scheduling data currently only includes Inspections, but in the future it should contain data on Visits and Photos scheduling.
+domain: Cross
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_schedules_test_raw.appointment.id
+    description: Unique ID of the schedule.
+  id_parente:
+    lineage:
+      - datalake_schedules_test_raw.appointment.parent_id
+  id_location_reference:
+    lineage:
+      - datalake_schedules_test_raw.appointment.location_reference_id
+    description: Unique ID of the House
+  id_internal_reference:
+    lineage:
+      - datalake_schedules_test_raw.appointment.internal_reference_id
+    description:
+      Reference to the scheduled service (number). If the appointment refers to an inspection,
+      the id_internal_reference will be the inspection ID, if it is a Visit it will be the visit ID, and so on.
+  id_visitant_reference:
+    lineage:
+      - datalake_schedules_test_raw.appointment.visitant_reference_id
+    description: Unique property visitor identifier
+  version:
+    lineage:
+      - datalake_schedules_test_raw.appointment.version
+  type:
+    lineage:
+      - datalake_schedules_test_raw.appointment.type
+    description: Scheduling type
+    categories:
+      VISIT: Scheduling the Visit
+      INSPECTION: Scheduling the property inspection
+      INSPECTION_EXTERNALLY_MANAGED: ""
+      CHECK_UP_HOME: ""
+      PHOTO_SESSION: Scheduling a photo session to publish the property
+  dated_at:
+    lineage:
+      - datalake_schedules_test_raw.appointment.dated_at
+    description: Date for which the service was scheduled
+  slot_of_day:
+    lineage:
+      - datalake_schedules_test_raw.appointment.slot_of_day
+    description: Space of busy days in the agent's calendar
+  duration_in_slots:
+    lineage:
+      - datalake_schedules_test_raw.appointment.duration_in_slots
+    description: Duration in slots in the agent's schedule
+  status:
+    lineage:
+      - datalake_schedules_test_raw.appointment.status
+    description: Schedule status
+    categories:
+      WAITING_CONFIRMATION: ""
+      DONE: ""
+      CANCELED: The appointment has been canceled
+      SCHEDULED: ""
+  check_in_status:
+    lineage:
+      - datalake_schedules_test_raw.appointment.check_in_status
+  last_app_origin:
+    lineage:
+      - datalake_schedules_test_raw.appointment.last_app_origin
+  code:
+    lineage:
+      - datalake_schedules_test_raw.appointment.code
+  business_context:
+    lineage:
+      - datalake_schedules_test_raw.appointment.business_context
+    description: Indicates the business context, which can be Rent or Sale.
+  location_reference_name:
+    lineage:
+      - datalake_schedules_test_raw.appointment.location_reference_name
+    description: Source of house data
+  internal_reference_name:
+    lineage:
+      - datalake_schedules_test_raw.appointment.internal_reference_name
+    description: Source of service data
+  visitant_date_time:
+    lineage:
+      - datalake_schedules_test_raw.appointment.visitant_date_time
+  visitant_reference_name:
+    lineage:
+      - datalake_schedules_test_raw.appointment.visitant_reference_name
+    description: Source of visitant data
+  business_metadata:
+    lineage:
+      - datalake_schedules_test_raw.appointment.business_metadata
+  datetime:
+    lineage:
+      - datalake_schedules_test_raw.appointment.datetime
+  timezone:
+    lineage:
+      - datalake_schedules_test_raw.appointment.timezone
+  is_confirmed:
+    lineage:
+      - datalake_schedules_test_raw.appointment.confirmed
+    description: Indicates whether the appointment was confirmed by the parties
+  is_fixed_agent:
+    lineage:
+      - datalake_schedules_test_raw.appointment.fixed_agent
+    description:
+      Indicates whether the inspection was scheduled with a specific agent,
+      rather than a temporary random assignment.
+  ts_created:
+    lineage:
+      - datalake_schedules_test_raw.appointment.created_at
+    description: Appointment creation date.
+  ts_updated:
+    lineage:
+      - datalake_schedules_test_raw.appointment.updated_at
+    description: Appointment update date.
+  year:
+    lineage:
+      - datalake_schedules_test_raw.appointment.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_schedules_test_raw.appointment.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_schedules_test_raw.appointment.day
+    description: Day of update date.
