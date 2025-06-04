@@ -1,9 +1,128 @@
 database_name: datalake_wall_street_clean
 table_name: blocklist
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
 columns:
   id:
     lineage:
       - datalake_wall_street_raw.blocklist.id
+  id_customer:
+    lineage:
+      - datalake_wall_street_raw.blocklist.customerId
+  id_charge:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargeId
+  id_subscription:
+    lineage:
+      - datalake_wall_street_raw.blocklist.subscriptionId
+  id_business_entity:
+    lineage:
+      - datalake_wall_street_raw.blocklist.businessEntityId
+  id_finance_entity:
+    lineage:
+      - datalake_wall_street_raw.blocklist.financeEntityId
+  id_credit_card:
+    lineage:
+      - datalake_wall_street_raw.blocklist.creditCardId
+  id_invoice:
+    lineage:
+      - datalake_wall_street_raw.blocklist.invoiceId
+  id_invoice_subscription_item:
+    lineage:
+      - datalake_wall_street_raw.blocklist.invoiceSubscriptionItemId
+  id_subscription_item:
+    lineage:
+      - datalake_wall_street_raw.blocklist.subscriptionItemId
+  id_store:
+    lineage:
+      - datalake_wall_street_raw.blocklist.storeId
+  id_charge_mundipagg:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargeMundipaggId
+  id_chargeback:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargebackId
+  id_chargeback_notification:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargebackNotificationId
+  id_charge_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargeAudId
+  id_charge_mundipagg_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargeMundipaggAudId
+  id_chargeback_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargebackAudId
+  id_chargeback_notification_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargebackNotificationAudId
+  id_credit_card_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.creditCardAudId
+  id_invoice_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.invoiceAudId
+  id_invoice_subscription_item_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.invoiceSubscriptionItemAudId
+  id_subscription_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.subscriptionAudId
+  id_subscription_item_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.subscriptionItemAudId
+  id_store_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.storeAudId
+  id_customer_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.customerAudId
+  id_business_entity_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.businessEntityAudId
+  id_finance_entity_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.financeEntityAudId
+  id_charge_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargeAudAudId
+  id_charge_mundipagg_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargeMundipaggAudAudId
+  id_chargeback_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargebackAudAudId
+  id_chargeback_notification_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.chargebackNotificationAudAudId
+  id_credit_card_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.creditCardAudAudId
+  id_invoice_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.invoiceAudAudId
+  id_invoice_subscription_item_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.invoiceSubscriptionItemAudAudId
+  id_subscription_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.subscriptionAudAudId
+  id_subscription_item_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.subscriptionItemAudAudId
+  id_store_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.storeAudAudId
+  id_customer_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.customerAudAudId
+  id_business_entity_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.businessEntityAudAudId
+  id_finance_entity_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.blocklist.financeEntityAudAudId
   id_risk_type:
     lineage:
       - datalake_wall_street_raw.blocklist.risktypeid

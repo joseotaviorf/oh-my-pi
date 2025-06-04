@@ -1,5 +1,7 @@
 database_name: datalake_wall_street_clean
 table_name: subscription
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
 columns:
   id:
     lineage:
@@ -9,19 +11,19 @@ columns:
       - datalake_wall_street_raw.subscription.externalid
   id_customer:
     lineage:
-      - datalake_wall_street_raw.subscription.customerid
+      - datalake_wall_street_raw.subscription.customerId
   id_store:
     lineage:
-      - datalake_wall_street_raw.subscription.storeid
+      - datalake_wall_street_raw.subscription.storeId
   id_credit_card:
     lineage:
       - datalake_wall_street_raw.subscription.creditcardid
   id_business_entity:
     lineage:
-      - datalake_wall_street_raw.subscription.businessentityid
+      - datalake_wall_street_raw.subscription.businessEntityId
   id_finance_entity:
     lineage:
-      - datalake_wall_street_raw.subscription.financeentityid
+      - datalake_wall_street_raw.subscription.financeEntityId
   code:
     lineage:
       - datalake_wall_street_raw.subscription.code
@@ -55,3 +57,39 @@ columns:
   dt_start:
     lineage:
       - datalake_wall_street_raw.subscription.startat
+  id_subscription_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.subscriptionAudId
+  id_subscription_item_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.subscriptionItemAudId
+  id_store_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.storeAudId
+  id_customer_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.customerAudId
+  id_business_entity_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.businessEntityAudId
+  id_finance_entity_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.financeEntityAudId
+  id_subscription_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.subscriptionAudAudId
+  id_subscription_item_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.subscriptionItemAudAudId
+  id_store_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.storeAudAudId
+  id_customer_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.customerAudAudId
+  id_business_entity_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.businessEntityAudAudId
+  id_finance_entity_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.subscription.financeEntityAudAudId

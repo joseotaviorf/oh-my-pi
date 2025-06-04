@@ -1,51 +1,59 @@
 database_name: datalake_wall_street_clean
 table_name: charge_mundipagg
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
 columns:
   id:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.id
   acquire_message:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.acquiremessage
+      - datalake_wall_street_raw.chargemundipagg.acquireMessage
   amount:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.amount
   id_card:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.cardid
+      - datalake_wall_street_raw.chargemundipagg.cardId
   ts_created:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.createdat
+      - datalake_wall_street_raw.chargemundipagg.createdAt
   currency:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.currency
   id_customer:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.customerid
+      - datalake_wall_street_raw.chargemundipagg.customerId
+  ts_due:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.dueAt
   id_gateway:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.gatewayid
+      - datalake_wall_street_raw.chargemundipagg.gatewayId
   ts_paid:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.paidat
+      - datalake_wall_street_raw.chargemundipagg.paidAt
   payment_method:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.paymentmethod
+      - datalake_wall_street_raw.chargemundipagg.paymentMethod
   status:
     lineage:
       - datalake_wall_street_raw.chargemundipagg.status
   ts_updated:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.updatedat
+      - datalake_wall_street_raw.chargemundipagg.updatedAt
   acquire_return_code:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.acquirereturncode
+      - datalake_wall_street_raw.chargemundipagg.acquireReturnCode
   acquire_auth_code:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.acquireauthcode
+      - datalake_wall_street_raw.chargemundipagg.acquireAuthCode
   acquire_nsu:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.acquirensu
-  id_acquire_transaction:
+      - datalake_wall_street_raw.chargemundipagg.acquireNsu
+  acquire_tid:
     lineage:
-      - datalake_wall_street_raw.chargemundipagg.acquiretid
+      - datalake_wall_street_raw.chargemundipagg.acquireTid
+  acquire_name:
+    lineage:
+      - datalake_wall_street_raw.chargemundipagg.acquireName

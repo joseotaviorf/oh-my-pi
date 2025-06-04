@@ -6,12 +6,12 @@ SELECT
     storeId AS id_store,
     priceInCents AS price_in_cents,
     status,
-    externalCreatedAt AS ts_created_external,
-    dueAt AS ts_due,
-    billingAt AS ts_billing,
-    paidAt AS ts_paid,
-    canceledAt AS ts_canceled,
-    createdAt AS ts_created,
-    updatedAt AS ts_updated
+    CAST(externalCreatedAt AS TIMESTAMP) AS ts_created_external,
+    CAST(dueAt AS TIMESTAMP) AS ts_due,
+    CAST(billingAt AS TIMESTAMP) AS ts_billing,
+    CAST(paidAt AS TIMESTAMP) AS ts_paid,
+    CAST(canceledAt AS TIMESTAMP) AS ts_canceled,
+    CAST(createdAt AS TIMESTAMP) AS ts_created,
+    CAST(updatedAt AS TIMESTAMP) AS ts_updated
 FROM
     datalake_wall_street_raw.invoice

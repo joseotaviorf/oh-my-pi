@@ -1,18 +1,38 @@
 database_name: datalake_wall_street_clean
 table_name: subscription_item
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
 columns:
   id:
     lineage:
       - datalake_wall_street_raw.subscriptionitem.id
   id_subscription:
     lineage:
-      - datalake_wall_street_raw.subscriptionitem.subscriptionid
+      - datalake_wall_street_raw.subscriptionitem.subscriptionId
   id_business_entity:
     lineage:
-      - datalake_wall_street_raw.subscriptionitem.businessentityid
+      - datalake_wall_street_raw.subscriptionitem.businessEntityId
   id_finance_entity:
     lineage:
-      - datalake_wall_street_raw.subscriptionitem.financeentityid
+      - datalake_wall_street_raw.subscriptionitem.financeEntityId
+  id_subscription_aud:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.subscriptionAudId
+  id_business_entity_aud:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.businessEntityAudId
+  id_finance_entity_aud:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.financeEntityAudId
+  id_subscription_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.subscriptionAudAudId
+  id_business_entity_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.businessEntityAudAudId
+  id_finance_entity_aud_aud:
+    lineage:
+      - datalake_wall_street_raw.subscriptionitem.financeEntityAudAudId
   id_external:
     lineage:
       - datalake_wall_street_raw.subscriptionitem.externalid

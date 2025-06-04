@@ -1,7 +1,7 @@
 SELECT
     id,
     chargeId AS id_charge,
-    transactionId AS id_trasaction,
+    transactionId AS id_transaction,
     externalId AS id_external,
     processId AS id_process,
     acquirer,
@@ -13,11 +13,11 @@ SELECT
     authorizationCode AS authorization_code,
     companyDocument AS company_document,
     metadata,
+    CAST(sentToBankDate AS TIMESTAMP) AS ts_sent_to_bank,
+    CAST(acquirerReferenceDate AS TIMESTAMP) AS ts_acquirer_reference,
+    CAST(adjustmentEntryDate AS TIMESTAMP) AS ts_adjustment_entry,
     adjustmentAmount AS adjustment_amount,
-    totalInstallments As total_installments,
-    installment,
-    sentToBankDate AS dt_sent_to_bank,
-    acquirerReferenceDate AS dt_acquirer_reference_date,
-    adjustmentEntryDate AS dt_adjustment_entry
+    totalInstallments AS total_installments,
+    installment
 FROM
     datalake_wall_street_raw.chargeback

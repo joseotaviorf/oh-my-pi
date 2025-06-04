@@ -1,15 +1,71 @@
 database_name: datalake_wall_street_clean
 table_name: chargeback_notification
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
 columns:
   id:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.id
+  id_chargeback:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.chargebackId
   id_charge:
     lineage:
-      - datalake_wall_street_raw.chargebacknotification.chargeid
+      - datalake_wall_street_raw.chargebacknotification.chargeId
+  id_transaction:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.transactionId
+  id_external:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.externalId
+  id_process:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.processId
+  acquirer:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.acquirer
+  acquirer_code:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.acquirerCode
   nsu:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.nsu
+  card_code:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.cardCode
+  card_first_six_digits:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.cardFirstSixDigits
+  card_last_four_digits:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.cardLastFourDigits
+  authorization_code:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.authorizationCode
+  company_document:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.companyDocument
+  metadata:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.metadata
+  ts_sent_to_bank:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.sentToBankDate
+  ts_acquirer_reference:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.acquirerReferenceDate
+  ts_adjustment_entry:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.adjustmentEntryDate
+  adjustment_amount:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.adjustmentAmount
+  total_installments:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.totalInstallments
+  installment:
+    lineage:
+      - datalake_wall_street_raw.chargebacknotification.installment
   reference_number:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.referencenumber
@@ -25,21 +81,12 @@ columns:
   reason_code:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.reasoncode
-  authorization_code:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.authorizationcode
   sheet_number:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.sheetnumber
   terminal_code:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.terminalcode
-  card_first_six_digits:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.cardfirstsixdigits
-  card_last_four_digits:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.cardlastfourdigits
   message:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.message
@@ -58,6 +105,3 @@ columns:
   transaction_amount:
     lineage:
       - datalake_wall_street_raw.chargebacknotification.transactionamount
-  metadata:
-    lineage:
-      - datalake_wall_street_raw.chargebacknotification.metadata

@@ -12,13 +12,12 @@ SELECT
     sheetNumber AS sheet_number,
     terminalCode AS terminal_code,
     cardFirstSixDigits AS card_first_six_digits,
-    cardLastFourDigits AS  card_last_four_digits,
+    cardLastFourDigits AS card_last_four_digits,
     message,
+    CAST(transactionDate AS TIMESTAMP) AS ts_transaction,
+    CAST(requestDate AS TIMESTAMP) AS ts_request,
+    CAST(returnDate AS TIMESTAMP) AS ts_return,
     chargebackAmount AS chargeback_amount,
-    transactionAmount AS  transaction_amount,
-    transactionDate AS dt_transaction,
-    requestDate AS dt_request,
-    returnDate AS dt_return
-    
-
-FROM datalake_wall_street_raw.chargebacknotification;
+    transactionAmount AS transaction_amount
+FROM
+    datalake_wall_street_raw.chargebacknotification;
