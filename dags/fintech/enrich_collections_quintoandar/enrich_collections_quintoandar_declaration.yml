@@ -33,6 +33,9 @@ workflow:
     negotiation:
       extraction_type: full
       partitions: []
+    operators:
+      extraction_type: full
+      partitions: []
 cluster:
   type: custom_cluster
   custom_configurations:
