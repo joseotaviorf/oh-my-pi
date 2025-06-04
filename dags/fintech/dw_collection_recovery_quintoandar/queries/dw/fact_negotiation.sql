@@ -19,7 +19,7 @@ trato_feito_negotiation AS (
     n.consultancy_name AS advisory,
     CASE
       WHEN n.consultancy_name = "PORTAL_QUINTOANDAR" THEN "Portal Auto Negociação"
-      WHEN n.consultancy_name IN ("PASCHOALOTTO", "MEETCALL", "TRC", "GRB") THEN "Assessoria"
+      WHEN n.consultancy_name IN ("PASCHOALOTTO", "MEETCALL", "TRC", "GRB", "MONEST") THEN "Assessoria"
       WHEN n.consultancy_name = "SERASA" THEN "Serasa Digital"
       WHEN n.consultancy_name = "COBRANÇA_INTERNA_QA" THEN "Operador Interno"
     END AS origin_agreement,
