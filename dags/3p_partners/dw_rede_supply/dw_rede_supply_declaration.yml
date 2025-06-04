@@ -15,13 +15,18 @@ workflow:
     # fact_lead_3p_status_reason:
     # - dim_lead_3p_context
 cluster:
-  type: databricks_12_2_min_memory_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new
+  type: custom_cluster
   custom_configurations:
+    driver_node_type_id: r7a.2xlarge
+    node_type_id: r7a.2xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  
