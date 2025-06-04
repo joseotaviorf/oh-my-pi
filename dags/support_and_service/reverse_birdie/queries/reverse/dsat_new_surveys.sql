@@ -478,7 +478,7 @@ SELECT
     csat_campanha,
     message_id AS feedback_id,
     date_format(posted_at, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') AS posted_at,
-    rating,
+    CAST(rating AS INT) AS rating,
     resolution,
     csat_score_category,
     text,
