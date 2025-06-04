@@ -805,7 +805,6 @@ bietlejuice.dw_rede_supply:
   - bietlejuice.enrich_rede_lead_acquisition:load-enrich-lead-3p-acquisition
   - bietlejuice.enrich_rede_lead_crawler:load-enrich-lead-3p-freshness
   - bietlejuice.enrich_rede_supply:load-enrich-file-sks
-  - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reason-changes
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reasons
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-sks
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status
@@ -3867,7 +3866,6 @@ bietlejuice.reverse_sale_listings_report_load:
   - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p
   - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-context
   - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-reason
-  - bietlejuice.dw_rede_supply:load-dw-rede-fact-lead-3p-status-reason
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type
   - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event
   - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing

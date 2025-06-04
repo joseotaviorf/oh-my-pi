@@ -12,8 +12,8 @@ workflow:
     - dim_lead_3p_context
     fact_lead_3p_status:
     - dim_lead_3p_context
-    fact_lead_3p_status_reason:
-    - dim_lead_3p_context
+    # fact_lead_3p_status_reason:
+    # - dim_lead_3p_context
 cluster:
   type: databricks_12_2_min_memory_cluster
   access_control_list:

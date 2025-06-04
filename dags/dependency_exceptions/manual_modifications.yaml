@@ -846,6 +846,9 @@ bietlejuice.reverse_rent_listings_report_access:
     - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-offer-sent
     - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-traffic
     - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-visit-scheduled
+bietlejuice.reverse_sale_listings_report_load:
+  remove:
+    - bietlejuice.dw_rede_supply:load-dw-rede-fact-lead-3p-status-reason
 bietlejuice.reverse_sale_listings_report_access:
   add:
     - bietlejuice.reverse_sale_listings_report_load:load-reverse-demand-score
