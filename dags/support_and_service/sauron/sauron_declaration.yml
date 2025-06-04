@@ -18,7 +18,6 @@ workflow:
       clean_table_name: bot_outgoing_messages
     Session:
       clean_table_name: session
-      z_order_by: [ts_created, id]
     CallEvents:
       clean_table_name: call_events
 
