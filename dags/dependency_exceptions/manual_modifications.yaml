@@ -1054,3 +1054,36 @@ wonka.user_search_profile_clustering:
 bietlejuice.reverse_neighborhood_price_range_access:
   add:
     - bietlejuice.reverse_neighborhood_price_range_load:load-reverse-neighborhood-price-range
+
+bietlejuice.enrich_pin:
+  remove:
+    - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation
+    - bietlejuice.pin_hr_review:load-clean-meeting
+    - bietlejuice.pin_performance:load-clean-evaluation
+    - bietlejuice.pin_performance:load-clean-evaluation-item
+    - bietlejuice.pin_performance:load-clean-evaluation-participant
+    - bietlejuice.pin_performance:load-clean-evaluation-rating
+    - bietlejuice.pin_performance:load-clean-evaluation-role
+    - bietlejuice.pin_performance:load-clean-evaluation-section
+    - bietlejuice.pin_performance:load-clean-evaluation-step
+    - bietlejuice.pin_performance:load-clean-role-definition-translation
+    - bietlejuice.pin_performance:load-clean-section-definition-translation
+    - bietlejuice.pin_performance:load-clean-task-role-base
+    - bietlejuice.pin_performance:load-clean-task-role-translation
+    - bietlejuice.pin_performance:load-clean-template-definition-base
+    - bietlejuice.pin_performance:load-clean-template-definition-translation
+    - bietlejuice.pin_performance:load-clean-template-period-translation
+    - bietlejuice.pin_performance:load-clean-template-role
+    - bietlejuice.pin_performance:load-clean-template-section
+    - bietlejuice.pin_questionnaires:load-clean-question-response
+    - bietlejuice.pin_questionnaires:load-clean-questionnaire-participant
+    - bietlejuice.pin_questionnaires:load-clean-questionnaire-response
+    - bietlejuice.pin_talent:load-clean-profile-base
+    - bietlejuice.pin_talent:load-clean-profile-item
+    - bietlejuice.pin_talent:load-clean-profile-type-sections-translation
+    - bietlejuice.pin_talent:load-clean-rating-level-base
+    - bietlejuice.pin_talent:load-clean-rating-level-translation
+    - bietlejuice.pin_talent:load-clean-rating-model-base
+    - bietlejuice.pin_talent:load-clean-rating-model-translation
+    - bietlejuice.pin_talent:load-clean-review-period-base
+    - bietlejuice.pin_talent:load-clean-review-period-translation
