@@ -1,0 +1,27 @@
+---
+database_name: datalake_house_listing_search_clean
+table_name: recommendation_use_case
+owner: fernando.filho@quintoandar.com.br
+domain: primitives
+description: "This table stores information about recommendation use cases that reflects shown data on feed from house Listing Search service"
+columns:
+  id:
+    description: "The long recommendation use case record identifier"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation_use_case.id
+  id_listing:
+    description: "The listing identified that was shown in this feed use case"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation_use_case.listing_id
+  id_user_use_case:
+    description: "The relation between user and use case"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation_use_case.user_use_case_id
+  displayed_order:
+    description: "The order that the listing was shown in the recommendation feed"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation_use_case.displayed_order
+  ts_created:
+    description: "The date when recommendation use case was performed"
+    lineage:
+    - datalake_house_listing_search_raw.recommendation_use_case.created_at 
