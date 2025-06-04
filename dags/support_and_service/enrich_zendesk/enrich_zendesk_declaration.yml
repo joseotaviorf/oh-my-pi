@@ -22,6 +22,7 @@ workflow:
       partitions: [year, month, day]
       z_order_by: [id_ticket]
     tickets:
+      merge_on: [id_ticket, ts_updated]
       z_order_by: [ts_updated, id_ticket]
 
 cluster:
