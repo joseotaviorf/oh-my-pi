@@ -1,6 +1,7 @@
 WITH terminations AS (
     SELECT
         id_termination,
+        team,
         cancellation_info,
         category,
         requested_by,
