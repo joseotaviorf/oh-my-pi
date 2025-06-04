@@ -39,6 +39,7 @@ mediations AS (
 SELECT
     t.id_termination AS sk_termination,
     m.id_ticket AS sk_mediation_ticket,
+    t.team,
     t.cancellation_info,
     t.category,
     t.requested_by,

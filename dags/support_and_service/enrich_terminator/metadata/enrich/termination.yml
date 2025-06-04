@@ -40,6 +40,10 @@ columns:
     description: Ticket identification key generated in Zendesk.
     lineage:
       - datalake_terminator_clean.termination_task.id_external
+  team:
+    description: Name of the team responsible for the termination.
+    lineage:
+      - datalake_terminator_clean.termination.team
   cancellation_info:
     description: Data with json structure that indicates detailed information about canceling termination.
     lineage:
