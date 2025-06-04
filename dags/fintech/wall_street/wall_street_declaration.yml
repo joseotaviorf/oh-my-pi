@@ -19,9 +19,6 @@ workflow:
     Blocklist:
       clean_table_name: blocklist
       primary_keys: ["id"]
-    Blocklist_AUD:
-      clean_table_name: blocklist_aud
-      primary_keys: ["id", "rev"]
     Charge:
       clean_table_name: charge
       primary_keys: ["id"]
@@ -34,9 +31,6 @@ workflow:
     Chargeback:
       clean_table_name: chargeback
       primary_keys: ["id"]
-    Chargeback_AUD:
-      clean_table_name: chargeback_aud
-      primary_keys: ["id", "rev"]
     ChargebackNotification:
       clean_table_name: chargeback_notification
       primary_keys: ["id"]
@@ -58,9 +52,6 @@ workflow:
     Store:
       clean_table_name: store
       primary_keys: ["id"]
-    RevInfo:
-      clean_table_name: rev_info
-      primary_keys: ["rev"]
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:
