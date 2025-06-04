@@ -14,7 +14,7 @@ workflow:
     - tickets
   default_extraction_type: incremental
   tables_customization:
-    tickets_curent:
+    tickets_current:
       extraction_type: full
       partitions: [year, month, day]
       z_order_by: [id_ticket]
