@@ -331,7 +331,7 @@ SELECT DISTINCT
   worker_email,
   completion_reason,
   quinto_andar_phone_number,
-  customer_phone_number,
+  REPLACE(customer_phone_number, "+", "") AS customer_phone_number,
   customer_email,
   total_talk_time,
   total_queue_time,

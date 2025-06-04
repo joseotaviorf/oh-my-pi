@@ -28,6 +28,9 @@ columns:
   customer_contact_info:
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes
+  customer_phone_number:
+    lineage:
+      - datalake_quinto_messenger_raw.task.task_attributes
   customer_email:
     lineage:
       - datalake_quinto_messenger_raw.task.task_attributes

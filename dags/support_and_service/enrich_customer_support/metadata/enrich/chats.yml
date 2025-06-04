@@ -42,6 +42,7 @@ columns:
     lineage:
       - datalake_sauron_clean.session.user_phone
       - datalake_quinto_messenger_clean.task.customer_contact_info
+      - datalake_quinto_messenger_clean.task.customer_phone_number
     description: Phone number of the customer associated with the task, from session or task contact info.
   twilio_phone_number:
     lineage:

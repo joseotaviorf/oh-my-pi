@@ -8,6 +8,7 @@ SELECT
     GET_JSON_OBJECT(task_attributes,'$.conversations.outcome') AS task_outcome,
     GET_JSON_OBJECT(task_attributes,'$.customers') AS customer_metadata,
     GET_JSON_OBJECT(task_attributes,'$.from') AS customer_contact_info,
+    GET_JSON_OBJECT(task_attributes,'$.originalNumber') AS customer_phone_number,
     GET_JSON_OBJECT(task_attributes,'$.email') AS customer_email,
     GET_JSON_OBJECT(task_attributes,'$.twilioNumber') AS twilio_phone_number,
     GET_JSON_OBJECT(assigned_to,'$.worker_name') AS worker_email,

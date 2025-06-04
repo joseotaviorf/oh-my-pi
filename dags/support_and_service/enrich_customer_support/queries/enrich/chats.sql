@@ -50,7 +50,8 @@ tasks AS (
     id_worker,
     worker_email,
     CASE
-      WHEN channel_type = 'whatsapp' THEN REPLACE(customer_contact_info, "whatsapp:+", "")
+      WHEN channel_type = 'whatsapp' THEN
+        COALESCE(customer_phone_number, REPLACE(customer_contact_info, "whatsapp:+", ""))
       ELSE NULL
     END AS from_phone_number,
     REPLACE(twilio_phone_number, "whatsapp:+", "") AS twilio_phone_number,
