@@ -411,7 +411,7 @@ SELECT
     END
   ) AS account_id,
   customer_type,
-  rating,
+  CAST(rating AS INT) AS rating,
   score_category,
   financing_bank,
   payment_method,
