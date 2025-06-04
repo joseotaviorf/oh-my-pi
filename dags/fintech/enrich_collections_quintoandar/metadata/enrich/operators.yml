@@ -1,0 +1,39 @@
+database_name: datalake_collections_quintoandar
+table_name: operators
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Consolidated table of operators from multiple sources, including internal and external operators, with standardized agency and company names.
+columns:
+  id_user:
+    description: "Unique identifier for the operator, standardized based on source. Includes transformations like 'PASC_' prefix for Paschoalotto and 'MTC_' prefix for MeetCall."
+    lineage:
+      - datalake_recupera_clean.operators.id_operator
+      - datalake_paschoalotto_clean.user.login_name
+      - datalake_webhelp_clean.login.id_login
+      - datalake_cyber.users.id_user
+      - datalake_grb_clean.operators.id_operator_cyber
+      - datalake_meetcall_clean.operators.id_operator_cyber
+  id_agency:
+    description: "Identifier for the agency associated with the operator, assigned based on the data source."
+    lineage:
+      - datalake_paschoalotto_clean.user.id_agency
+      - datalake_webhelp_clean.login.id_agency
+      - datalake_cyber.users.id_agency
+      - datalake_grb_clean.operators.id_agency
+      - datalake_meetcall_clean.operators.id_agency
+  user_name:
+    description: "Full name of the operator, converted to uppercase for standardization."
+    lineage:
+      - datalake_paschoalotto_clean.user.full_name
+      - datalake_webhelp_clean.login.person_name
+      - datalake_cyber.users.user_name
+      - datalake_grb_clean.operators.name
+      - datalake_meetcall_clean.operators.name
+  user_email:
+    description: "Email address of the operator, converted to lowercase for consistency."
+    lineage:
+      - datalake_recupera_clean.operators.operator_login_code
+      - datalake_paschoalotto_clean.user.email
+      - datalake_webhelp_clean.login.email
+      - datalake_cyber.users.user_email
+      - datalake_grb_clean.operators.email

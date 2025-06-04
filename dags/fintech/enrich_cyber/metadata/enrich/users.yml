@@ -1,0 +1,49 @@
+database_name: datalake_cyber
+table_name: users
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Table mapping users to agency groups, including deduplication and name standardization for company names.
+columns:
+  id_user:
+    description: "Unique identifier for the user, converted to uppercase."
+    lineage:
+      - datalake_cyber_clean.users.id_user
+  id_agency:
+    description: "Identifier for the agency associated with the user."
+    lineage:
+      - datalake_cyber_clean.users.id_agency
+  user_name:
+    description: "Name of the user, converted to uppercase."
+    lineage:
+      - datalake_cyber_clean.users.user_name
+  user_email:
+    description: "Email address of the user, converted to lowercase."
+    lineage:
+      - datalake_cyber_clean.users.user_email
+  user_type:
+    description: "Type of user, typically indicating their role within the system."
+    lineage:
+      - datalake_cyber_clean.users.user_type
+  user_department:
+    description: "Department of the user, indicating their organizational unit."
+    lineage:
+      - datalake_cyber_clean.users.department
+  agency_type:
+    description: "Type of the agency, providing a classification for the agency."
+    lineage:
+      - datalake_cyber_clean.agency.agency_type
+  agency_name:
+    description: "Name of the agency, resolved from either the agency or the deduplicated agency group."
+    lineage:
+      - datalake_cyber_clean.agency.agency_name
+      - datalake_cyber_clean.agency_group.agency_group
+  company_name:
+    description: "Standardized company name based on user email or agency name patterns, including known BPOs like ATENTO, PASCHOALOTTO, and WEBHELP."
+    lineage:
+      - datalake_cyber_clean.agency.agency_name
+      - datalake_cyber_clean.users.id_user
+      - datalake_cyber_clean.agency_group.agency_group
+  ts_user_created:
+    description: "Timestamp when the user record was created."
+    lineage:
+      - datalake_cyber_clean.users.ts_user_created

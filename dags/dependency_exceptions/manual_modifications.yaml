@@ -295,6 +295,16 @@ bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
     - bietlejuice.casa_mineira_criteo_campaigns:load-clean-criteo-campaigns
 bietlejuice.enrich_chattermill:
   override: []
+bietlejuice.enrich_collections_quintoandar:
+  remove:
+    - bietlejuice.paschoalotto:load-clean-user
+    - bietlejuice.recupera:load-clean-operators
+    - bietlejuice.recupera:load-clean-complementary-records
+    - bietlejuice.recupera:load-clean-complementary-records-written-down
+    - bietlejuice.recupera:load-clean-creditor-pending
+    - bietlejuice.enrich_recupera:load-enrich-installment
+    - bietlejuice.enrich_recupera:load-enrich-negotiation
+    - bietlejuice.webhelp:load-clean-login
 bietlejuice.enrich_consolidated_marketing_metrics:
   remove:
     - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes

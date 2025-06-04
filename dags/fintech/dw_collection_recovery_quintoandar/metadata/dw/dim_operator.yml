@@ -1,0 +1,52 @@
+database_name: dw_collection_recovery_quintoandar
+table_name: dim_operator
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Dimension table containing standardized information about operators, including metadata from multiple sources like Recupera, Cyber, Paschoalotto, Webhelp, GRB, and MeetCall. Used for joining operator data in analytical models.
+columns:
+  sk_operator:
+    description: "Surrogate key for the operator, derived from the unique user identifier (id_user) from the operators base table."
+    lineage:
+      - datalake_collections_quintoandar.operators.id_user
+  id_agency:
+    description: "Identifier for the agency associated with the operator, as extracted from the operators base table."
+    lineage:
+      - datalake_collections_quintoandar.operators.id_agency
+  user_name:
+    description: "Full name of the operator, standardized to uppercase for consistency."
+    lineage:
+      - datalake_collections_quintoandar.operators.user_name
+  user_email:
+    description: "Email address of the operator, standardized to lowercase for consistency."
+    lineage:
+      - datalake_collections_quintoandar.operators.user_email
+  user_type:
+    description: "Type of the operator, indicating whether the operator is internal or external."
+    lineage:
+      - datalake_collections_quintoandar.operators.user_type
+  user_department:
+    description: "Department to which the operator belongs, typically 'Assessoria' for external operators."
+    lineage:
+      - datalake_collections_quintoandar.operators.user_department
+  agency_type:
+    description: "Type of agency associated with the operator, typically 'Assessoria Convencional' for external operators."
+    lineage:
+      - datalake_collections_quintoandar.operators.agency_type
+  agency_name:
+    description: "Standardized name of the agency, representing the organization the operator is associated with, like 'PASCHOALOTTO' or 'WEBHELP'."
+    lineage:
+      - datalake_collections_quintoandar.operators.agency_name
+  company_name:
+    description: "Standardized company name based on known patterns, including 'PASCHOALOTTO', 'PORTAL_QUINTOANDAR', 'SYSOPEN', and 'MEETCALL'."
+    lineage:
+      - datalake_collections_quintoandar.operators.company_name
+  source:
+    description: "Origin of the operator record, indicating the source system like 'Recupera', 'Paschoalotto', 'Webhelp', 'Cyber', 'GRB', or 'MeetCall'."
+    lineage:
+      - datalake_collections_quintoandar.operators.source
+  ts_user_created:
+    description: "Timestamp indicating when the operator record was originally created in the source system."
+    lineage:
+      - datalake_collections_quintoandar.operators.ts_user_created
+  ts_load:
+    description: "Timestamp indicating when the record was loaded into the data lake. Generated at the time of ingestion."

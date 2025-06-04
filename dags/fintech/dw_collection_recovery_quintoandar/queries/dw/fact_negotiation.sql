@@ -206,9 +206,8 @@ renegotiation AS (
 paschoalotto_operator AS (
   SELECT DISTINCT
     d.id_contract_quintoandar AS id_contract,
-    ad.id_installment AS id_negotiation,
-    UPPER(u.login_name) AS id_operator,
-    UPPER(u.full_name) AS operator_name,
+    CAST(ad.id_installment AS BIGINT) AS id_negotiation,
+    CONCAT('PASC_',UPPER(u.login_name)) AS id_operator,
     DATE(ad.dt_emission) AS dt_promisse
   FROM datalake_paschoalotto_clean.agreement_detail AS ad
   LEFT JOIN datalake_paschoalotto_clean.contract AS c
@@ -298,9 +297,9 @@ calculations AS (
     CONCAT(COALESCE(CAST(u.id_contract AS BIGINT), 0), CAST(u.id_negotiation AS STRING)) AS sk_negotiation,
     CAST(u.id_contract AS BIGINT) AS sk_contract,
     u.id_debtor AS sk_debtor,
+    COALESCE(po.id_operator, u.id_operator) AS sk_operator,
     CAST(u.id_negotiation AS STRING) AS id_negotiation,
     u.id_negotiation_trato_feito,
-    COALESCE(po.operator_name, u.id_operator) AS id_operator,
     u.id_manager_authorized,
     u.id_campaign,
     u.creditor,
@@ -390,9 +389,9 @@ calculate_discounts AS (
     sk_negotiation,
     sk_contract,
     sk_debtor,
+    sk_operator,
     id_negotiation,
     id_negotiation_trato_feito,
-    id_operator,
     id_manager_authorized,
     id_campaign,
     creditor,
@@ -461,9 +460,9 @@ SELECT
   sk_negotiation,
   sk_contract,
   sk_debtor,
+  sk_operator,
   id_negotiation,
   id_negotiation_trato_feito,
-  id_operator,
   id_manager_authorized,
   id_campaign,
   creditor,

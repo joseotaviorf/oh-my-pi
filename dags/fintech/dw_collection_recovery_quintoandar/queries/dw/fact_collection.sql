@@ -67,7 +67,7 @@ SELECT
     md5(CONCAT(id_customer, COALESCE(id_contract,0), creditor, COALESCE(id_operator, " "), action, dt_occurrence)) AS sk_collection,
     id_customer AS sk_debtor,
     id_contract AS sk_contract,
-    id_operator,
+    id_operator AS sk_operator,
     operator_agency,
     source,
     action,

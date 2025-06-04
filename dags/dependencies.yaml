@@ -174,6 +174,7 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.trato_feito:load-clean-eviction-data
 bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_collections_quintoandar:load-enrich-delinquency-app-events
+  - bietlejuice.enrich_collections_quintoandar:load-enrich-operators
   - bietlejuice.enrich_cyber:load-enrich-collection
   - bietlejuice.enrich_cyber:load-enrich-contract-agency-distribution
   - bietlejuice.enrich_cyber:load-enrich-installment
@@ -1473,13 +1474,11 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
-  - bietlejuice.enrich_recupera:load-enrich-installment
-  - bietlejuice.enrich_recupera:load-enrich-negotiation
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
-  - bietlejuice.recupera:load-clean-complementary-records
-  - bietlejuice.recupera:load-clean-complementary-records-written-down
-  - bietlejuice.recupera:load-clean-creditor-pending
+  - bietlejuice.enrich_cyber:load-enrich-users
+  - bietlejuice.grb:load-clean-operators
+  - bietlejuice.meetcall:load-clean-operators
   - bietlejuice.trato_feito:load-clean-client
   - bietlejuice.trato_feito:load-clean-contract
   - bietlejuice.trato_feito:load-clean-debt
