@@ -13,15 +13,16 @@ workflow:
     - ticket_metrics
     - tickets
   default_extraction_type: incremental
-  default_partitions: ["year", "month", "day"]
   tables_customization:
     tickets_curent:
       extraction_type: full
+      partitions: [year, month, day]
       z_order_by: [id_ticket]
     tickets_metric:
+      partitions: [year, month, day]
       z_order_by: [id_ticket]
     tickets:
-      z_order_by: [id_ticket]
+      z_order_by: [ts_updated, id_ticket]
 
 cluster:
   type: custom_cluster
