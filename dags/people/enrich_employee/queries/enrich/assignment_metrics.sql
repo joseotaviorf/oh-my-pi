@@ -52,7 +52,7 @@ last_work_relationship AS (
     datalake_hr_system.work_relationships
   WHERE
     worker_type <> 'P'
-    AND dt_start < DATE('{load_start_date}')
+    AND dt_start <= DATE('{load_start_date}')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_person ORDER BY dt_start DESC) = 1
 )
