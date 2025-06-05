@@ -4,6 +4,8 @@ SELECT
   user_id AS id_user,
   search_criteria,
   response,
-  created_at AS ts_created
+  created_at AS ts_created,
+  active_experiments,
+  reranking_params
 FROM
   datalake_house_listing_search_raw.search

@@ -28,4 +28,12 @@ columns:
   ts_created:
     description: "The date when search was performed"
     lineage:
-    - datalake_house_listing_search_raw.search.created_at 
+    - datalake_house_listing_search_raw.search.created_at
+  active_experiments:
+    description: "The active experiments object sent by the service containing all experiments"
+    lineage:
+    - datalake_house_listing_search_raw.search.active_experiments
+  reranking_params:
+    description: "The params used on the search reranking step"
+    lineage:
+    - datalake_house_listing_search_raw.search.reranking_params
