@@ -132,6 +132,18 @@ columns:
     lineage:
       - datalake_salesforce_raw.case.MilestoneStatus
     description: Status of the case milestone.
+  is_ab_test:
+    lineage:
+      - datalake_salesforce_raw.case.IsABTest
+    description: Flag indicating if the case is an AB test.
+  is_contract_id_odd_even:
+    lineage:
+      - datalake_salesforce_raw.case.ContractIdOddOrEven
+    description: Flag indicating if the case contract ID is odd or even.
+  unlisting_reason:
+    lineage:
+      - datalake_salesforce_raw.case.UnlistingReason
+    description: Reason for unlisting the house.
   zendesk_url:
     lineage:
       - datalake_salesforce_raw.case.ZendeskUrl

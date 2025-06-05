@@ -1,0 +1,78 @@
+database_name: datalake_salesforce_clean
+table_name: relisting_context
+description: Clean table for ingesting relisting context data from the Sales Force tool.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_relisting_context:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.Id
+    description: Unique identification key for the relisting context in Sales Force.
+  id_owner:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.OwnerId
+    description: Owner identification key of the house.
+  id_house:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.HouseId__c
+    description: House identification key related to the relisting context.
+  id_contract:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.Contract__c
+    description: Contract identification key related to the relisting context.
+  id_termination:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.Termination__c
+    description: Termination identification key related to the relisting context.
+  id_external:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.ExternalId__c
+    description: External identification key for the relisting context.
+  id_created_by:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.CreatedById
+    description: Identification key of the user who created the relisting context record.
+  id_last_modified_by:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.LastModifiedById
+    description: Identification key of the user who last updated the relisting context record.
+  name:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.Name
+    description: Name of the relisting context.
+  listing_status:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.ListingStatus__c
+    description: Current status of the listing in the relisting context.
+  is_deleted:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.IsDeleted
+    description: Flag indicating if the relisting context record is deleted.
+  is_early_relisting_active:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.IsEarlyRelistingActive__c
+    description: Flag indicating if early relisting is active for this context.
+  is_relisting_eligible:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.IsRelistingEligible__c
+    description: Flag indicating if the property is eligible for relisting.
+  ts_created:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.CreatedDate
+    description: Timestamp of when the relisting context was created.
+  ts_last_modified:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.LastModifiedDate
+    description: Timestamp of the last modification of the relisting context.
+  ts_system_mod:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.SystemModstamp
+    description: System modification timestamp for the relisting context.
+  ts_last_viewed:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.LastViewedDate
+    description: Timestamp of when the relisting context was last viewed.
+  ts_last_referenced:
+    lineage:
+      - datalake_salesforce_raw.relisting_context.LastReferencedDate
+    description: Timestamp of when the relisting context was last referenced.

@@ -314,6 +314,8 @@ def schema_define():
                             StructField("LastReferencedDate", StringType()),
                             StructField("ServiceContractId", StringType()),
                             StructField("MilestoneStatus", StringType()),
+                            StructField("IsABTest__c", StringType()),
+                            StructField("ContractIdOddOrEven__c", StringType()),
                             StructField("ContestationResponsabilityValid__c", StringType()),
                             StructField("InformationCollected__c", StringType()),
                             StructField("LandlordInformedServiceProvider__c", StringType()),
@@ -391,6 +393,7 @@ def schema_define():
                             StructField("ReasonForRetry__c", StringType()),
                             StructField("SLContactSuccess__c", StringType()),
                             StructField("SLCurrentOnboardingContact__c", StringType()),
+                            StructField("UnlistingReason__c", StringType()),
                         ]
                     )
             },
@@ -441,6 +444,9 @@ def schema_define():
                             StructField("RecurrenceRegeneratedType", StringType()),
                             StructField("TaskSubtype", StringType()),
                             StructField("CompletedDateTime", StringType()),
+                            StructField("IsABTest__c", StringType()),
+                            StructField("ContractIdOddOrEven__c", StringType()),
+                            StructField("ExperimentGroup__c", StringType()),
                             StructField("PassDueDate__c", StringType()),
                             StructField("ResponsabilityContestingIsGood__c", StringType()),
                             StructField("TaskName__c", StringType()),
@@ -477,6 +483,7 @@ def schema_define():
                             StructField("TaskDueDateFormula__c", StringType()),
                             StructField("TaskManagement__c", StringType()),
                             StructField("WasDisagreement__c", StringType()),
+                            StructField("UnlistingReason__c", StringType()),
                         ]
                     )
             },
@@ -549,6 +556,32 @@ def schema_define():
                             StructField("FS_SL_KeyDeliveryDate__c",StringType()),
                             StructField("KeyDeliveryDate__c",StringType()),
                             ]
+                    )
+            },
+       'relisting_context':
+            {
+                'schema':
+                    StructType(
+                        [
+                            StructField("Id",StringType()),
+                            StructField("OwnerId",StringType()),
+                            StructField("HouseId__c",StringType()),
+                            StructField("Contract__c",StringType()),
+                            StructField("Termination__c",StringType()),
+                            StructField("ExternalId__c",StringType()),
+                            StructField("CreatedById",StringType()),
+                            StructField("LastModifiedById",StringType()),
+                            StructField("Name",StringType()),
+                            StructField("ListingStatus__c",StringType()),
+                            StructField("IsDeleted",StringType()),
+                            StructField("IsEarlyRelistingActive__c",StringType()),
+                            StructField("IsRelistingEligible__c",StringType()),
+                            StructField("CreatedDate",StringType()),
+                            StructField("LastModifiedDate",StringType()),
+                            StructField("SystemModstamp",StringType()),
+                            StructField("LastViewedDate",StringType()),
+                            StructField("LastReferencedDate",StringType()),
+                        ]
                     )
             },
     }

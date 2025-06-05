@@ -132,6 +132,14 @@ columns:
     lineage:
       - datalake_salesforce_raw.task.DelayMessage
     description: Message related to task delay.
+  experiment_group:
+    lineage:
+      - datalake_salesforce_raw.task.ExperimentGroup
+    description: Experiment group of the task.
+  unlisting_reason:
+    lineage:
+      - datalake_salesforce_raw.task.UnlistingReason
+    description: Reason for unlisting the house.
   is_answer:
     lineage:
       - datalake_salesforce_raw.task.Answer
@@ -160,6 +168,14 @@ columns:
     lineage:
       - datalake_salesforce_raw.task.IsRecurrence
     description: Indicates if the task is recurrent.
+  is_ab_test:
+    lineage:
+      - datalake_salesforce_raw.task.IsABTest
+    description: Flag indicating if the task is an AB test.
+  is_contract_id_odd_even:
+    lineage:
+      - datalake_salesforce_raw.task.ContractIdOddOrEven
+    description: Flag indicating if the task contract ID is odd or even.
   responsability_contesting_is_good:
     lineage:
       - datalake_salesforce_raw.task.ResponsabilityContestingIsGood
