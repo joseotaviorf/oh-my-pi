@@ -3,7 +3,7 @@ SELECT
     version,
     name,
     description,
-    created_at AS ts_updated,
+    created_at AS ts_created,
     updated_at AS ts_updated,
     NOW() AS ts_load
 FROM

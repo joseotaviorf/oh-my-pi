@@ -21,7 +21,7 @@ columns:
     description: "Optional description of the sequence"
     lineage:
       - datalake_trato_feito_raw.communication_sequence.description
-  ts_updated:
+  ts_created:
     description: "Timestamp when the sequence was last updated"
     lineage:
       - datalake_trato_feito_raw.communication_sequence.updated_at
