@@ -1985,6 +1985,8 @@ bietlejuice.enrich_golden_set:
   - bietlejuice.gsheets_for_sale:done-clean-vespucio-condo-golden-set
 bietlejuice.enrich_google_search_console:
   - bietlejuice.google_search_console:load-clean-report-by-page-and-query
+bietlejuice.enrich_google_search_console_classified:
+  - bietlejuice.google_search_console_classified:load-clean-report-by-page-and-query
 bietlejuice.enrich_greenseer:
   - bietlejuice.enrich_customer_support:load-enrich-tickets
   - bietlejuice.greenseer:load-clean-session

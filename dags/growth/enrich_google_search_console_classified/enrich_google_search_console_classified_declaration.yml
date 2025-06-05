@@ -1,0 +1,31 @@
+---
+dag:
+  name: enrich_google_search_console_classified
+  schedule_start_date: 2022, 10, 18
+  owner: Data Growth
+  documentation:
+    dag_purpose:
+      This DAG generates tables to track demand user behaviors in the Google
+      Search Console classified SEO funnel. It is relevant for the SEO tribe to monitor and analyze
+      the results by page type so that the squads (transactional and informational)
+      can more efficiently identify problems, impacts, and opportunities. In addition,
+      this funnel helps to prioritize the most relevant pages for the business.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions:
+    - year
+    - month
+    - day
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -7), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_end_date') }}"
+cluster:
+  type: databricks_12_2_min_general_photon_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

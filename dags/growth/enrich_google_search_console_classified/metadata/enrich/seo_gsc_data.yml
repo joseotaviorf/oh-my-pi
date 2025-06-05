@@ -1,0 +1,70 @@
+database_name: datalake_google_search_console_classified
+table_name: seo_gsc_data
+owner: henrique.miamoto@quintoandar.com.br
+domain: Growth
+description: This table contains information about SEO (Search Engine Optimization). It compiles the GSC (Google Search Console) data with our bussiness information.
+columns:
+  site_url:
+    description: Main URL that are being queried.
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.site_url
+  device:
+    description: device type where the search was made.
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.device
+  page:
+    description: Full page address.
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.page
+  query:
+    description: search words performed on Google.
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.query
+  country:
+    description: country where the search was made.
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.country
+  dt_created:
+    description: Search date.
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.dt_created
+  year:
+    description: Search year.
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.year
+  month:
+    description: Search month.
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.month
+  day:
+    description: Search day.
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.day
+  ctr:
+    description: Click Through Rate - times it was clicked over times it was showed
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.ctr
+  clicks:
+    description: Times it was clicked on SERP page organically
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.clicks
+  position:
+    description: Relative ranking of the position of the link on Google.
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.position
+  impressions:
+    description: Times it was showed on SERP page
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.impressions
+  posimp:
+    description: Average position X Impressions
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.posimp
+  domain:
+    description: Generic reffering domain.
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.page
+  is_branded:
+    description: If the search query is branded or non-branded
+    lineage:
+      - datalake_google_search_console_classified_clean.report_by_page_and_query.query
