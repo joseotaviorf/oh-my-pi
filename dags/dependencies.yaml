@@ -1471,12 +1471,12 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_cyber:load-enrich-installment
   - bietlejuice.enrich_cyber:load-enrich-negotiation
+  - bietlejuice.enrich_cyber:load-enrich-users
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
-  - bietlejuice.enrich_cyber:load-enrich-users
   - bietlejuice.grb:load-clean-operators
   - bietlejuice.meetcall:load-clean-operators
   - bietlejuice.trato_feito:load-clean-client

@@ -47,8 +47,8 @@ dados_tickets AS (
     date(em.ts_ticket_started) AS date_started,
     tkt.sk_sale_offer AS offer_id,
     CASE
-      WHEN GET_JSON_OBJECT(em.custom_fields, '$["[RC] Qual tipo de cliente?"]') = 'sl_rc_' then 'seller'
-      WHEN GET_JSON_OBJECT(em.custom_fields, '$["[RC] Qual tipo de cliente?"]') = 'by_rc_' then 'buyer'
+      WHEN dt.custom_fields_map['[RC] Qual tipo de cliente?'] = "sl_rc_" then 'seller'
+      WHEN dt.custom_fields_map['[RC] Qual tipo de cliente?'] = "by_rc_" THEN 'buyer'
       ELSE NULL
     END AS tipo_cliente
   FROM datalake_customer_support.email em
@@ -56,6 +56,8 @@ dados_tickets AS (
     ON CAST(em.id_ticket AS BIGINT) = tkt.sk_ticket
   LEFT JOIN dw_customer_support.dim_analyst an
     ON tkt.sk_first_analyst= an.sk_analyst
+  LEFT JOIN dw_customer_support.dim_ticket AS dt
+    ON CAST(em.id_ticket AS BIGINT) = dt.sk_ticket
   WHERE 
     em.channel = 'whatsapp'
   GROUP BY 
