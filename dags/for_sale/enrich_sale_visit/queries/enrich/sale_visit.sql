@@ -32,7 +32,7 @@ status_log AS (
     AND ts_created >= '2024-08-01'
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_schedule ORDER BY ts_created) = 1)
-SELECT
+SELECT DISTINCT
     b.id AS id_booking,
     b.id_sale_flow,
     b.id_house,
