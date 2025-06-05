@@ -1,5 +1,5 @@
 SELECT
-    CAST(id AS BIGINT) AS id_distribution,
+    CAST(id AS BIGINT) AS id_segment_distribution,
     CAST(segment_id AS BIGINT) AS id_segment,
     CAST(communication_audience_id AS BIGINT) AS id_communication_audience,
     customer_document_type,

@@ -5,7 +5,7 @@ owner: bianca.martins@quintoandar.com.br
 domain: fintech
 description: Segment Distribution table that replaces the former COMMS table, linking customers to communication segments and audiences.
 columns:
-  id:
+  id_segment_distribution:
     description: "Unique identifier for the segment distribution record (Primary Key)"
     lineage:
       - datalake_trato_feito_raw.segment_distribution.id
