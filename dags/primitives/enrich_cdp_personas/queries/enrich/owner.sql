@@ -32,7 +32,7 @@ owners_base AS (
     id_house,
     id_user,
     MIN(ts_first_user_event) AS ts_first_user_event,
-    MAX(ts_next_user_event) AS ts_last_user_event
+    MAX(COALESCE(ts_next_user_event, ts_first_user_event)) AS ts_last_user_event
   FROM
     adjusting_house_status
   GROUP BY 1, 2
