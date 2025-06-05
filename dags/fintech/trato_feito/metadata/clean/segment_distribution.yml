@@ -1,0 +1,53 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: segment_distribution
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Segment Distribution table that replaces the former COMMS table, linking customers to communication segments and audiences.
+columns:
+  id:
+    description: "Unique identifier for the segment distribution record (Primary Key)"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.id
+  id_segment:
+    description: "Identifier of the communication segment the customer belongs to"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.segment_id
+  id_communication_audience:
+    description: "Identifier of the communication audience associated with the segment"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.communication_audience_id
+  customer_document_type:
+    description: "Type of customer document (e.g., CPF, CNPJ, RG)"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.customer_document_type
+  customer_document_value:
+    description: "Customer document number used for identifying the individual"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.customer_document_value
+  is_active:
+    description: "Flag indicating whether the segment distribution is currently active"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.active
+  version:
+    description: "Version of the segmentation logic or configuration"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.version
+  dt_last_appearance:
+    description: "Date when the customer was last observed in the segment"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.last_appearance_date
+  ts_entered_segment:
+    description: "Timestamp when the customer entered the segment for the first time"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.entered_segment_at
+  ts_created:
+    description: "Timestamp when the record was initially created in the source system"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.created_at
+  ts_updated:
+    description: "Timestamp of the most recent update to the record in the source system"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.updated_at
+  ts_load:
+    description: "Timestamp when the record was loaded into the table"

@@ -1,0 +1,26 @@
+SELECT
+    CAST(id AS BIGINT) AS id_segment_distribution_history,
+    CAST(segment_id AS BIGINT) AS id_segment,
+    CAST(communication_audience_id AS BIGINT) AS id_communication_audience,
+    contract_id AS id_contract,
+    rev,
+    revtype,
+    revend,
+    customer_document_type,
+    customer_document_value,
+    active AS is_active,
+    active_mod AS has_active_modified,
+    segment_id_mod AS has_id_segment_modified,
+    communication_audience_id_mod AS has_id_communication_audience_modified,
+    contract_id_mod AS has_id_contract_modified,
+    customer_document_type_mod AS has_customer_document_type_modified,
+    customer_document_value_mod AS has_customer_document_value_modified,
+    entered_segment_at_mod AS has_ts_entered_segment_modified,
+    last_appearance_date_mod AS has_dt_last_appearance_modified,
+    last_appearance_date AS dt_last_appearance,
+    entered_segment_at AS ts_entered_segment,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    NOW() AS ts_load
+FROM
+    datalake_trato_feito_raw.segment_distribution_history

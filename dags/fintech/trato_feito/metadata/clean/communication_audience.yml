@@ -1,0 +1,57 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: communication_audience
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: It links segments to communication sequences and specifies distribution parameters
+columns:
+  id_communication_audience:
+    description: "Unique identifier for the audience"
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.id
+  id_segment:
+    description: "Reference to the associated segment"
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.segment_id
+  id_communication_sequence:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.communication_sequence_id
+  name:
+    description: "Name of the audience"
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.name
+  version:
+    description: "Version number for optimistic locking"
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.version
+  collector_audience_key:
+    description: "Key used to identify the audience in the collector system"
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.collector_audience_key
+  is_active:
+    description: "Indicates if the audience is currently active"
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.active
+  distribution_percentage:
+    description: "Percentage of distribution for this audience (must sum to 100% per segment)"
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.distribution_percentage
+  dt_start:
+    description: "First date when this audience is active (inclusive)"
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.start_date
+  dt_end:
+    description: "Last date when this audience is active (inclusive, optional)"
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.end_date
+  ts_created:
+    description: "Timestamp when the audience was created"
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.created_at
+  ts_updated:
+    description: "Timestamp when the audience was last updated"
+    lineage:
+      - datalake_trato_feito_raw.communication_audience.updated_at
+  ts_load:
+    description: "Load timestamp of the table."

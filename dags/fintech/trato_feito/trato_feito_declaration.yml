@@ -71,6 +71,12 @@ workflow:
     rollout_cyber_contract: {}
     blocklist: {}
     comms: {}
+    communication_audience: {}
+    communication_sequence: {}
+    segment: {}
+    segment_distribution: {}
+    segment_distribution_history: {}
+    segment_filter: {}
     segmentation_features: {}
 cluster:
   type: custom_cluster

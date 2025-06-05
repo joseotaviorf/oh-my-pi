@@ -1,0 +1,29 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: communication_sequence
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: It defines a sequence of communication steps to be executed
+columns:
+  id_communication_sequence:
+    description: "Unique identifier for the sequence"
+    lineage:
+      - datalake_trato_feito_raw.communication_sequence.id
+  version:
+    description: "Version number for optimistic locking"
+    lineage:
+      - datalake_trato_feito_raw.communication_sequence.version
+  name:
+    description: "Name of the communication sequence"
+    lineage:
+      - datalake_trato_feito_raw.communication_sequence.name
+  description:
+    description: "Optional description of the sequence"
+    lineage:
+      - datalake_trato_feito_raw.communication_sequence.description
+  ts_updated:
+    description: "Timestamp when the sequence was last updated"
+    lineage:
+      - datalake_trato_feito_raw.communication_sequence.updated_at
+  ts_load:
+    description: "Load timestamp of the table."

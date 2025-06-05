@@ -1,0 +1,97 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: segment_distribution_history
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_segment_distribution_history:
+    description: "Primary key of the entity.Auto-generated using IDENTITY strategy. Cannot be updated or null"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.id
+  id_segment:
+    description: "Identifier for the segment. Can be null. Represents which segment the customer belongs to"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.segment_id
+  id_communication_audience:
+    description: "Identifier for the communication audience. Can be null. Used for targeting specific communication grou"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.communication_audience_id
+  id_contract:
+    description: "Identifier for the associated contract. Can be null. Links the segment distribution to a specific contract"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.contract_id
+  rev:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.rev
+  revtype:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.revtype
+  revend:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.revend
+  customer_document_type:
+    description: "Enum type representing the type of customer document (CPF/CNPJ). Cannot be null. Stored as a string in the database"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.customer_document_type
+  customer_document_value:
+    description: "The actual value of the customer's document (CPF value or CNPJ value). Cannot be null. Together with customerDocumentType, forms a unique constraint in the database"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.customer_document_value
+  is_active:
+    description: "Flag indicating if the segment distribution is currently active. Default value is false. Used to track if the customer is currently in this segment"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.active
+  has_active_modified:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.active_mod
+  has_id_segment_modified:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.segment_id_mod
+  has_id_communication_audience_modified:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.communication_audience_id_mod
+  has_id_contract_modified:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.contract_id_mod
+  has_customer_document_type_modified:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.customer_document_type_mod
+  has_customer_document_value_modified:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.customer_document_value_mod
+  has_ts_entered_segment_modified:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.entered_segment_at_mod
+  has_dt_last_appearance_modified:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.last_appearance_date_mod
+  dt_last_appearance:
+    description: "The last date when the customer appeared in this segment. Cannot be null. Used for tracking customer activity in the segment - eg.: customer is no longer in segment A"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.last_appearance_date
+  ts_entered_segment:
+    description: "Timestamp of when the customer entered the segment. Cannot be null. Tracks when the customer was first associated with this segment - used to calculate which communication to send"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.entered_segment_at
+  ts_created:
+    description: "Timestamp when the distribution was created"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.created_at
+  ts_updated:
+    description: "Timestamp when the distribution was last updated"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution_history.updated_at
+  ts_load:
+    description: "Load timestamp of the table."

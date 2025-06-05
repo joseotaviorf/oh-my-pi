@@ -1,0 +1,37 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: segment
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: The Segment entity represents a group of customers with specific characteristics
+columns:
+  id_segment:
+    description: "Unique identifier for the segment"
+    lineage:
+      - datalake_trato_feito_raw.segment.id
+  name:
+    description: "Name of the segment"
+    lineage:
+      - datalake_trato_feito_raw.segment.name
+  description:
+    description: "Optional description of the segment"
+    lineage:
+      - datalake_trato_feito_raw.segment.description
+  version:
+    description: "Version number for optimistic locking"
+    lineage:
+      - datalake_trato_feito_raw.segment.version
+  is_active:
+    description: "Indicates if the segment is currently active"
+    lineage:
+      - datalake_trato_feito_raw.segment.active
+  ts_created:
+    description: "Timestamp when the segment was created"
+    lineage:
+      - datalake_trato_feito_raw.segment.created_at
+  ts_updated:
+    description: "Timestamp when the segment was last updated"
+    lineage:
+      - datalake_trato_feito_raw.segment.updated_at
+  ts_load:
+    description: ""

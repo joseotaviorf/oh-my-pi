@@ -1,0 +1,33 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: segment_filter
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: null
+columns:
+  id_segment_filter:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_filter.id
+  id_segment:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_filter.segment_id
+  version:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_filter.version
+  sql_query:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_filter.sql_query
+  ts_created:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_filter.created_at
+  ts_updated:
+    description: ""
+    lineage:
+      - datalake_trato_feito_raw.segment_filter.updated_at
+  ts_load:
+    description: ""
