@@ -308,3 +308,9 @@ sheets_info:
     sheet_name: wallet_history
     clean_table_name: quintocred_wallet_history
     sheet_context: fintech
+
+  getnet_return_codes:
+    sheet_id: 1K6k_I-ov7iqlA-5jya5bDSstV6hsTi4xxHig3fxRA6g
+    sheet_name: tabela_ws_getnet
+    clean_table_name: getnet_return_codes
+    sheet_context: fintech

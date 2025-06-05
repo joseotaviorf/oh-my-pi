@@ -91,6 +91,18 @@ sheets_info:
     clean_table_name: early_termination_fee_fines
     sheet_context: fintech
 
+  quintocred_executives_targets_commercial:
+    sheet_id: 1lN9XZ16_-Ym2CwiV2-O0ocpTimH_z3S4DWA-G80Yfr4
+    sheet_name: executives_targets_commercial
+    clean_table_name: quintocred_executives_targets_commercial
+    sheet_context: fintech
+
+  quintocred_test_proposals:
+    sheet_id: 1nqLwYeDxdq5lP9C2UCrOPO12B_X-B9rKYdY5HtJg2Gc
+    sheet_name: quintocred_test_proposals
+    clean_table_name: quintocred_test_proposals
+    sheet_context: fintech
+
   fraud_contracts:
     sheet_id: 1Dq9FJ56DJfbauri5EOky3U2C42_wV1u0UICQY1mFl94
     sheet_name: Controle
@@ -271,4 +283,34 @@ sheets_info:
     sheet_id: 19U8w20GDJjIaT-zzWXoBch3MPpx6POS22OenBRNEvDM
     sheet_name: collections_capacity_plan
     clean_table_name: quintocred_collections_capacity_plan
+    sheet_context: fintech
+
+  quintocred_iaf_occurrences:
+    sheet_id: 1gBO7nEtBL5lN4GSMKfNnQVHxAihYzbnCdpmuwWK2KJ0
+    sheet_name: Sheet1
+    clean_table_name: quintocred_iaf_occurrences
+    sheet_context: fintech
+
+  quintocred_iaf_qualifies_calls:
+    sheet_id: 1gBO7nEtBL5lN4GSMKfNnQVHxAihYzbnCdpmuwWK2KJ0
+    sheet_name: Sheet2
+    clean_table_name: quintocred_iaf_qualifies_calls
+    sheet_context: fintech
+
+  quintocred_excluded_proposals:
+    sheet_id: 1nqLwYeDxdq5lP9C2UCrOPO12B_X-B9rKYdY5HtJg2Gc
+    sheet_name: quintocred_excluded_proposals
+    clean_table_name: quintocred_excluded_proposals
+    sheet_context: fintech
+
+  quintocred_wallet_history:
+    sheet_id: 10LrirX0uAGO5oNJ07F1D8n4a6KVMMUyGhfPcb83bS7c
+    sheet_name: wallet_history
+    clean_table_name: quintocred_wallet_history
+    sheet_context: fintech
+
+  getnet_return_codes:
+    sheet_id: 1K6k_I-ov7iqlA-5jya5bDSstV6hsTi4xxHig3fxRA6g
+    sheet_name: tabela_ws_getnet
+    clean_table_name: getnet_return_codes
     sheet_context: fintech

@@ -1,0 +1,21 @@
+---
+database_name: datalake_gsheets_clean
+table_name: getnet_return_codes
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  new_code:
+    lineage:
+    - datalake_gsheets_raw.getnet_return_codes.codigo_novo
+  old_code:
+    lineage:
+    - datalake_gsheets_raw.getnet_return_codes.codigo_antigo
+  card_brand:
+    lineage:
+    - datalake_gsheets_raw.getnet_return_codes.bandeira
+  code_type:
+    lineage:
+    - datalake_gsheets_raw.getnet_return_codes.tipo_codigo
+  description:
+    lineage:
+    - datalake_gsheets_raw.getnet_return_codes.descricao
