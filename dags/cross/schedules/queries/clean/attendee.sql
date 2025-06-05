@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     appointment_id AS id_appointment,
     internal_reference_id AS id_internal_reference,
@@ -14,9 +14,5 @@ SELECT
     year,
     month,
     day
-FROM 
+FROM
     datalake_schedules_raw.attendee
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

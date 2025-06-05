@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     parent_id AS id_parente,
     location_reference_id AS id_location_reference,
@@ -28,9 +28,5 @@ SELECT
     year,
     month,
     day
-FROM 
+FROM
     datalake_schedules_raw.appointment
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

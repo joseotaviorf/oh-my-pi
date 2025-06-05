@@ -4,27 +4,42 @@ dag:
   schedule_interval: 0 0 * * *
   owner: Data SS
   documentation:
-    dag_purpose: New Service for managing the QuintoAndar schedulling operations.
+    dag_purpose: |
+      Dag Raw/Clean in order to ingest general scheduling data into the analytical environment.
+
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
-  lineage_product_database_name: schedules
-  default_extraction_type: incremental
-  default_partitions: [year, month, day]
+  source_database: schedules
+  source_schema: public
   dbutils_secret_key: SCHEDULES_DB
+  lineage_product_database_name: schedules
   tables_customization:
-    appointment:
-      date_filter_column: updated_at
     appointment_history:
-      date_filter_column: updated_at
+      clean_table_name: appointment_history
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+      get_table_metrics:
+        count: "id"
+    appointment:
+      clean_table_name: appointment
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+      get_table_metrics:
+        count: "id"
     attendee:
-      date_filter_column: updated_at
+      clean_table_name: attendee
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+      get_table_metrics:
+        count: "id"
+
 cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

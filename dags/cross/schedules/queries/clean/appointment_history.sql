@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     appointment_id AS id_appointment,
     updated_by_reference_id AS id_updated_by_reference,
@@ -15,9 +15,5 @@ SELECT
     year,
     month,
     day
-FROM 
+FROM
     datalake_schedules_raw.appointment_history
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

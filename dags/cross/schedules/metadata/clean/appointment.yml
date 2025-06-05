@@ -19,8 +19,8 @@ columns:
   id_internal_reference:
     lineage:
       - datalake_schedules_raw.appointment.internal_reference_id
-    description: 
-      Reference to the scheduled service (number). If the appointment refers to an inspection, 
+    description:
+      Reference to the scheduled service (number). If the appointment refers to an inspection,
       the id_internal_reference will be the inspection ID, if it is a Visit it will be the visit ID, and so on.
   id_visitant_reference:
     lineage:
@@ -54,8 +54,8 @@ columns:
   status:
     lineage:
       - datalake_schedules_raw.appointment.status
-    description: Schedule status 
-    categories:  
+    description: Schedule status
+    categories:
       WAITING_CONFIRMATION: ""
       DONE: ""
       CANCELED: The appointment has been canceled
@@ -104,7 +104,7 @@ columns:
   is_fixed_agent:
     lineage:
       - datalake_schedules_raw.appointment.fixed_agent
-    description: 
+    description:
       Indicates whether the inspection was scheduled with a specific agent,
       rather than a temporary random assignment.
   ts_created:
