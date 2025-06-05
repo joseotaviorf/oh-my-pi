@@ -518,6 +518,7 @@ bietlejuice.dw_employee:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
   - bietlejuice.enrich_hr_system:load-enrich-disability
+  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.enrich_hr_system:load-enrich-employee-info
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
@@ -1965,6 +1966,7 @@ bietlejuice.enrich_employee:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
   - bietlejuice.enrich_hr_system:load-enrich-disability
+  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.enrich_hr_system:load-enrich-salary-metrics
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy
@@ -2096,6 +2098,8 @@ bietlejuice.enrich_house_feature_inference:
   - bietlejuice.enrich_ebdb_country:load-enrich-house
 bietlejuice.enrich_hr_system:
   - bietlejuice.awesomeapi_currency_rates:load-clean-currency-closing-rates
+  - bietlejuice.gsheets_people:done-clean-codex-cost-centers
+  - bietlejuice.gsheets_people:done-clean-codex-cost-informations
   - bietlejuice.hr_system:load-clean-salaries
   - bietlejuice.hr_system:load-clean-workers
   - bietlejuice.hr_system_custom:load-clean-workers-registration
@@ -2560,6 +2564,7 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.wall_street:load-clean-subscription-item
 bietlejuice.enrich_people_public:
   - bietlejuice.enrich_hr_system:load-enrich-assignments
+  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.enrich_pin:load-enrich-managers-history
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
   - bietlejuice.hr_system:load-clean-jobs
@@ -2572,6 +2577,7 @@ bietlejuice.enrich_person:
   - bietlejuice.person:load-clean-preference-settings
   - bietlejuice.person:load-clean-right-to-be-forgotten
 bietlejuice.enrich_pin:
+  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.pin_core:load-clean-all-assignments
   - bietlejuice.pin_core:load-clean-assignment-supervisor
   - bietlejuice.pin_core:load-clean-foundation-lookup-value
@@ -3503,6 +3509,7 @@ bietlejuice.enrich_wololo:
   - bietlejuice.wololo:load-clean-round
 bietlejuice.enrich_workable:
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids
+  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.hr_system:load-clean-organizations
   - bietlejuice.workable_redshift:load-clean-activities

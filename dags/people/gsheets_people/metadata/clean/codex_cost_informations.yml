@@ -2,7 +2,7 @@ database_name: datalake_gsheets_people_clean
 table_name: codex_cost_informations
 owner: gabriel.berger@quintoandar.com.br
 domain: people
-description: 'Table containing information about the type of headcount allocated to each cost center.'
+description: 'Table containing information about the type of P&L cost, further used to infer the type of headcount allocated in the cost center.'
 columns:
   id_cost_center_legacy:
     description: 'Legacy unique identifier of the cost center (BEFORE the 2024-2025 review of the cost centers ids).'
