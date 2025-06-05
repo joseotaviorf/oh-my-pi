@@ -1,6 +1,7 @@
 database_name: datalake_listing_contracts
 table_name: listing_contracts
-description: This table contains the information about house listings (that were already published) and its contracts.
+description:
+  This table contains the information about house listings (that were already published) and its contracts.
   The goal of this table is to make possible to track all listing's contracts in an easily way, bringing information related to
   previous contracts, terminations, Early Demand, Early Relisting and Extended Rentals.
   Each line is composed by an id_house_listing + id_contract. You may find repeated contracts due to being related
@@ -24,7 +25,8 @@ columns:
   id_previous_contract:
     lineage:
       - datalake_ebdb_contract.contract.id
-    description: Id of the listing's previous contract. If the previous contract is the same as the current one,
+    description:
+      Id of the listing's previous contract. If the previous contract is the same as the current one,
       it should be a case of extended rental.
   country_code:
     lineage:
@@ -40,6 +42,10 @@ columns:
     description: The contract's status.
       Important to notice that in this table we're not filtering any contract status, so it's possible to find contracts
       that are still on pre signature step or already terminated.
+  previous_contract_status:
+    lineage:
+      - datalake_ebdb_contract.contract.status
+    description: The status of the listing's previous contract.
     categories:
       Ativo: The contract is active.
       Cancelado: The contract has been canceled.
@@ -51,13 +57,16 @@ columns:
       - datalake_terminator_clean.termination.status
     description: The termination status, if the contract has any termination created.
   days_ended_rental_to_relisting:
-    description: Number of days between the end of the rental contract for the listing.
+    description:
+      Number of days between the end of the rental contract for the listing.
       and the relisting
   days_relisting_to_re_rental:
-    description: Number of days between the relisting and a new rental contract for
+    description:
+      Number of days between the relisting and a new rental contract for
       the listing.
   days_ended_rental_to_re_rented:
-    description: Number of days between the end of the rental contract and a new rental.
+    description:
+      Number of days between the end of the rental contract and a new rental.
       contract for the listing
   is_early_relisting:
     lineage:
@@ -66,16 +75,19 @@ columns:
   is_early_demand:
     lineage:
       - datalake_ebdb_listing.house_listing.is_early_demand
-    description: Boolean flag indicating if the listing is available for early demand, which means it is available for
+    description:
+      Boolean flag indicating if the listing is available for early demand, which means it is available for
       visits/offers during a contract termination of the listing's current contract.
   is_extended_rental:
     lineage:
       - datalake_ebdb_listing.house_listing.is_extended_rental
-    description: Boolean flag indicating if the termination related to the contract was canceled after the property being
+    description:
+      Boolean flag indicating if the termination related to the contract was canceled after the property being
       relisted as early demand.
       In this case, you might find the same contract related to different versions of the listing.
   is_previous_contract_on_termination:
-    description: Boolean flag indicating if the listing's previous contract is on termination process, which means that
+    description:
+      Boolean flag indicating if the listing's previous contract is on termination process, which means that
       a termination has been requested for the previous contract and it's not canceled or finished/done yet.
   ts_listing_version_started:
     lineage:
@@ -104,4 +116,8 @@ columns:
   dt_previous_contract_termination:
     lineage:
       - datalake_ebdb_contract.contract.dt_termination
-    description: Date of when the previous contract related to the listing was terminated.
+    description: Date of when the previous contract termination was requested. If the previous contract was not active or finished, this field will be NULL.
+  dt_previous_termination:
+    lineage:
+      - datalake_ebdb_contract.contract.dt_termination
+    description: Date of when the previous contract related to the listing was terminated. If the previous contract was not active or finished, this field will be NULL.

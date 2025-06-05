@@ -651,19 +651,13 @@ termination_period AS (
     recent contract.
   **/
   SELECT
-    lc.id_house_listing,
-    lc.ts_listing_version_started,
-    lc.dt_previous_contract_termination,
-    ROW_NUMBER() OVER(PARTITION BY lc.id_house_listing ORDER BY lc.ts_contract_created DESC) AS rank_order
+    id_house_listing,
+    dt_previous_termination,
+    dt_previous_contract_termination
   FROM
-    datalake_listing_contracts.listing_contracts AS lc
-  JOIN
-    datalake_ebdb_contract.contract AS c
-      ON c.id = lc.id_contract
-      AND c.status IN ('Ativo', 'Finalizado')
-  WHERE
-    c.dt_termination IS NULL  -- Contracts that weren't terminated
-    OR c.dt_started < c.dt_termination  -- Contracts that were finished before even starting should be filtered out
+    datalake_listing_contracts.listing_contracts
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_house_listing ORDER BY ts_contract_created DESC) = 1
 )
 SELECT DISTINCT
   /** As a rent flow may have N times the same booking/proposal/offer appearing related to different demand steps
@@ -688,7 +682,7 @@ SELECT DISTINCT
   rde.uuid_company,
   rde.id_company_hubspot,
   rde.partner_3p_supply,
-  COALESCE(IF(rde.ts_event BETWEEN t.ts_listing_version_started AND t.dt_previous_contract_termination, TRUE, FALSE), FALSE) AS is_during_termination,
+  COALESCE(IF(rde.ts_event BETWEEN t.dt_previous_contract_termination AND t.dt_previous_termination, TRUE, FALSE), FALSE) AS is_during_termination,
   rde.ts_event,
   rde.country_code,
   rde.year AS event_year,
@@ -699,7 +693,6 @@ FROM
 LEFT JOIN
   termination_period AS t
     ON t.id_house_listing = rde.id_house_listing
-    AND t.rank_order = 1
 LEFT JOIN
   datalake_pro_owners.owner_category AS oc
     ON MAKE_DATE(rde.year, rde.month, rde.day) >= oc.dt_owner_category_started

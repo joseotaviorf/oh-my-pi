@@ -29,6 +29,7 @@ contracts_base AS (
         lc.id_house,
         hl.country_code,
         c.status AS contract_status,
+        LAG(c.status) OVER(PARTITION BY lc.id_house ORDER BY lc.id_house_listing) AS previous_contract_status,
         t.status AS termination_status,
         hl.status AS listing_status,
         hl.is_early_relisting,
@@ -93,6 +94,7 @@ SELECT
     cb.country_code,
     cb.listing_status,
     cb.contract_status,
+    cb.previous_contract_status,
     cb.termination_status,
     CAST((CAST(hl.ts_listing_version_end AS LONG) - CAST(CAST(hlc.dt_contract_annulment AS TIMESTAMP) AS LONG))/(86400) AS INTEGER) AS days_ended_rental_to_relisting,
     CAST((CAST(hlc.ts_next_contract_signed AS LONG) - CAST(hl.ts_listing_version_end AS LONG))/(86400) AS INTEGER) AS days_relisting_to_re_rental,
@@ -107,13 +109,19 @@ SELECT
     cb.ts_contract_created,
     cb.ts_termination_created,
     cb.dt_termination,
-    LAG(cb.dt_termination) OVER(PARTITION BY cb.id_house ORDER BY cb.id_house_listing, cb.ts_contract_created, cb.ts_termination_created) AS dt_previous_contract_termination
+    IF(cb.previous_contract_status IN ('Ativo', 'Finalizado'),
+      LAG(cb.ts_termination_created) OVER(PARTITION BY cb.id_house ORDER BY cb.id_house_listing, cb.ts_contract_created, cb.ts_termination_created),
+      NULL
+    ) AS dt_previous_contract_termination,
+    IF(cb.previous_contract_status IN ('Ativo', 'Finalizado'),
+      LAG(cb.dt_termination) OVER(PARTITION BY cb.id_house ORDER BY cb.id_house_listing, cb.ts_contract_created, cb.ts_termination_created),
+      NULL
+    ) AS dt_previous_termination
 FROM
     contracts_base AS cb
-JOIN 
+JOIN
     datalake_ebdb_listing.house_listing hl
         ON hl.id_house_listing = cb.id_house_listing
-LEFT JOIN  
+LEFT JOIN
     house_listing_contracts hlc
         ON hl.id_house_listing = hlc.id_house_listing
-

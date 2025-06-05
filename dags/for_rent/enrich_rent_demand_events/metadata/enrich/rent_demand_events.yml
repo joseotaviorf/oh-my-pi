@@ -109,8 +109,8 @@ columns:
     description: Short name of the Rede company.
   is_during_termination:
     description:
-      "Boolean flag indicating if the event happened between the listing's version start date and the listing's
-      previous version contract end date.
+      "Boolean flag indicating if the event happened between the termination request date and the listing's
+      previous version contract end date (dt_termination).
       This flag may help understanding events during Early Demand, for example."
   ts_event:
     lineage:
