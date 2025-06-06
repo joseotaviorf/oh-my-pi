@@ -17,7 +17,7 @@ workflow:
     tickets_current:
       merge_on: [id_ticket]
       z_order_by: [ts_created, id_ticket]
-    tickets_metric:
+    ticket_metrics:
       merge_on: [id_ticket, ts_updated]
       z_order_by: [ts_updated, id_ticket]
     tickets:
