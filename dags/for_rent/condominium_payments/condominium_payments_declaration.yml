@@ -12,7 +12,7 @@ workflow:
   lineage_product_database_name: condominium_payments
   dbutils_secret_key: CONDOMINIUM_PAYMENTS_DB
   source_database: condominium_payments
-  source_schema: condominium_payments
+  source_schema: public
   tables_customization:
     attachment: {}
     non_payment_report_invoice: {}
