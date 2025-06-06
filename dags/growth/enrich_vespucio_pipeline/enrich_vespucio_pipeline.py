@@ -636,6 +636,7 @@ classifieds_tasks = [
     create_task(
         entry_point="plugins_classifieds",
         parameters=[
+            f"--overwrite_schema",
             f"--input_condo_compound={Tables.condo_compounds}",
             f"--input_house_compound={Tables.house_compounds}",
             f"--input_listing_compound={Tables.listings}",
