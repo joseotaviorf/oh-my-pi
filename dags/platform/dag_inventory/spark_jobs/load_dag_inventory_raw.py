@@ -38,11 +38,12 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_dag_inventory_raw"
 THREAD_NUMBER = 8
+# TODO: Optimize file fetching so we can uncomment this
 LAYERS_TO_FETCH_FILES = [
-    LayerEnum.CLEAN.value,
-    LayerEnum.ENRICH.value,
-    LayerEnum.DW.value,
-    LayerEnum.METRIC.value,
+    # LayerEnum.CLEAN.value,
+    # LayerEnum.ENRICH.value,
+    # LayerEnum.DW.value,
+    # LayerEnum.METRIC.value,
 ]
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
