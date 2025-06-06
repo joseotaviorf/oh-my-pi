@@ -12,9 +12,9 @@ SELECT
    NULLIF(pt_chapter, '-') AS chapter,
    NULLIF(pt_line, '-') AS line,
    NULLIF(fp_owner, '') AS owner_finance_email,
-   NULLIF(l1 AS, '') owner_l1_email,
-   NULLIF(l2 AS, '') owner_l2_email,
-   NULLIF(l3 AS, '') owner_l3_email,
+   NULLIF(l1, '') AS owner_l1_email,
+   NULLIF(l2, '') AS owner_l2_email,
+   NULLIF(l3, '') AS owner_l3_email,
    status AS cost_center_status,
    CAST(sort AS INT) AS sort_number,
    ts_load
