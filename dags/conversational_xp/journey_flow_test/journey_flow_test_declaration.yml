@@ -18,10 +18,6 @@ workflow:
   custom_schema: journey_flow_test
 
   tables_customization:
-    t_journey_content:
-      clean_table_name: journey_content
-    t_rule:
-      clean_table_name: rule
     t_journey_flow:
       clean_table_name: journey_flow
     t_dialog:
