@@ -15,12 +15,11 @@ workflow:
   default_extraction_type: incremental
   tables_customization:
     tickets_current:
-      extraction_type: full
-      partitions: [year, month, day]
-      z_order_by: [id_ticket]
+      merge_on: [id_ticket]
+      z_order_by: [ts_created, id_ticket]
     tickets_metric:
-      partitions: [year, month, day]
-      z_order_by: [id_ticket]
+      merge_on: [id_ticket, ts_updated]
+      z_order_by: [ts_updated, id_ticket]
     tickets:
       merge_on: [id_ticket, ts_updated]
       z_order_by: [ts_updated, id_ticket]

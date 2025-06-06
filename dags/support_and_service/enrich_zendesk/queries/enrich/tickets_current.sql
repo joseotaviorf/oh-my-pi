@@ -96,9 +96,7 @@ WITH tickets AS (
   FROM
     datalake_zendesk.tickets
   WHERE
-    ts_updated >= DATE('{load_start_date}') - INTERVAL 2 YEAR
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
+    ts_updated BETWEEN DATE('{load_start_date}') - INTERVAL 7 DAY AND DATE('{load_end_date}')
 ),
 ticket_metrics AS (
   SELECT DISTINCT
@@ -128,9 +126,7 @@ ticket_metrics AS (
   FROM
     datalake_zendesk.ticket_metrics
   WHERE
-    ts_updated >= DATE('{load_start_date}') - INTERVAL 2 YEAR
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
+    ts_updated BETWEEN DATE('{load_start_date}') - INTERVAL 7 DAY AND DATE('{load_end_date}')
 )
 SELECT
   t.id_ticket,
