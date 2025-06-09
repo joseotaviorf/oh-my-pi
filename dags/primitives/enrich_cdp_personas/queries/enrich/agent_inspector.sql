@@ -2,7 +2,7 @@ SELECT
   u.id AS id_user,
   u.uuid_person,
   ad.is_active,
-  ad.ts_created AS ts_first_event,
+  COALESCE(ad.ts_created, ad.ts_updated) AS ts_first_event, -- Old users without creation date
   CASE
     WHEN ad.is_active = TRUE THEN CAST(NULL AS TIMESTAMP)
     ELSE ad.ts_updated

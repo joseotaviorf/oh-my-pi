@@ -20,8 +20,10 @@ columns:
       - datalake_ebdb_clean.agent_data.is_active
   ts_first_event:
     description: Timestamp of the first user event while as an inspector.
+      Some old users don't have a creation date, so we're assuming the update data for these cases.
     lineage:
       - datalake_ebdb_clean.agent_data.ts_created
+      - datalake_ebdb_clean.agent_data.ts_updated
   ts_last_event:
     description: Timestamp of the last user event while as an inspector.
     lineage:
