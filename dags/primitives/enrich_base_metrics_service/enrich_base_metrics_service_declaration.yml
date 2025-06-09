@@ -36,6 +36,8 @@ workflow:
       - sale_flow_past_30_days
       - rent_outlier_users_past_30_days
       - sale_outlier_users_past_30_days
+    recs_global_metrics:
+      - recs_impressions_processed
     global_metrics:
       - search_impressions
     experiment_config_processed:
@@ -57,6 +59,11 @@ workflow:
         - month
         - day
     global_metrics:
+      partitions:
+        - year
+        - month
+        - day
+    recs_global_metrics:
       partitions:
         - year
         - month

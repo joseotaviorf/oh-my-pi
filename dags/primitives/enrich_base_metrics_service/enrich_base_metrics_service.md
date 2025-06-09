@@ -20,6 +20,7 @@ This pipeline produces the following output table on enrich layer:
 - `recs_impressions`
 - `recs_impressions_processed`
 - `global_metrics`
+- `recs_global_metrics`
 - `experiment_config`
 - `experiment_config_processed`
 - `house_publication_dates`

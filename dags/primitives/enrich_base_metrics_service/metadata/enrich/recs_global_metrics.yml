@@ -1,0 +1,27 @@
+database_name: datalake_search
+table_name: recs_global_metrics
+owner: pedro.nogueira@quintoandar.com.br
+domain: primitives
+description: |
+  Table with ids, dimensions, metrics and timestamps related to user global metrics for recommendations.
+columns:
+  ids:
+    description: A json with all relevant ids for recommendations analysis. Ex. id_user, id_house
+  dimensions:
+    description: A json with all relevant dimensions for recommendations analysis. Ex. business_context, city, is_outlier_user
+  variants:
+    description: A json mapping `experiment_name` to `variant` the user was allocated to.
+  metrics:
+    description: A json with all relevant metrics for recommendations analysis. Ex. recommendation, global_visit_booked, global_offer, global_contract_signed
+  timestamps:
+    description: A json with all relevant timestamps for recommendations and subsequent events
+  date:
+    description: The date of a user interaction with a recommendation.
+  year:
+    description: The year of a user interaction with a recommendation.
+  month:
+    description: The month of a user interaction with a recommendation.
+  day:
+    description: The day of a user interaction with a recommendation.
+  week:
+    description: The week of a user interaction with a recommendation.
