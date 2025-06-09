@@ -9,7 +9,7 @@ workflow:
   layer: dw
   custom_schema: public
 cluster:
-  type: databricks_12_2_min_general_cluster
+  type: databricks_13_3_med_general_2_workers_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
