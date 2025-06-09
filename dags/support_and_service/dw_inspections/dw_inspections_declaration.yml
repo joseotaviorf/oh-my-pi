@@ -70,8 +70,6 @@ workflow:
       merge_on: [sk_item_issue]
     fact_inspection:
       extraction_type: full
-      z_order_by: [sk_inspection]
-      merge_on: [sk_inspection]
     fact_inspector:
       z_order_by: [sk_report]
       merge_on: [sk_report]
