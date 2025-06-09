@@ -1,18 +1,18 @@
 ---
 database_name: datalake_trato_feito_clean
 table_name: communication_step
-owner: null
+owner: bianca.martins@quintoandar.com.br
 domain: fintech
 description: Entity represents a single step in a communication sequence
 columns:
   id_communication_step:
     description: "Unique identifier for the step"
     lineage:
-      - datalake_trato_feito_raw.communication_step.CAST(id AS BIGINT)
+      - datalake_trato_feito_raw.communication_step.id
   id_sequence:
     description: "Unique identifier for the sequence"
     lineage:
-      - datalake_trato_feito_raw.communication_step.CAST(sequence_id AS BIGINT)
+      - datalake_trato_feito_raw.communication_step.sequence_id
   id_internal_comms:
     description: "Identification of the comms rule in comms manager"
     lineage:
