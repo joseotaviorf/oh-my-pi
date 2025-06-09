@@ -86,7 +86,7 @@ FROM VALUES
         "ab_beakman_search_services_demand_concentration_v2_policy_3_rent_experiment",
         named_struct(
             'begin_date', DATE('2025-04-08'),
-            'end_date', NULL,
+            'end_date', DATE('2025-05-26'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
