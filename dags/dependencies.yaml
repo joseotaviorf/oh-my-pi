@@ -3710,9 +3710,18 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-sessions-chatbot
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
+  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
+  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
+  - bietlejuice.dw_offboarding:load-dw-offboarding-dim-termination
+  - bietlejuice.dw_offboarding:load-dw-offboarding-fact-house-listing-terminations
+  - bietlejuice.dw_offboarding:load-dw-offboarding-fact-terminations
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_demand_events:load-dw-rent-dim-rent-event-type
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
   - bietlejuice.dw_sale_closing_flows:load-dw-sale-fact-closing-flows
   - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
@@ -3722,6 +3731,7 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-dim-answer
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-answer
+  - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-broker
   - bietlejuice.dw_velo_zendesk:load-dw-velo-dim-velo-ticket-users
@@ -3731,9 +3741,14 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_visit:load-dw-visit-dim-entrance-type
   - bietlejuice.dw_visit:load-dw-visit-fact-visit-schedules
   - bietlejuice.dw_visit:load-dw-visit-fact-visits
+  - bietlejuice.ebdb_user:load-clean-user-pro-owner
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
   - bietlejuice.enrich_nps_quintocred:load-enrich-broker-contact-info
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
+  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-category
+  - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-houses-quantity-history
   - bietlejuice.enrich_sale_offer_flows:load-enrich-offer-specialists
   - bietlejuice.enrich_survicate:load-enrich-inspections-surveys
   - bietlejuice.enrich_survicate:load-enrich-response-content
@@ -3747,6 +3762,8 @@ bietlejuice.reverse_birdie:
   - bietlejuice.insider:load-clean-template
   - bietlejuice.insider:load-clean-template-feature
   - bietlejuice.jaiminho:load-clean-user-notifications
+  - bietlejuice.terminator:load-clean-termination
+  - bietlejuice.terminator:load-clean-termination-workflow
 bietlejuice.reverse_birdie_access:
   - bietlejuice.reverse_birdie:load-reverse-dsat-bot
   - bietlejuice.reverse_birdie:load-reverse-dsat-customer-relationship
