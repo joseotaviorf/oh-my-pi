@@ -67,6 +67,7 @@ SELECT
     PublicationOccurredOnProperty__c AS publication_occurred_on_property,
     SLCurrentOnboardingContact__c AS seller_current_onboarding_contact,
     UnlistingReason__c AS unlisting_reason,
+    UnassignedReason__c AS unassigned_reason,
     CAST(IsABTest__c AS BOOLEAN) AS is_ab_test,
     CAST(ContractIdOddOrEven__c AS BOOLEAN) AS is_contract_id_odd_even,
     CAST(PastDueDateSimulation__c AS BOOLEAN) AS is_past_due_date_simulation,

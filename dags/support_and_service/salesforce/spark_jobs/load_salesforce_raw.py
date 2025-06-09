@@ -394,6 +394,7 @@ def schema_define():
                             StructField("SLContactSuccess__c", StringType()),
                             StructField("SLCurrentOnboardingContact__c", StringType()),
                             StructField("UnlistingReason__c", StringType()),
+                            StructField("UnassignedReason__c", StringType()),
                         ]
                     )
             },

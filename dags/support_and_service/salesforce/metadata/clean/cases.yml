@@ -144,6 +144,10 @@ columns:
     lineage:
       - datalake_salesforce_raw.case.UnlistingReason
     description: Reason for unlisting the house.
+  unassigned_reason:
+    lineage:
+      - datalake_salesforce_raw.case.UnassignedReason
+    description: Reason for unassigning the case.
   zendesk_url:
     lineage:
       - datalake_salesforce_raw.case.ZendeskUrl
