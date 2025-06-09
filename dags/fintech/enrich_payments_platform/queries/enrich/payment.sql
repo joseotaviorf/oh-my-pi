@@ -23,6 +23,8 @@ WITH subscription_invoices AS (
     WHERE
         s.code IS NULL
         AND s1.code IS NULL
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY i.id_charge ORDER BY si.ts_created DESC) = 1
 
 ),
 charge_created AS (
@@ -76,7 +78,11 @@ credit_card_payments AS (
         COALESCE(cca.ts_updated, ccan.ts_canceled, cc.ts_updated) AS ts_updated,
         wsc.id_customer,
         store.description AS store_description,
-        store.id AS store_id
+        store.id AS store_id,
+        NULL AS our_number,
+        NULL AS your_number,
+        NULL AS company_use,
+        COALESCE(gwt.description, 'NAO IDENTIFICADO') AS error_type
     FROM
         datalake_checkout_clean.credit_card AS cc
     LEFT JOIN
@@ -98,6 +104,10 @@ credit_card_payments AS (
     LEFT JOIN
         datalake_wall_street_clean.store AS store
         ON store.id = wsc.id_store
+    LEFT JOIN
+        datalake_gsheets_clean.getnet_return_codes AS gwt
+        ON gwt.new_code = wsc.acquire_return_code
+        AND IF(gwt.card_brand = 'GETNET' OR gwt.card_brand = 'TODAS', 1 = 1, gwt.card_brand = UPPER(wsc.card_brand))
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY COALESCE(cc.id_finance_entity, si.id_finance_entity, wsc.id_finance_entity), COALESCE(cc.id_charge, wsc.id) ORDER BY COALESCE(cca.ts_created, wsc.ts_updated, cc.ts_created) DESC) = 1
 
@@ -115,7 +125,6 @@ checkout AS (
         NULL AS id_last_payment_attempt_timeline,
         o.status AS payment_status,
         IF(o.status = 'PAID',ch.payment_method, NULL) AS successfull_method,
-        NULL AS origin,
         'checkout' AS datasource,
         'PAYIN' AS transaction_category,
         r.name AS requester_description,
@@ -159,7 +168,23 @@ checkout AS (
         o.ts_created AS ts_order_created,
         ch.ts_started_processing AS ts_charge_started_processing,
         ch.ts_paid AS ts_charge_paid,
-        ch.ts_canceled AS ts_charge_canceled
+        ch.ts_canceled AS ts_charge_canceled,
+        CASE ch.payment_method
+            WHEN 'BOLETO' THEN b.our_number
+            WHEN 'BOLECODE' THEN bc.our_number
+            ELSE NULL
+        END AS our_number,
+        CASE ch.payment_method
+            WHEN 'BOLETO' THEN b.your_number
+            WHEN 'BOLECODE' THEN bc.your_number
+            ELSE NULL
+        END AS your_number,
+        NULL AS company_use,
+        cc.acquire_auth_code AS acquirer_auth_code,
+        cc.acquire_nsu AS acquire_nsu,
+        wc.acquire_tid AS id_acquire_transaction,
+        cc.acquire_return_code AS acquire_return_code,
+        COALESCE(gwt.description, 'NAO IDENTIFICADO') AS error_type
     FROM
         datalake_checkout_clean.order AS o
     LEFT JOIN
@@ -194,6 +219,10 @@ checkout AS (
     LEFT JOIN
         datalake_wall_street_clean.store AS s
         ON s.id = wc.id_store
+    LEFT JOIN
+        datalake_gsheets_clean.getnet_return_codes AS gwt
+        ON gwt.new_code = wc.acquire_return_code
+        AND IF(gwt.card_brand = 'GETNET' OR gwt.card_brand = 'TODAS', 1 = 1, gwt.card_brand = UPPER(wc.card_brand))
 ),
 vans_boleto AS (
     SELECT
@@ -206,18 +235,8 @@ vans_boleto AS (
         b.id_bank_boleto,
         b.requested_by AS id_requester,
         NULL AS id_last_payment_attempt_timeline,
-        CASE
-            WHEN b.status = ':boleto.status/paid' THEN 'PAID'
-            WHEN b.status = ':boleto.status/scheduled' THEN 'SCHEDULED'
-            WHEN b.status = ':boleto.status/processed' THEN 'PROCESSED'
-            WHEN b.status = ':boleto.status/error' THEN 'ERROR'
-            WHEN b.status = ':boleto.status/chargeback' THEN 'CHARGEBACK'
-            WHEN b.status = ':boleto.status/requested' THEN 'REQUESTED'
-            WHEN b.status = ':boleto.status/canceled' THEN 'CANCELED'
-            ELSE UPPER(SPLIT_PART(b.status, ':', 2))
-        END AS payment_status,
+        b.status AS payment_status,
         'BOLETO' AS successfull_method,
-        'vans' AS origin,
         'vans' AS datasource,
         'PAYIN' AS transaction_category,
         b.requested_by AS requester_description,
@@ -240,7 +259,15 @@ vans_boleto AS (
         CASE
             WHEN b.status = ':boleto.status/canceled' THEN b.ts_updated
             ELSE NULL
-        END AS ts_charge_canceled
+        END AS ts_charge_canceled,
+        b.our_number,
+        NULL AS your_number,
+        b.company_use,
+        NULL AS acquirer_auth_code,
+        NULL AS acquire_nsu,
+        NULL AS id_acquire_transaction,
+        NULL AS acquire_return_code,
+        NULL AS error_type
     FROM
         datalake_vans_clean.boleto b
     LEFT JOIN
@@ -269,7 +296,6 @@ cte_union AS (
         NULL AS id_last_payment_attempt_timeline,
         status AS payment_status,
         'CREDIT_CARD' AS successfull_method,
-        NULL AS origin,
         'wallstreet' AS datasource,
         'PAYIN' AS transaction_category,
         store_description AS requester_description,
@@ -289,7 +315,15 @@ cte_union AS (
         ts_created AS ts_order_created,
         NULL AS ts_charge_started_processing,
         ts_paid AS ts_charge_paid,
-        ts_updated AS ts_charge_canceled
+        ts_updated AS ts_charge_canceled,
+        our_number,
+        your_number,
+        company_use,
+        acquire_auth_code,
+        acquire_nsu,
+        id_acquire_transaction,
+        acquire_return_code,
+        error_type
     FROM
         credit_card_payments
     WHERE
@@ -309,7 +343,6 @@ cte_union AS (
         id_last_payment_attempt_timeline,
         payment_status,
         successfull_method,
-        origin,
         datasource,
         'PAYIN' AS transaction_category,
         requester_description,
@@ -329,9 +362,19 @@ cte_union AS (
         ts_order_created,
         ts_charge_started_processing,
         ts_charge_paid,
-        ts_charge_canceled
+        ts_charge_canceled,
+        our_number,
+        your_number,
+        company_use,
+        acquirer_auth_code,
+        acquire_nsu,
+        id_acquire_transaction,
+        acquire_return_code,
+        error_type
     FROM
         checkout
+    WHERE
+        id_charge IS NOT NULL
 
     UNION ALL
 
@@ -347,7 +390,6 @@ cte_union AS (
         id_last_payment_attempt_timeline,
         payment_status,
         successfull_method,
-        origin,
         datasource,
         'PAYIN' AS transaction_category,
         requester_description,
@@ -367,11 +409,19 @@ cte_union AS (
         ts_order_created,
         ts_charge_started_processing,
         ts_charge_paid,
-        ts_charge_canceled
+        ts_charge_canceled,
+        our_number,
+        your_number,
+        company_use,
+        acquirer_auth_code,
+        acquire_nsu,
+        id_acquire_transaction,
+        acquire_return_code,
+        error_type
     FROM
         vans_boleto
 )
-SELECT
+SELECT DISTINCT
     -- id_payment BIGINT GENERATED ALWAYS AS IDENTITY (created directly on Databricks CREATE TABLE)
     id_business_key,
     id_charge,
@@ -382,9 +432,43 @@ SELECT
     id_finance_entity,
     id_requester,
     -- id_last_payment_attempt_timeline,
-    payment_status,
+    CASE
+        WHEN payment_status = '' THEN NULL
+        WHEN payment_status = '52' THEN NULL
+        WHEN payment_status = 'PAID' THEN 'PAID'
+        WHEN payment_status = 'PROCESSING' THEN 'PROCESSING'
+        WHEN payment_status = 'ERROR' THEN 'ERROR'
+        WHEN payment_status = 'CANCELED' THEN 'CANCELED'
+        WHEN payment_status = 'CHARGEBACK' THEN 'CHARGEBACK'
+        WHEN payment_status = 'CHARGEBACK_CAPTURED' THEN 'CHARGEBACK_CAPTURED'
+        WHEN payment_status = 'REFUNDED' THEN 'REFUNDED'
+        WHEN payment_status = 'PROCESSING_REFUND' THEN 'PROCESSING_REFUND'
+        WHEN payment_status = 'PENDING_CAPTURE' THEN 'PENDING_CAPTURE'
+        WHEN payment_status = 'CAPTURE_NOT_PROCESSED' THEN 'CAPTURE_NOT_PROCESSED'
+        WHEN payment_status = 'CAPTURE_DENIED' THEN 'CAPTURE_DENIED'
+        WHEN payment_status = 'CAPTURE_BLOCKED' THEN 'CAPTURE_BLOCKED'
+        WHEN payment_status = 'CAPTURED' THEN 'CAPTURED'
+        WHEN payment_status = 'PENDING_CANCELATION' THEN 'PENDING_CANCELATION'
+        WHEN payment_status = 'CANCELATION_NOT_PROCESSED' THEN 'CANCELATION_NOT_PROCESSED'
+        WHEN payment_status = 'OPEN' THEN 'OPEN'
+        WHEN payment_status = 'REQUESTED' THEN 'REQUESTED'
+        WHEN payment_status = 'PENDING_REGISTER_PAYMENT' THEN 'PENDING_REGISTER_PAYMENT'
+        WHEN payment_status = ':boleto.status/paid' THEN 'PAID'
+        WHEN payment_status = ':boleto.status/scheduled' THEN 'SCHEDULED'
+        WHEN payment_status = ':boleto.status/processed' THEN 'PROCESSED'
+        WHEN payment_status = ':boleto.status/error' THEN 'ERROR'
+        WHEN payment_status = ':boleto.status/chargeback' THEN 'CHARGEBACK'
+        WHEN payment_status = ':boleto.status/requested' THEN 'REQUESTED'
+        WHEN payment_status = ':boleto.status/canceled' THEN 'CANCELED'
+        WHEN payment_status = ':boleto.status/write-down-requested' THEN 'PENDING_WRITE_DOWN'
+        WHEN payment_status = ':boleto.status/created' THEN 'CREATED'
+        WHEN payment_status = ':boleto.status/written-down' THEN 'WRITTEN_DOWN'
+        WHEN payment_status = ':boleto.status/written-down-error' THEN 'WRITE_DOWN_ERROR'
+        WHEN payment_status = ':boleto.status/write-down-paid-requested' THEN 'PENDING_WRITE_DOWN_PAID'
+        WHEN payment_status = ':boleto.status/changed' THEN 'CHANGED'
+        ELSE payment_status
+    END AS payment_status,
     successfull_method,
-    origin,
     datasource,
     transaction_category,
     requester_description,
@@ -404,7 +488,15 @@ SELECT
     ts_order_created,
     ts_charge_started_processing,
     ts_charge_paid,
-    ts_charge_canceled
+    ts_charge_canceled,
+    our_number,
+    your_number,
+    company_use,
+    acquire_auth_code,
+    acquire_nsu,
+    id_acquire_transaction,
+    acquire_return_code,
+    error_type
 FROM
     cte_union
 

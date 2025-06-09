@@ -2553,6 +2553,7 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.checkout:load-clean-pix
   - bietlejuice.checkout:load-clean-pix-webhook
   - bietlejuice.checkout:load-clean-requester
+  - bietlejuice.gsheets_fintech:done-clean-getnet-return-codes
   - bietlejuice.vans:load-clean-boleto
   - bietlejuice.vans:load-clean-boleto-file
   - bietlejuice.vans:load-clean-file
