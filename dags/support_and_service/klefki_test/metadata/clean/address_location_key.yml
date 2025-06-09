@@ -1,0 +1,46 @@
+---
+database_name: datalake_klefki_test_clean
+table_name: address_location_key
+columns:
+  id_address_location_key:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.id
+  zipcode:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.zipcode
+  street:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.street
+  number:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.number
+  complement:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.complement
+  district:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.district
+  city:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.city
+  state:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.state
+  instructions:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.instructions
+  ts_created:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.created_at
+  ts_updated:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.updated_at
+  year:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.year
+  month:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.month
+  day:
+    lineage:
+      - datalake_klefki_test_raw.address_location_key.day

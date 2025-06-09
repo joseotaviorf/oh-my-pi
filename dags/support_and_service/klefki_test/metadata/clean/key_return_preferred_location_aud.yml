@@ -1,0 +1,49 @@
+---
+database_name: datalake_klefki_test_clean
+table_name: key_return_preferred_location_aud
+columns:
+  id_key_return_preferred_location_aud:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.id
+  address_location_key_id:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.address_location_key_id
+  property_id:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.property_id
+  user_id:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.user_id
+  rev:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.rev
+  revend:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.revend
+  revtype:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.revtype
+  location:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.location
+  source:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.source
+  ts_response:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.response_date
+  ts_created:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.created_at
+  ts_updated:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.updated_at
+  year:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.year
+  month:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.month
+  day:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location_aud.day

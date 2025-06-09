@@ -1,0 +1,58 @@
+---
+database_name: datalake_klefki_test_clean
+table_name: inspector_booking_retrieve_key
+columns:
+  id_inspector_booking_retrieve_key:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.id
+  inspector_id:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.inspector_id
+  house_id:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.house_id
+  collect_day:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.collect_day
+  collect_hour:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.collect_hour
+  zipcode:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.zipcode
+  street:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.street
+  "number":
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key."number"
+  complement:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.complement
+  district:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.district
+  city:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.city
+  state:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.state
+  instructions:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.instructions
+  ts_created:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.created_at
+  ts_updated:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.updated_at
+  year:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.year
+  month:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.month
+  day:
+    lineage:
+      - datalake_klefki_test_raw.inspector_booking_retrieve_key.day

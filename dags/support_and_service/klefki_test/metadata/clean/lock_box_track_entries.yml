@@ -1,0 +1,40 @@
+---
+database_name: datalake_klefki_test_clean
+table_name: lock_box_track_entries
+columns:
+  id_lock_box_track_entries:
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries.id
+  house_id:
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries.house_id
+  lock_box_id:
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries.lock_box_id
+  user_id:
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries.user_id
+  user_email:
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries.user_email
+  user_role:
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries.user_role
+  "password":
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries."password"
+  ts_created:
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries.created_at
+  ts_updated:
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries.updated_at
+  year:
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries.year
+  month:
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries.month
+  day:
+    lineage:
+      - datalake_klefki_test_raw.lock_box_track_entries.day

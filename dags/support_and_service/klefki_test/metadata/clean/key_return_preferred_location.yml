@@ -1,0 +1,40 @@
+---
+database_name: datalake_klefk_test_clean
+table_name: key_return_preferred_location
+columns:
+  id_key_return_preferred_location:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.id
+  address_location_key_id:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.address_location_key_id
+  property_id:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.property_id
+  user_id:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.user_id
+  location:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.location
+  source:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.source
+  ts_response:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.response_date
+  ts_created:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.created_at
+  ts_updated:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.updated_at
+  year:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.year
+  month:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.month
+  day:
+    lineage:
+      - datalake_klefki_test_raw.key_return_preferred_location.day

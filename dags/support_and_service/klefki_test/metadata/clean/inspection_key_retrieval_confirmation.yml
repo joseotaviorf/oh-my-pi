@@ -1,0 +1,28 @@
+---
+database_name: datalake_klefki_test_clean
+table_name: inspection_key_retrieval_confirmation
+columns:
+  id_inspection_key_retrieval_confirmation:
+    lineage:
+      - datalake_klefki_test_raw.inspection_key_retrieval_confirmation.id
+  id_contract:
+    lineage:
+      - datalake_klefki_test_raw.inspection_key_retrieval_confirmation.contract_id
+  id_inspection:
+    lineage:
+      - datalake_klefki_test_raw.inspection_key_retrieval_confirmation.inspection_id
+  owner_key_location_type:
+    lineage:
+      - datalake_klefki_test_raw.inspection_key_retrieval_confirmation.owner_key_location_type
+  inspector_key_location_type:
+    lineage:
+      - datalake_klefki_test_raw.inspection_key_retrieval_confirmation.inspector_key_location_type
+  details:
+    lineage:
+      - datalake_klefki_test_raw.inspection_key_retrieval_confirmation.details
+  ts_created:
+    lineage:
+      - datalake_klefki_test_raw.inspection_key_retrieval_confirmation.created_at
+  ts_updated:
+    lineage:
+      - datalake_klefki_test_raw.inspection_key_retrieval_confirmation.updated_at

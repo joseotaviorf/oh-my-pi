@@ -1,0 +1,37 @@
+---
+database_name: datalake_klefki_test_clean
+table_name: notifications_sent
+columns:
+  id_notifications_sent:
+    lineage:
+      - datalake_klefki_test_raw.notifications_sent.id
+  contract_id:
+    lineage:
+      - datalake_klefki_test_raw.notifications_sent.contract_id
+  msg_type:
+    lineage:
+      - datalake_klefki_test_raw.notifications_sent.msg_type
+  recipient:
+    lineage:
+      - datalake_klefki_test_raw.notifications_sent.recipient
+  channel:
+    lineage:
+      - datalake_klefki_test_raw.notifications_sent.channel
+  remaining_days:
+    lineage:
+      - datalake_klefki_test_raw.notifications_sent.remaining_days
+  property_id:
+    lineage:
+      - datalake_klefki_test_raw.notifications_sent.property_id
+  ts_created:
+    lineage:
+      - datalake_klefki_test_raw.notifications_sent.created_at
+  year:
+    lineage:
+      - datalake_klefki_test_raw.notifications_sent.year
+  month:
+    lineage:
+      - datalake_klefki_test_raw.notifications_sent.month
+  day:
+    lineage:
+      - datalake_klefki_test_raw.notifications_sent.day

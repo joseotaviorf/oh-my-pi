@@ -1,0 +1,37 @@
+dag:
+  name: klefki_test
+  schedule_start_date: 2020, 7, 27
+  schedule_interval: 0 2 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Retrieve data from Klefki database (postgresql). [Klefiki](https://github.com/quintoandar/klefiki-api) is related to delivering and receiving keys during the renting period.
+      Please note that, even though this is an PostgreSQL database, you'll find it named 'klefiki_api' on some locations.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  source_database: klefiki_api
+  custom_schema: klefki_test
+  lineage_product_database_name: klefki
+  dbutils_secret_key: KLEFKI_DB
+  tables_customization:
+    address_location_key: {}
+    address_location_key_aud: {}
+    change_owner_control: {}
+    inspection_key_retrieval_confirmation: {}
+    inspector_booking_retrieve_key: {}
+    key_delivery_location: {}
+    key_return_preferred_location: {}
+    key_return_preferred_location_aud: {}
+    lock_box_track_entries: {}
+    notifications_sent: {}
+cluster:
+  type: databricks_12_2_med_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
