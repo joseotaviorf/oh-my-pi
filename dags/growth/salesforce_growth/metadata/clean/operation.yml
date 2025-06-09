@@ -1,0 +1,30 @@
+database_name: datalake_salesforce_growth_clean
+table_name: operation
+description: Clean table for ingesting operation data from the Sales Force tool.
+domain: Growth
+owner: ederson.donde@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_salesforce_growth_raw.operation.id
+    description: Unique identification key for operation in Sales Force.
+  name:
+    lineage:
+      - datalake_salesforce_growth_raw.operation.name
+    description: Name of the operation in Sales Force.
+  dt_updated:
+    lineage:
+      - datalake_salesforce_growth_raw.operation.dt_updated
+    description: Last modified date of the operation in Sales Force.
+  year:
+    lineage:
+      - datalake_salesforce_growth_raw.operation.year
+    description: Year of the operation record.
+  month:
+    lineage:
+      - datalake_salesforce_growth_raw.operation.month
+    description: Month of the operation record.
+  day:
+    lineage:
+      - datalake_salesforce_growth_raw.operation.day
+    description: Day of the operation record.

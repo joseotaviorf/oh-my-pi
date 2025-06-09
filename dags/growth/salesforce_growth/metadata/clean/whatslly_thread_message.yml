@@ -1,0 +1,70 @@
+database_name: datalake_salesforce_growth_clean
+table_name: whatslly_thread_message
+description: Clean table for ingesting WhatsApp messages data from the Sales Force tool.
+domain: Growth
+owner: ederson.donde@quintoandar.com.br
+columns:
+  id_salesforce:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.id_salesforce
+    description: Unique identification key for the WhatsApp message in Sales Force.
+  id_message_whatslly:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.id_message_whatslly
+    description: Unique identification key for the message in Whatslly system.
+  message:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.message
+    description: Content of the WhatsApp message.
+  direction:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.direction
+    description: Direction of the message (Sent/Received).
+  datetime:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.datetime
+    description: Date and time when the message was sent or received.
+  is_past_24h:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.is_past_24h
+    description: Indicates if the message is older than 24 hours.
+  is_sent:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.is_sent
+    description: Indicates if the message was successfully sent.
+  recipient_phone:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.recipient_phone
+    description: Phone number of the message recipient.
+  sender_phone:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.sender_phone
+    description: Phone number of the message sender.
+  id_lead:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.id_lead
+    description: ID of the associated lead in Sales Force.
+  id_person:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.id_person
+    description: ID of the person in Whatslly system.
+  id_owner:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.id_owner
+    description: ID of the owner of this message record in Sales Force.
+  dt_updated:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.dt_updated
+    description: Last modified date of the message record in Sales Force.
+  year:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.year
+    description: Year of the message record.
+  month:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.month
+    description: Month of the message record.
+  day:
+    lineage:
+      - datalake_salesforce_growth_raw.whatslly_thread_message.day
+    description: Day of the message record.

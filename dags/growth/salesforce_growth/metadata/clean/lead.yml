@@ -1,0 +1,70 @@
+database_name: datalake_salesforce_growth_clean
+table_name: lead
+description: Clean table for ingesting leads data from the Sales Force tool.
+domain: Growth
+owner: ederson.donde@quintoandar.com.br
+columns:
+  id_lead:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.id_lead
+    description: Unique identification key for lead in Sales Force.
+  creation_date:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.creation_date
+    description: Date when the lead was created in Sales Force.
+  id_analyst:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.id_analyst
+    description: ID of the analyst assigned to the lead.
+  is_contacted:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.is_contacted
+    description: Boolean indicating if the lead has been contacted.
+  is_qualified:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.is_qualified
+    description: Boolean indicating if the lead has been qualified.
+  phone:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.phone
+    description: Contact phone number of the lead.
+  address:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.address
+    description: Address of the lead.
+  channel:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.channel
+    description: Channel through which the lead was acquired.
+  id_salesforce:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.id_salesforce
+    description: Salesforce internal ID for the lead.
+  status:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.status
+    description: Current status of the lead in Sales Force.
+  owner_name:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.owner_name
+    description: Name of the lead owner.
+  record_type_id:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.record_type_id
+    description: Type of record in Sales Force.
+  dt_updated:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.dt_updated
+    description: Last modified date of the lead in Sales Force.
+  year:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.year
+    description: Year of the lead record.
+  month:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.month
+    description: Month of the lead record.
+  day:
+    lineage:
+      - datalake_salesforce_growth_raw.lead.day
+    description: Day of the lead record.

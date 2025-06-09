@@ -1,0 +1,12 @@
+---
+database_name: datalake_salesforce_growth_raw
+table_name: whatslly_thread_message
+columns:
+  whatslly__Recipient_Phone__c:
+    tags:
+      - PII
+      - Confidential
+  whatslly__Sender_Phone__c:
+    tags:
+      - PII
+      - Confidential

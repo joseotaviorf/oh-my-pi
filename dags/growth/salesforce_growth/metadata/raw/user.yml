@@ -1,0 +1,12 @@
+---
+database_name: datalake_salesforce_growth_raw
+table_name: user
+columns:
+  Email:
+    tags:
+      - PII
+      - Confidential
+  Name:
+    tags:
+      - PII
+      - Confidential

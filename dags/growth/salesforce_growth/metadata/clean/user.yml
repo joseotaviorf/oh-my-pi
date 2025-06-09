@@ -1,0 +1,62 @@
+database_name: datalake_salesforce_growth_clean
+table_name: user
+description: Clean table for ingesting user data from the Sales Force tool.
+domain: Growth
+owner: ederson.donde@quintoandar.com.br
+columns:
+  email:
+    lineage:
+      - datalake_salesforce_growth_raw.user.email
+    description: Email address of the user.
+  name:
+    lineage:
+      - datalake_salesforce_growth_raw.user.name
+    description: Full name of the user.
+  id_user_salesforce:
+    lineage:
+      - datalake_salesforce_growth_raw.user.id_user_salesforce
+    description: Unique identification key for user in Sales Force.
+  role:
+    lineage:
+      - datalake_salesforce_growth_raw.user.role
+    description: Role or title of the user.
+  team:
+    lineage:
+      - datalake_salesforce_growth_raw.user.team
+    description: Department or team the user belongs to.
+  leadership:
+    lineage:
+      - datalake_salesforce_growth_raw.user.leadership
+    description: Division or leadership structure the user belongs to.
+  creation_date:
+    lineage:
+      - datalake_salesforce_growth_raw.user.creation_date
+    description: Date when the user was created in Sales Force.
+  last_login_date:
+    lineage:
+      - datalake_salesforce_growth_raw.user.last_login_date
+    description: Date of the user's last login to Sales Force.
+  country:
+    lineage:
+      - datalake_salesforce_growth_raw.user.country
+    description: Country where the user is located.
+  operation:
+    lineage:
+      - datalake_salesforce_growth_raw.user.operation
+    description: Sales organization or operation the user belongs to.
+  dt_updated:
+    lineage:
+      - datalake_salesforce_growth_raw.user.dt_updated
+    description: Last modified date of the user record in Sales Force.
+  year:
+    lineage:
+      - datalake_salesforce_growth_raw.user.year
+    description: Year of the user record.
+  month:
+    lineage:
+      - datalake_salesforce_growth_raw.user.month
+    description: Month of the user record.
+  day:
+    lineage:
+      - datalake_salesforce_growth_raw.user.day
+    description: Day of the user record.

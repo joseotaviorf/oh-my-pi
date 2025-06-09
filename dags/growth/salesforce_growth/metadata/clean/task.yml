@@ -1,0 +1,62 @@
+database_name: datalake_salesforce_growth_clean
+table_name: task
+description: Clean table for ingesting task data from the Sales Force tool.
+domain: Growth
+owner: ederson.donde@quintoandar.com.br
+columns:
+  id_task_salesforce:
+    lineage:
+      - datalake_salesforce_growth_raw.task.id_task_salesforce
+    description: Unique identification key for task in Sales Force.
+  date_creation:
+    lineage:
+      - datalake_salesforce_growth_raw.task.date_creation
+    description: Date when the task was created in Sales Force.
+  id_analyst_salesforce:
+    lineage:
+      - datalake_salesforce_growth_raw.task.id_analyst_salesforce
+    description: ID of the analyst responsible for the task in Sales Force.
+  date_deadline:
+    lineage:
+      - datalake_salesforce_growth_raw.task.date_deadline
+    description: Deadline date for the task completion.
+  date_conclusion:
+    lineage:
+      - datalake_salesforce_growth_raw.task.date_conclusion
+    description: Date when the task was concluded.
+  subject:
+    lineage:
+      - datalake_salesforce_growth_raw.task.subject
+    description: Subject or description of the task.
+  status_conclusion:
+    lineage:
+      - datalake_salesforce_growth_raw.task.status_conclusion
+    description: Conclusion status of the task.
+  status:
+    lineage:
+      - datalake_salesforce_growth_raw.task.status
+    description: Current status of the task.
+  id_lead:
+    lineage:
+      - datalake_salesforce_growth_raw.task.id_lead
+    description: ID of the associated lead.
+  type:
+    lineage:
+      - datalake_salesforce_growth_raw.task.type
+    description: Type of the task.
+  dt_updated:
+    lineage:
+      - datalake_salesforce_growth_raw.task.dt_updated
+    description: Last modified date of the task in Sales Force.
+  year:
+    lineage:
+      - datalake_salesforce_growth_raw.task.year
+    description: Year of the task record.
+  month:
+    lineage:
+      - datalake_salesforce_growth_raw.task.month
+    description: Month of the task record.
+  day:
+    lineage:
+      - datalake_salesforce_growth_raw.task.day
+    description: Day of the task record.

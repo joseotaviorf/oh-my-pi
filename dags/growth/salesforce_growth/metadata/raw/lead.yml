@@ -1,0 +1,16 @@
+---
+database_name: datalake_salesforce_growth_raw
+table_name: lead
+columns:
+  Phone:
+    tags:
+      - PII
+      - Confidential
+  Direccion__c:
+    tags:
+      - PII
+      - Confidential
+  LastName:
+    tags:
+      - PII
+      - Confidential

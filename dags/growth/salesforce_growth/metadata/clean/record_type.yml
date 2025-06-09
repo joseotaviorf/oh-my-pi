@@ -1,0 +1,30 @@
+database_name: datalake_salesforce_growth_clean
+table_name: record_type
+description: Clean table for ingesting record types data from the Sales Force tool.
+domain: Growth
+owner: ederson.donde@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_salesforce_growth_raw.record_type.id
+    description: Unique identification key for record type in Sales Force.
+  name:
+    lineage:
+      - datalake_salesforce_growth_raw.record_type.name
+    description: Name of the record type in Sales Force.
+  dt_updated:
+    lineage:
+      - datalake_salesforce_growth_raw.record_type.dt_updated
+    description: Last modified date of the record type in Sales Force.
+  year:
+    lineage:
+      - datalake_salesforce_growth_raw.record_type.year
+    description: Year of the record type record.
+  month:
+    lineage:
+      - datalake_salesforce_growth_raw.record_type.month
+    description: Month of the record type record.
+  day:
+    lineage:
+      - datalake_salesforce_growth_raw.record_type.day
+    description: Day of the record type record.
