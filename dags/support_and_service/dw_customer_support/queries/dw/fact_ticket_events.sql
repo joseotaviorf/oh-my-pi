@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
   CAST(id_ticket AS BIGINT) AS sk_ticket,
   COALESCE(CAST(id_problem_ticket AS BIGINT), -1) AS sk_problem_ticket,
   COALESCE(id_assignee, -1) AS sk_assignee,

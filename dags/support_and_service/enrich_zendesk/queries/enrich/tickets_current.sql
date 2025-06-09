@@ -96,7 +96,9 @@ WITH tickets AS (
   FROM
     datalake_zendesk.tickets
   WHERE
-    ts_updated BETWEEN DATE('{load_start_date}') - INTERVAL 7 DAY AND DATE('{load_end_date}')
+    ts_updated >= DATE('{load_start_date}')
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
 ),
 ticket_metrics AS (
   SELECT DISTINCT
@@ -126,7 +128,9 @@ ticket_metrics AS (
   FROM
     datalake_zendesk.ticket_metrics
   WHERE
-    ts_updated BETWEEN DATE('{load_start_date}') - INTERVAL 7 DAY AND DATE('{load_end_date}')
+    ts_updated >= DATE('{load_start_date}')
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
 )
 SELECT
   t.id_ticket,
@@ -255,3 +259,5 @@ LEFT JOIN
 LEFT JOIN
   datalake_support_users.zendesk_users AS zu
     ON zu.id_user_zendesk = t.id_requester
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) = 1
