@@ -24,7 +24,6 @@ workflow:
         "id_requester": "source.id_requester",
         "payment_status": "source.payment_status",
         "successfull_method": "source.successfull_method",
-        "origin": "source.origin",
         "datasource": "source.datasource",
         "transaction_category": "source.transaction_category",
         "requester_description": "source.requester_description",
@@ -44,7 +43,15 @@ workflow:
         "ts_order_created": "source.ts_order_created",
         "ts_charge_started_processing": "source.ts_charge_started_processing",
         "ts_charge_paid": "source.ts_charge_paid",
-        "ts_charge_canceled": "source.ts_charge_canceled"
+        "ts_charge_canceled": "source.ts_charge_canceled",
+        "our_number": "source.our_number",
+        "your_number": "source.your_number",
+        "company_use": "source.company_use",
+        "acquirer_auth_code": "source.acquirer_auth_code",
+        "acquire_nsu": "source.acquire_nsu",
+        "id_acquire_transaction": "source.id_acquire_transaction",
+        "acquire_return_code": "source.acquire_return_code",
+        "error_type": "source.error_type"
       }
       when_not_matched_operation: {
         "id_business_key": "source.id_business_key",
@@ -57,7 +64,6 @@ workflow:
         "id_requester": "source.id_requester",
         "payment_status": "source.payment_status",
         "successfull_method": "source.successfull_method",
-        "origin": "source.origin",
         "datasource": "source.datasource",
         "transaction_category": "source.transaction_category",
         "requester_description": "source.requester_description",
@@ -77,7 +83,15 @@ workflow:
         "ts_order_created": "source.ts_order_created",
         "ts_charge_started_processing": "source.ts_charge_started_processing",
         "ts_charge_paid": "source.ts_charge_paid",
-        "ts_charge_canceled": "source.ts_charge_canceled"
+        "ts_charge_canceled": "source.ts_charge_canceled",
+        "our_number": "source.our_number",
+        "your_number": "source.your_number",
+        "company_use": "source.company_use",
+        "acquirer_auth_code": "source.acquirer_auth_code",
+        "acquire_nsu": "source.acquire_nsu",
+        "id_acquire_transaction": "source.id_acquire_transaction",
+        "acquire_return_code": "source.acquire_return_code",
+        "error_type": "source.error_type"
       }
 cluster:
   type: databricks_13_3_med_general_photon_cluster
