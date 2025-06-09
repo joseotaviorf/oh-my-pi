@@ -9,8 +9,7 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  default_extraction_type: incremental
-  default_partitions: [year, month, day]
+  default_extraction_type: full
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
@@ -21,21 +20,9 @@ workflow:
       - installment
       - negotiation
   tables_customization:
-    invoice_portfolio:
-      extraction_type: full
-      partitions: []
-    debt_negotiated:
-      extraction_type: full
-      partitions: []
-    installment:
-      extraction_type: full
-      partitions: []
-    negotiation:
-      extraction_type: full
-      partitions: []
-    operators:
-      extraction_type: full
-      partitions: []
+    delinquency_app_events:
+      extraction_type: incremental
+      partitions: [year, month, day]
 cluster:
   type: custom_cluster
   custom_configurations:
