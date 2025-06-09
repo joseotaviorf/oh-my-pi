@@ -99,38 +99,6 @@ WITH tickets AS (
     ts_updated >= DATE('{load_start_date}')
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
-),
-ticket_metrics AS (
-  SELECT DISTINCT
-    id_ticket,
-    group_stations,
-    assignee_stations,
-    reopens,
-    replies,
-    reply_time_min_calendar,
-    first_resolution_time_min_calendar,
-    full_resolution_time_min_calendar,
-    requester_wait_time_min_calendar,
-    agent_wait_time_min_calendar,
-    on_hold_time_min_calendar,
-    reply_time_min_business,
-    first_resolution_time_min_business,
-    full_resolution_time_min_business,
-    requester_wait_time_min_business,
-    agent_wait_time_min_business,
-    on_hold_time_min_business,
-    ts_assigned,
-    ts_initially_assigned,
-    ts_solved,
-    ts_latest_comment_added,
-    ts_created,
-    ts_updated
-  FROM
-    datalake_zendesk.ticket_metrics
-  WHERE
-    ts_updated >= DATE('{load_start_date}')
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1
 )
 SELECT
   t.id_ticket,
@@ -254,10 +222,8 @@ SELECT
 FROM
   tickets AS t
 LEFT JOIN
-  ticket_metrics AS tm
+  datalake_zendesk.ticket_metrics AS tm
     ON tm.id_ticket = t.id_ticket
 LEFT JOIN
   datalake_support_users.zendesk_users AS zu
     ON zu.id_user_zendesk = t.id_requester
-QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY t.id_ticket ORDER BY t.ts_updated DESC) = 1
