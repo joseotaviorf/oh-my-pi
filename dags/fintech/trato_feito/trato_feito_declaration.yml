@@ -73,6 +73,7 @@ workflow:
     comms: {}
     communication_audience: {}
     communication_sequence: {}
+    communication_step: {}
     segment: {}
     segment_distribution: {}
     segment_distribution_history: {}

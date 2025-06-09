@@ -1,0 +1,41 @@
+---
+database_name: datalake_trato_feito_clean
+table_name: communication_step
+owner: null
+domain: fintech
+description: Entity represents a single step in a communication sequence
+columns:
+  id_communication_step:
+    description: "Unique identifier for the step"
+    lineage:
+      - datalake_trato_feito_raw.communication_step.CAST(id AS BIGINT)
+  id_sequence:
+    description: "Unique identifier for the sequence"
+    lineage:
+      - datalake_trato_feito_raw.communication_step.CAST(sequence_id AS BIGINT)
+  id_internal_comms:
+    description: "Identification of the comms rule in comms manager"
+    lineage:
+      - datalake_trato_feito_raw.communication_step.internal_comms_id
+  day_offset:
+    description: "Day offset for the step, starting from 1"
+    lineage:
+      - datalake_trato_feito_raw.communication_step.day_offset
+  version:
+    description: "Version number for optimistic locking"
+    lineage:
+      - datalake_trato_feito_raw.communication_step.version
+  minimum_start_hour_utc:
+    description: "Minimum hour in UTC when the step can start"
+    lineage:
+      - datalake_trato_feito_raw.communication_step.minimum_start_hour_utc
+  ts_created:
+    description: "Timestamp when the step was created"
+    lineage:
+      - datalake_trato_feito_raw.communication_step.created_at
+  ts_updated:
+    description: "Timestamp when the step was last updated"
+    lineage:
+      - datalake_trato_feito_raw.communication_step.updated_at
+  ts_load:
+    description: ""

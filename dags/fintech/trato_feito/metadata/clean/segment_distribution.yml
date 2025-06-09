@@ -17,6 +17,10 @@ columns:
     description: "Identifier of the communication audience associated with the segment"
     lineage:
       - datalake_trato_feito_raw.segment_distribution.communication_audience_id
+  id_contract:
+    description: "Contract ID"
+    lineage:
+      - datalake_trato_feito_raw.segment_distribution.contract_id
   customer_document_type:
     description: "Type of customer document (e.g., CPF, CNPJ, RG)"
     lineage:

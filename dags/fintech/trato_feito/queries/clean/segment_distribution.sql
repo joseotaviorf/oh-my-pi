@@ -2,6 +2,7 @@ SELECT
     CAST(id AS BIGINT) AS id_segment_distribution,
     CAST(segment_id AS BIGINT) AS id_segment,
     CAST(communication_audience_id AS BIGINT) AS id_communication_audience,
+    contract_id AS id_contract,
     customer_document_type,
     customer_document_value,
     version,
