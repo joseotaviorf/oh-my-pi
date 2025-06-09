@@ -29,6 +29,16 @@ columns:
     description: The unique identifier for the user. This column can be used in any join with the id_user from main.
     lineage:
     - datalake_docx_clean.credit_evaluation.id_user
+  credit_evaluation_status:
+    description: The status of the credit evaluation.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.status
+  scope:
+    description: The scope of the credit evaluation.
+    HOUSE: When the credit model evaluates the credit risk based on the property information.
+    CITY: When the credit evaluation is valid for any property within a city.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.scope
   group_authorization_status:
     description: The status of the authorization.
     categories:
@@ -40,6 +50,7 @@ columns:
     description: The name of the event.
     categories:
       PRE_EVALUATION_STARTED: Indicates the beginnning of the credit pre evaluation through credit passport.
+      NOT_SENT: Indicates the creation of a new proposal or the recovery of a proposal. It corresponds to the start of the tenant documentation state machine.
       EVALUATION_STARTED: Indicates the beginnning of the credit evaluation, which happens after the offer approval.
       PRE_APPROVED: Indicates the moment when the credit evaluation was pre approved with or without a paid guarantee.
       PRE_REJECTED: Indicates that the credit evaluation was pre rejected.
@@ -90,15 +101,16 @@ columns:
     - datalake_docx_clean.machine_state.ts_created
     - datalake_docx_clean.machine_state.input_source_type
     - datalake_docx_clean.machine_state.status
-  ts_sufficient_credit_limit:
-    description: The timestamp when the group was marked as 'VALUE_WITHIN_PRE_APPROVED_LIMIT' in the group authorization process.
-    lineage:
-    - datalake_docx_clean.group_authorization.ts_created
-    - datalake_docx_clean.group_authorization.credit_result
   ts_credit_evaluation_created:
     description: The timestamp creation of the credit evaluation.
     lineage:
     - datalake_docx_clean.credit_evaluation.ts_created
+  ts_state_machine_start:
+    description: The timestamp when the proposal is created or recovered and the tenant documentation state machine starts.
+    lineage:
+    - datalake_docx_clean.machine_state.ts_created
+    - datalake_docx_clean.machine_state.input_source_type
+    - datalake_docx_clean.machine_state.status
   ts_evaluation_started:
     description: The timestamp when the proposal credit evaluation started.
     lineage:
@@ -141,11 +153,3 @@ columns:
     - datalake_docx_clean.machine_state.ts_created
     - datalake_docx_clean.machine_state.input_source_type
     - datalake_docx_clean.machine_state.status
-  ts_group_authorization_created:
-    description: The timestamp when the authorization was created.
-    lineage:
-    - datalake_docx_clean.group_authorization.ts_created
-  ts_machine_state_created:
-    description: The timestamp when the machine state event was created.
-    lineage:
-    - datalake_docx_clean.machine_state.ts_created
