@@ -492,7 +492,7 @@ SELECT DISTINCT
     our_number,
     your_number,
     company_use,
-    acquire_auth_code,
+    acquirer_auth_code,
     acquire_nsu,
     id_acquire_transaction,
     acquire_return_code,
