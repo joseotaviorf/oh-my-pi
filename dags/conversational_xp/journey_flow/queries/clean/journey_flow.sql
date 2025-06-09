@@ -23,7 +23,3 @@ SELECT
     day
 FROM
     datalake_journey_flow_raw.t_journey_flow
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

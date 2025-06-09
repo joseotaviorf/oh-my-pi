@@ -9,27 +9,18 @@ dag:
       a service that is part of the chatbot structure.
 
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
+  source_schema: public
+  source_database: journey_flow
   database_type: postgres
-  lineage_product_database_name: journey_flow
   dbutils_secret_key: JOURNEY_FLOW_DB
+  custom_schema: journey_flow
+
   tables_customization:
-    t_journey_content:
-      extraction_type: full
-      clean_table_name: journey_content
-    t_rule:
-      extraction_type: full
-      clean_table_name: rule
     t_journey_flow:
-      date_filter_column: updated_at
-      extraction_type: incremental
-      partitions: [year, month, day]
       clean_table_name: journey_flow
     t_dialog:
-      date_filter_column: creation
-      extraction_type: incremental
-      partitions: [year, month, day]
       clean_table_name: dialog
 
 cluster:
