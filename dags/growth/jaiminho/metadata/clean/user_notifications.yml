@@ -8,15 +8,21 @@ columns:
   id_user:
     lineage:
       - datalake_jaiminho_raw.user_notifications.user_id
+      - datalake_jaiminho_raw.user_notifications.userid
   id_event:
     lineage:
       - datalake_jaiminho_raw.user_notifications.event_id
   id_entity:
     lineage:
       - datalake_jaiminho_raw.user_notifications.entity_id
+      - datalake_jaiminho_raw.user_notifications.referenceId
+  id_campaign:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications.campaign_id
   entity_name:
     lineage:
       - datalake_jaiminho_raw.user_notifications.entity_name
+      - datalake_jaiminho_raw.user_notifications.referenceName
   action:
     lineage:
       - datalake_jaiminho_raw.user_notifications.action
@@ -26,36 +32,48 @@ columns:
   channel:
     lineage:
       - datalake_jaiminho_raw.user_notifications.channel
+  profile:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications.profile
   tags:
     lineage:
       - datalake_jaiminho_raw.user_notifications.tags
   destination:
     lineage:
       - datalake_jaiminho_raw.user_notifications.destination
+  payload:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications.payload
   template:
     lineage:
-      - datalake_jaiminho_raw.user_notifications.template
+      - datalake_jaiminho_raw.user_notifications.payload:bodyTemplate
   country_code:
     lineage:
-      - datalake_jaiminho_raw.user_notifications.country
+      - datalake_jaiminho_raw.user_notifications.payload:country
   metadata:
     lineage:
-      - datalake_jaiminho_raw.user_notifications.metadata
+      - datalake_jaiminho_raw.user_notifications.payload:metadata
   cost_center:
     lineage:
       - datalake_jaiminho_raw.user_notifications.ccost
   scope:
     lineage:
       - datalake_jaiminho_raw.user_notifications.scope
+  notification_center_acknowledge:
+    lineage:
+      - datalake_jaiminho_raw.user_notifications.notificationCenterAcknowledge
   ts_sent:
     lineage:
       - datalake_jaiminho_raw.user_notifications.sent_at
+      - datalake_jaiminho_raw.user_notifications.sentAt
   ts_created:
     lineage:
       - datalake_jaiminho_raw.user_notifications.created_at
+      - datalake_jaiminho_raw.user_notifications.createdAt
   ts_updated:
     lineage:
       - datalake_jaiminho_raw.user_notifications.updated_at
+      - datalake_jaiminho_raw.user_notifications.updatedAt
   year:
     lineage:
       - datalake_jaiminho_raw.user_notifications.year
