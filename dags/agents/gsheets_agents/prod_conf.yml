@@ -17,12 +17,6 @@ sheets_info:
     clean_table_name: agents_targets_tracking
     sheet_context: agents
 
-  asp_consultants_allocation:
-    sheet_id: 1xEMHNMbTb6tBLghGSDwv5kLi0vid66oUNEirUY672oY
-    sheet_name: aux_table
-    clean_table_name: asp_consultants_allocation
-    sheet_context: agents
-
   asp_rent_fl_and_ciq_opportunity_distribution:
     sheet_id: 1r9jdNq5ux4D60smnonIH6S4_7DDgjWF9D_bQtJNPyWc
     sheet_name: export_dados
