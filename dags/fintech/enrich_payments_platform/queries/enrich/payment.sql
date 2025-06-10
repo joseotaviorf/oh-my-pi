@@ -30,26 +30,36 @@ WITH subscription_invoices AS (
 charge_created AS (
 
     SELECT
-    id,
-    FIRST_VALUE(ts_updated) OVER(PARTITION BY id ORDER BY rev) AS ts_created
+        id,
+        FIRST_VALUE(ts_updated) OVER(PARTITION BY id ORDER BY rev) AS ts_created
     FROM
-    datalake_wall_street_clean.charge_aud
+        datalake_wall_street_clean.charge_aud
     QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id ORDER BY rev DESC) = 1
+        ROW_NUMBER() OVER(PARTITION BY id ORDER BY rev DESC) = 1
 
 ),
 charge_canceled AS (
 
     SELECT
-    id,
-    FIRST_VALUE(ts_updated) OVER(PARTITION BY id ORDER BY rev) AS ts_canceled
+        id,
+        FIRST_VALUE(ts_updated) OVER(PARTITION BY id ORDER BY rev) AS ts_canceled
     FROM
-    datalake_wall_street_clean.charge_aud
+    datalake_wall_street_clean.charge_audit
     WHERE
-    charge_status = 'CANCELED'
+        charge_status = 'CANCELED'
     QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id ORDER BY rev DESC) = 1
+        ROW_NUMBER() OVER(PARTITION BY id ORDER BY rev DESC) = 1
 
+),
+ws_charge AS (
+    SELECT
+    *
+    FROM
+    datalake_wall_street_clean.charge
+    WHERE
+        id_finance_entity = 17593850655951
+    QUALIFY
+        IF(COUNT(*) OVER (PARTITION BY id_finance_entity) > 1, acquire_tid <> '-1', TRUE)
 ),
 credit_card_payments AS (
     SELECT
@@ -89,7 +99,7 @@ credit_card_payments AS (
         datalake_checkout_clean.credit_card_capture_attempt AS cca
         ON cca.id_credit_card = cc.id
     FULL JOIN
-        datalake_wall_street_clean.charge AS wsc
+        ws_charge AS wsc
         ON  wsc.code = cca.code
         AND wsc.id_finance_entity = cc.id_finance_entity
     LEFT JOIN
@@ -214,7 +224,7 @@ checkout AS (
         datalake_checkout_clean.requester AS r
         ON r.id = o.id_requester
     LEFT JOIN
-        datalake_wall_street_clean.charge AS wc
+        ws_charge AS wc
         ON o.id_finance_entity = wc.id_finance_entity
     LEFT JOIN
         datalake_wall_street_clean.store AS s
