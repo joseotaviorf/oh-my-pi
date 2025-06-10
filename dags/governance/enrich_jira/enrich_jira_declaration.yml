@@ -16,7 +16,7 @@ workflow:
       - "{bucket}"
       - "{schema}"
       - "{table_name}"
-      - '["DIN", "DG", "DAC"]'           # Projects to look for deleted issues. We don't include every project because this is not a very optimal process
+      - '["DIN", "DG", "DAC", "DEI"]'           # Projects to look for deleted issues. We don't include every project because this is not a very optimal process
   inner_dependencies:
     issues:
     - deleted_issues
