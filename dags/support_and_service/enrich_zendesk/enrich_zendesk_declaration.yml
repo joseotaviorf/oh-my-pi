@@ -10,8 +10,8 @@ workflow:
   layer: enrich
   inner_dependencies:
     tickets_current:
-    - ticket_metrics
-    - tickets
+      - ticket_metrics
+      - tickets
   default_extraction_type: incremental
   tables_customization:
     tickets_current:
@@ -34,6 +34,6 @@ cluster:
     spark_conf:
       spark.sql.mapKeyDedupPolicy: "LAST_WIN"
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
   databricks_conn_id: databricks_new
