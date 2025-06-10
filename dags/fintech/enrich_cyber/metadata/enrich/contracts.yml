@@ -97,6 +97,10 @@ columns:
     description: "To indicate the probability of recovery of a contract (High/Medium/Low/Very Low), a marking will be uploaded via a spreadsheet, storing key contract indicators in Cyber. These indicators will be used to assign contracts to specific queues for each group."
     lineage:
       - datalake_cyber_clean.contracts.probability_group
+  collection_strategy:
+    description: "Code representing the customer’s collection flow, based on collection_classification + probability_group, activation delay + BPO postponement."
+    lineage:
+      - datalake_cyber_clean.contracts.collection_strategy
   agreement_type:
     description: ""
     lineage:
