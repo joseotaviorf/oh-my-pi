@@ -44,7 +44,7 @@ charge_canceled AS (
         id,
         FIRST_VALUE(ts_updated) OVER(PARTITION BY id ORDER BY rev) AS ts_canceled
     FROM
-    datalake_wall_street_clean.charge_audit
+    datalake_wall_street_clean.charge_aud
     WHERE
         charge_status = 'CANCELED'
     QUALIFY
