@@ -26,7 +26,7 @@ eligibility_rules AS (
         END AS value_segment,
         hl.country_code,
         CASE
-            WHEN hl.first_key_location IN ('OwnerPresent','None') OR hl.first_key_location IS NULL THEN
+            WHEN hl.first_key_location IN ('OWNER','NONE') OR hl.first_key_location IS NULL THEN
                 (CASE
                     WHEN hldi.doorman_type IN ('horas24', 'Diurno') AND (hldi.id_occupant IS NULL OR hldi.id_occupant IN (1, 4)) THEN 'PP Acompanha - Elegível Com Portaria'
                     WHEN hldi.doorman_type NOT IN ('horas24', 'Diurno') AND hldi.is_for_sale = FALSE AND (hldi.id_occupant IS NULL OR hldi.id_occupant IN (1, 4)) THEN 'PP Acompanha - Elegível CRCC'
@@ -37,7 +37,7 @@ eligibility_rules AS (
         CASE
             WHEN hldi4w_ed.id_house_listing IS NOT NULL THEN (
                 CASE
-                    WHEN COALESCE(hldi4w_ed.key_location, hl.key_location) IN ('OwnerPresent', 'None') OR COALESCE(hldi4w_ed.key_location, hl.key_location) IS NULL THEN
+                    WHEN COALESCE(hldi4w_ed.key_location, hl.key_location) IN ('OWNER', 'NONE') OR COALESCE(hldi4w_ed.key_location, hl.key_location) IS NULL THEN
                         (CASE
                             WHEN COALESCE(hldi4w_ed.doorman_type, hl.house_entrance) IN ('horas24', 'Diurno') AND (COALESCE(CAST(hldi4w_ed.id_occupant AS STRING), hl.who_is_living) IS NULL OR COALESCE(CAST(hldi4w_ed.id_occupant AS STRING), hl.who_is_living) IN ('1', '4', 'None', 'Empty')) THEN 'PP Acompanha - Elegível Com Portaria'
                             WHEN COALESCE(hldi4w_ed.doorman_type, hl.house_entrance) not IN ('horas24', 'Diurno') AND COALESCE(hldi4w_ed.is_for_sale, hl.is_for_sale) = FALSE AND (COALESCE(CAST(hldi4w_ed.id_occupant AS STRING), hl.who_is_living) IS NULL OR COALESCE(CAST(hldi4w_ed.id_occupant AS STRING), hl.who_is_living) IN ('1', '4', 'None', 'Empty')) THEN 'PP Acompanha - Elegível CRCC'
@@ -47,7 +47,7 @@ eligibility_rules AS (
                 END)
             WHEN hldi4w_ed.id_house_listing IS NULL THEN (
                 CASE
-                    WHEN COALESCE(hldi4w.key_location, hl.key_location) IN ('OwnerPresent', 'None') OR COALESCE(hldi4w.key_location, hl.key_location) IS NULL THEN
+                    WHEN COALESCE(hldi4w.key_location, hl.key_location) IN ('OWNER', 'NONE') OR COALESCE(hldi4w.key_location, hl.key_location) IS NULL THEN
                     (CASE
                         WHEN COALESCE(hldi4w.doorman_type, hl.house_entrance) IN ('horas24', 'Diurno') AND (COALESCE(CAST(hldi4w.id_occupant AS STRING), hl.who_is_living) IS NULL OR COALESCE(CAST(hldi4w.id_occupant AS STRING), hl.who_is_living) IN ('1', '4', 'None', 'Empty')) THEN 'PP Acompanha - Elegível Com Portaria'
                         WHEN COALESCE(hldi4w.doorman_type, hl.house_entrance) not IN ('horas24', 'Diurno') AND COALESCE(hldi4w.is_for_sale, hl.is_for_sale) = FALSE AND (COALESCE(CAST(hldi4w.id_occupant AS STRING), hl.who_is_living) IS NULL OR COALESCE(CAST(hldi4w.id_occupant AS STRING), hl.who_is_living) IN ('1', '4', 'None', 'Empty')) THEN 'PP Acompanha - Elegível CRCC'

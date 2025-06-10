@@ -203,7 +203,7 @@ SELECT DISTINCT
     ka.is_keys_with_agent_opt_in,
     CASE
         WHEN ndl.is_keys_with_agent_eligible = TRUE THEN TRUE
-        WHEN ndl.house_key_location IN ('OwnerPresent','None')
+        WHEN ndl.house_key_location IN ('OWNER','NONE')
                 AND ndl.doorman_type IN ('NaoHaPorteiro', 'Noturno')
                 AND ndl.who_is_living = 'Empty'
                 AND ndl.is_for_sale = FALSE THEN TRUE

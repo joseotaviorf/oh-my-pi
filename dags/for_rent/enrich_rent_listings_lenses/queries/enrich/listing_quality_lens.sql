@@ -594,7 +594,7 @@ business_logic AS (
         IF(parking_slots IS NULL, -400, 0) AS parking_slots_score,
         IF(type IS NULL, -300, 0) AS type_score,
         IF(doorman_type IS NULL AND type IN ('Apartamento', 'CasaCondominio', 'StudioOuKitchenette'), -200, 0) AS doorman_type_score,
-        IF(key_location_type IS NULL OR key_location_type = 'None', -400, 0) AS key_location_score,
+        IF(key_location_type IS NULL OR key_location_type = 'NONE', -400, 0) AS key_location_score,
         IF(is_listing_accurate IS FALSE, -10000, 0) AS listing_accuracy_score,
         IF(is_furnished IS FALSE, -100, 0) AS furniture_score,
         IF(is_penthouse IS NULL, -50, 0) AS penthouse_score,

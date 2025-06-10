@@ -176,7 +176,7 @@ scores AS (
       ELSE 0.0
     END AS good_hours_score,
     CASE
-      WHEN hdi.key_location in ('OwnerPresent', 'None') OR hdi.key_location IS NULL THEN 0.0
+      WHEN hdi.key_location in ('OWNER', 'NONE') OR hdi.key_location IS NULL THEN 0.0
       ELSE 2.7
     END AS is_easy_entry_score,
     CASE

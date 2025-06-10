@@ -103,7 +103,7 @@ listing_ownership AS (
   LEFT JOIN
     datalake_company.company_sks AS cs
       ON cs.uuid_company = loa.uuid_company
-  LEFT JOIN  
+  LEFT JOIN
     datalake_company_clean.company AS cc
       ON cc.id = cs.id_company
   LEFT JOIN
@@ -219,10 +219,10 @@ SELECT
   h.land_area,
   h.predicted_price,
   h.sale_price,
-  entrance.key_location AS key_location_unified,
+  entrance.key_location,
   entrance.occupant_type,
   entrance.key_type,
-  entrance.authorization_type AS key_location,
+  entrance.authorization_type,
   entrance.restriction_type AS visit_restriction,
   hrs.registration_abandoned_reason AS registration_abandoned_reason,
   CASE

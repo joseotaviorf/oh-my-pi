@@ -23,13 +23,19 @@ columns:
       - datalake_ebdb_listing.house_entrance_history.key_location
     description: Where the key is located in a certain week.
     categories:
-      FrontDoor: Key is located at front door.
-      KeysLocker: Keys Locker.
-      KeysWithAgent: Keys is located with agent.
-      LockBox: Key is located at Lockbox.
-      None: Unknown.
-      OwnerPresent: The key is located with the Owner.
-      Password: Password.
+      FRONT_DOOR: Key is located at front door.
+      LOCKER: Keys Locker.
+      AGENT: Keys is located with agent.
+      LOCK_BOX: Key is located at Lockbox.
+      NONE: Unknown.
+      OWNER: The key is located with the Owner.
+      PASSWORD: Password.
+      BIOMETRY: Access through biometry.
+      TENANT: The key is with the tenant.
+      INSPECTOR: The key is with the inspector.
+      PHOTOGRAPHER: The key is with the photographer.
+      EXTERNAL_RESPONSIBLE: The key is with an external responsible.
+      PARTNER: The key is with the partner.
   key_type_history:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.key_type

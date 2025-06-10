@@ -396,12 +396,18 @@ columns:
     - dw_rent.dim_house_listing.key_location
     description: Where the key is located.
     categories:
-      FrontDoor: Front door
-      KeysLocker: Keys Locker
-      LockBox: Lockbox
-      None: Unknown
-      OwnerPresent: Owner present
-      Password: Password
+      LOCK_BOX: There's a lock box
+      FRONT_DOOR: Front door
+      PASSWORD: Access through password
+      BIOMETRY: Access through biometry
+      LOCKER: Access through a locker
+      OWNER: The key is with the owner
+      TENANT: The key is with the tenant
+      INSPECTOR: The key is with the inspector
+      PHOTOGRAPHER: The key is with the photographer
+      AGENT: The key is with the agent
+      EXTERNAL_RESPONSIBLE: The key is with an external responsible
+      PARTNER: The key is with the partner
   key_type:
     lineage:
     - dw_rent.dim_house_listing.key_type

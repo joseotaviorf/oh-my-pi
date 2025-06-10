@@ -39,13 +39,13 @@ columns:
       - datalake_ebdb_clean.access_type_aud.additional_info
       - datalake_ebdb_clean.entry_access_tracking.entry_access_details
     description: Additional info about from the unified entry model. This field has already been migrated
-  key_location_unified:
+  key_location:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name
       - datalake_ebdb_clean.entry_access_tracking.key_holder_role
       - datalake_ebdb_clean.entry_access_tracking.entry_access_type
     description: Location of the houses's key. This field has already been migrated.
-  key_location:
+  authorization_type:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name
     description: Location of the houses's key. This field come from old model and will be used until the migration communication.

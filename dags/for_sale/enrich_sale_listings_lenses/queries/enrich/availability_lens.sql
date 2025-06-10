@@ -232,8 +232,8 @@ business_logic AS (
     id_region,
     status,
     CASE
-      WHEN key_location = 'OwnerPresent' AND visits_canceled_by_owner_last_45_days >= 1 THEN -10000
-      WHEN key_location = 'OwnerPresent' AND visits_canceled_by_owner_last_45_days = 0 THEN -2000
+      WHEN key_location = 'OWNER' AND visits_canceled_by_owner_last_45_days >= 1 THEN -10000
+      WHEN key_location = 'OWNER' AND visits_canceled_by_owner_last_45_days = 0 THEN -2000
       ELSE 0
     END AS key_location_score,
     CASE
@@ -260,9 +260,9 @@ business_logic AS (
       ELSE 0
     END AS week_available_hours_score,
     CASE
-      WHEN key_location = 'OwnerPresent' AND visits_canceled_by_owner_last_45_days >= 1 THEN 'and its key location is Owner Present.'
-      WHEN key_location = 'OwnerPresent' AND visits_canceled_by_owner_last_45_days = 0 THEN 'and its key location is ' || key_location
-      WHEN key_location IS NULL OR key_location = 'None' THEN 'and the key location is unknown '
+      WHEN key_location = 'OWNER' AND visits_canceled_by_owner_last_45_days >= 1 THEN 'and its key location is Owner Present.'
+      WHEN key_location = 'OWNER' AND visits_canceled_by_owner_last_45_days = 0 THEN 'and its key location is ' || key_location
+      WHEN key_location IS NULL OR key_location = 'NONE' THEN 'and the key location is unknown '
       ELSE 'and its key location is ' || key_location
     END AS key_location_score_disclaimer,
     CASE

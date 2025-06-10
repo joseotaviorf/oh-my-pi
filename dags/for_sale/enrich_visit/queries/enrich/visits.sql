@@ -34,34 +34,17 @@ WITH
         GROUP BY
             id_visit
     ),
-    entrance_method AS (
+    entry_model AS (
         SELECT
-          heh.id_house AS sk_house,
-          DATE(heh.ts_entrance_started) AS date_start,
-          DATE(COALESCE(heh.ts_entrance_ended, NOW())) AS date_end,
-          MAX(heh.key_location) AS method,
-          MAX(heh.key_type) AS key_type
+            id_house,
+            DATE(ts_entrance_started) AS dt_entrance_started,
+            DATE(COALESCE(ts_entrance_ended, NOW())) AS dt_entrance_ended,
+            TRIM(LOWER(key_location)) AS method
         FROM
-          datalake_ebdb_listing.house_entrance_history heh
+            datalake_ebdb_listing.house_entrance_history
         WHERE
-          heh.is_last_status_of_day
-          AND heh.ts_entrance_started < NOW()
-          AND COALESCE(heh.ts_entrance_ended, NOW()) >= DATE_SUB(NOW(), 400)
-        GROUP BY ALL
-),
-    entrance_method_treatment(
-        SELECT
-            l.id AS id_house,
-            DATE(COALESCE(em.date_start, l.dt_creation)) AS start_date,
-            DATE(COALESCE(em.date_end, l.ts_updated)) AS end_date,
-            TRIM(LOWER(MAX(COALESCE(em.method, l.key_location)))) AS method
-        FROM
-           datalake_ebdb_listing.house AS l
-        LEFT JOIN
-            entrance_method AS em
-                ON l.id = em.sk_house
-        GROUP BY ALL
-),
+            is_last_status_of_day
+    ),
     visit_3p_demand_agent AS (
         SELECT
             v.id AS id_visit,
@@ -104,12 +87,12 @@ SELECT
     visit.behavior,
     visit.business_model,
     visit_log.first_event,
-    CASE emt.method
-        WHEN 'frontdoor' THEN 'Front Door'
-        WHEN 'keyswithagent' THEN 'Keys with Agent'
-        WHEN 'lockbox' THEN 'Lockbox'
+    CASE entry_model.method
+        WHEN 'front_door' THEN 'Front Door'
+        WHEN 'agent' THEN 'Keys with Agent'
+        WHEN 'lock_box' THEN 'Lockbox'
         WHEN 'password' THEN 'Password'
-        WHEN 'keyslocker' THEN 'Keys Locker'
+        WHEN 'locker' THEN 'Keys Locker'
         ELSE 'Owner Present'
     END AS method,
     CASE
@@ -199,9 +182,9 @@ LEFT JOIN
     datalake_ebdb_clean.country AS ct
         ON ct.code = hl.country_code
 LEFT JOIN
-    entrance_method_treatment AS emt
-        ON visit.id_house = emt.id_house
-        AND visit.dt_visit >= emt.start_date
-        AND visit.dt_visit < emt.end_date
+    entry_model
+        ON visit.id_house = entry_model.id_house
+        AND visit.dt_visit >= entry_model.dt_entrance_started
+        AND visit.dt_visit < entry_model.dt_entrance_ended
 WHERE
     DATE(visit.ts_created) >= '2024-11-01'

@@ -378,11 +378,11 @@ SELECT DISTINCT
   v.business_model,
   CASE
     entry_model.method
-    WHEN 'frontdoor' THEN 'Front Door'
-    WHEN 'keyswithagent' THEN 'Keys with Agent'
-    WHEN 'lockbox' THEN 'Lockbox'
+    WHEN 'front_door' THEN 'Front Door'
+    WHEN 'agent' THEN 'Keys with Agent'
+    WHEN 'lock_box' THEN 'Lockbox'
     WHEN 'password' THEN 'Password'
-    WHEN 'keyslocker' THEN 'Keys Locker'
+    WHEN 'locker' THEN 'Keys Locker'
     ELSE 'Owner Present'
   END AS method,
   CASE

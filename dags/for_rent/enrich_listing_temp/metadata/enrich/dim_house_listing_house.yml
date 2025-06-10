@@ -55,7 +55,7 @@ columns:
       publicado: "Published."
       suspenso: "Suspended."
   status_reason:
-    description: "Status reason (it's initially empty to facilitate the questions migration. 
+    description: "Status reason (it's initially empty to facilitate the questions migration.
       It will be filled when versioning 2.0 is up and running)."
   is_keys_with_agent_eligible:
     lineage:
@@ -350,12 +350,18 @@ columns:
     - datalake_ebdb_listing.house.key_location
     description: "Where the key is located."
     categories:
-      FrontDoor: "Front door."
-      KeysLocker: "Keys Locker."
-      LockBox: "Lockbox."
-      None: "Unknown."
-      OwnerPresent: "Owner present."
-      Password: "Password."
+      LOCK_BOX: "There's a lock box"
+      FRONT_DOOR: "Front door"
+      PASSWORD: "Access through password"
+      BIOMETRY: "Access through biometry"
+      LOCKER: "Access through a locker"
+      OWNER: "The key is with the owner"
+      TENANT: "The key is with the tenant"
+      INSPECTOR: "The key is with the inspector"
+      PHOTOGRAPHER: "The key is with the photographer"
+      AGENT: "The key is with the agent"
+      EXTERNAL_RESPONSIBLE: "The key is with an external responsible"
+      PARTNER: "The key is with the partner"
   house_predicted_price:
     lineage:
     - datalake_ebdb_listing.house.predicted_price

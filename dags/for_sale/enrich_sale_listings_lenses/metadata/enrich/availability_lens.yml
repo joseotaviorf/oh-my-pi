@@ -7,7 +7,7 @@ domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:
-    lineage: 
+    lineage:
       - datalake_ebdb_clean.listing_business_context.id_house
     description: >
       Column referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.
@@ -24,11 +24,11 @@ columns:
       We know that the conversion from VB to VC is lower when the listing needs the owner present at the visit.  In addition, we penalize even more when the owner has already cancelled a visit.
     categories:
       "-10000": >
-        When the listing has 'OwnerPresent' at the key location and furthermore, that same owner has previously had a visit cancelled, we penalize it by -10000 score points.
+        When the listing has 'OWNER' at the key location and furthermore, that same owner has previously had a visit cancelled, we penalize it by -10000 score points.
       "-2000": >
-        When the listing has 'OwnerPresent' at the key location and beyond, but has no previously cancelled visit, we penalize it by -2000 score points.
+        When the listing has 'OWNER' at the key location and beyond, but has no previously cancelled visit, we penalize it by -2000 score points.
       "0": >
-        If the location of the key is different from 'OwnerPresent.
+        If the location of the key is different from 'OWNER.
   week_available_hours_score:
     description: >
       Score based on the amount of weekly hours available for visit by the listing. The fewer hours available, the more we penalize the listing.

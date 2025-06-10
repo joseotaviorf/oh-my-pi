@@ -13,8 +13,8 @@ WITH old_entry_model AS (
             WHEN authorization.name = "KeysWithAgent" THEN "AGENT"
             WHEN authorization.name = "OwnerPresent" THEN "OWNER"
             ELSE UPPER(authorization.name)
-        END AS key_location_unified,
-        authorization.name AS key_location,
+        END AS key_location,
+        authorization.name AS authorization_type,
         access.has_opted_keys_with_agent,
         NULL AS entry_model_channel,
         NULL AS actor_role,
@@ -56,8 +56,8 @@ new_entry_model AS (
         NULL AS restriction_type,
         NULL AS key_type,
         entry_access_details AS entry_model_details,
-        IF(entry_access_type = "KEY_HOLDER", key_holder_role, entry_access_type) AS key_location_unified,
-        NULL AS key_location,
+        IF(entry_access_type = "KEY_HOLDER", key_holder_role, entry_access_type) AS key_location,
+        NULL AS authorization_type,
         NULL AS has_opted_keys_with_agent,
         channel AS entry_model_channel,
         actor_role,
@@ -84,8 +84,8 @@ unified_model AS ( -- When a field is null in the new model, we will consider th
         COALESCE(new_entry_model.restriction_type, old_entry_model.restriction_type) AS restriction_type,
         COALESCE(new_entry_model.key_type, old_entry_model.key_type) AS key_type,
         COALESCE(new_entry_model.entry_model_details, old_entry_model.entry_model_details) AS entry_model_details,
-        COALESCE(new_entry_model.key_location_unified, old_entry_model.key_location_unified) AS key_location_unified,
         COALESCE(new_entry_model.key_location, old_entry_model.key_location) AS key_location,
+        COALESCE(new_entry_model.authorization_type, old_entry_model.authorization_type) AS authorization_type,
         COALESCE(new_entry_model.has_opted_keys_with_agent, old_entry_model.has_opted_keys_with_agent) AS has_opted_keys_with_agent,
         COALESCE(new_entry_model.entry_model_channel, old_entry_model.entry_model_channel) AS entry_model_channel,
         COALESCE(new_entry_model.actor_role, old_entry_model.actor_role) AS actor_role,
@@ -131,8 +131,8 @@ enriched_model AS ( -- the events of entry models are enriched with the last eve
         unified.restriction_type,
         unified.key_type,
         unified.entry_model_details,
-        unified.key_location_unified,
         unified.key_location,
+        unified.authorization_type,
         unified.has_opted_keys_with_agent,
         unified.entry_model_channel,
         unified.actor_role,
@@ -166,8 +166,8 @@ lag_model AS (
         COALESCE(restriction_type, LAG(restriction_type) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_updated)) AS restriction_type,
         COALESCE(key_type, LAG(key_type) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_updated)) AS key_type,
         entry_model_details,
-        key_location_unified,
-        COALESCE(key_location, LAG(key_location) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_updated)) AS key_location,
+        key_location,
+        COALESCE(authorization_type, LAG(authorization_type) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_updated)) AS authorization_type,
         COALESCE(has_opted_keys_with_agent, LAG(has_opted_keys_with_agent) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_updated)) AS has_opted_keys_with_agent,
         doorman_type,
         entry_model_channel,
@@ -184,10 +184,10 @@ lag_model AS (
         LAG(occupant_type) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_occupant_type,
         LAG(restriction_type) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_restriction_type,
         LAG(key_type) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_key_type,
-        LAG(key_location) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_key_location,
+        LAG(authorization_type) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_authorization_type,
         LAG(has_opted_keys_with_agent) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_has_opted_keys_with_agent,
         LAG(entry_model_details) OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_entry_model_details,
-        LAG(key_location_unified) OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_key_location_unified,
+        LAG(key_location) OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_key_location,
         LAG(doorman_type) OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_doorman_type,
         LAG(entry_model_channel) OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_entry_model_channel,
         LAG(actor_role) OVER(PARTITION BY id_house ORDER BY ts_updated) AS lag_actor_role,
@@ -206,8 +206,8 @@ SELECT
     restriction_type,
     key_type,
     entry_model_details,
-    key_location_unified,
     key_location,
+    authorization_type,
     doorman_type,
     entry_model_channel,
     actor_role,
@@ -220,7 +220,7 @@ SELECT
     entry_model_source,
     country_code,
     has_opted_keys_with_agent,
-    COALESCE(key_location, -1) <> COALESCE(lag_key_location, -1) AS mod_authorization,
+    COALESCE(authorization_type, -1) <> COALESCE(lag_authorization_type, -1) AS mod_authorization,
     COALESCE(occupant_type, -1) <> COALESCE(lag_occupant_type, -1) AS mod_occupant,
     COALESCE(key_type, -1) <> COALESCE(lag_key_type, -1) AS mod_type,
     COALESCE(has_opted_keys_with_agent::INTEGER, -1) <> COALESCE(lag_has_opted_keys_with_agent::INTEGER, -1) AS mod_has_opted_keys_with_agent,
@@ -235,7 +235,7 @@ WHERE
     OR (restriction_type <> COALESCE(lag_restriction_type, -1))
     OR (key_type <> COALESCE(lag_key_type, -1))
     OR (entry_model_details <> COALESCE(lag_entry_model_details, -1))
-    OR (key_location_unified <> COALESCE(lag_key_location_unified, -1))
+    OR (key_location <> COALESCE(lag_key_location, -1))
     OR (doorman_type <> COALESCE(lag_doorman_type, -1))
     OR (entry_model_channel <> COALESCE(lag_entry_model_channel, -1))
     OR (actor_role <> COALESCE(lag_actor_role, -1))
@@ -243,4 +243,4 @@ WHERE
     OR (key_holder_identifier <> COALESCE(lag_key_holder_identifier, -1))
     OR (actor_user_type <> COALESCE(lag_actor_user_type, -1))
     OR (has_opted_keys_with_agent::INTEGER <> COALESCE(lag_has_opted_keys_with_agent::INTEGER, -1))
-    OR (key_location <> COALESCE(lag_key_location, -1))
+    OR (authorization_type <> COALESCE(lag_authorization_type, -1))

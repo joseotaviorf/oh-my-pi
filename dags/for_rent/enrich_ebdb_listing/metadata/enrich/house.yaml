@@ -395,7 +395,7 @@ columns:
       None: 'No key'
       Password: 'Password'
       Biometry: 'Biometry'
-  key_location:
+  authorization_type:
     lineage:
       - datalake_ebdb_listing.house_entrance.authorization_type
     description: 'Key location'
@@ -407,7 +407,7 @@ columns:
       KeysWithAgent: 'Keys with agent'
       KeysLocker: 'Keys in locker'
       Password: 'Password'
-  key_location_unified:
+  key_location:
     lineage:
       - datalake_ebdb_listing.house_entrance.key_location
     description: 'Key location unified: This field combines the access_type with the holder_role of the new entry model. If the access_type is KEY_HOLDER the holder_role field is used to identify who has the key.'
