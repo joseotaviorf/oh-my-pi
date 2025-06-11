@@ -18,13 +18,9 @@ workflow:
   dbutils_secret_key: KLEFKI_DB
   tables_customization:
     address_location_key: {}
-    address_location_key_aud: {}
-    change_owner_control: {}
     inspection_key_retrieval_confirmation: {}
     inspector_booking_retrieve_key: {}
-    key_delivery_location: {}
     key_return_preferred_location: {}
-    key_return_preferred_location_aud: {}
     lock_box_track_entries: {}
     notifications_sent: {}
 cluster:
