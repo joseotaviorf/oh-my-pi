@@ -2,84 +2,84 @@
 database_name: datalake_ebdb_clean
 table_name: house_listing_relation_aud
 description: Associates a house or a listing with another entity, like the property owner user or company.
-domain: Rede
-owner: gustavo.miller@quintoandar.com.br
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
 columns:
   house_origin:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.imovelOriginated
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.imovelOriginated
     description: indicate the origin of the property (house).
     categories:
       IMOVEL_TABLE: Imovel Table.
       LISTING_RELATION_TABLE: Listing Relation Table.
   id_house:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.imovelId
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.imovelId
     description: ID of the house.
   id_house_listing_relation:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.id
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.id
     description: ID of the relation.
   id_listing_business_context:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.listingBusinessContextId
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.listingBusinessContextId
     description: ID of the listing business context (datalake_ebdb_clean.listing_business_context).
   id_related:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.relatedId
-    description: ID of the entity related. 
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.relatedId
+    description: ID of the entity related.
       It can be a user ID or a company UUID (see column dw_rede.dim_company.uuid_company), depending on source_type.
   mod_house_origin:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.imovelOriginated_MOD
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.imovelOriginated_MOD
     description: Boolean indicating a house_origin modification.
   mod_id_house:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.imovelid_mod
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.imovelid_mod
     description: Boolean indicating a id_house modification.
   mod_id_listing_business_context:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.listingBusinessContextId_MOD
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.listingBusinessContextId_MOD
     description: Boolean indicating a id_listing_business_context modification.
   mod_id_related:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.relatedId_MOD
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.relatedId_MOD
     description: Boolean indicating a id_related modification.
   mod_related_as:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.relatedAs_MOD
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.relatedAs_MOD
     description: Boolean indicating a related_as modification.
   mod_source_type:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.sourceType_MOD
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.sourceType_MOD
     description: Boolean indicating a source_type modification.
   related_as:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.relatedAs
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.relatedAs
     description: indicate what kind of relation the entity has.
     categories:
       LISTING_OWNER: signals that the entity is the responsible for the listing.
       PROPERTY_OWNER: signals that the entity is the owner of the property listed (house).
   rev:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.rev
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.rev
     description: Identification of the revision registered on datalake_ebdb_clean.user_revision_entity.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.revtype
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.revtype
     description: Revision type described on datalake_ebdb_clean.user_revision_entity.
   source_type:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.sourceType
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.sourceType
     description: indicate whether the entity is a user or a company.
     categories:
       COMPANY_REF: signals that the entity is a company (so id_related is a company UUID).
       MAIN_USER: signals that the entity is a user (so id_related is a user ID).
   ts_created:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.criadoEm
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.criadoEm
     description: Timestamp of when the relation was created.
   ts_update:
     lineage:
-      - datalake_ebdb_raw.imovellistingrelation_aud.atualizadoEm
+      - datalake_ebdb_raw.ImovelListingRelation_AUD.atualizadoEm
     description: Timestamp of when the relation was updated.

@@ -520,6 +520,10 @@ table_block_list:
   - CategoryImovel
   - ProcessedMessage
   - PoligonoRegiao
+  - ImovelListingRelation
+  - ImovelListingRelation_AUD
+  - SuspectedUnavailabilityListing
+  - SuspectedUnavailabilityListing_AUD
 
 view_allow_list: []
 

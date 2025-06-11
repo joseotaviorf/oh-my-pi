@@ -16,5 +16,5 @@ SELECT
     imovelOriginated_MOD AS mod_house_origin,
     criadoEm AS ts_created,
     atualizadoEm AS ts_updated
-FROM 
-    datalake_ebdb_raw.imovellistingrelation_aud 
+FROM
+    datalake_ebdb_raw.ImovelListingRelation_AUD

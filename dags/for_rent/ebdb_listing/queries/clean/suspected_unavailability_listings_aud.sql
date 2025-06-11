@@ -13,5 +13,5 @@ SELECT
     last_contact_attempt_at_MOD AS mod_ts_last_contact_attempt,
     last_contact_attempt_at AS ts_last_contact_attempt,
     created_at AS ts_created
-FROM 
+FROM
     datalake_ebdb_raw.`SuspectedUnavailabilityListing_AUD`

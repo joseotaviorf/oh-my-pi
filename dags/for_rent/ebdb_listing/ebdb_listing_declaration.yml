@@ -21,6 +21,10 @@ workflow:
       clean_table_name: dynamic_pricing_parameters
     DynamicPricingParameters_AUD:
       clean_table_name: dynamic_pricing_parameters_aud
+    ImovelListingRelation:
+      clean_table_name: house_listing_relation
+    ImovelListingRelation_AUD:
+      clean_table_name: house_listing_relation_aud
     ListingBusinessContext:
       clean_table_name: listing_business_context
     ListingBusinessContext_AUD:
@@ -35,6 +39,10 @@ workflow:
       clean_table_name: listing_sale_model
     ListingSaleModel_AUD:
       clean_table_name: listing_sale_model_aud
+    SuspectedUnavailabilityListing:
+      clean_table_name: suspected_unavailability_listings
+    SuspectedUnavailabilityListing_AUD:
+      clean_table_name: suspected_unavailability_listings_aud
 cluster:
   type: databricks_12_2_med_general_cluster
   databricks_conn_id: databricks_new

@@ -794,8 +794,8 @@ bietlejuice.dw_rede_company:
   - bietlejuice.enrich_hubspot_management:load-enrich-owner
 bietlejuice.dw_rede_supply:
   - bietlejuice.company:load-clean-company
-  - bietlejuice.ebdb:load-clean-house-listing-relation
   - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_listing:load-clean-house-listing-relation
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-business-context-detail
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-file
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p
@@ -1835,7 +1835,6 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.company:load-clean-company
   - bietlejuice.company:load-clean-company-product
   - bietlejuice.company:load-clean-product
-  - bietlejuice.ebdb:load-clean-house-listing-relation
   - bietlejuice.ebdb_administration:load-clean-property-fee
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
   - bietlejuice.ebdb_administration:load-clean-property-fee-assigned-aud
@@ -1859,6 +1858,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.ebdb_house_properties:load-clean-special-condition
   - bietlejuice.ebdb_house_properties:load-clean-special-condition-aud
   - bietlejuice.ebdb_listing:load-clean-dynamic-pricing-house
+  - bietlejuice.ebdb_listing:load-clean-house-listing-relation
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
   - bietlejuice.ebdb_listing:load-clean-listing-rent-model
@@ -2134,7 +2134,7 @@ bietlejuice.enrich_hubspot_crm:
   - bietlejuice.company:load-clean-company
   - bietlejuice.company:load-clean-company-document
   - bietlejuice.company:load-clean-document
-  - bietlejuice.ebdb:load-clean-house-listing-relation
+  - bietlejuice.ebdb_listing:load-clean-house-listing-relation
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.hubspot:load-clean-company
   - bietlejuice.hubspot:load-clean-contact
@@ -2671,9 +2671,9 @@ bietlejuice.enrich_rede_house_history:
   - bietlejuice.company:load-clean-address
   - bietlejuice.company:load-clean-company
   - bietlejuice.company:load-clean-company-product
-  - bietlejuice.ebdb:load-clean-house-listing-relation
-  - bietlejuice.ebdb:load-clean-house-listing-relation-aud
   - bietlejuice.ebdb_house:load-clean-house-aud
+  - bietlejuice.ebdb_listing:load-clean-house-listing-relation
+  - bietlejuice.ebdb_listing:load-clean-house-listing-relation-aud
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
   - bietlejuice.ebdb_listing:load-clean-listing-rent-model-aud
@@ -2946,13 +2946,13 @@ bietlejuice.enrich_sale_listings:
   - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history
   - bietlejuice.enrich_region:load-enrich-region
 bietlejuice.enrich_sale_listings_lenses:
-  - bietlejuice.ebdb:load-clean-suspected-unavailability-listings
-  - bietlejuice.ebdb:load-clean-suspected-unavailability-listings-aud
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.ebdb_house:load-clean-house-predicted-price
   - bietlejuice.ebdb_listing:load-clean-listing-business-context
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
   - bietlejuice.ebdb_listing:load-clean-listing-sale-model
+  - bietlejuice.ebdb_listing:load-clean-suspected-unavailability-listings
+  - bietlejuice.ebdb_listing:load-clean-suspected-unavailability-listings-aud
   - bietlejuice.ebdb_visit:load-clean-booking
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_booking:load-enrich-booking-cancellation
@@ -3910,7 +3910,7 @@ bietlejuice.reverse_sale_unavailable_listings_load:
   - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings
   - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-  - bietlejuice.ebdb:load-clean-suspected-unavailability-listings
+  - bietlejuice.ebdb_listing:load-clean-suspected-unavailability-listings
 bietlejuice.reverse_supply:
   - bietlejuice.dw_supply:load-dw-growth-dim-affiliate-tracking
   - bietlejuice.dw_supply:load-dw-growth-dim-funnel-step

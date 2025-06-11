@@ -7,5 +7,5 @@ SELECT
     last_contact_attempt_at AS ts_last_contact_attempt,
     created_at AS ts_created,
     updated_at AS ts_updated
-FROM 
+FROM
     datalake_ebdb_raw.`SuspectedUnavailabilityListing`

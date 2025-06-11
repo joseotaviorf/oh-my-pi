@@ -1,7 +1,8 @@
 database_name: datalake_ebdb_clean
 table_name: suspected_unavailability_listings
 description: Table for all HSM submissions of sanitization of ongoing listings. This HSM consists in sending a message via Whatsapp to listings potentially unavailable for the visit in ForSale. Each row is a different send .
-owner: data-for-sale@quintoandar.com.br
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -14,7 +15,7 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_raw.SuspectedUnavailabilityListing.house_id
-    description: Foreign key referring to the house ID. 
+    description: Foreign key referring to the house ID.
   contact_attempts:
     lineage:
       - datalake_ebdb_raw.SuspectedUnavailabilityListing.contact_attempts

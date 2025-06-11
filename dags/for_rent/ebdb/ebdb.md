@@ -26,14 +26,10 @@ Produces the following output tables:
     `conservation_item_status`
     `conservation_room`
     `country`
-    `house_listing_relation`
-    `house_listing_relation_aud`
     `house_visit_information`
     `house_visit_information_aud`
     `ownerlead`
     `photographer_job`
     `photographer_job_aud`
-    `suspected_unavailability_listings`
-    `suspected_unavailability_listings_aud`
 
     </div>
