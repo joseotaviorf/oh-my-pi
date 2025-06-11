@@ -179,7 +179,6 @@ def create_accounts_results_payload(df):
     accounts_results_list = []
     for key, value in accounts_content.items():
         accounts_result_dict = {}
-        accounts_result_dict["batch_id"] = key
         accounts_result_dict["additional_fields"] = {k: str(v) for k, v in value.items()}
         accounts_results_json = {    
                 key: accounts_result_dict

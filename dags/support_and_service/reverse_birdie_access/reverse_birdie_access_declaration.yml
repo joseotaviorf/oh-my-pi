@@ -59,6 +59,21 @@ workflow:
       - "feedbacks"
       - "audience/accounts"
       - "https://api.birdie.ai/ingestion"
+    offboarding:
+      extra_spark_job_arguments:
+      - "feedbacks"
+      - "audience/accounts"
+      - "https://api.birdie.ai/ingestion"
+    pp_multi:
+      extra_spark_job_arguments:
+      - "feedbacks"
+      - "audience/accounts"
+      - "https://api.birdie.ai/ingestion"
+    ongoing:
+      extra_spark_job_arguments:
+      - "feedbacks"
+      - "audience/accounts"
+      - "https://api.birdie.ai/ingestion"
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
   databricks_conn_id: databricks_new
