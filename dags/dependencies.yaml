@@ -175,6 +175,7 @@ bietlejuice.dw_collection_recovery:
 bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_collections_quintoandar:load-enrich-negotiation
   - bietlejuice.enrich_collections_quintoandar:load-enrich-operators
+  - bietlejuice.enrich_collections_quintoandar:load-enrich-invoice-portfolio
   - bietlejuice.enrich_cyber:load-enrich-collection
   - bietlejuice.enrich_cyber:load-enrich-contract-agency-distribution
   - bietlejuice.enrich_cyber:load-enrich-installment

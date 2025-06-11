@@ -6,7 +6,7 @@ SELECT DISTINCT
     n.sk_negotiation,
     CAST(n.net_paid_amount / n.original_debt_amount AS DECIMAL(14,2))  AS net_rate,
     IF(n.origin_agreement = "Portal Auto Negociação", TRUE, FALSE) AS is_ssn_boletao
-  FROM dw_collections_quintoandar.invoice_portfolio AS ip
+  FROM datalake_collections_quintoandar.invoice_portfolio AS ip
   LEFT JOIN dw_collection_recovery_quintoandar.fact_negotiation AS n
     ON ip.id_negotiation_child = n.id_negotiation
   WHERE
