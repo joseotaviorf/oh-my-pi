@@ -5,13 +5,13 @@ columns:
   id_key_return_preferred_location:
     lineage:
       - datalake_klefki_test_raw.key_return_preferred_location.id
-  address_location_key_id:
+  id_address_location_key:
     lineage:
       - datalake_klefki_test_raw.key_return_preferred_location.address_location_key_id
-  property_id:
+  id_property:
     lineage:
       - datalake_klefki_test_raw.key_return_preferred_location.property_id
-  user_id:
+  id_user:
     lineage:
       - datalake_klefki_test_raw.key_return_preferred_location.user_id
   location:
