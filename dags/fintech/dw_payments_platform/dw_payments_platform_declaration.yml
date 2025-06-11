@@ -1,0 +1,19 @@
+dag:
+  name: dw_payments_platform
+  schedule_start_date: 2020,08,29
+  owner: Data Fintech
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: payments_platform
+cluster:
+  type: databricks_12_2_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"

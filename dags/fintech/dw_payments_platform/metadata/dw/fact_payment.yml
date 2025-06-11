@@ -1,0 +1,163 @@
+---
+database_name: dw_payments_platform
+table_name: fact_payment
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table contains all payment transactions from different sources (checkout, wallstreet, vans) unified in a single view"
+columns:
+  sk_payment:
+    lineage:
+      - datalake_payments_platform.payment.id_payment
+    description: "Surrogate key for the payment record"
+  id_business_key:
+    lineage:
+      - datalake_payments_platform.payment.id_business_key
+    description: "Unique business key combining charge ID and datasource"
+  id_charge:
+    lineage:
+      - datalake_payments_platform.payment.id_charge
+    description: "ID of the charge in the payment system"
+  id_order:
+    lineage:
+      - datalake_payments_platform.payment.id_order
+    description: "ID of the order associated with the payment"
+  id_contract:
+    lineage:
+      - datalake_payments_platform.payment.id_contract
+    description: "ID of the contract associated with the payment"
+  id_person:
+    lineage:
+      - datalake_payments_platform.payment.id_person
+    description: "ID of the person making the payment"
+  id_invoice:
+    lineage:
+      - datalake_payments_platform.payment.id_invoice
+    description: "ID of the invoice being paid"
+  id_finance_entity:
+    lineage:
+      - datalake_payments_platform.payment.id_finance_entity
+    description: "ID of the finance entity in the payment"
+  id_requester:
+    lineage:
+      - datalake_payments_platform.payment.id_requester
+    description: "ID of the system requesting the payment"
+  id_acquire_transaction:
+    lineage:
+      - datalake_payments_platform.payment.id_acquire_transaction
+    description: "ID of the transaction in the acquirer system"
+  payment_status:
+    lineage:
+      - datalake_payments_platform.payment.payment_status
+    description: "Current status of the payment"
+  successfull_method:
+    lineage:
+      - datalake_payments_platform.payment.successfull_method
+    description: "Payment method used when payment was successful"
+  datasource:
+    lineage:
+      - datalake_payments_platform.payment.datasource
+    description: "Source system of the payment (checkout, wallstreet, vans)"
+  transaction_category:
+    lineage:
+      - datalake_payments_platform.payment.transaction_category
+    description: "Category of the transaction (PAYIN, PAYOUT)"
+  requester_description:
+    lineage:
+      - datalake_payments_platform.payment.requester_description
+    description: "Description of the system requesting the payment"
+  methods:
+    lineage:
+      - datalake_payments_platform.payment.methods
+    description: "Array of payment methods attempted"
+  status_reason:
+    lineage:
+      - datalake_payments_platform.payment.status_reason
+    description: "Reason for the current payment status"
+  retry_reason:
+    lineage:
+      - datalake_payments_platform.payment.retry_reason
+    description: "Reason for payment retry if applicable"
+  error_type:
+    lineage:
+      - datalake_payments_platform.payment.error_type
+    description: "Type of error if payment failed"
+  our_number:
+    lineage:
+      - datalake_payments_platform.payment.our_number
+    description: "Our reference number for the payment"
+  your_number:
+    lineage:
+      - datalake_payments_platform.payment.your_number
+    description: "External reference number for the payment"
+  company_use:
+    lineage:
+      - datalake_payments_platform.payment.company_use
+    description: "Company-specific use field"
+  acquirer_auth_code:
+    lineage:
+      - datalake_payments_platform.payment.acquirer_auth_code
+    description: "Authorization code from the acquirer"
+  acquire_nsu:
+    lineage:
+      - datalake_payments_platform.payment.acquire_nsu
+    description: "NSU (Sequential Number) from the acquirer"
+  acquire_return_code:
+    lineage:
+      - datalake_payments_platform.payment.acquire_return_code
+    description: "Return code from the acquirer"
+  installments:
+    lineage:
+      - datalake_payments_platform.payment.installments
+    description: "Number of installments for the payment"
+  due_amount:
+    lineage:
+      - datalake_payments_platform.payment.due_amount
+    description: "Total amount due for the payment"
+  installment_fee_amount:
+    lineage:
+      - datalake_payments_platform.payment.installment_fee_amount
+    description: "Fee amount for installments"
+  fine_amount:
+    lineage:
+      - datalake_payments_platform.payment.fine_amount
+    description: "Fine amount if payment is late"
+  method_created_to_paid_latency_seconds:
+    lineage:
+      - datalake_payments_platform.payment.method_created_to_paid_latency_seconds
+    description: "Time in seconds between payment creation and payment completion"
+  is_recurrence:
+    lineage:
+      - datalake_payments_platform.payment.is_recurrence
+    description: "Flag indicating if payment is recurring"
+  has_retry:
+    lineage:
+      - datalake_payments_platform.payment.has_retry
+    description: "Flag indicating if payment has been retried"
+  dt_due:
+    lineage:
+      - datalake_payments_platform.payment.dt_due
+    description: "Due date for the payment"
+  ts_method_created:
+    lineage:
+      - datalake_payments_platform.payment.ts_method_created
+    description: "Timestamp when payment method was created"
+  ts_method_paid:
+    lineage:
+      - datalake_payments_platform.payment.ts_method_paid
+    description: "Timestamp when payment was completed"
+  ts_order_created:
+    lineage:
+      - datalake_payments_platform.payment.ts_order_created
+    description: "Timestamp when order was created"
+  ts_charge_started_processing:
+    lineage:
+      - datalake_payments_platform.payment.ts_charge_started_processing
+    description: "Timestamp when charge processing started"
+  ts_charge_paid:
+    lineage:
+      - datalake_payments_platform.payment.ts_charge_paid
+    description: "Timestamp when charge was paid"
+  ts_charge_canceled:
+    lineage:
+      - datalake_payments_platform.payment.ts_charge_canceled
+    description: "Timestamp when charge was canceled"
