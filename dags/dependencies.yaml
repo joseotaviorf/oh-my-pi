@@ -1043,14 +1043,6 @@ bietlejuice.dw_table_snapshot:
   - bietlejuice.enrich_trino_table_usage:load-enrich-total-table-usage-information
 bietlejuice.dw_taxonomy:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup
-bietlejuice.dw_tenant_documentation:
-  - bietlejuice.docx:load-clean-credit-evaluation
-  - bietlejuice.ebdb_proposal:load-clean-proponent-info-resend-request
-  - bietlejuice.ebdb_proposal:load-clean-proponent-proposal
-  - bietlejuice.ebdb_proposal:load-clean-proposal
-  - bietlejuice.ebdb_proposal:load-clean-proposal-aud
-  - bietlejuice.ebdb_proposal:load-clean-proposal-document
-  - bietlejuice.ebdb_user:load-clean-user-revision-entity
 bietlejuice.dw_user:
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_finance:load-clean-bank
