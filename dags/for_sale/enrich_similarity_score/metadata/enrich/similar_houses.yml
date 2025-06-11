@@ -4,8 +4,8 @@ owner: bruna.prates@quintoandar.com.br
 domain: For Sale
 description: Enrich table that contains a "base" house and its daily list of similar houses. A "base" house will only appear
     if it has been published for, at least, one day. The similar houses list is generated based in specific rules applied in
-    the SQL code. For now, it only includes For Rent houses. Each row of this table is a "base" house and its list of similar houses in a specific business context and
-    on a specific date.
+    the SQL code. For now, it only includes For Rent houses. Each row of this table is a "base" house and its list of similar
+    houses in a specific business context and on a specific date.
 columns:
     id:
       lineage:
