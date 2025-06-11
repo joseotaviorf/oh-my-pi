@@ -1,0 +1,20 @@
+---
+database_name: datalake_agents_validation
+table_name: ciq_payments_unsynchronized_houses
+description: |
+  Table used to validate the relationship between House and Agent. 
+  For this relationship to be well defined, this association must exist in the big agent through the agency table. 
+  Without this valid relationship, we cannot define whether that property is associated with a CIQ or not, impacting its payment.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_house:
+    description: Id of the house.
+    lineage:
+      - datalake_ebdb_clean.house_listing_relation.id_house
+  quantity_of_houses:
+    description: Number of houses that need to be synchronized.
+  dt_created:
+    description: Date of when the relation was created (Agent(CIQ) x House).
+    lineage:
+      - datalake_ebdb_clean.house_listing_relation.ts_created

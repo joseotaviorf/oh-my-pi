@@ -1,0 +1,11 @@
+---
+table_name: datalake_agents_validation.ciq_payments_unsynchronized_houses
+alert_channel: "#alerts-data-quality-agents"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  quantity_of_houses:
+    equal_to: 0
+    severity_level: Error

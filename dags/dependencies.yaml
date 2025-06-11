@@ -292,8 +292,8 @@ bietlejuice.dw_credit_passport:
   - bietlejuice.docx:load-clean-credit-evaluation-proponent
   - bietlejuice.docx:load-clean-group-authorization
   - bietlejuice.docx:load-clean-group-member
-  - bietlejuice.sorting_hat:load-clean-proponent
   - bietlejuice.sorting_hat:load-clean-policy-report
+  - bietlejuice.sorting_hat:load-clean-proponent
 bietlejuice.dw_crm:
   - bietlejuice.ebdb_inspections:load-clean-inspection
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal
@@ -1192,6 +1192,10 @@ bietlejuice.enrich_agent_accreditation:
   - bietlejuice.ebdb_user:load-clean-user
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_region:load-enrich-region
+bietlejuice.enrich_agents_validation:
+  - bietlejuice.ebdb_listing:load-clean-house-listing-relation
+  - bietlejuice.enrich_big_agent:load-enrich-agency
+  - bietlejuice.enrich_big_agent:load-enrich-house
 bietlejuice.enrich_agreement_hourly:
   - bietlejuice.trato_feito:load-clean-debtor
   - bietlejuice.trato_feito_hourly:load-clean-installment
