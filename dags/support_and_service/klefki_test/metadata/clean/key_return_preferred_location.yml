@@ -1,5 +1,5 @@
 ---
-database_name: datalake_klefk_test_clean
+database_name: datalake_klefki_test_clean
 table_name: key_return_preferred_location
 columns:
   id_key_return_preferred_location:
