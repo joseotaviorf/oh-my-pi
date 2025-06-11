@@ -1534,6 +1534,9 @@ bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.google_ads:load-clean-videos-performance
   - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns
+bietlejuice.enrich_consumption_bill:
+  - bietlejuice.ebdb_administration:load-clean-consumption-bill-aud
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
 bietlejuice.enrich_content_funnel:
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-performance-marketing-metrics-demand
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand

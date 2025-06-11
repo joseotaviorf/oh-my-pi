@@ -1,0 +1,31 @@
+---
+database_name: datalake_consumption_bill
+table_name: consumption_bill_history
+owner: "kleber.inoue@quintoandar.com.br"
+domain: For Rent
+description: This table contains the history of consumption bill of each house.
+columns:
+  id_house:
+    description: ID of the house.
+    lineage:
+      - datalake_ebdb_clean.consumption_bill_aud.id_house
+  is_water_included_in_condo:
+    description: Boolean flag indicating if the water bill is included in the condominium.
+    lineage:
+      - datalake_ebdb_clean.consumption_bill_aud.is_condo_included
+  is_power_included_in_condo:
+    description: Boolean flag indicating if the power bill is included in the condominium.
+    lineage:
+      - datalake_ebdb_clean.consumption_bill_aud.is_condo_included
+  is_gas_included_in_condo:
+    description: Boolean flag indicating if the gas bill is included in the condominium.
+    lineage:
+      - datalake_ebdb_clean.consumption_bill_aud.is_condo_included
+  dt_status_started:
+    description: Date of the start of the status.
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.dt_revision
+  dt_status_ended:
+    description: Date of the end of the status.
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.dt_revision
