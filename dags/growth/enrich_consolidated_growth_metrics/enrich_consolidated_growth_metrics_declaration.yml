@@ -21,8 +21,8 @@ workflow:
   default_extraction_type: incremental
   default_partitions: ["id_date"]
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -6), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -6), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 cluster:
   type: custom_cluster
   custom_configurations:

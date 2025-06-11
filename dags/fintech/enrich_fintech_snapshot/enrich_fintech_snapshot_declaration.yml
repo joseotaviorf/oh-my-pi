@@ -14,7 +14,7 @@ workflow:
   default_partitions: [year, month, day]
   short_circuit_customization:
     function: CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH
-    execution_date: "{{ macros.ds_add(ds, 1) }}"
+    execution_date: "{{ macros.ds_add(data_interval_start | ds, 1) }}"
 cluster:
   type: databricks_13_3_med_general_photon_cluster
   databricks_conn_id: databricks_new

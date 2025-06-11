@@ -13,8 +13,8 @@ workflow:
   - "{dag_name}"
   - "reverse_listings_report"
   - "{table_name}"
-  - "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-  - "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+  - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+  - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     rent_listing_traffic:
       extra_spark_job_arguments:

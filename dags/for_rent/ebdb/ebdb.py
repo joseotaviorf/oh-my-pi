@@ -313,7 +313,7 @@ for tb_name in tb_names:
                 "python_file": f"{base_spark_jobs_path}/data_quality_tests.py",
                 "parameters": [
                     ENV,
-                    "{{ ds }}",
+                    "{{ data_interval_start | ds }}",
                     inmetro_bucket,
                     LayerEnum.RAW.value,
                     SOURCE,

@@ -491,8 +491,8 @@ after_join_tasks = [
 ]
 
 
-yesterday = "{{ ds }}"
-today = "{{ macros.ds_add(ds, 1)  }}"
+yesterday = "{{ data_interval_start | ds }}"
+today = "{{ macros.ds_add(data_interval_start | ds, 1)  }}" 
 
 plugin_tasks = [
     create_task(

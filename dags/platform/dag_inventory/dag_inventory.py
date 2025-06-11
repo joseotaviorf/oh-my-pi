@@ -250,7 +250,7 @@ def create_extraction_task(table_name: str) -> PythonOperator:
 for table_name in tables:
     load_raw_to_s3_task = create_extraction_task(table_name=table_name)
 
-    extra_parameters = [dw_bucket, SOURCE, table_name, "{{ ds }}"]
+    extra_parameters = [dw_bucket, SOURCE, table_name, "{{ data_interval_start | ds }}"]
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,

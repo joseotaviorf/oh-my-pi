@@ -46,8 +46,8 @@ workflow:
       merge_on: [id_agent_business_context]
       z_order_by: [id_agent, ts_revision_started]
   extra_query_template_params:
-      load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-      load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+      load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+      load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 cluster:
   type: custom_cluster
   custom_configurations:

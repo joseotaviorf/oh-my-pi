@@ -12,7 +12,7 @@ workflow:
   load_spark_job: load_condominium_raw
   default_extraction_type: full
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_date') }}"
   spark_job_arguments:
   - "{environment}"   # env
   - "{bucket}"   # datalake_bucket

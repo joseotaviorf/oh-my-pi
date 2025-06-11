@@ -55,7 +55,7 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 DEFAULT_LIBRARIES = config_service.get_config("default_libraries")
 
 
-def get_date_param(dag_run, ds, date_param_name):
+def get_date_param(dag_run, execution_date, date_param_name):
     """
     Custom Airflow macro for handling dates for incremental execution.
 
@@ -65,7 +65,7 @@ def get_date_param(dag_run, ds, date_param_name):
     date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
     if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
         return date_param
-    return ds
+    return execution_date
 
 
 def get_optional_conf(dag_run, attribute, default):
@@ -136,8 +136,8 @@ for table, configs in tables.items():
         # The days_past variable is currently set to 15 days by default as we have metrics
         # that are calculated with 14 days delay.
         extra_query_template_params={
-            "start_date": "{{ get_date_param(dag_run, ds, 'start_date') }}",
-            "end_date": "{{ get_date_param(dag_run, ds, 'end_date') }}",
+            "start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'start_date') }}",
+            "end_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'end_date') }}",
             "days_past": "{{ get_optional_conf(dag_run, 'days_past', 15) }}",
         },
     )

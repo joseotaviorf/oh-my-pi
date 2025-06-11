@@ -19,8 +19,8 @@ workflow:
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
   extra_query_template_params:
-    load_start_date: "{{ yesterday_ds }}"
-    load_end_date: "{{ ds }}"
+    load_start_date: "{{ macros.ds_add(data_interval_start | ds, -1) }}"
+    load_end_date: "{{ data_interval_start | ds }}"
     days_past: 1
   inner_dependencies:
     outbound_last_contact:

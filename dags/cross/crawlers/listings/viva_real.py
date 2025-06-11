@@ -101,7 +101,7 @@ partition_cols = config_service.get_config("partition_cols")
 
 
 raw_spark_job_path = f"{RAW_SPARK_JOB_PATH}/load_crawlers_listings_into_datalake.py"
-parameters = [SOURCE, CONTEXT, origin, origin, "{{ds}}"]
+parameters = [SOURCE, CONTEXT, origin, origin, "{{ data_interval_start | ds}}"]
 
 
 raw_task_group = task_group.build_raw_task_group_for_single_table(

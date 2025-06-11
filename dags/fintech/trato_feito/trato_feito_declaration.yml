@@ -14,8 +14,8 @@ workflow:
   lineage_product_database_name: tratofeito
   source_database: tratofeito
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 0), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 0), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   tables_customization:
     accounting_installment:
       get_table_metrics:

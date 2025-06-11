@@ -14,7 +14,7 @@ workflow:
   spark_job_arguments:
   - "{environment}"
   - "{bucket}"
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   - "{dag_name}"
   - "{table_name}"
   - "{partitions}"

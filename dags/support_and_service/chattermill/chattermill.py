@@ -123,7 +123,7 @@ for table_name, table_details in tables.items():
         raw_spark_job_extra_args=[
             SOURCE,
             table_name,
-            "{{ ds }}",
+            "{{ data_interval_start | ds }}",
             json.dumps(partition_cols),
             json.dumps(table_details),
         ],

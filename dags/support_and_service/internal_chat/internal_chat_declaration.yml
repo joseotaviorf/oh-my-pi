@@ -16,7 +16,7 @@ workflow:
   - "{environment}"
   - "{bucket}"
   - "{schema}"
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   - "{table_name}"
   - "{partitions}"
 

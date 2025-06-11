@@ -100,7 +100,7 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": raw_spark_jobs_path + "load_amplitude_raw.py",
-            "parameters": [ENV, datalake_bucket, SOURCE, "{{ ds }}"],
+            "parameters": [ENV, datalake_bucket, SOURCE, "{{ data_interval_start | ds }}"],
         }
     },
     execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
@@ -138,7 +138,7 @@ events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
         "spark_python_task": {
             "python_file": raw_spark_jobs_path + "load_incremental_clean.py",
             "parameters": [
-                "{{ ds }}",
+                "{{ data_interval_start | ds }}",
                 ENV,
                 datalake_bucket,
                 "amplitude",
@@ -232,7 +232,7 @@ user_merge_170698_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
         "spark_python_task": {
             "python_file": raw_spark_jobs_path + "load_incremental_clean.py",
             "parameters": [
-                "{{ ds }}",
+                "{{ data_interval_start | ds }}",
                 ENV,
                 datalake_bucket,
                 "amplitude",
@@ -326,7 +326,7 @@ user_merge_183047_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
         "spark_python_task": {
             "python_file": raw_spark_jobs_path + "load_incremental_clean.py",
             "parameters": [
-                "{{ ds }}",
+                "{{ data_interval_start | ds }}",
                 ENV,
                 datalake_bucket,
                 "amplitude",
@@ -420,7 +420,7 @@ user_merge_205027_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
         "spark_python_task": {
             "python_file": raw_spark_jobs_path + "load_incremental_clean.py",
             "parameters": [
-                "{{ ds }}",
+                "{{ data_interval_start | ds }}",
                 ENV,
                 datalake_bucket,
                 "amplitude",
@@ -508,7 +508,7 @@ create_clean_staging_events_task = QuintoAndarDatabricksSubmitRunOperator(
         "spark_python_task": {
             "python_file": raw_spark_jobs_path + "load_incremental_clean_staging.py",
             "parameters": [
-                "{{ ds }}",
+                "{{ data_interval_start | ds }}",
                 ENV,
                 datalake_bucket,
                 "amplitude",
@@ -530,7 +530,7 @@ update_subpartitions_table_clean_staging_task = QuintoAndarDatabricksSubmitRunOp
             "python_file": raw_spark_jobs_path
             + "update_subpartitions_table_clean_staging.py",
             "parameters": [
-                "{{ ds }}",
+                "{{ data_interval_start | ds }}",
                 ENV,
                 datalake_bucket,
                 "amplitude",
@@ -550,7 +550,7 @@ create_subpartitioned_tables_clean_staging_task = QuintoAndarDatabricksSubmitRun
         "spark_python_task": {
             "python_file": raw_spark_jobs_path
             + "create_subpartitioned_tables_clean_staging.py",
-            "parameters": ["{{ ds }}", ENV, datalake_bucket, "amplitude", "events"],
+            "parameters": ["{{ data_interval_start | ds }}", ENV, datalake_bucket, "amplitude", "events"],
         }
     },
 )
@@ -563,7 +563,7 @@ update_subpartitioned_events_clean_staging_task = QuintoAndarDatabricksSubmitRun
         "spark_python_task": {
             "python_file": raw_spark_jobs_path
             + "update_subpartitioned_events_clean_staging.py",
-            "parameters": ["{{ ds }}", ENV, datalake_bucket, "amplitude"],
+            "parameters": ["{{ data_interval_start | ds }}", ENV, datalake_bucket, "amplitude"],
         }
     },
 )
@@ -589,7 +589,7 @@ for table in subpartitioned_table_list:
             "spark_python_task": {
                 "python_file": raw_spark_jobs_path + "load_subpartitioned_events_clean.py",
                 "parameters": [
-                    "{{ ds }}",
+                    "{{ data_interval_start | ds }}",
                     ENV,
                     datalake_bucket,
                     "amplitude",
@@ -650,7 +650,7 @@ propagate_tables_metadata_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     json={
         "spark_python_task": {
             "python_file": raw_spark_jobs_path + "propagate_tables_metadata_clean.py",
-            "parameters": ["{{ ds }}"],
+            "parameters": ["{{ data_interval_start | ds }}"],
         }
     },
 )

@@ -11,8 +11,8 @@ workflow:
     "days_past": 14
     "days_past_21": 21
     "days_past_30": 30
-    "start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    "end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    "start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    "end_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   inner_dependencies:
     rent_flow_past_30_days:
       - experiment_config

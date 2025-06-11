@@ -16,8 +16,8 @@ workflow:
       z_order_by: [id_inspection]
       merge_on: [id_inspection]
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 
 cluster:
   type: databricks_13_3_min_io-memory_cluster

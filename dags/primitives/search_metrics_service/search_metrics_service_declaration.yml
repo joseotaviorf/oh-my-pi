@@ -13,7 +13,7 @@ workflow:
   - "{bucket}"
   - "{dag_name}"
   - s3://data-science.s3.data.quintoandar.com.br/search_monitoring/data
-  - "{{ next_ds }}"
+  - "{{ macros.ds_add(data_interval_start | ds, 1) }}" # this refers to the next day. This only makes sense when the DAG runs daily.
   - "{table_name}"
   - "{partitions}"
   - parquet

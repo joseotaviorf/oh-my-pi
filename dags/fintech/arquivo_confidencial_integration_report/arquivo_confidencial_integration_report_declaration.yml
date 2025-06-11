@@ -22,13 +22,13 @@ workflow:
       extraction_type: incremental
       extra_spark_job_arguments:
       - "updated_at"
-      - "{{ ds }}"
+      - "{{ data_interval_start | ds }}"
     integration_report_aud:
       partitions: ["year", "month", "day"]
       extraction_type: incremental
       extra_spark_job_arguments:
         - "created_at"
-        - "{{ ds }}"
+        - "{{ data_interval_start | ds }}"
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new

@@ -20,7 +20,7 @@ workflow:
   - "listings"   # Context
   - "{table_name}"
   - "olx"   # Origin
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   default_extraction_type: incremental
   default_partitions: ["city", "year", "month", "day"]
   tables_customization:

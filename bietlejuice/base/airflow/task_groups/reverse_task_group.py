@@ -61,7 +61,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         spark_session_configs=None,
         extra_query_template_params=None,
         tree_path="",
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
         table_customization=None,
     ):
         """
@@ -88,7 +88,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         :param extra_query_template_params: filter parameters applied to
             the query besides year, month and day
         :type extra_query_template_params: dict
-        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :param execution_date: job execution date. Defaults to the start of the data interval {{ data_interval_start | ds }}
         :type execution_date: str
         :param table_customization: table's structure customization, when applicable
         :return: dict with initial and final tasks of the created task group
@@ -185,7 +185,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         is_incremental=False,
         spark_session_configs=None,
         extra_query_template_params=None,
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
         table_customization=None,
     ):
         """
@@ -208,7 +208,7 @@ class ReverseTaskGroup(BaseTaskGroup):
         :param extra_query_template_params: filter parameters applied to
             the query besides year, month and day
         :type extra_query_template_params: dict
-        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :param execution_date: job execution date. Defaults to the start of the data interval {{ data_interval_start | ds }}
         :param table_customization: table's structure customization, when applicable
         :type execution_date: str
         :rtype: list[BaseOperator]

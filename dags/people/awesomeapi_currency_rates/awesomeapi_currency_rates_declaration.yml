@@ -33,13 +33,13 @@ workflow:
     - "{bucket}"
     - "{dag_name}"
     - "{table_name}"
-    - "{{ ds }}"
+    - "{{ data_interval_start | ds }}"
     - "{extraction_type}"
     - "{load_start_date}"
     - "{load_end_date}"
   extra_query_template_params:
-    load_start_date: "{{ yesterday_ds }}"
-    load_end_date: "{{ ds }}"
+    load_start_date: "{{ macros.ds_add(data_interval_start | ds, -1) }}"
+    load_end_date: "{{ data_interval_start | ds }}"
   tables_customization:
     currency_closing_rates:
       merge_on: ["currency_pair", "ts_created"]

@@ -19,7 +19,7 @@ workflow:
   - "{environment}"
   - "{bucket}"
   - "{dag_name}"
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   - "{table_name}"
   - "{partitions}"
   default_extraction_type: incremental

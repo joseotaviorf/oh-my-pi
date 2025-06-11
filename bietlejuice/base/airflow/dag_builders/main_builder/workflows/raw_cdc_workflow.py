@@ -27,10 +27,11 @@ class RawCDCWorkflow(BaseWorkflow):
         incoming_bucket = self.config_service.get_config("incoming_bucket")
         load_start_date = self.workflow_args.get("extra_query_template_params", {}).get(
             "load_start_date",
-            "{{ get_date_param(dag_run, yesterday_ds, 'load_start_date') }}",
+            "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}",
         )
         load_end_date = self.workflow_args.get("extra_query_template_params", {}).get(
-            "load_end_date", "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+            "load_end_date",
+            "{{ get_date_param(dag_run,data_interval_start | ds, 'load_end_date') }}",
         )
         dag_execution_context = self._get_dag_execution_context(
             dag,

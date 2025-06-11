@@ -14,14 +14,14 @@ workflow:
     - "{bucket}"
     - "{dag_name}"
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -1), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     events:
       extraction_type: incremental
       partitions: ["id_app", "event_type", "year", "month", "day"]
       extra_spark_job_arguments:
-        - "{{ ds }}"
+        - "{{ data_interval_start | ds }}"
       run_optimize: false
       run_vacuum: false
 cluster:

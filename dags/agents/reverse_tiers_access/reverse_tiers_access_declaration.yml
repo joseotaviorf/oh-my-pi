@@ -18,13 +18,13 @@ workflow:
   - "{schema}"
   - "{bucket}"
   - "{table_name}"
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   - "nazare-revenue-share-{environment}"   #external_s3_bucket
   tables_customization:
     tiers: {}
   short_circuit_customization:
     function: CHECK_IS_IN_RANGE_OF_DAYS
-    execution_date: "{{ macros.ds_add(ds, 1) }}"
+    execution_date: "{{ macros.ds_add(data_interval_start | ds, 1) }}"
     function_params:
       range_of_days: [1, 15]
 cluster:

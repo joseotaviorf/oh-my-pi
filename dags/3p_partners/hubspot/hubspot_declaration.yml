@@ -13,7 +13,7 @@ workflow:
   - "{environment}"
   - "{bucket}"
   - "{dag_name}"
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   default_partitions: [year, month, day]
   tables_customization:
     company:

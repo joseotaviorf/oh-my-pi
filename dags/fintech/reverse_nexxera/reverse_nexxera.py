@@ -110,7 +110,7 @@ external_bucket_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id
                         datalake_bucket,
                         SOURCE,
                         external_s3_bucket,
-                        "{{ ds }}"
+                        "{{ data_interval_start | ds }}"
                         ],
         }
     },

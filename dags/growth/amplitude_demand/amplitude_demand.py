@@ -82,7 +82,7 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(databricks_
     json={
         "spark_python_task": {
             "python_file": raw_spark_jobs_path + "load_amplitude_demand_raw.py",
-            "parameters": [ENV, datalake_bucket, SOURCE, "{{ ds }}"],
+            "parameters": [ENV, datalake_bucket, SOURCE, "{{ data_interval_start | ds }}"],
         }
     },
     execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),

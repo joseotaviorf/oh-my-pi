@@ -37,7 +37,9 @@ class SkipRunTaskCreator(BaseTaskCreator):
         return short_circuit_customization
 
     def _get_parameters(self, short_circuit_customization: dict) -> tuple:
-        execution_date = short_circuit_customization.get("execution_date", "{{ ds }}")
+        execution_date = short_circuit_customization.get(
+            "execution_date", "{{ data_interval_start | ds }}"
+        )
         function_params = short_circuit_customization.get("function_params", {})
 
         return ([execution_date], function_params)

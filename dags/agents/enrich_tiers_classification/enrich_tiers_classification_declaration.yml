@@ -14,11 +14,11 @@ workflow:
   default_extraction_type: incremental
   default_partitions: [year, bimester]
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   short_circuit_customization:
     function: CHECK_IS_IN_RANGE_OF_DAYS
-    execution_date: "{{ macros.ds_add(ds, 1) }}"
+    execution_date: "{{ macros.ds_add(data_interval_start | ds, 1) }}"
     function_params:
       range_of_days: [1, 15]
 cluster:

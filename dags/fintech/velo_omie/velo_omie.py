@@ -94,7 +94,7 @@ for table in tables:
 
         if is_incremental:
             parameters.append(str(partition_columns))
-            parameters.append("{{ ds }}")
+            parameters.append("{{ data_interval_start | ds }}")
 
         partitions = partition_columns if is_incremental else None
 

@@ -12,7 +12,7 @@ workflow:
   - "{dag_name}" 
   - "reverse_birdie"
   - "{table_name}"
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   tables_customization:
     dsat_bot:
       extra_spark_job_arguments:

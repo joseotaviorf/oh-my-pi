@@ -12,7 +12,7 @@ workflow:
   spark_job_arguments:
     - "{dag_name}"
     - "{table_name}"
-    - "{{ ds }}"
+    - "{{ data_interval_start | ds }}"
     - "['kb0-consumer.quintoandar.com.br:9092','kb1-consumer.quintoandar.com.br:9092','kb2-consumer.quintoandar.com.br:9092']" # kafka servers
     - "ProfileEvents" # kafka topic
   tables_customization:

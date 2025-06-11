@@ -153,7 +153,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_name: str,
         source: str = None,
         tree_path: str = "",
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
     ) -> list:
         data_quality_tasks = []
 
@@ -213,7 +213,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         source,
         database_name,
         extraction_spark_job_file,
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
         table_name="",
         raw_spark_job_extra_args=None,
         pool=AIRFLOW_DEFAULT_POOL,
@@ -232,7 +232,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type database_name: str
         :param extraction_spark_job_file: full filepath for the extraction spark job
         :type extraction_spark_job_file: str
-        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :param execution_date: job execution date. Defaults to the start of the data interval  {{ data_interval_start | ds }}
         :type execution_date: str
         :param table_name: the table name when loading a single table
         :type table_name: str
@@ -308,7 +308,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         # However, since we have out of pattern paths in our project directory we
         # cannot chose only one now, we would need a refactoring first.
         tree_path="",
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
         has_hive_sync=True,
         table_customization=None,
         do_output_xcom_push=False,
@@ -340,7 +340,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type extra_query_template_params: dict
         :param schema: db schema where the table is at. Used in the query path
         :type schema: str
-        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :param execution_date: job execution date. Defaults to the start of the data interval {{ data_interval_start | ds }}
         :type execution_date: str
         :param has_hive_sync: if this table is going to have Hive sync
         :param table_customization: table's structure customization, when applicable
@@ -521,7 +521,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         extra_query_template_params=None,
         schema="",
         tree_path="",
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
         has_hive_sync=True,
         table_customization: Dict[str, Dict[str, str]] = None,
         do_output_xcom_push=False,
@@ -549,7 +549,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type extra_query_template_params: dict
         :param schema: db schema where the table is at. Used in the query path
         :type schema: str
-        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :param execution_date: job execution date. Defaults to the start of the data interval {{ data_interval_start | ds }}
         :param has_hive_sync: if this table is going to have Hive sync
         :param table_customization: table's structure customization, when applicable
         :param do_output_xcom_push: flag indicating if the job result should be pushed into xcom.
@@ -585,7 +585,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         spark_session_configs=None,
         extra_query_template_params=None,
         schema="",
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
         has_hive_sync=True,
         table_customization: Dict[str, Dict[str, str]] = None,
         do_output_xcom_push=False,
@@ -613,7 +613,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type extra_query_template_params: dict
         :param schema: db schema where the table is at. Used in the query path
         :type schema: str
-        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :param execution_date: job execution date. Defaults to the start of the data interval {{ data_interval_start | ds }}
         :param has_hive_sync: if this table is going to have Hive sync
         :param table_customization: table's structure customization, when applicable
         :param do_output_xcom_push: flag indicating if the job result should be pushed into xcom.
@@ -647,7 +647,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         spark_session_configs=None,
         extra_query_template_params=None,
         schema="",
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
         has_hive_sync=True,
         table_customization: Dict[str, Dict[str, str]] = None,
         do_output_xcom_push=False,
@@ -675,7 +675,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         :type extra_query_template_params: dict
         :param schema: db schema where the table is at. Used in the query path
         :type schema: str
-        :param execution_date: job execution date. Defaults to the airflow run date {{ ds }}
+        :param execution_date: job execution date. Defaults to the start of the data interval {{ data_interval_start | ds }}
         :param has_hive_sync: if this table is going to have Hive sync
         :param table_customization: table's structure customization, when applicable
         :param do_output_xcom_push: flag indicating if the job result should be pushed into xcom.

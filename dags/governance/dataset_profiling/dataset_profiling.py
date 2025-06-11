@@ -81,7 +81,7 @@ for schema in schemas_list:
             json={
                 "spark_python_task": {
                     "python_file": profiling_spark_job_path,
-                    "parameters": [ENV, "{{ ds }}", inmetro_bucket, schema],
+                    "parameters": [ENV, "{{ data_interval_start | ds }}", inmetro_bucket, schema],
                 }
             },
         )

@@ -12,23 +12,23 @@ workflow:
     expected_contribution_margin_by_event:
       partitions: [dt_event_time]
       extra_query_template_params:
-        start_date: "{{ get_date_param(dag_run, yesterday_ds, 'start_date') }}"
-        end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
+        start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'start_date') }}"
+        end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'end_date') }}"
     fr_ecm_by_events:
       partitions: [dt_event_time]
       extra_query_template_params:
-        start_date: "{{ get_date_param(dag_run, yesterday_ds, 'start_date') }}"
-        end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
+        start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'start_date') }}"
+        end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'end_date') }}"
     fs_ecm_by_events:
       partitions: [dt_event_time]
       extra_query_template_params:
-        start_date: "{{ get_date_param(dag_run, yesterday_ds, 'start_date') }}"
-        end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
+        start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'start_date') }}"
+        end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'end_date') }}"
     observed_contribution_margin:
       partitions: [month_of_year]
       extra_query_template_params:
-        start_date: "{{ get_date_param(dag_run, macros.ds_add(ds, -30), 'start_date') }}"
-        end_date: "{{ get_date_param(dag_run, ds, 'end_date') }}"
+        start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -30), 'start_date') }}"
+        end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'end_date') }}"
     contract_survival_curve:
       schedule_interval: monthly
       extraction_type: full

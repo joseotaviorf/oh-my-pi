@@ -31,14 +31,14 @@ workflow:
     - "{bucket}"
     - "{dag_name}"
     - "{table_name}"
-    - "{{ ds }}"
+    - "{{ data_interval_start | ds }}"
     - "{partitions}"
     - "{extraction_type}"
     - "{load_start_date}"
     - "{load_end_date}"
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     absences:
       partitions: ["year", "month", "day"]

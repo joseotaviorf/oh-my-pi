@@ -89,7 +89,7 @@ for table_name in tables:
                         database_name,
                         table_name,
                         queue_url,
-                        "{{ ds }}",
+                        "{{ data_interval_start | ds }}",
                     ],
                 }
             },

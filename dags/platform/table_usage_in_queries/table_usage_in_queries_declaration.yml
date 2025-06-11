@@ -17,7 +17,7 @@ workflow:
   - "{bucket}"
   - "{schema}"
   - "{table_name}"
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   - "{partitions}"
   tables_customization:
     table_usage_in_queries: {}

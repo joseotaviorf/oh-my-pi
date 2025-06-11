@@ -16,7 +16,7 @@ workflow:
   - '{bucket}'
   - 'lost_listings'   # its equal source
   - 'marketing_segmentations'   #its equal context
-  - '{{ ds }}'   # execution date
+  - '{{ data_interval_start | ds }}'   # execution date
   tables_customization:
     lost_listings: {}
   default_partitions:

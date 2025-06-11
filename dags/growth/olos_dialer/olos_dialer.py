@@ -54,11 +54,11 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 ENV = os.environ.get("ENVIRONMENT")
 
 
-def get_date_param(dag_run, ds, date_param_name):
+def get_date_param(dag_run, execution_date, date_param_name):
     date_param = dag_run.conf.get(date_param_name) if dag_run.conf else None
     if date_param and re.match(r"[0-9]{4}\-[0-9]{2}\-[0-9]{2}", date_param):
         return date_param
-    return ds
+    return execution_date
 
 def change_case(table_name, list_out_of_pattern=LIST_OUT_OF_PATTERN):
     for table_dict in list_out_of_pattern:
@@ -113,8 +113,8 @@ for table_name in TABLES_LIST:
         extraction_spark_job_file=raw_spark_job_file,
         raw_spark_job_extra_args=[
             SOURCE,
-            "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
-            "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+            "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}",
+            "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}",
             table_name,
         ],
         has_hive_sync=False,
@@ -128,8 +128,8 @@ for table_name in TABLES_LIST:
         has_create_external_table_task=False,
         partitions=PARTITION_COLS,
         extra_query_template_params={
-            "load_start_date": "{{ get_date_param(dag_run, ds, 'load_start_date') }}",
-            "load_end_date": "{{ get_date_param(dag_run, ds, 'load_end_date') }}",
+            "load_start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}",
+            "load_end_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}",
         },
     )
 

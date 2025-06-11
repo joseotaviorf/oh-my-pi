@@ -20,7 +20,7 @@ workflow:
   - "regions_polygon"   #source
   - "s3://5a-looker/subregion_polygons_new"   # output_file_path
   - "5a_subregion_polygons.topojson"   # output_file_name
-  - "{{ ds }}"   # execution_date
+  - "{{ data_interval_start | ds }}"   # execution_date
   tables_customization:
     regions_polygon_topojson: {}
 cluster:

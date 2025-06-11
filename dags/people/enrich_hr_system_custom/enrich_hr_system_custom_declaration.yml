@@ -15,13 +15,13 @@ workflow:
   - "{bucket}"
   - "hr_system"   # its equal source
   - "management_hierarchy"   #its equal context
-  - "{{ ds }}"   # execution date
+  - "{{ data_interval_start | ds }}"   # execution date
   tables_customization:
     management_hierarchy: {}
   has_hive_sync: false
   bucket_config_name: people_bucket
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
   default_table_privileges:
     people-team:
     - ALL PRIVILEGES

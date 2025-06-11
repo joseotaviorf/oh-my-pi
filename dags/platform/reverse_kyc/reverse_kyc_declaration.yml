@@ -13,7 +13,7 @@ workflow:
     - "{dag_name}"
     - "{table_name}"
     - "{schema}"
-    - "{{ ds }}"
+    - "{{ data_interval_start | ds }}"
     - "kyc-bigdatacorp-prod" # destination bucket name
   custom_schema: kyc_bigdatacorp
   tables_customization:

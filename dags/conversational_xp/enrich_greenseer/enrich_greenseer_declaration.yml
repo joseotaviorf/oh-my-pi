@@ -14,7 +14,6 @@ workflow:
       extraction_type: incremental
       merge_on: [id_session]
       z_order_by: [ts_started, id_session]
-
 cluster:
   type: custom_cluster
   custom_configurations:

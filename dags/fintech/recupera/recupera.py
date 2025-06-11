@@ -103,7 +103,7 @@ for table in TABLES:
         raw_spark_job_extra_args=[
             SOURCE,
             SOURCE_ROOT_PATH,
-            "{{ ds }}",
+            "{{ data_interval_start | ds }}",
             table_name,
             original_table_name,
             json.dumps(load_incremental),

@@ -100,7 +100,7 @@ for table in tables:
     if is_incremental:
         parameters.append(table["date_filter_column"])
         parameters.append(table.get("unixtime_measure", "date"))
-        parameters.append("{{ ds }}")
+        parameters.append("{{ data_interval_start | ds }}")
 
     raw_spark_job_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}//load_{extraction_type}_{SOURCE}_into_datalake.py"
     partitions = partition_columns if is_incremental else None

@@ -98,7 +98,7 @@ raw_task_group = task_group.build_raw_task_group_for_single_table(
     raw_spark_job_extra_args=[
         SOURCE,
         SOURCE_ROOT_PATH,
-        "{{ ds }}",
+        "{{ data_interval_start | ds }}",
         TABLE_NAME,
     ],
 )

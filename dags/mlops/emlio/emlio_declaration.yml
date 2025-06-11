@@ -15,7 +15,7 @@ workflow:
   - "{bucket}"
   - "{schema}"
   - "{partitions}"
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   execution_timeout_hours: 5
   default_extraction_type: incremental
   tables_customization:

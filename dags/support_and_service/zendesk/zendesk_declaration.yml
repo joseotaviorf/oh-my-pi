@@ -15,8 +15,8 @@ workflow:
   spark_job_arguments:
   - "{environment}"
   - "{bucket}"
-  - "{{ ds }}"
-  - "{{ next_ds }}"
+  - "{{ data_interval_start | ds }}"
+  - "{{ macros.ds_add(data_interval_start | ds, 1) }}" # this refers to the next day. This only makes sense when the DAG runs daily.
   - "{table_name}"
 
   default_extraction_type: incremental

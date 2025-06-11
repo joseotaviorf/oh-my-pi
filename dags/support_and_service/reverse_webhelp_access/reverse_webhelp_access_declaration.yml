@@ -14,7 +14,7 @@ workflow:
   - "{dag_name}"
   - "reverse_webhelp"   #database_name
   - "{table_name}"   #table_name
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   tables_customization:
     backlog_metric:
       extra_spark_job_arguments:

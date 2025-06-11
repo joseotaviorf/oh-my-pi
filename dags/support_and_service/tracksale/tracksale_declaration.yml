@@ -15,7 +15,7 @@ workflow:
   - "{bucket}"
   - "{dag_name}"
   - "{table_name}"
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   default_extraction_type: full
   tables_customization:
     campaign:

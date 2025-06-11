@@ -98,7 +98,7 @@ raw_task_groups = task_group.build_raw_task_group_for_all_tables(
     source=SOURCE,
     target_database_base_name=CONTEXT,
     extraction_spark_job_file=RAW_SPARK_JOB_PATH,
-    raw_spark_job_extra_args=[CONTEXT, "{{ ds }}"],
+    raw_spark_job_extra_args=[CONTEXT, "{{ data_interval_start | ds }}"],
     has_hive_sync=False,
 )
 

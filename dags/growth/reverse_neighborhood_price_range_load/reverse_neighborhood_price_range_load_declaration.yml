@@ -11,7 +11,7 @@ workflow:
   default_extraction_type: full
   short_circuit_customization:
     function: CHECK_IS_SPECIFIC_DAY_OF_MONTH
-    execution_date: "{{ macros.ds_add(ds, 1) }}"
+    execution_date: "{{ macros.ds_add(data_interval_start | ds, 1) }}"
     function_params:
       day: 17
 cluster:

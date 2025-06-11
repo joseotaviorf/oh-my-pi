@@ -94,7 +94,7 @@ class DWQueryWorkflow(BaseWorkflow):
                 python_callable=ShortCircuitFunctionEnum.get_function(
                     short_circuit_customization["function"]
                 ),
-                op_args=["{{ ds }}"],
+                op_args=["{{ data_interval_start | ds }}"],
             )
             if short_circuit_customization
             else None

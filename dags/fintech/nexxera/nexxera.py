@@ -113,7 +113,7 @@ for table in tables:
             raw_spark_job_extra_args=[
                 SOURCE,
                 SOURCE_ROOT_PATH,
-                "{{ ds }}",
+                "{{ data_interval_start | ds }}",
                 table_name,
                 json.dumps(CONSUMER_EXTRA_ARGS),
                 format,

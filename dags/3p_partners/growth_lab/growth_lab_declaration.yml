@@ -16,12 +16,12 @@ workflow:
   - "{bucket}"
   - "{dag_name}"
   - "{table_name}"
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   tables_customization:
     supply_recurrence:
       extra_spark_job_arguments:
       - "growthlab-factory"
-      - "supply_recurrence/{{ macros.ds_add(ds, 1) | replace('-', '_') }}/supply_recurrence.csv"
+      - "supply_recurrence/{{ macros.ds_add(data_interval_start | ds, 1) | replace('-', '_') }}/supply_recurrence.csv"
 cluster:
   type: databricks_12_2_med_general_cluster
   custom_libraries:

@@ -16,7 +16,7 @@ workflow:
       - '{schema}'
       - '{table_name}'
       - '{partitions}'
-      - '{{ ds }}'   # execution date
+      - '{{ data_interval_start | ds }}'   # execution date
       - 'datalake_databricks.bietlejuice_table_dependencies'
   default_partitions:
   - year

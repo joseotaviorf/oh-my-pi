@@ -11,8 +11,8 @@ workflow:
   spark_job_arguments:
     - "{dag_name}" # dag_name
     - "{environment}"
-    - "{{ get_date_param(dag_run, ds, 'load_start_date') }}" #start_date
-    - "{{ get_date_param(dag_run, ds, 'load_end_date') }}" #end_date
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}" #start_date
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}" #end_date
     - 2000 #dispatch_limits
     - "results" #endpoint
   tables_customization:

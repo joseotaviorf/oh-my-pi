@@ -14,7 +14,7 @@ workflow:
   - "{environment}"
   - "{schema}"
   - "{table_name}"
-  - "{{ ds }}"
+  - "{{ data_interval_start | ds }}"
   tables_customization:
     suspected_unavailable_listings: {}
 cluster:

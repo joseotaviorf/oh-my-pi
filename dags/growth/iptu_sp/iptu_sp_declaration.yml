@@ -14,7 +14,7 @@ workflow:
     - "{environment}"
     - "{bucket}"
     - "{dag_name}"
-    - "{{ ds }}"
+    - "{{ data_interval_start | ds }}"
   default_extraction_type: full
   tables_customization:
     iptu_sp: {}

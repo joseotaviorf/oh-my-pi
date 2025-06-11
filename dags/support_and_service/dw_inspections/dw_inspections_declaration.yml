@@ -83,8 +83,8 @@ workflow:
     fact_report_review:
       extraction_type: full
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 
 cluster:
   type: databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster

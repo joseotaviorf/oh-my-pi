@@ -132,10 +132,12 @@ class BaseWorkflow(BuilderInterface):
             self.workflow_args["extra_query_template_params"] = {}
 
         load_start_date = self.workflow_args["extra_query_template_params"].get(
-            "load_start_date", "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+            "load_start_date",
+            "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}",
         )
         load_end_date = self.workflow_args["extra_query_template_params"].get(
-            "load_end_date", "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+            "load_end_date",
+            "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}",
         )
 
         self.workflow_args["extra_query_template_params"][

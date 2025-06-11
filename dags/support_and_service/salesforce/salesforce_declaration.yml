@@ -14,8 +14,8 @@ workflow:
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
-    - "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    - "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
     - "{table_name}"
     - "{partitions}"
     - "{schema}"
@@ -53,8 +53,8 @@ workflow:
       extra_spark_job_arguments:
         - "SELECT Id,OwnerId,IsDeleted,Name,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,LastActivityDate,LastViewedDate,LastReferencedDate,AdminTermination__c,AgreementAndImprovements__c,AllRepairsExemptedByOwner__c,BeforeRental__c,BudgetApprovalResponseIQ__c,BudgetApprovalResponsePP__c,ConsumptionProofSubmissionIQ__c,Eviction__c,HasBudgetApproval__c,HighValueContract__c,InspectionOptedOut__c,InspectionRequired__c,IntermediationRequired__c,InternalAdministration__c,JobTransfer__c,LandlordSelling__c,NoticeDue__c,ProOwner__c,RepairsChargedARorPP__c,RepairsChargedPP__c,RepairsChargedToTenant__c,RepairsContestedByTenant__c,RepairsDetectedByOwner__c,RepairsDetectedInternally__c,SuccesContactIQ__c,SuccesContactPP__c,TenantCondominiumPayer__c,TerminationInFirstYear__c,TerminationStatus__c,TerminationWithPenalty__c,Case__c,Contract__c,ExternalId__c,IsValidLetter__c,ResponsibleOffManager__c,TRTerminationCreatedDate__c,TerminationDateSync__c,TerminationFinished__c,VacancyDate__c,TerminationUrl__c,PropertyId__c,RelistingEnabled__c,DescriptionAgreementAndImprovements__c,OwnerAnsweredBudgetApprovalReview__c,OwnerAgreedBudgetApprovalReview__c,TenantAnsweredBudgetApprovalReview__c,TenantAgreedBudgetApprovalReview__c,RequestedBy__c,ContractId__c,FeedItemComment__c FROM Termination__c"
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 
 cluster:
   type: databricks_13_3_med_general_cluster

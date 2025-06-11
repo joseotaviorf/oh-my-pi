@@ -17,7 +17,7 @@ workflow:
       load_spark_job: load_dashboard_governance_into_mp
       spark_job_arguments:
         - "{environment}"
-        - "{{ ds }}"
+        - "{{ data_interval_start | ds }}"
 cluster:
   type: databricks_13_3_min_general_cluster
   access_control_list:

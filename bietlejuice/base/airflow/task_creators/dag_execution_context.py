@@ -12,9 +12,9 @@ class DagExecutionContext:
     dag_args: dict
     workflow_args: dict
     cluster_args: dict
-    load_start_date: str = "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: str = "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
-    execution_date: str = "{{ ds }}"
+    load_start_date: str = "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: str = "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    execution_date: str = "{{ data_interval_start | ds }}"
     incoming_bucket: str = None
     databricks_conn_id: str = "databricks_job_cluster"
 

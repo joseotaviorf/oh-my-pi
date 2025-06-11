@@ -86,7 +86,7 @@ dag = DAG(
 skip_run_task = ShortCircuitOperator(
     task_id=f"check-day-to-skip-execution",
     python_callable=DAGRunDateValidators.check_is_specific_day_of_month,
-    op_args=["{{ macros.ds_add(ds, 1) }}", 1],
+    op_args=["{{ macros.ds_add(data_interval_start | ds, 1) }}", 1],
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
@@ -117,7 +117,7 @@ load_semrush_transient_task = QuintoAndarDatabricksSubmitRunOperator(databricks_
             "parameters": [ENV, datalake_bucket]
             + [
                 SOURCE,
-                "{{ ds }}",
+                "{{ data_interval_start | ds }}",
                 "{{ get_toggle_param(dag_run, 'overwrite_enabled') }}",
                 "{{ get_toggle_param(dag_run, 'overcosts_enabled') }}",
             ],
@@ -132,7 +132,7 @@ raw_task_group = datalake_task_group.build_raw_task_group_for_all_tables(
     extraction_spark_job_file=raw_spark_job_file,
     raw_spark_job_extra_args=[
         SOURCE,
-        "{{ ds }}",
+        "{{ data_interval_start | ds }}",
     ],
     has_hive_sync=False,
 )

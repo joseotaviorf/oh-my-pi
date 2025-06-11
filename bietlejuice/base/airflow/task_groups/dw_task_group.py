@@ -145,7 +145,7 @@ class DWTaskGroup(BaseTaskGroup):
         table_name: str,
         schema: str,
         tree_path: str = "",
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
     ) -> list:
         """
         Creates a task to validate data quality rules over the DW Staging table.
@@ -246,7 +246,7 @@ class DWTaskGroup(BaseTaskGroup):
         self,
         layer: str,
         table_name: str,
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
         is_incremental: bool = False,
         partitions: list = None,
         extra_query_template_params: dict = None,
@@ -269,7 +269,7 @@ class DWTaskGroup(BaseTaskGroup):
         )
 
         incremental_args = (
-            ["{{ ds }}", json.dumps(extra_query_template_params)]
+            ["{{ data_interval_start | ds }}", json.dumps(extra_query_template_params)]
             if extraction_type == "incremental"
             else []
         )
@@ -330,7 +330,7 @@ class DWTaskGroup(BaseTaskGroup):
         self,
         table_name: str,
         spectrum_iam_role: str = None,
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
         is_incremental: bool = False,
         partitions: list = None,
         extra_query_template_params: dict = None,
@@ -356,7 +356,7 @@ class DWTaskGroup(BaseTaskGroup):
         self,
         table_name: str,
         spectrum_iam_role: str = None,
-        execution_date="{{ ds }}",
+        execution_date="{{ data_interval_start | ds }}",
         is_incremental: bool = False,
         partitions: list = None,
         extra_query_template_params: dict = None,

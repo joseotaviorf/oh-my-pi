@@ -212,7 +212,7 @@ It includes:
 - dag_args
 - workflow_args
 - cluster_args
-- execution_date: default as the current dag execution date **{{ ds }}**
+- execution_date: default as the start of the data interval **{{ data_interval_start }}**
 
 
 ### **Table Attributes**
