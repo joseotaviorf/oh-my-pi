@@ -1,0 +1,30 @@
+database_name: datalake_linhadireta_test_clean
+table_name: user
+columns:
+  id:
+    lineage:
+      - datalake_linhadireta_test_raw.user.id
+  name:
+    lineage:
+      - datalake_linhadireta_test_raw.user.name
+  email:
+    lineage:
+      - datalake_linhadireta_test_raw.user.email
+  phone:
+    lineage:
+      - datalake_linhadireta_test_raw.user.phone
+  ts_created:
+    lineage:
+      - datalake_linhadireta_test_raw.user.created_at
+  ts_last_modified:
+    lineage:
+      - datalake_linhadireta_test_raw.user.last_modified_at
+  id_sendbird:
+    lineage:
+      - datalake_linhadireta_test_raw.user.sendbird_id
+  access_token:
+    lineage:
+      - datalake_linhadireta_test_raw.user.access_token
+  nickname:
+    lineage:
+      - datalake_linhadireta_test_raw.user.nickname

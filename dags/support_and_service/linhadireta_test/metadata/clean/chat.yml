@@ -1,0 +1,45 @@
+database_name: datalake_linhadireta_test_clean
+table_name: chat
+columns:
+  id:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.id
+  sendbird_url:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.sendbird_url
+  metadata:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.metadata
+  entity:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.entity
+  id_entity:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.entity_id
+  is_active:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.active
+  ts_created:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.created_at
+  ts_last_modified:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.last_modified_at
+  created_by_id:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.created_by_id
+  ts_finalized:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.finalized_at
+  tags:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.tags
+  ts_first_user_interaction:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.first_user_interaction_at
+  ts_first_other_user_interaction:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.first_other_user_interaction_at
+  last_contexts:
+    lineage:
+      - datalake_linhadireta_test_raw.chat.last_contexts

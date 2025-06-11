@@ -1,0 +1,44 @@
+dag:
+  name: linhadireta_test
+  schedule_start_date: 2025, 06, 09
+  schedule_interval: 0 5 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      dag_purpose: This DAG imports the tables from [LinhaDireta](https://github.com/quintoandar/linha-direta), our service for chat management.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: linhadireta
+  source_schema: public
+  dbutils_secret_key: ENV_LINHADIRETA
+  lineage_product_database_name: linhadireta
+  tables_customization:
+    Chat_users:
+      clean_table_name: chat_users
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    Chat:
+      clean_table_name: chat
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    User_chats:
+      clean_table_name: user_chats
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    User:
+      clean_table_name: user
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+cluster:
+  type: databricks_13_3_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
