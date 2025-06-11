@@ -89,7 +89,7 @@ LEFT JOIN
 QUALIFY
   ROW_NUMBER() OVER(
     PARTITION BY
-      id_cost_center
+      ccc.id_cost_center_legacy
     ORDER BY
       (
         CAST((ccc.cost_center_status = 'Active') AS INT) * 100
