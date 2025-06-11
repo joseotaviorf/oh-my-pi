@@ -206,3 +206,7 @@ columns:
     description: Timestamp when the invoice was last updated in the Retsuko system.
     lineage:
       - datalake_retsuko.invoice.ts_retsuko_updated
+  ts_last_app_action_event:
+    description: Timestamp when the last app action event occurred.
+    lineage:
+      - datalake_collections_quintoandar.negotiation.ts_event

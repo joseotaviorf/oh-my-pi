@@ -173,7 +173,6 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.trato_feito:load-clean-eviction
   - bietlejuice.trato_feito:load-clean-eviction-data
 bietlejuice.dw_collection_recovery_quintoandar:
-  - bietlejuice.enrich_collections_quintoandar:load-enrich-delinquency-app-events
   - bietlejuice.enrich_collections_quintoandar:load-enrich-negotiation
   - bietlejuice.enrich_collections_quintoandar:load-enrich-operators
   - bietlejuice.enrich_cyber:load-enrich-collection
@@ -289,12 +288,12 @@ bietlejuice.dw_credit_evers:
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.retsuko:load-clean-account
 bietlejuice.dw_credit_passport:
- - bietlejuice.docx:load-clean-credit-evaluation
- - bietlejuice.docx:load-clean-credit-evaluation-proponent
- - bietlejuice.docx:load-clean-group-authorization
- - bietlejuice.docx:load-clean-group-member
- - bietlejuice.sorting_hat:load-clean-proponent
- - bietlejuice.sorting_hat:load-clean-policy-report
+  - bietlejuice.docx:load-clean-credit-evaluation
+  - bietlejuice.docx:load-clean-credit-evaluation-proponent
+  - bietlejuice.docx:load-clean-group-authorization
+  - bietlejuice.docx:load-clean-group-member
+  - bietlejuice.sorting_hat:load-clean-proponent
+  - bietlejuice.sorting_hat:load-clean-policy-report
 bietlejuice.dw_crm:
   - bietlejuice.ebdb_inspections:load-clean-inspection
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal

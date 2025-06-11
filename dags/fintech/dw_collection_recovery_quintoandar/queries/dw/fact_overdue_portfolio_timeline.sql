@@ -1,38 +1,17 @@
 WITH
-ssn_original_payment AS (
-    SELECT DISTINCT
-        id_contract,
-        id_invoice
-    FROM datalake_collections_quintoandar.delinquency_app_events
-    WHERE
-      funnel_step = 'Overdue Self Service Action'
-      AND id_contract IS NOT NULL
-      AND id_invoice IS NOT NULL
-),
 negotiation_data AS (
-  SELECT DISTINCT
-    d.id_invoice,
-    d.id_contract,
+SELECT DISTINCT
+    ip.id_invoice,
+    ip.id_contract,
     n.sk_negotiation,
     CAST(n.net_paid_amount / n.original_debt_amount AS DECIMAL(14,2))  AS net_rate,
     IF(n.origin_agreement = "Portal Auto Negociação", TRUE, FALSE) AS is_ssn_boletao
-  FROM dw_collection_recovery_quintoandar.fact_debt AS d
-  INNER JOIN dw_collection_recovery_quintoandar.bridge_map_debt_negotiation AS b
-    ON d.sk_debt = b.sk_debt
-  INNER JOIN dw_collection_recovery_quintoandar.fact_negotiation AS n
-    ON b.sk_negotiation = n.sk_negotiation
+  FROM dw_collections_quintoandar.invoice_portfolio AS ip
+  LEFT JOIN dw_collection_recovery_quintoandar.fact_negotiation AS n
+    ON ip.id_negotiation_child = n.id_negotiation
   WHERE
     n.down_payment_net_amount_paid != 0
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_invoice, d.id_contract ORDER BY ABS(DATE_DIFF(n.dt_down_payment, d.dt_paid))) = 1
-),
-negotiation_installment AS (
-  SELECT
-    id_invoice_extra AS id_invoice,
-    sk_contract AS id_contract,
-    sk_negotiation AS sk_origin_negotiation,
-    installment_number
-  FROM dw_collection_recovery_quintoandar.fact_negotiation_installment
-  WHERE id_invoice_extra IS NOT NULL
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY ip.id_invoice, ip.id_contract ORDER BY ABS(DATE_DIFF(n.dt_down_payment, ip.ts_paid))) = 1
 ),
 add_all_dimensions AS (
 SELECT
@@ -42,52 +21,14 @@ SELECT
     o.id_proposal,
     o.id_region,
     IF(o.payment_status = "written-down", n.sk_negotiation, NULL) AS sk_negotiation,
-    IF(o.invoice_type = "extra", ni.sk_origin_negotiation, NULL) AS sk_origin_negotiation,
-    IF(o.invoice_type = "extra", ni.installment_number, NULL) AS negotiation_installment_number,
+    IF(o.invoice_type = "extra", CONCAT(COALESCE(o.id_contract, 0), CAST(o.id_negotiation_parent AS STRING)), NULL) AS sk_origin_negotiation,
+    IF(o.invoice_type = "extra", o.negotiation_installment_number, NULL) AS negotiation_installment_number,
     o.contract_status,
     o.invoice_type,
     o.payment_status,
     o.reason,
     o.paid_via,
-    CASE
-        WHEN possn.id_invoice IS NOT NULL AND o.reason NOT IN ("negotiation-recupera", "negotiation-cyber", "agreement") AND o.payment_status = "paid" THEN TRUE
-        WHEN n.is_ssn_boletao IS NOT NULL AND n.is_ssn_boletao IS TRUE AND o.payment_status = "written-down" THEN TRUE
-        ELSE FALSE
-    END AS is_ssn,
-    CASE
-        WHEN possn.id_invoice IS NOT NULL AND o.reason NOT IN ("negotiation-recupera", "negotiation-cyber", "agreement") AND o.payment_status = "paid" THEN "POSSN (payment of original)"
-        WHEN n.is_ssn_boletao IS NOT NULL AND n.is_ssn_boletao IS TRUE AND o.payment_status = "written-down" THEN "BOSSN (single debt negotiation)"
-        ELSE NULL
-    END AS type_ssn,
-    CASE
-      WHEN possn.id_invoice IS NOT NULL
-        AND o.payment_status = "paid"
-        AND o.reason NOT IN ("negotiation-recupera", "negotiation-cyber", "agreement")
-      THEN "Self Service Negotiation - Payment of original debt"
-      WHEN
-        n.is_ssn_boletao IS NOT NULL
-        AND n.is_ssn_boletao IS TRUE
-        AND o.payment_status = "written-down"
-      THEN "Self Service Negotiation - Negotiation"
-      WHEN possn.id_invoice IS NULL
-        AND (n.is_ssn_boletao IS NULL OR n.is_ssn_boletao IS FALSE)
-        AND o.payment_status = 'paid'
-        AND o.reason NOT IN ("negotiation-recupera", "negotiation-cyber", "agreement")
-        AND o.invoice_type != "extra"
-      THEN "Original debt"
-      WHEN possn.id_invoice IS NULL
-        AND (n.is_ssn_boletao IS NULL OR n.is_ssn_boletao IS FALSE)
-        AND o.payment_status = 'written-down'
-        AND o.reason NOT IN ("negotiation-recupera", "negotiation-cyber", "agreement")
-        AND o.invoice_type != "extra"
-      THEN "Negotiation"
-      WHEN possn.id_invoice IS NULL
-        AND (n.is_ssn_boletao IS NULL OR n.is_ssn_boletao IS FALSE)
-        AND o.payment_status = 'paid'
-        AND o.reason IN ("negotiation-recupera", "negotiation-cyber", "agreement")
-        AND o.invoice_type = "extra"
-      THEN "Negotiation installments (extra)"
-    END AS recovery_method,
+    o.recovery_channel,
     o.debtor_type,
     o.delay_contamined_at_closure,
     o.delay_contamined_range,
@@ -110,6 +51,8 @@ SELECT
     o.is_write_off,
     o.is_contract_write_off,
     o.is_first_payment_default,
+    o.has_app_action_event,
+    n.is_ssn_boletao,
     COALESCE(cad.advisory, rc.partner, LAG(rc.partner) IGNORE NULLS OVER(PARTITION BY o.id_contract ORDER BY o.dt_reference)) AS advisory,
     q.segmentation_queue,
     q.segmentation_queue_description,
@@ -129,10 +72,6 @@ SELECT
 FROM
     datalake_invoice.overdue_portfolio_timeline AS o
 LEFT JOIN
-    ssn_original_payment AS possn
-      ON possn.id_invoice = o.id_invoice
-      AND possn.id_contract = o.id_contract
-LEFT JOIN
     datalake_recupera.contract_advisory_distribution AS rc
       ON o.id_contract = rc.id_contract
       AND o.dt_reference = rc.dt_snapshot
@@ -141,17 +80,13 @@ LEFT JOIN
       ON o.id_contract = cad.id_contract
       AND o.dt_reference BETWEEN cad.dt_start_interval AND cad.dt_end_interval
 LEFT JOIN
-    negotiation_data AS n
-      ON o.id_invoice = n.id_invoice
-      AND o.id_contract = n.id_contract
-LEFT JOIN
-    negotiation_installment AS ni
-      ON o.id_invoice = ni.id_invoice
-      AND o.id_contract = ni.id_contract
-LEFT JOIN
     datalake_cyber.queue_timeline AS q
       ON o.id_contract = q.id_contract_external
       AND o.dt_reference = q.dt_reference
+LEFT JOIN
+    negotiation_data AS n
+      ON o.id_invoice = n.id_invoice
+      AND o.id_contract = n.id_contract
 ),
 get_last_valid_partner AS (
   -- Get the last valid partner per invoice, to freeze the partner after the invoice payment date
@@ -184,9 +119,12 @@ SELECT
     a.payment_status,
     a.reason,
     a.paid_via,
-    a.is_ssn,
-    a.type_ssn,
-    a.recovery_method,
+    CASE
+        WHEN a.has_app_action_event IS NOT NULL AND a.reason NOT IN ("negotiation-recupera", "negotiation-cyber", "agreement") AND a.payment_status = "paid" THEN TRUE
+        WHEN a.is_ssn_boletao IS NOT NULL AND a.is_ssn_boletao IS TRUE AND a.payment_status = "written-down" THEN TRUE
+        ELSE FALSE
+    END AS is_ssn,
+    a.recovery_channel,
     a.debtor_type,
     a.delay_contamined_at_closure,
     a.delay_contamined_range,
@@ -204,6 +142,7 @@ SELECT
     a.is_write_off,
     a.is_contract_write_off,
     a.is_first_payment_default,
+    a.has_app_action_event,
     IF(a.dt_reference >= a.dt_invoice_paid, g.advisory, a.advisory) AS advisory,
     IF(a.dt_reference >= a.dt_invoice_paid, g.segmentation_queue, a.segmentation_queue) AS segmentation_queue,
     IF(a.dt_reference >= a.dt_invoice_paid, g.segmentation_queue_description, a.segmentation_queue_description) AS segmentation_queue_description,

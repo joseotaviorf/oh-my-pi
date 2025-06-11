@@ -213,3 +213,7 @@ columns:
     description: Invoice timeline reference date
   ts_load:
     description: "Timestamp of when the data was inserted into the table"
+  has_app_action_event:
+    description: "Boolean to indicate if the invoice has an app action event within 5 days before the payment"
+    lineage:
+      - datalake_collections_quintoandar.invoice_portfolio.has_app_action_event

@@ -181,6 +181,11 @@ SELECT
             THEN 'Manual Written Down'
         WHEN b.status = 'written-down'
             AND bn.id_negotiation_child IS NOT NULL
+            AND bn.id_negotiation_parent IS NOT NULL
+            AND bn.origin_agreement = 'Portal Auto Negociação'
+            THEN 'Negotiation of Installment - SSN'
+        WHEN b.status = 'written-down'
+            AND bn.id_negotiation_child IS NOT NULL
             AND bn.origin_agreement = 'Portal Auto Negociação'
             THEN 'Negotiation - SSN'
         WHEN b.status = 'written-down'
@@ -226,7 +231,7 @@ SELECT
     b.dt_contract_annulled,
     bn.dt_created_negotiation_parent,
     bn.dt_created_negotiation_child,
-    ssn.ts_event AS ts_app_action_event,
+    ssn.ts_event AS ts_last_app_action_event,
     b.ts_write_off,
     b.ts_paid,
     b.ts_payment_confirmation,
@@ -256,3 +261,5 @@ LEFT JOIN base_negotiation AS bn
 LEFT JOIN paid_by_ssn AS ssn
      ON ssn.id_invoice = b.id_external
         AND ssn.id_contract = b.id_contract_external
+        AND DATE(ssn.ts_event) <= DATE(b.ts_paid)
+        AND DATE(ssn.ts_event) >= DATE(b.ts_paid) - INTERVAL 5 DAY
