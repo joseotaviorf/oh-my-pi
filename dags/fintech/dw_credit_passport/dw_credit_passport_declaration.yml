@@ -1,0 +1,20 @@
+dag:
+  name: dw_credit_passport
+  schedule_start_date: 2025,06,03
+  owner: Data Fintech
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: credit_passport
+cluster:
+  type: custom_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    num_workers: 4
+    spark_version: 13.3.x-scala2.12
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"

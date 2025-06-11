@@ -1,0 +1,138 @@
+---
+database_name: dw_credit_passport
+table_name: fact_credit_evaluation
+owner: isabella.santos@quintoandar.com.br
+domain: fintech
+description: This fact table contains all the information related to a Credit Evaluation.
+columns:
+  sk_credit_evaluation:
+    description: Unique identifier of a credit evaluation from DocX.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.id
+  sk_group:
+    description: ID group related to the credit evaluation. A group can have more than one credit evaluation. This ID only exists for credit evaluations done through the credit passport.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.id_group
+  sk_proposal:
+    description: ID proposal related to the credit evaluation. A proposal can have more than one credit evaluation. This ID can be null if the credit evaluation was done before offer approval (such as early credit or credit passport pre offer flow).
+    lineage:
+    - datalake_docx_clean.credit_evaluation.id_proposal
+  sk_user:
+    description: ID user who authenticated into 5A platform and submitted the credit evaluation.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.id_user
+  sk_house:
+    description: ID house of the credit evaluation. This column is null if the scope is CITY, which means that the credit evaluation may be used within a city.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.id_house
+  scope:
+    description: The scope of the evaluation. It could be HOUSE for the current credit model or CITY (credit passport).
+    lineage:
+    - datalake_docx_clean.credit_evaluation.scope
+  credit_evaluation_status:
+    description: The status of the Credit Evaluation.
+    categories:
+      NOT_SENT: when the credit evaluation was not submitted yet.
+      PROCESSING: when the credit evaluation is being processed.
+      FINISHED: when the credit evaluation has finished.
+      FAILED: when the credit evaluation has failed.
+      ON_HOLD: when the credit evaluation is blocked.
+      CANCELLED: when the credit evaluation was cancelled.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.status
+  credit_evaluation_result:
+    description: Result of the credit analysis.
+    categories:
+      PRE_APPROVED: when the credit evaluation was pre approved.
+      PRE_REJECTED: when the credit evaluation was pre rejected. The user may redo the credit evaluation if he/she wishes to move forward to the next step.
+      PRE_APPROVED_WITH_GUARANTEE: when the credit evaluation was approved with a paid guarantee.
+      RESULT_PENDING: when the result for the credit analysis is not available (i.e. credit evaluation not sent, processing, on hold...)
+    lineage:
+    - datalake_docx_clean.credit_evaluation.result
+  pre_evaluation_result:
+    description: Result of the credit pre evaluation process, such as early credit evaluation pr pre offer credit passport flow.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.result
+    - datalake_docx_clean.credit_evaluation.early_result_guarantee_type
+  decision_reason:
+    description: The credit analysis decision reason in case of rejection.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.reason
+  documentation_policy_type:
+    description: The documentation policy type requested to the user. This column is NULL for early credit, pre evaluation through credit passport or if the credit evaluation is still being processed.
+    categories:
+      LIGHT_APPROVAL: when no further documents is requested to the user
+      REGULAR: when the documentation policy is FULL or FLEX.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.type
+  pre_approved_limit:
+    description: The pre-approved limit value attached to the credit passport. This value is calculated by the credit models based on the limit value and the group income.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.pre_approved_limit
+  limit_value:
+    description: The limit value specified by the user.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.limit_value
+  credit_evaluation_source:
+    description: The credit evaluation source. This column indicates the origin of the credit evaluation.
+    categories:
+      EARLY_CREDIT_FLOW: when the credit evaluation refers to an early credit analysis.
+      PRE_OFFER_PASSPORT_FLOW: when the credit evaluation was submitted through the credit passport before offer approval.
+      POS_OFFER_PASSPORT_FLOW: when the credit evaluation was submitted through the credit passport after offer submission.
+      NORMAL_FLOW: when the credit evaluation was submitted through the default flow (i.e after offar approval). This flow will be soon replaced by the credit passport.
+  variant:
+    description: The variant model of the credit evaluation.
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.variant
+  policy_dti:
+    description: The DTI of the credit evaluation.
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.policy_dti
+  category:
+    description: The category value of the paid guarantee.
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.analysis_category
+  risk_category_canon:
+    description: The risk category canon of the credit evaluation.
+    lineage:
+    - datalake_sorting_hat_clean.policy_report.risk_category_canon
+  group_type:
+    description: The group composition. This column can be null for early credit analysis.
+    categories:
+      OTHERS: when the user responsible to do the credit evaluation is doing it on behalf of other person.
+      SINGLE: when the group or proposal is composed by only one tenant, which is the user responsible to submit the credit evaluation.
+      MULTI_TENANT: when the group or proposal is composed by more than one tenants.
+  number_of_proponents:
+    description: The total number of proponents in the group or proposal.
+    lineage:
+    -  datalake_sorting_hat_clean.proponent
+    -  datalake_docx_clean.group_member
+  is_automatic:
+    description: Boolean indicating if evaluation was automatically run after proposal creation with previous collected credit info from other proposal
+    lineage:
+    - datalake_docx_clean.credit_evaluation.automatic
+    - datalake_docx_clean.credit_evaluation.is_automatic
+  is_early_credit:
+    description: Boolean indicating if the credit evaluation refers to an early credit.
+  is_credit_passport:
+    description: Boolean indicating if the credit evaluation refers to a credit passport (pre offer or pos offer).
+  is_value_exceeding_credit_limit:
+    description: Boolean indicating if the house value exceeds the pre approved credit limit.
+  is_most_recent_evaluation:
+    description: Boolean indicating if the credit evaluation is the most recent submitted by an user or group.
+  is_passport_missing:
+    description: Boolean indicating if the credit passort was not done yet (missing group). In this case the credit evaluation remains ON HOLD until the user submit a valid credit passport.
+  ts_created:
+    description: Timestamp indicating when the credit evaluation was created.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.ts_created
+  ts_updated:
+    description: Timestamp indicating when the credit evaluation was updated.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.ts_updated
+  ts_expired:
+    description: Timestamp indicating when the credit evaluation expires.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.ts_expires
+  ts_load:
+    description: Timestamp indicating when the data was refreshed.
