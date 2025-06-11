@@ -1,0 +1,105 @@
+database_name: datalake_langfuse_clean
+table_name: observations
+columns:
+  id_observation:
+    lineage:
+      - datalake_langfuse_raw.observations.id
+  id_parent_observation:
+    lineage:
+      - datalake_langfuse_raw.observations.parentObservationId
+  id_trace:
+    lineage:
+      - datalake_langfuse_raw.observations.traceId
+  id_model:
+    lineage:
+      - datalake_langfuse_raw.observations.modelId
+  id_project:
+    lineage:
+      - datalake_langfuse_raw.observations.projectId
+  id_prompt:
+    lineage:
+      - datalake_langfuse_raw.observations.promptId
+  input:
+    lineage:
+      - datalake_langfuse_raw.observations.input
+  output:
+    lineage:
+      - datalake_langfuse_raw.observations.output
+  environment:
+    lineage:
+      - datalake_langfuse_raw.observations.environment
+  model:
+    lineage:
+      - datalake_langfuse_raw.observations.model
+  model_parameters:
+    lineage:
+      - datalake_langfuse_raw.observations.modelParameters
+  name:
+    lineage:
+      - datalake_langfuse_raw.observations.name
+  prompt_name:
+    lineage:
+      - datalake_langfuse_raw.observations.promptName
+  prompt_tokens:
+    lineage:
+      - datalake_langfuse_raw.observations.promptTokens
+  prompt_version:
+    lineage:
+      - datalake_langfuse_raw.observations.promptVersion
+  type:
+    lineage:
+      - datalake_langfuse_raw.observations.type
+  unit:
+    lineage:
+      - datalake_langfuse_raw.observations.unit
+  usage:
+    lineage:
+      - datalake_langfuse_raw.observations.usage
+  usage_details:
+    lineage:
+      - datalake_langfuse_raw.observations.usageDetails
+  latency:
+    lineage:
+      - datalake_langfuse_raw.observations.latency
+  level:
+    lineage:
+      - datalake_langfuse_raw.observations.level
+  input_price:
+    lineage:
+      - datalake_langfuse_raw.observations.inputPrice
+  output_price:
+    lineage:
+      - datalake_langfuse_raw.observations.outputPrice
+  completion_tokens:
+    lineage:
+      - datalake_langfuse_raw.observations.completionTokens
+  calculated_input_cost:
+    lineage:
+      - datalake_langfuse_raw.observations.calculatedInputCost
+  calculated_output_cost:
+    lineage:
+      - datalake_langfuse_raw.observations.calculatedOutputCost
+  calculated_total_cost:
+    lineage:
+      - datalake_langfuse_raw.observations.calculatedTotalCost
+  cost_details:
+    lineage:
+      - datalake_langfuse_raw.observations.costDetails
+  ts_created:
+    lineage:
+      - datalake_langfuse_raw.observations.createdAt
+  ts_updated:
+    lineage:
+      - datalake_langfuse_raw.observations.updatedAt
+  year:
+    lineage:
+      - datalake_langfuse_raw.observations.year
+  month:
+    lineage:
+      - datalake_langfuse_raw.observations.month
+  day:
+    lineage:
+      - datalake_langfuse_raw.observations.day
+  hour:
+    lineage:
+      - datalake_langfuse_raw.observations.hour 

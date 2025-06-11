@@ -1,0 +1,69 @@
+database_name: datalake_langfuse_clean
+table_name: scores
+columns:
+  id_score:
+    lineage:
+      - datalake_langfuse_raw.scores.id
+  id_trace:
+    lineage:
+      - datalake_langfuse_raw.scores.traceId
+  id_observation:
+    lineage:
+      - datalake_langfuse_raw.scores.observationId
+  id_session:
+    lineage:
+      - datalake_langfuse_raw.scores.sessionId
+  id_author_user:
+    lineage:
+      - datalake_langfuse_raw.scores.authorUserId
+  id_config:
+    lineage:
+      - datalake_langfuse_raw.scores.configId
+  id_queue:
+    lineage:
+      - datalake_langfuse_raw.scores.queueId
+  id_project:
+    lineage:
+      - datalake_langfuse_raw.scores.projectId
+  comment:
+    lineage:
+      - datalake_langfuse_raw.scores.comment
+  data_type:
+    lineage:
+      - datalake_langfuse_raw.scores.dataType
+  environment:
+    lineage:
+      - datalake_langfuse_raw.scores.environment
+  name:
+    lineage:
+      - datalake_langfuse_raw.scores.name
+  source:
+    lineage:
+      - datalake_langfuse_raw.scores.source
+  string_value:
+    lineage:
+      - datalake_langfuse_raw.scores.stringValue
+  trace:
+    lineage:
+      - datalake_langfuse_raw.scores.trace
+  value:
+    lineage:
+      - datalake_langfuse_raw.scores.value
+  ts_created:
+    lineage:
+      - datalake_langfuse_raw.scores.createdAt
+  ts_updated:
+    lineage:
+      - datalake_langfuse_raw.scores.updatedAt
+  year:
+    lineage:
+      - datalake_langfuse_raw.scores.year
+  month:
+    lineage:
+      - datalake_langfuse_raw.scores.month
+  day:
+    lineage:
+      - datalake_langfuse_raw.scores.day
+  hour:
+    lineage:
+      - datalake_langfuse_raw.scores.hour 

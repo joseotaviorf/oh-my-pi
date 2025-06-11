@@ -1,0 +1,78 @@
+database_name: datalake_langfuse_clean
+table_name: traces
+columns:
+  id_trace:
+    lineage:
+      - datalake_langfuse_raw.traces.id
+  id_project:
+    lineage:
+      - datalake_langfuse_raw.traces.projectId
+  id_session:
+    lineage:
+      - datalake_langfuse_raw.traces.sessionId
+  id_user:
+    lineage:
+      - datalake_langfuse_raw.traces.userId
+  id_external:
+    lineage:
+      - datalake_langfuse_raw.traces.externalId
+  environment:
+    lineage:
+      - datalake_langfuse_raw.traces.environment
+  html_path:
+    lineage:
+      - datalake_langfuse_raw.traces.htmlPath
+  input:
+    lineage:
+      - datalake_langfuse_raw.traces.input
+  output:
+    lineage:
+      - datalake_langfuse_raw.traces.output
+  latency:
+    lineage:
+      - datalake_langfuse_raw.traces.latency
+  name:
+    lineage:
+      - datalake_langfuse_raw.traces.name
+  observations:
+    lineage:
+      - datalake_langfuse_raw.traces.observations
+  scores:
+    lineage:
+      - datalake_langfuse_raw.traces.scores
+  release:
+    lineage:
+      - datalake_langfuse_raw.traces.release
+  tags:
+    lineage:
+      - datalake_langfuse_raw.traces.tags
+  version:
+    lineage:
+      - datalake_langfuse_raw.traces.version
+  total_cost:
+    lineage:
+      - datalake_langfuse_raw.traces.totalCost
+  is_bookmarked:
+    lineage:
+      - datalake_langfuse_raw.traces.bookmarked
+  is_public:
+    lineage:
+      - datalake_langfuse_raw.traces.public
+  ts_created:
+    lineage:
+      - datalake_langfuse_raw.traces.createdAt
+  ts_updated:
+    lineage:
+      - datalake_langfuse_raw.traces.updatedAt
+  year:
+    lineage:
+      - datalake_langfuse_raw.traces.year
+  month:
+    lineage:
+      - datalake_langfuse_raw.traces.month
+  day:
+    lineage:
+      - datalake_langfuse_raw.traces.day
+  hour:
+    lineage:
+      - datalake_langfuse_raw.traces.hour 
