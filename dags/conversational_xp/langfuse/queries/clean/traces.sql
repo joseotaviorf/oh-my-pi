@@ -28,3 +28,5 @@ FROM
     datalake_langfuse_raw.traces
 WHERE
     MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}')
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY id_trace ORDER BY ts_updated DESC) = 1
