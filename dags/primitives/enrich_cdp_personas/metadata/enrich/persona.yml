@@ -40,6 +40,12 @@ columns:
       TENANT: User is a tenant.
       TENANT_PROSPECT: User is a tenant prospect.
       OWNER: User is an owner.
+  journey_step:
+    lineage:
+      - datalake_cdp_personas.buyer_prospect.journey_step
+      - datalake_cdp_personas.tenant_prospect.journey_step
+    description: Journey step related to the user's last event. 
+      Only present in Tenant Prospect or Buyer Prospect, as these are the only journeys already consolidated.
   is_active:
     description: Boolean flag indicating if the user is active or not as the persona.
     lineage:

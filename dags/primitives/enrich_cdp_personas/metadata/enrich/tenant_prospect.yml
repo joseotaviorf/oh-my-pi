@@ -16,6 +16,8 @@ columns:
     description: The UUID Person of the user.
     lineage:
       - datalake_ebdb_clean.user.uuid_person
+  journey_step:
+    description: Journey step related to the user's last event.
   is_active:
     description: Boolean flags indicating the user's activity status as a tenant prospect.
       Since a rent flow doesn't have a natural "end" and our product doesn't make a final decision,

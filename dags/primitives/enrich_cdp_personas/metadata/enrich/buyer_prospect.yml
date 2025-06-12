@@ -16,6 +16,8 @@ columns:
     description: The UUID Person of the user.
     lineage:
       - datalake_ebdb_clean.user.uuid_person
+  journey_step:
+    description: Journey step related to the user's last event.
   is_active:
     description: Boolean flag indicating if the user is active or not as a buyer prospect.
       As we don't have in our products the concept of when a user starts/ends being a buyer prospect, it's always marked as null.
