@@ -3295,6 +3295,7 @@ bietlejuice.enrich_terminator:
   - bietlejuice.enrich_inspections:load-enrich-inspection-booking
   - bietlejuice.enrich_inspections:load-enrich-repair-request
   - bietlejuice.terminator:load-clean-checklist-item
+  - bietlejuice.terminator:load-clean-inspection-opted-out
   - bietlejuice.terminator:load-clean-negotiation
   - bietlejuice.terminator:load-clean-termination
   - bietlejuice.terminator:load-clean-termination-aud

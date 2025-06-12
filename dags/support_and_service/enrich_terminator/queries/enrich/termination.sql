@@ -24,6 +24,11 @@ last_negociation AS (
         tf.tenant_payment_method:['installments'] AS fee_number_of_installments,
         tf.tenant_payment_method:['paymentOption'] AS fee_payment_option,
         tfn.status AS fee_negotiation_status,
+        CASE
+            WHEN tf.period_fee_missing_days > 0 THEN TRUE
+            ELSE FALSE
+        END AS has_early_termination_fee,
+        tf.is_fee_prior_notice,
         tfn.ts_created AS ts_fee_negotiation_created,
         tfn.ts_updated AS ts_fee_negotiation_updated
     FROM
@@ -143,6 +148,7 @@ SELECT
     t.cancellation_info,
     t.category,
     t.requested_by,
+    t.source,
     t.status,
     t.feedback,
     GET_JSON_OBJECT(t.feedback, '$.reason') AS reason,
@@ -152,6 +158,7 @@ SELECT
     ln.fee_payment_option,
     checklist.checklist_item,
     cdr.decline_person,
+    tt.type AS task_type,
     t.is_spoc,
     t.is_spoc_control_group,
     t.is_relisting,
@@ -163,6 +170,9 @@ SELECT
     checklist.is_done AS is_checklist_done,
     cdr.is_relisting_enabled,
     cdr.is_early_relisting_enabled,
+    ioo.is_exit_inspection_opt_out,
+    ln.has_early_termination_fee,
+    ln.is_fee_prior_notice,
     neg.needs_repair_by_tenant AS has_repair_by_tenant_needed,
     DATEDIFF(t.dt_termination, t.ts_created) AS leadtime_request_to_vacancy,
     ln.fee_discount_percentage,
@@ -228,6 +238,9 @@ LEFT JOIN
 LEFT JOIN
     repair_metrics AS rm
         ON t.id_contract = rm.id_contract
+LEFT JOIN
+    datalake_terminator_clean.inspection_opted_out AS ioo
+      ON t.id = ioo.id_termination
 WHERE
     DATE(t.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY

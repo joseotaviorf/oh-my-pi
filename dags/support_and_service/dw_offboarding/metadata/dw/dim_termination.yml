@@ -29,6 +29,10 @@ columns:
     description: Descriptive information that indicates the type of user who made the termination request.
     lineage:
       - datalake_terminator.termination.requested_by
+  source:
+    description: Descriptive information that indicates the source of the termination request.
+    lineage:
+      - datalake_terminator.termination.source
   status:
     description: Current termination status.
     lineage:
@@ -37,6 +41,10 @@ columns:
     description: Information in json format that indicates the home's output feedback.
     lineage:
       - datalake_terminator.termination.feedback
+  task_type:
+    description: Descriptive information that indicates the type of task related to the termination.
+    lineage:
+      - datalake_terminator.termination.task_type
   reason:
     description: Termination's reason.
     lineage:

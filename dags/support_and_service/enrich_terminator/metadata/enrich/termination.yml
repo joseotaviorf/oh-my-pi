@@ -56,6 +56,10 @@ columns:
     description: Descriptive information that indicates the type of user who made the termination request.
     lineage:
       - datalake_terminator_clean.termination.requested_by
+  source:
+    description: Descriptive information that indicates the source of the termination request.
+    lineage:
+      - datalake_terminator_clean.termination.source
   status:
     description: Current termination status.
     lineage:
@@ -96,6 +100,10 @@ columns:
       "DECLINED_BY_PP": The person who declined the relisting was the owner.
       "DECLINED_BY_CX/ENG": The person who declined the relisting and opted-out wasn't the owner.
       "AUTO_DECLINED": If the is_early_relisting flag is False and we don't have any information who did the opt-out, the value will be Auto-declined.
+  task_type:
+    description: Descriptive information that indicates the type of task related to the termination.
+    lineage:
+      - datalake_terminator_clean.termination_task.type
   is_spoc:
     description: Boolean information indicating whether the termination is part of the spoc control group.
     lineage:
@@ -140,6 +148,16 @@ columns:
     lineage:
       - datalake_terminator_clean.negotiation.needs_repair_by_tenant
     description: Boolean flag indicating if needs repair by tenant.
+  is_exit_inspection_opt_out:
+    description: Boolean information that indicates whether the exit inspection is opted out.
+    lineage:
+      - datalake_terminator_clean.inspection_opted_out.is_exit_inspection_opt_out
+  has_early_termination_fee:
+    description: Boolean information that indicates whether the termination fee is early.
+  is_fee_prior_notice:
+    description: Boolean information that indicates whether the termination fee is prior notice.
+    lineage:
+      - datalake_terminator_clean.termination_fee.is_fee_prior_notice
   leadtime_request_to_vacancy:
     description: Numerical information that indicates the number of days between the request and the vacancy for termination.
     lineage:
