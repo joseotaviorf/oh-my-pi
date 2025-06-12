@@ -1,0 +1,58 @@
+database_name: datalake_signatures_test_clean
+table_name: signature
+description: This table contains the information about the signature.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id:
+    description: The unique identifier for the signature.
+    lineage:
+      - datalake_signatures_test_raw.signature.id
+  id_recipient:
+    description: The unique identifier for the recipient.
+    lineage:
+      - datalake_signatures_test_raw.signature.recipient_id
+  id_agreement_document:
+    description: The unique identifier for the agreement document.
+    lineage:
+      - datalake_signatures_test_raw.signature.agreement_document_id
+  id_signature_collector:
+    description: The unique identifier for the signature collector.
+    lineage:
+      - datalake_signatures_test_raw.signature.signature_collector_id
+  version:
+    description: The version of the signature.
+    lineage:
+      - datalake_signatures_test_raw.signature.version
+  status:
+    description: The status of the signature.
+    lineage:
+      - datalake_signatures_test_raw.signature.status
+  ts_sent:
+    description: The timestamp of the sent signature.
+    lineage:
+      - datalake_signatures_test_raw.signature.sent_at
+  ts_signed:
+    description: The timestamp of the signed signature.
+    lineage:
+      - datalake_signatures_test_raw.signature.signed_at
+  ts_created:
+    description: The timestamp of the created signature.
+    lineage:
+      - datalake_signatures_test_raw.signature.created_at
+  ts_updated:
+    description: The timestamp of the updated signature.
+    lineage:
+      - datalake_signatures_test_raw.signature.updated_at
+  year:
+    description: The year of when the signature was ingested.
+    lineage:
+      - datalake_signatures_test_raw.signature.year
+  month:
+    description: The month of when the signature was ingested.
+    lineage:
+      - datalake_signatures_test_raw.signature.month
+  day:
+    description: The day of when the signature was ingested.
+    lineage:
+      - datalake_signatures_test_raw.signature.day

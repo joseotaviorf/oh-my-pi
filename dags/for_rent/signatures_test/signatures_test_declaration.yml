@@ -1,0 +1,28 @@
+dag:
+  name: signatures_test
+  schedule_start_date: 2020, 7, 27
+  schedule_interval: 0 6 * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: Extraction of Signatures tables into data lake. Signatures is the service responsible for documents signature operations.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: signatures
+  source_schema: public
+  dbutils_secret_key: SIGNATURES_DB
+  lineage_product_database_name: signatures
+  tables_customization:
+    agreement_document: {}
+    recipient: {}
+    signature: {}
+    signature_collector: {}
+cluster:
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

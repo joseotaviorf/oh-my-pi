@@ -1,0 +1,58 @@
+database_name: datalake_signatures_test_clean
+table_name: signature_collector
+description: This table contains the information about the signature collector.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id:
+    description: The unique identifier for the signature collector.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.id
+  id_external_reference:
+    description: The unique identifier for the external reference.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.external_reference_id
+  external_reference_name:
+    description: The name of the external reference.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.external_reference_name
+  version:
+    description: The version of the signature collector.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.version
+  status:
+    description: The status of the signature collector.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.status
+  ts_started:
+    description: The timestamp of the started signature collector.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.started_at
+  ts_completed:
+    description: The timestamp of the completed signature collector.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.completed_at
+  ts_sent:
+    description: The timestamp of the sent signature collector.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.sent_at
+  ts_created:
+    description: The timestamp of the created signature collector.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.created_at
+  ts_updated:
+    description: The timestamp of the updated signature collector.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.updated_at
+  year:
+    description: The year of when the signature collector was ingested.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.year
+  month:
+    description: The month of when the signature collector was ingested.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.month
+  day:
+    description: The day of when the signature collector was ingested.
+    lineage:
+      - datalake_signatures_test_raw.signature_collector.day

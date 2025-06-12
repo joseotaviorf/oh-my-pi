@@ -1,0 +1,74 @@
+database_name: datalake_signatures_test_clean
+table_name: agreement_document
+description: This table contains the information about the agreement document.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id:
+    description: The unique identifier for the agreement document.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.id
+  id_internal_reference:
+    description: The unique identifier for the internal reference.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.internal_reference_id
+  id_external_reference:
+    description: The unique identifier for the external reference.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.external_reference_id
+  internal_reference_name:
+    description: The name of the internal reference.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.internal_reference_name
+  external_reference_name:
+    description: The name of the external reference.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.external_reference_name
+  version:
+    description: The version of the agreement document.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.version
+  type:
+    description: The type of the agreement document.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.type
+  document_s3_uid:
+    description: The S3 UID of the document.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.document_s3_uid
+  name:
+    description: The name of the agreement document.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.name
+  email_subject:
+    description: The subject of the email.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.email_subject
+  email_body:
+    description: The body of the email.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.email_body
+  signed_document_s3_uid:
+    description: The S3 UID of the signed document.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.signed_document_s3_uid
+  ts_created:
+    description: The timestamp of the created document.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.created_at
+  ts_updated:
+    description: The timestamp of the updated document.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.updated_at
+  year:
+    description: The year of when the document was ingested.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.year
+  month:
+    description: The month of when the document was ingested.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.month
+  day:
+    description: The day of when the document was ingested.
+    lineage:
+      - datalake_signatures_test_raw.agreement_document.day

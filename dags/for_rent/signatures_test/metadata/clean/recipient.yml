@@ -1,0 +1,62 @@
+database_name: datalake_signatures_test_clean
+table_name: recipient
+description: This table contains the information about the recipient.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id:
+    description: The unique identifier for the recipient.
+    lineage:
+      - datalake_signatures_test_raw.recipient.id
+  id_internal_reference:
+    description: The unique identifier for the internal reference.
+    lineage:
+      - datalake_signatures_test_raw.recipient.internal_reference_id
+  id_external_reference:
+    description: The unique identifier for the external reference.
+    lineage:
+      - datalake_signatures_test_raw.recipient.external_reference_id
+  internal_reference_name:
+    description: The name of the internal reference.
+    lineage:
+      - datalake_signatures_test_raw.recipient.internal_reference_name
+  external_reference_name:
+    description: The name of the external reference.
+    lineage:
+      - datalake_signatures_test_raw.recipient.external_reference_name
+  version:
+    description: The version of the recipient.
+    lineage:
+      - datalake_signatures_test_raw.recipient.version
+  name:
+    description: The name of the recipient.
+    lineage:
+      - datalake_signatures_test_raw.recipient.name
+  email:
+    description: The email of the recipient.
+    lineage:
+      - datalake_signatures_test_raw.recipient.email
+  type:
+    description: The type of the recipient.
+    lineage:
+      - datalake_signatures_test_raw.recipient.dtype
+  ts_created:
+    description: The timestamp of the created recipient.
+    lineage:
+      - datalake_signatures_test_raw.recipient.created_at
+  ts_updated:
+    description: The timestamp of the updated recipient.
+    lineage:
+      - datalake_signatures_test_raw.recipient.updated_at
+  year:
+    description: The year of when the recipient was ingested.
+    lineage:
+      - datalake_signatures_test_raw.recipient.year
+  month:
+    description: The month of when the recipient was ingested.
+    lineage:
+      - datalake_signatures_test_raw.recipient.month
+  day:
+    description: The day of when the recipient was ingested.
+    lineage:
+      - datalake_signatures_test_raw.recipient.day
