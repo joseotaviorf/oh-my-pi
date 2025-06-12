@@ -476,6 +476,9 @@ SELECT
     hl.is_iorent_active,
     hl.is_for_rent,
     hl.is_for_sale,
+    cbh.is_water_included_in_condo,
+    cbh.is_power_included_in_condo,
+    cbh.is_gas_included_in_condo,
     CAST(hled.ts_early_demand_started AS TIMESTAMP) AS ts_early_demand_started,
     hl.ts_listing_version_start,
     hl.ts_listing_version_end,
@@ -521,3 +524,8 @@ LEFT JOIN
 LEFT JOIN
   first_publication AS fp
     ON fp.id_house = hl.id_house
+LEFT JOIN
+  datalake_consumption_bill.consumption_bill_history AS cbh
+    ON cbh.id_house = hl.id_house
+    AND DATE(hl.ts_listing_version_start) >= cbh.dt_status_started
+    AND DATE(hl.ts_listing_version_start) < cbh.dt_status_ended

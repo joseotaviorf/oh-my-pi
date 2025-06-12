@@ -412,6 +412,18 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.is_sale_primary_market
     description: Boolean indicating if this is a sale primary market's house.
+  is_water_included_in_condo:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_water_included_in_condo
+    description: Boolean indicating if the water is included in the condo.
+  is_power_included_in_condo:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_power_included_in_condo
+    description: Boolean indicating if the power is included in the condo.
+  is_gas_included_in_condo:
+    lineage:
+      - datalake_ebdb_listing.house_listing.is_gas_included_in_condo
+    description: Boolean indicating if the gas is included in the condo.
   key_location:
     lineage:
       - datalake_ebdb_listing.house.key_location

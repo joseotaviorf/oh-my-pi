@@ -129,6 +129,18 @@ columns:
     description: Boolean indicating if the listing is for rent.
   is_for_sale:
     description: Boolean indicating if the listing is for sale.
+  is_water_included_in_condo:
+    description: Boolean indicating if the water is included in the condo.
+    lineage:
+      - datalake_consumption_bill.consumption_bill_history.is_water_included_in_condo
+  is_power_included_in_condo:
+    description: Boolean indicating if the power is included in the condo.
+    lineage:
+      - datalake_consumption_bill.consumption_bill_history.is_power_included_in_condo
+  is_gas_included_in_condo:
+    description: Boolean indicating if the gas is included in the condo.
+    lineage:
+      - datalake_consumption_bill.consumption_bill_history.is_gas_included_in_condo
   ts_listing_version_start:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.ts_state_started
