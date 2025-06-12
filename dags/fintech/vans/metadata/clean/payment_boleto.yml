@@ -49,6 +49,9 @@ columns:
   paid_amount:
     lineage:
       - datalake_vans_raw.paymentboleto.paid_amount
+  due_amount:
+    lineage:
+      - datalake_vans_raw.paymentboleto.due_amount
   bank_payment_code:
     lineage:
       - datalake_vans_raw.paymentboleto.bank_payment_code

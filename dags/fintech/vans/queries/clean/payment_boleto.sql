@@ -13,6 +13,7 @@ SELECT
     status,
     original_response,
     paid_amount,
+    due_amount,
     bank_payment_code,
     type,
     style,
