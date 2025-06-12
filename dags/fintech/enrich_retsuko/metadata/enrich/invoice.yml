@@ -45,6 +45,10 @@ columns:
     description: ""
     lineage:
       - datalake_retsuko_clean.invoice.id_idempotency
+  payment_unique_payment_identifier:
+    description: "Unique payment identifier in Vans"
+    lineage:
+      - datalake_retsuko_clean.invoice.payment_unique_payment_identifier
   status:
     description: "Invoice's status"
     lineage:

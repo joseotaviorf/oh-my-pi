@@ -31,6 +31,10 @@ columns:
     description: ""
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.idempotency_id
+  payment_unique_payment_identifier:
+    description: "Unique payment identifier in vans"
+    lineage:
+      - datalake_retsuko_raw.invoice_partitioned.payment_unique_payment_identifier
   status:
     lineage:
       - datalake_retsuko_raw.invoice_partitioned.status

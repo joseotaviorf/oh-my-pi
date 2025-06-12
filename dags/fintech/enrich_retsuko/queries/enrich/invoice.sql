@@ -17,6 +17,7 @@ SELECT
     in.id_checkout_order,
     in.id_checkout_charge,
     in.id_idempotency,
+    in.payment_unique_payment_identifier,
     in.status,
     in.payment_status,
     in.substatus,
