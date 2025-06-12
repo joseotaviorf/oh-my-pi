@@ -1,3 +1,11 @@
+WITH currentHLR AS (
+    SELECT
+      *,
+      ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY id DESC) AS ordenacao
+    FROM
+      datalake_ebdb_clean.house_listing_relation
+)
+
 SELECT
   sl.id_sale_listing AS sk_sale_listing,
   lbc.id_house AS sk_house,
@@ -15,6 +23,7 @@ SELECT
   hrs.registration_abandoned_reason,
   lbc.status_reason AS unpublished_reason,
   lbc.short_url,
+  hlr.related_as AS house_relation,
   ll.price_bin,
   ll.price_m2_bin,
   ll.total_area_bin,
@@ -92,5 +101,8 @@ LEFT JOIN
 LEFT JOIN
   datalake_sale_listings_lenses.listing_lenses AS ll
     ON ll.id_house = lbc.id_house
+LEFT JOIN 
+  currentHLR AS hlr
+    ON lbc.id_house = hlr.id_house AND hlr.ordenacao = 1
 WHERE
   lbc.business_context = 'SALE'

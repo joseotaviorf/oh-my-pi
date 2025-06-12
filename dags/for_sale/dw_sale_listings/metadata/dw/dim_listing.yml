@@ -171,6 +171,11 @@ columns:
     - datalake_ebdb_listing.listing_business_context.short_url
     description: >
       Shortened link of the listing on the QuintoAndar platform/website.
+  house_relation:
+    lineage:
+    - datalake_ebdb_clean.house_listing_relation.related_as
+    description: >
+      Refers to which user profile the property is related to.
   price_bin:
     lineage:
       - datalake_sale_listings_lenses.listing_lenses.price_bin
