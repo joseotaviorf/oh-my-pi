@@ -21,6 +21,7 @@ workflow:
     inspection_key_retrieval_confirmation: {}
     inspector_booking_retrieve_key: {}
     key_return_preferred_location: {}
+    key_delivery_location: {}
     lock_box_track_entries: {}
     notifications_sent: {}
 cluster:
