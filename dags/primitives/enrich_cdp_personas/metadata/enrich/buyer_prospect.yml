@@ -20,7 +20,7 @@ columns:
     description: Journey step related to the user's last event.
   is_active:
     description: Boolean flag indicating if the user is active or not as a buyer prospect.
-      As we don't have in our products the concept of when a user starts/ends being a buyer prospect, it's always marked as null.
+      As we don't have in our products the concept of when a user starts/ends being a buyer prospect, it's always marked as true.
   ts_first_event:
     description: Timestamp of the first user event while as a buyer prospect. 
     lineage:

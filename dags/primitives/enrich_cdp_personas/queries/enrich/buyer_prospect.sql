@@ -38,7 +38,7 @@ SELECT
     b.id_user,
     b.uuid_person,
     le.journey_step,
-    CAST(NULL AS BOOLEAN) AS is_active,
+    TRUE AS is_active,
     b.ts_first_event,
     b.ts_last_event
 FROM
