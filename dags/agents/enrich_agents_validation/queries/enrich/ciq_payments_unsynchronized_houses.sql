@@ -1,4 +1,3 @@
-%sql
 WITH related AS (
   SELECT
     id_house,
@@ -6,7 +5,7 @@ WITH related AS (
   FROM
     datalake_ebdb_clean.house_listing_relation
   WHERE
-    DATE(ts_created) BETWEEN DATE('{load_start_date}') - INTERVAL 30 DAY AND DATE({'load_end_date'})
+    DATE(ts_created) BETWEEN DATE('{load_start_date}') - INTERVAL 30 DAY AND DATE('{load_end_date}')
     AND source_type = 'COMPANY_REF'
     AND related_as = 'AUTONOMOUS_AGENT'
 ),
