@@ -1,0 +1,19 @@
+---
+database_name: datalake_gsheets_people_clean
+table_name: email_employee_mapping
+owner: gabriel.berger@quintoandar.com.br
+domain: people
+description: 'A lookup table that maps secondary or alternative email addresses to an existing user ID (PIN). Its primary use is to identify a user when they interact using an email that is not their primary registered address.'
+columns:
+  work_email:
+    description: 'The secondary or alternative email address used by an employee.'
+    lineage:
+    - datalake_gsheets_people_raw.email_employee_mapping.work_email
+  person_number:
+    description: 'Unique identifier for the employee.'
+    lineage:
+    - datalake_gsheets_people_raw.email_employee_mapping.person_number
+  ts_load:
+    description: 'Timestamp of when the record was loaded.'
+    lineage:
+    - datalake_gsheets_people_raw.email_employee_mapping.ts_load

@@ -9,6 +9,10 @@ columns:
     description: 'Surrogate key for the employee'
     lineage:
     - datalake_hr_system.employee_info.id_person
+  person_number:
+    description: 'Unique identifier for the employee.'
+    lineage:
+    - datalake_hr_system.employee_info.id_person
   first_name:
     description: 'First name of the employee, if has social name it is not the same as the first social name'
     lineage:
