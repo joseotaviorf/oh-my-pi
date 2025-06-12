@@ -5,7 +5,7 @@ dag:
   schedule_interval: "0 1 * * *"
   documentation:
     dag_purpose: |
-      Google Ads DAG retrieves QuintoAndar's marketing campaigns data from Google Ads platform. 
+      Google Ads DAG retrieves QuintoAndar's marketing campaigns data from Google Ads platform.
       It uses data extracted from [ads-performance](https://github.com/quintoandar/ads-performance) extraction tool, developed by Marketing Tools team.
 workflow:
   type: custom_ingestion
@@ -18,35 +18,35 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -6), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   spark_job_arguments:
-  - "{environment}"   # env
-  - "{bucket}"   # datalake_bucket
-  - "{dag_name}"   # source
-  - "{load_start_date}"   # load_start_date
-  - "{load_end_date}"   # load_end_date
+    - "{environment}" # env
+    - "{bucket}" # datalake_bucket
+    - "{dag_name}" # source
+    - "{load_start_date}" # load_start_date
+    - "{load_end_date}" # load_end_date
   tables_customization:
     ads_performance:
       extra_spark_job_arguments:
-      - ads_performance   # report type
+        - ads_performance # report type
     campaigns_performance:
       extra_spark_job_arguments:
-      - campaigns_performance   # report type
+        - campaigns_performance # report type
     keywords_performance:
       extra_spark_job_arguments:
-      - keywords_performance   # report type
+        - keywords_performance # report type
     videos_performance:
       extra_spark_job_arguments:
-      - videos_performance   # report type
+        - videos_performance # report type
     geo_target_constant:
       extra_spark_job_arguments:
-      - geo_target_constant   # report type
+        - geo_target_constant # report type
       extraction_type: full
       partitions: []
     campaigns_geo_performance:
       extra_spark_job_arguments:
-      - campaigns_geo_performance   # report type
+        - campaigns_geo_performance # report type
     ad_group_geo_performance:
       extra_spark_job_arguments:
-      - ad_group_geo_performance   # report type
+        - ad_group_geo_performance # report type
     # search_term_performance: # Not used, but can be added if needed
     #   extra_spark_job_arguments:
     #     - search_term_performance # report type
@@ -57,13 +57,13 @@ cluster:
     node_type_id: r5d.2xlarge
     num_workers: 3
     spark_version: 13.3.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   custom_libraries:
-  - pypi:
-      package: google-ads==25.0.0
-  - pypi:
-      package: google-auth==2.35
+    - pypi:
+        package: google-ads==27.0.0
+    - pypi:
+        package: google-auth==2.35
   databricks_conn_id: databricks_new

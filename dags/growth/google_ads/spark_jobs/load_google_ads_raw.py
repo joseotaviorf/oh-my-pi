@@ -122,7 +122,7 @@ if __name__ == "__main__":
     credentials_str = dbutils.secrets.get(scope="quintoandar", key=APIEnum.GOOGLE_ADS)
     credentials = json.loads(credentials_str)
 
-    googleads_client = GoogleAdsClient.load_from_dict(credentials, version="v17")
+    googleads_client = GoogleAdsClient.load_from_dict(credentials, version="v19")
     googleads_client.login_customer_id = login_customer_id
     customer_ids = _list_customer_ids(
         googleads_client, login_customer_id, customer_filter
@@ -196,8 +196,8 @@ if __name__ == "__main__":
                 )
                 .withColumn("report_type", lit(report_type_mapped))
                 .withColumn("dt_created", df["segments.date"])
-            )            
-        
+            )
+
         s3_loader = S3Loader()
         spark_metastore_service = SparkMetastoreService(spark_client)
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
@@ -215,7 +215,7 @@ if __name__ == "__main__":
         )
 
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-       
+
         spark_metastore_loader.update_metastore(
              df=df,
              database_name=database_name,
