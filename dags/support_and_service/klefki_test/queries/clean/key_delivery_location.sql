@@ -13,7 +13,3 @@ SELECT
 	day
 FROM
 	datalake_klefki_test_raw.key_delivery_location
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}
