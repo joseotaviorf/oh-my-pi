@@ -172,10 +172,10 @@ columns:
     lineage:
       - datalake_salesforce_raw.task.IsABTest
     description: Flag indicating if the task is an AB test.
-  is_contract_id_odd_even:
+  contract_id_odd_even:
     lineage:
       - datalake_salesforce_raw.task.ContractIdOddOrEven
-    description: Flag indicating if the task contract ID is odd or even.
+    description: Descriptive column indicating if the case contract ID is odd or even.
   responsability_contesting_is_good:
     lineage:
       - datalake_salesforce_raw.task.ResponsabilityContestingIsGood

@@ -46,6 +46,7 @@ SELECT
     TaskManagement__c AS task_management,
     ExperimentGroup__c AS experiment_group,
     UnlistingReason__c AS unlisting_reason,
+    ContractIdOddOrEven__c AS contract_id_odd_even,
     CAST(SLA__c AS FLOAT) AS sla,
     CAST(Answer__c AS BOOLEAN) AS is_answer,
     CAST(IsHighPriority AS BOOLEAN) AS is_high_priority,
@@ -55,7 +56,6 @@ SELECT
     CAST(IsReminderSet AS BOOLEAN) AS is_reminder_set,
     CAST(IsRecurrence AS BOOLEAN) AS is_recurrence,
     CAST(IsABTest__c AS BOOLEAN) AS is_ab_test,
-    CAST(ContractIdOddOrEven__c AS BOOLEAN) AS is_contract_id_odd_even,
     CASE
         WHEN FS_KeysReceived__c = 'Sim' THEN TRUE
         WHEN FS_KeysReceived__c = 'Não' THEN FALSE
