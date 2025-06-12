@@ -309,10 +309,10 @@ affiliate_volumetry_cluster AS (
 SELECT
     obt.*,
     CASE
-        WHEN company_report_origin = 'Indica Aí - General' AND COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Novos Afiliados' THEN 'Indica Aí - General_Novo Afiliado'
-        WHEN company_report_origin = 'Indica Aí - General' AND COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Top Afiliados' THEN 'Indica Aí - Top Afiliados'
-        WHEN company_report_origin = 'Indica Aí - General' AND COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Afiliados Alto Volume' THEN 'Indica Aí - General_Afiliados_Alto_Volume'
-        WHEN company_report_origin in ('Indica Aí - General','Indica Aí - Agents') AND COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Afiliados Risco Fraude' THEN 'Indica Aí - Afiliados Risco Fraude'
+        WHEN company_report_origin IN ('Indica Aí - General','Indica Aí - Agents') AND COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Novos Afiliados' THEN 'Indica Aí - General_Novo Afiliado'
+        WHEN company_report_origin IN ('Indica Aí - General','Indica Aí - Agents') AND COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Top Afiliados' THEN 'Indica Aí - Top Afiliados'
+        WHEN company_report_origin IN ('Indica Aí - General','Indica Aí - Agents') AND COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Afiliados Alto Volume' THEN 'Indica Aí - General_Afiliados_Alto_Volume'
+        WHEN company_report_origin IN ('Indica Aí - General','Indica Aí - Agents') AND COALESCE(avc.affiliate_volumetry, ac.affiliate_volumetry) = 'Afiliados Risco Fraude' THEN 'Indica Aí - Afiliados Risco Fraude'
         WHEN company_report_origin = 'Indica Aí - General' THEN 'Indica Aí - General_Baixo Volume'
         WHEN company_report_origin = 'Indica Aí - Agents' THEN 'Indica Aí - Agents_Baixo Volume'
         WHEN company_report_origin = 'Owner PWA - Paid' AND lower(medium) = 'web display' THEN 'Owner PWA - Paid_Display'
