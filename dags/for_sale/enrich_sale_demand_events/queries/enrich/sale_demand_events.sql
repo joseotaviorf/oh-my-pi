@@ -102,7 +102,7 @@ events AS (
         ts_offer_submitted IS NOT NULL
     UNION ALL
     SELECT -- Offer Accepted
-        dt_offer_accepted AS dt_event,
+        DATE(dt_offer_accepted) AS dt_event,
         id_sale_flow,
         4 AS sk_event_type,
         'OFFER_ACCEPTED' AS event_name,
@@ -116,7 +116,7 @@ events AS (
         sk_company_supply,
         sk_company_demand,
         id_business_unit,
-        CAST(dt_offer_accepted AS TIMESTAMP) AS ts_event
+        dt_offer_accepted AS ts_event
     FROM
         offers
     WHERE
@@ -144,7 +144,7 @@ events AS (
         dt_sale_agreement_created IS NOT NULL
     UNION ALL
     SELECT -- Sale Agreement Signed
-        dt_sale_agreement_signed AS dt_event,
+        DATE(dt_sale_agreement_signed) AS dt_event,
         id_sale_flow,
         6 AS sk_event_type,
         'SALE_AGREEMENT_SIGNED' AS event_name,
@@ -158,7 +158,7 @@ events AS (
         sk_company_supply,
         sk_company_demand,
         id_business_unit,
-        CAST(dt_sale_agreement_signed AS TIMESTAMP) AS ts_event
+        dt_sale_agreement_signed AS ts_event
     FROM
         offers
     WHERE
