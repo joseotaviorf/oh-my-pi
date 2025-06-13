@@ -56,7 +56,7 @@ historical_data AS (
         bur_g.id_region,
         bur_g.business_unit AS hub_name,
         bur_g.business_model,
-        ARRAY() AS lead_types,
+        "[]" AS lead_types,
         CAST(NULL AS STRING) AS negotiation_type,
         TIMESTAMP(bur_g.dt_start) AS ts_start_coverage,
         LEAST(TIMESTAMP(NULLIF(bur_g.dt_end, "2022-05-23T17:25:17")), TO_TIMESTAMP("2022-05-23 17:25:17", "yyyy-MM-dd HH:mm:ss")) AS ts_end_coverage
