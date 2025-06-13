@@ -16,8 +16,12 @@ workflow:
   source_database: hubs
   custom_schema: hub_services
   tables_customization:
-    business_unit: {}
-    business_unit_aud: {}
+    business_unit: 
+      transactional_datatype_overrides:
+        lead_types: string
+    business_unit_aud: 
+      transactional_datatype_overrides:
+        lead_types: string
     business_unit_region: {}
     business_unit_region_aud: {}
     lead: {}
