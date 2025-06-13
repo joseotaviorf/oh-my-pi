@@ -23,7 +23,7 @@ tables:
   inmueblesmercadolibreec_organic_search_kw: inmuebles.mercadolibre.com.ec
   compreoalquile_organic_search_kw: compreoalquile.com
   encuentra24_organic_search_kw: encuentra24.com
-  panama-real-estate_organic_search_kw: panama-real-estate.com
+  panama_real_estate_organic_search_kw: panama-real-estate.com
   inmopanama_organic_search_kw: inmopanama.com
   panamaequity_organic_search_kw: panamaequity.com
 clean_partition_cols:

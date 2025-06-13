@@ -209,7 +209,7 @@ report_list:
       display_positions_type: organic
       display_filter: "%2D%7CPo%7CGt%7C40" # -|Po|Gt|40 -> not | Keyword Positions | Greater than | 40
     display_limit: 1300 # expected number of results * 1,25
-  panama-real-estate_organic_search_kw:
+  panama_real_estate_organic_search_kw:
     configs:
       subdomain: panama-real-estate.com
       type: subdomain_organic
