@@ -115,8 +115,8 @@ WITH
       TO_TIMESTAMP(a.first_message_ts) AS ts_event
     FROM
       datalake_talk_to_agent.talk_to_agent AS a
-    INNER JOIN 
-      datalake_ebdb_clean.house AS h 
+    INNER JOIN
+      datalake_ebdb_clean.house AS h
         ON h.id = a.house_id
     WHERE
       DATE(a.first_message_ts) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
@@ -147,7 +147,7 @@ SELECT
   id_agent,
   event_name,
   business_context,
-  dt_event,
+  CAST(dt_event AS TIMESTAMP) AS dt_event,
   ts_event,
   YEAR(dt_event) AS year,
   MONTH(dt_event) AS month,
