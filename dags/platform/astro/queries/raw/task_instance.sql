@@ -1,3 +1,4 @@
+SET statement_timeout = '15min'; -- Only applies to the current session
 SELECT
     task_id,
     dag_id,
