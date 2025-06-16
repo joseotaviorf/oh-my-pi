@@ -17,9 +17,14 @@ WITH organizations AS (
     organization_dff['business'] AS business,
     organization_dff['product'] AS product,
     organization_dff['vertical'] AS vertical,
-    organization_dff['vicePresidencia'] AS vice_presidency,
-    organization_dff['diretoria'] AS directorate,
-    organization_dff['subDiretoria'] AS subdirectorate
+    organization_dff['brand'] AS brand,
+    organization_dff['structure'] AS structure,
+    organization_dff['team'] AS team,
+    organization_dff['chapter'] AS chapter,
+    organization_dff['line'] AS line,
+    organization_dff['l1Cc'] AS owner_leadership_layer_1_name,
+    organization_dff['l2Cc'] AS owner_leadership_layer_2_name,
+    organization_dff['l3Cc'] AS owner_leadership_layer_3_name
   FROM organization_dff_step1
 )
 SELECT 
@@ -40,10 +45,15 @@ SELECT
     odff.codigo_dff,
     odff.business,
     odff.product,
+    odff.brand,
     odff.vertical,
-    odff.vice_presidency,
-    odff.directorate,
-    odff.subdirectorate,
+    odff.structure,
+    odff.team,
+    odff.chapter,
+    odff.line,
+    odff.owner_leadership_layer_1_name,
+    odff.owner_leadership_layer_2_name,
+    odff.owner_leadership_layer_3_name,
     -- Nested Fields
     o.OrganizationDFF AS organization_dff,
     o.extraInformation AS extra_information,

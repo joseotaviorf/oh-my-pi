@@ -33,6 +33,50 @@ columns:
     description: ''
     lineage:
     - datalake_hr_system_raw.organizations.OrgClassificationVA
+  business:
+    description: 'Business unit to which the cost center belongs.'
+    lineage:
+    - organizations.OrganizationDFF.business
+  product:
+    description: 'Primary product associated with this cost center.'
+    lineage:
+    - organizations.OrganizationDFF.product
+  brand:
+    description: 'Brand to which the cost center belongs.'
+    lineage:
+    - organizations.OrganizationDFF.brand
+  vertical:
+    description: "Derived business vertical based on the structure field. Values include 'Ops' (for Sales, Operations, Marketing, Guarantees), 'Corp' (for Finance, People, Legal, Administrative), or 'Tech' (for Product)."
+    lineage:
+    - 'Derived from organizations.OrganizationDFF.structure'
+  structure:
+    description: 'Structure to which the cost center belongs.'
+    lineage:
+    - organizations.OrganizationDFF.structure_name
+  team:
+    description: 'Team to which the cost center belongs.'
+    lineage:
+    - organizations.OrganizationDFF.team_name
+  chapter:
+    description: 'Chapter to which the cost center belongs.'
+    lineage:
+    - organizations.OrganizationDFF.pt_chapter
+  line:
+    description: 'Line to which the cost center belongs.'
+    lineage:
+    - organizations.OrganizationDFF.pt_line
+  owner_leadership_layer_1_name:
+    description: 'Name of the second highest manager (L1) in the hierarchy responsible for the cost center.'
+    lineage:
+    - organizations.OrganizationDFF.l1Cc
+  owner_leadership_layer_2_name:
+    description: 'Name of the third highest manager (L2) in the hierarchy responsible for the cost center.'
+    lineage:
+    - organizations.OrganizationDFF.l2Cc
+  owner_leadership_layer_3_name:
+    description: 'Name of the fourth highest manager (L3) in the hierarchy responsible for the cost center.'
+    lineage:
+    - organizations.OrganizationDFF.l3Cc
   organization_dff:
     description: "Customer's flexfield for organization."
     lineage:

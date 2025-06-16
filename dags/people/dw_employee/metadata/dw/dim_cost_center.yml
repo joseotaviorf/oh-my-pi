@@ -26,55 +26,104 @@ columns:
     lineage:
       - datalake_hr_system_clean.organizations.codigo_dff
   business:
-    description: "Business name"
+    description: 'Business unit to which the cost center belongs.'
     categories:
-      "Benvi": ""
-      "Classifieds": ""
       "Classifieds & CRM": ""
       "Corporate": ""
-      "For Condo": ""
       "For Living": ""
       "For Rent": ""
       "For Sale": ""
-      "Quinto Cred": ""
+      "Inmuebles24 Full": ""
       "QuintoCred": ""
-      "Não se Aplica": ""
     lineage:
-      - "datalake_hr_system_clean.organizations.business"
+    - datalake_hr_system_clean.organizations.business
   product:
-    description: "Product name"
+    description: 'Primary product associated with this cost center.'
+    categories:
+      "1P": ""
+      "3P Demand": ""
+      "3P Supply": ""
+      "Benvi Cross": ""
+      "Brokerage Only": ""
+      "CRM": ""
+      "Classifieds": ""
+      "Classifieds & CRM Cross": ""
+      "Corporate Cross": ""
+      "For Living": ""
+      "For Rent Cross": ""
+      "For Sale Cross": ""
+      "Full Rental": ""
+      "Guarantees": ""
+      "Internal Channel": ""
+      "Mortgage Cross": ""
+      "QuintoCred Cross": ""
+      "Rede": ""
+      "Standalone": ""
     lineage:
-      - "datalake_hr_system_clean.organizations.product"
+    - datalake_hr_system_clean.organizations.product
+  brand:
+    description: 'Brand to which the cost center belongs.'
+    categories:
+      "Adondevivir": ""
+      "Allocations": ""
+      "Classifieds 2.0": ""
+      "Compre o Alquile": ""
+      "Imovelweb": ""
+      "Inmuebles24": ""
+      "Plusvalia": ""
+      "Tokko": ""
+      "Total Brands": ""
+      "Union": ""
+      "Urbania": ""
+      "Zonaprop": ""
+    lineage:
+    - datalake_hr_system_clean.organizations.brand
   vertical:
-    description: "Vertical name. Possible values"
+    description: "Derived business vertical based on the structure field."
     categories:
-      "Corp": ""
-      "Tech": ""
-      "Ops": ""
-      "Não se Aplica": ""
+      "Corp": "Part of one of the following Structures: Finance, People, Legal, Administrative."
+      "Ops": "Part of one of the following Structures: Sales, Operations, Marketing, Guarantees."
+      "Tech": "Part of Product Structure."
     lineage:
-      - "datalake_hr_system_clean.organizations.vertical"
-  vice_presidency:
-    description: "Vice presidency name"
+    - datalake_hr_system_clean.organizations.vertical
+  structure:
+    description: 'Structure to which the cost center belongs.'
     categories:
-      "Benvi MX": ""
-      "Classifieds LATAM": ""
-      "Fintech": ""
-      "For Brokers": ""
-      "Marketplace": ""
-      "Sales & Operations": ""
-      "Support & Services": ""
-      "Não se Aplica": ""
+      "Administrative": ""
+      "Finance": ""
+      "Guarantees": ""
+      "Legal": ""
+      "Marketing": ""
+      "Operations": ""
+      "People": ""
+      "Product": ""
+      "Sales": ""
     lineage:
-      - "datalake_hr_system_clean.organizations.vice_presidency"
-  directorate:
-    description: "Directorate name"
+    - datalake_hr_system_clean.organizations.structure
+  team:
+    description: 'Team to which the cost center belongs.'
     lineage:
-      - "datalake_hr_system_clean.organizations.directorate"
-  subdirectorate:
-    description: "Sub directorate name"
+    - datalake_hr_system_clean.organizations.team
+  chapter:
+    description: 'Chapter to which the cost center belongs.'
     lineage:
-      - "datalake_hr_system_clean.organizations.subdirectorate"
+    - datalake_hr_system_clean.organizations.chapter
+  line:
+    description: 'Line to which the cost center belongs.'
+    lineage:
+    - datalake_hr_system_clean.organizations.line
+  owner_leadership_layer_1_name:
+    description: 'Name of the second highest manager (L1) in the hierarchy responsible for the cost center.'
+    lineage:
+    - datalake_hr_system_clean.organizations.owner_leadership_1_name
+  owner_leadership_layer_2_name:
+    description: 'Name of the third highest manager (L2) in the hierarchy responsible for the cost center.'
+    lineage:
+    - datalake_hr_system_clean.organizations.owner_leadership_2_name
+  owner_leadership_layer_3_name:
+    description: 'Name of the fourth highest manager (L3) in the hierarchy responsible for the cost center.'
+    lineage:
+    - datalake_hr_system_clean.organizations.owner_leadership_3_name
   status:
     description: "Status of the cost center"
     categories:
