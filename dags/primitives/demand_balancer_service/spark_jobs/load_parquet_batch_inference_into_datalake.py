@@ -76,23 +76,12 @@ def main():
     spark_metastore_service.create_database(database_name)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    dt_execution = datetime.strptime(date_to_ingest, "%Y-%m-%d") + timedelta(days=1)
+    dt_execution = datetime.strptime(date_to_ingest, "%Y-%m-%d")
 
-    try:
-        df = s3_consumer.get_data_from_file(
-            f"{source_root_path}/year={dt_execution.year}/month={dt_execution.month}/day={dt_execution.day}/",
-            format
-        )
-    except AnalysisException as e:
-        logger.info(
-            f"""
-            m=__main__, msg=No data found for date_to_ingest={date_to_ingest}, source={source},
-            source_root_path={source_root_path}, table_name={table_name}.
-
-            Exception: {e}
-            """
-        )
-        return
+    df = s3_consumer.get_data_from_file(
+        f"{source_root_path}/year={dt_execution.year}/month={dt_execution.month}/day={dt_execution.day}/",
+        format
+    )
 
     df = (
         SparkDataFrameService()
