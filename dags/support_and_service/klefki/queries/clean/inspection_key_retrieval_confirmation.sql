@@ -12,7 +12,3 @@ SELECT
     day
 FROM
     datalake_klefki_raw.inspection_key_retrieval_confirmation
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}

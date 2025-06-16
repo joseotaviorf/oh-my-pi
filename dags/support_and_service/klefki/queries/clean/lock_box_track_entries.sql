@@ -13,7 +13,3 @@ SELECT
     day
 FROM
 	datalake_klefki_raw.lock_box_track_entries
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}

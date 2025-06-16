@@ -8,51 +8,24 @@ dag:
       Retrieve data from Klefki database (postgresql). [Klefiki](https://github.com/quintoandar/klefiki-api) is related to delivering and receiving keys during the renting period.
       Please note that, even though this is an PostgreSQL database, you'll find it named 'klefiki_api' on some locations.
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
+  source_schema: public
+  source_database: klefiki_api
+  custom_schema: klefki
   lineage_product_database_name: klefki
   dbutils_secret_key: KLEFKI_DB
   tables_customization:
-    address_location_key:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      extraction_type: incremental
-    address_location_key_aud:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      extraction_type: incremental
-    change_owner_control: {}
-    inspection_key_retrieval_confirmation:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      extraction_type: incremental
-    inspector_booking_retrieve_key:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      extraction_type: incremental
-    key_delivery_location:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      extraction_type: incremental
-    key_return_preferred_location:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      extraction_type: incremental
-    key_return_preferred_location_aud:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      extraction_type: incremental
-    lock_box_track_entries:
-      date_filter_column: updated_at
-      partitions: [year, month, day]
-      extraction_type: incremental
-    notifications_sent:
-      date_filter_column: created_at
-      partitions: [year, month, day]
-      extraction_type: incremental
+    address_location_key: {}
+    inspection_key_retrieval_confirmation: {}
+    inspector_booking_retrieve_key: {}
+    key_return_preferred_location: {}
+    key_delivery_location: {}
+    lock_box_track_entries: {}
+    notifications_sent: {}
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: databricks_12_2_med_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'

@@ -15,7 +15,3 @@ SELECT
 	day
 FROM
 	datalake_klefki_raw.address_location_key
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}

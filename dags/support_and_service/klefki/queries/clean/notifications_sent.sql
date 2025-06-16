@@ -12,7 +12,3 @@ SELECT
     day
 FROM
 	datalake_klefki_raw.notifications_sent
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}

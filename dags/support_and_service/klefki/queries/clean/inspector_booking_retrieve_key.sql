@@ -19,7 +19,3 @@ SELECT
 	day
 FROM
 	datalake_klefki_raw.inspector_booking_retrieve_key
-WHERE
-	year = {year}
-	AND month = {month}
-	AND day = {day}
