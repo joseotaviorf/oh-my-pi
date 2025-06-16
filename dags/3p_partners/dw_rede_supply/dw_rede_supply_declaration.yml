@@ -9,11 +9,17 @@ workflow:
   custom_schema: rede
   inner_dependencies:
     fact_lead_3p_flows:
-    - dim_lead_3p_context
+      - dim_lead_3p_context
     fact_lead_3p_status:
-    - dim_lead_3p_context
-    # fact_lead_3p_status_reason:
-    # - dim_lead_3p_context
+      - dim_lead_3p_context
+    fact_lead_3p_status_reason:
+      - dim_lead_3p_context
+  tables_customization:
+    fact_lead_3p_status_reason:
+      extraction_type: incremental
+      merge_on: [sk_lead_3p_flow, sk_lead_3p_reason, ts_reason_started]
+      partitions: [year, month, day]
+      z_order_by: [sk_lead_3p_flow, ts_reason_started]
 cluster:
   type: custom_cluster
   custom_configurations:
