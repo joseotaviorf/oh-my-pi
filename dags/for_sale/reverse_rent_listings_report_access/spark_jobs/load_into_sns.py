@@ -6,6 +6,7 @@ from datetime import datetime, date
 from typing import Tuple
 import boto3
 from bietlejuice.services import ConfigurationService
+from pyspark.sql.functions import make_date
 from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_into_sns"
@@ -79,8 +80,8 @@ def load_table_into_sns(
     df = spark.table(f"{database_name}.{table_name}")
 
     filtered_df = df.filter(
-        (df.ts_event >= load_start_date)
-        & (df.ts_event <= load_end_date)
+        (make_date(df.year, df.month, df.day) >= load_start_date)
+        & (make_date(df.year, df.month, df.day) <= load_end_date)
     ).drop("business_id", "year", "month", "day")
 
     region = sns_topic_arn.split(":")[3]

@@ -16,6 +16,10 @@ workflow:
   - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
   - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
+    listing_similar_score:
+      extra_spark_job_arguments:
+        - DEMAND_SCORE
+        - sns_topic_arn_scores
     rent_listing_traffic:
       extra_spark_job_arguments:
       - NEW_LISTING_TRAFFIC

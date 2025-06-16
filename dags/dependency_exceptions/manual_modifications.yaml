@@ -843,6 +843,7 @@ bietlejuice.reverse_dsat_report_access:
     - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report
 bietlejuice.reverse_rent_listings_report_access:
   add:
+    - bietlejuice.reverse_rent_listings_report_load:load-reverse-listing-similar-score
     - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-offer-sent
     - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-traffic
     - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-visit-scheduled
