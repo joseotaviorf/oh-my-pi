@@ -7,6 +7,7 @@ WITH lead_3p_reason_changes AS (
         COALESCE(l3p.id_region, -1) AS sk_region,
         COALESCE(BIGINT(DATE_FORMAT(lrc.ts_reason_started, 'yyyyMMdd')), -1) AS sk_reason_started_date,
         COALESCE(BIGINT(DATE_FORMAT(lrc.ts_reason_ended, 'yyyyMMdd')), -1) AS sk_reason_ended_date,
+        lsrs.sk_lead_3p_status AS sk_status_when_reason_started,
         lrc.id_file,
         lrc.business_context,
         lrc.uuid_company,
@@ -39,6 +40,13 @@ WITH lead_3p_reason_changes AS (
     JOIN
         datalake_rede_supply.lead_3p_reasons AS lr
             ON lr.reason = lrc.reason
+    JOIN
+        datalake_rede_supply.lead_3p_status AS lsrs
+            ON lsrs.status = lrc.status_when_reason_started
+            AND lsrs.growth_status = lrc.growth_status_when_reason_started
+            AND lsrs.is_waiting_for_enrichment = lrc.is_waiting_for_enrichment_when_reason_started
+            AND lsrs.is_ineligible = lrc.is_ineligible_when_reason_started
+            AND lsrs.is_discarded = lrc.is_discarded_when_reason_started
     LEFT JOIN
         datalake_rede_lead_acquisition.lead_3p_acquisition AS la
             ON la.id_lead_3p = lrc.id_lead_3p
@@ -60,7 +68,7 @@ SELECT
     lrc.sk_region,
     lrc.sk_reason_started_date,
     lrc.sk_reason_ended_date,
-    lsrs.sk_lead_3p_status AS sk_status_when_reason_started,
+    lrc.sk_status_when_reason_started,
     COALESCE(lsre.sk_lead_3p_status, -1) AS sk_status_when_reason_ended,
     lrc.days_in_reason,
     lrc.is_requirement_met,
@@ -73,13 +81,6 @@ SELECT
     lrc.day
 FROM
     lead_3p_reason_changes AS lrc
-JOIN
-    datalake_rede_supply.lead_3p_status AS lsrs
-        ON lsrs.status = lrc.status_when_reason_started
-        AND lsrs.growth_status = lrc.growth_status_when_reason_started
-        AND lsrs.is_waiting_for_enrichment = lrc.is_waiting_for_enrichment_when_reason_started
-        AND lsrs.is_ineligible = lrc.is_ineligible_when_reason_started
-        AND lsrs.is_discarded = lrc.is_discarded_when_reason_started
 LEFT JOIN
     datalake_rede_supply.lead_3p_status AS lsre
         ON lsre.status = lrc.status_when_reason_ended
