@@ -1,18 +1,27 @@
 dag:
   name: pixar
-  owner: Data Fintech
+  schedule_start_date: 2020, 8, 11
   schedule_interval: 0 3 * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG creates the full tables for Pixar, the integration with PIX payment services.
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
+  has_hive_sync: false
   database_type: postgres
+  source_schema: public
+  source_database: pixar
+  custom_schema: pixar
+  dbutils_secret_key: PIXAR_DB
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(ds, 1), 'load_end_date') }}"
   tables_customization:
-    account:
-      clean_table_name: account
-    charge:
-      clean_table_name: charge
-    refund:
-      clean_table_name: refund
+    account: {}
+    charge: {}
+    refund: {}
 cluster:
   type: databricks_12_2_med_general_cluster
   access_control_list:
