@@ -1,5 +1,5 @@
 dag:
-  name: jira
+  name: jira_ops
   owner: Data Governance
   schedule_start_date: 2020, 6, 1
   schedule_interval: "0 0 * * *"
@@ -8,23 +8,36 @@ dag:
 workflow:
   type: custom_ingestion
   layer: raw
-  load_spark_job: load_{extraction_type}_data_into_datalake_raw
+  load_spark_job: load_jira_ops_data_into_datalake_raw
   default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   spark_job_arguments:
-    - "{environment}" # env
-    - "{bucket}" # datalake_bucket
-    - "{dag_name}" # source
-    - "{load_start_date}" # load_start_date
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{partitions}"
     - "{table_name}"
+  raw_inner_dependencies:
+    alert_log:
+      - alerts
   tables_customization:
-    projects:
-      extraction_type: full
-    issues:
-      extraction_type: incremental
-      partitions: ["year", "month", "day"]
+    alerts:
+      extra_spark_job_arguments:
+        - endpoint_enum: LIST_ALERTS
+          jql_query_filter: 'responders: "Analytics Engineering"'
+    alert_log:
+      extra_spark_job_arguments:
+        - endpoint_enum: LIST_ALERT_LOG
+          feedback_config: 
+            table: datalake_jira_ops_clean.alerts
+            seleted_column: id
+            feedback_key: alert_id
+            date_column_filter: ts_created
 cluster:
   type: custom_cluster
   custom_libraries:

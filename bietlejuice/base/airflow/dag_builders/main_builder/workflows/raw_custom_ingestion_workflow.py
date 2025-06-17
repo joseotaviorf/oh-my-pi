@@ -16,8 +16,8 @@ from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathSe
 
 class RawCustomIngestionWorkflow(BaseWorkflow):
     """
-        This workflow is responsible for creating dags for raw ingestions that use custom
-        sparkjobs to load data from API's or databases
+    This workflow is responsible for creating dags for raw ingestions that use custom
+    sparkjobs to load data from API's or databases
     """
 
     def __init__(self, dag_args, workflow_args, cluster_args):
@@ -103,8 +103,15 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
         clean_first_tasks = {}
         clean_last_tasks = {}
 
-        tables_customization_raw_dependency, tables_customization_without_raw_dependency = self._generate_filtered_tables_customizations(
+        (
+            tables_customization_raw_dependency,
+            tables_customization_without_raw_dependency,
+        ) = self._generate_filtered_tables_customizations(
             self.workflow_args["tables_customization"]
+        )
+
+        raw_tables_with_raw_inner_dependencies = set(
+            self._get_lowercase_inner_dependencies("raw_inner_dependencies").keys()
         )
 
         for (
@@ -124,12 +131,20 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
                 optimize_delta_tables_task=optimize_delta_tables_task,
             )
 
-            execute_job_cluster_task >> raw_initial_task
+            if raw_table_name not in raw_tables_with_raw_inner_dependencies:
+                execute_job_cluster_task >> raw_initial_task
+
             raw_final_task >> clean_initial_task
 
             raw_last_tasks[raw_table_name] = raw_final_task
             clean_first_tasks[clean_table_name] = clean_initial_task
             clean_last_tasks[clean_table_name] = clean_final_task
+
+        self._set_inner_dependencies(
+            table_first_tasks=raw_last_tasks,
+            table_last_tasks=raw_last_tasks,
+            inner_dependencies_key="raw_inner_dependencies",
+        )
 
         for (
             table_name,
@@ -158,6 +173,7 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
             clean_first_tasks,
             clean_last_tasks,
             next_task_if_no_dependents=optimize_delta_tables_task,
+            inner_dependencies_key="clean_inner_dependencies",
         )
 
     def _create_raw_tasks(self, table_name: str, last_task) -> Tuple:

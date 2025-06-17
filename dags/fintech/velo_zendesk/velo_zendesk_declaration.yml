@@ -11,7 +11,7 @@ workflow:
   type: custom_ingestion
   custom_schema: velo_zendesk
   load_spark_job: add_partitions_to_raw_tables
-  inner_dependencies:
+  clean_inner_dependencies:
     tickets:
       - tickets_history
   spark_job_arguments:

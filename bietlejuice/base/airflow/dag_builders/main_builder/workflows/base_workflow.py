@@ -155,6 +155,7 @@ class BaseWorkflow(BuilderInterface):
         table_last_tasks: dict,
         previous_task_if_no_dependencies=None,
         next_task_if_no_dependents=None,
+        inner_dependencies_key: str = "inner_dependencies",
     ) -> None:
         """
         Sets the inner dependencies between the tables, based on the inner_dependencies dictionary. It is not
@@ -166,7 +167,9 @@ class BaseWorkflow(BuilderInterface):
         next_task_if_no_dependents: task that will be set as the next task if the table has no dependents.\
         Usually, this will be the cluster ending task.
         """
-        inner_dependencies = self._get_lowercase_inner_dependencies()
+        inner_dependencies = self._get_lowercase_inner_dependencies(
+            inner_dependencies_key
+        )
         tables_with_dependents = set()
         for table_name, dependent_first_task in table_first_tasks.items():
             if table_name.lower() in inner_dependencies:
@@ -184,12 +187,10 @@ class BaseWorkflow(BuilderInterface):
                 table_last_tasks, tables_with_dependents, next_task_if_no_dependents
             )
 
-    def _get_lowercase_inner_dependencies(self):
+    def _get_lowercase_inner_dependencies(self, key: str = "inner_dependencies"):
         """Returns the inner dependencies dictionary from the workflow args, both with the key and values in lowercase"""
 
-        inner_dependencies_case_sensitive = self.workflow_args.get(
-            "inner_dependencies", {}
-        )
+        inner_dependencies_case_sensitive = self.workflow_args.get(key, {})
         inner_dependencies_lowercase = {}
         for table_name, dependencies_list in inner_dependencies_case_sensitive.items():
             inner_dependencies_lowercase[table_name.lower()] = [

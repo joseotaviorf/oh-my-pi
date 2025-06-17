@@ -82,6 +82,8 @@ class DAGDeclarationValidator(Validator):
                     },
                 },
                 "inner_dependencies": {"type": "dict", "empty": False},
+                "clean_inner_dependencies": {"type": "dict", "empty": False},
+                "raw_inner_dependencies": {"type": "dict", "empty": False},
                 "has_load_to_redshift_task": {"type": "boolean", "empty": False},
                 "spark_session_configs": {
                     "type": "dict",
