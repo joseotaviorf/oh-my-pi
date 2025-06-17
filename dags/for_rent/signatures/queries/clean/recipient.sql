@@ -15,7 +15,3 @@ SELECT
     day
 FROM
     datalake_signatures_raw.recipient
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}

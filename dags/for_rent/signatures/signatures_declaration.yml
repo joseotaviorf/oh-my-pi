@@ -3,44 +3,26 @@ dag:
   schedule_start_date: 2020, 7, 27
   schedule_interval: 0 6 * * *
   owner: Data ForRent
+  documentation:
+    dag_purpose: Extraction of Signatures tables into data lake. Signatures is the service responsible for documents signature operations.
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   database_type: postgres
-  default_extraction_type: incremental
-  default_partitions: [year, month, day]
+  source_database: signatures
+  source_schema: public
   dbutils_secret_key: SIGNATURES_DB
   lineage_product_database_name: signatures
   tables_customization:
-    agreement_document:
-      date_filter_column: updated_at
-    agreement_document_aud:
-      date_filter_column: updated_at
-    recipient:
-      date_filter_column: updated_at
-    recipient_aud:
-      date_filter_column: updated_at
-    revinfo:
-      clean_table_name: rev_info
-      date_filter_column: revtstmp
-      unixtime_measure: milliseconds
-    signature:
-      date_filter_column: updated_at
-    signature_aud:
-      date_filter_column: updated_at
-    signature_collector_aud:
-      date_filter_column: updated_at
-    signature_collector:
-      date_filter_column: updated_at
+    agreement_document: {}
+    recipient: {}
+    signature: {}
+    signature_collector: {}
 cluster:
-  type: custom_cluster
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new
   custom_configurations:
-    driver_node_type_id: m5a.xlarge
-    node_type_id: r5a.large
-    num_workers: 2
-    spark_version: 12.2.x-scala2.12
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new

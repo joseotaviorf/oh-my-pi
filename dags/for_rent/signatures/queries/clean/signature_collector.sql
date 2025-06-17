@@ -14,7 +14,3 @@ SELECT
     day
 FROM
     datalake_signatures_raw.signature_collector
-WHERE
-    year = {year}
-    AND month = {month}
-    AND day = {day}
