@@ -9,13 +9,14 @@ columns:
     lineage:
       - datalake_tracksale.answer.id
       - datalake_tracksale.dispatch.id
+      - datalake_tracksale.dispatch.customers
     description: Key of each individual NPS dispatch to a customer in a campaign.
   id_dispatch_user:
     lineage:
       - datalake_tracksale.answer.id
       - datalake_tracksale.dispatch.id
       - datalake_ebdb_user.user.uuid_person
-    description: Key of each individual NPS dispatch to a customer in a campaign.
+    description: Key of each individual NPS dispatch to a customer in a campaign, concatenated with uuid_person or answer id.
   id_dispatch_lot:
     lineage:
       - datalake_tracksale.dispatch.id
@@ -29,13 +30,15 @@ columns:
       - datalake_tracksale.answer_tags.tag_value
       - datalake_ebdb_clean.user.id
       - datalake_ebdb_customer_contact_identification.customer_contact_identification.id_user
+      - datalake_ebdb_user.user.id
     description: Client identification from main (EBDB)
   id_customer:
     lineage:
       - datalake_tracksale.dispatch.customers
-    description:
-      "Key of NPS customer in a dispatch. Formed by the three contact info
-      availables: email, phone and name, if provided."
+      - datalake_tracksale.answer.email
+      - datalake_tracksale.answer.phone
+      - datalake_tracksale.answer.name
+    description: "Key of NPS customer in a dispatch. Formed by the three contact info availables: email, phone and name, if provided."
   customer_email:
     lineage:
       - datalake_tracksale.dispatch.customers
@@ -47,29 +50,25 @@ columns:
   id_answer:
     lineage:
       - datalake_tracksale.answer.id
-    description:
-      Key of the NPS answer from the customer in each dispatch (the last
-      if multiple, which is rare).
+    description: Key of the NPS answer from the customer in each dispatch (the last if multiple, which is rare).
   is_customer_identified:
     lineage:
       - datalake_tracksale.dispatch.customers
-    description:
-      Boolean that indicates if the customer is identified through the
-      id_customer, if the id_customer exists then it is True.
+    description: Boolean that indicates if the customer is identified through the id_customer, if the id_customer exists then it is True.
   customer_type:
     lineage:
       - datalake_tracksale.campaign.customer_type
     description: Description of customer type
   status:
     lineage:
-      - datalake_tracksale.dispatch.status
-    description: Dispatch tracking information.
+      - datalake_tracksale.dispatch_attributes.status
+      - datalake_tracksale.dispatch_attributes.ts_created
+    description: Dispatch tracking information. Shows 'Finalizado' when ts_created is not null, otherwise shows the status from dispatch_attributes.
   id_campaign:
     lineage:
-      - datalake_tracksale.dispatch.id_campaign
-    description: Key of NPS campaign, which is a definition of a certain customer
-      experience survey.
+      - datalake_tracksale.answer.id_campaign
+    description: Key of NPS campaign, which is a definition of a certain customer experience survey.
   ts_dispatch_created:
     lineage:
-      - datalake_tracksale.dispatch.ts_created
+      - datalake_tracksale.dispatch.ts_dispatch
     description: Timestamp in which the NPS survey was dispatched to the customers.

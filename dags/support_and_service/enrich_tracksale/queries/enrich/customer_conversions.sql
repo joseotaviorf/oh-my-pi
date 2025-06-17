@@ -149,7 +149,7 @@ all_answers AS (
     	FROM answers
     	WHERE id_customer = '-1'
 )
-  SELECT
+  SELECT DISTINCT
     CONCAT(
       dc.id_dispatch,
       COALESCE(dc.id_customer,CAST(ac.id_answer AS STRING))
@@ -168,12 +168,12 @@ all_answers AS (
     COALESCE(dc.id_customer != '',false) AS is_customer_identified,
     c.customer_type,
     CASE
-      WHEN d.ts_created IS NOT NULL 
+      WHEN da.ts_created IS NOT NULL 
       THEN 'Finalizado'
-      ELSE d.status
+      ELSE da.status
     END AS status,
-    d.id_campaign,
-    d.ts_created AS ts_dispatch_created
+    a.id_campaign,
+    a.ts_dispatch AS ts_dispatch_created
   FROM 
     all_answers AS ac
 FULL JOIN dispatch_customers dc
@@ -183,5 +183,10 @@ LEFT JOIN datalake_tracksale.dispatch d -- complete dispatch information in answ
 	ON d.id = ac.id_dispatch
   AND dc.id_dispatch IS NULL
 	AND dc.id_customer IS NULL
+LEFT JOIN datalake_tracksale.dispatch_attributes da
+  ON da.id = dc.id_dispatch
+  AND da.email = dc.customer_email
+LEFT JOIN datalake_tracksale.answer a
+  ON a.id = ac.id_answer
 LEFT JOIN datalake_tracksale.campaign AS c
-  ON c.id = d.id_campaign
+  ON c.id = a.id_campaign

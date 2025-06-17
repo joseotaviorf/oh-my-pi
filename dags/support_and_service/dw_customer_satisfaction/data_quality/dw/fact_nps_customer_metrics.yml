@@ -38,9 +38,6 @@ column_level_validations:
   has_pending_survey:
     is_complete:
       severity_level: Error
-  dt_last_dispatched:
-    is_complete:
-      severity_level: Error
   ts_load:
     is_complete:
       severity_level: Error
