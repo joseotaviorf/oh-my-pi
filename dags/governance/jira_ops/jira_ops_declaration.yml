@@ -34,10 +34,10 @@ workflow:
       extra_spark_job_arguments:
         - endpoint_enum: LIST_ALERT_LOG
           feedback_config: 
-            table: datalake_jira_ops_clean.alerts
+            table: datalake_jira_ops_raw.alerts
             seleted_column: id
             feedback_key: alert_id
-            date_column_filter: ts_created
+            date_column_filter: createdAt
 cluster:
   type: custom_cluster
   custom_libraries:

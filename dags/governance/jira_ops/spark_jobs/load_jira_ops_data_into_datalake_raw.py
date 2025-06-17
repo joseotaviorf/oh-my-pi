@@ -146,7 +146,7 @@ if __name__ == "__main__":
         df = spark.read.json(response_rdd)
 
         df = (
-            df.withColumn("dt_load", F.lit(dt_end_execution.year))
+            df.withColumn("dt_load", F.lit(dt_end_execution))
             .withColumn("year", F.lit(dt_end_execution.year))
             .withColumn("month", F.lit(dt_end_execution.month))
             .withColumn("day", F.lit(dt_end_execution.day))
@@ -155,13 +155,13 @@ if __name__ == "__main__":
         db_info = DatalakeMetastoreService.get_db_info(
             environment, source, datalake_bucket
         )
-        database_name = db_info["db_enrich_databricks"]
-        database_location = db_info["db_enrich_path"]
+        database_name = db_info["db_raw_databricks"]
+        database_location = db_info["db_raw_path"]
 
         loader = DeltaLoader()
         loader.load_table(
             table_name=f"{database_name}.{table_name}",
-            path=f"{database_location}/{table_name}",
+            path=f"{database_location}{table_name}",
             source_df=df,
             partition_by=partition_cols,
         )
