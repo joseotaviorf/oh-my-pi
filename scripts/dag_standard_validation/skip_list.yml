@@ -32,6 +32,7 @@ dags_not_using_builder:
   - mlops/batch_inference/batch_inference.py
   - mlops/emlio/emlio.py
   - platform/astro/astro.py
+  - platform/check_dags_dataset_queue/check_dags_dataset_queue.py
   - platform/dag_inventory/dag_inventory.py
   - platform/databricks_jobs_deletion/databricks_jobs_deletion.py
   - platform/mediator/dag_dependency_visualization.py
