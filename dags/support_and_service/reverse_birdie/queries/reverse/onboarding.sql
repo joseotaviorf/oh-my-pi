@@ -949,7 +949,7 @@ CASE
       ELSE FALSE
     END AS spoc,
     ca.vc_occupied_property,
-    to_char(date(o.ts_opt_out_flow), 'yyyy-mm-dd') AS early_demand_opt_out,
+    date_format(o.ts_opt_out_flow, 'yyyy-mm-dd') AS early_demand_opt_out,
     dr.city_group,
     dr.city_name,CASE
       WHEN dr.city_group not in ('RMSP', 'Belo Horizonte', 'Porto Alegre')
