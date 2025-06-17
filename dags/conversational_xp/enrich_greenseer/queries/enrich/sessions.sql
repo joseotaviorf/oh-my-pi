@@ -10,7 +10,7 @@ WITH greenseer_uniques AS (
   FROM
     datalake_greenseer_clean.session
   WHERE
-    ts_started BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
+    ts_started >= DATE('{load_start_date}') - INTERVAL 3 MONTH
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_session ORDER BY ts_updated DESC) = 1
 ),
