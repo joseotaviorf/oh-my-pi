@@ -1,6 +1,7 @@
 SELECT
   id,
   user_id AS id_user,
+  recommendation_id AS id_recommendation,
   filter,
   use_case,
   displayed_order,
