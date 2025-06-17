@@ -59,7 +59,7 @@ if __name__ == "__main__":
     logger.info(
         f"""
             m={JOB_NAME}, environment={args.environment}, source={args.source}, load_start_date={args.load_start_date},
-            datalake_bucket={args.datalake_bucket}, load_end_date={args.load_end_date}, partition_cols={args.partition_cols}, 
+            load_end_date={args.load_end_date}, datalake_bucket={args.datalake_bucket}, partition_cols={args.partitions}, 
             table_name={args.table_name}, endpoint_params={args.endpoint_params}, msg=print spark jobs args"
         """
     )
