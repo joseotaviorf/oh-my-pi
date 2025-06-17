@@ -59,6 +59,11 @@ workflow:
       - "feedbacks"
       - "audience/accounts"
       - "https://api.birdie.ai/ingestion"
+    onboarding:
+      extra_spark_job_arguments:
+      - "feedbacks"
+      - "audience/accounts"
+      - "https://api.birdie.ai/ingestion"
     offboarding:
       extra_spark_job_arguments:
       - "feedbacks"

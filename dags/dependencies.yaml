@@ -1133,8 +1133,8 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry
-  - bietlejuice.enrich_sap:load-enrich-ledger-new-template
   - bietlejuice.enrich_sap:load-enrich-ledger
+  - bietlejuice.enrich_sap:load-enrich-ledger-new-template
   - bietlejuice.gsheets_fintech:done-clean-cod-locale
   - bietlejuice.monopoly:load-clean-accounting-entry
   - bietlejuice.monopoly:load-clean-sale
@@ -3812,6 +3812,10 @@ bietlejuice.reverse_birdie_access:
   - bietlejuice.reverse_birdie:load-reverse-end-of-process
   - bietlejuice.reverse_birdie:load-reverse-lost
   - bietlejuice.reverse_birdie:load-reverse-new-surveys
+  - bietlejuice.reverse_birdie:load-reverse-offboarding
+  - bietlejuice.reverse_birdie:load-reverse-onboarding
+  - bietlejuice.reverse_birdie:load-reverse-ongoing
+  - bietlejuice.reverse_birdie:load-reverse-pp-multi
 bietlejuice.reverse_dashboard_governance:
   - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
   - bietlejuice.enrich_superset:load-enrich-dashboards

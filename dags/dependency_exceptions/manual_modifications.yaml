@@ -814,6 +814,10 @@ bietlejuice.reverse_birdie_access:
     - bietlejuice.reverse_birdie:load-reverse-dsat-new-surveys
     - bietlejuice.reverse_birdie:load-reverse-dsat-financing
     - bietlejuice.reverse_birdie:load-reverse-dsat-diligence
+    - bietlejuice.reverse_birdie:load-reverse-onboarding
+    - bietlejuice.reverse_birdie:load-reverse-ongoing
+    - bietlejuice.reverse_birdie:load-reverse-offboarding
+    - bietlejuice.reverse_birdie:load-reverse-pp-multi
 bietlejuice.reverse_dashboard_governance:
   add:
     - bietlejuice.enrich_dashboard_governance:load-enrich-dashboard-metadata
