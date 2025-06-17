@@ -663,17 +663,15 @@ rent_flow_vc AS (
 contrato_anterior AS (
   SELECT
     DISTINCT dhl.sk_house_listing,
-    to_char(date(dhl.ts_listing_version_start), 'yyyy-mm-dd') AS dt_relisting,
+    DATE_FORMAT(dhl.ts_listing_version_start, 'yyyy-mm-dd') AS dt_relisting,
     rl.sk_house_listing AS sk_house_listing_anterior,
     dc.sk_contract AS sk_contract_anterior,
-    to_char(
-      date(
-        COALESCE(dc.ts_analyst_annulment_input, dc.dt_annulment)
-      ),
+    DATE_FORMAT(
+      COALESCE(dc.ts_analyst_annulment_input, dc.dt_annulment),
       'yyyy-mm-dd'
     ) AS dt_ended_rental_confirmed,
-    date(
-      COALESCE(dc.ts_analyst_annulment_input, dc.dt_annulment)
+    DATE_FORMAT(
+      COALESCE(dc.ts_analyst_annulment_input, dc.dt_annulment), 'yyyy-mm-dd'
     ) AS date_erc,
     date_diff(
       DAY,
@@ -682,9 +680,9 @@ contrato_anterior AS (
       ),
       dhl.ts_listing_version_start
     ) AS er2rl,
-    to_char(date(dhl.ts_early_demand_started), 'yyyy-mm-dd') AS early_demand_started -- relisting
+    DATE_FORMAT(dhl.ts_early_demand_started, 'yyyy-mm-dd') AS early_demand_started -- relisting
 ,
-    to_char(date(dhl.ts_last_de_publication), 'yyyy-mm-dd') AS dt_despublicado -- relisting
+    DATE_FORMAT(dhl.ts_last_de_publication, 'yyyy-mm-dd') AS dt_despublicado -- relisting
 ,
     dc.rent,
     t.is_repair_tenant_duty,
@@ -726,13 +724,11 @@ contrato_anterior AS (
 contrato_anterior_new_relisting AS (
   SELECT
     DISTINCT dhl.sk_house_listing,
-    to_char(date(dhl.ts_listing_version_start), 'yyyy-mm-dd') AS dt_relisting,
+    DATE_FORMAT(dhl.ts_listing_version_start, 'yyyy-mm-dd') AS dt_relisting,
     rl.sk_house_listing AS sk_house_listing_anterior,
     dc.sk_contract AS sk_contract_anterior,
-    to_char(
-      date(
-        COALESCE(dc.ts_analyst_annulment_input, dc.dt_annulment)
-      ),
+    DATE_FORMAT(
+      COALESCE(dc.ts_analyst_annulment_input, dc.dt_annulment),
       'yyyy-mm-dd'
     ) AS dt_ended_rental_confirmed,
     date(
@@ -745,10 +741,8 @@ contrato_anterior_new_relisting AS (
       ),
       dhl.ts_listing_version_start
     ) AS er2rl,
-    to_char(date(dhl.ts_early_demand_started), 'yyyy-mm-dd') AS early_demand_started -- relisting
-,
-    to_char(date(dhl.ts_last_de_publication), 'yyyy-mm-dd') AS dt_despublicado -- relisting
-,
+    DATE_FORMAT(dhl.ts_early_demand_started, 'yyyy-mm-dd') AS early_demand_started,
+    DATE_FORMAT(dhl.ts_last_de_publication, 'yyyy-mm-dd') AS dt_despublicado,
     dc.rent,
     t.is_repair_tenant_duty,
     t.ts_termination_finished,CASE
@@ -841,7 +835,7 @@ inquilinos_em_contrato AS (
 retenants AS (
   SELECT
     DISTINCT sk_contract,
-    to_char(date_trunc('month', fim_contrato), 'yyyy-mm-dd') AS fim_contrato,
+    DATE_TRUNC('month', fim_contrato) AS fim_contrato,
     count(sk_personal_document) AS num_tenants,
     count(is_retenant) AS num_retenants,
     count(is_retenant_12W) AS num_retenants_12W
@@ -917,7 +911,7 @@ CASE
         OR dhl.consultant_type = 'Core'
       ) THEN 'FALSE'
     END AS is_b2b,
-    to_char(date(dc.ts_signature), 'yyyy-mm-dd') AS dt_signature,
+    DATE_FORMAT(dc.ts_signature, 'yyyy-mm-dd') AS dt_signature,
     COALESCE(dc.dt_start, dc.dt_entrance) AS dt_entrance,
     dhl.listing_category_start,
     dhl.sk_house_listing,
