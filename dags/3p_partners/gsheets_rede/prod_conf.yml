@@ -1,4 +1,10 @@
 sheets_info:
+  3p_partners_performance_targets:
+    sheet_id: 1qaV-paj_UFTVbCNCZwOwwAPqVlGypZ-x0ka7hrjeNx0
+    sheet_name: target_3p
+    clean_table_name: 3p_partners_performance_targets
+    sheet_context: 3p_partners
+    
   hubspot_acquisition_funnel_hunting:
     sheet_id: 1wSw3qcXri9rxD_ESqXn4Vp_PCgydvvw5XiyFaV0ZOxI
     sheet_name: hunting
