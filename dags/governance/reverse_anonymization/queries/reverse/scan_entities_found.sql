@@ -21,9 +21,9 @@ WITH dag_info AS (
   FROM
       datalake_astro_clean.dag AS d
   WHERE
-    year = 2025
-    AND month = 5
-    AND day = 20
+    year = {year}
+    AND month = {month}
+    AND day = {day}
 ), table_info as (
     SELECT
       t.table AS table_name,
