@@ -1,0 +1,52 @@
+---
+database_name: datalake_comms_manager_clean
+table_name: email_template
+columns:
+  id:
+    lineage:
+      - datalake_comms_manager_raw.email_template.id
+  name:
+    lineage:
+      - datalake_comms_manager_raw.email_template.name
+  category:
+    lineage:
+      - datalake_comms_manager_raw.email_template.category
+  provider_url:
+    lineage:
+      - datalake_comms_manager_raw.email_template.providerUrl
+  provider_code:
+    lineage:
+      - datalake_comms_manager_raw.email_template.providerCode
+  user_email:
+    lineage:
+      - datalake_comms_manager_raw.email_template.userEmail
+  sample_data:
+    lineage:
+      - datalake_comms_manager_raw.email_template.sampleData
+  user_profile:
+    lineage:
+      - datalake_comms_manager_raw.email_template.userProfile
+  metadata:
+    lineage:
+      - datalake_comms_manager_raw.email_template.metadata
+  subject:
+    lineage:
+      - datalake_comms_manager_raw.email_template.subject
+  is_manual:
+    lineage:
+      - datalake_comms_manager_raw.email_template.isManual
+  ts_created:
+    lineage:
+      - datalake_comms_manager_raw.email_template.createdAt
+  ts_updated:
+    lineage:
+      - datalake_comms_manager_raw.email_template.updatedAt
+  year:
+    lineage:
+      - datalake_comms_manager_raw.email_template.updatedAt
+  month:
+    lineage:
+      - datalake_comms_manager_raw.email_template.updatedAt
+  day:
+    lineage:
+      - datalake_comms_manager_raw.email_template.updatedAt

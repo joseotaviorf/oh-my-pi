@@ -1,0 +1,64 @@
+---
+database_name: datalake_comms_manager_clean
+table_name: whatsapp_template
+columns:
+  id:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.id
+  sid_template:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.templateSid
+  name:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.name
+  provider_code:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.providerCode
+  user_email:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.userEmail
+  sample_data:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.sampleData
+  content:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.content
+  language:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.language
+  status:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.status
+  rejection_reason:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.rejectionReason
+  meta_category:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.metaCategory
+  category:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.category
+  type:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.type
+  metadata:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.metadata
+  is_manual:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.isManual
+  ts_created:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.createdAt
+  ts_updated:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.updatedAt
+  year:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.updatedAt
+  month:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.updatedAt
+  day:
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.updatedAt
