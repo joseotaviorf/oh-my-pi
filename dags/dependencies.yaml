@@ -3018,6 +3018,17 @@ bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.sales_flow:load-clean-status-record
   - bietlejuice.sales_flow:load-clean-tag
   - bietlejuice.sales_flow:load-clean-users
+bietlejuice.enrich_sale_ongoing_listings:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
+  - bietlejuice.enrich_company:load-enrich-company-sks
+  - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-prediction-changes
+  - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-price-change
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
+  - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history
+  - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
+  - bietlejuice.enrich_sale_listings:load-enrich-sale-listing
 bietlejuice.enrich_sale_potential_listing:
   - bietlejuice.ebdb_partner:load-clean-partner
   - bietlejuice.ebdb_partner:load-clean-partner-agent

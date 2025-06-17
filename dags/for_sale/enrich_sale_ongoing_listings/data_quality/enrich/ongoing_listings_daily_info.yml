@@ -1,0 +1,18 @@
+---
+table_name: datalake_sale_ongoing_listings.ongoing_listings_daily_info
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_snapshot:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_snapshot_date:
+    is_complete:
+      severity_level: Error
+  id_sale_listing:
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error

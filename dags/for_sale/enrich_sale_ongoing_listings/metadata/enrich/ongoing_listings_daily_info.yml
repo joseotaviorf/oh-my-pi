@@ -1,0 +1,117 @@
+---
+database_name: datalake_sale_ongoing_listings
+table_name: ongoing_listings_daily_info
+description: Every row of this table is a snapshot of one sale ongoing listing per day. If it had the status="PUBLISHED" at that day, no matter
+  for how long, it will appear here, along with some metrics such as search, listing page viewed, visit booked, and other demand data.
+  DO NOT PERFORM HISTORICAL REPROCESSING PRIOR TO JUNE 15, 2025. Data before this date was obtained through the fact table, whose code is not the same.
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+columns:
+  id_snapshot:
+    description: Primary key of the table, formed by concatenating id_house to id_snapshot_date.
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.id_house
+      - datalake_quintoandar.aux_date.id_date
+  id_snapshot_date:
+    description:  Date ID (%Y%m%d format) of the snapshot.
+    lineage:
+      - datalake_quintoandar.aux_date.id_date
+  id_sale_listing:
+    description: ID of the sale listing.
+    lineage:
+      - datalake_sale_listings.sale_listing.id_sale_listing
+  id_house:
+    description: ID of the house.
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.id_house
+  id_region:
+    description: ID of the region of the house.
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+  sk_company:
+    description: Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company.
+    lineage:
+      - datalake_company.company_sks.sk_company
+  sale_price:
+    description: Price of the sale listing at the end of that day.
+    lineage:
+      - datalake_ebdb_pricing.listing_price_change.price
+  calculator_min_price:
+    description: Minimum price estimated by the calculator output. May also be referred as 'p_10'.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_min_price
+  calculator_p20_price:
+    description: Estimated price related to the 20% percentile of the calculator's output. May also be referred as 'p_20'.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p20_price
+  calculator_p30_price:
+    description: Estimated price related to the 30% percentile of the calculator's output. May also be referred as 'p_30'.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p30_price
+  calculator_p40_price:
+    description: Estimated price related to the 40% percentile of the calculator's output. May also be referred as 'p_40'.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p40_price
+  calculator_price:
+    description: Most likely price for the listing estimated by the calculator output. May also be referred as 'p_50'.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_price
+  calculator_p60_price:
+    description: Estimated price related to the 60% percentile of the calculator's output. May also be referred as 'p_60'.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p60_price
+  calculator_p70_price:
+    description: Estimated price related to the 70% percentile of the calculator's output. May also be referred as 'p_70'.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p70_price
+  calculator_p80_price:
+    description: Estimated price related to the 80% percentile of the calculator's output. May also be referred as 'p_80'.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_p80_price
+  calculator_max_price:
+    description: Maximum price estimated by the calculator output. May also be referred as 'p_90'.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.calculator_max_price
+  qt_search_result_page_viewed:
+    description: Amount of times the house was shown in the search results in that day.
+  qt_listing_page_viewed:
+    description: Amount of times the listing page was viewed in that day.
+  qt_favorites:
+    description: Amount of times the listing page was added to favorites in that day.
+  qt_visits_booked:
+    description: Amount of visits booked in that day.
+  qt_visits_completed:
+    description: Amount of visits completed in that day.
+  qt_offers_submitted:
+    description: Amount of offers submitted in that day.
+  qt_offers_accepted:
+    description: Amount of offers accepted in that day.
+  qt_sale_agreements_created:
+    description: Amount of sale agreements created in that day.
+  qt_sale_agreements_signed:
+    description: Amount of sale agreements signed in that day.
+  days_published:
+    description: Number of days the listing has been published. It starts counting from the day of publication.
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.ts_last_publication
+      - datalake_quintoandar.aux_date.date
+  ts_first_publication:
+    description: The timestamp of when the listing was first published.
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.ts_first_publication
+  ts_last_publication:
+    description: The timestamp of when the listing was last published.
+    lineage:
+      - datalake_ebdb_clean.listing_business_context_aud.ts_last_publication
+  year:
+    description: Year of the snapshot.
+    lineage:
+      - datalake_quintoandar.aux_date.year
+  month:
+    description: Month of the snapshot.
+    lineage:
+      - datalake_quintoandar.aux_date.month
+  day:
+    description: Day of the snapshot.
+    lineage:
+      - datalake_quintoandar.aux_date.day
