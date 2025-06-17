@@ -25,10 +25,17 @@ workflow:
       clean_table_name: session
 
 cluster:
-  type: databricks_13_3_med_general_cluster
-  databricks_conn_id: databricks_new
+  type: custom_cluster
   custom_configurations:
+    driver_node_type_id: r7a.xlarge
+    node_type_id: r7a.xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+      availability: ON_DEMAND
+    spark_conf:
+      spark.driver.maxResultSize: "0"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new 
