@@ -186,6 +186,48 @@ FROM VALUES
                                                 )
                                 )
         )
+    ),
+    -- HUE VS HSE for Rent
+    (
+        "AB_TEST_RECS_HUE_ITEM_RENT_V2",
+        named_struct(
+            'begin_date', DATE('2025-04-09'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'rent'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                )
+        )
+    ),
+    -- HUE VS HSE for Sale
+    (
+        "AB_TEST_RECS_HUE_ITEM_SALE_V2",
+        named_struct(
+            'begin_date', DATE('2025-04-09'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'sale'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                )
+        )
     )
 
 AS experiment_config(experiment_name, config)
