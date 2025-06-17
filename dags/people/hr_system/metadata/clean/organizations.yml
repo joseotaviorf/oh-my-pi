@@ -8,132 +8,144 @@ columns:
   id_organization:
     description: 'System generated primary key column.'
     lineage:
-    - datalake_hr_system_raw.organizations.OrganizationId
+      - datalake_hr_system_raw.organizations.OrganizationId
   id_location_lov:
     description: ''
     lineage:
-    - datalake_hr_system_raw.organizations.LocationIdLOV
+      - datalake_hr_system_raw.organizations.LocationIdLOV
   id_location:
     description: 'Identifier of location to which the Organization Unit belongs.'
     lineage:
-    - datalake_hr_system_raw.organizations.LocationId
+      - datalake_hr_system_raw.organizations.LocationId
   organization_code:
     description: ''
     lineage:
-    - datalake_hr_system_raw.organizations.OrganizationCode
+      - datalake_hr_system_raw.organizations.OrganizationCode
   status:
     description: ''
     lineage:
-    - datalake_hr_system_raw.organizations.status
+      - datalake_hr_system_raw.organizations.status
   org_code:
     description: 'Custom OrganizationCode to be used instead of auto generated code.'
     lineage:
-    - datalake_hr_system_raw.organizations.OrgCode
+      - datalake_hr_system_raw.organizations.OrgCode
   organization_classification_va:
     description: ''
     lineage:
-    - datalake_hr_system_raw.organizations.OrgClassificationVA
+      - datalake_hr_system_raw.organizations.OrgClassificationVA
   business:
     description: 'Business unit to which the cost center belongs.'
     lineage:
-    - organizations.OrganizationDFF.business
+      - datalake_hr_system_raw.organizations.OrganizationDFF.business
   product:
     description: 'Primary product associated with this cost center.'
     lineage:
-    - organizations.OrganizationDFF.product
+      - datalake_hr_system_raw.organizations.OrganizationDFF.product
   brand:
     description: 'Brand to which the cost center belongs.'
     lineage:
-    - organizations.OrganizationDFF.brand
+      - datalake_hr_system_raw.organizations.OrganizationDFF.brand
   vertical:
     description: "Derived business vertical based on the structure field. Values include 'Ops' (for Sales, Operations, Marketing, Guarantees), 'Corp' (for Finance, People, Legal, Administrative), or 'Tech' (for Product)."
     lineage:
-    - 'Derived from organizations.OrganizationDFF.structure'
+      - 'Derived from organizations.OrganizationDFF.structure'
+  vice_presidency:
+    description: 'Vice presidency to which the organization belongs. Its being deprecated in favor of CODEX structure.'
+    lineage:
+      - datalake_hr_system_raw.organizations.OrganizationDFF.vicePresidencia
+  directorate:
+    description: 'Directorate to which the organization belongs. Its being deprecated in favor of CODEX structure.'
+    lineage:
+      - datalake_hr_system_raw.organizations.OrganizationDFF.diretoria
+  subdirectorate:
+    description: 'Subdirectorate to which the organization belongs. Its being deprecated in favor of CODEX structure.'
+    lineage:
+      - datalake_hr_system_raw.organizations.OrganizationDFF.subDiretoria
   structure:
     description: 'Structure to which the cost center belongs.'
     lineage:
-    - organizations.OrganizationDFF.structure_name
+      - datalake_hr_system_raw.organizations.OrganizationDFF.structure_name
   team:
     description: 'Team to which the cost center belongs.'
     lineage:
-    - organizations.OrganizationDFF.team_name
+      - datalake_hr_system_raw.organizations.OrganizationDFF.team_name
   chapter:
     description: 'Chapter to which the cost center belongs.'
     lineage:
-    - organizations.OrganizationDFF.pt_chapter
+      - datalake_hr_system_raw.organizations.OrganizationDFF.pt_chapter
   line:
     description: 'Line to which the cost center belongs.'
     lineage:
-    - organizations.OrganizationDFF.pt_line
+      - datalake_hr_system_raw.organizations.OrganizationDFF.pt_line
   owner_leadership_layer_1_name:
     description: 'Name of the second highest manager (L1) in the hierarchy responsible for the cost center.'
     lineage:
-    - organizations.OrganizationDFF.l1Cc
+      - datalake_hr_system_raw.organizations.OrganizationDFF.l1Cc
   owner_leadership_layer_2_name:
     description: 'Name of the third highest manager (L2) in the hierarchy responsible for the cost center.'
     lineage:
-    - organizations.OrganizationDFF.l2Cc
+      - datalake_hr_system_raw.organizations.OrganizationDFF.l2Cc
   owner_leadership_layer_3_name:
     description: 'Name of the fourth highest manager (L3) in the hierarchy responsible for the cost center.'
     lineage:
-    - organizations.OrganizationDFF.l3Cc
+      - datalake_hr_system_raw.organizations.OrganizationDFF.l3Cc
   organization_dff:
     description: "Customer's flexfield for organization."
     lineage:
-    - datalake_hr_system_raw.organizations.OrganizationDFF
+      - datalake_hr_system_raw.organizations.OrganizationDFF
   status_lov:
     description: ''
     lineage:
-    - datalake_hr_system_raw.organizations.StatusLOV
+      - datalake_hr_system_raw.organizations.StatusLOV
   extra_information:
     description: 'Extra information about the organization'
     lineage:
-    - datalake_hr_system_raw.organizations.extraInformation
+      - datalake_hr_system_raw.organizations.extraInformation
   name:
     description: 'Denotes the translated name for the Organization Unit.'
     lineage:
-    - datalake_hr_system_raw.organizations.name
+      - datalake_hr_system_raw.organizations.name
   title:
     description: 'Denotes the translated title for the Organization Unit.'
     lineage:
-    - datalake_hr_system_raw.organizations.title
+      - datalake_hr_system_raw.organizations.title
   classification_code:
     description: 'Foreign key to HR_ORG_CLASSIFICATIONS table.'
     lineage:
-    - datalake_hr_system_raw.organizations.ClassificationCode
+      - datalake_hr_system_raw.organizations.ClassificationCode
   internal_address_line:
     description: 'Internal address of the organization.'
     lineage:
-    - datalake_hr_system_raw.organizations.InternalAddressLine
+      - datalake_hr_system_raw.organizations.InternalAddressLine
   dt_effective_start:
     description: 'Date Effective Entity: indicates the date at the beginning of the date range within which the row is effective.'
     lineage:
-    - datalake_hr_system_raw.organizations.EffectiveStartDate
+      - datalake_hr_system_raw.organizations.EffectiveStartDate
   dt_effective_end:
     description: 'Date Effective Entity: indicates the date at the end of the date range within which the row is effective.'
     lineage:
-    - datalake_hr_system_raw.organizations.EffectiveEndDate
+      - datalake_hr_system_raw.organizations.EffectiveEndDate
   ts_created:
     description: 'Timestamp of the creation of the organization record'
     lineage:
-    - datalake_hr_system_raw.organizations.CreationDate
+      - datalake_hr_system_raw.organizations.CreationDate
   ts_last_update:
     description: 'Timestamp of the last update of the organization record'
     lineage:
-    - datalake_hr_system_raw.LastUpdateDate
+      - datalake_hr_system_raw.LastUpdateDate
   ts_load:
     description: 'Timestamp of the load of the organization record in the data lake'
     lineage:
-    - datalake_hr_system_raw.salaries.ts_load
+      - datalake_hr_system_raw.salaries.ts_load
   year:
     description: 'Year of the creation of the organization record [Partition]'
     lineage:
-    - datalake_hr_system_raw.salaries.year
+      - datalake_hr_system_raw.salaries.year
   month:
     description: 'Month of the creation of the organization record [Partition]'
     lineage:
-    - datalake_hr_system_raw.salaries.month
+      - datalake_hr_system_raw.salaries.month
   day:
     description: 'Day of the creation of the organization record [Partition]'
     lineage:
-    - datalake_hr_system_raw.salaries.day
+      - datalake_hr_system_raw.salaries.day
