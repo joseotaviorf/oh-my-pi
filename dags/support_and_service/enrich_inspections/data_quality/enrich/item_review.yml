@@ -2,7 +2,7 @@
 table_name: datalake_inspections.item_review
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
-  id_item_review:
+  id_review_media:
     is_complete:
       severity_level: Error
     is_unique:
