@@ -11,7 +11,7 @@ bietlejuice.dw_accounting_funnel:
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-invoice-issuance
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-provision-creation
   - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-revenue-accounting
-  - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-reversion-creation
+  - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-revenue-share
   - bietlejuice.enrich_sap_accounting_process:load-enrich-for-rent-bank-settlement
   - bietlejuice.enrich_sap_accounting_process:load-enrich-for-rent-reservation-issuance
   - bietlejuice.enrich_sap_accounting_process:load-enrich-quintocred-bank-settlement
@@ -1134,6 +1134,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry
   - bietlejuice.enrich_sap:load-enrich-ledger-new-template
+  - bietlejuice.enrich_sap:load-enrich-ledger
   - bietlejuice.gsheets_fintech:done-clean-cod-locale
   - bietlejuice.monopoly:load-clean-accounting-entry
   - bietlejuice.monopoly:load-clean-sale
@@ -1148,6 +1149,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.robin_hood:load-clean-payment-request
   - bietlejuice.sap_gateway:load-clean-feature
   - bietlejuice.sap_gateway:load-clean-sync-sap-job
+  - bietlejuice.sap_gateway:load-clean-webhook-log
   - bietlejuice.trato_feito:load-clean-accounting-installment
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation

@@ -1,21 +1,73 @@
 WITH
 
-retsuko AS (
+retsuko AS(
   SELECT DISTINCT
     ct.id_external AS id_business_entity,
     i.id_external AS id_finance_entity,
     e.id_external AS id_finance_entity_entry,
     'seu barriga' AS source_name,
     CASE
-      WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND ct.landlord_legal_person = 'juridical' THEN '420021'
-      WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN '420022'
-      WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') THEN '420023'
+      WHEN e.bill_item IN ('entry.bill-item/brokerage-estate-agent') THEN '700006'
+      WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') AND LOWER(e.description) LIKE '%consultor imobiliário%' THEN '700007'
+      WHEN e.bill_item IN ('entry.bill-item/adm-fee-adm-partner') THEN '700009'
+      WHEN e.bill_item IN ('entry.bill-item/brokerage-partner-select') THEN '700010'
+      WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') THEN '700011'
     END AS accounting_number,
     CASE
-      WHEN e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin') AND ct.landlord_legal_person = 'juridical' THEN 'adm fee PJ'
-      WHEN e.bill_item IN ('entry.bill-item/brokerage-quinto-andar') THEN 'brokerage quinto andar'
-      WHEN e.bill_item IN ('entry.bill-item/brokerage-installment-fee') THEN 'brokerage installment fee'
+      WHEN e.bill_item IN ('entry.bill-item/brokerage-estate-agent') THEN 'brokerage agent'
+      WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') AND LOWER(e.description) LIKE '%consultor imobiliário%' THEN 'brokerage CIQ'
+      WHEN e.bill_item IN ('entry.bill-item/adm-fee-adm-partner') THEN 'adm fee partner'
+      WHEN e.bill_item IN ('entry.bill-item/brokerage-partner-select') THEN 'brokerage select'
+      WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner') THEN 'B2B brokerage partner'
     END AS accounting_name,
+    i.accrual_year_month,
+    DATE(e.ts_created) AS dt_source_trigger,
+    CASE
+      WHEN e.bill_item IN ('entry.bill-item/adm-fee-adm-partner') THEN CAST(-ABS(amount) AS DECIMAL(12,2))
+      ELSE CAST(amount AS DECIMAL(12,2))
+    END AS source_amount
+    FROM
+      datalake_retsuko.entry  e
+    INNER JOIN
+      datalake_retsuko_clean.account AS af
+        ON e.id_from_account = af.id
+    INNER JOIN
+      datalake_retsuko_clean.account AS at
+        ON e.id_to_account = at.id
+    LEFT JOIN
+      datalake_retsuko.invoice i
+        ON e.id_invoice = i.id
+    LEFT JOIN
+      datalake_retsuko.invoice_info ii
+        ON ii.id_invoice = i.id_external
+    LEFT JOIN
+      datalake_retsuko_clean.contract ct
+        ON ct.id = e.id_contract
+    WHERE
+        TRUE
+        AND e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-partner-select', 'entry.bill-item/brokerage-estate-agent', 'entry.bill-item/adm-fee-adm-partner')
+        AND ct.country_code = 'BR'
+        AND DATE(e.ts_created) >= '2024-01-01'
+        AND af.type IN ('contract', 'tenant','landlord')
+        AND at.type IN ('contract', 'tenant','landlord')
+        AND (i.is_write_off = FALSE OR i.is_write_off IS NULL)
+
+),
+
+retsuko_aggregate AS (
+  SELECT DISTINCT
+    ct.id_external AS id_business_entity,
+    i.id_external AS id_finance_entity,
+    e.id_external AS id_finance_entity_entry,
+    'seu barriga' AS source_name,
+    CASE
+      WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-partner-select', 'entry.bill-item/brokerage-estate-agent') THEN '700005'
+      WHEN e.bill_item IN ('entry.bill-item/adm-fee-adm-partner') THEN '700008'
+    END AS account_number,
+    CASE
+      WHEN e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-partner-select', 'entry.bill-item/brokerage-estate-agent') THEN 'brokerage partners'
+      WHEN e.bill_item IN ('entry.bill-item/adm-fee-adm-partner') THEN 'B2B adm partner'
+    END AS account_name,
     i.accrual_year_month,
     DATE(e.ts_created) AS dt_source_trigger,
     CAST(amount AS DECIMAL(12,2)) AS source_amount
@@ -31,18 +83,28 @@ retsuko AS (
     datalake_retsuko.invoice i
       ON e.id_invoice = i.id
   LEFT JOIN
+    datalake_retsuko.invoice_info ii
+      ON ii.id_invoice = i.id_external
+  LEFT JOIN
     datalake_retsuko_clean.contract ct
       ON ct.id = e.id_contract
   WHERE
-    e.description != 'Crédito - Parcelamento corretagem - QuintoAndar'
-    AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin', 'entry.bill-item/brokerage-quinto-andar', 'entry.bill-item/brokerage-installment-fee')
-    AND NOT(ct.landlord_legal_person = 'physical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
+    TRUE
+    AND e.bill_item IN ('entry.bill-item/brokerage-adm-partner', 'entry.bill-item/brokerage-partner-select', 'entry.bill-item/brokerage-estate-agent', 'entry.bill-item/adm-fee-adm-partner')
+    AND ct.country_code = 'BR'
     AND DATE(e.ts_created) >= '2024-01-01'
     AND af.type IN ('contract', 'tenant','landlord')
     AND at.type IN ('contract', 'tenant','landlord')
+    AND (i.is_write_off = FALSE OR i.is_write_off IS NULL)
 ),
 
-sap_entity AS (
+retsuko_final AS (
+  SELECT * FROM retsuko
+  UNION ALL
+  SELECT * FROM retsuko_aggregate
+),
+
+sap_entity AS(
   SELECT
     id_finance_entity,
     id_sap_gateway_feature,
@@ -55,7 +117,7 @@ sap_entity AS (
     datalake_retsuko_clean.sap_entity
   WHERE
     id_finance_entity IS NOT NULL
-    AND event = 'new-accounting-entries'
+    AND event IN ('new-accounting-entries', 'payment-accounting-entries')
   QUALIFY ROW_NUMBER() OVER (PARTITION BY id_finance_entity, event ORDER BY ts_updated DESC) = 1
 ),
 
@@ -77,11 +139,11 @@ sap_gateway AS (
     datalake_sap_gateway_clean.webhook_log w
       ON s.idoc = w.idoc
   WHERE
-    s.erp_solution IN ('S4')
-    AND s.type = 'LCM'
+    erp_solution IN ('S4')
+    AND type = 'LCM'
     AND s.status NOT IN ('ignore', 'ignored')
     AND DATE(f.ts_created) >= DATE('2024-01-01')
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, s.id_feature ORDER BY s.ts_updated) = 1
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY f.id_finance_entity, f.id_feature ORDER BY f.ts_updated) = 1
 ),
 
 sap_ledger AS (
@@ -97,7 +159,7 @@ sap_ledger AS (
     datalake_pas.ledger
   WHERE
     dt_reference >= DATE('2024-01-01')
-    AND account_number IN ('420021', '420022', '420023')
+    AND account_number IN ('700005','700006', '700007', '700008', '700009', '700010', '700011')
   GROUP BY 1, 2, 3, 4, 6, 7
 ),
 
@@ -132,7 +194,7 @@ errors_base AS (
     MAX(sl.dt_sap_created) AS dt_sap_created,
     MAX(sl.dt_sap_reference) AS dt_sap_reference
   FROM
-    retsuko r
+    retsuko_final r
   LEFT JOIN
     sap_entity se
       ON r.id_finance_entity_entry = se.id_finance_entity
@@ -142,9 +204,8 @@ errors_base AS (
   LEFT JOIN
     sap_ledger sl
       ON r.accounting_number = sl.account_number
-      AND sg.hash = sl.hash
+      AND sl.hash = sg.hash
     GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 12
-
 ),
 
 assertions_base AS (
@@ -171,14 +232,14 @@ assertions_base AS (
 )
 
 SELECT
-  ('FR-P'||'-'||IF(id_finance_entity_entry IS NOT NULL, id_finance_entity_entry, id_finance_entity)||'-'|| accounting_number) AS id_accounting_process,
+  ('FR-RRS'||'-'||IF(id_finance_entity_entry IS NOT NULL, id_finance_entity_entry, id_finance_entity)||'-'|| accounting_number) AS id_accounting_process,
   id_business_entity,
   id_finance_entity,
   id_finance_entity_entry,
   version,
   'for rent' AS business_unit,
   source_name,
-  'provision' AS accounting_type,
+  'revenue share' AS accounting_type,
   accounting_number,
   accounting_name,
   source_amount,

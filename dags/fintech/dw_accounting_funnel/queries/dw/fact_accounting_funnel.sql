@@ -1,110 +1,118 @@
 SELECT
-    id_retsuko_provision_creation AS sk_accounting_funnel,
-    id_business_entity,
-    id_finance_entity,
-    id_finance_entity_entry,
-    version,
-    source_name,
-    'provision' AS accounting_type,
-    revenue_name AS accounting_name,
-    accrual_year_month,
-    status,
-    source_amount,
-    sap_amount,
-    account_number,
-    is_completeness_compliance,
-    is_correctness_compliance,
-    is_temporality_compliance,
-    is_compliance,
-    dt_source_trigger,
-    dt_sap_created,
-    dt_sap_reference,
-    NOW() AS ts_load
-FROM 
+  id_accounting_process AS sk_accounting_funnel,
+  id_business_entity,
+  id_finance_entity,
+  id_finance_entity_entry,
+  version,
+  business_unit,
+  source_name,
+  accounting_type,
+  accounting_number AS account_number,
+  accounting_name,
+  source_amount,
+  sap_amount,
+  is_completeness,
+  is_correctness,
+  is_temporality,
+  is_compliance,
+  accounting_process_status,
+  error_description,
+  accrual_year_month,
+  dt_source_trigger,
+  dt_sap_reference,
+  dt_sap_created,
+  NOW() AS ts_load
+FROM
     datalake_accounting_funnel.retsuko_provision_creation
 
 UNION ALL
 
 SELECT
-    id_retsuko_reversion_creation AS sk_accounting_funnel,
-    id_business_entity,
-    id_finance_entity,
-    id_finance_entity_entry,
-    version,
-    source_name,
-    'reversion' AS accounting_type,
-    revenue_name AS accounting_name,
-    accrual_year_month,
-    status,
-    source_amount,
-    sap_amount,
-    account_number,
-    is_completeness_compliance,
-    is_correctness_compliance,
-    is_temporality_compliance,
-    is_compliance,
-    dt_source_trigger,
-    dt_sap_created,
-    dt_sap_reference,
-    NOW() AS ts_load
-FROM 
-    datalake_accounting_funnel.retsuko_reversion_creation
+  id_accounting_process AS sk_accounting_funnel,
+  id_business_entity,
+  id_finance_entity,
+  id_finance_entity_entry,
+  version,
+  business_unit,
+  source_name,
+  accounting_type,
+  accounting_number AS account_number,
+  accounting_name,
+  source_amount,
+  sap_amount,
+  is_completeness,
+  is_correctness,
+  is_temporality,
+  is_compliance,
+  accounting_process_status,
+  error_description,
+  accrual_year_month,
+  dt_source_trigger,
+  dt_sap_reference,
+  dt_sap_created,
+  NOW() AS ts_load
+FROM
+    datalake_accounting_funnel.retsuko_revenue_share
 
 UNION ALL
 
 SELECT
-    id_retsuko_revenue_accounting AS sk_accounting_funnel,
-    id_business_entity,
-    id_finance_entity,
-    id_finance_entity_entry,
-    version,
-    source_name,
-    'revenue accounting' AS accounting_type,
-    revenue_name AS accounting_name,
-    accrual_year_month,
-    status,
-    source_amount,
-    sap_amount,
-    account_number,
-    is_completeness_compliance,
-    is_correctness_compliance,
-    is_temporality_compliance,
-    is_compliance,
-    dt_source_trigger,
-    dt_sap_created,
-    dt_sap_reference,
-    NOW() AS ts_load
-FROM 
+  id_accounting_process AS sk_accounting_funnel,
+  id_business_entity,
+  id_finance_entity,
+  id_finance_entity_entry,
+  version,
+  business_unit,
+  source_name,
+  accounting_type,
+  accounting_number AS account_number,
+  accounting_name,
+  source_amount,
+  sap_amount,
+  is_completeness,
+  is_correctness,
+  is_temporality,
+  is_compliance,
+  accounting_process_status,
+  error_description,
+  accrual_year_month,
+  dt_source_trigger,
+  dt_sap_reference,
+  dt_sap_created,
+  NOW() AS ts_load
+FROM
     datalake_accounting_funnel.retsuko_revenue_accounting
 
 UNION ALL
 
 SELECT
-    id_retsuko_invoice_issuance AS sk_accounting_funnel,
-    id_business_entity,
-    id_finance_entity,
-    id_finance_entity_entry,
-    version,
-    source_name,
-    'invoice' AS accounting_type,
-    revenue_name AS accounting_name,
-    accrual_year_month,
-    status,
-    source_amount,
-    sap_amount,
-    account_number,
-    is_completeness_compliance,
-    is_correctness_compliance,
-    is_temporality_compliance,
-    is_compliance,
-    dt_source_trigger,
-    dt_sap_created,
-    dt_sap_reference,
-    NOW() AS ts_load
-FROM 
+  id_accounting_process AS sk_accounting_funnel,
+  id_business_entity,
+  id_finance_entity,
+  id_finance_entity_entry,
+  version,
+  business_unit,
+  source_name,
+  accounting_type,
+  accounting_number AS account_number,
+  accounting_name,
+  source_amount,
+  sap_amount,
+  is_completeness,
+  is_correctness,
+  is_temporality,
+  is_compliance,
+  accounting_process_status,
+  error_description,
+  accrual_year_month,
+  dt_source_trigger,
+  dt_sap_reference,
+  dt_sap_created,
+  NOW() AS ts_load
+FROM
     datalake_accounting_funnel.retsuko_invoice_issuance
 
-UNION ALL 
+UNION ALL
 
 SELECT
     id_kill_queue_invoice_issuance AS sk_accounting_funnel,
@@ -114,24 +122,25 @@ SELECT
     'kill-queue' AS version,
     source_name,
     'invoice' AS accounting_type,
+    account_number,
     revenue_name AS accounting_name,
-    accrual_year_month,
-    status,
     source_amount,
     sap_amount,
-    account_number,
-    is_completeness_compliance,
-    is_correctness_compliance,
-    is_temporality_compliance,
+    is_completeness_compliance AS is_completeness,
+    is_correctness_compliance AS is_correctness,
+    is_temporality_compliance AS is_temporality,
     is_compliance,
+    CAST(NULL AS STRING) AS accounting_process_status,
+    CAST(NULL AS STRING) AS error_description,
+    accrual_year_month,
     dt_source_trigger,
-    dt_sap_created,
     dt_sap_reference,
+    dt_sap_created,
     NOW() AS ts_load
-FROM 
+FROM
     datalake_sap_accounting_process.for_rent_reservation_issuance
 
-UNION ALL 
+UNION ALL
 
 SELECT
     CONCAT('BANK-QC-',id_finance_entity) AS sk_accounting_funnel,
@@ -141,24 +150,25 @@ SELECT
     'quintocred' AS version,
     billing_source AS source_name,
     'bank' AS accounting_type,
+    sap_account_number AS account_number,
     'quintocred' AS accounting_name,
-    CAST(NULL AS INTEGER) AS accrual_year_month,
-    CAST(NULL AS STRING) AS status,
     bank_amount AS source_amount,
     sap_amount,
-    sap_account_number AS account_number,
-    is_completeness_compliance,
-    is_correctness_compliance,
-    is_temporality_compliance,
+    is_completeness_compliance AS is_completeness,
+    is_correctness_compliance AS is_correctness,
+    is_temporality_compliance AS is_temporality,
     is_compliance,
+    CAST(NULL AS STRING) AS accounting_process_status,
+    CAST(NULL AS STRING) AS error_description,
+    CAST(NULL AS INTEGER) AS accrual_year_month,
     dt_bank_paid AS dt_source_trigger,
-    dt_sap_created,
     dt_sap_reference,
-    NOW() AS ts_load    
-FROM 
+    dt_sap_created,
+    NOW() AS ts_load
+FROM
     datalake_sap_accounting_process.quintocred_bank_settlement
 
-UNION ALL 
+UNION ALL
 
 SELECT
     CONCAT('BANK-QA-FR-',id_finance_entity) AS sk_accounting_funnel,
@@ -168,19 +178,21 @@ SELECT
     version,
     billing_source AS source_name,
     'bank' AS accounting_type,
+    sap_account_number AS account_number,
     'for rent' AS accounting_name,
-    accrual_year_month,
-    CAST(NULL AS STRING) AS status,
     billing_amount AS source_amount,
     sap_amount,
-    sap_account_number AS account_number,
-    is_completeness_compliance,
-    is_correctness_compliance,
-    is_temporality_compliance,
+    is_completeness_compliance AS is_completeness,
+    is_correctness_compliance AS is_correctness,
+    is_temporality_compliance AS is_temporality,
     is_compliance,
+    CAST(NULL AS INTEGER) AS accrual_year_month,
+    CAST(NULL AS STRING) AS accounting_process_status,
+    CAST(NULL AS STRING) AS error_description,
+    accrual_year_month,
     dt_billing AS dt_source_trigger,
+     dt_sap_reference,
     dt_sap_created,
-    dt_sap_reference,
-    NOW() AS ts_load    
-FROM 
+    NOW() AS ts_load
+FROM
     datalake_sap_accounting_process.for_rent_bank_settlement

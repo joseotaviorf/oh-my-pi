@@ -25,6 +25,8 @@ workflow:
       - ledger
     retsuko_reversion_creation:
       - ledger
+    retsuko_revenue_share:
+      - ledger
     monopoly_invoice_issuance:
       - ledger
 cluster:
