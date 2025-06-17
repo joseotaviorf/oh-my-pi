@@ -139,7 +139,12 @@ if __name__ == "__main__":
     if response:
 
         spark_client = SparkClient()
-        df = spark_client.create_dataframe(response)
+
+        json_lines = [json.dumps(item) for item in response]
+        response_rdd = spark_client.conn.sparkContext.parallelize(json_lines)
+
+        df = spark.read.json(response_rdd)
+
         df = (
             df.withColumn("dt_load", F.lit(dt_end_execution.year))
             .withColumn("year", F.lit(dt_end_execution.year))
