@@ -305,6 +305,7 @@ bietlejuice.enrich_collections_quintoandar:
     - bietlejuice.enrich_recupera:load-enrich-installment
     - bietlejuice.enrich_recupera:load-enrich-negotiation
     - bietlejuice.webhelp:load-clean-login
+    - bietlejuice.grb:load-clean-operators
 bietlejuice.enrich_consolidated_marketing_metrics:
   remove:
     - bietlejuice.enrich_braze_webhook_notification:load-enrich-webhook-notification-volumes
