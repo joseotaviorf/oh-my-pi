@@ -73,6 +73,9 @@ workflow:
     fact_inspector:
       z_order_by: [sk_report]
       merge_on: [sk_report]
+    fact_inspector_reports:
+      z_order_by: [sk_report]
+      merge_on: [sk_report]
     fact_repair_request:
       extraction_type: full
       z_order_by: [sk_repair_request]

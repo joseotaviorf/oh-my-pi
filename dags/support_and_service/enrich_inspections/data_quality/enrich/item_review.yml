@@ -1,18 +1,18 @@
 ---
-table_name: dw_inspections.fact_item_attachment
+table_name: datalake_inspections.item_review
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
-  sk_item_attachment:
+  id_item_review:
     is_complete:
       severity_level: Error
     is_unique:
       severity_level: Error
-  sk_assessment:
+  id_inspection:
     is_complete:
       severity_level: Error
-  sk_inspection:
+  id_assessment:
     is_complete:
       severity_level: Error
-  sk_item:
+  id_item:
     is_complete:
       severity_level: Error
