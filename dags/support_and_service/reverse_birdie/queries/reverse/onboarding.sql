@@ -68,7 +68,7 @@ onb_nps_infos AS (
     dnc.metric_group,
     DATE(dc.ts_signature) AS contract_signed,
     DATE(COALESCE(dc.dt_start, dc.dt_entrance)) AS entrance_date,
-    CASE WHEN multi.sk_contract IS NOTNULL THEN TRUE ELSE FALSE END AS pro_owner_property
+    CASE WHEN multi.sk_contract IS NOT NULL THEN TRUE ELSE FALSE END AS pro_owner_property
   FROM
     dw_customer_satisfaction.fact_nps_dispatches fnd
   JOIN dw_customer_satisfaction.dim_nps_answer dna 
@@ -138,7 +138,7 @@ closing_counts AS (
   FROM
     dw_crm.fact_closing_tasks fct
     JOIN dw_crm.dim_closing_task dct ON fct.sk_task = dct.sk_task
-    AND dct.ts_completed IS NOTNULL
+    AND dct.ts_completed IS NOT NULL
     AND dct.type = 'Manual'
   WHERE
     fct.sk_contract > 0
@@ -168,7 +168,7 @@ inspection_booking_cancelled_counts AS (
     oi.sk_contract,
     count(sk_contract) filter(
       WHERE
-        oi.ts_cancel_local IS NOTNULL
+        oi.ts_cancel_local IS NOT NULL
         AND (
           not(oi.is_first_booking_auto)
           OR oi.is_first_booking_auto is NULL
@@ -188,7 +188,7 @@ inspection_review_counts AS (
     count(DISTINCT fia.sk_item_review) filter(
       WHERE
         coalesce(review_creator, reviewer_type) = 'TENANT'
-        AND review_comment IS NOTNULL
+        AND review_comment IS NOT NULL
     ) n_tcomments,
     count(DISTINCT fia.sk_item_media) filter(
       WHERE
@@ -198,7 +198,7 @@ inspection_review_counts AS (
     count(DISTINCT fia.sk_item_review) filter(
       WHERE
         coalesce(review_creator, reviewer_type) = 'OWNER'
-        AND review_comment IS NOTNULL
+        AND review_comment IS NOT NULL
     ) n_lcomments
   FROM
     dw_inspections.fact_item fi
@@ -534,7 +534,7 @@ nps_ticket_counts AS (
     AND oni.ts_answered >= DATE('{load_start_date}' - interval '7' day)
     LEFT JOIN dw_customer_support.dim_department dd ON ft.sk_main_department = dd.sk_department
     LEFT JOIN dw_customer_support.dim_taxonomy dt ON ft.sk_taxonomy = dt.sk_taxonomy
-    WHERE DATE(oni.ts_answered) >= DATE('2025-06-15')
+    WHERE DATE(oni.ts_answered) >= DATE('{load_start_date}')
   GROUP BY
     1,
     2,
@@ -689,13 +689,13 @@ contrato_anterior AS (
     dc.rent,
     t.is_repair_tenant_duty,
     t.ts_termination_finished,CASE
-      WHEN rfo.id_house IS NOTNULL THEN 'Offer before TD'
+      WHEN rfo.id_house IS NOT NULL THEN 'Offer before TD'
       ELSE NULL
     END AS early_demand_offer,CASE
-      WHEN rfvb.id_house IS NOTNULL THEN 'VB before TD'
+      WHEN rfvb.id_house IS NOT NULL THEN 'VB before TD'
       ELSE NULL
     END AS early_demand_vb,CASE
-      WHEN rfvc.id_house IS NOTNULL THEN 'VC before TD'
+      WHEN rfvc.id_house IS NOT NULL THEN 'VC before TD'
       ELSE NULL
     END AS early_demand_vc,CASE
       WHEN rfvc.vc_occupied_property > 0 THEN 'VC_occupied_property'
@@ -752,13 +752,13 @@ contrato_anterior_new_relisting AS (
     dc.rent,
     t.is_repair_tenant_duty,
     t.ts_termination_finished,CASE
-      WHEN rfo.id_house IS NOTNULL THEN 'Offer before TD'
+      WHEN rfo.id_house IS NOT NULL THEN 'Offer before TD'
       ELSE NULL
     END AS early_demand_offer,CASE
-      WHEN rfvb.id_house IS NOTNULL THEN 'VB before TD'
+      WHEN rfvb.id_house IS NOT NULL THEN 'VB before TD'
       ELSE NULL
     END AS early_demand_vb,CASE
-      WHEN rfvc.id_house IS NOTNULL THEN 'VC before TD'
+      WHEN rfvc.id_house IS NOT NULL THEN 'VC before TD'
       ELSE NULL
     END AS early_demand_vc,CASE
       WHEN rfvc.vc_occupied_property > 0 THEN 'VC_occupied_property'
@@ -931,7 +931,7 @@ CASE
     rt.num_retenants_12W,
     CASE
       WHEN disp.sk_user > 0
-      AND ten.sk_user IS NOTNULL THEN 'Retenant'
+      AND ten.sk_user IS NOT NULL THEN 'Retenant'
       ELSE NULL
     END AS is_retenant,
     ca.early_demand_started,
@@ -1025,8 +1025,8 @@ CASE
     AND (
       ca.rk is NULL
       OR ca.rk = 1
-    ) -- AND ca.sk_house_listing_anterior IS NOTNULL -- filtro para imóveis Re-rented
-    AND DATE(ans.ts_answered) >= DATE('2025-06-15')
+    ) -- AND ca.sk_house_listing_anterior IS NOT NULL -- filtro para imóveis Re-rented
+    AND DATE(ans.ts_answered) >= DATE('{load_start_date}')
 ),
 status AS (
   SELECT
@@ -1276,4 +1276,3 @@ FROM
   joined jd
 LEFT JOIN dw_offboarding.fact_terminations AS dt
   ON dt.sk_contract = jd.sk_contract
-
