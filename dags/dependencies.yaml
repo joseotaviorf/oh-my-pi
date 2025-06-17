@@ -173,9 +173,9 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.trato_feito:load-clean-eviction
   - bietlejuice.trato_feito:load-clean-eviction-data
 bietlejuice.dw_collection_recovery_quintoandar:
+  - bietlejuice.enrich_collections_quintoandar:load-enrich-installment
   - bietlejuice.enrich_collections_quintoandar:load-enrich-invoice-portfolio
   - bietlejuice.enrich_collections_quintoandar:load-enrich-negotiation
-  - bietlejuice.enrich_collections_quintoandar:load-enrich-installment
   - bietlejuice.enrich_collections_quintoandar:load-enrich-operators
   - bietlejuice.enrich_cyber:load-enrich-collection
   - bietlejuice.enrich_cyber:load-enrich-contract-agency-distribution
@@ -970,6 +970,7 @@ bietlejuice.dw_sale_listings:
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-predicted-price
   - bietlejuice.ebdb_house:load-clean-house-registration-status
+  - bietlejuice.ebdb_listing:load-clean-house-listing-relation
   - bietlejuice.enrich_big_agent:load-enrich-house-sale-listing-consultant
   - bietlejuice.enrich_company:load-enrich-company-sks
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -979,7 +980,6 @@ bietlejuice.dw_sale_listings:
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-status
   - bietlejuice.enrich_sale_listings_lenses:load-enrich-listing-lenses
-  - bietlejuice.ebdb_listing:load-clean-house-listing-relation
 bietlejuice.dw_sale_offer_users:
   - bietlejuice.dw_user:load-dw-public-dim-user
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-users-info
@@ -3720,8 +3720,11 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_agent:load-dw-public-dim-agent-region
   - bietlejuice.dw_atta:load-dw-atta-dim-franchise-atta
   - bietlejuice.dw_atta:load-dw-atta-fact-pre-analysis-proposal-flow
+  - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people
+  - bietlejuice.dw_crm:load-dw-crm-dim-closing-task
+  - bietlejuice.dw_crm:load-dw-crm-fact-closing-tasks
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-answer
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-campaign
   - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-fact-nps-answer-justifications
@@ -3734,7 +3737,14 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-sessions-chatbot
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
   - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-item-group
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-item-media
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-item-review
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-reviewer
   - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-item
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-item-attachment
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
   - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
@@ -3764,9 +3774,14 @@ bietlejuice.reverse_birdie:
   - bietlejuice.dw_visit:load-dw-visit-dim-entrance-type
   - bietlejuice.dw_visit:load-dw-visit-fact-visit-schedules
   - bietlejuice.dw_visit:load-dw-visit-fact-visits
+  - bietlejuice.ebdb_contract:load-clean-contract
+  - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
   - bietlejuice.ebdb_user:load-clean-user-pro-owner
+  - bietlejuice.ebdb_visit:load-clean-booking
+  - bietlejuice.ebdb_visit:load-clean-visit
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
+  - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
   - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
   - bietlejuice.enrich_nps_quintocred:load-enrich-broker-contact-info
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
