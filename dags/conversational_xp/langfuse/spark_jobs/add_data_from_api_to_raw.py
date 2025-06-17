@@ -1,7 +1,7 @@
 import json
 import logging
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from langfuse import Langfuse
 from pyspark.sql.functions import lit
@@ -59,7 +59,8 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     table_name = args.table_name
     execution_date_str = args.execution_date
-    execution_date = datetime.fromisoformat(execution_date_str)
+    # fetch last 6 hours of data
+    execution_date = datetime.fromisoformat(execution_date_str) - timedelta(hours=6)
     partition_cols = ["year", "month", "day", "hour"]
 
     config_service = ConfigurationService(dag_name)
