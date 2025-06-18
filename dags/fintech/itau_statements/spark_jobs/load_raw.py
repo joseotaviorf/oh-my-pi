@@ -48,7 +48,7 @@ def get_data(statement_id, credentials, start_date):
         url = f"https://account-statement.api.itau.com/account-statement/v1/statements/{statement_id}"
         params = {
             "type": "current_account",
-            "page_size": 50000,
+            "page_size": 10000,
             "start_date": start_date.strftime("%Y-%m-%d"),
             "end_date": create_end_date(start_date),
             "page": page,
