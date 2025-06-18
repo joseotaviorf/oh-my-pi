@@ -7,6 +7,7 @@ from airflow.datasets import DatasetAlias
 from airflow.models.baseoperator import BaseOperator
 from bietlejuice.services.dataset_service import DatasetService
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
+from extra_link_plugin import DatasetTriggerOperatorLink
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
@@ -70,7 +71,7 @@ class BaseTaskCreator(ABC):
             ]
             kwargs["on_success_callback"] = [DatasetService.update_datasets]
 
-        return QuintoAndarDatabricksCheckJobTaskOperator(
+        operator = QuintoAndarDatabricksCheckJobTaskOperator(
             databricks_conn_id=self.dag_execution_context.databricks_conn_id,
             dag=self.dag_execution_context.dag,
             task_id=task_id,
@@ -83,6 +84,9 @@ class BaseTaskCreator(ABC):
             execution_timeout=timedelta(hours=execution_timeout_hours),
             **kwargs,
         )
+        if task_id.startswith("load-"):
+            operator.operator_extra_links = [DatasetTriggerOperatorLink()]
+        return operator
 
     @classmethod
     def generate_task_id(
