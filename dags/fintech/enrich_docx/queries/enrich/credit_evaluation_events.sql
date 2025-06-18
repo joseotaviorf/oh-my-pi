@@ -102,20 +102,19 @@ get_credit_evaluation_proposal_events AS (
     IF(ce.status = 'ON_HOLD' AND ce.early_result IS NULL, TRUE, FALSE) AS is_passport_missing,
     CASE
       WHEN
+        ms.input_source_type IN ('CREDIT_ANALYSIS', 'ANALYST')
+        AND ms.status = 'EVALUATION_NEGATIVE'
+      THEN
+        'EVALUATION_NEGATIVE'
+      WHEN
         ms.input_source_type = 'CREDIT_ANALYSIS'
         AND ms.status IN ('EVALUATION_POSITIVE', 'EVALUATION_POSITIVE_WITH_GUARANTEE')
       THEN
         'EVALUATION_POSITIVE'
       WHEN
-        ms.input_source_type IN ('CREDIT_ANALYSIS', 'ANALYST')
-        AND ms.status = 'APPROVED'
+        get_json_object(ce.early_result, '$[0].reason') IN ('VALUE_EXCEEDS_CREDIT_LIMIT', 'VALUE_WITHIN_PRE_APPROVED_LIMIT')
       THEN
-        'CREDIT_ANALYSIS_APPROVED'
-      WHEN
-        ms.input_source_type IN ('CREDIT_ANALYSIS', 'ANALYST')
-        AND ms.status = 'EVALUATION_NEGATIVE'
-      THEN
-        'EVALUATION_NEGATIVE'
+        'SUFFICIENT_CREDIT_LIMIT'
       WHEN
         ms.input_source_type IN ('TENANT', 'ANALYST')
         AND ms.status = 'DOCS_ANALYSIS'
@@ -126,6 +125,11 @@ get_credit_evaluation_proposal_events AS (
         AND ms.status = 'DOCS_RESEND'
       THEN
         'DOCS_RESEND'
+      WHEN
+        ms.input_source_type IN ('CREDIT_ANALYSIS', 'ANALYST')
+        AND ms.status = 'APPROVED'
+      THEN
+        'CREDIT_ANALYSIS_APPROVED'
       WHEN
         ms.input_source_type = 'ANALYST'
         AND ms.status = 'STAND_BY'
@@ -140,10 +144,6 @@ get_credit_evaluation_proposal_events AS (
         )
       THEN
         'EVALUATION_NEGATIVE'
-      WHEN
-        get_json_object(ce.early_result, '$[0].reason') IN ('VALUE_EXCEEDS_CREDIT_LIMIT', 'VALUE_WITHIN_PRE_APPROVED_LIMIT')
-      THEN
-        'SUFFICIENT_CREDIT_LIMIT'
     END AS event_name,
     NULL AS ts_bypassed,
     ce.ts_created AS ts_credit_evaluation_created,
@@ -210,9 +210,65 @@ get_credit_evaluation_proposal_events AS (
     AND ce.status <> 'FAILED'
 ),
 union_credit_evaluations AS (
-SELECT * FROM get_credit_passport_events
+SELECT
+  id_proposal,
+  id_credit_evaluation,
+  id_group,
+  id_city,
+  id_house,
+  id_user,
+  scope,
+  credit_result,
+  credit_result_reason,
+  credit_evaluation_status,
+  credit_evaluation_source,
+  user_requested_value,
+  user_pre_approved_limit,
+  event_name,
+  is_value_within_pre_approved_limit,
+  is_passport_missing,
+  is_credit_passport,
+  ts_credit_evaluation_created,
+  ts_bypassed,
+  ts_evaluation_positive,
+  ts_evaluation_negative,
+  ts_credit_analysis_approved,
+  ts_docs_analysis,
+  ts_docs_resend,
+  ts_stand_by,
+  ts_expired
+FROM get_credit_passport_events
+
 UNION ALL
-SELECT * FROM get_credit_evaluation_proposal_events
+
+SELECT
+  id_proposal,
+  id_credit_evaluation,
+  id_group,
+  id_city,
+  id_house,
+  id_user,
+  scope,
+  credit_result,
+  credit_result_reason,
+  credit_evaluation_status,
+  credit_evaluation_source,
+  user_requested_value,
+  user_pre_approved_limit,
+  event_name,
+  is_value_within_pre_approved_limit,
+  is_passport_missing,
+  is_credit_passport,
+  ts_credit_evaluation_created,
+  ts_bypassed,
+  ts_evaluation_positive,
+  ts_evaluation_negative,
+  ts_credit_analysis_approved,
+  ts_docs_analysis,
+  ts_docs_resend,
+  ts_stand_by,
+  ts_expired
+FROM get_credit_evaluation_proposal_events
 )
 SELECT
   id_proposal,

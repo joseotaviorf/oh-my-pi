@@ -15,7 +15,7 @@ SELECT
     type,
     automatic AS is_automatic,
     get_json_object(early_result, '$[0].guaranteeType') AS early_result_guarantee_type,
-    CAST(get_json_object(early_result, '$[0].guaranteeFactor') AS INTEGER) AS guarantee_factor,
+    CAST(get_json_object(early_result, '$[0].guaranteeFactor') AS DECIMAL(10,2)) AS guarantee_factor,
     CAST(get_json_object(early_result, '$[0].preApprovedLimit') AS DECIMAL(10,2)) AS pre_approved_limit,
     early_result,
     created_at AS ts_created,
