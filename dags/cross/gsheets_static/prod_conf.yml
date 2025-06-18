@@ -406,3 +406,9 @@ sheets_info:
     sheet_name: users_cx_plaquinhas
     clean_table_name: users_cx_plaquinhas
     sheet_context: static
+
+  seo_budget_target_clicks_2025:
+    sheet_id: 1BMz5lS5AsVUfa73WhZW7D-lTjiKEIBE9rrR4QjVc-L0
+    sheet_name: seo_budget_target_clicks_2025
+    clean_table_name: seo_budget_target_clicks_2025
+    sheet_context: static

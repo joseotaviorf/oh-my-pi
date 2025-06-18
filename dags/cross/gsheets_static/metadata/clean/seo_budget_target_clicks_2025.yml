@@ -1,0 +1,18 @@
+database_name: datalake_gsheets_clean
+table_name: seo_budget_target_clicks_2025
+columns:
+  pais:
+    lineage:
+      - datalake_gsheets_raw.seo_budget_target_clicks_2025.pais
+  fuente:
+    lineage:
+      - datalake_gsheets_raw.seo_budget_target_clicks_2025.fuente
+  periodo:
+    lineage:
+      - datalake_gsheets_raw.seo_budget_target_clicks_2025.periodo
+  variable:
+    lineage:
+      - datalake_gsheets_raw.seo_budget_target_clicks_2025.variable
+  valor:
+    lineage:
+      - datalake_gsheets_raw.seo_budget_target_clicks_2025.valor
