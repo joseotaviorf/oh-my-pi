@@ -20,6 +20,7 @@ from bietlejuice.base.airflow.dag_builders.main_builder.factories.clean_factory 
     CleanFactory,
 )
 from bietlejuice.base.pipeline import LayerEnum
+from airflow.datasets import BaseDataset
 
 
 class FactoryDispatcher:
@@ -40,11 +41,19 @@ class FactoryDispatcher:
     def __init__(self, layer: LayerEnum) -> None:
         self.layer = layer
 
-    def get_factory(self, dag_args: dict, workflow_args: dict, cluster_args: dict):
+    def get_factory(
+        self,
+        dag_args: dict,
+        workflow_args: dict,
+        cluster_args: dict,
+        dataset_dependencies: BaseDataset = None,
+    ):
         """Gets the factory class based on the DAG layer."""
 
         factory_class = self.__dispatch_factory_class()
-        return factory_class(dag_args, workflow_args, cluster_args)
+        return factory_class(
+            dag_args, workflow_args, cluster_args, dataset_dependencies
+        )
 
     def __dispatch_factory_class(self) -> BaseFactory:
         self.__validate_if_layer_factory_exits()

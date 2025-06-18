@@ -4,6 +4,8 @@ import re
 from typing import Tuple
 
 from airflow import DAG
+from airflow.datasets import BaseDataset
+from airflow.models.baseoperator import BaseOperator
 from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
@@ -18,15 +20,25 @@ from bietlejuice.base.airflow.task_creators.table_attributes import TableAttribu
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+from bietlejuice.base.airflow.task_creators.reprocessing_guard_task_creator import (
+    ReprocessingGuardTaskCreator,
+)
 
 
 class BaseWorkflow(BuilderInterface):
-    def __init__(self, dag_args, workflow_args, cluster_args) -> None:
+    def __init__(
+        self,
+        dag_args,
+        workflow_args,
+        cluster_args,
+        dataset_dependencies: BaseDataset = None,
+    ) -> None:
         """
         This class must be a component that all workflows must inherit to have the dag instance.
         :param dag_args: A dictionary containing the definition of the dag with parameters received from each dag yaml file.
         :param workflow_args: A dictionary containing arguments that will be used to decide which tasks to define in the dag.
         :param cluster_args: A dictionary containing arguments that will be used for the cluster definition that the dag processes will make.
+        :param dataset_dependencies: A dataset object containing the dependencies of the DAG.
         """
         super().__init__()
         self.env = os.environ.get("ENVIRONMENT")
@@ -38,6 +50,7 @@ class BaseWorkflow(BuilderInterface):
 
         self.workflow_args = workflow_args
         self.cluster_args = cluster_args
+        self.dataset_dependencies = dataset_dependencies
 
         self.local_tz = timezone("America/Sao_Paulo")
 
@@ -66,9 +79,10 @@ class BaseWorkflow(BuilderInterface):
                 "on_failure_callback": opsgenie_callback.task_failure_alert,
             },
             start_date=schedule_start_date,
-            schedule_interval=self.dag_args.get("schedule_interval", None),
+            schedule=self.dag_args.get("schedule_interval", self.dataset_dependencies),
             doc_md=doc_md,
             user_defined_macros=user_defined_macros,
+            params=BaseDAG.get_default_trigger_form_params(),
             **kwargs,
         )
 
@@ -311,3 +325,23 @@ class BaseWorkflow(BuilderInterface):
         get_table_metrics_task >> sync_metadata
 
         return get_table_metrics_task, sync_metadata
+
+    def _include_reprocessing_guard_task(
+        self,
+        dag_execution_context: DagExecutionContext,
+        first_tasks_of_dag: BaseOperator,
+    ) -> None:
+        """
+        Includes the reprocessing guard task in the DAG, as long as the DAG is scheduled based on dataset dependencies.
+        This task ensures that the DAG does not run multiple times unnecessarily due to reprocessings.
+        It will stop the DAG from running if it detects that it is a reprocessing run and the source of the reprocessing is not this DAG.
+        """
+        # DAG not triggered by dataset condition, so no need for reprocessing guard task.
+        if dag_execution_context.dag.timetable.dataset_condition is None:
+            return
+
+        reprocessing_guard_task_creator = ReprocessingGuardTaskCreator(
+            dag_execution_context
+        )
+        reprocessing_guard_task = reprocessing_guard_task_creator.create_task()
+        reprocessing_guard_task >> first_tasks_of_dag

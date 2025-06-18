@@ -3,7 +3,7 @@ when:
 
 steps:
   check-style-python:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.9.5
     commands:
       - apt-get update
       - apt-get install -y git > /dev/null
@@ -12,9 +12,10 @@ steps:
     depends_on: [] # This is for the steps to run in parallel
 
   files-validation-python:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.9.5
     commands:
       - apt-get update
       - apt-get install -y git > /dev/null
+      - pip install --upgrade pip
       - make requirements-test
       - make files-validation

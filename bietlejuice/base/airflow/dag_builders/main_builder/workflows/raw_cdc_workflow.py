@@ -18,9 +18,6 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 class RawCDCWorkflow(BaseWorkflow):
     MAX_TABLES_PER_CLUSTER = 13
 
-    def __init__(self, dag_args, workflow_args, cluster_args):
-        super().__init__(dag_args, workflow_args, cluster_args)
-
     def build_dag(self):
         dag = self.dag_instance()
         bucket = self.config_service.get_config("datalake_bucket")

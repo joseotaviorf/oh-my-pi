@@ -1,7 +1,7 @@
 import os
 import json
+from airflow.datasets import BaseDataset
 from typing import Dict, AnyStr
-
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
@@ -48,8 +48,14 @@ class RawGsheetsWorkflow(BaseWorkflow):
     DONE_TASK_PREFIX = "done-clean"
     IDS_TO_BE_INGESTED_TASK_ID = "ingested-gsheets-id-info"
 
-    def __init__(self, dag_args, workflow_args, cluster_args):
-        super().__init__(dag_args, workflow_args, cluster_args)
+    def __init__(
+        self,
+        dag_args,
+        workflow_args,
+        cluster_args,
+        dataset_dependencies: BaseDataset = None,
+    ):
+        super().__init__(dag_args, workflow_args, cluster_args, dataset_dependencies)
         self.dag_args["documentation"] = self.DEFAULT_DAG_DOCUMENTATION
         self.dag_args["documentation"]["dag_purpose"] = self.DEFAULT_DAG_DOCUMENTATION[
             "dag_purpose"

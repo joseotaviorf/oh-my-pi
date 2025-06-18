@@ -1,3 +1,4 @@
+from airflow.datasets import BaseDataset
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -21,8 +22,14 @@ class MetricQueryWorkflow(BaseWorkflow):
 
     BUSINESS_DOMAIN_DELIMITER = "__"
 
-    def __init__(self, dag_args, workflow_args, cluster_args):
-        super().__init__(dag_args, workflow_args, cluster_args)
+    def __init__(
+        self,
+        dag_args,
+        workflow_args,
+        cluster_args,
+        dataset_dependencies: BaseDataset = None,
+    ):
+        super().__init__(dag_args, workflow_args, cluster_args, dataset_dependencies)
         self.databricks_conn_id = self.cluster_args.get(
             "databricks_conn_id", "databricks_default"
         )
@@ -85,6 +92,11 @@ class MetricQueryWorkflow(BaseWorkflow):
             create_cluster_task,
             terminate_cluster_task,
             metric_task_group,
+        )
+
+        self._include_reprocessing_guard_task(
+            self._get_dag_execution_context(dag, metrics_bucket),
+            first_tasks_of_dag=create_cluster_task,
         )
 
         return dag

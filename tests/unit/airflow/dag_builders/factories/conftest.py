@@ -8,4 +8,4 @@ from bietlejuice.base.airflow.dag_builders.main_builder.factories.base_factory i
 @pytest.fixture(scope="function")
 def base_factory():
     BaseFactory.__abstractmethods__ = set()
-    return BaseFactory()
+    return BaseFactory({}, {"type": "workflow_type"}, {})

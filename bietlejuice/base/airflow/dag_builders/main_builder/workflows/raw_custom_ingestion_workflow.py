@@ -20,9 +20,6 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
     sparkjobs to load data from API's or databases
     """
 
-    def __init__(self, dag_args, workflow_args, cluster_args):
-        super().__init__(dag_args, workflow_args, cluster_args)
-
     def build_dag(self):
         dag = super().dag_instance()
 

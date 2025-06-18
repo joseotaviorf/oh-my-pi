@@ -22,9 +22,6 @@ class DwQueryDeltaWorkflow(BaseWorkflow):
     :param cluster_args: A dictionary containing arguments that will be used for the cluster definition that the dag processes will make.
     """
 
-    def __init__(self, dag_args, workflow_args, cluster_args):
-        super().__init__(dag_args, workflow_args, cluster_args)
-
     def build_dag(self):
         dag = self.dag_instance()
         bucket_config = self.workflow_args.get("bucket_config_name", "dw_bucket")
@@ -55,6 +52,10 @@ class DwQueryDeltaWorkflow(BaseWorkflow):
             table_last_tasks,
             optimize_delta_tables,
             dummy_terminate_job_cluster_task,
+        )
+
+        self._include_reprocessing_guard_task(
+            dag_execution_context, first_tasks_of_dag=execute_job_cluster_task
         )
 
         return dag

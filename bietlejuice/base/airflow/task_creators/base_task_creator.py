@@ -3,7 +3,9 @@ from datetime import timedelta
 from os import path
 from typing import Union
 
+from airflow.datasets import DatasetAlias
 from airflow.models.baseoperator import BaseOperator
+from bietlejuice.services.dataset_service import DatasetService
 from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
@@ -57,6 +59,17 @@ class BaseTaskCreator(ABC):
             )
         spark_job_path = path.join(spark_job_directory, f"{spark_job_name}.py")
 
+        kwargs = {}
+        if task_id.startswith("load-"):
+            kwargs["outlets"] = [
+                DatasetAlias(
+                    DatasetService.format_dataset_alias(
+                        dag_id=self.dag_execution_context.dag.dag_id, task_id=task_id
+                    )
+                )
+            ]
+            kwargs["on_success_callback"] = [DatasetService.update_datasets]
+
         return QuintoAndarDatabricksCheckJobTaskOperator(
             databricks_conn_id=self.dag_execution_context.databricks_conn_id,
             dag=self.dag_execution_context.dag,
@@ -68,6 +81,7 @@ class BaseTaskCreator(ABC):
                 }
             },
             execution_timeout=timedelta(hours=execution_timeout_hours),
+            **kwargs,
         )
 
     @classmethod

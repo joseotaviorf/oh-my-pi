@@ -1,5 +1,7 @@
 from typing import List, Tuple
+from airflow.datasets import BaseDataset
 import math
+from airflow.models.baseoperator import BaseOperator
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
@@ -25,8 +27,15 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
 
     MAX_TABLES_PER_CLUSTER = 25
 
-    def __init__(self, dag_args, workflow_args, cluster_args, layer: LayerEnum):
-        super().__init__(dag_args, workflow_args, cluster_args)
+    def __init__(
+        self,
+        dag_args,
+        workflow_args,
+        cluster_args,
+        layer: LayerEnum,
+        dataset_dependencies: BaseDataset = None,
+    ):
+        super().__init__(dag_args, workflow_args, cluster_args, dataset_dependencies)
         self.layer = layer
 
     def build_dag(self):
@@ -59,13 +68,16 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         dummy_terminate_job_cluster_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
+        first_tasks = []
 
         for table in tables:
             if n_tables_so_far != 0 and n_tables_so_far % tables_per_cluster == 0:
-                self._create_all_tasks_for_cluster(
-                    cluster_tables,
-                    execute_job_cluster_local_id,
-                    dummy_terminate_job_cluster_task,
+                first_tasks.append(
+                    self._create_all_tasks_for_cluster(
+                        cluster_tables,
+                        execute_job_cluster_local_id,
+                        dummy_terminate_job_cluster_task,
+                    )
                 )
                 cluster_tables = []
                 execute_job_cluster_local_id += 1
@@ -73,11 +85,17 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
             n_tables_so_far += 1
 
         if len(cluster_tables) > 0:
-            self._create_all_tasks_for_cluster(
-                cluster_tables,
-                execute_job_cluster_local_id,
-                dummy_terminate_job_cluster_task,
+            first_tasks.append(
+                self._create_all_tasks_for_cluster(
+                    cluster_tables,
+                    execute_job_cluster_local_id,
+                    dummy_terminate_job_cluster_task,
+                )
             )
+
+        self._include_reprocessing_guard_task(
+            dag_execution_context, first_tasks_of_dag=first_tasks
+        )
 
         return dag
 
@@ -86,12 +104,16 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         cluster_tables: List[TableAttributes],
         execute_job_cluster_local_id: int,
         dummy_terminate_job_cluster_task,
-    ) -> None:
-        """Creates all the tasks for the workflow and sets their dependencies."""
+    ) -> BaseOperator:
+        """
+        Creates all the tasks for the workflow and sets their dependencies.
+        Returns the first task of the cluster, which is the execute_job_cluster_task.
+        """
 
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task(
             execute_job_cluster_local_id if execute_job_cluster_local_id > 1 else None
         )
+
         optimize_delta_tables = self.optimize_delta_table_task_creator.create_task(
             cluster_tables,
             optimize_delta_table_local_id=execute_job_cluster_local_id
@@ -115,6 +137,8 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
             optimize_delta_tables,
             dummy_terminate_job_cluster_task,
         )
+
+        return execute_job_cluster_task
 
     def _get_tables(self) -> List[TableAttributes]:
         """Returns the table attributes for all the tables in the specified layer."""
@@ -180,6 +204,9 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
         task_creator_factory = TaskCreatorFactory(dag_execution_context)
+        self.reprocessing_guard_task_creator = task_creator_factory.get_task_creator(
+            TaskEnum.REPROCESSING_GUARD
+        )
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,

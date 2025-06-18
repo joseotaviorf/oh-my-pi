@@ -27,9 +27,6 @@ class DWQueryWorkflow(BaseWorkflow):
     :param cluster_args: A dictionary containing arguments that will be used for the cluster definition that the dag processes will make.
     """
 
-    def __init__(self, dag_args, workflow_args, cluster_args):
-        super().__init__(dag_args, workflow_args, cluster_args)
-
     def build_dag(self):
         dw_schema = self.workflow_args.get("custom_schema", self.dag_args["name"])
         tables_customization = self.workflow_args.get("tables_customization", {})
@@ -120,6 +117,10 @@ class DWQueryWorkflow(BaseWorkflow):
             dw_task_groups,
             dw_task_groups_boundaries,
             job_cluster_finished_task,
+        )
+
+        self._include_reprocessing_guard_task(
+            dag_execution_context, first_tasks_of_dag=execute_job_cluster_task
         )
 
         return dag

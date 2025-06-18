@@ -26,13 +26,6 @@ class MetricFactory(BaseFactory):
         WorkflowEnum.QUERY_DELTA_WORKFLOW: MetricQueryDeltaWorkflow,
     }
 
-    def __init__(self, dag_conf: dict, workflow_conf: dict, cluster_conf: dict):
-        super().__init__()
-        self.dag_conf = dag_conf
-        self.workflow_conf = workflow_conf
-        self.workflow_type = workflow_conf["type"]
-        self.cluster_conf = cluster_conf
-
     def get_workflow(self) -> BaseWorkflow:
         """
         Returns an instance of a workflow class, based on the `type` parameter
@@ -41,4 +34,9 @@ class MetricFactory(BaseFactory):
         :return: BaseWorkflow
         """
         workflow_class = self._dispatch_workflow_class(WorkflowEnum(self.workflow_type))
-        return workflow_class(self.dag_conf, self.workflow_conf, self.cluster_conf)
+        return workflow_class(
+            self.dag_conf,
+            self.workflow_conf,
+            self.cluster_conf,
+            self.dataset_dependencies,
+        )

@@ -1,3 +1,4 @@
+from airflow.datasets import BaseDataset
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_query_delta_workflow import (
     BaseQueryDeltaWorkflow,
 )
@@ -12,5 +13,17 @@ class MetricQueryDeltaWorkflow(BaseQueryDeltaWorkflow):
     :param cluster_args: A dictionary containing arguments that will be used for the cluster definition that the dag processes will make.
     """
 
-    def __init__(self, dag_args, workflow_args, cluster_args):
-        super().__init__(dag_args, workflow_args, cluster_args, LayerEnum.METRIC)
+    def __init__(
+        self,
+        dag_args,
+        workflow_args,
+        cluster_args,
+        dataset_dependencies: BaseDataset = None,
+    ):
+        super().__init__(
+            dag_args,
+            workflow_args,
+            cluster_args,
+            LayerEnum.METRIC,
+            dataset_dependencies,
+        )

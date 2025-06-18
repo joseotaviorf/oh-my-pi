@@ -19,5 +19,6 @@ class TaskEnum(Enum):
     LOAD_DELTA = "load_delta"
     OPTIMIZE_DELTA_TABLE = "optimize_delta_table"
     REGISTER_DELTA_TABLE = "register_delta_table"
+    REPROCESSING_GUARD = "reprocessing_guard"
     SKIP_RUN = "skip_run"
     SYNC_METADATA = "sync_metadata"

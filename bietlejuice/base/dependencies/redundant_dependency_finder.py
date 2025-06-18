@@ -1,3 +1,8 @@
+from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
+    BietlejuiceDependencyHelper,
+)
+
+
 class RedundantDependencyFinder:
     def __init__(self, dependencies_raw: dict) -> None:
         """
@@ -94,7 +99,10 @@ class RedundantDependencyFinder:
 
         for dependent in dependencies_raw:
             dependencies[dependent] = []
-            for dependency in dependencies_raw[dependent]:
+            flat_dependencies = BietlejuiceDependencyHelper.find_unique_dependencies_in_dependency_object(
+                dependencies_raw[dependent]
+            )
+            for dependency in flat_dependencies:
                 dependencies[dependent].append(
                     self._create_structured_dependency(dependency)
                 )

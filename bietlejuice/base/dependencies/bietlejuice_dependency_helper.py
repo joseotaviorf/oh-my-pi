@@ -1,6 +1,6 @@
 import re
 from os.path import join
-from typing import Tuple
+from typing import Tuple, Union
 
 from bietlejuice.services.file_service import FileService
 from dags import DAG_PACKAGES_ROOT
@@ -121,3 +121,75 @@ class BietlejuiceDependencyHelper:
             if len(new_dependencies[dag_name]) == 0:
                 new_dependencies.pop(dag_name)
         return new_dependencies
+
+    @classmethod
+    def find_unique_dependencies_in_dependency_object(
+        cls, dependencies: Union[dict, list]
+    ) -> set:
+        """
+        Given either a list of dependencies or a dict with "any" or "all" keys,
+        return a set with the unique dependencies.
+
+        e.g.:
+        ["dag1:task1", "dag2:task1", "dag1:task1"]
+        will return {"dag1:task1", "dag2:task1"}
+
+        {"any": ["dag1:task1", "dag2:task1", {"all": ["dag1:task1", "dag2:task2"]}]}
+        will return {"dag1:task1", "dag2:task1", "dag2:task2"}
+        """
+
+        # We can accept a dict in the form {"any": []} or {"all": []}, and we can also accept a list.
+        if not isinstance(dependencies, dict) and not isinstance(dependencies, list):
+            raise ValueError(f"Invalid dependencies type: {type(dependencies)}")
+
+        # If it's a dict, we'll fetch the values from the list inside the dict
+        if isinstance(dependencies, dict):
+            keys = dependencies.keys()
+            if len(keys) != 1:
+                raise ValueError(f"Invalid dependencies dict: {dependencies}")
+            if "any" in keys:
+                return cls.find_unique_dependencies_in_dependency_object(
+                    dependencies["any"]
+                )
+            elif "all" in keys:
+                return cls.find_unique_dependencies_in_dependency_object(
+                    dependencies["all"]
+                )
+            else:
+                raise ValueError(f"Invalid dependencies dict: {dependencies}")
+        # If it's a list, we'll iterate over the list and fetch the unique dependencies
+        else:
+            unique_dependencies = set()
+            for dependency in dependencies:
+                if isinstance(dependency, str):
+                    unique_dependencies.add(dependency.replace(":first-run-of-day", ""))
+                elif isinstance(dependency, dict):
+                    internal_unique_dependencies = cls.find_unique_dependencies_in_dependency_object(
+                        list(dependency.values())[0]
+                    )
+                    unique_dependencies = unique_dependencies.union(
+                        internal_unique_dependencies
+                    )
+            return unique_dependencies
+
+    @classmethod
+    def dag_b_depends_on_dag_a(cls, dag_b: str, dag_a: str, dependencies: dict) -> bool:
+        """
+        Checks if DAG B depends on DAG A, directly or indirectly.
+        """
+        unique_dependencies_of_b = cls.find_unique_dependencies_in_dependency_object(
+            dependencies.get(dag_b, [])
+        )
+        unique_dag_dependencies_of_b = {
+            dep.split(":")[0] for dep in unique_dependencies_of_b
+        }
+        if dag_a in unique_dag_dependencies_of_b:  # Direct dependency
+            return True
+        for dependency in unique_dag_dependencies_of_b:
+            if dependency == dag_b:
+                continue
+            if cls.dag_b_depends_on_dag_a(  # Indirect dependency
+                dag_b=dependency, dag_a=dag_a, dependencies=dependencies
+            ):
+                return True
+        return False

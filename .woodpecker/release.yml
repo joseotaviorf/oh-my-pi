@@ -91,8 +91,10 @@ steps:
       branch: [master, hotfix/*]
 
   create-dag-files:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.9.5
     commands:
+      - pip install "apache-airflow==2.10.4"
+      - make requirements-scripts
       - make create-dag-files
     when:
       event: push

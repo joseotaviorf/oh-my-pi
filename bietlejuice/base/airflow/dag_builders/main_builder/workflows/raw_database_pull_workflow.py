@@ -17,9 +17,6 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 class RawDatabasePullWorkflow(BaseWorkflow):
     MAX_TABLES_PER_CLUSTER = 20
 
-    def __init__(self, dag_args, workflow_args, cluster_args):
-        super().__init__(dag_args, workflow_args, cluster_args)
-
     def build_dag(self):
         dag = super().dag_instance()
 

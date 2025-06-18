@@ -1,11 +1,16 @@
 from os import listdir
 from os.path import join
+from airflow.models.param import Param
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.airflow.documentation import COMPOSER_DOCUMENTATION_PATH
 from bietlejuice.base.airflow.documentation.cron_descriptor import CronDescriptor
+from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
+    BietlejuiceDependencyHelper,
+)
 from bietlejuice.services import FileService
 from dags import DAG_PACKAGES_ROOT
 
@@ -77,9 +82,12 @@ class BaseDAG:
             ).get(dag_id)
 
             if dag_dependencies:
+                flat_dependencies = BietlejuiceDependencyHelper.find_unique_dependencies_in_dependency_object(
+                    dag_dependencies
+                )
                 dag_dependencies = [
                     f"- `{dependence.split(':')[0]}` \n"
-                    for dependence in dag_dependencies
+                    for dependence in flat_dependencies
                 ]
                 schedule_interval = f"This DAG will trigger {schedule_interval} after executing the following dependencies:\n\n{''.join(set(dag_dependencies))}"
             else:
@@ -118,3 +126,52 @@ class BaseDAG:
                 else ""
             ),
         )
+
+    @staticmethod
+    def get_default_trigger_form_params() -> dict:
+        """
+        :return: dict with the default trigger form params.
+        """
+        return {
+            "run_type": Param(
+                default=DagRunTypeEnum.DEFAULT.value,
+                type=["string", "null"],
+                enum=[
+                    DagRunTypeEnum.DEFAULT.value,
+                    DagRunTypeEnum.TEST_RUN.value,
+                    DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS.value,
+                    DagRunTypeEnum.REPROCESSING_RUN.value,
+                ],
+                values_display={
+                    DagRunTypeEnum.DEFAULT.value: "Select a run type. Default for manual runs: Test Run.",
+                    DagRunTypeEnum.TEST_RUN.value: "Test Run - choose this to avoid impacting any dependents.",
+                    DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS.value: "Impact Downstream Dependents",
+                    DagRunTypeEnum.REPROCESSING_RUN.value: "Reprocessing Run - will trigger entire downstream pipeline from this DAG!",
+                },
+                description_md="""
+                    Select one of this parameters to define which type of run:
+                    **`test_run`**: Use this to create a DAG run only for testing and not impact downstream dependents. Default for manual runs.
+                    **`impact_downstream_dependents`**: Use this to create a DAG run that will impact downstream dependents. Default for scheduled, dataset-triggered and mediator-triggered runs.
+                        (obs: will still depends on other dependencies to run)
+                    **`reprocessing_run`**: (WARNING!) Use this to trigger the entire downstream pipeline from this DAG.
+                """,
+            ),
+            "load_start_date": Param(
+                default=None,
+                type=["string", "null"],
+                format="date",
+                description_md="""
+                    Start interval that DAG will consider when filtering data. (e.g.: 'YYYY-MM-DD').
+                    Default: data_interval_start of the DAG run.
+                """,
+            ),
+            "load_end_date": Param(
+                default=None,
+                type=["string", "null"],
+                format="date",
+                description_md="""
+                    End interval that DAG will consider when filtering data. (e.g.: 'YYYY-MM-DD').
+                    Default: data_interval_start of the DAG run.
+                """,
+            ),
+        }
