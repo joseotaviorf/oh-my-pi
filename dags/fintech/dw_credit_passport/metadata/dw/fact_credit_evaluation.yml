@@ -110,7 +110,6 @@ columns:
   is_automatic:
     description: Boolean indicating if evaluation was automatically run after proposal creation with previous collected credit info from other proposal
     lineage:
-    - datalake_docx_clean.credit_evaluation.automatic
     - datalake_docx_clean.credit_evaluation.is_automatic
   is_early_credit:
     description: Boolean indicating if the credit evaluation refers to an early credit.

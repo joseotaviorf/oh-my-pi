@@ -113,7 +113,7 @@ SELECT DISTINCT
   get_json_object(pr.result, '$.analysis_category') AS category,
   get_json_object(pr.result, '$.risk_category_canon') AS risk_category_canon,
   COALESCE(pp.total_proposal_proponents, gp.total_group_proponents) AS number_of_proponents,
-  coalesce(ce.automatic, ce.is_automatic) AS is_automatic,
+  ce.is_automatic AS is_automatic,
   IF(
     ce.id_group IS NULL
     AND ce.id_proposal IS NULL,
