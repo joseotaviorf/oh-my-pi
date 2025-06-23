@@ -1,0 +1,97 @@
+---
+database_name: datalake_pin_benefits_clean
+table_name: life_event_reasons
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This table identifies all potential life event reasons that can trigger a change in a person's eligibility for benefits, their electability, coverage details, rates, or premiums. Examples include major life changes such as the birth or adoption of a child, marriage, reaching a maximum age for a plan, new hire, rehire, divorce, death, spouse losing coverage, promotions, salary increases, or age changes.
+columns:
+  id_life_event_reason:
+    description: The unique system-generated primary key for each life event reason.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.ler_id
+  id_business_group:
+    description: A foreign key referencing the business group associated with this life event reason.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.business_group_id
+  life_event_reason_name:
+    description: The official name of the life event reason.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.name
+  type_code:
+    description: A code indicating the specific type of life event reason.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.typ_cd
+  timelines_evaluation_code:
+    description: A code defining how the timeliness of a life event is evaluated.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.tmlns_eval_cd
+  selectable_self_service_code:
+    description: A code indicating whether this life event reason is selectable by individuals through self-service portals.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.slctbl_slf_svc_cd
+  product_code:
+    description: A code indicating the product associated with this life event reason.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.prod_cd
+  created_by:
+    description: The user account that initially created this record.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.created_by
+  updated_by:
+    description: The user account that last modified this record.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.last_updated_by
+  description:
+    description: A detailed description of the life event reason.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.desc_txt
+  days_timeliness:
+    description: The number of days allowed for timeliness related to this life event.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.tmlns_dys_num
+  object_version_number:
+    description: A version number used for optimistic locking, incremented with each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.object_version_number
+  is_check_related_person_eligibility:
+    description: A boolean flag indicating whether the eligibility of related persons should be checked for this life event (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.ck_rltd_per_elig_flag
+  is_communications_apply:
+    description: A boolean flag indicating whether communications are applicable for this life event (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.cm_aply_flag
+  is_overriding_life_event:
+    description: A boolean flag indicating whether this life event is considered an overriding event (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.ovridg_le_flag
+  is_qualifying_event:
+    description: A boolean flag indicating whether this life event is a qualifying event for benefits (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.qualg_evt_flag
+  is_global:
+    description: A boolean flag indicating if the life event has global exposure to legal entities (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.global_flag
+  is_self_assigned_event:
+    description: A boolean flag indicating whether the event can be self-assigned by users (TRUE) or not (FALSE). Default is FALSE.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.self_assigned_event_flag
+  dt_effective_started:
+    description: The date from which this life event reason became effective.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.effective_start_date
+  dt_effective_ended:
+    description: The date on which this life event reason ceased to be effective.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.effective_end_date
+  ts_created:
+    description: The timestamp indicating the exact date and time when this record was created in the source system.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.creation_date
+  ts_updated:
+    description: The timestamp indicating the exact date and time when this record was last updated in the source system.
+    lineage:
+      - datalake_pin_benefits_raw.ben_ler_f.last_update_date
+  ts_load:
+    description: The timestamp indicating when this record was loaded into the data lake.

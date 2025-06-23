@@ -1,0 +1,96 @@
+dag:
+  name: pin_benefits
+  owner: Data People
+  dag_documentation:
+    dag_purpose: |
+      This DAG ingests encrypted data from the Oracle HCM system, made available via an SFTP server through Oracle Integration Cloud (OIC).
+      It downloads, decrypts, parses, and loads the files into both the `incoming` and `raw` layers of the Data Lake.
+cluster:
+  type: databricks_13_3_min_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  custom_libraries:
+    - pypi:
+        package: paramiko==2.12.0
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+workflow:
+  layer: raw
+  type: custom_ingestion
+  default_partitions: ["year", "month", "day"]
+  bucket_config_name: people_bucket
+  has_hive_sync: false
+  load_spark_job: load_pin_benefits_raw
+  default_extraction_type: full
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ data_interval_start | ds }}"
+    - "{partitions}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, load_start_date) }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), load_end_date) }}"
+  default_table_privileges:
+    people-team:
+      - ALL PRIVILEGES
+  tables_customization:
+    ben_elig_cvrd_dpnt:
+      clean_table_name: eligible_covered_dependents
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_benefits
+          date_column_to_partition: last_update_date
+    ben_elig_dpnt:
+      clean_table_name: eligible_dependent_status
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_benefits
+          date_column_to_partition: last_update_date
+    ben_elig_per_elctbl_chc:
+      clean_table_name: person_electable_benefit_choices
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_benefits
+          date_column_to_partition: last_update_date
+    ben_ler_f:
+      clean_table_name: life_event_reasons
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_benefits
+          date_column_to_partition: last_update_date
+    ben_oipl_f:
+      clean_table_name: plan_option_details
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_benefits
+          date_column_to_partition: last_update_date
+    ben_opt_f:
+      clean_table_name: plan_options
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_benefits
+          date_column_to_partition: last_update_date
+    ben_per_in_ler:
+      clean_table_name: person_in_life_event
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_benefits
+          date_column_to_partition: last_update_date
+    ben_pl_f:
+      clean_table_name: plan_definitions
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_benefits
+          date_column_to_partition: last_update_date
+    ben_prtt_enrt_rslt:
+      clean_table_name: participant_enrollment_results
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_benefits
+          date_column_to_partition: last_update_date
+    ben_prtt_rt_val:
+      clean_table_name: participant_rate_values
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_benefits
+          date_column_to_partition: last_update_date

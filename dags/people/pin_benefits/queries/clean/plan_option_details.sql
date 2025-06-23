@@ -1,0 +1,28 @@
+SELECT
+  oipl_id AS id_option_in_plan,
+  opt_id AS id_option,
+  pl_id AS id_plan,
+  business_group_id AS id_business_group,
+  oipl_stat_cd AS option_in_plan_status_code,
+  per_cvrd_cd AS person_covered_code,
+  created_by AS created_by,
+  last_updated_by AS updated_by,
+  CAST(ordr_num AS INT) AS order_number,
+  CAST(object_version_number AS INT) AS object_version_number,
+  mndtry_flag = 'Y' AS is_mandatory,
+  dflt_flag = 'Y' AS is_default,
+  elig_apls_flag = 'Y' AS is_eligibility_applies,
+  trk_inelig_per_flag = 'Y' AS is_track_ineligible_person,
+  drvbl_fctr_prtn_elig_flag = 'Y' AS is_derivable_factor_proration_eligibility,
+  prtn_elig_ovrid_alwd_flag = 'Y' AS is_proration_eligibility_override_allowed,
+  drvbl_fctr_apls_rts_flag = 'Y' AS is_derivable_factor_applies_rates,
+  auto_enrt_flag = 'Y' AS is_auto_enrollment,
+  hidden_flag = 'Y' AS is_hidden,
+  susp_if_ctfn_not_prvd_flag = 'Y' AS is_suspend_if_certification_not_provided,
+  TO_DATE(effective_start_date) AS dt_effective_started,
+  TO_DATE(effective_end_date) AS dt_effective_ended,
+  TO_TIMESTAMP(creation_date) AS ts_created,
+  TO_TIMESTAMP(last_update_date) AS ts_updated,
+  NOW() AS ts_load
+FROM
+  datalake_pin_benefits_raw.ben_oipl_f

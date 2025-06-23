@@ -1,0 +1,25 @@
+SELECT
+  elig_cvrd_dpnt_id AS id_eligible_covered_dependent,
+  business_group_id AS id_business_group,
+  elig_per_elctbl_chc_id AS id_eligible_per_electable_choice,
+  prtt_enrt_rslt_id AS id_participant_enrollment_result,
+  dpnt_person_id AS id_dependent_person,
+  ended_per_in_ler_id AS id_ended_period_in_life_event_reason,
+  per_in_ler_id AS id_period_in_life_event_reason,
+  rlnshp_cd AS relationship_code,
+  created_by,
+  last_updated_by AS updated_by,
+  cvg_pndg_flag = 'Y' AS is_coverage_pending,
+  ovrdn_flag = 'Y' AS is_overridden,
+  CAST(object_version_number AS INT) AS object_version_number,
+  TO_DATE(cvg_strt_dt) AS dt_coverage_started,
+  TO_DATE(cvg_thru_dt) AS dt_coverage_ended,
+  TO_DATE(ended_cvg_thru_dt) AS dt_ended_coverage_ended,
+  TO_DATE(orgnl_oipl_cvg_strt_dt) AS dt_original_option_in_plan_coverage_started,
+  TO_DATE(orgnl_plan_cvg_strt_dt) AS dt_original_plan_coverage_started,
+  TO_TIMESTAMP(creation_date) AS ts_created,
+  TO_TIMESTAMP(last_update_date) AS ts_updated,
+  TO_TIMESTAMP(program_update_date) AS ts_program_updated,
+  NOW() AS ts_load
+FROM
+  datalake_pin_benefits_raw.ben_elig_cvrd_dpnt

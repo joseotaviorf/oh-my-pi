@@ -1,0 +1,157 @@
+---
+database_name: datalake_pin_benefits_clean
+table_name: participant_enrollment_results
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This table identifies the specific benefit plans or options within plans in which a participant is enrolled. Enrollment can occur either through an explicit election made by the participant or via system-driven default/automatic enrollments. It consistently links each enrollment to a specific plan and the life event reason (which may include open enrollment) that initiated the enrollment. Where applicable, the elected program and option details are also identified.
+columns:
+  id_prtt_enrollment_result:
+    description: The unique system-generated primary key for each participant enrollment result record.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.prtt_enrt_rslt_id
+  id_benefit_relation:
+    description: Identifier linking to benefit references, typically stored in payroll tables.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.benefit_relation_id
+  id_legal_entity:
+    description: Identifier for the legal entity associated with this enrollment.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.legal_entity_id
+  id_ended_period_in_life_event_reason:
+    description: Identifier for the period within a life event reason that signifies the end of coverage.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.ended_per_in_ler_id
+  id_person:
+    description: A foreign key linking to the `PER_PEOPLE_F` table, identifying the participant person.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.person_id
+  id_assignment:
+    description: A foreign key linking to the `PER_ALL_ASSIGNMENTS_F` table, identifying the participant's assignment.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.assignment_id
+  id_plan:
+    description: A foreign key linking to the `BEN_PL_F` table, identifying the benefit plan in which the participant is enrolled.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.pl_id
+  id_option_in_plan:
+    description: A foreign key linking to the `BEN_OIPL_F` table, identifying the specific option chosen within the plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.oipl_id
+  id_plan_type:
+    description: A foreign key linking to the `BEN_PL_TYP_F` table, identifying the type of plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.pl_typ_id
+  id_life_event_reason:
+    description: A foreign key linking to the `BEN_LER_F` table, identifying the life event reason that triggered this enrollment.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.ler_id
+  id_period_in_life_event_reason:
+    description: A foreign key linking to the `BEN_PER_IN_LER` table, representing the period within a life event reason relevant to this enrollment.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.per_in_ler_id
+  id_business_group:
+    description: A foreign key referencing the business group associated with this enrollment result.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.business_group_id
+  id_option:
+    description: A foreign key linking to the `BEN_OPT_F` table, identifying the specific option chosen for this enrollment.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.opt_id
+  enrollment_method_code:
+    description: A code indicating the method by which the participant was enrolled (e.g., explicit election, automatic).
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.enrt_mthd_cd
+  compensation_level_code:
+    description: A code indicating the compensation level of the participant relevant to their enrollment.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.comp_lvl_cd
+  admin_category_code:
+    description: A code used for page rendering and administrative categorization of the enrollment.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.admin_category_cd
+  self_service_category_code:
+    description: A code used for page rendering in self-service portals, categorizing the enrollment for user display.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.ss_category_cd
+  unit_of_measure:
+    description: The unit of measure associated with the benefit amount (e.g., USD, hours).
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.uom
+  created_by:
+    description: The user account that initially created this record.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.created_by
+  updated_by:
+    description: The user account that last modified this record.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.last_updated_by
+  option_in_plan_order_number:
+    description: The display order number for the option within the plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.oipl_ordr_num
+  object_version_number:
+    description: A version number used for optimistic locking, incremented with each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.object_version_number
+  is_interim:
+    description: A boolean flag indicating whether the enrollment is an interim enrollment (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.interim_flag
+  is_suspended:
+    description: A boolean flag indicating whether the enrollment is currently suspended (TRUE) or active (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.sspndd_flag
+  is_participant_covered:
+    description: A boolean flag indicating whether the participant is currently covered by the benefit (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.prtt_is_cvrd_flag
+  is_enrollment_overridden:
+    description: A boolean flag indicating whether the enrollment has been administratively overridden (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.enrt_ovridn_flag
+  is_no_longer_eligible:
+    description: A boolean flag indicating whether the participant is no longer eligible for this enrollment (TRUE) or is still eligible (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.no_lngr_elig_flag
+  is_savings_plan:
+    description: A boolean flag indicating whether this is a savings plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.svngs_pln_flag
+  is_miscellaneous_plan:
+    description: A boolean flag indicating whether this is a miscellaneous plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.misc_pln_flag
+  dt_ended_coverage_through:
+    description: The date up to which the coverage formally ended.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.ended_cvg_thru_dt
+  dt_enrollment_coverage_started:
+    description: The effective start date of the participant's enrollment coverage.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.enrt_cvg_strt_dt
+  dt_enrollment_coverage_ended:
+    description: The effective end date of the participant's enrollment coverage.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.enrt_cvg_thru_dt
+  dt_original_enrolled:
+    description: The original date on which the participant was enrolled in this plan or option.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.orgnl_enrt_dt
+  dt_elected:
+    description: The date when the participant made the election for this benefit.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.election_date
+  ts_created:
+    description: The timestamp indicating the exact date and time when this record was created in the source system.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.creation_date
+  ts_updated:
+    description: The timestamp indicating the exact date and time when this record was last updated in the source system.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.last_update_date
+  ts_program_updated:
+    description: The timestamp when a batch program or concurrent process last updated this row in the source system.
+    lineage:
+      - datalake_pin_benefits_raw.ben_prtt_enrt_rslt.program_update_date
+  ts_load:
+    description: The timestamp indicating when this record was loaded into the data lake.

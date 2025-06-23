@@ -1,0 +1,325 @@
+---
+database_name: datalake_pin_benefits_clean
+table_name: plan_definitions
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: This table identifies formally defined compensation offerings, each categorized by a single plan type. These plans typically feature one or more activity base rates, share a common set of eligibility criteria, and, where applicable, include a fixed set of provided options. For health and welfare benefits, a plan is usually administered by a third-party administrator or carrier. Columns prefixed with "NIP" (Not In Program) are used specifically when the plan is not incorporated into a broader program, while other attributes apply universally to the plan's characteristics, whether independent or within a program context.
+columns:
+  id_plan:
+    description: The unique system-generated primary key for each plan definition.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.pl_id
+  id_plan_type:
+    description: A foreign key linking to the `BEN_PL_TYP_F` table, identifying the type of the plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.pl_typ_id
+  id_business_group:
+    description: A foreign key referencing the business group to which this plan belongs.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.business_group_id
+  plan_code:
+    description: A code indicating the usage or category of the plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.pl_cd
+  enrollment_method_code:
+    description: A code indicating the method by which participants can enroll in this plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.enrt_mthd_cd
+  enrollment_coverage_start_date_code:
+    description: A code defining how the enrollment coverage start date is determined for this plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.enrt_cvg_strt_dt_cd
+  enrollment_coverage_end_date_code:
+    description: A code defining how the enrollment coverage end date is determined for this plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.enrt_cvg_end_dt_cd
+  not_in_program_default_enrollment_code:
+    description: A code indicating the default enrollment method for plans that are not part of a program.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.nip_dflt_enrt_cd
+  dependent_coverage_end_date_code:
+    description: A code defining how the dependent coverage end date is determined for this plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.dpnt_cvg_end_dt_cd
+  dependent_coverage_start_date_code:
+    description: A code defining how the dependent coverage start date is determined for this plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.dpnt_cvg_strt_dt_cd
+  not_in_program_activity_reference_period_code:
+    description: The activity reference period for plans not associated with a program.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.nip_acty_ref_perd_cd
+  not_in_program_enrollment_information_rate_frequency_code:
+    description: The rate frequency for enrollment information for plans not in a program.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.nip_enrt_info_rt_freq_cd
+  plan_status_code:
+    description: A code indicating the current status of the plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.pl_stat_cd
+  rate_end_date_code:
+    description: A code defining how the rate end date is determined for this plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.rt_end_dt_cd
+  rate_start_date_code:
+    description: A code defining how the rate start date is determined for this plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.rt_strt_dt_cd
+  subject_to_imputed_income_code:
+    description: A code indicating whether this plan is subject to imputed income calculations.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.subj_to_imptd_incm_cd
+  short_code:
+    description: A short code or abbreviation for the plan name.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.short_code
+  function_code:
+    description: A code representing the function or purpose of the plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.function_code
+  plan_name:
+    description: The full name of the benefit plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.name
+  short_name:
+    description: A shortened or abbreviated name for the plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.short_name
+  created_by:
+    description: The user account that initially created this record.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.created_by
+  updated_by:
+    description: The user account that last modified this record.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.last_updated_by
+  not_in_program_plan_unit_of_measure:
+    description: The unit of measure for plans that are not associated with a program.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.nip_pl_uom
+  object_version_number:
+    description: A version number used for optimistic locking, incremented with each update to detect concurrent modifications.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.object_version_number
+  is_uses_compensation_information_reporting:
+    description: A boolean flag indicating whether the plan uses compensation information reporting (TRUE) or not (FALSE), determining if rate information is passed to payroll elements.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.uses_cir
+  is_allows_qualified_domestic_relations_order:
+    description: A boolean flag indicating whether the plan allows Qualified Domestic Relations Orders (QDRO) (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.alws_qdro_flag
+  is_allows_qualified_medical_child_support_order:
+    description: A boolean flag indicating whether the plan allows Qualified Medical Child Support Orders (QMSCO) (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.alws_qmcso_flag
+  is_allows_reimbursements:
+    description: A boolean flag indicating whether the plan allows reimbursements (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.alws_reimbmts_flag
+  is_assent_required_for_enrollment:
+    description: A boolean flag indicating whether assent is required for enrollment in this plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.asnt_rqd_for_enrt_flag
+  is_beneficiary_additional_instruction_allowed:
+    description: A boolean flag indicating whether additional instruction text is allowed for beneficiaries (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.bnf_addl_instn_alwd_flag
+  is_beneficiary_address_required:
+    description: A boolean flag indicating whether a beneficiary's address is required (TRUE) or optional (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.bnf_adrs_rqd_flag
+  is_beneficiary_contingent_benefits_allowed:
+    description: A boolean flag indicating whether contingent benefits are allowed for beneficiaries (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.bnf_cntngt_bnfs_alwd_flag
+  is_beneficiary_certification_required:
+    description: A boolean flag indicating whether certification is required for beneficiaries (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.bnf_ctfn_rqd_flag
+  is_beneficiary_date_of_birth_required:
+    description: A boolean flag indicating whether a beneficiary's date of birth is required (TRUE) or optional (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.bnf_dob_rqd_flag
+  is_beneficiary_designee_minor_trustee_required:
+    description: A boolean flag indicating whether a beneficiary designee, minor, or trustee is required (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.bnf_dsge_mnr_ttee_rqd_flag
+  is_beneficiary_legislative_id_required:
+    description: A boolean flag indicating whether a beneficiary's legislative identifier is required (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.bnf_legv_id_rqd_flag
+  is_beneficiary_may_designate_organization:
+    description: A boolean flag indicating whether beneficiaries may designate an organization (TRUE) or only individuals (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.bnf_may_dsgt_org_flag
+  is_beneficiary_qualified_domestic_relations_order_rule_applies:
+    description: A boolean flag indicating whether QDRO rules apply to beneficiaries for this plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.bnf_qdro_rl_apls_flag
+  is_derivable_factor_applies_rates:
+    description: A boolean flag indicating whether derivable factors apply to rates for this plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.drvbl_fctr_apls_rts_flag
+  is_derivable_factor_participation_eligibility:
+    description: A boolean flag indicating whether derivable factors influence participation eligibility (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.drvbl_fctr_prtn_elig_flag
+  is_eligibility_applies:
+    description: A boolean flag indicating whether eligibility rules apply to this plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.elig_apls_flag
+  is_invoke_decline_participation_plan:
+    description: A boolean flag indicating whether declining participation in the plan is invoked (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.invk_dcln_prtn_pl_flag
+  is_invoke_flexible_credit_plan:
+    description: A boolean flag indicating whether a flexible credit plan is invoked (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.invk_flx_cr_pl_flag
+  is_invoke_imputed_income_plan:
+    description: A boolean flag indicating whether an imputed income plan is invoked (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.invk_imptd_incm_pl_flag
+  is_derivable_dependent_eligibility:
+    description: A boolean flag indicating whether dependent eligibility can be derived (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.drvbl_dpnt_elig_flag
+  is_track_ineligible_person:
+    description: A boolean flag indicating whether ineligible persons are tracked for this plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.trk_inelig_per_flag
+  is_domestic_partner_rate_treatment:
+    description: A boolean flag indicating whether domestic partner rate treatment applies to this plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.dmstc_prtr_rt_trtmt_flag
+  is_dependent_covered_by_other_applies:
+    description: A boolean flag indicating whether the "dependent covered by other plan" rule applies (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.dpnt_cvd_by_othr_apls_flag
+  is_forfeitures_applies:
+    description: A boolean flag indicating whether forfeitures apply to this plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.frfs_aply_flag
+  is_health_care_plan_subject_to_approval:
+    description: A boolean flag indicating whether this health care plan is subject to Health Care Finance Administration (HCFA) approval (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.hc_pl_subj_hcfa_aprvl_flag
+  is_highly_compensated_rule_applies:
+    description: A boolean flag indicating whether the highly compensated rule applies to this plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.hghly_cmpd_rl_apls_flag
+  is_maximum_waiting_period_participation_applies:
+    description: A boolean flag indicating whether a maximum waiting period for participation applies (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.mx_wtg_perd_prte_apls_flag
+  is_dependent_legislative_id_required:
+    description: A boolean flag indicating whether a dependent's legislative identifier is required (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.dpnt_leg_id_rqd_flag
+  is_dependent_no_certification_required:
+    description: A boolean flag indicating whether dependent certification is not required (TRUE) or is required (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.dpnt_no_ctfn_rqd_flag
+  is_no_minimum_options_number_applies:
+    description: A boolean flag indicating whether a minimum number of options does not apply (TRUE) or does apply (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.no_mn_opts_num_apls_flag
+  is_no_maximum_options_number_applies:
+    description: A boolean flag indicating whether a maximum number of options does not apply (TRUE) or does apply (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.no_mx_opts_num_apls_flag
+  is_participation_eligibility_override_allowed:
+    description: A boolean flag indicating whether participation eligibility override is allowed (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.prtn_elig_ovrid_alwd_flag
+  is_savings_plan:
+    description: A boolean flag indicating whether this is a savings plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.svgs_pl_flag
+  is_subject_to_imputed_income:
+    description: A boolean flag indicating whether this plan is subject to imputed income (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.subj_to_imput_inc_flag
+  is_use_all_assignments_eligibility:
+    description: A boolean flag indicating whether all assignments are used for eligibility determination (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.use_all_asnts_elig_flag
+  is_use_all_assignments_for_rate:
+    description: A boolean flag indicating whether all assignments are used for rate calculation (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.use_all_asnts_for_rt_flag
+  is_vesting_applies:
+    description: A boolean flag indicating whether vesting rules apply to this plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.vstg_apls_flag
+  is_waiveable:
+    description: A boolean flag indicating whether the plan is waiveable (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.wvbl_flag
+  is_enroll_plan_option:
+    description: A boolean flag indicating whether the plan enrollment includes options (TRUE) or only the plan itself (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.enrl_pl_opt_flag
+  is_may_enroll_plan_and_option_in_plan:
+    description: A boolean flag indicating whether a participant may enroll in both the plan and an option within the plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.may_enrl_pl_n_oipl_flag
+  is_allows_unrestricted_enrollment:
+    description: A boolean flag indicating whether unrestricted enrollment is allowed (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.alws_unrstrctd_enrt_flag
+  is_not_in_program_default:
+    description: A boolean flag indicating whether this is a default plan when not part of a program (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.nip_dflt_flag
+  is_allows_temporary_id_card:
+    description: A boolean flag indicating whether temporary ID cards are allowed for this plan (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.alws_tmqry_id_crd_flag
+  is_post_to_general_ledger:
+    description: A boolean flag indicating whether the plan details are posted to the General Ledger (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.post_to_gl_flag
+  is_plan_year_not_applicable:
+    description: A boolean flag indicating whether plan year periods are not applicable to this plan (TRUE) or are applicable (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.pl_yr_not_applcbl_flag
+  is_suspend_if_certification_not_provided:
+    description: A boolean flag indicating whether enrollment should be suspended if certification is not provided (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.susp_if_ctfn_not_prvd_flag
+  is_suspend_if_certification_not_beneficiary:
+    description: A boolean flag indicating whether enrollment should be suspended if beneficiary certification is not provided (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.susp_if_ctfn_not_bnf_flag
+  is_global:
+    description: A boolean flag indicating whether this plan has global exposure to legal entities (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.global_flag
+  is_designate_self_as_beneficiary:
+    description: A boolean flag indicating whether the participant can designate themselves as a beneficiary (TRUE) or not (FALSE).
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.dsgn_self_as_bnf_flag
+  dt_effective_started:
+    description: The date from which this plan definition became effective.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.effective_start_date
+  dt_effective_ended:
+    description: The date on which this plan definition ceased to be effective.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.effective_end_date
+  dt_inception:
+    description: The inception date of the plan.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.incptn_dt
+  ts_created:
+    description: The timestamp indicating the exact date and time when this record was created in the source system.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.creation_date
+  ts_updated:
+    description: The timestamp indicating the exact date and time when this record was last updated in the source system.
+    lineage:
+      - datalake_pin_benefits_raw.ben_pl_f.last_update_date
+  ts_load:
+    description: The timestamp indicating when this record was loaded into the data lake.
