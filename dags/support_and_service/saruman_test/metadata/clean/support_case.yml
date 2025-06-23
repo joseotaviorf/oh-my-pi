@@ -1,0 +1,19 @@
+---
+database_name: datalake_saruman_test_clean
+table_name: support_case
+columns:
+  id:
+    lineage:
+      - datalake_saruman_test_raw.support_case.id
+  title:
+    lineage:
+      - datalake_saruman_test_raw.support_case.title
+  summary:
+    lineage:
+      - datalake_saruman_test_raw.support_case.summary
+  status:
+    lineage:
+      - datalake_saruman_test_raw.support_case.status
+  type:
+    lineage:
+      - datalake_saruman_test_raw.support_case.type

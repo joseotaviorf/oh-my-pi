@@ -1,0 +1,37 @@
+---
+database_name: datalake_saruman_test_clean
+table_name: session
+columns:
+  id:
+    lineage:
+      - datalake_saruman_test_raw.session.id
+  id_support_case:
+    lineage:
+      - datalake_saruman_test_raw.session.support_case_id
+  id_user:
+    lineage:
+      - datalake_saruman_test_raw.session.user_id
+  department:
+    lineage:
+      - datalake_saruman_test_raw.session.department
+  tags:
+    lineage:
+      - datalake_saruman_test_raw.session.tags
+  status:
+    lineage:
+      - datalake_saruman_test_raw.session.status
+  ts_created:
+    lineage:
+      - datalake_saruman_test_raw.session.created_at
+  ts_updated:
+    lineage:
+      - datalake_saruman_test_raw.session.updated_at
+  year:
+    lineage:
+      - datalake_saruman_test_raw.session.year
+  month:
+    lineage:
+      - datalake_saruman_test_raw.session.month
+  day:
+    lineage:
+      - datalake_saruman_test_raw.session.day

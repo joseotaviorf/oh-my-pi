@@ -1,0 +1,39 @@
+dag:
+  name: saruman_test
+  schedule_start_date: 2022, 7, 27
+  schedule_interval: 0 3 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Retrieves data from the Saruman database (PostgreSQL).
+
+      [Saruman](https://github.com/quintoandar/saruman) is a service that concentrates events from multiple sources
+      and builds a timeline used to provide context for support sessions. Some of these events are tagging, routing,
+      creation, ending, comment events about a session and about workflows.
+
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  source_database: saruman
+  custom_schema: saruman_test
+  dbutils_secret_key: SARUMAN_DB
+  tables_customization:
+    session: {}
+    session_history: {}
+    support_case: {}
+    pendency: {}
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new
