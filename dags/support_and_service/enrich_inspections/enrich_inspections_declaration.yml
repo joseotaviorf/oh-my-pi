@@ -51,6 +51,8 @@ workflow:
     item_media:
       partitions: [year, month, day]
       extraction_type: incremental
+      z_order_by: [id_item_media]
+      merge_on: [id_item_media]
     item_review:
       partitions: [year, month, day]
       extraction_type: incremental
