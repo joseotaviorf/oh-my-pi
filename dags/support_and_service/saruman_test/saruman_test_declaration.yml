@@ -22,7 +22,6 @@ workflow:
   tables_customization:
     session: {}
     session_history: {}
-    support_case: {}
     pendency: {}
 
 cluster:

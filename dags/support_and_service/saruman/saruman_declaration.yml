@@ -27,8 +27,6 @@ workflow:
     session_history:
       date_filter_column: created_at
       partitions: [year, month, day]
-    support_case:
-      extraction_type: full
     pendency:
       date_filter_column: created_at
       partitions: [year, month, day]
