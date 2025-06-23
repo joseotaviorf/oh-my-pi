@@ -115,6 +115,11 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date
+    per_assignment_extra_info_m:
+      clean_table_name: assignment_extra_info
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     per_assignment_status_types_tl:
       clean_table_name: assignment_status_type_translation
       extra_spark_job_arguments:

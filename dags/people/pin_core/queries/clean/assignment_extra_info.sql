@@ -1,0 +1,23 @@
+SELECT
+    assignment_extra_info_id AS id_assignment_extra_info,
+    assignment_id AS id_assignment,
+    business_group_id AS id_business_group,
+    information_type,
+    UPPER(aei_attribute1) AS type_or_status,
+    aei_attribute2 AS period,
+    created_by,
+    last_updated_by AS updated_by,
+    aei_information_category AS information_category,
+    CAST(aei_information_number1 AS DECIMAL(10,2)) AS days_vacation_acquired,
+    CAST(effective_sequence AS INT) AS effective_sequence,
+    CAST(object_version_number AS INT) AS object_version_number,
+    effective_latest_change = 'Y' AS is_effective_latest_change,
+    TO_DATE(effective_start_date) AS dt_effective_started,
+    TO_DATE(effective_end_date) AS dt_effective_ended,
+    TO_DATE(aei_information_date1) AS dt_period_started,
+    TO_DATE(aei_information_date2) AS dt_period_ended,
+    TO_TIMESTAMP(creation_date) AS ts_created,
+    TO_TIMESTAMP(last_update_date) AS ts_updated,
+    NOW() AS ts_load
+FROM
+    datalake_pin_core_raw.per_assignment_extra_info_m
