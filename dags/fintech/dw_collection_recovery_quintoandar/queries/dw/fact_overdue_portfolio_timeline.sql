@@ -13,6 +13,16 @@ SELECT DISTINCT
     n.down_payment_net_amount_paid != 0
   QUALIFY ROW_NUMBER() OVER(PARTITION BY ip.id_invoice, ip.id_contract ORDER BY ABS(DATE_DIFF(n.dt_down_payment, ip.ts_paid))) = 1
 ),
+cyber_agencies AS (
+  SELECT
+    id_contract,
+    id_agency,
+    main_agency_name,
+    dt_start_interval,
+    dt_end_interval
+  FROM datalake_cyber.contract_agency_distribution
+  WHERE creditor = 'QuintoAndar'
+),
 add_all_dimensions AS (
 SELECT
     CONCAT(o.id_invoice, o.id_contract, DATE_FORMAT(o.dt_reference, 'yyyyMMdd')) AS sk_overdue_portfolio_timeline,
@@ -20,6 +30,7 @@ SELECT
     o.id_invoice,
     o.id_proposal,
     o.id_region,
+    cad.id_agency,
     IF(o.payment_status = "written-down", n.sk_negotiation, NULL) AS sk_negotiation,
     IF(o.invoice_type = "extra", CONCAT(COALESCE(o.id_contract, 0), CAST(o.id_negotiation_parent AS STRING)), NULL) AS sk_origin_negotiation,
     IF(o.invoice_type = "extra", o.negotiation_installment_number, NULL) AS negotiation_installment_number,
@@ -53,12 +64,12 @@ SELECT
     o.is_first_payment_default,
     o.has_app_action_event,
     n.is_ssn_boletao,
-    COALESCE(cad.advisory, rc.partner, LAG(rc.partner) IGNORE NULLS OVER(PARTITION BY o.id_contract ORDER BY o.dt_reference)) AS advisory,
+    COALESCE(cad.main_agency_name, rc.partner, LAG(rc.partner) IGNORE NULLS OVER(PARTITION BY o.id_contract ORDER BY o.dt_reference)) AS advisory,
     q.segmentation_queue,
     q.segmentation_queue_description,
     q.agreement_queue,
     q.agreement_queue_description,
-    q.eviction_queue ,
+    q.eviction_queue,
     q.eviction_queue_description,
     MAX(o.dt_invoice_paid) OVER(PARTITION BY o.id_contract, o.id_invoice) AS max_dt_invoice_paid, -- get the dt_paid of invoice, since dt_invoice_paid is only filled in when dt_reference >= dt_paid
     o.dt_invoice_paid,
@@ -76,7 +87,7 @@ LEFT JOIN
       ON o.id_contract = rc.id_contract
       AND o.dt_reference = rc.dt_snapshot
 LEFT JOIN
-    datalake_cyber.contract_agency_distribution AS cad
+    cyber_agencies AS cad
       ON o.id_contract = cad.id_contract
       AND o.dt_reference BETWEEN cad.dt_start_interval AND cad.dt_end_interval
 LEFT JOIN
@@ -93,6 +104,7 @@ get_last_valid_partner AS (
   SELECT
     id_contract,
     id_invoice,
+    id_agency,
     advisory,
     segmentation_queue,
     segmentation_queue_description,
@@ -111,6 +123,7 @@ SELECT
     a.id_contract AS sk_contract,
     a.sk_negotiation,
     a.sk_origin_negotiation,
+    IF(a.dt_reference >= a.dt_invoice_paid, g.id_agency, a.id_agency) AS sk_agency,
     a.id_invoice,
     a.id_proposal,
     a.negotiation_installment_number,

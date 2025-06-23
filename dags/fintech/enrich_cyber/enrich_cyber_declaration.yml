@@ -10,6 +10,8 @@ workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
+    contract_agency_distribution:
+      - agencies
     negotiation:
       - debt_negotiation_mapping
     contracts:

@@ -180,6 +180,7 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_cyber:load-enrich-collection
   - bietlejuice.enrich_cyber:load-enrich-contract-agency-distribution
   - bietlejuice.enrich_cyber:load-enrich-queue-timeline
+  - bietlejuice.enrich_cyber:load-enrich-agencies
   - bietlejuice.enrich_debt_recovery:load-enrich-debt
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation

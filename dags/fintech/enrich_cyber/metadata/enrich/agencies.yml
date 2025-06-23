@@ -1,0 +1,40 @@
+---
+database_name: datalake_cyber
+table_name: agencies
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Consolidated view of agencies and agency groups, including main agency indicators and membership details.
+columns:
+  id_agency:
+    description: "Unique identifier for the agency or agency group."
+    lineage:
+      - datalake_cyber_clean.agency.id_agency
+      - datalake_cyber_clean.agency_group.agency_group
+  id_main_agency:
+    description: "Identifier of the main agency within the group, or the agency itself when not grouped."
+    lineage:
+      - datalake_cyber_clean.agency_group.id_agency
+      - datalake_cyber_clean.agency.id_agency
+  id_agencies_group:
+    description: "Sorted array containing all agency IDs belonging to the group."
+    lineage:
+      - datalake_cyber_clean.agency_group.id_agency
+  main_agency_name:
+    description: "Name of the main agency in the group, or agency name when not grouped."
+    lineage:
+      - datalake_cyber_clean.agency.agency_name
+      - datalake_cyber_clean.agency_group.id_agency
+  main_agency_type:
+    description: "Type of the main agency or agency itself, standardized to uppercase."
+    lineage:
+      - datalake_cyber_clean.agency.agency_type
+      - datalake_cyber_clean.agency_group.id_agency
+  agencies_name_group:
+    description: "Sorted array containing names of all agencies in the group."
+    lineage:
+      - datalake_cyber_clean.agency.agency_name
+  ts_start:
+    description: "Timestamp representing the start date of the main agency or agency itself."
+    lineage:
+      - datalake_cyber_clean.agency.ts_start
+      - datalake_cyber_clean.agency_group.id_agency

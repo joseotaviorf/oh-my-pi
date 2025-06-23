@@ -1,0 +1,37 @@
+---
+database_name: dw_collection_recovery_quintoandar
+table_name: dim_agency
+owner: bianca.martins@quintoandar.com.br
+domain: fintech
+description: Dimension table containing agency and agency group information for collection recovery analysis.
+columns:
+  sk_agency:
+    description: "Surrogate key for the agency or agency group."
+    lineage:
+      - datalake_cyber.agencies.id_agency
+  sk_main_agency:
+    description: "Surrogate key for the main agency within the group."
+    lineage:
+      - datalake_cyber.agencies.id_main_agency
+  id_agencies_group:
+    description: "Sorted array containing all agency IDs belonging to the group."
+    lineage:
+      - datalake_cyber.agencies.id_agencies_group
+  main_agency_name:
+    description: "Name of the main agency in the group."
+    lineage:
+      - datalake_cyber.agencies.main_agency_name
+  main_agency_type:
+    description: "Type of the main agency in the group."
+    lineage:
+      - datalake_cyber.agencies.main_agency_type
+  agencies_name_group:
+    description: "Sorted array containing names of all agencies in the group."
+    lineage:
+      - datalake_cyber.agencies.agencies_name_group
+  ts_start:
+    description: "Timestamp representing the start date of the main agency or agency itself."
+    lineage:
+      - datalake_cyber.agencies.ts_start
+  ts_load:
+    description: "Timestamp when the record was loaded into the dimension table."
