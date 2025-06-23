@@ -41,6 +41,7 @@ SELECT
   h.is_iptu_included,
   h.is_verified,
   h.is_warn_owner_of_visits_needed,
+  h.is_sale_primary_market,
   h.ts_first_verified,
   TIMESTAMP(h.dt_creation) AS ts_created,
   h.ts_updated,

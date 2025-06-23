@@ -168,6 +168,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.total_area
     description: Total area of the house (in m2).
+  is_sale_primary_market:
+    lineage:
+      - datalake_ebdb_listing.house.is_sale_primary_market
+    description: If the house is in the primary market.
   ts_created:
     lineage:
       - datalake_ebdb_listing.house.dt_creation
