@@ -7,6 +7,7 @@ from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services import ConfigurationService
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 logger = QuintoAndarLogger("ReverseTaskGroup")
 
@@ -131,6 +132,7 @@ class ReverseTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
             databricks_conn_id=self.databricks_conn_id,
         )
+        DatasetAdder.attach_dataset_to_task(load_table_task)
 
         final_tasks = [load_table_task]
 

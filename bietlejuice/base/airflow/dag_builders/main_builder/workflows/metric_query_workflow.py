@@ -7,6 +7,7 @@ from databricks_plugin import (
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
@@ -94,10 +95,7 @@ class MetricQueryWorkflow(BaseWorkflow):
             metric_task_group,
         )
 
-        self._include_reprocessing_guard_task(
-            self._get_dag_execution_context(dag, metrics_bucket),
-            first_tasks_of_dag=create_cluster_task,
-        )
+        DatasetAdder.attach_reprocessing_guard(create_cluster_task)
 
         return dag
 

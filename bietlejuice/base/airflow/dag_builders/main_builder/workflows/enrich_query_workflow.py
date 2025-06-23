@@ -2,6 +2,7 @@ from typing import List, Tuple
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
     BaseWorkflow,
 )
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskCreatorFactory,
     TaskEnum,
@@ -50,8 +51,8 @@ class EnrichQueryWorkflow(BaseWorkflow):
             dummy_terminate_job_cluster_task,
         )
 
-        self._include_reprocessing_guard_task(
-            dag_execution_context, first_tasks_of_dag=execute_job_cluster_task
+        DatasetAdder.attach_reprocessing_guard(
+            execute_job_cluster_task, dag_execution_context
         )
 
         return dag

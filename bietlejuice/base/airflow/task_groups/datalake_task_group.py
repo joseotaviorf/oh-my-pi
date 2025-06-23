@@ -12,6 +12,7 @@ from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services import ConfigurationService
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 AIRFLOW_DEFAULT_POOL = "default_pool"  # TODO: Add to parameter service to be created
 
@@ -81,6 +82,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
             databricks_conn_id=self.databricks_conn_id,
         )
+        DatasetAdder.attach_dataset_to_task(load_table_task)
 
         return load_table_task
 

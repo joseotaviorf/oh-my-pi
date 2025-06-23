@@ -5,7 +5,6 @@ from typing import Tuple
 
 from airflow import DAG
 from airflow.datasets import BaseDataset
-from airflow.models.baseoperator import BaseOperator
 from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
@@ -20,9 +19,6 @@ from bietlejuice.base.airflow.task_creators.table_attributes import TableAttribu
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
-from bietlejuice.base.airflow.task_creators.reprocessing_guard_task_creator import (
-    ReprocessingGuardTaskCreator,
-)
 
 
 class BaseWorkflow(BuilderInterface):
@@ -325,23 +321,3 @@ class BaseWorkflow(BuilderInterface):
         get_table_metrics_task >> sync_metadata
 
         return get_table_metrics_task, sync_metadata
-
-    def _include_reprocessing_guard_task(
-        self,
-        dag_execution_context: DagExecutionContext,
-        first_tasks_of_dag: BaseOperator,
-    ) -> None:
-        """
-        Includes the reprocessing guard task in the DAG, as long as the DAG is scheduled based on dataset dependencies.
-        This task ensures that the DAG does not run multiple times unnecessarily due to reprocessings.
-        It will stop the DAG from running if it detects that it is a reprocessing run and the source of the reprocessing is not this DAG.
-        """
-        # DAG not triggered by dataset condition, so no need for reprocessing guard task.
-        if dag_execution_context.dag.timetable.dataset_condition is None:
-            return
-
-        reprocessing_guard_task_creator = ReprocessingGuardTaskCreator(
-            dag_execution_context
-        )
-        reprocessing_guard_task = reprocessing_guard_task_creator.create_task()
-        reprocessing_guard_task >> first_tasks_of_dag

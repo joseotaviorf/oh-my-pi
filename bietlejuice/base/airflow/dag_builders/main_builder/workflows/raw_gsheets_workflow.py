@@ -20,6 +20,7 @@ from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTas
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.base.api import APIEnum
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 
 def get_run_param(dag_run, param_name):
@@ -408,7 +409,13 @@ class RawGsheetsWorkflow(BaseWorkflow):
                 f"{self.DONE_TASK_PREFIX}-{clean_table_name}"
             )
 
-            done_task = [DummyOperator(task_id=task_id, trigger_rule="one_success")]
+            done_task = [
+                DatasetAdder.attach_dataset_to_task(
+                    DummyOperator(
+                        task_id=task_id, trigger_rule="one_success", dag=self.dag
+                    )
+                )
+            ]
             done_task_groups[
                 clean_table_name
             ] = DatalakeTaskGroup.format_tasks_boundaries(done_task, done_task)

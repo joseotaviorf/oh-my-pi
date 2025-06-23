@@ -15,6 +15,7 @@ from bietlejuice.base.airflow.task_creators.dag_execution_context import (
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 
 class BaseQueryDeltaWorkflow(BaseWorkflow):
@@ -93,9 +94,7 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
                 )
             )
 
-        self._include_reprocessing_guard_task(
-            dag_execution_context, first_tasks_of_dag=first_tasks
-        )
+        DatasetAdder.attach_reprocessing_guard(first_tasks, dag_execution_context)
 
         return dag
 

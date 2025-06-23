@@ -9,6 +9,9 @@ from bietlejuice.base.airflow.datasets.dataset_parser import DatasetParser
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
+from bietlejuice.base.dependencies.bietlejuice_redundant_dependency_finder import (
+    BietlejuiceRedundantDependencyFinder,
+)
 from typing import Union
 from datetime import datetime
 
@@ -29,13 +32,22 @@ class DatasetService:
         # Must be removed when we actually migrate to datasets
         return "validation-" + dataset_alias.replace(":alias", "")
 
-    @staticmethod
-    def get_dag_datasets(dag_id: str) -> Dataset:
-        """Reads dependencies file, get all DAG dependencies Datasets and apply logic for reprocessing datasets."""
+    @classmethod
+    def get_dag_datasets(cls, dag_id: str) -> Dataset:
+        """
+        Reads dependencies file, get all DAG dependencies Datasets and apply logic for reprocessing datasets.
+        It identifies redundant dependencies automatically.
+        """
         dependencies = BietlejuiceDependencyHelper.read_dependencies()
         if dag_id not in dependencies:
             return None
-        return DatasetService.get_dag_datasets_from_dependencies(dependencies[dag_id])
+        redundant_dependency_finder = BietlejuiceRedundantDependencyFinder(dependencies)
+        redundant_dependencies = redundant_dependency_finder.find_redundant_dependencies(
+            dag_id
+        )
+        return DatasetService.get_dag_datasets_from_dependencies(
+            dependencies[dag_id], redundant_dependencies
+        )
 
     @staticmethod
     def get_dag_datasets_from_dependencies(

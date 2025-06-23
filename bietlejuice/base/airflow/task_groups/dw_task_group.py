@@ -11,6 +11,7 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 
 class DWTaskGroup(BaseTaskGroup):
@@ -92,6 +93,7 @@ class DWTaskGroup(BaseTaskGroup):
             },
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
         )
+        DatasetAdder.attach_dataset_to_task(load_table_task)
 
         return load_table_task
 
