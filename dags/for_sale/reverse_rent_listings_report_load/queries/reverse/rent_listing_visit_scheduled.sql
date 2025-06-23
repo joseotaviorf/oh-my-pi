@@ -33,7 +33,7 @@ LEFT JOIN
 INNER JOIN
   house_status AS hs
     ON hs.id_house = dl.id_house
-    AND MAKE_DATE(dd.year, dd.month, dd.day) BETWEEN DATE(hs.ts_state_started) AND DATE(hs.ts_state_ended)
+    AND MAKE_DATE(dd.year, dd.month, dd.day) BETWEEN DATE(hs.ts_state_started) AND COALESCE(DATE(hs.ts_state_ended), CURRENT_DATE)
 WHERE
   MAKE_DATE(dd.year, dd.month, dd.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   AND hs.status IN ('publicado', 'PUBLISHED')
