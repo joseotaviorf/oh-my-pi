@@ -82,8 +82,10 @@ if dag_declaration_files:
             }
             for future in as_completed(futures):
                 if future.exception():
+                    exc = future.exception()
+                    error_msg = exc.args[1] if len(exc.args) > 1 else str(exc)
                     dag_declaration_fails_msg += "\n- Path: {}\n- Validation errors:\n{}".format(
-                        futures[future], future.exception().args[1]
+                        futures[future], error_msg
                     )
                 progress_bar.update(1)
     if dag_declaration_fails_msg:
