@@ -1,9 +1,12 @@
 ---
-custom_cluster:
-  driver_node_type_id: m5a.xlarge
-  node_type_id: m5a.large
-  num_workers: 3
-  spark_version: 12.2.x-scala2.12
+cluster:
+  type: databricks_13_3_med_memory_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
 consumer_extra_args:
   options:
     header: "false"
