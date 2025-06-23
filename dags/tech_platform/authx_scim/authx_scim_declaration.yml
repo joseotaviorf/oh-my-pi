@@ -15,18 +15,16 @@ workflow:
   source_database: authx-scim
   custom_schema: authx_scim
   tables_customization:
-    users:
-      {}
-    entitlements:
-      {}
-    user_entitlements:
-      {}
-    users_audit:
-      {}
-    openapis:
-      {}
+    users: {}
+    entitlements: {}
+    user_entitlements: {}
+    users_audit: {}
+    openapis: {}
+  default_table_privileges:
+    auditlogs: ["ALL PRIVILEGES"]
 cluster:
   type: databricks_12_2_med_general_cluster
   access_control_list:
-    group_name: software-engineers
+    group_name: auditlogs
     permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new

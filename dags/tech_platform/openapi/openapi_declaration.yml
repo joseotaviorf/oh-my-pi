@@ -13,14 +13,16 @@ workflow:
   custom_schema: access_logs
   load_spark_job: openapi_load
   spark_job_arguments:
-  - "{dag_name}"
-  - "{environment}"
-  - "{bucket}"
-  - "{schema}"
-  - "{{ ts }}"
-  - "{table_name}"
+    - "{dag_name}"
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{{ ts }}"
+    - "{table_name}"
   tables_customization:
     openapi: {}
+  default_table_privileges:
+    auditlogs: ["ALL PRIVILEGES"]
 
 cluster:
   type: custom_cluster
@@ -32,9 +34,9 @@ cluster:
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
   access_control_list:
-    group_name: software-engineers
+    group_name: auditlogs
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
