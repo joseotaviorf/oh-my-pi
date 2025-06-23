@@ -385,7 +385,7 @@ class TestTableAttributes:
         # assert
         assert table_attributes.has_custom_spark_job
 
-    def test_get_has_clean_soft_delete_should_return_true_if_set_to_true_in_table_customization(
+    def test_get_has_soft_delete_should_return_true_if_set_to_true_in_table_customization(
         self
     ):
         # arrange
@@ -393,7 +393,7 @@ class TestTableAttributes:
         workflow_args = {}
         layer = LayerEnum.CLEAN
         table_name = "table_name"
-        table_customization = {"has_clean_soft_delete": "true"}
+        table_customization = {"has_soft_delete": "true"}
 
         # act
         table_attributes = TableAttributes(
@@ -405,9 +405,9 @@ class TestTableAttributes:
         )
 
         # assert
-        assert table_attributes.get_has_clean_soft_delete() is True
+        assert table_attributes.get_has_soft_delete() is True
 
-    def test_get_has_clean_soft_delete_should_return_false_if_set_to_false_in_table_customization(
+    def test_get_has_soft_delete_should_return_false_if_set_to_false_in_table_customization(
         self
     ):
         # arrange
@@ -415,7 +415,7 @@ class TestTableAttributes:
         workflow_args = {}
         layer = LayerEnum.CLEAN
         table_name = "table_name"
-        table_customization = {"has_clean_soft_delete": "false"}
+        table_customization = {"has_soft_delete": "false"}
 
         # act
         table_attributes = TableAttributes(
@@ -427,14 +427,14 @@ class TestTableAttributes:
         )
 
         # assert
-        assert table_attributes.get_has_clean_soft_delete() is False
+        assert table_attributes.get_has_soft_delete() is False
 
-    def test_get_has_clean_soft_delete_should_return_true_if_set_to_true_in_workflow_args(
+    def test_get_has_soft_delete_should_return_true_if_set_to_true_in_workflow_args(
         self
     ):
         # arrange
         dag_args = {"name": "dag_name"}
-        workflow_args = {"has_clean_soft_delete": "true"}
+        workflow_args = {"has_soft_delete": "true"}
         layer = LayerEnum.CLEAN
         table_name = "table_name"
 
@@ -447,14 +447,14 @@ class TestTableAttributes:
         )
 
         # assert
-        assert table_attributes.get_has_clean_soft_delete() is True
+        assert table_attributes.get_has_soft_delete() is True
 
-    def test_get_has_clean_soft_delete_should_return_false_if_set_to_false_in_workflow_args(
+    def test_get_has_soft_delete_should_return_false_if_set_to_false_in_workflow_args(
         self
     ):
         # arrange
         dag_args = {"name": "dag_name"}
-        workflow_args = {"has_clean_soft_delete": "false"}
+        workflow_args = {"has_soft_delete": "false"}
         layer = LayerEnum.CLEAN
         table_name = "table_name"
 
@@ -467,9 +467,9 @@ class TestTableAttributes:
         )
 
         # assert
-        assert table_attributes.get_has_clean_soft_delete() is False
+        assert table_attributes.get_has_soft_delete() is False
 
-    def test_get_has_clean_soft_delete_should_return_false_if_not_set_anywhere(self):
+    def test_get_has_soft_delete_should_return_false_if_not_set_anywhere(self):
         # arrange
         dag_args = {"name": "dag_name"}
         workflow_args = {}
@@ -485,14 +485,12 @@ class TestTableAttributes:
         )
 
         # assert
-        assert table_attributes.get_has_clean_soft_delete() is False
+        assert table_attributes.get_has_soft_delete() is False
 
-    def test_get_has_clean_soft_delete_should_return_false_if_set_to_invalid_string(
-        self
-    ):
+    def test_get_has_soft_delete_should_return_false_if_set_to_invalid_string(self):
         # arrange
         dag_args = {"name": "dag_name"}
-        workflow_args = {"has_clean_soft_delete": "invalid"}
+        workflow_args = {"has_soft_delete": "invalid"}
         layer = LayerEnum.CLEAN
         table_name = "table_name"
 
@@ -505,4 +503,4 @@ class TestTableAttributes:
         )
 
         # assert
-        assert table_attributes.get_has_clean_soft_delete() is False
+        assert table_attributes.get_has_soft_delete() is False

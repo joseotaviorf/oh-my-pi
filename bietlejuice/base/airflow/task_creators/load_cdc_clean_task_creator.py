@@ -42,8 +42,8 @@ class LoadCDCCleanTaskCreator(BaseTaskCreator):
             json.dumps(table_attributes.table_privileges),
         ]
 
-        if table_attributes.has_clean_soft_delete:
-            parameters.append("--has-clean-soft-delete")
+        if table_attributes.has_soft_delete:
+            parameters.append("--has-soft-delete")
 
         return parameters
 

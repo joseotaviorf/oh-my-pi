@@ -47,6 +47,15 @@ def parse_arguments():
         required=False,
         default=None,
     )
+    parser.add_argument(
+        "--has-soft-delete",
+        nargs="?",
+        dest="has_soft_delete",
+        required=False,
+        default=False,
+        const=True,
+        help="Whether the Spark job should apply soft delete instead of hard delete for the raw layer",
+    )
 
     return parser.parse_args()
 
@@ -116,7 +125,7 @@ def main():
         table_privileges_dict = json.loads(args.table_privileges)
     else:
         table_privileges_dict = None
-    
+
     if args.primary_keys:
         primary_keys = [key.strip() for key in args.primary_keys.split(",")]
     else:
@@ -131,6 +140,7 @@ def main():
         primary_keys = pk_identifier.find_primary_keys(
             args.table_name
         )  # We don't use the table name in lowercase, because this is case sensitive
+    has_soft_delete = args.has_soft_delete
 
     if not primary_keys:
         raise ValueError(
@@ -170,7 +180,16 @@ def main():
         table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
 
     loader = DeltaLoader(spark)
-    loader.load_table(
+    if (has_soft_delete):
+        loader.load_table(
+        table_name=full_raw_table_name,
+        path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
+        source_df=transactional_df,
+        merge_on=primary_keys,
+        when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction AND source.op_cdc != 'd'",
+    )
+    else:
+      loader.load_table(
         table_name=full_raw_table_name,
         path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
         source_df=transactional_df,
@@ -180,7 +199,7 @@ def main():
     SparkTablePropertyHelper.set_property(
         full_raw_table_name, "primary_keys", ",".join(primary_keys), spark
     )
-    
+
     if (
         table_privileges
         and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
