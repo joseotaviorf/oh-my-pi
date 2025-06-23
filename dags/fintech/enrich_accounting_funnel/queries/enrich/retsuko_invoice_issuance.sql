@@ -122,7 +122,6 @@ sap_gateway AS (
 sap_ledger AS (
   SELECT
     id_finance_entity,
-    hash,
     account_number,
     SUM(debit_credit) AS debit_credit,
     MAX(DATE(dt_created)) AS dt_sap_created,
@@ -132,7 +131,7 @@ sap_ledger AS (
   WHERE
     dt_reference >= DATE('2024-01-01')
     AND account_number IN ('420001', '420002', '420004', '420010')
-  GROUP BY 1, 2, 3
+  GROUP BY 1, 2
 ),
 
 errors_base AS (
