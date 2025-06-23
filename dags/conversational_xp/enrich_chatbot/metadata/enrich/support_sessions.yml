@@ -16,6 +16,10 @@ columns:
     lineage:
       - datalake_copilot_service_clean.session.id_sauron_session
     description: Sauron session ID.
+  id_external:
+    lineage:
+      - datalake_copilot_service_clean.session.id_external
+    description: External session identifier.
   id_ticket:
     lineage:
       - datalake_customer_support.tickets.id_ticket

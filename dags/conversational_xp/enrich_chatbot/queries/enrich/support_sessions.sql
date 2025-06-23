@@ -1,6 +1,7 @@
 WITH orchestrator_sessions AS (
   SELECT DISTINCT
     s.id AS id_session,
+    s.id_external,
     s.id_sauron_session,
     s.id_user,
     m.channel,
@@ -35,6 +36,7 @@ support_sessions AS (
   SELECT
     bs.id_session,
     bs.id_sauron_session,
+    bs.id_external,
     es.id_ticket,
     bs.id_user,
     es.first_queue,
@@ -55,6 +57,7 @@ support_sessions AS (
 SELECT
   id_session,
   id_sauron_session,
+  id_external,
   id_ticket,
   id_user,
   first_queue,
