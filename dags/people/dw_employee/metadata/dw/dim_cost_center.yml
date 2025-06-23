@@ -124,6 +124,13 @@ columns:
     description: 'Name of the fourth highest manager (L3) in the hierarchy responsible for the cost center.'
     lineage:
     - datalake_hr_system_clean.organizations.owner_leadership_3_name
+  headcount_type:
+    description: 'Type of headcount present in the cost center.'
+    categories:
+      "Capacity": "Headcount are directly involved in producing goods or delivering the services that generate revenue for the company."
+      "Overhead": "Headcount in supportive roles, such as administration, management, or marketing, whose work is essential for operations but does not directly create a product or billable service."
+    lineage:
+    - datalake_hr_system_clean.organizations.headcount_type
   status:
     description: "Status of the cost center"
     categories:

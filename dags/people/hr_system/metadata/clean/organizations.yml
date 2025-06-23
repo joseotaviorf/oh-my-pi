@@ -89,6 +89,10 @@ columns:
     description: 'Name of the fourth highest manager (L3) in the hierarchy responsible for the cost center.'
     lineage:
       - datalake_hr_system_raw.organizations.OrganizationDFF.l3Cc
+  headcount_type:
+    description: 'Type of headcount present in the cost center.'
+    lineage:
+      - datalake_hr_system_raw.organizations.OrganizationDFF.headcountType
   organization_dff:
     description: "Customer's flexfield for organization."
     lineage:

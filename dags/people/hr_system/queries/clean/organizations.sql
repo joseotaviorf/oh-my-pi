@@ -27,7 +27,8 @@ WITH organizations AS (
     organization_dff['line'] AS line,
     organization_dff['l1Cc'] AS owner_leadership_layer_1_name,
     organization_dff['l2Cc'] AS owner_leadership_layer_2_name,
-    organization_dff['l3Cc'] AS owner_leadership_layer_3_name
+    organization_dff['l3Cc'] AS owner_leadership_layer_3_name,
+    organization_dff['headcountType'] AS headcount_type
   FROM organization_dff_step1
 )
 SELECT 
@@ -60,6 +61,7 @@ SELECT
     odff.owner_leadership_layer_1_name,
     odff.owner_leadership_layer_2_name,
     odff.owner_leadership_layer_3_name,
+    odff.headcount_type,
     -- Nested Fields
     o.OrganizationDFF AS organization_dff,
     o.extraInformation AS extra_information,
