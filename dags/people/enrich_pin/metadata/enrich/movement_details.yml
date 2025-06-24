@@ -37,6 +37,18 @@ columns:
     description: "Unique identifying number for the employee's assignment or work terms."
     lineage:
       - datalake_pin_core_clean.all_assignments.assignment_number
+  assignment_type:
+    description: "Indicates the type of individual's employment status or relationship."
+    lineage:
+      - datalake_pin_core_clean.all_assignments.assignment_type
+    categories:
+      E: "Employee"
+      C: "Contingent Worker"
+      P: "Pending Worker"
+  assignment_name:
+    description: "Describes the assignment or work terms (derived as [job name] - [department name] by default)."
+    lineage:
+      - datalake_pin_core_clean.all_assignments.assignment_name
   assignment_status_type:
     description: "Denormalized status of the assignment at the time of movement."
     lineage:

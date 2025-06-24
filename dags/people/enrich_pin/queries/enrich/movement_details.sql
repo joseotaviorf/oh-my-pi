@@ -26,6 +26,8 @@ SELECT DISTINCT
     aa.id_job,
     aa.id_grade_ladder_program AS id_band_ladder,
     aa.assignment_number,
+    aa.assignment_type,
+    UPPER(aa.assignment_name) AS assignment_name,
     aa.assignment_status_type,
     aa.action_code,
     g.grade_code AS band,
