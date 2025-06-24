@@ -13,11 +13,19 @@ columns:
     - datalake_checkout_clean.boleto.our_number
     - datalake_checkout_clean.bolecode.our_number
     - datalake_trato_feito_clean.installment.id_external
+    - datalake_trato_feito_clean.bill.our_number
+    - datalake_retsuko.invoice.payment_company_use_number
+    - datalake_pas.ledger.id_external_payment
   bank_amount:
     description: 'Amount received in bank statements from Nexxera and Itau'
     lineage:
     - datalake_nexxera.cnab_charges_recupera.net_amount
     - datalake_itau_statements_clean.statement_879200452685.amount_value
+  billing_amount:
+    description: 'Amount recorded in billing systems (Trato Feito and Retsuko)'
+    lineage:
+    - datalake_trato_feito_clean.installment.total_amount
+    - datalake_retsuko.invoice.paid_amount
   checkout_amount:
     description: 'Amount recorded in checkout system from boleto and bolecode payments'
     lineage:
@@ -32,6 +40,14 @@ columns:
     lineage:
     - datalake_nexxera.cnab_charges_recupera
     - datalake_itau_statements_clean.statement_879200452685
+  status_billing:
+    description: 'Status comparing bank and billing amounts and dates (ok/not recorded/recorded on wrong date or value)'
+    lineage:
+    - datalake_trato_feito_clean.installment
+    - datalake_trato_feito_clean.payment
+    - datalake_trato_feito_clean.accounting_installment
+    - datalake_trato_feito_clean.bill
+    - datalake_retsuko.invoice
   status_checkout:
     description: 'Status comparing bank and checkout amounts and dates (ok/not recorded/recorded on wrong date or value)'
     lineage:
@@ -42,21 +58,36 @@ columns:
     lineage:
     - datalake_pas.ledger
   is_reconciled:
-    description: 'Boolean flag indicating if the payment is fully reconciled between bank and SAP'
+    description: 'Boolean flag indicating if the payment is fully reconciled across all systems'
     lineage:
     - datalake_nexxera.cnab_charges_recupera
     - datalake_itau_statements_clean.statement_879200452685
     - datalake_pas.ledger
+    - datalake_checkout_clean.boleto
+    - datalake_checkout_clean.bolecode
+    - datalake_trato_feito_clean.installment
+    - datalake_trato_feito_clean.payment
+    - datalake_trato_feito_clean.accounting_installment
+    - datalake_trato_feito_clean.bill
+    - datalake_retsuko.invoice
   dt_bank_paid:
     description: 'Date when the payment was received in bank statements'
     lineage:
     - datalake_nexxera.cnab_charges_recupera.dt_credit
     - datalake_itau_statements_clean.statement_879200452685.date_accounting
+  dt_billing_paid:
+    description: 'Date when the payment was recorded in billing systems'
+    lineage:
+    - datalake_trato_feito_clean.payment.dt_paid
+    - datalake_retsuko.invoice.ts_paid
+    - dw_public.dim_date.next_brz_fintech_business_day
   dt_checkout_paid:
     description: 'Date when the payment was recorded in checkout system'
     lineage:
     - datalake_checkout_clean.boleto.ts_paid
     - datalake_checkout_clean.bolecode.ts_paid
+    - datalake_checkout_clean.bolecode.dt_credit
+    - dw_public.dim_date.next_brz_fintech_business_day
   dt_sap_paid:
     description: 'Date when the payment was recorded in SAP system'
     lineage:
