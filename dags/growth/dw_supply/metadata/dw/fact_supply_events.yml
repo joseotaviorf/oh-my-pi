@@ -1,7 +1,7 @@
 ---
 database_name: dw_growth
 table_name: fact_supply_events
-owner: arthur.gonzaga@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: growth
 description: This table contains the events related to the supply flow, each row is an event in the funnel step for one business context in Supply Flow.
 columns:
@@ -94,3 +94,7 @@ columns:
   sk_media_setup:
     lineage: datalake_supply_flows.dict_taxonomy.id_media_setup
     description: Key from the dw_growth.dim_media_setup dimension associated with the media setup.
+  nm_detailed_route:
+    description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
+    lineage: datalake_supply_flows.supply_events_tracking.detailed_route
+  

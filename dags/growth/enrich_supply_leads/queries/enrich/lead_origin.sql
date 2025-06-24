@@ -18,6 +18,7 @@ WITH lead_origin_rene_descartes AS (
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.contactChannel') AS STRING) AS ops_contact_medium, 
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.platform') AS STRING) AS platform,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.type') AS STRING) AS lead_type,
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.detailedRoute') AS STRING) AS detailed_route,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.originalLead') AS BIGINT) AS original_lead,
     amd.ts_created AS ts_event
   FROM datalake_rene_descartes_clean.house_lead AS hl
@@ -75,6 +76,7 @@ mid_table AS (
     r.ops_contact_medium,
     COALESCE(r.platform, a.platform, a2.platform) AS platform,
     r.lead_type,
+    r.detailed_route,
     r.original_lead,
     -- We're tracking how database is the source of our UTMs
     NVL2(r.campaign, 'rene_descartes', NVL2(a.campaign, 'amplitude', NVL2(a2.campaign, 'amplitude', 'lost_tracking'))) AS database_tracking_campaign,
@@ -118,6 +120,7 @@ SELECT
   SF_NORMALIZE_STRING(ops_contact_medium) AS ops_contact_medium,
   SF_NORMALIZE_STRING(platform) AS platform,
   SF_NORMALIZE_STRING(lead_type) AS lead_type,
+  SF_NORMALIZE_STRING(detailed_route) AS detailed_route,
   original_lead,
   database_tracking_campaign,
   database_tracking_medium,

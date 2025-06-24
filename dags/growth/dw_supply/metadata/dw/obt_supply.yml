@@ -1,7 +1,7 @@
 ---
 database_name: dw_growth
 table_name: obt_supply
-owner: arthur.gonzaga@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: growth
 description: Table with joined information about the supply events (our facts and dimensions).
 columns:
@@ -62,6 +62,9 @@ columns:
   tp_lead:
     description: Type of the lead, categorizing the lead based on its characteristics and origin.
     lineage: dw_growth.dim_acquisition_lead.tp_lead
+  nm_detailed_route:
+    description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
+    lineage: dw_growth.fact_supply_events.nm_detailed_route
   cd_funnel_step:
     description: Code representing the step in the sales funnel, providing additional granularity to sk_funnel_step.
     lineage: dw_growth.dim_funnel_step.cd_funnel_step

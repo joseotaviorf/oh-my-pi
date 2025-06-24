@@ -1,7 +1,7 @@
 database_name: datalake_supply_flows
 table_name: acquisition_tracking
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 description: This table is a union between 1P, 3P and CIQ leads and prospects. Also, contains information about the backfill of leads which doesn't have records in Rene Descartes. |
   For understading backfill, please check this [notebook](https://dbc-931ee6e0-6803.cloud.databricks.com/?o=4531937035440038#notebook/2308696875379500/command/3611167693023950).
 columns:
@@ -237,6 +237,11 @@ columns:
       - datalake_supply_flows.acquisition_backfill.lead_type
       - datalake_supply_flows.lead_origin.lead_type
     description: The type of the lead, that could be related with application.
+  detailed_route:
+    lineage: 
+      - datalake_supply_flows.acquisition_backfill.detailed_route
+      - datalake_supply_flows.lead_origin.detailed_route
+    description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
   original_lead:
     lineage: 
       - datalake_supply_flows.acquisition_backfill.original_lead

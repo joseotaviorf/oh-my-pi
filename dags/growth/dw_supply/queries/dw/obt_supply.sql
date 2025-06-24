@@ -71,6 +71,7 @@ base AS (
         fse.utm_campaign AS nm_campaign,
         fse.utm_content AS nm_content,
         fse.utm_term AS nm_term,
+        fse.nm_detailed_route,
         dal.tp_lead,
         dfs.cd_funnel_step,
         dfs.tp_business_event,

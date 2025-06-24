@@ -1,7 +1,7 @@
 database_name: datalake_supply_flows
 table_name: lead_origin
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 description: This table contains acquisition data extracted from the René Descartes and Amplitude service that will be used to track our leads in the supply domain.
 columns:
   id_lead:
@@ -73,6 +73,10 @@ columns:
       - datalake_amplitude_lead.lead_origin.platform
   lead_type:
     description: The type of lead
+    lineage: 
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  detailed_route:
+    description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
     lineage: 
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   original_lead:
