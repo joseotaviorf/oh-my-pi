@@ -1,4 +1,5 @@
 SELECT
+  id,
   buyer_id AS id_buyer,
   external_house_id AS id_external_house,
   house_id AS id_house,

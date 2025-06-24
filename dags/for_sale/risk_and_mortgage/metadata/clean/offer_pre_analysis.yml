@@ -1,6 +1,9 @@
 database_name: datalake_risk_and_mortgage_clean
 table_name: offer_pre_analysis
 columns:
+  id:
+    lineage:
+      - datalake_risk_and_mortgage_raw.offer_pre_analysis.id
   id_buyer:
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.buyer_id
