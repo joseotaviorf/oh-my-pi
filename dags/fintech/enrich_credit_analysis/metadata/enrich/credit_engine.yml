@@ -2,7 +2,7 @@ database_name: datalake_credit_analysis
 table_name: credit_engine
 owner: isabella.santos@quintoandar.com.br
 domain: Fintech
-description: "Enrich table with credit engine analysis state data. The analysis machine is composed by state groups, which are composed by analysis sates. The analysis state is the smallest unit of the analysis machine. The data in this table refers to any rule applied to a checklist, tenant or proposal (subject). The credit engine lives in Sorting Hat micro service."
+description: "Enrich table with credit engine analysis state data. The analysis machine is composed by state groups, which are composed by analysis sates. The analysis state is the smallest unit of the analysis machine. The data in this table refers to any rule applied to a checklist, tenant, proposal or credit evaluation (subject). The credit engine lives in Sorting Hat micro service."
 columns:
   id_analysis_state:
     lineage:
@@ -20,6 +20,10 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.analysis_request.id_external
     description: "Proposal ID attributed to the analysis request processed by the credit engine."
+  id_credit_evaluation:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_request.id_external
+    description: "Credit Evaluation ID attributed to the analysis request processed by the credit engine."
   id_state_group:
     lineage:
       - datalake_sorting_hat_clean.analysis_state_group.id
@@ -88,11 +92,15 @@ columns:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input
     description: "Total compromised income of the proposal."
+  total_informed_income:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+    description: "Total income informed when the credit evaluation was processed."
   number_of_resend_requests:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input
     description: "Total number of resend requests."
-  active_contracts:
+  number_of_active_contracts:
     lineage:
       - datalake_sorting_hat_clean.analysis_state.input
     description: "Total number of active contracts."
@@ -115,6 +123,31 @@ columns:
     categories:
       FINISHED: "When the analysis state has been run with success the status is finished"
       RETRY: "When the analysis state has been run with error the status is retry"
+  debit_limit:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+      - datalake_sorting_hat_clean.analysis_state_group.group_name
+    description: "The debit limit calculated by the credit engine to the credit passport."
+  pre_approval_limit:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+      - datalake_sorting_hat_clean.analysis_state_group.group_name
+    description: "The pre approved limit calculated by the credit engine displayed to the user."
+  risk_category_canon:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+      - datalake_sorting_hat_clean.analysis_state_group.group_name
+    description: "The risk category canon calculated by the credit engine."
+  dti:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+      - datalake_sorting_hat_clean.analysis_state_group.group_name
+    description: "The dti (Debt-to-income) value, which is a fraction between package value over tenants' total declared revenue."
+  policy_dti:
+    lineage:
+      - datalake_sorting_hat_clean.analysis_state.input
+      - datalake_sorting_hat_clean.analysis_state_group.group_name
+    description: "A categoryzation given to the DTI based on the percentil."
   is_current_machine:
     lineage:
       - datalake_sorting_hat_clean.analysis_machine.is_current_machine
