@@ -5,6 +5,8 @@ SELECT
     land_tenure,
     house_registration_status,
     has_seller_debt_payments,
+    has_chattel_mortgage,
+    registry_must_be_updated AS has_pending_registry_update,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

@@ -10,15 +10,21 @@ columns:
   id_address_data:
     lineage:
       - datalake_sales_flow_raw.house.address_data_id
-  has_seller_debt_payments:
-    lineage:
-      - datalake_sales_flow_raw.house.has_seller_debt_payments
-  house_registration_status:
-    lineage:
-      - datalake_sales_flow_raw.house.house_registration_status
   land_tenure:
     lineage:
       - datalake_sales_flow_raw.house.land_tenure
+  house_registration_status:
+    lineage:
+      - datalake_sales_flow_raw.house.house_registration_status
+  has_seller_debt_payments:
+    lineage:
+      - datalake_sales_flow_raw.house.has_seller_debt_payments
+  has_chattel_mortgage:
+    lineage:
+      - datalake_sales_flow_raw.house.has_chattel_mortgage
+  has_pending_registry_update:
+    lineage:
+      - datalake_sales_flow_raw.house.registry_must_be_updated
   ts_created:
     lineage:
       - datalake_sales_flow_raw.house.created_at
