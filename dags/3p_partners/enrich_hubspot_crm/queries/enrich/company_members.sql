@@ -1,47 +1,25 @@
-WITH merged_companies_aux AS (
-  SELECT
-    ids_merged_companies
-  FROM
-    datalake_hubspot.company_history
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY id_company ORDER BY ts_updated DESC) = 1
-),
-merged_companies AS (
-  SELECT
-    EXPLODE(ids_merged_companies) AS id_merged_company
-  FROM
-    merged_companies_aux
-)
 SELECT
-  ch.id_company,
-  ch.id_hubspot_owner,
-  ch.cnpj,
-  ch.company_cluster,
-  ch.name AS company_name,
-  ch.cluster_performance AS company_cluster_performance,
-  ch.crm,
-  ch.extracted_3p_tag,
-  ch.member_category,
-  ch.sale_lead_status,
-  ch.is_flagged_as_leadgen,
-  ch.ts_created,
-  ch.ts_updated,
-  ch.year,
-  ch.month,
-  ch.day
+  c.id_company,
+  c.id_hubspot_owner,
+  c.cnpj,
+  c.company_cluster,
+  c.name AS company_name,
+  c.cluster_performance AS company_cluster_performance,
+  c.crm,
+  c.extracted_3p_tag,
+  c.member_category,
+  c.sale_lead_status,
+  c.is_flagged_as_leadgen,
+  c.ts_created,
+  c.ts_updated,
+  c.year,
+  c.month,
+  c.day
 FROM
-  datalake_hubspot.company_history AS ch
-LEFT JOIN
-  merged_companies AS mc
-    ON ch.id_company = mc.id_merged_company
+  datalake_hubspot.company AS c
 WHERE
-    COALESCE(
-      ARRAY_CONTAINS(sale_lead_status_history.value, 'Membro')
-        OR ARRAY_CONTAINS(sale_lead_status_history.value, 'Parceiro'),
-      FALSE
-    )
-    AND NOT(ch.is_archived)
-    AND mc.id_merged_company IS NULL
+  c.has_been_sale_member
+    AND NOT(c.is_archived)
+    AND NOT(c.is_merged_into_other_company)
 QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY ch.id_company ORDER BY ch.ts_updated DESC) = 1
-    AND ROW_NUMBER() OVER(PARTITION BY ch.cnpj ORDER BY ch.ts_updated DESC) = 1
+  ROW_NUMBER() OVER(PARTITION BY c.cnpj ORDER BY c.ts_updated DESC) = 1
