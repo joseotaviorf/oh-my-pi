@@ -99,3 +99,15 @@ columns:
       - datalake_pin_core_raw.per_assignment_extra_info_m.last_update_date
   ts_load:
     description: "Timestamp of when the record was loaded into this clean table."
+  year:
+    description: Year extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_extra_info_m.year
+  month:
+    description: Month extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_extra_info_m.month
+  day:
+    description: Day extracted from the 'ts_updated' column.
+    lineage:
+      - datalake_pin_core_raw.per_assignment_extra_info_m.day

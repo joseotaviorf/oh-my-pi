@@ -22,6 +22,9 @@ SELECT
   TO_TIMESTAMP(creation_date) AS ts_created,
   TO_TIMESTAMP(last_update_date) AS ts_updated,
   TO_TIMESTAMP(program_update_date) AS ts_program_updated,
-  NOW() AS ts_load
+  NOW() AS ts_load,
+  year,
+  month,
+  day
 FROM
   datalake_pin_benefits_raw.ben_per_in_ler

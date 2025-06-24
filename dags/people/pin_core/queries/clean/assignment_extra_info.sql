@@ -18,6 +18,9 @@ SELECT
     TO_DATE(aei_information_date2) AS dt_period_ended,
     TO_TIMESTAMP(creation_date) AS ts_created,
     TO_TIMESTAMP(last_update_date) AS ts_updated,
-    NOW() AS ts_load
+    NOW() AS ts_load,
+    year,
+    month,
+    day
 FROM
     datalake_pin_core_raw.per_assignment_extra_info_m

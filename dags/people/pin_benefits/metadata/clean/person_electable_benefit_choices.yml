@@ -163,3 +163,15 @@ columns:
       - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.program_update_date
   ts_load:
     description: The timestamp indicating when this record was loaded into the data lake.
+  year:
+    description: The year extracted from the 'ts_updated' column. This is useful for partitioning the data by year to improve query performance.
+    lineage:
+      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.year
+  month:
+    description: The month extracted from the 'ts_updated' column (represented as a number from 1 to 12). Useful for data partitioning and filtering by month.
+    lineage:
+      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.month
+  day:
+    description: The day of the month extracted from the 'ts_updated' column (represented as a number from 1 to 31). Useful for filtering data by specific days.
+    lineage:
+      - datalake_pin_benefits_raw.ben_elig_per_elctbl_chc.day

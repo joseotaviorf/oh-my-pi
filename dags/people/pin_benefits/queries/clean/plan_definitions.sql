@@ -66,7 +66,7 @@ SELECT
   may_enrl_pl_n_oipl_flag = 'Y' AS is_may_enroll_plan_and_option_in_plan,
   alws_unrstrctd_enrt_flag = 'Y' AS is_allows_unrestricted_enrollment,
   nip_dflt_flag = 'Y' AS is_not_in_program_default,
-  alws_tmqry_id_crd_flag = 'Y' AS is_allows_temporary_id_card,
+  alws_tmpry_id_crd_flag = 'Y' AS is_allows_temporary_id_card,
   post_to_gl_flag = 'Y' AS is_post_to_general_ledger,
   pl_yr_not_applcbl_flag = 'Y' AS is_plan_year_not_applicable,
   susp_if_ctfn_not_prvd_flag = 'Y' AS is_suspend_if_certification_not_provided,
@@ -78,6 +78,9 @@ SELECT
   TO_DATE(incptn_dt) AS dt_inception,
   TO_TIMESTAMP(creation_date) AS ts_created,
   TO_TIMESTAMP(last_update_date) AS ts_updated,
-  NOW() AS ts_load
+  NOW() AS ts_load,
+  year,
+  month,
+  day
 FROM
   datalake_pin_benefits_raw.ben_pl_f
