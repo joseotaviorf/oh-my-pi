@@ -41,7 +41,7 @@ columns:
     description: Foreign key to PER_GRADES_F, representing the employee's grade.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.grade_id
-  id_grade_ladder_pgm:
+  id_grade_ladder_program:
     description: Identifier linking the assignment to a grade ladder for Benefits.
     lineage:
       - datalake_pin_core_raw.per_all_assignments_m.grade_ladder_pgm_id

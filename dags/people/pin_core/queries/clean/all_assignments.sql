@@ -8,7 +8,7 @@ SELECT
   id_flex_num AS id_flex_number,
   legal_entity_id AS id_legal_entity,
   grade_id AS id_grade,
-  grade_ladder_pgm_id AS id_grade_ladder_pgm,
+  grade_ladder_pgm_id AS id_grade_ladder_program,
   work_terms_assignment_id AS id_work_terms_assignment,
   union_id AS id_union,
   organization_id AS id_organization,

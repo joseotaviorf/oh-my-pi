@@ -1,0 +1,17 @@
+---
+table_name: datalake_pin.movement_details
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 8000
+    severity_level: Error
+column_level_validations:
+  id_person:
+    is_complete:
+      severity_level: Warning
+  id_period_of_service:
+    is_complete:
+      severity_level: Warning
+  id_organization:
+    is_complete:
+      severity_level: Warning
