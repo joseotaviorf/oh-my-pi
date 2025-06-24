@@ -26,7 +26,7 @@ columns:
     lineage:
     - datalake_docx_clean.credit_evaluation.id_house
   scope:
-    description: The scope of the evaluation. It could be HOUSE for the current credit model or CITY (credit passport).
+    description: The scope of the evaluation. It could be HOUSE for the current credit model or CITY (credit passport). All credit evaluations submitted within a passport are valid within a CITY. A credit evaluation submitted after an offer is accepted refers to a proposal and its scope will be HOUSE. Early credit analysis do not have scope.
     lineage:
     - datalake_docx_clean.credit_evaluation.scope
   credit_evaluation_status:
@@ -65,27 +65,35 @@ columns:
       REGULAR: when the documentation policy is FULL or FLEX.
     lineage:
     - datalake_docx_clean.credit_evaluation.type
-  pre_approved_limit:
-    description: The pre-approved limit value attached to the credit passport. This value is calculated by the credit models based on the limit value and the group income.
+  user_pre_approved_limit:
+    description: The pre-approved limit value attached to the credit passport and presented to the user.
     lineage:
     - datalake_docx_clean.credit_evaluation.pre_approved_limit
-  limit_value:
-    description: The limit value specified by the user.
+  user_requested_value:
+    description: The limit value specified by the user when the person filled up the credit evaluation form.
     lineage:
     - datalake_docx_clean.credit_evaluation.limit_value
+  credit_engine_debit_limit:
+    description: Credit engine calculated limit. This value is calculated by the credit models based on the limit value and the group income.
+    lineage:
+    - datalake_credit_analysis.credit_engine
+  total_informed_income:
+    description: Total informed income submitted by the user when the person filled up the credit passport.
+    lineage:
+    - datalake_credit_analysis.total_informed_income
   credit_evaluation_source:
     description: The credit evaluation source. This column indicates the origin of the credit evaluation.
     categories:
       EARLY_CREDIT_FLOW: when the credit evaluation refers to an early credit analysis.
       PRE_OFFER_PASSPORT_FLOW: when the credit evaluation was submitted through the credit passport before offer approval.
       POS_OFFER_PASSPORT_FLOW: when the credit evaluation was submitted through the credit passport after offer submission.
-      NORMAL_FLOW: when the credit evaluation was submitted through the default flow (i.e after offar approval). This flow will be soon replaced by the credit passport.
+      PROPOSAL_FLOW: when the credit evaluation was submitted after offar approval.
   variant:
     description: The variant model of the credit evaluation.
     lineage:
     - datalake_sorting_hat_clean.policy_report.variant
   policy_dti:
-    description: The DTI of the credit evaluation.
+    description: The percentil classifying the credit evaluation according to its DTI (debit to income).
     lineage:
     - datalake_sorting_hat_clean.policy_report.policy_dti
   category:
@@ -99,8 +107,8 @@ columns:
   group_type:
     description: The group composition. This column can be null for early credit analysis.
     categories:
-      OTHERS: when the user responsible to do the credit evaluation is doing it on behalf of other person.
-      SINGLE: when the group or proposal is composed by only one tenant, which is the user responsible to submit the credit evaluation.
+      RENTING_FOR_OTHERS: when the user responsible to do the credit evaluation is doing it on behalf of other person.
+      SINGLE_TENANT: when the group or proposal is composed by only one tenant, which is the user responsible to submit the credit evaluation.
       MULTI_TENANT: when the group or proposal is composed by more than one tenants.
   number_of_proponents:
     description: The total number of proponents in the group or proposal.
@@ -115,22 +123,18 @@ columns:
     description: Boolean indicating if the credit evaluation refers to an early credit.
   is_credit_passport:
     description: Boolean indicating if the credit evaluation refers to a credit passport (pre offer or pos offer).
-  is_value_exceeding_credit_limit:
-    description: Boolean indicating if the house value exceeds the pre approved credit limit.
   is_most_recent_evaluation:
     description: Boolean indicating if the credit evaluation is the most recent submitted by an user or group.
-  is_passport_missing:
-    description: Boolean indicating if the credit passort was not done yet (missing group). In this case the credit evaluation remains ON HOLD until the user submit a valid credit passport.
   ts_created:
-    description: Timestamp indicating when the credit evaluation was created.
+    description: Timestamp indicating when the credit evaluation was created in the data source.
     lineage:
     - datalake_docx_clean.credit_evaluation.ts_created
   ts_updated:
-    description: Timestamp indicating when the credit evaluation was updated.
+    description: Timestamp indicating when the credit evaluation was updated in the data source.
     lineage:
     - datalake_docx_clean.credit_evaluation.ts_updated
   ts_expired:
-    description: Timestamp indicating when the credit evaluation expires.
+    description: Timestamp indicating when the credit evaluation submitted within a credit passport expires.
     lineage:
     - datalake_docx_clean.credit_evaluation.ts_expires
   ts_load:

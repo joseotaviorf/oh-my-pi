@@ -291,11 +291,12 @@ bietlejuice.dw_credit_evers:
   - bietlejuice.retsuko:load-clean-account
 bietlejuice.dw_credit_passport:
   - bietlejuice.docx:load-clean-credit-evaluation
+  - bietlejuice.docx:load-clean-credit-evaluation-aud
   - bietlejuice.docx:load-clean-credit-evaluation-proponent
-  - bietlejuice.docx:load-clean-group-authorization
   - bietlejuice.docx:load-clean-group-member
   - bietlejuice.sorting_hat:load-clean-policy-report
   - bietlejuice.sorting_hat:load-clean-proponent
+  - bietlejuice.enrich_credit_analysis:load-enrich-credit-engine
 bietlejuice.dw_crm:
   - bietlejuice.ebdb_inspections:load-clean-inspection
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal

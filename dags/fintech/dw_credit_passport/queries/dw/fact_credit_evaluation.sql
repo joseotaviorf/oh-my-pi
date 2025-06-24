@@ -1,4 +1,29 @@
-WITH credit_evaluation AS (
+WITH get_credit_evaluation_source AS (
+SELECT
+   MIN(DATE_TRUNC('day', ce.ts_created)) AS day,
+   ce.id,
+   CASE
+     WHEN
+       MIN(cep.ts_created) IS NULL
+       OR MIN(ce.ts_updated) < MIN(cep.ts_created)
+     THEN
+       'PRE_OFFER_PASSPORT_FLOW'
+     ELSE 'POS_OFFER_PASSPORT_FLOW'
+   END AS credit_evaluation_source
+ FROM
+   datalake_docx_clean.credit_evaluation ce
+     LEFT JOIN datalake_docx_clean.credit_evaluation_aud cea
+       ON cea.scope = 'HOUSE'
+       AND cea.id_group = ce.id_group
+       AND cea.id_city = ce.id_city
+     LEFT JOIN datalake_docx_clean.credit_evaluation cep
+       ON cep.id = cea.id_credit_evaluation
+ WHERE
+   ce.scope = 'CITY'
+ GROUP BY
+   ce.id
+),
+credit_evaluation AS (
   SELECT
     cep.id_credit_evaluation,
     ce.id_user,
@@ -73,34 +98,34 @@ SELECT DISTINCT
     ce.reason
   ) AS decision_reason,
   ce.type AS documentation_policy_type,
-  ce.pre_approved_limit,
-  ce.limit_value,
+  ce.pre_approved_limit AS user_pre_approved_limit,
+  CAST(ce.limit_value AS DECIMAL(10,2)) AS user_requested_value,
+  cen.total_informed_income,
+  cen.debit_limit AS credit_engine_debit_limit,
   CASE
     WHEN
-      ga.requestor_type = 'TRANSACT_FLOW'
-      OR ce.scope = 'HOUSE'
+      ces.credit_evaluation_source IS NOT NULL
     THEN
-      'POS_OFFER_PASSPORT_FLOW'
-    WHEN ce.scope = 'CITY' THEN 'PRE_OFFER_PASSPORT_FLOW'
+      ces.credit_evaluation_source
     WHEN
       ce.scope IS NULL
       AND ce.id_proposal IS NULL
       AND ce.id_group IS NULL
     THEN
       'EARLY_CREDIT_FLOW'
-    ELSE 'NORMAL_FLOW'
+    ELSE 'PROPOSAL_FLOW'
   END AS credit_evaluation_source,
   CASE
     WHEN
       ce.proponent_group_type = 'MYSELF'
       OR pp.is_single_tenant = TRUE
     THEN
-      'SINGLE'
+      'SINGLE_TENANT'
     WHEN
       ce.proponent_group_type = 'OTHERS'
       OR pt.proposal_proponent_type = 'PERSON'
     THEN
-      'OTHERS'
+      'RENTING_FOR_OTHERS'
     WHEN
       ce.proponent_group_type = 'MYSELF_WITH_OTHERS'
       OR gp.total_group_proponents > 1
@@ -113,37 +138,21 @@ SELECT DISTINCT
   get_json_object(pr.result, '$.analysis_category') AS category,
   get_json_object(pr.result, '$.risk_category_canon') AS risk_category_canon,
   COALESCE(pp.total_proposal_proponents, gp.total_group_proponents) AS number_of_proponents,
-  ce.is_automatic AS is_automatic,
+  ce.is_automatic,
   IF(
     ce.id_group IS NULL
     AND ce.id_proposal IS NULL,
     TRUE,
     FALSE
   ) AS is_early_credit,
-  IF(ce.scope IS NOT NULL, TRUE, FALSE) is_credit_passport,
-  IF(
-    ce.status IN ('ON_HOLD', 'FAILED', 'CANCELLED')
-    AND get_json_object(ga.credit_result, '$.reason') = 'VALUE_EXCEEDS_CREDIT_LIMIT',
-    TRUE,
-    FALSE
-  ) AS is_value_exceeding_credit_limit,
+  IF(ce.scope = 'CITY', TRUE, FALSE) is_credit_passport,
   IF(eval.rank = 1, TRUE, FALSE) AS is_most_recent_evaluation,
-  IF(
-    ce.scope = 'HOUSE'
-    AND ce.id_group IS NULL,
-    TRUE,
-    FALSE
-  ) AS is_passport_missing,
   ce.ts_created,
   ce.ts_updated,
   ce.ts_expires AS ts_expired,
   NOW() AS ts_load
 FROM
   datalake_docx_clean.credit_evaluation AS ce
-    LEFT JOIN datalake_docx_clean.group_authorization AS ga
-      ON ce.id_group = ga.id_group
-      AND ce.id_house = ga.id_house
-      and ga.status = 'ISSUED'
     LEFT JOIN proposal_proponent_type AS pt
       ON ce.id_proposal = pt.id_proposal
     LEFT JOIN proposal_proponents AS pp
@@ -155,3 +164,8 @@ FROM
     LEFT JOIN datalake_sorting_hat_clean.policy_report AS pr
       ON pr.id_external = ce.id
       AND pr.type = 'CREDIT_POLICY'
+    LEFT JOIN get_credit_evaluation_source AS ces
+      ON ces.id = ce.id
+    LEFT JOIN datalake_credit_analysis.credit_engine AS cen
+      ON ce.id = cen.id_credit_evaluation
+      AND cen.group_name = 'PRE_APPROVAL_LIMIT_POLICY'
