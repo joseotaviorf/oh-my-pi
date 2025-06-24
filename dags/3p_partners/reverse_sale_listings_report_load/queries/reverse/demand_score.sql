@@ -27,7 +27,7 @@ SELECT
   UUID() AS id,
   CAST(CONCAT(dl.sk_house, DATE_FORMAT(DATE('{load_end_date}'), 'yyyyMMdd')) AS STRING) AS business_id,
   dl.sk_house AS id_house,
-  COALESCE(dc.uuid_company, '44bab39d-39e5-44b9-88fe-0a1a800c0bb3') AS company_uuid,
+  dc.uuid_company AS company_uuid,
   'SALE' AS business_context,
   CASE
     WHEN fl.days_as_published <= 30 AND ds.general_demand_score < 3 THEN 3
@@ -42,11 +42,12 @@ FROM
 INNER JOIN
   dw_sale.fact_listings AS fl
     ON dl.sk_house = fl.sk_house
+INNER JOIN
+  dw_public.dim_company_3p_partners AS dc
+    ON fl.sk_company = dc.sk_company
 LEFT JOIN
   demand_score AS ds
     ON dl.sk_house = ds.sk_house
-LEFT JOIN
-  dw_public.dim_company_3p_partners AS dc
-    ON fl.sk_company = dc.sk_company
 WHERE
   dl.status = 'PUBLISHED'
+  AND dc.uuid_company IS NOT NULL
