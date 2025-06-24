@@ -69,8 +69,8 @@ overdue_invoices_events AS (
   ),
   explode_overdue_invoices_events AS (
   SELECT
-    CAST(contract_invoice.id_contract AS BIGINT) AS id_contract,
-    CAST(contract_invoice.id_invoice AS BIGINT) AS id_invoice,
+    CAST(contract_invoice.filled_id_contract AS BIGINT) AS id_contract,
+    CAST(contract_invoice.filled_id_invoice AS BIGINT) AS id_invoice,
     id_amplitude,
     id_session,
     id_user,
@@ -85,11 +85,25 @@ overdue_invoices_events AS (
     day,
     ts_event
   FROM
-    overdue_invoices_events
+    (
+      SELECT
+        *,
+        CASE
+          WHEN SIZE(id_contract) < SIZE(id_invoice) THEN
+            CONCAT(id_contract, ARRAY_REPEAT(ELEMENT_AT(id_contract, -1), SIZE(id_invoice) - SIZE(id_contract)))
+          ELSE id_contract
+        END AS filled_id_contract,
+        CASE
+          WHEN SIZE(id_invoice) < SIZE(id_contract) THEN
+            CONCAT(id_invoice, ARRAY_REPEAT(ELEMENT_AT(id_invoice, -1), SIZE(id_contract) - SIZE(id_invoice)))
+          ELSE id_invoice
+        END AS filled_id_invoice
+      FROM overdue_invoices_events
+    ) AS filled_arrays
   LATERAL VIEW EXPLODE(
     ARRAYS_ZIP(
-      id_contract,
-      id_invoice
+      filled_id_contract,
+      filled_id_invoice
     )
   ) AS contract_invoice
   )
