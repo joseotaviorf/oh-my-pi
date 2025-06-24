@@ -60,5 +60,5 @@
  FROM
  datalake_google_search_console_classified_clean.report_by_page_and_query
  WHERE
- DATE(dt_created) BETWEEN DATE('2025-04-22') AND DATE('2025-04-24')
+ DATE(dt_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
  AND country IN ('bra', 'per', 'arg', 'mex', 'ecu', 'pan')
