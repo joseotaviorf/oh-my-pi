@@ -14,15 +14,17 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.dataset_service import DatasetService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 # Pipeline inputs
 CONTEXT = "growth_costs_sharing_rules"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = None
+MAIN_SCHEDULE_INTERVAL = DatasetService.get_dag_datasets(DAG_ID)
 CLUSTER_DESCRIPTION = "custom_cluster"
 
 config_service = ConfigurationService(DAG_NAME)
@@ -61,6 +63,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+    params=BaseDAG.get_default_trigger_form_params(),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
@@ -69,6 +72,9 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn
     libraries=default_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
+
+# Reprocessing guard task to ensure that the DAG does not run multiple times unnecessarily
+DatasetAdder.attach_reprocessing_guard(create_cluster_task)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )

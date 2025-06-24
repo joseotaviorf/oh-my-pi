@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 
 import airflow.utils.helpers as airflow_helpers
 from airflow.models import DAG
-from airflow.operators.dummy_operator import DummyOperator
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
@@ -20,12 +19,14 @@ from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+from bietlejuice.services.dataset_service import DatasetService
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 # Pipeline inputs
 SOURCE = "amplitude_supply"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = None
+MAIN_SCHEDULE_INTERVAL = DatasetService.get_dag_datasets(DAG_ID)
 CLUSTER_DESCRIPTION = "custom_cluster"
 
 EXECUTION_TIMEOUT_HOURS = 2
@@ -72,6 +73,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+    params=BaseDAG.get_default_trigger_form_params(),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_old", dag=dag,
@@ -94,6 +96,7 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(databricks_
     },
     execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
 )
+DatasetAdder.attach_dataset_to_task(events_to_datalake_raw_task)
 
 # raw tasks dependencies
 airflow_helpers.chain(

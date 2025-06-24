@@ -14,6 +14,7 @@ from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 # Pipeline inputs
@@ -65,6 +66,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+    params=BaseDAG.get_default_trigger_form_params(),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_old", dag=dag,
@@ -87,6 +89,7 @@ events_to_datalake_raw_task = QuintoAndarDatabricksSubmitRunOperator(databricks_
     },
     execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
 )
+DatasetAdder.attach_dataset_to_task(events_to_datalake_raw_task)
 
 # raw tasks dependencies
 airflow_helpers.chain(

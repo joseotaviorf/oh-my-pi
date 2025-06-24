@@ -20,6 +20,8 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.dataset_service import DatasetService
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -84,13 +86,14 @@ dag = DAG(
         "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
+    schedule_interval=DatasetService.get_dag_datasets(DAG_ID),
     doc_md=BaseDAG.generate_doc_md_str(
         dag_name=DAG_NAME,
         doc_md_chart_url=doc_md_chart_url,
         dag_documentation=DAG_DOCUMENTATION,
         dag_owner=DAG_OWNER,
     ),
+    params=BaseDAG.get_default_trigger_form_params(),
 )
 
 execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
@@ -102,6 +105,8 @@ execute_job_cluster_task = QuintoAndarDatabricksExecuteJobClusterOperator(
     libraries=LIBRARIES,
 )
 
+# Reprocessing guard task to ensure that the DAG does not run multiple times unnecessarily
+DatasetAdder.attach_reprocessing_guard(execute_job_cluster_task)
 
 def create_task(entry_point: str, parameters: List[str], task_id: str = None):
     return QuintoAndarDatabricksCheckJobTaskOperator(

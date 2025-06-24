@@ -17,6 +17,8 @@ from bietlejuice.base.airflow.task_groups.reverse_task_group import ReverseTaskG
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
 from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+from bietlejuice.services.dataset_service import DatasetService
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 # ENV setup
 ENV = os.environ.get("ENVIRONMENT")
@@ -68,10 +70,11 @@ dag = DAG(
 
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
+    schedule_interval=DatasetService.get_dag_datasets(DAG_ID),
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID, ENV=ENV
     ),
+    params=BaseDAG.get_default_trigger_form_params(),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
@@ -80,6 +83,9 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries,
 )
+
+# Reprocessing guard task to ensure that the DAG does not run multiple times unnecessarily
+DatasetAdder.attach_reprocessing_guard(create_cluster_task)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )

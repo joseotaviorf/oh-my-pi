@@ -93,6 +93,7 @@ dag = DAG(
         schedule_interval=MAIN_SCHEDULE_INTERVAL,
         dag_owner=DAG_OWNER,
     ),
+    params=BaseDAG.get_default_trigger_form_params(),
 )
 
 

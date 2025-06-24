@@ -18,6 +18,8 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+from bietlejuice.services.dataset_service import DatasetService
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 
 
@@ -59,10 +61,11 @@ dag = DAG(
         "on_failure_callback": opsgenie_callback.task_failure_alert,
     },
     start_date=MAIN_START_DATE,
-    schedule_interval=None,
+    schedule_interval=DatasetService.get_dag_datasets(DAG_ID),
     doc_md=BaseDAG.get_dag_doc(DAG_NAME).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+    params=BaseDAG.get_default_trigger_form_params(),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag, 
@@ -70,6 +73,8 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn
     cluster_configuration=cluster_description,
     libraries=default_libraries
 )
+# Reprocessing guard task to ensure that the DAG does not run multiple times unnecessarily
+DatasetAdder.attach_reprocessing_guard(create_cluster_task)
 
 terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )

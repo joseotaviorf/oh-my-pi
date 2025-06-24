@@ -19,6 +19,8 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.dataset_service import DatasetService
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
 
 # Pipeline inputs
@@ -26,7 +28,7 @@ SOURCE = "amplitude"
 DAG_ID = f"bietlejuice.{SOURCE}"
 MAIN_START_DATE = datetime(2019, 1, 1, tzinfo=timezone("America/Sao_Paulo"))
 CLUSTER_DESCRIPTION = "custom_cluster"
-MAIN_SCHEDULE_INTERVAL = None
+MAIN_SCHEDULE_INTERVAL = DatasetService.get_dag_datasets(DAG_ID)
 EXECUTION_TIMEOUT_HOURS = 3
 
 config_service = ConfigurationService(SOURCE)
@@ -77,6 +79,7 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
+    params=BaseDAG.get_default_trigger_form_params(),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
@@ -150,6 +153,7 @@ events_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
     },
     execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
 )
+DatasetAdder.attach_dataset_to_task(events_raw_to_clean_task)
 
 sync_metastore_clean_events_structure_task = QuintoAndarDatabricksSubmitRunOperator(
     databricks_conn_id="databricks_old",
@@ -243,6 +247,7 @@ user_merge_170698_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
         }
     },
 )
+DatasetAdder.attach_dataset_to_task(user_merge_170698_raw_to_clean_task)
 
 sync_metastore_clean_170698_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(
     databricks_conn_id="databricks_old",
@@ -337,6 +342,7 @@ user_merge_183047_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
         }
     },
 )
+DatasetAdder.attach_dataset_to_task(user_merge_183047_raw_to_clean_task)
 
 sync_metastore_clean_183047_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(
     databricks_conn_id="databricks_old",
@@ -431,6 +437,7 @@ user_merge_205027_raw_to_clean_task = QuintoAndarDatabricksSubmitRunOperator(
         }
     },
 )
+DatasetAdder.attach_dataset_to_task(user_merge_205027_raw_to_clean_task)
 
 sync_metastore_clean_205027_user_merge_structure_task = QuintoAndarDatabricksSubmitRunOperator(
     databricks_conn_id="databricks_old",
@@ -601,6 +608,7 @@ for table in subpartitioned_table_list:
         },
         execution_timeout=timedelta(hours=EXECUTION_TIMEOUT_HOURS),
     )
+    DatasetAdder.attach_dataset_to_task(load_subpartitioned_clean_table_task)
 
     load_subpartitioned_clean_tables_tasks.append(load_subpartitioned_clean_table_task)
 
@@ -608,6 +616,7 @@ load_subpartitioned_all_clean_tables_done_tasks = DummyOperator(
     dag=dag,
     task_id="load-subpartitioned-event-tables-to-clean",
 )
+DatasetAdder.attach_dataset_to_task(load_subpartitioned_all_clean_tables_done_tasks)
 
 sync_metastore_clean_subpartitioned_events_tables_structure_task = QuintoAndarDatabricksSubmitRunOperator(
     databricks_conn_id="databricks_old",

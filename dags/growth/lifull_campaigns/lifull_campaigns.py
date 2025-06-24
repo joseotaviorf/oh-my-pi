@@ -77,6 +77,7 @@ dag = DAG(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
     user_defined_macros={"get_date_param": get_date_param},
+    params=BaseDAG.get_default_trigger_form_params(),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,

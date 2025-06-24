@@ -81,6 +81,7 @@ dag = DAG(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
     user_defined_macros={"get_toggle_param": get_toggle_param},
+    params=BaseDAG.get_default_trigger_form_params(),
 )
 
 skip_run_task = ShortCircuitOperator(

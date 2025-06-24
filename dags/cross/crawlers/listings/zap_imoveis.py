@@ -76,6 +76,7 @@ dag = DAG(
         dag_name=ORIGIN,
         template_path=f"{DAG_PACKAGES_ROOT}/cross/{SOURCE}/{CONTEXT}",
     ).format(chart_url=doc_md_chart_url, dag_id=DAG_ID),
+    params=BaseDAG.get_default_trigger_form_params(),
 )
 
 create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
