@@ -14,6 +14,9 @@ columns:
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.event_properties
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.event_properties
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.event_properties
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.id_lead_ebdb
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.id_lead_ebdb
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.id_lead_ebdb
   id_firestore:
     lineage:
       - datalake_rene_descartes_clean.house_lead.id

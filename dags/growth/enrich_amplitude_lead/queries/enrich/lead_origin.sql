@@ -49,6 +49,7 @@ WITH app_205027_referral_form_events AS (
 ),
 app_183047_form_submitted_events AS (
     SELECT
+        id_lead_ebdb,
         formfield_lead_uuid,
         event_properties,
         country AS user_country,
@@ -67,9 +68,10 @@ app_183047_form_submitted_events AS (
     FROM
         datalake_amplitude_clean.183047_lead_form_submitted_events
     WHERE
-        formfield_lead_uuid IS NOT NULL
+        formfield_lead_uuid IS NOT NULL OR id_lead_ebdb IS NOT NULL
     UNION
     SELECT
+        id_lead_ebdb,
         formfield_lead_uuid,
         event_properties,
         country AS user_country,
@@ -88,9 +90,10 @@ app_183047_form_submitted_events AS (
     FROM
         datalake_amplitude_clean.183047_price_suggestion_form_submitted_events
     WHERE
-        formfield_lead_uuid IS NOT NULL
+        formfield_lead_uuid IS NOT NULL OR id_lead_ebdb IS NOT NULL
     UNION
     SELECT
+        id_lead_ebdb,
         formfield_lead_uuid,
         event_properties,
         country AS user_country,
@@ -109,7 +112,7 @@ app_183047_form_submitted_events AS (
     FROM
         datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events
     WHERE
-        formfield_lead_uuid IS NOT NULL
+        formfield_lead_uuid IS NOT NULL OR id_lead_ebdb IS NOT NULL
 ),
 app_ALL_lead_referred_events AS (
     SELECT
@@ -243,7 +246,7 @@ app_183047_all_events_firestore AS (
 ),
 app_183047_form_submitted_events_rene AS (
     SELECT
-        NULL AS id_lead,
+        app_183047_form_submitted_events.id_lead_ebdb AS id_lead,
         NULL AS id_firestore,
         COALESCE(rene.id, app_183047_form_submitted_events.formfield_lead_uuid, '') AS formfield_lead_uuid,
         4 AS rule_num,
@@ -389,7 +392,12 @@ lead_events_union AS (
     SELECT
         *,
         RANK() OVER(PARTITION BY formfield_lead_uuid ORDER BY ts_event DESC) AS rn
-    FROM app_183047_form_submitted_events_rene
+    FROM app_183047_form_submitted_events_rene WHERE formfield_lead_uuid IS NOT NULL
+    UNION
+    SELECT
+        *,
+        RANK() OVER(PARTITION BY id_lead ORDER BY ts_event DESC) AS rn
+    FROM app_183047_form_submitted_events_rene WHERE id_lead IS NOT NULL
     UNION
     SELECT
         *,
