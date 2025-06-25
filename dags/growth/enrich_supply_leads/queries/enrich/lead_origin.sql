@@ -1,6 +1,6 @@
 WITH lead_origin_rene_descartes AS (
   -- In this CTE we extract all taxonomy data available in Rene Descartes
-  SELECT 
+  SELECT
     hl.id AS id_lead,
     hl.id_lead_ebdb,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.affiliateType') AS STRING) AS affiliate_type,
@@ -9,13 +9,13 @@ WITH lead_origin_rene_descartes AS (
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmSource') AS STRING) AS source,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmContent') AS STRING) AS content,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmTerm') AS STRING) AS term,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.team') AS STRING) AS ops_agent, 
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.team') AS STRING) AS ops_agent,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.company') AS STRING) AS ops_partner,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.origin') AS STRING) AS application,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.cidade') AS STRING) AS city,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.referrer') AS STRING) AS landing_page,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.contactType') AS STRING) AS ops_approach,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.contactChannel') AS STRING) AS ops_contact_medium, 
+    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.contactChannel') AS STRING) AS ops_contact_medium,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.platform') AS STRING) AS platform,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.type') AS STRING) AS lead_type,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.detailedRoute') AS STRING) AS detailed_route,
@@ -29,8 +29,8 @@ WITH lead_origin_rene_descartes AS (
 ),
 -- Rule to fix affiliate type, we get the original affiliate type
 affiliate_type_fix AS (
-  SELECT 
-    lo_base.id_lead, 
+  SELECT
+    lo_base.id_lead,
     lo_fix.affiliate_type AS first_affiliate_type
   FROM lead_origin_rene_descartes AS lo_base
   JOIN lead_origin_rene_descartes AS lo_fix
@@ -41,16 +41,16 @@ affiliate_type_fix AS (
 
 lead_origin_amplitude AS (
   -- Here, I collect data from Amplitude
-  SELECT 
+  SELECT
     COALESCE(formfield_lead_uuid, id_firestore) AS id_lead, -- This coalesce is necessary because we have two different keys in Amplitude
     id_lead AS id_lead_ebdb,
     IF(utm_campaign == '', '-1', utm_campaign) AS campaign,
-    IF(utm_medium == '', '-1', utm_medium) AS medium, 
-    IF(utm_source == '', '-1', utm_source) AS source, 
+    IF(utm_medium == '', '-1', utm_medium) AS medium,
+    IF(utm_source == '', '-1', utm_source) AS source,
     IF(utm_content == '', '-1', utm_content) AS content,
     IF(utm_term == '', '-1', utm_term) AS term,
-    IF(city == '', '-1', city) AS city, 
-    IF(platform == '', '-1', platform) AS platform, 
+    IF(city == '', '-1', city) AS city,
+    IF(platform == '', '-1', platform) AS platform,
     ts_event
   FROM datalake_amplitude_lead.lead_origin
   WHERE DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
@@ -58,12 +58,12 @@ lead_origin_amplitude AS (
 ),
 
 mid_table AS (
-  SELECT 
+  SELECT
     r.id_lead AS id_lead,
     r.id_lead_ebdb AS id_lead_ebdb,
     COALESCE(r.affiliate_type, atf.first_affiliate_type) AS affiliate_type,
     COALESCE(r.campaign, a.campaign, a2.campaign) AS campaign,
-    COALESCE(r.medium, a.medium, a2.medium) AS medium,  
+    COALESCE(r.medium, a.medium, a2.medium) AS medium,
     COALESCE(r.source, a.source, a2.source) AS source,
     COALESCE(r.content, a.content, a2.content) AS content,
     COALESCE(r.term, a.term, a2.term) AS term,
@@ -95,17 +95,17 @@ mid_table AS (
 )
 
 -- Hard rules
-SELECT 
+SELECT DISTINCT
   id_lead,
   id_lead_ebdb,
   SF_NORMALIZE_STRING(affiliate_type) AS affiliate_type,
   campaign,
-  SF_NORMALIZE_STRING(medium) AS medium,  
+  SF_NORMALIZE_STRING(medium) AS medium,
   SF_NORMALIZE_STRING(source) AS source,
   SF_NORMALIZE_STRING(content) AS content,
   SF_NORMALIZE_STRING(term) AS term,
   SF_NORMALIZE_STRING(ops_agent) AS ops_agent,
-  CASE 
+  CASE
     WHEN ops_agent = 'CAPTA_AI' THEN 'acquisition'
     WHEN ops_agent IS NOT NULL THEN 'conversion'
     ELSE NULL
@@ -129,5 +129,5 @@ SELECT
   database_tracking_term,
   ts_event,
   CURRENT_TIMESTAMP AS ts_load
-FROM 
+FROM
   mid_table
