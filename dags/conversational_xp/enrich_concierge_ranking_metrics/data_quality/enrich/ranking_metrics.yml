@@ -1,0 +1,24 @@
+table_name: datalake_concierge.ranking_metrics
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  ts_created:
+    is_complete:
+      severity_level: Error
+  id_recommendation:
+    is_complete:
+      severity_level: Error
+  recall_at_3:
+    is_complete:
+      severity_level: Error
+  ndcg_at_3:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

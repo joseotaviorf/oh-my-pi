@@ -1103,3 +1103,7 @@ bietlejuice.enrich_pin:
     - bietlejuice.pin_talent:load-clean-rating-model-translation
     - bietlejuice.pin_talent:load-clean-review-period-base
     - bietlejuice.pin_talent:load-clean-review-period-translation
+  
+bietlejuice.enrich_concierge_ranking_metrics:
+  add:
+    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
