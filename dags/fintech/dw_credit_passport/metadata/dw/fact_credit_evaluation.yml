@@ -50,12 +50,12 @@ columns:
     lineage:
     - datalake_docx_clean.credit_evaluation.result
   pre_evaluation_result:
-    description: Result of the credit pre evaluation process, such as early credit evaluation pr pre offer credit passport flow.
+    description: Result of the credit pre evaluation process, such as early credit evaluation or pre offer credit passport flow.
     lineage:
     - datalake_docx_clean.credit_evaluation.result
     - datalake_docx_clean.credit_evaluation.early_result_guarantee_type
   decision_reason:
-    description: The credit analysis decision reason in case of rejection.
+    description: The credit analysis decision reason in case of rejection or evaluation positive (FREE or PAID).
     lineage:
     - datalake_docx_clean.credit_evaluation.reason
   documentation_policy_type:
@@ -73,8 +73,8 @@ columns:
     description: The limit value specified by the user when the person filled up the credit evaluation form.
     lineage:
     - datalake_docx_clean.credit_evaluation.limit_value
-  credit_engine_debit_limit:
-    description: Credit engine calculated limit. This value is calculated by the credit models based on the limit value and the group income.
+  maximum_debit_limit:
+    description: Credit engine calculated limit. This value is calculated by the credit models based on the limit value and the group income. It corresponds to the credit risk limit.
     lineage:
     - datalake_credit_analysis.credit_engine
   total_informed_income:
@@ -121,6 +121,8 @@ columns:
     - datalake_docx_clean.credit_evaluation.is_automatic
   is_early_credit:
     description: Boolean indicating if the credit evaluation refers to an early credit.
+  is_bypass:
+    description: Boolean indicating if the credit evaluation was bypassed.
   is_credit_passport:
     description: Boolean indicating if the credit evaluation refers to a credit passport (pre offer or pos offer).
   is_most_recent_evaluation:

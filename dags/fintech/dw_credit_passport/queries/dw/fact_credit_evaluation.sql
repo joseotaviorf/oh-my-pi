@@ -84,24 +84,28 @@ SELECT DISTINCT
   ce.id_city AS sk_city,
   ce.scope,
   ce.status AS credit_evaluation_status,
-  IF(
-    ce.status IN ('PROCESSING', 'NOT_SENT', 'ON_HOLD', 'CANCELLED', 'FAILED'),
-    'RESULT_PENDING',
-    ce.result
-  ) AS credit_evaluation_result,
+  CASE
+    WHEN ce.status IN ('PROCESSING', 'NOT_SENT', 'ON_HOLD', 'CANCELLED', 'FAILED') THEN 'REASON_PENDING'
+    ELSE ce.result
+  END AS credit_evaluation_result,
   COALESCE(
     ce.early_result_guarantee_type, get_json_object(ce.early_result, '$[0].result')
   ) AS pre_evaluation_result,
-  IF(
-    ce.status IN ('PROCESSING', 'NOT_SENT', 'ON_HOLD', 'CANCELLED', 'FAILED'),
-    'REASON_PENDING',
-    ce.reason
-  ) AS decision_reason,
+  CASE
+    WHEN (ce.reason = 'PRE_APPROVAL_POLICY' AND ce.result = 'PRE_APPROVED') OR ce.result = 'PRE_APPROVED' THEN 'FREE'
+    WHEN ce.early_result_guarantee_type = 'FREE' OR get_json_object(ce.early_result, '$[0].result') = 'FREE' THEN 'FREE'
+    WHEN ce.reason = 'PRE_APPROVAL_POLICY' AND ce.result = 'PRE_APPROVED_WITH_GUARANTEE' THEN 'PAID'
+    WHEN ce.early_result_guarantee_type = 'PRO_GUARANTOR' OR get_json_object(ce.early_result, '$[0].result') IN (
+      'PRO_GUARANTOR', 'THIRD_PARTY_GUARANTEE', 'STANDALONE', 'PRO_GUARANTOR_OR_DEPOSIT', 'DEPOSIT', 'INSURANCE_OR_DEPOSIT', 'RENTAL_GUARANTEE'
+      ) THEN 'PAID'
+    WHEN ce.status IN ('PROCESSING', 'NOT_SENT', 'ON_HOLD', 'CANCELLED', 'FAILED') THEN 'REASON_PENDING'
+  ELSE ce.reason
+  END AS decision_reason,
   ce.type AS documentation_policy_type,
   ce.pre_approved_limit AS user_pre_approved_limit,
   CAST(ce.limit_value AS DECIMAL(10,2)) AS user_requested_value,
   cen.total_informed_income,
-  cen.debit_limit AS credit_engine_debit_limit,
+  cen.debit_limit AS maximum_debit_limit,
   CASE
     WHEN
       ces.credit_evaluation_source IS NOT NULL
@@ -147,6 +151,7 @@ SELECT DISTINCT
   ) AS is_early_credit,
   IF(ce.scope = 'CITY', TRUE, FALSE) is_credit_passport,
   IF(eval.rank = 1, TRUE, FALSE) AS is_most_recent_evaluation,
+  IF(ce.result = 'BYPASSED', TRUE, FALSE) is_bypass,
   ce.ts_created,
   ce.ts_updated,
   ce.ts_expires AS ts_expired,
