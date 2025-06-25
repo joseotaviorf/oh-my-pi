@@ -210,7 +210,8 @@ SELECT
     accrual_year_month,
     revenue_amount,
     revenue_source,
-    TO_DATE(DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(CAST(accrual_year_month AS STRING), 'yyyyMM')), 'yyyy-MM-dd')) AS dt_month_ref
+    TO_DATE(DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(CAST(accrual_year_month AS STRING), 'yyyyMM')), 'yyyy-MM-dd')) AS dt_month_ref,
+    NOW() AS ts_load
 FROM
     unionall AS m
 LEFT JOIN

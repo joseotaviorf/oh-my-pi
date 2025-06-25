@@ -8,6 +8,7 @@ SELECT
     invoice_paid_amount,
     accrual_year_month,
     dt_due,
-    dt_paid
+    dt_paid,
+    NOW() AS ts_load
 FROM
     datalake_revenue_lines.service_fee

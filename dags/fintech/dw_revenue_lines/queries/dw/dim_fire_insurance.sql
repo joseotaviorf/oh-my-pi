@@ -9,6 +9,7 @@ SELECT
   rent,
   revenue_comission,
   dt_annulment,
-  dt_start
+  dt_start,
+  NOW() AS ts_load
 FROM
   datalake_revenue_lines.fire_insurance

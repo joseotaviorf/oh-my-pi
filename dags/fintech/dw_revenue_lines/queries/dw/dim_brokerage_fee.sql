@@ -12,13 +12,14 @@ SELECT
     accrual_year_month,
     dt_due,
     dt_paid,
-    dt_contract_start
+    dt_contract_start,
+    NOW() AS ts_load
 FROM
     datalake_revenue_lines.brokerage_fee
 WHERE
   contract_guarantee IN (
-    'SeguroFairfax', 
-    'PRO_GUARANTOR', 
+    'SeguroFairfax',
+    'PRO_GUARANTOR',
     'RentalDeposit',
     'Standalone'
   )
