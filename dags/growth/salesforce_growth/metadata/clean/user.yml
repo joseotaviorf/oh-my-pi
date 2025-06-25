@@ -6,43 +6,43 @@ owner: ederson.donde@quintoandar.com.br
 columns:
   email:
     lineage:
-      - datalake_salesforce_growth_raw.user.email
+      - datalake_salesforce_growth_raw.user.Email
     description: Email address of the user.
   name:
     lineage:
-      - datalake_salesforce_growth_raw.user.name
+      - datalake_salesforce_growth_raw.user.Name
     description: Full name of the user.
   id_user_salesforce:
     lineage:
-      - datalake_salesforce_growth_raw.user.id_user_salesforce
+      - datalake_salesforce_growth_raw.user.Id
     description: Unique identification key for user in Sales Force.
   role:
     lineage:
-      - datalake_salesforce_growth_raw.user.role
+      - datalake_salesforce_growth_raw.user.Title
     description: Role or title of the user.
   team:
     lineage:
-      - datalake_salesforce_growth_raw.user.team
+      - datalake_salesforce_growth_raw.user.Department
     description: Department or team the user belongs to.
   leadership:
     lineage:
-      - datalake_salesforce_growth_raw.user.leadership
+      - datalake_salesforce_growth_raw.user.Division
     description: Division or leadership structure the user belongs to.
   creation_date:
     lineage:
-      - datalake_salesforce_growth_raw.user.creation_date
+      - datalake_salesforce_growth_raw.user.CreatedDate
     description: Date when the user was created in Sales Force.
   last_login_date:
     lineage:
-      - datalake_salesforce_growth_raw.user.last_login_date
+      - datalake_salesforce_growth_raw.user.LastLoginDate
     description: Date of the user's last login to Sales Force.
   country:
     lineage:
-      - datalake_salesforce_growth_raw.user.country
+      - datalake_salesforce_growth_raw.user.Pais__c
     description: Country where the user is located.
   operation:
     lineage:
-      - datalake_salesforce_growth_raw.user.operation
+      - datalake_salesforce_growth_raw.user.Organizacion_de_venta__c
     description: Sales organization or operation the user belongs to.
   dt_updated:
     lineage:

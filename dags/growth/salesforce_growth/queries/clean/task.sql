@@ -2,6 +2,7 @@ SELECT
     Id AS id_task_salesforce,
     CreatedDate AS date_creation,
     OwnerId AS id_analyst_salesforce,
+    Organizacion_de_venta__c AS operation,
     ActivityDate AS date_deadline,
     CompletedDateTime AS date_conclusion,
     Subject AS subject,

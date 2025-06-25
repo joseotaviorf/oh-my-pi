@@ -6,43 +6,47 @@ owner: ederson.donde@quintoandar.com.br
 columns:
   id_task_salesforce:
     lineage:
-      - datalake_salesforce_growth_raw.task.id_task_salesforce
+      - datalake_salesforce_growth_raw.task.Id
     description: Unique identification key for task in Sales Force.
   date_creation:
     lineage:
-      - datalake_salesforce_growth_raw.task.date_creation
+      - datalake_salesforce_growth_raw.task.CreatedDate
     description: Date when the task was created in Sales Force.
   id_analyst_salesforce:
     lineage:
-      - datalake_salesforce_growth_raw.task.id_analyst_salesforce
+      - datalake_salesforce_growth_raw.task.OwnerId
     description: ID of the analyst responsible for the task in Sales Force.
+  operation:
+    lineage:
+      - datalake_salesforce_growth_raw.task.Organizacion_de_venta__c
+    description: ID of the sales organization or operation responsible for the task in Sales Force.
   date_deadline:
     lineage:
-      - datalake_salesforce_growth_raw.task.date_deadline
+      - datalake_salesforce_growth_raw.task.ActivityDate
     description: Deadline date for the task completion.
   date_conclusion:
     lineage:
-      - datalake_salesforce_growth_raw.task.date_conclusion
+      - datalake_salesforce_growth_raw.task.CompletedDateTime
     description: Date when the task was concluded.
   subject:
     lineage:
-      - datalake_salesforce_growth_raw.task.subject
+      - datalake_salesforce_growth_raw.task.Subject
     description: Subject or description of the task.
   status_conclusion:
     lineage:
-      - datalake_salesforce_growth_raw.task.status_conclusion
+      - datalake_salesforce_growth_raw.task.Status
     description: Conclusion status of the task.
   status:
     lineage:
-      - datalake_salesforce_growth_raw.task.status
+      - datalake_salesforce_growth_raw.task.Resultado_FUP__c
     description: Current status of the task.
   id_lead:
     lineage:
-      - datalake_salesforce_growth_raw.task.id_lead
+      - datalake_salesforce_growth_raw.task.WhoId
     description: ID of the associated lead.
   type:
     lineage:
-      - datalake_salesforce_growth_raw.task.type
+      - datalake_salesforce_growth_raw.task.Type
     description: Type of the task.
   dt_updated:
     lineage:

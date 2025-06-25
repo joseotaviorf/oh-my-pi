@@ -6,11 +6,11 @@ owner: ederson.donde@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_salesforce_growth_raw.record_type.id
+      - datalake_salesforce_growth_raw.record_type.Id
     description: Unique identification key for record type in Sales Force.
   name:
     lineage:
-      - datalake_salesforce_growth_raw.record_type.name
+      - datalake_salesforce_growth_raw.record_type.Name
     description: Name of the record type in Sales Force.
   dt_updated:
     lineage:

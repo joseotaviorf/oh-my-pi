@@ -6,11 +6,11 @@ owner: ederson.donde@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_salesforce_growth_raw.operation.id
+      - datalake_salesforce_growth_raw.operation.Id
     description: Unique identification key for operation in Sales Force.
   name:
     lineage:
-      - datalake_salesforce_growth_raw.operation.name
+      - datalake_salesforce_growth_raw.operation.Name
     description: Name of the operation in Sales Force.
   dt_updated:
     lineage:

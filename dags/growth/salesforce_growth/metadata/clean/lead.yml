@@ -6,51 +6,51 @@ owner: ederson.donde@quintoandar.com.br
 columns:
   id_lead:
     lineage:
-      - datalake_salesforce_growth_raw.lead.id_lead
+      - datalake_salesforce_growth_raw.lead.ID_Empresa_Site__c
     description: Unique identification key for lead in Sales Force.
   creation_date:
     lineage:
-      - datalake_salesforce_growth_raw.lead.creation_date
+      - datalake_salesforce_growth_raw.lead.CreatedDate
     description: Date when the lead was created in Sales Force.
   id_analyst:
     lineage:
-      - datalake_salesforce_growth_raw.lead.id_analyst
+      - datalake_salesforce_growth_raw.lead.OwnerId
     description: ID of the analyst assigned to the lead.
   is_contacted:
     lineage:
-      - datalake_salesforce_growth_raw.lead.is_contacted
+      - datalake_salesforce_growth_raw.lead.Ha_respondido_el_contacto__c
     description: Boolean indicating if the lead has been contacted.
   is_qualified:
     lineage:
-      - datalake_salesforce_growth_raw.lead.is_qualified
+      - datalake_salesforce_growth_raw.lead.Calificado__c
     description: Boolean indicating if the lead has been qualified.
   phone:
     lineage:
-      - datalake_salesforce_growth_raw.lead.phone
+      - datalake_salesforce_growth_raw.lead.Phone
     description: Contact phone number of the lead.
   address:
     lineage:
-      - datalake_salesforce_growth_raw.lead.address
+      - datalake_salesforce_growth_raw.lead.Direccion__c
     description: Address of the lead.
   channel:
     lineage:
-      - datalake_salesforce_growth_raw.lead.channel
+      - datalake_salesforce_growth_raw.lead.Canal__c
     description: Channel through which the lead was acquired.
   id_salesforce:
     lineage:
-      - datalake_salesforce_growth_raw.lead.id_salesforce
+      - datalake_salesforce_growth_raw.lead.Id
     description: Salesforce internal ID for the lead.
   status:
     lineage:
-      - datalake_salesforce_growth_raw.lead.status
+      - datalake_salesforce_growth_raw.lead.Status
     description: Current status of the lead in Sales Force.
   owner_name:
     lineage:
-      - datalake_salesforce_growth_raw.lead.owner_name
+      - datalake_salesforce_growth_raw.lead.LastName
     description: Name of the lead owner.
   record_type_id:
     lineage:
-      - datalake_salesforce_growth_raw.lead.record_type_id
+      - datalake_salesforce_growth_raw.lead.RecordTypeId
     description: Type of record in Sales Force.
   dt_updated:
     lineage:
