@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     table_id AS id_table,
     created_by_fk AS id_user_created,
@@ -19,4 +19,3 @@ SELECT
     month,
     day
 FROM datalake_superset_raw.sql_metrics
-WHERE MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

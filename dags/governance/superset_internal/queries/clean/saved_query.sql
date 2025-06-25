@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     user_id AS id_user,
     db_id AS id_database,
@@ -19,4 +19,3 @@ SELECT
     month,
     day
 FROM datalake_superset_raw.saved_query
-WHERE MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

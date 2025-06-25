@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     created_by_fk AS id_user_created,
     changed_by_fk AS id_user_changed,
@@ -20,4 +20,3 @@ SELECT
     month,
     day
 FROM datalake_superset_raw.dashboards
-WHERE MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     tag_id AS id_tag,
     object_id AS id_object,
@@ -11,4 +11,3 @@ SELECT
     month,
     day
 FROM datalake_superset_raw.tagged_object
-WHERE MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

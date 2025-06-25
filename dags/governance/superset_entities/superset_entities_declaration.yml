@@ -4,53 +4,49 @@ dag:
   schedule_interval: 0 0 * * *
   owner: Data Governance
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   custom_schema: superset
   has_hive_sync: true
   database_type: postgres
-  default_extraction_type: incremental
-  default_partitions: ["year", "month", "day"]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   dbutils_secret_key: SUPERSET_DB
   tables_customization:
     dashboard_slices:
-      extraction_type: full
-      partitions: []
+      clean_table_name: dashboard_slices
     dashboard_user:
-      extraction_type: full
-      partitions: []
+      clean_table_name: dashboard_user
     dashboards:
-      date_filter_column: changed_on
+      clean_table_name: dashboards
     slice_user:
-      extraction_type: full
-      partitions: []
+      clean_table_name: slice_user
     slices:
-      date_filter_column: changed_on
+      clean_table_name: slices
     sql_metrics:
-      date_filter_column: changed_on
+      clean_table_name: sql_metrics
     sqlatable_user:
-      extraction_type: full
-      partitions: []
+      clean_table_name: sqlatable_user
     table_columns:
-      date_filter_column: changed_on
+      clean_table_name: table_columns
     table_schema:
-      date_filter_column: changed_on
+      clean_table_name: table_schema
     tables:
-      date_filter_column: changed_on
+      clean_table_name: tables
     tag:
-      date_filter_column: changed_on
+      clean_table_name: tag
     tagged_object:
-      date_filter_column: changed_on
+      clean_table_name: tagged_object
 cluster:
   type: databricks_12_2_min_general_cluster
+  databricks_conn_id: databricks_new
   custom_configurations:
     driver_node_type_id: m5a.xlarge
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
-
-  databricks_conn_id: databricks_new

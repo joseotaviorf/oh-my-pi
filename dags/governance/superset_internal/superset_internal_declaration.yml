@@ -4,32 +4,27 @@ dag:
   schedule_interval: 0 0 * * *
   owner: Data Governance
 workflow:
-  type: database_pull_delta
+  type: cdc
   layer: raw
   custom_schema: superset
   database_type: postgres
-  default_extraction_type: incremental
-  default_partitions: ["year", "month", "day"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   dbutils_secret_key: SUPERSET_DB
   tables_customization:
     ab_role:
-      extraction_type: full
-      partitions: []
+      clean_table_name: ab_role
     ab_user:
-      date_filter_column: changed_on
+      clean_table_name: ab_user
     ab_user_role:
-      extraction_type: full
-      partitions: []
+      clean_table_name: ab_user_role
     logs:
-      date_filter_column: dttm
+      clean_table_name: logs
     saved_query:
-      date_filter_column: changed_on
+      clean_table_name: saved_query
     query:
-      date_filter_column: changed_on
-
+      clean_table_name: query
 cluster:
   type: databricks_13_3_med_general_driver_2_min_workers_cluster
   access_control_list:
@@ -37,7 +32,7 @@ cluster:
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
