@@ -1,19 +1,19 @@
 ---
 database_name: datalake_superset_clean
-table_name: sqltable_user
+table_name: sqlatable_user
 description: Table that links datasets to owner users
 domain: Data Governance
 owner: herivelto.junior@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_superset_raw.sqltable_user.id
+      - datalake_superset_raw.sqlatable_user.id
     description: ID unique table
   id_user:
     lineage:
-      - datalake_superset_raw.sqltable_user.user_id
+      - datalake_superset_raw.sqlatable_user.user_id
     description: ID user
   id_table:
     lineage:
-      - datalake_superset_raw.sqltable_user.table_id
+      - datalake_superset_raw.sqlatable_user.table_id
     description: ID table created

@@ -3179,6 +3179,7 @@ bietlejuice.enrich_superset:
   - bietlejuice.superset_entities:load-clean-slice-user
   - bietlejuice.superset_entities:load-clean-slices
   - bietlejuice.superset_entities:load-clean-sql-metrics
+  - bietlejuice.superset_entities:load-clean-sqlatable-user
   - bietlejuice.superset_entities:load-clean-table-columns
   - bietlejuice.superset_entities:load-clean-table-schema
   - bietlejuice.superset_entities:load-clean-tables
