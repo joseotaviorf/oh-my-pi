@@ -2025,6 +2025,15 @@ bietlejuice.enrich_growth_commission_costs:
   - bietlejuice.monopoly:load-clean-sale-revision
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance
   - bietlejuice.robin_hood:load-clean-payment-request
+bietlejuice.enrich_growth_costs:
+  - bietlejuice.dw_media_platform_metrics:load-dw-growth-fact-media-platform-metrics
+  - bietlejuice.dw_media_sharing_rules:load-dw-growth-dim-sharing-rules
+  - bietlejuice.dw_region:load-dw-public-dim-region
+  - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry
+  - bietlejuice.google_ads:load-clean-campaigns-performance
+  - bietlejuice.robin_hood:load-clean-accounting-entry-source
+  - bietlejuice.robin_hood:load-clean-tax
+  - bietlejuice.robin_hood:load-clean-tax-ratio
 bietlejuice.enrich_growth_costs_sharing_rules:
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_rent_listing_flow:load-dw-public-fact-house-listing-flows

@@ -1,0 +1,109 @@
+---
+database_name: enrich_growth_costs
+table_name: campaign_costs
+owner: henrique.paulo@quintoandar.com.br
+domain: growth
+description: This enrich table consolidates campaign costs
+columns:
+  date:
+    description: Date of the campaign cost
+    lineage:
+      - dw_public.dim_date.date
+  week_start:
+    description: Start date of the week for the campaign cost
+    lineage:
+      - dw_public.dim_date.week_start
+  year_month:
+    description: Year and month combination for the campaign cost
+    lineage:
+      - dw_public.dim_date.year_month
+  sk_date:
+    description: Key from the dw_growth.dim_date dimension associated with the cost date
+    lineage:
+      - dw_public.dim_date.sk_date
+      - dw_growth.fact_media_platform_metrics.sk_cost_date
+  sk_campaign:
+    description: The key for the campaign, representing the unique identifier for each media campaign
+    lineage:
+      - dw_growth.fact_media_platform_metrics.sk_campaign
+      - datalake_google_ads_clean.campaigns_performance.id_campaign
+  nm_campaign:
+    description: Campaign name derived from UTM campaign
+    lineage:
+      - dw_growth.fact_media_platform_metrics.utm_campaign
+  sk_adset:
+    description: The key for the adset, representing the unique identifier for each ad set
+    lineage:
+      - dw_growth.fact_media_platform_metrics.sk_adset
+  dt_cost:
+    description: Date when the cost was recorded.
+    lineage:
+      - dw_growth.fact_media_platform_metrics.dt_cost
+  origin:
+    description: The source of the data (e.g., media platform such as Facebook, Google).
+    lineage:
+      - dw_growth.fact_media_platform_metrics.origin
+  country_code:
+    description: Country code associated with the user's click on the campaign
+    lineage:
+      - dw_growth.fact_media_platform_metrics.country_code
+  nm_business_context:
+    description: Describes the business context of the lead, indicating if this lead is for rent or for sale
+    lineage:
+      - dw_growth.dim_sharing_rules.business_context
+      - dw_growth.dim_media_setup.campaign_business_context
+  city_group:
+    description: City group associated with the campaign region
+    lineage:
+      - dw_public.dim_region.city_group
+  share:
+    description: Sharing percentage applied to the campaign metrics
+    lineage:
+      - dw_growth.dim_sharing_rules.share
+  clicks:
+    description: Number of clicks recorded for the campaign
+    lineage:
+      - dw_growth.fact_media_platform_metrics.clicks
+      - datalake_google_ads_clean.campaigns_performance.clicks
+  conversions:
+    description: Number of conversions recorded for the campaign
+    lineage:
+      - dw_growth.fact_media_platform_metrics.conversions
+      - datalake_google_ads_clean.campaigns_performance.conversions
+  impressions:
+    description: Number of impressions recorded for the campaign
+    lineage:
+      - dw_growth.fact_media_platform_metrics.impressions
+      - datalake_google_ads_clean.campaigns_performance.impressions
+  total_cost:
+    description: Total cost associated with the campaign
+    lineage:
+      - dw_growth.fact_media_platform_metrics.total_cost
+      - datalake_google_ads_clean.campaigns_performance.cost
+  share_cost:
+    description: Total cost adjusted by sharing percentage.
+    lineage:
+      - dw_growth.fact_media_platform_metrics.total_cost
+      - dw_growth.dim_sharing_rules.share
+  share_impressions:
+    description: Number of impressions adjusted by sharing percentage
+    lineage:
+      - dw_growth.fact_media_platform_metrics.impressions
+      - dw_growth.dim_sharing_rules.share
+  share_clicks:
+    description: Number of clicks adjusted by sharing percentage
+    lineage:
+      - dw_growth.fact_media_platform_metrics.clicks
+      - dw_growth.dim_sharing_rules.share
+  year:
+    description: Year of the cost record
+    lineage:
+      - dw_growth.fact_media_platform_metrics.year
+  month:
+    description: Month of the cost record
+    lineage:
+      - dw_growth.fact_media_platform_metrics.month
+  day:
+    description: Day of the cost record
+    lineage:
+      - dw_growth.fact_media_platform_metrics.day

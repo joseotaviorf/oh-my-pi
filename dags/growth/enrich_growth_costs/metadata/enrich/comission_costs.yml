@@ -1,0 +1,75 @@
+---
+database_name: enrich_growth_costs
+table_name: comission_costs
+owner: henrique.paulo@quintoandar.com.br
+domain: growth
+description: This enrich table consolidates commission costs and manual taxes
+columns:
+  source_name:
+    description: Name of the source system or channel generating the commission
+    lineage:
+      - datalake_robin_hood.accounting_entry.source_name
+      - datalake_robin_hood_clean.accounting_entry_source.source_name
+  cost_type:
+    description: Type of cost categorization - 'commission_costs' for standard commissions or 'manual_tax' for tax-related entries
+    lineage:
+      - Static value 'commission_costs' or 'manual_tax'
+  id_rh_accounting_entry:
+    description: Unique identifier from the Robin Hood accounting entry system (NULL for manual tax entries)
+    lineage:
+      - datalake_robin_hood.accounting_entry.id
+  id_external:
+    description: External identifier for the accounting entry (NULL for manual tax entries)
+    lineage:
+      - datalake_robin_hood.accounting_entry.id_external
+  id_payee:
+    description: Identifier of the payee receiving the commission or tax
+    lineage:
+      - datalake_robin_hood.accounting_entry.id_payee
+      - datalake_robin_hood_clean.tax.id_payee
+  city_group:
+    description: Geographic locale or city group where the commission was generated
+    lineage:
+      - datalake_robin_hood.accounting_entry.locale
+      - datalake_robin_hood_clean.tax_ratio.locale
+  description:
+    description: Detailed description of the accounting entry (NULL for manual tax entries)
+    lineage:
+      - datalake_robin_hood.accounting_entry.description
+  source_bill_item:
+    description: Specific billing item type from the source system (NULL for manual tax entries)
+    lineage:
+      - datalake_robin_hood.accounting_entry.source_bill_item
+  commission_type:
+    description: Categorized commission type - Commission Listing, Commission Rent, Commission Sale, Commission MGM, or IRRF for tax entries
+    lineage:
+      - datalake_robin_hood.accounting_entry.source_bill_item
+  vertical:
+    description: Business vertical classification - 'acquisition' for MGM commissions or 'engagement' for other commission types and taxes
+    lineage:
+      - datalake_robin_hood.accounting_entry.source_bill_item
+  cost_center_code:
+    description: Cost center code for accounting purposes
+    lineage:
+      - datalake_robin_hood.accounting_entry.cost_center_code
+      - datalake_robin_hood_clean.tax_ratio.cost_center_code
+  company_report_origin:
+    description: Company reporting origin mapped from source - Indica Aí - General, Indica Aí - Agents, Doorman, B2B, or Not Mapped
+    lineage:
+      - datalake_robin_hood.accounting_entry.id_source
+      - datalake_robin_hood_clean.accounting_entry_source.source_name
+  business_context:
+    description: Business context derived from cost center code, indicating whether the commission is for 'sale' or 'rent' operations
+    lineage:
+      - datalake_robin_hood.accounting_entry.cost_center_code
+      - datalake_robin_hood_clean.tax_ratio.cost_center_code
+  dt_cost:
+    description: Date when the commission cost or tax occurred
+    lineage:
+      - datalake_robin_hood.accounting_entry.dt_occurrence
+      - datalake_robin_hood_clean.tax_ratio.accounting_year_month
+  total_costs:
+    description: Total commission costs or tax amounts aggregated from due amounts or tax ratios
+    lineage:
+      - datalake_robin_hood.accounting_entry.due_amount
+      - datalake_robin_hood_clean.tax_ratio.amount 
