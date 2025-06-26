@@ -1,0 +1,19 @@
+database_name: datalake_chatbot
+table_name: user_flags
+domain: Conversational XP
+owner: william.angelo@quintoandar.com.br
+description:
+  This table contains user experiment flags extracted from Amplitude events data.
+  It specifically tracks the "ab_beakman_conversational_platform_wall_e_experiment" A/B test flag
+  to identify which users are part of the Wall-E conversational platform experiment.
+  This data is used to analyze user behavior and performance metrics for the experimental features.
+columns:
+  id_user:
+    lineage:
+      - datalake_amplitude_new_clean.events.id_user
+    description: User identifier.
+  wall_e_rollout_flag:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: |
+      A/B test experiment flag value for the Wall-E conversational platform experiment.

@@ -1,7 +1,7 @@
 database_name: datalake_chatbot
 table_name: csat
 domain: Support and Services
-owner: data-ae-ss@quintoandar.com.br
+owner: william.angelo@quintoandar.com.br
 description:
   This table contains Customer Satisfaction (CSAT) data collected from chatbot interactions.
   It stores feedback ratings and comments provided by users after their chatbot sessions,
