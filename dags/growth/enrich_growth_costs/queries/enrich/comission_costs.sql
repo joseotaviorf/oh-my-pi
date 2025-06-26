@@ -54,7 +54,10 @@ commission_costs AS (
             ELSE 'rent' 
         END AS business_context,
         ae.dt_occurrence AS dt_cost,
-        SUM(ae.due_amount) AS total_costs
+        SUM(ae.due_amount) AS total_costs,
+        YEAR(ae.dt_occurrence) AS year,
+        MONTH(ae.dt_occurrence) AS month,
+        DAY(ae.dt_occurrence) AS day
     FROM
         datalake_robin_hood.accounting_entry AS ae
     WHERE 
@@ -87,7 +90,10 @@ manual_tax AS (
             ELSE 'sale' 
         END AS business_context,
         TO_DATE(CAST(accounting_year_month AS VARCHAR(6)) || '01', 'yyyyMMdd') AS dt_cost, 
-        SUM(tr.amount) AS total_costs
+        SUM(tr.amount) AS total_costs,
+        YEAR(TO_DATE(CAST(accounting_year_month AS VARCHAR(6)) || '01', 'yyyyMMdd')) AS year,
+        MONTH(TO_DATE(CAST(accounting_year_month AS VARCHAR(6)) || '01', 'yyyyMMdd')) AS month,
+        1 AS day
     FROM 
         datalake_robin_hood_clean.tax_ratio AS tr
     JOIN 

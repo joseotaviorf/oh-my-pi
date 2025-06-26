@@ -72,4 +72,19 @@ columns:
     description: Total commission costs or tax amounts aggregated from due amounts or tax ratios
     lineage:
       - datalake_robin_hood.accounting_entry.due_amount
-      - datalake_robin_hood_clean.tax_ratio.amount 
+      - datalake_robin_hood_clean.tax_ratio.amount
+  year:
+    description: Year extracted from the cost occurrence date
+    lineage:
+      - datalake_robin_hood.accounting_entry.dt_occurrence
+      - datalake_robin_hood_clean.tax_ratio.accounting_year_month
+  month:
+    description: Month extracted from the cost occurrence date
+    lineage:
+      - datalake_robin_hood.accounting_entry.dt_occurrence
+      - datalake_robin_hood_clean.tax_ratio.accounting_year_month
+  day:
+    description: Day extracted from the cost occurrence date
+    lineage:
+      - datalake_robin_hood.accounting_entry.dt_occurrence
+      - datalake_robin_hood_clean.tax_ratio.accounting_year_month 
