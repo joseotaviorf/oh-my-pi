@@ -1986,6 +1986,10 @@ bietlejuice.enrich_employee:
   - bietlejuice.enrich_hr_system:load-enrich-salary-metrics
   - bietlejuice.enrich_hr_system:load-enrich-work-relationships
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy
+  - bietlejuice.gsheets_people:done-clean-codex-cost-centers
+  - bietlejuice.gsheets_people:done-clean-codex-cost-informations
+  - bietlejuice.gsheets_people_static:load-clean-email-employee-mapping
+  - bietlejuice.hr_system:load-clean-organizations
   - bietlejuice.hr_system:load-clean-salaries
 bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.batch_inference:load-clean-batch-inference
@@ -2125,8 +2129,6 @@ bietlejuice.enrich_house_feature_inference:
   - bietlejuice.enrich_ebdb_country:load-enrich-house
 bietlejuice.enrich_hr_system:
   - bietlejuice.awesomeapi_currency_rates:load-clean-currency-closing-rates
-  - bietlejuice.gsheets_people:done-clean-codex-cost-centers
-  - bietlejuice.gsheets_people:done-clean-codex-cost-informations
   - bietlejuice.hr_system:load-clean-salaries
   - bietlejuice.hr_system:load-clean-workers
   - bietlejuice.hr_system_custom:load-clean-workers-registration
