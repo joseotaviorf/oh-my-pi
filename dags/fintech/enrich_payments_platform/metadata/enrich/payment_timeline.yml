@@ -1,0 +1,43 @@
+---
+database_name: datalake_payments_platform
+table_name: payment_timeline
+owner: ae-finance-fintech@quintoandar.com.br
+domain: fintech
+columns:
+  id_payment_timeline:
+    description: Unique identifier for the timeline record (generated using MONOTONICALLY_INCREASING_ID())
+  id_business_key:
+    description: Business key used to identify unique payment records across different sources
+    lineage:
+    - datalake_wall_street_clean.charge.id
+    - datalake_checkout_clean.charge.id
+    - datalake_vans_clean.boleto.id
+  datasource:
+    description: Source system of the payment data (wallstreet, checkout, vans)
+  timeline_status:
+    description: Normalized payment status at a specific point in time
+    lineage:
+    - datalake_wall_street_clean.charge_aud.charge_status
+    - datalake_checkout_clean.charge_status_log.status
+    - datalake_vans_clean.boleto.status
+  payment_method_timeline:
+    description: Payment method used at a specific point in time
+    lineage:
+    - datalake_checkout_clean.charge_status_log.payment_method
+    - datalake_vans_clean.boleto.status
+  timeline_order:
+    description: Sequential order of status changes for a payment
+    lineage:
+    - datalake_wall_street_clean.charge_aud.rev
+    - datalake_checkout_clean.charge_status_log.ts_updated
+  id_finance_entity:
+    description: Finance entity ID that represents the payment
+    lineage:
+    - datalake_wall_street_clean.charge.id_finance_entity
+    - datalake_checkout_clean.order.id_finance_entity
+    - datalake_vans_clean.boleto.id_bank_boleto
+  timeline_timestamp:
+    description: Timestamp when the status change occurred
+    lineage:
+    - datalake_wall_street_clean.charge_aud.ts_updated
+    - datalake_checkout_clean.charge_status_log.ts_updated

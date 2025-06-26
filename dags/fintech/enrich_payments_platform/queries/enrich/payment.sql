@@ -56,10 +56,9 @@ ws_charge AS (
     *
     FROM
     datalake_wall_street_clean.charge
-    WHERE
-        id_finance_entity = 17593850655951
     QUALIFY
         IF(COUNT(*) OVER (PARTITION BY id_finance_entity) > 1, acquire_tid <> '-1', TRUE)
+        AND IF(acquire_tid <> '-1', ROW_NUMBER() OVER (PARTITION BY id_finance_entity ORDER BY IF(acquire_tid <> '-1', 0, 1), ts_paid) = 1, FALSE)
 ),
 credit_card_payments AS (
     SELECT
@@ -509,4 +508,3 @@ SELECT DISTINCT
     error_type
 FROM
     cte_union
-

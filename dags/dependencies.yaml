@@ -2573,6 +2573,7 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.checkout:load-clean-boleto
   - bietlejuice.checkout:load-clean-boleto-webhook
   - bietlejuice.checkout:load-clean-charge
+  - bietlejuice.checkout:load-clean-charge-status-log
   - bietlejuice.checkout:load-clean-credit-card
   - bietlejuice.checkout:load-clean-credit-card-capture-attempt
   - bietlejuice.checkout:load-clean-order

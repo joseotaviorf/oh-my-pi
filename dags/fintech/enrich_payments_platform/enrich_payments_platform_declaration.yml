@@ -10,6 +10,28 @@ workflow:
   type: query_delta
   layer: enrich
   tables_customization:
+    payment_timeline:
+      merge_on: ["id_business_key", "timeline_order"]
+      z_order_by: ["id_business_key", "datasource"]
+      when_matched_update_condition: "target.id_payment_timeline IS NOT NULL"
+      when_matched_operation: {
+        "id_business_key": "source.id_business_key",
+        "datasource": "source.datasource",
+        "timeline_status": "source.timeline_status",
+        "payment_method_timeline": "source.payment_method_timeline",
+        "timeline_order": "source.timeline_order",
+        "id_finance_entity": "source.id_finance_entity",
+        "timeline_timestamp": "source.timeline_timestamp"
+      }
+      when_not_matched_operation: {
+        "id_business_key": "source.id_business_key",
+        "datasource": "source.datasource",
+        "timeline_status": "source.timeline_status",
+        "payment_method_timeline": "source.payment_method_timeline",
+        "timeline_order": "source.timeline_order",
+        "id_finance_entity": "source.id_finance_entity",
+        "timeline_timestamp": "source.timeline_timestamp"
+      }
     payment:
       merge_on: ["id_business_key"]
       z_order_by: ["id_business_key", "datasource"]
