@@ -1,0 +1,70 @@
+---
+database_name: dw_employee
+table_name: fact_vacation_balances
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Fact table that records employee vacation balances, including accrued days, used days, and the available balance.
+columns:
+  sk_vacation_balance:
+    description: Primary key that uniquely identifies each vacation balance entry.
+    lineage:
+      - datalake_pin_core_clean.assignment_extra_info.id_assignment_extra_info
+  sk_employee:
+    description: Foreign key to the employee dimension, identifying the employee.
+    lineage:
+      - datalake_hr_system.employee_ids.id_person
+  sk_assignment:
+    description: Foreign key to the assignment dimension, identifying the period of service to which the vacation balance refers.
+    lineage:
+      - datalake_hr_system.employee_ids.id_period_of_service
+  sk_accrual_started_date:
+    description: Foreign key to the date dimension (format yyyyMMdd) for the start date of the vacation accrual period.
+    lineage:
+      - datalake_pin_core_clean.assignment_extra_info.dt_period_started
+  sk_accrual_ended_date:
+    description: Foreign key to the date dimension (format yyyyMMdd) for the end date of the vacation accrual period.
+    lineage:
+      - datalake_pin_core_clean.assignment_extra_info.dt_period_ended
+  sk_accrual_expiration_date:
+    description: Foreign key to the date dimension (format yyyyMMdd) for the expiration date of the accrual, calculated as end_date + 365 days.
+    lineage:
+      - datalake_pin_core_clean.assignment_extra_info.dt_period_ended
+  sk_vacation_status:
+    description: Foreign key to the vacation status dimension, indicating the current status of the vacation balance (MD5 hash).
+    lineage:
+      - datalake_pin_core_clean.assignment_extra_info.type_or_status
+  days_accrued:
+    description: Number of vacation days accrued by the employee in the accrual period.
+    lineage:
+      - datalake_pin_core_clean.assignment_extra_info.days_vacation_acquired
+  days_vacation_taken_absence:
+    description: Number of vacation days used as absence, sourced from submitted and non-denied requests.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.days_duration
+  days_vacation_taken_cash_out:
+    description: Number of vacation days converted to cash-out, sourced from submitted and non-denied requests.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
+  total_days_taken:
+    description: Total sum of vacation days used (absence + cash-out).
+    lineage:
+      - datalake_pin_absence_clean.person_entry.days_duration
+      - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
+  days_balance:
+    description: Balance of available vacation days (accrued days - total used days).
+    lineage:
+      - datalake_pin_core_clean.assignment_extra_info.days_vacation_acquired
+      - datalake_pin_absence_clean.person_entry.days_duration
+      - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
+  has_available_days:
+    description: Boolean flag indicating if the employee has a non-zero vacation day balance.
+    lineage:
+      - datalake_pin_core_clean.assignment_extra_info.days_vacation_acquired
+      - datalake_pin_absence_clean.person_entry.days_duration
+      - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
+  is_accrual_period_closed:
+    description: Boolean flag indicating if the vacation accrual period status is 'FECHADO'.
+    lineage:
+      - datalake_pin_core_clean.assignment_extra_info.type_or_status
+  ts_load:
+    description: Timestamp of when the record was loaded into the table.

@@ -534,6 +534,9 @@ bietlejuice.dw_employee:
   - bietlejuice.hr_system:load-clean-organizations
   - bietlejuice.hr_system:load-clean-salaries
   - bietlejuice.hr_system:load-clean-workers
+  - bietlejuice.pin_absence:load-clean-person-entry
+  - bietlejuice.pin_absence:load-clean-type
+  - bietlejuice.pin_absence:load-clean-type-translation
 bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice

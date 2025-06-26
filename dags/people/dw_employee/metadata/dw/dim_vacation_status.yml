@@ -1,0 +1,17 @@
+---
+database_name: dw_employee
+table_name: dim_vacation_status
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: Dimension table that stores the different possible statuses related to an employee's vacation balance.
+columns:
+  sk_vacation_status:
+    description: Primary key (MD5 hash) that uniquely and deterministically identifies the vacation status.
+    lineage:
+     - datalake_pin_core_clean.assignment_extra_info.type_or_status
+  vacation_status:
+    description: Descriptive name of the vacation status.
+    lineage:
+     - datalake_pin_core_clean.assignment_extra_info.type_or_status
+  ts_load:
+    description: Timestamp of when the record was loaded into the table.
