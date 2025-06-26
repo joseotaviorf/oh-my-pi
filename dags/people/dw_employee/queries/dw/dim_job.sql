@@ -38,17 +38,17 @@ WITH jobs AS (
         id_band_ladder,
         comp_ladder_directorate
     FROM
-        datalake_hr_system.assignments
+        datalake_pin.movement_details
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_band_ladder ORDER BY dt_effective_start DESC) = 1
+        ROW_NUMBER() OVER (PARTITION BY id_band_ladder ORDER BY dt_effective_started DESC) = 1
 ), band AS (
     SELECT
         id_job,
         band
     FROM
-        datalake_hr_system.assignments
+        datalake_pin.movement_details
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_job ORDER BY dt_effective_start DESC) = 1
+        ROW_NUMBER() OVER (PARTITION BY id_job ORDER BY dt_effective_started DESC) = 1
 )
 SELECT DISTINCT
     -- ids

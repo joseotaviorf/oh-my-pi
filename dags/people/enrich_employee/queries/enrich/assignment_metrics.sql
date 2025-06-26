@@ -3,12 +3,12 @@ promotions_step_1 AS (
   SELECT
     id_period_of_service,
     id_assignment,
-    dt_effective_start,
+    dt_effective_started,
     action_code,
     band,
-    LAG(band) OVER (PARTITION BY id_assignment ORDER BY dt_effective_start) AS last_band
+    LAG(band) OVER (PARTITION BY id_assignment ORDER BY dt_effective_started) AS last_band
   FROM
-    datalake_hr_system.assignments
+    datalake_pin.movement_details
 ),
 promotions AS (
   SELECT

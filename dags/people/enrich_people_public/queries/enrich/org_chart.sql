@@ -14,16 +14,16 @@ manager_cte AS (
 ),
 assignment_cte AS (
   SELECT
-    a.id_person,
-    a.id_assignment,
-    a.assignment_number,
-    a.assignment_name,
-    a.business_unit_name,
-    a.id_cost_center,
-    a.cost_center_name,
-    a.assignment_status_type,
-    a.dt_effective_start,
-    a.dt_effective_end,
+    md.id_person,
+    md.id_assignment,
+    md.assignment_number,
+    md.assignment_name,
+    md.business_unit_name,
+    md.id_cost_center,
+    md.cost_center_name,
+    md.assignment_status_type,
+    md.dt_effective_started,
+    md.dt_effective_ended,
     o.business,
     o.product,
     o.vertical,
@@ -36,27 +36,27 @@ assignment_cte AS (
     em.work_email AS manager_email,
     jf.name_job_family AS position_class
   FROM
-    datalake_hr_system.assignments AS a
+    datalake_pin.movement_details AS md
   LEFT JOIN
     datalake_hr_system_clean.organizations AS o
-      ON o.id_organization = a.id_cost_center
+      ON o.id_organization = md.id_cost_center
   LEFT JOIN
     manager_cte AS m 
-      ON m.id_assignment = a.id_assignment
+      ON m.id_assignment = md.id_assignment
   LEFT JOIN
     datalake_hr_system.employee_ids AS em
       ON em.id_assignment = m.id_manager_assignment
   LEFT JOIN 
     datalake_hr_system_clean.jobs AS j
-      ON j.id_job = a.id_job
+      ON j.id_job = md.id_job
   LEFT JOIN
     datalake_hr_system_clean.job_families AS jf
       ON jf.id_job_family = j.id_job_family
   WHERE
-    a.dt_effective_start < DATE(CURRENT_DATE)
-    AND a.assignment_type IN ('E', 'C')
+    md.dt_effective_started < DATE(CURRENT_DATE)
+    AND md.assignment_type IN ('E', 'C')
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY a.id_assignment ORDER BY a.dt_effective_start DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY md.id_assignment ORDER BY md.dt_effective_started DESC) = 1
 )
 
 SELECT

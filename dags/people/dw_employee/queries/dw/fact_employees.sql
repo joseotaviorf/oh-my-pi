@@ -52,8 +52,8 @@ WITH
     salary_raw_for_employee AS (
         SELECT
             s.id_assignment,
-            a.id_person,
-            a.dt_effective_start AS start_date,
+            md.id_person,
+            md.dt_effective_started AS start_date,
             s.grade_name AS grade,
             s.salary_amount AS salary,
             s.adjustment_amount AS nominal_increase,
@@ -64,18 +64,18 @@ WITH
         FROM
             datalake_hr_system_clean.salaries AS s
         INNER JOIN
-            datalake_hr_system.assignments AS a
-                ON s.id_assignment = a.id_assignment
+            datalake_pin.movement_details AS md
+                ON s.id_assignment = md.id_assignment
         LEFT JOIN
             cte_dt_hiring AS h
-                ON h.dt_hiring <= a.dt_effective_start
-                    AND h.sk_employee = a.id_person
+                ON h.dt_hiring <= md.dt_effective_started
+                    AND h.sk_employee = md.id_person
         WHERE
             dt_from <= DATE ('{load_start_date}')
             AND s.assignment_number NOT LIKE 'P%'
         QUALIFY
-            a.dt_effective_start = MAX(a.dt_effective_start) OVER (PARTITION BY a.id_person)
-            AND s.dt_from = MAX(s.dt_from) OVER (PARTITION BY a.id_person)
+            md.dt_effective_started = MAX(md.dt_effective_started) OVER (PARTITION BY md.id_person)
+            AND s.dt_from = MAX(s.dt_from) OVER (PARTITION BY md.id_person)
     ),
     cte_movements_step_0_for_employee AS (
         SELECT

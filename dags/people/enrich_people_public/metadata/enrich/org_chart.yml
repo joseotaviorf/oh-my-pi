@@ -20,7 +20,7 @@ columns:
   assignment_status_type:
     description: "Assignment status type for the worker."
     lineage:
-      - datalake_hr_system.assignments.assignment_status_type
+      - datalake_pin.movement_details.assignment_status_type
     categories:
       ACTIVE: "The employee is active in the company."
       INACTIVE: "The employee is inactive or has left the company."
@@ -35,7 +35,7 @@ columns:
   assignment_name:
     description: "Name of the job of the worker."
     lineage:
-      - datalake_hr_system.assignments.assignment_name
+      - datalake_pin.movement_details.assignment_name
   job_class:
     description: "Type of position of the worker."
     lineage:
@@ -43,11 +43,11 @@ columns:
   business_unit_name:
     description: "Name of the business unit for the worker assignment."
     lineage:
-      - datalake_hr_system.assignments.business_unit_name
+      - datalake_pin.movement_details.business_unit_name
   cost_center_name:
     description: "Cost center of the employee."
     lineage:
-      - datalake_hr_system.assignments.cost_center_name
+      - datalake_pin.movement_details.cost_center_name
   business:
     description: "Business in which the employee works."
     lineage:

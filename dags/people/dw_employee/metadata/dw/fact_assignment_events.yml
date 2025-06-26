@@ -1,3 +1,4 @@
+---
 database_name: dw_employee
 table_name: fact_assignment_events
 owner: isabella.araujo@quintoandar.com.br
@@ -8,29 +9,35 @@ columns:
     description: "Unique identifier for the person related to the assignment."
     lineage:
       - datalake_hr_system.employee_ids.id_person
+      - datalake_pin.movement_details.id_person
   sk_assignment:
     description: "Unique identifier for the period of service related to the assignment."
     lineage:
       - datalake_hr_system.employee_ids.id_period_of_service
+      - datalake_pin.movement_details.id_period_of_service
   sk_started_date:
     description: "Started date of the event."
     lineage:
       - datalake_hr_system_clean.salaries.dt_from
+      - datalake_pin.movement_details.dt_effective_started
   sk_ended_date:
     description: "Ended date of the event."
     lineage:
       - datalake_hr_system_clean.salaries.dt_to
+      - datalake_pin.movement_details.dt_effective_ended
   event_type:
-    description: "Type of event being recorded, such as salary change, role change, or cost center reassignment."
+    description: "Type of event being recorded. Can be 'SALARY_ADJUSTMENT' or 'ASSIGNMENT_CHANGE'."
   event_value:
-    description: "The value or amount related to the event, such as salary or assignment."
+    description: "The value related to the event, such as salary amount or the new assignment name."
     lineage:
       - datalake_hr_system_clean.salaries.salary_amount
+      - datalake_pin.movement_details.assignment_name
   action_reason:
-    description: "The reason or justification for the event, such as promotion or salary raise."
+    description: "The reason or code for the event, such as promotion reason or action code for the assignment change."
     lineage:
       - datalake_hr_system_clean.salaries.action_reason
+      - datalake_pin.movement_details.action_code
   currency_code:
-    description: "Currency code associated with the salary or financial adjustment."
+    description: "Currency code associated with the salary or financial adjustment. It can be null for non-financial events."
     lineage:
       - datalake_hr_system_clean.salaries.currency_code

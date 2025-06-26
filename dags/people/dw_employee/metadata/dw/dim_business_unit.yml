@@ -6,9 +6,9 @@ domain: people
 description: Dimension table for business unit.
 columns:
   sk_business_unit:
-    description: Surrogate key for the business unit.'
+    description: 'Surrogate key for the business unit.'
     lineage:
-    - datalake_hr_system.assignments.a.id_business_unit
+    - datalake_pin.movement_details.id_business_unit
   business_unit_name:
     description: 'Business unit name'
     categories:
@@ -21,7 +21,7 @@ columns:
      "QuintoAndar SC": ""
      "QuintoAndar SP": ""
     lineage:
-    - datalake_hr_system.assignments.business_unit_name
+    - datalake_pin.movement_details.business_unit_name
   legal_employer_name:
     description: 'Legal employer name'
     categories:

@@ -522,7 +522,6 @@ bietlejuice.dw_demand:
 bietlejuice.dw_employee:
   - bietlejuice.enrich_employee:load-enrich-hierarchy-ids
   - bietlejuice.enrich_hr_system:load-enrich-assignment-effective-status
-  - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
   - bietlejuice.enrich_hr_system:load-enrich-disability
   - bietlejuice.enrich_hr_system:load-enrich-employee-ids
@@ -1504,6 +1503,10 @@ bietlejuice.enrich_company:
   - bietlejuice.company:load-clean-document
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-members
+bietlejuice.enrich_concierge_ranking_metrics:
+  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.house_listing_search:load-clean-recommendation-use-case
+  - bietlejuice.house_listing_search:load-clean-recommendation-user-use-case
 bietlejuice.enrich_condo_monitoring:
   - bietlejuice.condominium_payments:load-clean-non-payment-report
   - bietlejuice.ebdb_contract:load-clean-contract
@@ -1974,7 +1977,6 @@ bietlejuice.enrich_emlio:
   - bietlejuice.emlio:load-clean-emlio-logs
 bietlejuice.enrich_employee:
   - bietlejuice.enrich_hr_system:load-enrich-assignment-effective-status
-  - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes
   - bietlejuice.enrich_hr_system:load-enrich-disability
   - bietlejuice.enrich_hr_system:load-enrich-employee-ids
@@ -2577,7 +2579,6 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.wall_street:load-clean-subscription
   - bietlejuice.wall_street:load-clean-subscription-item
 bietlejuice.enrich_people_public:
-  - bietlejuice.enrich_hr_system:load-enrich-assignments
   - bietlejuice.enrich_hr_system:load-enrich-employee-ids
   - bietlejuice.enrich_pin:load-enrich-managers-history
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
@@ -4119,7 +4120,3 @@ wonka.user_search_profile_clustering:
   - wonka.user_bc_h3_7_city_agg_search_filters:load-user_bc_h3_7_city_agg_search_filters
 wonka.user_visit:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
-bietlejuice.enrich_concierge_ranking_metrics:
- - bietlejuice.house_listing_search:load-clean-recommendation-use-case
- - bietlejuice.house_listing_search:load-clean-recommendation-user-use-case
- - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean

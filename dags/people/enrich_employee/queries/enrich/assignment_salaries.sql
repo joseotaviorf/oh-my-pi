@@ -71,8 +71,8 @@ SELECT
         THEN 100 *(salary_amount / last_salary_amount - 1)
         ELSE 0
     END AS percentage_increase,
-    a.dt_effective_start AS dt_assignment_started,
-    a.dt_effective_end AS dt_assignment_ended,
+    a.dt_effective_started AS dt_assignment_started,
+    a.dt_effective_ended AS dt_assignment_ended,
     s.dt_salary_started,
     s.dt_salary_ended,
     LAG(s.dt_salary_started) OVER (
@@ -86,15 +86,15 @@ SELECT
             s.dt_salary_ended
     ) AS dt_last_salary_ended
 FROM
-    datalake_hr_system.assignments AS a
+    datalake_pin.movement_details AS a
 FULL OUTER JOIN
     salaries_cte AS s
         ON s.id_assignment = a.id_assignment
         AND (
-            dt_salary_started BETWEEN dt_effective_start AND dt_effective_end
-            OR dt_salary_ended BETWEEN dt_effective_start AND dt_effective_end
-            OR dt_effective_start BETWEEN dt_salary_started AND dt_salary_ended
-            OR dt_effective_end BETWEEN dt_salary_started AND dt_salary_ended
+            dt_salary_started BETWEEN dt_effective_started AND dt_effective_ended
+            OR dt_salary_ended BETWEEN dt_effective_started AND dt_effective_ended
+            OR dt_effective_started BETWEEN dt_salary_started AND dt_salary_ended
+            OR dt_effective_ended BETWEEN dt_salary_started AND dt_salary_ended
         )
 WHERE
     a.assignment_status_type = 'ACTIVE'

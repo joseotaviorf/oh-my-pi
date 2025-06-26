@@ -3,7 +3,7 @@ database_name: dw_employee
 table_name: fact_assignments
 owner: isabella.araujo@quintoandar.com.br
 domain: people
-description: "Table storing detailed information about employee assignments."
+description: "Table storing detailed information about employee assignments, sourced from assignment_metrics and hierarchy_ids."
 columns:
   sk_assignment:
     description: "Unique identifier for the period of service related to the assignment."
@@ -42,17 +42,21 @@ columns:
     lineage:
       - datalake_hr_system.assignment_metrics.sk_manager_assignment
   sk_work_relationship_started_date:
-    description: "Start date of the work relationship, formatted as SK."
+    description: "Start date of the work relationship, formatted as a surrogate key (YYYYMMDD)."
     lineage:
       - datalake_hr_system.assignment_metrics.dt_work_relationship_started
   sk_work_relationship_ended_date:
-    description: "End date of the work relationship, formatted as SK."
+    description: "End date of the work relationship, formatted as a surrogate key (YYYYMMDD)."
     lineage:
       - datalake_hr_system.assignment_metrics.dt_work_relationship_terminated
   sk_hierarchy:
     description: "Unique identifier for the hierarchy related to the assignment."
     lineage:
       - datalake_hr_system.hierarchy_ids.sk_hierarchy
+  assignment_number:
+    description: "Employee registration number in PIN."
+    lineage:
+      - datalake_hr_system.assignment_metrics.assignment_number
   salary_currency_code:
     description: "Currency code of the salary."
     lineage:
@@ -65,10 +69,6 @@ columns:
     description: "Date of the first promotion, formatted as SK."
     lineage:
       - datalake_hr_system.assignment_metrics.sk_first_promotion_date
-  assignment_number:
-    description: "Employee registration number in PIN."
-    lineage:
-      - datalake_hr_system.assignment_metrics.assignment_number
   is_last_work_relationship:
     description: "Indicates if this is the last work relationship (TRUE or FALSE)."
     lineage:
@@ -121,11 +121,11 @@ columns:
     description: "Average time between movements during the assignment."
     lineage:
       - datalake_hr_system.assignment_metrics.average_time_between_movimentations
-  last_increase:
+  last_salary_increase:
     description: "Last salary increase amount."
     lineage:
       - datalake_hr_system.assignment_metrics.last_increase
-  pct_last_increase:
+  pct_last_salary_increase:
     description: "Last salary increase percentage."
     lineage:
       - datalake_hr_system.assignment_metrics.pct_last_increase

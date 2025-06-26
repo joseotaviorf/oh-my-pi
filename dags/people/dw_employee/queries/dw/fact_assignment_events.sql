@@ -16,16 +16,16 @@ LEFT JOIN
 UNION ALL
 
 SELECT
-  a.id_person AS sk_employee,
-  a.id_period_of_service AS sk_assignment,
-  COALESCE(CAST(DATE_FORMAT(a.dt_effective_start, "yyyyMMdd") AS BIGINT), -1) AS sk_started_date,
-  COALESCE(CAST(DATE_FORMAT(a.dt_effective_end, "yyyyMMdd") AS BIGINT), -1) AS sk_ended_date,
+  md.id_person AS sk_employee,
+  md.id_period_of_service AS sk_assignment,
+  COALESCE(CAST(DATE_FORMAT(md.dt_effective_started, "yyyyMMdd") AS BIGINT), -1) AS sk_started_date,
+  COALESCE(CAST(DATE_FORMAT(md.dt_effective_ended, "yyyyMMdd") AS BIGINT), -1) AS sk_ended_date,
   'ASSIGNMENT_CHANGE' AS event_type,
-  UPPER(a.assignment_name) AS event_value,
-  UPPER(a.action_code) AS action_reason,
+  UPPER(md.assignment_name) AS event_value,
+  UPPER(md.action_code) AS action_reason,
   NULL AS currency_code
 FROM
-  datalake_hr_system.assignments AS a
+  datalake_pin.movement_details AS md
 QUALIFY
-  LEAD(UPPER(a.assignment_name))
-  OVER (PARTITION BY a.id_period_of_service ORDER BY a.dt_effective_start) <> UPPER(a.assignment_name)
+  LEAD(UPPER(md.assignment_name))
+  OVER (PARTITION BY md.id_period_of_service ORDER BY md.dt_effective_started) <> UPPER(md.assignment_name)

@@ -8,15 +8,15 @@ columns:
   id_assignment:
     description: "Id assignment of employee."
     lineage:
-      - datalake_hr_system.assignments.id_assignment
+      - datalake_pin.movement_details.id_assignment
   id_period_of_service:
     description: "Id period of service of employee. It is referenced in dw_employee.fact_assignment as sk_assignment."
     lineage:
-      - datalake_hr_system.assignments.id_period_of_service
+      - datalake_pin.movement_details.id_period_of_service
   id_person:
     description: "Id person of employee."
     lineage:
-      - datalake_hr_system.assignments.id_person
+      - datalake_pin.movement_details.id_person
   legacy_registration:
     description: "Legacy employee registration at TMF."
     lineage:
@@ -24,7 +24,7 @@ columns:
   assignment_number:
     description: "Employee registration number."
     lineage:
-      - datalake_hr_system.assignments.assignment_number
+      - datalake_pin.movement_details.assignment_number
   person_number:
     description: "Unique employee number in HCM."
     lineage:

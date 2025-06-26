@@ -20,28 +20,28 @@ columns:
   sk_cost_center:
     description: "Surrogate key for the cost center. Just the id_cost_center"
     lineage:
-      - datalake_hr_system.assignments.id_cost_center
+      - datalake_pin.movement_details.id_cost_center
   sk_business_unit:
     description: "Surrogate key for the business unit. Just the id_business_unit"
     lineage:
-      - datalake_hr_system.assignments.id_business_unit
+      - datalake_pin.movement_details.id_business_unit
   sk_job:
     description: "Surrogate key for the job. Just the id_job"
     lineage:
-      - datalake_hr_system.assignments.id_job
+      - datalake_pin.movement_details.id_job
   sk_manager:
     description:
       "Surrogate key for dim_employee, with the manager of the employee. Just
       the id_person"
     lineage:
-      - datalake_hr_system.assignments.id_assignment
-      - datalake_hr_system.assignments.id_person
+      - datalake_pin.movement_details.id_assignment
+      - datalake_pin.movement_details.id_person
   sk_manager_assignment:
     description:
       "Surrogate key for dim_assignment with the manager of the employee. Just
       the id_assignment"
     lineage:
-      - datalake_hr_system.assignments.id_assignment
+      - datalake_pin.movement_details.id_assignment
       - datalake_pin.managers_history.id_manager_assignment
   sk_disability:
     description: "Unique identifier for the disability related to the assignment."
@@ -63,18 +63,18 @@ columns:
   is_active:
     description: "Indicates if the assignment is active."
     lineage:
-      - datalake_hr_system.assignments.assignment_status_type
+      - datalake_pin.movement_details.assignment_status_type
   is_pending_worker:
     description:
       "Indicates if the worker is pending, that is, the worker is not yet
       active."
     lineage:
-      - datalake_hr_system.assignments.assignment_status_type
+      - datalake_pin.movement_details.assignment_status_type
       - datalake_hr_system.work_relationships.dt_start
   is_manager:
     description: "Indicates if the employee is a manager."
     lineage:
-      - datalake_hr_system.assignments.career_track
+      - datalake_pin.movement_details.career_track
       - datalake_pin.managers_history.id_manager_assignment
   has_self_declared_disability:
     description: "Indicates if the worker has self-declared disability."
@@ -96,10 +96,10 @@ columns:
   qnt_promotions:
     description: "Number of promotions of the employee, since Jannuary 1st, 2021."
     lineage:
-      - datalake_hr_system.assignments.band
-      - datalake_hr_system.assignments.id_assignment
-      - datalake_hr_system.assignments.dt_effective_start
-      - datalake_hr_system.assignments.action_code
+      - datalake_pin.movement_details.band
+      - datalake_pin.movement_details.id_assignment
+      - datalake_pin.movement_details.dt_effective_started
+      - datalake_pin.movement_details.action_code
   salary:
     description: "Value of the salary."
     lineage:
@@ -107,6 +107,6 @@ columns:
   target_plr:
     description: "Value of the target for the Variable Remuneration Program."
     lineage:
-      - datalake_hr_system.assignments.target_plr
+      - datalake_hr_system.assignment_effective_status.target_plr
   ts_load:
     description: "Timestamp of the load."

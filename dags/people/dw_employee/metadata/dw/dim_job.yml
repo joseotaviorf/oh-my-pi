@@ -20,7 +20,7 @@ columns:
   band:
     description: "Indicates the job band. The most recent band update is considered as the correct value."
     lineage:
-      - datalake_hr_system.assignments.band
+      - datalake_pin.movement_details.band
   comp_ladder_directorate:
     description: "Job's band ladder name. The band ladder is a structure that defines the career path for the employees."
     lineage:
