@@ -1,0 +1,39 @@
+dag:
+  name: risk_and_mortgage_test
+  schedule_start_date: 2021, 8, 10
+  schedule_interval: 0 3 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      This DAG imports the tables from [Risk And Mortgage](https://github.com/quintoandar/risk-and-mortgage), a service that makes an interface with Itau bank for financing credit approval.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  source_database: riskandmortgage
+  dbutils_secret_key: RISK_AND_MORTGAGE_DB
+  lineage_product_database_name: riskandmortgage
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    credit_proposal:
+      clean_table_name: credit_proposal
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    offer_pre_analysis:
+      clean_table_name: offer_pre_analysis
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+cluster:
+  type: databricks_13_3_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -10,9 +10,6 @@ columns:
   id_external_house:
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.external_house_id
-  id_house:
-    lineage:
-      - datalake_risk_and_mortgage_raw.offer_pre_analysis.house_id
   id_offer:
     lineage:
       - datalake_risk_and_mortgage_raw.offer_pre_analysis.offer_id
