@@ -28,13 +28,13 @@ columns:
   qt_opsgenie_alerts:
     description: Quantity of OpsGenie alerts during DAG's execution.
     lineage:
-      - datalake_opsgenie_clean.alerts.dag_name
-      - datalake_opsgenie_clean.alerts.ts_created
+      - datalake_opsgenie.alerts.id_alert
   qt_opsgenie_on_call_alerts:
     description: Quantity of OpsGenie alerts during on-call DAG's execution.
     lineage:
-      - datalake_opsgenie_clean.alerts.dag_name
-      - datalake_opsgenie_clean.alerts.ts_created
+      - datalake_opsgenie.alerts.id_alert
+      - datalake_opsgenie.alerts.ts_created
+      - datalake_opsgenie.jira_alert_actions.is_call_notification_sent
   qt_cluster_cpu_alerts:
     description: Quantity of CPU usage Databricks cluster alerts during DAG's execution.
     lineage:

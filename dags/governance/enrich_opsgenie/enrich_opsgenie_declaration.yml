@@ -8,6 +8,11 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  inner_dependencies:
+    alerts:
+    - jira_alert_actions
+    acordamentos:
+    - jira_alert_actions
   tables_customization:
     alerts:
       extraction_type: incremental

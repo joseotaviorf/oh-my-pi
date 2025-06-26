@@ -1,0 +1,56 @@
+---
+database_name: datalake_opsgenie
+table_name: jira_alert_actions
+domain: Cross
+description: This table contains enriched information about the actions of an alert opened in Jira.
+columns:
+  id_alert:
+    description: The unique alert identifier, use it as the primary key for alert data
+    lineage:
+    - datalake_jira_ops_clean.alert_log.id_alert
+  closed_by:
+    description: The user of the person who closed the alert
+    lineage:
+    - datalake_jira_ops_clean.alert_log.owner
+  acknowledged_by:
+    description: The user of the person who acknowledged the alert
+    lineage:
+    - datalake_jira_ops_clean.alert_log.owner
+  is_call_notification_sent:
+    description: True if a call notification was sent for this alert; otherwise, false
+    lineage:
+    - datalake_jira_ops_clean.alert_log.log
+  is_email_notification_sent:
+    description: True if an email was sent for this alert; otherwise, false
+    lineage:
+    - datalake_jira_ops_clean.alert_log.log
+  ts_acknowledged:
+    description: Timestamp when the alert was acknowledged
+    lineage:
+    - datalake_jira_ops_clean.alert_log.ts_log
+    - datalake_jira_ops_clean.alert_log.log
+  ts_closed:
+    description: Timestamp when the alert was closed
+    lineage:
+    - datalake_jira_ops_clean.alert_log.ts_log
+    - datalake_jira_ops_clean.alert_log.log
+  ts_first_call_notification_sent:
+    description: Timestamp of the first call notification
+    lineage:
+    - datalake_jira_ops_clean.alert_log.ts_log
+    - datalake_jira_ops_clean.alert_log.log
+  ts_last_call_notification_sent:
+    description: Timestamp of when the last call notification was sent
+    lineage:
+    - datalake_jira_ops_clean.alert_log.ts_log
+    - datalake_jira_ops_clean.alert_log.log
+  ts_first_email_notification_sent:
+    description: Timestamp of when the first email notification was sent
+    lineage:
+    - datalake_jira_ops_clean.alert_log.ts_log
+    - datalake_jira_ops_clean.alert_log.log
+  ts_last_email_notification_sent:
+    description: Timestamp of when the last email notification was sent
+    lineage:
+    - datalake_jira_ops_clean.alert_log.ts_log
+    - datalake_jira_ops_clean.alert_log.log

@@ -1,7 +1,7 @@
 WITH dag_layer AS (
-    SELECT DISTINCT 
-        dag, 
-        CASE 
+    SELECT DISTINCT
+        dag,
+        CASE
             WHEN CONCAT_WS('|', ARRAY_SORT(ARRAY_DISTINCT(ARRAY_AGG(layer)))) LIKE 'clean%' THEN 'clean|raw'
             ELSE CONCAT_WS('|', ARRAY_SORT(ARRAY_DISTINCT(ARRAY_AGG(layer))))
         END AS layer
@@ -9,8 +9,8 @@ WITH dag_layer AS (
     GROUP BY 1
 ),
 dags AS (
-    SELECT DISTINCT 
-        id_dag AS dag_name, 
+    SELECT DISTINCT
+        id_dag AS dag_name,
         REGEXP_REPLACE(owners,'(airflow|\,)','') AS dag_owner,
         layer AS dag_layer,
         DATE(adt.date) AS dt_executed
@@ -27,33 +27,30 @@ airflow_failed_tasks AS (
         id_dag AS dag_name,
         DATE(ts_executed) AS dt_executed,
         COUNT(DISTINCT id_fail) AS qt_failed_airflow_tasks
-    FROM 
+    FROM
         datalake_airflow.task_fail
     GROUP BY
         1, 2
 ),
 opsgenie_alerts AS (
-    SELECT 
-        dag_name,
+    SELECT
+        a.dag_name,
         DATE(a.ts_created) AS dt_executed,
-        COUNT(DISTINCT a.id) AS qt_opsgenie_alerts,
-        COUNT( DISTINCT 
+        COUNT(DISTINCT a.id_alert) AS qt_opsgenie_alerts,
+        COUNT( DISTINCT
             CASE
-                WHEN DAYOFWEEK(a.ts_created) IN (2,3,4,5,6) AND HOUR(a.ts_created) <= 12 AND is_call_notification_made = true THEN a.id
-                WHEN DAYOFWEEK(a.ts_created) IN (1,7) AND HOUR(a.ts_created) >= 12 AND HOUR(a.ts_created) <= 15 AND is_call_notification_made = true THEN a.id
+                WHEN DAYOFWEEK(a.ts_created) IN (2,3,4,5,6) AND HOUR(a.ts_created) <= 12 AND l.is_call_notification_sent = true THEN a.id_alert
+                WHEN DAYOFWEEK(a.ts_created) IN (1,7) AND HOUR(a.ts_created) >= 12 AND HOUR(a.ts_created) <= 15 AND l.is_call_notification_sent = true THEN a.id_alert
                 ELSE NULL
             END
-        ) AS qt_opsgenie_on_call_alerts        
+        ) AS qt_opsgenie_on_call_alerts
     FROM
-        datalake_opsgenie_clean.alerts AS a
+        datalake_opsgenie.alerts AS a
     LEFT JOIN
-        datalake_opsgenie_clean.logs AS l
+        datalake_opsgenie.jira_alert_actions AS l
     ON
-        a.id = l.id
-        AND a.year = l.year
-        AND a.month = l.month
-        AND a.day = l.day
-    GROUP BY 
+        a.id_alert = l.id_alert
+    GROUP BY
         1, 2
 ),
 databricks_cluster_alerts AS (
@@ -62,20 +59,20 @@ databricks_cluster_alerts AS (
         DATE(ts_alert) AS dt_executed,
         SUM( CASE WHEN alert_name LIKE '%cpu-alert%' THEN 1 ELSE 0 END ) AS qt_cluster_cpu_alerts,
         SUM( CASE WHEN alert_name LIKE '%memory-swap-alert%' THEN 1 ELSE 0 END ) AS qt_cluster_memory_swap_alerts
-    FROM 
+    FROM
         datalake_alert_manager_clean.alerts_databricks_cluster
-    WHERE 
+    WHERE
         message IS NOT NULL
     GROUP BY
         1, 2
 ),
 dei_incidents AS (
-    SELECT 
+    SELECT
         REGEXP_EXTRACT(summary,'bietlejuice.[a-zA-Z0-9\_\-]+',0) AS dag_name,
         DATE(ts_created) AS dt_executed,
         COUNT(*) AS qt_dei_incidents
     FROM datalake_jira.issues
-    WHERE 
+    WHERE
         project_name LIKE 'Data Engineering Incidents'
         AND summary LIKE '%bietlejuice.%'
     GROUP BY
@@ -86,16 +83,16 @@ data_quality_fails AS (
         dag AS dag_name,
         DATE(ts_execution_utc) AS dt_executed,
         COUNT( DISTINCT CASE WHEN suite_result = 'error' THEN suite_name ELSE NULL END ) AS qt_failed_data_quality_tests
-    FROM 
+    FROM
         datalake_inmetro_clean.data_validations AS dv
-    JOIN 
+    JOIN
         datalake_dag_inventory_clean.table AS tb
-    ON 
+    ON
         dv.database || '.' || dv.table = tb.table
-    WHERE 
+    WHERE
         repo = 'bietlejuice'
-    GROUP BY 
-        1, 2    
+    GROUP BY
+        1, 2
 )
 SELECT
 	dg.dag_name,
@@ -135,4 +132,4 @@ LEFT JOIN
 	data_quality_fails AS dq
 ON
 	dg.dag_name = dq.dag_name
-	AND dg.dt_executed = dq.dt_executed		
+	AND dg.dt_executed = dq.dt_executed

@@ -2563,7 +2563,8 @@ bietlejuice.enrich_ongoing_terminations_snapshot:
 bietlejuice.enrich_online_attribution:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_opsgenie:
-  - bietlejuice.opsgenie:load-clean-alerts
+ - bietlejuice.jira_ops:load-clean-alert-log
+ - bietlejuice.jira_ops:load-clean-alerts
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee
