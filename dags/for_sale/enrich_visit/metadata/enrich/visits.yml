@@ -59,6 +59,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_listing.country_code
     description: Country code.
+  type:
+    lineage:
+      - datalake_ebdb_clean.visit.type
+    description: Country code.
   partner_3p_supply:
     lineage:
       - datalake_ebdb_listing.house.partner_3p_supply
@@ -91,8 +95,20 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit.slot
     description: Slot is used to take the day of visit.
+  slot_count:
+    lineage:
+      - datalake_ebdb_clean.visit.slot_count
+    description: Number of available slots to visit.
   business_context:
     description: Which is the context of this visit.
+  booking_type:
+    lineage:
+      - datalake_ebdb_clean.visit.booking_type
+    description: Type of the booking
+  business_model:
+    lineage:
+      - datalake_ebdb_clean.visit.business_model
+    description: Identify the business model of the visit.
   default_timezone:
     lineage:
       - datalake_ebdb_clean.country.default_timezone
@@ -100,11 +116,15 @@ columns:
   cancellation_reason:
     lineage:
       - datalake_visit.visit_cancellation_unified.reason
-    description: What the reason for the cancellation of this visit
+    description: What the reason for the cancellation of this visit.
   cancellation_on_behalf_of:
     lineage:
       - datalake_visit.visit_cancellation_unified.on_behalf_of
     description: In whose name that cancellation status.
+  cancellation_channel:
+    lineage:
+      - datalake_visit.visit_cancellation_unified.cancellation_channel
+    description: What the channel for the cancellation of this visit.
   nbr_reschedule:
     description: Number of rescheduling.
   journey_days:
@@ -147,13 +167,25 @@ columns:
     description: If the tenant answered (If exists).
   has_tenant_confirmed:
     description: If the tenant confirmed (If exists).
+  dt_visit:
+    lineage:
+      - datalake_ebdb_clean.visit.dt_visit
+    description: Date of visit.
   ts_visit_local_tz:
     lineage:
       - datalake_ebdb_clean.visit.dt_visit
     description: Timestamp of when the visit will happen converted to local timezone.
   ts_created:
-    description: Timestamp with the first status of this visit.
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created
+    description: Timestamp of visit creating
   ts_updated:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_updated
+    description: Timestamp of visit updating
+  ts_first_event:
+    description: Timestamp with the first status of this visit.
+  ts_last_event:
     description: Timestamp with the last status of this visit.
   ts_visit_requested:
     description: Timestamp with the requested date of this visit.
@@ -182,6 +214,8 @@ columns:
   ts_visit_fup_collected:
     description: Timestamp with the follow up collected date of this visit.
   ts_visit_canceled:
+    lineage:
+      - datalake_visit.visit_cancellation_unified.ts_created
     description: Timestamp with the canceled date of this visit.
   ts_visit_done:
     description: Timestamp with the done date of this visit.

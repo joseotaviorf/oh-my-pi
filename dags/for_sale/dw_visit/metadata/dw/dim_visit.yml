@@ -8,58 +8,110 @@ owner: gustavo.alencar@quintoandar.com.br
 columns:
   sk_visit:
     lineage:
-    - datalake_ebdb_clean.visit.id
+      - datalake_visit.visits.id_visit
     description: Key of visit
   id_visit:
     lineage:
-    - datalake_ebdb_clean.visit.id
+      - datalake_visit.visits.id_visit
     description: Id of visit (equal to key of visit)
   cd_visit:
     lineage:
-    - datalake_ebdb_clean.visit.code
+      - datalake_visit.visits.code
     description: Code of visit
   business_unit:
     lineage:
-    - datalake_sale_visit_hubs.sale_visit_hubs.business_unit
+      - datalake_sale_visit_hubs.sale_visit_hubs.business_unit
     description: Business unit name, already standardized with Teams data.
   day_visit:
     lineage:
-    - datalake_ebdb_clean.visit.dt_visit
+      - datalake_visit.visits.dt_visit
     description: Date of visit
   slot:
     lineage:
-    - datalake_ebdb_clean.visit.slot
+      - datalake_visit.visits.slot
     description: Slot time of visit (0, 1, 2, ..., 51)
   slot_count:
     lineage:
-    - datalake_ebdb_clean.visit.slot_count
+      - datalake_visit.visits.slot_count
     description: Number of available slots to visit
   type:
     lineage:
-    - datalake_ebdb_clean.visit.type
+      - datalake_visit.visits.type
     description: Useless (only 6 rows if type = 1 from 2015)
   status:
     lineage:
-    - datalake_ebdb_clean.visit.status
+      - datalake_visit.visits.status
     description: Visit status
     categories:
       Canceled: ''
       Done: ''
       Scheduled: ''
+  computed_status:
+    lineage:
+      - datalake_visit.visits.computed_status
+    description: Last computed status from Visit, has to be almost the same of status
+  behavior:
+    lineage:
+      - datalake_visit.visits.behavior
+    description: What the step of behavior is this visit
   booking_type:
     lineage:
-    - datalake_ebdb_clean.visit.booking_type
+      - datalake_visit.visits.booking_type
     description: Type of the booking
     categories:
       Booked: ''
       Realized: ''
+  business_context:
+    lineage:
+      - datalake_visit.visits.business_context
+    description: Which is the context of this visit
+  business_model:
+    lineage:
+      - datalake_visit.visits.business_model
+    description: Identify the business model of the visit
+  cancellation_reason:
+    lineage:
+      - datalake_visit.visits.cancellation_reason
+    description: What the reason for the cancellation of this visit
+  cancellation_on_behalf_of:
+    lineage:
+      - datalake_visit.visits.cancellation_on_behalf_of
+    description: In whose name that cancellation status
+  cancellatin_channel:
+    lineage:
+      - datalake_visit.visits.cancellatin_channel
+    description: What the channel for the cancellation of this visit
+  is_visit_with_fixed_agent:
+    lineage:
+      - datalake_visit.visits.is_fixed_agent
+    description: If this visit has a fixed agent by the visitor
   dt_created:
     lineage:
-    - datalake_ebdb_clean.visit.ts_created
-    description: Timestamp of booking creating
+      - datalake_visit.visits.ts_created
+    description: Timestamp of visit creating
   dt_updated:
     lineage:
-    - datalake_ebdb_clean.visit.ts_updated
-    description: Timestamp of visit last status
+      - datalake_visit.visits.ts_updated
+    description: Timestamp of visit updating
+  ts_visit_requested:
+    lineage:
+      - datalake_visit.visits.ts_visit_requested
+    description: Timestamp with the requested date of this visit.
+  ts_visit_canceled:
+    lineage:
+      - datalake_visit.visits.ts_visit_canceled
+    description: Timestamp with the canceled date of this visit.
+  ts_visit_unsuccessful:
+    lineage:
+      - datalake_visit.visits.ts_visit_unsuccessful
+    description: Timestamp with the unsuccessful date of this visit.
+  ts_visit_done:
+    lineage:
+      - datalake_visit.visits.ts_visit_done
+    description: Timestamp with the done date of this visit.
+  ts_visit_fup_collected:
+    lineage:
+      - datalake_visit.visits.ts_visit_fup_collected
+    description: Timestamp with the follow up collected date of this visit.
   ts_load:
     description: Timestamp of the ingestion data.

@@ -6,7 +6,6 @@ WITH
             SUM(1) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS nbr_reschedule,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS ts_visit_requested,
             MAX(ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_visit_rescheduled,
-            MIN(ts_created) FILTER (WHERE event_type IN ('VISIT_REQUEST_CANCELED', 'VISIT_CANCELED')) AS ts_visit_canceled,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_DONE') AS ts_visit_done,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_UNSUCCESSFUL') AS ts_visit_unsuccessful,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_REGISTERED') AS ts_visit_registered,
@@ -20,10 +19,6 @@ WITH
             MIN(ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'AGENT') AS ts_visit_agent_confirmed,
             MIN(ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'TENANT_LIVING') AS ts_visit_tenant_confirmed,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_BOOKED' OR event_type = 'VISIT_CONFIRMED') AS ts_visit_confirmed,
-            MIN(ts_created) FILTER (WHERE event_type IN ('VISIT_REQUEST_CANCELED', 'VISIT_CANCELED') AND on_behalf_of = 'SUPPLY') AS ts_visit_supply_canceled,
-            MIN(ts_created) FILTER (WHERE event_type IN ('VISIT_REQUEST_CANCELED', 'VISIT_CANCELED') AND on_behalf_of = 'DEMAND') AS ts_visit_demand_canceled,
-            MIN(ts_created) FILTER (WHERE event_type IN ('VISIT_REQUEST_CANCELED', 'VISIT_CANCELED') AND on_behalf_of = 'AGENT') AS ts_visit_agent_canceled,
-            MIN(ts_created) FILTER (WHERE event_type IN ('VISIT_REQUEST_CANCELED', 'VISIT_CANCELED') AND on_behalf_of = 'TENANT_LIVING') AS ts_visit_tenant_canceled,
             MAX(ts_created) FILTER (WHERE event_type = 'ANSWER_PENDING' AND on_behalf_of = 'TENANT_LIVING') AS ts_visit_pending_tenant_answer,
             MIN(ts_created) AS ts_first_event,
             MAX(ts_created) AS ts_last_event,
@@ -79,12 +74,14 @@ SELECT
     -1 AS id_follow_up,
     -1 AS id_entrance_type,
     visit.code,
+    visit.type,
     hl.country_code,
     lh.partner_3p_supply,
     visit_demand.partner_3p_demand,
     visit.status,
     visit.computed_status,
     visit.behavior,
+    visit.booking_type,
     visit.business_model,
     visit_log.first_event,
     CASE entry_model.method
@@ -102,10 +99,12 @@ SELECT
         ELSE visit_log.last_event
     END AS last_event,
     visit.slot,
+    visit.slot_count,
     business_context,
     COALESCE(ct.default_timezone, 'UTC') AS default_timezone,
     visit_cancellation.reason AS cancellation_reason,
     visit_cancellation.on_behalf_of AS cancellation_on_behalf_of,
+    visit_cancellation.channel AS cancellation_channel,
     CASE
       WHEN visit_log.nbr_reschedule IS NULL THEN 0
       ELSE visit_log.nbr_reschedule
@@ -133,6 +132,7 @@ SELECT
     visit_log.ts_visit_supply_confirmed IS NOT NULL AS has_supply_confirmed,
     visit_log.ts_visit_tenant_answer IS NOT NULL AS has_tenant_answered,
     visit_log.ts_visit_tenant_confirmed IS NOT NULL AS has_tenant_confirmed,
+    visit.dt_visit,
     TO_UTC_TIMESTAMP(
         (
             CAST(visit.dt_visit AS TIMESTAMP)
@@ -141,8 +141,10 @@ SELECT
         ),
         COALESCE(ct.default_timezone, 'UTC')
     ) AS ts_visit_local_tz,
-    visit_log.ts_first_event AS ts_created,
-    visit_log.ts_last_event AS ts_updated,
+    visit.ts_created,
+    visit.ts_updated,
+    visit_log.ts_first_event,
+    visit_log.ts_last_event,
     visit_log.ts_visit_requested,
     visit_log.ts_visit_registered,
     visit_log.ts_visit_rescheduled,
@@ -156,12 +158,12 @@ SELECT
     visit_log.ts_visit_tenant_confirmed,
     visit_log.ts_visit_confirmed,
     visit_log.ts_visit_fup_collected,
-    visit_log.ts_visit_canceled,
+    visit_cancellation.ts_created AS ts_visit_canceled,
     visit_log.ts_visit_done,
     visit_log.ts_visit_unsuccessful
 FROM
     datalake_ebdb_clean.visit AS visit
-INNER JOIN
+LEFT JOIN
     visit_log
         ON visit.id = visit_log.id_visit
 LEFT JOIN
@@ -186,5 +188,3 @@ LEFT JOIN
         ON visit.id_house = entry_model.id_house
         AND visit.dt_visit >= entry_model.dt_entrance_started
         AND visit.dt_visit < entry_model.dt_entrance_ended
-WHERE
-    DATE(visit.ts_created) >= '2024-11-01'
