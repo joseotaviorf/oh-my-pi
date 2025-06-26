@@ -3515,6 +3515,7 @@ bietlejuice.enrich_visit:
   - bietlejuice.ebdb_visit:load-clean-visit-cancellation-details
   - bietlejuice.ebdb_visit:load-clean-visit-checkin
   - bietlejuice.ebdb_visit:load-clean-visit-fitting
+  - bietlejuice.ebdb_visit:load-clean-visit-origin
   - bietlejuice.ebdb_visit:load-clean-visit-status-log
   - bietlejuice.enrich_company:load-enrich-company-sks
   - bietlejuice.enrich_ebdb_agents:load-enrich-agent-contract

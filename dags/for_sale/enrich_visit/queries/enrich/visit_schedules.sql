@@ -24,6 +24,11 @@ schedule AS (
     ) AS id_user_cancelation,
     MAX(
       CASE
+        WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.channel
+      END
+    ) AS channel_creation,
+    MAX(
+      CASE
         WHEN vsl.on_behalf_of = 'TENANT_LIVING' THEN vsl.ts_created
       END
     ) AS ts_event_tenant,
@@ -334,6 +339,7 @@ filtered_visit AS (
     business_model,
     dt_visit,
     id_real_estate_agent_rating,
+    vo_create.name AS first_update_source,
     TO_UTC_TIMESTAMP(
       (CAST(dt_visit AS TIMESTAMP) + FLOOR((slot * 15 / 60) + 8) * INTERVAL 1 HOURS + ABS(slot * 15 % 60) * INTERVAL 1 MINUTES
       ),
@@ -350,6 +356,9 @@ filtered_visit AS (
   LEFT JOIN
     datalake_ebdb_clean.country AS ct
       ON ct.code = hll.country_code
+  LEFT JOIN
+    datalake_ebdb_clean.visit_origin AS vo_create
+      ON vo_create.id = v.id_creation_origin
 )
 SELECT DISTINCT
   s.id_schedule,
@@ -391,10 +400,13 @@ SELECT DISTINCT
   END AS visit_model,
   bb.visit_fup,
   v.behavior,
+  v.first_update_source,
   s.schedule_origin,
+  s.channel_creation,
   bha.contract_name AS hub_agent_region,
   IF(bha.id_schedule IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
   brh.is_house_rented,
+  IF(dm.id_schedule IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
   IF(v.behavior IN ('CONFIRMATION_TENANT_LIVING','CONFIRMATION_TENANT_LIVING_ASSURED','CONFIRMATION_TENANT_LIVING_REQUIRED'), TRUE, FALSE) AS has_tenant_living,
   DATEDIFF(v.dt_visit, ts_schedule_canceled) AS days_visit_cancelled_to_visit,
   DATEDIFF(v.dt_visit, ts_schedule_created) AS days_visit_booked_to_visit,
