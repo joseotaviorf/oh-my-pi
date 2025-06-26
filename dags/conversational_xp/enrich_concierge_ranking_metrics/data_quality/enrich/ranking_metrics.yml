@@ -1,4 +1,4 @@
-table_name: datalake_concierge.ranking_metrics
+table_name: datalake_concierge_ranking_metrics.ranking_metrics
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   ts_created:
