@@ -708,6 +708,7 @@ bietlejuice.dw_operator_performance:
   - bietlejuice.recupera:load-clean-operators
 bietlejuice.dw_payments_platform:
   - bietlejuice.enrich_payments_platform:load-enrich-payment
+  - bietlejuice.enrich_payments_platform:load-enrich-payment-timeline
 bietlejuice.dw_performance:
   - bietlejuice.enrich_pin:load-enrich-performance-calibration
   - bietlejuice.enrich_pin:load-enrich-talent-review
@@ -2563,8 +2564,8 @@ bietlejuice.enrich_ongoing_terminations_snapshot:
 bietlejuice.enrich_online_attribution:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
 bietlejuice.enrich_opsgenie:
- - bietlejuice.jira_ops:load-clean-alert-log
- - bietlejuice.jira_ops:load-clean-alerts
+  - bietlejuice.jira_ops:load-clean-alert-log
+  - bietlejuice.jira_ops:load-clean-alerts
 bietlejuice.enrich_owner_fees:
   - bietlejuice.owner_fees:load-clean-contract
   - bietlejuice.owner_fees:load-clean-contract-brokerage-fee

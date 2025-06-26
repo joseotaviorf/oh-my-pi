@@ -1,0 +1,43 @@
+---
+database_name: dw_payments_platform
+table_name: fact_payment_timeline
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "This table contains the timeline evolution of payment statuses from different sources (checkout, wallstreet, vans) unified in a single view"
+columns:
+  sk_payment_timeline:
+    lineage:
+      - datalake_payments_platform.payment_timeline.id_payment_timeline
+    description: "Surrogate key for the payment timeline record"
+  id_business_key:
+    lineage:
+      - datalake_payments_platform.payment_timeline.id_business_key
+    description: "Business key used to identify unique payment records across different sources"
+  sk_payment:
+    lineage:
+      - datalake_payments_platform.payment.id_payment
+    description: "Surrogate key linking to the main payment record"
+  datasource:
+    lineage:
+      - datalake_payments_platform.payment_timeline.datasource
+    description: "Source system of the payment data (wallstreet, checkout, vans)"
+  timeline_status:
+    lineage:
+      - datalake_payments_platform.payment_timeline.timeline_status
+    description: "Normalized payment status at a specific point in time"
+  payment_method_timeline:
+    lineage:
+      - datalake_payments_platform.payment_timeline.payment_method_timeline
+    description: "Payment method used at a specific point in time"
+  timeline_order:
+    lineage:
+      - datalake_payments_platform.payment_timeline.timeline_order
+    description: "Sequential order of status changes for a payment"
+  id_finance_entity:
+    lineage:
+      - datalake_payments_platform.payment_timeline.id_finance_entity
+    description: "Finance entity ID that represents the payment"
+  timeline_timestamp:
+    lineage:
+      - datalake_payments_platform.payment_timeline.timeline_timestamp
+    description: "Timestamp when the status change occurred"
