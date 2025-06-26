@@ -36,9 +36,6 @@ get_alert_notification AS (
       ELSE NULL
     END AS direction,
     REGEXP_EXTRACT(log, '\\[?(email|sms|voice)\\]?', 1) AS notification_type,
-    REGEXP_EXTRACT(log, '\\[(\\S+@\\S+|55-\\d{8,})\\]', 1) AS target,
-    REGEXP_EXTRACT(log, '(EmailStatus|CallStatus)', 1) AS status_key,
-    REGEXP_EXTRACT(log, '(?:EmailStatus|CallStatus):\\s*(\\w+)', 1) AS status_value,
     ts_log
   FROM
     datalake_jira_ops_clean.alert_log
