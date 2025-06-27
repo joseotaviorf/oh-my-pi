@@ -108,7 +108,7 @@ FROM VALUES
         "AB_TEST_RECS_HUE_V2_SALE",
         named_struct(
             'begin_date', DATE('2025-05-15'),
-            'end_date', NULL,
+            'end_date', DATE('2025-06-26'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
