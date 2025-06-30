@@ -28,6 +28,7 @@ SELECT
   updated_by,
   cancellation_reason,
   errors,
+  nf_reversion_succeeded AS is_nf_reversion_succeeded,
   TIMESTAMP(event_date_time) AS ts_event,
   DATE(notary_start_date) AS dt_notary_start,
   TIMESTAMP(payment_allowed_at) AS ts_payment_allowed,

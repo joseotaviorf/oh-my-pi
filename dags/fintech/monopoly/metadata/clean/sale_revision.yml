@@ -85,6 +85,9 @@ columns:
   brokerage_estate_agent_fee:
     lineage:
       - datalake_monopoly_raw.sale_revision.brokerage_estate_agent_fee
+  is_nf_reversion_succeeded:
+    lineage:
+      - datalake_monopoly_raw.sale_revision.nf_reversion_succeeded
   ts_event:
     lineage:
       - datalake_monopoly_raw.sale_revision.event_date_time
