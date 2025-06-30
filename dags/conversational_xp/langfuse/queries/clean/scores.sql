@@ -24,6 +24,6 @@ SELECT
 FROM
     datalake_langfuse_raw.scores
 WHERE
-    MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}')
+    MAKE_TIMESTAMP(year, month, day, hour, 0, 0) >= TIMESTAMP('{load_start_date}') - INTERVAL 12 HOUR
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_score ORDER BY ts_updated DESC) = 1
