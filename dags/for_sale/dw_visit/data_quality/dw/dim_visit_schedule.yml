@@ -1,0 +1,9 @@
+---
+table_name: dw_visit.dim_visit_schedule
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_schedule:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error

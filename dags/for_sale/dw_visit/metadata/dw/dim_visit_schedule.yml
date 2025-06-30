@@ -1,0 +1,56 @@
+database_name: dw_visit
+table_name: dim_visit
+description: Information about Rent and Sale schedules (booking). Each schedule is part of a visit.
+  When an visit intention is rescheduled another id_schedule is generated for the same id_visit.
+  Each line is an unique schedule.
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
+columns:
+  sk_schedule:
+    lineage:
+      - datalake_visit.visit_schedule.id_schedule
+    description: ID of schedule
+  schedule_origin:
+    lineage:
+      - datalake_visit.visit_schedule.schedule_origin
+    description: If the start of this schedule is from a Request or a Reschedule.
+  channel_creation:
+    lineage:
+      - datalake_visit.visit_schedule.channel_creation
+    description: Channel from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED)
+  is_last_schedule:
+    lineage:
+      - datalake_visit.visit_schedule.id_succeed_schedule
+    description: TRUE when is the last schedule of visit.
+  is_first_schedule:
+    lineage:
+      - datalake_visit.visit_schedule.schedule_origin
+    description: TRUE when is the first schedule of visit.
+  ts_schedule_created:
+    lineage:
+      - datalake_visit.visit_schedule.ts_schedule_created
+    description: Timestamp of the creation of the schedule (VISIT_REQUESTED or VISIT_RESCHEDULED).
+  ts_schedule_requested:
+    lineage:
+      - datalake_visit.visit_schedule.ts_schedule_requested (VISIT_REQUESTED).
+    description: Timestamp of the request event.
+  ts_schedule_rescheduled:
+    lineage:
+      - datalake_visit.visit_schedule.ts_schedule_rescheduled (VISIT_RESCHEDULED).
+    description: Timestamp of the reschedule event.
+  ts_schedule_confirmed:
+    lineage:
+      - datalake_visit.visit_schedule.ts_schedule_confirmed
+    description: Timestamp of the first confirmation event (VISIT_CONFIRMED).
+  ts_schedule_completed:
+    lineage:
+      - datalake_visit.visit_schedule.ts_schedule_completed
+    description: Timestamp of the completed event (VISIT_DONE).
+  ts_schedule_unsuccessful:
+    lineage:
+      - datalake_visit.visit_schedule.ts_schedule_unsuccessful
+    description: Timestamp with the unsuccessful event (VISIT_UNSUCCESSFUL).
+  ts_schedule_canceled:
+    lineage:
+      - datalake_visit.visit_schedule.ts_schedule_canceled
+    description: Timestamp of the canceled event (VISIT_REQUEST_CANCELED or VISIT_REQUEST_CANCELED).
