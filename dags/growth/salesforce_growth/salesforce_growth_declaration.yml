@@ -14,8 +14,8 @@ workflow:
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
-    - "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    - "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
     - "{table_name}"
     - "{partitions}"
     - "{schema}"
@@ -45,8 +45,8 @@ workflow:
         - "SELECT Id,OwnerId,IsDeleted,Name,CurrencyIsoCode,CreatedDate,CreatedById,LastModifiedDate,LastModifiedById,SystemModstamp,LastViewedDate,LastReferencedDate,whatslly__Datetime__c,whatslly__Direction__c,whatslly__Is_Past_24h__c,whatslly__Is_Sent__c,whatslly__Message_ID__c,whatslly__Message__c,whatslly__Recipient_Phone__c,whatslly__Related_Account__c,whatslly__Related_Contact__c,whatslly__Related_Lead__c,whatslly__Sender_Phone__c,whatslly__Whatslly_Person_Id__c,whatslly__Has_File__c,whatslly__Status__c,whatslly__Unique_Message_Id__c,whatslly__Sender_Name__c,whatslly__Quoted_Message_ID__c,whatslly__Msg_Latest_Update__c,whatslly__Tuvis_Created_By__c,whatslly__Transcript_Text__c FROM whatslly__Whatslly_Thread_Message__c"
 
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, ds, 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 
 cluster:
   type: databricks_13_3_med_general_cluster
