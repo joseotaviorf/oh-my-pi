@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
 from langfuse import Langfuse
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import lit, to_json, col
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -106,10 +106,10 @@ if __name__ == "__main__":
     else:
         logger.info(f"Found records for table {table_name} on execution date {execution_date_str}")
         
-        # Check if metadata column exists and drop it if present
+        # Check if metadata column exists and convert it to string if present
         if "metadata" in df.columns:
-            # logger.info("Dropping 'metadata' column from DataFrame")
-            df = df.drop("metadata")
+            logger.info("Converting 'metadata' column to JSON string")
+            df = df.withColumn("metadata", to_json(col("metadata")))
         
         df = (
             df.withColumn("year", lit(execution_date.year))
