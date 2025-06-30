@@ -101,7 +101,7 @@ calculations AS (
     END AS delay_contamined_range,
     oi.total_invoices_negotiated,
     u.number_of_installments,
-    u.paid_installments,
+    IF(u.paid_installments = 0 AND i.dt_down_payment IS NOT NULL, 1, u.paid_installments) AS paid_installments,
     u.breached_installments,
     u.original_debt_amount,
     u.fine_fee_amount,
