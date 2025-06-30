@@ -1989,7 +1989,6 @@ bietlejuice.enrich_employee:
   - bietlejuice.enrich_hr_system_custom:load-enrich-management-hierarchy
   - bietlejuice.gsheets_people:done-clean-codex-cost-centers
   - bietlejuice.gsheets_people:done-clean-codex-cost-informations
-  - bietlejuice.gsheets_people_static:load-clean-email-employee-mapping
   - bietlejuice.hr_system:load-clean-organizations
   - bietlejuice.hr_system:load-clean-salaries
 bietlejuice.enrich_expected_contribution_margin:
