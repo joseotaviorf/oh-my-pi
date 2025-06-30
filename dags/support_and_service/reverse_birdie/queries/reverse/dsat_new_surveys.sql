@@ -4,7 +4,7 @@ ranked_contracts AS (
         sk_contract,
         count(distinct sk_user) 
     FROM dw_rent.fact_contract_people
-    where 
+    WHERE 
         is_contract_user
     group by 1
     having count(distinct sk_user) = 1
@@ -66,19 +66,11 @@ base_respostas as (
     ELSE sq.survey_name END AS survey_name,
     sr.id_response AS message_id,
     sr.response_url,
-        SUBSTRING(
-    sr.response_url,
-   POSITION('email=' IN sr.response_url) + 6, -- Encontra o início do e-mail
-    CASE
-        WHEN POSITION('&' IN SUBSTRING(sr.response_url, POSITION('email=' IN sr.response_url) + 6)) > 0
-        THEN POSITION('&' IN SUBSTRING(sr.response_url, POSITION('email=' IN sr.response_url) + 6)) - 1
-        ELSE LENGTH(sr.response_url) - POSITION('email=' IN sr.response_url) - 5
-    END) AS email_agent,
-    case
-      when regexp_extract(sr.response_url, '[?&]ticket_id=([^&]+)', 1) is null then regexp_extract(sr.response_url, '[?&]t_id=([^&]+)', 1)
-      else regexp_extract(sr.response_url, '[?&]ticket_id=([^&]+)', 1)
-    end as ticket_id,
-    regexp_extract(sr.response_url, '[?&]contractid=([^&]+)', 1)  AS contractid,
+    PARSE_URL(sr.response_url, 'QUERY', 'email') AS email_agent,
+    CASE WHEN PARSE_URL(sr.response_url, 'QUERY', 'ticket_id') IS NULL THEN PARSE_URL(sr.response_url, 'QUERY', 't_id')
+      ELSE PARSE_URL(sr.response_url, 'QUERY', 'ticket_id')
+    END ticket_id,
+    PARSE_URL(sr.response_url, 'QUERY', 'contractid') AS contractid,
     CASE
       WHEN ARRAY_AGG(CASE WHEN rc.answer_content IS NOT NULL THEN rc.answer_content END) FILTER(
         WHERE
@@ -231,7 +223,7 @@ base_respostas as (
         OR (rc.id_question = '1869883' AND sq.id_survey = '00f46ff66c2ff389')
         OR (rc.id_question in ('2732164','2718008') AND sq.id_survey = '006af3a7ab9cdd3b')
         ),' | '
-    ) as justifications ,
+    ) as justifications,
     ARRAY_JOIN(ARRAY_AGG(distinct rc.answer_content) FILTER(
       WHERE 
           (rc.id_question = '2338912' AND sq.id_survey = 'e8f1a7a60f12ba1b')
@@ -242,8 +234,7 @@ base_respostas as (
        OR (rc.id_question = '2339129' AND sq.id_survey = '26a5ad040f5a9209') 
        OR (rc.id_question = '2768471' AND sq.id_survey = '20d6adebf70801b8') 
        OR (rc.id_question = '2513325' AND sq.id_survey = '12de0eedb5d98a27') 
-       ),' | ') as resolution_rate
-,
+       ),' | ') as resolution_rate,
     ARRAY_AGG(CASE WHEN rc.answer_content IS NOT NULL THEN rc.answer_content END) FILTER(
       WHERE 
         (rc.id_question = '2864547' AND sq.id_survey = 'f28163ea321f7cab')
@@ -266,10 +257,10 @@ base_respostas as (
        OR (rc.id_question = '1835806' AND sq.id_survey = '00f46ff66c2ff389') 
        ) [1] AS csat_score_category,
     ROW_NUMBER() OVER(
-      PARTITION BY COALESCE(regexp_extract(sr.response_url, '[?&]ticket_id=([^&]+)', 1),
-      regexp_extract(sr.response_url, '[?&]t_id=([^&]+)', 1),
-      regexp_extract(sr.response_url, '[?&]contractid=([^&]+)', 1),
-      regexp_extract(sr.response_url, '[?&]email=([^&]+)', 1))
+      PARTITION BY COALESCE(PARSE_URL(sr.response_url, 'QUERY', 'ticket_id'),
+      PARSE_URL(sr.response_url, 'QUERY', 't_id'),
+      PARSE_URL(sr.response_url, 'QUERY', 'contractid'),
+      PARSE_URL(sr.response_url, 'QUERY', 'email'))
       ORDER BY
         DATE(rc.ts_collected) ASC
     ) as answer_order
@@ -325,17 +316,17 @@ base_respostas as (
     sr.id_response,
     sr.response_url
 ), quinto_cred AS (
-select
+SELECT
   h.sk_ticket,
   h.sk_requester,
   group_name,
   CASE WHEN t.role = 'end-user' THEN 'tenant'
       WHEN t.role IS NULL THEN ''
     ELSE 'imobiliária parceira' END AS role
-  from dw_velo.fact_velo_ticket_history h
-  left join dw_velo.dim_velo_ticket_users t
+  FROM dw_velo.fact_velo_ticket_history h
+  LEFT JOIN dw_velo.dim_velo_ticket_users t
     on h.sk_requester = t.sk_ticket_user
-  where ticket_order = 1
+  WHERE ticket_order = 1
 ), fact_contract_people2 AS (
     SELECT 
       sk_user,
@@ -346,7 +337,7 @@ select
     WHERE is_contract_user 
     AND contract_role IN ('tenant', 'landlord')
 ), final AS (
-    select
+    SELECT
     csat.id_survey,
     csat.survey_name,
     message_id,
@@ -420,31 +411,31 @@ select
     offer_id, 
     tkt.id_ticket, 
     COALESCE(CAST(c.sk_contract AS STRING), csat.contractid, CAST(tkt.sk_contract AS STRING)) AS sk_contract
-    from
+    FROM
     base_respostas AS csat
-    left join dados_tickets as tkt 
+    LEFT JOIN dados_tickets as tkt 
         on csat.ticket_id = tkt.id_ticket
-    left join fact_contract_people c 
+    LEFT JOIN fact_contract_people c 
         ON csat.contractid = CAST(c.sk_contract AS STRING)
-    left join fact_contract_people c1 
+    LEFT JOIN fact_contract_people c1 
         ON tkt.sk_contract = CAST(c1.sk_contract AS STRING) -- PRECISA DISSO?
-    left join fact_contract_people2 c2 
+    LEFT JOIN fact_contract_people2 c2 
         ON tkt.sk_contract = CAST(c2.sk_contract AS STRING) 
-        and c2.contract_role = 'landlord'
-        and csat.id_survey in ('29d847ff4d17cc18', '00f46ff66c2ff389', '076f28a3e36bdb87', '7299d5b4e48d041a')
-    left join fact_contract_people2 c3 
+        AND c2.contract_role = 'landlord'
+        AND csat.id_survey in ('29d847ff4d17cc18', '00f46ff66c2ff389', '076f28a3e36bdb87', '7299d5b4e48d041a')
+    LEFT JOIN fact_contract_people2 c3 
         ON tkt.sk_contract = c3.sk_contract 
-        and c3.contract_role = 'tenant'
-        and csat.id_survey in ('ccecd6dbe925b337', '9d64bf0e2f6faa48', 'd52aad2976aab0d4')
+        AND c3.contract_role = 'tenant'
+        AND csat.id_survey in ('ccecd6dbe925b337', '9d64bf0e2f6faa48', 'd52aad2976aab0d4')
     LEFT JOIN quinto_cred 
         ON CAST(quinto_cred.sk_ticket AS STRING) = csat.ticket_id
-        and (csat.survey_name LIKE '%QuintoCred%')
+        AND (csat.survey_name LIKE '%QuintoCred%')
     LEFT JOIN datalake_survicate.inspections_surveys s 
         ON csat.contractid = s.id_contract 
-    where
+    WHERE
     answer_order = 1 
   ), final_2 AS (
-    select
+    SELECT
   --id_survey,
     survey_name AS csat_campanha,
     message_id,
@@ -471,13 +462,13 @@ select
             ELSE message_id
     END) AS account_id,--TRAZER TICKET IS SE SK_USER NULO
     CASE WHEN sk_contract = '0' THEN '' ELSE sk_contract END AS sk_contract
-    from final 
+    FROM final 
     GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,15
 )
 SELECT 
     csat_campanha,
     message_id AS feedback_id,
-    date_format(posted_at, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') AS posted_at,
+    DATE_FORMAT(posted_at, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') AS posted_at,
     CAST(rating AS INT) AS rating,
     resolution,
     csat_score_category,
@@ -489,9 +480,9 @@ SELECT
     customer_type,
     author_id,
     CASE 
-            WHEN customer_type <> '' THEN CONCAT(account_id, '_', customer_type)
-            ELSE account_id
-        END AS account_id,
+      WHEN customer_type <> '' THEN CONCAT(account_id, '_', customer_type)
+      ELSE account_id
+    END AS account_id,
     sk_contract,
     year(posted_at) AS year,
     month(posted_at) AS month,
