@@ -1,6 +1,7 @@
 from airflow.operators.python_operator import PythonOperator
 from airflow.models import DAG
 from airflow.models.param import Param
+from airflow.models.taskinstancekey import TaskInstanceKey
 from airflow.datasets import Dataset
 from airflow.utils import timezone
 from airflow.utils.session import NEW_SESSION, provide_session
@@ -35,6 +36,7 @@ def trigger_dataset_based_on_input(session: Session = NEW_SESSION, **context):
         # Must be removed when we actually migrate to datasets
     dataset_uri = f"validation-{source_dag_id}:{source_task_id}"
     dataset_uri_first_run = f"{dataset_uri}:first-run-of-day"
+    alias_uri = f"{dataset_uri}:alias"
     list_of_datasets = [dataset_uri]
     events = []
 
@@ -49,10 +51,16 @@ def trigger_dataset_based_on_input(session: Session = NEW_SESSION, **context):
         extra = {}
         
         dataset_event = dataset_manager.register_dataset_change(
+            task_instance=TaskInstanceKey(
+                dag_id=source_dag_id,
+                task_id=source_task_id,
+                run_id=source_run_id,
+            ),
             dataset=Dataset(uri),
             timestamp=timestamp,
             extra=extra,
             session=session,
+            source_alias_names={alias_uri},
         )
         if dataset_event:
             event = dataset_event_schema.dump(dataset_event)
