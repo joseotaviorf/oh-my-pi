@@ -131,7 +131,6 @@ class Tables:
     source_ebdb_condo = "vespucio_sources_delta.source_ebdb_condo"
     source_kodak_metadata_condo = "vespucio_sources_delta.source_kodak_metadata_condo"
     source_navent_condo = "vespucio_sources_delta.source_navent_condo"
-    source_sindiconet_condo = "vespucio_sources_delta.source_sindiconet_condo"
     source_union_condo = "vespucio_sources_delta.source_union_condo"
     source_iptu_condo = "vespucio_sources_delta.source_iptu_condo"
     source_ebdb_house = "vespucio_sources_delta.source_ebdb_house"
@@ -231,14 +230,6 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=sindiconet_condo.sql",
-            f"--output_table={Tables.source_sindiconet_condo}",
-        ],
-        task_id="sindiconet_condo",
-    ),
-    create_task(
-        entry_point="sources_sql_job",
-        parameters=[
             f"--script=union_condo.sql",
             f"--output_table={Tables.source_union_condo}",
         ],
@@ -333,7 +324,6 @@ core_tasks = [
             f"--input_source_ebdb_condos={Tables.source_ebdb_condo}",
             f"--input_source_navent_condos={Tables.source_navent_condo}",
             f"--input_source_kodak_metadata_condos={Tables.source_kodak_metadata_condo}",
-            f"--input_source_sindiconet_condos={Tables.source_sindiconet_condo}",
             f"--input_source_ebdb_houses={Tables.source_ebdb_house}",
             f"--input_source_navent_houses_composed={Tables.source_navent_houses_composed}",
             f"--input_source_union_houses={Tables.source_union_houses}",
