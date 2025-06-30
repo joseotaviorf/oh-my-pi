@@ -7,21 +7,25 @@ dag:
     dag_purpose: |
       This DAG imports the tables from [Risk And Mortgage](https://github.com/quintoandar/risk-and-mortgage), a service that makes an interface with Itau bank for financing credit approval.
 workflow:
-  type: database_pull
+  type: cdc
   layer: raw
   database_type: postgres
+  source_schema: public
+  source_database: riskandmortgage
   dbutils_secret_key: RISK_AND_MORTGAGE_DB
   lineage_product_database_name: riskandmortgage
-  default_extraction_type: incremental
-  default_partitions: [year, month, day]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     credit_proposal:
-      date_filter_column: updated_at
+      clean_table_name: credit_proposal
+      raw_primary_keys: [ id ]
+      clean_primary_keys: [ id ]
     offer_pre_analysis:
-      date_filter_column: updated_at
+      clean_table_name: offer_pre_analysis
+      raw_primary_keys: [ id ]
+      clean_primary_keys: [ id ]
 cluster:
   type: databricks_13_3_med_general_cluster
   access_control_list:
