@@ -983,3 +983,7 @@ bietlejuice.enrich_recommendations:
 bietlejuice.enrich_concierge_ranking_metrics:
   add:
     - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+
+bietlejuice.enrich_agreement_hourly:
+  remove:
+    - bietlejuice.trato_feito:load-clean-debtor

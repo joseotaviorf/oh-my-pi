@@ -1207,7 +1207,6 @@ bietlejuice.enrich_agents_validation:
   - bietlejuice.enrich_big_agent:load-enrich-agency
   - bietlejuice.enrich_big_agent:load-enrich-house
 bietlejuice.enrich_agreement_hourly:
-  - bietlejuice.trato_feito:load-clean-debtor
   - bietlejuice.trato_feito_hourly:load-clean-installment
   - bietlejuice.trato_feito_hourly:load-clean-negotiation
   - bietlejuice.trato_feito_hourly:load-clean-payment
