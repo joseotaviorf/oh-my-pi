@@ -791,13 +791,22 @@ bietlejuice.dw_recon_quintocred:
   - bietlejuice.vans:load-clean-bank-payment
   - bietlejuice.vans:load-clean-payment
 bietlejuice.dw_recon_quintocred_snapshot:
+  - bietlejuice.dw_fintech_snapshot_quintocred:load-dw-fintech-snapshot-quintocred-quintocred-ifrs-occurrence
   - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-annual-revenue
   - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-customer-advance
   - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-monthly-revenue
   - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-payable-guarantees
   - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-pending-transfers-detailed
   - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-pending-transfers-summarized
-  - bietlejuice.dw_recon_quintocred:load-dw-recon-quintocred-fact-receivable-guarantees
+  - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
+  - bietlejuice.dw_velo:load-dw-velo-fact-velo-propose
+  - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-history
+  - bietlejuice.dw_velo_zendesk:load-dw-velo-fact-velo-ticket-metrics
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency-entry
+  - bietlejuice.robin_hood:load-clean-accounting-entry
+  - bietlejuice.robin_hood:load-clean-accounting-entry-balance
+  - bietlejuice.robin_hood:load-clean-payment-request
 bietlejuice.dw_rede_company:
   - bietlejuice.company:load-clean-address
   - bietlejuice.company:load-clean-company
