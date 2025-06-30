@@ -5,9 +5,9 @@ domain: fintech
 description: Dimension table containing standardized information about operators, including metadata from multiple sources like Recupera, Cyber, Paschoalotto, Webhelp, GRB, and MeetCall. Used for joining operator data in analytical models.
 columns:
   sk_operator:
-    description: "Surrogate key for the operator, derived from the unique user identifier (id_user) from the operators base table."
+    description: "Surrogate key for the operator, derived directly from the unique operator ID (`id_operator`) from the source `operators` table."
     lineage:
-      - datalake_collections_quintoandar.operators.id_user
+      - datalake_collections_quintoandar.operators.id_operator
   id_agency:
     description: "Identifier for the agency associated with the operator, as extracted from the operators base table."
     lineage:
@@ -49,4 +49,4 @@ columns:
     lineage:
       - datalake_collections_quintoandar.operators.ts_user_created
   ts_load:
-    description: "Timestamp indicating when the record was loaded into the data lake. Generated at the time of ingestion."
+    description: "Timestamp indicating when the record was loaded into the data warehouse. Generated at the time of ingestion."

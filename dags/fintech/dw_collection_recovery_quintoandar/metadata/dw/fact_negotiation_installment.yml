@@ -1,128 +1,164 @@
 database_name: dw_collection_recovery_quintoandar
 table_name: fact_negotiation_installment
-description: Installments of negotiations
 domain: Fintech
 owner: ae-finance-fintech@quintoandar.com.br
+description: Installments of negotiations
 columns:
   sk_negotiation_installment:
     lineage:
-      - datalake_recupera.installment.id_negotiation
-      - datalake_debt_recovery.negotiation.id_negotiation_external
-      - datalake_recupera.installment.installment_number
-    description: "Negotiation ID + Number of installment. Table surrogate key"
+      - datalake_collections_quintoandar.installment.id_contract
+      - datalake_collections_quintoandar.installment.id_negotiation_installment
+    description: "Surrogate key for the negotiation installment, formed by concatenating the contract ID and the negotiation installment ID. This serves as the table's primary key."
   sk_negotiation:
     lineage:
-      - datalake_recupera.installment.id_negotiation
-      - datalake_debt_recovery.negotiation.id_negotiation_external
-    description: "Negotiation ID. Foreign key to fact_negotiation"
-  sk_debtor:
+      - datalake_collections_quintoandar.installment.id_contract
+      - datalake_collections_quintoandar.installment.id_negotiation
+    description: "Surrogate key for the parent negotiation, serving as a foreign key to the `fact_negotiation` table."
+  sk_contract:
     lineage:
-      - datalake_recupera.installment.customer_document
-    description: "Customer document (CPF). Foreign key to dim_debtor"
+      - datalake_collections_quintoandar.installment.id_contract
+    description: "Surrogate key for the contract associated with this installment, linking to the `dim_contract` table."
+  id_negotiation:
+    lineage:
+      - datalake_collections_quintoandar.installment.id_negotiation
+    description: "The unique identifier of the negotiation this installment belongs to."
   id_installment:
     lineage:
-      - datalake_debt_recovery.installment.id
-    description: Installment ID
+      - datalake_collections_quintoandar.installment.id_negotiation_installment
+    description: "The unique identifier for this specific negotiation installment."
+  id_installment_trato_feito:
+    lineage:
+      - datalake_collections_quintoandar.installment.id_installment_trato_feito
+    description: "The unique identifier for this installment within the Trato-Feito system."
   id_invoice_extra:
     lineage:
-      - datalake_trato_feito_clean.accounting_installment.id_external
-    description: Seu barriga extra invoice created through the negotiation.
-  id_receipt:
-    lineage:
-      - datalake_debt_recovery.installment.id_external
-      - datalake_recupera.installment.id_receipt
-    description: Seu barriga extra invoice created through the negotiation.
+      - datalake_collections_quintoandar.installment.id_invoice_extra
+      - datalake_retsuko.invoice.id_external
+    description: "The ID of the extra invoice created in Seu Barriga as part of this negotiation installment."
   installment_number:
     lineage:
-      - datalake_recupera.installment.installment_number
-    description: The number of the installment.
+      - datalake_collections_quintoandar.installment.installment_number
+    description: "The sequential number of this installment within its negotiation (e.g., 1 for the first installment, 2 for the second)."
+  our_number:
+    lineage:
+      - datalake_collections_quintoandar.installment.our_number
+    description: "Our reference number for the payment, used to reconcile payments received via Nexxera CNAB files."
   creditor:
     lineage:
-      - datalake_recupera.installment.creditor
-      - datalake_debt_recovery.negotiation.debtor
-    description: Creditor - IQ QuintoAndar, IQ QuintoCred or PP QuintoAndar
-  is_special_installment:
+      - datalake_collections_quintoandar.installment.creditor
+    description: "The entity to whom the debt is owed (e.g., IQ QuintoAndar, PP QuintoAndar)."
+  source:
     lineage:
-      - datalake_recupera.installment.is_special_installment
-    description: Indicates whether it is a special installment or not (common installment)
+      - datalake_collections_quintoandar.installment.source
+    description: "The source system or origin of the installment data."
   installment_status:
     lineage:
-      - datalake_recupera.installment.status
-      - datalake_debt_recovery.installment.status
-    description: Invoice status
+      - datalake_collections_quintoandar.installment.installment_status
+      - datalake_nexxera.cnab_charges_recupera.occurrence_code
+      - datalake_retsuko.invoice.status
+    description: "The current status of the installment."
     categories:
       expired: "The installment negotiation was broken before the installment was paid."
-      paid: "The installment was paid and accounted for."
+      paid: "The installment was paid and accounted for. This status can also be derived when a pending/registered installment is confirmed by Nexxera."
       pending: "The accounting registration of the installment (accounting-installment) is still pending."
-      registered: "The accounting record for the installment was created (the extra invoice was created in SeuBarriga)"
-      canceled: ""
-      failed: ""
-      ignored: ""
-  delay_days:
+      registered: "The accounting record for the installment was created (the extra invoice was created in SeuBarriga)."
+      canceled: "The installment was canceled."
+      failed: "Internal processing error related to the installment."
+      ignored: "The installment was manually ignored."
+  payment_method:
     lineage:
-      - datalake_recupera.installment.delay_days
-    description: Installment Main amount.
+      - datalake_collections_quintoandar.installment.payment_method
+    description: "The method chosen for paying this installment (e.g., 'CARTÃO DE CRÉDITO', 'BOLETO', 'PIX')."
   main_amount:
     lineage:
-      - datalake_recupera.installment.main_amount
-    description: Installment Main amount.
-  amount_to_pay:
-    lineage:
-      - datalake_recupera.installment.amount_to_pay
-      - datalake_debt_recovery.installment.total_amount
-    description: Total amount to be paid in the installment
+      - datalake_collections_quintoandar.installment.main_amount
+    description: "The principal amount of the debt associated with this installment, before any fees or discounts."
   updated_balance:
     lineage:
-      - datalake_recupera.installment.updated_balance
-    description: Installment Updated Balance (saldo).
-  amount_fine:
+      - datalake_collections_quintoandar.installment.updated_balance
+    description: "The updated balance of the debt after this installment's creation or payment."
+  fine_amount:
     lineage:
-      - datalake_recupera.installment.amount_fine
-    description: Fine Amount
+      - datalake_collections_quintoandar.installment.fine_amount
+    description: "The fine amount (multa) applied to this installment."
   interest_fee_amount:
     lineage:
-      - datalake_recupera.installment.interest_fee_amount
-    description: Interest Value
-  default_interest_amount:
+      - datalake_collections_quintoandar.installment.interest_fee_amount
+    description: "The interest fee amount (juros) applied to this installment."
+  debts_fee_amount:
     lineage:
-      - datalake_recupera.installment.default_interest_amount
-    description: Default interest value (juros de mora)
-  adm_fee_amount:
+      - datalake_collections_quintoandar.installment.debts_fee_amount
+    description: "The total amount of various debts/fees included in this installment."
+  credit_card_fee_amount:
     lineage:
-      - datalake_recupera.installment.adm_fee_amount
-      - datalake_debt_recovery.installment.adm_fee_amount
-    description: Administrative Fee Amount
+      - datalake_collections_quintoandar.installment.credit_card_fee_amount
+    description: "The credit card processing fee specific to this installment."
+  installment_costs:
+    lineage:
+      - datalake_collections_quintoandar.installment.installment_costs
+    description: "Additional costs associated with this installment."
+  installment_lawyers_fee:
+    lineage:
+      - datalake_collections_quintoandar.installment.installment_lawyers_fee
+    description: "Lawyers' fees specifically allocated to this installment."
+  debt_amount:
+    lineage:
+      - datalake_collections_quintoandar.installment.main_amount
+      - datalake_collections_quintoandar.installment.debts_fee_amount
+    description: "The total debt amount for this installment, calculated as the main amount plus other debt fees."
   discount_amount:
     lineage:
-      - datalake_recupera.installment.discount_amount
-      - datalake_debt_recovery.installment.discount_amount
-    description: Discount Amount
+      - datalake_collections_quintoandar.installment.discount_amount
+      - datalake_collections_quintoandar.installment.source
+      - datalake_collections_quintoandar.installment.main_amount
+      - datalake_collections_quintoandar.installment.debts_fee_amount
+      - datalake_collections_quintoandar.installment.amount_to_pay
+    description: "The total discount amount applied to this specific installment."
+  discount_to_original:
+    lineage:
+      - datalake_collections_quintoandar.installment.discount_to_original_amount
+      - datalake_collections_quintoandar.installment.discount_amount
+      - datalake_collections_quintoandar.installment.debts_fee_amount
+      - datalake_collections_quintoandar.installment.credit_card_fee_amount
+    description: "The portion of the total discount applied specifically to the original main amount of the installment."
+  net_amount:
+    lineage:
+      - datalake_collections_quintoandar.installment.main_amount
+      - datalake_collections_quintoandar.installment.discount_to_original_amount
+      - datalake_collections_quintoandar.installment.discount_amount
+      - datalake_collections_quintoandar.installment.debts_fee_amount
+      - datalake_collections_quintoandar.installment.credit_card_fee_amount
+    description: "The net amount of the installment after applying the discount to the original amount."
+  amount_to_pay:
+    lineage:
+      - datalake_collections_quintoandar.installment.amount_to_pay
+    description: "The final total amount that needs to be paid for this installment, after all calculations (fees, discounts)."
   paid_amount:
     lineage:
-      - datalake_recupera.installment.paid_amount
-      - datalake_debt_recovery.installment.total_amount
+      - datalake_collections_quintoandar.installment.paid_amount
       - datalake_nexxera.cnab_charges_recupera.net_amount
-    description: Installment Paid Amount.
+      - datalake_collections_quintoandar.installment.installment_status
+    description: "The actual amount that has been paid for this installment."
   dt_creation:
     lineage:
-      - datalake_recupera.installment.dt_formalization
-      - datalake_debt_recovery.installment.ts_created
-    description: Installment creation date.
+      - datalake_collections_quintoandar.installment.dt_creation
+    description: "The date when this installment record was created."
   dt_due:
     lineage:
-      - datalake_recupera.installment.dt_due
-      - datalake_debt_recovery.installment.dt_due
-    description: Installment due date. Original field name = dt_vencimento
+      - datalake_collections_quintoandar.installment.dt_due
+      - datalake_nexxera.cnab_charges_recupera.dt_due
+    description: "The official due date for this installment."
   dt_paid:
     lineage:
-      - datalake_recupera.installment.dt_paid
-      - datalake_debt_recovery.installment.ts_paid
+      - datalake_collections_quintoandar.installment.dt_paid
       - datalake_nexxera.cnab_charges_recupera.dt_occurrence_code
-    description: Installment Payment Date.
+      - datalake_retsuko.invoice.ts_paid
+      - datalake_collections_quintoandar.installment.installment_status
+    description: "The date when this installment was paid."
   dt_canceled:
     lineage:
-      - datalake_recupera.installment.dt_canceled
-      - datalake_debt_recovery.installment.ts_updated
-    description: Installment cancellation date.
+      - datalake_collections_quintoandar.installment.dt_canceled
+      - datalake_collections_quintoandar.installment.installment_status
+    description: "The date when this installment was canceled."
   ts_load:
-    description: Timestamp of when the data was inserted into the table
+    description: "Timestamp indicating when this record was loaded or last updated in the table."
