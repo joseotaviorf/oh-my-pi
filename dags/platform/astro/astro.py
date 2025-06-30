@@ -39,6 +39,8 @@ dag_declaration = {
             "task_instance": {"has_query": True},
             "task_instance_history": {"has_query": True},
             "serialized_dag": {"has_query": True},
+            "dataset": {"has_query": True},
+            "dataset_event": {"has_query": True},
         },
     },
     "cluster": {"type": "databricks_13_3_min_io-memory_cluster"},

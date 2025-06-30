@@ -1,0 +1,30 @@
+---
+database_name: datalake_astro_clean
+table_name: dataset
+owner: gustavo.miller@quintoandar.com.br
+domain: platform
+columns:
+  id:
+    lineage:
+      - datalake_astro_raw.dataset.id
+  uri:
+    lineage:
+      - datalake_astro_raw.dataset.uri
+  is_orphaned:
+    lineage:
+      - datalake_astro_raw.dataset.is_orphaned
+  ts_created:
+    lineage:
+      - datalake_astro_raw.dataset.created_at
+  ts_updated:
+    lineage:
+      - datalake_astro_raw.dataset.updated_at
+  year:
+    lineage:
+      - datalake_astro_raw.dataset.year
+  month:
+    lineage:
+      - datalake_astro_raw.dataset.month
+  day:
+    lineage:
+      - datalake_astro_raw.dataset.day

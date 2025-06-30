@@ -1,0 +1,39 @@
+---
+database_name: datalake_astro_clean
+table_name: dataset_event
+owner: gustavo.miller@quintoandar.com.br
+domain: platform
+columns:
+  id:
+    lineage:
+      - datalake_astro_raw.dataset_event.id
+  id_dataset:
+    lineage:
+      - datalake_astro_raw.dataset_event.dataset_id
+  id_source_dag:
+    lineage:
+      - datalake_astro_raw.dataset_event.source_dag_id
+  id_source_task:
+    lineage:
+      - datalake_astro_raw.dataset_event.source_task_id
+  id_source_run:
+    lineage:
+      - datalake_astro_raw.dataset_event.source_run_id
+  source_map_index:
+    lineage:
+      - datalake_astro_raw.dataset_event.source_map_index
+  extra:
+    lineage:
+      - datalake_astro_raw.dataset_event.extra
+  ts_event_created:
+    lineage:
+      - datalake_astro_raw.dataset_event.timestamp
+  year:
+    lineage:
+      - datalake_astro_raw.dataset_event.year
+  month:
+    lineage:
+      - datalake_astro_raw.dataset_event.month
+  day:
+    lineage:
+      - datalake_astro_raw.dataset_event.day
