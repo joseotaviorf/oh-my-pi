@@ -10,7 +10,7 @@ SELECT
     result_rows,
     error AS error_message,
     running_time AS running_time_in_milliseconds,
-    hash_string,
+    RIGHT(CAST(hash AS STRING), 64) AS hash_string,
     native AS is_native,
     started_at AS ts_started
 FROM

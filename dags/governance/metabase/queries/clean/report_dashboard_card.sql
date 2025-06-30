@@ -2,8 +2,9 @@ SELECT
     id,
     card_id AS id_card,
     dashboard_id AS id_dashboard,
-    sizeX AS size_x,
-    sizeY AS size_y,
+    entity_id AS id_entity,
+    size_x,
+    size_y,
     row,
     col AS column,
     parameter_mappings,
@@ -15,5 +16,3 @@ SELECT
     day
 FROM
     datalake_metabase_raw.report_dashboardcard
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

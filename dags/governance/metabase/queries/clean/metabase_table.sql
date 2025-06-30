@@ -4,7 +4,6 @@ SELECT
     name,
     display_name,
     description,
-    entity_name,
     entity_type,
     schema,
     visibility_type,
@@ -17,5 +16,3 @@ SELECT
     day
 FROM
     datalake_metabase_raw.metabase_table
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

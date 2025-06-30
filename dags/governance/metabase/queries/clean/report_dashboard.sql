@@ -18,5 +18,4 @@ SELECT
     day
 FROM
     datalake_metabase_raw.report_dashboard
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
+

@@ -7,14 +7,17 @@ SELECT
     display_name,
     description,
     base_type,
-    special_type,
-    position,
+    position, 
     has_field_values AS field_values,
     visibility_type,
     fingerprint,
     fingerprint_version,
     database_type AS database_field_type,
     settings,
+    semantic_type,
+    preview_display,
+    effective_type AS database_field_effective_type,
+    database_position AS database_field_position,
     active AS is_active,
     preview_display AS has_preview_display,
     last_analyzed AS ts_last_analyzed,
@@ -25,5 +28,3 @@ SELECT
     day
 FROM
     datalake_metabase_raw.metabase_field
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"

@@ -1,116 +1,53 @@
 dag:
   name: metabase
-  owner: Data Governance
   schedule_start_date: 2020, 6, 1
-  schedule_interval: "0 5 * * *"
+  schedule_interval: 0 5 * * *
+  owner: Data Governance
   documentation:
     dag_purpose: |
-      This DAG imports the tables from Metabase, our data visualization tool. We extract metadata from Metabase in order
-      to analyze user behavior and have a better control of what is being created there.
+      This DAG imports the tables from Metabase, our data visualization tool. We extract metadata from Metabase in order       to analyze user behavior and have a better control of what is being created there.
 workflow:
-  type: custom_ingestion
+  type: cdc
   layer: raw
-  load_spark_job: load_{extraction_type}_data_into_datalake_raw
-  default_extraction_type: incremental
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
-  spark_job_arguments:
-  - "{environment}"   # env
-  - "{bucket}"   # datalake_bucket
-  - "{dag_name}"   # source
-  - "{table_name}"
+  database_type: postgres
+  dbutils_secret_key: METABASE_DB
+  lineage_product_database_name: metabase
   tables_customization:
     core_user:
-      extraction_type: incremental
-      extra_spark_job_arguments:
-        - "{load_start_date}"   # load_start_date
-        - "updated_at"
+      clean_table_name: core_user
     metabase_database:
-      extraction_type: incremental
-      extra_spark_job_arguments:
-        - "{load_start_date}"   # load_start_date
-        - "updated_at"
+      clean_table_name: metabase_database
     metabase_field:
-      extraction_type: incremental
-      extra_spark_job_arguments:
-        - "{load_start_date}"   # load_start_date
-        - "updated_at"
+      clean_table_name: metabase_field
     metabase_table:
-      extraction_type: incremental
-      extra_spark_job_arguments:
-        - "{load_start_date}"   # load_start_date
-        - "updated_at"
+      clean_table_name: metabase_table
     pulse:
-      extraction_type: incremental
-      extra_spark_job_arguments:
-        - "{load_start_date}"   # load_start_date
-        - "updated_at"
+      clean_table_name: pulse
     pulse_channel:
-      extraction_type: incremental
-      extra_spark_job_arguments:
-        - "{load_start_date}"   # load_start_date
-        - "updated_at"
+      clean_table_name: pulse_channel
     report_card:
-      extraction_type: incremental
-      extra_spark_job_arguments:
-        - "{load_start_date}"   # load_start_date
-        - "updated_at"
+      clean_table_name: report_card
     report_dashboard:
-      extraction_type: incremental
-      extra_spark_job_arguments:
-        - "{load_start_date}"   # load_start_date
-        - "updated_at"
+      clean_table_name: report_dashboard
     report_dashboardcard:
-      extraction_type: incremental
       clean_table_name: report_dashboard_card
-      extra_spark_job_arguments:
-        - "{load_start_date}"   # load_start_date
-        - "updated_at"
     permissions_group:
-      extraction_type: full
-      extra_spark_job_arguments:
-        - "False"
+      clean_table_name: permissions_group
     permissions_group_membership:
-      extraction_type: full
-      extra_spark_job_arguments:
-        - "False"
+      clean_table_name: permissions_group_membership
     collection:
-      extraction_type: full
-      extra_spark_job_arguments:
-        - "False"
+      clean_table_name: collection
     pulse_card:
-      extraction_type: full
-      extra_spark_job_arguments:
-        - "False"
+      clean_table_name: pulse_card
     pulse_channel_recipient:
-      extraction_type: full
-      extra_spark_job_arguments:
-        - "False"
+      clean_table_name: pulse_channel_recipient
     query:
-      extraction_type: full
-      extra_spark_job_arguments:
-        - "False"
+      clean_table_name: query
     query_execution:
-      extraction_type: full
-      extra_spark_job_arguments:
-        - "True"
+      clean_table_name: query_execution
     revision:
-      extraction_type: full
-      extra_spark_job_arguments:
-        - "False"
+      clean_table_name: revision
     view_log:
-      extraction_type: full
-      extra_spark_job_arguments:
-        - "False"
+      clean_table_name: view_log
 cluster:
   type: databricks_12_2_med_general_cluster
-  databricks_conn_id: databricks_new
-  custom_configurations:
-    driver_node_type_id: m5a.2xlarge
-    node_type_id: r5a.2xlarge
-    num_workers: 2
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

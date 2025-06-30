@@ -4,8 +4,9 @@ SELECT
     description,
     details,
     engine,
-    options,
     timezone,
+    cache_field_values_schedule,
+    metadata_sync_schedule,
     is_on_demand,
     is_sample,
     is_full_sync,
@@ -17,5 +18,3 @@ SELECT
     day
 FROM
     datalake_metabase_raw.metabase_database
-WHERE
-    MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
