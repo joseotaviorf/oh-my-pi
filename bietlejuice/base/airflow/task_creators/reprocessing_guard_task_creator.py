@@ -101,7 +101,8 @@ class ReprocessingGuardTaskCreator(BaseTaskCreator):
             # If the DAG depends on the reprocessing source, directly or indirectly,
             # it needs to finish before the current DAG can continue. If we don't check this,
             # the current DAG might run multiple times unnecessarily.
-            if BietlejuiceDependencyHelper.dag_b_depends_on_dag_a(
+            if dag == reprocessing_source
+            or BietlejuiceDependencyHelper.dag_b_depends_on_dag_a(
                 dag_b=dag, dag_a=reprocessing_source, dependencies=dependencies
             )
         }
