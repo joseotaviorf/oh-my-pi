@@ -43,7 +43,7 @@ dag_declaration = {
             "dataset_event": {"has_query": True},
         },
     },
-    "cluster": {"type": "databricks_13_3_min_io-memory_cluster"},
+    "cluster": {"type": "databricks_13_3_med_memory_2_workers_general_cluster"},
 }
 factory = FactoryDispatcher(layer=LayerEnum.RAW).get_factory(
     dag_args=dag_declaration["dag"],
