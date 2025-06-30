@@ -7,17 +7,20 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   sk_company:
-    is_complete:
+    has_completeness:
+      greater_than: 0.99
       severity_level: Error
     is_unique:
       severity_level: Error
   id_company:
-    is_complete:
+    has_completeness:
+      greater_than: 0.99
       severity_level: Error
     is_unique:
       severity_level: Error
   uuid_company:
-    is_complete:
+    has_completeness:
+      greater_than: 0.99
       severity_level: Error
     is_unique:
       severity_level: Error
