@@ -28,9 +28,7 @@ class DatasetService:
     def transform_alias_into_dataset_name(dataset_alias: str) -> str:
         """Transform Dataset alias into Dataset name."""
 
-        # validation- prefix is temporary
-        # Must be removed when we actually migrate to datasets
-        return "validation-" + dataset_alias.replace(":alias", "")
+        return dataset_alias.replace(":alias", "")
 
     @classmethod
     def get_dag_datasets(cls, dag_id: str) -> Dataset:

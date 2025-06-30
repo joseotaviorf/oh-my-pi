@@ -498,11 +498,6 @@ bietlejuice.enrich_pipeline:
     - bietlejuice.dag_inventory:load-clean-table
     - bietlejuice.gsheets_cross:done-clean-dags-sla-exclusion-list
     - bietlejuice.gsheets_cross:done-clean-dags-special-scheduler
-bietlejuice.enrich_recommendations:
-  add:
-    - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
-    - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_condo_amenities
-    - wonka.house_main:load-house_main
 bietlejuice.enrich_recupera:
   add:
     - bietlejuice.recupera:load-clean-records
@@ -918,9 +913,6 @@ bietlejuice.reverse_webhelp_access:
 bietlejuice.reverse_supply_access:
   add:
     - bietlejuice.reverse_supply:load-reverse-supply-affiliates-volumetry
-bietlejuice.search_metrics_service:
-  add:
-    - quintoml.search.search_monitoring.inference:batch-predict
 bietlejuice.survicate_survey_attributes:
   add:
     - bietlejuice.survicate_surveys:load-raw-surveys
@@ -932,100 +924,6 @@ bietlejuice.enrich_wordpress_baroes:
     - bietlejuice.wordpress_baroes:load-clean-meulugar-data
 bietlejuice.enrich_velo_omie:
   override: []
-
-wonka.group_user_most_viewed:
-  add:
-    - bietlejuice.ebdb_location:load-clean-region
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-    - bietlejuice.amplitude:load-clean-170698-user-merge
-
-wonka.house_rent_search_page_viewed:
-  add:
-    - wonka.searched_house_main:load-searched_house_main
-
-wonka.house_sale_search_page_viewed:
-  add:
-    - wonka.searched_house_main:load-searched_house_main
-
-wonka.house_embeddings_main:
-  add:
-    - quintoml.recs.house_user_embeddings.inference:batch-predict
-
-wonka.user_embeddings_main:
-  add:
-    - quintoml.recs.house_user_embeddings.inference:batch-predict
-
-wonka.house_listing_business_context:
-  add:
-    - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
-    - bietlejuice.ebdb_user:load-clean-user-revision-entity
-
-wonka.house_rent_offer:
-  add:
-    - bietlejuice.ebdb_offer:load-clean-offer
-
-wonka.house_rent_proposal:
-  add:
-    - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
-    - bietlejuice.arquivo_confidencial:load-clean-rev-info
-    - bietlejuice.sorting_hat:load-clean-proponent
-    - bietlejuice.sorting_hat:load-clean-proposal
-
-quintoml.growth.eltv.inference:
-  add:
-    - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-    - bietlejuice.ebdb_administration:load-clean-property-fee-assigned
-    - bietlejuice.ebdb_house:load-clean-house
-    - bietlejuice.ebdb_location:load-clean-state
-    - bietlejuice.ebdb_location:load-clean-region
-
-quintoml.growth.sale_conversion_model.inference:
-  add:
-    - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
-    - bietlejuice.enrich_booking:load-enrich-booking
-    - wonka.house_main:load-house_main
-
-quintoml.growth.sale_discount_model.inference:
-  add:
-    - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
-    - bietlejuice.ebdb_location:load-clean-region
-    - bietlejuice.enrich_offer:load-enrich-sale-offer
-
-quintoml.growth.rent_conversion_model.inference:
-  add:
-    - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-    - bietlejuice.enrich_booking:load-enrich-booking
-    - wonka.house_main:load-house_main
-
-quintoml.growth.contract_duration_model.inference:
-  add:
-    - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events
-    - bietlejuice.enrich_booking:load-enrich-booking
-    - wonka.house_main:load-house_main
-
-quintoml.recs.house_user_embeddings_quintoml.inference:
-  add:
-    - wonka.house_listing_business_context:load-house_listing_business_context
-    - wonka.house_main:load-house_main
-    - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
-    - wonka.user_agg_search_filters:load-user_agg_search_filters
-    - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
-    - wonka.group_user_most_viewed:load-user_listing_page_viewed_cross_devices
-    - wonka.group_user_most_viewed:load-user_sale_listing_page_viewed_cross_devices
-
-quintoml.search.search_monitoring.inference:
-  add:
-    - bietlejuice.enrich_base_metrics_service:load-enrich-global-metrics
-    - bietlejuice.enrich_base_metrics_service:load-enrich-search-impressions
-
-wonka.house_demand_balancer_predictions:
-  add:
-    - bietlejuice.demand_balancer_service:load-clean-demand-balancer
-
-bietlejuice.demand_balancer_service:
-  add:
-    - quintoml.search.maestro.inference:batch-predict
 
 bietlejuice.enrich_trino:
   remove:
@@ -1042,33 +940,6 @@ bietlejuice.dw_agent:
     - bietlejuice.sirena:load-clean-agents
     - bietlejuice.sirena:load-clean-prospects
     - bietlejuice.enrich_sirena:load-enrich-messages
-
-wonka.house_user_rent_flows:
-  add:
-    - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
-    - bietlejuice.enrich_rent_flows:load-enrich-rent-flows-types
-    - wonka.house_listing_business_context:load-house_listing_business_context
-wonka.house_agg_rent_flows:
-  add:
-    - wonka.house_user_rent_flows:load-house_user_rent_flows
-
-wonka.user_visit:
-  add:
-    - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
-
-wonka.house_visit:
-  add:
-    - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
-
-wonka.user_bc_h3_7_city_agg_search_filters:
-  add:
-    - bietlejuice.amplitude:load-clean-170698-search-results-page-viewed-events
-    - bietlejuice.amplitude:load-clean-170698-search-page-viewed-events
-    - wonka.house_main:load-house_main
-
-wonka.user_search_profile_clustering:
-  add:
-    - wonka.user_bc_h3_7_city_agg_search_filters:load-user_bc_h3_7_city_agg_search_filters
 
 bietlejuice.reverse_neighborhood_price_range_access:
   add:
@@ -1106,6 +977,8 @@ bietlejuice.enrich_pin:
     - bietlejuice.pin_talent:load-clean-rating-model-translation
     - bietlejuice.pin_talent:load-clean-review-period-base
     - bietlejuice.pin_talent:load-clean-review-period-translation
+bietlejuice.enrich_recommendations:
+  override: []
   
 bietlejuice.enrich_concierge_ranking_metrics:
   add:

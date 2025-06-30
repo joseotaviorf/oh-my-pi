@@ -32,9 +32,8 @@ def trigger_dataset_based_on_input(session: Session = NEW_SESSION, **context):
         raise ValueError("dag_id, task_id and source_run_id must be provided in dag trigger forms")
     
     logging.info(""f"Triggering dataset for DAG: {source_dag_id}, Task: {source_task_id}, Source Run ID: {source_run_id}")
-     # validation- prefix is temporary
-        # Must be removed when we actually migrate to datasets
-    dataset_uri = f"validation-{source_dag_id}:{source_task_id}"
+     
+    dataset_uri = f"{source_dag_id}:{source_task_id}"
     dataset_uri_first_run = f"{dataset_uri}:first-run-of-day"
     alias_uri = f"{dataset_uri}:alias"
     list_of_datasets = [dataset_uri]

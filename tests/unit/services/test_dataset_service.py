@@ -181,8 +181,8 @@ class TestDatasetService:
 
         mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
             [
-                mock.call(Dataset("validation-dag:task")),
-                mock.call(Dataset("validation-dag:task:first-run-of-day")),
+                mock.call(Dataset("dag:task")),
+                mock.call(Dataset("dag:task:first-run-of-day")),
             ],
             any_order=True,
         )
@@ -194,7 +194,7 @@ class TestDatasetService:
         DatasetService.update_datasets(mock_context)
 
         mock_context["outlet_events"]["dag:task:alias"].add.assert_called_once_with(
-            Dataset("validation-dag:task:reprocessing"),
+            Dataset("dag:task:reprocessing"),
             extra={
                 "reprocessing_source": "dag",
                 "reprocessing_date": FAKE_TIME.date().isoformat(),
@@ -215,7 +215,7 @@ class TestDatasetService:
         DatasetService.update_datasets(mock_context)
 
         mock_context["outlet_events"]["dag:task:alias"].add.assert_called_once_with(
-            Dataset("validation-dag:task:reprocessing"),
+            Dataset("dag:task:reprocessing"),
             extra={
                 "reprocessing_source": "dag2",
                 "reprocessing_date": FAKE_TIME.date().isoformat(),
@@ -230,8 +230,8 @@ class TestDatasetService:
 
         mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
             [
-                mock.call(Dataset("validation-dag:task")),
-                mock.call(Dataset("validation-dag:task:first-run-of-day")),
+                mock.call(Dataset("dag:task")),
+                mock.call(Dataset("dag:task:first-run-of-day")),
             ],
             any_order=True,
         )
@@ -252,8 +252,8 @@ class TestDatasetService:
 
         mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
             [
-                mock.call(Dataset("validation-dag:task")),
-                mock.call(Dataset("validation-dag:task:first-run-of-day")),
+                mock.call(Dataset("dag:task")),
+                mock.call(Dataset("dag:task:first-run-of-day")),
             ],
             any_order=True,
         )
@@ -266,7 +266,7 @@ class TestDatasetService:
         DatasetService.update_datasets(mock_context)
 
         mock_context["outlet_events"]["dag:task:alias"].add.assert_called_once_with(
-            Dataset("validation-dag:task")
+            Dataset("dag:task")
         )
 
     def test_if_it_is_a_rerun_it_should_not_update_datasets(

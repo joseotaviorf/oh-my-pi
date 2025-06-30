@@ -1,6 +1,8 @@
 from datetime import datetime, date, timedelta
+from os.path import join
 
 from airflow.models import DAG, Variable
+from bietlejuice.services.file_service import FileService
 from bietlejuice_plugin.dag_mediator_plugin import (
     QuintoAndarShortCircuitExternalSensor,
     QuintoAndarCustomTriggerDagOperator,
@@ -8,13 +10,16 @@ from bietlejuice_plugin.dag_mediator_plugin import (
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
-    BietlejuiceDependencyHelper,
-)
 from bietlejuice.base.dependencies.bietlejuice_redundant_dependency_finder import (
     BietlejuiceRedundantDependencyFinder,
 )
 from bietlejuice.base.opsgenie.opsgenie_callback import OpsgenieCallback
+from dags import DAG_PACKAGES_ROOT
+
+DAGS_CROSS_DEPENDENCIES_FILE_NAME = "mediator-dependencies.yaml"
+DAGS_CROSS_DEPENDENCIES_FILE_PATH = join(
+    DAG_PACKAGES_ROOT, DAGS_CROSS_DEPENDENCIES_FILE_NAME
+)
 
 
 def validate_dependencies(dependencies_list):
@@ -26,7 +31,7 @@ def validate_dependencies(dependencies_list):
 
 
 def extract_dependencies():
-    dependencies_dict = BietlejuiceDependencyHelper.read_dependencies()
+    dependencies_dict = FileService.get_dict_from_yaml_file(DAGS_CROSS_DEPENDENCIES_FILE_PATH)
     redundancy_finder = BietlejuiceRedundantDependencyFinder(dependencies_dict)
     dependencies_dict = redundancy_finder.remove_all_redundancies()
     validate_dependencies(dependencies_dict)
