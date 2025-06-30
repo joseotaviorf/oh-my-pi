@@ -102,7 +102,5 @@ LEFT JOIN
 LEFT JOIN
     repair_request_media AS rrm
       ON rr.id_repair_request = rrm.id_repair_request
-WHERE
-    DATE(rr.ts_updated) BETWEEN '{load_start_date}' AND '{load_end_date}'
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY rr.id_repair_request ORDER BY rr.ts_updated DESC) = 1
