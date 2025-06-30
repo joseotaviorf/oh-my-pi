@@ -1742,6 +1742,19 @@ bietlejuice.enrich_docpilot:
   - bietlejuice.quinturk:load-clean-project
   - bietlejuice.quinturk:load-clean-task
   - bietlejuice.quinturk:load-clean-task-completion
+bietlejuice.enrich_docpilot_audit:
+  - bietlejuice.docx:load-clean-document
+  - bietlejuice.docx:load-clean-folder-reference
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
+  - bietlejuice.dw_rent_flow:load-dw-rent-fact-listing-rent-flows
+  - bietlejuice.ebdb_proposal:load-clean-proposal-aud
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.ebdb_user:load-clean-user-revision-entity
+  - bietlejuice.sorting_hat:load-clean-analysis-request
+  - bietlejuice.sorting_hat:load-clean-checklist
+  - bietlejuice.sorting_hat:load-clean-checklist-group
+  - bietlejuice.sorting_hat:load-clean-checklist-item
+  - bietlejuice.sorting_hat:load-clean-credit-analysis-version
 bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-categories-documentation
   - bietlejuice.documentation_metrics:load-clean-columns-documentation

@@ -1,0 +1,91 @@
+database_name: datalake_docpilot
+table_name: audit_labeling_data
+description: This table contains Docpilot data to audit team label.
+domain: Fintech
+owner: leticia.mendes@quintoandar.com.br
+columns:
+  id_proposal:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis_version
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference
+    description: Proposal ID.
+  name:
+    lineage:
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference
+    description: Name of the applicant.
+  type:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis_version
+    description: Type of the credit analysis.
+  ts_credit_analysis_updated:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis_version
+    description: Timestamp of the last update of the credit analysis.
+  result:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis_version
+    description: Result of the credit analysis.
+  reason:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis_version
+    description: Reason of the credit analysis.
+  analyst:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis_version
+      - datalake_sorting_hat_clean.checklist
+      - datalake_sorting_hat_clean.checklist_group
+      - datalake_sorting_hat_clean.checklist_item
+    description: Analyst responsible for the credit analysis.
+  document_1:
+    lineage:
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference
+    description: First document of the applicant.
+  document_2:
+    lineage:
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference
+    description: Second document of the applicant.
+  document_3:
+    lineage:
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference
+    description: Third document of the applicant.
+  document_4:
+    lineage:
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference
+    description: Fourth document of the applicant.
+  document_5:
+    lineage:
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference 
+    description: Fifth document of the applicant.
+  document_6:
+    lineage:
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference
+    description: Sixth document of the applicant.
+  document_7:
+    lineage:
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference
+    description: Seventh document of the applicant.
+  document_8:
+    lineage:
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference
+    description: Eighth document of the applicant.
+  document_9:
+    lineage:
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference
+    description: Ninth document of the applicant.
+  document_10:
+    lineage:
+      - datalake_docx_clean.document
+      - datalake_docx_clean.folder_reference
+    description: Tenth document of the applicant.
+  

@@ -1,0 +1,20 @@
+---
+dag:
+  name: enrich_docpilot_audit
+  schedule_start_date: 2025, 1, 1
+  schedule_interval: "0 0 * * *"
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      This DAG creates a table for DocPilot audit labeling data.
+workflow:
+  type: query_delta
+  layer: enrich
+cluster:
+  type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
