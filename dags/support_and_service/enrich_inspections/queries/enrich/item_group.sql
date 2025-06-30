@@ -16,6 +16,8 @@ SELECT
     igt.item_group_type,
     ig.status,
     ig.is_inferior_quality,
+    ig.is_active_status,
+    ig.is_active_inferior_quality,
     ig.ts_created,
     ig.ts_updated,
     ig.year,

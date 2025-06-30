@@ -39,6 +39,14 @@ columns:
     description: Indicates the quality of the object in case of replacement.
     lineage:
       - datalake_inspections.item_group.is_inferior_quality
+  is_active_status:
+    description: Indicates if the object is active.
+    lineage:
+      - datalake_inspections.item_group.is_active_status
+  is_active_inferior_quality:
+    description: Indicates if the object is active in case of replacement.
+    lineage:
+      - datalake_inspections.item_group.is_active_inferior_quality
   ts_created:
     description: Creation date and time.
     lineage:

@@ -48,6 +48,10 @@ columns:
     description: Indicates if the issue checklist item was checked by the inspector.
     lineage:
       - datalake_inspections.item.is_present
+  is_active:
+    description: Indicates if the object is active.
+    lineage:
+      - datalake_inspections.item.is_active
   ts_created:
     description: Creation date and time.
     lineage:

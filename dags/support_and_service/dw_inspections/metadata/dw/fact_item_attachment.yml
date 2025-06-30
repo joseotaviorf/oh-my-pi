@@ -67,6 +67,11 @@ columns:
     description: Unique identifier of attachment creator/responsable (number)
   is_review_media:
     description: Indicates whether the attachment is a media generated during the inspection review by the tenant or owner.
+  is_active:
+    description: Indicates if the object is active.
+    lineage:
+      - datalake_inspections.item_media.is_active
+      - datalake_inspections.item_review.is_active
   ts_created:
     description: Item media datetime creation.
     lineage:

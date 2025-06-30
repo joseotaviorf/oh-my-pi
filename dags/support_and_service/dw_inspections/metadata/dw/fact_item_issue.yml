@@ -27,6 +27,10 @@ columns:
     description: Inspection unique identifier.
     lineage:
       - datalake_inspectionss.item_issue.id_inspection
+  is_active:
+    description: Indicates if the object is active.
+    lineage:
+      - datalake_inspectionss.item_issue.is_active
   ts_created:
     description: Creation date and time.
     lineage:

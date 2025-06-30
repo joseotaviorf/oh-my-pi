@@ -27,6 +27,7 @@ SELECT
         ELSE ii.comment
     END AS issue_comment,
     it.repair_suggestion,
+    ii.is_active,
     ii.ts_created,
     ii.ts_updated,
     ii.year,

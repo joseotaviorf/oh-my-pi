@@ -50,6 +50,10 @@ columns:
     description: It is the email address of the media.
     lineage:
       - datalake_inspection_services_clean.item_media.url
+  is_active:
+    description: Indicates if the object is active.
+    lineage:
+      - datalake_inspection_services_clean.item_media.is_active
   ts_created:
     description: Creation date and time.
     lineage:

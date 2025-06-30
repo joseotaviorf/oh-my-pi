@@ -8,6 +8,7 @@ SELECT
     CAST(i.id_inspection AS STRING) AS sk_inspection,
     i.comment IS NOT NULL AS has_inspector_comment,
     i.is_present,
+    i.is_active,
     i.ts_created,
     i.ts_updated,
     NOW() AS ts_load,

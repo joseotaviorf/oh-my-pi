@@ -46,6 +46,8 @@ SELECT DISTINCT
     COALESCE(igc.has_item_chip_choice, FALSE) AS has_item_chip_choice,
     COALESCE(igc.has_inspector_open_comment, FALSE) AS has_inspector_open_comment,
     ig.is_inferior_quality,
+    ig.is_active_status,
+    ig.is_active_inferior_quality,
     ig.ts_created,
     ig.ts_updated,
     NOW() AS ts_load,

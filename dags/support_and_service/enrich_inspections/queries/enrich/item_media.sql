@@ -10,6 +10,7 @@ SELECT
     "INSPECTOR" AS user_type,
     im.type AS media_type,
     im.url AS media_path,
+    im.is_active,
     im.ts_created,
     im.ts_updated,
     im.year,

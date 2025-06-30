@@ -77,6 +77,10 @@ columns:
     description: This column would keep repair suggestions for presentation in the report, but this functionality was not integrated.
     lineage:
       - datalake_inspection_services_clean.issue_type.repair_suggestion
+  is_active:
+    description: Indicates if the object is active.
+    lineage:
+      - datalake_inspection_services_clean.item_issue.is_active
   ts_created:
     description: Creation date and time.
     lineage:
