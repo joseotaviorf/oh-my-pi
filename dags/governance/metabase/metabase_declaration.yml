@@ -36,6 +36,7 @@ workflow:
       clean_primary_keys: ["id"]
     permissions_group_membership:
       clean_table_name: permissions_group_membership
+      clean_primary_keys: ["id"]
     collection:
       clean_table_name: collection
     pulse_card:
