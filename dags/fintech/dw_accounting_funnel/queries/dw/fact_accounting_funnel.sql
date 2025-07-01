@@ -144,16 +144,16 @@ FROM
 UNION ALL
 
 SELECT
-    id_kill_queue_invoice_issuance AS sk_accounting_funnel,
+    id_accounting_process AS sk_accounting_funnel,
     id_business_entity,
     id_finance_entity,
     id_finance_entity_entry,
     'kill-queue' AS version,
-    'for rent' AS business_unit,
+    business_unit,
     source_name,
-    'invoice' AS accounting_type,
+    accounting_type,
     account_number,
-    revenue_name AS accounting_name,
+    accounting_name,
     source_amount,
     sap_amount,
     is_completeness_compliance AS is_completeness,

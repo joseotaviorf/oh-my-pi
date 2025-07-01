@@ -21,7 +21,7 @@ WITH sap_gateway AS (
         accrual_year_month,
         CASE
             WHEN account_number = '420006' THEN 'reservation fee'
-        END AS revenue_account,
+        END AS accounting_name,
         account_number,
         MAX(DATE(dt_created)) AS dt_sap_created,
         MAX(DATE(dt_reference)) AS dt_sap_reference,
@@ -39,9 +39,9 @@ WITH sap_gateway AS (
     SELECT
         r.id_tenant AS id_business_entity,
         r.id AS id_finance_entity,
-        'kill_queue' AS source_name,
-        '420006' AS account_number,
-        'reservation_fee' AS revenue_name,
+        'for rent' AS business_unit,
+        'kill queue' AS source_name,
+        'invoice' AS accounting_type,
         r.value AS source_amount,
         r.status,
         r.last_charge_status,
@@ -60,9 +60,11 @@ WITH sap_gateway AS (
       k.id_business_entity,
       k.id_finance_entity,
       CAST(NULL AS INT) AS id_finance_entity_entry,
+      k.business_unit,
       k.source_name,
-      k.revenue_name,
-      k.account_number,
+      k.accounting_type,
+      s.account_number,
+      s.accounting_name,
       s.accrual_year_month,
       CASE
           WHEN s.id_finance_entity IS NOT NULL THEN 'SUCCESS'
@@ -83,24 +85,24 @@ WITH sap_gateway AS (
     LEFT JOIN
         sap_gateway sg
             ON k.id_finance_entity = sg.id_source
-    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 10, 11
+    GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13
 )
 
 , df_final AS (
     SELECT
-        'IN'||'-'||COALESCE(df.id_finance_entity, df.id_business_entity||df.accrual_year_month)||'-'||'1'||'-'||'2'||'-'|| '1' AS id_kill_queue_invoice_issuance,
+        ('KK-I'||'-'||COALESCE(df.id_finance_entity, df.id_business_entity||df.accrual_year_month)||'-'|| account_number) AS id_accounting_process,
         df.id_business_entity,
         df.id_finance_entity,
         df.id_finance_entity_entry,
-        --df.version,
-        --df.contract_type,
+        df.business_unit,
         df.source_name,
-        df.revenue_name,
+        df.accounting_type,
+        df.account_number,
+        df.accounting_name,
         df.accrual_year_month,
         df.status,
         df.source_amount,
         df.sap_amount,
-        df.account_number,
         df.is_completeness_compliance,
         IF((ABS(df.source_amount) - ABS(df.sap_amount)) >= 0.05 OR (ABS(df.source_amount) - ABS(df.sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness_compliance,
         IF(df.dt_sap_reference BETWEEN df.dt_source_trigger AND DATE_ADD(df.dt_source_trigger, 30), TRUE, FALSE) AS is_temporality_compliance,
@@ -112,17 +114,19 @@ WITH sap_gateway AS (
 )
 
 SELECT DISTINCT
-    id_kill_queue_invoice_issuance,
+    id_accounting_process,
     id_business_entity,
     id_finance_entity,
     id_finance_entity_entry,
+    business_unit,
     source_name,
-    revenue_name,
+    accounting_type,
+    account_number,
+    accounting_name,
     accrual_year_month,
     status,
     source_amount,
     sap_amount,
-    account_number,
     is_completeness_compliance,
     is_correctness_compliance,
     is_temporality_compliance,

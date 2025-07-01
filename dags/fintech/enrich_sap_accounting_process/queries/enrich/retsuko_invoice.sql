@@ -1,6 +1,4 @@
-WITH
-
-original_invoice AS (
+WITH original_invoice AS (
   SELECT
     id_original_invoice_external,
     MAX(ts_due) AS ts_due_original,
@@ -11,7 +9,6 @@ original_invoice AS (
     ts_nf_requested IS NOT NULL
   GROUP BY 1
 ),
-
 
 retsuko AS (
   SELECT DISTINCT
@@ -201,11 +198,12 @@ assertions_base AS (
     dt_sap_created,
     IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness,
     IF(dt_sap_reference BETWEEN dt_source_trigger AND DATE_ADD(dt_source_trigger, 3), TRUE, FALSE) AS is_temporality
-  FROM errors_base
+  FROM
+    errors_base
 )
 
 SELECT
-  ('FR-I'||'-'||IF(id_finance_entity_entry IS NOT NULL, id_finance_entity_entry, id_finance_entity)||'-'|| accounting_number) AS id_accounting_process,
+  ('RTSK-I'||'-'||COALESCE(id_finance_entity_entry, id_finance_entity)||'-'|| account_number) AS id_accounting_process,
   id_business_entity,
   id_finance_entity,
   id_finance_entity_entry,
@@ -227,4 +225,5 @@ SELECT
   dt_source_trigger,
   dt_sap_reference,
   dt_sap_created
-FROM assertions_base
+FROM 
+  assertions_base

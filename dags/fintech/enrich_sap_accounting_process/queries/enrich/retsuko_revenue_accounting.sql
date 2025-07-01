@@ -1,5 +1,4 @@
-WITH
-sap_entity AS (
+WITH sap_entity AS (
   SELECT
     id_finance_entity,
     id_sap_gateway_feature,
@@ -221,11 +220,12 @@ assertions_base AS (
     dt_sap_created,
     IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness,
     IF(dt_sap_reference BETWEEN dt_source_trigger AND DATE_ADD(dt_source_trigger, 3), TRUE, FALSE) AS is_temporality
-  FROM errors_base
+  FROM 
+    errors_base
 )
 
 SELECT
-  ('FR-RRA'||'-'||IF(id_finance_entity_entry IS NOT NULL, id_finance_entity_entry, id_finance_entity)||'-'|| accounting_number) AS id_accounting_process,
+  ('RTSK-RRA'||'-'||COALESCE(id_finance_entity_entry, id_finance_entity)||'-'||account_number) AS id_accounting_process,
   id_business_entity,
   id_finance_entity,
   id_finance_entity_entry,
@@ -247,4 +247,5 @@ SELECT
   dt_source_trigger,
   dt_sap_reference,
   dt_sap_created
-FROM assertions_base
+FROM 
+  assertions_base
