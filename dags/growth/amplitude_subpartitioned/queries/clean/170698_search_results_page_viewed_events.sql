@@ -60,7 +60,7 @@ SELECT
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_campaign=([^&|$]+)', 1), ''), 'direct') AS up_utm_campaign,
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_content=([^&|$]+)', 1), ''), 'direct') AS up_utm_content,
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_term=([^&|$]+)', 1), ''), 'direct') AS up_utm_term,
-    CASE
+    CASE 
         WHEN GET_JSON_OBJECT(event_properties , '$.top5_house_id') <> '[]'
             THEN SPLIT(REGEXP_REPLACE(GET_JSON_OBJECT(event_properties , '$.top5_house_id'), '\\[|\\]|\\"', ''), ',')
         ELSE NULL
@@ -78,7 +78,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_new_clean.events
+    datalake_amplitude_clean.events
 WHERE
     id_app = '170698' AND event_type = 'search_results_page_viewed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

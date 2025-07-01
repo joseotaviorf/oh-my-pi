@@ -1,207 +1,207 @@
-database_name: datalake_amplitude_subpartitioned_clean
+database_name: datalake_amplitude_clean
 table_name: 170698_help_center_call_viewed_events
-owner: eduardo.soares@quintoandar.com.br
-domain: Growth
-description: This table contains help_center_call_viewed_events events from app 170698.
-  It tracks user interactions and includes relevant metadata and user properties.
 columns:
   id_amplitude:
     lineage:
-    - datalake_amplitude_new_clean.events.id_amplitude
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.id_amplitude
     description: Column id_amplitude from Amplitude events
   ids_amplitude_attributed:
     lineage:
-    - datalake_amplitude_new_clean.events.ids_amplitude_attributed
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.ids_amplitude_attributed
     description: Column ids_amplitude_attributed from Amplitude events
   id_user:
     lineage:
-    - datalake_amplitude_new_clean.events.id_user
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.id_user
     description: Column id_user from Amplitude events
   id_device:
     lineage:
-    - datalake_amplitude_new_clean.events.id_device
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.id_device
     description: Column id_device from Amplitude events
   id_event:
     lineage:
-    - datalake_amplitude_new_clean.events.id_event
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.id_event
     description: Column id_event from Amplitude events
   id_app:
     lineage:
-    - datalake_amplitude_new_clean.events.id_app
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.id_app
     description: Column id_app from Amplitude events
   uuid:
     lineage:
-    - datalake_amplitude_new_clean.events.uuid
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.uuid
     description: Column uuid from Amplitude events
   adid:
     lineage:
-    - datalake_amplitude_new_clean.events.adid
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.adid
     description: Column adid from Amplitude events
   id_session:
     lineage:
-    - datalake_amplitude_new_clean.events.id_session
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.id_session
     description: Column id_session from Amplitude events
   id_schema:
     lineage:
-    - datalake_amplitude_new_clean.events.id_schema
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.id_schema
     description: Column id_schema from Amplitude events
   id_inserted:
     lineage:
-    - datalake_amplitude_new_clean.events.id_inserted
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.id_inserted
     description: Column id_inserted from Amplitude events
   idfa:
     lineage:
-    - datalake_amplitude_new_clean.events.idfa
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.idfa
     description: Column idfa from Amplitude events
   event_type:
     lineage:
-    - datalake_amplitude_new_clean.events.event_type
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.event_type
     description: Column event_type from Amplitude events
   amplitude_event_type:
     lineage:
-    - datalake_amplitude_new_clean.events.amplitude_event_type
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.amplitude_event_type
     description: Column amplitude_event_type from Amplitude events
   city:
     lineage:
-    - datalake_amplitude_new_clean.events.city
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.city
     description: Column city from Amplitude events
   country:
     lineage:
-    - datalake_amplitude_new_clean.events.country
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.country
     description: Column country from Amplitude events
   data:
     lineage:
-    - datalake_amplitude_new_clean.events.data
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.data
     description: Column data from Amplitude events
   device_brand:
     lineage:
-    - datalake_amplitude_new_clean.events.device_brand
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.device_brand
     description: Column device_brand from Amplitude events
   device_carrier:
     lineage:
-    - datalake_amplitude_new_clean.events.device_carrier
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.device_carrier
     description: Column device_carrier from Amplitude events
   device_family:
     lineage:
-    - datalake_amplitude_new_clean.events.device_family
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.device_family
     description: Column device_family from Amplitude events
   device_manufacturer:
     lineage:
-    - datalake_amplitude_new_clean.events.device_manufacturer
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.device_manufacturer
     description: Column device_manufacturer from Amplitude events
   device_model:
     lineage:
-    - datalake_amplitude_new_clean.events.device_model
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.device_model
     description: Column device_model from Amplitude events
   device_type:
     lineage:
-    - datalake_amplitude_new_clean.events.device_type
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.device_type
     description: Column device_type from Amplitude events
   dma:
     lineage:
-    - datalake_amplitude_new_clean.events.dma
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.dma
     description: Column dma from Amplitude events
   ip_address:
     lineage:
-    - datalake_amplitude_new_clean.events.ip_address
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.ip_address
     description: Column ip_address from Amplitude events
   location_lat:
     lineage:
-    - datalake_amplitude_new_clean.events.location_lat
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.location_lat
     description: Column location_lat from Amplitude events
   location_lng:
     lineage:
-    - datalake_amplitude_new_clean.events.location_lng
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.location_lng
     description: Column location_lng from Amplitude events
   os_name:
     lineage:
-    - datalake_amplitude_new_clean.events.os_name
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.os_name
     description: Column os_name from Amplitude events
   os_version:
     lineage:
-    - datalake_amplitude_new_clean.events.os_version
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.os_version
     description: Column os_version from Amplitude events
   platform:
     lineage:
-    - datalake_amplitude_new_clean.events.platform
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.platform
     description: Column platform from Amplitude events
   library:
     lineage:
-    - datalake_amplitude_new_clean.events.library
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.library
     description: Column library from Amplitude events
   region:
     lineage:
-    - datalake_amplitude_new_clean.events.region
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.region
     description: Column region from Amplitude events
   start_version:
     lineage:
-    - datalake_amplitude_new_clean.events.start_version
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.start_version
     description: Column start_version from Amplitude events
   language:
     lineage:
-    - datalake_amplitude_new_clean.events.language
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.language
     description: Column language from Amplitude events
   version_name:
     lineage:
-    - datalake_amplitude_new_clean.events.version_name
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.version_name
     description: Column version_name from Amplitude events
   sample_rate:
     lineage:
-    - datalake_amplitude_new_clean.events.sample_rate
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.sample_rate
     description: Column sample_rate from Amplitude events
   event_properties:
     lineage:
-    - datalake_amplitude_new_clean.events.event_properties
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.event_properties
     description: Column event_properties from Amplitude events
   user_properties:
     lineage:
-    - datalake_amplitude_new_clean.events.user_properties
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.user_properties
     description: Column user_properties from Amplitude events
   is_paying:
     lineage:
-    - datalake_amplitude_new_clean.events.is_paying
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.is_paying
     description: Column is_paying from Amplitude events
   is_attribution_event:
     lineage:
-    - datalake_amplitude_new_clean.events.is_attribution_event
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.is_attribution_event
     description: Column is_attribution_event from Amplitude events
   ts_server_received:
     lineage:
-    - datalake_amplitude_new_clean.events.ts_server_received
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.ts_server_received
     description: Column ts_server_received from Amplitude events
   ts_event:
     lineage:
-    - datalake_amplitude_new_clean.events.ts_event
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.ts_event
     description: Column ts_event from Amplitude events
   ts_server_uploaded:
     lineage:
-    - datalake_amplitude_new_clean.events.ts_server_uploaded
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.ts_server_uploaded
     description: Column ts_server_uploaded from Amplitude events
   ts_user_created:
     lineage:
-    - datalake_amplitude_new_clean.events.ts_user_created
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.ts_user_created
     description: Column ts_user_created from Amplitude events
   ts_client_event:
     lineage:
-    - datalake_amplitude_new_clean.events.ts_client_event
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.ts_client_event
     description: Column ts_client_event from Amplitude events
   ts_client_uploaded:
     lineage:
-    - datalake_amplitude_new_clean.events.ts_client_uploaded
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.ts_client_uploaded
     description: Column ts_client_uploaded from Amplitude events
   ts_processed:
     lineage:
-    - datalake_amplitude_new_clean.events.ts_processed
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.ts_processed
     description: Column ts_processed from Amplitude events
   year:
     lineage:
-    - datalake_amplitude_new_clean.events.year
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.year
     description: Column year from Amplitude events
   month:
     lineage:
-    - datalake_amplitude_new_clean.events.month
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.month
     description: Column month from Amplitude events
   day:
     lineage:
-    - datalake_amplitude_new_clean.events.day
+    - datalake_amplitude_clean.170698_help_center_page_viewed_events.day
     description: Column day from Amplitude events
+owner: eduardo.soares@quintoandar.com.br
+domain: Growth
+description: This table contains help_center_call_viewed events from app 170698. It
+  tracks user interactions and includes relevant metadata and user properties.

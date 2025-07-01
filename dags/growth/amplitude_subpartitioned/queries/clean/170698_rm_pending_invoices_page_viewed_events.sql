@@ -39,7 +39,7 @@ SELECT
   uuid,
   version_name,
   sample_rate,
-  CAST(GET_JSON_OBJECT(event_properties, '$.contract_ids') AS STRING) AS ep_id_contracts,
+  BIGINT(GET_JSON_OBJECT(event_properties, '$.contractId')) AS ep_id_contract,
   CAST(GET_JSON_OBJECT(event_properties, '$.invoice_ids') AS STRING) AS ep_id_invoices,
   ts_client_event,
   ts_client_uploaded,
@@ -51,7 +51,7 @@ SELECT
   year,
   month,
   day
-FROM datalake_amplitude_new_clean.events
+FROM datalake_amplitude_clean.events
 WHERE
     id_app = '170698' AND event_type = 'rm_pending_invoices_page_viewed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

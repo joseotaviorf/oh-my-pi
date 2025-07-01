@@ -1,240 +1,240 @@
-database_name: datalake_amplitude_subpartitioned_clean
+database_name: datalake_amplitude_clean
 table_name: 170698_fs_mortgage_track_progress_button_clicked_events
 owner: eduardo.soares@quintoandar.com.br
 domain: Growth
-description: This table contains fs_mortgage_track_progress_button_clicked_events
-  events from app 170698. It tracks user interactions and includes relevant metadata
-  and user properties.
+description: This table contains fs_mortgage_track_progress_button_clicked events
+  from app 170698. It tracks user interactions and includes relevant metadata and
+  user properties.
 columns:
   id_amplitude:
+    description: Amplitude user identifier
     lineage:
-    - datalake_amplitude_new_clean.events.id_amplitude
-    description: Column id_amplitude from Amplitude events
+    - datalake_amplitude_clean.events.id_amplitude
   ids_amplitude_attributed:
+    description: Amplitude user identifier after attritution
     lineage:
-    - datalake_amplitude_new_clean.events.ids_amplitude_attributed
-    description: Column ids_amplitude_attributed from Amplitude events
+    - datalake_amplitude_clean.events.ids_amplitude_attributed
   id_app:
+    description: Id from the origin app
     lineage:
-    - datalake_amplitude_new_clean.events.id_app
-    description: Column id_app from Amplitude events
+    - datalake_amplitude_clean.events.id_app
   id_device:
+    description: Device identifier
     lineage:
-    - datalake_amplitude_new_clean.events.id_device
-    description: Column id_device from Amplitude events
+    - datalake_amplitude_clean.events.id_device
   id_event:
+    description: Event identifier
     lineage:
-    - datalake_amplitude_new_clean.events.id_event
-    description: Column id_event from Amplitude events
+    - datalake_amplitude_clean.events.id_event
   id_session:
+    description: Session identifier
     lineage:
-    - datalake_amplitude_new_clean.events.id_session
-    description: Column id_session from Amplitude events
+    - datalake_amplitude_clean.events.id_session
   id_inserted:
+    description: Inserted identifier
     lineage:
-    - datalake_amplitude_new_clean.events.id_inserted
-    description: Column id_inserted from Amplitude events
+    - datalake_amplitude_clean.events.id_inserted
   id_user:
+    description: User identifier (same as sk_user from the product database)
     lineage:
-    - datalake_amplitude_new_clean.events.id_user
-    description: Column id_user from Amplitude events
+    - datalake_amplitude_clean.events.id_user
   id_schema:
+    description: Schema identifier
     lineage:
-    - datalake_amplitude_new_clean.events.id_schema
-    description: Column id_schema from Amplitude events
+    - datalake_amplitude_clean.events.id_schema
   idfa:
+    description: IDFA
     lineage:
-    - datalake_amplitude_new_clean.events.idfa
-    description: Column idfa from Amplitude events
+    - datalake_amplitude_clean.events.idfa
   adid:
+    description: adid
     lineage:
-    - datalake_amplitude_new_clean.events.adid
-    description: Column adid from Amplitude events
+    - datalake_amplitude_clean.events.adid
   uuid:
+    description: Event unique identifier
     lineage:
-    - datalake_amplitude_new_clean.events.uuid
-    description: Column uuid from Amplitude events
+    - datalake_amplitude_clean.events.uuid
   id_offer:
+    description: Offer identifier (firestore)
     lineage:
-    - datalake_amplitude_new_clean.events.id_offer
-    description: Column id_offer from Amplitude events
+    - datalake_amplitude_clean.events.event_properties
   amplitude_event_type:
+    description: Event name
     lineage:
-    - datalake_amplitude_new_clean.events.amplitude_event_type
-    description: Column amplitude_event_type from Amplitude events
+    - datalake_amplitude_clean.events.amplitude_event_type
   city:
+    description: Amplitude city
     lineage:
-    - datalake_amplitude_new_clean.events.city
-    description: Column city from Amplitude events
+    - datalake_amplitude_clean.events.city
   country:
+    description: Amplitude country
     lineage:
-    - datalake_amplitude_new_clean.events.country
-    description: Column country from Amplitude events
+    - datalake_amplitude_clean.events.country
   region:
+    description: Amplitude region
     lineage:
-    - datalake_amplitude_new_clean.events.region
-    description: Column region from Amplitude events
+    - datalake_amplitude_clean.events.region
   data:
+    description: Amplitude data
     lineage:
-    - datalake_amplitude_new_clean.events.data
-    description: Column data from Amplitude events
+    - datalake_amplitude_clean.events.data
   device_brand:
+    description: Brand of the device
     lineage:
-    - datalake_amplitude_new_clean.events.device_brand
-    description: Column device_brand from Amplitude events
+    - datalake_amplitude_clean.events.device_brand
   device_carrier:
+    description: Carrier of the device
     lineage:
-    - datalake_amplitude_new_clean.events.device_carrier
-    description: Column device_carrier from Amplitude events
+    - datalake_amplitude_clean.events.device_carrier
   device_family:
+    description: Amplitude device family
     lineage:
-    - datalake_amplitude_new_clean.events.device_family
-    description: Column device_family from Amplitude events
+    - datalake_amplitude_clean.events.device_family
   device_manufacturer:
+    description: Device manufacturer
     lineage:
-    - datalake_amplitude_new_clean.events.device_manufacturer
-    description: Column device_manufacturer from Amplitude events
+    - datalake_amplitude_clean.events.device_manufacturer
   device_model:
+    description: Model of the device
     lineage:
-    - datalake_amplitude_new_clean.events.device_model
-    description: Column device_model from Amplitude events
+    - datalake_amplitude_clean.events.device_model
   device_type:
+    description: Type of the device
     lineage:
-    - datalake_amplitude_new_clean.events.device_type
-    description: Column device_type from Amplitude events
+    - datalake_amplitude_clean.events.device_type
   dma:
+    description: DMA
     lineage:
-    - datalake_amplitude_new_clean.events.dma
-    description: Column dma from Amplitude events
+    - datalake_amplitude_clean.events.dma
   event_type:
+    description: Event name
     lineage:
-    - datalake_amplitude_new_clean.events.event_type
-    description: Column event_type from Amplitude events
+    - datalake_amplitude_clean.events.event_type
   event_properties:
+    description: Properties from the event
     lineage:
-    - datalake_amplitude_new_clean.events.event_properties
-    description: Column event_properties from Amplitude events
+    - datalake_amplitude_clean.events.event_properties
   is_attribution_event:
+    description: Flag that identifies if the event is a attribution one.
     lineage:
-    - datalake_amplitude_new_clean.events.is_attribution_event
-    description: Column is_attribution_event from Amplitude events
+    - datalake_amplitude_clean.events.is_attribution_event
   ip_address:
+    description: IP from user
     lineage:
-    - datalake_amplitude_new_clean.events.ip_address
-    description: Column ip_address from Amplitude events
+    - datalake_amplitude_clean.events.ip_address
   location_lat:
+    description: Latitude of the user
     lineage:
-    - datalake_amplitude_new_clean.events.location_lat
-    description: Column location_lat from Amplitude events
+    - datalake_amplitude_clean.events.location_lat
   location_lng:
+    description: Longitude of the user
     lineage:
-    - datalake_amplitude_new_clean.events.location_lng
-    description: Column location_lng from Amplitude events
+    - datalake_amplitude_clean.events.location_lng
   os_name:
+    description: Operational system name
     lineage:
-    - datalake_amplitude_new_clean.events.os_name
-    description: Column os_name from Amplitude events
+    - datalake_amplitude_clean.events.os_name
   os_version:
+    description: Operational system version
     lineage:
-    - datalake_amplitude_new_clean.events.os_version
-    description: Column os_version from Amplitude events
+    - datalake_amplitude_clean.events.os_version
   platform:
+    description: User platform
     lineage:
-    - datalake_amplitude_new_clean.events.platform
-    description: Column platform from Amplitude events
+    - datalake_amplitude_clean.events.platform
   library:
+    description: Library
     lineage:
-    - datalake_amplitude_new_clean.events.library
-    description: Column library from Amplitude events
+    - datalake_amplitude_clean.events.library
   is_paying:
+    description: Flag that identifies if the user is paying
     lineage:
-    - datalake_amplitude_new_clean.events.is_paying
-    description: Column is_paying from Amplitude events
+    - datalake_amplitude_clean.events.is_paying
   start_version:
+    description: Start version
     lineage:
-    - datalake_amplitude_new_clean.events.start_version
-    description: Column start_version from Amplitude events
+    - datalake_amplitude_clean.events.start_version
   language:
+    description: Language
     lineage:
-    - datalake_amplitude_new_clean.events.language
-    description: Column language from Amplitude events
+    - datalake_amplitude_clean.events.language
   version_name:
+    description: Version name
     lineage:
-    - datalake_amplitude_new_clean.events.version_name
-    description: Column version_name from Amplitude events
+    - datalake_amplitude_clean.events.version_name
   sample_rate:
+    description: Rate of sample
     lineage:
-    - datalake_amplitude_new_clean.events.sample_rate
-    description: Column sample_rate from Amplitude events
+    - datalake_amplitude_clean.events.sample_rate
   user_properties:
+    description: Properties that describes the user
     lineage:
-    - datalake_amplitude_new_clean.events.user_properties
-    description: Column user_properties from Amplitude events
+    - datalake_amplitude_clean.events.user_properties
   up_app_type:
+    description: User property that identifies the app type
     lineage:
-    - datalake_amplitude_new_clean.events.up_app_type
-    description: Column up_app_type from Amplitude events
+    - datalake_amplitude_clean.events.user_properties
   up_utm_source:
+    description: User property that identifies the utm source
     lineage:
-    - datalake_amplitude_new_clean.events.up_utm_source
-    description: Column up_utm_source from Amplitude events
+    - datalake_amplitude_clean.events.user_properties
   up_utm_medium:
+    description: User property that identifies the utm medium
     lineage:
-    - datalake_amplitude_new_clean.events.up_utm_medium
-    description: Column up_utm_medium from Amplitude events
+    - datalake_amplitude_clean.events.user_properties
   up_utm_campaign:
+    description: User property that identifies the utm campaign
     lineage:
-    - datalake_amplitude_new_clean.events.up_utm_campaign
-    description: Column up_utm_campaign from Amplitude events
+    - datalake_amplitude_clean.events.user_properties
   up_utm_content:
+    description: User property that identifies the utm content
     lineage:
-    - datalake_amplitude_new_clean.events.up_utm_content
-    description: Column up_utm_content from Amplitude events
+    - datalake_amplitude_clean.events.user_properties
   up_utm_term:
+    description: User property that identifies the utm term
     lineage:
-    - datalake_amplitude_new_clean.events.up_utm_term
-    description: Column up_utm_term from Amplitude events
+    - datalake_amplitude_clean.events.user_properties
   dt_event:
+    description: Date when the event was triggered
     lineage:
-    - datalake_amplitude_new_clean.events.dt_event
-    description: Column dt_event from Amplitude events
+    - datalake_amplitude_clean.events.ts_event
   ts_event:
+    description: Timestamp when the event was triggered
     lineage:
-    - datalake_amplitude_new_clean.events.ts_event
-    description: Column ts_event from Amplitude events
+    - datalake_amplitude_clean.events.ts_event
   ts_server_uploaded:
+    description: Timestamp when the server uploaded the info
     lineage:
-    - datalake_amplitude_new_clean.events.ts_server_uploaded
-    description: Column ts_server_uploaded from Amplitude events
+    - datalake_amplitude_clean.events.ts_server_uploaded
   ts_user_created:
+    description: Timestamp when the user were created
     lineage:
-    - datalake_amplitude_new_clean.events.ts_user_created
-    description: Column ts_user_created from Amplitude events
+    - datalake_amplitude_clean.events.ts_user_created
   ts_client_event:
+    description: Timestamp when the event was triggered on client
     lineage:
-    - datalake_amplitude_new_clean.events.ts_client_event
-    description: Column ts_client_event from Amplitude events
+    - datalake_amplitude_clean.events.ts_client_event
   ts_client_uploaded:
+    description: Timestamp when the event was uploaded
     lineage:
-    - datalake_amplitude_new_clean.events.ts_client_uploaded
-    description: Column ts_client_uploaded from Amplitude events
+    - datalake_amplitude_clean.events.ts_client_uploaded
   ts_server_received:
+    description: Timestamp when the event was received
     lineage:
-    - datalake_amplitude_new_clean.events.ts_server_received
-    description: Column ts_server_received from Amplitude events
+    - datalake_amplitude_clean.events.ts_server_received
   ts_processed:
+    description: Timestamp when the event was processed
     lineage:
-    - datalake_amplitude_new_clean.events.ts_processed
-    description: Column ts_processed from Amplitude events
+    - datalake_amplitude_clean.events.ts_processed
   year:
+    description: Year when the data was received
     lineage:
-    - datalake_amplitude_new_clean.events.year
-    description: Column year from Amplitude events
+    - datalake_amplitude_clean.events.year
   month:
+    description: Month when the data was received
     lineage:
-    - datalake_amplitude_new_clean.events.month
-    description: Column month from Amplitude events
+    - datalake_amplitude_clean.events.month
   day:
+    description: Day when the data was received
     lineage:
-    - datalake_amplitude_new_clean.events.day
-    description: Column day from Amplitude events
+    - datalake_amplitude_clean.events.day

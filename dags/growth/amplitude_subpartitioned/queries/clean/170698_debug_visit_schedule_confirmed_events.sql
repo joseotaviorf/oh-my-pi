@@ -12,7 +12,7 @@ SELECT
     GET_JSON_OBJECT(event_properties, '$.house_id') as ep_house_id,
     GET_JSON_OBJECT(event_properties, '$.visit_code') as ep_visit_code
 FROM
-    datalake_amplitude_new_clean.events
+    datalake_amplitude_clean.events
 WHERE
     id_app = '170698' AND event_type = 'debug_visit_schedule_confirmed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

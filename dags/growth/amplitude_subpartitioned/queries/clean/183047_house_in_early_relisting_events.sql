@@ -1,7 +1,7 @@
-SELECT
+SELECT 
     id_amplitude,
-    BIGINT(id_user) AS id_user,
-    id_device,
+    BIGINT(id_user) AS id_user, 
+    id_device, 
     BIGINT(GET_JSON_OBJECT(event_properties, '$.house_id')) AS id_house,
     BIGINT(GET_JSON_OBJECT(event_properties, '$.contract_id')) AS id_contract,
     INT(GET_JSON_OBJECT(event_properties, '$.test_group')) AS id_test_group,
@@ -13,7 +13,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_new_clean.events
+    datalake_amplitude_clean.events
 WHERE
     id_app = '183047' AND event_type = 'house_in_early_relisting'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

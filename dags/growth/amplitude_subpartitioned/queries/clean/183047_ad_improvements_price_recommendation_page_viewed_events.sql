@@ -1,4 +1,4 @@
-SELECT
+SELECT 
     id_amplitude,
     ids_amplitude_attributed,
     CAST((GET_JSON_OBJECT(event_properties, '$.house_id')) AS BIGINT) AS id_house,
@@ -40,8 +40,8 @@ SELECT
     sample_rate,
     event_properties,
     user_properties,
-    GET_JSON_OBJECT(event_properties, '$.current_price') ep_current_price,
-    GET_JSON_OBJECT(event_properties, '$.recommended_price') ep_recommended_price,
+    GET_JSON_OBJECT(event_properties, '$.current_price') ep_current_price, 
+    GET_JSON_OBJECT(event_properties, '$.recommended_price') ep_recommended_price, 
     GET_JSON_OBJECT(event_properties, '$.recommended_price_diff') ep_recommended_price_diff,
     GET_JSON_OBJECT(event_properties, '$.decrease_or_increase') ep_decrease_or_increase,
     is_paying,
@@ -57,7 +57,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_new_clean.events
+    datalake_amplitude_clean.events
 WHERE
     id_app = '183047' AND event_type = 'ad_improvements_price_recommendation_page_viewed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

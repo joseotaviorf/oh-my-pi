@@ -57,7 +57,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_new_clean.events
+    datalake_amplitude_clean.events
 WHERE
     id_app = '183047' AND event_type = 'rent_pricing_new_listing_form_submitted'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

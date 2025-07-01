@@ -37,7 +37,7 @@ SELECT
     sample_rate,
     event_properties,
     user_properties,
-    BIGINT(GET_JSON_OBJECT(event_properties, '$.contract_id')) AS ep_id_contract,
+    BIGINT(GET_JSON_OBJECT(event_properties, '$.contractId')) AS ep_id_contract,
     STRING(GET_JSON_OBJECT(user_properties, '$.platform')) AS up_platform,
     STRING(GET_JSON_OBJECT(user_properties, '$.active_contracts')) AS up_active_contracts,
     STRING(GET_JSON_OBJECT(user_properties, '$.ab_postcontract_dynamic_home')) AS up_ab_postcontract_dynamic_home,
@@ -54,7 +54,7 @@ SELECT
     month,
     day
 FROM
-  datalake_amplitude_new_clean.events
+  datalake_amplitude_clean.events
 WHERE
     id_app = '170698' AND event_type = 'contract_page_viewed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

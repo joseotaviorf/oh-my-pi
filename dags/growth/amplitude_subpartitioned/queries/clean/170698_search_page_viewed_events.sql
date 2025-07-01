@@ -55,7 +55,7 @@ SELECT
     STRING(GET_JSON_OBJECT(user_properties , '$.platform')) AS up_platform,
     STRING(GET_JSON_OBJECT(user_properties, '$.entrance_uri')) AS entrance_uri,
     STRING(GET_JSON_OBJECT(user_properties, '$.referrer')) AS referrer,
-    CASE
+    CASE 
         WHEN GET_JSON_OBJECT(event_properties , '$.top5_house_id') <> '[]'
             THEN SPLIT(REGEXP_REPLACE(GET_JSON_OBJECT(event_properties , '$.top5_house_id'), '\\[|\\]|\\"', ''), ',')
         ELSE NULL
@@ -73,7 +73,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_new_clean.events
+    datalake_amplitude_clean.events
 WHERE
     id_app = '170698' AND event_type = 'search_page_viewed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

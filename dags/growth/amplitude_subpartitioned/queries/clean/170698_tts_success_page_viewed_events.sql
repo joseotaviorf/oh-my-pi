@@ -66,7 +66,7 @@ SELECT
         GET_JSON_OBJECT(event_properties, '$.tts_email_md5')
     ) AS ep_user_email_md5
 FROM
-    datalake_amplitude_new_clean.events
+    datalake_amplitude_clean.events
 WHERE
     id_app = '170698' AND event_type = 'tts_success_page_viewed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

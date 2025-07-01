@@ -16,7 +16,7 @@ SELECT
     CAST(TRIM(GET_JSON_OBJECT(event_properties, '$.formfield_lead_uuid')) AS STRING) AS formfield_lead_uuid,
     CAST(GET_JSON_OBJECT(user_properties, '$.country') AS STRING) AS country_code
 FROM
-    datalake_amplitude_new_clean.events
+    datalake_amplitude_clean.events
 WHERE
     id_app = '183047' AND event_type = 'lead_form_submitted'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

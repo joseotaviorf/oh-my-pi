@@ -1,4 +1,4 @@
-SELECT
+SELECT 
     id_amplitude,
     ids_amplitude_attributed,
     id_app,
@@ -29,7 +29,7 @@ SELECT
     device_family,
     device_manufacturer,
     device_model,
-    device_type,
+    device_type,    
     dma,
     event_type,
     event_properties,
@@ -66,7 +66,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_new_clean.events
+    datalake_amplitude_clean.events
 WHERE
     id_app = '233592' AND event_type = 'chatcrpp_suspicious_message_sent'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

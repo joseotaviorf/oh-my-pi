@@ -1,4 +1,4 @@
-SELECT
+SELECT 
     id_amplitude,
     ids_amplitude_attributed,
     CAST((GET_JSON_OBJECT(event_properties, '$.house_id')) AS BIGINT) AS id_house,
@@ -19,7 +19,9 @@ SELECT
     GET_JSON_OBJECT(event_properties, '$.total_tasks') AS ep_total_tasks,
     GET_JSON_OBJECT(event_properties, '$.pending_tasks') AS ep_pending_tasks,
     GET_JSON_OBJECT(event_properties, '$.rent_price_task_status') AS ep_rent_price_task_status,
+    GET_JSON_OBJECT(event_properties, '$.sale_price_task_status') AS ep_sale_price_task_status,
     GET_JSON_OBJECT(event_properties, '$.available_hours_task_status') AS ep_available_hours_task_status,
+    GET_JSON_OBJECT(event_properties, '$.key_location_task_status') AS ep_key_location_task_status,
     city,
     country,
     data,
@@ -57,7 +59,7 @@ SELECT
     month,
     day
 FROM
-    datalake_amplitude_new_clean.events
+    datalake_amplitude_clean.events
 WHERE
     id_app = '183047' AND event_type = 'ad_improvements_page_viewed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

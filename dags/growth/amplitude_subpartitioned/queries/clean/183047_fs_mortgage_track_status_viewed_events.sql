@@ -58,7 +58,7 @@ SELECT
   month,
   day
 FROM
-  datalake_amplitude_new_clean.events
+  datalake_amplitude_clean.events
 WHERE
     id_app = '183047' AND event_type = 'fs_mortgage_track_status_viewed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'

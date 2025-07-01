@@ -11,7 +11,7 @@ SELECT
     GET_JSON_OBJECT(user_properties, '$.entrance_uri') AS entrance_uri,
     GET_JSON_OBJECT(user_properties, '$.referrer') AS referrer
 FROM
-    datalake_amplitude_new_clean.events
+    datalake_amplitude_clean.events
 WHERE
     id_app = '170698' AND event_type = 'alert_subscription_confirmed'
     AND MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
