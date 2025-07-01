@@ -649,6 +649,7 @@ classifieds_tasks = [
             f"--output_index_prefix=vespucio_prod",
             f"--number_of_shards=4",
             f"--number_of_replicas=2",
+            f"--refresh_interval=60",
         ],
     ),
 ]
