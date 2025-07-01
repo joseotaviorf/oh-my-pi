@@ -72,8 +72,8 @@ if __name__ == "__main__":
     parser.add_argument("environment")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
-    parser.add_argument("execution_date")
     parser.add_argument("schema")
+    parser.add_argument("execution_date")
 
     args = parser.parse_args()
     environment = args.environment
