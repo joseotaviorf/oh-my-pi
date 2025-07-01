@@ -137,7 +137,7 @@ SELECT
         WHEN a.is_ssn_boletao IS NOT NULL AND a.is_ssn_boletao IS TRUE AND a.payment_status = "written-down" THEN TRUE
         ELSE FALSE
     END AS is_ssn,
-    a.recovery_channel,
+    IF(a.dt_reference >= a.dt_invoice_paid, a.recovery_channel, NULL) AS recovery_channel,
     a.debtor_type,
     a.delay_contamined_at_closure,
     a.delay_contamined_range,
