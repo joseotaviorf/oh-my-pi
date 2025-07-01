@@ -693,6 +693,12 @@ workflow:
     155696_refer_lead_referred_events:
       run_optimize: false
       run_vacuum: false
+    170698_share_listing_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_listing_favorite_remove_events:
+      run_optimize: false
+      run_vacuum: false
 cluster:
   type: databricks_12_2_med_2xlarge_general_photon_cluster
   databricks_conn_id: databricks_new
