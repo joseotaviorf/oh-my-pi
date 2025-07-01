@@ -25,12 +25,12 @@ JOB_NAME = "load_amplitude_new_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def process_key(key, environment, source, schema, datalake_bucket, execution_date, partition_cols, table_name, transient_location, transient_data_schema, transient_expected_cols):
+def process_key(key, environment, source, datalake_bucket, execution_date, partition_cols, table_name, transient_location, transient_data_schema, transient_expected_cols):
     try:
         spark_client = SparkClient()
         dataframe_service = SparkDataFrameService()
 
-        db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
+        db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
         database_location = db_info["db_raw_path"]
 
         transient_path = f'{transient_location}{key["app_id"]}/{key["app_id"]}_{execution_date}_*/'
@@ -72,12 +72,10 @@ if __name__ == "__main__":
     parser.add_argument("environment")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
-    parser.add_argument("schema")
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
     environment = args.environment
-    schema = args.schema
     datalake_bucket = args.datalake_bucket
     source = args.source
     execution_date = args.execution_date
@@ -92,5 +90,5 @@ if __name__ == "__main__":
 
     # Process keys in parallel
     with ThreadPoolExecutor() as executor:
-        list(executor.map(lambda key: process_key(key, environment, source, schema, datalake_bucket, execution_date, partition_cols, table_name, transient_location, transient_data_schema, transient_expected_cols), all_keys))
+        list(executor.map(lambda key: process_key(key, environment, source, datalake_bucket, execution_date, partition_cols, table_name, transient_location, transient_data_schema, transient_expected_cols), all_keys))
         print(f"Processed {len(all_keys)} keys.")

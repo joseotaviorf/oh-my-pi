@@ -50,6 +50,6 @@ SELECT
     CAST(month AS INT) AS month,
     CAST(day AS INT) AS day
 FROM
-    datalake_amplitude_raw.events
+    datalake_amplitude_new_raw.events
 WHERE
     MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
