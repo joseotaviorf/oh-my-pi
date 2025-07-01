@@ -93,6 +93,7 @@ SELECT
         WHEN UPPER(n.consultancy) IN ('018','G018', 'QA_GRB') THEN 'GRB'
         WHEN UPPER(n.consultancy) IN ('019','G019', 'QA_MEETC') THEN 'MEETCALL'
         WHEN UPPER(n.consultancy) IN ('021','G021', 'QA_MONES') THEN 'MONEST'
+        WHEN UPPER(n.consultancy) IN ('020','G020', 'QA_PELLON') THEN 'PELLON'
         ELSE UPPER(n.consultancy)
     END AS consultancy_name,
     n.status,

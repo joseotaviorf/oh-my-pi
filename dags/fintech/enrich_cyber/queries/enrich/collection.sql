@@ -52,6 +52,8 @@ SELECT
     WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%MEETC%" THEN "MEETCALL"
     WHEN UPPER(l.id_user) LIKE "%MTC%" THEN "MEETCALL"
     WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%MONES%" THEN "MONEST"
+    WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%PELLON%" THEN "PELLON"
+    WHEN UPPER(l.id_user) LIKE "%PELLON%" THEN "PELLON"
     WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%PORTAL%" THEN "PORTAL_QUINTOANDAR"
     WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) = "WEBHELP" THEN "WEBHELP"
     WHEN UPPER(COALESCE(agg.agency_name, ag.agency_name, l.id_user)) LIKE "%WHELP%" THEN "WEBHELP"
