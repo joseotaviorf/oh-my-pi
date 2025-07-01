@@ -4101,6 +4101,10 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.enrich_tracksale_dispatches:load-enrich-true-offboarding-pp-dispatches
 bietlejuice.reverse_webhelp:
   - bietlejuice.bigfone:load-clean-call
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-answer
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-dim-nps-campaign
+  - bietlejuice.dw_customer_satisfaction:load-dw-customer-satisfaction-fact-nps-dispatches
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-taxonomy
@@ -4109,17 +4113,27 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-customer-contacts
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets
+  - bietlejuice.dw_inspections:load-dw-inspections-dim-inspection
+  - bietlejuice.dw_inspections:load-dw-inspections-fact-inspection
+  - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
+  - bietlejuice.dw_offboarding:load-dw-offboarding-dim-termination
+  - bietlejuice.dw_offboarding:load-dw-offboarding-fact-terminations
+  - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat
   - bietlejuice.enrich_customer_support:load-enrich-calls
   - bietlejuice.enrich_customer_support:load-enrich-chat-aht
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-tasks
+  - bietlejuice.enrich_offboarding:load-enrich-contract-termination
   - bietlejuice.enrich_repairs:load-enrich-repair-tickets
   - bietlejuice.enrich_support_users:load-enrich-analysts
+  - bietlejuice.enrich_terminator:load-enrich-termination
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
   - bietlejuice.quinto_messenger:load-clean-channel
   - bietlejuice.quinto_messenger:load-clean-channel-event
   - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up
+  - bietlejuice.terminator:load-clean-termination-characteristics
 bietlejuice.reverse_webhelp_access:
   - bietlejuice.reverse_webhelp:load-reverse-backlog-metric
   - bietlejuice.reverse_webhelp:load-reverse-csat-front
