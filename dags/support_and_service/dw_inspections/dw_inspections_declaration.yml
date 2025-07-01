@@ -49,7 +49,8 @@ workflow:
       merge_on: [sk_repair_request]
     dim_repair_request:
       z_order_by: [id_repair_request]
-      merge_on: [id_repair_request]
+      extraction_type: full
+      partitions: []
     dim_reviewer:
       z_order_by: [sk_reviewer]
       merge_on: [sk_reviewer]
@@ -82,7 +83,8 @@ workflow:
       merge_on: [sk_repair_request]
     fact_report_inspections:
       z_order_by: [sk_inspection]
-      merge_on: [sk_inspection]
+      extraction_type: full
+      partitions: []
     fact_report_review:
       extraction_type: full
   extra_query_template_params:

@@ -64,7 +64,5 @@ LEFT JOIN
 LEFT JOIN
     datalake_inspections.inspection_status_change AS isc
         ON isa.id_inspection = isc.id_inspection
-WHERE
-    MAKE_DATE(isa.year, isa.month, isa.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 GROUP BY
     ALL
