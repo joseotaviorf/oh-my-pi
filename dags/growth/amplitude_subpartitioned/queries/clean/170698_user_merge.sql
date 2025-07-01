@@ -1,7 +1,7 @@
 SELECT
-    amplitude_id AS id_amplitude,
-    merged_amplitude_id AS id_amplitude_merged,
-    scope AS id_app,
+    CAST(amplitude_id AS BIGINT) AS id_amplitude,
+    CAST(merged_amplitude_id AS BIGINT) AS id_amplitude_merged,
+    CAST(scope AS BIGINT) AS id_app,
     timestamp(merge_time/1000) AS ts_merge,
     timestamp(merge_server_time/1000) AS ts_server_merge,
     YEAR(timestamp(merge_time/1000)) AS year,
