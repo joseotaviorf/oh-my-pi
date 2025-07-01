@@ -65,4 +65,6 @@ WHERE
     MAKE_DATE(hms.year, hms.month, hms.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND hms.business_context = 'RENT'
     AND hdi.uuid_company IS NULL
+QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY hms.id_house ORDER BY hdi.dt_day DESC) = 1
 
