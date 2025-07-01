@@ -16,7 +16,7 @@ WITH union_spvs AS (
         "spv" as search_rendering_type,
         ts_event
     FROM
-        datalake_amplitude_clean_staging.170698_search_page_viewed_events
+        datalake_amplitude_clean.170698_search_page_viewed_events
     WHERE
         -- include one more day to make sure we don't repeat id_search that start before midnight and end after.
         MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30} + 1) AND DATE('{end_date}')
@@ -38,7 +38,7 @@ WITH union_spvs AS (
         "srpv" as search_rendering_type,
         ts_event
     FROM
-        datalake_amplitude_clean_staging.170698_search_results_page_viewed_events
+        datalake_amplitude_clean.170698_search_results_page_viewed_events
     WHERE
         -- include one more day to make sure we don't repeat id_search that start before midnight and end after.
         MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30} + 1) AND DATE('{end_date}')

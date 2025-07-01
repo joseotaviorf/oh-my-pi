@@ -10,7 +10,7 @@ WITH amplitude_active_search AS (
   FROM
     datalake_amplitude_clean.170698_search_results_page_viewed_events AS srp
   INNER JOIN
-    datalake_amplitude_clean_staging.170698_apply_filters_events AS apf
+    datalake_amplitude_clean.170698_apply_filters_events AS apf
       ON apf.id_amplitude = srp.id_amplitude
       AND apf.year = srp.year
       AND apf.month = srp.month

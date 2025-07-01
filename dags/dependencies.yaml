@@ -130,6 +130,7 @@ bietlejuice.dw_charging_payment_quintocred:
 bietlejuice.dw_ciq_supply:
   - bietlejuice.enrich_ciq:load-enrich-ciq-supply-events-tracking
 bietlejuice.dw_collection_recovery:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-invoice-pay-button-clicked-events
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-house
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-junk
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-person
@@ -391,6 +392,7 @@ bietlejuice.dw_datamarts_cross:
   - bietlejuice.gsheets_growth:done-clean-affiliate-volumetry-cluster
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
 bietlejuice.dw_datamarts_for_rent:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-hoursalert-confirmed-events
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
@@ -414,6 +416,7 @@ bietlejuice.dw_datamarts_for_rent_cross:
   - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud
   - bietlejuice.ebdb_user:load-clean-user-revision-entity
 bietlejuice.dw_datamarts_for_sale:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-hoursalert-confirmed-events
   - bietlejuice.dw_booking:load-dw-public-dim-booking
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
@@ -1217,9 +1220,23 @@ bietlejuice.enrich_amplitude_agents_app:
   - bietlejuice.amplitude_new:load-clean-events
   - bietlejuice.enrich_ebdb_agents:load-enrich-business-context
 bietlejuice.enrich_amplitude_inspections:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-inspection-budgetapproval-home-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-inspection-review-home-page-viewed-events
   - bietlejuice.inspection_services:load-clean-inspection-aud
 bietlejuice.enrich_amplitude_lead:
   - bietlejuice.amplitude_new:load-clean-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-155696-refer-lead-referred-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-155697-refer-lead-referred-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-160023-affiliate-lead-referred-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-intro-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-lead-form-submitted-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-price-suggestion-form-submitted-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-price-suggestion-sale-form-submitted-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-property-details-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-rent-pricing-new-listing-form-submitted-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-rent-pricing-new-listing-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-205027-referral-form-accepted-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-205027-referral-form-discarded-events
   - bietlejuice.rene_descartes:load-clean-house-lead
 bietlejuice.enrich_amplitude_magic_link:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
@@ -1230,6 +1247,17 @@ bietlejuice.enrich_amplitude_magic_link:
   - bietlejuice.zendesk:load-clean-users
 bietlejuice.enrich_amplitude_offboarding:
   - bietlejuice.amplitude_new:load-clean-events
+bietlejuice.enrich_amplitude_offer:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-offer-submitted-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-offer-submitted-new-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-sale-offer-form-accepted-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-offer-submitted-new-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183049-offer-submitted-events
+bietlejuice.enrich_amplitude_page_viewed_events:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-schedule-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
 bietlejuice.enrich_amplitude_partner_taxonomy:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.amplitude_new:load-clean-events
@@ -1238,6 +1266,9 @@ bietlejuice.enrich_amplitude_sale_visit_intent:
   - bietlejuice.amplitude_new:load-clean-events
 bietlejuice.enrich_amplitude_user:
   - bietlejuice.amplitude_new:load-clean-events
+bietlejuice.enrich_amplitude_visit:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-debug-visit-schedule-confirmed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-schedule-confirmed-events
 bietlejuice.enrich_anonymization:
   - bietlejuice.documentation_metrics:load-clean-columns-documentation
   - bietlejuice.enrich_anonymization_validation:load-enrich-manual-validation
@@ -1250,6 +1281,7 @@ bietlejuice.enrich_arquivo_confidencial:
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
   - bietlejuice.arquivo_confidencial_integration_report:load-clean-integration-report-aud
 bietlejuice.enrich_atlas_pricing_report:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
   - bietlejuice.dw_contract:load-dw-rent-dim-contract
   - bietlejuice.dw_datamarts_cross:load-dw-datamarts-lead-listing-flows
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing
@@ -1312,6 +1344,11 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.trato_feito:load-clean-payment
   - bietlejuice.vans:load-clean-boleto
 bietlejuice.enrich_base_metrics_service:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-recset-impression-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-recset-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
   - bietlejuice.dw_region:load-dw-public-dim-region
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
@@ -1479,6 +1516,19 @@ bietlejuice.enrich_ciq_comissioning:
   - bietlejuice.gsheets_agents:done-clean-rent-comission-for-strategic-region
   - bietlejuice.gsheets_agents:done-clean-sale-comission-for-strategic-region
 bietlejuice.enrich_collections_quintoandar:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-contract-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-my-rent-pending-invoices-card-view-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-invoice-pay-button-clicked-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-invoice-pay-total-button-clicked-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-overdue-invoices-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-invoice-pay-button-clicked-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-negotiation-cta-clicked-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-pay-total-cta-clicked-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pending-invoices-payment-option-clicked-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-pi-negotiation-payment-option-clicked-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-rm-invoice-payment-option-clicked-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-rm-pending-invoices-page-viewed-events
   - bietlejuice.enrich_cyber:load-enrich-installment
   - bietlejuice.enrich_cyber:load-enrich-negotiation
   - bietlejuice.enrich_cyber:load-enrich-users
@@ -1507,6 +1557,7 @@ bietlejuice.enrich_company:
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-members
 bietlejuice.enrich_concierge_ranking_metrics:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
   - bietlejuice.house_listing_search:load-clean-recommendation-use-case
   - bietlejuice.house_listing_search:load-clean-recommendation-user-use-case
 bietlejuice.enrich_condo_monitoring:
@@ -2576,6 +2627,14 @@ bietlejuice.enrich_ongoing_terminations_snapshot:
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
 bietlejuice.enrich_online_attribution:
   - bietlejuice.amplitude_new:load-clean-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-debug-visit-schedule-confirmed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-offer-submitted-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-offer-submitted-new-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-sale-offer-form-accepted-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-user-merge
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-schedule-confirmed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-offer-submitted-new-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183049-offer-submitted-events
 bietlejuice.enrich_opsgenie:
   - bietlejuice.jira_ops:load-clean-alert-log
   - bietlejuice.jira_ops:load-clean-alerts
@@ -2793,6 +2852,9 @@ bietlejuice.enrich_rental_guarantee:
   - bietlejuice.rental_guarantee:load-clean-charge
   - bietlejuice.rental_guarantee:load-clean-guarantee
 bietlejuice.enrich_rental_historical_follow_up:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-favorite-set-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_house:load-clean-house-aud
   - bietlejuice.enrich_b2b:load-enrich-house-listing
@@ -2930,6 +2992,10 @@ bietlejuice.enrich_sale_flows:
   - bietlejuice.sales_flow:load-clean-offer
   - bietlejuice.sales_flow:load-clean-sales-flow-aud
 bietlejuice.enrich_sale_journey:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-apply-filters-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-tts-success-page-viewed-events
   - bietlejuice.ebdb_user:load-clean-user-aud
   - bietlejuice.enrich_booking:load-enrich-booking
   - bietlejuice.enrich_offer:load-enrich-sale-offer
@@ -3040,6 +3106,9 @@ bietlejuice.enrich_sale_offer_flows:
   - bietlejuice.sales_flow:load-clean-tag
   - bietlejuice.sales_flow:load-clean-users
 bietlejuice.enrich_sale_ongoing_listings:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-favorite-set-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_listing:load-clean-listing-business-context-aud
   - bietlejuice.enrich_company:load-enrich-company-sks
@@ -3148,11 +3217,17 @@ bietlejuice.enrich_satisfaction_rating:
   - bietlejuice.gsheets_support_and_service:done-clean-tenant-exit-inspection-csat
   - bietlejuice.zendesk:load-clean-satisfaction-ratings
 bietlejuice.enrich_search:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-user-merge
   - bietlejuice.ebdb_offer:load-clean-offer
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
   - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event
 bietlejuice.enrich_search_session_event:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
   - bietlejuice.ebdb_location:load-clean-region
 bietlejuice.enrich_secretariat:
   - bietlejuice.ebdb_house:load-clean-house
@@ -3360,11 +3435,17 @@ bietlejuice.enrich_tiers_classification:
   - bietlejuice.enrich_tiers:load-enrich-hub-points-rule
   - bietlejuice.enrich_tiers:load-enrich-hub-share-rule
 bietlejuice.enrich_top_of_funnel_affiliates:
+  - bietlejuice.amplitude_subpartitioned:load-clean-205027-intro-page-viewed-events
   - bietlejuice.gsheets_growth:done-clean-taxonomy-affiliates
 bietlejuice.enrich_top_of_funnel_demand:
   - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events
 bietlejuice.enrich_top_of_funnel_supply:
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-landing-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-price-report-landing-rent-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-price-report-landing-sale-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-price-suggestion-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-183047-price-suggestion-sale-page-viewed-events
   - bietlejuice.enrich_consolidated_marketing_metrics:load-enrich-consolidated-media-metrics
   - bietlejuice.gsheets_growth:done-clean-marketing-cost-taxonomy
 bietlejuice.enrich_tqc_referral:
@@ -3843,6 +3924,7 @@ bietlejuice.reverse_demand_classifieds_ranking:
 bietlejuice.reverse_demand_classifieds_ranking_access:
   - bietlejuice.reverse_demand_classifieds_ranking:load-reverse-house-classified-ranking-score
 bietlejuice.reverse_demand_score:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
   - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing
   - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings
   - bietlejuice.dw_region:load-dw-public-dim-region

@@ -35,7 +35,7 @@ FROM
             year,
             month,
             day
-        FROM datalake_amplitude_clean_staging.170698_recset_impression_events
+        FROM datalake_amplitude_clean.170698_recset_impression_events
         WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
         AND get_json_object(user_properties, '$.country') = 'BR'
         AND id_user IS NOT NULL
@@ -65,7 +65,7 @@ recs_impressions AS (
     concat(get_json_object(event_properties, '$.recset_id'), '-', id_user) AS recset_id_fix,
     from_json(get_json_object(event_properties, '$.viewed_house_list'), 'array<string>') AS imp_viewed_houses,
     ts_event
-    FROM datalake_amplitude_clean_staging.170698_recset_impression_events
+    FROM datalake_amplitude_clean.170698_recset_impression_events
     WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     AND get_json_object(user_properties, '$.country') = 'BR'
     AND id_user IS NOT NULL
@@ -78,7 +78,7 @@ UNION ALL
     concat(get_json_object(event_properties, '$.recset_id'), '-', id_user) AS recset_id_fix,
     from_json(get_json_object(event_properties, '$.viewed_house_list'), 'array<string>') AS imp_viewed_houses,
     ts_event
-    FROM datalake_amplitude_clean_staging.170698_recset_viewed_events
+    FROM datalake_amplitude_clean.170698_recset_viewed_events
     WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
     AND get_json_object(user_properties, '$.country') = 'BR'
     AND id_user IS NOT NULL
