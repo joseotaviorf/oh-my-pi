@@ -7,7 +7,7 @@ SELECT
   business_unit,
   source_name,
   accounting_type,
-  accounting_number AS account_number,
+  account_number,
   accounting_name,
   source_amount,
   sap_amount,
@@ -23,7 +23,7 @@ SELECT
   dt_sap_created,
   NOW() AS ts_load
 FROM
-    datalake_accounting_funnel.retsuko_provision_creation
+    datalake_sap_accounting_process.retsuko_provision
 
 UNION ALL
 
@@ -36,7 +36,7 @@ SELECT
   business_unit,
   source_name,
   accounting_type,
-  accounting_number AS account_number,
+  account_number,
   accounting_name,
   source_amount,
   sap_amount,
@@ -52,7 +52,7 @@ SELECT
   dt_sap_created,
   NOW() AS ts_load
 FROM
-    datalake_accounting_funnel.retsuko_revenue_share
+    datalake_sap_accounting_process.retsuko_revenue_share
 
 UNION ALL
 
@@ -65,7 +65,7 @@ SELECT
   business_unit,
   source_name,
   accounting_type,
-  accounting_number AS account_number,
+  account_number,
   accounting_name,
   source_amount,
   sap_amount,
@@ -81,7 +81,7 @@ SELECT
   dt_sap_created,
   NOW() AS ts_load
 FROM
-    datalake_accounting_funnel.retsuko_revenue_accounting
+    datalake_sap_accounting_process.retsuko_revenue_accounting
 
 UNION ALL
 
@@ -94,7 +94,7 @@ SELECT
   business_unit,
   source_name,
   accounting_type,
-  accounting_number AS account_number,
+  account_number,
   accounting_name,
   source_amount,
   sap_amount,
@@ -110,7 +110,36 @@ SELECT
   dt_sap_created,
   NOW() AS ts_load
 FROM
-    datalake_accounting_funnel.retsuko_invoice_issuance
+    datalake_sap_accounting_process.retsuko_invoice
+
+UNION ALL
+
+SELECT
+  id_accounting_process AS sk_accounting_funnel,
+  id_business_entity,
+  id_finance_entity,
+  id_finance_entity_entry,
+  version,
+  business_unit,
+  source_name,
+  accounting_type,
+  account_number,
+  accounting_name,
+  source_amount,
+  sap_amount,
+  is_completeness,
+  is_correctness,
+  is_temporality,
+  is_compliance,
+  accounting_process_status,
+  error_description,
+  accrual_year_month,
+  dt_source_trigger,
+  dt_sap_reference,
+  dt_sap_created,
+  NOW() AS ts_load
+FROM
+    datalake_sap_accounting_process.retsuko_invoice_unified
 
 UNION ALL
 
@@ -139,7 +168,7 @@ SELECT
     dt_sap_created,
     NOW() AS ts_load
 FROM
-    datalake_sap_accounting_process.for_rent_reservation_issuance
+    datalake_sap_accounting_process.kill_queue_reservation_issuance
 
 UNION ALL
 

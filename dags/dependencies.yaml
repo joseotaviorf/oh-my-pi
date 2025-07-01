@@ -6,13 +6,13 @@ bietlejuice.amplitude_subpartitioned:
 bietlejuice.amplitude_supply:
   - bietlejuice.amplitude_demand:events-demand-to-datalake-raw
 bietlejuice.dw_accounting_funnel:
-  - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-invoice-issuance
-  - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-provision-creation
-  - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-revenue-accounting
-  - bietlejuice.enrich_accounting_funnel:load-enrich-retsuko-revenue-share
   - bietlejuice.enrich_sap_accounting_process:load-enrich-for-rent-bank-settlement
-  - bietlejuice.enrich_sap_accounting_process:load-enrich-for-rent-reservation-issuance
   - bietlejuice.enrich_sap_accounting_process:load-enrich-quintocred-bank-settlement
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-invoice-unified
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-provision
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-accounting
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-share
 bietlejuice.dw_accounts_receivable:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings
@@ -3097,7 +3097,10 @@ bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.enrich_accounting_funnel:load-enrich-ledger
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
+  - bietlejuice.enrich_retsuko:load-enrich-entry
   - bietlejuice.enrich_retsuko:load-enrich-invoice
+  - bietlejuice.enrich_retsuko:load-enrich-invoice-info
+  - bietlejuice.enrich_sap:load-enrich-ledger
   - bietlejuice.itau_statements:load-clean-statement-879200452685
   - bietlejuice.itau_statements:load-clean-statement-879200494588
   - bietlejuice.kill_queue:load-clean-reservation
@@ -3109,10 +3112,14 @@ bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency
   - bietlejuice.rental_guarantee_platform:load-clean-delinquency-accounting
   - bietlejuice.rental_guarantee_platform:load-clean-payment
+  - bietlejuice.retsuko:load-clean-account
   - bietlejuice.retsuko:load-clean-contract
   - bietlejuice.retsuko:load-clean-sap-entity
+  - bietlejuice.sap_gateway:load-clean-consolidated-invoice
   - bietlejuice.sap_gateway:load-clean-feature
+  - bietlejuice.sap_gateway:load-clean-invoice
   - bietlejuice.sap_gateway:load-clean-sync-sap-job
+  - bietlejuice.sap_gateway:load-clean-webhook-log
   - bietlejuice.trato_feito:load-clean-installment
   - bietlejuice.trato_feito:load-clean-negotiation
   - bietlejuice.trato_feito:load-clean-payment
