@@ -11,20 +11,6 @@ workflow:
   custom_schema: repairs
   default_extraction_type: full
   tables_customization:
-    dim_repair_ongoing:
-      z_order_by: [sk_ticket]
-      merge_on: [sk_ticket]
-    fact_repair_ongoing:
-      z_order_by:
-        [
-          sk_ticket,
-          sk_request,
-          sk_contract,
-          sk_user,
-          sk_agent,
-          sk_budget_sender
-        ]
-      merge_on: [sk_ticket]
     fact_ongoing_repairs:
       z_order_by:
         [ sk_ticket,

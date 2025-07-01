@@ -902,7 +902,6 @@ bietlejuice.dw_rental_payments:
 bietlejuice.dw_repairs:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-ticket-events
   - bietlejuice.enrich_repairs:load-enrich-ongoing-repair-tickets
-  - bietlejuice.enrich_repairs:load-enrich-repair-tickets
   - bietlejuice.enrich_support_users:load-enrich-zendesk-users
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current
   - bietlejuice.repairs:load-clean-repair-request
@@ -4140,3 +4139,4 @@ bietlejuice.survicate_respondent_attributes:
   - bietlejuice.survicate_survey_attributes:load-raw-survey-responses
 bietlejuice.survicate_survey_attributes:
   - bietlejuice.survicate_surveys:load-raw-surveys
+  
