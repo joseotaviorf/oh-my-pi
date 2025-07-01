@@ -16,7 +16,7 @@ base_churn AS (
   FROM
     datalake_greenseer.sessions g
   WHERE
-    g.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
+    g.ts_started >= DATE('{load_start_date}') - INTERVAL 3 MONTH
     AND is_retention = TRUE
   UNION
   SELECT
@@ -32,7 +32,7 @@ base_churn AS (
         AND g.ts_started < t.ts_created - INTERVAL 3 HOUR
   WHERE
     t.channel = 'call'
-    AND g.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
+    AND g.ts_started >= DATE('{load_start_date}') - INTERVAL 3 MONTH
 ),
 assistances AS (
   SELECT
@@ -187,6 +187,6 @@ LEFT JOIN
   normalize_options AS nop
     ON gs.id_session = nop.id_session
 WHERE
-    gs.ts_started BETWEEN DATE('{load_start_date}') - INTERVAL 3 MONTH AND DATE('{load_end_date}')
+    gs.ts_started >= DATE('{load_start_date}') - INTERVAL 3 MONTH
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY gs.id_session ORDER BY gs.ts_updated DESC) = 1
