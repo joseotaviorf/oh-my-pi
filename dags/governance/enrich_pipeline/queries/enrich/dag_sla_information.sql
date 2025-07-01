@@ -6,9 +6,9 @@ WITH dag_run_base AS (
         dr.is_first_run_ever,
         dr.is_triggered_by_mediator,
         dr.is_first_execution_inside_sla,
-        ROW_NUMBER() OVER(PARTITION BY id_dag, DATE(dr.ts_run) ORDER BY ts_run) AS rn,
-        DATE(dr.ts_run) AS dt_run,
-        DATE_ADD(dr.ts_run, 1) AS dt_event,
+        ROW_NUMBER() OVER(PARTITION BY id_dag, DATE(dr.ts_data_interval_started) ORDER BY ts_data_interval_started) AS rn,
+        DATE(dr.ts_data_interval_started) AS dt_run,
+        DATE_ADD(dr.ts_data_interval_started, 1) AS dt_event,
         ts_first_execution_success,
         ts_first_execution_success_brt,
         ts_last_table_task_successful,
@@ -16,7 +16,7 @@ WITH dag_run_base AS (
     FROM
         datalake_pipeline.dag_run AS dr
     WHERE
-        DATE(ts_run) BETWEEN DATE_SUB(DATE('{load_start_date}'), 1) AND DATE_SUB(DATE('{load_end_date}'), 1) -- Runs are D-1
+        DATE(ts_data_interval_started) BETWEEN DATE_SUB(DATE('{load_start_date}'), 1) AND DATE_SUB(DATE('{load_end_date}'), 1) -- Runs are D-1
 ),
 paused_dates AS (
     SELECT
