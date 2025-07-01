@@ -1,0 +1,34 @@
+---
+database_name: datalake_gsheets_clean
+table_name: expected_evers
+columns:
+  model_key:
+    lineage:
+      - datalake_gsheets_raw.expected_evers.Chave
+  model_name:
+    lineage:
+      - datalake_gsheets_raw.expected_evers.Modelo
+  risk_category_canon:
+    lineage:
+      - datalake_gsheets_raw.expected_evers.risk_category_canon
+  ever_30_mob3_expected:
+    lineage:
+      - datalake_gsheets_raw.expected_evers.Ever30mob3_EXPECTED
+  ever_30_mob3_upper_limit:
+    lineage:
+      - datalake_gsheets_raw.expected_evers.Ever30mob3_UPPER_LIMIT
+  ever_30_mob3_low_performance:
+    lineage:
+      - datalake_gsheets_raw.expected_evers.Ever30mob3_low_performance
+  ever_60_mob6_expected:
+    lineage:
+      - datalake_gsheets_raw.expected_evers.Ever60mob6_EXPECTED
+  ever_60_mob6_upper_limit:
+    lineage:
+      - datalake_gsheets_raw.expected_evers.Ever60mob6_UPPER_LIMIT
+  ever_60_mob6_low_performance:
+    lineage:
+      - datalake_gsheets_raw.expected_evers.Ever60mob6_low_performance
+  risk_category_group:
+    lineage:
+      - datalake_gsheets_raw.expected_evers.risk_category_agroup
