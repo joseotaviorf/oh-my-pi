@@ -12,236 +12,687 @@ workflow:
   default_partitions: ["year", "month", "day"]
   default_extraction_type: incremental
   tables_customization:
-    170135_piloto_cw_message_sent_events: {}
-    170698_recset_impression_events: {}
-    170698_recset_viewed_events: {}
-    170698_visit_intent_clicked_events: {}
-    183047_price_edit_confirmed_button_clicked_events: {}
-    183047_price_edit_intent_button_clicked_events: {}
-    183047_price_edit_page_viewed_events: {}
-    183047_price_edit_review_page_viewed_events: {}
-    183047_property_edit_hub_page_viewed_events: {}
-    183047_property_edit_price_intent_button_clicked_events: {}
-    170698_apply_filters_events: {}
-    170698_chatcrpp_button_clicked_events: {}
-    170698_chat_pp_iq_channel_list_page_viewed_events: {}
-    170698_chat_screen_page_viewed_events: {}
-    170698_contract_page_viewed_events: {}
-    170698_copy_inspection_report_link_button_clicked_events: {}
-    170698_cxp_fine_invoice_button_clicked_events: {}
-    170698_cxp_fine_negotiate_button_clicked_events: {}
-    170698_cxp_flow_payments_page_viewed_events: {}
-    170698_cxp_main_page_off_inspection_button_clicked_events: {}
-    170698_cxp_main_page_payments_button_clicked_events: {}
-    170698_cxp_main_page_post_exit_inspection_button_clicked_events: {}
-    170698_cxp_main_page_post_exit_page_viewed_events: {}
-    170698_cxp_main_page_property_return_button_clicked_events: {}
-    170698_cxp_payments_page_payment_receipts_button_clicked_events: {}
-    170698_debug_visit_schedule_confirmed_events: {}
-    170698_evaluation_runevaluation_clicked_events: {}
-    170698_evaluation_timeout_viewed_events: {}
-    170698_feed_recommendation_page_viewed_events: {}
-    170698_fs_mortgage_progress_step_clicked_events: {}
-    170698_fs_mortgage_track_progress_button_clicked_events: {}
-    170698_fs_mortgage_track_status_viewed_events: {}
-    170698_help_center_article_recommendation_clicked_events: {}
-    170698_help_center_article_recommendation_viewed_events: {}
-    170698_help_center_faq_clicked_events: {}
-    170698_help_center_wait_call_viewed_events: {}
-    170698_inspection_review_home_page_viewed_events: {}
-    170698_listing_early_credit_clicked_events: {}
-    170698_listing_open_gallery_view_events: {}
-    170698_listing_page_viewed_events: {}
-    170698_listing_photosphere_opened_events: {}
-    170698_login_confirmation_viewed_events: {}
-    170698_mortgage_home_viewed_events: {}
-    170698_my_checkout_page_viewed_events: {}
-    170698_ntc_notification_clicked_events: {}
-    170698_offboarding_inspections_repairs_task_button_clicked_events: {}
-    170698_offboarding_keys_task_success_page_viewed_events: {}
-    170698_offboarding_repair_guidelines_entry_inspection_clicked_events: {}
+    170135_piloto_cw_message_sent_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_recset_impression_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_recset_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_visit_intent_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_price_edit_confirmed_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_price_edit_intent_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_price_edit_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_price_edit_review_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_property_edit_hub_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_property_edit_price_intent_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_apply_filters_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_chatcrpp_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_chat_pp_iq_channel_list_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_chat_screen_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_contract_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_copy_inspection_report_link_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_fine_invoice_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_fine_negotiate_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_flow_payments_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_main_page_off_inspection_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_main_page_payments_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_main_page_post_exit_inspection_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_main_page_post_exit_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_main_page_property_return_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_payments_page_payment_receipts_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_debug_visit_schedule_confirmed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_runevaluation_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_timeout_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_feed_recommendation_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_fs_mortgage_progress_step_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_fs_mortgage_track_progress_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_fs_mortgage_track_status_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_help_center_article_recommendation_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_help_center_article_recommendation_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_help_center_faq_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_help_center_wait_call_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_inspection_review_home_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_listing_early_credit_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_listing_open_gallery_view_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_listing_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_listing_photosphere_opened_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_login_confirmation_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_mortgage_home_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_my_checkout_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_ntc_notification_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offboarding_inspections_repairs_task_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offboarding_keys_task_success_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offboarding_repair_guidelines_entry_inspection_clicked_events:
+      run_optimize: false
+      run_vacuum: false
     170698_offboarding_repair_guidelines_negotiate_repairs_card_viewed_events:
-      {}
-    170698_offboarding_repairs_task_success_page_viewed_events: {}
-    170698_offboarding_terminationcontrol_inspection_page_viewed_events: {}
-    170698_offboarding_utilitybills_receipts_page_viewed_events: {}
-    170698_offer_accepted_new_events: {}
-    170698_owner_termination_management_page_viewed_events: {}
-    170698_pending_invoices_page_viewed_events: {}
-    170698_piloto_cw_message_sent_events: {}
-    170698_rm_invoice_page_viewed_events: {}
-    170698_rm_invoice_payment_option_clicked_events: {}
-    170698_rm_myrent_page_viewed_events: {}
-    170698_rm_pending_invoices_page_viewed_events: {}
-    170698_schedule_page_viewed_events: {}
-    170698_search_page_viewed_events: {}
-    170698_select_listing_visit_button_clicked_events: {}
-    170698_session_start_events: {}
-    170698_unavailable_listing_viewed_events: {}
-    170698_user_has_been_blocked_on_ivr_events: {}
-    170698_user_ivr_still_accessible_events: {}
-    170698_user_tried_to_call_again_after_blocked_events: {}
-    170698_visit_hoursalert_confirmed_events: {}
-    170698_visit_list_request_schedule_button_clicked_events: {}
-    170698_visit_schedule_confirmed_events: {}
-    183047_ad_improvements_first_access_page_viewed_events: {}
-    183047_ad_improvements_intent_button_clicked_events: {}
-    183047_ad_improvements_page_viewed_events: {}
-    183047_ad_improvements_price_in_range_page_viewed_events: {}
+      run_optimize: false
+      run_vacuum: false
+    170698_offboarding_repairs_task_success_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offboarding_terminationcontrol_inspection_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offboarding_utilitybills_receipts_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offer_accepted_new_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_owner_termination_management_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pending_invoices_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_piloto_cw_message_sent_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_rm_invoice_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_rm_invoice_payment_option_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_rm_myrent_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_rm_pending_invoices_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_schedule_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_search_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_select_listing_visit_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_session_start_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_unavailable_listing_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_user_has_been_blocked_on_ivr_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_user_ivr_still_accessible_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_user_tried_to_call_again_after_blocked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_visit_hoursalert_confirmed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_visit_list_request_schedule_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_visit_schedule_confirmed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_ad_improvements_first_access_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_ad_improvements_intent_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_ad_improvements_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_ad_improvements_price_in_range_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
     183047_ad_improvements_price_recommendation_accepted_button_clicked_events:
-      {}
-    183047_ad_improvements_price_recommendation_page_viewed_events: {}
-    183047_ad_improvements_price_strategy_button_clicked_events: {}
-    183047_chatcrpp_blocked_message_alert_shown_events: {}
-    183047_chatcrpp_chat_conversation_started_events: {}
-    183047_chatcrpp_chat_page_viewed_events: {}
-    183047_chatcrpp_suspicious_message_sent_events: {}
-    183047_chatcrpp_warning_message_alert_shown_events: {}
-    183047_contract_page_viewed_events: {}
-    183047_faq_article_page_viewed_events: {}
-    183047_fs_mortgage_track_progress_button_clicked_events: {}
-    183047_fs_mortgage_track_progress_page_viewed_events: {}
-    183047_fs_mortgage_track_status_viewed_events: {}
-    183047_help_center_article_clicked_events: {}
-    183047_help_center_article_recommendation_clicked_events: {}
-    183047_help_center_article_recommendation_viewed_events: {}
-    183047_help_center_faq_clicked_events: {}
-    183047_help_center_page_viewed_events: {}
-    183047_help_center_question_mark_clicked_events: {}
-    183047_house_in_early_relisting_events: {}
-    183047_inspection_report_button_clicked_events: {}
-    183047_intro_page_viewed_events: {}
-    183047_landing_page_viewed_events: {}
-    183047_lead_form_submitted_events: {}
-    183047_listing_location_submitted_events: {}
-    183047_listing_terms_confirmed_events: {}
-    183047_mortgage_home_viewed_events: {}
-    183047_offer_accepted_new_events: {}
-    183047_offer_canceled_new_events: {}
-    183047_offer_submitted_new_events: {}
-    183047_price_report_landing_rent_page_viewed_events: {}
-    183047_price_report_landing_sale_page_viewed_events: {}
-    183047_price_suggestion_advertise_clicked_events: {}
-    183047_price_suggestion_form_submitted_events: {}
-    183047_price_suggestion_page_viewed_events: {}
-    183047_price_suggestion_sale_form_submitted_events: {}
-    183047_price_suggestion_sale_page_viewed_events: {}
-    183047_property_details_page_viewed_events: {}
-    183047_property_page_viewed_events: {}
-    183047_relisting_early_visits_confirmed_events: {}
-    183047_rent_pricing_new_listing_form_submitted_events: {}
-    183047_rent_pricing_new_listing_page_viewed_events: {}
-    183047_sale_calculator_edition_form_submitted_events: {}
-    183047_sale_calculator_page_viewed_events: {}
-    183047_sale_price_page_viewed_events: {}
-    183047_sale_pricing_existing_listing_form_submitted_events: {}
-    183047_sale_pricing_existing_listing_page_viewed_events: {}
-    183047_sale_pricing_new_listing_form_submitted_events: {}
-    183047_sale_pricing_new_listing_page_viewed_events: {}
-    183047_terms_page_viewed_events: {}
-    170135_in_app_survey_answered_events: {}
-    170135_in_app_survey_dismissed_events: {}
-    170135_in_app_survey_displayed_events: {}
-    170135_in_app_survey_received_events: {}
-    170135_in_app_survey_viewed_events: {}
-    170135_offer_submitted_events: {}
-    183049_offer_submitted_events: {}
-    205027_intro_page_viewed_events: {}
-    205027_referral_form_accepted_events: {}
-    205027_referral_form_discarded_events: {}
-    233592_chatcrpp_accep_terms_button_clicked_events: {}
-    233592_chatcrpp_allchats_page_viewed_events: {}
-    233592_chatcrpp_blocked_message_alert_shown_events: {}
-    233592_chatcrpp_chat_conversation_started_events: {}
-    233592_chatcrpp_chat_page_viewed_events: {}
-    233592_chatcrpp_suspicious_message_sent_events: {}
-    233592_chatcrpp_warning_message_alert_shown_events: {}
-    233592_tts_helps_button_clicked_events: {}
-    440441_home_page_viewed_events: {}
-    525551_listing_page_viewed_events: {}
-    525551_schedule_visit_at_5a_button_clicked_events: {}
-    525551_search_page_viewed_events: {}
-    155697_refer_lead_referred_events: {}
-    160023_affiliate_lead_referred_events: {}
-    203461_inspector_app_add_photo_clicked_events: {}
-    170698_user_merge: {}
-    183047_user_merge: {}
-    170698_adjust_install_events: {}
-    170698_alert_subscription_confirmed_events: {}
-    170698_appsflyer_install_events: {}
-    170698_chat_menu_item_clicked_events: {}
-    170698_contract_docusign_signed_events: {}
-    170698_cxp_fine_info_page_viewed_events: {}
-    170698_cxp_fine_more_info_button_clicked_events: {}
-    170698_cxp_main_page_next_steps_button_clicked_events: {}
-    170698_cxp_main_page_post_exit_payments_button_clicked_events: {}
-    170698_cxp_main_page_postpone_termination_button_clicked_events: {}
-    170698_cxp_next_steps_page_viewed_events: {}
-    170698_cxp_payments_page_termination_fine_button_clicked_events: {}
-    170698_evaluation_anchor_clicked_events: {}
-    170698_evaluation_anchor_result_clicked_events: {}
-    170698_evaluation_onboarding_clicked_events: {}
-    170698_evaluation_onboarding_dismissed_events: {}
-    170698_evaluation_onboarding_viewed_events: {}
-    170698_evaluation_result_newevaluation_clicked_events: {}
-    170698_evaluation_result_senddocs_clicked_events: {}
-    170698_evaluation_result_viewed_events: {}
-    170698_evaluation_selecttenants_viewed_events: {}
-    170698_evaluation_summary_viewed_events: {}
-    170698_evaluation_tenantform_viewed_events: {}
-    170698_faq_article_page_viewed_events: {}
-    170698_fs_mortgage_track_progress_page_viewed_events: {}
-    170698_fs_task_page_viewed_events: {}
-    170698_help_center_article_clicked_events: {}
-    170698_help_center_call_cancel_button_clicked_events: {}
-    170698_help_center_call_request_button_clicked_events: {}
-    170698_help_center_call_viewed_events: {}
-    170698_help_center_page_viewed_events: {}
-    170698_help_center_question_mark_clicked_events: {}
-    170698_home_page_viewed_events: {}
-    170698_homes_subscription_confirmed_events: {}
-    170698_house_card_clicked_events: {}
-    170698_inspection_budgetapproval_home_page_viewed_events: {}
-    170698_listing_favorite_set_events: {}
-    170698_listing_video_started_events: {}
-    170698_my_rent_pending_invoices_card_view_events: {}
-    170698_native_home_page_viewed_events: {}
-    170698_offboarding_keys_task_start_setup_page_viewed_events: {}
-    170698_offboarding_repair_guidelines_task_accordion_clicked_events: {}
-    170698_offboarding_terminationcontrol_page_viewed_events: {}
-    170698_offer_canceled_new_events: {}
-    170698_offer_submitted_events: {}
-    170698_offer_submitted_new_events: {}
-    170698_offerinfo_page_viewed_events: {}
-    170698_overdue_invoices_invoice_pay_button_clicked_events: {}
-    170698_overdue_invoices_invoice_pay_total_button_clicked_events: {}
-    170698_overdue_invoices_page_viewed_events: {}
-    170698_pending_invoices_invoice_pay_button_clicked_events: {}
-    170698_pending_invoices_negotiation_cta_clicked_events: {}
-    170698_pending_invoices_pay_total_cta_clicked_events: {}
-    170698_pending_invoices_payment_option_clicked_events: {}
-    170698_pi_negotiation_payment_option_clicked_events: {}
-    170698_price_suggestion_address_submitted_events: {}
-    170698_price_suggestion_page_viewed_events: {}
-    170698_pv_management_area_viewed_events: {}
-    170698_pv_management_hub_viewed_events: {}
-    170698_repair_center_ps_iq_budget_sent_budget_details_clicked_events: {}
-    170698_sale_offer_form_accepted_events: {}
-    170698_search_results_page_viewed_events: {}
-    170698_tts_success_page_viewed_events: {}
-    170698_user_accepted_scr_terms_clicked_event_events: {}
-    183047_fs_task_page_viewed_events: {}
-    183047_property_performance_hub_available_hours_button_clicked_events: {}
+      run_optimize: false
+      run_vacuum: false
+    183047_ad_improvements_price_recommendation_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_ad_improvements_price_strategy_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_chatcrpp_blocked_message_alert_shown_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_chatcrpp_chat_conversation_started_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_chatcrpp_chat_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_chatcrpp_suspicious_message_sent_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_chatcrpp_warning_message_alert_shown_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_contract_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_faq_article_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_fs_mortgage_track_progress_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_fs_mortgage_track_progress_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_fs_mortgage_track_status_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_help_center_article_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_help_center_article_recommendation_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_help_center_article_recommendation_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_help_center_faq_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_help_center_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_help_center_question_mark_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_house_in_early_relisting_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_inspection_report_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_intro_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_landing_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_lead_form_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_listing_location_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_listing_terms_confirmed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_mortgage_home_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_offer_accepted_new_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_offer_canceled_new_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_offer_submitted_new_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_price_report_landing_rent_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_price_report_landing_sale_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_price_suggestion_advertise_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_price_suggestion_form_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_price_suggestion_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_price_suggestion_sale_form_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_price_suggestion_sale_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_property_details_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_property_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_relisting_early_visits_confirmed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_rent_pricing_new_listing_form_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_rent_pricing_new_listing_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_sale_calculator_edition_form_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_sale_calculator_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_sale_price_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_sale_pricing_existing_listing_form_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_sale_pricing_existing_listing_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_sale_pricing_new_listing_form_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_sale_pricing_new_listing_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_terms_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170135_in_app_survey_answered_events:
+      run_optimize: false
+      run_vacuum: false
+    170135_in_app_survey_dismissed_events:
+      run_optimize: false
+      run_vacuum: false
+    170135_in_app_survey_displayed_events:
+      run_optimize: false
+      run_vacuum: false
+    170135_in_app_survey_received_events:
+      run_optimize: false
+      run_vacuum: false
+    170135_in_app_survey_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170135_offer_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    183049_offer_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    205027_intro_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    205027_referral_form_accepted_events:
+      run_optimize: false
+      run_vacuum: false
+    205027_referral_form_discarded_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_chatcrpp_accep_terms_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_chatcrpp_allchats_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_chatcrpp_blocked_message_alert_shown_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_chatcrpp_chat_conversation_started_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_chatcrpp_chat_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_chatcrpp_suspicious_message_sent_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_chatcrpp_warning_message_alert_shown_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_tts_helps_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    440441_home_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    525551_listing_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    525551_schedule_visit_at_5a_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    525551_search_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    155697_refer_lead_referred_events:
+      run_optimize: false
+      run_vacuum: false
+    160023_affiliate_lead_referred_events:
+      run_optimize: false
+      run_vacuum: false
+    203461_inspector_app_add_photo_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_user_merge:
+      run_optimize: false
+      run_vacuum: false
+    183047_user_merge:
+      run_optimize: false
+      run_vacuum: false
+    170698_adjust_install_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_alert_subscription_confirmed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_appsflyer_install_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_chat_menu_item_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_contract_docusign_signed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_fine_info_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_fine_more_info_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_main_page_next_steps_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_main_page_post_exit_payments_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_main_page_postpone_termination_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_next_steps_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_cxp_payments_page_termination_fine_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_anchor_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_anchor_result_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_onboarding_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_onboarding_dismissed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_onboarding_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_result_newevaluation_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_result_senddocs_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_result_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_selecttenants_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_summary_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_evaluation_tenantform_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_faq_article_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_fs_mortgage_track_progress_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_fs_task_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_help_center_article_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_help_center_call_cancel_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_help_center_call_request_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_help_center_call_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_help_center_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_help_center_question_mark_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_home_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_homes_subscription_confirmed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_house_card_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_inspection_budgetapproval_home_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_listing_favorite_set_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_listing_video_started_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_my_rent_pending_invoices_card_view_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_native_home_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offboarding_keys_task_start_setup_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offboarding_repair_guidelines_task_accordion_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offboarding_terminationcontrol_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offer_canceled_new_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offer_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offer_submitted_new_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_offerinfo_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_overdue_invoices_invoice_pay_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_overdue_invoices_invoice_pay_total_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_overdue_invoices_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pending_invoices_invoice_pay_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pending_invoices_negotiation_cta_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pending_invoices_pay_total_cta_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pending_invoices_payment_option_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pi_negotiation_payment_option_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_price_suggestion_address_submitted_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_price_suggestion_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pv_management_area_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_pv_management_hub_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_repair_center_ps_iq_budget_sent_budget_details_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_sale_offer_form_accepted_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_search_results_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_tts_success_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_user_accepted_scr_terms_clicked_event_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_fs_task_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_property_performance_hub_available_hours_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
     183047_property_performance_hub_available_hours_card_button_clicked_events:
-      {}
-    183047_property_performance_hub_button_clicked_events: {}
-    183047_property_performance_hub_page_viewed_events: {}
-    183047_property_performance_hub_price_button_clicked_events: {}
-    183047_property_performance_hub_price_card_button_clicked_events: {}
-    183047_pv_management_area_viewed_events: {}
-    183047_pv_management_hub_viewed_events: {}
-    170135_in_app_survey_completed_events: {}
-    155696_refer_lead_referred_events: {}
+      run_optimize: false
+      run_vacuum: false
+    183047_property_performance_hub_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_property_performance_hub_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_property_performance_hub_price_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_property_performance_hub_price_card_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_pv_management_area_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    183047_pv_management_hub_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170135_in_app_survey_completed_events:
+      run_optimize: false
+      run_vacuum: false
+    155696_refer_lead_referred_events:
+      run_optimize: false
+      run_vacuum: false
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
   databricks_conn_id: databricks_new
