@@ -1,6 +1,6 @@
 database_name: datalake_visit
 table_name: visit_cancellation_unified
-description: Information about cancelled visits.
+description: This data model unifies visit cancellation data. Until 2024 coming from visit_cancellation_details and after 2024 coming from visit_status_log.
   Each row is an unique visit.
 domain: Data ForSale
 owner: guilherme.rocha@quintoandar.com.br

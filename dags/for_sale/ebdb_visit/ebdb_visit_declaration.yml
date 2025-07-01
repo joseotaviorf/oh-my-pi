@@ -59,10 +59,6 @@ workflow:
       clean_table_name: visit
     Visita_AUD:
       clean_table_name: visit_aud
-    VisitCancellationDetails:
-      clean_table_name: visit_cancellation_details
-    VisitCancellationDetails_AUD:
-      clean_table_name: visit_cancellation_details_aud
     VisitCheckin:
       clean_table_name: visit_checkin
     VisitCheckin_AUD:
