@@ -2,11 +2,11 @@ database_name: datalake_similarity_score
 table_name: house_metrics_score
 owner: bruna.prates@quintoandar.com.br
 domain: For Sale
-description: Enrich table that contains the daily view of a "base" house, its possible list of similar houses, the aggregated
-  metrics of both in a specific interval, the calculation of the score of each metric, the result and the final score. A "base"
-  house will only appear if it's published and may or may not have similar houses associated with it. For now, it only includes
-  For Rent houses. Each row of this table is a "base" house and its possible list of similar houses in a specific business context
-  and on a specific date.
+description: Enrich table that contains, for both Rent and Sale contexts, the daily view of a "base" house, its possible list
+  of similar houses, the aggregated metrics of both in a specific interval, the calculation of the score of each metric, the
+  result and the final score. A "base" house will only appear if it's published and may or may not have similar houses associated
+  with it. For now, it only includes For Rent houses. Each row of this table is a "base" house and its possible list of similar
+  houses in a specific business context and on a specific date.
 columns:
     id:
       lineage:
@@ -20,99 +20,121 @@ columns:
     id_house:
       lineage:
         - datalake_similarity_score.similar_houses.id_house
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.id_house
       description: ID of the "base" house, currently published and which may have a list of similar houses associated with it.
     ids_similar:
       lineage:
         - datalake_similarity_score.similar_houses.ids_similar
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.id_house
       description: List of house IDs similar to the "base" house (id_house). It may have NULL value if the "base" house has no similar associated with it.
     base_lpv:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_listing_page_viewed
       description: Sum of listing page views of the "base" house for a specific range.
     base_srpv:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_search_results_page_viewed
       description: Sum of search results page views of the "base" house for a specific range.
     base_favorites:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.favorites
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_favorites
       description: Sum of favorites of the "base" house for a specific range.
     base_vb:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_visits_booked
       description: Sum of visits booked to the "base" house for a specific range.
     base_os:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_offers_submitted
       description: Sum of offers sent to the "base" house for a specific range.
     similar_lpv:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_listing_page_viewed
       description: Aggregation of listing page views of the similar houses for a specific range. It may have NULL value if the "base" house has no similar associated with it.
     similar_srpv:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_search_results_page_viewed
       description: Aggregation of search results page views of the similar houses for a specific range. It may have NULL value if the "base" house has no similar associated with it.
     similar_favorites:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.favorites
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_favorites
       description: Aggregation of favorites of the similar houses for a specific range. It may have NULL value if the "base" house has no similar associated with it.
     similar_vb:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_visits_booked
       description: Aggregation of visits booked to the similar houses for a specific range. It may have NULL value if the "base" house has no similar associated with it.
     similar_os:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_offers_submitted
       description: Aggregation of offers sent to the similar houses for a specific range. It may have NULL value if the "base" house has no similar associated with it.
     calculation_score_lpv:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_listing_page_viewed
       description: The result of the calculation, according to score_calculation_rule, applied to listing page views metric.
         It may have NULL value if the "base" house has no similar associated with it.
     calculation_score_srpv:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_search_results_page_viewed
       description: The result of the calculation, according to score_calculation_rule, applied to search results page views metric.
         It may have NULL value if the "base" house has no similar associated with it.
     calculation_score_favorites:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.favorites
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_favorites
       description: The result of the calculation, according to score_calculation_rule, applied to favorites metric.
         It may have NULL value if the "base" house has no similar associated with it.
     calculation_score_vb:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_visits_booked
       description: The result of the calculation, according to score_calculation_rule, applied to visits booked metric.
         It may have NULL value if the "base" house has no similar associated with it.
     calculation_score_os:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_offers_submitted
       description: The result of the calculation, according to score_calculation_rule, applied to offers sent metric.
         It may have NULL value if the "base" house has no similar associated with it.
     score_lpv:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.listing_page_views
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_listing_page_viewed
       description: Score of the listing page views metric, which is classified as an integer between 1 (bad) and 5 (very good),
         according to the score_metric_rule. It may have NULL value if the "base" house has no similar associated with it.
     score_srpv:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_search_results_page_viewed
       description: Score of the search results page views metric, which is classified as an integer between 1 (bad) and 5 (very good),
         according to the score_metric_rule. It may have NULL value if the "base" house has no similar associated with it.
     score_favorites:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.favorites
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_favorites
       description: Score of the favorites metric, which is classified as an integer between 1 (bad) and 5 (very good),
         according to the score_metric_rule. It may have NULL value if the "base" house has no similar associated with it.
     score_vb:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_visits_booked
       description: Score of the visits booked metric, which is classified as an integer between 1 (bad) and 5 (very good),
         according to the score_metric_rule. It may have NULL value if the "base" house has no similar associated with it.
     score_os:
       lineage:
         - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_offers_submitted
       description: Score of the offers sent metric, which is classified as an integer between 1 (bad) and 5 (very good),
         according to the score_metric_rule. It may have NULL value if the "base" house has no similar associated with it.
     final_score:
@@ -121,6 +143,10 @@ columns:
         - datalake_rental_historical_follow_up.house_listings_daily_info.search_results_page_views
         - datalake_rental_historical_follow_up.house_listings_daily_info.visits_booked
         - datalake_rental_historical_follow_up.house_listings_daily_info.offers_sent
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_listing_page_viewed
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_search_results_page_viewed
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_visits_booked
+        - datalake_sale_ongoing_listings.ongoing_listings_daily_info.qt_offers_submitted
       description: The final score for the "base" house compared to its similar houses, which is classified as an integer between
         1 (bad) and 5 (very good), according to the final_score_rule. It may have NULL value if the "base" house has no similar associated with it.
     business_context:
@@ -129,6 +155,7 @@ columns:
       description: Business context of the "base" house.
       categories:
         RENT: The "base" house is published in the rental context.
+        SALE: The "base" house is published in the sale context.
     similar_metric_rule:
       description: String explaining the aggregation rule applied to metrics of similar houses.
     score_calculation_rule:

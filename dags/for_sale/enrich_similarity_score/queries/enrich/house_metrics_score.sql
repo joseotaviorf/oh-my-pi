@@ -1,4 +1,4 @@
-WITH get_metrics_base AS (
+WITH get_metrics_base_rent AS (
     SELECT
         MD5(CONCAT(hldi_1.id_house, 'RENT', hldi_1.year, hldi_1.month, hldi_1.day)) AS id,
         hldi_1.id_house,
@@ -26,6 +26,45 @@ WITH get_metrics_base AS (
         AND hldi_1.status_history = 'PUBLISHED'
     GROUP BY
         ALL
+),
+get_metrics_base_sale AS (
+    SELECT
+        MD5(CONCAT(oldi_1.id_house, 'SALE', oldi_1.year, oldi_1.month, oldi_1.day)) AS id,
+        oldi_1.id_house,
+        SUM(COALESCE(oldi_2.qt_listing_page_viewed, 0)) AS base_lpv,
+        SUM(COALESCE(oldi_2.qt_search_results_page_viewed, 0)) AS base_srpv,
+        SUM(COALESCE(oldi_2.qt_favorites, 0)) AS base_favorites,
+        SUM(COALESCE(oldi_2.qt_visits_booked, 0)) AS base_vb,
+        SUM(COALESCE(oldi_2.qt_offers_submitted, 0)) AS base_os,
+        'SALE' AS business_context,
+        DATE_SUB(MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day), CAST(IF(oldi_1.days_published < 30, oldi_1.days_published, 30) AS INT) - 1) AS dt_agg_started,
+        MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day) AS dt_agg_ended,
+        oldi_1.year,
+        oldi_1.month,
+        oldi_1.day
+    FROM
+        datalake_sale_ongoing_listings.ongoing_listings_daily_info AS oldi_1
+    INNER JOIN
+        datalake_sale_ongoing_listings.ongoing_listings_daily_info AS oldi_2
+            ON oldi_1.id_house = oldi_2.id_house
+            AND MAKE_DATE(oldi_2.year, oldi_2.month, oldi_2.day) BETWEEN
+                DATE_SUB(MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day), CAST(IF(oldi_1.days_published < 30, oldi_1.days_published, 30) AS INT) - 1 )
+                AND MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day)
+    WHERE
+        MAKE_DATE(oldi_1.year, oldi_1.month, oldi_1.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    GROUP BY
+        ALL
+),
+get_metrics_base AS (
+    SELECT
+        *
+    FROM
+        get_metrics_base_rent
+    UNION ALL
+    SELECT
+        *
+    FROM
+        get_metrics_base_sale
 ),
 explode_similar AS (
     SELECT
@@ -55,11 +94,31 @@ get_metrics_similar_1 AS (
         es.id,
         es.id_house,
         es.id_similar,
-        SUM(COALESCE(di.listing_page_views, 0)) AS sum_similar_lpv,
-        SUM(COALESCE(di.search_results_page_views, 0)) AS sum_similar_srpv,
-        SUM(COALESCE(di.favorites, 0)) AS sum_similar_favorites,
-        SUM(COALESCE(di.visits_booked, 0)) AS sum_similar_vb,
-        SUM(COALESCE(di.offers_sent, 0)) AS sum_similar_os,
+        IF(
+            es.business_context = 'RENT',
+            SUM(COALESCE(di.listing_page_views, 0)),
+            SUM(COALESCE(oldi.qt_listing_page_viewed, 0))
+        ) AS sum_similar_lpv,
+        IF(
+            es.business_context = 'RENT',
+            SUM(COALESCE(di.search_results_page_views, 0)),
+            SUM(COALESCE(oldi.qt_search_results_page_viewed, 0))
+        ) AS sum_similar_srpv,
+        IF(
+            es.business_context = 'RENT',
+            SUM(COALESCE(di.favorites, 0)),
+            SUM(COALESCE(oldi.qt_favorites, 0))
+        ) AS sum_similar_favorites,
+        IF(
+            es.business_context = 'RENT',
+            SUM(COALESCE(di.visits_booked, 0)),
+            SUM(COALESCE(oldi.qt_visits_booked, 0))
+        ) AS sum_similar_vb,
+        IF(
+            es.business_context = 'RENT',
+            SUM(COALESCE(di.offers_sent, 0)),
+            SUM(COALESCE(oldi.qt_offers_submitted, 0))
+        ) AS sum_similar_os,
         es.business_context,
         es.dt_agg_started,
         es.dt_agg_ended,
@@ -71,7 +130,13 @@ get_metrics_similar_1 AS (
     LEFT JOIN
         datalake_rental_historical_follow_up.house_listings_daily_info AS di
             ON di.id_house = es.id_similar
+            AND es.business_context = 'RENT'
             AND di.dt_day BETWEEN es.dt_agg_started AND es.dt_agg_ended
+    LEFT JOIN
+        datalake_sale_ongoing_listings.ongoing_listings_daily_info AS oldi
+            ON oldi.id_house = es.id_similar
+            AND es.business_context = 'SALE'
+            AND MAKE_DATE(oldi.year, oldi.month,oldi.day) BETWEEN es.dt_agg_started AND es.dt_agg_ended
     GROUP BY
         ALL
 ),
