@@ -15,6 +15,14 @@ workflow:
   dbutils_secret_key: INSPECTIONS_DB
   lineage_product_database_name: inspections
   tables_customization:
+    annotation:
+      clean_table_name: annotation
+      clean_primary_keys: [uuid_inspection, key]
+      raw_primary_keys: [inspection_uuid, key]
+    annotation_aud:
+      clean_table_name: annotation_aud
+      clean_primary_keys: [uuid_inspection, key, rev]
+      raw_primary_keys: [inspection_uuid, key, rev]
     appointment_aud:
       clean_table_name: appointment_aud
       clean_primary_keys: [id_appointment, rev]
