@@ -31,6 +31,8 @@ workflow:
       clean_table_name: listing_business_context_aud
     ListingInfo:
       clean_table_name: listing_info
+    ListingPerformance:
+      clean_table_name: listing_performance
     ListingRentModel:
       clean_table_name: listing_rent_model
     ListingRentModel_AUD:

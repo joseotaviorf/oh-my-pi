@@ -1,0 +1,101 @@
+---
+database_name: datalake_ebdb_clean
+table_name: listing_performance
+description: Table related to the Performance & Score project, which brings information about the Demand Score, created by the OwnerXP team.
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.id
+    description: Primary key of the table.
+  id_listing_business_context:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.listing_business_context_id
+    description: ID of the listing in a specific business context. It can be joined with listing_business_context.
+  traffic_count:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.traffic_count
+    description: Sum of traffic (listing page views) for a specific range.
+  visits_scheduled_count:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.visits_scheduled_count
+    description: Sum of visits scheduled for a specific range.
+  offers_count:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.offers_count
+    description: Sum of offers sent for a specific range.
+  favorites_count:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.favorites_count
+    description: Sum of favorites for a specific range.
+  traffic_median:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.traffic_median
+    description: Median of traffic (listing page views) for a specific range.
+  visits_scheduled_median:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.visits_scheduled_median
+    description: Median of visits scheduled for a specific range.
+  offers_median:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.offers_median
+    description: Median of offers sent for a specific range.
+  favorites_median:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.favorites_median
+    description: Median of favorites for a specific range.
+  period_in_days:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.period_in_days
+    description: Number of days of the specific range for the metrics.
+  traffic_flag:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.traffic_flag
+    description: Flag for traffic (listing page views) metric.
+    categories:
+      ABOVE_MEDIAN: Traffic count is above the traffic median.
+      ON_MEDIAN: Traffic count is equal to the traffic median.
+      BELOW_MEDIAN: Traffic count is below the traffic median.
+  visits_scheduled_flag:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.visits_scheduled_flag
+    description: Flag for visits scheduled metric.
+    categories:
+      ABOVE_MEDIAN: Visits scheduled count is above the traffic median.
+      ON_MEDIAN: Visits scheduled count is equal to the traffic median.
+      BELOW_MEDIAN: Visits scheduled count is below the traffic median.
+  offers_flag:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.offers_flag
+    description: Flag for offers sent metric.
+    categories:
+      ABOVE_MEDIAN: Offers sent count is above the traffic median.
+      ON_MEDIAN: Offers sent count is equal to the traffic median.
+      BELOW_MEDIAN: Offers sent count is below the traffic median.
+  favorites_flag:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.favorites_flag
+    description: Flag for favorites metric.
+    categories:
+      ABOVE_MEDIAN: Favorites count is above the traffic median.
+      ON_MEDIAN: Favorites count is equal to the traffic median.
+      BELOW_MEDIAN: Favorites count is below the traffic median.
+  score_value:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.score_value
+    description: Value of the score, an integer between 1 (bad) and 5 (very good).
+  score_type:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.score_type
+    description: Type of the score.
+    categories:
+      DEMAND_SCORE: The score is calculated according to demand metrics.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.criadoEm
+    description: Timestamp of when the data was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.atualizadoEm
+    description: Timestamp of when the data was updated.
