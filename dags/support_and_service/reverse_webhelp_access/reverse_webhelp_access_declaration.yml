@@ -37,6 +37,9 @@ workflow:
     listing_quality_sla:
       extra_spark_job_arguments:
       - services
+    nps_offboarding:
+      extra_spark_job_arguments:
+      - cx
     repair_tickets:
       extra_spark_job_arguments:
       - services
