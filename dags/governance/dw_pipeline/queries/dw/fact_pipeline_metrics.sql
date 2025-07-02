@@ -27,6 +27,18 @@ WITH totals_base AS (
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.layer = 'metric' AND ds.is_executed = TRUE) AS total_metric_dags_executed,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.layer = 'reverse' AND ds.is_executed = TRUE) AS total_reverse_dags_executed,
         COUNT(DISTINCT ds.id_dag) FILTER (WHERE d.is_datamart = TRUE AND ds.is_executed = TRUE) AS total_datamart_dags_executed,
+        ROUND(
+            100 * (
+                COUNT(DISTINCT ds.id_dag) FILTER (
+                    WHERE ds.is_inside_sla = TRUE AND ((ds.is_active_and_unpaused AND NOT ds.is_in_ignoring_list) OR ds.is_special_scheduler_executed)
+                ) / (
+                    COUNT(DISTINCT ds.id_dag) FILTER (
+                        WHERE (ds.is_active_and_unpaused AND NOT ds.is_in_ignoring_list) OR ds.is_special_scheduler_executed
+                    )
+                )
+            ),
+            1
+        ) AS sla,
         ds.dt_snapshot
     FROM
         datalake_pipeline.dag_sla_information AS ds
@@ -35,12 +47,12 @@ WITH totals_base AS (
             ON d.id_dag = ds.id_dag
     WHERE
         ds.dt_snapshot BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    GROUP BY 1, 28
+    GROUP BY 1, 29
 )
 SELECT
     tb.id_line AS sk_line,
     DATE_FORMAT(tb.dt_snapshot, 'yyyyMMdd') AS sk_snapshot_date,
-    ROUND(100*(tb.total_dags_inside_sla/(tb.total_active_unpaused_dags - tb.total_dags_ignoring_list + tb.total_dags_special_scheduler_executed)), 1) AS sla,
+    sla,
     tb.total_active_dags,
     tb.total_active_unpaused_dags,
     tb.total_dags_executed,
