@@ -61,6 +61,21 @@ terminator AS (
     AND t.ts_termination_request BETWEEN DATE('{load_start_date}') - INTERVAL '24' MONTH AND DATE('{load_start_date}')
     GROUP BY 2, 6, 7, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22
 ),
+
+new_mediation AS (
+    SELECT
+        t.id_contract sk_contract,
+        t.id_zendesk_task sk_ticket,
+        (t.ts_termination_request - INTERVAL '1' HOUR) as created_date
+    FROM datalake_terminator.termination t
+    LEFT JOIN dw_customer_support.dim_ticket dt
+        ON t.id_zendesk_task = dt.sk_ticket
+    WHERE t.task_type = 'TERMINATION_LANDLORD'
+    AND t.ts_termination_request>= DATE('2023-01-01')
+    AND dt.group_name like '%[POS] [BACK]'
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY t.id_contract ORDER BY t.ts_termination_request DESC) = 1
+),
 offboarding AS (
     SELECT
         id_request,
@@ -153,6 +168,7 @@ SELECT DISTINCT
     WHEN ofb.termination_request >= DATE('2025-05-22') AND spc.is_spoc_contract = TRUE AND spc.is_spoc_control_group = TRUE THEN 'lab_control'
     ELSE NULL
   END spoc_class,
+  med.created_date med_created_dt,
   IF(spc.agent_email LIKE '%webhelp%', spc.agent_email, NULL) spoc_agent_email,
   ans.comment,
   YEAR(ans.ts_answered) AS year,
@@ -164,12 +180,12 @@ LEFT JOIN dw_customer_satisfaction.fact_nps_dispatches disp
   ON ans.sk_nps_answer = disp.sk_nps_answer
 INNER JOIN dw_customer_satisfaction.dim_nps_campaign camp
   ON disp.sk_nps_campaign = camp.sk_nps_campaign
-INNER JOIN dw_public.dim_date pub
-  ON disp.sk_answered_date = pub.sk_date
 LEFT JOIN offboarding ofb
   ON disp.sk_contract = ofb.id_contract
 LEFT JOIN repair_resolution_terminations rrt
   ON disp.sk_contract = rrt.sk_contract
+LEFT JOIN new_mediation med
+  ON ofb.id_contract = med.sk_contract
 LEFT JOIN spoc_contracts spc
   ON disp.sk_contract = spc.sk_contract
 WHERE disp.sk_nps_answer > 0
@@ -178,3 +194,4 @@ AND camp.business_context = 'forRent'
 AND camp.metric_group IN ('ppoffboarding', 'iqoffboarding')
 AND ans.ts_answered >= DATE('{load_start_date}') - INTERVAL '12' MONTH 
 AND ans.ts_answered >= DATE('2025-01-01')
+AND (spc.is_spoc_contract = TRUE OR med.created_date IS NOT NULL)
