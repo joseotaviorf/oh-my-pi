@@ -384,7 +384,7 @@ core_tasks = [
         entry_point="core_cluster_step",
         parameters=[
             f"--input_address_adjusted_condos={Tables.address_adjusted_step_condos}",
-            f"--input_address_adjusted_houses={Tables.address_adjusted_step_houses}",
+            f"--input_indirect_matches_clustering_image={Tables.address_adjusted_step_houses}",
             f"--overwrite_schema",
             f"--output_clustered_condos={Tables.cluster_step_condos}",
             f"--output_clustered_houses={Tables.cluster_step_houses}",
@@ -487,7 +487,7 @@ after_join_tasks = [
 
 
 yesterday = "{{ data_interval_start | ds }}"
-today = "{{ macros.ds_add(data_interval_start | ds, 1)  }}" 
+today = "{{ macros.ds_add(data_interval_start | ds, 1)  }}"
 
 plugin_tasks = [
     create_task(
