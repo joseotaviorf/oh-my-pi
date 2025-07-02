@@ -81,29 +81,33 @@ recontact_drilldown AS (
     tp.sk_ticket,
     CASE
       WHEN DATE_DIFF(DAY, DATE(tp.ts_started), LEAD(DATE(tp.ts_started)) OVER(PARTITION BY tp.sk_user, tp.last_team ORDER BY tp.ts_started)) <= 4 THEN
-        CASE WHEN tp.sk_ticket != LEAD(tp.sk_ticket) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) THEN 1 ELSE 0 END
+        CASE WHEN tp.sk_ticket != LEAD(tp.sk_ticket) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) 
+        AND tp.ts_started != LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)
+        THEN 1 ELSE 0 END
       ELSE 0
     END AS recontact_flag,
     CASE
       WHEN DATE_DIFF(DAY, DATE(tp.ts_started), LEAD(DATE(tp.ts_started)) OVER(PARTITION BY tp.sk_user, tp.last_team, tp.theme ORDER BY tp.ts_started)) <= 4 THEN
         CASE WHEN tp.sk_ticket != LEAD(tp.sk_ticket) OVER(PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme ORDER BY tp.ts_started)
+        AND tp.ts_started != LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)
                   AND tp.theme IS NOT NULL THEN 1 ELSE 0 END
       ELSE 0
     END AS theme_recontact_flag,
     CASE
       WHEN DATE_DIFF(DAY, DATE(tp.ts_started), LEAD(DATE(tp.ts_started)) OVER(PARTITION BY tp.sk_user, tp.last_team, tp.theme, tp.theme_detail ORDER BY tp.ts_started)) <= 4 THEN
         CASE WHEN tp.sk_ticket != LEAD(tp.sk_ticket) OVER(PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme, tp.theme_detail ORDER BY tp.ts_started)
+        AND tp.ts_started != LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)
                   AND tp.theme IS NOT NULL AND tp.theme_detail IS NOT NULL THEN 1 ELSE 0 END
       ELSE 0
     END AS theme_detail_recontact_flag,
-    LEAD(tp.sk_ticket) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS next_contact_sk_ticket,
-    LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS next_contact_ts_started,
-    LEAD(tp.last_agent_email) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS next_agent,
-    LEAD(tp.channel) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS next_contact_channel,
-    LEAD(tp.theme) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS next_contact_theme,
-    LEAD(tp.theme_detail) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS next_contact_theme_detail,
-    LEAD(tp.sk_ticket) OVER(PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme ORDER BY tp.ts_started) AS next_contact_per_theme_sk_ticket,
-    LEAD(tp.sk_ticket) OVER(PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme, tp.theme_detail ORDER BY tp.ts_started) AS next_contact_per_theme_detail_sk_ticket
+    CASE WHEN tp.ts_started != LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) THEN LEAD(tp.sk_ticket) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) ELSE NULL END AS next_contact_sk_ticket,
+    CASE WHEN tp.ts_started != LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) THEN LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) ELSE NULL END AS next_contact_ts_started,
+    CASE WHEN tp.ts_started != LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) THEN LEAD(tp.last_agent_email) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) ELSE NULL END AS next_agent,
+    CASE WHEN tp.ts_started != LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) THEN LEAD(tp.channel) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) ELSE NULL END AS next_contact_channel,
+    CASE WHEN tp.ts_started != LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) THEN LEAD(tp.theme) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) ELSE NULL END AS next_contact_theme,
+    CASE WHEN tp.ts_started != LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) THEN LEAD(tp.theme_detail) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) ELSE NULL END AS next_contact_theme_detail,
+    CASE WHEN tp.ts_started != LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) THEN LEAD(tp.sk_ticket) OVER(PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme ORDER BY tp.ts_started) ELSE NULL END AS next_contact_per_theme_sk_ticket,
+    CASE WHEN tp.ts_started != LEAD(tp.ts_started) OVER(PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) THEN LEAD(tp.sk_ticket) OVER(PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme, tp.theme_detail ORDER BY tp.ts_started) ELSE NULL END AS next_contact_per_theme_detail_sk_ticket
   FROM
     tickets_perspective AS tp
   WHERE
