@@ -1,0 +1,91 @@
+---
+database_name: datalake_gsheets_clean
+table_name: bandaid
+columns:
+  key:
+    lineage:
+      - datalake_gsheets_raw.bandaid.chave
+  id_contract:
+    lineage:
+      - datalake_gsheets_raw.bandaid.contrato
+  id_house:
+    lineage:
+      - datalake_gsheets_raw.bandaid.id_imovel
+  id_jira_analysis:
+    lineage:
+      - datalake_gsheets_raw.bandaid.id_analise_jira
+  value:
+    lineage:
+      - datalake_gsheets_raw.bandaid.valor
+  status:
+    lineage:
+      - datalake_gsheets_raw.bandaid.status
+  type:
+    lineage:
+      - datalake_gsheets_raw.bandaid.tipo
+  department:
+    lineage:
+      - datalake_gsheets_raw.bandaid.departamento
+  requester:
+    lineage:
+      - datalake_gsheets_raw.bandaid.solicitante
+  requester_email:
+    lineage:
+      - datalake_gsheets_raw.bandaid.email_solicitante
+  client_email:
+    lineage:
+      - datalake_gsheets_raw.bandaid.email_cliente
+  beneficiary:
+    lineage:
+      - datalake_gsheets_raw.bandaid.beneficiario
+  case_summary:
+    lineage:
+      - datalake_gsheets_raw.bandaid.resumo_do_caso
+  jira_responsible:
+    lineage:
+      - datalake_gsheets_raw.bandaid.responsavel_jira
+  jira_analysis_date:
+    lineage:
+      - datalake_gsheets_raw.bandaid.data_analise_jira
+  approver:
+    lineage:
+      - datalake_gsheets_raw.bandaid.aprovador
+  request_type:
+    lineage:
+      - datalake_gsheets_raw.bandaid.tipo_solicitacao
+  category:
+    lineage:
+      - datalake_gsheets_raw.bandaid.categoria
+  classification:
+    lineage:
+      - datalake_gsheets_raw.bandaid.classificacao
+  reason:
+    lineage:
+      - datalake_gsheets_raw.bandaid.motivo
+  comment:
+    lineage:
+      - datalake_gsheets_raw.bandaid.comentario
+  specific_action_tag:
+    lineage:
+      - datalake_gsheets_raw.bandaid.tag_acao_especifica
+  error_analyst_email:
+    lineage:
+      - datalake_gsheets_raw.bandaid.email_analista_erro
+  bpo:
+    lineage:
+      - datalake_gsheets_raw.bandaid.bpo
+  rejection_reason:
+    lineage:
+      - datalake_gsheets_raw.bandaid.motivo_reprovacao
+  system_process_name:
+    lineage:
+      - datalake_gsheets_raw.bandaid.nome_do_processo_sistema
+  created_at:
+    lineage:
+      - datalake_gsheets_raw.bandaid.criado
+  updated_at:
+    lineage:
+      - datalake_gsheets_raw.bandaid.atualizadoa
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.bandaid.ts_load

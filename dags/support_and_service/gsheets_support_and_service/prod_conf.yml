@@ -25,6 +25,12 @@ sheets_info:
     clean_table_name: aux_payments_photos
     sheet_context: support_and_service
 
+  bandaid:
+    sheet_id: 1CBjUGaiUPauSvzMD2BnKl-OdMMAmsYzAkW5QuS4V0as
+    sheet_name: atualizacao_py
+    clean_table_name: bandaid
+    sheet_context: support_and_service
+
   call_inapp_users:
     sheet_id: 1rZzhzwvGZBlyAMOBpc-dXbNOBXyEg6FFNe6bf_Uz93o
     sheet_name: db
