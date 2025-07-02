@@ -1,0 +1,78 @@
+database_name: datalake_botcity_audit_logs
+table_name: botcity_audit_logs
+description: Table with BotCity audit logs.
+domain: Tech Platform
+owner: rpa-team@quintoandar.com.br
+columns:
+  id_event:
+    lineage:
+      - s3_auditlogs_bucket/botcity.log_id
+    description: Unique identifier for the audit log
+  ts_event:
+    lineage:
+      - s3_auditlogs_bucket/botcity.date
+    description: Event timestamp
+  user_email:
+    lineage:
+      - s3_auditlogs_bucket/botcity.user.email
+    description: User email
+  user_name:
+    lineage:
+      - s3_auditlogs_bucket/botcity.user.name
+    description: User name
+  source:
+    lineage:
+      - s3_auditlogs_bucket/botcity.source
+    description: Source of the event
+  type:
+    lineage:
+      - s3_auditlogs_bucket/botcity.type
+    description: Type of the event
+  organization:
+    lineage:
+      - s3_auditlogs_bucket/botcity.organization
+    description: Organization
+  params_resource:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.resource
+    description: Resource affected by the event
+  params_name:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.name
+    description: Name of the resource
+  id_params:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.id
+    description: Unique identifier of the resource
+  params_automation:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.automation
+    description: Automation related to the event
+  params_cron:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.cron
+    description: Cron expression related to the event
+  params_version:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.version
+    description: Version of the resource
+  params_release:
+    lineage:
+      - s3_auditlogs_bucket/botcity.params.releaseVersion
+    description: Release associated with the event
+  year:
+    lineage:
+      - s3_auditlogs_bucket/botcity.date
+    description: Year of the event
+  month:
+    lineage:
+      - s3_auditlogs_bucket/botcity.date
+    description: Month of the event
+  day:
+    lineage:
+      - s3_auditlogs_bucket/botcity.date
+    description: Day of the event
+  hour:
+    lineage:
+      - s3_auditlogs_bucket/botcity.date
+    description: Hour of the event

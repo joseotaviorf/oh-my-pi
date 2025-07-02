@@ -1,0 +1,42 @@
+dag:
+  name: botcity
+  schedule_start_date: 2025, 06, 12
+  schedule_interval: 0 1 * * *
+  owner: Tech Platform Workforce Productivity
+  documentation:
+    dag_purpose: |
+      This DAG loads and cleans BotCity audit logs.
+
+workflow:
+  layer: clean
+  type: query_delta
+  load_spark_job: botcity_audit_logs_load
+  custom_schema: botcity_audit_logs
+  spark_job_arguments:
+  - "{dag_name}"
+  - "{environment}"
+  - "{bucket}"
+  - "{schema}"
+  - "{{ ts }}"
+  - "{table_name}"
+  - "{partitions}"
+  default_extraction_type: incremental
+  tables_customization:
+    audit_logs: {}
+
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    spark_conf:
+      spark.sql.legacy.json.allowEmptyString.enabled: "true"
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  access_control_list:
+    group_name: software-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
