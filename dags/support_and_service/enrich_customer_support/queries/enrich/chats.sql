@@ -6,7 +6,7 @@ WITH task_queues AS (
   FROM
     datalake_quinto_messenger_clean.task_event
   WHERE
-    ts_created BETWEEN DATE("{load_start_date}") - INTERVAL 60 DAY AND DATE("{load_end_date}")
+    MAKE_DATE(year, month, day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
 ),
@@ -17,7 +17,7 @@ inapp_sessions AS (
   FROM
     datalake_quinto_messenger_clean.chat
   WHERE
-    ts_created BETWEEN DATE("{load_start_date}") - INTERVAL 60 DAY AND DATE("{load_end_date}")
+    MAKE_DATE(year, month, day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
 ),
 whatsapp_sessions AS (
   SELECT DISTINCT
@@ -26,7 +26,7 @@ whatsapp_sessions AS (
   FROM
     datalake_quinto_messenger_clean.channel
   WHERE
-    ts_created BETWEEN DATE("{load_start_date}") - INTERVAL 60 DAY AND DATE("{load_end_date}")
+    MAKE_DATE(year, month, day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
 ),
 sauron_sessions AS (
   SELECT
@@ -73,7 +73,7 @@ tasks AS (
   FROM
     datalake_quinto_messenger_clean.task
   WHERE
-    ts_created BETWEEN DATE("{load_start_date}") - INTERVAL 60 DAY AND DATE("{load_end_date}")
+    MAKE_DATE(year, month, day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
 )
