@@ -1,10 +1,4 @@
 ---
-bietlejuice.amplitude:
-  add:
-    - bietlejuice.amplitude_supply:events-supply-to-datalake-raw
-bietlejuice.amplitude_supply:
-  add:
-    - bietlejuice.amplitude_demand:events-demand-to-datalake-raw
 bietlejuice.dw_agent_contract:
   add:
     - bietlejuice.dw_rede_company:load-dw-rede-dim-company
@@ -224,32 +218,7 @@ bietlejuice.enrich_accounting_funnel:
     - bietlejuice.sap:load-clean-chart-of-accounts
 bietlejuice.enrich_airflow:
   override: []
-bietlejuice.enrich_amplitude_agents_app:
-  add:
-    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  remove:
-    - bietlejuice.amplitude:load-clean-events
-bietlejuice.enrich_amplitude_lead:
-  remove:
-    - bietlejuice.amplitude:load-clean-events
-bietlejuice.enrich_amplitude_magic_link:
-  add:
-    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  remove:
-    - bietlejuice.amplitude:load-clean-events
-bietlejuice.enrich_amplitude_partner_taxonomy:
-  add:
-    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  remove:
-    - bietlejuice.amplitude:load-clean-events
-bietlejuice.enrich_amplitude_sale_visit_intent:
-  add:
-    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-  remove:
-    - bietlejuice.amplitude:load-clean-events
 bietlejuice.enrich_app_installed:
-  add:
-    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user
 bietlejuice.enrich_booking:
@@ -475,10 +444,6 @@ bietlejuice.enrich_olos_dialer:
 bietlejuice.enrich_olx_crawler_listings:
   remove:
     - bietlejuice.listings_olx:load-clean-olx
-bietlejuice.enrich_online_attribution:
-  remove:
-    - bietlejuice.amplitude:load-clean-170698-user-merge
-    - bietlejuice.amplitude:load-clean-events
 bietlejuice.enrich_open_external_data:
   override: []
 bietlejuice.enrich_open_external_data_addresses:
@@ -673,8 +638,6 @@ bietlejuice.enrich_seo_funnel:
     - bietlejuice.dw_region:load-dw-public-dim-region
     - bietlejuice.ebdb_visit:load-clean-visit
 bietlejuice.enrich_ss_logic_model:
-  add:
-    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.ebdb:load-clean-contract
     - bietlejuice.enrich_customer_support:load-enrich-email
@@ -700,8 +663,6 @@ bietlejuice.enrich_survicate:
 bietlejuice.enrich_talk_to_agent:
   override: []
 bietlejuice.enrich_top_of_funnel_demand:
-  add:
-    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   remove:
     - bietlejuice.ebdb_house:load-clean-house
     - bietlejuice.gsheets_growth:done-clean-taxonomy-demand
@@ -979,11 +940,6 @@ bietlejuice.enrich_pin:
     - bietlejuice.pin_talent:load-clean-review-period-translation
 bietlejuice.enrich_recommendations:
   override: []
-  
-bietlejuice.enrich_concierge_ranking_metrics:
-  add:
-    - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
-
 bietlejuice.enrich_agreement_hourly:
   remove:
     - bietlejuice.trato_feito:load-clean-debtor

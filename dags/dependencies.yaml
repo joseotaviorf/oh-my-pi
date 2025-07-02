@@ -1,10 +1,6 @@
 ---
-bietlejuice.amplitude:
-  - bietlejuice.amplitude_supply:events-supply-to-datalake-raw
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events
-bietlejuice.amplitude_supply:
-  - bietlejuice.amplitude_demand:events-demand-to-datalake-raw
 bietlejuice.dw_accounting_funnel:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-for-rent-bank-settlement
   - bietlejuice.enrich_sap_accounting_process:load-enrich-kill-queue-reservation-issuance
@@ -1215,7 +1211,6 @@ bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-cr-occurrences
   - bietlejuice.airtable:load-clean-jira-tickets
 bietlejuice.enrich_amplitude_agents_app:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.amplitude_new:load-clean-events
   - bietlejuice.enrich_ebdb_agents:load-enrich-business-context
 bietlejuice.enrich_amplitude_inspections:
@@ -1238,7 +1233,6 @@ bietlejuice.enrich_amplitude_lead:
   - bietlejuice.amplitude_subpartitioned:load-clean-205027-referral-form-discarded-events
   - bietlejuice.rene_descartes:load-clean-house-lead
 bietlejuice.enrich_amplitude_magic_link:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.amplitude_new:load-clean-events
   - bietlejuice.enrich_support_users:load-enrich-analysts
   - bietlejuice.gsheets_support_and_service:done-clean-department-control
@@ -1258,10 +1252,8 @@ bietlejuice.enrich_amplitude_page_viewed_events:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
 bietlejuice.enrich_amplitude_partner_taxonomy:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.amplitude_new:load-clean-events
 bietlejuice.enrich_amplitude_sale_visit_intent:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.amplitude_new:load-clean-events
 bietlejuice.enrich_amplitude_user:
   - bietlejuice.amplitude_new:load-clean-events
@@ -1274,7 +1266,6 @@ bietlejuice.enrich_anonymization:
 bietlejuice.enrich_anonymization_validation:
   - bietlejuice.gsheets_governance:done-clean-anonymization-manual-validation
 bietlejuice.enrich_app_installed:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.amplitude_new:load-clean-events
 bietlejuice.enrich_arquivo_confidencial:
   - bietlejuice.arquivo_confidencial:load-clean-rev-info
@@ -1555,7 +1546,6 @@ bietlejuice.enrich_company:
   - bietlejuice.enrich_hubspot_crm:load-enrich-company
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-members
 bietlejuice.enrich_concierge_ranking_metrics:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
   - bietlejuice.house_listing_search:load-clean-recommendation-use-case
   - bietlejuice.house_listing_search:load-clean-recommendation-user-use-case
@@ -3253,7 +3243,6 @@ bietlejuice.enrich_sorting_hat:
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis
   - bietlejuice.sorting_hat:load-clean-policy-report
 bietlejuice.enrich_ss_logic_model:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.chat_fup:load-clean-rating
   - bietlejuice.enrich_app_installed:load-enrich-events
   - bietlejuice.enrich_customer_support:load-enrich-csat
@@ -3437,7 +3426,6 @@ bietlejuice.enrich_top_of_funnel_affiliates:
   - bietlejuice.amplitude_subpartitioned:load-clean-205027-intro-page-viewed-events
   - bietlejuice.gsheets_growth:done-clean-taxonomy-affiliates
 bietlejuice.enrich_top_of_funnel_demand:
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events
 bietlejuice.enrich_top_of_funnel_supply:
   - bietlejuice.amplitude_subpartitioned:load-clean-183047-landing-page-viewed-events
@@ -4153,4 +4141,3 @@ bietlejuice.survicate_respondent_attributes:
   - bietlejuice.survicate_survey_attributes:load-raw-survey-responses
 bietlejuice.survicate_survey_attributes:
   - bietlejuice.survicate_surveys:load-raw-surveys
-  
