@@ -45,6 +45,7 @@ dags_not_using_builder:
   - primitives/enrich_recommendations/enrich_recommendations.py
   - support_and_service/chattermill/chattermill.py
   - platform/trigger_datasets/trigger_datasets.py
+  - platform/reset_datasets/reset_datasets.py
 
 database_ingestion_without_cdc:
   - brokers_supply_processor
