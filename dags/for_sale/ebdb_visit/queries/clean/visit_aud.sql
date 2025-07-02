@@ -13,6 +13,7 @@ SELECT
     status_MOD AS mod_status,
     bookingType AS booking_type,
     houseRating_id AS id_house_rating,
-    origemCriacao_id AS id_creation_origin
+    origemCriacao_id AS id_creation_origin,
+    visit_datetime AS ts_visit
 FROM
     datalake_ebdb_raw.Visita_AUD

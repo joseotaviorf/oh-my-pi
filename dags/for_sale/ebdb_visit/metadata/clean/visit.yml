@@ -76,6 +76,9 @@ columns:
   ts_created:
     lineage:
       - datalake_ebdb_raw.visita.criadoEm
+  ts_visit:
+    lineage:
+      - datalake_ebdb_raw.visita.visit_datetime
   ts_updated:
     lineage:
       - datalake_ebdb_raw.visita.atualizadoEm

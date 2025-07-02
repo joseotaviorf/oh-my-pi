@@ -24,6 +24,7 @@ SELECT
     request_date AS dt_request,
     confirmation_expiration_date AS dt_confirmation_expiration,
     criadoEm AS ts_created,
+    visit_datetime AS ts_visit,
     atualizadoEm AS ts_updated
 FROM
     datalake_ebdb_raw.Visita

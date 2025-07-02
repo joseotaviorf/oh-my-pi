@@ -46,3 +46,6 @@ columns:
   id_creation_origin:
     lineage:
       - datalake_ebdb_raw.visita_aud.origemcriacao_id
+  ts_visit:
+    lineage:
+      - datalake_ebdb_raw.visita_aud.visit_datetime
