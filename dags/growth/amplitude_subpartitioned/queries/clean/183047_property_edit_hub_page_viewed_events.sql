@@ -2,7 +2,7 @@
 SELECT
     id_amplitude,
     ids_amplitude_attributed,
-    CAST((GET_JSON_OBJECT(event_properties, '$.house_id')) AS BIGINT) AS id_house,
+    CAST((GET_JSON_OBJECT(event_properties, '$.houseId')) AS BIGINT) AS id_house,
     id_user,
     GET_JSON_OBJECT(user_properties, '$.ab_beakman_owner_price_feedback') AS up_ab_beakman_owner_price_feedback,
     id_device,
