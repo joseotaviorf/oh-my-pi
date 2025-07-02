@@ -24,6 +24,11 @@ column_level_validations:
   business_context:
     is_complete:
       severity_level: Error
+    is_contained_in:
+      values:
+        - RENT
+        - SALE
+      severity_level: Error
   year:
     is_complete:
       severity_level: Error
