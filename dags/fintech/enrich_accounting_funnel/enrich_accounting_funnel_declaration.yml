@@ -7,26 +7,9 @@ workflow:
   type: query_delta
   layer: enrich
   inner_dependencies:
-    for_rent_cap_bank_recon:
-      - payment_platforms
-      - ledger
-    retsuko_revenue_accounting:
-      - ledger
-    for_rent_car_bank_recon:
-      - ledger
-    for_rent_car_bank_recon_recupera:
-      - ledger
     for_rent_brokerage_transfer:
       - invoice_all
       - for_rent_contract_brokerage
-    retsuko_invoice_issuance:
-      - ledger
-    retsuko_provision_creation:
-      - ledger
-    retsuko_reversion_creation:
-      - ledger
-    retsuko_revenue_share:
-      - ledger
     monopoly_invoice_issuance:
       - ledger
 cluster:
