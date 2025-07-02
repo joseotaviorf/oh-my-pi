@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
     environment = args.environment
     data_assets = args.data_assets
-    chunk_size = 30
+    chunk_size = 400
 
     logger.info(
         f"""m=__main__, environment={environment}, source=dashboard_governance,
@@ -110,10 +110,8 @@ if __name__ == "__main__":
             METADATA_PROPAGATOR_PATH = "/dashboard"
         elif asset == "chart":
             METADATA_PROPAGATOR_PATH = "/chart"
-            chunk_size = 200
         elif asset == "dataset":
             METADATA_PROPAGATOR_PATH = "/dataset"
-            chunk_size = 120
 
         base_dbutils = BaseDBUtils()
         if base_dbutils.get_dbutils() is not None:
@@ -137,4 +135,3 @@ if __name__ == "__main__":
 
     if error:
         raise RuntimeError(f"Error sending data to Metadata Propagator: {error}")
-

@@ -11,7 +11,7 @@ workflow:
     - "{environment}"
     - "--data_assets"
     - "{table_name}"
-  execution_timeout_hours: 5
+  execution_timeout_hours: 6
   tables_customization:
     dashboard_governance:
       load_spark_job: load_dashboard_governance_into_mp
