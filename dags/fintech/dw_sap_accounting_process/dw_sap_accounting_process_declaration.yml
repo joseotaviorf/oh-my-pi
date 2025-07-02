@@ -1,11 +1,11 @@
 dag:
-  name: dw_accounting_funnel
+  name: dw_sap_accounting_process
   schedule_start_date: 2020,08,29
   owner: Data Fintech
 workflow:
   type: query_delta
   layer: dw
-  custom_schema: accounting_funnel
+  custom_schema: sap_accounting_process
 cluster:
   type: databricks_12_2_med_general_cluster
   access_control_list:
@@ -17,4 +17,3 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
-

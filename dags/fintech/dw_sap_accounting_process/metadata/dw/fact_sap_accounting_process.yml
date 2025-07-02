@@ -1,11 +1,11 @@
 ---
-database_name: dw_accounting_funnel
-table_name: fact_accounting_funnel
+database_name: dw_sap_accounting_process
+table_name: fact_sap_accounting_process
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: "This table reunite all accounting funnel enrich models to unify accounting analysis"
+description: "This table reunite all sap accounting process enrich models to unify accounting analysis"
 columns:
-  sk_accounting_funnel:
+  sk_accounting_process:
     lineage:
       - datalake_sap_accounting_process.retsuko_provision.id_accounting_process
       - datalake_sap_accounting_process.retsuko_revenue_share.id_accounting_process

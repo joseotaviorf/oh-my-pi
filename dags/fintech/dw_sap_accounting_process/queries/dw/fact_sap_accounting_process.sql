@@ -1,5 +1,5 @@
 SELECT
-  id_accounting_process AS sk_accounting_funnel,
+  id_accounting_process AS sk_accounting_process,
   id_business_entity,
   id_finance_entity,
   id_finance_entity_entry,
@@ -28,7 +28,7 @@ FROM
 UNION ALL
 
 SELECT
-  id_accounting_process AS sk_accounting_funnel,
+  id_accounting_process AS sk_accounting_process,
   id_business_entity,
   id_finance_entity,
   id_finance_entity_entry,
@@ -57,7 +57,7 @@ FROM
 UNION ALL
 
 SELECT
-  id_accounting_process AS sk_accounting_funnel,
+  id_accounting_process AS sk_accounting_process,
   id_business_entity,
   id_finance_entity,
   id_finance_entity_entry,
@@ -86,7 +86,7 @@ FROM
 UNION ALL
 
 SELECT
-  id_accounting_process AS sk_accounting_funnel,
+  id_accounting_process AS sk_accounting_process,
   id_business_entity,
   id_finance_entity,
   id_finance_entity_entry,
@@ -115,7 +115,7 @@ FROM
 UNION ALL
 
 SELECT
-  id_accounting_process AS sk_accounting_funnel,
+  id_accounting_process AS sk_accounting_process,
   id_business_entity,
   id_finance_entity,
   id_finance_entity_entry,
@@ -144,7 +144,7 @@ FROM
 UNION ALL
 
 SELECT
-    id_accounting_process AS sk_accounting_funnel,
+    id_accounting_process AS sk_accounting_process,
     id_business_entity,
     id_finance_entity,
     id_finance_entity_entry,
@@ -173,7 +173,7 @@ FROM
 UNION ALL
 
 SELECT
-    CONCAT('BANK-QC-',id_finance_entity) AS sk_accounting_funnel,
+    CONCAT('BANK-QC-',id_finance_entity) AS sk_accounting_process,
     id_business_entity,
     id_finance_entity,
     id_external_payment AS id_finance_entity_entry,
@@ -202,7 +202,7 @@ FROM
 UNION ALL
 
 SELECT
-    CONCAT('BANK-QA-FR-',id_finance_entity) AS sk_accounting_funnel,
+    CONCAT('BANK-QA-FR-',id_finance_entity) AS sk_accounting_process,
     id_business_entity,
     id_finance_entity,
     company_use AS id_finance_entity_entry,
