@@ -1,0 +1,40 @@
+dag:
+  name: metabase_pull
+  owner: Data Governance
+  schedule_start_date: 2020, 6, 1
+  schedule_interval: "0 5 * * *"
+  documentation:
+    dag_purpose: |
+      This DAG imports the tables from Metabase, our data visualization tool. We extract metadata from Metabase in order
+      to analyze user behavior and have a better control of what is being created there.
+workflow:
+  type: custom_ingestion
+  layer: raw
+  custom_schema: metabase
+  dbutils_secret_key: METABASE_DB
+  load_spark_job: load_{extraction_type}_data_into_datalake_raw
+  default_extraction_type: incremental
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+  - "{environment}"   # env
+  - "{bucket}"   # datalake_bucket
+  - "metabase"   # source
+  - "{table_name}"
+  tables_customization:
+    report_card:
+      extra_spark_job_arguments:
+        - "{load_start_date}"   # load_start_date
+        - "updated_at"
+cluster:
+  type: databricks_12_2_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    driver_node_type_id: m5a.xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 2
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

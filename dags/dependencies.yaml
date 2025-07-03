@@ -1715,10 +1715,10 @@ bietlejuice.enrich_dashboard_governance:
   - bietlejuice.metabase:load-clean-core-user
   - bietlejuice.metabase:load-clean-metabase-database
   - bietlejuice.metabase:load-clean-metabase-table
-  - bietlejuice.metabase:load-clean-report-card
   - bietlejuice.metabase:load-clean-report-dashboard
   - bietlejuice.metabase:load-clean-report-dashboard-card
   - bietlejuice.metabase:load-clean-view-log
+  - bietlejuice.metabase_pull:load-clean-report-card
 bietlejuice.enrich_databricks_job_runs:
   - bietlejuice.enrich_databricks:load-enrich-daily-clusters
   - bietlejuice.enrich_databricks:load-enrich-unique-clusters
