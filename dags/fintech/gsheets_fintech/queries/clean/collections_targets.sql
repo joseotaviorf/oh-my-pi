@@ -1,0 +1,27 @@
+SELECT
+    NULLIF(Active_Flow, '') AS active_flow,
+    NULLIF(Active_Stock, '') AS active_stock,
+    NULLIF(FPD, '') AS fpd,
+    NULLIF(Property_Owners, '') AS property_owners,
+    NULLIF(`Ended_1-90`, '') AS ended_1_90,
+    NULLIF(`Ended_91-360`, '') AS ended_91_360,
+    NULLIF(`Ended_>360`, '') AS ended_360_plus,
+    NULLIF(Detractor_index, '') AS detractor_index,
+    NULLIF(Active_Cushion_Effectiveness, '') AS active_cushion_effectiveness,
+    NULLIF(Ended_Cushion_Effectiveness, '') AS ended_cushion_effectiveness,
+    NULLIF(Resolution_Rate_120D, '') AS resolution_rate_120d,
+    NULLIF(`Resolution_Rate_120-240D`, '') AS resolution_rate_120_240d,
+    NULLIF(`Resolution_Rate_240D+`, '') AS resolution_rate_240d_plus,
+    NULLIF(`Resolution_Rate_240D-360D`, '') AS resolution_rate_240d_360d,
+    NULLIF(`Resolution_Rate_360D+`, '') AS resolution_rate_360d_plus,
+    NULLIF(Resolution_Rate_MOB3, '') AS resolution_rate_mob3,
+    NULLIF(Eficiência_Processual, '') AS process_efficiency,
+    NULLIF(`Average_Overdue_Rent_Anomalies_120+`, '') AS average_overdue_rent_anomalies_120_plus,
+    NULLIF(working_days_today, '') AS working_days_today,
+    NULLIF(week_of_the_year, '') AS week_of_the_year,
+    NULLIF(day, '') AS day,
+    NULLIF(month, '') AS month,
+    NULLIF(Date, '') AS dt_reference,
+    NOW() AS ts_load
+FROM
+    datalake_gsheets_raw.collections_targets

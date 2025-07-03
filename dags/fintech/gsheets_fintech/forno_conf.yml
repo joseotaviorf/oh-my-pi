@@ -302,3 +302,15 @@ sheets_info:
     sheet_name: tabela_ws_getnet
     clean_table_name: getnet_return_codes
     sheet_context: fintech
+
+  collections_targets:
+    sheet_id: 1NFHHQgYHVxeVc4yCQ9hykn9J07CCjopzCe4F0M7OnYw
+    sheet_name: Daily
+    clean_table_name: collections_targets
+    sheet_context: fintech
+
+  stilingue_data:
+    sheet_id: 12Q5ROjVIDRipM0PTRSqdPRkHQH1p-Njw1fbXqf_VkIU
+    sheet_name: "[base stilingue] midias sociais"
+    clean_table_name: stilingue_data
+    sheet_context: fintech

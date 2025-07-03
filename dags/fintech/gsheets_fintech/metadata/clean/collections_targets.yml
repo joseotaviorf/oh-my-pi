@@ -1,0 +1,76 @@
+---
+database_name: datalake_gsheets_clean
+table_name: collections_targets
+columns:
+  dt_reference:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Date
+  working_days_today:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.working_days_today
+  month:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.month
+  week_of_the_year:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.week_of_the_year
+  day:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.day
+  active_flow:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Active_Flow
+  active_stock:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Active_Stock
+  fpd:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.FPD
+  property_owners:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Property_Owners
+  ended_1_90:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.`Ended_1-90`
+  ended_91_360:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.`Ended_91-360`
+  ended_360_plus:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.`Ended_>360`
+  detractor_index:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Detractor_index
+  active_cushion_effectiveness:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Active_Cushion_Effectiveness
+  ended_cushion_effectiveness:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Ended_Cushion_Effectiveness
+  resolution_rate_120d:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_120D
+  resolution_rate_120_240d:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.`Resolution_Rate_120-240D`
+  resolution_rate_240d_plus:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.`Resolution_Rate_240D+`
+  resolution_rate_240d_360d:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.`Resolution_Rate_240D-360D`
+  resolution_rate_360d_plus:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.`Resolution_Rate_360D+`
+  resolution_rate_mob3:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_MOB3
+  process_efficiency:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Eficiência_Processual
+  average_overdue_rent_anomalies_120_plus:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.`Average_Overdue_Rent_Anomalies_120+`
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.ts_load

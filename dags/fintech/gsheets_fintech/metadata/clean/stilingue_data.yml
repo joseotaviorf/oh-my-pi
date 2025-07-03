@@ -1,0 +1,61 @@
+---
+database_name: datalake_gsheets_clean
+table_name: stilingue_data
+columns:
+  id_manifestation:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.id
+  id_author:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.autor_id
+  channel:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.canal
+  manifestation_url:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.link
+  author_name:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.autor_nome
+  author_profile_url:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.autor_link
+  author_image_url:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.autor_imagem
+  content:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.conteudo
+  polarity:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.polaridade
+  gender:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.genero
+  theme:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.temas
+  manifestation_type:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.tipo_de_manisfetacao
+  offending_area:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.area_ofensora
+  collection_theme:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.tema_collection
+  tags:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.tags
+  dt_manifestation:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.data_sem_hora
+  dt_week_manifestation:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.semana_da_manifestacao
+  dt_month_manifestation:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.mes_da_manifestacao_
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.stilingue_data.ts_load

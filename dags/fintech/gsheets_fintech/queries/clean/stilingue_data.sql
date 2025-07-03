@@ -1,0 +1,21 @@
+SELECT
+  NULLIF(id, '') AS id_manifestation,
+  NULLIF(autor_id, '') AS id_author,
+  NULLIF(canal, '') AS channel,
+  NULLIF(link, '') AS manifestation_url,
+  NULLIF(autor_nome, '') AS author_name,
+  NULLIF(autor_link, '') AS author_profile_url,
+  NULLIF(autor_imagem, '') AS author_image_url,
+  NULLIF(conteudo, '') AS content,
+  NULLIF(polaridade, '') AS polarity,
+  NULLIF(genero, '') AS gender,
+  NULLIF(temas, '') AS theme,
+  NULLIF(tipo_de_manisfetacao, '') AS manifestation_type,
+  NULLIF(area_ofensora, '') AS offending_area,
+  NULLIF(tema_collection, '') AS collection_theme,
+  NULLIF(tags, '') AS tags,
+  CAST(NULLIF(data_sem_hora, '') AS DATE) AS dt_manifestation,
+  CAST(NULLIF(semana_da_manifestacao, '') AS DATE) AS dt_week_manifestation,
+  CAST(NULLIF(mes_da_manifestacao_, '') AS DATE) AS dt_month_manifestation,
+  NOW() AS ts_load
+FROM datalake_gsheets_raw.stilingue_data
