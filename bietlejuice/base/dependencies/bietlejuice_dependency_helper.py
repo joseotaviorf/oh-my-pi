@@ -5,7 +5,7 @@ from typing import Tuple, Union
 from bietlejuice.services.file_service import FileService
 from dags import DAG_PACKAGES_ROOT
 
-DEPENDENCIES_PATTERN = "bietlejuice\.(\w*):(.*)"
+DEPENDENCIES_PATTERN = "bietlejuice\.(\w*):([^:]*)"
 
 DAGS_CROSS_DEPENDENCIES_FILE_NAME = "dependencies.yaml"
 DAGS_CROSS_DEPENDENCIES_FILE_PATH = join(
@@ -38,12 +38,12 @@ class BietlejuiceDependencyHelper:
         table_group_number = 4
         if ":create-external-table" in task_name:
             task_name_pattern = (
-                "bietlejuice\.(.*):create-external-table-(enrich|raw|clean|dw)*-(.*)"
+                "bietlejuice\.(.*):create-external-table-(enrich|raw|clean|dw)*-([^:]*)"
             )
             table_group_number = 3
         else:
             task_name_pattern = (
-                "bietlejuice\.(.*):(load|done)-(enrich|raw|clean|dw|metric)*-(.*)"
+                "bietlejuice\.(.*):(load|done)-(enrich|raw|clean|dw|metric)*-([^:]*)"
             )
 
         match = re.search(task_name_pattern, task_name)
@@ -87,7 +87,7 @@ class BietlejuiceDependencyHelper:
         """
         Parses the DAG and table name from load into redshift tasks
         """
-        match = re.search("bietlejuice\.(.*):load-into-redshift-dw-(.*)", task_name)
+        match = re.search("bietlejuice\.(.*):load-into-redshift-dw-([^:]*)", task_name)
 
         if not match:
             match_dag_name = re.search(DEPENDENCIES_PATTERN, task_name)

@@ -17,6 +17,8 @@ dags_out_of_pattern:
         "dw_velo",
         "dw_satisfaction_rating",
         "enrich_anonymization",
+        "enrich_chatbot",
+        "enrich_copilot_service",
         "enrich_house_feature_inference",
         "enrich_hr_system_custom",
         "enrich_lost_listings",

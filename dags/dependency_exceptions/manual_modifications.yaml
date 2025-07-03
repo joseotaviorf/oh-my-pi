@@ -261,6 +261,13 @@ bietlejuice.enrich_casa_mineira_consolidated_marketing_metrics:
     - bietlejuice.casa_mineira_criteo_campaigns:load-clean-criteo-campaigns
 bietlejuice.enrich_chattermill:
   override: []
+bietlejuice.enrich_chatbot:
+  remove:
+    - bietlejuice.copilot_service:load-clean-message
+    - bietlejuice.copilot_service:load-clean-session
+  add:
+      - bietlejuice.copilot_service:load-clean-message:first-run-of-day
+      - bietlejuice.copilot_service:load-clean-session:first-run-of-day
 bietlejuice.enrich_collections_quintoandar:
   remove:
     - bietlejuice.paschoalotto:load-clean-user
@@ -284,6 +291,17 @@ bietlejuice.enrich_content_funnel:
     - bietlejuice.dw_booking:load-dw-public-dim-booking
     - bietlejuice.dw_region:load-dw-public-dim-region
     - bietlejuice.ebdb_visit:load-clean-visit
+bietlejuice.enrich_copilot_service:
+  remove:
+    - bietlejuice.copilot_service:load-clean-message
+    - bietlejuice.copilot_service:load-clean-message-flow
+    - bietlejuice.copilot_service:load-clean-session
+    - bietlejuice.copilot_service:load-clean-state
+  add:
+    - bietlejuice.copilot_service:load-clean-message:first-run-of-day
+    - bietlejuice.copilot_service:load-clean-message-flow:first-run-of-day
+    - bietlejuice.copilot_service:load-clean-session:first-run-of-day
+    - bietlejuice.copilot_service:load-clean-state:first-run-of-day
 bietlejuice.enrich_crawlers_listings:
   override: []
 bietlejuice.enrich_crawlers_listings_deduplicated:

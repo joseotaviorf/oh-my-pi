@@ -1488,8 +1488,8 @@ bietlejuice.enrich_cdp_personas:
 bietlejuice.enrich_chatbot:
   - bietlejuice.amplitude_new:load-clean-events
   - bietlejuice.chat_fup:load-clean-rating
-  - bietlejuice.copilot_service:load-clean-message
-  - bietlejuice.copilot_service:load-clean-session
+  - bietlejuice.copilot_service:load-clean-message:first-run-of-day
+  - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_ciq:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -1594,10 +1594,10 @@ bietlejuice.enrich_content_funnel:
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions
 bietlejuice.enrich_copilot_service:
-  - bietlejuice.copilot_service:load-clean-message
-  - bietlejuice.copilot_service:load-clean-message-flow
-  - bietlejuice.copilot_service:load-clean-session
-  - bietlejuice.copilot_service:load-clean-state
+  - bietlejuice.copilot_service:load-clean-message-flow:first-run-of-day
+  - bietlejuice.copilot_service:load-clean-message:first-run-of-day
+  - bietlejuice.copilot_service:load-clean-session:first-run-of-day
+  - bietlejuice.copilot_service:load-clean-state:first-run-of-day
   - bietlejuice.ebdb_user:load-clean-user
 bietlejuice.enrich_cozy_metrics:
   - bietlejuice.cozy_metrics:load-clean-library-versions

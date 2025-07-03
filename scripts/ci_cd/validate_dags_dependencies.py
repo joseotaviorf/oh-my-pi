@@ -28,7 +28,7 @@ LAYERS = ["clean", "enrich", "dw", "metric", "raw"]
 PRINT_ALL_PARSING_ERRORS = False
 COMPOSER_FILES_ROOT = f"{BI_ETL_EJUICE_ROOT}/bietlejuice"
 VALIDATION_LOG_SEPARATOR = "=" * 150
-DEPENDENCIES_PATTERN = "bietlejuice\.(\w*):(.*)"
+DEPENDENCIES_PATTERN = "bietlejuice\.(\w*):([^:]*)"
 
 
 class CrossDAGDependenciesValidator:
