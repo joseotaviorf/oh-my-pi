@@ -79,6 +79,11 @@ if __name__ == "__main__":
         )
 
         df = df.where("NOT RLIKE(message, 'error')")
+        
+        # Check if kubernetes column exists and convert it to string if present
+        if "kubernetes" in df.columns:
+            logger.info("Converting 'kubernetes' column to JSON string")
+            df = df.withColumn("kubernetes", to_json(col("kubernetes")))
 
         df = (
             df.withColumn("year", lit(execution_date.year))
