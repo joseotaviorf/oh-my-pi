@@ -2,21 +2,6 @@
 database_name: datalake_gsheets_clean
 table_name: collections_targets
 columns:
-  dt_reference:
-    lineage:
-      - datalake_gsheets_raw.collections_targets.Date
-  working_days_today:
-    lineage:
-      - datalake_gsheets_raw.collections_targets.working_days_today
-  month:
-    lineage:
-      - datalake_gsheets_raw.collections_targets.month
-  week_of_the_year:
-    lineage:
-      - datalake_gsheets_raw.collections_targets.week_of_the_year
-  day:
-    lineage:
-      - datalake_gsheets_raw.collections_targets.day
   active_flow:
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Flow
@@ -29,15 +14,15 @@ columns:
   property_owners:
     lineage:
       - datalake_gsheets_raw.collections_targets.Property_Owners
-  ended_1_90:
+  ended_1_to_90:
     lineage:
-      - datalake_gsheets_raw.collections_targets.`Ended_1-90`
-  ended_91_360:
+      - datalake_gsheets_raw.collections_targets.Ended_1_to_90
+  ended_91_to_360:
     lineage:
-      - datalake_gsheets_raw.collections_targets.`Ended_91-360`
-  ended_360_plus:
+      - datalake_gsheets_raw.collections_targets.Ended_91_to_360
+  ended_greater_360:
     lineage:
-      - datalake_gsheets_raw.collections_targets.`Ended_>360`
+      - datalake_gsheets_raw.collections_targets.Ended_greater_360
   detractor_index:
     lineage:
       - datalake_gsheets_raw.collections_targets.Detractor_index
@@ -50,27 +35,96 @@ columns:
   resolution_rate_120d:
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_120D
-  resolution_rate_120_240d:
+  resolution_rate_120_to_240d:
     lineage:
-      - datalake_gsheets_raw.collections_targets.`Resolution_Rate_120-240D`
-  resolution_rate_240d_plus:
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_120_to_240D
+  resolution_rate_greater_240d:
     lineage:
-      - datalake_gsheets_raw.collections_targets.`Resolution_Rate_240D+`
-  resolution_rate_240d_360d:
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_greater_240D
+  resolution_rate_240d_to_360d:
     lineage:
-      - datalake_gsheets_raw.collections_targets.`Resolution_Rate_240D-360D`
-  resolution_rate_360d_plus:
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_240D_to_360D
+  resolution_rate_greater_360d:
     lineage:
-      - datalake_gsheets_raw.collections_targets.`Resolution_Rate_360D+`
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_greater_360D
   resolution_rate_mob3:
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_MOB3
   process_efficiency:
     lineage:
-      - datalake_gsheets_raw.collections_targets.Eficiência_Processual
-  average_overdue_rent_anomalies_120_plus:
+      - datalake_gsheets_raw.collections_targets.Eficiencia_Processual
+  average_overdue_rent_anomalies_greater_120:
     lineage:
-      - datalake_gsheets_raw.collections_targets.`Average_Overdue_Rent_Anomalies_120+`
+      - datalake_gsheets_raw.collections_targets.Average_Overdue_Rent_Anomalies_greater_120
+  working_days_today:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.working_days_today
+  week_of_the_year:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.week_of_the_year
+  day:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.day
+  month:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.month
+  dt_reference:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Date
   ts_load:
     lineage:
       - datalake_gsheets_raw.collections_targets.ts_load
+  active_flow_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Active_Flow_forecast
+  active_stock_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Active_Stock_forecast
+  fpd_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.FPD_forecast
+  property_owners_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Property_Owners_forecast
+  ended_1_to_90_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Ended_1_to_90_forecast
+  ended_91_to_360_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Ended_91_to_360_forecast
+  ended_greater_360_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Ended_greater_360_forecast
+  detractor_index_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Detractor_index_forecast
+  active_cushion_effectiveness_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Active_Cushion_Effectiveness_forecast
+  ended_cushion_effectiveness_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Ended_Cushion_Effectiveness_forecast
+  resolution_rate_120d_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_120D_forecast
+  resolution_rate_120_to_240d_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_120_to_240D_forecast
+  resolution_rate_greater_240d_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_greater_240D_forecast
+  resolution_rate_240d_to_360d_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_240D_to_360D_forecast
+  resolution_rate_greater_360d_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_greater_360D_forecast
+  resolution_rate_mob3_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Resolution_Rate_MOB3_forecast
+  process_efficiency_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Eficiencia_Processual_forecast
+  average_overdue_rent_anomalies_greater_120_forecast:
+    lineage:
+      - datalake_gsheets_raw.collections_targets.Average_Overdue_Rent_Anomalies_greater_120_forecast
