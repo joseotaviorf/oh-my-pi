@@ -212,6 +212,20 @@ SELECT
     key_type,
     entry_model_details,
     COALESCE(migration_old_key_location, key_location) AS key_location,
+    CASE
+        COALESCE(migration_old_key_location, key_location)
+        WHEN 'OWNER' THEN 'ASSISTED_ENTRANCE'
+        WHEN 'TENANT' THEN 'ASSISTED_ENTRANCE'
+        WHEN 'INSPECTOR' THEN 'ASSISTED_ENTRANCE'
+        WHEN 'EXTERNAL_RESPONSIBLE' THEN 'ASSISTED_ENTRANCE'
+        WHEN 'EXTERNAL_TENANT' THEN 'ASSISTED_ENTRANCE'
+        WHEN 'FRONT_DOOR' THEN 'EASY_ENTRANCE'
+        WHEN 'AGENT' THEN 'EASY_ENTRANCE'
+        WHEN 'PASSWORD' THEN 'EASY_ENTRANCE'
+        WHEN 'LOCK_BOX' THEN 'EASY_ENTRANCE'
+        WHEN 'LOCKER' THEN 'EASY_ENTRANCE'
+        ELSE 'NOT_CLASSIFIED'
+    END AS entry_model_type,
     authorization_type,
     doorman_type,
     entry_model_channel,

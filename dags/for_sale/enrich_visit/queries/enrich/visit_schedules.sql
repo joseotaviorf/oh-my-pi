@@ -91,17 +91,6 @@ visit_model AS (
   WHERE
     vse.event_type IN ('VISIT_FITTED', 'VISIT_REGISTERED')
 ),
-entry_model AS (
-  SELECT
-    id_house,
-    DATE(ts_entrance_started) AS dt_entrance_started,
-    DATE(COALESCE(ts_entrance_ended, NOW())) AS dt_entrance_ended,
-    TRIM(LOWER(key_location)) AS method
-  FROM
-    datalake_ebdb_listing.house_entrance_history
-  WHERE
-    is_last_status_of_day
-),
 offer_after_booking AS (
   SELECT
     id_booking AS id_schedule,
@@ -385,15 +374,8 @@ SELECT DISTINCT
   v.code AS visit_code,
   v.business_context,
   v.business_model,
-  CASE
-    entry_model.method
-    WHEN 'front_door' THEN 'Front Door'
-    WHEN 'agent' THEN 'Keys with Agent'
-    WHEN 'lock_box' THEN 'Lockbox'
-    WHEN 'password' THEN 'Password'
-    WHEN 'locker' THEN 'Keys Locker'
-    ELSE 'Owner Present'
-  END AS method,
+  entry_model.key_location AS method,
+  entry_model.entry_model_type,
   CASE
     WHEN vm.visit_model IS NULL THEN 'STANDARD'
     ELSE vm.visit_model
@@ -453,10 +435,10 @@ LEFT JOIN
   datalake_hub_services.secretariat_hierarchy AS su
     ON su.id_user_5a = s.id_user_creator
 LEFT JOIN
-  entry_model
+  datalake_ebdb_listing.house_entrance_history AS entry_model
     ON v.id_house = entry_model.id_house
-    AND v.dt_visit >= entry_model.dt_entrance_started
-    AND v.dt_visit < entry_model.dt_entrance_ended
+    AND s.ts_schedule_created >= entry_model.ts_entrance_started
+    AND s.ts_schedule_created < COALESCE(entry_model.ts_entrance_ended, NOW())
 LEFT JOIN
   booking_3p_demand_agent AS dm
     ON s.id_schedule = dm.id_schedule

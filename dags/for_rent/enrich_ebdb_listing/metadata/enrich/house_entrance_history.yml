@@ -45,6 +45,12 @@ columns:
       - datalake_ebdb_clean.entry_access_tracking.key_holder_role
       - datalake_ebdb_clean.entry_access_tracking.entry_access_type
     description: Location of the houses's key. This field has already been migrated.
+  entry_model_type:
+    description: Type of entry models.
+    categories:
+      ASSISTED_ENTRANCE: When a third person is needed to enter.
+      EASY_ENTRANCE: When no third person is needed to enter.
+      NOT_CLASSIFIED: Unmapped case.
   authorization_type:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name

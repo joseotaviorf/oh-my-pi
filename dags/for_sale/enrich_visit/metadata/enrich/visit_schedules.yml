@@ -109,7 +109,16 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.key_location
     description:
-      How occurred the entry method.
+      How occurred the entry method. Last method before the schedule.
+  entry_model_type:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.entry_model_type
+    description:
+      Type of entry method.
+    categories:
+      ASSISTED_ENTRANCE: When a third person is needed to enter.
+      EASY_ENTRANCE: When no third person is needed to enter.
+      NOT_CLASSIFIED: Unmapped case.
   visit_model:
     lineage:
       - datalake_visit.visit_status_events.event_type
