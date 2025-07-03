@@ -1,0 +1,59 @@
+database_name: datalake_amplitude_clean
+table_name: 170698_tap_intent_selection_register_property_events
+columns:
+  id_amplitude:
+    lineage:
+    - datalake_amplitude_clean.events.id_amplitude
+    description: Column id_amplitude from Amplitude events
+  id_user:
+    lineage:
+    - datalake_amplitude_clean.events.id_user
+    description: Column id_user from Amplitude events
+  id_event:
+    lineage:
+    - datalake_amplitude_clean.events.id_event
+    description: Column id_event from Amplitude events
+  id_session:
+    lineage:
+    - datalake_amplitude_clean.events.id_session
+    description: Column id_session from Amplitude events
+  uuid:
+    lineage:
+    - datalake_amplitude_clean.events.uuid
+    description: Column uuid from Amplitude events
+  ab_beakman_onboarding_owner_flow_v2:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: Column ab_beakman_onboarding_owner_flow_v2 from Amplitude events
+  ts_event:
+    lineage:
+    - datalake_amplitude_clean.events.ts_event
+    description: Column ts_event from Amplitude events
+  ts_client_event:
+    lineage:
+    - datalake_amplitude_clean.events.ts_client_event
+    description: Column ts_client_event from Amplitude events
+  ts_client_uploaded:
+    lineage:
+    - datalake_amplitude_clean.events.ts_client_uploaded
+    description: Column ts_client_uploaded from Amplitude events
+  ts_processed:
+    lineage:
+    - datalake_amplitude_clean.events.ts_processed
+    description: Column ts_processed from Amplitude events
+  year:
+    lineage:
+    - datalake_amplitude_clean.events.year
+    description: Column year from Amplitude events
+  month:
+    lineage:
+    - datalake_amplitude_clean.events.month
+    description: Column month from Amplitude events
+  day:
+    lineage:
+    - datalake_amplitude_clean.events.day
+    description: Column day from Amplitude events
+owner: eduardo.soares@quintoandar.com.br
+domain: Growth
+description: This table contains tap_intent_selection_register_property events from app 170698. It tracks
+  user interactions and includes relevant metadata and user properties.
