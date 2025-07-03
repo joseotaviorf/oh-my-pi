@@ -130,7 +130,7 @@ def get_columns_to_sample(spark_client: SparkClient, load_start_date: str, load_
                 datalake_documentation_metrics_clean.columns_metastore
             WHERE
                 MAKE_DATE(year, month, day) BETWEEN "{load_start_date}" AND "{load_end_date}"
-                AND layer in ('enrich')
+                AND layer in ('clean', 'enrich', 'dw')
             ),
             columns_to_sample AS (
             SELECT
