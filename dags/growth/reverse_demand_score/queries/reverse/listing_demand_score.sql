@@ -176,7 +176,7 @@ scores AS (
       ELSE 0.0
     END AS good_hours_score,
     CASE
-      WHEN hdi.key_location in ('OWNER', 'NONE') OR hdi.key_location IS NULL THEN 0.0
+      WHEN hdi.key_location in ('OwnerPresent', 'None') OR hdi.key_location IS NULL THEN 0.0
       ELSE 2.7
     END AS is_easy_entry_score,
     CASE
@@ -607,9 +607,13 @@ results AS (
   FULL OUTER JOIN for_sale_score AS fs
     ON (fr.id_house = fs.id_house)
 )
-
 SELECT
-  *
-FROM
-  results
+  r.*, 
+  CASE 
+    WHEN fhlt.sk_ended_rental_confirmed_date = -1 AND dt_publication_for_rent IS NOT NULL THEN 'Ocupado' -- imoveis de rent ou hibridos
+    ELSE 'Desocupado'
+  END AS occupation_status
+FROM results AS r
+LEFT JOIN dw_offboarding.fact_house_listing_terminations  AS fhlt 
+  ON fhlt.sk_next_house_listing_consolidated = r.id_house_listing
 GROUP BY ALL
