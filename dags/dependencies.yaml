@@ -2294,6 +2294,13 @@ bietlejuice.enrich_internal_chat:
   - bietlejuice.enrich_hub_services_agents:load-enrich-member-profile
   - bietlejuice.enrich_hub_services_agents:load-enrich-users
   - bietlejuice.internal_chat:load-clean-internal-chat-messages
+bietlejuice.enrich_investigation:
+  - bietlejuice.ebdb_agent:load-clean-agent-data
+  - bietlejuice.ebdb_agent:load-clean-agent-data-types
+  - bietlejuice.ebdb_house:load-clean-house
+  - bietlejuice.ebdb_user:load-clean-user
+  - bietlejuice.enrich_amplitude_agents_app:load-enrich-agents-native-events
+  - bietlejuice.enrich_ebdb_user:load-enrich-agent-data
 bietlejuice.enrich_invoice:
   - bietlejuice.ebdb_contract:load-clean-contract
   - bietlejuice.ebdb_house:load-clean-house
