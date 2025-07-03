@@ -1,17 +1,5 @@
 bietlejuice.demand_balancer_service:
   - quintoml.search.maestro.inference:batch-predict
-bietlejuice.enrich_recommendations:
-  - bietlejuice.amplitude_new:load-clean-events
-  - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-dim-campaign
-  - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-fact-campaign-user-dispatch
-  - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
-  - bietlejuice.dw_sale_listings:load-dw-sale-fact-listing-status
-  - bietlejuice.ebdb_rent_flow:load-clean-rent-flow
-  - bietlejuice.emlio:load-clean-emlio-logs
-  - bietlejuice.enrich_sale_flows:load-enrich-sale-flow
-  - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
-  - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_condo_amenities
-  - wonka.house_main:load-house_main
 bietlejuice.search_metrics_service:
   - quintoml.search.search_monitoring.inference:batch-predict
 quintoml.growth.contract_duration_model.inference:
@@ -36,19 +24,12 @@ quintoml.growth.sale_discount_model.inference:
   - bietlejuice.ebdb_location:load-clean-region
   - bietlejuice.enrich_offer:load-enrich-sale-offer
   - bietlejuice.enrich_sale_demand_events:load-enrich-sale-demand-events
-quintoml.recs.house_user_embeddings_quintoml.inference:
-  - wonka.group_house_amenities_house_condo_amenities_house_maintenance_condition:load-house_amenities
-  - wonka.group_user_most_viewed:load-user_listing_page_viewed_cross_devices
-  - wonka.group_user_most_viewed:load-user_sale_listing_page_viewed_cross_devices
-  - wonka.house_listing_business_context:load-house_listing_business_context
-  - wonka.house_main:load-house_main
-  - wonka.user_agg_search_filters:load-user_agg_search_filters
-  - wonka.user_sale_agg_search_filters:load-user_sale_agg_search_filters
 quintoml.search.search_monitoring.inference:
   - bietlejuice.enrich_base_metrics_service:load-enrich-global-metrics
   - bietlejuice.enrich_base_metrics_service:load-enrich-search-impressions
 wonka.group_user_most_viewed:
-  - bietlejuice.amplitude_new:load-clean-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-user-merge
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_location:load-clean-region
 wonka.house_agg_rent_flows:
@@ -78,7 +59,8 @@ wonka.house_user_rent_flows:
 wonka.house_visit:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
 wonka.user_bc_h3_7_city_agg_search_filters:
-  - bietlejuice.amplitude_new:load-clean-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
   - wonka.house_main:load-house_main
 wonka.user_embeddings_main:
   - quintoml.recs.house_user_embeddings.inference:batch-predict
