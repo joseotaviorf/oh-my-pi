@@ -61,10 +61,16 @@ LEFT JOIN
         AND hdi.year = hms.year
         AND hdi.month = hms.month
         AND hdi.day = hms.day
+LEFT JOIN
+    datalake_sale_ongoing_listings.ongoing_listings_daily_info AS oldi
+        ON oldi.id_house = hms.id_house
+        AND oldi.year = hms.year
+        AND oldi.month = hms.month
+        AND oldi.day = hms.day
 WHERE
     MAKE_DATE(hms.year, hms.month, hms.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    AND hms.business_context = 'RENT'
     AND hdi.uuid_company IS NULL
+    AND oldi.sk_company IS NULL
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY hms.id_house ORDER BY hdi.dt_day DESC) = 1
 
