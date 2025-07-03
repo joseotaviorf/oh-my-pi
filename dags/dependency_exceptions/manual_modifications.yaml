@@ -681,7 +681,7 @@ bietlejuice.enrich_tracksale:
     - bietlejuice.enrich_sale_firestore:load-enrich-sale-offer
 bietlejuice.enrich_tracksale_dispatches:
   remove:
-    - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
+    - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline
 bietlejuice.dw_quintocred_ifrs:
   remove:
     - bietlejuice.enrich_velo_omie:load-enrich-cash-flows
@@ -851,7 +851,7 @@ bietlejuice.reverse_tracksale:
     - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing
     - bietlejuice.dw_sale_offers:load-dw-sale-dim-offer
     - bietlejuice.dw_sale_visits:load-dw-sale-fact-visits
-    - bietlejuice.enrich_invoice:load-enrich-overdue-portfolio-timeline
+    - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline
 bietlejuice.reverse_webhelp_access:
   add:
     - bietlejuice.reverse_webhelp:load-reverse-backlog-metric

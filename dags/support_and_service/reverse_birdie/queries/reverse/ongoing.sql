@@ -55,7 +55,7 @@ ppm_ongoing_rentals AS (
     AND dd.date < CURRENT_DATE
     AND dc.type <> 'DealOnly'
     AND EXTRACT(YEAR FROM dd.date) >= 2024
-), 
+),
 base_nps AS (
   SELECT
     ans.sk_nps_answer,
@@ -101,9 +101,9 @@ base_nps AS (
     ON fhl.sk_contract = c.sk_contract
   LEFT JOIN dw_public.dim_region AS dr
     ON fhl.sk_region = dr.sk_region
-  LEFT JOIN ppm_ongoing_rentals multi 
+  LEFT JOIN ppm_ongoing_rentals multi
     ON multi.sk_contract = c.sk_contract
-  LEFT JOIN dw_rent.dim_contract dc 
+  LEFT JOIN dw_rent.dim_contract dc
   ON dc.sk_contract = disp.sk_contract
   WHERE
     disp.sk_nps_answer > 0
@@ -451,49 +451,49 @@ col_tab AS (
     nps.campanha_nps,
     nps.score_category,
     nps.data_resposta_nps,
-    COUNT(DISTINCT 
-          CASE WHEN t.dt_reference <= DATE(nps.ts_answered) 
+    COUNT(DISTINCT
+          CASE WHEN t.dt_reference <= DATE(nps.ts_answered)
           THEN t.id_contract END) AS Coll,
-    COUNT(DISTINCT 
-          CASE WHEN t.debtor_type = 'Stock' 
-          AND t.dt_reference <= DATE(nps.ts_answered) 
+    COUNT(DISTINCT
+          CASE WHEN t.debtor_type = 'Stock'
+          AND t.dt_reference <= DATE(nps.ts_answered)
           THEN t.id_contract END) AS Coll_Stock,
-    COUNT(DISTINCT 
-          CASE WHEN t.debtor_type = 'Flow' 
-          AND t.dt_reference <= DATE(nps.ts_answered) 
+    COUNT(DISTINCT
+          CASE WHEN t.debtor_type = 'Flow'
+          AND t.dt_reference <= DATE(nps.ts_answered)
           THEN t.id_contract END)AS Coll_Flow,
-    COUNT(DISTINCT 
-          CASE WHEN t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '30' DAY) 
-          AND DATE(nps.ts_answered) 
+    COUNT(DISTINCT
+          CASE WHEN t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '30' DAY)
+          AND DATE(nps.ts_answered)
           THEN t.id_contract END) AS Coll_1_mes,
-    COUNT(DISTINCT 
-          CASE WHEN t.debtor_type = 'Stock' 
-          AND t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '30' DAY) 
+    COUNT(DISTINCT
+          CASE WHEN t.debtor_type = 'Stock'
+          AND t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '30' DAY)
           AND DATE(nps.ts_answered) THEN t.id_contract END) AS Coll_Stock_1_mes,
-    COUNT(DISTINCT 
-          CASE WHEN t.debtor_type = 'Flow' 
-          AND t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '30' DAY) 
+    COUNT(DISTINCT
+          CASE WHEN t.debtor_type = 'Flow'
+          AND t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '30' DAY)
           AND DATE(nps.ts_answered) THEN t.id_contract END) AS Coll_Flow_1_mes,
-    COUNT(DISTINCT 
-          CASE WHEN t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '90' DAY) 
+    COUNT(DISTINCT
+          CASE WHEN t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '90' DAY)
           AND DATE(nps.ts_answered) THEN t.id_contract END) AS Coll_3_mes,
-    COUNT(DISTINCT 
-          CASE WHEN t.debtor_type = 'Stock' 
-          AND t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '90' DAY) 
+    COUNT(DISTINCT
+          CASE WHEN t.debtor_type = 'Stock'
+          AND t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '90' DAY)
           AND DATE(nps.ts_answered) THEN t.id_contract END) AS Coll_Stock_3_mes,
-    COUNT(DISTINCT 
-          CASE WHEN t.debtor_type = 'Flow' 
-          AND t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '90' DAY) 
+    COUNT(DISTINCT
+          CASE WHEN t.debtor_type = 'Flow'
+          AND t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '90' DAY)
           AND DATE(nps.ts_answered) THEN t.id_contract END) AS Coll_Flow_3_mes,
-    COUNT(DISTINCT 
-          CASE WHEN t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '180' DAY) 
+    COUNT(DISTINCT
+          CASE WHEN t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '180' DAY)
           AND DATE(nps.ts_answered) THEN t.id_contract END) AS Coll_6_mes,
-    COUNT(DISTINCT 
-          CASE WHEN t.debtor_type = 'Stock' 
-          AND t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '180' DAY) 
+    COUNT(DISTINCT
+          CASE WHEN t.debtor_type = 'Stock'
+          AND t.dt_reference BETWEEN DATE(nps.ts_answered - INTERVAL '180' DAY)
           AND DATE(nps.ts_answered) THEN t.id_contract END) AS Coll_Stock_6_mes
   FROM base_nps AS nps
-  LEFT JOIN datalake_invoice.overdue_portfolio_timeline AS t
+  LEFT JOIN datalake_collections_quintoandar.overdue_portfolio_timeline AS t
     ON nps.sk_contract = t.id_contract
   GROUP BY
     nps.sk_nps_answer,
@@ -647,12 +647,12 @@ tabela_final AS (
     /* Relisting */
     CASE WHEN br.indicador_relisting > 0 THEN 1 ELSE 0 END AS relisting
   FROM base_nps AS nps
-  LEFT JOIN tickets AS tkt 
+  LEFT JOIN tickets AS tkt
     ON nps.user_contrato = tkt.user_contrato
-  LEFT JOIN col_tab    AS col 
+  LEFT JOIN col_tab    AS col
     ON col.sk_nps_answer = nps.sk_nps_answer
-  LEFT JOIN num_houses AS nh  
-    ON nps.sk_user = nh.sk_owner 
+  LEFT JOIN num_houses AS nh
+    ON nps.sk_user = nh.sk_owner
     AND nps.customer_type = 'PP'
   LEFT JOIN bd_relisting AS br
     ON br.contrato_relisting = nps.sk_contract
@@ -703,15 +703,15 @@ SELECT
   jd.sk_user  AS author_id,
   CONCAT(
     CAST(jd.sk_contract AS STRING), '_',
-    CASE 
-      WHEN jd.customer_type = 'IQ' 
+    CASE
+      WHEN jd.customer_type = 'IQ'
       THEN 'tenant'
       ELSE 'landlord' END
   ) AS account_id,
-  CASE 
-    WHEN jd.customer_type = 'IQ' 
-    THEN 'tenant' 
-    ELSE 'landlord' 
+  CASE
+    WHEN jd.customer_type = 'IQ'
+    THEN 'tenant'
+    ELSE 'landlord'
   END AS customer_type,
   jd.score AS rating,
   jd.score_category,
@@ -741,6 +741,6 @@ SELECT
   day(jd.data_resposta_nps) AS day,
   NOW() AS ts_load
 FROM joined jd
-WHERE 
+WHERE
   DATE(jd.data_resposta_nps) >= DATE('{load_start_date}')
 QUALIFY ROW_NUMBER() OVER(PARTITION BY jd.sk_contract, jd.customer_type ORDER BY jd.data_resposta_nps ASC) = 1

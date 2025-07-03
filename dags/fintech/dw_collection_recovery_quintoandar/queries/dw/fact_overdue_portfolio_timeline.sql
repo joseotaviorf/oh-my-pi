@@ -81,7 +81,7 @@ SELECT
     o.dt_reference,
     NOW() AS ts_load
 FROM
-    datalake_invoice.overdue_portfolio_timeline AS o
+    datalake_collections_quintoandar.overdue_portfolio_timeline AS o
 LEFT JOIN
     datalake_recupera.contract_advisory_distribution AS rc
       ON o.id_contract = rc.id_contract

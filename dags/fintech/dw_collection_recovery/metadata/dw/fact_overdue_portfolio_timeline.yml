@@ -7,32 +7,32 @@ owner: ae-finance-fintech@quintoandar.com.br
 columns:
   sk_overdue_portfolio_timeline:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.id_invoice
-      - datalake_invoice.overdue_portfolio_timeline.dt_reference
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.id_invoice
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.dt_reference
     description: Surrogate key of table. It is the concat between id_invoice and dt_reference
   sk_contract:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.id_contract
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.id_contract
     description: Contract ID
   id_invoice:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.id_invoice
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.id_invoice
     description: Invoice ID
   id_proposal:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.id_invoice
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.id_invoice
     description: Proposal ID
   contract_status:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.contract_status
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.contract_status
     description: Contract status
   invoice_type:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.invoice_type
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.invoice_type
     description: Invoice's type frequency - monthly, extra, pos rental, onboarding, early termination...
   payment_status:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.payment_status
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.payment_status
     description: Payment status on the reference date
     categories:
       open: ""
@@ -42,15 +42,15 @@ columns:
   is_ssn:
     lineage:
       - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.id_invoice
-      - datalake_invoice.overdue_portfolio_timeline.reason
-      - datalake_invoice.overdue_portfolio_timeline.payment_status
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.reason
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.payment_status
       - datalake_trato_feito_clean.debt.id_external
     description: "Boolean to indicate if the invoice was paid by SSN - Self Service Negotiation."
   type_ssn:
     lineage:
       - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.id_invoice
-      - datalake_invoice.overdue_portfolio_timeline.reason
-      - datalake_invoice.overdue_portfolio_timeline.payment_status
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.reason
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.payment_status
       - datalake_trato_feito_clean.debt.id_external
     description: Indicate the type of SSN.
     categories:
@@ -59,8 +59,8 @@ columns:
   recovery_method:
     lineage:
       - datalake_amplitude_clean.170698_pending_invoices_invoice_pay_button_clicked_events.id_invoice
-      - datalake_invoice.overdue_portfolio_timeline.reason
-      - datalake_invoice.overdue_portfolio_timeline.payment_status
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.reason
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.payment_status
       - datalake_trato_feito_clean.debt.id_external
     description: "Recovery Method"
     categories:
@@ -71,50 +71,50 @@ columns:
       Negotiation installments (extra): ""
   debtor_type:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.debtor_type
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.debtor_type
     description: "Debtor type: Flow or Stock"
     categories:
       Flow: customers that are new in the Portfolio. The day the flow contracts enters the portfolio is the first day of the overdue (i.e first business day after the due date).
       Stock: customers that were already in the portfolio in the last month. Important to notice that the cut off date to this reference is the first day of the month.
   delay_contamined_at_closure:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.delay_contamined_at_closure
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.delay_contamined_at_closure
     description: Delay contamined at closure (Days that define delay_contract_range and delay_contamined_range)
   delay_contamined_range:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.delay_contamined_range
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.delay_contamined_range
     description: Delay contamined range. We calculate it based on the contract and not the invoice
   delay_contract_range:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.delay_contract_range
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.delay_contract_range
     description: Same delay contamined range used for pdd. We calculate it based on the contract and not the invoice
   contract_overdue_invoices:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.contract_overdue_invoices
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.contract_overdue_invoices
     description: Total number of overdue invoices in a contract on the reference date
   due_amount:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.due_amount
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.due_amount
     description: Invoice due amount
   paid_amount:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.paid_amount
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.paid_amount
     description: Invoice paid amount
   recovered_amount:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.recovered_amount
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.recovered_amount
     description: Amount recovered between reference month start and reference date
   contract_debt:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.contract_debt
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.contract_debt
     description: Debt of the contract
   business_day:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.business_day
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.business_day
     description: Working days accumulated up to the reference date
   is_last_business_days:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.is_last_business_days
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.is_last_business_days
     description: Boolean to inform whether it is the most recent date among days with the same business day, same invoice and month. It deduplicates the calculations per business day.
   advisory:
     lineage:
@@ -137,27 +137,27 @@ columns:
     description: Boolean to indicate if the invoice record is the most recent in that month.
   dt_invoice_paid:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.dt_invoice_paid
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.dt_invoice_paid
     description: Invoice paid date
   dt_invoice_due:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.dt_invoice_due
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.dt_invoice_due
     description: Invoice due date
   dt_invoice_due_adjust:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.dt_invoice_due_adjust
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.dt_invoice_due_adjust
     description: Invoice due date adjust for next business day
   dt_month_start:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.dt_month_start
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.dt_month_start
     description: The first day of the month of reference date
   dt_month_end:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.dt_month_end
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.dt_month_end
     description: The last day of the month of reference date
   dt_reference:
     lineage:
-      - datalake_invoice.overdue_portfolio_timeline.dt_reference
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.dt_reference
     description: Invoice timeline reference date
   ts_load:
     description: "Timestamp of when the data was inserted into the table"

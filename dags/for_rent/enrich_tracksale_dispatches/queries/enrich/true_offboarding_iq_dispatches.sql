@@ -46,7 +46,7 @@ stock_contracts AS (  -- Contracts that must be filtered out due to being stock 
   SELECT DISTINCT
     op.id_contract
   FROM
-    datalake_invoice.overdue_portfolio_timeline AS op
+    datalake_collections_quintoandar.overdue_portfolio_timeline AS op
     -- We're not considering this table as a dependency for the DAG due to being a context that runs during by the day and is out of our SLA.
     -- So related to this data, we're only dealing here with D-2 results.
   JOIN

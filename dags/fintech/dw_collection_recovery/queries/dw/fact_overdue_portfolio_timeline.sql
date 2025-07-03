@@ -138,7 +138,7 @@ SELECT
     o.dt_reference,
     NOW() AS ts_load
 FROM
-    datalake_invoice.overdue_portfolio_timeline AS o
+    datalake_collections_quintoandar.overdue_portfolio_timeline AS o
 LEFT JOIN
     ssn_original_payment AS possn
         ON possn.id_invoice = o.id_invoice

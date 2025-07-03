@@ -19,6 +19,8 @@ workflow:
       - debt_negotiated
       - installment
       - negotiation
+    overdue_portfolio_timeline:
+      - invoice_portfolio
   tables_customization:
     delinquency_app_events:
       extraction_type: incremental

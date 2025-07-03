@@ -29,7 +29,7 @@ stock_contracts AS (  -- Contracts that must be filtered out due to being stock 
   SELECT DISTINCT
     op.id_contract
   FROM
-    datalake_invoice.overdue_portfolio_timeline AS op
+    datalake_collections_quintoandar.overdue_portfolio_timeline AS op
   WHERE
     op.debtor_type = 'Stock'
     AND op.dt_reference BETWEEN (DATE(NOW()) - INTERVAL '180' DAY) AND DATE(NOW())
