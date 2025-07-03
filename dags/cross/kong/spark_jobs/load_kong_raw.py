@@ -15,7 +15,7 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from pyspark.sql.functions import lit, to_json
+from pyspark.sql.functions import lit, to_json, col
 
 JOB_NAME = "load_kong_raw"
 SOURCE = "kong"
