@@ -54,7 +54,7 @@ lead_origin_amplitude AS (
     ts_event
   FROM datalake_amplitude_lead.lead_origin
   WHERE DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY COALESCE(formfield_lead_uuid, id_firestore, id_lead) ORDER BY ts_event) = 1 -- Getting the first event
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY COALESCE(formfield_lead_uuid, id_firestore, id_lead) ORDER BY ts_event) = 1 -- Works if formfield_lead_uuid is a NULL
 ),
 
 mid_table AS (
@@ -62,11 +62,11 @@ mid_table AS (
     r.id_lead AS id_lead,
     r.id_lead_ebdb AS id_lead_ebdb,
     COALESCE(r.affiliate_type, atf.first_affiliate_type) AS affiliate_type,
-    COALESCE(r.campaign, a.campaign, a2.campaign) AS campaign,
-    COALESCE(r.medium, a.medium, a2.medium) AS medium,
-    COALESCE(r.source, a.source, a2.source) AS source,
-    COALESCE(r.content, a.content, a2.content) AS content,
-    COALESCE(r.term, a.term, a2.term) AS term,
+    COALESCE(IF(r.campaign == '', NULL, r.campaign), a.campaign, a2.campaign) AS campaign,
+    COALESCE(IF(r.medium == '', NULL, r.medium), a.medium, a2.medium) AS medium,
+    COALESCE(IF(r.source == '', NULL, r.source), a.source, a2.source) AS source,
+    COALESCE(IF(r.content == '', NULL, r.content), a.content, a2.content) AS content,
+    COALESCE(IF(r.term == '', NULL, r.term), a.term, a2.term) AS term,
     r.ops_agent,
     r.ops_partner,
     r.application,
@@ -74,7 +74,7 @@ mid_table AS (
     r.landing_page,
     r.ops_approach,
     r.ops_contact_medium,
-    COALESCE(r.platform, a.platform, a2.platform) AS platform,
+    COALESCE(IF(r.platform == '', NULL, r.platform), a.platform, a2.platform) AS platform,
     r.lead_type,
     r.detailed_route,
     r.original_lead,

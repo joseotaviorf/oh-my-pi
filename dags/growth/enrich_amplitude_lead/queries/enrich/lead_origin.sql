@@ -248,7 +248,7 @@ app_183047_form_submitted_events_rene AS (
     SELECT
         app_183047_form_submitted_events.id_lead_ebdb AS id_lead,
         NULL AS id_firestore,
-        COALESCE(rene.id, app_183047_form_submitted_events.formfield_lead_uuid, '') AS formfield_lead_uuid,
+        COALESCE(rene.id, app_183047_form_submitted_events.formfield_lead_uuid) AS formfield_lead_uuid,
         4 AS rule_num,
         'formfield' AS rule,
         user_country,
@@ -392,12 +392,12 @@ lead_events_union AS (
     SELECT
         *,
         RANK() OVER(PARTITION BY formfield_lead_uuid ORDER BY ts_event DESC) AS rn
-    FROM app_183047_form_submitted_events_rene WHERE formfield_lead_uuid IS NOT NULL
+    FROM app_183047_form_submitted_events_rene WHERE formfield_lead_uuid IS NOT NULL -- retrieving data firebase cases
     UNION
     SELECT
         *,
         RANK() OVER(PARTITION BY id_lead ORDER BY ts_event DESC) AS rn
-    FROM app_183047_form_submitted_events_rene WHERE id_lead IS NOT NULL
+    FROM app_183047_form_submitted_events_rene WHERE id_lead IS NOT NULL -- retrieving data from v2 lead creation API cases
     UNION
     SELECT
         *,
