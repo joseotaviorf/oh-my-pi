@@ -15,7 +15,7 @@ SELECT
     NULLIF(`Resolution_Rate_240D-360D`, '') AS resolution_rate_240d_360d,
     NULLIF(`Resolution_Rate_360D+`, '') AS resolution_rate_360d_plus,
     NULLIF(Resolution_Rate_MOB3, '') AS resolution_rate_mob3,
-    NULLIF(Eficiência_Processual, '') AS process_efficiency,
+    NULLIF(`Eficiência_Processual`, '') AS process_efficiency,
     NULLIF(`Average_Overdue_Rent_Anomalies_120+`, '') AS average_overdue_rent_anomalies_120_plus,
     NULLIF(working_days_today, '') AS working_days_today,
     NULLIF(week_of_the_year, '') AS week_of_the_year,
