@@ -1,5 +1,5 @@
 SELECT
-    iid_amplitude,
+    id_amplitude,
     ids_amplitude_attributed,
     CAST((GET_JSON_OBJECT(event_properties, '$.house_id')) AS BIGINT) AS id_house,
     id_user,
