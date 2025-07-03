@@ -1,8 +1,7 @@
 bietlejuice.demand_balancer_service:
   - quintoml.search.maestro.inference:batch-predict
 bietlejuice.enrich_recommendations:
-  - bietlejuice.amplitude:load-clean-events
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.amplitude_new:load-clean-events
   - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-dim-campaign
   - bietlejuice.dw_braze_events_user_dispatch:load-dw-braze-fact-campaign-user-dispatch
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listing-status
@@ -49,8 +48,7 @@ quintoml.search.search_monitoring.inference:
   - bietlejuice.enrich_base_metrics_service:load-enrich-global-metrics
   - bietlejuice.enrich_base_metrics_service:load-enrich-search-impressions
 wonka.group_user_most_viewed:
-  - bietlejuice.amplitude:load-clean-170698-user-merge
-  - bietlejuice.amplitude:load-subpartitioned-event-tables-to-clean
+  - bietlejuice.amplitude_new:load-clean-events
   - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.ebdb_location:load-clean-region
 wonka.house_agg_rent_flows:
@@ -80,8 +78,7 @@ wonka.house_user_rent_flows:
 wonka.house_visit:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
 wonka.user_bc_h3_7_city_agg_search_filters:
-  - bietlejuice.amplitude:load-clean-170698-search-page-viewed-events
-  - bietlejuice.amplitude:load-clean-170698-search-results-page-viewed-events
+  - bietlejuice.amplitude_new:load-clean-events
   - wonka.house_main:load-house_main
 wonka.user_embeddings_main:
   - quintoml.recs.house_user_embeddings.inference:batch-predict
