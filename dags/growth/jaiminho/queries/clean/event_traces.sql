@@ -1,7 +1,7 @@
 SELECT
     CAST(id AS BIGINT) AS id,
-    CAST(traceId AS BIGINT) AS id_trace,
-    CAST(entityId AS BIGINT) AS id_entity,
+    CAST(traceId AS STRING) AS id_trace,
+    CAST(entityId AS STRING) AS id_entity,
     entityName AS entity_name,
     destination,
     status,
