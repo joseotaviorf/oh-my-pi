@@ -24,6 +24,7 @@ workflow:
         - "{{ data_interval_start | ds }}"
       run_optimize: false
       run_vacuum: false
+      has_hive_sync: false
 cluster:
   type: databricks_13_3_high_mem_driver_high_mem_nodes
   databricks_conn_id: databricks_new
