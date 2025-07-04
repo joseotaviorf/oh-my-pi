@@ -123,9 +123,9 @@ bietlejuice.dw_collection_recovery:
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-person
   - bietlejuice.dw_velo:load-dw-velo-dim-velo-propose-values
   - bietlejuice.dw_velo:load-dw-velo-fact-velo-propose
+  - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
-  - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
   - bietlejuice.enrich_recupera:load-enrich-collection
   - bietlejuice.enrich_recupera:load-enrich-installment
@@ -163,6 +163,7 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_collections_quintoandar:load-enrich-invoice-portfolio
   - bietlejuice.enrich_collections_quintoandar:load-enrich-negotiation
   - bietlejuice.enrich_collections_quintoandar:load-enrich-operators
+  - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline
   - bietlejuice.enrich_cyber:load-enrich-agencies
   - bietlejuice.enrich_cyber:load-enrich-collection
   - bietlejuice.enrich_cyber:load-enrich-contract-agency-distribution
@@ -170,7 +171,6 @@ bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_debt_recovery:load-enrich-debt
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
-  - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
@@ -1490,6 +1490,7 @@ bietlejuice.enrich_chatbot:
   - bietlejuice.chat_fup:load-clean-rating
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-tickets
   - bietlejuice.sauron:load-clean-session
 bietlejuice.enrich_ciq:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house
@@ -1516,20 +1517,20 @@ bietlejuice.enrich_collections_quintoandar:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-pi-negotiation-payment-option-clicked-events
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-rm-invoice-payment-option-clicked-events
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-rm-pending-invoices-page-viewed-events
+  - bietlejuice.ebdb_house:load-clean-house
   - bietlejuice.enrich_cyber:load-enrich-installment
   - bietlejuice.enrich_cyber:load-enrich-negotiation
   - bietlejuice.enrich_cyber:load-enrich-users
   - bietlejuice.enrich_debt_recovery:load-enrich-installment
   - bietlejuice.enrich_debt_recovery:load-enrich-negotiation
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract
+  - bietlejuice.enrich_proposal:load-enrich-proposal
   - bietlejuice.enrich_retsuko:load-enrich-invoice
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info
   - bietlejuice.meetcall:load-clean-operators
   - bietlejuice.trato_feito:load-clean-client
   - bietlejuice.trato_feito:load-clean-contract
   - bietlejuice.trato_feito:load-clean-debt
-  - bietlejuice.ebdb_house:load-clean-house
-  - bietlejuice.enrich_proposal:load-enrich-proposal
 bietlejuice.enrich_collections_quintocred:
   - bietlejuice.enrich_velo:load-enrich-propose
   - bietlejuice.enrich_velo:load-enrich-propose-person
@@ -3867,10 +3868,10 @@ bietlejuice.reverse_birdie:
   - bietlejuice.ebdb_user:load-clean-user-pro-owner
   - bietlejuice.ebdb_visit:load-clean-booking
   - bietlejuice.ebdb_visit:load-clean-visit
+  - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline
   - bietlejuice.enrich_customer_support:load-enrich-email
   - bietlejuice.enrich_ebdb_contract:load-enrich-contract-person
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity
-  - bietlejuice.enrich_collections_quintoandar:load-enrich-overdue-portfolio-timeline
   - bietlejuice.enrich_nps_quintocred:load-enrich-broker-contact-info
   - bietlejuice.enrich_offboarding:load-enrich-contract-termination
   - bietlejuice.enrich_pro_owners:load-enrich-daily-owner-category

@@ -266,8 +266,9 @@ bietlejuice.enrich_chatbot:
     - bietlejuice.copilot_service:load-clean-message
     - bietlejuice.copilot_service:load-clean-session
   add:
-      - bietlejuice.copilot_service:load-clean-message:first-run-of-day
-      - bietlejuice.copilot_service:load-clean-session:first-run-of-day
+    - bietlejuice.copilot_service:load-clean-message:first-run-of-day
+    - bietlejuice.copilot_service:load-clean-session:first-run-of-day
+    - bietlejuice.enrich_customer_support:load-enrich-tickets
 bietlejuice.enrich_collections_quintoandar:
   remove:
     - bietlejuice.paschoalotto:load-clean-user
