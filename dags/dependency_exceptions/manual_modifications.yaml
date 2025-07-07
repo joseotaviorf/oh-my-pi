@@ -196,6 +196,9 @@ bietlejuice.dw_sale_visits:
   remove:
     - bietlejuice.ebdb_user:load-clean-user
     - bietlejuice.enrich_booking:load-enrich-booking
+bietlejuice.dw_sap_accounting_process:
+  remove:
+    - bietlejuice.enrich_sap_accounting_process:load-enrich-reverse-accounts-420003-420019-420020-420025-611012
 bietlejuice.dw_table_snapshot:
   remove:
     - bietlejuice.enrich_airflow:load-enrich-dag

@@ -15,12 +15,14 @@ SELECT
   is_correctness,
   is_temporality,
   is_compliance,
+  FALSE AS is_accounting_process_reversed,
   accounting_process_status,
   error_description,
   accrual_year_month,
   dt_source_trigger,
   dt_sap_reference,
   dt_sap_created,
+  dt_source_trigger AS dt_filter,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_provision
@@ -44,12 +46,14 @@ SELECT
   is_correctness,
   is_temporality,
   is_compliance,
+  FALSE AS is_accounting_process_reversed,
   accounting_process_status,
   error_description,
   accrual_year_month,
   dt_source_trigger,
   dt_sap_reference,
   dt_sap_created,
+  dt_source_trigger AS dt_filter,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_revenue_share
@@ -73,12 +77,14 @@ SELECT
   is_correctness,
   is_temporality,
   is_compliance,
+  FALSE AS is_accounting_process_reversed,
   accounting_process_status,
   error_description,
   accrual_year_month,
   dt_source_trigger,
   dt_sap_reference,
   dt_sap_created,
+  dt_source_trigger AS dt_filter,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_revenue_accounting
@@ -102,12 +108,45 @@ SELECT
   is_correctness,
   is_temporality,
   is_compliance,
+  TRUE AS is_accounting_process_reversed,
   accounting_process_status,
   error_description,
   accrual_year_month,
   dt_source_trigger,
   dt_sap_reference,
   dt_sap_created,
+  dt_sap_reference AS dt_filter,
+  NOW() AS ts_load
+FROM 
+  datalake_sap_accounting_process.reverse_accounts_420003_420019_420020_420025_611012
+
+UNION ALL
+
+SELECT
+  id_accounting_process AS sk_accounting_process,
+  id_business_entity,
+  id_finance_entity,
+  id_finance_entity_entry,
+  version,
+  business_unit,
+  source_name,
+  accounting_type,
+  account_number,
+  accounting_name,
+  source_amount,
+  sap_amount,
+  is_completeness,
+  is_correctness,
+  is_temporality,
+  is_compliance,
+  FALSE AS is_accounting_process_reversed,
+  accounting_process_status,
+  error_description,
+  accrual_year_month,
+  dt_source_trigger,
+  dt_sap_reference,
+  dt_sap_created,
+  dt_source_trigger AS dt_filter,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_invoice
@@ -131,12 +170,14 @@ SELECT
   is_correctness,
   is_temporality,
   is_compliance,
+  FALSE AS is_accounting_process_reversed,
   accounting_process_status,
   error_description,
   accrual_year_month,
   dt_source_trigger,
   dt_sap_reference,
   dt_sap_created,
+  dt_source_trigger AS dt_filter,
   NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.retsuko_invoice_unified
@@ -160,12 +201,14 @@ SELECT
     is_correctness_compliance AS is_correctness,
     is_temporality_compliance AS is_temporality,
     is_compliance,
+    FALSE AS is_accounting_process_reversed,
     CAST(NULL AS STRING) AS accounting_process_status,
     CAST(NULL AS STRING) AS error_description,
     accrual_year_month,
     dt_source_trigger,
     dt_sap_reference,
     dt_sap_created,
+    dt_source_trigger AS dt_filter,
     NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.kill_queue_reservation_issuance
@@ -189,12 +232,14 @@ SELECT
     is_correctness_compliance AS is_correctness,
     is_temporality_compliance AS is_temporality,
     is_compliance,
+    FALSE AS is_accounting_process_reversed,
     CAST(NULL AS STRING) AS accounting_process_status,
     CAST(NULL AS STRING) AS error_description,
     CAST(NULL AS INTEGER) AS accrual_year_month,
     dt_bank_paid AS dt_source_trigger,
     dt_sap_reference,
     dt_sap_created,
+    dt_source_trigger AS dt_filter,
     NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.quintocred_bank_settlement
@@ -218,12 +263,14 @@ SELECT
     is_correctness_compliance AS is_correctness,
     is_temporality_compliance AS is_temporality,
     is_compliance,
-    accrual_year_month,
+    FALSE AS is_accounting_process_reversed,
     CAST(NULL AS STRING) AS accounting_process_status,
     CAST(NULL AS STRING) AS error_description,
+    accrual_year_month,
     dt_billing AS dt_source_trigger,
     dt_sap_reference,
     dt_sap_created,
+    dt_source_trigger AS dt_filter,
     NOW() AS ts_load
 FROM
     datalake_sap_accounting_process.for_rent_bank_settlement
