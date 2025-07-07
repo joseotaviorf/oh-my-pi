@@ -15,18 +15,18 @@ columns:
   name:
     description: 'The name of the content provider (e.g., "Coursera", "LinkedIn Learning").'
     lineage:
-      - datalake_degreed_raw.providers.attributtes.name
+      - datalake_degreed_raw.providers.attributes.name
   url:
     description: 'The base URL for the content providers website.'
     lineage:
-      - datalake_degreed_raw.providers.attributtes.url
+      - datalake_degreed_raw.providers.attributes.url
   provider_content_visibility:
     description: 'Defines the visibility level for content from this provider within the organization.'
     lineage:
-      - datalake_degreed_raw.providers.attributtes.provider_content_visibility
+      - datalake_degreed_raw.providers.attributes.provider_content_visibility
   is_active:
     description: 'A boolean flag indicating if the provider integration is currently active.'
     lineage:
-      - datalake_degreed_raw.providers.attributtes.is_active
+      - datalake_degreed_raw.providers.attributes.is_active
   ts_load:
     description: 'Timestamp indicating when the record was loaded into the clean table.'

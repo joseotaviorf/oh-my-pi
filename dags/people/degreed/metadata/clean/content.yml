@@ -1,0 +1,101 @@
+---
+database_name: datalake_degreed_clean
+table_name: content
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  This table contains a comprehensive catalog of all learning content available
+  in the Degreed platform, excluding items marked as obsolete. Each row represents
+  a unique piece of content, such as an article, video, course, or book.
+
+columns:
+  id:
+    description: 'Unique identifier for the content item within Degreed.'
+    lineage:
+      - datalake_degreed_raw.content.id
+  id_external:
+    description: 'The identifier for the content item from its original source or provider.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.external_id
+  id_owner:
+    description: 'The unique identifier of the user or entity that owns or added the content.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.owner_id
+  url_degreed:
+    description: 'The URL to access this content item directly within the Degreed platform.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.degreed_url
+  url_content:
+    description: 'The direct URL to the content on the external providers website.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.url
+  url_image:
+    description: 'URL for the contents thumbnail or cover image.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.image_url
+  title:
+    description: 'The title of the learning content.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.title
+  summary:
+    description: 'A brief summary or description of the content.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.summary
+  format:
+    description: 'The general format of the content (e.g., "Video", "Article", "Course").'
+    lineage:
+      - datalake_degreed_raw.content.attributes.format
+  owner_type:
+    description: 'The type of entity that owns the content (e.g., "User", "Organization").'
+    lineage:
+      - datalake_degreed_raw.content.attributes.owner_type
+  provider:
+    description: 'The name of the content source or provider (e.g., "YouTube", "Coursera", "Internal").'
+    lineage:
+      - datalake_degreed_raw.content.attributes.provider
+  language:
+    description: 'The language of the content (e.g., "en", "pt-br").'
+    lineage:
+      - datalake_degreed_raw.content.attributes.language
+  duration_type:
+    description: 'The unit of measurement for the contents duration (e.g., "minutes", "hours").'
+    lineage:
+      - datalake_degreed_raw.content.attributes.duration_type
+  content_type:
+    description: 'The specific type of the content, which can be more granular than format (e.g., "Course", "Video").'
+    lineage:
+      - datalake_degreed_raw.content.attributes.content_type
+  owner:
+    description: 'The name of the content owner.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.owner
+  duration:
+    description: 'The numerical value for the length of the content, corresponding to the duration_type.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.duration
+  learning_minutes:
+    description: 'The estimated or actual duration of the content, standardized in minutes.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.learning_minutes
+  is_obsolete:
+    description: 'A boolean flag indicating if the content is considered obsolete or outdated.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.is_obsolete
+  is_internal:
+    description: 'A boolean flag indicating if the content is hosted internally versus from an external provider.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.is_internal
+  dt_published:
+    description: 'The original publication date of the content.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.publish_date
+  ts_created:
+    description: 'Timestamp indicating when the content was first added to Degreed.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.created_at
+  ts_modified:
+    description: 'Timestamp indicating the last time the contents metadata was modified in Degreed.'
+    lineage:
+      - datalake_degreed_raw.content.attributes.modified_at
+  ts_load:
+    description: 'Timestamp indicating when the record was loaded into the clean table.'

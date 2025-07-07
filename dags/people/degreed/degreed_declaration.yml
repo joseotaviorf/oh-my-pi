@@ -40,9 +40,113 @@ workflow:
     load_start_date: "{{ macros.ds_add(data_interval_start | ds, -1) }}"
     load_end_date: "{{ data_interval_start | ds }}"
   tables_customization:
+    accomplishments:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - scope: "accomplishments:read"
+          base_filters:
+            "filter[start_date]": "load_start_date"
+            "filter[end_date]": "load_end_date"
+            "limit": "1000"
+    certifiable_skills:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "user_skills:read"
+          base_filters:
+            "limit": "1000"
+    certificates:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - scope: "certificates:read"
+          base_filters:
+            "filter[start_date]": "load_start_date"
+            "filter[end_date]": "load_end_date"
+            "limit": "1000"
+    completions:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - scope: "completions:read"
+          base_filters:
+            "filter[added_after]": "load_start_date"
+            "filter[added_before]": "load_end_date"
+            "limit": "1000"
+    content:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "content:read"
+          base_filters:
+            "filter[include_restricted]": "true"
+            "limit": "1000"
+    custom_attributes:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "custom_attribute:read"
+    degrees:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "degrees:read"
+          base_filters:
+            "limit": "1000"
+    experiences:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "experiences:read"
+          base_filters:
+            "limit": "1000"
+    groups:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "groups:read"
+          base_filters:
+            "limit": "1000"
+    logins:
+      extraction_type: incremental
+      extra_spark_job_arguments:
+        - scope: "logins:read"
+          base_filters:
+            "filter[start_date]": "load_start_date"
+            "filter[end_date]": "load_end_date"
+            "limit": "1000"
+    organization_skills:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "skill:read"
+          base_filters:
+            "limit": "1000"
+    pathways:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "pathways:read"
+          base_filters:
+            "limit": "1000"
     providers:
       extraction_type: full
       extra_spark_job_arguments:
         - scope: "providers:read"
+          base_filters:
+            "limit": "1000"
+    skill_plans:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "skill_plans:read"
+          base_filters:
+            "limit": "1000"
+    skill_ratings:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "skill_ratings:read"
+          base_filters:
+            "filter[include_private_ratings]": "true"
+            "limit": "1000"
+    user_skills:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "user_skills:read"
+          base_filters:
+            "limit": "1000"
+    users:
+      extraction_type: full
+      extra_spark_job_arguments:
+        - scope: "users:read"
           base_filters:
             "limit": "1000"

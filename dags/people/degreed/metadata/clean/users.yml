@@ -1,0 +1,125 @@
+---
+database_name: datalake_degreed_clean
+table_name: users
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  This table contains the master list of all user profiles within the
+  organization's Degreed instance. Each row represents a single user account
+  and its associated attributes.
+
+columns:
+  id:
+    description: 'Unique identifier for the user within Degreed.'
+    lineage:
+      - datalake_degreed_raw.users.id
+  id_alias:
+    description: 'An alternative unique identifier or alias for the user.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.alias_uid
+  full_name:
+    description: 'The users full name.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.full_name
+  first_name:
+    description: 'The users first name.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.first_name
+  last_name:
+    description: 'The users last name.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.last_name
+  personal_email:
+    description: 'The users personal email address.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.personal_email
+  organization_email:
+    description: 'The users official email address within the organization.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.organization_email
+  bio:
+    description: 'A short biography or summary written by the user.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.bio
+  location:
+    description: 'The users geographical location.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.location
+  permission_role:
+    description: 'The users permission level within Degreed (e.g., "Admin", "User").'
+    lineage:
+      - datalake_degreed_raw.users.attributes.permission_role
+  profile_visibility:
+    description: 'The visibility setting for the users profile (e.g., "Public", "Private").'
+    lineage:
+      - datalake_degreed_raw.users.attributes.profile_visibility
+  job_role:
+    description: 'The users current job title or role.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.job_role
+  preferred_language:
+    description: 'The users preferred language for content.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.preferred_language
+  display_language:
+    description: 'The language used for the Degreed user interface for this user.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.display_language
+  profile_image_url:
+    description: 'URL for the users profile picture.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.profile_image_url
+  relationships:
+    description: 'An array field defining relationships to other entities, such as manager or direct reports.'
+    lineage:
+      - datalake_degreed_raw.users.relationships
+  total_points:
+    description: 'The total number of points the user has accumulated in Degreed.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.total_points
+  daily_logins:
+    description: 'Count of daily logins for the user.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.daily_logins
+  is_active_learner:
+    description: 'A boolean flag indicating if the user is considered an active learner.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.is_active_learner
+  is_daily_digest_email:
+    description: 'A boolean flag indicating if the user is subscribed to daily digest emails.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.daily_digest_email
+  is_weekly_digest_email:
+    description: 'A boolean flag indicating if the user is subscribed to weekly digest emails.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.weekly_digest_email
+  is_managed:
+    description: 'A boolean flag indicating if the user is part of a managed population (e.g., for specific assignments).'
+    lineage:
+      - datalake_degreed_raw.users.attributes.is_managed
+  is_restricted:
+    description: 'A boolean flag indicating if the user account has restricted access.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.restricted
+  is_real_time_email_notification:
+    description: 'A boolean flag indicating if the user receives real-time email notifications.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.real_time_email_notification
+  is_login_disabled:
+    description: 'A boolean flag indicating if the users login is disabled.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.login_disabled
+  ts_created:
+    description: 'Timestamp indicating when the user account was created.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.created_at
+  ts_first_login:
+    description: 'Timestamp of the users first login to the platform.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.first_login_at
+  ts_last_login:
+    description: 'Timestamp of the users most recent login.'
+    lineage:
+      - datalake_degreed_raw.users.attributes.last_login_at
+  ts_load:
+    description: 'Timestamp indicating when the record was loaded into the clean table.'

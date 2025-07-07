@@ -1,0 +1,45 @@
+---
+database_name: datalake_degreed_clean
+table_name: groups
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  This table contains information about all collaborative groups within the
+  organization's Degreed platform. Each row represents a single group, which can
+  be used for sharing content and fostering community learning.
+
+columns:
+  id:
+    description: 'Unique identifier for the group within Degreed.'
+    lineage:
+      - datalake_degreed_raw.groups.id
+  id_user_created_by:
+    description: 'The unique identifier for the user who created the group.'
+    lineage:
+      - datalake_degreed_raw.groups.relationships[0].created_by.data.id
+  id_external_group:
+    description: 'An external identifier for the group, potentially from another system (e.g., an HRIS or Active Directory group).'
+    lineage:
+      - datalake_degreed_raw.groups.attributes.external_group_id
+  name:
+    description: 'The name of the group.'
+    lineage:
+      - datalake_degreed_raw.groups.attributes.name
+  description:
+    description: 'A detailed description of the groups purpose and focus.'
+    lineage:
+      - datalake_degreed_raw.groups.attributes.description
+  privacy:
+    description: 'The privacy setting for the group (e.g., "Public", "Private", "Secret").'
+    lineage:
+      - datalake_degreed_raw.groups.attributes.privacy
+  has_shared_access:
+    description: 'A boolean flag indicating if the group has shared access features enabled.'
+    lineage:
+      - datalake_degreed_raw.groups.attributes.has_shared_access
+  ts_created:
+    description: 'Timestamp indicating when the group was created in Degreed.'
+    lineage:
+      - datalake_degreed_raw.groups.attributes.created_at
+  ts_load:
+    description: 'Timestamp indicating when the record was loaded into the clean table.'

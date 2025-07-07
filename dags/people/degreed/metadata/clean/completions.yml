@@ -1,0 +1,53 @@
+---
+database_name: datalake_degreed_clean
+table_name: completions
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  This table holds records of all content completions within the organization.
+  A completion signifies that a user has finished a piece of learning content,
+  which may or may not be self-reported.
+
+columns:
+  id:
+    description: 'Unique identifier for the completion record.'
+    lineage:
+      - datalake_degreed_raw.completions.id
+  email_employee:
+    description: 'The employee ID, typically an email address, of the user who completed the content.'
+    lineage:
+      - datalake_degreed_raw.completions.attributes.employee_id
+  attributes:
+    description: 'A struct containing all original attributes of the completion record from the raw layer.'
+    lineage:
+      - datalake_degreed_raw.completions.attributes
+  included:
+    description: 'A field containing related data pulled in with the API request, such as user or content details, to avoid additional API calls.'
+    lineage:
+      - datalake_degreed_raw.completions.included
+  relationships:
+    description: 'A field defining the relationships between this completion and other entities, such as the user and the content that was completed.'
+    lineage:
+      - datalake_degreed_raw.completions.relationships
+  points_earned:
+    description: 'The number of points the user earned for this specific completion.'
+    lineage:
+      - datalake_degreed_raw.completions.attributes.points_earned
+  rating:
+    description: 'The rating (score) the user gave to the content. Can be null if no rating was provided.'
+    lineage:
+      - datalake_degreed_raw.completions.attributes.rating
+  is_verified:
+    description: 'A boolean flag indicating if the completion was verified (e.g., by a manager or an integration) rather than just self-reported.'
+    lineage:
+      - datalake_degreed_raw.completions.attributes.is_verified
+  dt_completed:
+    description: 'The date when the learning content was completed.'
+    lineage:
+      - datalake_degreed_raw.completions.attributes.completed_at
+  ts_added:
+    description: 'Timestamp indicating when the completion record was added to Degreed.'
+    lineage:
+      - datalake_degreed_raw.completions.attributes.added_at
+  ts_load:
+    description: 'Timestamp indicating when the record was loaded into the clean table.'

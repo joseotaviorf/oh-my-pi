@@ -1,0 +1,56 @@
+---
+database_name: datalake_degreed_clean
+table_name: user_skills
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  This table maps users to the skills they are tracking, developing, or have
+  added to their profile. Each row represents a single skill associated with a user.
+
+columns:
+  id:
+    description: 'Unique identifier for the user-skill association record.'
+    lineage:
+      - datalake_degreed_raw.user_skills.id
+  id_user:
+    description: 'The unique identifier of the user associated with the skill.'
+    lineage:
+      - datalake_degreed_raw.user_skills.relationships[0].user.data.id
+  id_skill:
+    description: 'The unique identifier for the skill being tracked by the user.'
+    lineage:
+      - datalake_degreed_raw.user_skills.attributes.skill_id
+  skill_name:
+    description: 'The name of the skill.'
+    lineage:
+      - datalake_degreed_raw.user_skills.attributes.skill_name
+  id_employee:
+    description: 'The employee ID, typically an email, of the user associated with the skill.'
+    lineage:
+      - datalake_degreed_raw.user_skills.attributes.employee_id
+  id_certifiable_skill:
+    description: 'A unique identifier (GUID) that links to a certifiable version of the skill, if one exists.'
+    lineage:
+      - datalake_degreed_raw.user_skills.attributes.certifiable_skill_guid
+  url_degreed:
+    description: 'The URL to the skills page within the Degreed platform.'
+    lineage:
+      - datalake_degreed_raw.user_skills.attributes.degreed_url
+  target_rating:
+    description: 'The proficiency rating level the user is aiming to achieve for this skill.'
+    lineage:
+      - datalake_degreed_raw.user_skills.attributes.target_rating
+  is_focus:
+    description: 'A boolean flag indicating if the user has marked this as a "focus skill" for development.'
+    lineage:
+      - datalake_degreed_raw.user_skills.attributes.is_focus
+  is_endorsed:
+    description: 'A boolean flag indicating whether the users proficiency in this skill has been endorsed by others.'
+    lineage:
+      - datalake_degreed_raw.user_skills.attributes.is_endorsed
+  ts_followed:
+    description: 'Timestamp indicating when the user started following or tracking this skill.'
+    lineage:
+      - datalake_degreed_raw.user_skills.attributes.followed_at
+  ts_load:
+    description: 'Timestamp indicating when the record was loaded into the clean table.'

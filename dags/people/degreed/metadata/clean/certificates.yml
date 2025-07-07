@@ -1,0 +1,45 @@
+---
+database_name: datalake_degreed_clean
+table_name: certificates
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  This table stores all certificates that have been awarded to users and
+  recorded within the Degreed platform. Each row represents a single certificate
+  obtained by a user.
+
+columns:
+  id:
+    description: 'Unique identifier for the certificate record.'
+    lineage:
+      - datalake_degreed_raw.certificates.id
+  id_user:
+    description: 'Unique identifier for the user who was awarded the certificate.'
+    lineage:
+      - datalake_degreed_raw.certificates.relationships[0].user.data.id
+  title:
+    description: 'The title of the certification (e.g., "Certified Cloud Practitioner").'
+    lineage:
+      - datalake_degreed_raw.certificates.attributes.title
+  url_certificate:
+    description: 'A direct URL to view or download the certificate image or document.'
+    lineage:
+      - datalake_degreed_raw.certificates.attributes.url
+  certificate_number:
+    description: 'The official identification number of the certificate, if available.'
+    lineage:
+      - datalake_degreed_raw.certificates.attributes.certificate_number
+  issuer:
+    description: 'The name of the organization or institution that issued the certificate (e.g., "Amazon Web Services").'
+    lineage:
+      - datalake_degreed_raw.certificates.attributes.issued_by
+  ts_started:
+    description: 'Timestamp indicating when the user started the course or program for the certificate. Can be null.'
+    lineage:
+      - datalake_degreed_raw.certificates.attributes.started_at
+  ts_completed:
+    description: 'Timestamp indicating when the user was awarded the certificate.'
+    lineage:
+      - datalake_degreed_raw.certificates.attributes.completed_at
+  ts_load:
+    description: 'Timestamp indicating when the record was loaded into the clean table.'

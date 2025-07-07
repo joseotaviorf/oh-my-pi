@@ -1,0 +1,68 @@
+---
+database_name: datalake_degreed_clean
+table_name: skill_plans
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  Contains details about Skill Plans, which are guided learning paths of content
+  that track a learner's completion progress. Each row represents a single skill plan.
+
+columns:
+  id:
+    description: 'Unique identifier for the skill plan within Degreed.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.id
+  id_external:
+    description: 'An external identifier for the skill plan, potentially from another system.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.external_id
+  name:
+    description: 'The name or title of the skill plan.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.name
+  subtitle:
+    description: 'A brief subtitle or tagline for the skill plan.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.subtitle
+  description:
+    description: 'A detailed description of what the skill plan covers.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.description
+  plan_type:
+    description: 'The type of the skill plan.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.plan_type
+  visibility:
+    description: 'The privacy setting for the skill plan (e.g., "Public", "Private").'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.visibility
+  url_image:
+    description: 'URL for the skill plans cover image.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.image_url
+  url_degreed:
+    description: 'The URL to access the skill plan directly within the Degreed platform.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.degreed_url
+  is_collaborative:
+    description: 'A boolean flag indicating if other users can be invited to collaborate on the skill plan.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.can_collaborate
+  is_followable:
+    description: 'A boolean flag indicating if other users can follow this skill plan.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.can_follow
+  is_endorsed:
+    description: 'A boolean flag indicating if the skill plan is officially endorsed by the organization.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.is_endorsed
+  ts_created:
+    description: 'Timestamp indicating when the skill plan was created.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.created_at
+  ts_modified:
+    description: 'Timestamp indicating the last time the skill plan was modified.'
+    lineage:
+      - datalake_degreed_raw.skill_plans.attributes.modified_at
+  ts_load:
+    description: 'Timestamp indicating when the record was loaded into the clean table.'

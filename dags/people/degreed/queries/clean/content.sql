@@ -1,0 +1,26 @@
+SELECT
+    id,
+    attributes.external_id AS id_external,
+    attributes.owner_id AS id_owner,
+    attributes.degreed_url AS url_degreed,
+    attributes.url AS url_content,
+    attributes.image_url AS url_image,
+    attributes.title,
+    attributes.summary,
+    attributes.format,
+    attributes.owner_type AS owner_type,
+    attributes.provider,
+    attributes.language,
+    attributes.duration_type AS duration_type,
+    attributes.content_type AS content_type,
+    attributes.owner,
+    CAST(attributes.duration AS FLOAT) AS duration,
+    CAST(attributes.learning_minutes AS FLOAT) AS learning_minutes,
+    CAST(attributes.is_obsolete AS BOOLEAN) AS is_obsolete,
+    CAST(attributes.is_internal AS BOOLEAN) AS is_internal,
+    TO_DATE(attributes.publish_date) AS dt_published,
+    TO_TIMESTAMP(attributes.created_at) AS ts_created,
+    TO_TIMESTAMP(attributes.modified_at) AS ts_modified,
+    NOW() AS ts_load
+FROM
+    datalake_degreed_raw.content

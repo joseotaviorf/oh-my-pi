@@ -1,0 +1,41 @@
+---
+database_name: datalake_degreed_clean
+table_name: accomplishments
+owner: isabella.araujo@quintoandar.com.br
+domain: people
+description: >
+  Stores the records of all learning items (such as courses, videos,
+  articles, etc.) that users in the organization have marked as completed on the
+  Degreed platform. Each row represents a single user accomplishment.
+
+columns:
+  id:
+    description: 'Unique identifier for the completed learning item record (accomplishment).'
+    lineage:
+      - datalake_degreed_raw.accomplishments.id
+  id_user:
+    description: 'Unique identifier for the user who completed the learning item.'
+    lineage:
+      - datalake_degreed_raw.accomplishments.relationships[0].user.data.id
+  title:
+    description: 'Title of the completed learning item (e.g., course name, article title).'
+    lineage:
+      - datalake_degreed_raw.accomplishments.attributes.title
+  url_image:
+    description: 'URL for the cover image or thumbnail associated with the learning content.'
+    lineage:
+      - datalake_degreed_raw.accomplishments.attributes.image_url
+  rating:
+    description: 'The rating (score) the user gave to the content. Can be null if no rating was given.'
+    lineage:
+      - datalake_degreed_raw.accomplishments.attributes.rating
+  ts_started:
+    description: 'The timestamp when the user started the learning item. Can be null.'
+    lineage:
+      - datalake_degreed_raw.accomplishments.attributes.started_at
+  ts_completed:
+    description: 'The timestamp when the user marked the learning item as completed.'
+    lineage:
+      - datalake_degreed_raw.accomplishments.attributes.completed_at
+  ts_load:
+    description: 'Timestamp indicating when the record was loaded into the clean table.'
