@@ -41,20 +41,20 @@ columns:
     description: Identifier of the calibrated risk of loss rating level.
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.risk_loss_calib_rt_lvl_id
-  id_criticality_rating_level:
-    description: Identifier for criticality rating level.
-    lineage:
-      - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_value3
   id_readiness_rating_level:
     description: Identifier for readiness rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_value3
+  id_readiness_rating_level_calibrated:
+    description: Identifier of the calibrated readiness rating level.
+    lineage:
+      - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_calib_value3
+  id_criticality_rating_level:
+    description: Identifier for criticality rating level.
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_value4
   id_criticality_rating_level_calibrated:
     description: Identifier of the calibrated criticality rating level.
-    lineage:
-      - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_calib_value3
-  id_readiness_rating_level_calibrated:
-    description: Identifier of the calibrated readiness rating level.
     lineage:
       - datalake_pin_hr_review_raw.hrr_dashboards.extn_metric_calib_value4
   created_by:
