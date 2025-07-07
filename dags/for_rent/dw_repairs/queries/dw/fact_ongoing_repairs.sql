@@ -1,22 +1,22 @@
 WITH repair_request_chat AS (
   SELECT
-    rrc.id_repair_request AS sk_repair_request,
-    rrc.ts_started AS ts_started
+    id_repair_request AS sk_repair_request,
+    ts_started
   FROM
-    datalake_repairs_clean.repair_request_chat AS rrc
+    datalake_repairs_clean.repair_request_chat
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY rrc.id_repair_request ORDER BY rrc.ts_started ASC) = 1
+    ROW_NUMBER() OVER (PARTITION BY id_repair_request ORDER BY ts_started ASC) = 1
 ),
 repair_request_budget AS (
   SELECT
-    b.id_repair_request AS sk_repair_request,
-    b.id_budget_sender AS id_budget_sender
+    id_repair_request AS sk_repair_request,
+    id_budget_sender
   FROM
-    datalake_repairs_clean.repair_request_budget AS b
+    datalake_repairs_clean.repair_request_budget
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY b.id_repair_request ORDER BY b.ts_updated DESC) = 1
-)
-,ticket_events AS (
+    ROW_NUMBER() OVER (PARTITION BY id_repair_request ORDER BY ts_updated DESC) = 1
+),
+ticket_events AS (
   SELECT
     te.sk_ticket,
     MIN(te.ts_event) FILTER (
@@ -76,7 +76,7 @@ repair_request_budget AS (
             '10567436267277', --FullService [BACK]
             '11373011255565', --Reparos [BACK]
             '10054637827597', --Triagem Reparos [Back]
-            '32017711499661', --ReparAção (Piloto Urgente) 
+            '32017711499661', --ReparAção (Piloto Urgente)
             '36385276117261', --ReparAção Comum [BACK]
             '36464344850701'  --Reparos PP Multi [BACK]
           )
@@ -105,7 +105,7 @@ repair_request_budget AS (
             '10567436267277', --FullService [BACK]
             '11373011255565', --Reparos [BACK]
             '10054637827597', --Triagem Reparos [Back]
-            '32017711499661', --ReparAção (Piloto Urgente) 
+            '32017711499661', --ReparAção (Piloto Urgente)
             '36385276117261', --ReparAção Comum [BACK]
             '36464344850701'  --Reparos PP Multi [BACK]
           )
@@ -132,7 +132,7 @@ repair_request_budget AS (
             '10567436267277', --FullService [BACK]
             '11373011255565', --Reparos [BACK]
             '10054637827597', --Triagem Reparos [Back]
-            '32017711499661', --ReparAção (Piloto Urgente) 
+            '32017711499661', --ReparAção (Piloto Urgente)
             '36385276117261', --ReparAção Comum [BACK]
             '36464344850701'  --Reparos PP Multi [BACK]
           )
@@ -175,18 +175,19 @@ repair_request_budget AS (
   WHERE
     te.ts_ticket_created >= DATE('2023-07-01')
   GROUP BY te.sk_ticket
-)
-,status_fup AS (
-SELECT
+),
+status_fup AS (
+  SELECT
     rrtnf.id_repair_request,
     rrtnf.ts_updated AS ts_help_request
   FROM
     datalake_repairs_clean.repair_request_tenant_negotiation_follow_up AS rrtnf
-  WHERE status = 'HELP_NEEDED'
+  WHERE
+    status = 'HELP_NEEDED'
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY rrtnf.id_repair_request ORDER BY rrtnf.ts_updated ASC) = 1
-)
-,ticket_comment_metrics AS (
+),
+ticket_comment_metrics AS (
   SELECT
     tc.id_ticket,
     SUM(CASE WHEN tc.is_public THEN 1 ELSE 0 END) AS total_public_comments,

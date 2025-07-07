@@ -16,7 +16,7 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.id_ticket_whatsapp
   sk_contact_ticket:
-    description:
+    description: Contact ticket unique identifier for WhatsApp tickets.
     lineage:
       - datalake_zendesk.tickets_current.id_contact_ticket
   sk_request:
@@ -52,11 +52,11 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.replies
   total_public_comments:
-    description:
+    description: Total number of public comments in the ticket.
     lineage:
       - datalake_zendesk.tickets_current.total_public_comments
   total_private_comments:
-    description:
+    description: Total number of private comments in the ticket.
     lineage:
       - datalake_zendesk.tickets_current.total_private_comments
   frt:
@@ -73,6 +73,10 @@ columns:
     description: Amount of calendar minutes the ticket took to be replied
     lineage:
       - datalake_zendesk.tickets_current.reply_time_min_calendar
+  csat_score:
+    description: Customer satisfaction score for the repair request.
+    lineage:
+      - datalake_repairs.repair_tickets.csat_score
   has_chat_negociation:
     description: Boolean data that indicates whether the repair was negotiated via chat.
     lineage:
@@ -86,47 +90,47 @@ columns:
     lineage:
       - datalake_repairs.repair_tickets.tags
   is_reflux:
-    description:
+    description: Boolean flag indicating if the ticket was sent to backlog for internal provider action.
     lineage:
       - datalake_repairs.repair_tickets.tags
   is_contestation:
-    description:
+    description: Boolean flag indicating if the repair was contested by the provider.
     lineage:
       - datalake_repairs.repair_tickets.tags
   is_ended_without_return:
-    description:
+    description: Boolean flag indicating if the repair was ended without tenant contact.
     lineage:
       - datalake_repairs.repair_tickets.tags
   is_execution_confirmed:
-    description:
+    description: Boolean flag indicating if the repair execution was confirmed.
     lineage:
       - datalake_repairs.repair_tickets.tags
   is_audited_ticket:
-    description:
+    description: Boolean flag indicating if the ticket was audited.
     lineage:
       - datalake_repairs.repair_tickets.tags
   is_fup_iq_agreement:
-    description:
+    description: Boolean flag indicating if there was an agreement in the tenant negotiation follow-up.
     lineage:
       - datalake_repairs.repair_tickets.tags
   is_solved_pspp_automation:
-    description:
+    description: Boolean flag indicating if the ticket was solved by PS PP automation.
     lineage:
       - datalake_repairs.repair_tickets.tags
   is_selfservice_migration:
-    description:
+    description: Boolean flag indicating if the ticket was migrated to self-service.
     lineage:
       - datalake_repairs.repair_tickets.tags
   is_closed_by_merge:
-    description:
+    description: Boolean flag indicating if the ticket was closed by merge.
     lineage:
       - datalake_repairs.repair_tickets.tags
   dt_definition:
-    description:
+    description: Date when the repair was defined.
     lineage:
       - datalake_repairs.repair_tickets.dt_definition
   dt_chat:
-    description:
+    description: Date when the chat negotiation occurred.
     lineage:
       - datalake_repairs.repair_tickets.dt_chat
   ts_first_interaction:
@@ -201,6 +205,11 @@ columns:
     lineage:
       - dw_customer_support.fact_ticket_events.ts_event
       - dw_customer_support.fact_ticket_events.tags
+  ts_manual_service_provider:
+    description: Timestamp when manual service provider was assigned.
+    lineage:
+      - dw_customer_support.fact_ticket_events.ts_event
+      - dw_customer_support.fact_ticket_events.tags
   ts_help_request:
     description: Timestamp of the help request.
     lineage:
@@ -213,6 +222,10 @@ columns:
     description: Timestamp of the latest analyst comment.
     lineage:
       - datalake_zendesk_clean.ticket_comments.ts_created
+  ts_csat_response_submitted:
+    description: Timestamp when the CSAT response was submitted.
+    lineage:
+      - datalake_repairs.ongoing_repair_tickets.ts_csat_response_submitted
   ts_created_local:
     description: Timestamp of the ticket creation.
     lineage:
@@ -229,5 +242,17 @@ columns:
     description: Timestamp of the ticket updated.
     lineage:
       - datalake_zendesk.tickets_current.ts_updated
+  year:
+    description: Year when the ticket was created.
+    lineage:
+      - datalake_zendesk.tickets_current.year
+  month:
+    description: Month when the ticket was created.
+    lineage:
+      - datalake_zendesk.tickets_current.month
+  day:
+    description: Day when the ticket was created.
+    lineage:
+      - datalake_zendesk.tickets_current.day
   ts_load:
     description: Date in timestamp format that indicates when the ticket was loaded.

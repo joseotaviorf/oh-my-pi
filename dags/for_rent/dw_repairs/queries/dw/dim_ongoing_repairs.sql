@@ -1,47 +1,51 @@
-WITH criticidade AS (
+WITH
+criticidade AS (
   SELECT
-    rt.id_ticket,
+    id_ticket,
     CASE
       WHEN
-        CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Nova criticidade"]') AS STRING) IS NOT NULL
-        THEN CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Nova criticidade"]') AS STRING)
+        CAST(GET_JSON_OBJECT(custom_fields, '$["Nova criticidade"]') AS STRING) IS NOT NULL
+        THEN CAST(GET_JSON_OBJECT(custom_fields, '$["Nova criticidade"]') AS STRING)
       WHEN
-        CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Criticidade"]') AS STRING) IS NOT NULL
-      THEN CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Criticidade"]') AS STRING)
+        CAST(GET_JSON_OBJECT(custom_fields, '$["Criticidade"]') AS STRING) IS NOT NULL
+      THEN CAST(GET_JSON_OBJECT(custom_fields, '$["Criticidade"]') AS STRING)
       WHEN
-        regexp_like(rt.tags,'triagem_automatica_comum')
-        AND regexp_like(rt.tags, 'resolve_iq_pp_autosservico_prestadorpp')
+        regexp_like(tags,'triagem_automatica_comum')
+        AND regexp_like(tags, 'resolve_iq_pp_autosservico_prestadorpp')
       THEN 'comum_criticidade'
       WHEN
-        regexp_like(rt.tags, 'triagem_automatica_urgente')
-        AND regexp_like(rt.tags, 'resolve_iq_pp_autosservico_prestadorpp')
+        regexp_like(tags, 'triagem_automatica_urgente')
+        AND regexp_like(tags, 'resolve_iq_pp_autosservico_prestadorpp')
       THEN 'urgente_criticidade'
       WHEN
-        regexp_like(rt.tags, 'triagem_automatica_emergencial')
-        AND regexp_like(rt.tags, 'resolve_iq_pp_autosservico_prestadorpp')
+        regexp_like(tags, 'triagem_automatica_emergencial')
+        AND regexp_like(tags, 'resolve_iq_pp_autosservico_prestadorpp')
       THEN 'emergencial_criticidade'
       WHEN
-        CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Classificação do atendimento (Tags)"]') AS STRING) IS NOT NULL
-      THEN CAST(GET_JSON_OBJECT(rt.custom_fields, '$["Classificação do atendimento (Tags)"]') AS STRING)
+        CAST(GET_JSON_OBJECT(custom_fields, '$["Classificação do atendimento (Tags)"]') AS STRING) IS NOT NULL
+      THEN CAST(GET_JSON_OBJECT(custom_fields, '$["Classificação do atendimento (Tags)"]') AS STRING)
     END AS criticidade
-  FROM datalake_repairs.ongoing_repair_tickets AS rt
-)
-,status_fup AS (
+  FROM
+    datalake_repairs.ongoing_repair_tickets
+),
+status_fup AS (
   SELECT
-    rrtnf.id_repair_request AS sk_repair_request
-    ,rrtnf.status AS status_fup_iq
-    ,rrtnf.help_action AS reason_help_request
-  FROM datalake_repairs_clean.repair_request_tenant_negotiation_follow_up AS rrtnf
+    id_repair_request AS sk_repair_request,
+    status AS status_fup_iq,
+    help_action AS reason_help_request
+  FROM
+    datalake_repairs_clean.repair_request_tenant_negotiation_follow_up
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY rrtnf.id ORDER BY rrtnf.ts_updated DESC) = 1
-)
-,repair_request AS (
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
+),
+repair_request AS (
   SELECT
-    rr.id AS sk_repair_request
-    ,rr.owner_approval AS owner_approval
-  FROM datalake_repairs_clean.repair_request AS rr
+    id AS sk_repair_request,
+    owner_approval AS owner_approval
+  FROM
+    datalake_repairs_clean.repair_request
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY rr.id ORDER BY rr.ts_updated DESC) = 1
+    ROW_NUMBER() OVER (PARTITION BY id ORDER BY ts_updated DESC) = 1
 )
 
 SELECT
@@ -89,11 +93,11 @@ SELECT
   tc.day,
   NOW() AS ts_load
 FROM
-  datalake_zendesk.tickets_current tc
+  datalake_zendesk.tickets_current AS tc
 LEFT JOIN
   datalake_repairs.ongoing_repair_tickets AS rt
     ON tc.id_ticket = rt.id_ticket
-LEFT JOIN 
+LEFT JOIN
   criticidade AS c
     ON c.id_ticket = rt.id_ticket
 LEFT JOIN

@@ -38,6 +38,10 @@ columns:
     lineage:
       - datalake_repairs.repair_tickets.custom_fields
       - datalake_repairs.repair_tickets.tags
+  ticket_opening:
+    description: Indicates whether the ticket was opened through the front-end (FRONT) or mobile app (APP).
+    lineage:
+      - datalake_zendesk.tickets_current.tags
   contract_journey:
     description: Indicates whether the repair request is part of a onboarding or ongoing contract.
     lineage:
@@ -79,10 +83,10 @@ columns:
     description: Reason for the help request.
     lineage:
       - datalake_repairs_clean.repair_request_tenant_negotiation_follow_up.help_action
-  owner_aproval:
+  owner_approval:
     description: Approval status from the owner regarding the repair request.
     lineage:
-      - datalake_repairs_clean.repair_request.owner_aproval
+      - datalake_repairs_clean.repair_request.owner_approval
   group_name:
     description: Discursive data that indicates the department to which the service ticket is linked.
     lineage:
@@ -99,5 +103,17 @@ columns:
     description: Descriptive data that indicates the process tags used during the service.
     lineage:
       - datalake_repairs.repair_tickets.group_name
+  year:
+    description: Year when the ticket was created.
+    lineage:
+      - datalake_zendesk.tickets_current.year
+  month:
+    description: Month when the ticket was created.
+    lineage:
+      - datalake_zendesk.tickets_current.month
+  day:
+    description: Day when the ticket was created.
+    lineage:
+      - datalake_zendesk.tickets_current.day
   ts_load:
     description: Date and time when the data was loaded.
