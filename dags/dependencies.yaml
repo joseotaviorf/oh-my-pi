@@ -1014,6 +1014,7 @@ bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-provision
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-accounting
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-revenue-share
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-reverse-accounts-420003-420019-420020-420025-611012
 bietlejuice.dw_satisfaction_rating:
   - bietlejuice.enrich_customer_support:load-enrich-csat
   - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers
