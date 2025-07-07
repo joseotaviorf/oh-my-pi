@@ -32,17 +32,64 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 def get_langfuse_data(langfuse, execution_date, table_name):
     """Retrieves data from Langfuse API for the specified table and execution date."""
-    if table_name == "scores":
-        resp = langfuse.api.score_v_2.get(from_timestamp=execution_date)
-    elif table_name == "traces":
-        resp = langfuse.api.trace.list(from_timestamp=execution_date)
-    elif table_name == "observations":
-        resp = langfuse.api.observations.get_many(from_start_time=execution_date)
-    else:
-        raise Exception(f"Table {table_name} not found")
-
-    json_data = [json.dumps(x.dict(), default=str) for x in resp.data]
-    return json_data
+    all_json_data = []
+    page = 1
+    limit = 50  # API default
+    
+    logger.info(f"Starting pagination for table {table_name} from execution_date {execution_date}")
+    
+    while True:
+        
+        try:
+            if table_name == "scores":
+                resp = langfuse.api.score_v_2.get(
+                    from_timestamp=execution_date,
+                    page=page,
+                    limit=limit
+                )
+            elif table_name == "traces":
+                resp = langfuse.api.trace.list(
+                    from_timestamp=execution_date,
+                    page=page,
+                    limit=limit
+                )
+            elif table_name == "observations":
+                resp = langfuse.api.observations.get_many(
+                    from_start_time=execution_date,
+                    page=page,
+                    limit=limit
+                )
+            else:
+                raise Exception(f"Table {table_name} not found")
+            
+            # Check if we got any data
+            if not resp.data:
+                logger.info(f"No more data found on page {page} for table {table_name}")
+                break
+                
+    
+            page_json_data = [json.dumps(x.dict(), default=str) for x in resp.data]
+            all_json_data.extend(page_json_data)
+            
+            # check if we've reached the last page
+            if hasattr(resp, 'meta') and hasattr(resp.meta, 'page') and hasattr(resp.meta, 'total_pages'):
+                logger.info(f"Page {resp.meta.page} of {resp.meta.total_pages} processed")
+                if resp.meta.page >= resp.meta.total_pages:
+                    logger.info(f"Reached the last page ({resp.meta.total_pages}) for table {table_name}")
+                    break
+            elif len(resp.data) < limit:
+                # ff we got fewer items than the limit, likely reached the end
+                logger.info(f"Retrieved {len(resp.data)} records (less than limit {limit}), assuming last page")
+                break
+                
+            page += 1
+            
+        except Exception as e:
+            logger.error(f"Error fetching page {page} for table {table_name}: {e}")
+            break
+    
+    logger.info(f"Total records for table {table_name}: {len(all_json_data)}")
+    return all_json_data
 
 if __name__ == "__main__":
 
@@ -67,7 +114,7 @@ if __name__ == "__main__":
     langfuse_host = config_service.get_config("langfuse_host")
 
     logger.info(f"m=dag_name={dag_name}, environment={environment}, datalake_bucket={datalake_bucket}")
-    logger.info(f"m=table_name={table_name}, execution_date_str={execution_date_str}")
+    logger.info(f"m=table_name={table_name}, execution_date={execution_date}, execution_date_str={execution_date_str}")
  
 
     base_dbutils = BaseDBUtils()
