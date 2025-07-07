@@ -120,8 +120,8 @@ contract_onboarding_costs AS (
         id_tenant_prospect,
         id_event,
         months_since_contract_start,
-        800 AS pre_rental_costs,
-        255 AS onboarding_costs
+        1000 AS pre_rental_costs,
+        210.8066516752 AS onboarding_costs
     FROM
         exploded_table
     WHERE
@@ -135,7 +135,7 @@ contract_ongoing_costs AS (
         id_tenant_prospect,
         id_event,
         months_since_contract_start,
-        25 AS ongoing_costs
+        26.9614742092 AS ongoing_costs
     FROM
         exploded_table
     WHERE
@@ -150,7 +150,8 @@ contract_offboarding_costs AS (
         id_tenant_prospect,
         id_event,
         months_since_contract_start,
-        700 AS offboarding_costs
+        797.1387047908 AS offboarding_costs,
+        1712 AS cost_of_guarantee
     FROM
         exploded_table
     WHERE
@@ -168,31 +169,80 @@ final_table AS (
         months_since_contract_start,
         predicted_duration as estimated_contract_duration,
         predicted_conversion as estimated_conversion,
-        CASE
-            WHEN months_since_contract_start = 1 THEN rent  -- Brokerage fee
-            ELSE 0.1 * rent * monthly_revenue_multiplier  -- Management Fee + Service Fee
-        END * predicted_conversion AS estimated_gross_revenue,
         (
             CASE
-                WHEN months_since_contract_start = 1 THEN rent * (1 - 0.35)
-                ELSE 0.1 * rent * monthly_revenue_multiplier
-            END * (1 - 0.08)
-        ) * predicted_conversion AS estimated_net_revenue,
+                WHEN months_since_contract_start = 1 THEN
+                    rent  -- Brokerage
+                    + rent * 0.02  -- Reserves
+                    + rent * 0.016  -- Brokerage Financing
+                ELSE
+                    rent * 0.004  -- credit card payment
+                    + rent * 0.002  -- Long-Term Rental Antecipation
+                    + rent * 0.001  -- Monthly Rental Antecipation
+                    + rent * 0.02   -- other revenues
+                    + rent * 0.007  -- interest payments
+            END
+            + rent * 0.095  -- Management fee
+            + rent * 0.023  -- Service fee
+            + rent * 0.007  -- Guarantee
+        ) * predicted_conversion AS estimated_gross_revenue,
         (
             CASE
-                WHEN months_since_contract_start = 1 THEN rent * (1 - 0.35)
-                ELSE 0.1 * rent * monthly_revenue_multiplier
-            END * (1 - 0.08)
-        ) * predicted_conversion AS estimated_net_revenue_after_losses,
+                WHEN months_since_contract_start = 1 THEN
+                    (1 - 0.2893321011) * rent  -- Brokerage
+                    + rent * 0.02  -- Reserves
+                    + rent * 0.016  -- Brokerage Financing
+                ELSE
+                    rent * 0.004  -- credit card payment
+                    + rent * 0.002  -- Long-Term Rental Antecipation
+                    + rent * 0.001  -- Monthly Rental Antecipation
+                    + rent * 0.02   -- other revenues
+                    + rent * 0.007  -- interest payments
+            END
+            + rent * 0.095  -- Management fee
+            + rent * 0.023  -- Service fee
+            + rent * 0.007  -- Guarantee
+        ) * (1 - 0.0847624411) * predicted_conversion AS estimated_net_revenue,
         (
             CASE
-                WHEN months_since_contract_start = 1 THEN rent * (1 - 0.35)
-                ELSE 0.1 * rent * monthly_revenue_multiplier
-            END * (1 - 0.08)
+                WHEN months_since_contract_start = 1 THEN
+                    (1 - 0.2893321011) * rent  -- Brokerage
+                    + rent * 0.02  -- Reserves
+                    + rent * 0.016  -- Brokerage Financing
+                ELSE
+                    rent * 0.004  -- credit card payment
+                    + rent * 0.002  -- Long-Term Rental Antecipation
+                    + rent * 0.001  -- Monthly Rental Antecipation
+                    + rent * 0.02   -- other revenues
+                    + rent * 0.007  -- interest payments
+            END
+            + rent * 0.095  -- Management fee
+            + rent * 0.023  -- Service fee
+            + rent * 0.007  -- Guarantee
+        ) * (1 - 0.0847624411) * predicted_conversion AS estimated_net_revenue_after_losses,
+        (
+            (
+                CASE
+                    WHEN months_since_contract_start = 1 THEN
+                        (1 - 0.2893321011) * rent  -- Brokerage
+                        + rent * 0.02  -- Reserves
+                        + rent * 0.016  -- Brokerage Financing
+                    ELSE
+                        rent * 0.004  -- credit card payment
+                        + rent * 0.002  -- Long-Term Rental Antecipation
+                        + rent * 0.001  -- Monthly Rental Antecipation
+                        + rent * 0.02   -- other revenues
+                        + rent * 0.007  -- interest payments
+                END
+                + rent * 0.095  -- Management fee
+                + rent * 0.023  -- Service fee
+                + rent * 0.007  -- Guarantee
+            ) * (1 - 0.0847624411)
             - COALESCE(pre_rental_costs, 0.0)
             - COALESCE(onboarding_costs, 0.0)
             - COALESCE(ongoing_costs, 0.0)
             - COALESCE(offboarding_costs, 0.0)
+            - COALESCE(cost_of_guarantee, 0.0)
         ) * predicted_conversion AS estimated_contribution_margin,
         dt_inference,
         CAST(ts_event AS DATE) as dt_event_time
