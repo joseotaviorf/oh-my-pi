@@ -19,6 +19,11 @@ schedule AS (
     ) AS id_user_creator,
     MAX(
       CASE
+        WHEN vsl.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vsl.author_user_role
+      END
+    ) AS user_role_creator,
+    MAX(
+      CASE
         WHEN vsl.event_type IN ('VISIT_CANCELED', 'VISIT_REQUEST_CANCELED') THEN vsl.id_author_user
       END
     ) AS id_user_cancelation,
@@ -71,7 +76,15 @@ schedule AS (
       WHEN MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') IS NOT NULL THEN 'RESCHEDULE'
       ELSE 'REQUEST'
     END AS schedule_origin,
-    LEAD(vsl.id_schedule) OVER(PARTITION BY vsl.id_visit ORDER BY MIN(vsl.ts_created)) AS id_succeed_schedule
+    LEAD(vsl.id_schedule) OVER(PARTITION BY vsl.id_visit ORDER BY MIN(vsl.ts_created)) AS id_succeed_schedule,
+    MAX_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND on_behalf_of = 'SUPPLY') AS last_confirm_answer_supply,
+    MAX_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND on_behalf_of = 'DEMAND') AS last_confirm_answer_demand,
+    MAX_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND on_behalf_of = 'AGENT') AS last_confirm_answer_agent,
+    MAX_BY(event_type, ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND on_behalf_of = 'TENANT_LIVING') AS last_confirm_answer_tenant_living,
+    MAX_BY(channel, ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'SUPPLY') AS channel_confirmed_supply,
+    MAX_BY(channel, ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'DEMAND') AS channel_confirmed_demand,
+    MAX_BY(channel, ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'AGENT') AS channel_confirmed_agent,
+    MAX_BY(channel, ts_created) FILTER (WHERE event_type = 'ANSWER_CONFIRMED' AND on_behalf_of = 'TENANT_LIVING') AS channel_confirmed_tenant_living
   FROM
     datalake_ebdb_clean.visit_status_log AS vsl
   JOIN
@@ -356,6 +369,7 @@ SELECT DISTINCT
   h.id_user AS id_owner,
   v.id_house,
   s.id_user_creator AS id_user_creation,
+  s.user_role_creator AS user_role_creation,
   s.id_user_cancelation,
   v.id_agent AS id_user_agent,
   ua.id_agent,
@@ -386,6 +400,39 @@ SELECT DISTINCT
   s.schedule_origin,
   s.channel_creation,
   bha.contract_name AS hub_agent_region,
+  s.last_confirm_answer_supply,
+  s.last_confirm_answer_demand,
+  s.last_confirm_answer_agent,
+  s.last_confirm_answer_tenant_living,
+  s.channel_confirmed_supply,
+  s.channel_confirmed_demand,
+  s.channel_confirmed_agent,
+  s.channel_confirmed_tenant_living,
+  CASE
+    WHEN s.last_confirm_answer_supply = 'ANSWER_CONFIRMED' THEN TRUE
+    WHEN s.last_confirm_answer_supply IN ('ANSWER_PENDING', 'ANSWER_REJECTED') THEN FALSE
+    ELSE NULL
+  END AS is_confirmed_by_supply,
+  CASE
+    WHEN s.last_confirm_answer_demand = 'ANSWER_CONFIRMED' THEN TRUE
+    WHEN s.last_confirm_answer_demand IN ('ANSWER_PENDING', 'ANSWER_REJECTED') THEN FALSE
+    ELSE NULL
+  END AS is_confirmed_by_demand,
+  CASE
+    WHEN s.last_confirm_answer_agent = 'ANSWER_CONFIRMED' THEN TRUE
+    WHEN s.last_confirm_answer_agent IN ('ANSWER_PENDING', 'ANSWER_REJECTED') THEN FALSE
+    ELSE NULL
+  END AS is_confirmed_by_agent,
+  CASE
+    WHEN s.last_confirm_answer_tenant_living = 'ANSWER_CONFIRMED' THEN TRUE
+    WHEN s.last_confirm_answer_tenant_living IN ('ANSWER_PENDING', 'ANSWER_REJECTED') THEN FALSE
+    ELSE NULL
+  END AS is_confirmed_by_tenant_living,
+  IF(s.ts_schedule_confirmed IS NOT NULL, TRUE, FALSE) AS is_confirmed,
+  IF(s.ts_schedule_completed IS NOT NULL, TRUE, FALSE) AS is_completed,
+  IF(s.ts_schedule_unsuccessful IS NOT NULL, TRUE, FALSE) AS is_unsuccessful,
+  IF(s.ts_schedule_canceled IS NOT NULL, TRUE, FALSE) AS is_canceled,
+  IF(s.ts_schedule_rescheduled IS NOT NULL, TRUE, FALSE) AS is_rescheduled,
   IF(bha.id_schedule IS NOT NULL, TRUE, FALSE) AS is_hub_flow,
   brh.is_house_rented,
   IF(dm.id_schedule IS NOT NULL, TRUE, FALSE) AS is_3p_demand,

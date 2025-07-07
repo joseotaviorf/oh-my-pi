@@ -8,57 +8,141 @@ owner: guilherme.rocha@quintoandar.com.br
 columns:
   sk_schedule:
     lineage:
-      - datalake_visit.visit_schedule.id_schedule
+      - datalake_visit.visit_schedules.id_schedule
     description: ID of schedule
   schedule_origin:
     lineage:
-      - datalake_visit.visit_schedule.schedule_origin
+      - datalake_visit.visit_schedules.schedule_origin
     description: If the start of this schedule is from a Request or a Reschedule.
   channel_creation:
     lineage:
-      - datalake_visit.visit_schedule.channel_creation
+      - datalake_visit.visit_schedules.channel_creation
     description: Channel from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED)
   entry_method:
     lineage:
-      - datalake_visit.visit_schedule.method
+      - datalake_visit.visit_schedules.method
     description: How occurred the entry method. Last method before the schedule.
   entry_method_type:
     lineage:
-      - datalake_visit.visit_schedule.entry_model_type
+      - datalake_visit.visit_schedules.entry_model_type
     description: Type of entry method.
+  last_confirm_answer_supply:
+    lineage:
+      - datalake_visit.visit_schedules.last_answer_supply
+    description: Last answer of confirmation on behalf of supply.
+    categories:
+      ANSWER_CONFIRMED: Supply's answer is confirmed for scheduling.
+      ANSWER_PENDING: Supply's answer is pending for scheduling.
+      ANSWER_REJECTED: Supply's answer is rejected for scheduling.
+  last_confirm_answer_demand:
+    lineage:
+      - datalake_visit.visit_schedules.last_answer_demand
+    description: Last answer of confirmation on behalf of demand.
+    categories:
+      ANSWER_CONFIRMED: Demand's answer is confirmed for scheduling.
+      ANSWER_PENDING: Demand's answer is pending for scheduling.
+      ANSWER_REJECTED: Demand's answer is rejected for scheduling.
+  last_confirm_answer_agent:
+    lineage:
+      - datalake_visit.visit_schedules.last_answer_agent
+    description: Last answer of confirmation on behalf of agent.
+    categories:
+      ANSWER_CONFIRMED: Agent's answer is confirmed for scheduling.
+      ANSWER_PENDING: Agent's answer is pending for scheduling.
+      ANSWER_REJECTED: Agent's answer is rejected for scheduling.
+  last_confirm_answer_tenant_living:
+    lineage:
+      - datalake_visit.visit_schedules.last_answer_tenant_living
+    description: Last answer of confirmation on behalf of tenant living.
+    categories:
+      ANSWER_CONFIRMED: Tenant's answer is confirmed for scheduling.
+      ANSWER_PENDING: Tenant's answer is pending for scheduling.
+      ANSWER_REJECTED: Tenant's answer is rejected for scheduling.
+  channel_confirmed_supply:
+    lineage:
+      - datalake_visit.visit_schedules.channel_confirmed_supply
+    description: Channel from supply's confirmation of schedule.
+  channel_confirmed_demand:
+    lineage:
+      - datalake_visit.visit_schedules.channel_confirmed_demand
+    description: Channel from demand's confirmation of schedule.
+  channel_confirmed_agent:
+    lineage:
+      - datalake_visit.visit_schedules.channel_confirmed_agent
+    description: Channel from agent's confirmation of schedule.
+  channel_confirmed_tenant_living:
+    lineage:
+      - datalake_visit.visit_schedules.channel_confirmed_tenant_living
+    description: Channel from tenant's confirmation of schedule.
+  is_schedule_confirmed_by_supply:
+    lineage:
+      - datalake_visit.visit_schedules.is_confirmed_by_supply
+    description: TRUE if the schedule is confirmed by supply.
+  is_schedule_confirmed_by_demand:
+    lineage:
+      - datalake_visit.visit_schedules.is_confirmed_by_demand
+    description: TRUE if the schedule is confirmed by demand.
+  is_schedule_confirmed_by_agent:
+    lineage:
+      - datalake_visit.visit_schedules.is_confirmed_by_agent
+    description: TRUE if the schedule is confirmed by agent.
+  is_schedule_confirmed_by_tenant_living:
+    lineage:
+      - datalake_visit.visit_schedules.is_confirmed_by_tenant_living
+    description: TRUE if the schedule is confirmed by tenant living.
   is_last_schedule:
     lineage:
-      - datalake_visit.visit_schedule.id_succeed_schedule
+      - datalake_visit.visit_schedules.id_succeed_schedule
     description: TRUE when is the last schedule of visit.
   is_first_schedule:
     lineage:
-      - datalake_visit.visit_schedule.schedule_origin
+      - datalake_visit.visit_schedules.schedule_origin
     description: TRUE when is the first schedule of visit.
+  is_schedule_confirmed:
+    lineage:
+      - datalake_visit.visit_schedules.is_confirmed
+    description: If the schedule was confirmed by all.
+  is_schedule_completed:
+    lineage:
+      - datalake_visit.visit_schedules.is_completed
+    description: If the schedule is completed.
+  is_schedule_rescheduled:
+    lineage:
+      - datalake_visit.visit_schedules.is_rescheduled
+    description: If the schedule is a reschedule.
+  is_schedule_canceled:
+    lineage:
+      - datalake_visit.visit_schedules.is_canceled
+    description: If the schedule is canceled.
+  is_schedule_unsuccessful:
+    lineage:
+      - datalake_visit.visit_schedules.is_unsuccessful
+    description: If the schedule return unsuccessful.
   ts_schedule_created:
     lineage:
-      - datalake_visit.visit_schedule.ts_schedule_created
+      - datalake_visit.visit_schedules.ts_schedule_created
     description: Timestamp of the creation of the schedule (VISIT_REQUESTED or VISIT_RESCHEDULED).
   ts_schedule_requested:
     lineage:
-      - datalake_visit.visit_schedule.ts_schedule_requested (VISIT_REQUESTED).
+      - datalake_visit.visit_schedules.ts_schedule_requested (VISIT_REQUESTED).
     description: Timestamp of the request event.
   ts_schedule_rescheduled:
     lineage:
-      - datalake_visit.visit_schedule.ts_schedule_rescheduled (VISIT_RESCHEDULED).
+      - datalake_visit.visit_schedules.ts_schedule_rescheduled (VISIT_RESCHEDULED).
     description: Timestamp of the reschedule event.
   ts_schedule_confirmed:
     lineage:
-      - datalake_visit.visit_schedule.ts_schedule_confirmed
+      - datalake_visit.visit_schedules.ts_schedule_confirmed
     description: Timestamp of the first confirmation event (VISIT_CONFIRMED).
   ts_schedule_completed:
     lineage:
-      - datalake_visit.visit_schedule.ts_schedule_completed
+      - datalake_visit.visit_schedules.ts_schedule_completed
     description: Timestamp of the completed event (VISIT_DONE).
   ts_schedule_unsuccessful:
     lineage:
-      - datalake_visit.visit_schedule.ts_schedule_unsuccessful
+      - datalake_visit.visit_schedules.ts_schedule_unsuccessful
     description: Timestamp with the unsuccessful event (VISIT_UNSUCCESSFUL).
   ts_schedule_canceled:
     lineage:
-      - datalake_visit.visit_schedule.ts_schedule_canceled
+      - datalake_visit.visit_schedules.ts_schedule_canceled
     description: Timestamp of the canceled event (VISIT_REQUEST_CANCELED or VISIT_REQUEST_CANCELED).

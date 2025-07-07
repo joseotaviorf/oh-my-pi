@@ -27,14 +27,16 @@ columns:
     description: Id of house.
   id_user_creation:
     lineage:
-      - datalake_visit.visit_status_events.id_author_user
-    description:
-      Creator of the schedule.
+      - datalake_ebdb_clean.visit_status_log.id_author_user
+    description: Creator of the schedule.
+  user_role_creation:
+    lineage:
+      - datalake_visit.visit_status_events.author_user_role
+    description: User role of who created the schedule.
   id_user_cancelation:
     lineage:
       - datalake_visit.visit_status_events.id_author_user
-    description:
-      Who canceled the schedule.
+    description: Who canceled the schedule.
   id_user_agent:
     lineage:
       - datalake_ebdb_clean.visit.id_agent
@@ -151,6 +153,46 @@ columns:
     lineage:
       - datalake_ebdb_clean.work_contract.contract_name
     description: Name of the contract of the agent associated with the booking, if the contract is from a hub.
+  last_confirm_answer_supply:
+    description: Last answer of confirmation on behalf of supply.
+    categories:
+      ANSWER_CONFIRMED: Supply's answer is confirmed for scheduling.
+      ANSWER_PENDING: Supply's answer is pending for scheduling.
+      ANSWER_REJECTED: Supply's answer is rejected for scheduling.
+  last_confirm_answer_demand:
+    description: Last answer of confirmation on behalf of demand.
+    categories:
+      ANSWER_CONFIRMED: Demand's answer is confirmed for scheduling.
+      ANSWER_PENDING: Demand's answer is pending for scheduling.
+      ANSWER_REJECTED: Demand's answer is rejected for scheduling.
+  last_confirm_answer_agent:
+    description: Last answer of confirmation on behalf of agent.
+    categories:
+      ANSWER_CONFIRMED: Agent's answer is confirmed for scheduling.
+      ANSWER_PENDING: Agent's answer is pending for scheduling.
+      ANSWER_REJECTED: Agent's answer is rejected for scheduling.
+  last_confirm_answer_tenant_living:
+    description: Last answer of confirmation on behalf of tenant living.
+    categories:
+      ANSWER_CONFIRMED: Tenant's answer is confirmed for scheduling.
+      ANSWER_PENDING: Tenant's answer is pending for scheduling.
+      ANSWER_REJECTED: Tenant's answer is rejected for scheduling.
+  channel_confirmed_supply:
+    description: Channel from supply's confirmation of schedule.
+  channel_confirmed_demand:
+    description: Channel from demand's confirmation of schedule.
+  channel_confirmed_agent:
+    description: Channel from agent's confirmation of schedule.
+  channel_confirmed_tenant_living:
+    description: Channel from tenant's confirmation of schedule.
+  is_confirmed_by_supply:
+    description: TRUE if the schedule is confirmed by supply.
+  is_confirmed_by_demand:
+    description: TRUE if the schedule is confirmed by demand.
+  is_confirmed_by_agent:
+    description: TRUE if the schedule is confirmed by agent.
+  is_confirmed_by_tenant_living:
+    description: TRUE if the schedule is confirmed by tenant living.
   is_hub_flow:
     description: True if the visit is from an agent with HUB active workcontract.
   is_house_rented:
@@ -161,6 +203,16 @@ columns:
   is_3p_demand:
     description:
       Boolean column that identifies if the visitor came from a QuintoAndar demand partner.
+  is_confirmed:
+    description: If the schedule was confirmed by all.
+  is_completed:
+    description: If the schedule is completed.
+  is_reschedule:
+    description: If the schedule is a reschedule.
+  is_canceled:
+    description: If the schedule is canceled.
+  is_unsuccessful:
+    description: If the schedule return unsuccessful.
   days_visit_cancelled_to_visit:
     description:
       Days between the visit cancelled and the visit.
