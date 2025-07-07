@@ -1,0 +1,88 @@
+---
+database_name: dw_inspections
+table_name: dim_assessment
+description:
+  This dimension brings information from the inspection assessment, there will only be an assessment after the survey is started by the inspector.
+  Each row is a unique assessment, identified by the sk_assessment column.
+  An Assessment must be unique per inspection, however for dates before August 19, 2023 there is residual data of a product bug.
+  This bug erroneously created more than one Assessment per inspection. Therefore, for these cases, the Assessment will not be unique per inspection.
+  It is observed that the extra Assessments are identical, with no data distinction between them.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  sk_assessment:
+    description: Assessment unique identifier.
+      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
+      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the sk_inspection will not be unique.
+      It is observed that the extra Assessments are identical, with no data distinction between them.
+    lineage:
+      - datalake_inspection_services_clean.assessment.id_assessment
+  source:
+    description: Identifies which application the inspector used to perform the inspection.
+    categories:
+      INSPETOR_BUGIGANGA: The inspection was carried out through the PWA.
+      INSPECTORS_FLUTTER: The inspection was carried out through the Inspection Service.
+    lineage:
+      - datalake_inspection_services_clean.assessment.source
+  house_supplies:
+    description:
+      Indicates the operating condition of the water, gas and electricity supply. However,
+      this field is no longer populated in the database, serving only for historical consultation.
+    lineage:
+      - datalake_inspection_services_clean.assessment.house_supplies
+  key_location:
+    description: Where or with whom is the key after assessment of the property.
+    lineage:
+      - datalake_inspection_services_clean.assessment.key_location
+  key_location_details:
+    description:
+      If the key_location column is filled in as 'other', the inspector must
+      describe the location and this information is saved in this column.
+    lineage:
+      - datalake_inspection_services_clean.assessment.key_location_details
+  dt_owner_limit_revision:
+    description:
+      Indicates the deadline for the owner to conclude its review of the report.
+      After this date, completion is compulsory.
+    lineage:
+      - datalake_inspection_services_clean.assessment.dt_owner_limit_revision
+  dt_tenant_limit_revision:
+    description:
+      Indicates the deadline for tenant to complete its review of the report.
+      After this date, completion is compulsory.
+    lineage:
+      - datalake_inspection_services_clean.assessment.dt_tenant_limit_revision
+  ts_created:
+    description: Assessment creation date and time.
+    lineage:
+      - datalake_inspection_services_clean.assessment.ts_created
+  ts_finished_local:
+    description:
+      This column should display the time when the inspector finished carrying
+      out the inspection (local timezone).
+    lineage:
+      - datalake_inspection_services_clean.assessment.ts_finished
+  ts_started_local:
+    description:
+      This column should display the time when the inspector started to
+      perform the inspection (local timezone).
+    lineage:
+      - datalake_inspection_services_clean.assessment.ts_started
+  ts_updated:
+    description: Assessment update date and time.
+    lineage:
+      - datalake_inspection_services_clean.assessment.ts_updated
+  ts_load:
+    description: Date and time when the data was loaded.
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_inspection_services_clean.assessment.year
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_inspection_services_clean.assessment.month
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_inspection_services_clean.assessment.day

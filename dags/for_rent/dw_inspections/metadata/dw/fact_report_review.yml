@@ -1,0 +1,136 @@
+---
+database_name: dw_inspections
+table_name: fact_report_review
+description: This table provides a general summary of the approvals, stages and totals of repair requests that occurred based on the inspection report.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  sk_assessment:
+    lineage:
+      - datalake_inspections.reviewer.id_assessment
+    description: Assessment unique identifier.
+      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
+      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the sk_inspection will not be unique.
+      It is observed that the extra Assessments are identical, with no data distinction between them.
+  sk_previous_assessment:
+    lineage:
+      - datalake_inspections.reviewer.id_previous_assessment
+    description:
+      If there was any previous assessment for the same contract, it will
+      be indicated in this column. Usually references an assessment from an onboarding
+      or contestation inspection.
+  sk_inspection:
+    lineage:
+      - datalake_inspections.reviewer.id_inspection
+    description: Unique id to identify a inspection.
+  total_repair_request:
+    description: Total repair requests made during the inspection review
+  total_repair_request_by_analyst:
+    description: Total repair requests made during the inspection review by the analyst
+  total_repair_request_by_owner:
+    description: Total repair requests made during the inspection review by the owner
+  total_repair_contested:
+    description: Total number of repair requests contested in the inspection review
+  total_repair_exempted:
+    description: Total number of repair requests exempted from inspection review
+  has_owners_approval:
+    lineage:
+      - datalake_inspections.report_approval.has_owner_access_review
+    description: Indicates that all owners involved approved the inspection report
+  has_tenants_approval:
+    lineage:
+      - datalake_inspections.report_approval.has_owner_access_review
+    description: Indicates that all tenants involved approved the inspection report
+  has_analysts_approval:
+    lineage:
+      - datalake_inspections.report_approval.has_owner_access_review
+    description: Indicates that all analysts involved approved the inspection report
+  has_owner_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.has_owner_access_review
+    description: Indicates whether the owner has already accessed the inspection report review home page
+  has_tenant_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.has_tenant_access_review
+    description: Indicates whether the tenant has already accessed the inspection report review home page
+  dt_owner_limit_revision:
+    lineage:
+      - datalake_inspections.report_approval.dt_owner_limit_revision
+    description:
+      Indicates the deadline for the owner to conclude its review of the report.
+      After this date, completion is compulsory.
+  dt_tenant_limit_revision:
+    lineage:
+      - datalake_inspections.report_approval.dt_tenant_limit_revision
+    description:
+      Indicates the deadline for tenant to complete its review of the report.
+      After this date, completion is compulsory.
+  ts_sent_to_repair_analysis:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_sent_to_repair_analysis
+    description: Timestamp. The inspection was sent to the analysis team to identify the need for repairs to the house
+  ts_sent_to_owner_review:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_sent_to_owner_review
+    description: Timestamp. Review available for owner review
+  ts_review_started_by_owner:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_review_started_by_owner
+    description: Timestamp. Survey whose owner has already done some intervention
+  ts_sent_to_tenant_review:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_sent_to_tenant_review
+    description: Timestamp. Survey available for tenant review
+  ts_review_started_by_tenant:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_review_started_by_tenant
+    description: Timestamp. Survey whose tenant has already done some intervention
+  ts_sent_to_contestation_analysis:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_sent_to_contestation_analysis
+    description: Timestamp. The inspection was sent to the analysis team, to evaluate the owner/tenant contestation
+  ts_reviewed:
+    lineage:
+      - datalake_inspections.inspection_status_change.ts_reviewed
+    description: |
+      Timestamp.
+      In offboarding: Survey sent to the Operations team to validate interventions proposed by owner/tenant
+      In onboarding: When the review deadline is reached
+  ts_first_owner_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.ts_first_owner_access_review
+    description: Timestamp of the first time the owner accessed the inspection report review home page
+  ts_last_owner_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.ts_last_owner_access_review
+    description: Timestamp of the last time the owner accessed the inspection report review home page
+  ts_first_tenant_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.ts_first_tenant_access_review
+    description: Timestamp of the first time the tenant accessed the inspection report review home page
+  ts_last_tenant_access_review:
+    lineage:
+      - datalake_amplitude_inspections.inspection_stages_access.ts_last_tenant_access_review
+    description: Timestamp of the last time the tenant accessed the inspection report review home page
+  ts_first_approval:
+    lineage:
+      - datalake_inspections.report_approval.ts_first_approval
+    description: Timestamp of first approval/disapproval
+  ts_last_approval:
+    lineage:
+      - datalake_inspections.report_approval.ts_last_approval
+    description: Timestamp of last approval/disapproval
+  ts_load:
+    description: Date and time when the data was loaded.
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_inspections.reviewer.year
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_inspections.reviewer.month
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_inspections.reviewer.day

@@ -1,0 +1,199 @@
+database_name: datalake_ebdb_photo_jobs
+table_name: photo_job
+owner: data-ae-for-rent@quintoandar.com.br
+domain: For Rent
+description: Information about the photography job carried out on the properties
+columns:
+  id:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.id
+  id_house:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.id_house
+  id_photographer:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_data.id
+  id_user_who_canceled:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.user.id
+  id_rep:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.user.id_sales_rep
+      - datalake_ebdb_clean.user.id
+  country_code:
+    description: ""
+    lineage:
+      - datalake_ebdb_country.house.country_code
+  job_status:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.status
+  booking_instructions:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.booking_instructions
+  photographer_name:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.user.name
+  photographer_email:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.user.email
+  photo_session_contact_name:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.photo_session_contact_name
+  photo_session_email:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.photo_session_email
+  photo_session_phone:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.photo_session_phone
+  photo_session_secondary_phone:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.photo_session_secondary_phone
+  key_pick_up:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.key_pick_up
+  key_others:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.key_others
+  contract_type:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.contract_type
+  problem:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.problem
+  photo_sender_user_type:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.photo_sender_user_type
+  cancellation_reason:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.reason_of_change
+      - datalake_ebdb_clean.house_registration_status_aud.photo_shoot_schedule_reason
+  cancellation_reason_text:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.cancellation_reason_text
+  user_who_canceled_name:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.user.name
+  user_who_canceled_email:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.user.email
+  creation_origin:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.user.id_photographer_data
+      - datalake_ebdb_clean.user.id_sales_rep
+      - datalake_ebdb_clean.user.email
+  user_cancellation_type:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.status
+      - datalake_ebdb_clean.user.id
+      - datalake_ebdb_clean.user.id_photographer_data
+      - datalake_ebdb_clean.user.id_sales_rep
+      - datalake_ebdb_clean.user.email
+  has_lockbox:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.has_lockbox
+  is_canceled:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.status
+  is_approved:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.is_approved
+  is_confirmed:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.is_confirmed
+  is_flexible_schedule:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  is_same_day_upload:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
+      - datalake_ebdb_clean.photographer_job.ts_session_started
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  is_job_on_time:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  is_job_anticipated:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  creation_to_scheduling_diff_minutes:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+      - datalake_ebdb_clean.photographer_job.ts_created
+  dt_photographer_started:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_data.ts_created
+  ts_photographer_accepted:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photographer_accepted
+  ts_photo_job_requested:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photo_job_requested
+  ts_session_started:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_session_started
+  ts_scheduled:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  ts_scheduled_local:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_scheduled
+  ts_photos_uploaded:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_photos_uploaded
+  ts_problem_reported:
+    description: ""
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+  ts_canceled:
+    description: ""
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+  ts_created:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_created
+  ts_updated:
+    description: ""
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_updated

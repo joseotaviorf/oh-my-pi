@@ -1,0 +1,49 @@
+---
+database_name: dw_inspections
+table_name: dim_contestation
+description: This dimension provides comments and justifications for opening the repair contestation
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  sk_contestation:
+    lineage:
+      - datalake_inspection_services_clean.contestation.id_contestation
+    description: Auto-incrementing internal ID
+  comment:
+    lineage:
+      - datalake_inspection_services_clean.contestation.comment
+    description: Contestation description
+  reason:
+    lineage:
+      - datalake_inspection_services_clean.contestation.reason
+    description: "Reason/Justification for contestation"
+    categories:
+      DISAGREE: ""
+      SAME: ""
+      REPAIR_NEGOTIATED: ""
+  origin:
+    lineage:
+      - datalake_inspection_services_clean.contestation.origin
+    description: Indicates which feature originated the contestation, for example, the value 'BUGET_APPROVAL' indicates whether the contestation came from the budget approval feature.
+  type:
+    lineage:
+      - datalake_inspection_services_clean.contestation.type
+    description: Indicates the type of contestation, for example cost or liability.
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_clean.contestation.ts_updated
+    description: Record update date
+  ts_load:
+    description: Date and time when the data was loaded.
+  year:
+    lineage:
+      - datalake_inspection_services_clean.contestation.year
+    description: Year of update date
+  month:
+    lineage:
+      - datalake_inspection_services_clean.contestation.month
+    description: Month of update date
+  day:
+    lineage:
+      - datalake_inspection_services_clean.contestation.day
+    description: Day of update date

@@ -2,7 +2,7 @@ dag:
   name: schedules
   schedule_start_date: 2024, 1, 1
   schedule_interval: 0 0 * * *
-  owner: Data SS
+  owner: Data ForRent
   documentation:
     dag_purpose: |
       Dag Raw/Clean in order to ingest general scheduling data into the analytical environment.

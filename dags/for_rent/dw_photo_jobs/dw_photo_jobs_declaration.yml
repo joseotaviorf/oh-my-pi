@@ -1,0 +1,22 @@
+dag:
+  name: dw_photo_jobs
+  schedule_start_date: 2020,08,29
+  owner: Data ForRent
+  documentation:
+    dag_purpose: This DAG loads to DW our models related to the listings jobs.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: public
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new

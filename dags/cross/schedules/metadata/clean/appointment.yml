@@ -3,7 +3,7 @@ database_name: datalake_schedules_clean
 table_name: appointment
 description: Scheduling data currently only includes Inspections, but in the future it should contain data on Visits and Photos scheduling.
 domain: Cross
-owner: data-ae-ss@quintoandar.com.br
+owner: data-ae-for-rent@quintoandar.com.br
 columns:
   id:
     lineage:

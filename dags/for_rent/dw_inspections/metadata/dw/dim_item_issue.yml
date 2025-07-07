@@ -1,0 +1,64 @@
+---
+database_name: dw_inspections
+table_name: dim_item_issue
+description:
+  This dimension provides information on the problems or sub-problems linked to the condition of an evaluated item.
+  Here we find what type of problem was found, what was the comment, tag or checklist marked by the surveyor and the
+  suggestion for repairing the problem.
+  Each row is a unique issue, identified by the sk_item_issue column.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  sk_item_issue:
+    description: Item Issue unique identifier.
+    lineage:
+      - datalake_inspectionss.item_issue.id_item_issue
+  issue_type:
+    description: Specify the sub-type problem.
+    lineage:
+      - datalake_inspectionss.item_issue.issue_type
+  display_type:
+    description: Shows the component that renders this type of problem.
+    categories:
+      COUNTER: Registers the number of parts with problems.
+      OPTION_DESCRIPTION: Chipchoice with comment option.
+      CHECK_DESCRIPTION: Checklist option with description.
+      CHECK: Checklist option.
+      OVERVIEW: Displays the overview of the item.
+      CHIP_CHOICE_SINGLE: Chipchoice with single select option.
+      OVERVIEW_WITH_CONDITIONS: Overview with option to record conditions.
+      DEFAULT: Overview with comment option.
+    lineage:
+      - datalake_inspectionss.item_issue.display_type
+  issue_comment:
+    description: Displays a inspector's comment.
+    lineage:
+      - datalake_inspectionss.item_issue.issue_comment
+  repair_suggestion:
+    description:
+      This column would keep repair suggestions for presentation in the report,
+      but this functionality was not integrated.
+    lineage:
+      - datalake_inspectionss.item_issue.repair_suggestion
+  ts_created:
+    description: Creation date and time.
+    lineage:
+      - datalake_inspectionss.item_issue.ts_created
+  ts_updated:
+    description: Update date and time.
+    lineage:
+      - datalake_inspectionss.item_issue.ts_updated
+  ts_load:
+    description: Date and time when the data was loaded.
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_inspectionss.item_issue.year
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_inspectionss.item_issue.month
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_inspectionss.item_issue.day

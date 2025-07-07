@@ -1,0 +1,57 @@
+---
+database_name: dw_inspections
+table_name: dim_item_media
+description:
+  This dimension table carries data from photos and videos (media) generated during inspection,
+  by the inspector, both those generated during the review, by the tenant and owner.
+  Each row is a unique media, identified by the sk_item_media column.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  sk_item_media:
+    description: Item Media unique identifier.
+    lineage:
+      - datalake_inspections.item_media.id_item_media
+      - datalake_inspections.item_review.id_review_media
+  media_creator:
+    description: Indicates the type of user creating the media.
+    lineage:
+      - datalake_inspections.item_media.user_type
+      - datalake_inspections.item_review.user_type
+  media_type:
+    description: Indicates whether the media is a photo or a video.
+    lineage:
+      - datalake_inspections.item_media.media_type
+      - datalake_inspections.item_review.media_type
+  media_path:
+    description: It is the email address of the media.
+    lineage:
+      - datalake_inspections.item_media.media_path
+      - datalake_inspections.item_review.media_path
+  ts_created:
+    description: Creation date and time.
+    lineage:
+      - datalake_inspections.item_media.ts_created
+      - datalake_inspections.item_review.ts_media_created
+  ts_updated:
+    description: Update date and time.
+    lineage:
+      - datalake_inspections.item_media.ts_updated
+      - datalake_inspections.item_review.ts_media_updated
+  ts_load:
+    description: Date and time when the data was loaded.
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_inspections.item_media.year
+      - datalake_inspections.item_review.year
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_inspections.item_media.month
+      - datalake_inspections.item_review.month
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_inspections.item_media.day
+      - datalake_inspections.item_review.day

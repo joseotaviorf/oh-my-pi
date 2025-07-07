@@ -1,0 +1,76 @@
+---
+database_name: datalake_inspections
+table_name: item_media
+description: When inspecting an item, the inspector may photograph or record video to demonstrate the condition of the item.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_item:
+    description: Item unique identifier.
+    lineage:
+      - datalake_inspection_services_clean.item_media.id_item
+  id_item_media:
+    description: Item Media unique identifier.
+    lineage:
+      - datalake_inspection_services_clean.item_media.id_item_media
+  id_external_media:
+    description: Item Media correlational unique identifier in the PWA database.
+    lineage:
+      - datalake_inspection_services_clean.item_media.id_main
+  uuid:
+    description: Item Media unique identifier (uuid)
+    lineage:
+      - datalake_inspection_services_clean.item_media.uuid
+  id_room:
+    description: Room unique identifier.
+    lineage:
+      - datalake_inspections.item.id_room
+  id_assessment:
+    description: Unique identifier of an Assessment.
+      This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
+      This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the id_inspection will not be unique.
+      It is observed that the extra Assessments are identical, with no data distinction between them.
+    lineage:
+      - datalake_inspections.item.id_assessment
+  id_inspection:
+    description: Inspection unique identifier.
+    lineage:
+      - datalake_inspections.item.id_inspection
+  id_user:
+    description: Unique identifier of the media creator user.
+    lineage:
+      - datalake_inspections.item.id_inspector
+  user_type:
+    description: Indicates the type of user creating the media.
+  media_type:
+    description: Indicates whether the media is a photo or a video.
+    lineage:
+      - datalake_inspection_services_clean.item_media.type
+  media_path:
+    description: It is the email address of the media.
+    lineage:
+      - datalake_inspection_services_clean.item_media.url
+  is_active:
+    description: Indicates if the object is active.
+    lineage:
+      - datalake_inspection_services_clean.item_media.is_active
+  ts_created:
+    description: Creation date and time.
+    lineage:
+      - datalake_inspection_services_clean.item_media.ts_created
+  ts_updated:
+    description: Update date and time.
+    lineage:
+      - datalake_inspection_services_clean.item_media.ts_updated
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_inspection_services_clean.item_media.year
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_inspection_services_clean.item_media.month
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_inspection_services_clean.item_media.day

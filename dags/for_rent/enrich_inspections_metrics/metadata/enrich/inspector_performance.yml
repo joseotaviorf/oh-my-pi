@@ -1,0 +1,50 @@
+---
+database_name: datalake_inspections_metrics
+table_name: inspector_performance
+description:
+  This table reports the performance of inspectors. This data is mainly used by the logistics
+  efficiency team to optimize inspection schedules. Data will be saved daily in snapshots
+  with data from the last 60 days.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_inspector:
+    description: Unique identifier of the inspector.
+    lineage:
+      - datalake_inspections.inspection_booking.id_inspector
+  inspector_name:
+    description: Inspector's full name.
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.inspector_name
+  total_inspected:
+    description: Total inspections carried out during the entire period of the inspector's contract.
+  total_booked:
+    description: Total inspections that were scheduled throughout the inspector's contract period.
+  total_cancelled_by_inspector:
+    description: Total inspections that were canceled for reasons linked to the inspector.
+  total_cancelled_by_others:
+    description: Total inspections that were canceled for reasons that are not linked to the inspector.
+  total_days_worked:
+    description: Total days worked, that is, days the inspector carried out the inspection.
+  total_weeks_worked:
+    description: Total weeks worked, that is, total weeks in which the inspector carried out an inspection.
+  average_inspections:
+    description: Average of inspections per day worked.
+  inspections_conversion:
+    description: Conversion of scheduled inspections that were performed.
+  eligible_inspections:
+    description: Total number of inspections that a inspector is eligible to perform in one day
+  dt_inspector_started:
+    description: Beginning of the employment contract.
+    lineage:
+      - datalake_gsheets_clean.inspectors_control.dt_start
+  dt_load:
+    description:
+      Date referring to the loading of data in the snapshot, so the calculated metrics consider all data up to this
+      snapshot date. This date is the day before the day the flow was run (D-1).
+  year:
+    description: Year of the date referring to the loading of data in snapshot.
+  month:
+    description: Month of the date referring to the loading of data in snapshot.
+  day:
+    description: Day of the date referring to the loading of data in snapshot.

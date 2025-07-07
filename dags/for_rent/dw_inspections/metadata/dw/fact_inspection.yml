@@ -1,0 +1,181 @@
+---
+database_name: dw_inspections
+table_name: fact_inspection
+description:
+    This fact table communicates with the inspection, assessment and inspector dimensions, bringing an overview of inspection
+    indicators and metrics, such as the Lead Time of execution, booleans to indicate whether we completed the survey within
+    the expected time frame, whether this survey was canceled at day or the day before the scheduled one, among others.
+    Each row is a unique inspection, identified by the sk_inspection column. This is just not true for data prior to August 19, 2023, because of a bug in the product
+    (read the description of the sk_assessment column for more details).
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+    sk_inspection:
+        description:
+            Unique id to identify a inspection. If its origin is the Inspection Service
+            (IS), the sk will correspond to the id generated in the product. If the inspection
+            source is still the PWA, the sk will correspond to the id generated in the enrich_inspection
+            by the MD5 function.
+        lineage:
+            - datalake_inspections.inspection_booking.id_inspection
+    sk_main_inspection:
+        description: Inspection correlational unique identifier in the PWA database.
+        lineage:
+            - datalake_inspections_metrics.inspection_booking.id_external
+    sk_client_side:
+        lineage:
+            - datalake_inspections.inspection_booking.id_client_side
+        description: Inspection unique identifier (uuid)
+    sk_previous_inspection:
+        description:
+            If there is a previous inspection for the same contract, it will be indicated in this column.
+            It is usually completed in offboarding inspections, bringing the identification of the onboarding or dispute inspection.
+        lineage:
+            - datalake_inspections_metrics.inspection_booking.id_previous_inspection
+    sk_inspector:
+        description: Unique identifier of the inspector responsible for carrying out the inspection.
+        lineage:
+            - datalake_inspections_metrics.inspection_booking.id_inspector
+    sk_assessment:
+        description: Assessment unique identifier.
+            This identifier must be unique per inspection, however, for dates prior to August 19, 2023, there is residual data in a product bug.
+            This bug erroneously created more than one Assessment per survey. Therefore, for these cases, the sk_inspection will not be unique.
+            It is observed that the extra Assessments are identical, with no data distinction between them.
+        lineage:
+            - datalake_inspections.inspection_booking.id_assessment
+    sk_booking:
+        description: Identification key for scheduling the inspection on the main
+        lineage:
+            - datalake_inspections.inspection_booking.id_booking
+    sk_appointment:
+        description: Scheduling identification key in hash format that groups the main and IS ids.
+        lineage:
+            - datalake_inspections.inspection_booking.id_appointment
+    sk_contract:
+        description: Unique identifier of the contract related to the property to be inspected.
+        lineage:
+            - datalake_inspections.inspection_booking.id_contract
+    sk_house:
+        description: Unique identifier of the related house to be inspected.
+        lineage:
+            - datalake_inspections.inspection_booking.id_house
+    sk_country:
+        description: Unique identifier of country.
+        lineage:
+            - datalake_inspections.inspection_booking.id_country
+    sk_city:
+        description: Unique identifier of city.
+        lineage:
+            - datalake_inspections.inspection_booking.id_city
+    country_code:
+        description: Identification code of the country where the property is located.
+        lineage:
+            - datalake_inspections.inspection_booking.country_code
+    booking_type:
+        description: What type of booking is Inspection or Quarterly Inspection.
+        lineage:
+            - datalake_inspections.inspection_booking.booking_type
+    ldt_hours_execution:
+        description: Lead time from the beginning to the end of the inspection, that is, the assessment execution interval.
+        lineage:
+            - datalake_inspections_metrics.inspection_achievements.ldt_hours_execution
+    sla_execution_target:
+        description:
+            Inspection execution target. Indicates the maximum interval of days before or after a
+            pre-defined period, in which the inspection must take place.
+        lineage:
+            - datalake_inspections_metrics.inspection_achievements.sla_execution_target
+    is_sla_execution:
+        description: Indicates whether the inspection occurred within the day range predefined by the execution target.
+        lineage:
+            - datalake_inspections_metrics.inspection_achievements.is_sla_execution
+    is_d0_canceled:
+        description: Indicates that the inspection was canceled by the inspector on the scheduled day.
+        lineage:
+            - datalake_inspections.inspection_booking.is_d0_canceled
+    is_d1_canceled:
+        description: Indicates that the inspection was canceled by the inspector the day before the scheduled.
+        lineage:
+            - datalake_inspections.inspection_booking.is_d1_canceled
+    is_not_canceled_by_inspector:
+        description: Indicates that the inspection was not canceled because of the inspector.
+        lineage:
+            - datalake_inspections.inspection_booking.is_not_canceled_by_inspector
+    is_first_schedule:
+        description: Indicates whether scheduling the inspection is the first in the process.
+        lineage:
+            - datalake_inspections.inspection_booking.is_first_schedule
+    is_executed_in_first_schedule:
+        description: Indicates whether the inspection took place in the first scheduled time.
+        lineage:
+            - datalake_inspections.inspection_booking.is_executed_in_first_schedule
+    dt_contract_entrance:
+        description: Date defined in the contract of when the tenant will enter in the property.
+        lineage:
+            - datalake_inspections.inspection_booking.dt_contract_entrance
+    dt_contract_termination:
+        description: Contract termination date.
+        lineage:
+            - datalake_inspections.inspection_booking.dt_contract_termination
+    dt_execution_limit:
+        description: Deadline for carrying out the inspection within the expected SLA.
+        lineage:
+            - datalake_inspections.inspection_booking.dt_execution_limit
+    ts_inspected:
+        description: Date and time the inspection was performed.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_inspected
+    ts_synced:
+        description: Date and time of the first synchronization of the inspection in the application.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_synced
+    ts_booking_created:
+        description: Datetime of the booking creation (UTC).
+        lineage:
+            - datalake_inspections.inspection_booking.ts_booking_created_utc
+    ts_booking_created_local:
+        description: Datetime of the booking creation in your region's local time.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_booking_created_local_tz
+    ts_booking_inspected:
+        description: Scheduled date and time (UTC).
+        lineage:
+            - datalake_inspections.inspection_booking.ts_booking_inspected_utc
+    ts_booking_inspected_local:
+        description: Scheduled date and time in your region's local time.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_booking_inspected_local_tz
+    ts_booking_cancelled:
+        description: Schedule cancellation date and time (UTC).
+        lineage:
+            - datalake_inspections.inspection_booking.ts_booking_cancelled_utc
+    ts_booking_cancelled_local:
+        description: Schedule cancellation date and time in local time for the region.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_booking_cancelled_local_tz
+    ts_termination_canceled:
+        description: Date and time when the termination of the contract was canceled.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_termination_canceled
+    ts_created:
+        description: Timestamp of when the inspection request was synchronized in the database product.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_created
+    ts_updated:
+        description: Timestamp of when the inspection request was updated in the database product.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_updated
+    ts_load:
+        description: Date and time when the data was loaded.
+    year:
+        description: Year referring to date of update.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_updated
+    month:
+        description: Month referring to date of update.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_updated
+    day:
+        description: Day referring to date of update.
+        lineage:
+            - datalake_inspections.inspection_booking.ts_updated

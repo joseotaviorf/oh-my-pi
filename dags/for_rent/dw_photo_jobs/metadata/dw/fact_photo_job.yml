@@ -1,0 +1,253 @@
+database_name: dw_public
+table_name: fact_photo_job
+description: Fact table that contains each photo job created and keys associated with
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+
+columns:
+  id_photo_job:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.id
+    description: Key of photo job
+  sk_house_listing:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.id_house
+      - datalake_ebdb_listing.house_listing.version
+    description: Key of house listing
+  sk_region:
+    lineage:
+      - datalake_ebdb_clean.house.id_region
+    description: Key of region where house listing is located in
+  sk_user_cancel:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.id_user_who_canceled
+    description: Key of user that cancelled the photo job
+  sk_user_photographer:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.id_photographer
+    description: Key of photographer that is assigned to the job
+  sk_user_rep:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.id_rep
+    description: Key of sales rep that created the photo job
+  job_status:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.job_status
+    description: Status to identify the job status (Cancelado, ComProblema, etc)
+    categories:
+      Aceito: ""
+      Agendado: ""
+      Cancelado: ""
+      ComProblema: ""
+      Completado: ""
+      DesignadoFotografo: ""
+      FotosTiradas: ""
+      Iniciado: ""
+      NaoListado: ""
+      Novo: ""
+      Publicado: ""
+  creation_origin:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.creation_origin
+    description: Origin of the photo job (IS, Owner, etc)
+    categories:
+      Admin: ""
+      Fotografo: ""
+      InsideSales_external: ""
+      InsideSales_internal: ""
+      Prop: ""
+      Teste: ""
+  photo_shoot_contact_name:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.photo_session_contact_name
+    description: Name reference of person to contact about the photo job
+  photo_shoot_email:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.photo_session_email
+    description: Email of person to contact about the photo job
+  photo_shoot_phone:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.photo_session_phone
+    description: Primary phone of person to contact about the photo job
+  photo_shoot_second_phone:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.photo_session_secondary_phone
+    description: Secondary phone of person to contact about the photo job
+  key_withdraw:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.key_pick_up
+    description: Info about who holds the key for the photographer
+    categories:
+      Outros: ""
+      Portaria: ""
+      Proprietario: ""
+  key_comments:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.key_others
+    description: Comments about key retrieval
+  photographer_contract_type:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.contract_type
+    description: Photographer contract type (CLT, Freelancer)
+    categories:
+      CLT: ""
+      Freelancer: ""
+  photographer_problem_reason:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.problem
+    description: Problem that the photographer encountered in the job
+    categories:
+      Alugado: ""
+      ApartamentoBanguncado: ""
+      Duplicado: ""
+      ForaDoPadrao: ""
+      IMOVEL_COMERCIAL: ""
+      IMOVEL_EM_CONDICAO_INSEGURA: ""
+      IMPREVISTO_FOTOGRAFO: ""
+      LOCALIZACAO_PERIGOSA: ""
+      NaoCompareceu: ""
+      Outros: ""
+      PROBLEMAS_NO_ENVIO_DE_FOTOS: ""
+      PROBLEMA_COM_ENDERECO: ""
+      ProprietarioCancelou: ""
+      Reforma: ""
+      SemAutorizacao: ""
+      SemChaves: ""
+      SemContato: ""
+      Vendido: ""
+  cancel_reason:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.cancellation_reason
+    description: Reason that a job was cancelled
+    categories:
+      HOUSE_ALREADY_PUBLISHED: ""
+      HOUSE_PRICE_WAS_OUT_OF_BOUNDS: ""
+      HOUSE_UNDER_RENOVATION: ""
+      HOUSE_WAS_A_BUSINESS_REAL_ESTATE: ""
+      HOUSE_WAS_OUT_OF_APARTMENT_RENTING_REGIONS: ""
+      HOUSE_WAS_OUT_OF_HOUSE_RENTING_REGIONS: ""
+      HOUSE_WAS_OUT_OF_HOUSE_SALES_REGIONS: ""
+      HOUSE_WAS_SOLD: ""
+      IMMEDIATE_RESCHEDULING: ""
+      IMMEDIATE_RESCHEDULING_BY_PHOTOGRAPHER: ""
+      ISSUES_WITH_HOUSE_DOCUMENTATION: ""
+      MANUAL_RESCHEDULING: ""
+      OTHER: ""
+      OWNER_CONSIDERED_ADMINISTRATION_FEE_TOO_HIGH: ""
+      OWNER_CONSIDERED_BROKERAGE_FEE_TOO_HIGH: ""
+      OWNER_DIDNT_ACCEPT_ONLINE_PROCESS: ""
+      OWNER_DIDNT_ANSWER_PHONE: ""
+      OWNER_DIDNT_WANT_ADMINISTRATION: ""
+      OWNER_DIDNT_WANT_TO_LIST_ON_QUINTOANDAR: ""
+      OWNER_DISAGREE_CHARGES_PAYMENTS: ""
+      OWNER_EVALUATING: ""
+      OWNER_GAVE_UP_RENTING: ""
+      OWNER_HAD_NEGATIVE_PHOTOGRAPHER_EXPERIENCE: ""
+      OWNER_NEED_MORE_TIME: ""
+      OWNER_PHONE_INVALID: ""
+      OWNER_RENTED_EXTERNALLY: ""
+      OWNER_WANT_TO_CHANGE_PHOTO_JOB_TYPE: ""
+      OWNER_WITH_UNAVAILABLE_DATE_AND_TIME: ""
+      OWNER_WONT_ANSWER_PHONE: ""
+      PHOTOGRAPHER_WONT_ANSWER: ""
+  user_cancel_type:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.user_cancellation_type
+    description: Type of user that cancelled the photo job
+    categories:
+      Admin: ""
+      Fotografo: ""
+      InsideSales_external: ""
+      InsideSales_internal: ""
+      Prop: ""
+      Teste: ""
+  flexible_schedule:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.is_flexible_schedule
+    description:
+      Flag to identify if job has a fixed scheduled hour or a flexible
+      one
+  is_same_day_upload:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.is_same_day_upload
+    description: Flag to identify if job was uploaded same day it was realized
+  is_anticipated:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.is_job_anticipated
+    description: Boolean indicating if the job was anticipated
+  flg_job_on_time:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.is_job_on_time
+    description: Flag to identiify if job was uploaded same day it was scheduled
+  approved:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.is_approved
+    description: Boolean indicating if the job was approved
+  confirmed:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.is_confirmed
+    description: Boolean indicating if the job was confirmed
+  lockbox:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.has_lockbox
+    description: Flag that indicates if a lockbox is present to retrieve key
+  rescheduled:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.id
+    description:
+      Flag that indicates if this job was successfully rescheduled for
+      another date
+  sk_date_photographer_accepted:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.ts_photographer_accepted
+    description: Key of date that photorapher accepted job
+  sk_date_job_created:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.ts_created
+    description: Key of date that photo job was created
+  sk_date_job_issued:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.ts_photo_job_requested
+    description: Date when the job was requested
+  sk_date_shoot_started:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.ts_session_started
+    description: Key of date that photographer initiated job
+  sk_date_job_scheduled:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.ts_scheduled
+    description: Key of date that photo job was scheduled to happen
+  sk_date_photos_uploaded:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.ts_photos_uploaded
+    description: Key of date that photo job was uploaded to website
+  sk_date_updated:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.ts_updated
+    description: Update date of photojob
+  sk_date_photographer_start:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.dt_photographer_started
+    description: Date when photographer has started working in QuintoAndar
+  sk_date_user_cancel:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.ts_problem_reported
+    description: Key of date that photo job was cancelled
+  sk_date_problem_reported:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.ts_canceled
+    description: Date when the job was canceled
+  creation_to_scheduling_diff_minutes:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.creation_to_scheduling_diff_minutes
+    description: Minutes between date job creation and date it was scheduled to happen
+  creation_to_scheduling_diff_hours:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.creation_to_scheduling_diff_minutes
+    description: Hours between date job creation and date it was scheduled to happen
+  creation_to_scheduling_diff_days:
+    lineage:
+      - datalake_ebdb_photo_jobs.photo_job.creation_to_scheduling_diff_minutes
+    description: Days between date job creation and date it was scheduled to happen
+  ts_load:
+    description: Date and time when the data was loaded.

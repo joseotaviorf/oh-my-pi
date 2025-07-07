@@ -1,0 +1,73 @@
+---
+database_name: datalake_inspections
+table_name: item_group
+description:
+  This table deals with the objects that were evaluated during the inspection. It is worth noting that,
+  when dealing with IS data, the item_group object refers to window, door, floor, etc.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_item_group:
+    description: Item Group unique identifier.
+    lineage:
+      - datalake_inspection_services_clean.item_group.id_item_group
+  id_item_group_type:
+    description: Item Group Type unique identifier.
+    lineage:
+      - datalake_inspection_services_clean.item_group_type.id_item_group_type
+  id_room:
+    description: Room unique identifier.
+    lineage:
+      - datalake_inspection_services_clean.item_group.id_room
+  id_main:
+    description: Item Group correlational unique identifier in the PWA database.
+    lineage:
+      - datalake_inspection_services_clean.item_group.id_main
+  item_group_name:
+    description: Description of the item group, for example floor, paint, lighting, etc. (typed by inspector)
+    lineage:
+      - datalake_inspection_services_clean.item_group.name
+  item_group_type:
+    description: Name of the object evaluated in the inspection.
+    lineage:
+      - datalake_inspection_services_clean.item_group_type.type
+  status:
+    description: Indicates the condition of the object for comparative surveys.
+    categories:
+      ABSENT: Object removed.
+      SAME: Object in the same conditions as the previous inspection.
+      REPLACED: Replaced object.
+    lineage:
+      - datalake_inspection_services_clean.item_group.status
+  is_inferior_quality:
+    description: Indicates the quality of the object in case of replacement.
+    lineage:
+      - datalake_inspection_services_clean.item_group.is_inferior_quality
+  is_active_status:
+    description: Indicates if the object is active.
+    lineage:
+      - datalake_inspection_services_clean.item_group.is_active_status
+  is_active_inferior_quality:
+    description: Indicates if the object is active in case of replacement.
+    lineage:
+      - datalake_inspection_services_clean.item_group.is_active_inferior_quality
+  ts_created:
+    description: Creation date and time.
+    lineage:
+      - datalake_inspection_services_clean.item_group.ts_created
+  ts_updated:
+    description: Update date and time.
+    lineage:
+      - datalake_inspection_services_clean.item_group.ts_updated
+  year:
+    description: Year referring to date of update.
+    lineage:
+      - datalake_inspection_services_clean.item_group.year
+  month:
+    description: Month referring to date of update.
+    lineage:
+      - datalake_inspection_services_clean.item_group.month
+  day:
+    description: Day referring to date of update.
+    lineage:
+      - datalake_inspection_services_clean.item_group.day
