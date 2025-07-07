@@ -2,7 +2,7 @@
 database_name: datalake_product_tech
 table_name: team_formation_product_tech
 owner: leonardo.soares@quintoandar.com.br
-domain: people
+domain: People
 description: Table that contains the team formation of the Product and Tech team historic changes.
 columns:
   id:

@@ -2,7 +2,7 @@
 database_name: datalake_pin
 table_name: performance_calibration
 owner: isabella.araujo@quintoandar.com.br
-domain: people
+domain: People
 description: Table that stores the consolidated results of the performance calibration process. It contains evaluations from different perspectives (self-assessment, manager, calibration) for each section of an employee's performance review.
 columns:
   id_assignment:
@@ -13,10 +13,6 @@ columns:
     description: 'Unique identifier for the period of service of an employee.'
     lineage:
       - datalake_hr_system.employee_ids.id_period_of_service
-  id_assignment:
-    description: 'Unique identifier for the assignment of an employee.'
-    lineage:
-      - datalake_pin_performance_clean.evaluation.id_assignment
   id_evaluation:
     description: 'Unique identifier for a specific performance evaluation. Primary key of the evaluation.'
     lineage:
@@ -24,7 +20,7 @@ columns:
   id_eval_section:
     description: 'Unique identifier for a specific section within a performance evaluation.'
     lineage:
-      - datalake_pin_performance_clean.evaluation.id_eval_section
+      - datalake_pin_performance_clean.evaluation_section.id_eval_section
   id_rating_level_from_self:
     description: 'Identifier of the rating level that the employee assigned to themselves for this section.'
     lineage:
@@ -37,6 +33,10 @@ columns:
     description: 'Identifier of the final rating level defined for the employee in this section after the calibration process.'
     lineage:
       - datalake_pin_talent_clean.rating_level_translation.id_rating_level
+  id_person:
+    description: 'Unique identifier for the person (employee).'
+    lineage:
+      - datalake_hr_system.employee_ids.id_person
   assignment_number:
     description: 'Unique identifier for the period of service of an employee.'
     lineage:
@@ -81,6 +81,14 @@ columns:
     description: 'Date when the performance document was completed.'
     lineage:
       - datalake_pin_performance_clean.evaluation.dt_performance_document_ended
+  ts_created:
+    description: 'Timestamp of when the evaluation was created in the source system.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.ts_created
+  ts_updated:
+    description: 'Timestamp of when the evaluation was last updated in the source system.'
+    lineage:
+      - datalake_pin_performance_clean.evaluation.ts_updated
   ts_load:
     description: 'Timestamp of when the record was loaded or last updated in this table.'
   year:

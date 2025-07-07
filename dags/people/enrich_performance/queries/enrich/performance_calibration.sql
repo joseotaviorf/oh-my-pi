@@ -82,25 +82,28 @@ SELECT
   rw.id_rating_level AS id_rating_level_from_self,
   rm.id_rating_level AS id_rating_level_from_manager,
   rc.id_rating_level AS id_rating_level_from_calibration,
+  employees.id_person,
   employees.assignment_number,
   CASE 
       WHEN hsdvl.name ILIKE '%Leadership%' THEN 'Leadership'
       WHEN hsdvl.name ILIKE '%Impact%' THEN 'Impact'
       WHEN hsdvl.name ILIKE '%Behavi%' THEN 'Behavior'
   END AS section_name,
-  rw.rating_description AS rating_description_from_self,
-  rm.rating_description AS rating_description_from_manager,
-  rc.rating_description AS rating_description_from_calibration,
+  COALESCE(rw.rating_description, -1) AS rating_description_from_self,
+  COALESCE(rm.rating_description, -1) AS rating_description_from_manager,
+  COALESCE(rc.rating_description, -1) AS rating_description_from_calibration,
   rw.numeric_rating AS numeric_rating_from_self,
   rm.numeric_rating AS numeric_rating_from_manager,
   rc.numeric_rating AS numeric_rating_from_calibration,
   e.dt_evaluation_occurred,
   e.dt_performance_document_started,
   e.dt_performance_document_ended,
+  e.ts_created,
+  e.ts_updated,
   NOW() AS ts_load,
   YEAR(e.dt_performance_document_started) AS year,
   MONTH(e.dt_performance_document_started) AS month,
-  YEAR(e.dt_performance_document_started) AS day
+  DAY(e.dt_performance_document_started) AS day
 FROM
   datalake_pin_performance_clean.evaluation AS e
 INNER JOIN 
