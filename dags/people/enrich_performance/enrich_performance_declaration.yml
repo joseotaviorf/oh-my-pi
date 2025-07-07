@@ -1,0 +1,25 @@
+dag:
+  name: enrich_performance
+  owner: Data People
+  schedule_start_date: 2025, 7, 3
+  documentation:
+    dag_purpose: This DAG brings enriched PIN data about Performance and Talent Reviews. 
+workflow:
+  type: query_delta
+  layer: enrich
+  has_hive_sync: false
+  bucket_config_name: people_bucket
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]
+  custom_schema: pin
+cluster:
+  type: databricks_13_3_min_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

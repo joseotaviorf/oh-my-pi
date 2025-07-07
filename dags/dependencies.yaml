@@ -691,8 +691,8 @@ bietlejuice.dw_payments_platform:
   - bietlejuice.enrich_payments_platform:load-enrich-payment
   - bietlejuice.enrich_payments_platform:load-enrich-payment-timeline
 bietlejuice.dw_performance:
-  - bietlejuice.enrich_pin:load-enrich-performance-calibration
-  - bietlejuice.enrich_pin:load-enrich-talent-review
+  - bietlejuice.enrich_performance:load-enrich-performance-calibration
+  - bietlejuice.enrich_performance:load-enrich-talent-review
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation
   - bietlejuice.pin_hr_review:load-clean-meeting
   - bietlejuice.pin_talent:load-clean-rating-level-base
@@ -2659,6 +2659,24 @@ bietlejuice.enrich_people_public:
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech
   - bietlejuice.hr_system:load-clean-jobs
   - bietlejuice.hr_system:load-clean-organizations
+bietlejuice.enrich_performance:
+  - bietlejuice.enrich_hr_system:load-enrich-employee-ids
+  - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation
+  - bietlejuice.pin_hr_review:load-clean-meeting
+  - bietlejuice.pin_performance:load-clean-evaluation
+  - bietlejuice.pin_performance:load-clean-evaluation-item
+  - bietlejuice.pin_performance:load-clean-evaluation-rating
+  - bietlejuice.pin_performance:load-clean-evaluation-section
+  - bietlejuice.pin_performance:load-clean-section-definition-translation
+  - bietlejuice.pin_performance:load-clean-template-section
+  - bietlejuice.pin_talent:load-clean-profile-base
+  - bietlejuice.pin_talent:load-clean-profile-item
+  - bietlejuice.pin_talent:load-clean-profile-type-sections-translation
+  - bietlejuice.pin_talent:load-clean-rating-level-base
+  - bietlejuice.pin_talent:load-clean-rating-level-translation
+  - bietlejuice.pin_talent:load-clean-rating-model-base
+  - bietlejuice.pin_talent:load-clean-rating-model-translation
+  - bietlejuice.pin_talent:load-clean-review-period-base
 bietlejuice.enrich_person:
   - bietlejuice.company:load-clean-member-profile
   - bietlejuice.person:load-clean-contact-info
@@ -2674,7 +2692,6 @@ bietlejuice.enrich_pin:
   - bietlejuice.pin_core:load-clean-action-reason-base
   - bietlejuice.pin_core:load-clean-all-assignments
   - bietlejuice.pin_core:load-clean-assignment-supervisor
-  - bietlejuice.pin_core:load-clean-foundation-lookup-value
   - bietlejuice.pin_core:load-clean-grade
   - bietlejuice.pin_core:load-clean-person-name
 bietlejuice.enrich_pixar:
