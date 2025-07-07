@@ -57,20 +57,22 @@ FROM
     datalake_similarity_score.house_metrics_score AS hms
 LEFT JOIN
     datalake_rental_historical_follow_up.house_listings_daily_info AS hdi
-        ON hdi.id_house = hms.id_house
-        AND hdi.year = hms.year
+        ON hdi.year = hms.year
         AND hdi.month = hms.month
         AND hdi.day = hms.day
+        AND hdi.id_house = hms.id_house
+        AND hms.business_context = 'RENT'
 LEFT JOIN
     datalake_sale_ongoing_listings.ongoing_listings_daily_info AS oldi
-        ON oldi.id_house = hms.id_house
-        AND oldi.year = hms.year
+        ON oldi.year = hms.year
         AND oldi.month = hms.month
         AND oldi.day = hms.day
+        AND oldi.id_house = hms.id_house
+        AND hms.business_context = 'SALE'
 WHERE
     MAKE_DATE(hms.year, hms.month, hms.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND hdi.uuid_company IS NULL
     AND oldi.sk_company IS NULL
 QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY hms.id_house ORDER BY hdi.dt_day DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY hms.id_house, hms.business_context ORDER BY hdi.dt_day DESC) = 1
 
