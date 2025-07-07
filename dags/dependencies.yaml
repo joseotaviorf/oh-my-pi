@@ -49,11 +49,6 @@ bietlejuice.dw_atta:
   - bietlejuice.enrich_atta:load-enrich-proposal-situation-changes
   - bietlejuice.sales_flow:load-clean-negotiation
   - bietlejuice.sales_flow:load-clean-offer
-bietlejuice.dw_banking:
-  - bietlejuice.ebdb_finance:load-clean-account
-  - bietlejuice.ebdb_finance:load-clean-account-transaction
-  - bietlejuice.ebdb_finance:load-clean-bank
-  - bietlejuice.ebdb_user:load-clean-user
 bietlejuice.dw_banking_file_payments:
   - bietlejuice.vans:load-clean-bank
   - bietlejuice.vans:load-clean-bank-boleto
