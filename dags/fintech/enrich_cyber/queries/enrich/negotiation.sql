@@ -138,6 +138,7 @@ union_promisses_agreements AS (
     COALESCE(a.agreement_type, c.agreement_type) AS agreement_type,
     a.payment_method,
     i.promisse_payment_method,
+    a.contact_type,
     a.exception,
     COALESCE(a.status, IF(c.campaign_status = "Vencida", "Cancelado", NULL)) AS status,
     a.description_broken_agreement,
@@ -214,6 +215,7 @@ SELECT
     at.payment_method AS agreement_type_payment_method,
     a.payment_method,
     a.promisse_payment_method,
+    a.contact_type,
     a.exception,
     at.min_down_payment_percentage,
     CASE
