@@ -41,6 +41,7 @@ WITH zendesk_email AS (
   WHERE
     id_session IS NULL
     AND id_call IS NULL
+    AND ts_created >= DATE("{load_start_date}") - INTERVAL 6 MONTH
 ),
 csat AS (
   SELECT
