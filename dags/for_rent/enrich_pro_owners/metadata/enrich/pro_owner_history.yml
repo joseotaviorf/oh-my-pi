@@ -1,7 +1,8 @@
 ---
 database_name: datalake_pro_owners
 table_name: pro_owner_history
-description: Historical enriched table for rent context (PP Multi - Pro owner). Each
+description:
+  Historical enriched table for rent context (PP Multi - Pro owner). Each
   row contains the changes of the status or the account manager associated with the PP Multi.
 domain: For Rent
 owner: data-for-rent@quintoandar.com.br
@@ -21,6 +22,8 @@ columns:
     description: Boolean flag indicating if the PP Multi is active on the program.
   is_expert:
     description: Boolean flag indicating if the PP Multi is expert (is_active and has an account manager).
+  is_last_event:
+    description: Boolean flag indicating if the event is the most recent one for the owner.
   ts_event:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
