@@ -85,15 +85,12 @@ def output_results(results, verbose):
     if results["passed"]:
         print(f"Files that passed the validation:")
         for result in results["passed"]:
-            print(f"file={result.data}")
+            print(f"{result}")
         print()
     if results["failed"]:
         print(f"Files that failed the validation:")
         for result in results["failed"]:
-            print(f"file={result.data}")
-            if verbose:
-                for error in result.errors:
-                    print(error)
+            print(f"{result}")
         print()
     if results["skipped"]:
         print("Files skipped:")
@@ -116,13 +113,7 @@ def main():
                 result = metadata_file_service.validate_file(file, status)
                 results["passed"].append(result[0])
             except YamaleError as error:
-                for yaml_result in error.results:
-                    for yaml_err in yaml_result.errors:
-                        if "domain: " in yaml_err:
-                            yaml_err = (
-                                yaml_err + " Check in DataHub if the domain is valid"
-                            )
-                        results["failed"].append(yaml_err)
+                results["failed"].append(error)
             except ReverseMetadataFileException as error:
                 results["failed"].append(error)
             except MetricValidateLayerException as error:

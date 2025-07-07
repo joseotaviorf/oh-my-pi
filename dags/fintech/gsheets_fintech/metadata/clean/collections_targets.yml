@@ -1,130 +1,175 @@
 ---
 database_name: datalake_gsheets_clean
 table_name: collections_targets
+description: Work in progress
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
 columns:
   active_flow:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Flow
   active_stock:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Stock
   fpd:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.FPD
   property_owners:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Property_Owners
   ended_1_to_90:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_1_to_90
   ended_91_to_360:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_91_to_360
   ended_greater_360:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_greater_360
   detractor_index:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Detractor_index
   active_cushion_effectiveness:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Cushion_Effectiveness
   ended_cushion_effectiveness:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_Cushion_Effectiveness
   resolution_rate_120d:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_120D
   resolution_rate_120_to_240d:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_120_to_240D
   resolution_rate_greater_240d:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_greater_240D
   resolution_rate_240d_to_360d:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_240D_to_360D
   resolution_rate_greater_360d:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_greater_360D
   resolution_rate_mob3:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_MOB3
   process_efficiency:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Eficiencia_Processual
   average_overdue_rent_anomalies_greater_120:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Average_Overdue_Rent_Anomalies_greater_120
   working_days_today:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.working_days_today
   week_of_the_year:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.week_of_the_year
   day:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.day
   month:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.month
   dt_reference:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Date
   ts_load:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.ts_load
   active_flow_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Flow_forecast
   active_stock_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Stock_forecast
   fpd_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.FPD_forecast
   property_owners_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Property_Owners_forecast
   ended_1_to_90_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_1_to_90_forecast
   ended_91_to_360_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_91_to_360_forecast
   ended_greater_360_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_greater_360_forecast
   detractor_index_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Detractor_index_forecast
   active_cushion_effectiveness_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Active_Cushion_Effectiveness_forecast
   ended_cushion_effectiveness_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Ended_Cushion_Effectiveness_forecast
   resolution_rate_120d_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_120D_forecast
   resolution_rate_120_to_240d_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_120_to_240D_forecast
   resolution_rate_greater_240d_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_greater_240D_forecast
   resolution_rate_240d_to_360d_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_240D_to_360D_forecast
   resolution_rate_greater_360d_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_greater_360D_forecast
   resolution_rate_mob3_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Resolution_Rate_MOB3_forecast
   process_efficiency_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Eficiencia_Processual_forecast
   average_overdue_rent_anomalies_greater_120_forecast:
+    description: Work in progress
     lineage:
       - datalake_gsheets_raw.collections_targets.Average_Overdue_Rent_Anomalies_greater_120_forecast
