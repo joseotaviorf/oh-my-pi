@@ -18,6 +18,14 @@ columns:
     lineage:
       - datalake_visit.visits.code
     description: Code of visit
+  visit_origin:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.name
+    description: Shows the origin of visit
+  visit_origin_description:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.description
+    description: Origin description of visit
   business_unit:
     lineage:
       - datalake_sale_visit_hubs.sale_visit_hubs.business_unit
@@ -81,10 +89,62 @@ columns:
     lineage:
       - datalake_visit.visits.cancellatin_channel
     description: What the channel for the cancellation of this visit
+  entry_method:
+    lineage:
+      - datalake_visit.visit_schedule.method
+    description: How occurred the entry method. Last method before the visit.
+  entry_method_type:
+    lineage:
+      - datalake_visit.visit_schedule.entry_model_type
+    description: Type of entry method.
+    categories:
+      ASSISTED_ENTRANCE: When a third person is needed to enter.
+      EASY_ENTRANCE: When no third person is needed to enter.
+      NOT_CLASSIFIED: Unmapped case.
+  visit_model:
+    lineage:
+      - datalake_visit.visits.visit_model
+    description: Visit model of the visit.
+    categories:
+      REGISTERED: When the visit is registered after after it has occurred
+      FITTED: When the visit is fitted. It is already confirmed
+      STANDARD: When the visit follows the standard flow
+  visit_request_channel:
+    lineage:
+      - datalake_visit.visits.visit_request_channel
+    description: Channel when the visit was requested.
   is_visit_with_fixed_agent:
     lineage:
       - datalake_visit.visits.is_fixed_agent
     description: If this visit has a fixed agent by the visitor
+  is_visit_confirmed:
+    lineage:
+      - datalake_visit.visits.is_confirmed
+    description: If the visit was confirmed by all
+  is_visit_completed:
+    lineage:
+      - datalake_visit.visits.is_completed
+    description: If the visit is completed
+  is_visit_canceled:
+    lineage:
+      - datalake_visit.visits.is_canceled
+    description: If this visit is canceled
+  is_visit_unsuccessful:
+    lineage:
+      - datalake_visit.visits.is_unsuccessful
+    description: If this visit return unsuccessful
+  is_visit_reschedule:
+    lineage:
+      - datalake_visit.visits.is_reschedule
+    description: If this visit is a reschedule
+  is_visit_registered_by_agent:
+    lineage:
+      - datalake_visit.visits.is_visit_registered_by_agent
+    description: If the visit was registered by agent
+  is_visit_cancelled_by_expiration:
+    lineage:
+      - datalake_visit.visits.is_cancelled_by_expiration
+    description: True if the visit was cancelled due to expired time
   dt_created:
     lineage:
       - datalake_visit.visits.ts_created
@@ -93,10 +153,30 @@ columns:
     lineage:
       - datalake_visit.visits.ts_updated
     description: Timestamp of visit updating
+  ts_visit:
+    lineage:
+      - datalake_visit.visits.ts_visit
+    description: Timestamp of visit
   ts_visit_requested:
     lineage:
       - datalake_visit.visits.ts_visit_requested
     description: Timestamp with the requested date of this visit.
+  ts_visit_first_confirmed:
+    lineage:
+      - datalake_visit.visits.ts_visit_first_confirmed
+    description: Timestamp with the first confirmation of this visit.
+  ts_visit_last_confirmed:
+    lineage:
+      - datalake_visit.visits.ts_visit_last_confirmed
+    description: Timestamp with the last confirmation of this visit
+  ts_visit_first_rescheduled:
+    lineage:
+      - datalake_visit.visits.ts_visit_first_rescheduled
+    description: Timestamp with the first reschedule date of this visit
+  ts_visit_last_rescheduled:
+    lineage:
+      - datalake_visit.visits.ts_visit_rescheduled
+    description: Timestamp with the last rescheduled date of this visit.
   ts_visit_canceled:
     lineage:
       - datalake_visit.visits.ts_visit_canceled

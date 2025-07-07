@@ -5,11 +5,17 @@ WITH
             MAX_BY(id_schedule, ts_created) AS last_id_schedule,
             SUM(1) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS nbr_reschedule,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS ts_visit_requested,
+            MIN(channel) FILTER (WHERE event_type = 'VISIT_REQUESTED') AS visit_request_channel,
             MAX(ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_visit_rescheduled,
+            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_RESCHEDULED') AS ts_visit_first_rescheduled,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_DONE') AS ts_visit_done,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_UNSUCCESSFUL') AS ts_visit_unsuccessful,
             MIN(ts_created) FILTER (WHERE event_type = 'VISIT_REGISTERED') AS ts_visit_registered,
+            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_FITTED') AS ts_visit_fitted,
+            MIN(author_user_role) FILTER (WHERE event_type = 'VISIT_REGISTERED') AS author_role_visit_registered,
             MIN(ts_created) FILTER (WHERE event_type = 'FOLLOW_UP_COLLECTED') AS ts_visit_fup_collected,
+            MIN(ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS ts_visit_first_confirmed,
+            MAX(ts_created) FILTER (WHERE event_type = 'VISIT_CONFIRMED') AS ts_visit_last_confirmed,
             MIN(ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'SUPPLY') AS ts_visit_supply_answer,
             MIN(ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'DEMAND') AS ts_visit_demand_answer,
             MIN(ts_created) FILTER (WHERE event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND on_behalf_of = 'AGENT') AS ts_visit_agent_answer,
@@ -28,17 +34,6 @@ WITH
             datalake_ebdb_clean.visit_status_log
         GROUP BY
             id_visit
-    ),
-    entry_model AS (
-        SELECT
-            id_house,
-            DATE(ts_entrance_started) AS dt_entrance_started,
-            DATE(COALESCE(ts_entrance_ended, NOW())) AS dt_entrance_ended,
-            TRIM(LOWER(key_location)) AS method
-        FROM
-            datalake_ebdb_listing.house_entrance_history
-        WHERE
-            is_last_status_of_day
     ),
     visit_3p_demand_agent AS (
         SELECT
@@ -74,6 +69,8 @@ SELECT
     -1 AS id_follow_up,
     -1 AS id_entrance_type,
     visit.code,
+    v_origin.name AS visit_origin,
+    v_origin.description AS visit_origin_description,
     visit.type,
     hl.country_code,
     lh.partner_3p_supply,
@@ -84,14 +81,8 @@ SELECT
     visit.booking_type,
     visit.business_model,
     visit_log.first_event,
-    CASE entry_model.method
-        WHEN 'front_door' THEN 'Front Door'
-        WHEN 'agent' THEN 'Keys with Agent'
-        WHEN 'lock_box' THEN 'Lockbox'
-        WHEN 'password' THEN 'Password'
-        WHEN 'locker' THEN 'Keys Locker'
-        ELSE 'Owner Present'
-    END AS method,
+    entry_model.key_location AS method,
+    entry_model.entry_model_type,
     CASE
         WHEN visit_log.ts_visit_fup_collected IS NOT NULL THEN 'FOLLOW_UP_COLLECTED'
         WHEN visit_log.ts_visit_fup_collected IS NULL
@@ -106,18 +97,25 @@ SELECT
     visit_cancellation.on_behalf_of AS cancellation_on_behalf_of,
     visit_cancellation.channel AS cancellation_channel,
     CASE
+        WHEN visit_log.ts_visit_registered IS NOT NULL THEN 'REGISTERED'
+        WHEN visit_log.ts_visit_fitted IS NOT NULL THEN 'FITTED'
+        ELSE 'STANDARD'
+    END AS visit_model,
+    visit_log.visit_request_channel,
+    CASE
       WHEN visit_log.nbr_reschedule IS NULL THEN 0
       ELSE visit_log.nbr_reschedule
     END AS nbr_reschedule,
     DATEDIFF(DAY, visit_log.ts_first_event, visit_log.ts_last_event) AS journey_days,
     DATEDIFF(HOUR, visit_log.ts_first_event, visit_log.ts_visit_supply_answer) AS hours_waiting_for_answers,
     DATEDIFF(DAY, visit_log.ts_first_event, visit_log.ts_visit_supply_answer) AS days_waiting_for_answers,
-    visit_log.ts_visit_confirmed IS NOT NULL AS is_confirmed,
+    IF(visit_log.ts_visit_confirmed IS NOT NULL, TRUE, FALSE) AS is_confirmed,
     visit_log.ts_visit_registered IS NOT NULL AS is_registered,
-    visit.computed_status = 'DONE'  AS is_completed,
+    IF(visit_log.ts_visit_done IS NOT NULL, TRUE, FALSE) AS is_completed,
     IF(nbr_reschedule >= 1, TRUE, FALSE) AS is_reschedule,
-    visit.status = 'Canceled' AS is_canceled,
-    visit.computed_status = 'UNSUCCESSFUL' AS is_unsuccessful,
+    IF(visit_cancellation.ts_created IS NOT NULL, TRUE, FALSE) AS is_canceled,
+    IF(visit_log.ts_visit_unsuccessful IS NOT NULL, TRUE, FALSE) AS is_unsuccessful,
+    IF(visit_log.author_role_visit_registered = 'AGENT', TRUE, FALSE) AS is_registered_by_agent,
     IF(visit_demand.id_visit IS NOT NULL, TRUE, FALSE) AS is_3p_demand,
     FALSE AS is_3p_supply,
     visit.is_fixed_agent,
@@ -132,6 +130,7 @@ SELECT
     visit_log.ts_visit_supply_confirmed IS NOT NULL AS has_supply_confirmed,
     visit_log.ts_visit_tenant_answer IS NOT NULL AS has_tenant_answered,
     visit_log.ts_visit_tenant_confirmed IS NOT NULL AS has_tenant_confirmed,
+    visit_cancellation.is_cancelled_by_expiration,
     visit.dt_visit,
     TO_UTC_TIMESTAMP(
         (
@@ -143,11 +142,13 @@ SELECT
     ) AS ts_visit_local_tz,
     visit.ts_created,
     visit.ts_updated,
+    visit.ts_visit,
     visit_log.ts_first_event,
     visit_log.ts_last_event,
     visit_log.ts_visit_requested,
     visit_log.ts_visit_registered,
     visit_log.ts_visit_rescheduled,
+    visit_log.ts_visit_first_rescheduled,
     visit_log.ts_visit_supply_answer,
     visit_log.ts_visit_demand_answer,
     visit_log.ts_visit_agent_answer,
@@ -157,12 +158,17 @@ SELECT
     visit_log.ts_visit_agent_confirmed,
     visit_log.ts_visit_tenant_confirmed,
     visit_log.ts_visit_confirmed,
+    visit_log.ts_visit_first_confirmed,
+    visit_log.ts_visit_last_confirmed,
     visit_log.ts_visit_fup_collected,
     visit_cancellation.ts_created AS ts_visit_canceled,
     visit_log.ts_visit_done,
     visit_log.ts_visit_unsuccessful
 FROM
     datalake_ebdb_clean.visit AS visit
+LEFT JOIN
+    datalake_ebdb_clean.visit_origin AS v_origin
+        ON visit.id_creation_origin = v_origin.id
 LEFT JOIN
     visit_log
         ON visit.id = visit_log.id_visit
@@ -184,7 +190,9 @@ LEFT JOIN
     datalake_ebdb_clean.country AS ct
         ON ct.code = hl.country_code
 LEFT JOIN
-    entry_model
+    datalake_ebdb_listing.house_entrance_history AS entry_model
         ON visit.id_house = entry_model.id_house
-        AND visit.dt_visit >= entry_model.dt_entrance_started
-        AND visit.dt_visit < entry_model.dt_entrance_ended
+        AND visit.ts_visit >= entry_model.ts_entrance_started
+        AND visit.ts_visit < COALESCE(entry_model.ts_entrance_ended, NOW())
+WHERE
+    DATE(visit.ts_created) >= '2024-11-01'

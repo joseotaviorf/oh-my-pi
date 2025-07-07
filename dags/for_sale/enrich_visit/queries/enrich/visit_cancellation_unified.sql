@@ -5,6 +5,7 @@ new_model AS (
     channel,
     on_behalf_of,
     reason,
+    IF(reason = 'REQUEST_EXPIRED', TRUE, FALSE) AS is_cancelled_by_expiration,
     ts_created,
     ts_updated
   FROM
@@ -19,6 +20,7 @@ old_model AS (
     channel,
     on_behalf_of,
     reason,
+    IF(reason = 'REQUEST_EXPIRED', TRUE, FALSE) AS is_cancelled_by_expiration,
     ts_created,
     ts_updated
   FROM
@@ -31,6 +33,7 @@ SELECT
   channel,
   on_behalf_of,
   reason,
+  is_cancelled_by_expiration,
   ts_created,
   ts_updated
 FROM new_model
@@ -40,6 +43,7 @@ SELECT
   channel,
   on_behalf_of,
   reason,
+  is_cancelled_by_expiration,
   ts_created,
   ts_updated
 FROM old_model

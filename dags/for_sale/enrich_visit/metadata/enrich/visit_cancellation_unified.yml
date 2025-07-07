@@ -30,6 +30,8 @@ columns:
       - datalake_ebdb_clean.visit_status_log.reason
       - datalake_ebdb_clean.visit_cancellation_details.reason
     description: Reason why the visit was cancelled.
+  is_cancelled_by_expiration:
+    description: True if the visit was cancelled due to expired time.
   ts_created:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created

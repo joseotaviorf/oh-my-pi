@@ -55,6 +55,14 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit.code
     description: Code for usage in the S&S.
+  visit_origin:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.name
+    description: Shows the origin of visit.
+  visit_origin_description:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.description
+    description: Origin description of visit.
   country_code:
     lineage:
       - datalake_ebdb_listing.house_listing.country_code
@@ -91,6 +99,18 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_status_log.event_type
     description: Last event computed from VSL.
+  method:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.key_location
+    description: How occurred the entry method. Last method before the visit.
+  entry_model_type:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.entry_model_type
+    description: Type of entry method.
+    categories:
+      ASSISTED_ENTRANCE: When a third person is needed to enter.
+      EASY_ENTRANCE: When no third person is needed to enter.
+      NOT_CLASSIFIED: Unmapped case.
   slot:
     lineage:
       - datalake_ebdb_clean.visit.slot
@@ -125,6 +145,16 @@ columns:
     lineage:
       - datalake_visit.visit_cancellation_unified.cancellation_channel
     description: What the channel for the cancellation of this visit.
+  visit_model:
+    description: Visit model of the visit.
+    categories:
+      REGISTERED: When the visit is registered after after it has occurred
+      FITTED: When the visit is fitted. It is already confirmed
+      STANDARD: When the visit follows the standard flow
+  visit_request_channel:
+    lineage:
+      - datalake_visit.visits.visit_request_channel
+    description: Channel when the visit was requested.
   nbr_reschedule:
     description: Number of rescheduling.
   journey_days:
@@ -145,6 +175,8 @@ columns:
     description: If this visit is canceled.
   is_unsuccessful:
     description: If this visit return unsuccessful.
+  is_registered_by_agent:
+    description: If the visit was registered by agent.
   is_3p_demand:
     description: If this visit is by 3p demand.
   is_3p_supply:
@@ -167,6 +199,10 @@ columns:
     description: If the tenant answered (If exists).
   has_tenant_confirmed:
     description: If the tenant confirmed (If exists).
+  is_cancelled_by_expiration:
+    lineage:
+      - datalake_visit.visit_cancellation_unified.is_cancelled_by_expiration
+    description: True if the visit was cancelled due to expired time.
   dt_visit:
     lineage:
       - datalake_ebdb_clean.visit.dt_visit
@@ -183,6 +219,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit.ts_updated
     description: Timestamp of visit updating
+  ts_visit:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_visit
+    description: Timestamp of visit
   ts_first_event:
     description: Timestamp with the first status of this visit.
   ts_last_event:
@@ -191,6 +231,8 @@ columns:
     description: Timestamp with the requested date of this visit.
   ts_visit_registered:
     description: Timestamp with the registered date of this visit.
+  ts_visit_first_rescheduled:
+    description: Timestamp with the first reschedule date of this visit.
   ts_visit_rescheduled:
     description: Timestamp with the last rescheduled date of this visit.
   ts_visit_supply_answer:
@@ -211,6 +253,10 @@ columns:
     description: Timestamp with the tenant confirmed date of this visit.
   ts_visit_confirmed:
     description: Timestamp with the confirmation date of this visit.
+  ts_visit_first_confirmed:
+    description: Timestamp with the first confirmation of this visit.
+  ts_visit_last_confirmed:
+    description: Timestamp with the last confirmation of this visit.
   ts_visit_fup_collected:
     description: Timestamp with the follow up collected date of this visit.
   ts_visit_canceled:
