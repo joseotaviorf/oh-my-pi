@@ -58,6 +58,16 @@ wonka.house_user_rent_flows:
   - wonka.house_listing_business_context:load-house_listing_business_context
 wonka.house_visit:
   - bietlejuice.enrich_rent_flows:load-enrich-rent-flows
+wonka.searched_house_listing_page_viewed:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
+wonka.searched_house_main:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events
+wonka.searched_house_offer_submitted:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-offer-submitted-events
+wonka.searched_house_visit_schedule_confirmed:
+  - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-schedule-confirmed-events
 wonka.user_bc_h3_7_city_agg_search_filters:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-page-viewed-events
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-search-results-page-viewed-events
