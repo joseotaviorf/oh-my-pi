@@ -6,7 +6,7 @@ owner: data-ae-ss@quintoandar.com.br
 columns:
   app:
     lineage:
-      - datalake_kong_raw.kong_logs.app
+      - "datalake_kong_raw.kong_logs.kubernetes.pod_labels.app"
     description: The application log, in this case, kong ingress.
   cluster_name:
     lineage:
@@ -14,11 +14,11 @@ columns:
     description: The cluster name that registrated the logs.
   container_name:
     lineage:
-      - datalake_kong_raw.kong_logs.container_name
+      - "datalake_kong_raw.kong_logs.kubernetes.container_name"
     description: The container name responsible for the logs.
   env:
     lineage:
-      - datalake_kong_raw.kong_logs.env
+      - "datalake_kong_raw.kong_logs.kubernetes.pod_namespace"
     description: The log environment.
   message:
     lineage:
@@ -26,11 +26,11 @@ columns:
     description: Details about the log, such as, request method, app url, among others.
   namespace:
     lineage:
-      - datalake_kong_raw.kong_logs.namespace
+      - "datalake_kong_raw.kong_logs.kubernetes.pod_namespace"
     description: The log space name.
   pod_name:
     lineage:
-      - datalake_kong_raw.kong_logs.pod_name
+      - "datalake_kong_raw.kong_logs.kubernetes.pod_name"
     description: The pod name.
   stream:
     lineage:
@@ -38,7 +38,7 @@ columns:
     description: The log stream type.
   ts_event:
     lineage:
-      - datalake_kong_raw.kong_logs.time
+      - datalake_kong_raw.kong_logs.timestamp
     description: The event time.
   year:
     lineage:
