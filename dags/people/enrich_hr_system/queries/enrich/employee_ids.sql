@@ -24,8 +24,9 @@ emails AS (
     e.ToDate IS NULL OR e.ToDate = '4712-12-31'
   QUALIFY
     w.dt_effective = MAX(w.dt_effective) OVER (PARTITION BY id_person)
-    AND e.LastUpdateDate = MAX(e.LastUpdateDate) OVER (PARTITION BY id_person, email_type)
+    AND ROW_NUMBER() OVER (PARTITION BY id_person, email_type ORDER BY e.LastUpdateDate DESC) = 1
 )
+
 SELECT DISTINCT
   md.id_assignment,
   md.id_period_of_service,

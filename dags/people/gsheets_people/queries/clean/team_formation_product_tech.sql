@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
     MD5(
         CONCAT(
             assignment_number,
