@@ -412,3 +412,9 @@ sheets_info:
     sheet_name: seo_budget_target_clicks_2025
     clean_table_name: seo_budget_target_clicks_2025
     sheet_context: static
+
+  collections_quarter_targets:
+    sheet_id: 1NFHHQgYHVxeVc4yCQ9hykn9J07CCjopzCe4F0M7OnYw
+    sheet_name: Quarter
+    clean_table_name: collections_quarter_targets
+    sheet_context: static

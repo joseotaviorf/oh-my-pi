@@ -1,0 +1,86 @@
+database_name: datalake_gsheets_clean
+table_name: collections_quarter_targets
+description: Quarter targets for collections and evictions
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+columns:
+  active_flow:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.active_flow
+    description: "Active Flow Target"
+  active_stock:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.active_stock
+    description: "Active Stock Target"
+  fpd:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.FPD
+    description: "FPD Target"
+  property_owners:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.property_owners
+    description: "Property Owners Target"
+  ended_1_to_90:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.ended_1_to_90
+    description: "Ended 1-90 Target"
+  ended_91_to_360:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.ended_91_to_360
+    description: "Ended 91-360 Target"
+  ended_greater_360:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.ended_greater_360
+    description: "Ended Greater 360 Target"
+  detractor_index:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.detractor_index
+    description: "Detractor Index Target"
+  active_cushion_effectiveness:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.active_cushion_effectiveness
+    description: "Active Cushion Effectiveness Target"
+  ended_cushion_effectiveness:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.ended_cushion_effectiveness
+    description: "Ended Cushion Effectiveness Target"
+  resolution_rate_120d:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_120d
+    description: "Resolution Rate 120D Target"
+  resolution_rate_120_to_240d:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_120_to_240d
+    description: "Resolution Rate 120-240D Target"
+  resolution_rate_greater_240d:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_greater_240d
+    description: "Resolution Rate Greater 240D Target"
+  resolution_rate_240d_to_360d:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_240d_to_360d
+    description: "Resolution Rate 240-360D Target"
+  resolution_rate_greater_360d:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_greater_360d
+    description: "Resolution Rate Greater 360D Target"
+  resolution_rate_mob3:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.resolution_rate_mob3
+    description: "Resolution Rate MOB3 Target"
+  process_efficiency:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.process_efficiency
+    description: "Process Efficiency Target"
+  average_overdue_rent_anomalies_greater_120:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.average_overdue_rent_anomalies_greater_120
+    description: "Average Overdue Rent Anomalies Greater 120 Target"
+  dt_reference:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.dt_reference
+    description: "Date Reference"
+  ts_load:
+    lineage:
+      - datalake_gsheets_raw.collections_quarter_targets.ts_load
+    description: "Timestamp Load"
