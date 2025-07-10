@@ -1,0 +1,51 @@
+---
+database_name: datalake_rental_management_clean
+table_name: key_location_preference
+description: Table containing about the key location preferences, including the key location preference ID, the contract ID, the termination ID, the key holder preference ID, the key location return address ID, the access key, and the observation.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id:
+    description: Key location preference ID.
+    lineage:
+      - datalake_rental_management_raw.key_location_preference.id
+  uuid_key_location_preference:
+    description: Key location preference UUID.
+    lineage:
+      - datalake_rental_management_raw.key_location_preference.key_location_preference_uuid
+  id_contract:
+    description: Foreign key for EBDB/Main's ID contract.
+    lineage:
+      - datalake_rental_management_raw.key_location_preference.contract_id
+  id_termination:
+    description: Termination ID related to the key location preference.
+    lineage:
+      - datalake_rental_management_raw.key_location_preference.termination_id
+  id_key_holder_preference:
+    description: Foreign key for key_holder_preference table.
+    lineage:
+      - datalake_rental_management_raw.key_location_preference.key_holder_preference_id
+  id_key_location_return_address:
+    description: Foreign key for key_location_return_address table.
+    lineage:
+      - datalake_rental_management_raw.key_location_preference.key_location_return_address_id
+  access_key:
+    description: Access key type.
+    lineage:
+      - datalake_rental_management_raw.key_location_preference.access_key
+  observation:
+    description: Observation related to the key location preference.
+    lineage:
+      - datalake_rental_management_raw.key_location_preference.observation
+  version:
+    description: Version field track. Used for Optimistic locking and avoid losing data in concurrent writes.
+    lineage:
+      - datalake_rental_management_raw.key_location_preference.version
+  ts_created:
+    description: Key location preference creation timestamp.
+    lineage:
+      - datalake_rental_management_raw.key_location_preference.created_at
+  ts_updated:
+    description: Key location preference update timestamp.
+    lineage:
+      - datalake_rental_management_raw.key_location_preference.updated_at

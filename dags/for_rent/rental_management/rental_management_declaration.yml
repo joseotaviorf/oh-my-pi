@@ -24,6 +24,10 @@ workflow:
       clean_table_name: invoice_user_issuer
     condo_monitoring_actions: {}
     condo_monitoring_eligibility: {}
+    key_holder_preference: {}
+    key_location_preference: {}
+    key_location_preference_log: {}
+    key_location_return_address: {}
 cluster:
   type: databricks_13_3_med_general_cluster
   databricks_conn_id: databricks_new

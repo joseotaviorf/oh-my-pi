@@ -1,0 +1,47 @@
+---
+database_name: datalake_rental_management_clean
+table_name: key_location_return_address
+description: Table containing about the key location return addresses, including the key location return address ID, the zip code, the street name, the number, the neighborhood, the complement, the city, the state, the creation timestamp, and the update timestamp.
+domain: For Rent
+owner: kleber.inoue@quintoandar.com.br
+columns:
+  id:
+    description: Key location return address ID
+    lineage:
+      - datalake_rental_management_raw.key_location_return_address.id
+  zip_code:
+    description: Zip code related to the key location return address
+    lineage:
+      - datalake_rental_management_raw.key_location_return_address.zip_code
+  street_name:
+    description: Street name related to the key location return address
+    lineage:
+      - datalake_rental_management_raw.key_location_return_address.street_name
+  number:
+    description: Number related to the key location return address
+    lineage:
+      - datalake_rental_management_raw.key_location_return_address.number
+  neighborhood:
+    description: Neighborhood related to the key location return address
+    lineage:
+      - datalake_rental_management_raw.key_location_return_address.neighborhood
+  complement:
+    description: Complement related to the key location return address
+    lineage:
+      - datalake_rental_management_raw.key_location_return_address.complement
+  city:
+    description: City related to the key location return address
+    lineage:
+      - datalake_rental_management_raw.key_location_return_address.city
+  state:
+    description: State related to the key location return address
+    lineage:
+      - datalake_rental_management_raw.key_location_return_address.state
+  ts_created:
+    description: Creation timestamp related to the register.
+    lineage:
+      - datalake_rental_management_raw.key_location_return_address.created_at
+  ts_updated:
+    description: Last update timestamp related to the register.
+    lineage:
+      - datalake_rental_management_raw.key_location_return_address.updated_at
